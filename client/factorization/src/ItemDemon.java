@@ -80,21 +80,28 @@ public class ItemDemon extends Item implements ITextureProvider {
 		}
 		int poison = 0;
 		if (isBound(is)) {
+			if (!hardBite) {
+				return;
+			}
 			if (itemRand.nextInt(3) == 0) {
 				poison = itemRand.nextInt(2);
 			}
 		} else {
 			poison = itemRand.nextInt(5) + 2;
-			FactorizationHack.damageEntity(player, FactorizationHack.imp_bite, 1);
+			FactorizationHack.damageEntity(player, FactorizationHack.imp_bite, 3);
 		}
 		if (hardBite) {
 			poison += 3 + itemRand.nextInt(12);
 		}
 		if (poison > 0) {
+			poison *= 2;
 			player.addPotionEffect(new PotionEffect(Potion.poison.id, poison * 20, 1));
 		}
 		if (is.animationsToGo <= 0) {
 			is.animationsToGo += 5;
+			if (is.animationsToGo > 50) {
+				is.animationsToGo = 10;
+			}
 		}
 		Sound.demonSqueek.playAt(player);
 	}
@@ -103,10 +110,10 @@ public class ItemDemon extends Item implements ITextureProvider {
 		if (is == null || !(is.getItem() instanceof ItemDemon)) {
 			return;
 		}
+		if (isBound(is)) {
+			return;
+		}
 		if (itemRand.nextInt(50) == 0) {
-			if (isBound(is) && itemRand.nextInt(20) > 0) {
-				return;
-			}
 			bitePlayer(is, player, true);
 		}
 	}

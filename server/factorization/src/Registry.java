@@ -344,14 +344,6 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
 				'#', Block.cobblestone,
 				'p', Block.pistonBase,
 				'C', Block.workbench);
-		ModLoader.addRecipe(maker_item,
-				"#r#",
-				"#I#",
-				"#C#",
-				'#', Block.cobblestone,
-				'r', Item.redstone,
-				'I', Item.ingotIron,
-				'C', Block.workbench);
 		fake_is = maker_item;
 
 		// Craft stamper

@@ -1,10 +1,13 @@
 0.3.2
+  The pistonless recipe for makers has been removed, 'cause it didn't make sense 'cause pistons don't make sense.
+  Redstone ore, Tin, and Copper are now slaggable.
+  Bound demons are now mostly harmless, and free demons more dangerous.
   Internal workings of barrels changed so that they should now work with Logistics Pipes, and should be more likely to work with other item-moving systems.
+  Since I found like 4 silver veins right next eachother in my playtest world, silver now spawns only on alternating chunks.
+  Routers:
+      will continue to distribute items even if there isn't a TE path between the router and its current location.
+      might actually work properly on moving frames?
+  Now using the cooler texture for dark iron.
   Buildcraft API no longer used
-  Redstone, Tin, and Copper ore are now slaggable.
-  Since I found like 4 silver veins right next eachother in my playtest world, silver is now twice as rare.
-  Routers will continue to distribute items even if there isn't a TE path between the router and its current location.
-  Routers might actually work properly on moving frames?
-  Why wasn't I using this texture for dark iron before?
 
 

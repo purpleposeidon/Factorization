@@ -149,6 +149,9 @@ public class TileEntityRouter extends TileEntityFactorization {
 	void doLogic() {
 		Profiler.startSection("router");
 		needLogic();
+		if (lastSeenAt == null) {
+			lastSeenAt = getCoord();
+		}
 		if (frontier.size() == 0) {
 			resetGraph();
 		}
@@ -169,8 +172,20 @@ public class TileEntityRouter extends TileEntityFactorization {
 	}
 
 	TileEntity popFrontier() {
-		// TODO: Remove the nearest of 8 or so
-		return frontier.remove(0);
+		int closestDistance = Integer.MAX_VALUE;
+		int closestIndex = 0;
+		final int end = Math.min(8, frontier.size());
+		for (int i = 0; i < end; i++) {
+			int d = lastSeenAt.distanceSq(new Coord(frontier.get(i)));
+			if (d < closestDistance) {
+				closestDistance = d;
+				closestIndex = i;
+			}
+			if (closestDistance == 1) {
+				return frontier.remove(i);
+			}
+		}
+		return frontier.remove(closestIndex);
 	}
 
 	void updateFrontier() {
