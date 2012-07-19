@@ -1,0 +1,6 @@
+#!/bin/sh
+
+
+unionfs-fuse -o cow factorization/client=RW:src.real/minecraft/=RO src/minecraft/
+unionfs-fuse -o cow factorization/server=RW:src.real/minecraft_server/=RO src/minecraft_server/
+

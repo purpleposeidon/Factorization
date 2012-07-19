@@ -1,0 +1,60 @@
+===== Recipes =====
+    A “router” requires 6 iron, an ender pearl, an eye of ender, and a chicken egg. Iron ingots on top and bottom, ender pearl and eye of ender on the sides, and chicken egg in the middle.
+     
+    A “craftpacket maker” is made with cobblestone in the four corners, a piston on top, a crafting on the bottom, and sticks on the sides with an empty slot in the middle.
+     
+    A “craftpacket stamper” is made with a sticky piston atop an iron block atop a crafting table, with sides of smoothstone.
+     
+    A “barrel” is made with a U of wooden logs, with a wooden plank on top.
+     
+    A “queue” is made with a stone slab with two pistons on top and bottom, with a chest to the left of the slab, and a wooden pressureplate above the chest.
+     
+     
+    ===== General =====
+    Like any good technical mod, if you hold shift, you can place things against the blocks without opening the inventory.
+     
+    Some GUI buttons can be right-clicked as well as left clicked, to go backwards in a list or something.
+     
+     
+     
+    ===== Routing Items with Routers =====
+    A router creates a single interface to access an inventory slot in a set of connected machines. For example, suppose you have a wall of furnaces. You can place 3 routers adjacent to them. One router can be setup to insert fuel, another to insert ores, and another to pull out the ingots. To get basic functionality, you need only consider the Input/Output button, and the Side button.
+     
+    Each tick, the router will look for a block with an inventory that it can take from/give to. It will search all blocks with inventories that are connected to it.
+     
+    The lower left button in the GUI controls which way the router runs. In 'Input' mode, a single item is taken from the slot and placed in a connected inventory. In 'Output' mode, a single item is moved from a connected inventory into the router.
+     
+    The button at the top of the GUI filters which inventories it will try to access. You might have a setup like this: [router][furnace][chest]. If the filter says “Chest”, the chest will be connected through the furnace, but the furnace will not be considered for input/output.
+     
+    The lower-right set of buttons controls which slots will be used. Cardinal directions, and Up and Down, access the block as if there were a tube going into that side. The colors of the cardinal directions corespond to the colors of the wiring of router's texture. You can also choose an individual slot to target using the + and - buttons. Interesting things can be done with this.
+     
+    Take note that you can shoot yourself in the foot with routers. It's even easier than usual to send diamonds into a recycler, and pull transformer upgrades out of your macerators.
+     
+     
+     
+    ===== Low-level Automated Crafting =====
+    The craftpacket stamper takes either a single item that can be crafted alone, such as bones, or a craft packet. If a recipe has more than one result (such as the cake recipe, which makes a cake and three buckets), the excess will be placed in the output slot after the crafting result. If a craft packet has an invalid recipe, the ingredients are dumped into the output.
+     
+    A craftpacket is a little crafting grid stored in an item. Craft packets turn blue when they have something craftable in them.
+     
+    A craftpacket is made in a craft stamper. A stamp packet requires at least one item and a piece of paper to make. The paper acts as fuel. Books and bookshelves can also be used as fuel, and are equivalent to exponentially increasing amounts of paper. The grid of buttons can be toggled on and off. Items from the top are put into the craftpacket, and when all the appropriate slots have been filled, it is moved to the output.
+     
+    ===== Storing Items with Barrels =====
+    The barrel can store very large numbers of identical items. The items must all be the same type, and may not be damaged. Right click a barrel with an item to store it, and left click the barrel to pull a stack out. Item piping systems should insert from the top, and pull from the bottom. Note that if you break a barrel containing many stacks of items, it will explode, and many items will be lost.
+     
+    ===== Remembering Items with Queues =====
+     
+    The queue implements the highly touted FIFO data structure, for item stacks. Like the barrel, right click to put something in, and left click to pull something out from the top. No more than 27 item stacks can be stored in the barrel. Items will not be merged. The top side of the queue block is the front; all other sides will put the item at the end of the queue.
+     
+     
+    ===== Download & Dependencies =====
+    http://dl.dropbox.com/u/76265666/Factorization.jar
+    http://dl.dropbox.com/u/76265666/Factorization_server.jar
+     
+    Requires ModLoader and Forge. Put Factorization.jar into the mods folder.
+     
+    ModLoader: http://www.minecraftforum.net/topic/75440-v172-risugamis-mods-updates/
+    Forge: http://minecraftforge.net/forum/index.php/topic,5.0.html
+     
+    This mod implements portions of the Buildcraft API: http://www.mod-buildcraft.com/
+

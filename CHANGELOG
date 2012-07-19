@@ -1,0 +1,5 @@
+0.3.2
+  Internal workings of barrels changed so that they should now work with Logistics Pipes, and should be more likely to work with other item-moving systems.
+  Buildcraft API no longer used
+  Redstone, Tin, and Copper ore are now slaggable.
+  Since I found like 4 silver veins right next eachother in my playtest world, silver is now twice as rare.

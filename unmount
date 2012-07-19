@@ -1,0 +1,4 @@
+#!/bin/sh
+
+fusermount $1 -u src/minecraft
+fusermount $1 -u src/minecraft_server

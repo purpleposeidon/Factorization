@@ -1,0 +1,100 @@
+[u][b][size=6][anchor=ABOUT]Factorization[/anchor][/size][/b][/u]
+This mod adds a few tools & machines. I am hoping to make a good playmate for [url="http://www.minecraftforum.net/topic/365357-125-eloraams-mods-redpower-2-prerelease-5b2/"]RedPower[/url]. I've been working on it for a while. I'll start with the easy stuff.
+
+
+[u]The [b]Pocket Crafting Table[/b][/u]
+[img]http://i.imgur.com/CfoGQ.png[/img]
+Did somebody order a 3x3 crafting grid to go? Craft directly from your inventory, at any time! Press 'c' to use. (Note that this may interfere with some other GUIs due to a missing Forge feature; you could rebind to the Insert key if this is a problem.) Of course, you'll have to clear out that extra junk in your inventory before you can use it. But don't worry; with this mod, that won't be a problem for long!
+
+
+[u]The Almighty [b]Barrel[/b][/u]
+Based on quantum-stockpiling technology discovered in the recently abandoned Dwarven Fortress of [i]Nod Semor[/i], the barrel can store over one thousand stacks of a single item type. Never fill a chest with cobblestone again!
+[img]http://i.imgur.com/pGWkx.png[/img]
+Right click a barrel with an item to drop it in; left-click to remove. Double-right clicking will dump all of the matching items in your inventory into a barrel, and shift-left click will pull out a single item.
+[img]http://i.imgur.com/6c7Q7.png[/img]
+Be warned that the contents of rather full barrels are under such high pressure as to be fused together: they will explode if the barrel is broken, and stacks will be lost. Two of the barrels in that picture would explode if not first emptied.
+
+
+[u]The [b]Crafting Machines[/b][/u]
+The crafting automation tools found in certain other mods makes automatic crafting far too easy. This crafting system has two machines, the Maker and the Stamper. These machines need to be used with (for example!) RedPower's tube system to make them actually be automatic.
+
+[img]http://i.imgur.com/H83w7.png[/img]
+[img]http://i.imgur.com/JdQvF.png[/img]
+[img]http://i.imgur.com/qxOOx.png[/img]
+The Maker makes craftpackets. This is fueled by paper, which goes in the bottom slot. Then you need to select which crafting slots items will go in. Place items in the top slot to put those items into a craftpacket. When there are items in all the selected slots, the craftpacket will be moved to the right slot. If the craftpacket is blue, that means it can be crafted into something.
+[img]http://i.imgur.com/cCYot.png[/img]
+Place craftpackets in the left slot of stamper to craft the packet. If you place an invalid or incomplete craftpacket in, the contents will be dumped to the other slot. You can also put in, for example, bones to get bonemeal.
+
+This is how you can make an axe.
+[img]http://i.imgur.com/wJFAA.png[/img]
+[img]http://i.imgur.com/lyRX3.png[/img]
+
+Here is a simple sword machine. Press button, receive sword!
+[img]http://i.imgur.com/K56lO.png[/img]
+
+There is another crafting machine, the Packager, which will try crafting a 3x3 or 2x2 grid full of whatever item you give it. This is quite useful for automatically making bricks and metal storage blocks.
+[img]http://i.imgur.com/SJjz0.png[/img]
+
+
+[u][b]Silver Ore[/b][/u]
+This mod adds silver ore. It can be found between y-level 7 and 55. It generates in fairly large blobs that are bigger than coal veins. However, it is somewhat rare. Only one silver ore vein can be found in a chunk, and most chunks don't have one.
+[img]http://i.imgur.com/kzEVe.png[/img]
+
+
+[u]The [b]Slag Furnace[/b][/u]
+[img]http://i.imgur.com/E3v37.png[/img]
+The slag furnace works similarly to the vanilla furnace, but has an extra output slot. It also uses twice the fuel. For most ores, it will produce an ingot with a low chance of making two instead of one, and also some stone. Silver ore will make silver ingots and lead ingots.
+
+[u][b]Demons[/b][/u]
+[img]http://i.imgur.com/1z6J2.png[/img]
+These adorable little beasts can be found only in the nether. To catch one, you need to trap one in a chest containing plenty of netherwort and nothing else. Be aware that they will eat up all the netherwort in the chest if they aren't tended to. And be careful with them, as they will attempt to kill you when you handle them. You can get slightly more control over them by tying them up with a piece of string on a crafting table.
+
+[img]http://i.imgur.com/LpZAu.png[/img]
+A demon can be used to craft a Wand of Cooling. The demon operates the wand of cooling by seperating hot molecules from cooler molecules, and sending the hotter molecules to some other [url="http://dresdencodak.com/2009/02/16/exorcising-laplaces-demon/"]Place[/url]. Since the only limiting factor in this process is the enthusiasm and health of the demon, Wands of Cooling will last for quite a while. They will cool lava/water source blocks into obsidian/ice, and destroy fire, Wrath Fire, and non-source water/lava.
+
+[u]Other Stuff[/u]
+
+[spoiler]
+This documentation is incomplete. Use science and [url="http://www.minecraftforum.net/topic/909223-125-smp-chickenbones-mods/"]NEI[/url]  to figure out the recipes yourself.
+
+
+
+If you take a diamond block, and craft it with 4 TNT, and 4 obsidian in the corners, and place the craft packet in a stamper, the block of diamond will be blown up into 12 diamond shards. There is only one use for these so far: Wrath Fire. Craft a diamond shard with a netherbrick to create a Wrath Fire Igniter. Wrath Fire will spread much faster and farther than ordinary fire. It will spread and burn only on the block you click on. Wood and plants will be destroyed. Cobblestone will be melted into smoothstone. Certain metal storage blocks will be converted to their Darker counterparts. Some of this is reversible. Be warned that when Wrath Fire dies, it leaves behind ordinary fire, which may have no problem with burning down the rest of your house.
+Igniting a block of iron with Wrath Fire will burn into a block of Dark Iron. This block can be uncrafted into Dark Iron Ingots, which can be used to make Bags of Holding, Wrath Lamps, and Routers.
+
+The Bag of Holding can store parts of your inventory for you. By default it'll store only 3 columns. Press ` at any time to put your inventory into the BoH and pull other stuff out. You can add another column of storage to the BoH by crafting it with an enderpearl, a dark iron ingot, and a bit of leather. The BoH works on the side of your inventory that is to the right of it. The best place to put your Bag of Holding depends on how many columns it stores! An unupgraded BoH should go in the 4th column from the right; this way the location of items won't change as you use `. Less basically, you'll want the number of inventory columns the bag stores to be a multiple of the number of columns to the right of the BoH.
+
+The Wrath Lamp's pretty sweet! It lights up a fairly large area as bright as day. It'll fill a 13x13 area around it with glowstone-quality light, and this light will flood downward up to 30 blocks. Crafting it requires 4 lead, 2 dark iron, 2 glass panes, and a use off of a wrath igniter.
+
+The router is slightly complicated, and unfinished. It is very powerful! An upgrade system will make it even more powerful, but I haven't made that yet. Placing it next to a contiguous blob of TileEntities with inventories will create a network that router will access. The button on the top GUI filters which inventories will be interacted with. It'll eventually be factored out into an upgrade system. The router will extract or insert items from this network. Place a stack of items in the router's IO slot, and that item will be evenly distributed to all the connected TileEntities. Routers will skip over other routers. You also can control which side the router accesses from, and even limit to using a specific inventory slot. You can use this feature to make some VERY useful and interesting machines... 
+
+If you light Wrath Fire on nether brick, it will not spread. If there is enough netherbrick nearby, it will be kindled eternal, and so can be used as a Wrath Forge. Netherrack is used as fuel. You can use this to make as much dark iron as you'd like.
+
+[u]Future Stuff[/u]
+Mecha-Armor & Mecha-crafting
+Router Upgrades
+Ceramics
+? ? ?
+
+[/spoiler]
+
+
+
+
+[u][b][size=6][anchor=INSTALL]Installation[/anchor][/size][/b][/u]
+This is a [url="http://lexmanos.no-ip.org:8080/job/Forge/Recommended/"]Minecraft Forge[/url] mod. It uses 3 block IDs. 
+
+1. Install [url="http://lexmanos.no-ip.org:8080/job/Forge/Recommended/"]Minecraft Forge[/url] by extracting the contents of the forge download into the Minecraft jar. Be sure to delete the META-INF/ folder (unless you are installing on a server). If you have a version of forge that's as old as or newer than 3.1.2, it should work fine.
+2. Check that the forge install worked by running the client (or the server).
+3. Put the mod into the mods folder.
+
+
+[u][b][size=6][anchor=DOWNLOAD]Download[/anchor][/size][/b][/u]
+[url="http://adf.ly/Ah9BS"]Client (adfly + MediaFire)[/url], or [url="http://adf.ly/AiEBA"] (adfly + DropBox)[/url]
+[url="http://adf.ly/Ah9Dv"]Server (adfly + MediaFire)[/url], or [url="http://adf.ly/AiEEz"] (adfly + DropBox)[/url]
+
+
+[u][b][size=6][anchor=LICENSE]License[/anchor][/size][/b][/u]
+Do not distribute! Unless you have my permission. Source code may be available on request.
+
+This mod includes portions of the [url="http://www.mod-buildcraft.com/"]BuildCraft[/url] API.
