@@ -203,6 +203,9 @@ public class TileEntityRouter extends TileEntityFactorization {
 				continue; //can't just fetch an IInventory.
 			}
 			if (!visited.contains(ent)) {
+				if (match_to_visit && !matchIInventory((IInventory) ent)) {
+					continue;
+				}
 				frontier.add(ent);
 				visited.add(ent);
 			}
