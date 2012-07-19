@@ -7,7 +7,7 @@ package factorization.src;
 import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.regex.Matcher;
 
@@ -24,11 +24,11 @@ import net.minecraft.src.forge.ISidedInventory;
 import factorization.src.NetworkFactorization.MessageType;
 
 public class TileEntityRouter extends TileEntityFactorization {
-	// configs
-	boolean moveFullStack = false;
-	final int maxSearchPerTick = 16;
+	// TODO: Save these in NBT!
+	public int maxSearchPerTick = 16;
 
 	// save these guys/share with client
+	public boolean moveFullStack = false;
 	public int target_side;
 	public int target_slot; // If negative, use target_side instead. The old value is saved as the inverse. For some reason.
 	public boolean is_input;
@@ -39,97 +39,10 @@ public class TileEntityRouter extends TileEntityFactorization {
 	Coord lastSeenAt; // where we put an item in last
 
 	// Runtime
-	private HashMap<Coord, Coord> visited; // All of the cells that we've found
-											// in the current run
-	private ArrayList<Coord> frontier; // Cells that we haven't visited yet.
-										// (subset of visited). NOTE: We really
-										// do want this to be ordered
-
+	private HashSet<TileEntity> visited; // All of the cells that we've found in the current run
+	private ArrayList<TileEntity> frontier; // Cells that we haven't visited yet. (subset of visited). NOTE: We really do want this to be ordered
+	private static Random random = new Random();
 	int delayDistance; // wait some ticks when moving between far locations
-
-	private static Coord[] adjacentOffsets = { new Coord(0, -1, 0),
-			new Coord(0, +1, 0), new Coord(0, 0, -1), new Coord(0, 0, +1),
-			new Coord(-1, 0, 0), new Coord(+1, 0, 0), };
-
-	static private class Coord {
-		public int x, y, z;
-
-		Coord(int X, int Y, int Z) {
-			x = X;
-			y = Y;
-			z = Z;
-		}
-
-		Coord add(Coord other) {
-			return new Coord(x + other.x, y + other.y, z + other.z);
-		}
-
-		@Override
-		public String toString() {
-			return x + " " + z;
-		}
-
-		private IInventory openInventory(TileEntity ent, TileEntityRouter router) {
-			if (ent instanceof TileEntityChest) {
-				IInventory chest = FactorizationUtil.openDoubleChest((TileEntityChest) ent);
-				// null means it's a lower chest, but would keep it from
-				// continuing, so return a convenient Router.
-				return (chest == null) ? router : chest;
-			}
-			return (IInventory) ent;
-		}
-
-		public boolean tryInsert(World w, TileEntityRouter router) {
-			TileEntity ent = w.getBlockTileEntity(x, y, z);
-			if (ent instanceof IInventory) {
-				IInventory inv = openInventory(ent, router);
-				if (router.actOn(inv)) {
-					// router.drawActive(1);
-					// Net Optimization: Have lastSeenAt increment draw_active
-					router.draw_active += 1;
-					router.delayDistance = distance(router.lastSeenAt);
-					router.lastSeenAt = this;
-					router.broadcastItem(MessageType.RouterLastSeen, null);
-					return true;
-				}
-			}
-			return false;
-		}
-
-		public int distance(Coord other) {
-			if (other == null) {
-				return 0;
-			}
-			int dx = x - other.x, dy = y - other.y, dz = z - other.z;
-			return (int) Math.sqrt(dx * dx + dy * dy + dz * dz);
-		}
-
-		public int distanceManhatten(Coord other) {
-			if (other == null) {
-				return 0;
-			}
-			int dx = x - other.x, dy = y - other.y, dz = z - other.z;
-			return Math.abs(dx) + Math.abs(dy) + Math.abs(dz);
-		}
-
-		@Override
-		public int hashCode() {
-			return (((x * 11) % 71) << 7) + ((z * 7) % 479) + y;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (obj instanceof Coord) {
-				Coord other = (Coord) obj;
-				return x == other.x && y == other.y && z == other.z;
-			}
-			return false;
-		}
-
-		TileEntity getTileEntity(World w) {
-			return w.getBlockTileEntity(x, y, z);
-		}
-	}
 
 	public TileEntityRouter() {
 		super();
@@ -140,23 +53,20 @@ public class TileEntityRouter extends TileEntityFactorization {
 		buffer = null;
 		match = new String("");
 
-		visited = new HashMap<Coord, Coord>();
-		frontier = new ArrayList<Coord>();
+		visited = new HashSet();
+		frontier = new ArrayList();
 	}
 
 	void resetGraph() {
 		visited.clear();
-		Coord myCoord = new Coord(xCoord, yCoord, zCoord);
-		visited.put(myCoord, myCoord);
-		frontier.add(myCoord);
+		visited.add(this);
+		frontier.add(this);
 	}
 
 	@Override
 	public BlockClass getBlockClass() {
 		return BlockClass.DarkIron;
 	}
-
-	static Random random = new Random();
 
 	void putParticles(World world) {
 		if (lastSeenAt == null) {
@@ -202,6 +112,39 @@ public class TileEntityRouter extends TileEntityFactorization {
 		}
 	}
 
+	private IInventory openInventory(TileEntity ent) {
+		if (ent instanceof TileEntityChest) {
+			IInventory chest = FactorizationUtil.openDoubleChest((TileEntityChest) ent);
+			// null means it's a lower chest, but would keep it from
+			// continuing, so return a convenient Router.
+			return (chest == null) ? this : chest;
+		}
+		if (ent instanceof IInventory) {
+			return (IInventory) ent;
+		}
+		return null;
+	}
+
+	boolean tryInsert(TileEntity ent) {
+		if (ent.isInvalid()) {
+			return true;
+		}
+		if (ent instanceof IInventory) {
+			IInventory inv = openInventory(ent);
+			if (actOn(inv)) {
+				// router.drawActive(1);
+				// Net Optimization: Have lastSeenAt increment draw_active
+				draw_active += 1;
+				Coord here = new Coord(ent);
+				delayDistance = (int) here.distance(lastSeenAt);
+				lastSeenAt = here;
+				broadcastItem(MessageType.RouterLastSeen, null);
+				return true;
+			}
+		}
+		return false;
+	}
+
 	@Override
 	void doLogic() {
 		Profiler.startSection("router");
@@ -225,8 +168,8 @@ public class TileEntityRouter extends TileEntityFactorization {
 		Profiler.endSection();
 	}
 
-	Coord popFrontier() {
-		// TODO: Remove the nearest of 4 or so
+	TileEntity popFrontier() {
+		// TODO: Remove the nearest of 8 or so
 		return frontier.remove(0);
 	}
 
@@ -234,57 +177,20 @@ public class TileEntityRouter extends TileEntityFactorization {
 		if (frontier.size() == 0) {
 			return;
 		}
-		Coord here = popFrontier();
+		TileEntity here = popFrontier();
 
-		if (!isCoordConnected(here)) {
-			clearInvalidConnection(here);
-			return;
-		}
-
-		here.tryInsert(worldObj, this);
+		tryInsert(here);
 
 		// Can't put anything else here. We move on
-		for (Coord n : adjacentOffsets) {
-			Coord neighbor = here.add(n);
-			TileEntity ent = worldObj.getBlockTileEntity(neighbor.x,
-					neighbor.y, neighbor.z);
+		for (Coord neighbor : new Coord(here).getNeighborsAdjacent()) {
+			TileEntity ent = neighbor.getTE();
 			if (!(ent instanceof IInventory)) {
-				continue;
+				continue; //can't just fetch an IInventory.
 			}
-			if (!visited.containsKey(neighbor)) {
-				frontier.add(neighbor);
-				visited.put(neighbor, here);
+			if (!visited.contains(ent)) {
+				frontier.add(ent);
+				visited.add(ent);
 			}
-		}
-	}
-
-	boolean isCoordConnected(Coord here) {
-		// make sure that the world hasn't changed under our trail
-		// NOTE: Breaks under frames. Probably has to do with moving the router
-		// under an inventory?
-		while (true) {
-			if (here == null) {
-				return false;
-			}
-			if (!(worldObj.getBlockTileEntity(here.x, here.y, here.z) instanceof IInventory)) {
-				return false;
-			}
-			if (here.x == xCoord && here.y == yCoord && here.z == zCoord) {
-				return true;
-			}
-			here = visited.get(here);
-		}
-	}
-
-	void clearInvalidConnection(Coord here) {
-		// XXX NOTE O(n*log(n))
-		// Shouldn't happen terribly often?
-		while (true) {
-			if (here == null) {
-				return;
-			}
-			frontier.remove(here);
-			here = visited.remove(here);
 		}
 	}
 
@@ -292,8 +198,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 	 * If the router can possibly do anything
 	 */
 	boolean shouldUpdate() {
-		if (worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord)
-				|| worldObj.isBlockGettingPowered(xCoord, yCoord, zCoord)) {
+		if (worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord) || worldObj.isBlockGettingPowered(xCoord, yCoord, zCoord)) {
 			return false;
 		}
 		if (is_input) {
@@ -307,8 +212,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 		}
 	}
 
-	boolean moveStack(IInventory src, int src_slot, IInventory dest,
-			int dest_slot) {
+	boolean moveStack(IInventory src, int src_slot, IInventory dest, int dest_slot) {
 		// move as much as possible from src's slot to dest's slot
 		ItemStack srcStack = src.getStackInSlot(src_slot);
 		ItemStack destStack = dest.getStackInSlot(dest_slot);
@@ -323,8 +227,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 				return true;
 			} else {
 				// leave it as 0 for us to fill up
-				// The two returns below shouldn't be a problem, as it'll be
-				// equal, and there'll be room
+				// The two returns below shouldn't be a problem, as it'll be equal, and there'll be room
 				destStack = srcStack.copy();
 				destStack.stackSize = 0;
 			}
@@ -376,6 +279,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 	}
 
 	public String getIInventoryName(IInventory t) {
+		//NOTE: This seems to have troubles with IC TEs? Maybe just on SMP?
 		String invName = t.getInvName();
 		if (invName == null || invName.length() == 0) {
 			String className = t.getClass().getSimpleName();
@@ -462,8 +366,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 		int start, end;
 		if (target_slot < 0) {
 			// Get/Put from one of the sides
-			if (t instanceof ISidedInventory && target_side < 6
-					&& target_side >= 0) {
+			if (t instanceof ISidedInventory && target_side < 6 && target_side >= 0) {
 				ISidedInventory inv = (ISidedInventory) t;
 				start = inv.getStartInventorySide(target_side);
 				end = start + inv.getSizeInventorySide(target_side);
@@ -483,8 +386,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 			}
 		}
 		for (int slot = start; slot < end; slot++) {
-			// XXX: Should onInventoryChanged() happen at moveStack for
-			// both inventories?
+			// XXX: Should onInventoryChanged() happen at moveStack for both inventories?
 			if (!legalSlot(t, slot)) {
 				continue;
 			}
@@ -518,13 +420,8 @@ public class TileEntityRouter extends TileEntityFactorization {
 			tag.setString("match", match);
 		}
 		tag.setBoolean("match_to_visit", match_to_visit);
-		// hardly worth saving.
-		if (lastSeenAt != null) {
-			tag.setInteger("lastX", lastSeenAt.x);
-			tag.setInteger("lastY", lastSeenAt.y);
-			tag.setInteger("lastZ", lastSeenAt.z);
-		}
 		tag.setBoolean("move_full_stack", moveFullStack);
+		tag.setInteger("max_search_per_tick", maxSearchPerTick);
 	}
 
 	@Override
@@ -534,17 +431,13 @@ public class TileEntityRouter extends TileEntityFactorization {
 		target_slot = tag.getInteger("use_slot");
 		is_input = tag.getBoolean("is_input");
 		if (tag.hasKey("buffer")) {
-			buffer = ItemStack.loadItemStackFromNBT(tag
-					.getCompoundTag("buffer"));
+			buffer = ItemStack.loadItemStackFromNBT(tag.getCompoundTag("buffer"));
 		}
 		match = tag.getString("match");
 		match_to_visit = tag.getBoolean("match_to_visit");
-		if (tag.hasKey("move_full_stack")) {
-			moveFullStack = tag.getBoolean("move_full_stack");
-		}
-		if (tag.hasKey("lastX")) {
-			lastSeenAt = new Coord(tag.getInteger("lastX"),
-					tag.getInteger("lastY"), tag.getInteger("lastZ"));
+		moveFullStack = tag.getBoolean("move_full_stack");
+		if (tag.hasKey("max_search_per_tick")) {
+			maxSearchPerTick = tag.getInteger("max_search_per_tick");
 		}
 	}
 
@@ -571,7 +464,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 
 	@Override
 	public String getInvName() {
-		return "Router";
+		return "Item Router";
 	}
 
 	@Override
@@ -579,9 +472,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 		return FactoryType.ROUTER;
 	}
 
-	public boolean handleMessageFromAny(int messageType, DataInput input)
-			throws IOException {
-		boolean cannon = mod_Factorization.instance.isCannonical(worldObj);
+	public boolean handleMessageFromAny(int messageType, DataInput input) throws IOException {
 		// target_side side
 		// target_slot slot
 		// is_input flag
@@ -660,17 +551,12 @@ public class TileEntityRouter extends TileEntityFactorization {
 		}
 	}
 
-	public void broadcastMessage(EntityPlayer who, int messageType,
-			Object... items) {
-		// if server: send message to everyone within 100 blocks
-		// if client: send message to server
-		mod_Factorization.network.broadcastMessage(who, getCoord(), messageType,
-				items);
+	public void broadcastMessage(EntityPlayer who, int messageType, Object... items) {
+		mod_Factorization.network.broadcastMessage(who, getCoord(), messageType, items);
 	}
 
 	@Override
-	public boolean handleMessageFromClient(int messageType, DataInput input)
-			throws IOException {
+	public boolean handleMessageFromClient(int messageType, DataInput input) throws IOException {
 		if (super.handleMessageFromClient(messageType, input)) {
 			return true;
 		}
@@ -681,8 +567,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 	}
 
 	@Override
-	public boolean handleMessageFromServer(int messageType, DataInput input)
-			throws IOException {
+	public boolean handleMessageFromServer(int messageType, DataInput input) throws IOException {
 		if (super.handleMessageFromServer(messageType, input)) {
 			return true;
 		}
@@ -693,7 +578,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 			int x = input.readInt();
 			int y = input.readInt();
 			int z = input.readInt();
-			lastSeenAt = new Coord(x, y, z);
+			lastSeenAt = new Coord(worldObj, x, y, z);
 			drawActive(1);
 			return true;
 		}
@@ -715,10 +600,11 @@ public class TileEntityRouter extends TileEntityFactorization {
 
 	@Override
 	public void invalidate() {
-		// XXX TODO: This is a terrible non-solution to work with frames.
-		// Seems like we get infinite loops in isCoordConnected if we don't do
-		// this. Maybe we should have our coordinates's origin be delta-based?
-		resetGraph();
+		//There should no longer be a problem here.
+		//		// XXX TODO: This is a terrible non-solution to work with frames.
+		//		// Seems like we get infinite loops in isCoordConnected if we don't do
+		//		// this. Maybe we should have our coordinates's origin be delta-based?
+		//		resetGraph();
 	}
 
 	@Override

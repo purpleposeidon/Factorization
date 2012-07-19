@@ -3,3 +3,8 @@
   Buildcraft API no longer used
   Redstone, Tin, and Copper ore are now slaggable.
   Since I found like 4 silver veins right next eachother in my playtest world, silver is now twice as rare.
+  Routers will continue to distribute items even if there isn't a TE path between the router and its current location.
+  Routers might actually work properly on moving frames?
+  Why wasn't I using this texture for dark iron before?
+
+

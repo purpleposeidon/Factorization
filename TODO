@@ -4,7 +4,6 @@ mod info file
 draw_active isn't marking the block dirty apparently?
 shift-clicking out of pocket crafting result slot should go into a hotbar slot... (And I guess the 3x3 should go to normal inv)
 re-write the shift-clicking function to use slots
-Router: Store TileEntites instead of Coords! And we don't care if they're not connected 'cause enderpearls.
 slag furnace recipes for copper/tin! Obviously! My goodness!
 particle effects for slag furnaces
 silver ore needs to be toughened up just a tad!
