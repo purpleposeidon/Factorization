@@ -53,6 +53,8 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
 	public ItemCraftingComponent silver_ingot, lead_ingot, dark_iron;
 	public ItemCraftingComponent mecha_chasis;
 	public MechaArmor mecha_head, mecha_chest, mecha_leg, mecha_foot;
+	public ItemMachineUpgrade router_item_filter, router_machine_filter, router_speed,
+			router_thorough, router_throughput;
 	public ItemStack fake_is;
 
 	public Material materialMachine = new Material(MapColor.ironColor);
@@ -308,6 +310,51 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
 				'I', Item.egg,
 				'o', Item.enderPearl,
 				'O', Item.eyeOfEnder);
+		// router upgrades
+		router_item_filter = new ItemMachineUpgrade(itemID("routerItemFilter", 9016), "Router Upgrade: Item Filter", FactoryType.ROUTER, 0);
+		router_machine_filter = new ItemMachineUpgrade(itemID("routerMachineFilter", 9017), "Router Upgrade: Machine Filter", FactoryType.ROUTER, 1);
+		router_speed = new ItemMachineUpgrade(itemID("routerSpeed", 9018), "Router Upgrade: Speed Boost", FactoryType.ROUTER, 2);
+		router_thorough = new ItemMachineUpgrade(itemID("routerThorough", 9019), "Router Upgrade: Thoroughness", FactoryType.ROUTER, 3);
+		router_throughput = new ItemMachineUpgrade(itemID("routerThroughput", 9020), "Router Upgrade: Bandwidth", FactoryType.ROUTER, 4);
+		ModLoader.addRecipe(new ItemStack(router_item_filter),
+				"ITI",
+				"GDG",
+				"ICI",
+				'I', dark_iron,
+				'T', Block.torchRedstoneIdle,
+				'D', bound_tiny_demon,
+				'G', Item.ingotGold,
+				'C', Block.chest);
+		//XXX TODO: Silver ingot ore dictionary!
+		ModLoader.addRecipe(new ItemStack(router_machine_filter),
+				"ITI",
+				"SDS",
+				"IBI",
+				'I', dark_iron,
+				'T', Block.torchRedstoneIdle,
+				'D', bound_tiny_demon,
+				'S', silver_ingot,
+				'C', Item.book);
+		ModLoader.addRecipe(new ItemStack(router_speed),
+				"ISI",
+				"SCS",
+				"ISI",
+				'I', dark_iron,
+				'S', Item.sugar,
+				'C', Item.cake);
+		ModLoader.addRecipe(new ItemStack(router_thorough),
+				"ISI",
+				"SSS",
+				"ISI",
+				'I', dark_iron,
+				'S', Block.slowSand);
+		ModLoader.addRecipe(new ItemStack(router_throughput),
+				"IBI",
+				"B!B",
+				"IBI",
+				'I', dark_iron,
+				'B', Item.blazePowder,
+				'!', Item.egg);
 
 		// Cutter
 		//TODO: Remove the cutter

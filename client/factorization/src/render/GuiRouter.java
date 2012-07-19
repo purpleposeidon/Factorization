@@ -17,6 +17,7 @@ import factorization.src.ContainerFactorization;
 import factorization.src.Core;
 import factorization.src.NetworkFactorization.MessageType;
 import factorization.src.TileEntityRouter;
+import factorization.src.render.ButtonSet.Predicate;
 
 public class GuiRouter extends GuiContainer implements IClickable {
 	TileEntityRouter router;
@@ -31,9 +32,13 @@ public class GuiRouter extends GuiContainer implements IClickable {
 	ArrayList<String> inv_names;
 	ButtonSet global_buttons = new ButtonSet();
 	ButtonSet main_buttons = new ButtonSet();
+	ButtonSet item_filter_buttons = new ButtonSet();
 	ButtonSet machine_filter_buttons = new ButtonSet();
+	ButtonSet speed_buttons = new ButtonSet();
+	ButtonSet thorough_buttons = new ButtonSet();
+	ButtonSet bandwidth_buttons = new ButtonSet();
 
-	ButtonSet allSets[] = { main_buttons, machine_filter_buttons };
+	ButtonSet allSets[] = { main_buttons, machine_filter_buttons, speed_buttons, thorough_buttons, bandwidth_buttons };
 	ButtonSet current_set = allSets[0];
 
 	String[] side_names = { "bottom sides", "top sides", "§asouth§r sides", "§3north§r sides", "§eeast§r sides",
@@ -100,6 +105,44 @@ public class GuiRouter extends GuiContainer implements IClickable {
 		machine_filter_buttons.clear();
 		strict_entity_button = machine_filter_buttons.add(strict_entity, global_buttons.currentRight + 4, row_top, 63, bh, "visit all"); //visit only/visit all
 		next_entity_button = machine_filter_buttons.add(next_entity, LEFT, row2_top, xSize - 16, bh, any_inv);
+		machine_filter_buttons.setTest(new Predicate<TileEntity>() {
+			public boolean test(TileEntity a) {
+				return ((TileEntityRouter) a).upgradeMachineFilter;
+			}
+		});
+
+		int lh = 9;
+		int line1 = row2_top + 2;
+		int line2 = line1 + lh;
+		int line3 = line2 + lh;
+
+		speed_buttons.clear();
+		speed_buttons.add(LEFT, line1, Core.registry.router_speed.getItemDisplayName(null));
+		speed_buttons.add(LEFT, line2, "No delay when visiting machines");
+		speed_buttons.setTest(new Predicate<TileEntity>() {
+			public boolean test(TileEntity a) {
+				return ((TileEntityRouter) a).upgradeSpeed;
+			}
+		});
+
+		thorough_buttons.clear();
+		thorough_buttons.add(LEFT, line1, Core.registry.router_thorough.getItemDisplayName(null));
+		thorough_buttons.add(LEFT, line2, "Always finish serving machines");
+		thorough_buttons.setTest(new Predicate<TileEntity>() {
+			public boolean test(TileEntity a) {
+				return ((TileEntityRouter) a).upgradeThorough;
+			}
+		});
+
+		bandwidth_buttons.clear();
+		bandwidth_buttons.add(LEFT, line1, Core.registry.router_throughput.getItemDisplayName(null));
+		bandwidth_buttons.add(LEFT, line2, "Move stacks at a time");
+		bandwidth_buttons.setTest(new Predicate<TileEntity>() {
+			public boolean test(TileEntity a) {
+				return ((TileEntityRouter) a).upgradeThroughput;
+			}
+		});
+
 		updateGui();
 	}
 
@@ -110,7 +153,14 @@ public class GuiRouter extends GuiContainer implements IClickable {
 			mode_button.displayString = "Extract";
 		}
 
-		upgrade_button.enabled = allSets.length >= 2;
+		upgrade_button.enabled = false;
+		for (int i = 1; i < allSets.length; i++) {
+			if (allSets[i].canShow(router)) {
+				upgrade_button.enabled = true;
+				break;
+			}
+		}
+		upgrade_button.drawButton = upgrade_button.enabled;
 
 		String m = "";
 		if (router.target_slot < 0) {
@@ -143,20 +193,28 @@ public class GuiRouter extends GuiContainer implements IClickable {
 		fontRenderer.drawString("Inventory", 8, (ySize - 96) + 2, 0x404040);
 	}
 
+	void selectNextUpgrade() {
+		for (int i = 0; i < allSets.length; i++) {
+			if (allSets[i] == current_set) {
+				for (int j = i + 1; j != i; j++) {
+					if (j == allSets.length) {
+						j = 0;
+					}
+					if (allSets[j].canShow(router)) {
+						current_set = allSets[j];
+						return;
+					}
+				}
+				return;
+			}
+		}
+	}
+
 	@Override
 	public void actionPerformedMouse(GuiButton guibutton, boolean rightClick) {
 		switch (guibutton.id) {
 		case upgrade_button_id:
-			for (int i = 0; i < allSets.length; i++) {
-				if (allSets[i] == current_set) {
-					i++;
-					if (i == allSets.length) {
-						i = 0;
-					}
-					current_set = allSets[i];
-					return;
-				}
-			}
+			selectNextUpgrade();
 			break;
 		case mode_button_id:
 			router.is_input = !router.is_input;
@@ -259,6 +317,11 @@ public class GuiRouter extends GuiContainer implements IClickable {
 		updateGui();
 		global_buttons.draw(mc, i, j);
 		current_set.draw(mc, i, j);
+		String msg = "";
+		if (global_buttons.focused_id == upgrade_button_id && current_set != main_buttons) {
+			msg = "Press DELETE to remove this upgrade. ";
+		}
+		fontRenderer.drawString(msg, guiLeft, guiTop + ySize + 2, 0x707070);
 	}
 
 	protected void mouseClicked(int x, int y, int button) {
@@ -273,6 +336,34 @@ public class GuiRouter extends GuiContainer implements IClickable {
 		if (i == org.lwjgl.input.Keyboard.KEY_ESCAPE) {
 			router.broadcastItem(MessageType.RouterMatch, null);
 			super.keyTyped(c, i);
+			return;
+		}
+		if (i == org.lwjgl.input.Keyboard.KEY_DELETE && current_set.focused_id == upgrade_button_id) {
+			int upgrade_id = -1;
+
+			if (current_set == item_filter_buttons) {
+				upgrade_id = Core.registry.router_item_filter.upgradeId;
+			}
+			else if (current_set == machine_filter_buttons) {
+				upgrade_id = Core.registry.router_machine_filter.upgradeId;
+			}
+			else if (current_set == speed_buttons) {
+				upgrade_id = Core.registry.router_speed.upgradeId;
+			}
+			else if (current_set == thorough_buttons) {
+				upgrade_id = Core.registry.router_thorough.upgradeId;
+			}
+			else if (current_set == bandwidth_buttons) {
+				upgrade_id = Core.registry.router_throughput.upgradeId;
+			}
+			if (upgrade_id == -1) {
+				return;
+			}
+			if (!Core.instance.isCannonical(router.worldObj)) {
+				Core.network.broadcastMessage(null, router.getCoord(), MessageType.RouterDowngrade, upgrade_id);
+			}
+			router.removeUpgrade(upgrade_id, Core.instance.getClientPlayer());
+			selectNextUpgrade();
 			return;
 		}
 		if (current_set.focused_id == next_entity) {

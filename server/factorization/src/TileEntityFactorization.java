@@ -61,6 +61,10 @@ public abstract class TileEntityFactorization extends TileEntityCommon
 		setFacingDirectionFromEntity(player);
 	}
 
+	public boolean takeUpgrade(ItemStack is) {
+		return false;
+	}
+
 	//few of the stuff below would be overridden
 
 	void setFacingDirectionFromEntity(Entity player) {
@@ -147,22 +151,9 @@ public abstract class TileEntityFactorization extends TileEntityCommon
 
 	public void dropContents() {
 		// XXX TODO: ModLoader.genericContainerRemoval
+		Coord here = getCoord();
 		for (int i = 0; i < getSizeInventory(); i++) {
-			ItemStack item = getStackInSlot(i);
-			if (item == null) {
-				continue;
-			}
-
-			double dx = rand.nextFloat() * 0.5 - 0.5;
-			double dy = rand.nextFloat() * 0.5 - 0.5;
-			double dz = rand.nextFloat() * 0.5 - 0.5;
-
-			EntityItem entityitem = new EntityItem(worldObj, xCoord + 0.5, yCoord + 0.5,
-					zCoord + 0.5, item);
-			entityitem.motionY = 0.2 + rand.nextGaussian() * 0.02;
-			entityitem.motionX = rand.nextGaussian() * 0.02;
-			entityitem.motionZ = rand.nextGaussian() * 0.02;
-			worldObj.spawnEntityInWorld(entityitem);
+			FactorizationUtil.spawnItemStack(here, getStackInSlot(i));
 		}
 	}
 

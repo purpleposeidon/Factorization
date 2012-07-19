@@ -3,15 +3,23 @@ package factorization.src.render;
 import java.util.ArrayList;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.src.Gui;
 import net.minecraft.src.GuiButton;
+import net.minecraft.src.TileEntity;
 import factorization.src.Sound;
 
 public class ButtonSet {
-	ArrayList<GuiButton> buttons = new ArrayList();
+	ArrayList<Gui> buttons = new ArrayList();
 	int focused_id = -1;
 
 	public int currentTop = 0;
 	public int currentRight = 0;
+
+	interface Predicate<A> {
+		boolean test(A a);
+	}
+
+	Predicate<TileEntity> showTest = null;
 
 	GuiButton add(int id, int xPos, int yPos, int width, int height, String text) {
 		if (xPos == -1) {
@@ -27,32 +35,60 @@ public class ButtonSet {
 		return ret;
 	}
 
+	GuiLabel add(int x, int y, String text) {
+		GuiLabel ret = new GuiLabel(x, y, text);
+		buttons.add(ret);
+		return ret;
+	}
+
+	boolean canShow(TileEntity te) {
+		if (showTest == null) {
+			return true;
+		}
+		return showTest.test(te);
+	}
+
+	void setTest(Predicate<TileEntity> tester) {
+		showTest = tester;
+	}
+
 	void clear() {
 		buttons.clear();
 	}
 
 	void draw(Minecraft mc, int i, int j) {
 		focused_id = -1;
-		for (GuiButton button : buttons) {
-			button.drawButton(mc, i, j);
-			if (button.mousePressed(mc, i, j)) {
-				focused_id = button.id;
+		for (Gui gui : buttons) {
+			if (gui instanceof GuiButton) {
+				GuiButton button = (GuiButton) gui;
+				button.drawButton(mc, i, j);
+				if (button.mousePressed(mc, i, j)) {
+					focused_id = button.id;
+				}
+			}
+			if (gui instanceof GuiLabel) {
+				GuiLabel label = (GuiLabel) gui;
+				label.drawLabel(mc, i, j);
 			}
 		}
 	}
 
-	void handleClick(IClickable gui, Minecraft mc, int x, int y, int button) {
+	void handleClick(IClickable parentgui, Minecraft mc, int x, int y, int button) {
 		if (button != 0 && button != 1) {
 			return;
 		}
-		for (GuiButton guibutton : buttons) {
+		for (Gui _gui : buttons) {
+			if (!(_gui instanceof GuiButton)) {
+				continue;
+			}
+			GuiButton guibutton = (GuiButton) _gui;
 			if (guibutton.mousePressed(mc, x, y)) {
 				if (button == 1) {
 					Sound.leftClick.play();
 				} else {
 					Sound.rightClick.play();
 				}
-				gui.actionPerformedMouse(guibutton, button == 1);
+				parentgui.actionPerformedMouse(guibutton, button == 1);
 			}
 		}
 	}

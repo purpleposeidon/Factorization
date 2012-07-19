@@ -137,7 +137,7 @@ public class ItemDemon extends Item implements ITextureProvider {
 			list.add("Less likely to bite");
 			return;
 		} else {
-			list.add("Beware its poisonous bite!");
+			list.add("Beware its poisonous fangs!");
 		}
 	}
 

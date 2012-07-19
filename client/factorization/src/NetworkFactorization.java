@@ -110,10 +110,13 @@ public class NetworkFactorization implements IConnectionHandler, IPacketHandler 
 		}
 	}
 
+	static EntityPlayer currentPlayer = null;
+
 	@Override
 	public void onPacketData(NetworkManager network, String channel, byte[] data) {
 		//wow, long function...
 		EntityPlayer player = Core.instance.getPlayer(network.getNetHandler());
+		currentPlayer = player;
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
 		DataInput input = new DataInputStream(inputStream);
 		if (channel.equals(factorizeMsgChannel)) {
@@ -303,7 +306,7 @@ public class NetworkFactorization implements IConnectionHandler, IPacketHandler 
 				MakerTarget = 101, MakerFuel = 102,
 				//
 				RouterSlot = 200, RouterTargetSide = 201, RouterMatch = 202, RouterIsInput = 203,
-				RouterLastSeen = 204, RouterMatchToVisit = 205,
+				RouterLastSeen = 204, RouterMatchToVisit = 205, RouterDowngrade = 206,
 				//
 				BarrelDescription = 300, BarrelItem = 301, BarrelCount = 302
 				//

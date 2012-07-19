@@ -24,11 +24,11 @@ import net.minecraft.src.forge.ISidedInventory;
 import factorization.src.NetworkFactorization.MessageType;
 
 public class TileEntityRouter extends TileEntityFactorization {
-	// TODO: Save these in NBT!
-	public int maxSearchPerTick = 16;
+	final public int maxSearchPerTick = 16;
 
 	// save these guys/share with client
-	public boolean moveFullStack = false;
+	public boolean upgradeItemFilter = false, upgradeMachineFilter = false, upgradeSpeed = false,
+			upgradeThorough = false, upgradeThroughput = false;
 	public int target_side;
 	public int target_slot; // If negative, use target_side instead. The old value is saved as the inverse. For some reason.
 	public boolean is_input;
@@ -80,13 +80,13 @@ public class TileEntityRouter extends TileEntityFactorization {
 		int out_count = 1;
 		int in_count = 1;
 		if (is_input) {
-			if (moveFullStack) {
+			if (upgradeThroughput) {
 				in_count += 5;
 			} else {
 				in_count += 3;
 			}
 		} else {
-			if (moveFullStack) {
+			if (upgradeThroughput) {
 				out_count += 5;
 			} else {
 				in_count += 3;
@@ -136,7 +136,9 @@ public class TileEntityRouter extends TileEntityFactorization {
 				// Net Optimization: Have lastSeenAt increment draw_active
 				draw_active += 1;
 				Coord here = new Coord(ent);
-				delayDistance = (int) here.distance(lastSeenAt);
+				if (!upgradeSpeed) {
+					delayDistance = (int) here.distance(lastSeenAt);
+				}
 				lastSeenAt = here;
 				broadcastItem(MessageType.RouterLastSeen, null);
 				return true;
@@ -194,7 +196,9 @@ public class TileEntityRouter extends TileEntityFactorization {
 		}
 		TileEntity here = popFrontier();
 
-		tryInsert(here);
+		if (tryInsert(here) && upgradeThorough) {
+			return;
+		}
 
 		// Can't put anything else here. We move on
 		for (Coord neighbor : new Coord(here).getNeighborsAdjacent()) {
@@ -238,7 +242,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 			return false;
 		}
 		if (destStack == null) {
-			if (moveFullStack) {
+			if (upgradeThroughput) {
 				// Ha! Easy swap!
 				src.setInventorySlotContents(src_slot, null);
 				dest.setInventorySlotContents(dest_slot, srcStack);
@@ -257,7 +261,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 			return false;
 		}
 
-		if (moveFullStack) {
+		if (upgradeThroughput) {
 			int movable = destStack.getMaxStackSize() - destStack.stackSize;
 			if (movable > srcStack.stackSize) {
 				// dest takes an incomplete stack
@@ -425,9 +429,46 @@ public class TileEntityRouter extends TileEntityFactorization {
 		return false;
 	}
 
+	void verifyUpgrades() {
+		if (!upgradeItemFilter) {
+
+		}
+		if (!upgradeMachineFilter) {
+			match_to_visit = false;
+			match = null;
+		}
+
+	}
+
+	@Override
+	public void dropContents() {
+		super.dropContents();
+		ArrayList<ItemStack> toDrop = new ArrayList();
+		if (upgradeItemFilter) {
+			toDrop.add(new ItemStack(Core.registry.router_item_filter));
+		}
+		if (upgradeMachineFilter) {
+			toDrop.add(new ItemStack(Core.registry.router_machine_filter));
+		}
+		if (upgradeSpeed) {
+			toDrop.add(new ItemStack(Core.registry.router_speed));
+		}
+		if (upgradeThorough) {
+			toDrop.add(new ItemStack(Core.registry.router_thorough));
+		}
+		if (upgradeThroughput) {
+			toDrop.add(new ItemStack(Core.registry.router_throughput));
+		}
+		Coord here = getCoord();
+		for (ItemStack is : toDrop) {
+			FactorizationUtil.spawnItemStack(here, is);
+		}
+	}
+
 	@Override
 	public void writeToNBT(NBTTagCompound tag) {
 		super.writeToNBT(tag);
+		verifyUpgrades();
 		tag.setInteger("target_side", target_side);
 		tag.setInteger("use_slot", target_slot);
 		tag.setBoolean("is_input", is_input);
@@ -438,8 +479,12 @@ public class TileEntityRouter extends TileEntityFactorization {
 			tag.setString("match", match);
 		}
 		tag.setBoolean("match_to_visit", match_to_visit);
-		tag.setBoolean("move_full_stack", moveFullStack);
-		tag.setInteger("max_search_per_tick", maxSearchPerTick);
+
+		tag.setBoolean("upgrade_item_filter", upgradeItemFilter);
+		tag.setBoolean("upgrade_machine_filter", upgradeMachineFilter);
+		tag.setBoolean("upgrade_speed", upgradeSpeed);
+		tag.setBoolean("upgrade_thorough", upgradeThorough);
+		tag.setBoolean("upgrade_throughput", upgradeThroughput);
 	}
 
 	@Override
@@ -453,10 +498,45 @@ public class TileEntityRouter extends TileEntityFactorization {
 		}
 		match = tag.getString("match");
 		match_to_visit = tag.getBoolean("match_to_visit");
-		moveFullStack = tag.getBoolean("move_full_stack");
-		if (tag.hasKey("max_search_per_tick")) {
-			maxSearchPerTick = tag.getInteger("max_search_per_tick");
+		upgradeItemFilter = tag.getBoolean("upgrade_item_filter");
+		upgradeMachineFilter = tag.getBoolean("upgrade_machine_filter");
+		upgradeSpeed = tag.getBoolean("upgrade_speed");
+		upgradeThorough = tag.getBoolean("upgrade_thorough");
+		upgradeThroughput = tag.getBoolean("upgrade_throughput");
+	}
+
+	@Override
+	public boolean takeUpgrade(ItemStack is) {
+		ItemMachineUpgrade upgrade = (ItemMachineUpgrade) is.getItem();
+		if (upgrade == Core.registry.router_item_filter) {
+			if (upgradeItemFilter)
+				return false;
+			upgradeItemFilter = true;
 		}
+		else if (upgrade == Core.registry.router_machine_filter) {
+			if (upgradeMachineFilter)
+				return false;
+			upgradeMachineFilter = true;
+		}
+		else if (upgrade == Core.registry.router_speed) {
+			if (upgradeSpeed)
+				return false;
+			upgradeSpeed = true;
+		}
+		else if (upgrade == Core.registry.router_thorough) {
+			if (upgradeThorough)
+				return false;
+			upgradeThorough = true;
+		}
+		else if (upgrade == Core.registry.router_throughput) {
+			if (upgradeThroughput)
+				return false;
+			upgradeThroughput = true;
+		}
+		else {
+			return false;
+		}
+		return true;
 	}
 
 	@Override
@@ -573,6 +653,31 @@ public class TileEntityRouter extends TileEntityFactorization {
 		mod_Factorization.network.broadcastMessage(who, getCoord(), messageType, items);
 	}
 
+	public void removeUpgrade(int upgradeType, EntityPlayer player) {
+		ItemStack drop = null;
+		if (upgradeType == Core.registry.router_item_filter.upgradeId && upgradeItemFilter) {
+			drop = new ItemStack(Core.registry.router_item_filter);
+		}
+		else if (upgradeType == Core.registry.router_machine_filter.upgradeId && upgradeMachineFilter) {
+			drop = new ItemStack(Core.registry.router_machine_filter);
+		}
+		else if (upgradeType == Core.registry.router_speed.upgradeId && upgradeSpeed) {
+			drop = new ItemStack(Core.registry.router_speed);
+		}
+		else if (upgradeType == Core.registry.router_thorough.upgradeId && upgradeThorough) {
+			drop = new ItemStack(Core.registry.router_thorough);
+		}
+		else if (upgradeType == Core.registry.router_throughput.upgradeId && upgradeThroughput) {
+			drop = new ItemStack(Core.registry.router_throughput);
+		}
+		if (drop != null) {
+			player.inventory.addItemStackToInventory(drop);
+		}
+		else {
+			player.addChatMessage("No upgrade");
+		}
+	}
+
 	@Override
 	public boolean handleMessageFromClient(int messageType, DataInput input) throws IOException {
 		if (super.handleMessageFromClient(messageType, input)) {
@@ -580,6 +685,9 @@ public class TileEntityRouter extends TileEntityFactorization {
 		}
 		if (handleMessageFromAny(messageType, input)) {
 			return true;
+		}
+		if (messageType == NetworkFactorization.MessageType.RouterDowngrade) {
+			removeUpgrade(input.readInt(), Core.network.currentPlayer);
 		}
 		return false;
 	}

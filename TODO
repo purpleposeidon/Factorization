@@ -1,6 +1,7 @@
 http://www.minecraftforum.net/topic/1351802-factorization/
 
 mod info file
+silver ingot for an upgrade recipe
 draw_active isn't marking the block dirty apparently?
 shift-clicking out of pocket crafting result slot should go into a hotbar slot... (And I guess the 3x3 should go to normal inv)
 re-write the shift-clicking function to use slots

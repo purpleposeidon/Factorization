@@ -2,8 +2,10 @@ package factorization.src;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 import net.minecraft.src.Block;
+import net.minecraft.src.EntityItem;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.IRecipe;
 import net.minecraft.src.InventoryLargeChest;
@@ -173,5 +175,22 @@ public class FactorizationUtil {
 		}
 
 		return new ShapelessRecipes(result, var3);
+	}
+
+	static Random rand = new Random();
+
+	static void spawnItemStack(Coord c, ItemStack item) {
+		if (item == null) {
+			return;
+		}
+		double dx = rand.nextFloat() * 0.5 - 0.5;
+		double dy = rand.nextFloat() * 0.5 - 0.5;
+		double dz = rand.nextFloat() * 0.5 - 0.5;
+
+		EntityItem entityitem = new EntityItem(c.w, c.x + 0.5, c.y + 0.5, c.z + 0.5, item);
+		entityitem.motionY = 0.2 + rand.nextGaussian() * 0.02;
+		entityitem.motionX = rand.nextGaussian() * 0.02;
+		entityitem.motionZ = rand.nextGaussian() * 0.02;
+		c.w.spawnEntityInWorld(entityitem);
 	}
 }
