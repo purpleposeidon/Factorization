@@ -1,0 +1,21 @@
+[
+{
+  "modid": "mod_Factorization",
+  "name": "Factorization",
+  "description": "",
+  "version": "@VERSION@",
+  "mcversion": "1.2.5",
+  "url": "http://www.minecraftforum.net/topic/1351802-factorization/",
+  "updateUrl": "",
+  "authors": [
+    "absurdHuman"
+  ],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [
+  ],
+  "parent":"",
+  "dependencies": [
+  ]
+}
+]
