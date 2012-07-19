@@ -1,7 +1,7 @@
 0.3.2
-  The pistonless recipe for makers has been removed, 'cause it didn't make sense 'cause pistons don't make sense.
+  The pistonless recipe for makers has been removed, 'cause it didn't make sense, 'cause the recipe for pistons doesn't make sense.
   Redstone ore, Tin, and Copper are now slaggable.
-  Bound demons are now mostly harmless, and free demons more dangerous.
+  Bound demons are now mostly harmless, and unbound demons more dangerous.
   Internal workings of barrels changed so that they should now work with Logistics Pipes, and should be more likely to work with other item-moving systems.
   Since I found like 4 silver veins right next eachother in my playtest world, silver now spawns only on alternating chunks.
   Routers:
