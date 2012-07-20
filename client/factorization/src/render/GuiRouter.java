@@ -90,6 +90,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
 		final int bh = 20;
 		final int LEFT = guiLeft + 7;
 		final int TOP = guiTop + bh;
+		final int WIDTH = xSize - 16;
 		final int row_top = TOP;
 		final int row2_top = row_top + bh + 2;
 		global_buttons.clear();
@@ -100,7 +101,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
 		main_buttons.clear();
 		int dbw = 16; //delta button width
 		slot_down_button = main_buttons.add(slot_down, LEFT, row2_top, dbw, bh, "-");
-		direction_button = main_buttons.add(direction_button_id, -1, -1, (xSize - 16) - dbw * 2, bh, "Slot...");
+		direction_button = main_buttons.add(direction_button_id, -1, -1, WIDTH - dbw * 2, bh, "Slot...");
 		slot_up_button = main_buttons.add(slot_up, -1, -1, dbw, bh, "+");
 
 		item_filter_buttons.clear();
@@ -112,7 +113,9 @@ public class GuiRouter extends GuiContainer implements IClickable {
 		});
 
 		machine_filter_buttons.clear();
-		strict_entity_button = machine_filter_buttons.add(strict_entity, global_buttons.currentRight + 4, row_top, 63, bh, "visit all"); //visit near/visit all
+		int sebl = global_buttons.currentRight + 4;
+		int sebw = 60; //xSize - 8 - sebl;
+		strict_entity_button = machine_filter_buttons.add(strict_entity, sebl, row_top, sebw, bh, "visit all"); //visit near/visit all
 		next_entity_button = machine_filter_buttons.add(next_entity, LEFT, row2_top, xSize - 16, bh, any_inv);
 		machine_filter_buttons.setTest(new Predicate<TileEntity>() {
 			public boolean test(TileEntity a) {
@@ -155,7 +158,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
 		if (router.guiLastButtonSet >= 0 && router.guiLastButtonSet < allSets.length) {
 			current_set = allSets[router.guiLastButtonSet];
 			if (!current_set.canShow(router)) {
-				selectNextUpgrade();
+				selectNextUpgrade(true);
 			}
 		}
 		updateGui();
@@ -243,12 +246,25 @@ public class GuiRouter extends GuiContainer implements IClickable {
 		fontRenderer.drawString(msg, guiLeft, guiTop + ySize + 2, 0x707070);
 	}
 
-	void selectNextUpgrade() {
+	void selectNextUpgrade(boolean forward) {
 		for (int i = 0; i < allSets.length; i++) {
-			if (allSets[i] == current_set) {
+			if (allSets[i] == current_set && forward) {
 				for (int j = i + 1; j != i; j++) {
 					if (j == allSets.length) {
 						j = 0;
+					}
+					if (allSets[j].canShow(router)) {
+						current_set = allSets[j];
+						router.guiLastButtonSet = j;
+						return;
+					}
+				}
+				router.guiLastButtonSet = 0;
+				return;
+			} else if (allSets[i] == current_set && !forward) {
+				for (int j = i - 1; j != i; j--) {
+					if (j == -1) {
+						j = allSets.length - 1;
 					}
 					if (allSets[j].canShow(router)) {
 						current_set = allSets[j];
@@ -266,7 +282,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
 	public void actionPerformedMouse(GuiButton guibutton, boolean rightClick) {
 		switch (guibutton.id) {
 		case upgrade_button_id:
-			selectNextUpgrade();
+			selectNextUpgrade(!rightClick);
 			break;
 		case mode_button_id:
 			router.is_input = !router.is_input;
@@ -398,7 +414,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
 				router.broadcastMessage(null, MessageType.RouterDowngrade, upgrade_id);
 			}
 			router.removeUpgrade(upgrade_id, Core.instance.getClientPlayer());
-			selectNextUpgrade();
+			selectNextUpgrade(false);
 			return;
 		}
 		if (current_set.focused_id == next_entity) {
