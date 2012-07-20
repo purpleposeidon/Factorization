@@ -25,6 +25,7 @@ import factorization.src.NetworkFactorization.MessageType;
 
 public class TileEntityRouter extends TileEntityFactorization {
 	final public int maxSearchPerTick = 16;
+	public int guiLastButtonSet = 0; //for the client
 
 	// save these guys/share with client
 	public boolean upgradeItemFilter = false, upgradeMachineFilter = false, upgradeSpeed = false,
@@ -35,6 +36,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 	public boolean match_to_visit = false;
 	public String match;
 	ItemStack buffer;
+	ItemStack filter[] = new ItemStack[9];
 
 	Coord lastSeenAt; // where we put an item in last
 
@@ -127,17 +129,21 @@ public class TileEntityRouter extends TileEntityFactorization {
 
 	boolean tryInsert(TileEntity ent) {
 		if (ent.isInvalid()) {
-			return true;
+			//Should help with frames/unloading chunks
+			return false; //This is correct. upgradeThorough would have it hang here.
 		}
 		if (ent instanceof IInventory) {
 			IInventory inv = openInventory(ent);
 			if (actOn(inv)) {
+				// Netcode Optimization: lastSeenAt increments draw_active
 				// router.drawActive(1);
-				// Net Optimization: Have lastSeenAt increment draw_active
 				draw_active += 1;
 				Coord here = new Coord(ent);
 				if (!upgradeSpeed) {
 					delayDistance = (int) here.distance(lastSeenAt);
+				}
+				else {
+					delayDistance = 1;
 				}
 				lastSeenAt = here;
 				broadcastItem(MessageType.RouterLastSeen, null);
@@ -164,6 +170,9 @@ public class TileEntityRouter extends TileEntityFactorization {
 		}
 
 		int i = maxSearchPerTick;
+		if (upgradeSpeed) {
+			i *= 2;
+		}
 		while (i-- != 0 && shouldUpdate() && frontier.size() > 0) {
 			updateFrontier();
 			if (delayDistance != 0) {
@@ -174,6 +183,9 @@ public class TileEntityRouter extends TileEntityFactorization {
 	}
 
 	TileEntity popFrontier() {
+		if (upgradeSpeed) {
+			return frontier.remove(0);
+		}
 		int closestDistance = Integer.MAX_VALUE;
 		int closestIndex = 0;
 		final int end = Math.min(8, frontier.size());
@@ -374,6 +386,32 @@ public class TileEntityRouter extends TileEntityFactorization {
 		return false;
 	}
 
+	boolean itemPassesFilter(ItemStack is) {
+		if (!upgradeItemFilter) {
+			return true;
+		}
+		if (is == null) {
+			return false;
+		}
+		int hits = 0;
+		for (int i = 0; i < filter.length; i++) {
+			if (filter[i] == null) {
+				continue;
+			}
+			hits++;
+			if (filter[i].isItemEqual(is)) {
+				//NOTE: Ignores NBT data. I think this will be more useful.
+				return true;
+			} else if (filter[i].itemID == is.itemID) {
+				//a slightly damaged sword will match all other damaged swords. A new sword should not.
+				if (filter[i].isItemDamaged() && is.isItemDamaged()) {
+					return true;
+				}
+			}
+		}
+		return hits == 0;
+	}
+
 	boolean actOn(IInventory t) {
 		if (t == null) {
 			return false;
@@ -412,13 +450,19 @@ public class TileEntityRouter extends TileEntityFactorization {
 			if (!legalSlot(t, slot)) {
 				continue;
 			}
+			//So, about that item filtering...
 			if (is_input) {
+				//Filtering the input doesn't sound useful.
+				//XXX TODO: Maybe do nothing if buffer doesn't match the filter? That might be useful for a very complicated auto-processor
 				if (moveStack(this, 0, t, slot)) {
 					onInventoryChanged();
 					t.onInventoryChanged();
 					return true;
 				}
 			} else {
+				if (!itemPassesFilter(t.getStackInSlot(slot))) {
+					continue;
+				}
 				if (moveStack(t, slot, this, 0)) {
 					onInventoryChanged();
 					t.onInventoryChanged();
@@ -431,7 +475,9 @@ public class TileEntityRouter extends TileEntityFactorization {
 
 	void verifyUpgrades() {
 		if (!upgradeItemFilter) {
-
+			for (int i = 0; i < filter.length; i++) {
+				filter[i] = null;
+			}
 		}
 		if (!upgradeMachineFilter) {
 			match_to_visit = false;
@@ -442,7 +488,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 
 	@Override
 	public void dropContents() {
-		super.dropContents();
+		super.dropContents(); //this takes care of buffer & filter
 		ArrayList<ItemStack> toDrop = new ArrayList();
 		if (upgradeItemFilter) {
 			toDrop.add(new ItemStack(Core.registry.router_item_filter));
@@ -472,9 +518,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 		tag.setInteger("target_side", target_side);
 		tag.setInteger("use_slot", target_slot);
 		tag.setBoolean("is_input", is_input);
-		if (buffer != null) {
-			tag.setTag("buffer", buffer.writeToNBT(new NBTTagCompound()));
-		}
+		writeSlotsToNBT(tag);
 		if (match != null) {
 			tag.setString("match", match);
 		}
@@ -494,7 +538,11 @@ public class TileEntityRouter extends TileEntityFactorization {
 		target_slot = tag.getInteger("use_slot");
 		is_input = tag.getBoolean("is_input");
 		if (tag.hasKey("buffer")) {
+			//This is old!
 			buffer = ItemStack.loadItemStackFromNBT(tag.getCompoundTag("buffer"));
+		}
+		else {
+			readSlotsFromNBT(tag);
 		}
 		match = tag.getString("match");
 		match_to_visit = tag.getBoolean("match_to_visit");
@@ -541,23 +589,31 @@ public class TileEntityRouter extends TileEntityFactorization {
 
 	@Override
 	public int getSizeInventory() {
-		return 1;
+		return 10;
 	}
 
 	@Override
 	public ItemStack getStackInSlot(int i) {
-		if (i != 0) {
-			return null;
+		if (i == 0) {
+			return buffer;
 		}
-		return buffer;
+		int f = i - 1;
+		if (f >= 0 && f < filter.length) {
+			return filter[f];
+		}
+		return null;
 	}
 
 	@Override
 	public void setInventorySlotContents(int i, ItemStack itemstack) {
-		if (i != 0) {
+		if (i == 0) {
+			buffer = itemstack;
 			return;
 		}
-		buffer = itemstack;
+		int f = i - 1;
+		if (f >= 0 && f < filter.length) {
+			filter[f] = itemstack;
+		}
 	}
 
 	@Override
@@ -631,6 +687,9 @@ public class TileEntityRouter extends TileEntityFactorization {
 		if (all || messageType == MessageType.RouterIsInput) {
 			broadcastMessage(who, MessageType.RouterIsInput, is_input);
 		}
+		if (all || messageType == MessageType.RouterUpgradeState) {
+			broadcastMessage(who, MessageType.RouterUpgradeState, upgradeItemFilter, upgradeMachineFilter, upgradeSpeed, upgradeThorough, upgradeThroughput);
+		}
 		if (all || messageType == MessageType.RouterMatch) {
 			if (match == null) {
 				match = "";
@@ -656,25 +715,41 @@ public class TileEntityRouter extends TileEntityFactorization {
 	public void removeUpgrade(int upgradeType, EntityPlayer player) {
 		ItemStack drop = null;
 		if (upgradeType == Core.registry.router_item_filter.upgradeId && upgradeItemFilter) {
+			for (int i = 0; i < filter.length; i++) {
+				ItemStack is = filter[i];
+				if (is == null) {
+					continue;
+				}
+				player.inventory.addItemStackToInventory(is);
+				filter[i] = null;
+			}
 			drop = new ItemStack(Core.registry.router_item_filter);
+			upgradeItemFilter = false;
 		}
 		else if (upgradeType == Core.registry.router_machine_filter.upgradeId && upgradeMachineFilter) {
 			drop = new ItemStack(Core.registry.router_machine_filter);
+			upgradeMachineFilter = false;
 		}
 		else if (upgradeType == Core.registry.router_speed.upgradeId && upgradeSpeed) {
 			drop = new ItemStack(Core.registry.router_speed);
+			upgradeSpeed = false;
 		}
 		else if (upgradeType == Core.registry.router_thorough.upgradeId && upgradeThorough) {
 			drop = new ItemStack(Core.registry.router_thorough);
+			upgradeThorough = false;
 		}
 		else if (upgradeType == Core.registry.router_throughput.upgradeId && upgradeThroughput) {
 			drop = new ItemStack(Core.registry.router_throughput);
+			upgradeThroughput = false;
 		}
+		verifyUpgrades();
 		if (drop != null) {
 			player.inventory.addItemStackToInventory(drop);
 		}
 		else {
-			player.addChatMessage("No upgrade");
+			if (Core.instance.isCannonical(worldObj)) {
+				player.addChatMessage("No upgrade");
+			}
 		}
 	}
 
@@ -688,6 +763,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 		}
 		if (messageType == NetworkFactorization.MessageType.RouterDowngrade) {
 			removeUpgrade(input.readInt(), Core.network.currentPlayer);
+			return true;
 		}
 		return false;
 	}
@@ -706,6 +782,15 @@ public class TileEntityRouter extends TileEntityFactorization {
 			int z = input.readInt();
 			lastSeenAt = new Coord(worldObj, x, y, z);
 			drawActive(1);
+			return true;
+		}
+		if (messageType == MessageType.RouterUpgradeState) {
+			upgradeItemFilter = input.readBoolean();
+			upgradeMachineFilter = input.readBoolean();
+			upgradeSpeed = input.readBoolean();
+			upgradeThorough = input.readBoolean();
+			upgradeThroughput = input.readBoolean();
+			verifyUpgrades();
 			return true;
 		}
 		return false;

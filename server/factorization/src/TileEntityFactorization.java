@@ -15,6 +15,7 @@ import net.minecraft.src.Vec3D;
 import net.minecraft.src.mod_Factorization;
 import net.minecraft.src.forge.ISidedInventory;
 import factorization.src.NetworkFactorization.MessageType;
+import factorization.src.api.ICoord;
 
 public abstract class TileEntityFactorization extends TileEntityCommon
 		implements IInventory, ISidedInventory, ICoord, IFactoryType {

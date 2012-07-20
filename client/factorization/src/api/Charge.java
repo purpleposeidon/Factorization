@@ -1,7 +1,9 @@
-package factorization.src;
+package factorization.src.api;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+
+import factorization.src.Coord;
 
 import net.minecraft.src.NBTTagCompound;
 

@@ -3,6 +3,7 @@ package factorization.src;
 import net.minecraft.src.Packet;
 import net.minecraft.src.TileEntity;
 import factorization.src.NetworkFactorization.MessageType;
+import factorization.src.api.ICoord;
 
 public abstract class TileEntityCommon extends TileEntity implements ICoord, IFactoryType {
 	//@Override -- can't override due to MY GOD ITS THE CLIENTS FAULT THIS TIME

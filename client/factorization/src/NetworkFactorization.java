@@ -287,12 +287,17 @@ public class NetworkFactorization implements IConnectionHandler, IPacketHandler 
 	}
 
 	public void broadcastMessage(EntityPlayer who, Coord src, int messageType, Object... msg) {
-		// who is ignored
-		if (!Core.instance.isServer() && who == null) {
-			return;
-		}
+		//		// who is ignored
+		//		if (!Core.instance.isServer() && who == null) {
+		//			return;
+		//		}
 		Packet toSend = Core.network.messagePacket(src, messageType, msg);
-		broadcastPacket(who, src, toSend);
+		if (Core.instance.isServer()) {
+			broadcastPacket(who, src, toSend);
+		}
+		else {
+			Core.instance.addPacket(who, toSend);
+		}
 	}
 
 	static public class MessageType {
@@ -307,6 +312,7 @@ public class NetworkFactorization implements IConnectionHandler, IPacketHandler 
 				//
 				RouterSlot = 200, RouterTargetSide = 201, RouterMatch = 202, RouterIsInput = 203,
 				RouterLastSeen = 204, RouterMatchToVisit = 205, RouterDowngrade = 206,
+				RouterUpgradeState = 207,
 				//
 				BarrelDescription = 300, BarrelItem = 301, BarrelCount = 302
 				//

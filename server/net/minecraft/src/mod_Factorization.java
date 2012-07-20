@@ -87,6 +87,7 @@ public class mod_Factorization extends Core {
 
 	@Override
 	public void broadcastTranslate(EntityPlayer who, String... msg) {
+		//this function really is side-specific.
 		Packet p = network.translatePacket(msg);
 		EntityPlayerMP player = (EntityPlayerMP) who;
 		addPacket(player, p);

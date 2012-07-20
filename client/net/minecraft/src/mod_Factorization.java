@@ -87,7 +87,7 @@ public class mod_Factorization extends Core {
 
 	@Override
 	protected void addPacket(EntityPlayer player, Packet packet) {
-		if (!isCannonical(player.worldObj)) {
+		if (!isCannonical(ModLoader.getMinecraftInstance().thePlayer.worldObj)) {
 			ModLoader.getMinecraftInstance().getSendQueue().addToSendQueue(packet);
 		}
 	}

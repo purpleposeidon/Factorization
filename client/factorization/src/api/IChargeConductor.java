@@ -1,4 +1,5 @@
-package factorization.src;
+package factorization.src.api;
+
 
 public interface IChargeConductor extends ICoord {
 	/**

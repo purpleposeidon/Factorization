@@ -66,12 +66,31 @@ public class ContainerFactorization extends Container {
 		}
 	}
 
+	class StackLimitedSlot extends Slot {
+		int max_size;
+
+		public StackLimitedSlot(int max_size, IInventory par1iInventory, int par2, int par3,
+				int par4) {
+			super(par1iInventory, par2, par3, par4);
+			this.max_size = max_size;
+		}
+
+		@Override
+		public int getSlotStackLimit() {
+			return max_size;
+		}
+
+	}
+
 	public void addSlotsForGui(TileEntityFactorization ent, InventoryPlayer inventoryplayer) {
 		FactoryType type = ent.getFactoryType();
 		switch (type) {
 		case ROUTER:
 			TileEntityRouter router = (TileEntityRouter) ent;
-			addSlot(new Slot(router, 0, 61, 22));
+			addSlot(new Slot(router, 0, 62, 22));
+			for (int i = 0; i < 9; i++) {
+				addSlot(new StackLimitedSlot(1, router, 1 + i, 8 + i * 18, 44 - 0xFFFFFF));
+			}
 			break;
 		case CUTTER:
 			TileEntityCutter cutter = (TileEntityCutter) ent;
@@ -118,14 +137,16 @@ public class ContainerFactorization extends Container {
 			break;
 		}
 		addPlayerSlots(inventoryplayer);
+		if (type == FactoryType.ROUTER) {
+			slot_end = 1;
+		}
 	}
 
 	void addPlayerSlots(InventoryPlayer inventoryplayer) {
 		player_slot_start = inventorySlots.size();
 		for (int i = 0; i < 3; i++) {
 			for (int k = 0; k < 9; k++) {
-				addSlot(new Slot(inventoryplayer, k + i * 9 + 9, invdx + 8 + k
-						* 18, invdy + 84 + i * 18));
+				addSlot(new Slot(inventoryplayer, k + i * 9 + 9, invdx + 8 + k * 18, invdy + 84 + i * 18));
 			}
 		}
 

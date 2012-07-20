@@ -100,9 +100,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
 		}
 		topStack = bottomStack = null;
 		updateStacks();
-		if (worldObj != null && Core.instance.isCannonical(worldObj)) {
-			mod_Factorization.network.broadcastMessage(null, getCoord(), MessageType.BarrelCount, getItemCount());
-		}
+		broadcastItemCount();
 	}
 
 	public void setItemCount(int val) {
@@ -167,11 +165,13 @@ public class TileEntityBarrel extends TileEntityFactorization {
 		}
 		ItemStack ret = is.splitStack(amount);
 		updateStacks();
+		broadcastItemCount();
 		return ret;
 	}
 
 	@Override
 	public void setInventorySlotContents(int slot, ItemStack is) {
+		ItemStack old_item = item;
 		taintBarrel(is);
 		if (is != null && !itemMatch(is)) {
 			//whoever's doing this is a douchebag. Forget about the item.
@@ -186,6 +186,10 @@ public class TileEntityBarrel extends TileEntityFactorization {
 			topStack = is;
 			break;
 		}
+		if (old_item != item) {
+			broadcastItem();
+		}
+		broadcastItemCount();
 	}
 
 	@Override
@@ -238,8 +242,14 @@ public class TileEntityBarrel extends TileEntityFactorization {
 	}
 
 	void broadcastItem() {
-		if (Core.instance.isCannonical(worldObj)) {
+		if (worldObj != null && Core.instance.isCannonical(worldObj)) {
 			mod_Factorization.network.broadcastMessage(null, getCoord(), MessageType.BarrelItem, item);
+		}
+	}
+
+	void broadcastItemCount() {
+		if (worldObj != null && Core.instance.isCannonical(worldObj)) {
+			mod_Factorization.network.broadcastMessage(null, getCoord(), MessageType.BarrelCount, getItemCount());
 		}
 	}
 
@@ -420,7 +430,9 @@ public class TileEntityBarrel extends TileEntityFactorization {
 			count -= to_drop;
 			ejectItem(makeStack(to_drop), getItemCount() > 64 * 16, null);
 		}
-		setItemCount(0);
+		topStack = null;
+		middleCount = 0;
+		bottomStack = null;
 	}
 
 	@Override
@@ -458,7 +470,8 @@ public class TileEntityBarrel extends TileEntityFactorization {
 
 	@Override
 	public boolean canUpdate() {
-		//XXX TODO: Barrels don't need this. (Just to make sure the MD is enforced)
+		//XXX TODO: Barrels don't need this. (Just to make sure the MD is enforced, since an incorrect MD'd be so dangerous)
+		//Can probably get rid of it in... well, several versions. Maybe in September?
 		return true;
 	}
 
@@ -476,14 +489,18 @@ public class TileEntityBarrel extends TileEntityFactorization {
 		switch (messageType) {
 		case MessageType.BarrelCount:
 			setItemCount(input.readInt());
-			return true;
+			break;
 		case MessageType.BarrelDescription:
-			setItemCount(input.readInt());
-			// FALL THROUGH. LAZYNESS FOR THE WIN.
+			int i = input.readInt();
+			item = FactorizationHack.loadItemStackFromDataInput(input);
+			setItemCount(i);
+			break;
 		case MessageType.BarrelItem:
 			item = FactorizationHack.loadItemStackFromDataInput(input);
-			return true;
+			break;
+		default:
+			return false;
 		}
-		return false;
+		return true;
 	}
 }

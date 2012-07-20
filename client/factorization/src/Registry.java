@@ -319,12 +319,12 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
 		ModLoader.addRecipe(new ItemStack(router_item_filter),
 				"ITI",
 				"GDG",
-				"ICI",
+				"IDI",
 				'I', dark_iron,
 				'T', Block.torchRedstoneIdle,
 				'D', bound_tiny_demon,
 				'G', Item.ingotGold,
-				'C', Block.chest);
+				'D', Block.dispenser);
 		//XXX TODO: Silver ingot ore dictionary!
 		ModLoader.addRecipe(new ItemStack(router_machine_filter),
 				"ITI",

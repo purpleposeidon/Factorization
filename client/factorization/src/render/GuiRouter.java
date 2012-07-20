@@ -8,6 +8,7 @@ import java.util.HashMap;
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiContainer;
 import net.minecraft.src.IInventory;
+import net.minecraft.src.Slot;
 import net.minecraft.src.StatCollector;
 import net.minecraft.src.TileEntity;
 
@@ -38,7 +39,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
 	ButtonSet thorough_buttons = new ButtonSet();
 	ButtonSet bandwidth_buttons = new ButtonSet();
 
-	ButtonSet allSets[] = { main_buttons, machine_filter_buttons, speed_buttons, thorough_buttons, bandwidth_buttons };
+	ButtonSet allSets[] = { main_buttons, item_filter_buttons, machine_filter_buttons, speed_buttons, thorough_buttons, bandwidth_buttons };
 	ButtonSet current_set = allSets[0];
 
 	String[] side_names = { "bottom sides", "top sides", "§asouth§r sides", "§3north§r sides", "§eeast§r sides",
@@ -92,9 +93,9 @@ public class GuiRouter extends GuiContainer implements IClickable {
 		final int row_top = TOP;
 		final int row2_top = row_top + bh + 2;
 		global_buttons.clear();
-		int mode_width = 50;
+		int mode_width = 51;
 		mode_button = global_buttons.add(mode_button_id, LEFT, row_top, mode_width, bh, "Insert");
-		upgrade_button = global_buttons.add(upgrade_button_id, global_buttons.currentRight + 24, -1, bh, bh, "--");
+		upgrade_button = global_buttons.add(upgrade_button_id, global_buttons.currentRight + 24 + 1, -1, bh, bh, "--");
 
 		main_buttons.clear();
 		int dbw = 16; //delta button width
@@ -102,8 +103,16 @@ public class GuiRouter extends GuiContainer implements IClickable {
 		direction_button = main_buttons.add(direction_button_id, -1, -1, (xSize - 16) - dbw * 2, bh, "Slot...");
 		slot_up_button = main_buttons.add(slot_up, -1, -1, dbw, bh, "+");
 
+		item_filter_buttons.clear();
+		item_filter_buttons.add(global_buttons.currentRight + 8, row_top + 6, "Item Filter");
+		item_filter_buttons.setTest(new Predicate<TileEntity>() {
+			public boolean test(TileEntity a) {
+				return ((TileEntityRouter) a).upgradeItemFilter;
+			}
+		});
+
 		machine_filter_buttons.clear();
-		strict_entity_button = machine_filter_buttons.add(strict_entity, global_buttons.currentRight + 4, row_top, 63, bh, "visit all"); //visit only/visit all
+		strict_entity_button = machine_filter_buttons.add(strict_entity, global_buttons.currentRight + 4, row_top, 63, bh, "visit all"); //visit near/visit all
 		next_entity_button = machine_filter_buttons.add(next_entity, LEFT, row2_top, xSize - 16, bh, any_inv);
 		machine_filter_buttons.setTest(new Predicate<TileEntity>() {
 			public boolean test(TileEntity a) {
@@ -143,6 +152,12 @@ public class GuiRouter extends GuiContainer implements IClickable {
 			}
 		});
 
+		if (router.guiLastButtonSet >= 0 && router.guiLastButtonSet < allSets.length) {
+			current_set = allSets[router.guiLastButtonSet];
+			if (!current_set.canShow(router)) {
+				selectNextUpgrade();
+			}
+		}
 		updateGui();
 	}
 
@@ -184,13 +199,48 @@ public class GuiRouter extends GuiContainer implements IClickable {
 		} else {
 			next_entity_button.displayString = router.match;
 		}
+
+		for (int i = 1; i <= 9; i++) {
+			Slot s = (Slot) inventorySlots.inventorySlots.get(i);
+			if (router.upgradeItemFilter && current_set == item_filter_buttons) {
+				if (s.yDisplayPosition < 0) {
+					s.yDisplayPosition += 0xFFFFFF;
+				}
+			}
+			else {
+				if (s.yDisplayPosition > 0) {
+					s.yDisplayPosition -= 0xFFFFFF;
+				}
+			}
+		}
+
 		next_entity_button.displayString = StatCollector.translateToLocal(next_entity_button.displayString);
-		strict_entity_button.displayString = router.match_to_visit ? "visit only" : "visit all";
+		strict_entity_button.displayString = router.match_to_visit ? "visit near" : "visit all";
 	}
 
 	protected void drawGuiContainerForegroundLayer() {
 		fontRenderer.drawString("Item Router", 60, 6, 0x404040);
 		fontRenderer.drawString("Inventory", 8, (ySize - 96) + 2, 0x404040);
+	}
+
+	protected void drawGuiContainerBackgroundLayer(float f, int i, int j) {
+		int k = mc.renderEngine.getTexture(Core.texture_dir + "routergui.png");
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		mc.renderEngine.bindTexture(k);
+		int l = (width - xSize) / 2;
+		int i1 = (height - ySize) / 2;
+		drawTexturedModalRect(l, i1, 0, 0, xSize, ySize);
+		updateGui();
+		if (current_set == item_filter_buttons) {
+			drawTexturedModalRect(l + 8 - 1, i1 + 44 - 1, 0, 238, 162, 18);
+		}
+		global_buttons.draw(mc, i, j);
+		current_set.draw(mc, i, j);
+		String msg = "";
+		if (global_buttons.focused_id == upgrade_button_id && current_set != main_buttons) {
+			msg = "Press DELETE to remove this upgrade. ";
+		}
+		fontRenderer.drawString(msg, guiLeft, guiTop + ySize + 2, 0x707070);
 	}
 
 	void selectNextUpgrade() {
@@ -202,9 +252,11 @@ public class GuiRouter extends GuiContainer implements IClickable {
 					}
 					if (allSets[j].canShow(router)) {
 						current_set = allSets[j];
+						router.guiLastButtonSet = j;
 						return;
 					}
 				}
+				router.guiLastButtonSet = 0;
 				return;
 			}
 		}
@@ -307,23 +359,6 @@ public class GuiRouter extends GuiContainer implements IClickable {
 		}
 	}
 
-	protected void drawGuiContainerBackgroundLayer(float f, int i, int j) {
-		int k = mc.renderEngine.getTexture(Core.texture_dir + "routergui.png");
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		mc.renderEngine.bindTexture(k);
-		int l = (width - xSize) / 2;
-		int i1 = (height - ySize) / 2;
-		drawTexturedModalRect(l, i1, 0, 0, xSize, ySize);
-		updateGui();
-		global_buttons.draw(mc, i, j);
-		current_set.draw(mc, i, j);
-		String msg = "";
-		if (global_buttons.focused_id == upgrade_button_id && current_set != main_buttons) {
-			msg = "Press DELETE to remove this upgrade. ";
-		}
-		fontRenderer.drawString(msg, guiLeft, guiTop + ySize + 2, 0x707070);
-	}
-
 	protected void mouseClicked(int x, int y, int button) {
 		super.mouseClicked(x, y, button);
 		global_buttons.handleClick(this, mc, x, y, button);
@@ -338,7 +373,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
 			super.keyTyped(c, i);
 			return;
 		}
-		if (i == org.lwjgl.input.Keyboard.KEY_DELETE && current_set.focused_id == upgrade_button_id) {
+		if (i == org.lwjgl.input.Keyboard.KEY_DELETE && global_buttons.focused_id == upgrade_button_id) {
 			int upgrade_id = -1;
 
 			if (current_set == item_filter_buttons) {
@@ -360,7 +395,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
 				return;
 			}
 			if (!Core.instance.isCannonical(router.worldObj)) {
-				Core.network.broadcastMessage(null, router.getCoord(), MessageType.RouterDowngrade, upgrade_id);
+				router.broadcastMessage(null, MessageType.RouterDowngrade, upgrade_id);
 			}
 			router.removeUpgrade(upgrade_id, Core.instance.getClientPlayer());
 			selectNextUpgrade();
