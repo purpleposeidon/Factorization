@@ -11,12 +11,22 @@ import net.minecraft.src.IRecipe;
 import net.minecraft.src.InventoryLargeChest;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
+import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.ShapedRecipes;
 import net.minecraft.src.ShapelessRecipes;
 import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.World;
 
 public class FactorizationUtil {
+	public static NBTTagCompound getTag(ItemStack is) {
+		NBTTagCompound ret = is.getTagCompound();
+		if (ret == null) {
+			ret = new NBTTagCompound();
+			is.setTagCompound(ret);
+		}
+		return ret;
+	}
+
 	public static ItemStack transferStackToArea(IInventory srcInv, int slotIndex,
 			IInventory destInv, Iterable<Integer> targetSlots) {
 		//this is probably all wrong. >_>

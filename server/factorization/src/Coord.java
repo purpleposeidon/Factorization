@@ -29,6 +29,10 @@ public class Coord {
 		this(ent.worldObj, (int) ent.posX, (int) (ent.posY + ent.yOffset), (int) ent.posZ);
 	}
 
+	public Coord(World w, double x, double y, double z) {
+		this(w, (int) x, (int) y, (int) z);
+	}
+
 	public String toString() {
 		return "(" + x + ", " + y + ", " + z + ")";
 	}

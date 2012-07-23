@@ -26,6 +26,7 @@ import net.minecraft.src.forge.IPickupHandler;
 import net.minecraft.src.forge.MinecraftForge;
 
 public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
+	static public final int MechaKeyCount = 3;
 
 	public ItemFactorization item_factorization;
 	public ItemBlockResource item_resource;
@@ -53,6 +54,8 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
 	public ItemCraftingComponent silver_ingot, lead_ingot, dark_iron;
 	public ItemCraftingComponent mecha_chasis;
 	public MechaArmor mecha_head, mecha_chest, mecha_leg, mecha_foot;
+	public MechaBuoyantBarrel mecha_buoyant_barrel;
+	public MechaCobblestoneDrive mecha_cobble_drive;
 	public ItemMachineUpgrade router_item_filter, router_machine_filter, router_speed,
 			router_thorough, router_throughput;
 	public ItemStack fake_is;
@@ -290,6 +293,44 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
 				"# #",
 				"# #",
 				'#', mecha_chasis
+				);
+		//mecha armor upgrades
+		mecha_buoyant_barrel = new MechaBuoyantBarrel(itemID("mechaBouyantBarrel", 9021));
+		mecha_cobble_drive = new MechaCobblestoneDrive(itemID("mechaCobbleDrive", 9022));
+		AddName(mecha_buoyant_barrel, "Mecha-Upgrade: Buoyant Barrel");
+		AddName(mecha_cobble_drive, "Mecha-Upgrade: Cobblestone Drive");
+
+		ModLoader.addRecipe(new ItemStack(mecha_buoyant_barrel),
+				"W_W",
+				"PBP",
+				"WVW",
+				'W', Block.planks,
+				'_', Block.pressurePlatePlanks,
+				'P', Block.pistonBase,
+				'B', barrel_item,
+				'V', Item.boat
+				);
+
+		ItemStack is_cobble_drive = new ItemStack(mecha_cobble_drive);
+		ModLoader.addRecipe(is_cobble_drive,
+				"OPO",
+				"WTL",
+				"OOO",
+				'O', Block.obsidian,
+				'P', Block.pistonBase,
+				'W', Item.bucketWater,
+				'T', Item.pickaxeSteel,
+				'L', Item.bucketLava
+				);
+		ModLoader.addRecipe(is_cobble_drive,
+				"OPO",
+				"LTW",
+				"OOO",
+				'O', Block.obsidian,
+				'P', Block.pistonBase,
+				'W', Item.bucketWater,
+				'T', Item.pickaxeSteel,
+				'L', Item.bucketLava
 				);
 
 		// BlockFactorization recipes
@@ -530,6 +571,10 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
 
 	public void onTickPlayer(EntityPlayer player) {
 		MechaArmor.onTickPlayer(player);
+		if (!Core.instance.isCannonical(player.worldObj)) {
+			//we need mecha-armor to tick on the client. >_>
+			return;
+		}
 		// If in a GUI and holding a demon, BITE!
 		// Otherwise, if not in a GUI and holding in hand... BITE!
 		if (player.inventory.getItemStack() != null) {

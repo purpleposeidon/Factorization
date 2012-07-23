@@ -213,11 +213,12 @@ public class NetworkFactorization implements IConnectionHandler, IPacketHandler 
 			}
 			return;
 		} else if (channel.equals(factorizeCmdChannel)) {
-			if (data == null || data.length < 1) {
+			if (data == null || data.length < 2) {
 				return;
 			}
 			byte s = data[0];
-			Command.fromNetwork(player, s);
+			byte arg = data[1];
+			Command.fromNetwork(player, s, arg);
 			return;
 		}
 	}
@@ -251,11 +252,12 @@ public class NetworkFactorization implements IConnectionHandler, IPacketHandler 
 
 	}
 
-	public void sendCommand(EntityPlayer player, Command cmd) {
+	public void sendCommand(EntityPlayer player, Command cmd, byte arg) {
 		Packet250CustomPayload packet = new Packet250CustomPayload();
 		packet.channel = factorizeCmdChannel;
-		packet.data = new byte[1];
+		packet.data = new byte[2];
 		packet.data[0] = cmd.id;
+		packet.data[1] = arg;
 		packet.length = packet.data.length;
 		Core.instance.addPacket(player, packet);
 	}

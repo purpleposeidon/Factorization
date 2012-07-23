@@ -13,7 +13,107 @@ import net.minecraft.src.forge.ITextureProvider;
 
 public class MechaArmor extends ItemArmor
 		implements ISpecialArmor, ITextureProvider {
-	int slotCount = 2;
+	public int slotCount = 2;
+
+	public enum ActivationMode {
+		ALWAYS_ON, ALWAYS_OFF, HOLD_ON, SINGLEFIRE;
+
+		int toInt() {
+			for (int i = 0; i < values().length; i++) {
+				if (values()[i] == this) {
+					return i;
+				}
+			}
+			return 0;
+		}
+
+		static ActivationMode fromInt(int i) {
+			return values()[i];
+		}
+
+		public String describe(String action) {
+			switch (this) {
+			case ALWAYS_ON:
+				return "Always on";
+			case ALWAYS_OFF:
+				return "Never on";
+			case HOLD_ON:
+				return "On while " + action;
+			case SINGLEFIRE:
+				return "Fires once if " + action;
+			}
+			return "Always off (?)";
+		}
+	}
+
+	public static class MechaMode {
+		public int key = 0;
+		public ActivationMode mode = ActivationMode.HOLD_ON;
+
+		void writeToNbt(int slot, NBTTagCompound tag) {
+			tag.setInteger("modeKey" + slot, key);
+			tag.setInteger("activationMode" + slot, mode.toInt());
+		}
+
+		static MechaMode loadFromNbt(int slot, NBTTagCompound tag) {
+			MechaMode ret = new MechaMode();
+			if (tag == null) {
+				return ret;
+			}
+			ret.key = tag.getInteger("modeKey" + slot);
+			ret.mode = ActivationMode.fromInt(tag.getInteger("activationMode" + slot));
+			return ret;
+		}
+
+		boolean getState(EntityPlayer player) {
+			if (mode == ActivationMode.ALWAYS_OFF) {
+				return false;
+			}
+			if (mode == ActivationMode.ALWAYS_ON) {
+				return true;
+			}
+			if (mode == ActivationMode.SINGLEFIRE) {
+				return Core.instance.getPlayerKeyState(player, key) == Core.KeyState.KEYSTART;
+			}
+			if (mode == ActivationMode.HOLD_ON) {
+				return Core.instance.getPlayerKeyState(player, key).isPressed();
+			}
+			//TOOD: Hmm, how are we going to do toggling?
+			return false;
+		}
+
+		public boolean isConstant() {
+			return mode == ActivationMode.ALWAYS_ON || mode == ActivationMode.ALWAYS_OFF;
+		}
+
+		public void nextActivationMode(int d) {
+			int o = mode.toInt() + d;
+			int end = ActivationMode.values().length - 1;
+			if (o == -1) {
+				mode = ActivationMode.values()[end];
+				return;
+			}
+			if (o > end) {
+				mode = ActivationMode.values()[0];
+				return;
+			}
+			mode = ActivationMode.fromInt(o);
+		}
+
+		public void nextKey(int d) {
+			key += d;
+			if (key >= Registry.MechaKeyCount) {
+				key = Core.ExtraKey_minimum;
+			}
+			if (key < Core.ExtraKey_minimum) {
+				key = Registry.MechaKeyCount - 1;
+			}
+			if (mode == ActivationMode.SINGLEFIRE) {
+				key = Math.max(0, key);
+				//XXX TODO: Too lazy to keep track of states properly
+			}
+		}
+	}
 
 	public MechaArmor(int par1, int armorType) {
 		super(par1, EnumArmorMaterial.CHAIN, 0, armorType);
@@ -27,7 +127,7 @@ public class MechaArmor extends ItemArmor
 		return this;
 	}
 
-	ItemStack getStackInSlot(ItemStack is, int slot) {
+	public ItemStack getStackInSlot(ItemStack is, int slot) {
 		if (slot < 0 || slot >= slotCount) {
 			return null;
 		}
@@ -42,18 +142,21 @@ public class MechaArmor extends ItemArmor
 		return ItemStack.loadItemStackFromNBT(tag.getCompoundTag(index));
 	}
 
-	IMechaUpgrade getUpgradeInSlot(ItemStack is, int slot) {
+	public IMechaUpgrade getUpgradeInSlot(ItemStack is, int slot) {
 		return getUpgrade(getStackInSlot(is, slot));
 	}
 
-	IMechaUpgrade getUpgrade(ItemStack i) {
+	public IMechaUpgrade getUpgrade(ItemStack i) {
 		if (i == null || !(i.getItem() instanceof IMechaUpgrade)) {
+			return null;
+		}
+		if (i.stackSize == 0) {
 			return null;
 		}
 		return (IMechaUpgrade) i.getItem();
 	}
 
-	void setStackInSlot(ItemStack is, int slot, ItemStack stack) {
+	public void setStackInSlot(ItemStack is, int slot, ItemStack stack) {
 		if (slot < 0 || slot >= slotCount) {
 			return;
 		}
@@ -69,10 +172,36 @@ public class MechaArmor extends ItemArmor
 		is.getTagCompound().setCompoundTag("slot" + slot, itemTag);
 	}
 
+	public boolean isValidUpgrade(ItemStack is) {
+		if (is == null) {
+			return false;
+		}
+		if (is.getItem() instanceof IMechaUpgrade) {
+			return true;
+		}
+		if (is.getItem().getClass() == ItemArmor.class) {
+			if (((ItemArmor) is.getItem()).armorType == armorType) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void setSlotMechaMode(ItemStack is, int slot, MechaMode mode) {
+		if (is.getTagCompound() == null) {
+			is.setTagCompound(new NBTTagCompound());
+		}
+		mode.writeToNbt(slot, is.getTagCompound());
+	}
+
+	public MechaMode getSlotMechaMode(ItemStack is, int slot) {
+		return MechaMode.loadFromNbt(slot, is.getTagCompound());
+	}
+
 	static void onTickPlayer(EntityPlayer player) {
 		for (ItemStack armorStack : player.inventory.armorInventory) {
 			if (armorStack == null) {
-				return;
+				continue;
 			}
 			if (armorStack.getItem() instanceof MechaArmor) {
 				((MechaArmor) armorStack.getItem()).tickArmor(player, armorStack);
@@ -85,7 +214,16 @@ public class MechaArmor extends ItemArmor
 			ItemStack is = getStackInSlot(armorStack, i);
 			IMechaUpgrade up = getUpgrade(is);
 			if (up != null) {
-				up.tickUpgrade(player, is);
+				boolean active = getSlotMechaMode(armorStack, i).getState(player);
+				ItemStack ret = up.tickUpgrade(player, armorStack, is, active);
+				getSlotMechaMode(armorStack, i).getState(player);
+				if (ret == null) {
+					continue;
+				}
+				if (ret.stackSize == 0) {
+					setStackInSlot(armorStack, i, null);
+				}
+				setStackInSlot(armorStack, i, ret);
 			}
 		}
 	}
@@ -215,5 +353,4 @@ public class MechaArmor extends ItemArmor
 	public int getIconFromDamage(int par1) {
 		return (4 + armorType) * 16;
 	}
-
 }

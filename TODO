@@ -1,16 +1,15 @@
 http://www.minecraftforum.net/topic/1351802-factorization/
 
+You probably spelled "buoyancy" wrong.
 mod info file
 silver ingot for an upgrade recipe
 draw_active isn't marking the block dirty apparently?
+re-write the shift-clicking function to use slots!!!
 shift-clicking out of pocket crafting result slot should go into a hotbar slot... (And I guess the 3x3 should go to normal inv)
-re-write the shift-clicking function to use slots
-slag furnace recipes for copper/tin! Obviously! My goodness!
-particle effects for slag furnaces
 silver ore needs to be toughened up just a tad!
-pocket-crafting out of a chest bugs it out
 allow making diamond shard using a single diamond (or something)
 update Forge
+see if barrel can use Forge's item rendering methods instead. Just need to prevent bobbing, and set stack size..?
 check normal fire interactions w/ our TEs
 
 have sentry demon send redstone signal when it senses shit
@@ -226,6 +225,20 @@ Sand papers:
 
 smelter:
   so, like, purify iron ore or something?
+
+Mecha-upgrades:
+  Free:
+    bouyancy barrel
+    internal piston
+    cobblestone drive
+  Electric:
+    charcoal filter
+    thermal environmental control
+  Antium:
+    upgrades from slowing falling to slight hovering to flying amongst the birds
+    something to feed you
+    
+
 
 
 Clay

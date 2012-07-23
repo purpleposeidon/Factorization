@@ -8,7 +8,6 @@ import net.minecraft.src.Container;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.InventoryPlayer;
-import net.minecraft.src.ItemArmor;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.Slot;
 
@@ -16,12 +15,12 @@ public class ContainerMechaModder extends Container {
 	Coord benchLocation;
 	InventoryPlayer inv;
 	EntityPlayer player;
-	InventoryUpgrader upgrader;
+	public InventoryUpgrader upgrader;
 	SlotMechaArmor armorSlot;
 
-	class InventoryUpgrader implements IInventory {
-		ItemStack armor;
-		ItemStack[] upgrades = new ItemStack[9];
+	public class InventoryUpgrader implements IInventory {
+		public ItemStack armor;
+		public ItemStack[] upgrades = new ItemStack[9];
 
 		ItemStack lastArmor;
 
@@ -131,16 +130,8 @@ public class ContainerMechaModder extends Container {
 					continue;
 				}
 				ItemStack up = upgradeSlot.getStack();
-				if (up == null) {
-					continue;
-				}
-				if (up.getItem() instanceof IMechaUpgrade) {
+				if (armor.isValidUpgrade(up)) {
 					armor.setStackInSlot(is, slot, upgradeSlot.decrStackSize(1));
-				}
-				if (up.getItem().getClass() == ItemArmor.class) {
-					if (((ItemArmor) up.getItem()).armorType == armor.armorType) {
-						armor.setStackInSlot(is, slot, upgradeSlot.decrStackSize(1));
-					}
 				}
 			}
 			return is;

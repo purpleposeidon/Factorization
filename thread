@@ -84,17 +84,18 @@ Ceramics
 [u][b][size=6][anchor=INSTALL]Installation[/anchor][/size][/b][/u]
 This is a [url="http://lexmanos.no-ip.org:8080/job/Forge/Recommended/"]Minecraft Forge[/url] mod. It uses 3 block IDs. 
 
-1. Install [url="http://lexmanos.no-ip.org:8080/job/Forge/Recommended/"]Minecraft Forge[/url] by extracting the contents of the forge download into the Minecraft jar. Be sure to delete the META-INF/ folder (unless you are installing on a server). If you have a version of forge that's as old as or newer than 3.1.2, it should work fine.
-2. Check that the forge install worked by running the client (or the server).
-3. Put the mod into the mods folder.
+1. Install [url="http://lexmanos.no-ip.org:8080/job/Forge/Recommended/"]Minecraft Forge[/url] by extracting the contents of the forge download into the Minecraft jar. Be sure to delete the META-INF/ folder ([u]unless you are installing a server![/u]). If you already have a version of forge that's as old as or newer than 3.1.2, it should work fine.
+2. Check that the forge install worked by running the client (or the server). Forge information should be on the title screen  (or in the server's logs).
+3. Put Factorization.jar/Factorization_server.jar into the mods folder. Restart Minecraft.
+4. This instruction list is too short!
+5. There. That's better.
 
 
 [u][b][size=6][anchor=DOWNLOAD]Download[/anchor][/size][/b][/u]
 [url="http://adf.ly/Ah9BS"]Client (adfly + MediaFire)[/url], or [url="http://adf.ly/AiEBA"] (adfly + DropBox)[/url]
 [url="http://adf.ly/Ah9Dv"]Server (adfly + MediaFire)[/url], or [url="http://adf.ly/AiEEz"] (adfly + DropBox)[/url]
 
+I recommend you also install RedPower and NEI.
 
 [u][b][size=6][anchor=LICENSE]License[/anchor][/size][/b][/u]
 Do not distribute! Unless you have my permission. Source code may be available on request.
-
-This mod includes portions of the [url="http://www.mod-buildcraft.com/"]BuildCraft[/url] API.

@@ -2,6 +2,7 @@ package factorization.src;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -260,5 +261,101 @@ public abstract class Core extends NetworkMod implements IGuiHandler {
 		int z = cz + rand.nextInt(16);
 		int y = 5 + rand.nextInt(48);
 		silverGen.generate(w, rand, x, y, z);
+	}
+
+	enum KeyState {
+		KEYOFF, KEYSTART, KEYON;
+
+		boolean isPressed() {
+			return this != KEYOFF;
+		}
+	}
+
+	HashMap<EntityPlayer, KeyState[]> keyStateMap = new HashMap();
+
+	void putPlayerKey(EntityPlayer player, int key, boolean state) {
+		KeyState pmap[] = keyStateMap.get(player);
+		if (pmap == null) {
+			pmap = new KeyState[Registry.MechaKeyCount];
+			keyStateMap.put(player, pmap);
+		}
+		if (state) {
+			pmap[key] = KeyState.KEYSTART;
+		}
+		else {
+			pmap[key] = KeyState.KEYOFF;
+		}
+	}
+
+	static int ExtraKey_minimum = 0;
+
+	public enum ExtraKey {
+		SNEAK(-1, "sneaking"), INAIR(-2, "in the air"), RUN(-3, "running");
+
+		int id;
+		public String text;
+
+		ExtraKey(int id, String text) {
+			this.id = id;
+			this.text = text;
+			ExtraKey_minimum = Math.min(ExtraKey_minimum, id);
+		}
+
+		public static ExtraKey fromInt(int i) {
+			for (ExtraKey ek : values()) {
+				if (ek.id == i) {
+					return ek;
+				}
+			}
+			return INAIR;
+		}
+
+		boolean isActive(EntityPlayer player) {
+			switch (this) {
+			case SNEAK:
+				return player.isSneaking();
+			case INAIR:
+				return player.isAirBorne;
+			case RUN:
+				return player.isSprinting();
+			}
+			return false;
+		}
+	}
+
+	KeyState getPlayerKeyState(EntityPlayer player, int key) {
+		if (player == null) {
+			return KeyState.KEYOFF;
+		}
+		if (key < 0) {
+			return ExtraKey.fromInt(key).isActive(player) ? KeyState.KEYON : KeyState.KEYOFF;
+		}
+		KeyState arr[] = keyStateMap.get(player);
+		if (arr == null) {
+			putPlayerKey(player, 0, false);
+			return KeyState.KEYOFF;
+		}
+		KeyState ret = arr[key];
+		if (ret == null) {
+			return KeyState.KEYOFF;
+		}
+		return ret;
+	}
+
+	boolean hasPlayerKey(EntityPlayer player, int key) {
+		return getPlayerKeyState(player, key).isPressed();
+	}
+
+	public void updatePlayerKeys() {
+		for (KeyState states[] : keyStateMap.values()) {
+			for (int i = 0; i < states.length; i++) {
+				if (states[i] == KeyState.KEYSTART) {
+					states[i] = KeyState.KEYON;
+				}
+				if (states[i] == null) {
+					states[i] = KeyState.KEYOFF;
+				}
+			}
+		}
 	}
 }
