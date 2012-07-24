@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-import factorization.api.Coord;
-
 import net.minecraft.src.Block;
 import net.minecraft.src.EntityItem;
 import net.minecraft.src.IInventory;
@@ -18,6 +16,7 @@ import net.minecraft.src.ShapedRecipes;
 import net.minecraft.src.ShapelessRecipes;
 import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.World;
+import factorization.api.Coord;
 
 public class FactorizationUtil {
     public static NBTTagCompound getTag(ItemStack is) {
@@ -32,6 +31,10 @@ public class FactorizationUtil {
     public static boolean itemCanFire(World w, ItemStack is, int tickDelay) {
         NBTTagCompound tag = FactorizationUtil.getTag(is);
         long t = tag.getLong("lf");
+        if (t > w.getWorldTime()) {
+            tag.setLong("lf", w.getWorldTime());
+            return true;
+        }
         if (t + tickDelay > w.getWorldTime()) {
             return false;
         }

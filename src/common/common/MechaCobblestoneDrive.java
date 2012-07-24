@@ -1,6 +1,5 @@
 package factorization.common;
 
-import factorization.api.IMechaUpgrade;
 import net.minecraft.src.Block;
 import net.minecraft.src.DamageSource;
 import net.minecraft.src.EntityItem;
@@ -10,6 +9,7 @@ import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.forge.ArmorProperties;
 import net.minecraft.src.forge.ITextureProvider;
+import factorization.api.IMechaUpgrade;
 
 public class MechaCobblestoneDrive extends Item implements IMechaUpgrade, ITextureProvider {
 
@@ -28,6 +28,9 @@ public class MechaCobblestoneDrive extends Item implements IMechaUpgrade, ITextu
     public ItemStack tickUpgrade(EntityPlayer player, ItemStack armor, ItemStack upgrade,
             boolean isEnabled) {
         if (!isEnabled) {
+            return null;
+        }
+        if (!Core.instance.isCannonical(player.worldObj)) {
             return null;
         }
         if (!FactorizationUtil.itemCanFire(player.worldObj, upgrade, 40)) {

@@ -9,8 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.IllegalFormatException;
 
-import factorization.api.Coord;
-
+import net.minecraft.src.Block;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.FactorizationHack;
 import net.minecraft.src.ItemStack;
@@ -26,6 +25,7 @@ import net.minecraft.src.World;
 import net.minecraft.src.forge.IConnectionHandler;
 import net.minecraft.src.forge.IPacketHandler;
 import net.minecraft.src.forge.MessageManager;
+import factorization.api.Coord;
 
 public class NetworkFactorization implements IConnectionHandler, IPacketHandler {
     protected final static String factorizeChannel = "factorize"; //used for tile entities
@@ -240,6 +240,10 @@ public class NetworkFactorization implements IConnectionHandler, IPacketHandler 
             case MessageType.PlaySound:
                 Sound.receive(input);
                 break;
+            case MessageType.PistonPush:
+                Block.pistonBase.receiveClientEvent(world, x, y, z, 0, input.readInt());
+                new Coord(world, x, y, z).setId(0);
+                break;
             default:
                 if (world.blockExists(x, y, z)) {
                     System.err.println("Got unhandled message: " + messageType + " for " + (x + "," + y + "," + z));
@@ -307,7 +311,7 @@ public class NetworkFactorization implements IConnectionHandler, IPacketHandler 
     static public class MessageType {
         //Non TEF messages
         public final static int ShareAll = -1;
-        public final static int DemonEnterChest = 10, PlaySound = 11;
+        public final static int DemonEnterChest = 10, PlaySound = 11, PistonPush = 12;
         //TEF messages
         public final static int
                 DrawActive = 0, FactoryType = 1,

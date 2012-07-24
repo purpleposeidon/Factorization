@@ -45,6 +45,9 @@ public class MechaMountedPiston extends Item implements IMechaUpgrade, ITextureP
         }
         Block.pistonBase.receiveClientEvent(c.w, c.x, c.y, c.z, 0, orientation);
         c.setId(0);
+        if (Core.instance.isServer()) {
+            Core.network.broadcastMessage(null, c, NetworkFactorization.MessageType.PistonPush, orientation);
+        }
         return true;
     }
 
@@ -53,11 +56,26 @@ public class MechaMountedPiston extends Item implements IMechaUpgrade, ITextureP
         if (!isEnabled) {
             return null;
         }
+        if (!Core.instance.isCannonical(player.worldObj)) {
+            return null;
+        }
+
         if (!FactorizationUtil.itemCanFire(player.worldObj, upgrade, 15)) {
             return null;
         }
-        Coord head = new Coord(player).add(0, -2, 0);
-        Coord foot = new Coord(player).add(0, -3, 0);
+
+        Coord head;
+        Coord foot;
+        if (Core.instance.isServer()) {
+            //...?
+            //man, what's up with this?
+            head = new Coord(player).add(0, 1, 0).add(-1, 0, 0);
+            foot = new Coord(player).add(-1, 0, 0);
+        }
+        else {
+            head = new Coord(player).add(0, -2, 0);
+            foot = new Coord(player).add(0, -3, 0);
+        }
 
         Coord order[];
         if (player.rotationPitch <= 45) {

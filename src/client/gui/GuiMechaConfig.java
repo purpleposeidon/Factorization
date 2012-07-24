@@ -2,12 +2,14 @@ package factorization.client.gui;
 
 import java.util.ArrayList;
 
+import net.minecraft.src.Block;
 import net.minecraft.src.Container;
 import net.minecraft.src.GameSettings;
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiContainer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemArmor;
+import net.minecraft.src.ItemBlock;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.ModLoader;
 
@@ -74,6 +76,46 @@ public class GuiMechaConfig extends GuiContainer {
         return null;
     }
 
+    void drawSlotInfo(int slot) {
+        MechaArmor armor = getArmor();
+        if (armor == null) {
+            return;
+        }
+        ItemStack upgrade = cont.upgrader.getStackInSlot(101 + slot);
+        if (upgrade == null) {
+            return;
+        }
+
+        int left = guiLeft + 8;
+        int top = guiTop + 72;
+        int delta = 12;
+        String description = null;
+        if (upgrade.getItem() instanceof IMechaUpgrade) {
+            IMechaUpgrade up = (IMechaUpgrade) upgrade.getItem();
+            description = up.getDescription();
+        }
+        else if (upgrade.getItem() instanceof ItemBlock) {
+            ItemBlock ib = (ItemBlock) upgrade.getItem();
+            if (ib.getBlockID() == Block.cloth.blockID) {
+                description = "Emits colored particles";
+            }
+        }
+        if (description == null) {
+            return;
+        }
+        fontRenderer.drawString(description, left, top, 4210752);
+        MechaMode mode = armor.getSlotMechaMode(cont.upgrader.armor, slot);
+        String action = "";
+        if (mode.key >= 0) {
+            int key = ((mod_Factorization) Core.instance).mechas[mode.key].keyCode;
+            action = GameSettings.getKeyDisplayString(key) + " is pressed";
+        }
+        else {
+            action = Core.ExtraKey.fromInt(mode.key).text;
+        }
+        fontRenderer.drawString(mode.mode.describe(action), left, top + delta, 4210752);
+    }
+
     @Override
     protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
         int k = mc.renderEngine.getTexture(Core.texture_dir + "mechamodder.png");
@@ -86,36 +128,12 @@ public class GuiMechaConfig extends GuiContainer {
         updateButtons();
         for (GuiButton button : buttons) {
             button.drawButton(mc, var2, var3);
-            if (button.mousePressed(mc, var2, var3)) {
-                MechaArmor armor = getArmor();
-                if (armor == null) {
-                    continue;
+            if (button.id % 2 == 0) {
+                if (button.mousePressed(mc, var2, guiTop + 26 + 1)) {
+                    if (var3 > guiTop && var3 < guiTop + 20 * 4) {
+                        drawSlotInfo(button.id / 2);
+                    }
                 }
-                int slot = button.id / 2;
-                boolean activationButton = 0 == (button.id % 2);
-                ItemStack upgrade = cont.upgrader.getStackInSlot(101 + slot);
-                if (upgrade == null) {
-                    continue;
-                }
-                if (!(upgrade.getItem() instanceof IMechaUpgrade)) {
-                    continue;
-                }
-                IMechaUpgrade up = (IMechaUpgrade) upgrade.getItem();
-                MechaMode mode = armor.getSlotMechaMode(cont.upgrader.armor, slot);
-
-                int left = guiLeft + 8;
-                int top = guiTop + 72;
-                int delta = 12;
-                fontRenderer.drawString(up.getDescription(), left, top, 4210752);
-                String action = "";
-                if (mode.key >= 0) {
-                    int key = ((mod_Factorization) Core.instance).mechas[mode.key].keyCode;
-                    action = GameSettings.getKeyDisplayString(key) + " is pressed";
-                }
-                else {
-                    action = Core.ExtraKey.fromInt(mode.key).text;
-                }
-                fontRenderer.drawString(mode.mode.describe(action), left, top + delta, 4210752);
             }
         }
     }

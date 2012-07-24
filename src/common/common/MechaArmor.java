@@ -1,16 +1,21 @@
 package factorization.common;
 
-import factorization.api.IMechaUpgrade;
+import java.util.Random;
+
+import net.minecraft.src.Block;
 import net.minecraft.src.DamageSource;
 import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EnumArmorMaterial;
+import net.minecraft.src.Item;
 import net.minecraft.src.ItemArmor;
+import net.minecraft.src.ItemBlock;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.forge.ArmorProperties;
 import net.minecraft.src.forge.ISpecialArmor;
 import net.minecraft.src.forge.ITextureProvider;
+import factorization.api.IMechaUpgrade;
 
 public class MechaArmor extends ItemArmor
         implements ISpecialArmor, ITextureProvider {
@@ -177,8 +182,14 @@ public class MechaArmor extends ItemArmor
         if (is == null) {
             return false;
         }
-        if (is.getItem() instanceof IMechaUpgrade) {
+        Item item = is.getItem();
+        if (item instanceof IMechaUpgrade) {
             return true;
+        }
+        if (item instanceof ItemBlock) {
+            if (((ItemBlock) item).getBlockID() == Block.cloth.blockID) {
+                return true;
+            }
         }
         if (is.getItem().getClass() == ItemArmor.class) {
             if (((ItemArmor) is.getItem()).armorType == armorType) {
@@ -213,6 +224,9 @@ public class MechaArmor extends ItemArmor
     void tickArmor(EntityPlayer player, ItemStack armorStack) {
         for (int i = 0; i < slotCount; i++) {
             ItemStack is = getStackInSlot(armorStack, i);
+            if (is == null) {
+                continue;
+            }
             IMechaUpgrade up = getUpgrade(is);
             if (up != null) {
                 boolean active = getSlotMechaMode(armorStack, i).getState(player);
@@ -225,8 +239,34 @@ public class MechaArmor extends ItemArmor
                     setStackInSlot(armorStack, i, null);
                 }
                 setStackInSlot(armorStack, i, ret);
+            } else if (is.getItem() instanceof ItemBlock) {
+                ItemBlock ib = (ItemBlock) is.getItem();
+                if (ib.getBlockID() == Block.cloth.blockID) {
+                    boolean active = getSlotMechaMode(armorStack, i).getState(player);
+                    if (active) {
+                        spawnWoolParticles(player, is.getItemDamage());
+                    }
+                }
             }
         }
+    }
+
+    static Random rand = new Random();
+
+    double randDelta() {
+        return (rand.nextGaussian() - 0.5) / 4;
+    }
+    public void spawnWoolParticles(EntityPlayer player, int id) {
+        double reds[] = new double[] { 221, 219, 179, 107, 177, 65, 208, 64, 154, 46, 126, 46, 79, 53, 150, 25 };
+        double greens[] = new double[] { 221, 125, 80, 138, 166, 174, 132, 64, 161, 110, 61, 56, 50, 70, 52, 22 };
+        double blues[] = new double[] { 221, 62, 188, 201, 39, 56, 153, 64, 161, 137, 181, 141, 31, 27, 48, 22 };
+        if (id < 0 || id >= 16) {
+            return;
+        }
+        double x = player.posX + randDelta();
+        double y = player.posY + randDelta();
+        double z = player.posZ + randDelta();
+        player.worldObj.spawnParticle("reddust", x, y, z, reds[id] / 0xFF, greens[id] / 0xFF, blues[id] / 0xFF);
     }
 
     //vanilla armor feature
