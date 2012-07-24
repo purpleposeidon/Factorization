@@ -60,7 +60,7 @@ public class mod_Factorization extends Core {
     public File getWorldSaveDir(World world) {
         ISaveHandler handler = world.getSaveHandler();
         SaveHandler sh = (SaveHandler) world.getSaveHandler();
-        File save_dir = ReflectionHelper.getPrivateValue(SaveHandler.class, sh, 0);
+        File save_dir = ReflectionHelper.getPrivateValue(SaveHandler.class, sh, 1);
         String save_folder = world.worldProvider.getSaveFolder();
         if (save_folder == null) {
             return save_dir;
