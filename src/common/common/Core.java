@@ -254,7 +254,7 @@ public abstract class Core extends NetworkMod implements IGuiHandler {
         if (rand.nextFloat() > 0.35) {
             return;
         }
-        if (Math.abs(cx + cz) % 2 == 0) {
+        if (Math.abs(cx + cz) % 3 == 1) {
             return;
         }
         int x = cx + rand.nextInt(16);
@@ -358,4 +358,5 @@ public abstract class Core extends NetworkMod implements IGuiHandler {
             }
         }
     }
+
 }
