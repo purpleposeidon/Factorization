@@ -3,12 +3,12 @@
   "modid": "mod_Factorization",
   "name": "Factorization",
   "description": "",
-  "version": "@VERSION@",
+  "version": "",
   "mcversion": "1.2.5",
-  "url": "http://www.minecraftforum.net/topic/1351802-factorization/",
+  "url": "http://minecraftforum.net/topic/1351802-",
   "updateUrl": "",
   "authors": [
-    "absurdHuman"
+    "neptunepink"
   ],
   "credits": "",
   "logoFile": "",
