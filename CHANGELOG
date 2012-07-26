@@ -1,13 +1,30 @@
-0.3.2
+0.3.2 -- Upgraded!
+  In brief: Mecha-upgrades, and Router upgrades.
+
+  Doesn't work with the old ModLoader. Do not install ModLoader, install the recommended Forge version instead.
   The pistonless recipe for makers has been removed, 'cause it didn't make sense, 'cause the recipe for pistons doesn't make sense.
   Redstone ore, Tin, and Copper are now slaggable.
   Bound demons are now mostly harmless, and unbound demons more dangerous.
-  Internal workings of barrels changed so that they should now work with Logistics Pipes, and should be more likely to work with other item-moving systems.
-  Since I found like 4 silver veins right next eachother in my playtest world, silver now spawns only on alternating chunks.
+  Internal workings of barrels changed so that they should now work with Logistics Pipes, and should be more likely to work with other item-moving systems by default.
+  Since I found like 4 silver veins right next eachother in my playtest world, silver is now guaranteed to not spawn in every 3rd chunk.
   Routers:
-      will continue to distribute items even if there isn't a TE path between the router and its current location.
-      might actually work properly on moving frames?
-  Now using the cooler texture for dark iron.
+    might work sensibly with frames now
+    now have an upgrade system! And the GUI has been re-made. I'm hoping that an GUI w/o upgrades will be easier to understand.
+  Router upgrades:
+    Machine Filter (This was in the previous version. You will have to craft an upgrade & reset it if you were using it.)
+    Item Filter ([i]Diabolus in machina![/i] You get 9 slots.)
+    Speed Boost (Will be faster at removing items from a mostly empty network, or for networks that are large/complex)
+    Thoroughness (Will attempt to completely finish handling a machine before going to the next one.)
+    Bandwidth (Will move up to 1 stack of items at a time)
+  Did I mention that you can turn off a router by giving it a redstone signal? That's not actually a new thing.
+  Additional fun router-related fact: Many buttons can be right-clicked.
+  Mecha upgrades:
+    buoyancy barrel: This makes you rise quickly through the water. I hope you haven't forgotten your water elevators!
+    cobblestone drive: a cobblegen in your back-pocket. The cobble will quickly disappear.
+    shoulder-mounted piston: This lets you push blocks.
+    wool: pretty colors. Others might not see it in SMP?
+    A very small taste of things to come; these are mere toys. Most upgrades'll require an energy source and/or very, very exotic materials.
+  Now using the cooler texture for dark iron. It looks so much cooler now.
   Buildcraft API no longer used
 
 

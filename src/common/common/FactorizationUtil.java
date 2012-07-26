@@ -14,6 +14,7 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.ShapedRecipes;
 import net.minecraft.src.ShapelessRecipes;
+import net.minecraft.src.Slot;
 import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.World;
 import factorization.api.Coord;
@@ -85,6 +86,42 @@ public class FactorizationUtil {
         }
         srcInv.setInventorySlotContents(slotIndex, is);
         return is;
+    }
+
+    public static void transferSlotToSlots(Slot src, Iterable<Slot> destination) {
+        if (src == null || destination == null || !destination.iterator().hasNext()) {
+            return;
+        }
+        ItemStack sis = src.getStack();
+        if (sis == null || sis.stackSize < 1) {
+            return;
+        }
+        for (Slot slot : destination) {
+            ItemStack is = slot.getStack();
+            if (is != null) {
+                if (slot.getStack().stackSize >= slot.getSlotStackLimit()) {
+                    continue;
+                }
+                if (!is.isStackEqual(sis)) {
+                    continue;
+                }
+                int avail = slot.getSlotStackLimit() - is.stackSize;
+                int toput = Math.min(sis.stackSize, avail);
+                is.stackSize += toput;
+                slot.putStack(is);
+                sis.stackSize -= toput;
+                if (sis.stackSize == 0) {
+                    sis = null;
+                }
+                src.putStack(sis);
+                return;
+
+            } else {
+                int toput = Math.min(slot.getSlotStackLimit(), src.getStack().stackSize);
+                slot.putStack(src.decrStackSize(toput));
+                return;
+            }
+        }
     }
 
     /**

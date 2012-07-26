@@ -61,28 +61,6 @@ public class ItemCraft extends Item implements ITextureProvider {
         craftAt(is, true, null);
     }
 
-    public static String centerJustify(String src, final int width) {
-        int free = width - src.length();
-        if (free <= 0) {
-            return src;
-        }
-        int pad_left = free / 2;
-        int pad_right = free / 2;
-        if (pad_left + pad_right < width) {
-            pad_left++;
-        }
-
-        StringBuilder str = new StringBuilder(width);
-        while (pad_left-- > 0) {
-            str.append(' ');
-        }
-        str.append(src);
-        while (pad_right-- > 0) {
-            str.append(' ');
-        }
-
-        return new String(str);
-    }
 
     // @Override -- XXX NOTE Can't override due to server
     public void addInformation(ItemStack is, List list) {
@@ -147,8 +125,7 @@ public class ItemCraft extends Item implements ITextureProvider {
     }
 
     InventoryCrafting getCrafter(ItemStack is) {
-        InventoryCrafting craft = new InventoryCrafting(new DummyContainer(),
-                3, 3);
+        InventoryCrafting craft = new InventoryCrafting(new DummyContainer(), 3, 3);
         for (int i = 0; i < slot_length; i++) {
             craft.setInventorySlotContents(i, getSlot(is, i));
         }
@@ -170,6 +147,12 @@ public class ItemCraft extends Item implements ITextureProvider {
         if (!(is.getItem() instanceof ItemCraft)) {
             return null;
         }
+        if (is.getItemDamage() == Core.registry.diamond_shard_packet.getItemDamage()) {
+            ItemStack cp = Core.registry.diamond_shard_packet.copy();
+            cp.setItemDamage(0);
+            return craftAt(cp, fake, where);
+        }
+
         ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
         InventoryCrafting craft = getCrafter(is);
 

@@ -1,7 +1,6 @@
 http://www.minecraftforum.net/topic/1351802-factorization/
 
 You probably spelled "buoyancy" wrong.
-mod info file
 silver ingot for an upgrade recipe
 draw_active isn't marking the block dirty apparently?
 re-write the shift-clicking function to use slots!!!
@@ -11,6 +10,9 @@ allow making diamond shard using a single diamond (or something)
 update Forge
 see if barrel can use Forge's item rendering methods instead. Just need to prevent bobbing, and set stack size..?
 check normal fire interactions w/ our TEs
+two issues with buttons in mecha-modder: doesn't update when blank armor put in; reinforcing w/ vanilla armor doesn't hide buttons
+shift-clicking the shard recipe doesn't do the thing. *and*, stamping them doesn't work either!!!
+have wrathfire be supported also by netherbrick variants
 
 have sentry demon send redstone signal when it senses shit
   player: signal on top.

@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import factorization.api.Coord;
-
 import net.minecraft.src.Container;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.InventoryPlayer;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.Slot;
+import factorization.api.Coord;
 
 public class ContainerMechaModder extends Container {
     Coord benchLocation;
@@ -19,6 +18,7 @@ public class ContainerMechaModder extends Container {
     EntityPlayer player;
     public InventoryUpgrader upgrader;
     SlotMechaArmor armorSlot;
+    ArrayList<Slot> upgradeSlots = new ArrayList(), playerSlots = new ArrayList<Slot>();
 
     public class InventoryUpgrader implements IInventory {
         public ItemStack armor;
@@ -177,12 +177,16 @@ public class ContainerMechaModder extends Container {
         //player inventory
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                this.addSlot(new Slot(inv, col + row * 9 + 9, 8 + col * 18, 116 + row * 18));
+                Slot s = new Slot(inv, col + row * 9 + 9, 8 + col * 18, 116 + row * 18);
+                this.addSlot(s);
+                playerSlots.add(s);
             }
         }
 
         for (int col = 0; col < 9; col++) {
-            this.addSlot(new Slot(inv, col, 8 + col * 18, 174));
+            Slot s = new Slot(inv, col, 8 + col * 18, 174);
+            this.addSlot(s);
+            playerSlots.add(s);
         }
 
         //slots for upgrades
@@ -195,6 +199,8 @@ public class ContainerMechaModder extends Container {
         //slot for the armor
         armorSlot = new SlotMechaArmor(upgrader, 100, 7, 7, upgrades);
         this.addSlot(armorSlot);
+        upgradeSlots.add(armorSlot);
+        upgradeSlots.addAll(upgrades);
     }
 
     @Override
@@ -242,15 +248,21 @@ public class ContainerMechaModder extends Container {
                 ItemStack is = armorSlot.decrStackSize(armorSlot.getStack().stackSize);
                 armorSlot.inventory.setInventorySlotContents(100, is);
 
+                //				FactorizationUtil.transferSlotToSlots(armorSlot, playerSlots);
+                //				return null;
                 return FactorizationUtil.transferStackToArea(upgrader, 100, inv, invArea);
             }
             else if (slot >= 9 * 4) {
+                //				FactorizationUtil.transferSlotToSlots(upgradeSlots.get(slot - 9 * 4), playerSlots);
+                //				return null;
                 return FactorizationUtil.transferStackToArea(upgrader, slot - 9 * 4 + 101, inv, invArea);
             }
             slot += 9;
             if (slot >= 9 * 4) {
                 slot -= 9 * 4;
             }
+            //			FactorizationUtil.transferSlotToSlots(playerSlots.get(slot), upgradeSlots);
+            //			return null;
             return FactorizationUtil.transferStackToArea(inv, slot, upgrader, upgradeArea);
 
         } finally {

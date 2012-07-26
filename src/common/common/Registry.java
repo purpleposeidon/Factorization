@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 
-import factorization.api.IActOnCraft;
-
 import net.minecraft.src.Block;
 import net.minecraft.src.EntityItem;
 import net.minecraft.src.EntityPlayer;
@@ -26,6 +24,8 @@ import net.minecraft.src.forge.ICraftingHandler;
 import net.minecraft.src.forge.IOreHandler;
 import net.minecraft.src.forge.IPickupHandler;
 import net.minecraft.src.forge.MinecraftForge;
+import net.minecraft.src.forge.oredict.OreDictionary;
+import factorization.api.IActOnCraft;
 
 public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
     static public final int MechaKeyCount = 3;
@@ -217,6 +217,7 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
                 'D', Block.blockDiamond);
         ItemCraft.addStamperRecipe(diamond_shard_recipe);
         diamond_shard_packet = new ItemStack(item_craft);
+        diamond_shard_packet.setItemDamage(0xFF);
         for (int i : new int[] { 0, 2, 6, 8 }) {
             item_craft.addItem(diamond_shard_packet, i, new ItemStack(Block.obsidian));
         }
@@ -231,7 +232,7 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
                 'O', Block.obsidian,
                 'T', Block.tnt,
                 'D', Block.blockDiamond);
-        diamond_shard_packet.setItemDamage(0xFF);
+
 
         //wrathfire igniter
         wrath_igniter = new ItemWrathIgniter(itemID("wrathIgniter", 9007));
@@ -374,22 +375,24 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
         ModLoader.addRecipe(new ItemStack(router_item_filter),
                 "ITI",
                 "GDG",
-                "IDI",
+                "ICI",
                 'I', dark_iron,
                 'T', Block.torchRedstoneIdle,
                 'D', bound_tiny_demon,
                 'G', Item.ingotGold,
-                'D', Block.dispenser);
-        //XXX TODO: Silver ingot ore dictionary!
-        ModLoader.addRecipe(new ItemStack(router_machine_filter),
-                "ITI",
-                "SDS",
-                "IBI",
-                'I', dark_iron,
-                'T', Block.torchRedstoneIdle,
-                'D', bound_tiny_demon,
-                'S', silver_ingot,
-                'C', Item.book);
+                'C', Block.chest);
+
+        for (ItemStack ingotSilver : OreDictionary.getOres("ingotSilver")) {
+            ModLoader.addRecipe(new ItemStack(router_machine_filter),
+                    "ITI",
+                    "SDS",
+                    "IBI",
+                    'I', dark_iron,
+                    'T', Block.torchRedstoneIdle,
+                    'D', bound_tiny_demon,
+                    'S', ingotSilver,
+                    'B', Item.book);
+        }
         ModLoader.addRecipe(new ItemStack(router_speed),
                 "ISI",
                 "SCS",
@@ -468,14 +471,16 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
                 'S', stamper_item);
 
         // Wrath lamp
+        for (ItemStack ingotLead : OreDictionary.getOres("ingotLead")) {
         ModLoader.addRecipe(lamp_item,
                 "LIL",
                 "GWG",
                 "LIL",
                 'I', dark_iron,
-                'L', lead_ingot,
+                    'L', ingotLead,
                 'G', Block.thinGlass,
                 'W', new ItemStack(wrath_igniter, 1, -1));
+        }
 
         //sentry demon
         ModLoader.addRecipe(sentrydemon_item,
@@ -503,11 +508,11 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
 
         //mecha-workshop
         ModLoader.addRecipe(mechaworkshop_item,
-                "CIC",
+                "MCM",
                 "i i",
                 "i i",
                 'C', Block.workbench,
-                'I', Block.blockSteel,
+                'M', mecha_chasis,
                 'i', Item.ingotIron
                 );
     }

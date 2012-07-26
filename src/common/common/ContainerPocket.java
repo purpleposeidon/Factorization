@@ -289,9 +289,10 @@ public class ContainerPocket extends ContainerWorkbench {
             productRemaining -= res.stackSize;
             materialRemaining--;
             assert res != null;
-            ItemStack remainder = FactorizationUtil.transferStackToArea(craftResult, 0, player.inventory,
-                    playerNormalInvSlots);
             slotCrafting.onPickupFromSlot(res);
+            craftResult.setInventorySlotContents(0, res);
+            ItemStack remainder = FactorizationUtil.transferStackToArea(craftResult, 0, player.inventory, playerNormalInvSlots);
+
             updateCraft();
             if (remainder != null && remainder.stackSize != 0) {
                 player.inventory.setItemStack(remainder);
