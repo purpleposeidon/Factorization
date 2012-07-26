@@ -1,7 +1,8 @@
 [u][b][size=6][anchor=ABOUT]Factorization[/anchor][/size][/b][/u]
 This mod adds a few tools & machines. I am hoping to make a good playmate for [url="http://www.minecraftforum.net/topic/365357-125-eloraams-mods-redpower-2-prerelease-5b2/"]RedPower[/url]. I've been working on it for a while. I'll start with the easy stuff.
 
-
+[u][b][size=6][anchor=START]First Tools & Machines[/anchor][/size][/b][/u]
+[spoiler]
 [u]The [b]Pocket Crafting Table[/b][/u]
 [img]http://i.imgur.com/CfoGQ.png[/img]
 Did somebody order a 3x3 crafting grid to go? Craft directly from your inventory, at any time! Press 'c' to use. (Note that this may interfere with some other GUIs due to a missing Forge feature; you could rebind to the Insert key if this is a problem.) Of course, you'll have to clear out that extra junk in your inventory before you can use it. But don't worry; with this mod, that won't be a problem for long!
@@ -45,38 +46,126 @@ This mod adds silver ore. It can be found between y-level 7 and 55. It generates
 [img]http://i.imgur.com/E3v37.png[/img]
 The slag furnace works similarly to the vanilla furnace, but has an extra output slot. It also uses twice the fuel. For most ores, it will produce an ingot with a low chance of making two instead of one, and also some stone. Silver ore will make silver ingots and lead ingots.
 
+[u][b]Diamond Shards[/b][/u]
+The recipe for Diamond Shards is very expensive and volatile. Diamond Shards can only be safely created in a Stamper. (You can make the Craft Packet directly from a crafting table.)
+[img]http://i.imgur.com/XzkE8.png[/img]
+Now, head into the Nether with a Diamond Shard to learn all about Demons and Wrath.
+
+
+
+[/spoiler]
+[u][b][size=6][anchor=WRATH]Demons and Wrath[/anchor][/size][/b][/u]
+[spoiler]
+All of these recipes require access to a fully stocked Nether Fortress.
+[u]The [b]Wrath Igniter[/b][/u]
+[img]http://i.imgur.com/sc9HV.png[/img]
+Wrathfire is a very special kind of fire. It will only burn on the block you clicked on, and will spread very quickly on it. Plant materials will burn away, obsidian will liquify into lava again, ice will vaporize instantly, and various forms of stone and other materials can be converted to another and back. When the fire dies, it will leave behind normal fire, which is much less picky about what it burns. There are two particularly important fuels for Wrathfire: Netherbrick, and iron blocks. Netherbrick will never be burned up: instead, the Wrath Fire will not spread, and can be kindled eternal. Using this property, a Wrath Forge can be built.
+[img]http://i.imgur.com/LG1SE.png[/img]
+A Wrath Forge needs to have a certain amount of netherbrick, or else the Wrath Fire will die out. Placing fuels, such as Iron Blocks, next to the Wrath Fire will burn it, but will also weaken the fire. If the fire becomes weak enough, it will be extinguished. The fire can be strengthed with netherrack.
+
+[u][b]Dark Iron[/b][/u]
+Burning an iron block with Wrath Fire will leave behind a Dark Iron block. This block can be uncrafted into 4 Dark Iron ingots. This metal appears to be Ender-aligned, and has a few good uses, which will be discussed after Demons.
+
+
 [u][b]Demons[/b][/u]
 [img]http://i.imgur.com/1z6J2.png[/img]
-These adorable little beasts can be found only in the nether. To catch one, you need to trap one in a chest containing plenty of netherwort and nothing else. Be aware that they will eat up all the netherwort in the chest if they aren't tended to. And be careful with them, as they will attempt to kill you when you handle them. You can get slightly more control over them by tying them up with a piece of string on a crafting table.
+These adorable little beasts can be found only in the nether. To catch one, you need to trap it in a chest containing plenty of netherwort, and nothing else. Be aware that they will accumulate and may quickly eat up all the netherwort in the chest if they aren't tended to. Be careful with them, as they will attempt to kill you with their poisonous fangs when you handle them. You can get slightly more control over them by tying them up with a piece of string on a crafting table.
 
 [img]http://i.imgur.com/LpZAu.png[/img]
 A demon can be used to craft a Wand of Cooling. The demon operates the wand of cooling by seperating hot molecules from cooler molecules, and sending the hotter molecules to some other [url="http://dresdencodak.com/2009/02/16/exorcising-laplaces-demon/"]Place[/url]. Since the only limiting factor in this process is the enthusiasm and health of the demon, Wands of Cooling will last for quite a while. They will cool lava/water source blocks into obsidian/ice, and destroy fire, Wrath Fire, and non-source water/lava.
 
-[u]Other Stuff[/u]
+[u]The [b]Item Router[/b][/u]
+The Item Router is a very flexible, very powerful machine. Making it requires the 3rd material Nether Fortresses provide, blaze powder, which is used to craft the Eye of Ender.
+[img]http://i.imgur.com/Mw3si.png[/img]
+The Router is a block that creates an item delivery network out of blobs of machines that are all next to eachother. (What I mean by "machine" is a block that has an inventory, such as a chest or furnace.) The router will visit each machine and either take or give a single item, depending on the mode set in the GUI. You can change what direction the machine is accessed from, or you can access a specific slot.
 
-[spoiler]
-This documentation is incomplete. Use science and [url="http://www.minecraftforum.net/topic/909223-125-smp-chickenbones-mods/"]NEI[/url]  to figure out the recipes yourself.
+The Item Router has a number of upgrades that can be applied to it by shift-right-clicking the router with the item in hand. This will add a "--" button in the GUI, which you can press to look at each upgrade. To remove an upgrade, press Delete while hovering the mouse over the button.
 
+[u]Item Filter[/u]
+[img]http://i.imgur.com/vQd06.png[/img]
+This lets you choose what items to extract from machines. This upgrade does nothing in insertion mode.
 
+[u]Machine Filter[/u]
+[img]http://i.imgur.com/KrhbR.png[/img]
+This lets you choose what machines to access. In the default mode, "visit all", machines that don't match will just be skipped over. In "visit near" mode, the router will not pass through non-matching machines. For example, if it's set to match only chests, "router chest furnace chest" will only access the first chest.
 
-If you take a diamond block, and craft it with 4 TNT, and 4 obsidian in the corners, and place the craft packet in a stamper, the block of diamond will be blown up into 12 diamond shards. There is only one use for these so far: Wrath Fire. Craft a diamond shard with a netherbrick to create a Wrath Fire Igniter. Wrath Fire will spread much faster and farther than ordinary fire. It will spread and burn only on the block you click on. Wood and plants will be destroyed. Cobblestone will be melted into smoothstone. Certain metal storage blocks will be converted to their Darker counterparts. Some of this is reversible. Be warned that when Wrath Fire dies, it leaves behind ordinary fire, which may have no problem with burning down the rest of your house.
-Igniting a block of iron with Wrath Fire will burn into a block of Dark Iron. This block can be uncrafted into Dark Iron Ingots, which can be used to make Bags of Holding, Wrath Lamps, and Routers.
+[u]Speed Boost[/u]
+[img]http://i.imgur.com/AeycT.png[/img]
+This will ease some of the traveling and searching restrictions on the router. This is useless for small networks.
 
-The Bag of Holding can store parts of your inventory for you. By default it'll store only 3 columns. Press ` at any time to put your inventory into the BoH and pull other stuff out. You can add another column of storage to the BoH by crafting it with an enderpearl, a dark iron ingot, and a bit of leather. The BoH works on the side of your inventory that is to the right of it. The best place to put your Bag of Holding depends on how many columns it stores! An unupgraded BoH should go in the 4th column from the right; this way the location of items won't change as you use `. Less basically, you'll want the number of inventory columns the bag stores to be a multiple of the number of columns to the right of the BoH.
+[u]Thoroughness[/u]
+[img]http://i.imgur.com/984Ri.png[/img]
+This upgrade will make the router wait at a machine until it is completely full or empty.
 
-The Wrath Lamp's pretty sweet! It lights up a fairly large area as bright as day. It'll fill a 13x13 area around it with glowstone-quality light, and this light will flood downward up to 30 blocks. Crafting it requires 4 lead, 2 dark iron, 2 glass panes, and a use off of a wrath igniter.
+[u]Bandwidth[/u]
+[img]http://i.imgur.com/kbDLI.png[/img]
+This will cause the router to move entire stacks at a time instead of single items.
 
-The router is slightly complicated, and unfinished. It is very powerful! An upgrade system will make it even more powerful, but I haven't made that yet. Placing it next to a contiguous blob of TileEntities with inventories will create a network that router will access. The button on the top GUI filters which inventories will be interacted with. It'll eventually be factored out into an upgrade system. The router will extract or insert items from this network. Place a stack of items in the router's IO slot, and that item will be evenly distributed to all the connected TileEntities. Routers will skip over other routers. You also can control which side the router accesses from, and even limit to using a specific inventory slot. You can use this feature to make some VERY useful and interesting machines... 
+[u]The [b]Wrath Lamp[/b][/u]
+This lamp will light up a huge area!
+[img]http://i.imgur.com/2sYLG.png[/img]
+The Wrath Lamp's pretty sweet! It lights up a fairly large area as bright as day. It'll fill a huge area around it with glowstone-quality light, and this light will flood downward up to 30 blocks. Crafting it causes half the damage on the Igniter that using it in-world does.
+[img]http://i.imgur.com/qo1OV.jpg[/img]
 
-If you light Wrath Fire on nether brick, it will not spread. If there is enough netherbrick nearby, it will be kindled eternal, and so can be used as a Wrath Forge. Netherrack is used as fuel. You can use this to make as much dark iron as you'd like.
+[u]The [b]Bag of Holding[/b][/u]
+The Bag of Holding can store parts of your inventory for you. The BoH moves the columns to the right of it into itself, and then replaces them with columns that were already inside it. When you first craft it, it will store only 3 columns.
+[img]http://i.imgur.com/kyzJk.png[/img]
 
-[u]Future Stuff[/u]
-Mecha-Armor & Mecha-crafting
-Router Upgrades
-Ceramics
-? ? ?
+Press ` at any time to put your inventory into the BoH and pull other stuff out. You can add another column of storage to the BoH by crafting it with an enderpearl, a dark iron ingot, and a bit of leather.
+[img]http://i.imgur.com/UUchz.png[/img]
+
+The best place to put your Bag of Holding depends on how many columns it stores! An new BoH should go in the 4th column from the right; this way the location of items won't change as you use `.
+[img]http://i.imgur.com/BNZTv.png[/img]
+Specifically, you'll want to place the bag such that the number of inventory columns it stores is a multiple of the number of columns to its right.
 
 [/spoiler]
+
+[u][b][size=6][anchor=MECHA]Mecha-Factorization[/anchor][/size][/b][/u]
+[spoiler]
+[u]The [b]Mecha-Chasis[/b][/u]
+The Mecha-Chasis is a slightly expensive crafting made by boxing a gold nugget inside 8 iron.
+[img]http://i.imgur.com/n3eSP.png[/img]
+
+[u][b]Mecha-Armor[/b][/u]
+Mecha-Armor is crafted in the usual way using Mecha-Chasis.
+[img]http://i.imgur.com/dKwVp.png[/img]
+This armor will never break. It also will not protect you. Its strengths and powers come from the upgrades you give it.
+
+[u]The [b]Mecha-Modder[/b][/u]
+To add upgrades to the armor, you need to place it in a Mecha-Modder. It is crafted like so:
+[img]http://i.imgur.com/Jzcfc.png[/img]
+Place the Mecha-Armor into the slot with the M. Many upgrades need to be triggered. The 'A' and 'K' buttons control when the upgrade is activated. The Mecha-Armors have differeing ammounts of slots for upgrades. The number of chasis it takes to make the armor is how many available slots there are.
+[img]http://i.imgur.com/CC8u0.png[/img]
+
+There are a few types of upgrades:
+
+[u]Vanilla Armor[/u]
+This is presently the primary means of protectiong yourself while wearing Mecha-Armor. The vanilla armor's type must match the mecha-armor's. You are never limited to placing only 1 type of upgrade in. In the case of vanilla armor, one piece will be used up until it breaks, and then the next one will be used.
+
+[u]Buoyancy Barrel[/u]
+This makes you float to the surface very quickly in water.
+[img]http://i.imgur.com/T3tml.png[/img]
+
+[u]The Cobblestone Drive[/u]
+This will generate cobblestone for you! Never run out of cobblestone again! The cobble will despawn after a few seconds.
+[img]http://i.imgur.com/SSOhm.png[/img]
+
+[u]Shoulder-Mounted Piston[/u]
+Push blocks everywhere! Feel like an Enderman! This will push a block that's in front of you, either the upper block, or the lower block. You must be standing in a clear space to use it. You can also push vertically by looking straight up or down.
+[img]http://i.imgur.com/kKFoQ.png[/img]
+
+
+
+[/spoiler]
+
+[u]Future Stuff[/u]
+[spoiler]
+Electricity
+More Mecha-Armor upgrades
+Ceramics
+? ? ?
+[/spoiler]
+
 
 
 
