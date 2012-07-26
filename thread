@@ -1,7 +1,12 @@
 [u][b][size=6][anchor=ABOUT]Factorization[/anchor][/size][/b][/u]
-This mod adds a few tools & machines. I am hoping to make a good playmate for [url="http://www.minecraftforum.net/topic/365357-125-eloraams-mods-redpower-2-prerelease-5b2/"]RedPower[/url]. I've been working on it for a while. I'll start with the easy stuff.
+This mod adds a some cool tools & machines. I am hoping to make a good playmate for [url="http://www.minecraftforum.net/topic/365357-"]RedPower[/url]. 
 
-[u][b][size=6][anchor=START]First Tools & Machines[/anchor][/size][/b][/u]
+[url="http://www.minecraftforum.net/topic/1351802-factorization/#entry16536762"]Laslon[/url] has made a mod spotlight!
+[youtube]http://www.youtube.com/watch?v=UlSohYZ3S40[/youtube]
+
+And I have spent a bit of time adding more information to this documentation below.
+
+[u][b][size=4][anchor=START]First Tools & Machines[/anchor][/size][/b][/u]
 [spoiler]
 [u]The [b]Pocket Crafting Table[/b][/u]
 [img]http://i.imgur.com/CfoGQ.png[/img]
@@ -44,17 +49,15 @@ This mod adds silver ore. It can be found between y-level 7 and 55. It generates
 
 [u]The [b]Slag Furnace[/b][/u]
 [img]http://i.imgur.com/E3v37.png[/img]
-The slag furnace works similarly to the vanilla furnace, but has an extra output slot. It also uses twice the fuel. For most ores, it will produce an ingot with a low chance of making two instead of one, and also some stone. Silver ore will make silver ingots and lead ingots.
+The slag furnace works similarly to the vanilla furnace, but has an extra output slot. It also uses twice the fuel. For most ores, it will produce an ingot with a low chance of making two instead of one, and also some stone. Silver ore will make silver ingots and lead ingots. Lead (will) be used for electricity, and silver will be used for... well, I certainly wouldn't want to spoil the surprise.
 
 [u][b]Diamond Shards[/b][/u]
 The recipe for Diamond Shards is very expensive and volatile. Diamond Shards can only be safely created in a Stamper. (You can make the Craft Packet directly from a crafting table.)
 [img]http://i.imgur.com/XzkE8.png[/img]
 Now, head into the Nether with a Diamond Shard to learn all about Demons and Wrath.
 
-
-
 [/spoiler]
-[u][b][size=6][anchor=WRATH]Demons and Wrath[/anchor][/size][/b][/u]
+[u][b][size=4][anchor=WRATH]Demons and Wrath[/anchor][/size][/b][/u]
 [spoiler]
 All of these recipes require access to a fully stocked Nether Fortress.
 [u]The [b]Wrath Igniter[/b][/u]
@@ -87,11 +90,11 @@ This lets you choose what items to extract from machines. This upgrade does noth
 
 [u]Machine Filter[/u]
 [img]http://i.imgur.com/KrhbR.png[/img]
-This lets you choose what machines to access. In the default mode, "visit all", machines that don't match will just be skipped over. In "visit near" mode, the router will not pass through non-matching machines. For example, if it's set to match only chests, "router chest furnace chest" will only access the first chest.
+This lets you choose what machines to access. In the default mode, "visit all", machines that don't match will just be skipped over. In "visit near" mode, the router will not pass through non-matching machines. For example, if it's set to match only chests, a network setup like "router chest furnace chest" will only access the first chest. It will not even look past the furnace. In "visit all" mode, it will visit both chests, but otherwise ignore the furnace.
 
 [u]Speed Boost[/u]
 [img]http://i.imgur.com/AeycT.png[/img]
-This will ease some of the traveling and searching restrictions on the router. This is useless for small networks.
+This will ease some of the traveling and searching speed restrictions on the router. This is useless for small networks.
 
 [u]Thoroughness[/u]
 [img]http://i.imgur.com/984Ri.png[/img]
@@ -104,7 +107,7 @@ This will cause the router to move entire stacks at a time instead of single ite
 [u]The [b]Wrath Lamp[/b][/u]
 This lamp will light up a huge area!
 [img]http://i.imgur.com/2sYLG.png[/img]
-The Wrath Lamp's pretty sweet! It lights up a fairly large area as bright as day. It'll fill a huge area around it with glowstone-quality light, and this light will flood downward up to 30 blocks. Crafting it causes half the damage on the Igniter that using it in-world does.
+The Wrath Lamp's pretty sweet! It lights up a fairly large area as bright as day. It'll fill a huge area around it with glowstone-quality light, and this light will flood downward up to 30 blocks. Crafting it will only slightly damage the igniter.
 [img]http://i.imgur.com/qo1OV.jpg[/img]
 
 [u]The [b]Bag of Holding[/b][/u]
@@ -119,15 +122,14 @@ The best place to put your Bag of Holding depends on how many columns it stores!
 Specifically, you'll want to place the bag such that the number of inventory columns it stores is a multiple of the number of columns to its right.
 
 [/spoiler]
-
-[u][b][size=6][anchor=MECHA]Mecha-Factorization[/anchor][/size][/b][/u]
+[u][b][size=4][anchor=MECHA]Mecha-Armor[/anchor][/size][/b][/u]
 [spoiler]
 [u]The [b]Mecha-Chasis[/b][/u]
-The Mecha-Chasis is a slightly expensive crafting made by boxing a gold nugget inside 8 iron.
+The Mecha-Chasis is a slightly expensive armor crafting component made by boxing a gold nugget inside 8 iron.
 [img]http://i.imgur.com/n3eSP.png[/img]
 
 [u][b]Mecha-Armor[/b][/u]
-Mecha-Armor is crafted in the usual way using Mecha-Chasis.
+Mecha-Armor is crafted as usual, with Mecha-Chasis.
 [img]http://i.imgur.com/dKwVp.png[/img]
 This armor will never break. It also will not protect you. Its strengths and powers come from the upgrades you give it.
 
@@ -137,13 +139,13 @@ To add upgrades to the armor, you need to place it in a Mecha-Modder. It is craf
 Place the Mecha-Armor into the slot with the M. Many upgrades need to be triggered. The 'A' and 'K' buttons control when the upgrade is activated. The Mecha-Armors have differeing ammounts of slots for upgrades. The number of chasis it takes to make the armor is how many available slots there are.
 [img]http://i.imgur.com/CC8u0.png[/img]
 
-There are a few types of upgrades:
+There are a few types of upgrades. For most upgrades, you can place multiples in to get increased effects:
 
 [u]Vanilla Armor[/u]
-This is presently the primary means of protectiong yourself while wearing Mecha-Armor. The vanilla armor's type must match the mecha-armor's. You are never limited to placing only 1 type of upgrade in. In the case of vanilla armor, one piece will be used up until it breaks, and then the next one will be used.
+This is presently the only way of protectiong yourself with Mecha-Armor. The clothing type of the armors must match. Multiple armor upgrades will not stack; only one will be used until it wears out.
 
 [u]Buoyancy Barrel[/u]
-This makes you float to the surface very quickly in water.
+This makes you fly very quickly to the surface when you are in water.
 [img]http://i.imgur.com/T3tml.png[/img]
 
 [u]The Cobblestone Drive[/u]
@@ -151,27 +153,25 @@ This will generate cobblestone for you! Never run out of cobblestone again! The 
 [img]http://i.imgur.com/SSOhm.png[/img]
 
 [u]Shoulder-Mounted Piston[/u]
-Push blocks everywhere! Feel like an Enderman! This will push a block that's in front of you, either the upper block, or the lower block. You must be standing in a clear space to use it. You can also push vertically by looking straight up or down.
+Push blocks everywhere! Be the Enderman! This will push a block that's in front of you, either the upper block, or the lower block. You must be standing in a clear space to use it. You can also push vertically by looking straight up or down.
 [img]http://i.imgur.com/kKFoQ.png[/img]
-
-
-
 [/spoiler]
 
-[u]Future Stuff[/u]
+[u]Other Stuff/Future Plans[/u]
 [spoiler]
-Electricity
+Electricity: power gen, wiring, batteries, heaters...
 More Mecha-Armor upgrades
 Ceramics
 ? ? ?
+
+
+The Sentry Demon is a chunk loader. Please [b]do not[/b] use it with frames; it's currently broken.
 [/spoiler]
-
-
 
 
 
 [u][b][size=6][anchor=INSTALL]Installation[/anchor][/size][/b][/u]
-This is a [url="http://lexmanos.no-ip.org:8080/job/Forge/Recommended/"]Minecraft Forge[/url] mod. It uses 3 block IDs. 
+This is a [url="http://lexmanos.no-ip.org:8080/job/Forge/Recommended/"]Minecraft Forge[/url] mod. It uses 3 block IDs, and a bunch of item IDs.
 
 1. Install [url="http://lexmanos.no-ip.org:8080/job/Forge/Recommended/"]Minecraft Forge[/url] by extracting the contents of the forge download into the Minecraft jar. Be sure to delete the META-INF/ folder ([u]unless you are installing a server![/u]). If you already have a version of forge that's as old as or newer than 3.1.2, it should work fine.
 2. Check that the forge install worked by running the client (or the server). Forge information should be on the title screen  (or in the server's logs).
@@ -181,10 +181,10 @@ This is a [url="http://lexmanos.no-ip.org:8080/job/Forge/Recommended/"]Minecraft
 
 
 [u][b][size=6][anchor=DOWNLOAD]Download[/anchor][/size][/b][/u]
-[url="http://adf.ly/Ah9BS"]Client (adfly + MediaFire)[/url], or [url="http://adf.ly/AiEBA"] (adfly + DropBox)[/url]
-[url="http://adf.ly/Ah9Dv"]Server (adfly + MediaFire)[/url], or [url="http://adf.ly/AiEEz"] (adfly + DropBox)[/url]
+[url="http://adf.ly/B8rGI"]Client (adfly + MediaFire)[/url], or [url="http://adf.ly/B8qrB"](adfly + DropBox)[/url]
+[url="http://adf.ly/B8rSI"]Server (adfly + MediaFire)[/url], or [url="http://adf.ly/B8r5N"](adfly + DropBox)[/url]
 
-I recommend you also install RedPower and NEI.
+I recommend you also install [url="http://www.minecraftforum.net/topic/365357-"]RedPower[/url] and [url="http://www.minecraftforum.net/topic/909223-"]NEI[/url].
 
 [u][b][size=6][anchor=LICENSE]License[/anchor][/size][/b][/u]
 Do not distribute! Unless you have my permission. Source code may be available on request.
