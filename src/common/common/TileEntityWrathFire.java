@@ -6,13 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
-import factorization.api.Coord;
-
 import net.minecraft.src.Block;
+import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Material;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
+import factorization.api.Coord;
 
 public class TileEntityWrathFire extends TileEntity {
     //constants
@@ -102,6 +102,8 @@ public class TileEntityWrathFire extends TileEntity {
     static BlockMatch air = new BlockMatch(0, -1);
     static BlockMatch fire = new BlockMatch(Block.fire);
     static BlockMatch netherBrick = new BlockMatch(Block.netherBrick);
+    static BlockMatch netherFence = new BlockMatch(Block.netherFence);
+    static BlockMatch netherStair = new BlockMatch(Block.stairsNetherBrick);
 
     public static void burn(Object key) {
         burn(key, air);
@@ -277,13 +279,14 @@ public class TileEntityWrathFire extends TileEntity {
         }
         Coord here = new Coord(this);
 
-        if (host.id == Block.netherBrick.blockID) {
+        //if (host.id == Block.netherBrick.blockID) {
+        if (netherBrick.equals(host) || netherStair.equals(host) || netherFence.equals(host)) {
             int furnace_size = 13;
             int fueling = 4;
             //try to live forever
             int src_count = 0;
             for (Coord c : here.getRandomNeighborsDiagonal()) {
-                if (netherBrick.matches(c)) {
+                if (netherBrick.matches(c) || netherStair.matches(c) || netherFence.matches(c)) {
                     src_count += 1;
                 }
                 if (c.is(Block.netherrack)) {
@@ -356,6 +359,10 @@ public class TileEntityWrathFire extends TileEntity {
                 return true;
             }
         }
+        if (netherBrick.isType(id, md) || netherFence.isType(id, md) || netherStair.isType(id, md)) {
+            host = netherBrick;
+            return true;
+        }
         return false;
     }
 
@@ -371,5 +378,20 @@ public class TileEntityWrathFire extends TileEntity {
         //			}
         //		}
 
+    }
+
+    public static void ignite(Coord baseBlock, Coord fireBlock, EntityPlayer player) {
+        fireBlock.setIdMd(Core.lightair_id, BlockLightAir.fire_md);
+        TileEntityWrathFire fire = fireBlock.getTE(TileEntityWrathFire.class);
+        if (fire == null) {
+            return;
+        }
+        if (netherBrick.matches(baseBlock) || netherFence.matches(baseBlock) || netherStair.matches(baseBlock)) {
+            Sound.wrathForge.playAt(player);
+        }
+        else {
+            Sound.wrathLight.playAt(player);
+        }
+        fire.setTarget(baseBlock.getId(), baseBlock.getMd());
     }
 }

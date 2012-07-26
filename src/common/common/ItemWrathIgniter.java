@@ -1,14 +1,13 @@
 package factorization.common;
 
-import factorization.api.Coord;
-import factorization.api.IActOnCraft;
-import net.minecraft.src.Block;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.World;
 import net.minecraft.src.forge.ITextureProvider;
+import factorization.api.Coord;
+import factorization.api.IActOnCraft;
 
 public class ItemWrathIgniter extends Item implements ITextureProvider, IActOnCraft {
     public ItemWrathIgniter(int par1) {
@@ -53,19 +52,8 @@ public class ItemWrathIgniter extends Item implements ITextureProvider, IActOnCr
                 return true;
             }
         }
-        fireBlock.setIdMd(Core.lightair_id, BlockLightAir.fire_md);
         is.damageItem(2, player);
-        TileEntityWrathFire fire = fireBlock.getTE(TileEntityWrathFire.class);
-        if (fire == null) {
-            return true;
-        }
-        if (baseBlock.is(Block.netherBrick)) {
-            Sound.wrathForge.playAt(player);
-        }
-        else {
-            Sound.wrathLight.playAt(player);
-        }
-        fire.setTarget(baseBlock.getId(), baseBlock.getMd());
+        TileEntityWrathFire.ignite(baseBlock, fireBlock, player);
         return true;
     }
 

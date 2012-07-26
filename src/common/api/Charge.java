@@ -3,7 +3,6 @@ package factorization.api;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-
 import net.minecraft.src.NBTTagCompound;
 
 public class Charge {
@@ -36,7 +35,7 @@ public class Charge {
         return ret;
     }
 
-    private void swapWith(Charge other) {
+    public void swapWith(Charge other) {
         int a = this.charge, b = other.charge;
         this.setCharge(b);
         other.setCharge(a);
