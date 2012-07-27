@@ -223,6 +223,7 @@ public class Coord {
         }
         return Block.lightOpacity[getId()] == 0;
     }
+
     public boolean canSeeSky() {
         for (int i = y + 1; i < w.getHeight(); i++) {
             if (!new Coord(w, x, i, z).canBeSeenThrough()) {
