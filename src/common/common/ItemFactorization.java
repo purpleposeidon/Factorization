@@ -1,13 +1,16 @@
 package factorization.common;
 
-import factorization.api.Coord;
+import java.util.List;
+
 import net.minecraft.src.Block;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemBlock;
 import net.minecraft.src.ItemStack;
+import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.Packet;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
+import factorization.api.Coord;
 
 public class ItemFactorization extends ItemBlock {
     public ItemFactorization() {
@@ -25,8 +28,8 @@ public class ItemFactorization extends ItemBlock {
     }
 
     @Override
-    public boolean onItemUse(ItemStack is, EntityPlayer player,
-            World w, int x, int y, int z, int side) {
+    public boolean onItemUse(ItemStack is, EntityPlayer player, World w, int x, int y, int z,
+            int side) {
         Coord here = new Coord(w, x, y, z);
         int id = here.getId();
         if (id == Block.snow.blockID) {
@@ -89,6 +92,7 @@ public class ItemFactorization extends ItemBlock {
 
     @Override
     public String getItemNameIS(ItemStack itemstack) {
+        //XXX I think this is actually supposed to return localization IDs like "factory.whatever"
         // I don't think this actually gets called...
         int md = itemstack.getItemDamage();
         if (md == FactoryType.ROUTER.md) {
@@ -121,11 +125,28 @@ public class ItemFactorization extends ItemBlock {
         if (FactoryType.SLAGFURNACE.is(md)) {
             return "Slag Furnace";
         }
+        if (FactoryType.BATTERY.is(md)) {
+            return "Battery";
+        }
+        if (FactoryType.SOLARTURBINE.is(md)) {
+            return "Solar Turbine";
+        }
+        if (FactoryType.LEADWIRE.is(md)) {
+            return "Lead Wire";
+        }
         return "??? It's a Mystery!!!";
     }
 
     @Override
     public String getItemName() {
         return "ItemFactorization";
+    }
+
+    //@Override -- Hello, server
+    public void addInformation(ItemStack is, List lines) {
+        if (FactoryType.BATTERY.is(is.getItemDamage())) {
+            NBTTagCompound tag = FactorizationUtil.getTag(is);
+            lines.add("??% charged");
+        }
     }
 }

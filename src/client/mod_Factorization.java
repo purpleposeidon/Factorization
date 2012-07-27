@@ -27,6 +27,7 @@ import net.minecraft.src.RenderItem;
 import net.minecraft.src.RenderManager;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntityChest;
+import net.minecraft.src.TileEntityRenderer;
 import net.minecraft.src.World;
 import net.minecraft.src.forge.Configuration;
 import net.minecraft.src.forge.MinecraftForgeClient;
@@ -46,6 +47,7 @@ import factorization.client.render.EmptyRender;
 import factorization.client.render.EntityWrathFlameFX;
 import factorization.client.render.FactorizationRender;
 import factorization.client.render.TileEntityBarrelRenderer;
+import factorization.client.render.TileEntitySolarTurbineRender;
 import factorization.client.render.TileEntityWatchDemonRenderer;
 import factorization.common.Command;
 import factorization.common.ContainerFactorization;
@@ -58,6 +60,7 @@ import factorization.common.Registry;
 import factorization.common.TileEntityBarrel;
 import factorization.common.TileEntityFactorization;
 import factorization.common.TileEntitySlagFurnace;
+import factorization.common.TileEntitySolarTurbine;
 import factorization.common.TileEntityWatchDemon;
 import factorization.common.TileEntityWrathLamp;
 
@@ -85,12 +88,10 @@ public class mod_Factorization extends Core {
         super.load();
 
         if (render_barrel_item || render_barrel_text) {
-            ModLoader.registerTileEntity(TileEntityBarrel.class, "factory_barrel",
-                    new TileEntityBarrelRenderer(render_barrel_item, render_barrel_text));
-        } else {
-            ModLoader.registerTileEntity(TileEntityBarrel.class, "factory_barrel");
+            TileEntityRenderer.setTileEntityRenderer(TileEntityBarrel.class, new TileEntityBarrelRenderer(render_barrel_item, render_barrel_text));
         }
-        ModLoader.registerTileEntity(TileEntityWatchDemon.class, "factory_watchdemon", new TileEntityWatchDemonRenderer());
+        TileEntityRenderer.setTileEntityRenderer(TileEntityWatchDemon.class, new TileEntityWatchDemonRenderer());
+        TileEntityRenderer.setTileEntityRenderer(TileEntitySolarTurbine.class, new TileEntitySolarTurbineRender());
 
         MinecraftForgeClient.preloadTexture(texture_file_block);
         MinecraftForgeClient.preloadTexture(texture_file_item);

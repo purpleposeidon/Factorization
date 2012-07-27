@@ -39,7 +39,7 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
     public ItemStack cutter_item, router_item, maker_item, stamper_item, packager_item,
             barrel_item,
             queue_item, lamp_item, air_item, sentrydemon_item,
-            slagfurnace_item;
+            slagfurnace_item, battery_item, solar_turbine_item;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item, mechaworkshop_item;
     public ItemStack is_factory, is_lamp, is_lightair;
@@ -62,6 +62,8 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
     public ItemMachineUpgrade router_item_filter, router_machine_filter, router_speed,
             router_thorough, router_throughput;
     public ItemStack fake_is;
+    public ItemCraftingComponent acid, magnet, insulated_coil, motor, fan;
+    public ItemChargeMeter charge_meter;
 
     public Material materialMachine = new Material(MapColor.ironColor);
 
@@ -87,7 +89,10 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
         ModLoader.registerTileEntity(TileEntityWrathLamp.class, "factory_lamp");
         ModLoader.registerTileEntity(TileEntityWrathFire.class, "factory_fire");
         ModLoader.registerTileEntity(TileEntitySlagFurnace.class, "factory_slag");
-        //Barrels and WatchDemons must be registered specially by mod_Factorization due to siding issues.
+        ModLoader.registerTileEntity(TileEntitySolarTurbine.class, "factory_solarturbine");
+        ModLoader.registerTileEntity(TileEntityWatchDemon.class, "factory_watchdemon");
+        ModLoader.registerTileEntity(TileEntityBarrel.class, "factory_barrel");
+        //TileEntity renderers are registered in the client's mod_Factorization
 
         ModLoader.registerEntityID(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", Core.entity_relight_task_id);
     }
@@ -133,6 +138,9 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
         packager_item = FactoryType.PACKAGER.itemStack("Packager");
         sentrydemon_item = FactoryType.SENTRYDEMON.itemStack("Sentry Demon");
         slagfurnace_item = FactoryType.SLAGFURNACE.itemStack("Slag Furnace");
+        battery_item = FactoryType.BATTERY.itemStack("Battery");
+        solar_turbine_item = FactoryType.SOLARTURBINE.itemStack("Solar Turbine");
+
 
         //BlockResource stuff
         silver_ore_item = ResourceType.SILVERORE.itemStack("Silver Ore");
@@ -515,6 +523,60 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
                 'M', mecha_chasis,
                 'i', Item.ingotIron
                 );
+
+        //electricity crafting components
+        acid = new ItemAcidBottle(itemID("acid", 9024), "Sulfuric Acid", 16 * 3 + 5);
+        magnet = new ItemCraftingComponent(itemID("magnet", 9025), "Magnet", 16 * 3 + 6);
+        insulated_coil = new ItemCraftingComponent(itemID("coil", 9026), "Insulated Coil", 16 * 3 + 7);
+        motor = new ItemCraftingComponent(itemID("motor", 9027), "Motor", 16 * 3 + 8);
+        fan = new ItemCraftingComponent(itemID("fan", 9028), "Fan", 16 * 3 + 9);
+        charge_meter = new ItemChargeMeter(itemID("chargemeter", 9029));
+
+        ModLoader.addShapelessRecipe(new ItemStack(acid), Item.gunpowder, Item.coal, Item.potion);
+        //uh, you might be able to use like charcoal & a splash potion of poison or something >_>
+        ModLoader.addRecipe(new ItemStack(insulated_coil),
+                "LLL",
+                "LCL",
+                "LLL",
+                'L', lead_ingot,
+                'C', Block.blockClay);
+        ModLoader.addRecipe(new ItemStack(motor),
+                "CMC",
+                "CMC",
+                "CLC",
+                'C', insulated_coil,
+                'M', magnet,
+                'L', lead_ingot);
+        ModLoader.addRecipe(new ItemStack(fan),
+                "I I",
+                " I ",
+                "I I",
+                'I', Item.ingotIron);
+        ModLoader.addRecipe(battery_item,
+                "ILI",
+                "LAL",
+                "ILI",
+                'I', Item.ingotIron,
+                'L', lead_ingot,
+                'A', acid);
+        ModLoader.addRecipe(solar_turbine_item,
+                "###",
+                "#F#",
+                "#M#",
+                '#', Block.glass,
+                'F', fan,
+                'M', motor);
+        ModLoader.addRecipe(new ItemStack(charge_meter),
+                "WSW",
+                "W/W",
+                "LIL",
+                'W', Block.planks,
+                'S', Item.sign,
+                '/', Item.stick,
+                'L', lead_ingot,
+                'I', Item.ingotIron
+                );
+
     }
 
     void createOreProcessingPath(ItemStack ore, ItemStack ingot) {

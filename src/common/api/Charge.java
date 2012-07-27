@@ -12,16 +12,16 @@ public class Charge {
         this.charge = 0;
     }
 
-    public int getCharge() {
+    public int getValue() {
         return charge;
     }
 
-    public void setCharge(int newCharge) {
+    public void setValue(int newCharge) {
         this.charge = Math.max(0, newCharge);
     }
 
-    public int addCharge(int chargeToAdd) {
-        setCharge(charge + chargeToAdd);
+    public int addValue(int chargeToAdd) {
+        setValue(charge + chargeToAdd);
         return charge;
     }
 
@@ -31,14 +31,14 @@ public class Charge {
 
     static public Charge readFromTag(NBTTagCompound tag, String name) {
         Charge ret = new Charge();
-        ret.setCharge(tag.getInteger(name));
+        ret.setValue(tag.getInteger(name));
         return ret;
     }
 
     public void swapWith(Charge other) {
         int a = this.charge, b = other.charge;
-        this.setCharge(b);
-        other.setCharge(a);
+        this.setValue(b);
+        other.setValue(a);
     }
 
     //These are some functions for users to make good & healthy use of
@@ -65,9 +65,12 @@ public class Charge {
         }
     }
 
-    private static ArrayList<Coord> frontier = new ArrayList(5 * 5 * 4);
-    private static HashSet<Coord> visited = new HashSet(5 * 5 * 5);
+    private static ArrayList<IChargeConductor> frontier = new ArrayList(5 * 5 * 4);
+    private static HashSet<IChargeConductor> visited = new HashSet(5 * 5 * 5);
 
+    public static class ChargeDensityReading {
+        public int totalCharge, conductorCount, maxCharge;
+    }
     /**
      * Gets the average charge in the nearby connected network
      * 
@@ -77,30 +80,38 @@ public class Charge {
      *            Only checks this range. Manhatten distance.
      * @return
      */
-    public static double getChargeDensity(IChargeConductor start, int maxDistance) {
-        int totalCharge = 0;
+    public static ChargeDensityReading getChargeDensity(IChargeConductor start, int maxDistance) {
+        int totalCharge = 0, maxCharge = 0;
         frontier.clear();
         visited.clear();
-        frontier.add(start.getCoord());
+        frontier.add(start);
+        visited.add(start);
         while (frontier.size() > 0) {
-            Coord hereCoord = frontier.remove(0);
-            visited.add(hereCoord);
-            IChargeConductor here = hereCoord.getTE(IChargeConductor.class); //won't be null
-            totalCharge += here.getCharge().charge;
-            for (Coord neighbor : hereCoord.getNeighborsAdjacent()) {
-                if (neighbor.getTE(IChargeConductor.class) == null) {
+            IChargeConductor here = frontier.remove(0);
+            Coord hereCoord = here.getCoord();
+            int hereCharge = here.getCharge().charge;
+            totalCharge += hereCharge;
+            maxCharge = Math.max(maxCharge, hereCharge);
+            for (Coord neighborCoord : hereCoord.getNeighborsAdjacent()) {
+                IChargeConductor neighbor = neighborCoord.getTE(IChargeConductor.class);
+                if (neighbor == null) {
                     continue;
                 }
                 if (visited.contains(neighbor)) {
                     continue;
                 }
-                if (neighbor.distanceManhatten(hereCoord) > maxDistance) {
+                if (neighborCoord.distanceManhatten(hereCoord) > maxDistance) {
                     continue;
                 }
                 frontier.add(neighbor);
+                visited.add(neighbor);
             }
         }
-        return totalCharge / visited.size();
+        ChargeDensityReading ret = new ChargeDensityReading();
+        ret.totalCharge = totalCharge;
+        ret.conductorCount = visited.size();
+        ret.maxCharge = maxCharge;
+        return ret;
     }
 
 }

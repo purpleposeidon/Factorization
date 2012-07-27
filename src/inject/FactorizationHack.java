@@ -10,6 +10,7 @@ import java.io.IOException;
 public class FactorizationHack {
 
     static public DamageSource imp_bite = new DamageSource("imp bite").setDamageBypassesArmor();
+    static public DamageSource acidBurn = new DamageSource("acid burn").setDamageBypassesArmor();
 
     static public IChunkProvider getChunkProvider(World world) {
         return world.chunkProvider;

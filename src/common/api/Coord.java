@@ -213,6 +213,36 @@ public class Coord {
         return b.isBlockReplaceable(w, x, y, z);
     }
 
+    public boolean isTop() {
+        return w.getHeightValue(x, z) == y;
+    }
+
+    public boolean canBeSeenThrough() {
+        if (w.isAirBlock(x, y, z)) {
+            return true;
+        }
+        return Block.lightOpacity[getId()] == 0;
+    }
+    public boolean canSeeSky() {
+        for (int i = y + 1; i < w.getHeight(); i++) {
+            if (!new Coord(w, x, i, z).canBeSeenThrough()) {
+                return false;
+            }
+        }
+        return true;
+        //...okay, so apparently this doesn't get updated or something? wtf?
+        //		int top = w.getHeightValue(x, z);
+        //		if (top <= y) {
+        //			return true;
+        //		}
+        //		for (int i = top; i > y; i--) {
+        //			if (!w.isAirBlock(x, i, z)) {
+        //				return false;
+        //			}
+        //		}
+        //		return true;
+    }
+
     public boolean is(Block b) {
         return getId() == b.blockID;
     }

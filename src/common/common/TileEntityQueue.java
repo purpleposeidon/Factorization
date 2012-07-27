@@ -143,18 +143,18 @@ public class TileEntityQueue extends TileEntityFactorization implements
     }
 
     @Override
-    public void activate(EntityPlayer entityplayer) {
+    public boolean activate(EntityPlayer entityplayer) {
         // we've been right-clicked! Insert!
         int handslot = entityplayer.inventory.currentItem;
         if (handslot < 0 || handslot > 8) {
-            return;
+            return true;
         }
 
         ItemStack is = entityplayer.inventory.getStackInSlot(handslot);
         if (is == null) {
             if (empty()) {
                 entityplayer.addChatMessage("The queue is empty");
-                return;
+                return true;
             }
             ItemStack f = items.getFirst();
             if (items.size() > 1) {
@@ -168,14 +168,15 @@ public class TileEntityQueue extends TileEntityFactorization implements
                         "The queue containts %s %s", "" + f.stackSize,
                         Core.instance.translateItemStack(f));
             }
-            return;
+            return true;
         }
         if (full()) {
             entityplayer.addChatMessage("The queue is full");
-            return;
+            return true;
         }
         items.addLast(is);
         entityplayer.inventory.setInventorySlotContents(handslot, null);
+        return true;
     }
 
     @Override

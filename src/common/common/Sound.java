@@ -23,7 +23,8 @@ public enum Sound {
     wandCool("random.fizz", .2, 0.5, true),
     shardMake("random.old_explode", 0.7, 1, true),
     wrathLight("mob.zombie.metal", 1, 3),
-    wrathForge("ambient.cave.cave", 1, 1), ;
+    wrathForge("ambient.cave.cave", 1, 1),
+    acidBurn("random.fizz", 1, 1, true), ;
     String src;
     float volume, pitch;
     int index;

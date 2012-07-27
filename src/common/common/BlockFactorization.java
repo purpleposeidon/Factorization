@@ -11,18 +11,20 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 import net.minecraft.src.forge.IConnectRedstone;
+import net.minecraft.src.forge.IMultipassRender;
 import net.minecraft.src.forge.ITextureProvider;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
 
 public class BlockFactorization extends BlockContainer implements
-        ITextureProvider, IConnectRedstone {
+        ITextureProvider, IConnectRedstone, IMultipassRender {
     public boolean fake_normal_render = false;
 
     public BlockFactorization(int id) {
         super(id, Core.registry.materialMachine);
         setHardness(2.0F);
         setResistance(5);
+        setLightOpacity(3);
     }
 
     @Override
@@ -77,11 +79,11 @@ public class BlockFactorization extends BlockContainer implements
             return false;
         }
 
-        TileEntityFactorization t = new Coord(world, i, j, k).getTE(TileEntityFactorization.class);
+        TileEntityCommon t = new Coord(world, i, j, k).getTE(TileEntityCommon.class);
 
         if (t != null) {
             if (Core.instance.isCannonical(world)) {
-                t.activate(entityplayer);
+                return t.activate(entityplayer);
             }
 
             return true;
@@ -89,7 +91,7 @@ public class BlockFactorization extends BlockContainer implements
         else {
             //info message
             if (!Core.instance.isCannonical(world)) {
-                return false;
+                return false; //...?
             }
             entityplayer.addChatMessage("This block is missing its TileEntity, possibly due to a bug in Factorization.");
             if (Core.instance.isPlayerAdmin(entityplayer) || entityplayer.capabilities.isCreativeMode) {
@@ -97,9 +99,8 @@ public class BlockFactorization extends BlockContainer implements
             } else {
                 entityplayer.addChatMessage("It can not be repaired without cheating.");
             }
+            return true;
         }
-
-        return false;
     }
 
     @Override
@@ -211,18 +212,22 @@ public class BlockFactorization extends BlockContainer implements
 
     @Override
     public void addCreativeItems(ArrayList itemList) {
-        Registry core = Core.registry;
+        Registry reg = Core.registry;
         //common
-        itemList.add(core.barrel_item);
-        itemList.add(core.maker_item);
-        itemList.add(core.stamper_item);
-        itemList.add(core.packager_item);
-        itemList.add(core.slagfurnace_item);
+        itemList.add(reg.barrel_item);
+        itemList.add(reg.maker_item);
+        itemList.add(reg.stamper_item);
+        itemList.add(reg.packager_item);
+        itemList.add(reg.slagfurnace_item);
 
         //dark
-        itemList.add(core.router_item);
-        itemList.add(core.lamp_item);
-        itemList.add(core.sentrydemon_item);
+        itemList.add(reg.router_item);
+        itemList.add(reg.lamp_item);
+        itemList.add(reg.sentrydemon_item);
+
+        //electric
+        itemList.add(reg.battery_item);
+        itemList.add(reg.solar_turbine_item);
 
         //itemList.add(core.cutter_item);
         //itemList.add(core.queue_item);
@@ -332,5 +337,20 @@ public class BlockFactorization extends BlockContainer implements
     //@Override ser-ver ser-ver
     public void randomDisplayTick(World w, int x, int y, int z, Random rand) {
         Core.instance.randomDisplayTickFor(w, x, y, z, rand);
+    }
+
+    @Override
+    public boolean canRenderInPass(int pass) {
+        return pass == 0 || pass == 1;
+    }
+
+    //@Override -- hello server asshole
+    public int getRenderBlockPass() {
+        return 1;
+    }
+
+    @Override
+    public boolean isAirBlock(World world, int x, int y, int z) {
+        return false;
     }
 }

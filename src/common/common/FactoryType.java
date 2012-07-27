@@ -18,6 +18,9 @@ public enum FactoryType {
     SENTRYDEMON(9, false), //load a chunk
     WRATHFIRE(10, false), //burn things
     SLAGFURNACE(11, true), //get extra ore output
+    BATTERY(12, false),
+    SOLARTURBINE(13, false), //sun-powered steam turbine
+    LEADWIRE(14, false),
 
     POCKETCRAFTGUI(101, true, 101),
     MECHATABLEGUI(102, true, 102), //Mecha-crafting
@@ -73,7 +76,10 @@ public enum FactoryType {
             return new TileEntityWrathFire();
         case SLAGFURNACE:
             return new TileEntitySlagFurnace();
+        case SOLARTURBINE:
+            return new TileEntitySolarTurbine();
         }
+        System.err.println("Note: " + this + " is a FactoryType with no associated TE");
         return null;
     }
 

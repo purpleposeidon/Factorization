@@ -269,25 +269,25 @@ public class TileEntityBarrel extends TileEntityFactorization {
     //* Double:						Add all but 1 item
 
     @Override
-    public void activate(EntityPlayer entityplayer) {
+    public boolean activate(EntityPlayer entityplayer) {
         // right click: put an item in
         if (!Core.instance.isCannonical(entityplayer.worldObj)) {
-            return;
+            return true;
         }
         if (worldObj.getWorldTime() - lastClick < 10 && item != null) {
             addAllItems(entityplayer);
-            return;
+            return true;
         }
         lastClick = worldObj.getWorldTime();
         int handslot = entityplayer.inventory.currentItem;
         if (handslot < 0 || handslot > 8) {
-            return;
+            return true;
         }
 
         ItemStack is = entityplayer.inventory.getStackInSlot(handslot);
         if (is == null) {
             info(entityplayer);
-            return;
+            return true;
         }
 
         if (is.isItemDamaged()) {
@@ -296,7 +296,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
             } else {
                 info(entityplayer);
             }
-            return;
+            return true;
         }
 
         taintBarrel(is);
@@ -307,12 +307,12 @@ public class TileEntityBarrel extends TileEntityFactorization {
             } else {
                 info(entityplayer);
             }
-            return;
+            return true;
         }
         int free = maxBarrelSize - getItemCount();
         if (free <= 0) {
             info(entityplayer);
-            return;
+            return true;
         }
         int take = Math.min(free, is.stackSize);
         is.stackSize -= take;
@@ -320,6 +320,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
         if (is.stackSize == 0) {
             entityplayer.inventory.setInventorySlotContents(handslot, null);
         }
+        return true;
     }
 
     @Override

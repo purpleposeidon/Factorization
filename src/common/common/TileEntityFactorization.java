@@ -37,9 +37,6 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     public void click(EntityPlayer entityplayer) {
     }
 
-    void sendFullDescription(EntityPlayer player) {
-    }
-
     void makeNoise() {
     }
 
@@ -142,14 +139,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         draw_active = b;
     }
 
-    public void activate(EntityPlayer entityplayer) {
-        FactoryType type = getFactoryType();
 
-        if (type.hasGui) {
-            entityplayer.openGui(Core.instance, type.gui, worldObj, xCoord, yCoord, zCoord);
-            sendFullDescription(entityplayer);
-        }
-    }
 
     public void dropContents() {
         // XXX TODO: ModLoader.genericContainerRemoval

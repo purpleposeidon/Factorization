@@ -9,6 +9,7 @@ public class ItemCraftingComponent extends Item implements ITextureProvider {
     public ItemCraftingComponent(int id, String itemName, int icon) {
         super(id);
         setItemName(itemName);
+        Core.instance.addName(this, itemName);
         this.icon = icon;
     }
 

@@ -5,6 +5,7 @@ import net.minecraft.src.IBlockAccess;
 import net.minecraft.src.RenderBlocks;
 import net.minecraft.src.Tessellator;
 import net.minecraft.src.TileEntity;
+import net.minecraft.src.forge.MinecraftForgeClient;
 
 import org.lwjgl.opengl.GL11;
 
@@ -13,6 +14,7 @@ import factorization.common.BlockFactorization;
 import factorization.common.Core;
 import factorization.common.FactoryType;
 import factorization.common.Texture;
+import factorization.common.TileEntitySolarTurbine;
 
 public class FactorizationRender {
     static Block metal = Block.obsidian;
@@ -71,6 +73,31 @@ public class FactorizationRender {
         float h = 0.99F, l = 0.01F;
         renderPart(rb, cage, h, h, h, l, l, l);
         renderPart(rb, cage, l, l, l, h, h, h);
+    }
+
+    static void renderSolarTurbine(RenderBlocks rb, int water_height) {
+        int glass = Texture.lamp_iron + 2;
+        int water = 7;
+        float d = 1F / 16F;
+        if (MinecraftForgeClient.getRenderPass() == 1) {
+            if (water_height <= 1F / 16F) {
+                return;
+            }
+            //Tessellator.instance.setColorOpaque_F(0.5F, 0.5F, 0.5F);
+            //Tessellator.instance.setColorOpaque(255, 0, 255);
+            renderPart(rb, 7, d, 0.001F, d, 1 - d, (1 + water_height / 64) / 16F, 1 - d);
+            //			renderPart(rb, glass, 1 - d, 1 - d, 1 - d, d, 0.02F, d);
+            return;
+        }
+        renderPart(rb, glass, 0, 0, 0, 1, 1, 1);
+        renderMotor(rb);
+    }
+
+    static void renderMotor(RenderBlocks rb) {
+        int lead = Core.registry.lead_block_item.getIconIndex();
+        float d = 4.0F / 16.0F;
+        float yd = -d + 0.003F;
+        renderPart(rb, lead, d, d + yd, d, 1 - d, 1 - d + yd, 1 - d);
     }
 
     public static void renderNormalBlock(RenderBlocks rb, int x, int y, int z, int md) {
@@ -134,28 +161,31 @@ public class FactorizationRender {
         GL11.glTranslatef(0.5F, 0.5F, 0.5F);
     }
 
-    static public boolean renderWorldBlock(RenderBlocks renderBlocks, IBlockAccess world, int x,
-            int y,
-            int z, Block block, int render_type) {
-
+    static public boolean renderWorldBlock(RenderBlocks renderBlocks, IBlockAccess world,
+            int x, int y, int z, Block block, int render_type) {
+        boolean first_pass = MinecraftForgeClient.getRenderPass() == 0;
         FactorizationRender.renderInWorld(x, y, z);
         int md = world.getBlockMetadata(x, y, z);
         if (block == Core.registry.factory_block) {
             TileEntity te = world.getBlockTileEntity(x, y, z);
             if (te instanceof IFactoryType) {
                 md = ((IFactoryType) te).getFactoryType().md;
-            }
-            else {
+            } else {
                 md = -1;
+            }
+            if (FactoryType.SOLARTURBINE.is(md)) {
+                renderSolarTurbine(renderBlocks, ((TileEntitySolarTurbine) te).water_level);
+                return true;
+            }
+            if (!first_pass) {
+                return false;
             }
             if (FactoryType.LAMP.is(md)) {
                 //TODO: Pick a side for the handle to go on
-                FactorizationRender.renderLamp(renderBlocks, 0);
-            }
-            else if (FactoryType.SENTRYDEMON.is(md)) {
-                FactorizationRender.renderSentryDemon(renderBlocks);
-            }
-            else {
+                renderLamp(renderBlocks, 0);
+            } else if (FactoryType.SENTRYDEMON.is(md)) {
+                renderSentryDemon(renderBlocks);
+            } else {
                 FactorizationRender.renderNormalBlock(renderBlocks, x, y, z, md);
             }
             return true;
@@ -178,8 +208,9 @@ public class FactorizationRender {
             FactorizationRender.renderInInventory();
             if (FactoryType.LAMP.is(damage)) {
                 FactorizationRender.renderLamp(renderBlocks, 0);
-            }
-            else {
+            } else if (FactoryType.SOLARTURBINE.is(damage)) {
+                renderSolarTurbine(renderBlocks, 0);
+            } else {
                 FactorizationRender.renderNormalBlock(renderBlocks, 0, 0, 0, damage);
             }
         }

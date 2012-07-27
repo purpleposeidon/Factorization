@@ -1,5 +1,6 @@
 package factorization.common;
 
+import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Packet;
 import net.minecraft.src.TileEntity;
 import factorization.api.Coord;
@@ -29,6 +30,9 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     void useExtraInfo2(byte b) {
     }
 
+    void sendFullDescription(EntityPlayer player) {
+    }
+
     Packet getDescriptionPacketWith(Object... args) {
         Object[] suffix = new Object[args.length + 3];
         suffix[0] = getFactoryType().md;
@@ -45,5 +49,16 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     @Override
     public Coord getCoord() {
         return new Coord(this);
+    }
+
+    public boolean activate(EntityPlayer entityplayer) {
+        FactoryType type = getFactoryType();
+
+        if (type.hasGui) {
+            entityplayer.openGui(Core.instance, type.gui, worldObj, xCoord, yCoord, zCoord);
+            sendFullDescription(entityplayer);
+            return true;
+        }
+        return false;
     }
 }

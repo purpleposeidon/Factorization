@@ -1,0 +1,52 @@
+Charge Measuring Device
+  WSW   Wood, Sign, stick, Lead, Iron ingot
+  W/W
+  LIL
+
+acid
+  gunpowder + coal + water bottle
+
+battery (factorization block)
+  ILI   iron, lead, acid
+  LAL
+  ILI
+
+Magnet
+  fully charged battery + iron ingot
+
+insulated coil
+  LLL   Lead, Clay
+  LCL
+  LLL
+
+Motor
+  CMC   insulated coil, lead, magnet
+  CMC
+  CLC
+
+Fan
+  I I   Iron
+   I
+  I I
+
+
+Solar Turbine
+  ###   glass, Fan, Motor
+  #F#
+  #M#
+
+  Reflect the sun onto a combination water-boilers/steam turbine
+  (This generator'll pick up its water from the environment, and release steam into the air)
+
+
+electric heater
+  CLC   insulated coil, lead
+  CLC
+  CLC
+
+  
+
+Stuff that needs to be attatched:
+  Sunlight/reflected sunlight
+  Output wire
+  Water source

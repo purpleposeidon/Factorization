@@ -1,8 +1,8 @@
 package factorization.common;
 
-import factorization.api.Coord;
 import net.minecraft.src.Block;
 import net.minecraft.src.forge.MinecraftForge;
+import factorization.api.Coord;
 
 /**
  * This associates various block properties with metadata.
@@ -19,7 +19,7 @@ public enum BlockClass {
     WrathFire(6, false, 0, 4, 0),
     Machine(7, true, 0, 0, 3.5F),
     MachineLightable(8, true, 0, 13, 3.5F),
-
+    Wire(9, false, 0, 0, 0.5F)
     ;
 
     static class Md {
