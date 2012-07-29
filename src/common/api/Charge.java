@@ -25,14 +25,12 @@ public class Charge {
         return charge;
     }
 
-    public void writeToTag(NBTTagCompound tag, String name) {
+    public void writeToNBT(NBTTagCompound tag, String name) {
         tag.setInteger(name, charge);
     }
 
-    static public Charge readFromTag(NBTTagCompound tag, String name) {
-        Charge ret = new Charge();
-        ret.setValue(tag.getInteger(name));
-        return ret;
+    public void readFromNBT(NBTTagCompound tag, String name) {
+        setValue(tag.getInteger(name));
     }
 
     public void swapWith(Charge other) {
@@ -50,16 +48,20 @@ public class Charge {
      */
     public static void update(IChargeConductor te) {
         Charge me = te.getCharge();
-        //This is a fine place for an error if me == null
-        if (me.charge <= 0) {
+        Coord here = te.getCoord();
+
+        if (here.parity()) {
+            //In short lines, it's possible to swap and then swap back
+            //Anyways, a neighbor'll swap with us.
             return;
         }
 
-        for (Coord neighbor : te.getCoord().getRandomNeighborsAdjacent()) {
+        for (Coord neighbor : here.getRandomNeighborsAdjacent()) {
             IChargeConductor n = neighbor.getTE(IChargeConductor.class);
             if (n == null) {
                 continue;
             }
+            //This is a fine place for an error if me == null
             me.swapWith(n.getCharge());
             return;
         }

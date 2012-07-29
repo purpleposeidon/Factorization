@@ -39,8 +39,9 @@ public class ItemChargeMeter extends Item {
         String d = String.format("%.1f", density);
         //TODO: Let's put it somewhere better than the chat log
         player.addChatMessage("Average: " + d
-                + "  Condcutors: " + ret.conductorCount
-                + "  Target: " + ic.getCharge().getValue());
+                + "  Conductors: " + ret.conductorCount
+                + "  Target: " + ic.getCharge().getValue()
+                + "  Total: " + ret.totalCharge);
         return true;
     }
 

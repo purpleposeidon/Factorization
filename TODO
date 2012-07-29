@@ -1,6 +1,7 @@
 http://www.minecraftforum.net/topic/1351802-factorization/
 
 You probably spelled "buoyancy" wrong.
+solar turbines need to check if it's raining. It's okay if you're in a desert tho.
 silver ingot for an upgrade recipe
 draw_active isn't marking the block dirty apparently?
 re-write the shift-clicking function to use slots!!!

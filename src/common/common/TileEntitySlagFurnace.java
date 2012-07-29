@@ -128,7 +128,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
         if (this.isBurning() && this.canSmelt()) {
             ++this.furnaceCookTime;
 
-            if (this.furnaceCookTime == 200) {
+            if (this.furnaceCookTime >= 200) {
                 this.furnaceCookTime = 0;
                 this.smeltItem();
                 invChanged = true;
@@ -138,9 +138,9 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
             this.furnaceCookTime = 0;
         }
 
-        if (burnState != isBurning()) {
+        if (burnState != isBurning() || (isBurning() && draw_active != 1)) {
             draw_active = -1;
-            drawActive(furnaceBurnTime > 0 ? 2 : 1);
+            drawActive(furnaceBurnTime > 0 ? 2 : 0);
             Coord here = getCoord();
             here.dirty();
             here.updateLight();
@@ -164,7 +164,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
         return false;
     }
 
-    private boolean canSmelt() {
+    boolean canSmelt() {
         if (this.furnaceItemStacks[input] == null) {
             return false;
         }

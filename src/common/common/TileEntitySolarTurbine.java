@@ -1,20 +1,21 @@
 package factorization.common;
 
-import java.util.Random;
-
 import net.minecraft.src.Block;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.NBTTagCompound;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
+import factorization.api.IReflectionTarget;
 
-public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeConductor {
+public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeConductor,
+        IReflectionTarget {
     Charge charge = new Charge();
     int reflectors = 0;
     public int water_level = 0;
+    public static int max_water = 256 * 4;
+    int fan_speed = 0;
 
-    public int fan_speed = 0;
     public float fan_rotation = 0;
 
     @Override
@@ -28,15 +29,26 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
     }
 
     @Override
+    public void addReflector(int strength) {
+        reflectors += strength;
+        if (reflectors < 0) {
+            System.err.println("reflector count went negative!");
+            new Exception().printStackTrace();
+            reflectors = 0;
+        }
+    }
+
+    @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
-        charge.writeToTag(tag, "charge");
+        charge.writeToNBT(tag, "charge");
     }
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
-        charge = Charge.readFromTag(tag, "charge");
+        charge.readFromNBT(tag, "charge");
+        fan_rotation = rand.nextInt(90);
     }
 
     @Override
@@ -44,16 +56,8 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
         return false;
     }
 
-    boolean hasSun() {
-        Coord here = getCoord();
-        if (!here.canSeeSky()) {
-            return false;
-        }
-        return worldObj.isDaytime();
-    }
-
     int getHeat() {
-        return (hasSun() ? 1 : 0) + reflectors;
+        return reflectors;
     }
 
     boolean saturated() {
@@ -72,16 +76,25 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
         }
     }
 
-    static Random rand = new Random();
     @Override
     public void updateEntity() {
         charge.update(this);
+        if (fan_speed == -1) {
+            fan_rotation += rand.nextBoolean() ? -0.25 : 0.25;
+        }
+        else {
+            if (fan_speed > 35) {
+                fan_rotation += 35;
+            } else {
+                fan_rotation += fan_speed;
+            }
+        }
         if (water_level <= 0) {
             Coord below = getCoord().add(0, -1, 0);
             if (below.is(Block.waterMoving) || below.is(Block.waterStill)) {
                 if (below.getMd() == 0) {
                     below.setId(0);
-                    water_level = 256;
+                    water_level = max_water;
                     getCoord().dirty();
                 }
             }
@@ -95,15 +108,18 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
             return;
         }
         if (saturated()) {
-            if (fan_speed == -1) {
-                return;
-            }
-            if (fan_speed > -1 && heat > 0) {
-                fan_speed--;
+            if (heat > 0) {
+                if (fan_speed > heat / 2) {
+                    fan_speed--;
+                }
             } else {
                 adjustFanSpeed();
             }
             return;
+        } else {
+            worldObj.spawnParticle("reddust",
+                    (double) xCoord + 0.5, (double) yCoord + 0.5, (double) zCoord + 0.5,
+                    1, 1, 1);
         }
         adjustFanSpeed();
         if (reflectors == 0 && worldObj.getWorldTime() % 20 == 0) {

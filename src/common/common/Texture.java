@@ -28,6 +28,8 @@ public class Texture {
     static final int mecha_bottom = mecha_top + 2;
     static final int mecha_config = mecha_top + 3;
     static final int furnace_start = 16 * 4 + 2;
+    static public final int heater_coil = 8, heater_element = heater_coil + 1;
+    static public final int silver = 1 + 16 * 2;
 
     static int pick(int md, int side, boolean active, int facing_direction) {
         if (FactoryType.ROUTER.is(md)) {
@@ -117,6 +119,12 @@ public class Texture {
                 return furnace_start + 2;
             }
             return furnace_start + 1;
+        }
+        if (FactoryType.HEATER.is(md)) {
+            return heater_coil;
+        }
+        if (FactoryType.MIRROR.is(md)) {
+            return 15;
         }
         return 0;
     }

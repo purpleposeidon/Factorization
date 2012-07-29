@@ -29,4 +29,8 @@ public class DeltaCoord {
             c(0, +1, 0),
             c(0, 0, -1),
             c(0, 0, +1) };
+
+    public double getAngleHorizontal() {
+        return Math.atan2(z, -x);
+    }
 }

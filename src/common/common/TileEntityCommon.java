@@ -1,6 +1,9 @@
 package factorization.common;
 
+import java.util.Random;
+
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.ItemStack;
 import net.minecraft.src.Packet;
 import net.minecraft.src.TileEntity;
 import factorization.api.Coord;
@@ -9,11 +12,15 @@ import factorization.api.IFactoryType;
 import factorization.common.NetworkFactorization.MessageType;
 
 public abstract class TileEntityCommon extends TileEntity implements ICoord, IFactoryType {
+    static Random rand = new Random();
     //@Override -- can't override due to MY GOD ITS THE CLIENTS FAULT THIS TIME
     public Packet getDescriptionPacket() {
         Packet p = Core.network.messagePacket(getCoord(), MessageType.FactoryType, getFactoryType().md, getExtraInfo(), getExtraInfo2());
         p.isChunkDataPacket = true;
         return p;
+    }
+
+    void onRemove() {
     }
 
     byte getExtraInfo() {
@@ -31,6 +38,9 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     }
 
     void sendFullDescription(EntityPlayer player) {
+    }
+
+    void onPlacedBy(EntityPlayer player, ItemStack is) {
     }
 
     Packet getDescriptionPacketWith(Object... args) {

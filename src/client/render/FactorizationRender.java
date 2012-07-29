@@ -85,11 +85,20 @@ public class FactorizationRender {
             }
             //Tessellator.instance.setColorOpaque_F(0.5F, 0.5F, 0.5F);
             //Tessellator.instance.setColorOpaque(255, 0, 255);
-            renderPart(rb, 7, d, 0.001F, d, 1 - d, (1 + water_height / 64) / 16F, 1 - d);
+            renderPart(rb, 7, d, 0.001F, d, 1 - d, (1 + water_height / (TileEntitySolarTurbine.max_water / 4)) / 16F, 1 - d);
             //			renderPart(rb, glass, 1 - d, 1 - d, 1 - d, d, 0.02F, d);
             return;
         }
-        renderPart(rb, glass, 0, 0, 0, 1, 1, 1);
+        if (true) {
+            renderPart(rb, glass, 0, 0, 0, 1, 1, 1);
+        }
+        if (!world_mode) {
+            GL11.glPushMatrix();
+            GL11.glTranslatef(-0.5F, 0.1F, -0.5F);
+            GL11.glRotatef(90, 1, 0, 0);
+            renderItemIn2D(10);
+            GL11.glPopMatrix();
+        }
         renderMotor(rb);
     }
 
@@ -98,6 +107,16 @@ public class FactorizationRender {
         float d = 4.0F / 16.0F;
         float yd = -d + 0.003F;
         renderPart(rb, lead, d, d + yd, d, 1 - d, 1 - d + yd, 1 - d);
+    }
+
+    static void renderMirrorStand(RenderBlocks rb) {
+        float height = 6.5F / 16F;
+        float radius = 1F / 16F;
+        float c = 0.5F;
+        renderPart(rb, Texture.silver, c - radius, 0, c - radius, c + radius, height, c + radius);
+        float trim = 3F / 16F;
+        float trim_height = 2F / 16F;
+        renderPart(rb, Texture.silver, trim, 0, trim, 1 - trim, trim_height, 1 - trim);
     }
 
     public static void renderNormalBlock(RenderBlocks rb, int x, int y, int z, int md) {
@@ -185,8 +204,10 @@ public class FactorizationRender {
                 renderLamp(renderBlocks, 0);
             } else if (FactoryType.SENTRYDEMON.is(md)) {
                 renderSentryDemon(renderBlocks);
+            } else if (FactoryType.MIRROR.is(md)) {
+                renderMirrorStand(renderBlocks);
             } else {
-                FactorizationRender.renderNormalBlock(renderBlocks, x, y, z, md);
+                renderNormalBlock(renderBlocks, x, y, z, md);
             }
             return true;
         }
@@ -195,7 +216,7 @@ public class FactorizationRender {
                 return false;
             }
             if (md == Core.registry.lightair_block.fire_md) {
-                FactorizationRender.renderFire(renderBlocks);
+                renderFire(renderBlocks);
             }
             return true;
         }
@@ -211,9 +232,107 @@ public class FactorizationRender {
             } else if (FactoryType.SOLARTURBINE.is(damage)) {
                 renderSolarTurbine(renderBlocks, 0);
             } else {
-                FactorizationRender.renderNormalBlock(renderBlocks, 0, 0, 0, damage);
+                renderNormalBlock(renderBlocks, 0, 0, 0, damage);
+            }
+            if (FactoryType.HEATER.is(damage)) {
+                float d = 1F / 32F;
+                GL11.glColor3f(0.1F, 0.1F, 0.1F);
+                renderPart(renderBlocks, Texture.heater_element, d, d, d, 1 - d, 1 - d, 1 - d);
             }
         }
     }
 
+    static void renderItemIn2D(int icon_index) {
+        float var6 = ((float) (icon_index % 16 * 16) + 0.0F) / 256.0F;
+        float var7 = ((float) (icon_index % 16 * 16) + 15.9999F) / 256.0F;
+        float var8 = ((float) (icon_index / 16 * 16) + 0.0F) / 256.0F;
+        float var9 = ((float) (icon_index / 16 * 16) + 15.9999F) / 256.0F;
+
+        renderItemIn2D_DO(Tessellator.instance, var7, var8, var6, var9);
+    }
+
+    //copied from ItemRenderer.renderItemIn2D()
+    static void renderItemIn2D_DO(Tessellator par1Tessellator, float par2, float par3, float par4,
+            float par5) {
+        float var6 = 1.0F;
+        float var7 = 0.0625F;
+        par1Tessellator.startDrawingQuads();
+        par1Tessellator.setNormal(0.0F, 0.0F, 1.0F);
+        par1Tessellator.addVertexWithUV(0.0D, 0.0D, 0.0D, (double) par2, (double) par5);
+        par1Tessellator.addVertexWithUV((double) var6, 0.0D, 0.0D, (double) par4, (double) par5);
+        par1Tessellator.addVertexWithUV((double) var6, 1.0D, 0.0D, (double) par4, (double) par3);
+        par1Tessellator.addVertexWithUV(0.0D, 1.0D, 0.0D, (double) par2, (double) par3);
+        par1Tessellator.draw();
+        par1Tessellator.startDrawingQuads();
+        par1Tessellator.setNormal(0.0F, 0.0F, -1.0F);
+        par1Tessellator.addVertexWithUV(0.0D, 1.0D, (double) (0.0F - var7), (double) par2, (double) par3);
+        par1Tessellator.addVertexWithUV((double) var6, 1.0D, (double) (0.0F - var7), (double) par4, (double) par3);
+        par1Tessellator.addVertexWithUV((double) var6, 0.0D, (double) (0.0F - var7), (double) par4, (double) par5);
+        par1Tessellator.addVertexWithUV(0.0D, 0.0D, (double) (0.0F - var7), (double) par2, (double) par5);
+        par1Tessellator.draw();
+        par1Tessellator.startDrawingQuads();
+        par1Tessellator.setNormal(-1.0F, 0.0F, 0.0F);
+        int var8;
+        float var9;
+        float var10;
+        float var11;
+
+        for (var8 = 0; var8 < 16; ++var8)
+        {
+            var9 = (float) var8 / 16.0F;
+            var10 = par2 + (par4 - par2) * var9 - 0.001953125F;
+            var11 = var6 * var9;
+            par1Tessellator.addVertexWithUV((double) var11, 0.0D, (double) (0.0F - var7), (double) var10, (double) par5);
+            par1Tessellator.addVertexWithUV((double) var11, 0.0D, 0.0D, (double) var10, (double) par5);
+            par1Tessellator.addVertexWithUV((double) var11, 1.0D, 0.0D, (double) var10, (double) par3);
+            par1Tessellator.addVertexWithUV((double) var11, 1.0D, (double) (0.0F - var7), (double) var10, (double) par3);
+        }
+
+        par1Tessellator.draw();
+        par1Tessellator.startDrawingQuads();
+        par1Tessellator.setNormal(1.0F, 0.0F, 0.0F);
+
+        for (var8 = 0; var8 < 16; ++var8)
+        {
+            var9 = (float) var8 / 16.0F;
+            var10 = par2 + (par4 - par2) * var9 - 0.001953125F;
+            var11 = var6 * var9 + 0.0625F;
+            par1Tessellator.addVertexWithUV((double) var11, 1.0D, (double) (0.0F - var7), (double) var10, (double) par3);
+            par1Tessellator.addVertexWithUV((double) var11, 1.0D, 0.0D, (double) var10, (double) par3);
+            par1Tessellator.addVertexWithUV((double) var11, 0.0D, 0.0D, (double) var10, (double) par5);
+            par1Tessellator.addVertexWithUV((double) var11, 0.0D, (double) (0.0F - var7), (double) var10, (double) par5);
+        }
+
+        par1Tessellator.draw();
+        par1Tessellator.startDrawingQuads();
+        par1Tessellator.setNormal(0.0F, 1.0F, 0.0F);
+
+        for (var8 = 0; var8 < 16; ++var8)
+        {
+            var9 = (float) var8 / 16.0F;
+            var10 = par5 + (par3 - par5) * var9 - 0.001953125F;
+            var11 = var6 * var9 + 0.0625F;
+            par1Tessellator.addVertexWithUV(0.0D, (double) var11, 0.0D, (double) par2, (double) var10);
+            par1Tessellator.addVertexWithUV((double) var6, (double) var11, 0.0D, (double) par4, (double) var10);
+            par1Tessellator.addVertexWithUV((double) var6, (double) var11, (double) (0.0F - var7), (double) par4, (double) var10);
+            par1Tessellator.addVertexWithUV(0.0D, (double) var11, (double) (0.0F - var7), (double) par2, (double) var10);
+        }
+
+        par1Tessellator.draw();
+        par1Tessellator.startDrawingQuads();
+        par1Tessellator.setNormal(0.0F, -1.0F, 0.0F);
+
+        for (var8 = 0; var8 < 16; ++var8)
+        {
+            var9 = (float) var8 / 16.0F;
+            var10 = par5 + (par3 - par5) * var9 - 0.001953125F;
+            var11 = var6 * var9;
+            par1Tessellator.addVertexWithUV((double) var6, (double) var11, 0.0D, (double) par4, (double) var10);
+            par1Tessellator.addVertexWithUV(0.0D, (double) var11, 0.0D, (double) par2, (double) var10);
+            par1Tessellator.addVertexWithUV(0.0D, (double) var11, (double) (0.0F - var7), (double) par2, (double) var10);
+            par1Tessellator.addVertexWithUV((double) var6, (double) var11, (double) (0.0F - var7), (double) par4, (double) var10);
+        }
+
+        par1Tessellator.draw();
+    }
 }

@@ -47,6 +47,8 @@ import factorization.client.render.EmptyRender;
 import factorization.client.render.EntityWrathFlameFX;
 import factorization.client.render.FactorizationRender;
 import factorization.client.render.TileEntityBarrelRenderer;
+import factorization.client.render.TileEntityHeaterRenderer;
+import factorization.client.render.TileEntityMirrorRenderer;
 import factorization.client.render.TileEntitySolarTurbineRender;
 import factorization.client.render.TileEntityWatchDemonRenderer;
 import factorization.common.Command;
@@ -59,6 +61,8 @@ import factorization.common.FactoryType;
 import factorization.common.Registry;
 import factorization.common.TileEntityBarrel;
 import factorization.common.TileEntityFactorization;
+import factorization.common.TileEntityHeater;
+import factorization.common.TileEntityMirror;
 import factorization.common.TileEntitySlagFurnace;
 import factorization.common.TileEntitySolarTurbine;
 import factorization.common.TileEntityWatchDemon;
@@ -92,6 +96,8 @@ public class mod_Factorization extends Core {
         }
         TileEntityRenderer.setTileEntityRenderer(TileEntityWatchDemon.class, new TileEntityWatchDemonRenderer());
         TileEntityRenderer.setTileEntityRenderer(TileEntitySolarTurbine.class, new TileEntitySolarTurbineRender());
+        TileEntityRenderer.setTileEntityRenderer(TileEntityHeater.class, new TileEntityHeaterRenderer());
+        TileEntityRenderer.setTileEntityRenderer(TileEntityMirror.class, new TileEntityMirrorRenderer());
 
         MinecraftForgeClient.preloadTexture(texture_file_block);
         MinecraftForgeClient.preloadTexture(texture_file_item);

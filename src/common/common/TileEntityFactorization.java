@@ -53,6 +53,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         return false;
     }
 
+    @Override
     void onPlacedBy(EntityPlayer player, ItemStack is) {
         if (player == null) {
             return;
@@ -140,6 +141,10 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }
 
 
+    @Override
+    void onRemove() {
+        dropContents();
+    }
 
     public void dropContents() {
         // XXX TODO: ModLoader.genericContainerRemoval

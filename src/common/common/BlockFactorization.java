@@ -163,22 +163,14 @@ public class BlockFactorization extends BlockContainer implements
         return 1;
     }
 
-    TileEntity destroyedTE;
+    TileEntityCommon destroyedTE;
 
     @Override
     public void onBlockRemoval(World w, int x, int y, int z) {
-        TileEntity ent = w.getBlockTileEntity(x, y, z);
-        destroyedTE = ent;
-        if (ent instanceof TileEntityFactorization) {
-            TileEntityFactorization factory = (TileEntityFactorization) ent;
-            factory.dropContents();
-        }
-        if (ent instanceof TileEntityWrathLamp) {
-            TileEntityWrathLamp lamp = (TileEntityWrathLamp) ent;
-            lamp.onRemove();
-        }
-        if (ent instanceof TileEntityWatchDemon) {
-            ((TileEntityWatchDemon) ent).onRemove();
+        TileEntityCommon te = new Coord(w, x, y, z).getTE(TileEntityCommon.class);
+        if (te != null) {
+            destroyedTE = te;
+            te.onRemove();
         }
     }
 
@@ -206,6 +198,9 @@ public class BlockFactorization extends BlockContainer implements
             destroyedTE = null;
         }
         ItemStack is = new ItemStack(Core.registry.item_factorization, 1, f.getFactoryType().md);
+        if (f.getFactoryType() == FactoryType.MIRROR) {
+            is = new ItemStack(Core.registry.mirror);
+        }
         ret.add(is);
         return ret;
     }
@@ -228,6 +223,10 @@ public class BlockFactorization extends BlockContainer implements
         //electric
         itemList.add(reg.battery_item);
         itemList.add(reg.solar_turbine_item);
+        //itemList.add(reg.mirror_item_hidden);
+        itemList.add(new ItemStack(reg.mirror));
+        itemList.add(reg.heater_item);
+
 
         //itemList.add(core.cutter_item);
         //itemList.add(core.queue_item);

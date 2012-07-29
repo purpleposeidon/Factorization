@@ -39,7 +39,7 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
     public ItemStack cutter_item, router_item, maker_item, stamper_item, packager_item,
             barrel_item,
             queue_item, lamp_item, air_item, sentrydemon_item,
-            slagfurnace_item, battery_item, solar_turbine_item;
+            slagfurnace_item, battery_item, solar_turbine_item, heater_item, mirror_item_hidden;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item, mechaworkshop_item;
     public ItemStack is_factory, is_lamp, is_lightair;
@@ -64,6 +64,7 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
     public ItemStack fake_is;
     public ItemCraftingComponent acid, magnet, insulated_coil, motor, fan;
     public ItemChargeMeter charge_meter;
+    public ItemMirror mirror;
 
     public Material materialMachine = new Material(MapColor.ironColor);
 
@@ -92,6 +93,8 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
         ModLoader.registerTileEntity(TileEntitySolarTurbine.class, "factory_solarturbine");
         ModLoader.registerTileEntity(TileEntityWatchDemon.class, "factory_watchdemon");
         ModLoader.registerTileEntity(TileEntityBarrel.class, "factory_barrel");
+        ModLoader.registerTileEntity(TileEntityHeater.class, "factory_heater");
+        ModLoader.registerTileEntity(TileEntityMirror.class, "factory_mirror");
         //TileEntity renderers are registered in the client's mod_Factorization
 
         ModLoader.registerEntityID(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", Core.entity_relight_task_id);
@@ -140,6 +143,8 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
         slagfurnace_item = FactoryType.SLAGFURNACE.itemStack("Slag Furnace");
         battery_item = FactoryType.BATTERY.itemStack("Battery");
         solar_turbine_item = FactoryType.SOLARTURBINE.itemStack("Solar Turbine");
+        heater_item = FactoryType.HEATER.itemStack("Furnace Heater");
+        mirror_item_hidden = FactoryType.MIRROR.itemStack("Reflective Mirror");
 
 
         //BlockResource stuff
@@ -531,34 +536,16 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
         motor = new ItemCraftingComponent(itemID("motor", 9027), "Motor", 16 * 3 + 8);
         fan = new ItemCraftingComponent(itemID("fan", 9028), "Fan", 16 * 3 + 9);
         charge_meter = new ItemChargeMeter(itemID("chargemeter", 9029));
+        mirror = new ItemMirror(itemID("mirror", 9030));
 
         ModLoader.addShapelessRecipe(new ItemStack(acid), Item.gunpowder, Item.coal, Item.potion);
-        //uh, you might be able to use like charcoal & a splash potion of poison or something >_>
-        ModLoader.addRecipe(new ItemStack(insulated_coil),
-                "LLL",
-                "LCL",
-                "LLL",
-                'L', lead_ingot,
-                'C', Block.blockClay);
-        ModLoader.addRecipe(new ItemStack(motor),
-                "CMC",
-                "CMC",
-                "CLC",
-                'C', insulated_coil,
-                'M', magnet,
-                'L', lead_ingot);
+        
         ModLoader.addRecipe(new ItemStack(fan),
                 "I I",
                 " I ",
                 "I I",
                 'I', Item.ingotIron);
-        ModLoader.addRecipe(battery_item,
-                "ILI",
-                "LAL",
-                "ILI",
-                'I', Item.ingotIron,
-                'L', lead_ingot,
-                'A', acid);
+        
         ModLoader.addRecipe(solar_turbine_item,
                 "###",
                 "#F#",
@@ -576,6 +563,40 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
                 'L', lead_ingot,
                 'I', Item.ingotIron
                 );
+        ModLoader.addRecipe(battery_item,
+                "ILI",
+                "LAL",
+                "ILI",
+                'I', Item.ingotIron,
+                'L', lead_ingot,
+                'A', acid);
+        ModLoader.addRecipe(heater_item,
+                "CLC",
+                "CLC",
+                "CLC",
+                'C', insulated_coil,
+                'L', lead_ingot);
+        ModLoader.addRecipe(new ItemStack(insulated_coil),
+                "LLL",
+                "LCL",
+                "LLL",
+                'L', lead_ingot,
+                'C', Block.blockClay);
+        ModLoader.addRecipe(new ItemStack(motor),
+                "CMC",
+                "CMC",
+                "CLC",
+                'C', insulated_coil,
+                'M', magnet,
+                'L', lead_ingot);
+        for (ItemStack silver : OreDictionary.getOres("ingotSilver")) {
+            ModLoader.addRecipe(new ItemStack(mirror),
+                    "SSS",
+                    "SGS",
+                    "SSS",
+                    'S', silver,
+                    'G', Block.thinGlass);
+        }
 
     }
 

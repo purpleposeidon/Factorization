@@ -21,6 +21,8 @@ public enum FactoryType {
     BATTERY(12, false),
     SOLARTURBINE(13, false), //sun-powered steam turbine
     LEADWIRE(14, false),
+    HEATER(15, false), //work furnaces without fuel
+    MIRROR(16, false), //reflect sunlight onto IReflectionTargets
 
     POCKETCRAFTGUI(101, true, 101),
     MECHATABLEGUI(102, true, 102), //Mecha-crafting
@@ -78,6 +80,10 @@ public enum FactoryType {
             return new TileEntitySlagFurnace();
         case SOLARTURBINE:
             return new TileEntitySolarTurbine();
+        case HEATER:
+            return new TileEntityHeater();
+        case MIRROR:
+            return new TileEntityMirror();
         }
         System.err.println("Note: " + this + " is a FactoryType with no associated TE");
         return null;

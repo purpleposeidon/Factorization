@@ -68,14 +68,14 @@ public class ItemFactorization extends ItemBlock {
             }
             TileEntity te = f.makeTileEntity();
             w.setBlockTileEntity(here.x, here.y, here.z, te);
+            if (te instanceof TileEntityCommon) {
+                ((TileEntityCommon) te).onPlacedBy(player, is);
+            }
             if (Core.instance.isCannonical(w)) {
                 if (te instanceof TileEntityCommon) {
                     Packet p = ((TileEntityCommon) te).getDescriptionPacket();
                     Core.network.broadcastPacket(null, here, p);
                 }
-            }
-            if (te instanceof TileEntityFactorization) {
-                ((TileEntityFactorization) te).onPlacedBy(player, is);
             }
         }
         return ret;
@@ -133,6 +133,9 @@ public class ItemFactorization extends ItemBlock {
         }
         if (FactoryType.LEADWIRE.is(md)) {
             return "Lead Wire";
+        }
+        if (FactoryType.MIRROR.is(md)) {
+            return "Reflective Mirror";
         }
         return "??? It's a Mystery!!!";
     }

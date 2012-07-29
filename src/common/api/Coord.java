@@ -6,6 +6,7 @@ import java.util.Random;
 
 import net.minecraft.src.Block;
 import net.minecraft.src.Entity;
+import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 
@@ -53,6 +54,16 @@ public class Coord {
 
     public Coord copy() {
         return new Coord(w, x, y, z);
+    }
+
+    /** @return boolean for a check pattern */
+    public boolean parity() {
+        return ((x + y + z) & 1) == 0;
+    }
+
+    /** @return a mostly unique integer for this location */
+    public int seed() {
+        return ((x << 4 + z) << 8) + y;
     }
 
     public DeltaCoord difference(Coord b) {
@@ -120,6 +131,10 @@ public class Coord {
     }
 
     //Impure methods
+    public void setWorld(World newWorld) {
+        this.w = newWorld;
+    }
+
     public Coord add(DeltaCoord d) {
         return add(d.x, d.y, d.z);
     }
@@ -203,6 +218,10 @@ public class Coord {
             return false;
         }
         return getBlock().isBlockNormalCube(w, x, y, z);
+    }
+
+    public boolean blockExists() {
+        return w.blockExists(x, y, z);
     }
 
     public boolean isReplacable() {
@@ -290,4 +309,19 @@ public class Coord {
         return setId(block.blockID);
     }
 
+    public void writeToNBT(String prefix, NBTTagCompound tag) {
+        tag.setInteger(prefix + "x", x);
+        tag.setInteger(prefix + "y", y);
+        tag.setInteger(prefix + "z", z);
+    }
+
+    public void readFromNBT(String prefix, NBTTagCompound tag) {
+        x = tag.getInteger(prefix + "x");
+        y = tag.getInteger(prefix + "y");
+        z = tag.getInteger(prefix + "z");
+    }
+
+    public void mark() {
+        w.spawnParticle("reddust", x, y, z, 0, 0, 0);
+    }
 }

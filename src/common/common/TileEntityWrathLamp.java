@@ -191,13 +191,13 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         int dx = x - xCoord, dz = z - zCoord;
         float idealm = div(dz, dx);
 
-        float old_dist = 999999999999F;
+        float old_dist = Float.MAX_VALUE;
         while (true) {
             if (x == xCoord && z == zCoord) {
                 return true;
             }
             int id = worldObj.getBlockId(x, yCoord, z);
-            if (Block.blocksList[id] != null && Block.blocksList[id].isOpaqueCube()) {
+            if (Block.blocksList[id] != null && Block.blocksList[id].isOpaqueCube() && Block.lightOpacity[id] != 0) {
                 return false;
             }
             dx = x - xCoord;
