@@ -54,7 +54,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }
 
     @Override
-    void onPlacedBy(EntityPlayer player, ItemStack is) {
+    void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
         if (player == null) {
             return;
         }

@@ -14,14 +14,14 @@ public class ItemWandOfCooling extends Item implements ITextureProvider {
     static int changeArray[] = new int[0xFF];
     final int max_change = 70;
     final int radius_tries = 50;
-    final int max_radius = 5;
+    final int max_radius = 3;
     int change_count = 0, noise_count = 0;
 
     public ItemWandOfCooling(int par1) {
         super(par1);
         setMaxStackSize(1);
         setFull3D();
-        setMaxDamage(1024 * 15);
+        setMaxDamage(1024 * 13);
 
         Arrays.fill(changeArray, -1);
         remove(Block.fire);
@@ -194,7 +194,7 @@ public class ItemWandOfCooling extends Item implements ITextureProvider {
         changeArea(world, x, y, z, 1);
         int real_max_radius = max_radius;
         if (player.isSneaking()) {
-            real_max_radius *= 2;
+            real_max_radius *= 1.5;
         }
         for (int r = 2; r < real_max_radius; r++) {
             changeRadius(world, x, y, z, r);

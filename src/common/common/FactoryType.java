@@ -84,6 +84,8 @@ public enum FactoryType {
             return new TileEntityHeater();
         case MIRROR:
             return new TileEntityMirror();
+        case LEADWIRE:
+            return new TileEntityWire();
         }
         System.err.println("Note: " + this + " is a FactoryType with no associated TE");
         return null;

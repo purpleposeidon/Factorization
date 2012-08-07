@@ -57,19 +57,27 @@ public class ItemFactorization extends ItemBlock {
             }
         }
 
+        FactoryType f = FactoryType.fromMd(is.getItemDamage());
+        if (f == null) {
+            is.stackSize = 0;
+            return false;
+        }
+        TileEntity te = f.makeTileEntity();
+        if (te instanceof TileEntityCommon) {
+            boolean good = ((TileEntityCommon) te).canPlaceAgainst(here.copy().towardSide(CubeFace.oppositeSide(side)), side);
+            if (!good) {
+                return false;
+            }
+        }
+
         boolean ret = super.onItemUse(is, player, w, x, y, z, side);
         if (ret) {
             //create our TileEntityFactorization
             //Coord c = new Coord(w, x, y, z).towardSide(side);
-            FactoryType f = FactoryType.fromMd(is.getItemDamage());
-            if (f == null) {
-                is.stackSize = 0;
-                return false;
-            }
-            TileEntity te = f.makeTileEntity();
+
             w.setBlockTileEntity(here.x, here.y, here.z, te);
             if (te instanceof TileEntityCommon) {
-                ((TileEntityCommon) te).onPlacedBy(player, is);
+                ((TileEntityCommon) te).onPlacedBy(player, is, side);
             }
             if (Core.instance.isCannonical(w)) {
                 if (te instanceof TileEntityCommon) {

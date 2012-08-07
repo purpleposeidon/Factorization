@@ -35,7 +35,11 @@ public class Coord {
     }
 
     public String toString() {
-        return "(" + x + ", " + y + ", " + z + ")";
+        String ret = "(" + x + ", " + y + ", " + z + ")";
+        if (w != null) {
+            ret += " a " + getBlock();
+        }
+        return ret;
     }
 
     @Override
@@ -130,6 +134,70 @@ public class Coord {
         return this.add(DeltaCoord.directNeighbors[r]);
     }
 
+    public Coord d(int dx, int dy, int dz) {
+        return new Coord(w, x + dx, y + dy, z + dz);
+    }
+
+    public Coord[] getNeighborsInPlane(int side) {
+        //For god's sake, don't change the order of these return values.
+        //That would mess up wire rendering.
+        switch (side) {
+        case 0:
+        case 1: //y
+            return new Coord[] {
+                    d(-1, 0, 0),
+                    d(+1, 0, 0),
+                    d(0, 0, -1),
+                    d(0, 0, +1)
+            };
+        case 2:
+        case 3: //z
+            return new Coord[] {
+                    d(-1, 0, 0),
+                    d(+1, 0, 0),
+                    d(0, -1, 0),
+                    d(0, +1, 0)
+            };
+        case 4:
+        case 5: //x
+            return new Coord[] {
+                    d(0, 0, -1),
+                    d(0, 0, +1),
+                    d(0, -1, 0),
+                    d(0, +1, 0)
+            };
+        }
+        return null;
+    }
+
+    public Coord[] getNeighborsOutOfPlane(int side) {
+        switch (side) {
+        case 0:
+        case 1: //y
+            return new Coord[] {
+                    d(0, -1, 0),
+                    d(0, +1, 0)
+            };
+        case 2:
+        case 3: //z
+            return new Coord[] {
+                    d(0, 0, -1),
+                    d(0, 0, +1),
+            };
+        case 4:
+        case 5: //x
+            return new Coord[] {
+                    d(-1, 0, 0),
+                    d(+1, 0, 0),
+            };
+        }
+        return null;
+    }
+
+    public boolean isSubmissiveTo(Coord o) {
+        return y < o.y || x < o.x || z < o.z;
+    }
+
     //Impure methods
     public void setWorld(World newWorld) {
         this.w = newWorld;
@@ -218,6 +286,10 @@ public class Coord {
             return false;
         }
         return getBlock().isBlockNormalCube(w, x, y, z);
+    }
+
+    public boolean isSolidOnSide(int side) {
+        return w.isBlockSolidOnSide(x, y, z, side);
     }
 
     public boolean blockExists() {

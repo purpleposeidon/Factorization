@@ -40,7 +40,11 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     void sendFullDescription(EntityPlayer player) {
     }
 
-    void onPlacedBy(EntityPlayer player, ItemStack is) {
+    boolean canPlaceAgainst(Coord c, int side) {
+        return true;
+    }
+
+    void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
     }
 
     Packet getDescriptionPacketWith(Object... args) {
@@ -70,5 +74,9 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
             return true;
         }
         return false;
+    }
+
+    public boolean isBlockSolidOnSide(int side) {
+        return true;
     }
 }

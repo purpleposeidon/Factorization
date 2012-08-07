@@ -66,12 +66,12 @@ public class TileEntityMirror extends TileEntityCommon {
     }
     
     @Override
-    void onPlacedBy(EntityPlayer player, ItemStack is) {
+    void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
         if (player == null) {
             return;
         }
-        rotation = clipAngle((int) player.rotationYaw);
-        rotation = clipAngle(rotation + 270);
+        rotation = clipAngle((int) player.rotationYaw + 270);
+        rotation = clipAngle(-rotation);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class TileEntityMirror extends TileEntityCommon {
 
     @Override
     public void updateEntity() {
-        //if we don't have a target, spin about
+        //		if we don't have a target, spin about
         if (reflection_target == null) {
             rotation++;
             if (search_delay > 0) {
@@ -239,5 +239,10 @@ public class TileEntityMirror extends TileEntityCommon {
             }
         }
 
+    }
+
+    @Override
+    public boolean isBlockSolidOnSide(int side) {
+        return false;
     }
 }

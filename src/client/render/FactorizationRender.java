@@ -2,6 +2,7 @@ package factorization.client.render;
 
 import net.minecraft.src.Block;
 import net.minecraft.src.IBlockAccess;
+import net.minecraft.src.ModLoader;
 import net.minecraft.src.RenderBlocks;
 import net.minecraft.src.Tessellator;
 import net.minecraft.src.TileEntity;
@@ -9,19 +10,24 @@ import net.minecraft.src.forge.MinecraftForgeClient;
 
 import org.lwjgl.opengl.GL11;
 
+import factorization.api.Coord;
 import factorization.api.IFactoryType;
 import factorization.common.BlockFactorization;
 import factorization.common.Core;
 import factorization.common.FactoryType;
+import factorization.common.RenderingCube;
+import factorization.common.RenderingCube.Vector;
 import factorization.common.Texture;
 import factorization.common.TileEntitySolarTurbine;
+import factorization.common.TileEntityWire;
+import factorization.common.WireConnections;
 
 public class FactorizationRender {
     static Block metal = Block.obsidian;
     static Block glass = Block.glowStone;
 
     static boolean world_mode;
-    static int x, y, z;
+    static public int x, y, z;
 
     static void renderInWorld(int wx, int wy, int wz) {
         world_mode = true;
@@ -119,6 +125,56 @@ public class FactorizationRender {
         renderPart(rb, Texture.silver, trim, 0, trim, 1 - trim, trim_height, 1 - trim);
     }
 
+    static float wireWidth = 4F / 16F;
+
+
+    final static double uvd = -0.00001;
+
+    static void plane(int icon, int ox, int oy, int oz, int width, int height, int depth) {
+        Tessellator tes = Tessellator.instance;
+        double u = ((icon & 0xf) << 4) / 256.0;
+        double v = (icon & 0xf0) / 256.0;
+
+        double ax = x + ox / 16F, ay = y + oy / 16F, az = z + oz / 16F;
+        double bx = ax + width / 16F, by = ay + height / 16F, bz = az + depth / 16F;
+
+        tes.addVertexWithUV(ax, ay, az, u, v);
+        double uw = u; // u + uvd;
+        double vw = v; //v + uvd;
+        if (width == 0) {
+            uw += height / 256F;
+            vw += depth / 256F;
+            tes.addVertexWithUV(ax, by, az, uw, v);
+            tes.addVertexWithUV(ax, by, bz, uw, vw);
+            tes.addVertexWithUV(ax, ay, bz, u, vw);
+        } else if (height == 0) {
+            uw += width / 256F;
+            vw += depth / 256F;
+            tes.addVertexWithUV(ax, ay, bz, u, vw);
+            tes.addVertexWithUV(bx, ay, bz, uw, vw);
+            tes.addVertexWithUV(bx, ay, az, uw, v);
+        } else if (depth == 0) {
+            uw += width / 256F;
+            vw += height / 256F;
+            tes.addVertexWithUV(ax, by, az, u, vw);
+            tes.addVertexWithUV(bx, by, az, uw, vw);
+            tes.addVertexWithUV(bx, ay, az, uw, v);
+        }
+    }
+
+    static WireRenderer wireRenderer = new WireRenderer();
+    static void renderWireWorld(RenderBlocks rb, Coord me) {
+        for (RenderingCube rc : new WireConnections(me.getTE(TileEntityWire.class)).getParts()) {
+            renderCube(rc);
+        }
+    }
+
+    static void renderWireInv(RenderBlocks rb) {
+        int lead = Core.registry.resource_block.getBlockTextureFromSideAndMetadata(0, Core.registry.lead_block_item.getItemDamage());
+        renderPart(rb, lead, 0, 0, 0, 1, wireWidth, wireWidth);
+        renderPart(rb, lead, 0, 0, 0, wireWidth, wireWidth, 1);
+    }
+
     public static void renderNormalBlock(RenderBlocks rb, int x, int y, int z, int md) {
         if (world_mode) {
             Block b = Core.registry.factory_block;
@@ -206,6 +262,8 @@ public class FactorizationRender {
                 renderSentryDemon(renderBlocks);
             } else if (FactoryType.MIRROR.is(md)) {
                 renderMirrorStand(renderBlocks);
+            } else if (FactoryType.LEADWIRE.is(md)) {
+                renderWireWorld(renderBlocks, new Coord(ModLoader.getMinecraftInstance().theWorld, x, y, z));
             } else {
                 renderNormalBlock(renderBlocks, x, y, z, md);
             }
@@ -231,6 +289,8 @@ public class FactorizationRender {
                 FactorizationRender.renderLamp(renderBlocks, 0);
             } else if (FactoryType.SOLARTURBINE.is(damage)) {
                 renderSolarTurbine(renderBlocks, 0);
+            } else if (FactoryType.LEADWIRE.is(damage)) {
+                renderWireInv(renderBlocks);
             } else {
                 renderNormalBlock(renderBlocks, 0, 0, 0, damage);
             }
@@ -334,5 +394,30 @@ public class FactorizationRender {
         }
 
         par1Tessellator.draw();
+    }
+
+    static public void renderCube(RenderingCube rc) {
+        for (int face = 0; face < 6; face++) {
+            Vector[] vecs = rc.faceVerts(face);
+            for (int i = 0; i < vecs.length; i++) {
+                Vector vec = vecs[i];
+                vertex(rc, vec.x, vec.y, vec.z, vec.u, vec.v);
+            }
+        }
+    }
+
+    public static void initRenderCube() {
+        //		Tessellator.instance.setBrightness(0xf000f);
+    }
+
+    static private void vertex(RenderingCube rc, float x, float y, float z, float u, float v) {
+        //all units are in texels; center of the cube is the origin. Or, like... not the center but the texel that's (8,8,8) away from the corner is.
+        //u & v are in texels
+        Tessellator.instance.setColorOpaque_F(1, 1, 1);
+        Tessellator.instance.addVertexWithUV(
+                FactorizationRender.x + 0.5 + x / 16F,
+                FactorizationRender.y + 0.5 + y / 16F,
+                FactorizationRender.z + 0.5 + z / 16F,
+                rc.ul + u / 256F, rc.vl + v / 256F);
     }
 }

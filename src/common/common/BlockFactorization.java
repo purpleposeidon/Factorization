@@ -53,6 +53,16 @@ public class BlockFactorization extends BlockContainer implements
     }
 
     @Override
+    public boolean isBlockSolidOnSide(World world, int x, int y, int z, int side) {
+        Coord here = new Coord(world, x, y, z);
+        TileEntityCommon te = here.getTE(TileEntityCommon.class);
+        if (te == null) {
+            return false;
+        }
+        return te.isBlockSolidOnSide(side);
+    }
+
+    @Override
     public void onNeighborBlockChange(World w, int x, int y, int z, int l) {
         int md = w.getBlockMetadata(x, y, z);
         TileEntity ent = w.getBlockTileEntity(x, y, z);
@@ -175,8 +185,8 @@ public class BlockFactorization extends BlockContainer implements
     }
 
     @Override
-    public ArrayList<ItemStack> getBlockDropped(World world, int X, int Y,
-            int Z, int md, int fortune) {
+    public ArrayList<ItemStack> getBlockDropped(World world, int X, int Y, int Z, int md,
+            int fortune) {
         ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
         Coord here = new Coord(world, X, Y, Z);
         IFactoryType f = here.getTE(IFactoryType.class);
@@ -226,6 +236,7 @@ public class BlockFactorization extends BlockContainer implements
         //itemList.add(reg.mirror_item_hidden);
         itemList.add(new ItemStack(reg.mirror));
         itemList.add(reg.heater_item);
+        itemList.add(reg.leadwire_item);
 
 
         //itemList.add(core.cutter_item);

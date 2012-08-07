@@ -1,9 +1,10 @@
 0.3.3 -- Electrically Charged!
   
   Electricity:
-    Solar turbines, reflective mirrors, heaters
-    Solar turbines require a few reflective mirrors facing towards it, and a water source block underneath. This'll produce enough electric charge to power a heater.
-    The heater allows you to run vanilla furnaces & slag furnaces without fuel. Place a heater adjacent to a furnace to heat it. A properly heated furnace will cook faster than normal. You can put more than one heater touching a furnace for extra speed. Heaters (and everything electricity-related except for mirrors) can conduct charge through them, so you don't have to use wires.
+    Solar turbines, reflective mirrors, heaters, wires
+    Solar turbines require a few reflective mirrors facing towards it on the same y-level, and a water source block underneath. This'll produce enough electric charge to power a heater.
+    The heater allows you to run vanilla furnaces & slag furnaces without fuel. Place a heater adjacent to a furnace to heat it. A properly heated furnace will cook faster than normal. You can put more than one heater touching a furnace for extra speed. Heaters (and everything electricity-related, except mirrors) can conduct charge through them, so you don't have to use wires.
+    Of course wires are there if you need them. It's called "Soldering Wire". Since it's very weak structurally, it must be supported by a block (or supported by a wire that is directly supported).
 
 
   Wrath Fire now treats other netherbrickblocks properly

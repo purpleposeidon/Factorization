@@ -338,7 +338,10 @@ public class mod_Factorization extends Core {
     @Override
     public boolean renderWorldBlock(RenderBlocks renderBlocks, IBlockAccess world, int x, int y,
             int z, Block block, int render_type) {
-        return FactorizationRender.renderWorldBlock(renderBlocks, world, x, y, z, block, render_type);
+        Profiler.startSection("factorization");
+        boolean ret = FactorizationRender.renderWorldBlock(renderBlocks, world, x, y, z, block, render_type);
+        Profiler.endSection();
+        return ret;
     }
 
     @Override

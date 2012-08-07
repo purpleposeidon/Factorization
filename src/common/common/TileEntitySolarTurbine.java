@@ -133,4 +133,9 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
             getCoord().dirty();
         }
     }
+
+    @Override
+    public boolean isBlockSolidOnSide(int side) {
+        return side != 1;
+    }
 }

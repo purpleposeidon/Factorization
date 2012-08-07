@@ -25,7 +25,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     static final int update_limit = 64;
     static PriorityQueue<Coord> airToUpdate = new PriorityQueue(1024);
 
-    static class Coord implements Comparable<Coord> {
+    private static class Coord implements Comparable<Coord> {
         World w;
         int x, y, z;
 
@@ -390,5 +390,10 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.LAMP;
+    }
+
+    @Override
+    public boolean isBlockSolidOnSide(int side) {
+        return false;
     }
 }

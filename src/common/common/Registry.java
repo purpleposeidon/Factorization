@@ -39,7 +39,8 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
     public ItemStack cutter_item, router_item, maker_item, stamper_item, packager_item,
             barrel_item,
             queue_item, lamp_item, air_item, sentrydemon_item,
-            slagfurnace_item, battery_item, solar_turbine_item, heater_item, mirror_item_hidden;
+            slagfurnace_item, battery_item, solar_turbine_item, heater_item, mirror_item_hidden,
+            leadwire_item;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item, mechaworkshop_item;
     public ItemStack is_factory, is_lamp, is_lightair;
@@ -95,6 +96,7 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
         ModLoader.registerTileEntity(TileEntityBarrel.class, "factory_barrel");
         ModLoader.registerTileEntity(TileEntityHeater.class, "factory_heater");
         ModLoader.registerTileEntity(TileEntityMirror.class, "factory_mirror");
+        ModLoader.registerTileEntity(TileEntityWire.class, "factory_solder");
         //TileEntity renderers are registered in the client's mod_Factorization
 
         ModLoader.registerEntityID(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", Core.entity_relight_task_id);
@@ -145,6 +147,7 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
         solar_turbine_item = FactoryType.SOLARTURBINE.itemStack("Solar Turbine");
         heater_item = FactoryType.HEATER.itemStack("Furnace Heater");
         mirror_item_hidden = FactoryType.MIRROR.itemStack("Reflective Mirror");
+        leadwire_item = FactoryType.LEADWIRE.itemStack("Lead Wire");
 
 
         //BlockResource stuff
@@ -275,7 +278,7 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
 
         //mecha armor
         mecha_chasis = new ItemCraftingComponent(itemID("mechaChasis", 9009), "item.mechachasis", 5);
-        addName(mecha_chasis, "Mecha-Chasis");
+        addName(mecha_chasis, "Mecha-Chassis");
         //mecha_ITEMS created in make_recipes_side()
         //Mecha-armor uses up to Item ID 9013.
         addName(mecha_head, "Mecha-Helmet");
@@ -390,7 +393,7 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
                 "GDG",
                 "ICI",
                 'I', dark_iron,
-                'T', Block.torchRedstoneIdle,
+                'T', Block.torchRedstoneActive,
                 'D', bound_tiny_demon,
                 'G', Item.ingotGold,
                 'C', Block.chest);
@@ -401,7 +404,7 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
                     "SDS",
                     "IBI",
                     'I', dark_iron,
-                    'T', Block.torchRedstoneIdle,
+                    'T', Block.torchRedstoneActive,
                     'D', bound_tiny_demon,
                     'S', ingotSilver,
                     'B', Item.book);
@@ -654,7 +657,7 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
             return;
         }
         if (oreClass.equals("oreSilver")) {
-            TileEntitySlagFurnace.SlagRecipes.register(ore, 1F, new ItemStack(silver_ingot), 1.2F, new ItemStack(lead_ingot));
+            TileEntitySlagFurnace.SlagRecipes.register(ore, 0.9F, new ItemStack(silver_ingot), 1.4F, new ItemStack(lead_ingot));
             return;
         }
     }
