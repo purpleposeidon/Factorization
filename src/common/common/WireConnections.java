@@ -2,7 +2,11 @@ package factorization.common;
 
 import java.util.ArrayList;
 
+import net.minecraft.src.Block;
+import net.minecraft.src.MovingObjectPosition;
 import net.minecraft.src.Profiler;
+import net.minecraft.src.Vec3D;
+import net.minecraft.src.World;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.IChargeConductor;
@@ -164,5 +168,57 @@ public class WireConnections {
             ret.add(edge_map[edge_index].copy());
         }
         return ret;
+    }
+
+    public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z, Vec3D startVec,
+            Vec3D endVec) {
+        for (RenderingCube part : getParts()) {
+            part.toBlockBounds(Core.registry.resource_block);
+            MovingObjectPosition ret = Core.registry.resource_block.collisionRayTrace(w, x, y, z, startVec, endVec);
+            if (ret != null) {
+                Core.registry.resource_block.setBlockBounds(0, 0, 0, 1, 1, 1);
+                return ret;
+            }
+        }
+        Core.registry.resource_block.setBlockBounds(0, 0, 0, 1, 1, 1);
+        return null;
+    }
+
+    public void conductorRestrict() {
+        faces = 0;
+        center_core = false;
+        //		cleanup();
+    }
+
+    public void setBlockBounds(Block block) {
+        Vector min = null, max = null;
+        boolean first = true;
+        for (RenderingCube part : getParts()) {
+            if (first) {
+                first = false;
+                min = max = part.faceVerts(0)[2];
+                max = part.faceVerts(0)[1];
+            }
+            getExtremes(part, min, max);
+        }
+        min = min.add(8, 8, 8);
+        max = max.add(8, 8, 8);
+        min.scale(1F / 16F);
+        max.scale(1F / 16F);
+        float d = 0;
+        block.setBlockBounds(min.x + d, min.y + d, min.z + d, max.x + d, max.y + d, max.z + d);
+    }
+
+    private void getExtremes(RenderingCube cube, Vector min, Vector max) {
+        for (int face = 0; face < 6; face++) {
+            for (Vector v : cube.faceVerts(face)) {
+                min.x = Math.min(v.x, min.x);
+                min.y = Math.min(v.y, min.y);
+                min.z = Math.min(v.z, min.z);
+                max.x = Math.max(v.x, max.x);
+                max.y = Math.max(v.y, max.y);
+                max.z = Math.max(v.z, max.z);
+            }
+        }
     }
 }
