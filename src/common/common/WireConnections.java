@@ -56,8 +56,10 @@ public class WireConnections {
                     center_core = true;
                 } else {
                     //adjacent
-                    edges |= my_face.getEdgeFlags() & delta_face.getEdgeFlags();
-                    faces |= my_face.getFaceFlag();
+                    //edges |= my_face.getEdgeFlags() & delta_face.getEdgeFlags();
+                    //edges |= my_face.getEdgeFlags() & new CubeFace(0).getEdgeFlags();
+                    edges |= new CubeFace(0).getEdgeFlags() & delta_face.getEdgeFlags();
+                    //faces |= my_face.getFaceFlag();
                 }
             }
         }
@@ -72,6 +74,10 @@ public class WireConnections {
             faces = my_face.getFaceFlag();
         }
 
+        cleanup();
+    }
+
+    void cleanup() {
         //if a face has more than 1 edge drawn, draw the face as well
         for (int side = 0; side < 6; side++) {
             if (Long.bitCount(edges & CubeFace.getEdgeFlags(side)) > 1) {
@@ -82,6 +88,12 @@ public class WireConnections {
         if (Long.bitCount(edges) > 1 && faces == 0) {
             faces = my_face.getFaceFlag();
         }
+    }
+
+    public void conductorRestrict() {
+        faces = 0;
+        center_core = false;
+//		cleanup();
     }
 
     void addNeighbor(DeltaCoord neighbor, TileEntityWire nte, CubeFace neighbor_face, CubeFace delta_face) {
@@ -117,7 +129,7 @@ public class WireConnections {
     }
     
     static RenderingCube cube(Vector corner, Vector origin) {
-        final int icon = 34;
+        final int icon = 11; //34... was old. 11 is right, but... what?
         return new RenderingCube(icon, corner, origin);
     }
 
@@ -170,24 +182,17 @@ public class WireConnections {
         return ret;
     }
 
-    public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z, Vec3D startVec,
-            Vec3D endVec) {
-        for (RenderingCube part : getParts()) {
-            part.toBlockBounds(Core.registry.resource_block);
-            MovingObjectPosition ret = Core.registry.resource_block.collisionRayTrace(w, x, y, z, startVec, endVec);
-            if (ret != null) {
-                Core.registry.resource_block.setBlockBounds(0, 0, 0, 1, 1, 1);
-                return ret;
+    private void getExtremes(RenderingCube cube, Vector min, Vector max) {
+        for (int face = 0; face < 6; face++) {
+            for (Vector v : cube.faceVerts(face)) {
+                min.x = Math.min(v.x, min.x);
+                min.y = Math.min(v.y, min.y);
+                min.z = Math.min(v.z, min.z);
+                max.x = Math.max(v.x, max.x);
+                max.y = Math.max(v.y, max.y);
+                max.z = Math.max(v.z, max.z);
             }
         }
-        Core.registry.resource_block.setBlockBounds(0, 0, 0, 1, 1, 1);
-        return null;
-    }
-
-    public void conductorRestrict() {
-        faces = 0;
-        center_core = false;
-        //		cleanup();
     }
 
     public void setBlockBounds(Block block) {
@@ -203,22 +208,23 @@ public class WireConnections {
         }
         min = min.add(8, 8, 8);
         max = max.add(8, 8, 8);
-        min.scale(1F / 16F);
-        max.scale(1F / 16F);
+        min.scale(1F/16F);
+        max.scale(1F/16F);
         float d = 0;
         block.setBlockBounds(min.x + d, min.y + d, min.z + d, max.x + d, max.y + d, max.z + d);
     }
 
-    private void getExtremes(RenderingCube cube, Vector min, Vector max) {
-        for (int face = 0; face < 6; face++) {
-            for (Vector v : cube.faceVerts(face)) {
-                min.x = Math.min(v.x, min.x);
-                min.y = Math.min(v.y, min.y);
-                min.z = Math.min(v.z, min.z);
-                max.x = Math.max(v.x, max.x);
-                max.y = Math.max(v.y, max.y);
-                max.z = Math.max(v.z, max.z);
+    public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z, Vec3D startVec,
+            Vec3D endVec) {
+        for (RenderingCube part : getParts()) {
+            part.toBlockBounds(Core.registry.resource_block);
+            MovingObjectPosition ret = Core.registry.resource_block.collisionRayTrace(w, x, y, z, startVec, endVec);
+            if (ret != null) {
+                Core.registry.resource_block.setBlockBounds(0, 0, 0, 1, 1, 1);
+                return ret;
             }
         }
+        Core.registry.resource_block.setBlockBounds(0, 0, 0, 1, 1, 1);
+        return null;
     }
 }
