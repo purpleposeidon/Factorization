@@ -149,9 +149,12 @@ public class FactorizationRender {
         double uw = u + 16F / 256F; // u + uvd;
         double vw = v + 16F / 256F; //v + uvd;
 
-        float h = 1F / 16F + Math.round(fullness * 15) / 16F;
-        v = v + (4 + 11 - Math.round(fullness * 11)) / 256F;
+        float pixels = Math.round(fullness * 11);
+
+        float h = 1F / 16F + pixels / 16F;
+        v += (4 + 11 - pixels) / 256F;
         final double d = 1.0 / 128.0;
+        tes.setBrightness(0x80); //XXX TODO
         tes.addVertexWithUV(x, y, z - d, uw, vw);
         tes.addVertexWithUV(x, y + h, z - d, uw, v);
         tes.addVertexWithUV(x + 1, y + h, z - d, u, v);

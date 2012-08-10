@@ -405,7 +405,7 @@ public class mod_Factorization extends Core {
             }
             if (ft == FactoryType.SOLARTURBINE) {
                 TileEntitySolarTurbine sol = (TileEntitySolarTurbine) te;
-                if (sol.getReflectors() > 0) {
+                if (sol.getReflectors() > 0 && sol.water_level > 0) {
                     double X = x + 2 / 16F;
                     double Z = z + 2 / 16F;
                     if (rand.nextBoolean()) {

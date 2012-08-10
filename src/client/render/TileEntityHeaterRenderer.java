@@ -41,6 +41,7 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
         float d = 0.5F - 2F / 16F - 1.35F / 32F; //....
         GL11.glTranslatef((float) x + d, (float) y + d, (float) z + d);
         float scale = 5F + 5 / 16F;
+        scale -= 10F / 128F;
         GL11.glScalef(scale, scale, scale);
         element.renderAll();
         GL11.glPopMatrix();

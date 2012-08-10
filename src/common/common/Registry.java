@@ -574,9 +574,9 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
                 'L', lead_ingot,
                 'A', acid);
         ModLoader.addRecipe(heater_item,
-                "CLC",
-                "CLC",
-                "CLC",
+                "CCC",
+                "L L",
+                "CCC",
                 'C', insulated_coil,
                 'L', lead_ingot);
         ModLoader.addRecipe(new ItemStack(insulated_coil),
@@ -586,19 +586,20 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
                 'L', lead_ingot,
                 'C', Block.blockClay);
         ModLoader.addRecipe(new ItemStack(motor),
+                "CIC",
                 "CMC",
-                "CMC",
-                "CLC",
+                "LIL",
                 'C', insulated_coil,
                 'M', magnet,
-                'L', lead_ingot);
+                'L', lead_ingot,
+                'I', Item.ingotIron);
         for (ItemStack silver : OreDictionary.getOres("ingotSilver")) {
             ModLoader.addRecipe(new ItemStack(mirror),
                     "SSS",
-                    "SGS",
+                    "S#S",
                     "SSS",
                     'S', silver,
-                    'G', Block.thinGlass);
+                    '#', Block.thinGlass);
         }
         ItemStack with_8 = leadwire_item.copy();
         with_8.stackSize = 8;
