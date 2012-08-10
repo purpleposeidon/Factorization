@@ -85,11 +85,6 @@ public class WireConnections {
     }
 
     void addNeighbor(DeltaCoord neighbor, TileEntityWire nte, CubeFace neighbor_face, CubeFace delta_face) {
-        if (neighbor.equals(my_face_vector) || neighbor.reverse().equals(my_face_vector)) {
-            center_core = true;
-            faces |= neighbor_face.getFaceFlag() | my_face.getFaceFlag();
-            return;
-        }
         long edge_to_add = delta_face.getEdgeFlags() & my_face.getEdgeFlags();
         if (edge_to_add == 0) {
             //neighbor's support is far away
