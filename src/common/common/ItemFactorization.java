@@ -77,7 +77,9 @@ public class ItemFactorization extends ItemBlock {
 
             w.setBlockTileEntity(here.x, here.y, here.z, te);
             if (te instanceof TileEntityCommon) {
-                ((TileEntityCommon) te).onPlacedBy(player, is, side);
+                TileEntityCommon tec = (TileEntityCommon) te;
+                tec.onPlacedBy(player, is, side);
+                tec.getBlockClass().enforce(here);
             }
             if (Core.instance.isCannonical(w)) {
                 if (te instanceof TileEntityCommon) {

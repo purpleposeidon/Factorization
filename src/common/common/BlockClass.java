@@ -22,18 +22,23 @@ public enum BlockClass {
     Wire(9, false, 0, 0, 0.5F)
     ;
 
+    static {
+        Wire.setAbnormal();
+    }
+
     static class Md {
         //Some say java is retarded. I disagree. Wait -- No I don't.
         static BlockClass map[] = new BlockClass[16];
     }
 
-    Block block;
+    Block block; //XXX This actually gets set to the block properly right now, but it might not in a dynamic-block-ids future or something...?
     int md;
     boolean normalCube;
     int flamability;
     boolean isFlamable;
     int lightValue;
     float hardness; //Our default is 2
+    boolean normal_cube = true;
 
     BlockClass(Block block, int md, boolean normalCube, int flamability, int lightValue,
             float hardness) {
@@ -56,6 +61,11 @@ public enum BlockClass {
         this(Core.registry.factory_block, md, normalCube, flamability, lightValue, hardness);
     }
 
+    BlockClass setAbnormal() {
+        normal_cube = false;
+        return this;
+    }
+
     static BlockClass get(int md) {
         BlockClass ret = Md.map[md];
         if (ret == null) {
@@ -66,7 +76,7 @@ public enum BlockClass {
 
     //Makes sure the block at Coord is what it should be
     void enforce(Coord c) {
-        if (c.getBlock() == Core.registry.factory_block) {
+        if (c.getBlock() == block) {
             //only enforce if the block's right.
             if (c.setMd(md, false)) {
                 //System.out.println("BlockClass enforce: Changed to " + this + " at " + c);
@@ -75,7 +85,7 @@ public enum BlockClass {
     }
 
     void enforceQuiet(Coord c) {
-        if (c.getBlock() == Core.registry.factory_block) {
+        if (c.getBlock() == block) {
             c.setMd(md, false);
         }
     }
@@ -83,5 +93,9 @@ public enum BlockClass {
     BlockClass harvest(String tool, int level) {
         MinecraftForge.setBlockHarvestLevel(this.block, this.md, tool, level);
         return this;
+    }
+
+    boolean isNormal() {
+        return normal_cube;
     }
 }

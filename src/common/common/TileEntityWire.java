@@ -1,8 +1,15 @@
 package factorization.common;
 
+import java.util.TreeMap;
+
+import net.minecraft.src.AxisAlignedBB;
+import net.minecraft.src.Block;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
+import net.minecraft.src.MovingObjectPosition;
 import net.minecraft.src.NBTTagCompound;
+import net.minecraft.src.Vec3D;
+import net.minecraft.src.World;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
@@ -15,6 +22,11 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.LEADWIRE;
+    }
+
+    @Override
+    public BlockClass getBlockClass() {
+        return BlockClass.Wire;
     }
 
     @Override
@@ -127,10 +139,53 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
             break;
         }
         supporting_side = (byte) side;
+
+        TreeMap<Byte, Byte> nmap = new TreeMap();
+        for (Coord c : getCoord().getNeighborsAdjacent()) {
+            TileEntityWire n = c.getTE(TileEntityWire.class);
+            if (n == null) {
+                continue;
+            }
+            Byte b = nmap.get(n.supporting_side);
+            b = (b == null) ? 0 : b;
+            b++;
+            nmap.put(n.supporting_side, b);
+        }
+        if (nmap.size() == 1) {
+            byte proper = nmap.keySet().iterator().next();
+
+            if (supporting_side != proper) {
+                byte old = supporting_side;
+                supporting_side = proper;
+                if (!is_directly_supported()) {
+                    supporting_side = old;
+                }
+            }
+        }
     }
 
     @Override
     public boolean isBlockSolidOnSide(int side) {
         return false;
+    }
+
+
+    @Override
+    public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z, Vec3D startVec,
+            Vec3D endVec) {
+        return new WireConnections(this).collisionRayTrace(w, x, y, z, startVec, endVec);
+    }
+
+    @Override
+    public AxisAlignedBB getCollisionBoundingBoxFromPool() {
+        setBlockBounds(Core.registry.resource_block);
+        AxisAlignedBB ret = Core.registry.resource_block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
+        Core.registry.resource_block.setBlockBounds(0, 0, 0, 1, 1, 1);
+        return ret;
+    }
+
+    @Override
+    public void setBlockBounds(Block b) {
+        new WireConnections(this).setBlockBounds(b);
     }
 }

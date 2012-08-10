@@ -37,6 +37,11 @@ public class TileEntityWatchDemon extends TileEntityCommon {
         return FactoryType.SENTRYDEMON;
     }
 
+    @Override
+    public BlockClass getBlockClass() {
+        return BlockClass.Cage;
+    }
+
     public static class LoadHandler implements IChunkLoadHandler, ISaveEventHandler {
         static Charset charset = Charset.forName("UTF-8");
 

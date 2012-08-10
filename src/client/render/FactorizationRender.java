@@ -81,8 +81,8 @@ public class FactorizationRender {
         renderPart(rb, cage, l, l, l, h, h, h);
     }
 
-    static void renderSolarTurbine(RenderBlocks rb, int water_height) {
-        int glass = Texture.lamp_iron + 2;
+    static void renderSolarTurbine(RenderBlocks rb, int water_height, Coord me) {
+        int glass = Texture.lamp_iron + 10;
         int water = 7;
         float d = 1F / 16F;
         if (MinecraftForgeClient.getRenderPass() == 1) {
@@ -91,12 +91,13 @@ public class FactorizationRender {
             }
             //Tessellator.instance.setColorOpaque_F(0.5F, 0.5F, 0.5F);
             //Tessellator.instance.setColorOpaque(255, 0, 255);
-            renderPart(rb, 7, d, 0.001F, d, 1 - d, (1 + water_height / (TileEntitySolarTurbine.max_water / 4)) / 16F, 1 - d);
+            renderPart(rb, 7, d, 0.001F, d, 1 - d, (0.99F + water_height / (TileEntitySolarTurbine.max_water / 4)) / 16F, 1 - d);
             //			renderPart(rb, glass, 1 - d, 1 - d, 1 - d, d, 0.02F, d);
             return;
         }
         if (true) {
-            renderPart(rb, glass, 0, 0, 0, 1, 1, 1);
+            float m = 0.0001F;
+            renderPart(rb, glass, 0 + m, 0 + m, 0 + m, 1 - m, 1 - m, 1 - m);
         }
         if (!world_mode) {
             GL11.glPushMatrix();
@@ -106,6 +107,19 @@ public class FactorizationRender {
             GL11.glPopMatrix();
         }
         renderMotor(rb);
+        if (world_mode) {
+            TileEntityWire fake_wire = new TileEntityWire();
+            fake_wire.worldObj = me.w;
+            fake_wire.xCoord = me.x;
+            fake_wire.yCoord = me.y;
+            fake_wire.zCoord = me.z;
+            fake_wire.supporting_side = 0;
+            WireConnections con = new WireConnections(fake_wire);
+            con.conductorRestrict();
+            for (RenderingCube rc : con.getParts()) {
+                renderCube(rc);
+            }
+        }
     }
 
     static void renderMotor(RenderBlocks rb) {
@@ -162,8 +176,8 @@ public class FactorizationRender {
         }
     }
 
-    static WireRenderer wireRenderer = new WireRenderer();
     static void renderWireWorld(RenderBlocks rb, Coord me) {
+        Tessellator.instance.setBrightness(me.getBlock().getMixedBrightnessForBlock(me.w, me.x, me.y, me.z));
         for (RenderingCube rc : new WireConnections(me.getTE(TileEntityWire.class)).getParts()) {
             renderCube(rc);
         }
@@ -176,13 +190,14 @@ public class FactorizationRender {
     }
 
     public static void renderNormalBlock(RenderBlocks rb, int x, int y, int z, int md) {
+        Block b = Core.registry.factory_block;
+        b.setBlockBounds(0, 0, 0, 1, 1, 1);
         if (world_mode) {
-            Block b = Core.registry.factory_block;
             rb.renderStandardBlock(b, x, y, z);
         }
         else {
             Core.registry.factory_block.fake_normal_render = true;
-            rb.renderBlockAsItem(Core.registry.factory_block, md, 1.0F);
+            rb.renderBlockAsItem(b, md, 1.0F);
             Core.registry.factory_block.fake_normal_render = false;
         }
     }
@@ -249,7 +264,7 @@ public class FactorizationRender {
                 md = -1;
             }
             if (FactoryType.SOLARTURBINE.is(md)) {
-                renderSolarTurbine(renderBlocks, ((TileEntitySolarTurbine) te).water_level);
+                renderSolarTurbine(renderBlocks, ((TileEntitySolarTurbine) te).water_level, new Coord(te));
                 return true;
             }
             if (!first_pass) {
@@ -288,14 +303,14 @@ public class FactorizationRender {
             if (FactoryType.LAMP.is(damage)) {
                 FactorizationRender.renderLamp(renderBlocks, 0);
             } else if (FactoryType.SOLARTURBINE.is(damage)) {
-                renderSolarTurbine(renderBlocks, 0);
+                renderSolarTurbine(renderBlocks, 0, null);
             } else if (FactoryType.LEADWIRE.is(damage)) {
                 renderWireInv(renderBlocks);
             } else {
                 renderNormalBlock(renderBlocks, 0, 0, 0, damage);
             }
             if (FactoryType.HEATER.is(damage)) {
-                float d = 1F / 32F;
+                float d = 0.5F / 32F;
                 GL11.glColor3f(0.1F, 0.1F, 0.1F);
                 renderPart(renderBlocks, Texture.heater_element, d, d, d, 1 - d, 1 - d, 1 - d);
             }

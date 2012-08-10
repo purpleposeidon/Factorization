@@ -1,5 +1,6 @@
 package factorization.common;
 
+import net.minecraft.src.Block;
 
 public class RenderingCube {
     public static class Vector {
@@ -37,6 +38,12 @@ public class RenderingCube {
 
         public Vector add(int dx, int dy, int dz) {
             return new Vector(x + dx, y + dy, z + dz, u, v);
+        }
+
+        void scale(float d) {
+            x *= d;
+            y *= d;
+            z *= d;
         }
 
         void incr(Vector d) {
@@ -99,6 +106,18 @@ public class RenderingCube {
         newCorner.y = Math.abs(newCorner.y);
         newCorner.z = Math.abs(newCorner.z);
         return new RenderingCube(icon, newCorner, newOrigin);
+    }
+
+    public void toBlockBounds(Block b) {
+        RenderingCube cube = normalize();
+        Vector c = cube.corner;
+        Vector o = cube.origin;
+        c.scale(1F / 16F);
+        o = o.add(8, 8, 8);
+        o.scale(1F / 16F);
+        b.setBlockBounds(
+                o.x - c.x, o.y - c.y, o.z - c.z,
+                o.x + c.x, o.y + c.y, o.z + c.z);
     }
 
     public RenderingCube rotate(double ax, double ay, double az, int theta) {

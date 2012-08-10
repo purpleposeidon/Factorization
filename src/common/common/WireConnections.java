@@ -56,10 +56,8 @@ public class WireConnections {
                     center_core = true;
                 } else {
                     //adjacent
-                    //edges |= my_face.getEdgeFlags() & delta_face.getEdgeFlags();
-                    //edges |= my_face.getEdgeFlags() & new CubeFace(0).getEdgeFlags();
-                    edges |= new CubeFace(0).getEdgeFlags() & delta_face.getEdgeFlags();
-                    //faces |= my_face.getFaceFlag();
+                    edges |= my_face.getEdgeFlags() & delta_face.getEdgeFlags();
+                    faces |= my_face.getFaceFlag();
                 }
             }
         }
@@ -74,10 +72,6 @@ public class WireConnections {
             faces = my_face.getFaceFlag();
         }
 
-        cleanup();
-    }
-
-    void cleanup() {
         //if a face has more than 1 edge drawn, draw the face as well
         for (int side = 0; side < 6; side++) {
             if (Long.bitCount(edges & CubeFace.getEdgeFlags(side)) > 1) {
@@ -88,12 +82,6 @@ public class WireConnections {
         if (Long.bitCount(edges) > 1 && faces == 0) {
             faces = my_face.getFaceFlag();
         }
-    }
-
-    public void conductorRestrict() {
-        faces = 0;
-        center_core = false;
-//		cleanup();
     }
 
     void addNeighbor(DeltaCoord neighbor, TileEntityWire nte, CubeFace neighbor_face, CubeFace delta_face) {
@@ -226,5 +214,11 @@ public class WireConnections {
         }
         Core.registry.resource_block.setBlockBounds(0, 0, 0, 1, 1, 1);
         return null;
+    }
+
+    public void conductorRestrict() {
+        faces = 0;
+        center_core = false;
+        //		cleanup();
     }
 }

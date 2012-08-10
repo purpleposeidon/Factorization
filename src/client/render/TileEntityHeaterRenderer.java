@@ -7,7 +7,6 @@ import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntitySpecialRenderer;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import factorization.common.Core;
 import factorization.common.Texture;
@@ -34,7 +33,7 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
     public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
         GL11.glPushMatrix();
         this.bindTextureByName(Core.texture_file_block);
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        //GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         float color = 0.1F;
         TileEntityHeater heater = (TileEntityHeater) te;
         color += (heater.heat / (float) heater.maxHeat) * (1 - color);
@@ -44,8 +43,8 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
         float scale = 5F + 5 / 16F;
         GL11.glScalef(scale, scale, scale);
         element.renderAll();
-        GL11.glColor3f(1, 1, 1);
         GL11.glPopMatrix();
+        GL11.glColor4f(1, 1, 1, 1);
     }
 
 }

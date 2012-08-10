@@ -26,6 +26,11 @@ public class TileEntityMirror extends TileEntityCommon {
     }
 
     @Override
+    public BlockClass getBlockClass() {
+        return BlockClass.Machine;
+    }
+
+    @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
         if (reflection_target != null) {
@@ -47,6 +52,10 @@ public class TileEntityMirror extends TileEntityCommon {
         }
     }
     
+    @Override
+    public void neighborChanged() {
+        search_delay = trace_check = 1;
+    }
 
     int getPower() {
         return 1;
@@ -125,6 +134,9 @@ public class TileEntityMirror extends TileEntityCommon {
                 rotation++;
             }
             rotation = clipAngle(rotation);
+            if (rotation == target_rotation) {
+                trace_check = 1;
+            }
         }
         if (trace_check == 0) {
             trace_check = 20 * 30 + rand.nextInt(20);
@@ -132,8 +144,9 @@ public class TileEntityMirror extends TileEntityCommon {
                 if (is_lit) {
                     is_lit = false;
                     target.addReflector(-getPower());
+                    reflection_target = null;
+                    return;
                 }
-                reflection_target = null;
             }
         } else {
             trace_check--;
@@ -206,14 +219,19 @@ public class TileEntityMirror extends TileEntityCommon {
         float idealm = div(dz, dx);
 
         float old_dist = Float.MAX_VALUE;
+        boolean first = true;
         while (true) {
             if (x == xCoord && z == zCoord) {
                 return true;
             }
             int id = worldObj.getBlockId(x, yCoord, z);
-            if (Block.blocksList[id] != null && Block.blocksList[id].isOpaqueCube() && Block.lightOpacity[id] != 0) {
-                return false;
+            Block b = Block.blocksList[id];
+            if (b != null && !first) {
+                if (!b.isAirBlock(worldObj, x, yCoord, z) || b.isOpaqueCube() || Block.lightOpacity[id] != 0) {
+                    return false;
+                }
             }
+            first = false;
             dx = x - xCoord;
             dz = z - zCoord;
             float m = div(dz, dx);

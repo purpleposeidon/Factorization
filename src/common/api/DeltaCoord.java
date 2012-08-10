@@ -73,4 +73,8 @@ public class DeltaCoord {
     public boolean isSubmissive() {
         return x < 0 || y < 0 || z < 0;
     }
+
+    public boolean equals(DeltaCoord o) {
+        return x == o.x && y == o.y && z == o.z;
+    }
 }

@@ -24,6 +24,11 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
     }
 
     @Override
+    public BlockClass getBlockClass() {
+        return BlockClass.Machine;
+    }
+
+    @Override
     public Charge getCharge() {
         return charge;
     }
@@ -36,6 +41,10 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
             new Exception().printStackTrace();
             reflectors = 0;
         }
+    }
+
+    public int getReflectors() {
+        return reflectors;
     }
 
     @Override
@@ -116,10 +125,6 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
                 adjustFanSpeed();
             }
             return;
-        } else {
-            worldObj.spawnParticle("reddust",
-                    (double) xCoord + 0.5, (double) yCoord + 0.5, (double) zCoord + 0.5,
-                    1, 1, 1);
         }
         adjustFanSpeed();
         if (reflectors == 0 && worldObj.getWorldTime() % 20 == 0) {

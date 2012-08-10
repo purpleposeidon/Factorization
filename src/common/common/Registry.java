@@ -600,7 +600,9 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
                     'S', silver,
                     'G', Block.thinGlass);
         }
-
+        ItemStack with_8 = leadwire_item.copy();
+        with_8.stackSize = 8;
+        ModLoader.addRecipe(with_8, "LLL", 'L', lead_ingot);
     }
 
     void createOreProcessingPath(ItemStack ore, ItemStack ingot) {

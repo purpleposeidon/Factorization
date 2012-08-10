@@ -3,12 +3,15 @@ package factorization.common;
 import java.util.ArrayList;
 import java.util.Random;
 
+import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.Block;
 import net.minecraft.src.BlockContainer;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IBlockAccess;
 import net.minecraft.src.ItemStack;
+import net.minecraft.src.MovingObjectPosition;
 import net.minecraft.src.TileEntity;
+import net.minecraft.src.Vec3D;
 import net.minecraft.src.World;
 import net.minecraft.src.forge.IConnectRedstone;
 import net.minecraft.src.forge.IMultipassRender;
@@ -22,9 +25,11 @@ public class BlockFactorization extends BlockContainer implements
 
     public BlockFactorization(int id) {
         super(id, Core.registry.materialMachine);
+        //		super(id, Material.air);
         setHardness(2.0F);
         setResistance(5);
         setLightOpacity(3);
+        //setBlockBounds(0, -1000, 0, 0, -999, 0);
     }
 
     @Override
@@ -69,13 +74,9 @@ public class BlockFactorization extends BlockContainer implements
         if (ent == null) {
             return;
         }
-        if (ent instanceof TileEntityFactorization) {
-            TileEntityFactorization factory = (TileEntityFactorization) ent;
-            factory.neighborChanged();
-        }
-        if (ent instanceof TileEntityWrathLamp) {
-            TileEntityWrathLamp lamp = (TileEntityWrathLamp) ent;
-            lamp.activate(y);
+        if (ent instanceof TileEntityCommon) {
+            TileEntityCommon tec = (TileEntityCommon) ent;
+            tec.neighborChanged();
         }
     }
 
@@ -253,7 +254,7 @@ public class BlockFactorization extends BlockContainer implements
 
     @Override
     public boolean isBlockNormalCube(World world, int i, int j, int k) {
-        return true;
+        return BlockClass.get(world.getBlockMetadata(i, j, k)).isNormal();
     }
 
     @Override
@@ -298,9 +299,35 @@ public class BlockFactorization extends BlockContainer implements
         return BlockClass.get(md).hardness;
     }
 
+    //smack these blocks up
+    @Override
+    public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z,
+            Vec3D startVec, Vec3D endVec) {
+        TileEntityCommon tec = new Coord(w, x, y, z).getTE(TileEntityCommon.class);
+        if (tec == null) {
+            return super.collisionRayTrace(w, x, y, z, startVec, endVec);
+        }
+        return tec.collisionRayTrace(w, x, y, z, startVec, endVec);
+    }
+
+    @Override
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(World w, int x, int y, int z) {
+        TileEntityCommon tec = new Coord(w, x, y, z).getTE(TileEntityCommon.class);
+        setBlockBounds(0, 0, 0, 1, 1, 1);
+        if (tec == null) {
+            return super.getCollisionBoundingBoxFromPool(w, x, y, z);
+        }
+        return tec.getCollisionBoundingBoxFromPool();
+    }
+
     @Override
     public void setBlockBoundsBasedOnState(IBlockAccess w, int x, int y, int z) {
-        setBlockBounds(0, 0, 0, 1, 1, 1);
+        TileEntity te = w.getBlockTileEntity(x, y, z);
+        if (te == null || !(te instanceof TileEntityCommon)) {
+            setBlockBounds(0, 0, 0, 1, 1, 1);
+            return;
+        }
+        ((TileEntityCommon) te).setBlockBounds(this);
     }
 
     @Override

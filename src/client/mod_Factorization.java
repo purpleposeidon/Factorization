@@ -44,6 +44,7 @@ import factorization.client.gui.GuiRouter;
 import factorization.client.gui.GuiSlag;
 import factorization.client.gui.GuiStamper;
 import factorization.client.render.EmptyRender;
+import factorization.client.render.EntitySteamFX;
 import factorization.client.render.EntityWrathFlameFX;
 import factorization.client.render.FactorizationRender;
 import factorization.client.render.TileEntityBarrelRenderer;
@@ -354,6 +355,7 @@ public class mod_Factorization extends Core {
 
     @Override
     public void randomDisplayTickFor(World w, int x, int y, int z, Random rand) {
+        Coord here = new Coord(w, x, y, z);
         int id = w.getBlockId(x, y, z);
         int md = w.getBlockMetadata(x, y, z);
         if (id == factory_block_id) {
@@ -400,6 +402,24 @@ public class mod_Factorization extends Core {
                     w.spawnParticle("flame", (double) (var7 + var11), (double) var8, (double) (var9 + var10), 0.0D, 0.0D, 0.0D);
                 }
 
+            }
+            if (ft == FactoryType.SOLARTURBINE) {
+                TileEntitySolarTurbine sol = (TileEntitySolarTurbine) te;
+                if (sol.getReflectors() > 0) {
+                    double X = x + 2 / 16F;
+                    double Z = z + 2 / 16F;
+                    if (rand.nextBoolean()) {
+                        X += 0.5;
+                    }
+                    if (rand.nextBoolean()) {
+                        Z += 0.5;
+                    }
+                    X += rand.nextFloat() * 2 / 16;
+                    Z += rand.nextFloat() * 2 / 16;
+                    double Y = y + (0.99F + sol.water_level / (TileEntitySolarTurbine.max_water / 4)) / 16F;
+                    EntitySteamFX steam = new EntitySteamFX(w, X, Y, Z);
+                    ModLoader.getMinecraftInstance().effectRenderer.addEffect(steam, null);
+                }
             }
         }
         if (id == lightair_id) {

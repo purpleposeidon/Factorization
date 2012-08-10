@@ -235,6 +235,11 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         //		return trace(other, me);
     }
 
+    @Override
+    public void neighborChanged() {
+        activate(yCoord);
+    }
+
     void activate(int at_height) {
         updater = updater.getActive(at_height);
     }
@@ -390,6 +395,11 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.LAMP;
+    }
+
+    @Override
+    public BlockClass getBlockClass() {
+        return BlockClass.Lamp;
     }
 
     @Override

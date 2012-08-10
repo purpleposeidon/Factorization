@@ -21,6 +21,11 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
     }
 
     @Override
+    public BlockClass getBlockClass() {
+        return BlockClass.Machine;
+    }
+
+    @Override
     public Charge getCharge() {
         return charge;
     }

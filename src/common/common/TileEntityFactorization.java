@@ -32,15 +32,10 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     @Override
     public abstract FactoryType getFactoryType();
 
-    public abstract BlockClass getBlockClass();
-
     public void click(EntityPlayer entityplayer) {
     }
 
     void makeNoise() {
-    }
-
-    public void neighborChanged() {
     }
 
     abstract void doLogic();
@@ -333,7 +328,6 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     @Override
     public void updateEntity() {
         super.updateEntity();
-        getBlockClass().enforce(getCoord());
         if (draw_active > 0) {
             makeNoise();
             worldObj.markBlockNeedsUpdate(xCoord, yCoord, zCoord);
