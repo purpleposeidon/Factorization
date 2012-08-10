@@ -1,5 +1,8 @@
 package factorization.common;
 
+import net.minecraft.src.EntityItem;
+import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import factorization.api.Charge;
 import factorization.api.IChargeConductor;
@@ -66,5 +69,27 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
             charge.addValue(delta);
             storage.addValue(-delta);
         }
+    }
+
+    @Override
+    void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
+        super.onPlacedBy(player, is, side);
+        NBTTagCompound tag = FactorizationUtil.getTag(is);
+        if (tag.hasKey("storage")) {
+            storage.setValue(tag.getInteger("storage"));
+        } else {
+            storage.setValue(max_storage);
+        }
+    }
+
+    @Override
+    void onRemove() {
+        super.onRemove();
+        ItemStack is = Core.registry.battery_item.copy();
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setInteger("storage", storage.getValue());
+        is.setTagCompound(tag);
+        EntityItem ei = new EntityItem(worldObj, xCoord, yCoord, zCoord, is);
+        worldObj.spawnEntityInWorld(ei);
     }
 }
