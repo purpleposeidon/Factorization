@@ -159,7 +159,11 @@ public class ItemFactorization extends ItemBlock {
     public void addInformation(ItemStack is, List lines) {
         if (FactoryType.BATTERY.is(is.getItemDamage())) {
             NBTTagCompound tag = FactorizationUtil.getTag(is);
-            lines.add("??% charged");
+            float fullness = 1;
+            if (tag.hasKey("storage")) {
+                fullness = TileEntityBattery.getFullness(tag.getInteger("storage"));
+            }
+            lines.add((int) (fullness * 100) + "% charged");
         }
     }
 }

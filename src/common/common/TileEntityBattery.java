@@ -1,6 +1,5 @@
 package factorization.common;
 
-import net.minecraft.src.EntityItem;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
@@ -9,7 +8,7 @@ import factorization.api.IChargeConductor;
 
 public class TileEntityBattery extends TileEntityCommon implements IChargeConductor {
     Charge charge = new Charge(), storage = new Charge();
-    private final int max_storage = 600;
+    private static final int max_storage = 600;
 
     @Override
     public FactoryType getFactoryType() {
@@ -40,12 +39,16 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
         storage.writeToNBT(tag, "storage");
     }
 
-    float getFullness() {
-        return storage.getValue() / ((float) max_storage);
+    public static float getFullness(int value) {
+        return value / ((float) max_storage);
+    }
+
+    public float getFullness() {
+        return getFullness(storage.getValue());
     }
 
     private int getTargetCharge() {
-        return (int) Math.min(getFullness() * 6, 0);
+        return (int) Math.max(getFullness() * 6, 0);
     }
 
     @Override
@@ -80,16 +83,5 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
         } else {
             storage.setValue(max_storage);
         }
-    }
-
-    @Override
-    void onRemove() {
-        super.onRemove();
-        ItemStack is = Core.registry.battery_item.copy();
-        NBTTagCompound tag = new NBTTagCompound();
-        tag.setInteger("storage", storage.getValue());
-        is.setTagCompound(tag);
-        EntityItem ei = new EntityItem(worldObj, xCoord, yCoord, zCoord, is);
-        worldObj.spawnEntityInWorld(ei);
     }
 }

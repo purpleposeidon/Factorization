@@ -126,6 +126,16 @@ public class Texture {
         if (FactoryType.MIRROR.is(md)) {
             return 15;
         }
+        if (FactoryType.BATTERY.is(md)) {
+            int start = 4 + 16;
+            if (side == 0) {
+                return start + 3;
+            }
+            if (side == 1) {
+                return start + 1;
+            }
+            return start;
+        }
         return 0;
     }
 }

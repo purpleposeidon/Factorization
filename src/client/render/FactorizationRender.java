@@ -18,6 +18,7 @@ import factorization.common.FactoryType;
 import factorization.common.RenderingCube;
 import factorization.common.RenderingCube.Vector;
 import factorization.common.Texture;
+import factorization.common.TileEntityBattery;
 import factorization.common.TileEntitySolarTurbine;
 import factorization.common.TileEntityWire;
 import factorization.common.WireConnections;
@@ -139,6 +140,43 @@ public class FactorizationRender {
         renderPart(rb, Texture.silver, trim, 0, trim, 1 - trim, trim_height, 1 - trim);
     }
 
+    static void renderBatteryDisplay(RenderBlocks rb, float fullness) {
+        int icon = (6) + 16 * 1;
+        Tessellator tes = Tessellator.instance;
+        double u = ((icon & 0xf) << 4) / 256.0;
+        double v = (icon & 0xf0) / 256.0;
+
+        double uw = u + 16F / 256F; // u + uvd;
+        double vw = v + 16F / 256F; //v + uvd;
+
+        float h = 1F / 16F + Math.round(fullness * 15) / 16F;
+        v = v + (4 + 11 - Math.round(fullness * 11)) / 256F;
+        final double d = 1.0 / 128.0;
+        tes.addVertexWithUV(x, y, z - d, uw, vw);
+        tes.addVertexWithUV(x, y + h, z - d, uw, v);
+        tes.addVertexWithUV(x + 1, y + h, z - d, u, v);
+        tes.addVertexWithUV(x + 1, y, z - d, u, vw);
+
+        tes.addVertexWithUV(x + 1, y, z + 1 + d, uw, vw);
+        tes.addVertexWithUV(x + 1, y + h, z + 1 + d, uw, v);
+        tes.addVertexWithUV(x, y + h, z + 1 + d, u, v);
+        tes.addVertexWithUV(x, y, z + 1 + d, u, vw);
+
+        tes.addVertexWithUV(x - d, y, z + 1, u, vw);
+        tes.addVertexWithUV(x - d, y + h, z + 1, u, v);
+        tes.addVertexWithUV(x - d, y + h, z, uw, v);
+        tes.addVertexWithUV(x - d, y, z, uw, vw);
+
+
+        tes.addVertexWithUV(x + 1 + d, y, z, uw, vw);
+        tes.addVertexWithUV(x + 1 + d, y + h, z, uw, v);
+        tes.addVertexWithUV(x + 1 + d, y + h, z + 1, u, v);
+        tes.addVertexWithUV(x + 1 + d, y, z + 1, u, vw);
+
+
+        renderNormalBlock(rb, x, y, z, FactoryType.BATTERY.md);
+    }
+
     static float wireWidth = 4F / 16F;
 
 
@@ -152,27 +190,29 @@ public class FactorizationRender {
         double ax = x + ox / 16F, ay = y + oy / 16F, az = z + oz / 16F;
         double bx = ax + width / 16F, by = ay + height / 16F, bz = az + depth / 16F;
 
-        tes.addVertexWithUV(ax, ay, az, u, v);
         double uw = u; // u + uvd;
         double vw = v; //v + uvd;
         if (width == 0) {
             uw += height / 256F;
             vw += depth / 256F;
+            tes.addVertexWithUV(ax, ay, az, u, v);
             tes.addVertexWithUV(ax, by, az, uw, v);
             tes.addVertexWithUV(ax, by, bz, uw, vw);
             tes.addVertexWithUV(ax, ay, bz, u, vw);
         } else if (height == 0) {
             uw += width / 256F;
             vw += depth / 256F;
+            tes.addVertexWithUV(ax, ay, az, u, v);
             tes.addVertexWithUV(ax, ay, bz, u, vw);
             tes.addVertexWithUV(bx, ay, bz, uw, vw);
             tes.addVertexWithUV(bx, ay, az, uw, v);
         } else if (depth == 0) {
             uw += width / 256F;
             vw += height / 256F;
-            tes.addVertexWithUV(ax, by, az, u, vw);
-            tes.addVertexWithUV(bx, by, az, uw, vw);
-            tes.addVertexWithUV(bx, ay, az, uw, v);
+            tes.addVertexWithUV(ax, ay, az, uw, vw);
+            tes.addVertexWithUV(ax, by, az, uw, v);
+            tes.addVertexWithUV(bx, by, az, u, v);
+            tes.addVertexWithUV(bx, ay, az, u, vw);
         }
     }
 
@@ -279,6 +319,9 @@ public class FactorizationRender {
                 renderMirrorStand(renderBlocks);
             } else if (FactoryType.LEADWIRE.is(md)) {
                 renderWireWorld(renderBlocks, new Coord(ModLoader.getMinecraftInstance().theWorld, x, y, z));
+            } else if (FactoryType.BATTERY.is(md)) {
+                TileEntityBattery bat = (TileEntityBattery) te;
+                renderBatteryDisplay(renderBlocks, bat.getFullness());
             } else {
                 renderNormalBlock(renderBlocks, x, y, z, md);
             }

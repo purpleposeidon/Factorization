@@ -10,6 +10,7 @@ import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IBlockAccess;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.MovingObjectPosition;
+import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.Vec3D;
 import net.minecraft.src.World;
@@ -211,6 +212,12 @@ public class BlockFactorization extends BlockContainer implements
         ItemStack is = new ItemStack(Core.registry.item_factorization, 1, f.getFactoryType().md);
         if (f.getFactoryType() == FactoryType.MIRROR) {
             is = new ItemStack(Core.registry.mirror);
+        }
+        if (f.getFactoryType() == FactoryType.BATTERY) {
+            TileEntityBattery bat = (TileEntityBattery) f;
+            NBTTagCompound tag = new NBTTagCompound();
+            tag.setInteger("storage", bat.storage.getValue());
+            is.setTagCompound(tag);
         }
         ret.add(is);
         return ret;
