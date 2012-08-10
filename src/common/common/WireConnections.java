@@ -34,6 +34,9 @@ public class WireConnections {
     }
 
     void calculate() {
+        //******************************************************************************************************************************
+        //NOTE: Be *very* careful with this code, it's a huge PITA. git commit & check the wire testing area before & after any changes.
+        //******************************************************************************************************************************
         int wire_neighbor_count = 0;
         for (DeltaCoord d : DeltaCoord.directNeighbors) {
             Coord nc = here.add(d);
@@ -85,6 +88,9 @@ public class WireConnections {
     }
 
     void addNeighbor(DeltaCoord neighbor, TileEntityWire nte, CubeFace neighbor_face, CubeFace delta_face) {
+        //******************************************************************************************************************************
+        //NOTE: Be *very* careful with this code, it's a huge PITA. git commit & check the wire testing area before & after any changes.
+        //******************************************************************************************************************************
         long edge_to_add = delta_face.getEdgeFlags() & my_face.getEdgeFlags();
         if (edge_to_add == 0) {
             //neighbor's support is far away
