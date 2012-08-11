@@ -527,7 +527,7 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
         charge_meter = new ItemChargeMeter(itemID("chargemeter", 9029));
         mirror = new ItemMirror(itemID("mirror", 9030));
 
-        ModLoader.addShapelessRecipe(new ItemStack(acid), Item.gunpowder, Item.coal, Item.potion);
+        ModLoader.addShapelessRecipe(new ItemStack(acid), Item.gunpowder, Item.gunpowder, Item.coal, Item.potion);
         
         ModLoader.addRecipe(new ItemStack(fan),
                 "I I",
@@ -589,7 +589,11 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
         }
         ItemStack with_8 = leadwire_item.copy();
         with_8.stackSize = 8;
-        ModLoader.addRecipe(with_8, "LLL", 'L', lead_ingot);
+        ModLoader.addRecipe(with_8,
+                "   ",
+                "LLL",
+                "LLL",
+                'L', lead_ingot);
     }
 
     void createOreProcessingPath(ItemStack ore, ItemStack ingot) {
