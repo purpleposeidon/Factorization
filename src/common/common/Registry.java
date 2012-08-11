@@ -82,21 +82,7 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
     }
 
     void registerSimpleTileEntities() {
-        ModLoader.registerTileEntity(TileEntityRouter.class, "factory_router");
-        ModLoader.registerTileEntity(TileEntityCutter.class, "factory_cutter");
-        ModLoader.registerTileEntity(TileEntityMaker.class, "factory_maker");
-        ModLoader.registerTileEntity(TileEntityStamper.class, "factory_stamper");
-        ModLoader.registerTileEntity(TileEntityQueue.class, "factory_queue");
-        ModLoader.registerTileEntity(TileEntityPackager.class, "factory_packager");
-        ModLoader.registerTileEntity(TileEntityWrathLamp.class, "factory_lamp");
-        ModLoader.registerTileEntity(TileEntityWrathFire.class, "factory_fire");
-        ModLoader.registerTileEntity(TileEntitySlagFurnace.class, "factory_slag");
-        ModLoader.registerTileEntity(TileEntitySolarTurbine.class, "factory_solarturbine");
-        ModLoader.registerTileEntity(TileEntityWatchDemon.class, "factory_watchdemon");
-        ModLoader.registerTileEntity(TileEntityBarrel.class, "factory_barrel");
-        ModLoader.registerTileEntity(TileEntityHeater.class, "factory_heater");
-        ModLoader.registerTileEntity(TileEntityMirror.class, "factory_mirror");
-        ModLoader.registerTileEntity(TileEntityWire.class, "factory_solder");
+        FactoryType.registerTileEntities();
         //TileEntity renderers are registered in the client's mod_Factorization
 
         ModLoader.registerEntityID(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", Core.entity_relight_task_id);
