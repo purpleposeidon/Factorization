@@ -8,7 +8,7 @@ import factorization.api.IChargeConductor;
 
 public class TileEntityBattery extends TileEntityCommon implements IChargeConductor {
     Charge charge = new Charge(), storage = new Charge();
-    private static final int max_storage = 60000;
+    private static final int max_storage = 6400;
 
     @Override
     public FactoryType getFactoryType() {
@@ -47,24 +47,21 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
         return getFullness(storage.getValue());
     }
 
-    private int getTargetCharge() {
-        return (int) Math.max(getFullness() * 6, 3);
-    }
-
     @Override
     public void updateEntity() {
         super.updateEntity();
         charge.update(this);
         int val = getCharge().getValue();
         int delta = 0;
-        if (val < getTargetCharge()) {
-            delta = Math.min(getTargetCharge() - val, storage.getValue());
-        } else if (val > getTargetCharge()) {
+        final int min_charge = 10, max_charge = 30;
+        if (val < min_charge) {
+            delta = Math.min(min_charge - val, storage.getValue());
+        } else if (val > max_charge) {
             int free = max_storage - storage.getValue();
             if (free <= 0) {
                 return;
             }
-            delta = -Math.min(free, val - getTargetCharge());
+            delta = -Math.min(free, val - max_charge);
         } else {
             return;
         }

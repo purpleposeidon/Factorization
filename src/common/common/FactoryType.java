@@ -104,6 +104,9 @@ public enum FactoryType {
 
     public static void registerTileEntities() {
         for (FactoryType ft : FactoryType.values()) {
+            if (ft.clazz == null || ft.te_id == null) {
+                continue;
+            }
             ModLoader.registerTileEntity(ft.clazz, ft.te_id);
         }
     }
