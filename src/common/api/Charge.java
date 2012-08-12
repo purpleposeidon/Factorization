@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import net.minecraft.src.NBTTagCompound;
+import factorization.common.Core;
 
 public class Charge {
     private int charge;
@@ -47,8 +48,11 @@ public class Charge {
      *            A conductive TileEntity
      */
     public static void update(IChargeConductor te) {
-        Charge me = te.getCharge();
         Coord here = te.getCoord();
+        if (!Core.instance.isCannonical(here.w)) {
+            return;
+        }
+        Charge me = te.getCharge();
 
         if (here.parity()) {
             //In short lines, it's possible to swap and then swap back
