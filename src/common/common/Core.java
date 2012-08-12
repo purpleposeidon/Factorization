@@ -20,6 +20,7 @@ import net.minecraft.src.forge.IGuiHandler;
 import net.minecraft.src.forge.MinecraftForge;
 import net.minecraft.src.forge.NetworkMod;
 import net.minecraft.src.forge.Property;
+import net.minecraft.src.forge.oredict.OreDictionary;
 import factorization.api.Coord;
 
 public abstract class Core extends NetworkMod implements IGuiHandler {
@@ -213,7 +214,7 @@ public abstract class Core extends NetworkMod implements IGuiHandler {
         MinecraftForge.setGuiHandler(this, this);
         MinecraftForge.registerCraftingHandler(registry);
         MinecraftForge.registerPickupHandler(registry);
-        MinecraftForge.registerOreHandler(registry);
+        OreDictionary.registerOreHandler(registry);
         MinecraftForge.registerChunkLoadHandler(TileEntityWatchDemon.loadHandler);
         MinecraftForge.registerSaveHandler(TileEntityWatchDemon.loadHandler);
         ModLoader.setInGameHook(this, true, true);

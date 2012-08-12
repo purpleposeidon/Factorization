@@ -154,7 +154,10 @@ public class FactorizationRender {
         float h = 1F / 16F + pixels / 16F;
         v += (4 + 11 - pixels) / 256F;
         final double d = 1.0 / 128.0;
-        tes.setBrightness(0x80); //XXX TODO
+        int brightness = Core.registry.factory_block.getMixedBrightnessForBlock(ModLoader.getMinecraftInstance().theWorld, x, y, z);
+        tes.setBrightness(brightness);
+        float color = Math.min(1, fullness * .8F + 0.2F);
+        tes.setColorOpaque_F(color, fullness, fullness);
         tes.addVertexWithUV(x, y, z - d, uw, vw);
         tes.addVertexWithUV(x, y + h, z - d, uw, v);
         tes.addVertexWithUV(x + 1, y + h, z - d, u, v);

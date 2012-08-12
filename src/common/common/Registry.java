@@ -126,7 +126,7 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
         packager_item = FactoryType.PACKAGER.itemStack("Packager");
         sentrydemon_item = FactoryType.SENTRYDEMON.itemStack("Sentry Demon");
         slagfurnace_item = FactoryType.SLAGFURNACE.itemStack("Slag Furnace");
-        battery_item = FactoryType.BATTERY.itemStack("Battery");
+        battery_item = FactoryType.BATTERY.itemStack("Battery Block");
         solar_turbine_item = FactoryType.SOLARTURBINE.itemStack("Solar Turbine");
         heater_item = FactoryType.HEATER.itemStack("Furnace Heater");
         mirror_item_hidden = FactoryType.MIRROR.itemStack("Reflective Mirror");
@@ -141,9 +141,9 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
 
         lead_ingot = new ItemCraftingComponent(itemID("leadIngot", 9014), "Lead Ingot", 16 * 3 + 3);
         silver_ingot = new ItemCraftingComponent(itemID("silverIngot", 9015), "Silver Ingot", 16 * 3 + 4);
-        MinecraftForge.registerOre("oreSilver", silver_ore_item);
-        MinecraftForge.registerOre("ingotSilver", new ItemStack(silver_ingot));
-        MinecraftForge.registerOre("ingotLead", new ItemStack(lead_ingot));
+        OreDictionary.registerOre("oreSilver", silver_ore_item);
+        OreDictionary.registerOre("ingotSilver", new ItemStack(silver_ingot));
+        OreDictionary.registerOre("ingotLead", new ItemStack(lead_ingot));
         addName(lead_ingot, "Lead Ingot");
         addName(silver_ingot, "Silver Ingot");
 

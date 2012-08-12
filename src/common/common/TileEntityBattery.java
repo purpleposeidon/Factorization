@@ -65,9 +65,13 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
         } else {
             return;
         }
+        int tier = storage.getValue() * 32 / max_storage;
         if (delta != 0) {
             charge.addValue(delta);
             storage.addValue(-delta);
+        }
+        if (tier != storage.getValue() * 32 / max_storage) {
+            getCoord().dirty();
         }
     }
 
