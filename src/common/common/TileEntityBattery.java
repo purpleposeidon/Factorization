@@ -91,6 +91,7 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
         }
         if (messageType == MessageType.BatteryLevel) {
             storage.setValue(input.readInt());
+            return true;
         }
         return false;
     }

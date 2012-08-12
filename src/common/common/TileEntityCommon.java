@@ -129,4 +129,8 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     void broadcastMessage(EntityPlayer who, int messageType, Object... msg) {
         Core.network.broadcastMessage(who, getCoord(), messageType, msg);
     }
+
+    void broadcastMessage(EntityPlayer who, Packet toSend) {
+        Core.network.broadcastPacket(who, getCoord(), toSend);
+    }
 }

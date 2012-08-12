@@ -35,6 +35,16 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     }
 
     @Override
+    byte getExtraInfo() {
+        return supporting_side;
+    }
+
+    @Override
+    void useExtraInfo(byte b) {
+        supporting_side = b;
+    }
+
+    @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
         tag.setByte("side", supporting_side);

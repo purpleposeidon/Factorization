@@ -276,6 +276,9 @@ public class NetworkFactorization implements IConnectionHandler, IPacketHandler 
      * @param toSend
      */
     public void broadcastPacket(EntityPlayer who, Coord src, Packet toSend) {
+        if (src.w == null) {
+            return;
+        }
         if (who == null) {
             //send to everyone in range
             int max_dist = (int) (3 * Math.pow(32, 2));
@@ -324,7 +327,13 @@ public class NetworkFactorization implements IConnectionHandler, IPacketHandler 
                 //
                 BarrelDescription = 300, BarrelItem = 301, BarrelCount = 302,
                 //
-                BatteryLevel = 400
+                BatteryLevel = 400,
+                //
+                MirrorTargetRotation = 500, MirrorDescription = 501,
+                //
+                TurbineWater = 601, TurbineSpeed = 602,
+                //
+                HeaterHeat = 700
                 ;
     }
 }

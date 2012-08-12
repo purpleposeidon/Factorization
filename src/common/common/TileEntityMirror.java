@@ -1,12 +1,17 @@
 package factorization.common;
 
+import java.io.DataInput;
+import java.io.IOException;
+
 import net.minecraft.src.Block;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
+import net.minecraft.src.Packet;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.IReflectionTarget;
+import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityMirror extends TileEntityCommon {
     Coord reflection_target = null;
@@ -54,7 +59,9 @@ public class TileEntityMirror extends TileEntityCommon {
     
     @Override
     public void neighborChanged() {
-        search_delay = trace_check = 1;
+        if (Core.instance.isCannonical(worldObj)) {
+            search_delay = trace_check = 1;
+        }
     }
 
     int getPower() {
@@ -74,13 +81,63 @@ public class TileEntityMirror extends TileEntityCommon {
         return getCoord().canSeeSky() && worldObj.isDaytime() && !raining;
     }
     
+    void setRotation(int rotation) {
+        if (this.rotation != rotation) {
+            this.rotation = rotation;
+        }
+    }
+
+    int last_shared = -1;
+
+    void broadcastTargetInfo() {
+        if (getTargetInfo() != last_shared) {
+            broadcastMessage(null, MessageType.MirrorTargetRotation, getTargetInfo());
+            last_shared = getTargetInfo();
+        }
+    }
+
+    int getTargetInfo() {
+        return reflection_target == null ? -99 : target_rotation;
+    }
+
+    void setRotationTarget(int new_target) {
+        if (this.target_rotation != new_target) {
+            this.target_rotation = new_target;
+        }
+    }
+
+
+    @Override
+    public Packet getDescriptionPacket() {
+        return super.getDescriptionPacketWith(MessageType.MirrorDescription, rotation, getTargetInfo());
+    }
+
+    @Override
+    public boolean handleMessageFromServer(int messageType, DataInput input) throws IOException {
+        if (super.handleMessageFromServer(messageType, input)) {
+            return true;
+        }
+        switch (messageType) {
+        case MessageType.MirrorDescription:
+            rotation = input.readInt();
+            //FALL THROUGH
+        case MessageType.MirrorTargetRotation:
+            target_rotation = input.readInt();
+            getCoord().dirty();
+            return true;
+        }
+        return false;
+    }
+
     @Override
     void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
         if (player == null) {
             return;
         }
-        rotation = clipAngle((int) player.rotationYaw + 270);
-        rotation = clipAngle(-rotation);
+        setRotation(clipAngle(-clipAngle((int) player.rotationYaw + 270)));
+        //		if (Core.instance.isCannonical(worldObj)) {
+        //			broadcastMessage(null, getDescriptionPacket());
+        //		}
     }
 
     @Override
@@ -102,6 +159,22 @@ public class TileEntityMirror extends TileEntityCommon {
     @Override
     public void updateEntity() {
         //		if we don't have a target, spin about
+        boolean cannon = Core.instance.isCannonical(worldObj);
+        if (!cannon) {
+            if (target_rotation == -99) {
+                rotation++;
+            } else if (target_rotation != rotation) {
+                int dist = target_rotation - rotation;
+                if (dist > 180 || (dist < 0 && dist > -180)) {
+                    rotation--;
+                } else {
+                    rotation++;
+                }
+                rotation = clipAngle(rotation);
+            }
+            return;
+        }
+        broadcastTargetInfo();
         if (reflection_target == null) {
             rotation++;
             if (search_delay > 0) {
@@ -113,11 +186,13 @@ public class TileEntityMirror extends TileEntityCommon {
                 search_delay = 60;
                 return;
             }
+            trace_check = 20 * 15;
         } else {
             reflection_target.setWorld(worldObj);
         }
         //we *do* have a target coord by this point. Is there a TE there tho?
-        IReflectionTarget target = reflection_target.getTE(IReflectionTarget.class);
+        IReflectionTarget target = null;
+        target = reflection_target.getTE(IReflectionTarget.class);
         if (target == null) {
             if (reflection_target.blockExists()) {
                 reflection_target = null;
@@ -145,6 +220,7 @@ public class TileEntityMirror extends TileEntityCommon {
                     is_lit = false;
                     target.addReflector(-getPower());
                     reflection_target = null;
+                    setRotationTarget(-99);
                     return;
                 }
             }
@@ -196,14 +272,16 @@ public class TileEntityMirror extends TileEntityCommon {
         if (closest != null) {
             reflection_target = closest.getCoord();
             updateRotation();
+        } else {
+            setRotationTarget(-99);
         }
     }
 
     void updateRotation() {
         DeltaCoord dc = getCoord().difference(reflection_target);
 
-        target_rotation = (int) Math.toDegrees(dc.getAngleHorizontal());
-        target_rotation = clipAngle(target_rotation);
+        int new_target = clipAngle((int) Math.toDegrees(dc.getAngleHorizontal()));
+        setRotationTarget(new_target);
     }
 
     //XXX NOTE: Stolen from TileEntityWrathLamp. Ah hah hah hah...

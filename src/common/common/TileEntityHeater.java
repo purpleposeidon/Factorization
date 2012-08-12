@@ -1,5 +1,8 @@
 package factorization.common;
 
+import java.io.DataInput;
+import java.io.IOException;
+
 import net.minecraft.src.BlockFurnace;
 import net.minecraft.src.FurnaceRecipes;
 import net.minecraft.src.ItemStack;
@@ -9,11 +12,12 @@ import net.minecraft.src.TileEntityFurnace;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
+import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityHeater extends TileEntityCommon implements IChargeConductor {
     Charge charge = new Charge();
-    public int heat = 0;
-    public static final int maxHeat = 32;
+    public byte heat = 0;
+    public static final byte maxHeat = 32;
 
     @Override
     public FactoryType getFactoryType() {
@@ -34,20 +38,58 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
         charge.writeToNBT(tag, "charge");
+        tag.setByte("heat", heat);
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound par1nbtTagCompound) {
-        super.readFromNBT(par1nbtTagCompound);
-        charge.readFromNBT(par1nbtTagCompound, "charge");
+    public void readFromNBT(NBTTagCompound tag) {
+        super.readFromNBT(tag);
+        charge.readFromNBT(tag, "charge");
+        heat = tag.getByte("heat");
     }
 
     int charge2heat(int i) {
         return (int) (i / 1.5);
     }
 
+    byte last_heat = -99;
+
+    void updateClient() {
+        int delta = Math.abs(heat - last_heat);
+        if (delta > 2) {
+            broadcastMessage(null, MessageType.HeaterHeat, heat);
+            last_heat = heat;
+        }
+    }
+
+    @Override
+    byte getExtraInfo() {
+        return heat;
+    }
+
+    @Override
+    void useExtraInfo(byte b) {
+        heat = b;
+    }
+
+    @Override
+    public boolean handleMessageFromServer(int messageType, DataInput input) throws IOException {
+        if (super.handleMessageFromServer(messageType, input)) {
+            return true;
+        }
+        if (messageType == MessageType.HeaterHeat) {
+            heat = input.readByte();
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void updateEntity() {
+        if (!Core.instance.isCannonical(worldObj)) {
+            return;
+        }
+        updateClient();
         Coord here = getCoord();
         int delta = Math.min(maxHeat - heat, charge.getValue());
         long now = worldObj.getWorldTime() + here.seed();
@@ -60,7 +102,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
             //lose some heat if we're not being powered
             int toLose = Math.max(1, heat / 8);
             heat -= toLose;
-            heat = Math.max(0, heat);
+            heat = (byte) Math.max(0, heat);
         }
         charge.update(this);
 

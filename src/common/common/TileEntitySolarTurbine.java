@@ -1,5 +1,8 @@
 package factorization.common;
 
+import java.io.DataInput;
+import java.io.IOException;
+
 import net.minecraft.src.Block;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.NBTTagCompound;
@@ -7,6 +10,7 @@ import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
 import factorization.api.IReflectionTarget;
+import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeConductor,
         IReflectionTarget {
@@ -85,9 +89,39 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
         }
     }
 
+    int last_speed = -99, last_quart_water_level = -99;
+
+    void updateClients() {
+        if (last_speed != fan_speed) {
+            broadcastMessage(null, MessageType.TurbineSpeed, fan_speed);
+            last_speed = fan_speed;
+        }
+        int quart_water_level = water_level / 4;
+        if (last_quart_water_level != quart_water_level) {
+            broadcastMessage(null, MessageType.TurbineWater, water_level);
+            last_quart_water_level = quart_water_level;
+        }
+    }
+
+    @Override
+    public boolean handleMessageFromServer(int messageType, DataInput input) throws IOException {
+        if (super.handleMessageFromServer(messageType, input)) {
+            return true;
+        }
+        switch (messageType) {
+        case MessageType.TurbineSpeed:
+            fan_speed = input.readInt();
+            return true;
+        case MessageType.TurbineWater:
+            water_level = input.readInt();
+            getCoord().dirty();
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void updateEntity() {
-        charge.update(this);
         if (fan_speed == -1) {
             fan_rotation += rand.nextBoolean() ? -0.25 : 0.25;
         }
@@ -98,6 +132,11 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
                 fan_rotation += fan_speed;
             }
         }
+        if (!Core.instance.isCannonical(worldObj)) {
+            return;
+        }
+        updateClients();
+        charge.update(this);
         if (water_level <= 0) {
             Coord below = getCoord().add(0, -1, 0);
             if (below.is(Block.waterMoving) || below.is(Block.waterStill)) {
