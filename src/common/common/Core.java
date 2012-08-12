@@ -203,6 +203,7 @@ public abstract class Core extends NetworkMod implements IGuiHandler {
         registry.makeBlocks();
         registry.registerSimpleTileEntities();
         make_recipes_side();
+        registry.makeItems();
         registry.makeRecipes();
         registry.setToolEffectiveness();
 
