@@ -64,7 +64,7 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
     public MechaCobblestoneDrive mecha_cobble_drive;
     public MechaMountedPiston mecha_mounted_piston;
     public ItemMachineUpgrade router_item_filter, router_machine_filter, router_speed,
-            router_thorough, router_throughput;
+            router_thorough, router_throughput, router_eject;
     public ItemStack fake_is;
     public ItemCraftingComponent acid, magnet, insulated_coil, motor, fan;
     public ItemChargeMeter charge_meter;
@@ -171,6 +171,7 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
         router_speed = new ItemMachineUpgrade(itemID("routerSpeed", 9018), "Router Upgrade: Speed Boost", FactoryType.ROUTER, 2);
         router_thorough = new ItemMachineUpgrade(itemID("routerThorough", 9019), "Router Upgrade: Thoroughness", FactoryType.ROUTER, 3);
         router_throughput = new ItemMachineUpgrade(itemID("routerThroughput", 9020), "Router Upgrade: Bandwidth", FactoryType.ROUTER, 4);
+        router_eject = new ItemMachineUpgrade(itemID("routerEject", 9031), "Router Upgrade: Ejector", FactoryType.ROUTER, 5);
 
         //Electricity
         acid = new ItemAcidBottle(itemID("acid", 9024), "Sulfuric Acid", 16 * 3 + 5);
@@ -454,6 +455,15 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
                 'I', dark_iron,
                 'B', Item.blazePowder,
                 '!', Item.egg);
+        recipe(new ItemStack(router_eject),
+                "IWI",
+                "C_C",
+                "IPI",
+                'I', dark_iron,
+                'W', Block.planks,
+                'C', Block.cobblestone,
+                '_', Block.pressurePlatePlanks,
+                'P', Block.pistonBase);
 
         // Barrel
         recipe(barrel_item,

@@ -323,7 +323,7 @@ public class NetworkFactorization implements IConnectionHandler, IPacketHandler 
                 //
                 RouterSlot = 200, RouterTargetSide = 201, RouterMatch = 202, RouterIsInput = 203,
                 RouterLastSeen = 204, RouterMatchToVisit = 205, RouterDowngrade = 206,
-                RouterUpgradeState = 207,
+                RouterUpgradeState = 207, RouterEjectDirection = 208,
                 //
                 BarrelDescription = 300, BarrelItem = 301, BarrelCount = 302,
                 //

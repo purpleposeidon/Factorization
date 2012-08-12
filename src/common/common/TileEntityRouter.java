@@ -29,11 +29,12 @@ public class TileEntityRouter extends TileEntityFactorization {
 
     // save these guys/share with client
     public boolean upgradeItemFilter = false, upgradeMachineFilter = false, upgradeSpeed = false,
-            upgradeThorough = false, upgradeThroughput = false;
+            upgradeThorough = false, upgradeThroughput = false, upgradeEject = false;
     public int target_side;
     public int target_slot; // If negative, use target_side instead. The old value is saved as the inverse. For some reason.
     public boolean is_input;
     public boolean match_to_visit = false;
+    public int eject_direction;
     public String match;
     ItemStack buffer;
     ItemStack filter[] = new ItemStack[9];
@@ -153,6 +154,34 @@ public class TileEntityRouter extends TileEntityFactorization {
         return false;
     }
 
+    int last_eject = 0;
+    void eject() {
+        if (last_eject != 0) {
+            last_eject--;
+        }
+        last_eject = 20;
+        Coord target = getCoord().add(new CubeFace(eject_direction).toVector());
+        IInventory inv = target.getTE(IInventory.class);
+        if (inv == null) {
+            return;
+        }
+        int start = 0, end = inv.getSizeInventory();
+        if (inv instanceof ISidedInventory) {
+            ISidedInventory isi = (ISidedInventory) inv;
+            int access_side = CubeFace.oppositeSide(eject_direction);
+            start = isi.getStartInventorySide(access_side);
+            end = start + isi.getSizeInventorySide(access_side);
+            if (start == end) {
+                return;
+            }
+        }
+        for (int slot = start; slot < end; slot++) {
+            if (moveStack(this, 0, target.getTE(IInventory.class), slot)) {
+                return;
+            }
+        }
+    }
+
     @Override
     void doLogic() {
         Profiler.startSection("router");
@@ -162,6 +191,9 @@ public class TileEntityRouter extends TileEntityFactorization {
         }
         if (frontier.size() == 0) {
             resetGraph();
+        }
+        if (upgradeEject && !is_input && buffer != null && buffer.stackSize > 0) {
+            eject();
         }
 
         if (delayDistance > 0) {
@@ -505,6 +537,9 @@ public class TileEntityRouter extends TileEntityFactorization {
         if (upgradeThroughput) {
             toDrop.add(new ItemStack(Core.registry.router_throughput));
         }
+        if (upgradeEject) {
+            toDrop.add(new ItemStack(Core.registry.router_eject));
+        }
         Coord here = getCoord();
         for (ItemStack is : toDrop) {
             FactorizationUtil.spawnItemStack(here, is);
@@ -523,12 +558,14 @@ public class TileEntityRouter extends TileEntityFactorization {
             tag.setString("match", match);
         }
         tag.setBoolean("match_to_visit", match_to_visit);
+        tag.setInteger("eject_side", eject_direction);
 
         tag.setBoolean("upgrade_item_filter", upgradeItemFilter);
         tag.setBoolean("upgrade_machine_filter", upgradeMachineFilter);
         tag.setBoolean("upgrade_speed", upgradeSpeed);
         tag.setBoolean("upgrade_thorough", upgradeThorough);
         tag.setBoolean("upgrade_throughput", upgradeThroughput);
+        tag.setBoolean("upgrade_eject", upgradeEject);
     }
 
     @Override
@@ -551,6 +588,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         upgradeSpeed = tag.getBoolean("upgrade_speed");
         upgradeThorough = tag.getBoolean("upgrade_thorough");
         upgradeThroughput = tag.getBoolean("upgrade_throughput");
+        upgradeEject = tag.getBoolean("upgrade_eject");
     }
 
     @Override
@@ -580,6 +618,11 @@ public class TileEntityRouter extends TileEntityFactorization {
             if (upgradeThroughput)
                 return false;
             upgradeThroughput = true;
+        }
+        else if (upgrade == Core.registry.router_eject) {
+            if (upgradeEject)
+                return false;
+            upgradeEject = true;
         }
         else {
             return false;
@@ -661,6 +704,11 @@ public class TileEntityRouter extends TileEntityFactorization {
             need_share = b != match_to_visit;
             match_to_visit = b;
             break;
+        case MessageType.RouterEjectDirection:
+            m = input.readInt();
+            need_share = (m != eject_direction);
+            eject_direction = m;
+            break;
         default:
             return false;
         }
@@ -688,7 +736,7 @@ public class TileEntityRouter extends TileEntityFactorization {
             broadcastMessage(who, MessageType.RouterIsInput, is_input);
         }
         if (all || messageType == MessageType.RouterUpgradeState) {
-            broadcastMessage(who, MessageType.RouterUpgradeState, upgradeItemFilter, upgradeMachineFilter, upgradeSpeed, upgradeThorough, upgradeThroughput);
+            broadcastMessage(who, MessageType.RouterUpgradeState, upgradeItemFilter, upgradeMachineFilter, upgradeSpeed, upgradeThorough, upgradeThroughput, upgradeEject);
         }
         if (all || messageType == MessageType.RouterMatch) {
             if (match == null) {
@@ -696,8 +744,11 @@ public class TileEntityRouter extends TileEntityFactorization {
             }
             broadcastMessage(who, MessageType.RouterMatch, match);
         }
-        if (all | messageType == MessageType.RouterMatchToVisit) {
+        if (all || messageType == MessageType.RouterMatchToVisit) {
             broadcastMessage(who, MessageType.RouterMatchToVisit, match_to_visit);
+        }
+        if (all || messageType == MessageType.RouterEjectDirection) {
+            broadcastMessage(who, MessageType.RouterEjectDirection, eject_direction);
         }
         //well, turns out 'all' doesn't actually mean we want to send them all.
         //Otherwise it'd spawn particles when the GUI's opened
@@ -741,6 +792,10 @@ public class TileEntityRouter extends TileEntityFactorization {
         else if (upgradeType == Core.registry.router_throughput.upgradeId && upgradeThroughput) {
             drop = new ItemStack(Core.registry.router_throughput);
             upgradeThroughput = false;
+        }
+        else if (upgradeType == Core.registry.router_eject.upgradeId && upgradeEject) {
+            drop = new ItemStack(Core.registry.router_eject);
+            upgradeEject = false;
         }
         verifyUpgrades();
         if (drop != null) {
@@ -798,7 +853,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 
     @Override
     int getLogicSpeed() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -812,7 +867,7 @@ public class TileEntityRouter extends TileEntityFactorization {
     @Override
     public void invalidate() {
         //There should no longer be a problem here.
-        //		// XXX TODO: This is a terrible non-solution to work with frames.
+        //		// X-XX T-ODO: This is a terrible non-solution to work with frames.
         //		// Seems like we get infinite loops in isCoordConnected if we don't do
         //		// this. Maybe we should have our coordinates's origin be delta-based?
         //		resetGraph();

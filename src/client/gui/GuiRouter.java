@@ -17,18 +17,20 @@ import org.lwjgl.opengl.GL11;
 import factorization.client.gui.ButtonSet.Predicate;
 import factorization.common.ContainerFactorization;
 import factorization.common.Core;
-import factorization.common.TileEntityRouter;
 import factorization.common.NetworkFactorization.MessageType;
+import factorization.common.TileEntityRouter;
 
 public class GuiRouter extends GuiContainer implements IClickable {
     TileEntityRouter router;
     final int mode_button_id = 1, upgrade_button_id = 2;
     final int direction_button_id = 10, slot_up = 11, slot_down = 12;
     final int strict_entity = 20, next_entity = 21;
+    final int eject_direction = 30;
 
     GuiButton mode_button, direction_button, upgrade_button;
     GuiButton slot_up_button, slot_down_button;
     GuiButton strict_entity_button, next_entity_button;
+    GuiButton eject_direction_button;
 
     ArrayList<String> inv_names;
     ButtonSet global_buttons = new ButtonSet();
@@ -38,12 +40,15 @@ public class GuiRouter extends GuiContainer implements IClickable {
     ButtonSet speed_buttons = new ButtonSet();
     ButtonSet thorough_buttons = new ButtonSet();
     ButtonSet bandwidth_buttons = new ButtonSet();
+    ButtonSet ejector_buttons = new ButtonSet();
 
-    ButtonSet allSets[] = { main_buttons, item_filter_buttons, machine_filter_buttons, speed_buttons, thorough_buttons, bandwidth_buttons };
+    ButtonSet allSets[] = { main_buttons, item_filter_buttons, machine_filter_buttons, speed_buttons, thorough_buttons, bandwidth_buttons, ejector_buttons };
     ButtonSet current_set = allSets[0];
 
     String[] side_names = { "bottom sides", "top sides", "§asouth§r sides", "§3north§r sides", "§eeast§r sides",
             "§5west§r sides", "any sides" };
+    String[] ejection_side_names = { "eject to bottom", "eject to top", "eject to §asouth§r", "eject to §3north§r", "eject to §eeast§r",
+            "eject to §5west§r" };
     static final String any_inv = "all machines in network";
 
     public GuiRouter(ContainerFactorization cont) {
@@ -155,6 +160,14 @@ public class GuiRouter extends GuiContainer implements IClickable {
             }
         });
 
+        ejector_buttons.clear();
+        eject_direction_button = ejector_buttons.add(eject_direction, LEFT, row2_top, xSize - 16, bh, "to ...");
+        ejector_buttons.setTest(new Predicate<TileEntity>() {
+            public boolean test(TileEntity a) {
+                return ((TileEntityRouter) a).upgradeEject;
+            }
+        });
+
         if (router.guiLastButtonSet >= 0 && router.guiLastButtonSet < allSets.length) {
             current_set = allSets[router.guiLastButtonSet];
             if (!current_set.canShow(router)) {
@@ -216,6 +229,8 @@ public class GuiRouter extends GuiContainer implements IClickable {
                 }
             }
         }
+
+        eject_direction_button.displayString = ejection_side_names[router.eject_direction];
 
         next_entity_button.displayString = StatCollector.translateToLocal(next_entity_button.displayString);
         strict_entity_button.displayString = router.match_to_visit ? "visit near" : "visit all";
@@ -370,6 +385,21 @@ public class GuiRouter extends GuiContainer implements IClickable {
 
             router.broadcastItem(MessageType.RouterMatch, null);
             break;
+        case eject_direction:
+            if (rightClick) {
+                router.eject_direction--;
+                if (router.eject_direction < 0) {
+                    router.eject_direction = 5;
+                }
+            } else {
+                router.eject_direction++;
+                if (router.eject_direction > 5) {
+                    router.eject_direction = 0;
+                }
+            }
+
+            router.broadcastItem(MessageType.RouterEjectDirection, null);
+            break;
         default:
             return;
         }
@@ -406,6 +436,9 @@ public class GuiRouter extends GuiContainer implements IClickable {
             }
             else if (current_set == bandwidth_buttons) {
                 upgrade_id = Core.registry.router_throughput.upgradeId;
+            }
+            else if (current_set == ejector_buttons) {
+                upgrade_id = Core.registry.router_eject.upgradeId;
             }
             if (upgrade_id == -1) {
                 return;
