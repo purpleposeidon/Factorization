@@ -8,6 +8,7 @@
 
   Wrath Fire now treats other netherbrickblocks properly
   Using more ore dict.
+  Added ejection router upgrade. You'll want to use the filter upgrade with it.
 
 0.3.2 -- Upgraded!
   In brief: Mecha-upgrades, and Router upgrades.
