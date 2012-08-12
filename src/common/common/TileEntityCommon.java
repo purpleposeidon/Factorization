@@ -1,5 +1,7 @@
 package factorization.common;
 
+import java.io.DataInput;
+import java.io.IOException;
 import java.util.Random;
 
 import net.minecraft.src.AxisAlignedBB;
@@ -111,6 +113,20 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
+        tag.setString("ver", Core.instance.getVersion());
         getBlockClass().enforceQuiet(getCoord()); //NOTE: This won't actually work for the quiting save; but a second save'll take care of that.
+    }
+
+    public boolean handleMessageFromServer(int messageType, DataInput input) throws IOException {
+        return false;
+    }
+
+    public boolean handleMessageFromClient(int messageType, DataInput input) throws IOException {
+        // There are no base attributes a client can edit
+        return false;
+    }
+
+    void broadcastMessage(EntityPlayer who, int messageType, Object... msg) {
+        Core.network.broadcastMessage(who, getCoord(), messageType, msg);
     }
 }

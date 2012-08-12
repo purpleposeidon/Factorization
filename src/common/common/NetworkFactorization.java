@@ -193,22 +193,22 @@ public class NetworkFactorization implements IConnectionHandler, IPacketHandler 
                     return;
                 }
 
-                TileEntity ent = player.worldObj.getBlockTileEntity(x, y, z);
-                if (ent == null || !(ent instanceof TileEntityFactorization)) {
-                    handleForeignMessage(player.worldObj, x, y, z, ent, messageType, input);
+                Coord target = new Coord(player.worldObj, x, y, z);
+                TileEntityCommon tec = target.getTE(TileEntityCommon.class);
+                if (tec == null) {
+                    handleForeignMessage(player.worldObj, x, y, z, tec, messageType, input);
                     return;
                 }
-                TileEntityFactorization fac = (TileEntityFactorization) ent;
                 boolean handled;
                 if (Core.instance.isCannonical(player.worldObj)) {
                     // server. And not SSP 'cause there's no packets
-                    handled = fac.handleMessageFromClient(messageType, input);
+                    handled = tec.handleMessageFromClient(messageType, input);
                 } else {
                     // SMP client
-                    handled = fac.handleMessageFromServer(messageType, input);
+                    handled = tec.handleMessageFromServer(messageType, input);
                 }
                 if (!handled) {
-                    handleForeignMessage(player.worldObj, x, y, z, ent, messageType, input);
+                    handleForeignMessage(player.worldObj, x, y, z, tec, messageType, input);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -322,8 +322,9 @@ public class NetworkFactorization implements IConnectionHandler, IPacketHandler 
                 RouterLastSeen = 204, RouterMatchToVisit = 205, RouterDowngrade = 206,
                 RouterUpgradeState = 207,
                 //
-                BarrelDescription = 300, BarrelItem = 301, BarrelCount = 302
+                BarrelDescription = 300, BarrelItem = 301, BarrelCount = 302,
                 //
+                BatteryLevel = 400
                 ;
     }
 }

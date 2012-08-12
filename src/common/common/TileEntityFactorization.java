@@ -236,7 +236,6 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         super.writeToNBT(tag);
         tag.setByte("draw_active_byte", draw_active);
         tag.setByte("facing", facing_direction);
-        tag.setString("ver", Core.instance.getVersion());
     }
 
     @Override
@@ -292,20 +291,6 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         return null;
     }
 
-    public boolean handleMessageFromServer(int messageType, DataInput input) throws IOException {
-        if (messageType == MessageType.DrawActive) {
-            draw_active = input.readByte();
-            getCoord().dirty();
-            return true;
-        }
-        return false;
-    }
-
-    public boolean handleMessageFromClient(int messageType, DataInput input) throws IOException {
-        // There are no base attributes a client can edit
-        return false;
-    }
-
     public void drawActive(int add_time) {
         int new_active = draw_active + add_time;
         if (new_active < 0) {
@@ -320,10 +305,6 @@ public abstract class TileEntityFactorization extends TileEntityCommon
                 broadcastMessage(null, MessageType.DrawActive, draw_active);
             }
         }
-    }
-
-    void broadcastMessage(EntityPlayer who, int messageType, Object... msg) {
-        Core.network.broadcastMessage(who, getCoord(), messageType, msg);
     }
 
     @Override
@@ -343,4 +324,15 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         }
     }
 
+    public boolean handleMessageFromServer(int messageType, DataInput input) throws IOException {
+        if (super.handleMessageFromServer(messageType, input)) {
+            return true;
+        }
+        if (messageType == MessageType.DrawActive) {
+            draw_active = input.readByte();
+            getCoord().dirty();
+            return true;
+        }
+        return false;
+    }
 }

@@ -1,10 +1,14 @@
 package factorization.common;
 
+import java.io.DataInput;
+import java.io.IOException;
+
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import factorization.api.Charge;
 import factorization.api.IChargeConductor;
+import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityBattery extends TileEntityCommon implements IChargeConductor {
     Charge charge = new Charge(), storage = new Charge();
@@ -71,8 +75,24 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
             storage.addValue(-delta);
         }
         if (tier != storage.getValue() * 32 / max_storage) {
-            getCoord().dirty();
+            updateMeter();
         }
+    }
+
+    void updateMeter() {
+        getCoord().dirty();
+        Core.network.broadcastMessage(null, getCoord(), MessageType.BatteryLevel, storage.getValue());
+    }
+
+    @Override
+    public boolean handleMessageFromServer(int messageType, DataInput input) throws IOException {
+        if (super.handleMessageFromServer(messageType, input)) {
+            return true;
+        }
+        if (messageType == MessageType.BatteryLevel) {
+            storage.setValue(input.readInt());
+        }
+        return false;
     }
 
     @Override
