@@ -3,11 +3,10 @@ package factorization.client.render;
 import net.minecraft.src.EntityBreakingFX;
 import net.minecraft.src.Tessellator;
 import net.minecraft.src.World;
-import net.minecraft.src.forge.ITextureProvider;
 import factorization.api.Coord;
 import factorization.common.Core;
 
-public class EntityWrathFlameFX extends EntityBreakingFX implements ITextureProvider {
+public class EntityWrathFlameFX extends EntityBreakingFX {
     double defaultY = 0;
 
     public EntityWrathFlameFX(World par1World, double x, double y, double z,

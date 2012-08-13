@@ -12,16 +12,13 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.MovingObjectPosition;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.TileEntity;
-import net.minecraft.src.Vec3D;
+import net.minecraft.src.Vec3;
 import net.minecraft.src.World;
-import net.minecraft.src.forge.IConnectRedstone;
-import net.minecraft.src.forge.IMultipassRender;
-import net.minecraft.src.forge.ITextureProvider;
+import net.minecraftforge.common.Orientation;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
 
-public class BlockFactorization extends BlockContainer implements
-        ITextureProvider, IConnectRedstone, IMultipassRender {
+public class BlockFactorization extends BlockContainer {
     public boolean fake_normal_render = false;
 
     public BlockFactorization(int id) {
@@ -32,9 +29,9 @@ public class BlockFactorization extends BlockContainer implements
         setLightOpacity(3);
         //setBlockBounds(0, -1000, 0, 0, -999, 0);
     }
-
+    
     @Override
-    public TileEntity getBlockEntity(int md) {
+    public TileEntity createNewTileEntity(World world) {
         //The TileEntity needs to be set when the block is placed.
         return null;
     }
@@ -54,17 +51,12 @@ public class BlockFactorization extends BlockContainer implements
     }
 
     @Override
-    public TileEntity getBlockEntity() {
-        throw new RuntimeException("This function shouldn't be called. Bad Forge install?");
-    }
-
-    @Override
-    public boolean isBlockSolidOnSide(World world, int x, int y, int z, int side) {
-        Coord here = new Coord(world, x, y, z);
-        TileEntityCommon te = here.getTE(TileEntityCommon.class);
-        if (te == null) {
+    public boolean isBlockSolid(IBlockAccess world, int x, int y, int z, int side) {
+        TileEntity t = world.getBlockTileEntity(x, y, z);
+        if (t == null || ! (t instanceof TileEntityCommon)) {
             return false;
         }
+        TileEntityCommon te = (TileEntityCommon) t;
         return te.isBlockSolidOnSide(side);
     }
 
@@ -84,14 +76,13 @@ public class BlockFactorization extends BlockContainer implements
     //TODO: Ctrl/alt clicking!
 
     @Override
-    public boolean blockActivated(World world, int i, int j, int k,
-            EntityPlayer entityplayer) {
+    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer entityplayer, int side, float vecx, float vecy, float vecz) {
         // right click
         if (entityplayer.isSneaking()) {
             return false;
         }
 
-        TileEntityCommon t = new Coord(world, i, j, k).getTE(TileEntityCommon.class);
+        TileEntityCommon t = new Coord(world, x, y, z).getTE(TileEntityCommon.class);
 
         if (t != null) {
             if (Core.instance.isCannonical(world)) {
@@ -178,7 +169,7 @@ public class BlockFactorization extends BlockContainer implements
     TileEntityCommon destroyedTE;
 
     @Override
-    public void onBlockRemoval(World w, int x, int y, int z) {
+    public void breakBlock(World w, int x, int y, int z, int id, int md) {
         TileEntityCommon te = new Coord(w, x, y, z).getTE(TileEntityCommon.class);
         if (te != null) {
             destroyedTE = te;
@@ -197,7 +188,7 @@ public class BlockFactorization extends BlockContainer implements
                 System.out.println("No IFactoryType TE behind block that was destroyed, and nothing saved!");
                 return ret;
             }
-            Coord destr = new Coord(destroyedTE);
+            Coord destr = destroyedTE.getCoord();
             if (!destr.equals(here)) {
                 System.out.println("Last saved destroyed TE wasn't for this location");
                 return ret;
@@ -266,7 +257,7 @@ public class BlockFactorization extends BlockContainer implements
 
     @Override
     public int getFlammability(IBlockAccess world, int x, int y, int z,
-            int md, int face) {
+            int md, Orientation face) {
         if (FactoryType.BARREL.is(md)) {
             return 25;
         }
@@ -274,7 +265,7 @@ public class BlockFactorization extends BlockContainer implements
     }
 
     @Override
-    public boolean isFlammable(IBlockAccess world, int x, int y, int z, int metadata, int face) {
+    public boolean isFlammable(IBlockAccess world, int x, int y, int z, int metadata, Orientation face) {
         return false;
         //Not really. But this keeps fire rendering.
         //		if (FactoryType.BARREL.is(metadata)) {
@@ -302,14 +293,14 @@ public class BlockFactorization extends BlockContainer implements
     }
 
     @Override
-    public float getHardness(int md) {
-        return BlockClass.get(md).hardness;
+    public float getBlockHardness(World w, int x, int y, int z) {
+        return BlockClass.get(w.getBlockMetadata(x, y, z)).hardness;
     }
 
     //smack these blocks up
     @Override
     public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z,
-            Vec3D startVec, Vec3D endVec) {
+            Vec3 startVec, Vec3 endVec) {
         TileEntityCommon tec = new Coord(w, x, y, z).getTE(TileEntityCommon.class);
         if (tec == null) {
             return super.collisionRayTrace(w, x, y, z, startVec, endVec);

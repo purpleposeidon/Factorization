@@ -1,6 +1,6 @@
 package factorization.client;
 
-import net.minecraft.src.forge.IArmorTextureProvider;
+import net.minecraftforge.common.IArmorTextureProvider;
 import factorization.common.MechaArmor;
 
 public class MechaArmorTextured extends MechaArmor implements IArmorTextureProvider {

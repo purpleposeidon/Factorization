@@ -51,7 +51,7 @@ public class ContainerPocket extends ContainerWorkbench {
         addPlayerSlots(inv);
         slotCrafting = new RedirectedSlotCrafting(player, this.craftMatrix, this.craftResult, 0,
                 205 + 3, 25 + 3);
-        this.addSlot(slotCrafting);
+        this.addSlotToContainer(slotCrafting);
         updateCraftingResults();
         updateCraft();
     }
@@ -156,14 +156,14 @@ public class ContainerPocket extends ContainerWorkbench {
         int col_limit = 9 - 3;
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 9; x++) {
-                addSlot(new Slot(inventoryplayer, x + y * 9 + 9, invdx + 8 + x * 18, invdy + 8 + y
+                addSlotToContainer(new Slot(inventoryplayer, x + y * 9 + 9, invdx + 8 + x * 18, invdy + 8 + y
                         * 18));
             }
         }
 
         int y = 3;
         for (int x = 0; x < 9; x++) {
-            addSlot(new Slot(inventoryplayer, x, invdx + 8 + x * 18, 4 + invdy + 8 + y * 18));
+            addSlotToContainer(new Slot(inventoryplayer, x, invdx + 8 + x * 18, 4 + invdy + 8 + y * 18));
         }
     }
 

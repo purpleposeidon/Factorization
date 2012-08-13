@@ -14,10 +14,10 @@ import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NBTTagList;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
-import net.minecraft.src.forge.ISidedInventory;
-import net.minecraft.src.forge.ITextureProvider;
+import net.minecraftforge.common.ISidedInventory;
+import net.minecraftforge.common.Orientation;
 
-public class ItemBagOfHolding extends Item implements ITextureProvider, IActOnCraft {
+public class ItemBagOfHolding extends Item implements IActOnCraft {
     public ItemBagOfHolding(int id) {
         super(id);
         setMaxStackSize(1);
@@ -210,8 +210,9 @@ public class ItemBagOfHolding extends Item implements ITextureProvider, IActOnCr
         int inv_end = inv.getSizeInventory();
         if (inv instanceof ISidedInventory) {
             ISidedInventory sinv = (ISidedInventory) inv;
-            inv_start = sinv.getStartInventorySide(side);
-            inv_end = inv_start = sinv.getSizeInventorySide(side);
+            Orientation orient = Orientation.getOrientation(side);
+            inv_start = sinv.getStartInventorySide(orient);
+            inv_end = inv_start = sinv.getSizeInventorySide(orient);
         }
         // NOTE: We *could* consider double chests properly. But it maybe it's
         // more useful this way?

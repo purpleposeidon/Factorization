@@ -3,6 +3,8 @@ package factorization.common;
 import java.util.ArrayList;
 import java.util.List;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+
 import net.minecraft.src.Container;
 import net.minecraft.src.CraftingManager;
 import net.minecraft.src.EntityPlayer;
@@ -13,10 +15,9 @@ import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.TileEntity;
-import net.minecraft.src.forge.ForgeHooks;
-import net.minecraft.src.forge.ITextureProvider;
+import net.minecraftforge.common.ForgeHooks;
 
-public class ItemCraft extends Item implements ITextureProvider {
+public class ItemCraft extends Item  {
     private final int slot_length = 9;
     static List<IRecipe> recipes = new ArrayList();
 
@@ -179,7 +180,7 @@ public class ItemCraft extends Item implements ITextureProvider {
                 if (Core.registry.diamond_shard_recipe.matches(craft) && where != null) {
                     Sound.shardMake.playAt(where);
                 }
-                ForgeHooks.onTakenFromCrafting(null, result, craft);
+                GameRegistry.onItemCrafted(null, result, craft);
             }
 
             for (int i = 0; i < craft.getSizeInventory(); i++) {

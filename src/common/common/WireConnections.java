@@ -4,8 +4,7 @@ import java.util.ArrayList;
 
 import net.minecraft.src.Block;
 import net.minecraft.src.MovingObjectPosition;
-import net.minecraft.src.Profiler;
-import net.minecraft.src.Vec3D;
+import net.minecraft.src.Vec3;
 import net.minecraft.src.World;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
@@ -28,9 +27,9 @@ public class WireConnections {
         this.my_face_vector = my_face.toVector();
         this.here = me.getCoord();
 
-        Profiler.startSection("factoryWire");
+        Core.instance.getProfiler().startSection("factoryWire");
         calculate();
-        Profiler.endSection();
+        Core.instance.getProfiler().endSection();
     }
 
     void calculate() {
@@ -203,8 +202,8 @@ public class WireConnections {
         block.setBlockBounds(min.x + d, min.y + d, min.z + d, max.x + d, max.y + d, max.z + d);
     }
 
-    public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z, Vec3D startVec,
-            Vec3D endVec) {
+    public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z, Vec3 startVec,
+            Vec3 endVec) {
         for (RenderingCube part : getParts()) {
             part.toBlockBounds(Core.registry.resource_block);
             MovingObjectPosition ret = Core.registry.resource_block.collisionRayTrace(w, x, y, z, startVec, endVec);

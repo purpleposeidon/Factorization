@@ -29,8 +29,8 @@ import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.TileEntityRenderer;
 import net.minecraft.src.World;
-import net.minecraft.src.forge.Configuration;
-import net.minecraft.src.forge.MinecraftForgeClient;
+import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.common.Configuration;
 
 import org.lwjgl.input.Keyboard;
 
@@ -317,7 +317,7 @@ public class mod_Factorization extends Core {
     @Override
     public boolean onTickInGame(float tickDelta, Minecraft mc) {
         fireParticlesSpawned = 0;
-        Profiler.startSection("factorizationtick");
+        Core.instance.getProfiler().startSection("factorizationtick");
         registry.onTickPlayer(mc.thePlayer);
         updatePlayerKeys();
         updateKeyStatus();
@@ -325,7 +325,7 @@ public class mod_Factorization extends Core {
             return true;
         }
         registry.onTickWorld(mc.theWorld);
-        Profiler.endSection();
+        Core.instance.getProfiler().endSection();
         return true;
     }
 
@@ -340,9 +340,9 @@ public class mod_Factorization extends Core {
     @Override
     public boolean renderWorldBlock(RenderBlocks renderBlocks, IBlockAccess world, int x, int y,
             int z, Block block, int render_type) {
-        Profiler.startSection("factorization");
+        Core.instance.getProfiler().startSection("factorization");
         boolean ret = FactorizationRender.renderWorldBlock(renderBlocks, world, x, y, z, block, render_type);
-        Profiler.endSection();
+        Core.instance.getProfiler().endSection();
         return ret;
     }
 

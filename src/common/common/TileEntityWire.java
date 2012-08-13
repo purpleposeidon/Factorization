@@ -8,7 +8,7 @@ import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.MovingObjectPosition;
 import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.Vec3D;
+import net.minecraft.src.Vec3;
 import net.minecraft.src.World;
 import factorization.api.Charge;
 import factorization.api.Coord;
@@ -181,8 +181,8 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
 
 
     @Override
-    public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z, Vec3D startVec,
-            Vec3D endVec) {
+    public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z, Vec3 startVec,
+            Vec3 endVec) {
         return new WireConnections(this).collisionRayTrace(w, x, y, z, startVec, endVec);
     }
 

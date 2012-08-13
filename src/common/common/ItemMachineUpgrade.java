@@ -1,13 +1,12 @@
 package factorization.common;
 
-import factorization.api.Coord;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.World;
-import net.minecraft.src.forge.ITextureProvider;
+import factorization.api.Coord;
 
-public class ItemMachineUpgrade extends Item implements ITextureProvider {
+public class ItemMachineUpgrade extends Item {
     FactoryType machineType;
     public int upgradeId;
     String name;
@@ -29,8 +28,8 @@ public class ItemMachineUpgrade extends Item implements ITextureProvider {
     }
 
     @Override
-    public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int X, int Y,
-            int Z, int side) {
+    public boolean tryPlaceIntoWorld(ItemStack stack, EntityPlayer player, World world, int X, int Y,
+            int Z, int side, float vecx, float vecy, float vecz) {
         Coord here = new Coord(world, X, Y, Z);
         TileEntityFactorization te = here.getTE(TileEntityFactorization.class);
         if (te.takeUpgrade(stack)) {

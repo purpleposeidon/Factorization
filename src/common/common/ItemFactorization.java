@@ -28,8 +28,7 @@ public class ItemFactorization extends ItemBlock {
     }
 
     @Override
-    public boolean onItemUse(ItemStack is, EntityPlayer player, World w, int x, int y, int z,
-            int side) {
+    public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side, float vecx, float vecy, float vecz) {
         Coord here = new Coord(w, x, y, z);
         int id = here.getId();
         if (id == Block.snow.blockID) {
@@ -70,7 +69,7 @@ public class ItemFactorization extends ItemBlock {
             }
         }
 
-        boolean ret = super.onItemUse(is, player, w, x, y, z, side);
+        boolean ret = super.tryPlaceIntoWorld(is, player, w, x, y, z, side, vecx, vecy, vecz);
         if (ret) {
             //create our TileEntityFactorization
             //Coord c = new Coord(w, x, y, z).towardSide(side);

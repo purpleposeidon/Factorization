@@ -16,9 +16,8 @@ import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldProviderHell;
-import net.minecraft.src.forge.ITextureProvider;
 
-public class ItemDemon extends Item implements ITextureProvider {
+public class ItemDemon extends Item {
 
     public ItemDemon(int par1) {
         super(par1);

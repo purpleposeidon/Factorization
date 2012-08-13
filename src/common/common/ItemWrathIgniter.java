@@ -5,11 +5,10 @@ import net.minecraft.src.IInventory;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.World;
-import net.minecraft.src.forge.ITextureProvider;
 import factorization.api.Coord;
 import factorization.api.IActOnCraft;
 
-public class ItemWrathIgniter extends Item implements ITextureProvider, IActOnCraft {
+public class ItemWrathIgniter extends Item implements IActOnCraft {
     public ItemWrathIgniter(int par1) {
         super(par1);
         setMaxStackSize(1);
@@ -43,8 +42,7 @@ public class ItemWrathIgniter extends Item implements ITextureProvider, IActOnCr
     }
 
     @Override
-    public boolean onItemUse(ItemStack is, EntityPlayer player,
-            World w, int x, int y, int z, int side) {
+    public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side, float vecx, float vecy, float vecz) {
         Coord baseBlock = new Coord(w, x, y, z);
         Coord fireBlock = baseBlock.copy().towardSide(side);
         if (fireBlock.getId() != 0) {

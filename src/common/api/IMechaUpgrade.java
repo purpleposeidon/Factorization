@@ -4,7 +4,7 @@ import net.minecraft.src.DamageSource;
 import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
-import net.minecraft.src.forge.ArmorProperties;
+import net.minecraftforge.common.ISpecialArmor.ArmorProperties;
 
 public interface IMechaUpgrade {
     /**

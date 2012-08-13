@@ -5,9 +5,8 @@ import net.minecraft.src.InventoryPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.World;
-import net.minecraft.src.forge.ITextureProvider;
 
-public class ItemPocketTable extends Item implements ITextureProvider {
+public class ItemPocketTable extends Item {
 
     public ItemPocketTable(int id) {
         super(id);

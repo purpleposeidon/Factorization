@@ -12,15 +12,15 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.ModLoader;
 import net.minecraft.src.NetHandler;
 import net.minecraft.src.Packet;
+import net.minecraft.src.Profiler;
 import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldGenMinable;
-import net.minecraft.src.forge.Configuration;
-import net.minecraft.src.forge.IGuiHandler;
-import net.minecraft.src.forge.MinecraftForge;
-import net.minecraft.src.forge.NetworkMod;
-import net.minecraft.src.forge.Property;
-import net.minecraft.src.forge.oredict.OreDictionary;
+import net.minecraftforge.common.IGuiHandler;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.Property;
+import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.common.Configuration;
 import factorization.api.Coord;
 
 public abstract class Core extends NetworkMod implements IGuiHandler {
@@ -77,6 +77,8 @@ public abstract class Core extends NetworkMod implements IGuiHandler {
     }
 
     public abstract boolean isPlayerAdmin(EntityPlayer player);
+    
+    public abstract Profiler getProfiler();
 
     // configificable
     public static int factory_block_id = 254;

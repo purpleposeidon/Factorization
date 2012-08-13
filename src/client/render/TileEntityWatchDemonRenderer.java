@@ -7,7 +7,8 @@ import net.minecraft.src.RenderManager;
 import net.minecraft.src.Tessellator;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntitySpecialRenderer;
-import net.minecraft.src.forge.MinecraftForgeClient;
+import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.MinecraftForgeClient;
 
 import org.lwjgl.opengl.GL11;
 
@@ -26,7 +27,7 @@ public class TileEntityWatchDemonRenderer extends TileEntitySpecialRenderer {
             float partial) {
 
         renderItem = (RenderItem) RenderManager.instance.getEntityClassRenderObject(EntityItem.class);
-        MinecraftForgeClient.bindTexture(Core.texture_file_item);
+        ForgeHooksClient.bindTexture(Core.texture_file_item, 0);
         //renderItem.loadTexture(FactorizationCore.texture_file_item);
         GL11.glPushMatrix();
         GL11.glTranslatef((float) x + 0.5F, (float) y + 0.1F, (float) z + 0.5F);
@@ -34,7 +35,7 @@ public class TileEntityWatchDemonRenderer extends TileEntitySpecialRenderer {
         GL11.glScalef(0.5F, 0.5F, 0.5F);
         renderItem(Core.registry.bound_tiny_demon.getIconFromDamage(0));
         GL11.glPopMatrix();
-        MinecraftForgeClient.unbindTexture();
+        ForgeHooksClient.unbindTexture();
     }
 
     private void renderItem(int textureIndex) {

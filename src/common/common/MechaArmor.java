@@ -12,13 +12,12 @@ import net.minecraft.src.ItemArmor;
 import net.minecraft.src.ItemBlock;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.forge.ArmorProperties;
-import net.minecraft.src.forge.ISpecialArmor;
-import net.minecraft.src.forge.ITextureProvider;
+import net.minecraftforge.common.ISpecialArmor;
+import net.minecraftforge.common.ISpecialArmor.ArmorProperties;
 import factorization.api.IMechaUpgrade;
 
 public class MechaArmor extends ItemArmor
-        implements ISpecialArmor, ITextureProvider {
+        implements ISpecialArmor {
     public int slotCount = 2;
 
     public enum ActivationMode {

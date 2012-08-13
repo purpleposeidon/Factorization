@@ -11,6 +11,10 @@ import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.TileEntityFurnace;
 import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
+import net.minecraftforge.common.Orientation;
+import static net.minecraftforge.common.Orientation.*;
+
+
 
 public class TileEntitySlagFurnace extends TileEntityFactorization {
     ItemStack furnaceItemStacks[] = new ItemStack[4];
@@ -41,11 +45,11 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     }
 
     @Override
-    public int getStartInventorySide(int side) {
+    public int getStartInventorySide(Orientation side) {
         switch (side) {
-        case 0:
+        case DOWN:
             return fuel; //bottom: fuel
-        case 1:
+        case UP:
             return input; //top: input
         default:
             return output; //side: output
@@ -53,8 +57,8 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     }
 
     @Override
-    public int getSizeInventorySide(int side) {
-        if (side == 0 || side == 1) {
+    public int getSizeInventorySide(Orientation side) {
+        if (side == DOWN || side == UP) {
             return 1; //bottom/top: fuel/input
         }
         return 2;

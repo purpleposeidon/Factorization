@@ -23,8 +23,6 @@ import net.minecraft.src.Entity;
 import net.minecraft.src.FactorizationHack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.World;
-import net.minecraft.src.forge.IChunkLoadHandler;
-import net.minecraft.src.forge.ISaveEventHandler;
 
 public class TileEntityWatchDemon extends TileEntityCommon {
     public static LoadHandler loadHandler = new LoadHandler();
@@ -96,7 +94,7 @@ public class TileEntityWatchDemon extends TileEntityCommon {
                     continue;
                 }
                 for (ChunkCoordIntPair coord : toLoad) {
-                    FactorizationHack.getChunkProvider(world).loadChunk(coord.chunkXPos, coord.chunkZPosition);
+                    FactorizationHack.getChunkProvider(world).loadChunk(coord.chunkXPos, coord.chunkZPos);
                 }
             }
         }
@@ -182,13 +180,13 @@ public class TileEntityWatchDemon extends TileEntityCommon {
                     toLoad = new HashSet();
                 }
                 for (ChunkCoordIntPair coord : toLoad) {
-                    Chunk chunk = world.getChunkFromChunkCoords(coord.chunkXPos, coord.chunkZPosition);
-                    String coords = coord.chunkXPos + " " + coord.chunkZPosition;
+                    Chunk chunk = world.getChunkFromChunkCoords(coord.chunkXPos, coord.chunkZPos);
+                    String coords = coord.chunkXPos + " " + coord.chunkZPos;
                     out.write(coords);
                     for (int i = 10 - coords.length(); i >= 0; i--) {
                         out.write(" ");
                     }
-                    out.write("# At " + (coord.chunkXPos << 4) + " 0 " + (coord.chunkZPosition << 4)
+                    out.write("# At " + (coord.chunkXPos << 4) + " 0 " + (coord.chunkZPos << 4)
                             + ". " + chunk.chunkTileEntityMap.size() + " TileEntities and "
                             + chunk.entityLists.length + " Entities");
                     out.newLine();

@@ -20,8 +20,7 @@ public class ItemChargeMeter extends Item {
     }
 
     @Override
-    public boolean onItemUse(ItemStack is, EntityPlayer player,
-            World w, int x, int y, int z, int side) {
+    public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side, float vecx, float vecy, float vecz) {
         Coord here = new Coord(w, x, y, z);
         IChargeConductor ic = here.getTE(IChargeConductor.class);
         if (ic == null) {

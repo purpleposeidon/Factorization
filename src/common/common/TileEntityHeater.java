@@ -159,17 +159,17 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
             if (!TEF_canSmelt(furnace)) {
                 return;
             }
-            ProxiedHeatingResult pf = new ProxiedHeatingResult(new Coord(te), furnace.furnaceBurnTime, furnace.furnaceCookTime);
+            ProxiedHeatingResult pf = new ProxiedHeatingResult(new Coord(worldObj, te), furnace.furnaceBurnTime, furnace.furnaceCookTime);
             furnace.furnaceBurnTime = pf.burnTime;
             furnace.furnaceCookTime = Math.min(pf.cookTime, 200-1);
-            BlockFurnace.updateFurnaceBlockState(furnace.furnaceCookTime > 0, te.worldObj, te.xCoord, te.yCoord, te.zCoord);
+            BlockFurnace.updateFurnaceBlockState(furnace.furnaceCookTime > 0, worldObj, te.xCoord, te.yCoord, te.zCoord);
         }
         if (te instanceof TileEntitySlagFurnace) {
             TileEntitySlagFurnace furnace = (TileEntitySlagFurnace) te;
             if (!furnace.canSmelt()) {
                 return;
             }
-            ProxiedHeatingResult pf = new ProxiedHeatingResult(new Coord(te), furnace.furnaceBurnTime, furnace.furnaceCookTime);
+            ProxiedHeatingResult pf = new ProxiedHeatingResult(new Coord(worldObj, te), furnace.furnaceBurnTime, furnace.furnaceCookTime);
             furnace.furnaceBurnTime = pf.burnTime;
             furnace.furnaceCookTime = pf.cookTime;
         }

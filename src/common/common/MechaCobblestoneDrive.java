@@ -7,11 +7,10 @@ import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
-import net.minecraft.src.forge.ArmorProperties;
-import net.minecraft.src.forge.ITextureProvider;
+import net.minecraftforge.common.ISpecialArmor.ArmorProperties;
 import factorization.api.IMechaUpgrade;
 
-public class MechaCobblestoneDrive extends Item implements IMechaUpgrade, ITextureProvider {
+public class MechaCobblestoneDrive extends Item implements IMechaUpgrade {
 
     protected MechaCobblestoneDrive(int par1) {
         super(par1);

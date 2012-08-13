@@ -7,12 +7,11 @@ import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.MathHelper;
-import net.minecraft.src.forge.ArmorProperties;
-import net.minecraft.src.forge.ITextureProvider;
+import net.minecraftforge.common.ISpecialArmor.ArmorProperties;
 import factorization.api.Coord;
 import factorization.api.IMechaUpgrade;
 
-public class MechaMountedPiston extends Item implements IMechaUpgrade, ITextureProvider {
+public class MechaMountedPiston extends Item implements IMechaUpgrade {
     protected MechaMountedPiston(int par1) {
         super(par1);
         setItemName("mecha.mountedpiston");
@@ -43,7 +42,7 @@ public class MechaMountedPiston extends Item implements IMechaUpgrade, ITextureP
         if (c.copy().towardSide(orientation).isAir()) {
             return false;
         }
-        Block.pistonBase.receiveClientEvent(c.w, c.x, c.y, c.z, 0, orientation);
+        Block.pistonBase.onBlockEventReceived(c.w, c.x, c.y, c.z, 0, orientation);
         c.setId(0);
         if (Core.instance.isServer()) {
             Core.network.broadcastMessage(null, c, NetworkFactorization.MessageType.PistonPush, orientation);

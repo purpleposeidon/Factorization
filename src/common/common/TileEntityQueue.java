@@ -7,7 +7,10 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTBase;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NBTTagList;
-import net.minecraft.src.forge.ISidedInventory;
+import net.minecraftforge.common.ISidedInventory;
+import net.minecraftforge.common.Orientation;
+import static net.minecraftforge.common.Orientation.*;
+
 
 public class TileEntityQueue extends TileEntityFactorization implements
         ISidedInventory {
@@ -73,8 +76,8 @@ public class TileEntityQueue extends TileEntityFactorization implements
     }
 
     @Override
-    public int getStartInventorySide(int side) {
-        if (side == 1) {
+    public int getStartInventorySide(Orientation side) {
+        if (side == UP) {
             // the y+ (top) side; where the queue pops items out
             return 0;
         }
@@ -82,9 +85,9 @@ public class TileEntityQueue extends TileEntityFactorization implements
     }
 
     @Override
-    public int getSizeInventorySide(int side) {
+    public int getSizeInventorySide(Orientation side) {
         cleanQueue();
-        if (side == 1) {
+        if (side == UP) {
             // top; front
             if (items.size() == 0) {
                 // nothing for you

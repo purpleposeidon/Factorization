@@ -15,11 +15,12 @@ import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.Profiler;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.World;
-import net.minecraft.src.forge.ISidedInventory;
+import net.minecraftforge.common.ISidedInventory;
+import net.minecraftforge.common.Orientation;
+import static net.minecraftforge.common.Orientation.*;
 import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
 
@@ -168,7 +169,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         int start = 0, end = inv.getSizeInventory();
         if (inv instanceof ISidedInventory) {
             ISidedInventory isi = (ISidedInventory) inv;
-            int access_side = CubeFace.oppositeSide(eject_direction);
+            Orientation access_side = Orientation.getOrientation(CubeFace.oppositeSide(eject_direction));
             start = isi.getStartInventorySide(access_side);
             end = start + isi.getSizeInventorySide(access_side);
             if (start == end) {
@@ -184,7 +185,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 
     @Override
     void doLogic() {
-        Profiler.startSection("router");
+        Core.instance.getProfiler().startSection("router");
         needLogic();
         if (lastSeenAt == null) {
             lastSeenAt = getCoord();
@@ -211,7 +212,7 @@ public class TileEntityRouter extends TileEntityFactorization {
                 break;
             }
         }
-        Profiler.endSection();
+        Core.instance.getProfiler().endSection();
     }
 
     TileEntity popFrontier() {
@@ -392,7 +393,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         if (t instanceof ISidedInventory) {
             int free_count = 0;
             ISidedInventory inv = (ISidedInventory) t;
-            for (int side = 0; side < 6; side++) {
+            for (Orientation side : Orientation.values()) {
                 // check each side
                 if (inv.getSizeInventorySide(side) != 0) {
                     free_count++;
@@ -408,7 +409,7 @@ public class TileEntityRouter extends TileEntityFactorization {
             return true;
         }
         ISidedInventory s = (ISidedInventory) t;
-        for (int side = 0; side < 6; side++) {
+        for (Orientation side : Orientation.values()) {
             int low = s.getStartInventorySide(side);
             int high = low + s.getSizeInventorySide(side);
             if (low <= slot && slot < high) {
@@ -460,8 +461,8 @@ public class TileEntityRouter extends TileEntityFactorization {
             // Get/Put from one of the sides
             if (t instanceof ISidedInventory && target_side < 6 && target_side >= 0) {
                 ISidedInventory inv = (ISidedInventory) t;
-                start = inv.getStartInventorySide(target_side);
-                end = start + inv.getSizeInventorySide(target_side);
+                start = inv.getStartInventorySide(Orientation.getOrientation(target_side));
+                end = start + inv.getSizeInventorySide(Orientation.getOrientation(target_side));
             } else {
                 start = 0;
                 end = t.getSizeInventory();
@@ -874,12 +875,12 @@ public class TileEntityRouter extends TileEntityFactorization {
     }
 
     @Override
-    public int getStartInventorySide(int side) {
+    public int getStartInventorySide(Orientation side) {
         return 0;
     }
 
     @Override
-    public int getSizeInventorySide(int side) {
+    public int getSizeInventorySide(Orientation side) {
         return 1;
     }
 }

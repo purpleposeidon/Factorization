@@ -1,9 +1,8 @@
 package factorization.common;
 
 import net.minecraft.src.Item;
-import net.minecraft.src.forge.ITextureProvider;
 
-public class ItemCraftingComponent extends Item implements ITextureProvider {
+public class ItemCraftingComponent extends Item {
     int icon;
 
     public ItemCraftingComponent(int id, String itemName, int icon) {

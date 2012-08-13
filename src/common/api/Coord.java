@@ -9,6 +9,7 @@ import net.minecraft.src.Entity;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
+import net.minecraftforge.common.Orientation;
 
 public class Coord {
     public World w;
@@ -20,6 +21,11 @@ public class Coord {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+    
+    @Deprecated
+    public Coord(World w, TileEntity te) {
+        this(w, te.xCoord, te.yCoord, te.zCoord);
     }
 
     public Coord(TileEntity te) {
@@ -288,7 +294,13 @@ public class Coord {
         return getBlock().isBlockNormalCube(w, x, y, z);
     }
 
+    /** Let's try to use Orientation */
+    @Deprecated
     public boolean isSolidOnSide(int side) {
+        return w.isBlockSolidOnSide(x, y, z, Orientation.getOrientation(side));
+    }
+    
+    public boolean isSolidOnSide(Orientation side) {
         return w.isBlockSolidOnSide(x, y, z, side);
     }
 

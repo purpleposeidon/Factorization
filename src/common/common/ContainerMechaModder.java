@@ -178,14 +178,14 @@ public class ContainerMechaModder extends Container {
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 Slot s = new Slot(inv, col + row * 9 + 9, 8 + col * 18, 116 + row * 18);
-                this.addSlot(s);
+                this.addSlotToContainer(s);
                 playerSlots.add(s);
             }
         }
 
         for (int col = 0; col < 9; col++) {
             Slot s = new Slot(inv, col, 8 + col * 18, 174);
-            this.addSlot(s);
+            this.addSlotToContainer(s);
             playerSlots.add(s);
         }
 
@@ -193,12 +193,12 @@ public class ContainerMechaModder extends Container {
         ArrayList<Slot> upgrades = new ArrayList(8);
         for (int col = 0; col < 8; col++) {
             Slot u = new Slot(upgrader, 101 + col, 27 + col * 18, 7);
-            this.addSlot(u);
+            this.addSlotToContainer(u);
             upgrades.add(u);
         }
         //slot for the armor
         armorSlot = new SlotMechaArmor(upgrader, 100, 7, 7, upgrades);
-        this.addSlot(armorSlot);
+        this.addSlotToContainer(armorSlot);
         upgradeSlots.add(armorSlot);
         upgradeSlots.addAll(upgrades);
     }

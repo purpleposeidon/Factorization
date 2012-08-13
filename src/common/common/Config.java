@@ -3,7 +3,8 @@ package factorization.common;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
-import net.minecraft.src.forge.Configuration;
+import net.minecraftforge.common.Configuration;
+
 
 public class Config {
     @Conf("serverAdmin")

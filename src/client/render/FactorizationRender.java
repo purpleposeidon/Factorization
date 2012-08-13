@@ -6,7 +6,7 @@ import net.minecraft.src.ModLoader;
 import net.minecraft.src.RenderBlocks;
 import net.minecraft.src.Tessellator;
 import net.minecraft.src.TileEntity;
-import net.minecraft.src.forge.MinecraftForgeClient;
+import net.minecraftforge.client.MinecraftForgeClient;
 
 import org.lwjgl.opengl.GL11;
 
@@ -310,7 +310,7 @@ public class FactorizationRender {
                 md = -1;
             }
             if (FactoryType.SOLARTURBINE.is(md)) {
-                renderSolarTurbine(renderBlocks, ((TileEntitySolarTurbine) te).water_level, new Coord(te));
+                renderSolarTurbine(renderBlocks, ((TileEntitySolarTurbine) te).water_level, ((TileEntitySolarTurbine) te).getCoord());
                 return true;
             }
             if (!first_pass) {

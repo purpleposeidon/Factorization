@@ -7,10 +7,9 @@ import net.minecraft.src.Block;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Material;
 import net.minecraft.src.World;
-import net.minecraft.src.forge.ITextureProvider;
 import factorization.api.Coord;
 
-public class BlockResource extends Block implements ITextureProvider {
+public class BlockResource extends Block {
     protected BlockResource(int id) {
         super(id, Material.rock);
         setHardness(2.0F);
@@ -49,8 +48,9 @@ public class BlockResource extends Block implements ITextureProvider {
         itemList.add(Core.registry.mechaworkshop_item);
     }
 
+    
     @Override
-    public boolean blockActivated(World w, int x, int y, int z, EntityPlayer player) {
+    public boolean onBlockActivated(World w, int x, int y, int z, EntityPlayer player, int md, float vx, float vy, float vz) {
         if (player.isSneaking()) {
             return false;
         }

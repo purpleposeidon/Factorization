@@ -6,6 +6,10 @@ import java.util.Iterator;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NBTTagList;
+import net.minecraftforge.common.ISidedInventory;
+import net.minecraftforge.common.Orientation;
+import static net.minecraftforge.common.Orientation.*;
+
 
 public class TileEntityStamper extends TileEntityFactorization {
     // save these naughty juvenile males
@@ -24,10 +28,10 @@ public class TileEntityStamper extends TileEntityFactorization {
     }
 
     @Override
-    public int getStartInventorySide(int side) {
+    public int getStartInventorySide(Orientation side) {
         switch (side) {
-        case 0:
-        case 1:
+        case UP:
+        case DOWN:
             return 0;
         default:
             return 1;
@@ -35,7 +39,7 @@ public class TileEntityStamper extends TileEntityFactorization {
     }
 
     @Override
-    public int getSizeInventorySide(int side) {
+    public int getSizeInventorySide(Orientation side) {
         return 1;
     }
 

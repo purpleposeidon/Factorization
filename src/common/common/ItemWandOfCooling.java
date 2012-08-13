@@ -2,15 +2,16 @@ package factorization.common;
 
 import java.util.Arrays;
 
+import factorization.api.Coord;
+
 import net.minecraft.src.Block;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.World;
-import net.minecraft.src.forge.ITextureProvider;
 
-public class ItemWandOfCooling extends Item implements ITextureProvider {
+public class ItemWandOfCooling extends Item {
     static int changeArray[] = new int[0xFF];
     final int max_change = 70;
     final int radius_tries = 50;
@@ -183,21 +184,20 @@ public class ItemWandOfCooling extends Item implements ITextureProvider {
     }
 
     @Override
-    public boolean onItemUse(ItemStack is, EntityPlayer player, World world, int x, int y, int z,
-            int side) {
-        if (!Core.instance.isCannonical(world)) {
+    public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side, float vecx, float vecy, float vecz) {
+        if (!Core.instance.isCannonical(w)) {
             return true;
         }
         reset();
         safetyFirst(player, 0);
         safetyFirst(player, 1);
-        changeArea(world, x, y, z, 1);
+        changeArea(w, x, y, z, 1);
         int real_max_radius = max_radius;
         if (player.isSneaking()) {
             real_max_radius *= 1.5;
         }
         for (int r = 2; r < real_max_radius; r++) {
-            changeRadius(world, x, y, z, r);
+            changeRadius(w, x, y, z, r);
         }
 
         int damage = Math.min(max_change - change_count, 1);
@@ -210,7 +210,7 @@ public class ItemWandOfCooling extends Item implements ITextureProvider {
 
     @Override
     public ItemStack onItemRightClick(ItemStack is, World world, EntityPlayer player) {
-        onItemUse(is, player, world, (int) player.posX, (int) player.posY, (int) player.posZ, 0);
+        tryPlaceIntoWorld(is, player, world, (int) player.posX, (int) player.posY, (int) player.posZ, 0, 0, 0, 0);
         return is;
     }
 

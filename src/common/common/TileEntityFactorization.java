@@ -11,8 +11,8 @@ import net.minecraft.src.IInventory;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NBTTagList;
-import net.minecraft.src.Vec3D;
-import net.minecraft.src.forge.ISidedInventory;
+import net.minecraft.src.Vec3;
+import net.minecraftforge.common.ISidedInventory;
 import factorization.api.Coord;
 import factorization.api.ICoord;
 import factorization.api.IFactoryType;
@@ -107,7 +107,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
 
     @Override
     public final Coord getCoord() {
-        return new Coord(this);
+        return new Coord(worldObj, this);
     }
 
     @Override
@@ -161,7 +161,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         }
         if (player != null) {
             // point velocity towards player
-            Vec3D vec = Vec3D.createVectorHelper(player.posX - xCoord, player.posY - yCoord,
+            Vec3 vec = Vec3.createVectorHelper(player.posX - xCoord, player.posY - yCoord,
                     player.posZ - zCoord);
             vec.normalize();
             ent.motionX = vec.xCoord;

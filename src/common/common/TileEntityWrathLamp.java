@@ -9,8 +9,7 @@ import net.minecraft.src.Chunk;
 import net.minecraft.src.Entity;
 import net.minecraft.src.MovingObjectPosition;
 import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.Profiler;
-import net.minecraft.src.Vec3D;
+import net.minecraft.src.Vec3;
 import net.minecraft.src.World;
 
 public class TileEntityWrathLamp extends TileEntityCommon {
@@ -131,13 +130,13 @@ public class TileEntityWrathLamp extends TileEntityCommon {
 
     @Override
     public void updateEntity() {
-        Profiler.startSection("WrathLamp");
+        Core.instance.getProfiler().startSection("WrathLamp");
         this.updater = this.updater.update();
-        Profiler.endSection();
+        Core.instance.getProfiler().endSection();
     }
 
     void onRemove() {
-        Profiler.startSection("WrathLamp");
+        Core.instance.getProfiler().startSection("WrathLamp");
         for (int x = xCoord - radius; x <= xCoord + radius; x++) {
             for (int z = zCoord - radius; z <= zCoord + radius; z++) {
                 int id = worldObj.getBlockId(x, yCoord, z);
@@ -147,7 +146,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                 }
             }
         }
-        Profiler.endSection();
+        Core.instance.getProfiler().endSection();
     }
 
     @Override
@@ -168,12 +167,12 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         return Math.abs(a - b) < 0.9;
     }
 
-    boolean trace(Vec3D a, Vec3D b) {
+    boolean trace(Vec3 a, Vec3 b) {
         MovingObjectPosition trace = worldObj.rayTraceBlocks(a, b);
         if (trace == null) {
             return true;
         }
-        Vec3D hit = trace.hitVec;
+        Vec3 hit = trace.hitVec;
         if (eq(hit.xCoord, b.xCoord) && eq(hit.yCoord, b.yCoord) && eq(hit.zCoord, b.zCoord)) {
             return true;
         }

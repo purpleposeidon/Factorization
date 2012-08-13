@@ -21,13 +21,11 @@ import net.minecraft.src.ModLoader;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldProviderHell;
-import net.minecraft.src.forge.ICraftingHandler;
-import net.minecraft.src.forge.IOreHandler;
-import net.minecraft.src.forge.IPickupHandler;
-import net.minecraft.src.forge.MinecraftForge;
-import net.minecraft.src.forge.oredict.OreDictionary;
-import net.minecraft.src.forge.oredict.ShapedOreRecipe;
-import net.minecraft.src.forge.oredict.ShapelessOreRecipe;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.oredict.ShapedOreRecipe;
+import net.minecraftforge.oredict.ShapelessOreRecipe;
+import cpw.mods.fml.common.ICraftingHandler;
 import factorization.api.IActOnCraft;
 
 public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
@@ -471,7 +469,7 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
                 "W W",
                 "WWW",
                 'W', Block.wood,
-                '-', new ItemStack(Block.stairSingle, 1, 2));
+                '-', new ItemStack(Block.stoneSingleSlab, 1, 2));
 
         // Craft maker
         recipe(maker_item,
@@ -724,7 +722,7 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
         //(Like THAT would ever happen, ah ha ha ha ha ha ha ha ha ha ha ha ha ha.)
         TileEntityWrathLamp.handleAirUpdates();
         TileEntityWrathFire.updateCount = 0;
-        if (world.worldProvider instanceof WorldProviderHell) {
+        if (world.provider instanceof WorldProviderHell) {
             spawn_delay -= 1;
             if (spawn_delay <= 0) {
                 try {

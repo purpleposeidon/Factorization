@@ -2,10 +2,11 @@ package factorization.common;
 
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.forge.ISidedInventory;
+import net.minecraftforge.common.ISidedInventory;
+import net.minecraftforge.common.Orientation;
+import static net.minecraftforge.common.Orientation.*;
 
-public class TileEntityCutter extends TileEntityFactorization implements
-        ISidedInventory {
+public class TileEntityCutter extends TileEntityFactorization implements ISidedInventory {
     // Save these
     ItemStack head;
     ItemStack[] splits;
@@ -108,8 +109,8 @@ public class TileEntityCutter extends TileEntityFactorization implements
     }
 
     @Override
-    public int getStartInventorySide(int side) {
-        if (side == 1) {
+    public int getStartInventorySide(Orientation side) {
+        if (side == UP) {
             // top
             return 8;
         }
@@ -117,8 +118,8 @@ public class TileEntityCutter extends TileEntityFactorization implements
     }
 
     @Override
-    public int getSizeInventorySide(int side) {
-        if (side == 1) {
+    public int getSizeInventorySide(Orientation side) {
+        if (side == UP) {
             // top
             return 1;
         }

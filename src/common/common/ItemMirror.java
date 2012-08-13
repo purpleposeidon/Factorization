@@ -4,9 +4,8 @@ import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.World;
-import net.minecraft.src.forge.ITextureProvider;
 
-public class ItemMirror extends Item implements ITextureProvider {
+public class ItemMirror extends Item {
 
     protected ItemMirror(int par1) {
         super(par1);
@@ -14,12 +13,11 @@ public class ItemMirror extends Item implements ITextureProvider {
         setTextureFile(Core.texture_file_item);
     }
 
-    @Override
-    public boolean onItemUse(ItemStack is, EntityPlayer player, World w, int x, int y, int z,
-            int side) {
+    
+    public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side, float vecx, float vecy, float vecz) {
         ItemStack proxy = Core.registry.mirror_item_hidden.copy();
         proxy.stackSize = is.stackSize;
-        boolean ret = proxy.getItem().onItemUse(proxy, player, w, x, y, z, side);
+        boolean ret = proxy.getItem().tryPlaceIntoWorld(proxy, player, w, x, y, z, side, vecx, vecy, vecz);
         is.stackSize = proxy.stackSize;
         return ret;
     }

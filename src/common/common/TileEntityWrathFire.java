@@ -13,8 +13,9 @@ import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 import factorization.api.Coord;
+import factorization.api.ICoord;
 
-public class TileEntityWrathFire extends TileEntity {
+public class TileEntityWrathFire extends TileEntity implements ICoord {
     //constants
     final int max_generation = 45;
     final int max_age = 35;
@@ -241,9 +242,14 @@ public class TileEntityWrathFire extends TileEntity {
             return false;
         }
     }
+    
+    @Override
+    public Coord getCoord() {
+        return new Coord(this.worldObj, this);
+    }
 
     void die() {
-        fire.set(new Coord(this));
+        fire.set(getCoord());
     }
 
     public static int updateCount = 0;
@@ -277,7 +283,7 @@ public class TileEntityWrathFire extends TileEntity {
             die();
             return;
         }
-        Coord here = new Coord(this);
+        Coord here = getCoord();
 
         //if (host.id == Block.netherBrick.blockID) {
         if (netherBrick.equals(host) || netherStair.equals(host) || netherFence.equals(host)) {

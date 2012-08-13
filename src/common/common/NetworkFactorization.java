@@ -22,9 +22,6 @@ import net.minecraft.src.StringTranslate;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.World;
-import net.minecraft.src.forge.IConnectionHandler;
-import net.minecraft.src.forge.IPacketHandler;
-import net.minecraft.src.forge.MessageManager;
 import factorization.api.Coord;
 
 public class NetworkFactorization implements IConnectionHandler, IPacketHandler {

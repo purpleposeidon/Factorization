@@ -9,7 +9,9 @@ import net.minecraft.src.Item;
 import net.minecraft.src.ItemBlock;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.forge.ISidedInventory;
+import net.minecraftforge.common.ISidedInventory;
+import net.minecraftforge.common.Orientation;
+import static net.minecraftforge.common.Orientation.*;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityMaker extends TileEntityFactorization implements
@@ -212,11 +214,11 @@ public class TileEntityMaker extends TileEntityFactorization implements
     }
 
     @Override
-    public int getStartInventorySide(int side) {
+    public int getStartInventorySide(Orientation side) {
         switch (side) {
-        case 0: // bottom
+        case DOWN:
             return craft_slot;
-        case 1:
+        case UP:
             return input_slot;
         default:
             return output_slot;
@@ -224,7 +226,7 @@ public class TileEntityMaker extends TileEntityFactorization implements
     }
 
     @Override
-    public int getSizeInventorySide(int side) {
+    public int getSizeInventorySide(Orientation side) {
         return 1;
     }
 

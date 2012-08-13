@@ -87,14 +87,14 @@ public class ContainerFactorization extends Container {
         switch (type) {
         case ROUTER:
             TileEntityRouter router = (TileEntityRouter) ent;
-            addSlot(new Slot(router, 0, 62, 22));
+            addSlotToContainer(new Slot(router, 0, 62, 22));
             for (int i = 0; i < 9; i++) {
-                addSlot(new StackLimitedSlot(1, router, 1 + i, 8 + i * 18, 44 - 0xFFFFFF));
+                addSlotToContainer(new StackLimitedSlot(1, router, 1 + i, 8 + i * 18, 44 - 0xFFFFFF));
             }
             break;
         case CUTTER:
             TileEntityCutter cutter = (TileEntityCutter) ent;
-            addSlot(new Slot(cutter, 8, 80, 17));
+            addSlotToContainer(new Slot(cutter, 8, 80, 17));
             for (int i = 0; i < 8; i++) {
                 int top = 41;
                 int left = 53;
@@ -103,35 +103,35 @@ public class ContainerFactorization extends Container {
                 }
                 left += (i % 4) * 18;
 
-                addSlot(new Slot(cutter, i, left, top));
+                addSlotToContainer(new Slot(cutter, i, left, top));
             }
             break;
         case MAKER:
             TileEntityMaker maker = (TileEntityMaker) ent;
             int[] ic = { Core.registry.item_craft.shiftedIndex };
             // input: No item_craft allowed!
-            addSlot(new FactorySlot(maker, 0, 58, 19, null, ic));
+            addSlotToContainer(new FactorySlot(maker, 0, 58, 19, null, ic));
             int[] fuel = { Core.registry.item_craft.shiftedIndex,
                     Item.paper.shiftedIndex, Item.book.shiftedIndex,
                     Block.bookShelf.blockID, Item.painting.shiftedIndex,
                     Item.map.shiftedIndex };
             // craft: Must be paper/craft
-            addSlot(new FactorySlot(maker, 1, 58, 55, fuel, null));
+            addSlotToContainer(new FactorySlot(maker, 1, 58, 55, fuel, null));
             // output: Nothing goes in
-            addSlot(new FactorySlot(maker, 2, 152, 37, null, null));
+            addSlotToContainer(new FactorySlot(maker, 2, 152, 37, null, null));
             break;
         case STAMPER:
         case PACKAGER:
             TileEntityStamper stamper = (TileEntityStamper) ent;
-            addSlot(new Slot(stamper, 0, 44, 43));
-            addSlot(new FactorySlot(stamper, 1, 116, 43, null, null));
+            addSlotToContainer(new Slot(stamper, 0, 44, 43));
+            addSlotToContainer(new FactorySlot(stamper, 1, 116, 43, null, null));
             break;
         case SLAGFURNACE:
             TileEntitySlagFurnace furnace = (TileEntitySlagFurnace) ent;
-            addSlot(new Slot(furnace, 0, 56, 17));
-            addSlot(new Slot(furnace, 1, 56, 53));
-            addSlot(new Slot(furnace, 2, 115, 34));
-            addSlot(new Slot(furnace, 3, 141, 34));
+            addSlotToContainer(new Slot(furnace, 0, 56, 17));
+            addSlotToContainer(new Slot(furnace, 1, 56, 53));
+            addSlotToContainer(new Slot(furnace, 2, 115, 34));
+            addSlotToContainer(new Slot(furnace, 3, 141, 34));
             break;
         default:
             break;
@@ -146,12 +146,12 @@ public class ContainerFactorization extends Container {
         player_slot_start = inventorySlots.size();
         for (int i = 0; i < 3; i++) {
             for (int k = 0; k < 9; k++) {
-                addSlot(new Slot(inventoryplayer, k + i * 9 + 9, invdx + 8 + k * 18, invdy + 84 + i * 18));
+                addSlotToContainer(new Slot(inventoryplayer, k + i * 9 + 9, invdx + 8 + k * 18, invdy + 84 + i * 18));
             }
         }
 
         for (int j = 0; j < 9; j++) {
-            addSlot(new Slot(inventoryplayer, j, 8 + j * 18, 142));
+            addSlotToContainer(new Slot(inventoryplayer, j, 8 + j * 18, 142));
         }
         player_slot_end = inventorySlots.size();
         slot_start = 0;

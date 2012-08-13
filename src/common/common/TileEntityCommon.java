@@ -12,7 +12,7 @@ import net.minecraft.src.MovingObjectPosition;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.Packet;
 import net.minecraft.src.TileEntity;
-import net.minecraft.src.Vec3D;
+import net.minecraft.src.Vec3;
 import net.minecraft.src.World;
 import factorization.api.Coord;
 import factorization.api.ICoord;
@@ -69,7 +69,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     }
 
     public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z,
-            Vec3D startVec, Vec3D endVec) {
+            Vec3 startVec, Vec3 endVec) {
         return Block.stone.collisionRayTrace(worldObj, xCoord, yCoord, zCoord, startVec, endVec);
     }
 
@@ -92,7 +92,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
 
     @Override
     public Coord getCoord() {
-        return new Coord(this);
+        return new Coord(worldObj, this);
     }
 
     public boolean activate(EntityPlayer entityplayer) {

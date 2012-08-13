@@ -1,7 +1,5 @@
 package factorization.common;
 
-import factorization.api.Coord;
-import factorization.api.IMechaUpgrade;
 import net.minecraft.src.Block;
 import net.minecraft.src.DamageSource;
 import net.minecraft.src.EntityLiving;
@@ -9,10 +7,11 @@ import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.Material;
-import net.minecraft.src.forge.ArmorProperties;
-import net.minecraft.src.forge.ITextureProvider;
+import net.minecraftforge.common.ISpecialArmor.ArmorProperties;
+import factorization.api.Coord;
+import factorization.api.IMechaUpgrade;
 
-class MechaBuoyantBarrel extends Item implements IMechaUpgrade, ITextureProvider {
+class MechaBuoyantBarrel extends Item implements IMechaUpgrade {
 
     protected MechaBuoyantBarrel(int par1) {
         super(par1);
