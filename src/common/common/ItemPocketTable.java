@@ -52,7 +52,7 @@ public class ItemPocketTable extends Item {
         player.openGui(Core.instance, FactoryType.POCKETCRAFTGUI.gui, null, 0, 0, 0);
         if (save != null) {
             player.inventory.setItemStack(save);
-            Core.instance.updateHeldItem(player);
+            Core.proxy.updateHeldItem(player);
         }
         return stack;
     }

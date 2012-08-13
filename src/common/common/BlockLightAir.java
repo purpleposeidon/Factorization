@@ -168,6 +168,6 @@ public class BlockLightAir extends Block {
 
     //@Override -- server. I am so sick and tired of your BULLSHIT
     public void randomDisplayTick(World w, int x, int y, int z, Random rand) {
-        Core.instance.randomDisplayTickFor(w, x, y, z, rand);
+        Core.proxy.randomDisplayTickFor(w, x, y, z, rand);
     }
 }

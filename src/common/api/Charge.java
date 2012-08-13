@@ -49,7 +49,7 @@ public class Charge {
      */
     public static void update(IChargeConductor te) {
         Coord here = te.getCoord();
-        if (!Core.instance.isCannonical(here.w)) {
+        if (!Core.isCannonical()) {
             return;
         }
         Charge me = te.getCharge();

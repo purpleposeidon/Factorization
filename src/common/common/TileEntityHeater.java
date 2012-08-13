@@ -86,7 +86,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
 
     @Override
     public void updateEntity() {
-        if (!Core.instance.isCannonical(worldObj)) {
+        if (!Core.isCannonical()) {
             return;
         }
         updateClient();

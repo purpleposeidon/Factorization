@@ -56,7 +56,7 @@ public enum Sound {
         if (!share) {
             return;
         }
-        if (!Core.instance.isCannonical(w)) {
+        if (!Core.isCannonical()) {
             return;
         }
         Core.network.broadcastMessage(null, new Coord(w, x, y, z), MessageType.PlaySound, index, x, y, z);
@@ -65,7 +65,7 @@ public enum Sound {
     static void receive(DataInput input) {
         try {
             int index = input.readInt(), x = input.readInt(), y = input.readInt(), z = input.readInt();
-            EntityPlayer player = Core.instance.getClientPlayer();
+            EntityPlayer player = Core.proxy.getClientPlayer();
             if (player == null) {
                 return;
             }
@@ -90,7 +90,7 @@ public enum Sound {
     }
 
     public void play() {
-        Core.instance.playSoundFX(src, volume, pitch);
+        Core.proxy.playSoundFX(src, volume, pitch);
         if (share) {
             throw new RuntimeException("sharing simple play() not implemented");
         }

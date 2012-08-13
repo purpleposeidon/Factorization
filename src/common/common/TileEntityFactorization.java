@@ -122,7 +122,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
 
     @Override
     void useExtraInfo(byte b) {
-        if (Core.instance.isCannonical(worldObj)) {
+        if (Core.isCannonical()) {
             return;
         }
         facing_direction = b;
@@ -130,7 +130,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
 
     @Override
     void useExtraInfo2(byte b) {
-        if (Core.instance.isCannonical(worldObj)) {
+        if (Core.isCannonical()) {
             return;
         }
         draw_active = b;
@@ -301,7 +301,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         }
         if (draw_active != new_active) {
             draw_active = (byte) new_active;
-            if (Core.instance.isCannonical(worldObj)) {
+            if (Core.isCannonical()) {
                 broadcastMessage(null, MessageType.DrawActive, draw_active);
             }
         }
@@ -315,7 +315,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
             worldObj.markBlockNeedsUpdate(xCoord, yCoord, zCoord);
             draw_active--;
         }
-        if (!Core.instance.isCannonical(worldObj)) {
+        if (!Core.isCannonical()) {
             return;
         }
         if (need_logic_check && 0 == worldObj.getWorldTime() % getLogicSpeed()) {

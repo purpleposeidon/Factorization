@@ -256,7 +256,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
 
     @Override
     public void updateEntity() {
-        if (Core.instance.isCannonical(worldObj)) {
+        if (Core.isCannonical()) {
             doUpdate();
         }
     }

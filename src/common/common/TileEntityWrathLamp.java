@@ -130,13 +130,13 @@ public class TileEntityWrathLamp extends TileEntityCommon {
 
     @Override
     public void updateEntity() {
-        Core.instance.getProfiler().startSection("WrathLamp");
+        Core.proxy.getProfiler().startSection("WrathLamp");
         this.updater = this.updater.update();
-        Core.instance.getProfiler().endSection();
+        Core.proxy.getProfiler().endSection();
     }
 
     void onRemove() {
-        Core.instance.getProfiler().startSection("WrathLamp");
+        Core.proxy.getProfiler().startSection("WrathLamp");
         for (int x = xCoord - radius; x <= xCoord + radius; x++) {
             for (int z = zCoord - radius; z <= zCoord + radius; z++) {
                 int id = worldObj.getBlockId(x, yCoord, z);
@@ -146,7 +146,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                 }
             }
         }
-        Core.instance.getProfiler().endSection();
+        Core.proxy.getProfiler().endSection();
     }
 
     @Override

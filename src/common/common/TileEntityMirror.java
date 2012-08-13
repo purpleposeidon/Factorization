@@ -59,7 +59,7 @@ public class TileEntityMirror extends TileEntityCommon {
     
     @Override
     public void neighborChanged() {
-        if (Core.instance.isCannonical(worldObj)) {
+        if (Core.isCannonical()) {
             search_delay = trace_check = 1;
         }
     }
@@ -135,7 +135,7 @@ public class TileEntityMirror extends TileEntityCommon {
             return;
         }
         setRotation(clipAngle(-clipAngle((int) player.rotationYaw + 270)));
-        //		if (Core.instance.isCannonical(worldObj)) {
+        //		if (Core.isCannonical()) {
         //			broadcastMessage(null, getDescriptionPacket());
         //		}
     }
@@ -159,7 +159,7 @@ public class TileEntityMirror extends TileEntityCommon {
     @Override
     public void updateEntity() {
         //		if we don't have a target, spin about
-        boolean cannon = Core.instance.isCannonical(worldObj);
+        boolean cannon = Core.isCannonical();
         if (!cannon) {
             if (target_rotation == -99) {
                 rotation++;

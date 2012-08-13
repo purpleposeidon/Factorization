@@ -1,11 +1,29 @@
 package factorization.common;
 
 import java.io.File;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.FMLLog;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.Mod.Init;
+import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.Mod.PostInit;
+import cpw.mods.fml.common.Mod.PreInit;
+import cpw.mods.fml.common.Side;
+import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.network.IGuiHandler;
+import cpw.mods.fml.common.network.NetworkMod;
+import cpw.mods.fml.common.network.NetworkRegistry;
 
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
@@ -16,71 +34,32 @@ import net.minecraft.src.Profiler;
 import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldGenMinable;
-import net.minecraftforge.common.IGuiHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.common.Configuration;
 import factorization.api.Coord;
 
-public abstract class Core extends NetworkMod implements IGuiHandler {
-    /** Wrapper for client */
-    public abstract void addName(Object what, String string);
+@Mod(modid = "factorization", name = "Factorization", version = Core.version)
+@NetworkMod(
+        clientSideRequired = true,
+        packetHandler = NetworkFactorization.class,
+        connectionHandler = NetworkFactorization.class,
+        channels = {NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel}
+)
+public abstract class Core {
+    public static final String version = "0.5.0";
+    // runtime storage
+    @Instance
+    public static Core instance;
+    public static Registry registry;
+    @SidedProxy(clientSide = "")
+    public static FactorizationProxy proxy;
+    public static NetworkFactorization network;
+    public static int factory_rendertype;
 
-    /** Wrapper for client */
-    public abstract String translateItemStack(ItemStack here);
-
-    /** Return false if we're an SMP client */
-    public abstract boolean isCannonical(World world);
-
-    public abstract boolean isServer();
-
-    /** Send a chat message to the client to translate */
-    public abstract void broadcastTranslate(EntityPlayer who, String... msg);
-
-    /** Get a configuration instance */
-    public abstract Configuration getConfig();
-
-    /** Get the save directory for a world */
-    public abstract File getWorldSaveDir(World world);
-
-    /** If on SMP, send packet to tell player what he's holding */
-    public void updateHeldItem(EntityPlayer player) {
-    }
-
-    public abstract void pokeChest(TileEntityChest chest);
-
-    public EntityPlayer getClientPlayer() {
-        return null;
-    }
-
-    public void randomDisplayTickFor(World w, int x, int y, int z, Random rand) {
-    }
-
-    public void pokePocketCrafting() {
-    }
-
-    public void playSoundFX(String src, float volume, float pitch) {
-    }
-
-    public void updatePlayerInventory(EntityPlayer player) {
-    }
-
-    public abstract void make_recipes_side();
-
-    protected abstract EntityPlayer getPlayer(NetHandler handler);
-
-    protected abstract void addPacket(EntityPlayer player, Packet packet);
-
-    public boolean playerListensToCoord(EntityPlayer player, Coord c) {
-        return true;
-    }
-
-    public abstract boolean isPlayerAdmin(EntityPlayer player);
-    
-    public abstract Profiler getProfiler();
-
-    // configificable
+    // Configuration
+    Configuration config;
     public static int factory_block_id = 254;
     public static int lightair_id = 253;
     public static int resource_id = 252;
@@ -95,21 +74,12 @@ public abstract class Core extends NetworkMod implements IGuiHandler {
     public static boolean spread_wrathfire = true;
     public static boolean pocket_craft_anywhere = true;
     public static boolean bag_swap_anywhere = true;
+    
+    // universal constant config
+    public final static String texture_dir = "/factorization/texture/";
+    public final static String texture_file_block = texture_dir + "blocks.png";
+    public final static String texture_file_item = texture_dir + "items.png";
 
-    // universal config
-    public static String texture_dir = "/factorization/texture/";
-    public static String texture_file_block = texture_dir + "blocks.png";
-    public static String texture_file_item = texture_dir + "items.png";
-
-    // runtime storage
-    public static Core instance;
-    public static Registry registry;
-    public static NetworkFactorization network;
-    final static Charset utf8 = Charset.forName("UTF-8");
-    public static int factory_rendertype;
-    WorldGenMinable silverGen;
-
-    Configuration config;
 
     private int getBlockConfig(String name, int defaultId, String comment) {
         Property prop = config.getOrCreateBlockIdProperty(name, defaultId);
@@ -143,9 +113,16 @@ public abstract class Core extends NetworkMod implements IGuiHandler {
         return prop.value;
     }
 
-    void loadConfig() {
-        config = getConfig();
-        config.load();
+
+    @PreInit
+    public void loadConfig(FMLPreInitializationEvent event) {
+        config = new Configuration(event.getSuggestedConfigurationFile());
+        try {
+            config.load();
+        } catch (Exception e) {
+            FMLLog.severe("Error loading config: %s", e.toString());
+            e.printStackTrace();
+        }
         factory_block_id = getBlockConfig("factoryBlockId", factory_block_id, "Factorization Machines.");
         lightair_id = getBlockConfig("lightAirBlockId", lightair_id, "WrathFire and invisible lamp-air made by WrathLamps");
         resource_id = getBlockConfig("resourceBlockId", resource_id, "Ores and metal blocks mostly");
@@ -180,51 +157,26 @@ public abstract class Core extends NetworkMod implements IGuiHandler {
 
         config.save();
     }
-
-    @Override
-    public String getVersion() {
-        return "0.4.0";
-    }
-
-    @Override
-    public String getName() {
-        return "Factorization";
-    }
-
-    boolean is_loaded = false;
-
-    @Override
-    public void load() {
-        if (is_loaded) {
-            return;
-        }
-        is_loaded = true;
-        loadConfig();
-        instance = this;
+    
+    @Init
+    public void load(FMLInitializationEvent event) {
         registry = new Registry();
-        network = new NetworkFactorization();
         registry.makeBlocks();
         registry.registerSimpleTileEntities();
-        make_recipes_side();
+        proxy.makeItemsSide();
         registry.makeItems();
+        registry.makeOther();
         registry.makeRecipes();
         registry.setToolEffectiveness();
 
-        silverGen = new WorldGenMinable(resource_id, 35);
-
-        MinecraftForge.registerConnectionHandler(network);
-        MinecraftForge.setGuiHandler(this, this);
-        MinecraftForge.registerCraftingHandler(registry);
-        MinecraftForge.registerPickupHandler(registry);
-        OreDictionary.registerOreHandler(registry);
-        MinecraftForge.registerChunkLoadHandler(TileEntityWatchDemon.loadHandler);
-        MinecraftForge.registerSaveHandler(TileEntityWatchDemon.loadHandler);
-        ModLoader.setInGameHook(this, true, true);
+        NetworkRegistry.instance().registerGuiHandler(this, proxy);
+        MinecraftForge.EVENT_BUS.register(registry);
+        MinecraftForge.EVENT_BUS.register(TileEntityWatchDemon.loadHandler);
         config.save();
     }
 
-    @Override
-    public void modsLoaded() {
+    @PostInit
+    public void modsLoaded(FMLPostInitializationEvent event) {
         TileEntityWrathFire.setupBurning();
     }
 
@@ -237,34 +189,6 @@ public abstract class Core extends NetworkMod implements IGuiHandler {
         }
         return null;
 
-    }
-
-    @Override
-    public boolean clientSideRequired() {
-        return true;
-    }
-
-    @Override
-    public boolean serverSideRequired() {
-        return false;
-    }
-
-    @Override
-    public void generateSurface(World w, Random rand, int cx, int cz) {
-        if (!gen_silver_ore) {
-            return;
-        }
-        //only gen in 1/4 of the chunks or something
-        if (rand.nextFloat() > 0.35) {
-            return;
-        }
-        if (Math.abs(cx + cz) % 3 == 1) {
-            return;
-        }
-        int x = cx + rand.nextInt(16);
-        int z = cz + rand.nextInt(16);
-        int y = 5 + rand.nextInt(48);
-        silverGen.generate(w, rand, x, y, z);
     }
 
     enum KeyState {
@@ -363,4 +287,19 @@ public abstract class Core extends NetworkMod implements IGuiHandler {
         }
     }
 
+    
+    public static boolean isCannonical() {
+        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+            return false;
+        }
+        return true;
+    }
+    
+    public static boolean isServer() {
+        return FMLCommonHandler.instance().getSide() != Side.CLIENT;
+    }
+    
+    public static void logWarning(String format, Object... data) {
+        FMLLog.warning("Factorization: " + format, data);
+    }
 }

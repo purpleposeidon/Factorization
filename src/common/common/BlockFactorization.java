@@ -85,7 +85,7 @@ public class BlockFactorization extends BlockContainer {
         TileEntityCommon t = new Coord(world, x, y, z).getTE(TileEntityCommon.class);
 
         if (t != null) {
-            if (Core.instance.isCannonical(world)) {
+            if (Core.isCannonical()) {
                 return t.activate(entityplayer);
             }
 
@@ -93,11 +93,11 @@ public class BlockFactorization extends BlockContainer {
         }
         else {
             //info message
-            if (!Core.instance.isCannonical(world)) {
+            if (!Core.isCannonical()) {
                 return false; //...?
             }
             entityplayer.addChatMessage("This block is missing its TileEntity, possibly due to a bug in Factorization.");
-            if (Core.instance.isPlayerAdmin(entityplayer) || entityplayer.capabilities.isCreativeMode) {
+            if (Core.proxy.isPlayerAdmin(entityplayer) || entityplayer.capabilities.isCreativeMode) {
                 entityplayer.addChatMessage("The block and its contents can not be recovered.");
             } else {
                 entityplayer.addChatMessage("It can not be repaired without cheating.");
@@ -111,7 +111,7 @@ public class BlockFactorization extends BlockContainer {
             EntityPlayer entityplayer) {
         // left click
 
-        if (!Core.instance.isCannonical(world)) {
+        if (!Core.isCannonical()) {
             return;
         }
 
@@ -371,7 +371,7 @@ public class BlockFactorization extends BlockContainer {
 
     //@Override ser-ver ser-ver
     public void randomDisplayTick(World w, int x, int y, int z, Random rand) {
-        Core.instance.randomDisplayTickFor(w, x, y, z, rand);
+        Core.proxy.randomDisplayTickFor(w, x, y, z, rand);
     }
 
     @Override

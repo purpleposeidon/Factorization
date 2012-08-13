@@ -8,7 +8,7 @@ public class ItemCraftingComponent extends Item {
     public ItemCraftingComponent(int id, String itemName, int icon) {
         super(id);
         setItemName(itemName);
-        Core.instance.addName(this, itemName);
+        Core.proxy.addName(this, itemName);
         this.icon = icon;
     }
 

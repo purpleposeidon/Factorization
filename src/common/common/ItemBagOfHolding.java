@@ -91,7 +91,7 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
         else {
             swapItems(player);
         }
-        Core.instance.pokePocketCrafting();
+        Core.proxy.pokePocketCrafting();
     }
 
     int findBag(EntityPlayer player) {

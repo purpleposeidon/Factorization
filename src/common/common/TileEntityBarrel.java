@@ -223,9 +223,9 @@ public class TileEntityBarrel extends TileEntityFactorization {
         if (item == null && getItemCount() == 0) {
             entityplayer.addChatMessage("This barrel is empty");
         } else if (getItemCount() >= maxBarrelSize) {
-            Core.instance.broadcastTranslate(entityplayer, "This barrel is full of %s", Core.instance.translateItemStack(item));
+            Core.proxy.broadcastTranslate(entityplayer, "This barrel is full of %s", Core.proxy.translateItemStack(item));
         } else {
-            Core.instance.broadcastTranslate(entityplayer, "This barrel contains %s %s", "" + getItemCount(), Core.instance.translateItemStack(item));
+            Core.proxy.broadcastTranslate(entityplayer, "This barrel contains %s %s", "" + getItemCount(), Core.proxy.translateItemStack(item));
         }
     }
 
@@ -244,13 +244,13 @@ public class TileEntityBarrel extends TileEntityFactorization {
     }
 
     void broadcastItem() {
-        if (worldObj != null && Core.instance.isCannonical(worldObj)) {
+        if (worldObj != null && Core.isCannonical()) {
             Core.network.broadcastMessage(null, getCoord(), MessageType.BarrelItem, item);
         }
     }
 
     void broadcastItemCount() {
-        if (worldObj != null && Core.instance.isCannonical(worldObj)) {
+        if (worldObj != null && Core.isCannonical()) {
             Core.network.broadcastMessage(null, getCoord(), MessageType.BarrelCount, getItemCount());
         }
     }
@@ -274,7 +274,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     @Override
     public boolean activate(EntityPlayer entityplayer) {
         // right click: put an item in
-        if (!Core.instance.isCannonical(entityplayer.worldObj)) {
+        if (!Core.isCannonical()) {
             return true;
         }
         if (worldObj.getWorldTime() - lastClick < 10 && item != null) {
@@ -305,7 +305,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
         taintBarrel(is);
 
         if (!itemMatch(is)) {
-            if (Core.instance.translateItemStack(is).equals(Core.instance.translateItemStack(item))) {
+            if (Core.proxy.translateItemStack(is).equals(Core.proxy.translateItemStack(item))) {
                 entityplayer.addChatMessage("That item is different");
             } else {
                 info(entityplayer);
@@ -329,7 +329,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     @Override
     public void click(EntityPlayer entityplayer) {
         // left click: remove a stack
-        if (!Core.instance.isCannonical(entityplayer.worldObj)) {
+        if (!Core.isCannonical()) {
             return;
         }
         if (getItemCount() == 0 || item == null) {
@@ -351,7 +351,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
             taintBarrel(hand);
         }
         if (hand != null && !itemMatch(hand)) {
-            if (Core.instance.translateItemStack(hand).equals(Core.instance.translateItemStack(item))) {
+            if (Core.proxy.translateItemStack(hand).equals(Core.proxy.translateItemStack(item))) {
                 entityplayer.addChatMessage("That item is different");
             } else {
                 info(entityplayer);
@@ -384,7 +384,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
         }
         changeItemCount(total_delta);
         if (total_delta > 0) {
-            Core.instance.updatePlayerInventory(entityplayer);
+            Core.proxy.updatePlayerInventory(entityplayer);
         }
     }
 

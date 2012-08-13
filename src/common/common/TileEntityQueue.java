@@ -161,15 +161,15 @@ public class TileEntityQueue extends TileEntityFactorization implements
             }
             ItemStack f = items.getFirst();
             if (items.size() > 1) {
-                Core.instance.broadcastTranslate(entityplayer,
+                Core.proxy.broadcastTranslate(entityplayer,
                         "The queue containts %s %s and %s other items", ""
                                 + f.stackSize,
-                        Core.instance.translateItemStack(f), ""
+                        Core.proxy.translateItemStack(f), ""
                                 + (items.size() - 1));
             } else {
-                Core.instance.broadcastTranslate(entityplayer,
+                Core.proxy.broadcastTranslate(entityplayer,
                         "The queue containts %s %s", "" + f.stackSize,
-                        Core.instance.translateItemStack(f));
+                        Core.proxy.translateItemStack(f));
             }
             return true;
         }

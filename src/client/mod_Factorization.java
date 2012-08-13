@@ -118,24 +118,9 @@ public class mod_Factorization extends Core {
         map.put(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
     }
 
-    @Override
-    public void broadcastTranslate(EntityPlayer who, String... msg) {
-        String format = msg[0];
-        String params[] = new String[msg.length - 1];
-        System.arraycopy(msg, 1, params, 0, msg.length - 1);
-        try {
-            who.addChatMessage(String.format(format, (Object[]) params));
-        } catch (IllegalFormatException e) {
-        }
-    }
+    
 
-    @Override
-    protected void addPacket(EntityPlayer player, Packet packet) {
-        World w = ModLoader.getMinecraftInstance().theWorld;
-        if (w != null && !isCannonical(w)) {
-            ModLoader.getMinecraftInstance().getSendQueue().addToSendQueue(packet);
-        }
-    }
+    
 
     @Override
     public boolean isCannonical(World world) {
@@ -150,10 +135,7 @@ public class mod_Factorization extends Core {
         ModLoader.addName(what, string);
     }
 
-    @Override
-    protected EntityPlayer getPlayer(NetHandler handler) {
-        return ModLoader.getMinecraftInstance().thePlayer;
-    }
+    
 
     @Override
     public String translateItemStack(ItemStack here) {
@@ -252,7 +234,7 @@ public class mod_Factorization extends Core {
             return;
         }
         if (key == bag_swap_key) {
-            if (!Core.instance.bag_swap_anywhere && gui != null) {
+            if (!Core.proxy.bag_swap_anywhere && gui != null) {
                 return;
             }
             if (ModLoader.getMinecraftInstance().gameSettings.keyBindSneak.pressed) {
@@ -264,7 +246,7 @@ public class mod_Factorization extends Core {
             return;
         }
         if (key == pocket_key) {
-            if (!Core.instance.pocket_craft_anywhere && !(gui instanceof GuiPocketTable)) {
+            if (!Core.proxy.pocket_craft_anywhere && !(gui instanceof GuiPocketTable)) {
                 return;
             }
             if (ModLoader.getMinecraftInstance().currentScreen instanceof GuiPocketTable) {
@@ -317,7 +299,7 @@ public class mod_Factorization extends Core {
     @Override
     public boolean onTickInGame(float tickDelta, Minecraft mc) {
         fireParticlesSpawned = 0;
-        Core.instance.getProfiler().startSection("factorizationtick");
+        Core.proxy.getProfiler().startSection("factorizationtick");
         registry.onTickPlayer(mc.thePlayer);
         updatePlayerKeys();
         updateKeyStatus();
@@ -325,24 +307,18 @@ public class mod_Factorization extends Core {
             return true;
         }
         registry.onTickWorld(mc.theWorld);
-        Core.instance.getProfiler().endSection();
+        Core.proxy.getProfiler().endSection();
         return true;
     }
 
-    @Override
-    public void pokeChest(TileEntityChest chest) {
-        float angle = 1.0F;
-        if (chest.lidAngle < angle) {
-            chest.lidAngle = angle;
-        }
-    }
+    
 
     @Override
     public boolean renderWorldBlock(RenderBlocks renderBlocks, IBlockAccess world, int x, int y,
             int z, Block block, int render_type) {
-        Core.instance.getProfiler().startSection("factorization");
+        Core.proxy.getProfiler().startSection("factorization");
         boolean ret = FactorizationRender.renderWorldBlock(renderBlocks, world, x, y, z, block, render_type);
-        Core.instance.getProfiler().endSection();
+        Core.proxy.getProfiler().endSection();
         return ret;
     }
 
@@ -426,7 +402,7 @@ public class mod_Factorization extends Core {
         if (id == lightair_id) {
             if (md == registry.lightair_block.fire_md) {
                 int to_spawn = 1;
-                EntityPlayer player = Core.instance.getClientPlayer();
+                EntityPlayer player = Core.proxy.getClientPlayer();
                 boolean force = false;
                 boolean big = true;
                 if (player != null) {
@@ -477,24 +453,10 @@ public class mod_Factorization extends Core {
         }
     }
 
-    @Override
-    public File getWorldSaveDir(World world) {
-        String dotmc = ModLoader.getMinecraftInstance().getMinecraftDir().getPath();
-        char slash = File.separatorChar;
-        return new File(dotmc + slash + "saves" + slash + world.getSaveHandler().getSaveDirectoryName());
-    }
-
     //client-specific retarded java shit
     static public void loadTexture(RenderItem itemRender, String t) {
         RenderEngine engine = RenderManager.instance.renderEngine;
         engine.bindTexture(engine.getTexture(t));
     }
 
-    @Override
-    public void make_recipes_side() {
-        registry.mecha_head = new MechaArmorTextured(registry.itemID("mechaHead", 9010), 0);
-        registry.mecha_chest = new MechaArmorTextured(registry.itemID("mechaChest", 9011), 1);
-        registry.mecha_leg = new MechaArmorTextured(registry.itemID("mechaLeg", 9012), 2);
-        registry.mecha_foot = new MechaArmorTextured(registry.itemID("mechaFoot", 9013), 3);
-    }
 }

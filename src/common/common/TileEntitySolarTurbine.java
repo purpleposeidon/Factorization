@@ -132,7 +132,7 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
                 fan_rotation += fan_speed;
             }
         }
-        if (!Core.instance.isCannonical(worldObj)) {
+        if (!Core.isCannonical()) {
             return;
         }
         updateClients();

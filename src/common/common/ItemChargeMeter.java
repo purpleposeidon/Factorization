@@ -14,7 +14,7 @@ public class ItemChargeMeter extends Item {
     protected ItemChargeMeter(int par1) {
         super(par1);
         setItemName("factorization.chargemeter");
-        Core.instance.addName(this, "Charge Meter");
+        Core.proxy.addName(this, "Charge Meter");
         setIconIndex(6);
         setTextureFile(Core.texture_file_item);
     }
@@ -26,7 +26,7 @@ public class ItemChargeMeter extends Item {
         if (ic == null) {
             return false;
         }
-        if (!Core.instance.isCannonical(w)) {
+        if (!Core.isCannonical()) {
             return true;
         }
         int toLook = 5;

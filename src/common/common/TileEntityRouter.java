@@ -185,7 +185,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 
     @Override
     void doLogic() {
-        Core.instance.getProfiler().startSection("router");
+        Core.proxy.getProfiler().startSection("router");
         needLogic();
         if (lastSeenAt == null) {
             lastSeenAt = getCoord();
@@ -212,7 +212,7 @@ public class TileEntityRouter extends TileEntityFactorization {
                 break;
             }
         }
-        Core.instance.getProfiler().endSection();
+        Core.proxy.getProfiler().endSection();
     }
 
     TileEntity popFrontier() {
@@ -337,11 +337,11 @@ public class TileEntityRouter extends TileEntityFactorization {
     }
 
     boolean isIInventoryBanned(String name) {
-        if (Core.instance.routerBan == null) {
+        if (Core.proxy.routerBan == null) {
             //xu do mi tavla fo la .rAUterban.
             return false;
         }
-        Matcher m = Core.instance.routerBan.matcher(name);
+        Matcher m = Core.proxy.routerBan.matcher(name);
         return m.matches();
     }
 
@@ -713,7 +713,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         default:
             return false;
         }
-        if (need_share && Core.instance.isCannonical(worldObj)) {
+        if (need_share && Core.isCannonical()) {
             broadcastItem(messageType, null);
         }
         return true;
@@ -803,7 +803,7 @@ public class TileEntityRouter extends TileEntityFactorization {
             player.inventory.addItemStackToInventory(drop);
         }
         else {
-            if (Core.instance.isCannonical(worldObj)) {
+            if (Core.isCannonical()) {
                 player.addChatMessage("No upgrade");
             }
         }

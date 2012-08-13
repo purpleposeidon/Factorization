@@ -27,9 +27,9 @@ public class WireConnections {
         this.my_face_vector = my_face.toVector();
         this.here = me.getCoord();
 
-        Core.instance.getProfiler().startSection("factoryWire");
+        Core.proxy.getProfiler().startSection("factoryWire");
         calculate();
-        Core.instance.getProfiler().endSection();
+        Core.proxy.getProfiler().endSection();
     }
 
     void calculate() {

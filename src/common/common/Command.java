@@ -45,7 +45,7 @@ public enum Command {
         if (player == null) {
             return;
         }
-        if (!Core.instance.isCannonical(player.worldObj)) {
+        if (!Core.isCannonical()) {
             Core.network.sendCommand(player, this, arg);
             if (!shareCommand) {
                 return;

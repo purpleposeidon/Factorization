@@ -9,7 +9,7 @@ public class ItemMirror extends Item {
 
     protected ItemMirror(int par1) {
         super(par1);
-        Core.instance.addName(this, "Reflective Mirror");
+        Core.proxy.addName(this, "Reflective Mirror");
         setTextureFile(Core.texture_file_item);
     }
 

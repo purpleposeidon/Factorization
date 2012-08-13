@@ -29,7 +29,7 @@ public class MechaCobblestoneDrive extends Item implements IMechaUpgrade {
         if (!isEnabled) {
             return null;
         }
-        if (!Core.instance.isCannonical(player.worldObj)) {
+        if (!Core.isCannonical()) {
             return null;
         }
         if (!FactorizationUtil.itemCanFire(player.worldObj, upgrade, 40)) {

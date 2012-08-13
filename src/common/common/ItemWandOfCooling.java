@@ -51,7 +51,7 @@ public class ItemWandOfCooling extends Item {
     }
 
     void setBlock(World world, int x, int y, int z, int id) {
-        if (Core.instance.isCannonical(world)) {
+        if (Core.isCannonical()) {
             world.setBlockWithNotify(x, y, z, id);
         }
         soundCool(world, x, y, z);
@@ -185,7 +185,7 @@ public class ItemWandOfCooling extends Item {
 
     @Override
     public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side, float vecx, float vecy, float vecz) {
-        if (!Core.instance.isCannonical(w)) {
+        if (!Core.isCannonical()) {
             return true;
         }
         reset();
@@ -201,7 +201,7 @@ public class ItemWandOfCooling extends Item {
         }
 
         int damage = Math.min(max_change - change_count, 1);
-        if (damage > 0 && Core.instance.isCannonical(player.worldObj)) {
+        if (damage > 0 && Core.isCannonical()) {
             is.damageItem(damage, player);
         }
 

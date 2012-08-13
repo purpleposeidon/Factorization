@@ -17,7 +17,7 @@ public enum ResourceType {
 
     ItemStack itemStack(String name) {
         ItemStack ret = new ItemStack(Core.registry.item_resource, 1, this.md);
-        Core.instance.addName(ret, name);
+        Core.proxy.addName(ret, name);
         return ret;
     }
 }

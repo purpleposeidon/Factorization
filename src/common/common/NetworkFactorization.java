@@ -9,6 +9,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.IllegalFormatException;
 
+import cpw.mods.fml.common.network.IConnectionHandler;
+import cpw.mods.fml.common.network.IPacketHandler;
+import cpw.mods.fml.common.network.Player;
+
 import net.minecraft.src.Block;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.FactorizationHack;
@@ -24,29 +28,15 @@ import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.World;
 import factorization.api.Coord;
 
-public class NetworkFactorization implements IConnectionHandler, IPacketHandler {
-    protected final static String factorizeChannel = "factorize"; //used for tile entities
+public class NetworkFactorization implements IPacketHandler {
+    protected final static String factorizeTEChannel = "factorizeTE"; //used for tile entities
     protected final static String factorizeMsgChannel = "factorizeMsg"; //used for sending translatable chat messages
     protected final static String factorizeCmdChannel = "factorizeCmd"; //used for player keys
-
-    @Override
-    public void onConnect(NetworkManager network) {
-    };
-
-    @Override
-    public void onDisconnect(NetworkManager network, String message, Object[] args) {
-    };
-
-    private void registerChannel(NetworkManager network, String channel) {
-        MessageManager.getInstance().registerChannel(network, this, channel);
+    
+    public NetworkFactorization() {
+        Core.network = this;
     }
 
-    @Override
-    public void onLogin(NetworkManager network, Packet1Login login) {
-        registerChannel(network, factorizeChannel);
-        registerChannel(network, factorizeMsgChannel);
-        registerChannel(network, factorizeCmdChannel);
-    }
 
     public Packet250CustomPayload messagePacket(Coord src, int messageType, Object... items) {
         try {
@@ -80,7 +70,7 @@ public class NetworkFactorization implements IConnectionHandler, IPacketHandler 
             }
             output.flush();
             Packet250CustomPayload packet = new Packet250CustomPayload();
-            packet.channel = factorizeChannel;
+            packet.channel = factorizeTEChannel;
             packet.data = outputStream.toByteArray();
             packet.length = packet.data.length; // XXX this is stupid.
             return packet;
@@ -108,153 +98,7 @@ public class NetworkFactorization implements IConnectionHandler, IPacketHandler 
             return null;
         }
     }
-
-    static EntityPlayer currentPlayer = null;
-
-    @Override
-    public void onPacketData(NetworkManager network, String channel, byte[] data) {
-        //wow, long function...
-        EntityPlayer player = Core.instance.getPlayer(network.getNetHandler());
-        currentPlayer = player;
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
-        DataInput input = new DataInputStream(inputStream);
-        if (channel.equals(factorizeMsgChannel)) {
-            if (Core.instance.isServer()) {
-                return; // so, an SMP client sends *us* a message? Nah.
-            }
-            String main;
-            try {
-                main = input.readUTF();
-            } catch (IOException e1) {
-                return;
-            }
-            ArrayList<String> items = new ArrayList<String>();
-            try {
-                while (true) {
-                    String orig = input.readUTF();
-                    String name = orig + ".name";
-                    String transd = StringTranslate.getInstance().translateKey(name);
-                    if (transd.compareTo(name) == 0) {
-                        items.add(orig);
-                    } else {
-                        items.add(transd);
-                    }
-                }
-            } catch (IOException e) {
-            }
-            try {
-                player.addChatMessage(String.format(main, items.toArray()));
-            } catch (IllegalFormatException e) {
-                System.out.print("Illegal format: \"" + main + '"');
-                for (String i : items) {
-                    System.out.print(" \"" + i + "\"");
-                }
-                System.out.println();
-                e.printStackTrace();
-            }
-            return;
-        } else if (channel.equals(factorizeChannel)) {
-            try {
-                int x = input.readInt();
-                int y = input.readInt();
-                int z = input.readInt();
-                int messageType = input.readInt();
-
-                if (!player.worldObj.blockExists(x, y, z)) {
-                    // I suppose we can't avoid this.
-                    // (Unless we can get a proper server-side check)
-                    return;
-                }
-
-                if (messageType == MessageType.FactoryType) {
-                    //create a Tile Entity of that type there.
-                    FactoryType ft = FactoryType.fromMd(input.readInt());
-                    byte extraData = input.readByte();
-                    byte extraData2 = input.readByte();
-                    //There may be additional description data following this
-                    try {
-                        messageType = input.readInt();
-                    } catch (IOException e) {
-                        messageType = -1;
-                    }
-                    TileEntity spawn = ft.makeTileEntity();
-                    player.worldObj.setBlockTileEntity(x, y, z, spawn);
-
-                    if (spawn instanceof TileEntityCommon) {
-                        ((TileEntityCommon) spawn).useExtraInfo(extraData);
-                        ((TileEntityCommon) spawn).useExtraInfo2(extraData2);
-                    }
-                }
-
-                if (messageType == -1) {
-                    return;
-                }
-
-                Coord target = new Coord(player.worldObj, x, y, z);
-                TileEntityCommon tec = target.getTE(TileEntityCommon.class);
-                if (tec == null) {
-                    handleForeignMessage(player.worldObj, x, y, z, tec, messageType, input);
-                    return;
-                }
-                boolean handled;
-                if (Core.instance.isCannonical(player.worldObj)) {
-                    // server. And not SSP 'cause there's no packets
-                    handled = tec.handleMessageFromClient(messageType, input);
-                } else {
-                    // SMP client
-                    handled = tec.handleMessageFromServer(messageType, input);
-                }
-                if (!handled) {
-                    handleForeignMessage(player.worldObj, x, y, z, tec, messageType, input);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return;
-        } else if (channel.equals(factorizeCmdChannel)) {
-            if (data == null || data.length < 2) {
-                return;
-            }
-            byte s = data[0];
-            byte arg = data[1];
-            Command.fromNetwork(player, s, arg);
-            return;
-        }
-    }
-
-    //Messages for non-TEFs.
-    void handleForeignMessage(World world, int x, int y, int z, TileEntity ent, int messageType,
-            DataInput input) throws IOException {
-        if (Core.instance.isCannonical(world)) {
-            //Nothing for the server to deal with
-        } else {
-            switch (messageType) {
-            case MessageType.DemonEnterChest:
-                if (ent instanceof TileEntityChest) {
-                    Core.instance.pokeChest((TileEntityChest) ent);
-                }
-                break;
-            case MessageType.PlaySound:
-                Sound.receive(input);
-                break;
-            case MessageType.PistonPush:
-                Block.pistonBase.receiveClientEvent(world, x, y, z, 0, input.readInt());
-                new Coord(world, x, y, z).setId(0);
-                break;
-            default:
-                if (world.blockExists(x, y, z)) {
-                    System.err.println("Got unhandled message: " + messageType + " for " + (x + "," + y + "," + z));
-                }
-                else {
-                    //XXX: Need to figure out how to keep the server from sending these things!
-                    System.err.println("Got message to unloaded chunk: " + messageType + " for " + (x + "," + y + "," + z));
-                }
-                break;
-            }
-        }
-
-    }
-
+    
     public void sendCommand(EntityPlayer player, Command cmd, byte arg) {
         Packet250CustomPayload packet = new Packet250CustomPayload();
         packet.channel = factorizeCmdChannel;
@@ -262,9 +106,23 @@ public class NetworkFactorization implements IConnectionHandler, IPacketHandler 
         packet.data[0] = cmd.id;
         packet.data[1] = arg;
         packet.length = packet.data.length;
-        Core.instance.addPacket(player, packet);
+        Core.proxy.addPacket(player, packet);
     }
 
+    public void broadcastMessage(EntityPlayer who, Coord src, int messageType, Object... msg) {
+        //		// who is ignored
+        //		if (!Core.proxy.isServer() && who == null) {
+        //			return;
+        //		}
+        Packet toSend = Core.network.messagePacket(src, messageType, msg);
+        if (Core.isServer()) {
+            broadcastPacket(who, src, toSend);
+        }
+        else {
+            Core.proxy.addPacket(who, toSend);
+        }
+    }
+    
     /**
      * @param who
      *            Player to send packet to; if null, send to everyone in range.
@@ -283,30 +141,177 @@ public class NetworkFactorization implements IConnectionHandler, IPacketHandler 
                 if (src.distanceSq(new Coord(player)) > max_dist) {
                     continue;
                 }
-                if (!Core.instance.playerListensToCoord(player, src)) {
+                if (!Core.proxy.playerListensToCoord(player, src)) {
                     continue;
                 }
-                Core.instance.addPacket(player, toSend);
+                Core.proxy.addPacket(player, toSend);
             }
         }
         else {
-            Core.instance.addPacket(who, toSend);
+            Core.proxy.addPacket(who, toSend);
         }
     }
 
-    public void broadcastMessage(EntityPlayer who, Coord src, int messageType, Object... msg) {
-        //		// who is ignored
-        //		if (!Core.instance.isServer() && who == null) {
-        //			return;
-        //		}
-        Packet toSend = Core.network.messagePacket(src, messageType, msg);
-        if (Core.instance.isServer()) {
-            broadcastPacket(who, src, toSend);
+    private EntityPlayer currentPlayer = null;
+    
+    EntityPlayer getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    @Override
+    public void onPacketData(NetworkManager network, Packet250CustomPayload packet, Player player) {
+        String channel = packet.channel;
+        byte[] data = packet.data;
+        currentPlayer = (EntityPlayer) player; //Core.proxy.getPlayer(network.getNetHandler());;
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
+        DataInput input = new DataInputStream(inputStream);
+        if (channel.equals(factorizeTEChannel)) {
+            handleTE(input);
+        } else  if (channel.equals(factorizeMsgChannel)) {
+            handleMsg(input);
+        } else if (channel.equals(factorizeCmdChannel)) {
+            handleCmd(data);
         }
-        else {
-            Core.instance.addPacket(who, toSend);
+        
+        currentPlayer = null;
+    }
+    
+    void handleTE(DataInput input) {
+        try {
+            int x = input.readInt();
+            int y = input.readInt();
+            int z = input.readInt();
+            int messageType = input.readInt();
+
+            if (!getCurrentPlayer().worldObj.blockExists(x, y, z)) {
+                // I suppose we can't avoid this.
+                // (Unless we can get a proper server-side check)
+                return;
+            }
+
+            if (messageType == MessageType.FactoryType) {
+                //create a Tile Entity of that type there.
+                FactoryType ft = FactoryType.fromMd(input.readInt());
+                byte extraData = input.readByte();
+                byte extraData2 = input.readByte();
+                //There may be additional description data following this
+                try {
+                    messageType = input.readInt();
+                } catch (IOException e) {
+                    messageType = -1;
+                }
+                TileEntity spawn = ft.makeTileEntity();
+                getCurrentPlayer().worldObj.setBlockTileEntity(x, y, z, spawn);
+
+                if (spawn instanceof TileEntityCommon) {
+                    ((TileEntityCommon) spawn).useExtraInfo(extraData);
+                    ((TileEntityCommon) spawn).useExtraInfo2(extraData2);
+                }
+            }
+
+            if (messageType == -1) {
+                return;
+            }
+
+            Coord target = new Coord(getCurrentPlayer().worldObj, x, y, z);
+            TileEntityCommon tec = target.getTE(TileEntityCommon.class);
+            if (tec == null) {
+                handleForeignMessage(getCurrentPlayer().worldObj, x, y, z, tec, messageType, input);
+                return;
+            }
+            boolean handled;
+            if (Core.isCannonical()) {
+                // server. And not SSP 'cause there's no packets
+                handled = tec.handleMessageFromClient(messageType, input);
+            } else {
+                // SMP client
+                handled = tec.handleMessageFromServer(messageType, input);
+            }
+            if (!handled) {
+                handleForeignMessage(getCurrentPlayer().worldObj, x, y, z, tec, messageType, input);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
+    
+    void handleMsg(DataInput input) {
+        if (Core.proxy.isServer()) {
+            return; // so, an SMP client sends *us* a message? Nah.
+        }
+        String main;
+        try {
+            main = input.readUTF();
+        } catch (IOException e1) {
+            return;
+        }
+        ArrayList<String> items = new ArrayList<String>();
+        try {
+            while (true) {
+                String orig = input.readUTF();
+                String name = orig + ".name";
+                String transd = StringTranslate.getInstance().translateKey(name);
+                if (transd.compareTo(name) == 0) {
+                    items.add(orig);
+                } else {
+                    items.add(transd);
+                }
+            }
+        } catch (IOException e) {
+        }
+        try {
+            getCurrentPlayer().addChatMessage(String.format(main, items.toArray()));
+        } catch (IllegalFormatException e) {
+            System.out.print("Illegal format: \"" + main + '"');
+            for (String i : items) {
+                System.out.print(" \"" + i + "\"");
+            }
+            System.out.println();
+            e.printStackTrace();
+        }
+    }
+    
+    void handleCmd(byte[] data) {
+        if (data == null || data.length < 2) {
+            return;
+        }
+        byte s = data[0];
+        byte arg = data[1];
+        Command.fromNetwork(getCurrentPlayer(), s, arg);
+    }
+    
+    void handleForeignMessage(World world, int x, int y, int z, TileEntity ent, int messageType, DataInput input) throws IOException {
+        if (Core.isCannonical()) {
+            //Nothing for the server to deal with
+        } else {
+            switch (messageType) {
+            case MessageType.DemonEnterChest:
+                if (ent instanceof TileEntityChest) {
+                    Core.proxy.pokeChest((TileEntityChest) ent);
+                }
+                break;
+            case MessageType.PlaySound:
+                Sound.receive(input);
+                break;
+            case MessageType.PistonPush:
+                Block.pistonBase.onBlockEventReceived(world, x, y, z, 0, input.readInt());
+                new Coord(world, x, y, z).setId(0);
+                break;
+            default:
+                if (world.blockExists(x, y, z)) {
+                    Core.logWarning("Got unhandled message: " + messageType + " for " + (x + "," + y + "," + z));
+                }
+                else {
+                    //XXX: Need to figure out how to keep the server from sending these things!
+                    Core.logWarning("Got message to unloaded chunk: " + messageType + " for " + (x + "," + y + "," + z));
+                }
+                break;
+            }
+        }
+
+    }
+
+
 
     static public class MessageType {
         //Non TEF messages
@@ -333,4 +338,6 @@ public class NetworkFactorization implements IConnectionHandler, IPacketHandler 
                 HeaterHeat = 700
                 ;
     }
+
+
 }

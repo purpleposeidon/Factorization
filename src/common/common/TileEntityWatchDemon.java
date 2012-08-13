@@ -82,7 +82,7 @@ public class TileEntityWatchDemon extends TileEntityCommon {
         }
 
         File getSetSave(World world) {
-            File world_dir = Core.instance.getWorldSaveDir(world);
+            File world_dir = Core.proxy.getWorldSaveDir(world);
             File ret = new File(world_dir.getAbsolutePath(), "factorizationChunkLoader");
             return ret;
         }
@@ -101,7 +101,7 @@ public class TileEntityWatchDemon extends TileEntityCommon {
 
         @Override
         public void onWorldLoad(World world) {
-            if (!Core.instance.isCannonical(world)) {
+            if (!Core.isCannonical()) {
                 return;
             }
             HashSet<ChunkCoordIntPair> toLoad = new HashSet<ChunkCoordIntPair>();
@@ -161,7 +161,7 @@ public class TileEntityWatchDemon extends TileEntityCommon {
 
         @Override
         public void onWorldSave(World world) {
-            if (!Core.instance.isCannonical(world)) {
+            if (!Core.isCannonical()) {
                 return;
             }
             FileOutputStream fos = null;

@@ -443,10 +443,10 @@ public class GuiRouter extends GuiContainer implements IClickable {
             if (upgrade_id == -1) {
                 return;
             }
-            if (!Core.instance.isCannonical(router.worldObj)) {
+            if (!Core.isCannonical()) {
                 router.broadcastMessage(null, MessageType.RouterDowngrade, upgrade_id);
             }
-            router.removeUpgrade(upgrade_id, Core.instance.getClientPlayer());
+            router.removeUpgrade(upgrade_id, Core.proxy.getClientPlayer());
             selectNextUpgrade(false);
             return;
         }

@@ -105,7 +105,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
         if (furnaceBurnTime > 0) {
             furnaceBurnTime--;
         }
-        if (!Core.instance.isCannonical(worldObj)) {
+        if (!Core.isCannonical()) {
             return;
         }
 

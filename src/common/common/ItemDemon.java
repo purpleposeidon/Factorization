@@ -74,7 +74,7 @@ public class ItemDemon extends Item {
         if (!(is.getItem() instanceof ItemDemon)) {
             return;
         }
-        if (!Core.instance.isCannonical(player.worldObj)) {
+        if (!Core.isCannonical()) {
             return;
         }
         int poison = 0;
@@ -264,14 +264,14 @@ public class ItemDemon extends Item {
             }
             if (chosen != -1) {
                 chest.setInventorySlotContents(chosen, new ItemStack(Core.registry.tiny_demon));
-                Core.instance.pokeChest(realChest);
+                Core.proxy.pokeChest(realChest);
             }
         }
     }
 
     public static void spawnDemons(World world) {
         // find a chest in world to stick a demon into
-        if (!(world.worldProvider instanceof WorldProviderHell)) {
+        if (!(world.provider instanceof WorldProviderHell)) {
             return;
         }
         //XXX TODO: We could check if the chests were in a Hell biome instead...

@@ -29,7 +29,7 @@ public class ItemAcidBottle extends ItemCraftingComponent {
     public ItemStack onFoodEaten(ItemStack is, World w, EntityPlayer player) {
         is.stackSize--;
         Sound.acidBurn.playAt(player);
-        if (!Core.instance.isCannonical(w)) {
+        if (!Core.isCannonical()) {
             return is;
         }
         FactorizationHack.damageEntity(player, FactorizationHack.acidBurn, 12);

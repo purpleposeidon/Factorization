@@ -78,7 +78,7 @@ public class ItemCraft extends Item  {
             if (here == null) {
                 line += "-";
             } else {
-                line += Core.instance.translateItemStack(here);
+                line += Core.proxy.translateItemStack(here);
                 count++;
             }
             if (i % 3 == 2) {

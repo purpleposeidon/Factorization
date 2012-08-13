@@ -80,7 +80,7 @@ public class ItemFactorization extends ItemBlock {
                 tec.onPlacedBy(player, is, side);
                 tec.getBlockClass().enforce(here);
             }
-            if (Core.instance.isCannonical(w)) {
+            if (Core.isCannonical()) {
                 if (te instanceof TileEntityCommon) {
                     Packet p = ((TileEntityCommon) te).getDescriptionPacket();
                     Core.network.broadcastPacket(null, here, p);

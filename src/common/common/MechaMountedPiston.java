@@ -55,7 +55,7 @@ public class MechaMountedPiston extends Item implements IMechaUpgrade {
         if (!isEnabled) {
             return null;
         }
-        if (!Core.instance.isCannonical(player.worldObj)) {
+        if (!Core.isCannonical()) {
             return null;
         }
 
@@ -65,7 +65,7 @@ public class MechaMountedPiston extends Item implements IMechaUpgrade {
 
         Coord head;
         Coord foot;
-        if (Core.instance.isServer()) {
+        if (Core.isServer()) {
             //...?
             //man, what's up with this?
             head = new Coord(player).add(0, 1, 0).add(-1, 0, 0);

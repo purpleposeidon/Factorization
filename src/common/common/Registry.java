@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
+import java.util.Random;
 
 import net.minecraft.src.Block;
 import net.minecraft.src.CraftingManager;
 import net.minecraft.src.EntityItem;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.FurnaceRecipes;
+import net.minecraft.src.IChunkProvider;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.IRecipe;
 import net.minecraft.src.InventoryPlayer;
@@ -20,15 +22,18 @@ import net.minecraft.src.Material;
 import net.minecraft.src.ModLoader;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.World;
+import net.minecraft.src.WorldGenMinable;
 import net.minecraft.src.WorldProviderHell;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import cpw.mods.fml.common.ICraftingHandler;
+import cpw.mods.fml.common.ITickHandler;
+import cpw.mods.fml.common.IWorldGenerator;
 import factorization.api.IActOnCraft;
 
-public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
+public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler, IWorldGenerator, ITickHandler {
     static public final int MechaKeyCount = 3;
 
     public ItemFactorization item_factorization;
@@ -69,6 +74,8 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
     public ItemMirror mirror;
 
     public Material materialMachine = new Material(MapColor.ironColor);
+    
+    WorldGenMinable silverGen;
 
     void makeBlocks() {
         factory_block = new BlockFactorization(Core.factory_block_id);
@@ -90,13 +97,13 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
     }
 
     private void addName(Object what, String name) {
-        Core.instance.addName(what, name);
+        Core.proxy.addName(what, name);
     }
 
     HashSet<Integer> added_ids = new HashSet();
 
     public int itemID(String name, int default_id) {
-        int id = Integer.parseInt(Core.instance.config.getOrCreateIntProperty(name, "item", default_id).value);
+        int id = Integer.parseInt(Core.proxy.config.getOrCreateIntProperty(name, "item", default_id).value);
         if (added_ids.contains(default_id)) {
             throw new RuntimeException("Default ID already used: " + default_id);
         }
@@ -693,10 +700,14 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
         BlockClass.Cage.harvest("pickaxe", 1);
         MinecraftForge.setBlockHarvestLevel(resource_block, "pickaxe", 2);
     }
+    
+    public void makeOther() {
+        silverGen = new WorldGenMinable(resource_block.blockID, 35);
+    }
 
     public void onTickPlayer(EntityPlayer player) {
         MechaArmor.onTickPlayer(player);
-        if (!Core.instance.isCannonical(player.worldObj)) {
+        if (!Core.isCannonical()) {
             //we need mecha-armor to tick on the client. >_>
             return;
         }
@@ -787,7 +798,7 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
                 Sound.bagSlurp.playAt(player);
             }
         }
-        Core.instance.pokePocketCrafting();
+        Core.proxy.pokePocketCrafting();
         tiny_demon.bitePlayer(is, player, true);
         return true;
     }
@@ -809,5 +820,23 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler {
             stack.setTagCompound((NBTTagCompound) diamond_shard_packet.getTagCompound().copy());
             stack.setItemDamage(1);
         }
+    }
+    
+    @Override
+    public void generate(Random rand, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
+        if (!Core.gen_silver_ore) {
+            return;
+        }
+        //only gen in 1/4 of the chunks or something
+        if (rand.nextFloat() > 0.35) {
+            return;
+        }
+        if (Math.abs(chunkX + chunkZ) % 3 == 1) {
+            return;
+        }
+        int x = chunkX + rand.nextInt(16);
+        int z = chunkZ + rand.nextInt(16);
+        int y = 5 + rand.nextInt(48);
+        silverGen.generate(world, rand, x, y, z);
     }
 }

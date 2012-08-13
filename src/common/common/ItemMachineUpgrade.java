@@ -19,7 +19,7 @@ public class ItemMachineUpgrade extends Item {
         setItemName(this.name);
         setIconIndex(9 * 16 + upgradeId);
         setMaxStackSize(16);
-        Core.instance.addName(this, this.name);
+        Core.proxy.addName(this, this.name);
     }
 
     @Override
