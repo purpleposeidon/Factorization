@@ -61,7 +61,7 @@ public class TileEntitySolarTurbineRender extends TileEntitySpecialRenderer {
     }
 
     void drawProp() {
-        FactorizationRender.renderItemIn2D(Core.registry.fan.getIconFromDamage(0));
+        FactorizationBlockRender.renderItemIn2D(Core.registry.fan.getIconFromDamage(0));
     }
 
 }

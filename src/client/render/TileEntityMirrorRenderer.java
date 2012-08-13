@@ -47,7 +47,7 @@ public class TileEntityMirrorRenderer extends TileEntitySpecialRenderer {
 
         GL11.glTranslatef(-0.5F, -0.3F, 0.3F);
         GL11.glRotatef(-45, 1, 0, 0);
-        FactorizationRender.renderItemIn2D(9);
+        FactorizationBlockRender.renderItemIn2D(9); //Hello, magic # 9. I bet you're a mirror!
 
         GL11.glPopMatrix();
     }

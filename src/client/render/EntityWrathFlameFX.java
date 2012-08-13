@@ -120,10 +120,10 @@ public class EntityWrathFlameFX extends EntityBreakingFX {
         setParticleTextureIndex(0);
     }
 
-    @Override
-    public String getTextureFile() {
-        return Core.texture_file_item;
-    }
+//	@Override
+//	public String getTextureFile() {
+//		return Core.texture_file_item;
+//	}
 
     public void renderParticle(Tessellator par1Tessellator, float par2, float par3, float par4,
             float par5, float par6, float par7)
