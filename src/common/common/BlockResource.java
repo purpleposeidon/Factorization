@@ -1,6 +1,7 @@
 package factorization.common;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.src.Block;
@@ -48,6 +49,11 @@ public class BlockResource extends Block {
         itemList.add(Core.registry.lead_block_item);
         itemList.add(Core.registry.dark_iron_block_item);
         itemList.add(Core.registry.mechaworkshop_item);
+    }
+    
+    @Override
+    public void getSubBlocks(int par1, CreativeTabs par2CreativeTabs, List par3List) {
+        Core.addBlockToCreativeList(par3List, this);
     }
 
     

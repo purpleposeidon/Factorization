@@ -5,6 +5,7 @@ import java.util.Random;
 import net.minecraft.src.ModelBase;
 import net.minecraft.src.ModelRenderer;
 import net.minecraft.src.TileEntity;
+import net.minecraft.src.TileEntityRenderer;
 import net.minecraft.src.TileEntitySpecialRenderer;
 
 import org.lwjgl.opengl.GL11;

@@ -1,6 +1,7 @@
 package factorization.common;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.src.AxisAlignedBB;
@@ -177,6 +178,7 @@ public class BlockFactorization extends BlockContainer {
             destroyedTE = te;
             te.onRemove();
         }
+        super.breakBlock(w, x, y, z, id, md);
     }
 
     @Override
@@ -242,6 +244,11 @@ public class BlockFactorization extends BlockContainer {
 
         //itemList.add(core.cutter_item);
         //itemList.add(core.queue_item);
+    }
+    
+    @Override
+    public void getSubBlocks(int par1, CreativeTabs par2CreativeTabs, List par3List) {
+        Core.addBlockToCreativeList(par3List, this);
     }
 
     @Override

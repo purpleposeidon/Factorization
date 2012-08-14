@@ -103,11 +103,10 @@ public class TileEntityMirror extends TileEntityCommon {
             this.target_rotation = new_target;
         }
     }
-
-
+    
     @Override
-    public Packet getDescriptionPacket() {
-        return super.getDescriptionPacketWith(MessageType.MirrorDescription, rotation, getTargetInfo());
+    public Packet getAuxillaryInfoPacket() {
+        return getDescriptionPacketWith(MessageType.MirrorDescription, rotation, getTargetInfo());
     }
 
     @Override
@@ -134,7 +133,7 @@ public class TileEntityMirror extends TileEntityCommon {
         }
         setRotation(clipAngle(-clipAngle((int) player.rotationYaw + 270)));
         //		if (Core.isCannonical()) {
-        //			broadcastMessage(null, getDescriptionPacket());
+        //			broadcastMessage(null, getAuxillaryInfoPacket());
         //		}
     }
 

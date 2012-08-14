@@ -459,9 +459,9 @@ public class TileEntityBarrel extends TileEntityFactorization {
     }
 
     @Override
-    public Packet getDescriptionPacket() {
+    public Packet getAuxillaryInfoPacket() {
         if (item == null) {
-            return super.getDescriptionPacket();
+            return super.getAuxillaryInfoPacket();
         }
         return getDescriptionPacketWith(MessageType.BarrelDescription, getItemCount(), item);
     }

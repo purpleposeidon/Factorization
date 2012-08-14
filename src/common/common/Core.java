@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -26,6 +28,7 @@ import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 
+import net.minecraft.src.Block;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.ModLoader;
@@ -309,5 +312,13 @@ public class Core {
     
     public static void logWarning(String format, Object... data) {
         FMLLog.warning("Factorization: " + format, data);
+    }
+    
+    public static void addBlockToCreativeList(List tab, Block block) {
+        ArrayList a = new ArrayList<Object>();
+        block.addCreativeItems(a);
+        for (Object o : a) {
+            tab.add(o);
+        }
     }
 }

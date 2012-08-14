@@ -54,10 +54,11 @@ public class FactorizationRender implements ISimpleBlockRenderingHandler {
             FactorizationBlockRender FBR = FactorizationBlockRender.getRenderer(md);
             FBR.renderInWorld(world, x, y, z);
             if (renderPass == 0) {
-                FBR.render(renderBlocks);
+//				FBR.render(renderBlocks);
             } else if (renderPass == 1) {
-                FBR.renderSecondPass(renderBlocks);
+//				FBR.renderSecondPass(renderBlocks);
             }
+            return true;
         }
         if (block == Core.registry.lightair_block) {
             if (md == Core.registry.lightair_block.air_md) {

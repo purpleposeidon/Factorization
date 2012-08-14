@@ -82,7 +82,7 @@ public class ItemFactorization extends ItemBlock {
             }
             if (!w.isRemote) {
                 if (te instanceof TileEntityCommon) {
-                    Packet p = ((TileEntityCommon) te).getDescriptionPacket();
+                    Packet p = ((TileEntityCommon) te).getAuxillaryInfoPacket();
                     Core.network.broadcastPacket(null, here, p); //XXX TODO: Is this necessary?
                 }
             }

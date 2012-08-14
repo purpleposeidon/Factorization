@@ -24,8 +24,8 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
 
     public abstract BlockClass getBlockClass();
 
-    //@Override -- can't override due to MY GOD ITS THE CLIENTS FAULT THIS TIME
-    public Packet getDescriptionPacket() {
+    @Override
+    public Packet getAuxillaryInfoPacket() {
         Packet p = Core.network.messagePacket(getCoord(), MessageType.FactoryType, getFactoryType().md, getExtraInfo(), getExtraInfo2());
         p.isChunkDataPacket = true;
         return p;
