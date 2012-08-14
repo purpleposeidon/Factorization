@@ -6,6 +6,7 @@ import java.util.Random;
 import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.Block;
 import net.minecraft.src.BlockContainer;
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IBlockAccess;
 import net.minecraft.src.ItemStack;
@@ -28,6 +29,7 @@ public class BlockFactorization extends BlockContainer {
         setResistance(5);
         setLightOpacity(3);
         //setBlockBounds(0, -1000, 0, 0, -999, 0);
+        setCreativeTab(CreativeTabs.tabRedstone);
     }
     
     @Override
@@ -85,7 +87,7 @@ public class BlockFactorization extends BlockContainer {
         TileEntityCommon t = new Coord(world, x, y, z).getTE(TileEntityCommon.class);
 
         if (t != null) {
-            if (Core.isCannonical()) {
+            if (!world.isRemote) {
                 return t.activate(entityplayer);
             }
 
@@ -93,7 +95,7 @@ public class BlockFactorization extends BlockContainer {
         }
         else {
             //info message
-            if (!Core.isCannonical()) {
+            if (world.isRemote) {
                 return false; //...?
             }
             entityplayer.addChatMessage("This block is missing its TileEntity, possibly due to a bug in Factorization.");
@@ -111,7 +113,7 @@ public class BlockFactorization extends BlockContainer {
             EntityPlayer entityplayer) {
         // left click
 
-        if (!Core.isCannonical()) {
+        if (world.isRemote) {
             return;
         }
 

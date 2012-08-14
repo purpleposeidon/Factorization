@@ -59,9 +59,7 @@ public class TileEntityMirror extends TileEntityCommon {
     
     @Override
     public void neighborChanged() {
-        if (Core.isCannonical()) {
-            search_delay = trace_check = 1;
-        }
+        search_delay = trace_check = 1;
     }
 
     int getPower() {
@@ -159,8 +157,8 @@ public class TileEntityMirror extends TileEntityCommon {
     @Override
     public void updateEntity() {
         //		if we don't have a target, spin about
-        boolean cannon = Core.isCannonical();
-        if (!cannon) {
+        if (worldObj.isRemote) {
+            //TODO: Wait for an info packet before spinning
             if (target_rotation == -99) {
                 rotation++;
             } else if (target_rotation != rotation) {

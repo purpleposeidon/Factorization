@@ -5,6 +5,7 @@ import java.util.List;
 
 import factorization.api.IActOnCraft;
 
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.InventoryPlayer;
@@ -21,6 +22,7 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
     public ItemBagOfHolding(int id) {
         super(id);
         setMaxStackSize(1);
+        setTabToDisplayOn(CreativeTabs.tabTools);
     }
 
     final String pearlcount = "pearlcount";

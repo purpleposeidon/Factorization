@@ -2,6 +2,7 @@ package factorization.common;
 
 import java.util.List;
 
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityPlayer;
@@ -16,12 +17,14 @@ import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldProviderHell;
+import net.minecraftforge.event.ForgeSubscribe;
 
 public class ItemDemon extends Item {
 
     public ItemDemon(int par1) {
         super(par1);
         setMaxStackSize(1);
+        setTabToDisplayOn(CreativeTabs.tabMisc);
     }
 
     static void init(ItemStack is) {
@@ -74,7 +77,7 @@ public class ItemDemon extends Item {
         if (!(is.getItem() instanceof ItemDemon)) {
             return;
         }
-        if (!Core.isCannonical()) {
+        if (player.worldObj.isRemote) {
             return;
         }
         int poison = 0;
@@ -268,7 +271,7 @@ public class ItemDemon extends Item {
             }
         }
     }
-
+    
     public static void spawnDemons(World world) {
         // find a chest in world to stick a demon into
         if (!(world.provider instanceof WorldProviderHell)) {
@@ -284,6 +287,7 @@ public class ItemDemon extends Item {
                 continue;
             }
             IInventory chest = FactorizationUtil.openDoubleChest((TileEntityChest) ent);
+            //XXX What happens here if the ent's actually a subclass of TEChest?
             if (chest == null) {
                 continue;
             }

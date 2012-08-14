@@ -1,6 +1,7 @@
 package factorization.common;
 
 import net.minecraft.src.Block;
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.DamageSource;
 import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityPlayer;
@@ -16,6 +17,7 @@ public class MechaMountedPiston extends Item implements IMechaUpgrade {
         super(par1);
         setItemName("mecha.mountedpiston");
         setIconIndex(16 * 10 + 2);
+        setTabToDisplayOn(CreativeTabs.tabMisc);
     }
     
     @Override
@@ -44,9 +46,7 @@ public class MechaMountedPiston extends Item implements IMechaUpgrade {
         }
         Block.pistonBase.onBlockEventReceived(c.w, c.x, c.y, c.z, 0, orientation);
         c.setId(0);
-        if (Core.instance.isServer()) {
-            Core.network.broadcastMessage(null, c, NetworkFactorization.MessageType.PistonPush, orientation);
-        }
+        Core.network.broadcastMessage(null, c, NetworkFactorization.MessageType.PistonPush, orientation);
         return true;
     }
 
@@ -55,7 +55,7 @@ public class MechaMountedPiston extends Item implements IMechaUpgrade {
         if (!isEnabled) {
             return null;
         }
-        if (!Core.isCannonical()) {
+        if (player.worldObj.isRemote) {
             return null;
         }
 
@@ -65,7 +65,8 @@ public class MechaMountedPiston extends Item implements IMechaUpgrade {
 
         Coord head;
         Coord foot;
-        if (Core.isServer()) {
+        //TODO: Figure out which one to use, since this'll always be on a server...
+        if (!player.worldObj.isRemote) {
             //...?
             //man, what's up with this?
             head = new Coord(player).add(0, 1, 0).add(-1, 0, 0);

@@ -252,7 +252,7 @@ public class TileEntityMaker extends TileEntityFactorization implements
         if (messageType == MessageType.MakerTarget) {
             int target_id = input.readInt();
             boolean state = input.readBoolean();
-            if (Core.isCannonical()) {
+            if (!worldObj.isRemote) {
                 setTargets(target_id, state);
             } else {
                 // we might be receiving a message from someone else

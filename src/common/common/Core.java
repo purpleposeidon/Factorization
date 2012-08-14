@@ -24,6 +24,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.registry.TickRegistry;
 
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
@@ -44,22 +45,21 @@ import factorization.api.Coord;
 @NetworkMod(
         clientSideRequired = true,
         packetHandler = NetworkFactorization.class,
-        connectionHandler = NetworkFactorization.class,
         channels = {NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel}
 )
-public abstract class Core {
+public class Core {
     public static final String version = "0.5.0";
     // runtime storage
     @Instance
     public static Core instance;
     public static Registry registry;
-    @SidedProxy(clientSide = "")
+    @SidedProxy(clientSide = "factorization.client.FactorizationClientProxy", serverSide = "factorization.common.FactorizationServerProxy")
     public static FactorizationProxy proxy;
     public static NetworkFactorization network;
     public static int factory_rendertype;
 
     // Configuration
-    Configuration config;
+    public static Configuration config;
     public static int factory_block_id = 254;
     public static int lightair_id = 253;
     public static int resource_id = 252;
@@ -161,23 +161,31 @@ public abstract class Core {
     @Init
     public void load(FMLInitializationEvent event) {
         registry = new Registry();
+        
+        NetworkRegistry.instance().registerGuiHandler(this, proxy);
+        MinecraftForge.EVENT_BUS.register(registry);
+        //MinecraftForge.EVENT_BUS.register(TileEntityWatchDemon.loadHandler);
+        TickRegistry.registerTickHandler(registry, Side.CLIENT);
+        TickRegistry.registerTickHandler(registry, Side.SERVER);
+        
         registry.makeBlocks();
         registry.registerSimpleTileEntities();
         proxy.makeItemsSide();
         registry.makeItems();
+        config.save();
         registry.makeOther();
         registry.makeRecipes();
         registry.setToolEffectiveness();
+        proxy.registerKeys();
+        proxy.registerRenderers();
 
-        NetworkRegistry.instance().registerGuiHandler(this, proxy);
-        MinecraftForge.EVENT_BUS.register(registry);
-        MinecraftForge.EVENT_BUS.register(TileEntityWatchDemon.loadHandler);
         config.save();
     }
 
     @PostInit
     public void modsLoaded(FMLPostInitializationEvent event) {
         TileEntityWrathFire.setupBurning();
+        registry.addDictOres();
     }
 
     ItemStack getExternalItem(String className, String classField, String description) {
@@ -288,16 +296,16 @@ public abstract class Core {
     }
 
     
-    public static boolean isCannonical() {
-        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            return false;
-        }
-        return true;
-    }
+//	public static boolean isCannonical() {
+//		if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+//			return false;
+//		}
+//		return true;
+//	}
     
-    public static boolean isServer() {
-        return FMLCommonHandler.instance().getSide() != Side.CLIENT;
-    }
+//	public static boolean isServer() {
+//		return FMLCommonHandler.instance().getSide() != Side.CLIENT;
+//	}
     
     public static void logWarning(String format, Object... data) {
         FMLLog.warning("Factorization: " + format, data);

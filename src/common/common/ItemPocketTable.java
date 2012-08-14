@@ -1,5 +1,6 @@
 package factorization.common;
 
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.InventoryPlayer;
 import net.minecraft.src.Item;
@@ -11,6 +12,7 @@ public class ItemPocketTable extends Item {
     public ItemPocketTable(int id) {
         super(id);
         setMaxStackSize(1);
+        setTabToDisplayOn(CreativeTabs.tabTools);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package factorization.common;
 
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
@@ -11,6 +12,7 @@ public class ItemMirror extends Item {
         super(par1);
         Core.proxy.addName(this, "Reflective Mirror");
         setTextureFile(Core.texture_file_item);
+        setTabToDisplayOn(CreativeTabs.tabRedstone);
     }
 
     

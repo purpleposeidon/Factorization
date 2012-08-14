@@ -1,5 +1,6 @@
 package factorization.common;
 
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.Item;
@@ -14,6 +15,7 @@ public class ItemWrathIgniter extends Item implements IActOnCraft {
         setMaxStackSize(1);
         setMaxDamage((6 * 2) - 1);
         setNoRepair();
+        setTabToDisplayOn(CreativeTabs.tabTools);
     }
 
     @Override

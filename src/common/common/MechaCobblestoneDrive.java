@@ -1,6 +1,7 @@
 package factorization.common;
 
 import net.minecraft.src.Block;
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.DamageSource;
 import net.minecraft.src.EntityItem;
 import net.minecraft.src.EntityLiving;
@@ -16,6 +17,7 @@ public class MechaCobblestoneDrive extends Item implements IMechaUpgrade {
         super(par1);
         setItemName("mecha.cobbledrive");
         setIconIndex(16*10 + 1);
+        setTabToDisplayOn(CreativeTabs.tabMisc);
     }
     
     @Override
@@ -29,7 +31,7 @@ public class MechaCobblestoneDrive extends Item implements IMechaUpgrade {
         if (!isEnabled) {
             return null;
         }
-        if (!Core.isCannonical()) {
+        if (player.worldObj.isRemote) {
             return null;
         }
         if (!FactorizationUtil.itemCanFire(player.worldObj, upgrade, 40)) {

@@ -56,7 +56,7 @@ public enum Sound {
         if (!share) {
             return;
         }
-        if (!Core.isCannonical()) {
+        if (w.isRemote) {
             return;
         }
         Core.network.broadcastMessage(null, new Coord(w, x, y, z), MessageType.PlaySound, index, x, y, z);

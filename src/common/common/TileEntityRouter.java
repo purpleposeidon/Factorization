@@ -337,11 +337,11 @@ public class TileEntityRouter extends TileEntityFactorization {
     }
 
     boolean isIInventoryBanned(String name) {
-        if (Core.proxy.routerBan == null) {
+        if (Core.routerBan == null) {
             //xu do mi tavla fo la .rAUterban.
             return false;
         }
-        Matcher m = Core.proxy.routerBan.matcher(name);
+        Matcher m = Core.routerBan.matcher(name);
         return m.matches();
     }
 
@@ -713,7 +713,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         default:
             return false;
         }
-        if (need_share && Core.isCannonical()) {
+        if (need_share && !worldObj.isRemote) {
             broadcastItem(messageType, null);
         }
         return true;
@@ -803,7 +803,7 @@ public class TileEntityRouter extends TileEntityFactorization {
             player.inventory.addItemStackToInventory(drop);
         }
         else {
-            if (Core.isCannonical()) {
+            if (!worldObj.isRemote) {
                 player.addChatMessage("No upgrade");
             }
         }
@@ -818,7 +818,7 @@ public class TileEntityRouter extends TileEntityFactorization {
             return true;
         }
         if (messageType == NetworkFactorization.MessageType.RouterDowngrade) {
-            removeUpgrade(input.readInt(), Core.network.currentPlayer);
+            removeUpgrade(input.readInt(), Core.network.getCurrentPlayer());
             return true;
         }
         return false;

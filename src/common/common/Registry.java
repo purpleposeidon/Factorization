@@ -3,6 +3,7 @@ package factorization.common;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Random;
 
@@ -25,15 +26,19 @@ import net.minecraft.src.World;
 import net.minecraft.src.WorldGenMinable;
 import net.minecraft.src.WorldProviderHell;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.ForgeSubscribe;
+import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.oredict.OreDictionary.OreRegisterEvent;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import cpw.mods.fml.common.ICraftingHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.IWorldGenerator;
+import cpw.mods.fml.common.TickType;
 import factorization.api.IActOnCraft;
 
-public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler, IWorldGenerator, ITickHandler {
+public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler {
     static public final int MechaKeyCount = 3;
 
     public ItemFactorization item_factorization;
@@ -103,7 +108,7 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler, 
     HashSet<Integer> added_ids = new HashSet();
 
     public int itemID(String name, int default_id) {
-        int id = Integer.parseInt(Core.proxy.config.getOrCreateIntProperty(name, "item", default_id).value);
+        int id = Integer.parseInt(Core.config.getOrCreateIntProperty(name, "item", default_id).value);
         if (added_ids.contains(default_id)) {
             throw new RuntimeException("Default ID already used: " + default_id);
         }
@@ -672,8 +677,10 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler, 
         }
     }
 
-    @Override
-    public void registerOre(String oreClass, ItemStack ore) {
+    @ForgeSubscribe
+    public void registerOre(OreRegisterEvent evt) {
+        String oreClass = evt.Name;
+        ItemStack ore = evt.Ore;
         if (oreClass.equals("ingotLead")) {
             //NOTE: I think it'd be cool to have the recipe for lead blocks be 5x5 instead of 3x3...
             ModLoader.addRecipe(lead_block_item, "###", "###", "###", '#', ore);
@@ -706,9 +713,8 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler, 
     }
 
     public void onTickPlayer(EntityPlayer player) {
-        MechaArmor.onTickPlayer(player);
-        if (!Core.isCannonical()) {
-            //we need mecha-armor to tick on the client. >_>
+        MechaArmor.onTickPlayer(player); //mecha-armor needs to tick on both sides
+        if (player.worldObj.isRemote) {
             return;
         }
         // If in a GUI and holding a demon, BITE!
@@ -720,37 +726,21 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler, 
         }
     }
 
-    int spawn_delay = 0;
-    boolean reg_ore = false;
-
     public void onTickWorld(World world) {
-        if (!reg_ore) {
-            //XXX TODO: Move this somewhere proper; after all our favorite mods have loaded
-            addDictOres();
-            reg_ore = true;
+        if (world.isRemote) {
+            return;
         }
         //NOTE: This might bug out if worlds don't tick at the same rate or something! Or if they're in different threads!
         //(Like THAT would ever happen, ah ha ha ha ha ha ha ha ha ha ha ha ha ha.)
         TileEntityWrathLamp.handleAirUpdates();
         TileEntityWrathFire.updateCount = 0;
-        if (world.provider instanceof WorldProviderHell) {
-            spawn_delay -= 1;
-            if (spawn_delay <= 0) {
-                try {
-                    ItemDemon.spawnDemons(world);
-                } catch (ConcurrentModificationException e) {
-                    //This can happen while loading?
-                    System.err.print("This error occured while attempting to spawn demons: ");
-                    e.printStackTrace();
-                }
-                spawn_delay = 20 * 60;
-            }
-        }
         TileEntityWatchDemon.worldTick(world);
     }
 
-    @Override
-    public boolean onItemPickup(EntityPlayer player, EntityItem item) {
+    @ForgeSubscribe
+    public boolean onItemPickup(EntityItemPickupEvent event) {
+        EntityPlayer player = event.entityPlayer;
+        EntityItem item = event.item;
         if (item == null || item.item == null || item.item.stackSize == 0) {
             return true;
         }
@@ -804,25 +794,6 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler, 
     }
 
     @Override
-    public void onTakenFromCrafting(EntityPlayer player, ItemStack stack, IInventory craftMatrix) {
-        for (int i = 0; i < craftMatrix.getSizeInventory(); i++) {
-            ItemStack here = craftMatrix.getStackInSlot(i);
-            if (here == null) {
-                continue;
-            }
-            Item item = here.getItem();
-            if (item instanceof IActOnCraft) {
-                ((IActOnCraft) item).onCraft(here, craftMatrix, i, stack, player);
-            }
-        }
-
-        if (stack.getItem() == item_craft && stack.getItemDamage() == diamond_shard_packet.getItemDamage()) {
-            stack.setTagCompound((NBTTagCompound) diamond_shard_packet.getTagCompound().copy());
-            stack.setItemDamage(1);
-        }
-    }
-    
-    @Override
     public void generate(Random rand, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
         if (!Core.gen_silver_ore) {
             return;
@@ -839,4 +810,68 @@ public class Registry implements IOreHandler, IPickupHandler, ICraftingHandler, 
         int y = 5 + rand.nextInt(48);
         silverGen.generate(world, rand, x, y, z);
     }
+    
+    
+
+
+    private int demon_spawn_delay = 0;
+    
+    @Override
+    public void tickStart(EnumSet<TickType> type, Object... tickData) {
+        demon_spawn_delay--;
+        if (demon_spawn_delay < -1) {
+            demon_spawn_delay = 20*60;
+        }
+        if (type.contains(TickType.WORLD)) {
+            World w = (World) tickData[0];
+            if (w.isRemote) {
+                return;
+            }
+            onTickWorld(w);
+            if (demon_spawn_delay == 0) {
+                ItemDemon.spawnDemons(w);
+            }
+        }
+        if (type.contains(TickType.PLAYER)) {
+            EntityPlayer player = (EntityPlayer) tickData[0];
+            onTickPlayer(player);
+        }
+    }
+
+    @Override
+    public void tickEnd(EnumSet<TickType> type, Object... tickData) {}
+
+    @Override
+    public EnumSet<TickType> ticks() {
+        return EnumSet.of(TickType.WORLD, TickType.PLAYER);
+    }
+
+    @Override
+    public String getLabel() {
+        return "factorization-world";
+    }
+
+    @Override
+    public void onCrafting(EntityPlayer player, ItemStack stack, IInventory craftMatrix) {
+        for (int i = 0; i < craftMatrix.getSizeInventory(); i++) {
+            ItemStack here = craftMatrix.getStackInSlot(i);
+            if (here == null) {
+                continue;
+            }
+            Item item = here.getItem();
+            if (item instanceof IActOnCraft) {
+                ((IActOnCraft) item).onCraft(here, craftMatrix, i, stack, player);
+            }
+        }
+
+        if (stack.getItem() == item_craft && stack.getItemDamage() == diamond_shard_packet.getItemDamage()) {
+            stack.setTagCompound((NBTTagCompound) diamond_shard_packet.getTagCompound().copy());
+            stack.setItemDamage(1);
+        }
+    }
+
+    @Override
+    public void onSmelting(EntityPlayer player, ItemStack item) {}
+    
+    
 }

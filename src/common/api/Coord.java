@@ -408,4 +408,12 @@ public class Coord {
     public void mark() {
         w.spawnParticle("reddust", x, y, z, 0, 0, 0);
     }
+    
+    public boolean remote() {
+        return w.isRemote;
+    }
+    
+    public boolean local() {
+        return !w.isRemote;
+    }
 }

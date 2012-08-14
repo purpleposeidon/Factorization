@@ -16,7 +16,7 @@ import net.minecraft.src.ModLoader;
 import org.lwjgl.opengl.GL11;
 
 import factorization.api.IMechaUpgrade;
-import factorization.client.mod_Factorization;
+import factorization.client.FactorizationClientProxy;
 import factorization.common.Command;
 import factorization.common.ContainerMechaModder;
 import factorization.common.Core;
@@ -107,7 +107,7 @@ public class GuiMechaConfig extends GuiContainer {
         MechaMode mode = armor.getSlotMechaMode(cont.upgrader.armor, slot);
         String action = "";
         if (mode.key >= 0) {
-            int key = ((mod_Factorization) Core.instance).mechas[mode.key].keyCode;
+            int key = ((FactorizationClientProxy) Core.proxy).mechas[mode.key].keyCode;
             action = GameSettings.getKeyDisplayString(key) + " is pressed";
         }
         else {

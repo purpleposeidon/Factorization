@@ -1,6 +1,7 @@
 package factorization.common;
 
 import net.minecraft.src.Block;
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.DamageSource;
 import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityPlayer;
@@ -17,6 +18,7 @@ class MechaBuoyantBarrel extends Item implements IMechaUpgrade {
         super(par1);
         setItemName("mecha.buoyantbarrel");
         setIconIndex(16*10);
+        setTabToDisplayOn(CreativeTabs.tabMisc);
     }
     
     @Override

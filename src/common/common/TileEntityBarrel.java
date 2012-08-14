@@ -244,13 +244,13 @@ public class TileEntityBarrel extends TileEntityFactorization {
     }
 
     void broadcastItem() {
-        if (worldObj != null && Core.isCannonical()) {
+        if (worldObj != null && !worldObj.isRemote) {
             Core.network.broadcastMessage(null, getCoord(), MessageType.BarrelItem, item);
         }
     }
 
     void broadcastItemCount() {
-        if (worldObj != null && Core.isCannonical()) {
+        if (worldObj != null && !worldObj.isRemote) {
             Core.network.broadcastMessage(null, getCoord(), MessageType.BarrelCount, getItemCount());
         }
     }
@@ -274,7 +274,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     @Override
     public boolean activate(EntityPlayer entityplayer) {
         // right click: put an item in
-        if (!Core.isCannonical()) {
+        if (entityplayer.worldObj.isRemote) {
             return true;
         }
         if (worldObj.getWorldTime() - lastClick < 10 && item != null) {
@@ -329,7 +329,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     @Override
     public void click(EntityPlayer entityplayer) {
         // left click: remove a stack
-        if (!Core.isCannonical()) {
+        if (entityplayer.worldObj.isRemote) {
             return;
         }
         if (getItemCount() == 0 || item == null) {

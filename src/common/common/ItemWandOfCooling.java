@@ -5,6 +5,7 @@ import java.util.Arrays;
 import factorization.api.Coord;
 
 import net.minecraft.src.Block;
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
@@ -26,6 +27,7 @@ public class ItemWandOfCooling extends Item {
 
         Arrays.fill(changeArray, -1);
         remove(Block.fire);
+        setTabToDisplayOn(CreativeTabs.tabTools);
     }
 
     @Override
@@ -51,9 +53,7 @@ public class ItemWandOfCooling extends Item {
     }
 
     void setBlock(World world, int x, int y, int z, int id) {
-        if (Core.isCannonical()) {
-            world.setBlockWithNotify(x, y, z, id);
-        }
+        world.setBlockWithNotify(x, y, z, id);
         soundCool(world, x, y, z);
     }
 
@@ -185,7 +185,7 @@ public class ItemWandOfCooling extends Item {
 
     @Override
     public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side, float vecx, float vecy, float vecz) {
-        if (!Core.isCannonical()) {
+        if (w.isRemote) {
             return true;
         }
         reset();
@@ -201,7 +201,7 @@ public class ItemWandOfCooling extends Item {
         }
 
         int damage = Math.min(max_change - change_count, 1);
-        if (damage > 0 && Core.isCannonical()) {
+        if (damage > 0) {
             is.damageItem(damage, player);
         }
 

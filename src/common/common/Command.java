@@ -2,6 +2,8 @@ package factorization.common;
 
 import java.util.HashMap;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
 import factorization.common.MechaArmor.MechaMode;
@@ -45,7 +47,7 @@ public enum Command {
         if (player == null) {
             return;
         }
-        if (!Core.isCannonical()) {
+        if (player.worldObj.isRemote) {
             Core.network.sendCommand(player, this, arg);
             if (!shareCommand) {
                 return;

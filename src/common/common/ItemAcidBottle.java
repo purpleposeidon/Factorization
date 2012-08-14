@@ -1,5 +1,6 @@
 package factorization.common;
 
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EnumAction;
 import net.minecraft.src.FactorizationHack;
@@ -10,6 +11,7 @@ public class ItemAcidBottle extends ItemCraftingComponent {
 
     public ItemAcidBottle(int id, String itemName, int icon) {
         super(id, itemName, icon);
+        setTabToDisplayOn(CreativeTabs.tabMisc);
     }
 
     public int getMaxItemUseDuration(ItemStack par1ItemStack) {
@@ -29,7 +31,7 @@ public class ItemAcidBottle extends ItemCraftingComponent {
     public ItemStack onFoodEaten(ItemStack is, World w, EntityPlayer player) {
         is.stackSize--;
         Sound.acidBurn.playAt(player);
-        if (!Core.isCannonical()) {
+        if (w.isRemote) {
             return is;
         }
         FactorizationHack.damageEntity(player, FactorizationHack.acidBurn, 12);

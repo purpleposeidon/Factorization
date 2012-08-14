@@ -1,5 +1,6 @@
 package factorization.common;
 
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
@@ -20,6 +21,7 @@ public class ItemMachineUpgrade extends Item {
         setIconIndex(9 * 16 + upgradeId);
         setMaxStackSize(16);
         Core.proxy.addName(this, this.name);
+        setTabToDisplayOn(CreativeTabs.tabRedstone);
     }
 
     @Override

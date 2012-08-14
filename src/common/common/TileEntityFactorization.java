@@ -122,18 +122,16 @@ public abstract class TileEntityFactorization extends TileEntityCommon
 
     @Override
     void useExtraInfo(byte b) {
-        if (Core.isCannonical()) {
-            return;
+        if (worldObj.isRemote) {
+            facing_direction = b;
         }
-        facing_direction = b;
     }
 
     @Override
     void useExtraInfo2(byte b) {
-        if (Core.isCannonical()) {
-            return;
+        if (worldObj.isRemote) {
+            draw_active = b;
         }
-        draw_active = b;
     }
 
 
@@ -301,7 +299,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         }
         if (draw_active != new_active) {
             draw_active = (byte) new_active;
-            if (Core.isCannonical()) {
+            if (!worldObj.isRemote) {
                 broadcastMessage(null, MessageType.DrawActive, draw_active);
             }
         }
@@ -315,7 +313,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
             worldObj.markBlockNeedsUpdate(xCoord, yCoord, zCoord);
             draw_active--;
         }
-        if (!Core.isCannonical()) {
+        if (worldObj.isRemote) {
             return;
         }
         if (need_logic_check && 0 == worldObj.getWorldTime() % getLogicSpeed()) {

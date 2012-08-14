@@ -80,10 +80,10 @@ public class ItemFactorization extends ItemBlock {
                 tec.onPlacedBy(player, is, side);
                 tec.getBlockClass().enforce(here);
             }
-            if (Core.isCannonical()) {
+            if (!w.isRemote) {
                 if (te instanceof TileEntityCommon) {
                     Packet p = ((TileEntityCommon) te).getDescriptionPacket();
-                    Core.network.broadcastPacket(null, here, p);
+                    Core.network.broadcastPacket(null, here, p); //XXX TODO: Is this necessary?
                 }
             }
         }
@@ -104,49 +104,7 @@ public class ItemFactorization extends ItemBlock {
         //XXX I think this is actually supposed to return localization IDs like "factory.whatever"
         // I don't think this actually gets called...
         int md = itemstack.getItemDamage();
-        if (md == FactoryType.ROUTER.md) {
-            return "Router";
-        }
-        if (md == FactoryType.CUTTER.md) {
-            return "Cutter";
-        }
-        if (md == FactoryType.MAKER.md) {
-            return "Craftpacket Maker";
-        }
-        if (md == FactoryType.STAMPER.md) {
-            return "Craftpacket Stamper";
-        }
-        if (md == FactoryType.QUEUE.md) {
-            return "Queue";
-        }
-        if (md == FactoryType.BARREL.md) {
-            return "Barrel";
-        }
-        if (FactoryType.LAMP.is(md)) {
-            return "Wrathlamp";
-        }
-        if (FactoryType.PACKAGER.is(md)) {
-            return "Packager";
-        }
-        if (FactoryType.SENTRYDEMON.is(md)) {
-            return "Sentry Demon";
-        }
-        if (FactoryType.SLAGFURNACE.is(md)) {
-            return "Slag Furnace";
-        }
-        if (FactoryType.BATTERY.is(md)) {
-            return "Battery";
-        }
-        if (FactoryType.SOLARTURBINE.is(md)) {
-            return "Solar Turbine";
-        }
-        if (FactoryType.LEADWIRE.is(md)) {
-            return "Lead Wire";
-        }
-        if (FactoryType.MIRROR.is(md)) {
-            return "Reflective Mirror";
-        }
-        return "??? It's a Mystery!!!";
+        return "item.factoryBlock" + md;
     }
 
     @Override

@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.IllegalFormatException;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.network.IConnectionHandler;
 import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.Player;
@@ -115,7 +117,7 @@ public class NetworkFactorization implements IPacketHandler {
         //			return;
         //		}
         Packet toSend = Core.network.messagePacket(src, messageType, msg);
-        if (Core.isServer()) {
+        if (who == null || !who.worldObj.isRemote) {
             broadcastPacket(who, src, toSend);
         }
         else {
@@ -220,12 +222,10 @@ public class NetworkFactorization implements IPacketHandler {
                 return;
             }
             boolean handled;
-            if (Core.isCannonical()) {
-                // server. And not SSP 'cause there's no packets
-                handled = tec.handleMessageFromClient(messageType, input);
-            } else {
-                // SMP client
+            if (target.w.isRemote) {
                 handled = tec.handleMessageFromServer(messageType, input);
+            } else {
+                handled = tec.handleMessageFromClient(messageType, input);
             }
             if (!handled) {
                 handleForeignMessage(getCurrentPlayer().worldObj, x, y, z, tec, messageType, input);
@@ -236,7 +236,7 @@ public class NetworkFactorization implements IPacketHandler {
     }
     
     void handleMsg(DataInput input) {
-        if (Core.proxy.isServer()) {
+        if (FMLCommonHandler.instance().getSide() != Side.CLIENT) {
             return; // so, an SMP client sends *us* a message? Nah.
         }
         String main;
@@ -281,7 +281,7 @@ public class NetworkFactorization implements IPacketHandler {
     }
     
     void handleForeignMessage(World world, int x, int y, int z, TileEntity ent, int messageType, DataInput input) throws IOException {
-        if (Core.isCannonical()) {
+        if (!world.isRemote) {
             //Nothing for the server to deal with
         } else {
             switch (messageType) {

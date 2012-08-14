@@ -7,6 +7,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 
 import net.minecraft.src.Container;
 import net.minecraft.src.CraftingManager;
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.IRecipe;
@@ -25,6 +26,7 @@ public class ItemCraft extends Item  {
         super(i);
         maxStackSize = 1;
         setHasSubtypes(true);
+        setTabToDisplayOn(CreativeTabs.tabMisc);
     }
 
     public static void addStamperRecipe(IRecipe recipe) {

@@ -1,5 +1,6 @@
 package factorization.common;
 
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
@@ -17,6 +18,7 @@ public class ItemChargeMeter extends Item {
         Core.proxy.addName(this, "Charge Meter");
         setIconIndex(6);
         setTextureFile(Core.texture_file_item);
+        setTabToDisplayOn(CreativeTabs.tabRedstone);
     }
 
     @Override
@@ -26,7 +28,7 @@ public class ItemChargeMeter extends Item {
         if (ic == null) {
             return false;
         }
-        if (!Core.isCannonical()) {
+        if (w.isRemote) {
             return true;
         }
         int toLook = 5;
