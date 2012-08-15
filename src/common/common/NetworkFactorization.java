@@ -202,12 +202,22 @@ public class NetworkFactorization implements IPacketHandler {
                 } catch (IOException e) {
                     messageType = -1;
                 }
-                TileEntity spawn = ft.makeTileEntity();
-                getCurrentPlayer().worldObj.setBlockTileEntity(x, y, z, spawn);
+                World world = getCurrentPlayer().worldObj;
+                Coord here = new Coord(world, x, y, z);
+                TileEntityCommon spawn = here.getTE(TileEntityCommon.class);
+                if (spawn != null && spawn.getFactoryType() != ft) {
+                    world.removeBlockTileEntity(x, y, z);
+                    spawn = null;
+                }
+                if (spawn == null) {
+                    spawn = ft.makeTileEntity();
+                    spawn.worldObj = world;
+                    world.setBlockTileEntity(x, y, z, spawn);
+                }
 
-                if (spawn instanceof TileEntityCommon) {
-                    ((TileEntityCommon) spawn).useExtraInfo(extraData);
-                    ((TileEntityCommon) spawn).useExtraInfo2(extraData2);
+                if (spawn != null) {
+                    spawn.useExtraInfo(extraData);
+                    spawn.useExtraInfo2(extraData2);
                 }
             }
 

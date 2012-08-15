@@ -62,13 +62,13 @@ public enum FactoryType {
         this(md, use_gui, md, null, null);
     }
 
-    TileEntity makeTileEntity() {
+    TileEntityCommon makeTileEntity() {
         if (clazz == null) {
             System.err.println("Note: " + this + " is a FactoryType with no associated TE");
             return null;
         }
         try {
-            return (TileEntity) clazz.newInstance();
+            return (TileEntityCommon) clazz.newInstance();
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
