@@ -106,7 +106,7 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
     void setupLight(TileEntityBarrel barrel, int dx, int dz) {
         int br = barrel.getCoord().w.getLightBrightnessForSkyBlocks(barrel.xCoord + dx, barrel.yCoord,
                 barrel.zCoord + dz, 0 /* minimum */);
-        br = (int)(br * 0.95);
+        br = (int)(br * 0.55);
         int var11 = br % 65536;
         int var12 = br / 65536;
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) var11 / 1.0F,
@@ -186,6 +186,7 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
         GL11.glScalef(0.05F, 1.5F, 1.5F);
         GL11.glRotatef(90/4, 0, 0, -1);
         GL11.glRotatef(45, 0, 1, 0);
+        GL11.glTranslatef(0, -0.05F, 0);
 //        GL11.glTranslatef(1, 0, 0);
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         int var16;
@@ -218,6 +219,7 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
         {
             GL11.glPopMatrix();
             GL11.glRotatef(item_rotation, 0.0F, 1.0F, 0.0F);
+            GL11.glTranslatef(0, -0.1F, 0);
             int var15;
             float var17;
             if (var10.getItem().requiresMultipleRenderPasses())

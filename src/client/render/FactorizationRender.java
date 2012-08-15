@@ -24,6 +24,7 @@ import factorization.common.RenderingCube;
 import factorization.common.RenderingCube.Vector;
 import factorization.common.Texture;
 import factorization.common.TileEntityBattery;
+import factorization.common.TileEntityCommon;
 import factorization.common.TileEntitySolarTurbine;
 import factorization.common.TileEntityWire;
 import factorization.common.WireConnections;
@@ -49,10 +50,13 @@ public class FactorizationRender implements ISimpleBlockRenderingHandler {
             Block block, int modelId, RenderBlocks renderBlocks) {
         int md = world.getBlockMetadata(x, y, z);
         int renderPass = MinecraftForgeClient.getRenderPass();
-        if (block == Core.registry.factory_block) {
-            FactorizationBlockRender FBR = FactorizationBlockRender.getRenderer(md);
+        TileEntity te = world.getBlockTileEntity(x, y, z);
+        if (te instanceof TileEntityCommon) {
+            TileEntityCommon tec = (TileEntityCommon) te;
+            int fmd = tec.getFactoryType().md;
+            FactorizationBlockRender FBR = FactorizationBlockRender.getRenderer(fmd);
             FBR.renderInWorld(world, x, y, z);
-            FBR.setMetadata(md);
+            FBR.setMetadata(fmd);
             if (renderPass == 0) {
                 FBR.render(renderBlocks);
             } else if (renderPass == 1) {

@@ -153,9 +153,9 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     public void invalidate() {
         super.invalidate();
         if (worldObj.isRemote) {
-            RelightTask task = new RelightTask(worldObj);
-            task.setPosition(xCoord, yCoord, zCoord);
-            worldObj.spawnEntityInWorld(task);
+//			RelightTask task = new RelightTask(worldObj);
+//			task.setPosition(xCoord, yCoord, zCoord);
+//			worldObj.spawnEntityInWorld(task);
         }
     }
 

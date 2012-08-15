@@ -1,8 +1,10 @@
 package factorization.client.render;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.src.EntityBreakingFX;
 import net.minecraft.src.Tessellator;
 import net.minecraft.src.World;
+import net.minecraftforge.client.ForgeHooksClient;
 import factorization.api.Coord;
 import factorization.common.Core;
 
@@ -32,6 +34,8 @@ public class EntityWrathFlameFX extends EntityBreakingFX {
     static final float scaleDelta = 0.03F;
     static final float motionDelta = 0.1F;
 
+    
+    
     //	@Override
     //	public void renderParticle(Tessellator par1Tessellator, float par2, float par3, float par4,
     //			float par5, float par6, float par7) {
@@ -128,6 +132,7 @@ public class EntityWrathFlameFX extends EntityBreakingFX {
     public void renderParticle(Tessellator par1Tessellator, float par2, float par3, float par4,
             float par5, float par6, float par7)
     {
+        ForgeHooksClient.bindTexture(Core.texture_file_item, 0);
         float var8 = (float) (0 % 16) / 16.0F;
         float var9 = var8 + 0.0624375F;
         float var10 = (float) (0 / 16) / 16.0F;
@@ -142,6 +147,7 @@ public class EntityWrathFlameFX extends EntityBreakingFX {
         par1Tessellator.addVertexWithUV((double) (var13 - par3 * var12 + par6 * var12), (double) (var14 + par4 * var12), (double) (var15 - par5 * var12 + par7 * var12), (double) var9, (double) var10);
         par1Tessellator.addVertexWithUV((double) (var13 + par3 * var12 + par6 * var12), (double) (var14 + par4 * var12), (double) (var15 + par5 * var12 + par7 * var12), (double) var8, (double) var10);
         par1Tessellator.addVertexWithUV((double) (var13 + par3 * var12 - par6 * var12), (double) (var14 - par4 * var12), (double) (var15 + par5 * var12 - par7 * var12), (double) var8, (double) var11);
+        ForgeHooksClient.unbindTexture();
     }
 
     public void setScale(int scale) {

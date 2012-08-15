@@ -308,6 +308,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     @Override
     public void updateEntity() {
         super.updateEntity();
+        //TODO: draw_active oughta be used to make the machines draw nicer.
         if (draw_active > 0) {
             makeNoise();
             worldObj.markBlockNeedsUpdate(xCoord, yCoord, zCoord);
