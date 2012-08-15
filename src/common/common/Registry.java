@@ -36,6 +36,8 @@ import cpw.mods.fml.common.ICraftingHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.common.registry.BlockProxy;
+import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.api.IActOnCraft;
 
 public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler {
@@ -89,9 +91,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         is_factory = new ItemStack(factory_block);
         is_lightair = new ItemStack(lightair_block);
 
-        ModLoader.registerBlock(factory_block, ItemFactorization.class);
-        ModLoader.registerBlock(lightair_block);
-        ModLoader.registerBlock(resource_block, ItemBlockResource.class);
+        GameRegistry.registerBlock(factory_block, ItemFactorization.class);
+        GameRegistry.registerBlock(lightair_block);
+        GameRegistry.registerBlock(resource_block, ItemBlockResource.class);
     }
 
     void registerSimpleTileEntities() {

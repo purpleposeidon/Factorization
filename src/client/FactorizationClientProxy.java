@@ -122,13 +122,16 @@ public class FactorizationClientProxy extends FactorizationProxy {
         return ModLoader.getMinecraftInstance().thePlayer;
     }
     
-    @Override
-    public void addPacket(EntityPlayer player, Packet packet) {
-        World w = ModLoader.getMinecraftInstance().theWorld;
-        if (w != null && w.isRemote) {
-            Minecraft.getMinecraft().getSendQueue().addToSendQueue(packet);
-        }
-    }
+//	@Override
+//	public void addPacket(EntityPlayer player, Packet packet) {
+//		World w = ModLoader.getMinecraftInstance().theWorld;
+//		if (w != null && w.isRemote) {
+//			if (Minecraft.getMinecraft().getSendQueue() == null) {
+//				return; //wow, what?
+//			}
+//			Minecraft.getMinecraft().getSendQueue().addToSendQueue(packet);
+//		}
+//	}
     
     @Override
     public Profiler getProfiler() {
@@ -457,9 +460,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
         MinecraftForgeClient.preloadTexture(Core.texture_file_block);
         MinecraftForgeClient.preloadTexture(Core.texture_file_item);
         
-        RenderingRegistry.instance().registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
+        RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
         
-        RenderingRegistry.instance().registerBlockHandler(new FactorizationRender());
+        RenderingRegistry.registerBlockHandler(new FactorizationRender());
         new BlockRenderBattery();
         new BlockRenderDefault();
         new BlockRenderHeater();

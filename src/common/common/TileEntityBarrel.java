@@ -503,6 +503,12 @@ public class TileEntityBarrel extends TileEntityFactorization {
         default:
             return false;
         }
+        getCoord().dirty();
         return true;
+    }
+    
+    @Override
+    public String toString() {
+        return "Barrel of " + getItemCount() + " " + item;
     }
 }

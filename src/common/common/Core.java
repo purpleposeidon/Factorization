@@ -26,6 +26,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.NetworkMod.SidedPacketHandler;
 import cpw.mods.fml.common.registry.TickRegistry;
 
 import net.minecraft.src.Block;
@@ -48,7 +49,15 @@ import factorization.api.Coord;
 @NetworkMod(
         clientSideRequired = true,
         packetHandler = NetworkFactorization.class,
-        channels = {NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel}
+        channels = {NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel},
+        clientPacketHandlerSpec = @SidedPacketHandler(
+                packetHandler = NetworkFactorization.class,
+                channels = {NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel}
+        ),
+        serverPacketHandlerSpec = @SidedPacketHandler(
+                packetHandler = NetworkFactorization.class,
+                channels = {NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel}
+        )
 )
 public class Core {
     public static final String version = "0.5.0";
@@ -157,13 +166,14 @@ public class Core {
             prop.value = "" + entity_relight_task_id;
             prop.comment = "This is a Java Regex to blacklist access to TE";
         }
-
         config.save();
+        
+        registry = new Registry();
+        registry.makeBlocks();
     }
     
     @Init
     public void load(FMLInitializationEvent event) {
-        registry = new Registry();
         
         NetworkRegistry.instance().registerGuiHandler(this, proxy);
         MinecraftForge.EVENT_BUS.register(registry);
@@ -171,7 +181,6 @@ public class Core {
         TickRegistry.registerTickHandler(registry, Side.CLIENT);
         TickRegistry.registerTickHandler(registry, Side.SERVER);
         
-        registry.makeBlocks();
         registry.registerSimpleTileEntities();
         proxy.makeItemsSide();
         registry.makeItems();

@@ -22,3 +22,5 @@ pushd src/minecraft_server/factorization/
   ln -s $BASE/src/server ./
   ln -s $BASE/src/inject/FactorizationHack.java ../net/minecraft/src/
 popd
+
+

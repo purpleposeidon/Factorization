@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import cpw.mods.fml.common.registry.BlockProxy;
+
 import net.minecraft.src.Block;
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
@@ -11,7 +13,7 @@ import net.minecraft.src.Material;
 import net.minecraft.src.World;
 import factorization.api.Coord;
 
-public class BlockResource extends Block {
+public class BlockResource extends Block implements BlockProxy /* ??? */ {
     protected BlockResource(int id) {
         super(id, Material.rock);
         setHardness(2.0F);

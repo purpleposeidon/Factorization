@@ -1,5 +1,7 @@
 package factorization.client.render;
 
+import java.util.ArrayList;
+
 import net.minecraft.src.Block;
 import net.minecraft.src.IBlockAccess;
 import net.minecraft.src.ModLoader;
@@ -27,13 +29,9 @@ import factorization.common.TileEntityWire;
 import factorization.common.WireConnections;
 
 public class FactorizationRender implements ISimpleBlockRenderingHandler {
-    public final int modelID;
     public FactorizationRender() {
-        modelID = RenderingRegistry.instance().getNextAvailableRenderId();
+        Core.factory_rendertype = RenderingRegistry.getNextAvailableRenderId();
     }
-
-    
-
 
     @Override
     public void renderInventoryBlock(Block block, int metadata, int modelID,
@@ -41,6 +39,7 @@ public class FactorizationRender implements ISimpleBlockRenderingHandler {
         if (block == Core.registry.factory_block) {
             FactorizationBlockRender FBR = FactorizationBlockRender.getRenderer(metadata);
             FBR.renderInInventory();
+            FBR.setMetadata(metadata);
             FBR.render(renderer);
         }
     }
@@ -53,10 +52,11 @@ public class FactorizationRender implements ISimpleBlockRenderingHandler {
         if (block == Core.registry.factory_block) {
             FactorizationBlockRender FBR = FactorizationBlockRender.getRenderer(md);
             FBR.renderInWorld(world, x, y, z);
+            FBR.setMetadata(md);
             if (renderPass == 0) {
-//				FBR.render(renderBlocks);
+                FBR.render(renderBlocks);
             } else if (renderPass == 1) {
-//				FBR.renderSecondPass(renderBlocks);
+                FBR.renderSecondPass(renderBlocks);
             }
             return true;
         }
@@ -76,9 +76,6 @@ public class FactorizationRender implements ISimpleBlockRenderingHandler {
 
     @Override
     public int getRenderId() {
-        return modelID;
+        return Core.factory_rendertype;
     }
-
-
-
 }

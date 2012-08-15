@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import cpw.mods.fml.common.registry.BlockProxy;
+
 import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.Block;
 import net.minecraft.src.BlockContainer;
@@ -20,7 +22,7 @@ import net.minecraftforge.common.Orientation;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
 
-public class BlockFactorization extends BlockContainer {
+public class BlockFactorization extends BlockContainer implements BlockProxy /* ??? */ {
     public boolean fake_normal_render = false;
 
     public BlockFactorization(int id) {

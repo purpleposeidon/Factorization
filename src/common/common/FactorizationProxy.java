@@ -11,6 +11,7 @@ import cpw.mods.fml.common.network.Player;
 
 import net.minecraft.src.ContainerPlayer;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NetHandler;
@@ -37,7 +38,7 @@ public abstract class FactorizationProxy implements IGuiHandler {
     public abstract EntityPlayer getPlayer(NetHandler handler);
     /** Send packet to other side */
     public void addPacket(EntityPlayer player, Packet packet) {
-        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+        if (player.worldObj.isRemote) {
             PacketDispatcher.sendPacketToServer(packet);
         } else {
             PacketDispatcher.sendPacketToPlayer(packet, (Player) player);
@@ -106,7 +107,13 @@ public abstract class FactorizationProxy implements IGuiHandler {
     //SERVER
     /** If on SMP, send packet to tell player what he's holding */
     public void updateHeldItem(EntityPlayer player) {}
-    public void updatePlayerInventory(EntityPlayer player) {}
+    public void updatePlayerInventory(EntityPlayer player) {
+        if (player instanceof EntityPlayerMP) {
+            EntityPlayerMP emp = (EntityPlayerMP) player;
+            emp.sendContainerToPlayer(emp.inventorySlots);
+            // updates entire inventory. Inefficient, I know, but... XXX
+        }
+    }
     public boolean playerListensToCoord(EntityPlayer player, Coord c) {
         //XXX TODO: Figure this out.
         return true;

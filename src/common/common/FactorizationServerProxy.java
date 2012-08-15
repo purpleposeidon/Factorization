@@ -20,7 +20,7 @@ import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class FactorizationServerProxy extends FactorizationProxy {
-
+    //XXX TODO: This is *all* wrong. Err, except maybe makeItemsSide().
     @Override
     public void makeItemsSide() {
         Registry registry = Core.registry;

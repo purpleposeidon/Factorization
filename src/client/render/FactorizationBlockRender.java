@@ -28,7 +28,7 @@ abstract public class FactorizationBlockRender implements ICoord {
     protected boolean world_mode;
     protected IBlockAccess w;
     protected int x, y, z;
-    
+    protected int metadata;
     
     private static FactorizationBlockRender renderMap[] = new FactorizationBlockRender[0xFF];
     private static FactorizationBlockRender defaultRender;
@@ -69,6 +69,10 @@ abstract public class FactorizationBlockRender implements ICoord {
 
     public final void renderInInventory() {
         world_mode = false;
+    }
+    
+    public final void setMetadata(int md) {
+        metadata = md;
     }
     
     protected void renderNormalBlock(RenderBlocks rb, int md) {
