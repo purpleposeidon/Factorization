@@ -1,3 +1,0 @@
-#!/bin/sh
-
-ln --verbose "client/factorization/src/$1" "server/factorization/src/$1"

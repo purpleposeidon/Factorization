@@ -1,9 +1,10 @@
 #!/bin/bash
 
 set -e
-
-./recompile.sh
-./reobfuscate.sh
+pushd ../
+  ./recompile.sh
+  ./reobfuscate.sh
+popd
 
 ./package
 

@@ -1,8 +1,0 @@
-#!/bin/sh
-
-CLIENT="client/factorization/src/$1"
-SERVER="server/factorization/src/$1"
-touch $CLIENT
-ln $CLIENT $SERVER
-
-
