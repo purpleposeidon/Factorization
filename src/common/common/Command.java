@@ -6,6 +6,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
+import net.minecraft.src.EntityClientPlayerMP;
 import factorization.common.MechaArmor.MechaMode;
 
 public enum Command {
@@ -48,6 +49,9 @@ public enum Command {
             return;
         }
         if (player.worldObj.isRemote) {
+            if (this == craftOpen && player.craftingInventory != null) {
+                ((EntityClientPlayerMP)player).closeScreen();
+            }
             Core.network.sendCommand(player, this, arg);
             if (!shareCommand) {
                 return;

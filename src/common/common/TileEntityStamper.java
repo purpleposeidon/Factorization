@@ -219,4 +219,9 @@ public class TileEntityStamper extends TileEntityFactorization {
     void makeNoise() {
         Sound.stamperUse.playAt(this);
     }
+    
+    @Override
+    public boolean power() {
+        return draw_active > 0;
+    }
 }

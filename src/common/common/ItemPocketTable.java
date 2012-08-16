@@ -50,7 +50,7 @@ public class ItemPocketTable extends Item {
             player.inventory.setItemStack(null);
         }
         //XXX TODO: Chests stay open. Man, how do I fix this?
-        player.openGui(Core.instance, FactoryType.NULLGUI.gui, null, 0, 0, 0);
+        //player.openGui(Core.instance, FactoryType.NULLGUI.gui, null, 0, 0, 0);
         player.openGui(Core.instance, FactoryType.POCKETCRAFTGUI.gui, null, 0, 0, 0);
         if (save != null) {
             player.inventory.setItemStack(save);
@@ -69,9 +69,12 @@ public class ItemPocketTable extends Item {
         return getItemName();
     }
 
-    ItemStack findPocket(EntityPlayer player) {
+    public ItemStack findPocket(EntityPlayer player) {
         InventoryPlayer inv = player.inventory;
         for (int i = 0; i < inv.getSizeInventory(); i++) {
+            if (i % 9 >= (9-3) && i > 9) {
+                continue;
+            }
             ItemStack is = inv.getStackInSlot(i);
             if (is == null) {
                 continue;
@@ -81,7 +84,7 @@ public class ItemPocketTable extends Item {
             }
         }
         ItemStack mouse_item = player.inventory.getItemStack();
-        if (mouse_item != null && mouse_item.getItem() == this) {
+        if (mouse_item != null && mouse_item.getItem() == this && player.craftingInventory instanceof ContainerPocket) {
             return mouse_item;
         }
         return null;

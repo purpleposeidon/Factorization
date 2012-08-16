@@ -1,4 +1,9 @@
-0.3.3 -- Electrically Charged!
+0.5.0 -- Electrically Charged!
+  Ported to Minecraft 1.3!
+  The pocket crafting table & bag of holding now respond to key presses only if they are not otherwise handled. BWAH-HA-HA-HA-HA! [i]Ahem.[/i] I'm [b]quite positively certain[/b] that this feature would [b]never[/b] go away due to Forge sucking, and that there will be No Problems At All.
+  The barrel renderer looks much nicer now.
+
+0.4.0 -- Secretly Updated!
   Electricity:
     Solar turbines, reflective mirrors, heaters, wires
     Solar turbines require a few reflective mirrors facing towards it on the same y-level, and a water source block underneath. 4 mirrors will produce enough electric charge to power a heater.
@@ -8,7 +13,7 @@
 
   Wrath Fire now treats other netherbrickblocks properly
   Using more ore dict.
-  Added ejection router upgrade. You'll want to use the filter upgrade with it.
+  Added ejection router upgrade. You'll need to use the filter upgrade with it.
 
 0.3.2 -- Upgraded!
   In brief: Mecha-upgrades, and Router upgrades.

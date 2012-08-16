@@ -7,41 +7,41 @@ import java.util.IllegalFormatException;
 import java.util.Map;
 import java.util.Random;
 
-import org.lwjgl.input.Keyboard;
-
-import cpw.mods.fml.client.registry.ClientRegistry;
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
-import cpw.mods.fml.client.registry.KeyBindingRegistry;
-import cpw.mods.fml.client.registry.RenderingRegistry;
-import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
-import cpw.mods.fml.common.TickType;
-import cpw.mods.fml.common.registry.LanguageRegistry;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.Block;
 import net.minecraft.src.ContainerPlayer;
 import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.EntityRenderer;
 import net.minecraft.src.GuiScreen;
-import net.minecraft.src.IBlockAccess;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.KeyBinding;
 import net.minecraft.src.ModLoader;
 import net.minecraft.src.NetHandler;
-import net.minecraft.src.Packet;
 import net.minecraft.src.Profiler;
-import net.minecraft.src.RenderBlocks;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntityChest;
-import net.minecraft.src.TileEntityRenderer;
 import net.minecraft.src.TileEntitySpecialRenderer;
 import net.minecraft.src.World;
 import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.client.event.DrawBlockHighlightEvent;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.Event;
 import net.minecraftforge.event.ForgeSubscribe;
+import net.minecraftforge.event.entity.EntityEvent;
+import net.minecraftforge.event.world.WorldEvent;
+
+import org.lwjgl.input.Keyboard;
+
+import cpw.mods.fml.client.registry.ClientRegistry;
+import cpw.mods.fml.client.registry.KeyBindingRegistry;
+import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
+import cpw.mods.fml.client.registry.RenderingRegistry;
+import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.common.registry.LanguageRegistry;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
+import factorization.client.coremod.GuiKeyEvent;
 import factorization.client.gui.GuiCutter;
 import factorization.client.gui.GuiMaker;
 import factorization.client.gui.GuiMechaConfig;
@@ -83,7 +83,6 @@ import factorization.common.TileEntitySlagFurnace;
 import factorization.common.TileEntitySolarTurbine;
 import factorization.common.TileEntityWatchDemon;
 import factorization.common.TileEntityWrathLamp;
-import factorization.client.coremod.GuiKeyEvent;
 
 public class FactorizationClientProxy extends FactorizationProxy {
     //COMMON
@@ -495,14 +494,17 @@ public class FactorizationClientProxy extends FactorizationProxy {
     }
     
     @ForgeSubscribe
-    void handledGuiKey(GuiKeyEvent event) {
-        if (bag_swap_key.pressTime == 1) {
+    public void handledGuiKey(GuiKeyEvent event) {
+        if (bag_swap_key.keyCode == event.symbol) {
             event.setCanceled(true);
             Command.bagShuffle.call(getClientPlayer());
         }
-        if (pocket_key.pressTime == 1) {
+        if (pocket_key.keyCode == event.symbol) {
             event.setCanceled(true);
-            Command.craftOpen.call(getClientPlayer());
+            if (Core.registry.pocket_table.findPocket(getClientPlayer()) != null) {
+                Command.craftOpen.call(getClientPlayer());
+            }
         }
     }
+    
 }

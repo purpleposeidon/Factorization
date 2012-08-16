@@ -3,16 +3,9 @@ package factorization.common;
 import java.io.File;
 import java.util.Random;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Side;
-import cpw.mods.fml.common.network.IGuiHandler;
-import cpw.mods.fml.common.network.PacketDispatcher;
-import cpw.mods.fml.common.network.Player;
-
 import net.minecraft.src.ContainerPlayer;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerMP;
-import net.minecraft.src.GuiScreen;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NetHandler;
 import net.minecraft.src.Packet;
@@ -20,14 +13,10 @@ import net.minecraft.src.Profiler;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.World;
+import cpw.mods.fml.common.network.IGuiHandler;
+import cpw.mods.fml.common.network.PacketDispatcher;
+import cpw.mods.fml.common.network.Player;
 import factorization.api.Coord;
-import factorization.client.gui.GuiCutter;
-import factorization.client.gui.GuiMaker;
-import factorization.client.gui.GuiMechaConfig;
-import factorization.client.gui.GuiPocketTable;
-import factorization.client.gui.GuiRouter;
-import factorization.client.gui.GuiSlag;
-import factorization.client.gui.GuiStamper;
 
 public abstract class FactorizationProxy implements IGuiHandler {
     //COMMON

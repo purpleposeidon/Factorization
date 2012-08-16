@@ -60,6 +60,10 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
 
     public void neighborChanged() {
     }
+    
+    public boolean power() {
+        return false;
+    }
 
     public AxisAlignedBB getCollisionBoundingBoxFromPool() {
         setBlockBounds(Core.registry.resource_block);

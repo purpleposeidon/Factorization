@@ -5,5 +5,5 @@ BASE=$(dirname `pwd`/$0)/
 
 
 pushd ../reobf/minecraft/
-  jar -cmf $BASE/coremod_manifest.mf $BASE/../jars/coremods/GuiKeyEvent.jar factorization/coremod/*
+  jar -cmf $BASE/coremod_manifest.mf $BASE/../jars/coremods/GuiKeyEvent.jar factorization/client/coremod/*
 popd

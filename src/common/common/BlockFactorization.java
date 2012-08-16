@@ -362,6 +362,18 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
 
     public static final float lamp_pad = 1F / 16F;
 
+    @Override
+    public boolean canProvidePower() {
+        return true;
+    }
+    
+    @Override
+    public boolean isIndirectlyPoweringTo(World w, int x, int y, int z, int side) {
+        Coord here = new Coord(w, x, y, z);
+        TileEntityCommon tec = here.getTE(TileEntityCommon.class);
+        return tec == null ? false : tec.power();
+    }
+    
     //	@Override
     //	public AxisAlignedBB getCollisionBoundingBoxFromPool(World w, int x, int y, int z) {
     //		//		int md = w.getBlockMetadata(x, y, z);
