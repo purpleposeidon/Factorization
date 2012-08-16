@@ -83,7 +83,7 @@ import factorization.common.TileEntitySlagFurnace;
 import factorization.common.TileEntitySolarTurbine;
 import factorization.common.TileEntityWatchDemon;
 import factorization.common.TileEntityWrathLamp;
-import factorization.coremod.GuiKeyEvent;
+import factorization.client.coremod.GuiKeyEvent;
 
 public class FactorizationClientProxy extends FactorizationProxy {
     //COMMON
