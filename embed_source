@@ -23,4 +23,7 @@ pushd src/minecraft_server/factorization/
   ln -s $BASE/src/inject/FactorizationHack.java ../net/minecraft/src/
 popd
 
-
+mkdir lib/factorization
+pushd lib/factorization
+  ln -s ../../factorization/texture/
+popd

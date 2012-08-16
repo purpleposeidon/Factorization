@@ -2,7 +2,9 @@ package factorization.client;
 
 import java.io.File;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.IllegalFormatException;
+import java.util.Map;
 import java.util.Random;
 
 import org.lwjgl.input.Keyboard;
@@ -359,16 +361,33 @@ public class FactorizationClientProxy extends FactorizationProxy {
         return Minecraft.getMinecraft().thePlayer;
     }
     
-    KeyBinding bag_swap_key = new KeyBinding("Bag of Holding", org.lwjgl.input.Keyboard.KEY_GRAVE);
-    KeyBinding pocket_key = new KeyBinding("Pocket Crafting Table", org.lwjgl.input.Keyboard.KEY_C);
-    public KeyBinding mechas[] = new KeyBinding[Registry.MechaKeyCount];
+    public static KeyBinding bag_swap_key = new KeyBinding("Bag of Holding", org.lwjgl.input.Keyboard.KEY_GRAVE);
+    public static KeyBinding pocket_key = new KeyBinding("Pocket Crafting Table", org.lwjgl.input.Keyboard.KEY_C);
+    public static KeyBinding mechas[] = new KeyBinding[Registry.MechaKeyCount];
 
-    private class CommandKey extends KeyHandler {
-        Command cmd;
-        public CommandKey(KeyBinding kb, Command cmd) {
-            super(kb, false);
-            this.cmd = cmd;
+    private static class CommandKeySet extends KeyHandler {
+        Map<KeyBinding, Command> map;
+        
+        static CommandKeySet create(Object... args) {
+            KeyBinding bindings[] = new KeyBinding[args.length/2];
+            boolean repeatings[] = new boolean[args.length/2];
+            Map<KeyBinding, Command> map = new HashMap();
+            for (int i = 0; i < args.length; i += 2) {
+                KeyBinding key = (KeyBinding) args[i];
+                Command cmd = (Command) args[i+1];
+                map.put(key, cmd);
+                bindings[i/2] = key;
+                repeatings[i/2] = false;
+            }
+            CommandKeySet ret = new CommandKeySet(bindings, repeatings);
+            ret.map = map;
+            return ret;
         }
+        
+        private CommandKeySet(KeyBinding[] keyBindings, boolean[] repeatings) {
+            super(keyBindings, repeatings);
+        }
+        
         @Override
         public EnumSet<TickType> ticks() {
             return EnumSet.of(TickType.CLIENT, TickType.RENDER);
@@ -376,27 +395,27 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
         @Override
         public String getLabel() {
-            return "CommandKey: " + cmd;
+            return "CommandKeys";
         }
 
         @Override
-        public void keyDown(EnumSet<TickType> types, boolean tickEnd, boolean isRepeat) {
+        public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd, boolean isRepeat) {
             GuiScreen gui = Minecraft.getMinecraft().currentScreen;
             if (gui != null && gui.doesGuiPauseGame()) {
                 return;
             }
-            cmd.call(getClientPlayer());
+            map.get(kb).call(Core.proxy.getClientPlayer());
         }
-
+        
         @Override
-        public void keyUp(EnumSet<TickType> types, boolean tickEnd) {}
+        public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd) {}
     }
     
-    private class MechaKey extends KeyHandler {
-        byte id;
-        public MechaKey(KeyBinding keyBinding, byte id) {
-            super(keyBinding, false);
-            this.id = id;
+    
+    private Map<KeyBinding, Byte> mechaIDmap = new HashMap();
+    public class MechaKeySet extends KeyHandler {		
+        public MechaKeySet(KeyBinding[] keyBindings, boolean[] repeatings) {
+            super(keyBindings, repeatings);
         }
 
         @Override
@@ -406,42 +425,40 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
         @Override
         public String getLabel() {
-            return "Mecha-Key #" + id;
-        }
-
-        @Override
-        public void keyDown(EnumSet<TickType> types, boolean tickEnd, boolean isRepeat) {
-            GuiScreen gui = Minecraft.getMinecraft().currentScreen;
-            if (gui == null) {
-                return;
-            }
-            Command.mechaKeyOn.call(getClientPlayer(), id);
-        }
-
-        @Override
-        public void keyUp(EnumSet<TickType> types, boolean tickEnd) {
-            GuiScreen gui = Minecraft.getMinecraft().currentScreen;
-            if (gui == null) {
-                return;
-            }
-            Command.mechaKeyOff.call(getClientPlayer(), id);
+            return "MechaKeys";
         }
         
+        @Override
+        public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd, boolean isRepeat) {
+            GuiScreen gui = Minecraft.getMinecraft().currentScreen;
+            if (gui == null) {
+                return;
+            }
+            Command.mechaKeyOn.call(getClientPlayer(), mechaIDmap.get(kb));
+        }
+        
+        @Override
+        public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd) {
+            GuiScreen gui = Minecraft.getMinecraft().currentScreen;
+            if (gui == null) {
+                return;
+            }
+            Command.mechaKeyOff.call(getClientPlayer(), mechaIDmap.get(kb));
+        }
+
     }
     
     @Override
     public void registerKeys() {
         int defaults[] = new int[] { Keyboard.KEY_R, Keyboard.KEY_F, Keyboard.KEY_V, Keyboard.KEY_Z, Keyboard.KEY_X, Keyboard.KEY_B };
-        for (int i = 0; i < mechas.length; i++) {
+        for (byte i = 0; i < mechas.length; i++) {
             mechas[i] = new KeyBinding("Mecha" + (i + 1), defaults[i]);
+            mechaIDmap.put(mechas[i], i);
         }
-        KeyBindingRegistry.registerKeyBinding(new CommandKey(bag_swap_key, Command.bagShuffle));
-        KeyBindingRegistry.registerKeyBinding(new CommandKey(pocket_key, Command.craftOpen));
-        byte b = 0;
-        for (KeyBinding k : mechas) {
-            KeyBindingRegistry.registerKeyBinding(new MechaKey(k, b));
-            b++;
-        }
+        KeyBindingRegistry.registerKeyBinding(CommandKeySet.create(
+                bag_swap_key, Command.bagShuffle,
+                pocket_key, Command.craftOpen));
+        KeyBindingRegistry.registerKeyBinding(new MechaKeySet(mechas, new boolean[mechas.length]));
     }
     
     private void setTileEntityRenderer(Class clazz, TileEntitySpecialRenderer r) {

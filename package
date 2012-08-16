@@ -1,6 +1,9 @@
 #!/bin/bash
 
 set -e
+
+./build_core_mod
+
 cd ../
 
 pushd ~/mc > /dev/zero
@@ -12,13 +15,13 @@ pushd reobf/minecraft  > /dev/zero
   cp -R ../../factorization/texture/ factorization/texture/
   cp ../../factorization/mcmod.info factorization/
   rm -rf factorization/texture/ignore/
-  jar -cf ~/Dropbox/Public/Factorization.jar *Factorization*.class factorization/ buildcraft/
+  jar -cf ~/Dropbox/Public/Factorization.jar *Factorization*.class factorization/
 popd > /dev/zero
 cp ~/Dropbox/Public/Factorization.jar ~/.minecraft/mods/
 
 echo Packaging server
 pushd reobf/minecraft_server > /dev/zero
-  jar -cf ~/Dropbox/Public/Factorization_server.jar *Factorization*.class factorization/ buildcraft/
+  jar -cf ~/Dropbox/Public/Factorization_server.jar *Factorization*.class factorization/
 popd > /dev/zero
 
 
