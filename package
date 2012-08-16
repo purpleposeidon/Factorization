@@ -13,15 +13,18 @@ popd > /dev/zero
 echo Packaging client
 pushd reobf/minecraft  > /dev/zero
   cp -R ../../factorization/texture/ factorization/texture/
-  cp ../../factorization/mcmod.info factorization/
+  cp ../../factorization/*.info ./
   rm -rf factorization/texture/ignore/
-  jar -cf ~/Dropbox/Public/Factorization.jar *Factorization*.class factorization/
+  jar -cf ~/Dropbox/dev/Factorization-dev.jar *Factorization*.class *.info factorization/
 popd > /dev/zero
-cp ~/Dropbox/Public/Factorization.jar ~/.minecraft/mods/
+pushd ~/mc/
+  ./install test
+popd
+cp ~/Dropbox/dev/Factorization-dev.jar ~/.minecraft/mods/Factorization.jar
 
-echo Packaging server
-pushd reobf/minecraft_server > /dev/zero
-  jar -cf ~/Dropbox/Public/Factorization_server.jar *Factorization*.class factorization/
-popd > /dev/zero
+#echo Packaging server
+#pushd reobf/minecraft_server > /dev/zero
+#  jar -cf ~/Dropbox/dev/Factorization_server-dev.jar *Factorization*.class factorization/
+#popd > /dev/zero
 
 
