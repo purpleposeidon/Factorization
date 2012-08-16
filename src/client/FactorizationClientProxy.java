@@ -38,6 +38,8 @@ import net.minecraft.src.TileEntityRenderer;
 import net.minecraft.src.TileEntitySpecialRenderer;
 import net.minecraft.src.World;
 import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.ForgeSubscribe;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
 import factorization.client.gui.GuiCutter;
@@ -81,6 +83,7 @@ import factorization.common.TileEntitySlagFurnace;
 import factorization.common.TileEntitySolarTurbine;
 import factorization.common.TileEntityWatchDemon;
 import factorization.common.TileEntityWrathLamp;
+import factorization.coremod.GuiKeyEvent;
 
 public class FactorizationClientProxy extends FactorizationProxy {
     //COMMON
@@ -401,7 +404,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         @Override
         public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd, boolean isRepeat) {
             GuiScreen gui = Minecraft.getMinecraft().currentScreen;
-            if (gui != null && gui.doesGuiPauseGame()) {
+            if (gui != null /*&& gui.doesGuiPauseGame() -- GuiKeyEvent'll save us. */) {
                 return;
             }
             map.get(kb).call(Core.proxy.getClientPlayer());
@@ -459,6 +462,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 bag_swap_key, Command.bagShuffle,
                 pocket_key, Command.craftOpen));
         KeyBindingRegistry.registerKeyBinding(new MechaKeySet(mechas, new boolean[mechas.length]));
+        MinecraftForge.EVENT_BUS.register(this);
     }
     
     private void setTileEntityRenderer(Class clazz, TileEntitySpecialRenderer r) {
@@ -488,5 +492,17 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderSentryDemon();
         new BlockRenderSolarTurbine();
         new BlockRenderWire();
-    }	
+    }
+    
+    @ForgeSubscribe
+    void handledGuiKey(GuiKeyEvent event) {
+        if (bag_swap_key.pressTime == 1) {
+            event.setCanceled(true);
+            Command.bagShuffle.call(getClientPlayer());
+        }
+        if (pocket_key.pressTime == 1) {
+            event.setCanceled(true);
+            Command.craftOpen.call(getClientPlayer());
+        }
+    }
 }
