@@ -16,7 +16,7 @@ import net.minecraft.src.NBTTagList;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 import net.minecraftforge.common.ISidedInventory;
-import net.minecraftforge.common.Orientation;
+import net.minecraftforge.common.ForgeOrientation;
 
 public class ItemBagOfHolding extends Item implements IActOnCraft {
     public ItemBagOfHolding(int id) {
@@ -212,7 +212,7 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
         int inv_end = inv.getSizeInventory();
         if (inv instanceof ISidedInventory) {
             ISidedInventory sinv = (ISidedInventory) inv;
-            Orientation orient = Orientation.getOrientation(side);
+            ForgeOrientation orient = ForgeOrientation.getOrientation(side);
             inv_start = sinv.getStartInventorySide(orient);
             inv_end = inv_start = sinv.getSizeInventorySide(orient);
         }

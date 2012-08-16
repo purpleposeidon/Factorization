@@ -18,7 +18,7 @@ import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.Vec3;
 import net.minecraft.src.World;
-import net.minecraftforge.common.Orientation;
+import net.minecraftforge.common.ForgeOrientation;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
 
@@ -268,7 +268,7 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
 
     @Override
     public int getFlammability(IBlockAccess world, int x, int y, int z,
-            int md, Orientation face) {
+            int md, ForgeOrientation face) {
         if (FactoryType.BARREL.is(md)) {
             return 25;
         }
@@ -276,7 +276,7 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
     }
 
     @Override
-    public boolean isFlammable(IBlockAccess world, int x, int y, int z, int metadata, Orientation face) {
+    public boolean isFlammable(IBlockAccess world, int x, int y, int z, int metadata, ForgeOrientation face) {
         return false;
         //Not really. But this keeps fire rendering.
         //		if (FactoryType.BARREL.is(metadata)) {
