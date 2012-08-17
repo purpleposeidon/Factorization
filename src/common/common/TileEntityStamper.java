@@ -7,8 +7,8 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NBTTagList;
 import net.minecraftforge.common.ISidedInventory;
-import net.minecraftforge.common.ForgeOrientation;
-import static net.minecraftforge.common.ForgeOrientation.*;
+import net.minecraftforge.common.ForgeDirection;
+import static net.minecraftforge.common.ForgeDirection.*;
 
 
 public class TileEntityStamper extends TileEntityFactorization {
@@ -28,7 +28,7 @@ public class TileEntityStamper extends TileEntityFactorization {
     }
 
     @Override
-    public int getStartInventorySide(ForgeOrientation side) {
+    public int getStartInventorySide(ForgeDirection side) {
         switch (side) {
         case UP:
         case DOWN:
@@ -39,7 +39,7 @@ public class TileEntityStamper extends TileEntityFactorization {
     }
 
     @Override
-    public int getSizeInventorySide(ForgeOrientation side) {
+    public int getSizeInventorySide(ForgeDirection side) {
         return 1;
     }
 

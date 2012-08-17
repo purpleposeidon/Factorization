@@ -11,8 +11,8 @@ import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.TileEntityFurnace;
 import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
-import net.minecraftforge.common.ForgeOrientation;
-import static net.minecraftforge.common.ForgeOrientation.*;
+import net.minecraftforge.common.ForgeDirection;
+import static net.minecraftforge.common.ForgeDirection.*;
 
 
 
@@ -45,7 +45,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     }
 
     @Override
-    public int getStartInventorySide(ForgeOrientation side) {
+    public int getStartInventorySide(ForgeDirection side) {
         switch (side) {
         case DOWN:
             return fuel; //bottom: fuel
@@ -57,7 +57,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     }
 
     @Override
-    public int getSizeInventorySide(ForgeOrientation side) {
+    public int getSizeInventorySide(ForgeDirection side) {
         if (side == DOWN || side == UP) {
             return 1; //bottom/top: fuel/input
         }

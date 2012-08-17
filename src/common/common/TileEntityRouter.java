@@ -19,8 +19,8 @@ import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.World;
 import net.minecraftforge.common.ISidedInventory;
-import net.minecraftforge.common.ForgeOrientation;
-import static net.minecraftforge.common.ForgeOrientation.*;
+import net.minecraftforge.common.ForgeDirection;
+import static net.minecraftforge.common.ForgeDirection.*;
 import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
 
@@ -169,7 +169,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         int start = 0, end = inv.getSizeInventory();
         if (inv instanceof ISidedInventory) {
             ISidedInventory isi = (ISidedInventory) inv;
-            ForgeOrientation access_side = ForgeOrientation.getOrientation(CubeFace.oppositeSide(eject_direction));
+            ForgeDirection access_side = ForgeDirection.getOrientation(CubeFace.oppositeSide(eject_direction));
             start = isi.getStartInventorySide(access_side);
             end = start + isi.getSizeInventorySide(access_side);
             if (start == end) {
@@ -393,7 +393,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         if (t instanceof ISidedInventory) {
             int free_count = 0;
             ISidedInventory inv = (ISidedInventory) t;
-            for (ForgeOrientation side : ForgeOrientation.values()) {
+            for (ForgeDirection side : ForgeDirection.values()) {
                 // check each side
                 if (inv.getSizeInventorySide(side) != 0) {
                     free_count++;
@@ -409,7 +409,7 @@ public class TileEntityRouter extends TileEntityFactorization {
             return true;
         }
         ISidedInventory s = (ISidedInventory) t;
-        for (ForgeOrientation side : ForgeOrientation.values()) {
+        for (ForgeDirection side : ForgeDirection.values()) {
             int low = s.getStartInventorySide(side);
             int high = low + s.getSizeInventorySide(side);
             if (low <= slot && slot < high) {
@@ -461,8 +461,8 @@ public class TileEntityRouter extends TileEntityFactorization {
             // Get/Put from one of the sides
             if (t instanceof ISidedInventory && target_side < 6 && target_side >= 0) {
                 ISidedInventory inv = (ISidedInventory) t;
-                start = inv.getStartInventorySide(ForgeOrientation.getOrientation(target_side));
-                end = start + inv.getSizeInventorySide(ForgeOrientation.getOrientation(target_side));
+                start = inv.getStartInventorySide(ForgeDirection.getOrientation(target_side));
+                end = start + inv.getSizeInventorySide(ForgeDirection.getOrientation(target_side));
             } else {
                 start = 0;
                 end = t.getSizeInventory();
@@ -875,12 +875,12 @@ public class TileEntityRouter extends TileEntityFactorization {
     }
 
     @Override
-    public int getStartInventorySide(ForgeOrientation side) {
+    public int getStartInventorySide(ForgeDirection side) {
         return 0;
     }
 
     @Override
-    public int getSizeInventorySide(ForgeOrientation side) {
+    public int getSizeInventorySide(ForgeDirection side) {
         return 1;
     }
 }

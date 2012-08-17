@@ -4,6 +4,7 @@ import factorization.api.Coord;
 import factorization.common.Core;
 import factorization.common.FactoryType;
 import factorization.common.RenderingCube;
+import factorization.common.RenderingCube.Vector;
 import factorization.common.TileEntityWire;
 import factorization.common.WireConnections;
 import net.minecraft.client.Minecraft;
@@ -11,6 +12,7 @@ import net.minecraft.src.RenderBlocks;
 import net.minecraft.src.Tessellator;
 
 public class BlockRenderWire extends FactorizationBlockRender {
+    RenderingCube bot = new RenderingCube(11, new Vector(1, 0, 0), new Vector(0, -1, 0));
     @Override
     void render(RenderBlocks rb) {
         if (world_mode) {
@@ -20,10 +22,15 @@ public class BlockRenderWire extends FactorizationBlockRender {
                 renderCube(rc);
             }
         } else {
-            int lead = Core.registry.resource_block.getBlockTextureFromSideAndMetadata(0, Core.registry.lead_block_item.getItemDamage());
-            float wireWidth = 4F / 16F;
-            renderPart(rb, lead, 0, 0, 0, 1, wireWidth, wireWidth);
-            renderPart(rb, lead, 0, 0, 0, wireWidth, wireWidth, 1);
+            for (RenderingCube rc : WireConnections.getInventoryParts()) {
+                renderCube(rc);
+            }
+//			renderCube(bot);
+//			renderCube(new RenderingCube(11, new Vector(-16, -16, -16), null));
+//			int lead = Core.registry.resource_block.getBlockTextureFromSideAndMetadata(0, Core.registry.lead_block_item.getItemDamage());
+//			float wireWidth = 4F / 16F;
+//			renderPart(rb, lead, 0, 0, 0, 1, wireWidth, wireWidth);
+//			renderPart(rb, lead, 0, 0, 0, wireWidth, wireWidth, 1);
         }
     }
 

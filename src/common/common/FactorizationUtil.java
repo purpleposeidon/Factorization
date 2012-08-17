@@ -42,6 +42,13 @@ public class FactorizationUtil {
         tag.setLong("lf", w.getWorldTime());
         return true;
     }
+    
+    public static ItemStack normalize(ItemStack is) {
+        if (is == null || is.stackSize <= 0) {
+            return null;
+        }
+        return is;
+    }
 
     public static ItemStack transferStackToArea(IInventory srcInv, int slotIndex,
             IInventory destInv, Iterable<Integer> targetSlots) {

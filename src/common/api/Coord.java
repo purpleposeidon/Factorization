@@ -9,7 +9,7 @@ import net.minecraft.src.Entity;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
-import net.minecraftforge.common.ForgeOrientation;
+import net.minecraftforge.common.ForgeDirection;
 
 public class Coord {
     public World w;
@@ -297,10 +297,10 @@ public class Coord {
     /** Let's try to use Orientation */
     @Deprecated
     public boolean isSolidOnSide(int side) {
-        return w.isBlockSolidOnSide(x, y, z, ForgeOrientation.getOrientation(side));
+        return w.isBlockSolidOnSide(x, y, z, ForgeDirection.getOrientation(side));
     }
     
-    public boolean isSolidOnSide(ForgeOrientation side) {
+    public boolean isSolidOnSide(ForgeDirection side) {
         return w.isBlockSolidOnSide(x, y, z, side);
     }
 

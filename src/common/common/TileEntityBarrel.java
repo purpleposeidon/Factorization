@@ -12,8 +12,8 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.Packet;
 import net.minecraftforge.common.ISidedInventory;
-import net.minecraftforge.common.ForgeOrientation;
-import static net.minecraftforge.common.ForgeOrientation.*;
+import net.minecraftforge.common.ForgeDirection;
+import static net.minecraftforge.common.ForgeDirection.*;
 import factorization.common.NetworkFactorization.MessageType;
 
 //Based off of technology found stockpiled in the long-abandoned dwarven fortress of "Nod Semor, the Toad of Unity".
@@ -200,7 +200,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     }
 
     @Override
-    public int getStartInventorySide(ForgeOrientation side) {
+    public int getStartInventorySide(ForgeDirection side) {
         switch (side) {
         case DOWN:
             return 0; // -Y
@@ -212,7 +212,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     }
 
     @Override
-    public int getSizeInventorySide(ForgeOrientation side) {
+    public int getSizeInventorySide(ForgeDirection side) {
         if (side == UP || side == DOWN) {
             return 1;
         }

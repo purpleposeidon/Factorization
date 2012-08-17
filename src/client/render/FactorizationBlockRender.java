@@ -20,6 +20,8 @@ import net.minecraft.src.IBlockAccess;
 import net.minecraft.src.RenderBlocks;
 import net.minecraft.src.Tessellator;
 import net.minecraft.src.World;
+import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.MinecraftForgeClient;
 
 abstract public class FactorizationBlockRender implements ICoord {
     static Block metal = Block.obsidian;
@@ -69,6 +71,7 @@ abstract public class FactorizationBlockRender implements ICoord {
 
     public final void renderInInventory() {
         world_mode = false;
+        x = y = z = 0;
     }
     
     public final void setMetadata(int md) {
@@ -138,12 +141,22 @@ abstract public class FactorizationBlockRender implements ICoord {
     }
 
     protected void renderCube(RenderingCube rc) {
+        if (!world_mode) {
+            Tessellator.instance.startDrawingQuads();
+            ForgeHooksClient.bindTexture(Core.texture_file_block, 0);
+            GL11.glDisable(GL11.GL_LIGHTING);
+        }
         for (int face = 0; face < 6; face++) {
             Vector[] vecs = rc.faceVerts(face);
             for (int i = 0; i < vecs.length; i++) {
                 Vector vec = vecs[i];
                 vertex(rc, vec.x, vec.y, vec.z, vec.u, vec.v);
             }
+        }
+        if (!world_mode) {
+            Tessellator.instance.draw();
+            ForgeHooksClient.unbindTexture();
+            GL11.glEnable(GL11.GL_LIGHTING);
         }
     }
     

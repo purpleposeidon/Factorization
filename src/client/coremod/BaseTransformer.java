@@ -16,6 +16,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.MethodNode;
 
 public class BaseTransformer implements IClassTransformer, IFMLLoadingPlugin {
@@ -54,7 +55,9 @@ public class BaseTransformer implements IClassTransformer, IFMLLoadingPlugin {
         AbstractInsnNode ins = toAppend.instructions.getFirst();
         while (ins != null) {
             AbstractInsnNode next = ins.getNext();
-            base.instructions.insertBefore(base_end, ins);
+            if (!(ins instanceof LineNumberNode)) {
+                base.instructions.insertBefore(base_end, ins);
+            }
             ins = next;
         }
         base.instructions.remove(base_end);

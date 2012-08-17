@@ -9,6 +9,7 @@ import net.minecraft.src.Chunk;
 import net.minecraft.src.Entity;
 import net.minecraft.src.MovingObjectPosition;
 import net.minecraft.src.NBTTagCompound;
+import net.minecraft.src.Profiler;
 import net.minecraft.src.Vec3;
 import net.minecraft.src.World;
 
@@ -130,9 +131,11 @@ public class TileEntityWrathLamp extends TileEntityCommon {
 
     @Override
     public void updateEntity() {
-        Core.proxy.getProfiler().startSection("WrathLamp");
+        Profiler prof = Core.proxy.getProfiler();
+        prof.startSection("WrathLamp");
+        //... lame.
         this.updater = this.updater.update();
-        Core.proxy.getProfiler().endSection();
+        prof.endSection();
     }
 
     void onRemove() {

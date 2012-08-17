@@ -66,16 +66,8 @@ public class MechaMountedPiston extends Item implements IMechaUpgrade {
         Coord head;
         Coord foot;
         //TODO: Figure out which one to use, since this'll always be on a server...
-        if (!player.worldObj.isRemote) {
-            //...?
-            //man, what's up with this?
-            head = new Coord(player).add(0, 1, 0).add(-1, 0, 0);
-            foot = new Coord(player).add(-1, 0, 0);
-        }
-        else {
-            head = new Coord(player).add(0, -2, 0);
-            foot = new Coord(player).add(0, -3, 0);
-        }
+        head = new Coord(player).add(-1, 1, -1);
+        foot = new Coord(player).add(-1, 0, -1);
 
         Coord order[];
         if (player.rotationPitch <= 45) {

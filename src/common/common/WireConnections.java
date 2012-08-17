@@ -121,10 +121,10 @@ public class WireConnections {
         return new RenderingCube(icon, corner, origin);
     }
 
-    final float h = 2, w = 4; //these are half of the actual size.
-    RenderingCube base_face = cube(new Vector(w, h, w), new Vector(0, -8 + h, 0));
-    RenderingCube base_face_side = base_face.copy().rotate(1, 0, 0, 90).normalize();
-    RenderingCube face_map[] = {
+    static final float h = 2, w = 4; //these are half of the actual size.
+    static RenderingCube base_face = cube(new Vector(w, h, w), new Vector(0, -8 + h, 0));
+    static RenderingCube base_face_side = base_face.copy().rotate(1, 0, 0, 90).normalize();
+    static RenderingCube face_map[] = {
             base_face.copy(),
             base_face.rotate(1, 0, 0, 180).normalize(),
             base_face_side.rotate(0, 1, 0, 90 * 0).normalize(),
@@ -132,10 +132,10 @@ public class WireConnections {
             base_face_side.rotate(0, 1, 0, 90 * 1).normalize(),
             base_face_side.rotate(0, 1, 0, 90 * 3).normalize(),
     };
-    RenderingCube bottom_edge = cube(new Vector(w, h, h), new Vector(0, -8 + h, 8 - h)),
+    static RenderingCube bottom_edge = cube(new Vector(w, h, h), new Vector(0, -8 + h, 8 - h)),
             top_edge = bottom_edge.copy().rotate(1, 0, 0, 180).normalize(),
             side_edge = bottom_edge.copy().rotate(0, 0, 1, 90).normalize();
-    RenderingCube edge_map[] = {
+    static RenderingCube edge_map[] = {
             bottom_edge.rotate(0, 1, 0, 90 * 2).normalize(),
             bottom_edge.rotate(0, 1, 0, 90 * 1).normalize(),
             bottom_edge.rotate(0, 1, 0, 90 * 0).normalize(),
@@ -167,6 +167,17 @@ public class WireConnections {
             }
             ret.add(edge_map[edge_index].copy());
         }
+        return ret;
+    }
+    
+    static public Iterable<RenderingCube> getInventoryParts() {
+        ArrayList<RenderingCube> ret = new ArrayList(2);
+        ret.add(face_map[0].copy());
+        ret.add(edge_map[0].copy());
+        ret.add(edge_map[1].copy());
+        //ret.add(edge_map[2].copy());
+        ret.add(edge_map[3].copy());
+        ret.add(face_map[2].copy());
         return ret;
     }
 

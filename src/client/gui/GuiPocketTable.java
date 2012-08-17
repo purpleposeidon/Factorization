@@ -18,6 +18,7 @@ public class GuiPocketTable extends GuiContainer {
         ySize = 89;
     }
 
+    private int open_time = 0;
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int i, int j) {
         int k = mc.renderEngine.getTexture(Core.texture_dir + "pocketgui.png");
@@ -26,6 +27,7 @@ public class GuiPocketTable extends GuiContainer {
         int l = (width - xSize) / 2;
         int i1 = (height - ySize) / 2;
         drawTexturedModalRect(l, i1, 0, 0, xSize, ySize);
+        open_time++;
     }
 
     @Override
@@ -42,6 +44,10 @@ public class GuiPocketTable extends GuiContainer {
 
     @Override
     protected void keyTyped(char key, int par2) {
+        if (open_time < 4) {
+            super.keyTyped(key, par2);
+            return;
+        }
         // 'x' clears items out of the way. Fill inv, then bag (and make slurp
         // sound). [XXX TODO -- Doing this server-friendly'd require a packet or
         // something]
@@ -62,7 +68,7 @@ public class GuiPocketTable extends GuiContainer {
             Command.craftMove.call(mc.thePlayer);
             return;
         }
-        if (key == 'f') {
+        if (key == 'z') {
             Command.craftBalance.call(mc.thePlayer);
             return;
         }
