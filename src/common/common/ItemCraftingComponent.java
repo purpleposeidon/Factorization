@@ -17,7 +17,7 @@ public class ItemCraftingComponent extends Item {
         return Core.texture_file_item;
     }
 
-    //@Override -- SERVERf
+    @Override //-- SERVERf
     public int getIconFromDamage(int par1) {
         return icon;
     }

@@ -133,7 +133,12 @@ public class ContainerFactorization extends Container {
             addSlotToContainer(new Slot(furnace, 2, 115, 34));
             addSlotToContainer(new Slot(furnace, 3, 141, 34));
             break;
-        default:
+        case GRINDER:
+            TileEntityGrinder grinder = (TileEntityGrinder) ent;
+            addSlotToContainer(new Slot(grinder, 0, 56, 35));
+            addSlotToContainer(new Slot(grinder, 1, 115, 34));
+            break;
+        default: //Fun fact: progress is done by subclassing; see ContainerSlagFurnace
             break;
         }
         addPlayerSlots(inventoryplayer);

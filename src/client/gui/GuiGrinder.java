@@ -1,0 +1,40 @@
+package factorization.client.gui;
+
+import net.minecraft.src.GuiContainer;
+
+import org.lwjgl.opengl.GL11;
+
+import factorization.common.ContainerFactorization;
+import factorization.common.ContainerGrinder;
+import factorization.common.Core;
+import factorization.common.TileEntityGrinder;
+import factorization.common.TileEntitySlagFurnace;
+
+public class GuiGrinder extends GuiContainer {
+    ContainerGrinder factContainer;
+    TileEntityGrinder grinder;
+
+    public GuiGrinder(ContainerFactorization cont) {
+        super(cont);
+        factContainer = (ContainerGrinder) cont;
+        grinder = factContainer.grinder;
+    }
+
+    protected void drawGuiContainerForegroundLayer() {
+        fontRenderer.drawString(grinder.getInvName(), 60, 6, 0x404040);
+    }
+
+    @Override
+    protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
+        int var4 = mc.renderEngine.getTexture(Core.texture_dir + "grinder.png");
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        this.mc.renderEngine.bindTexture(var4);
+        int var5 = (this.width - this.xSize) / 2;
+        int var6 = (this.height - this.ySize) / 2;
+        this.drawTexturedModalRect(var5, var6, 0, 0, this.xSize, this.ySize);
+        int var7;
+        var7 = grinder.getGrindProgressScaled(24);
+        this.drawTexturedModalRect(var5 + 79, var6 + 34, 176, 14, var7 + 1, 16);
+    }
+
+}

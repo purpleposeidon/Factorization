@@ -248,9 +248,9 @@ public class FactorizationUtil {
 
     static Random rand = new Random();
 
-    static void spawnItemStack(Coord c, ItemStack item) {
+    static EntityItem spawnItemStack(Coord c, ItemStack item) {
         if (item == null) {
-            return;
+            return null;
         }
         double dx = rand.nextFloat() * 0.5 - 0.5;
         double dy = rand.nextFloat() * 0.5 - 0.5;
@@ -261,5 +261,6 @@ public class FactorizationUtil {
         entityitem.motionX = rand.nextGaussian() * 0.02;
         entityitem.motionZ = rand.nextGaussian() * 0.02;
         c.w.spawnEntityInWorld(entityitem);
+        return entityitem;
     }
 }

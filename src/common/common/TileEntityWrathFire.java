@@ -151,7 +151,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
         burn(Block.blockClay, Block.brick);
 
         burn(Block.blockSteel, new BlockMatch(Core.registry.resource_block, ResourceType.DARKIRONBLOCK.md));
-        burn(new BlockMatch(Core.registry.resource_block, ResourceType.SILVERBLOCK.md), new BlockMatch(Core.registry.resource_block, ResourceType.LEADBLOCK.md));
+        //burn(new BlockMatch(Core.registry.resource_block, ResourceType.SILVERBLOCK.md), new BlockMatch(Core.registry.resource_block, ResourceType.LEADBLOCK.md));
 
     }
 
@@ -239,6 +239,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
         else {
             //what? Okay, forget it.
             c.setId(0);
+            c.rmTE();
             return false;
         }
     }
@@ -250,6 +251,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
 
     void die() {
         fire.set(getCoord());
+        getCoord().rmTE();
     }
 
     public static int updateCount = 0;

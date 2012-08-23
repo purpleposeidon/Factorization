@@ -79,21 +79,22 @@ abstract public class FactorizationBlockRender implements ICoord {
     }
     
     protected void renderNormalBlock(RenderBlocks rb, int md) {
-        Block b = Core.registry.factory_block;
+//		renderPart(rb, Core.registry.factory_block.getBlockTextureFromSideAndMetadata(0, md), 0, 0, 0, 1, 1, 1);
+        Block b = Core.registry.factory_rendering_block;
         b.setBlockBounds(0, 0, 0, 1, 1, 1);
         if (world_mode) {
             rb.renderStandardBlock(b, x, y, z);
         }
         else {
-            Core.registry.factory_block.fake_normal_render = true;
+            Core.registry.factory_rendering_block.fake_normal_render = true;
             rb.renderBlockAsItem(b, md, 1.0F);
-            Core.registry.factory_block.fake_normal_render = false;
+            Core.registry.factory_rendering_block.fake_normal_render = false;
         }
     }
     
     protected void renderPart(RenderBlocks rb, int texture, float b1, float b2, float b3,
             float b4, float b5, float b6) {
-        BlockFactorization block = Core.registry.factory_block;
+        BlockFactorization block = Core.registry.factory_rendering_block;
         block.setBlockBounds(b1, b2, b3, b4, b5, b6);
         if (world_mode) {
             Texture.force_texture = texture;
@@ -171,7 +172,7 @@ abstract public class FactorizationBlockRender implements ICoord {
                 rc.ul + u / 256F, rc.vl + v / 256F);
     }
     
-    static void renderItemIn2D(int icon_index) {
+    public static void renderItemIn2D(int icon_index) {
         //NOTE: This is *not* suited for world_mode!
         float var6 = ((float) (icon_index % 16 * 16) + 0.0F) / 256.0F;
         float var7 = ((float) (icon_index % 16 * 16) + 15.9999F) / 256.0F;
@@ -263,5 +264,13 @@ abstract public class FactorizationBlockRender implements ICoord {
         }
 
         par1Tessellator.draw();
+    }
+    
+
+    void renderMotor(RenderBlocks rb, float yoffset) {
+        int lead = Core.registry.lead_block_item.getIconIndex();
+        float d = 4.0F / 16.0F;
+        float yd = -d + 0.003F;
+        renderPart(rb, lead, d, d + yd + yoffset, d, 1 - d, 1 - (d + 0F/16F) + yd + yoffset, 1 - d);
     }
 }

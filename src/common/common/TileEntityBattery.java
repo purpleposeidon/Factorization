@@ -12,7 +12,7 @@ import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityBattery extends TileEntityCommon implements IChargeConductor {
     Charge charge = new Charge(), storage = new Charge();
-    private static final int max_storage = 6400;
+    static final int max_storage = 6400;
 
     @Override
     public FactoryType getFactoryType() {

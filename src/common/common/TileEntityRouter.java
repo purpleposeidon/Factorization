@@ -185,7 +185,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 
     @Override
     void doLogic() {
-        Core.proxy.getProfiler().startSection("router");
+        Core.profileStart("router");
         needLogic();
         if (lastSeenAt == null) {
             lastSeenAt = getCoord();
@@ -212,7 +212,7 @@ public class TileEntityRouter extends TileEntityFactorization {
                 break;
             }
         }
-        Core.proxy.getProfiler().endSection();
+        Core.profileEnd();
     }
 
     TileEntity popFrontier() {

@@ -198,6 +198,7 @@ public class Core {
     public void modsLoaded(FMLPostInitializationEvent event) {
         TileEntityWrathFire.setupBurning();
         registry.addDictOres();
+        registry.makeRenderHelperBlock();
     }
 
     ItemStack getExternalItem(String className, String classField, String description) {
@@ -329,5 +330,14 @@ public class Core {
         for (Object o : a) {
             tab.add(o);
         }
+    }
+    
+    public static void profileStart(String section) {
+        // :|
+        //Core.proxy.getProfiler().startSection(section);
+    }
+    
+    public static void profileEnd() {
+        //Core.proxy.getProfiler().endSection();
     }
 }

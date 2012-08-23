@@ -1,15 +1,21 @@
 0.5.0 -- Electrically Charged!
   Ported to Minecraft 1.3!
+  Due to concurrency & laziness issues, the client will dynamically pick an additional block ID if possible. The block will be used only for rendering. I don't anticipate it causing problems with other mods. If you've somehow managed to use up all 4096 or so other block IDs, the real Factorization block will be used instead; this would cause occasional rendering glitches when using the integrated server.
   The pocket crafting table & bag of holding now respond to key presses only if they are not otherwise handled. BWAH-HA-HA-HA-HA! [i]Ahem.[/i] I'm [b]quite positively certain[/b] that this feature would [b]never[/b] go away due to Forge sucking, and that there will be. No. Problems. At. All.
   The barrel renders blocks much nicer now.
+  Wrath lamp recipe is now 4 dark iron & 2 silver.
+
+  More Electricity:
+    The battery block is made using acid & lead. When crafted, it will be fully charged. They do not stack. Battery blocks keep their charge when broken. They are used to craft magnets, which are used in motors.
+    The Grinder is the first step of the ore processing chain. A second use for diamond shards!
 
 0.4.0 -- Secretly Updated!
   Electricity:
-    Solar turbines, reflective mirrors, heaters, wires
+    Solar turbines, reflective mirrors, heaters, wires, charge meters
     Solar turbines require a few reflective mirrors facing towards it on the same y-level, and a water source block underneath. 4 mirrors will produce enough electric charge to power a heater.
     The heater allows you to run vanilla furnaces & slag furnaces without fuel. Place a heater adjacent to a furnace to heat it. A properly heated furnace will cook faster than normal. You can put more than one heater touching a furnace for extra speed.
-    Of course wires are there if you need them. It's called "Soldering Wire". Since it's very weak structurally, it must be supported by a block (or supported by a wire that is directly supported).
-
+    The wires are called "Soldering Wire". Since it's very weak structurally, it must be supported by a block (or supported by a wire that is directly supported).
+    A Charge Meter will tell you how much charge is at conductor, how many conductors are connected, and what the average charge on them is.
 
   Wrath Fire now treats other netherbrickblocks properly
   Using more ore dict.

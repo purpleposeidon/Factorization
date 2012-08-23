@@ -3,6 +3,7 @@ package factorization.common;
 import java.io.File;
 import java.util.Random;
 
+import net.minecraft.src.Container;
 import net.minecraft.src.ContainerPlayer;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerMP;
@@ -34,10 +35,7 @@ public abstract class FactorizationProxy implements IGuiHandler {
         }
     }
     public abstract Profiler getProfiler();
-    @Override
-    public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) { return null; }
-    @Override
-    public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) { 
+    protected Container getContainer(int ID, EntityPlayer player, World world, int x, int y, int z) {
         if (ID == FactoryType.NULLGUI.gui) {
             player.craftingInventory = new ContainerPlayer(player.inventory);
             //ModLoader.getMinecraftInstance().displayGuiScreen(null);
@@ -59,12 +57,19 @@ public abstract class FactorizationProxy implements IGuiHandler {
         ContainerFactorization cont;
         if (ID == FactoryType.SLAGFURNACE.gui) {
             cont = new ContainerSlagFurnace(player, fac);
-        }
-        else {
+        } else if (ID == FactoryType.GRINDER.gui) {
+            cont = new ContainerGrinder(player, (TileEntityGrinder) fac);
+        } else {
             cont = new ContainerFactorization(player, fac);
         }
         cont.addSlotsForGui(fac, player.inventory);
         return cont;
+    }
+    @Override
+    public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) { return null; }
+    @Override
+    public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) { 
+        return getContainer(ID, player, world, x, y, z);
     }
     
     //CLIENT

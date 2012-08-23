@@ -33,7 +33,7 @@ public class ItemMachineUpgrade extends Item {
     public boolean tryPlaceIntoWorld(ItemStack stack, EntityPlayer player, World world, int X, int Y,
             int Z, int side, float vecx, float vecy, float vecz) {
         Coord here = new Coord(world, X, Y, Z);
-        TileEntityFactorization te = here.getTE(TileEntityFactorization.class);
+        TileEntityCommon te = here.getTE(TileEntityCommon.class);
         if (te.takeUpgrade(stack)) {
             if (!player.capabilities.isCreativeMode) {
                 stack.stackSize--;

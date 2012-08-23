@@ -31,8 +31,8 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
         setHardness(2.0F);
         setResistance(5);
         setLightOpacity(3);
+        canBlockGrass[id] = false;
         //setBlockBounds(0, -1000, 0, 0, -999, 0);
-        setCreativeTab(CreativeTabs.tabRedstone);
     }
     
     @Override
@@ -90,11 +90,12 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
         TileEntityCommon t = new Coord(world, x, y, z).getTE(TileEntityCommon.class);
 
         if (t != null) {
-            if (!world.isRemote) {
-                return t.activate(entityplayer);
-            }
-
-            return true;
+            return t.activate(entityplayer);
+//			if (!world.isRemote) {
+//				return t.activate(entityplayer);
+//			}
+//
+//			return true;
         }
         else {
             //info message
@@ -126,7 +127,7 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
         }
     }
 
-    // @Override -- Nope, can't do this for server
+    @Override
     public int getBlockTexture(IBlockAccess w, int x, int y, int z, int side) {
         // Used for in-world rendering. Takes 'active' into consideration.
         if (Texture.force_texture != -1) {
@@ -139,6 +140,10 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
             TileEntityFactorization f = (TileEntityFactorization) t;
             active = (((f).draw_active + 1) / 2) % 3 == 1;
             facing_direction = f.facing_direction;
+        }
+        if (t instanceof TileEntityBarrel) {
+            //whee, hack
+            active = ((TileEntityBarrel) t).upgrade != 0;
         }
 
         if (t instanceof IFactoryType) {
@@ -211,6 +216,7 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
             is = new ItemStack(Core.registry.mirror);
         }
         if (f.getFactoryType() == FactoryType.BATTERY) {
+            is = new ItemStack(Core.registry.battery);
             TileEntityBattery bat = (TileEntityBattery) f;
             NBTTagCompound tag = new NBTTagCompound();
             tag.setInteger("storage", bat.storage.getValue());
@@ -222,6 +228,9 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
 
     @Override
     public void addCreativeItems(ArrayList itemList) {
+        if (this != Core.registry.factory_block) {
+            return;
+        }
         Registry reg = Core.registry;
         //common
         itemList.add(reg.barrel_item);
@@ -236,12 +245,14 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
         itemList.add(reg.sentrydemon_item);
 
         //electric
-        itemList.add(reg.battery_item);
+        //itemList.add(reg.battery_item_hidden);
+        itemList.add(new ItemStack(reg.battery));
         itemList.add(reg.solar_turbine_item);
         //itemList.add(reg.mirror_item_hidden);
         itemList.add(new ItemStack(reg.mirror));
         itemList.add(reg.heater_item);
         itemList.add(reg.leadwire_item);
+        itemList.add(reg.grinder_item);
 
 
         //itemList.add(core.cutter_item);
@@ -250,6 +261,9 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
     
     @Override
     public void getSubBlocks(int par1, CreativeTabs par2CreativeTabs, List par3List) {
+        if (this != Core.registry.factory_block) {
+            return;
+        }
         Core.addBlockToCreativeList(par3List, this);
     }
 
@@ -392,7 +406,7 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
     //		return super.getSelectedBoundingBoxFromPool(w, x, y, z);
     //	}
 
-    //@Override ser-ver ser-ver
+    @Override //ser-ver ser-ver
     public void randomDisplayTick(World w, int x, int y, int z, Random rand) {
         Core.proxy.randomDisplayTickFor(w, x, y, z, rand);
     }
@@ -402,7 +416,7 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
         return pass == 0 || pass == 1;
     }
 
-    //@Override -- hello server asshole
+    @Override // -- hello server asshole
     public int getRenderBlockPass() {
         return 1;
     }

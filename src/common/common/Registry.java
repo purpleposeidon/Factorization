@@ -9,6 +9,7 @@ import java.util.Random;
 
 import net.minecraft.src.Block;
 import net.minecraft.src.CraftingManager;
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityItem;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.FurnaceRecipes;
@@ -22,6 +23,7 @@ import net.minecraft.src.MapColor;
 import net.minecraft.src.Material;
 import net.minecraft.src.ModLoader;
 import net.minecraft.src.NBTTagCompound;
+import net.minecraft.src.TileEntityFurnace;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldGenMinable;
 import net.minecraft.src.WorldProviderHell;
@@ -32,9 +34,11 @@ import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.OreDictionary.OreRegisterEvent;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ICraftingHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.IWorldGenerator;
+import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.registry.BlockProxy;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -45,15 +49,15 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
     public ItemFactorization item_factorization;
     public ItemBlockResource item_resource;
-    public BlockFactorization factory_block;
+    public BlockFactorization factory_block, factory_rendering_block = null;
     public BlockLightAir lightair_block;
     public BlockResource resource_block;
 
     public ItemStack cutter_item, router_item, maker_item, stamper_item, packager_item,
             barrel_item,
             queue_item, lamp_item, air_item, sentrydemon_item,
-            slagfurnace_item, battery_item, solar_turbine_item, heater_item, mirror_item_hidden,
-            leadwire_item;
+            slagfurnace_item, battery_item_hidden, solar_turbine_item, heater_item, mirror_item_hidden,
+            leadwire_item, grinder_item;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item, mechaworkshop_item;
     public ItemStack is_factory, is_lamp, is_lightair;
@@ -75,10 +79,13 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public MechaMountedPiston mecha_mounted_piston;
     public ItemMachineUpgrade router_item_filter, router_machine_filter, router_speed,
             router_thorough, router_throughput, router_eject;
+    public ItemMachineUpgrade barrel_enlarge;
     public ItemStack fake_is;
     public ItemCraftingComponent acid, magnet, insulated_coil, motor, fan;
     public ItemChargeMeter charge_meter;
     public ItemMirror mirror;
+    public ItemBattery battery;
+    public ItemOreProcessing ore_dirty_gravel, ore_clean_gravel, ore_reduced, ore_crystal;
 
     public Material materialMachine = new Material(MapColor.ironColor);
     
@@ -94,6 +101,23 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         GameRegistry.registerBlock(factory_block, ItemFactorization.class);
         GameRegistry.registerBlock(lightair_block);
         GameRegistry.registerBlock(resource_block, ItemBlockResource.class);
+        
+        factory_block.setCreativeTab(CreativeTabs.tabRedstone);
+    }
+    
+    void makeRenderHelperBlock() {
+        // TODO: I'd like to do this as late as possible.
+        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+            factory_rendering_block = factory_block;
+            for (int i = Block.blocksList.length - 1; i > 0; i--) {
+                if (Block.blocksList[i] == null && Item.itemsList[i] == null) {
+                    factory_rendering_block = new BlockFactorization(i);
+                    System.out.println("Creating render helper block with ID " + i);
+                    GameRegistry.registerBlock(factory_rendering_block);
+                    return;
+                }
+            }
+        }
     }
 
     void registerSimpleTileEntities() {
@@ -123,6 +147,15 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     }
 
     void makeItems() {
+        ore_dirty_gravel = new ItemOreProcessing(itemID("oreDirtyGravel", 9034), 2*16 + 4, "dirtyGravel");
+        ore_clean_gravel = new ItemOreProcessing(itemID("oreCleanGravel", 9035), 2*16 + 5, "cleanGravel");
+        ore_reduced = new ItemOreProcessing(itemID("oreReduced", 9036), 2*16 + 6, "reduced");
+        ore_crystal = new ItemOreProcessing(itemID("oreCrystal", 9037), 2*16 + 7, "crystal");
+        ore_dirty_gravel.addEnglishNames("Dirty ", " Gravel");
+        ore_clean_gravel.addEnglishNames("Clean ", " Chunks");
+        ore_reduced.addEnglishNames("Reduced ", " Chunks");
+        ore_crystal.addEnglishNames("Crystalline ", "");
+        
         //ItemBlocks
         item_factorization = (ItemFactorization) Item.itemsList[Core.factory_block_id];
         item_resource = (ItemBlockResource) Item.itemsList[resource_block.blockID];
@@ -138,11 +171,12 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         packager_item = FactoryType.PACKAGER.itemStack("Packager");
         sentrydemon_item = FactoryType.SENTRYDEMON.itemStack("Sentry Demon");
         slagfurnace_item = FactoryType.SLAGFURNACE.itemStack("Slag Furnace");
-        battery_item = FactoryType.BATTERY.itemStack("Battery Block");
+        battery_item_hidden = FactoryType.BATTERY.itemStack("Battery Block");
         solar_turbine_item = FactoryType.SOLARTURBINE.itemStack("Solar Turbine");
         heater_item = FactoryType.HEATER.itemStack("Furnace Heater");
         mirror_item_hidden = FactoryType.MIRROR.itemStack("Reflective Mirror");
         leadwire_item = FactoryType.LEADWIRE.itemStack("Lead Wire");
+        grinder_item = FactoryType.GRINDER.itemStack("Grinder");
 
         //BlockResource stuff
         silver_ore_item = ResourceType.SILVERORE.itemStack("Silver Ore");
@@ -184,6 +218,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         router_thorough = new ItemMachineUpgrade(itemID("routerThorough", 9019), "Router Upgrade: Thoroughness", FactoryType.ROUTER, 3);
         router_throughput = new ItemMachineUpgrade(itemID("routerThroughput", 9020), "Router Upgrade: Bandwidth", FactoryType.ROUTER, 4);
         router_eject = new ItemMachineUpgrade(itemID("routerEject", 9031), "Router Upgrade: Ejector", FactoryType.ROUTER, 5);
+        
+        barrel_enlarge = new ItemMachineUpgrade(itemID("barrelEnlarge", 9032), "Barrel Size Upgrade", FactoryType.BARREL, 6);
 
         //Electricity
         acid = new ItemAcidBottle(itemID("acid", 9024), "Sulfuric Acid", 16 * 3 + 5);
@@ -192,7 +228,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         motor = new ItemCraftingComponent(itemID("motor", 9027), "Motor", 16 * 3 + 8);
         fan = new ItemCraftingComponent(itemID("fan", 9028), "Fan", 16 * 3 + 9);
         charge_meter = new ItemChargeMeter(itemID("chargemeter", 9029));
+        addName(charge_meter, "Charge Meter");
         mirror = new ItemMirror(itemID("mirror", 9030));
+        addName(mirror, "Reflective Mirror");
+        battery = new ItemBattery(itemID("battery", 9033));
+        addName(battery, "Battery Block");
 
         //Industrial
         item_craft = new ItemCraft(itemID("itemCraftId", 9000));
@@ -291,6 +331,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'I', Item.ingotIron);
 
         // diamond shard
+        //How do we feel about 12 shards for 9 diamonds?
         diamond_shard_recipe = FactorizationUtil.createShapedRecipe(new ItemStack(diamond_shard, 12),
                 "OTO",
                 "TDT",
@@ -516,11 +557,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
         // Wrath lamp
         oreRecipe(lamp_item,
-                "LIL",
+                "ISI",
                 "GWG",
-                "LIL",
+                "ISI",
                 'I', dark_iron,
-                'L', "ingotLead",
+                'S', "ingotSilver",
                 'G', Block.thinGlass,
                 'W', new ItemStack(wrath_igniter, 1, -1));
 
@@ -539,8 +580,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "CFC",
                 'C', Block.cobblestone,
                 'F', Block.stoneOvenIdle);
-        createOreProcessingPath(new ItemStack(Block.oreIron), new ItemStack(Item.ingotIron));
-        createOreProcessingPath(new ItemStack(Block.oreGold), new ItemStack(Item.ingotGold));
+        createOreProcessingPath(new ItemStack(Block.oreIron), new ItemStack(Item.ingotIron), ItemOreProcessing.IRON);
+        createOreProcessingPath(new ItemStack(Block.oreGold), new ItemStack(Item.ingotGold), ItemOreProcessing.GOLD);
         for (Block redstone : Arrays.asList(Block.oreRedstone, Block.oreRedstoneGlowing)) {
             TileEntitySlagFurnace.SlagRecipes.register(redstone, 5.8F, Item.redstone, 0.2F, Block.stone);
             //most ores give 0.4F stone, but redstone is dense.
@@ -580,7 +621,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 '/', Item.stick,
                 'L', "ingotLead",
                 'I', Item.ingotIron);
-        oreRecipe(battery_item,
+        oreRecipe(new ItemStack(battery),
                 "ILI",
                 "LAL",
                 "ILI",
@@ -619,6 +660,14 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "LLL",
                 "LLL",
                 'L', "ingotLead");
+        recipe(grinder_item,
+                "IMI",
+                "DDD",
+                "OOO",
+                'I', Item.ingotIron,
+                'M', motor,
+                'D', diamond_shard,
+                'O', Block.obsidian);
 
         // Cutter
         //TODO: Remove the cutter
@@ -639,18 +688,26 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //				'C', Block.chest);
     }
 
-    void createOreProcessingPath(ItemStack ore, ItemStack ingot) {
-        //Smelt: 1.0
-        //Slag: 1.2
-        //Grind -> Smelt: 1.4
-        //Grind -> Slag -> Smelt: 1.6
-        //Grind -> Wash -> Smelt: 1.8
-        //Grind -> Wash -> Slag -> Smelt: 2.0
-        //Grind -> Wash -> Slag -> Crystallize -> Smelt: 3.0
+    void createOreProcessingPath(ItemStack ore, ItemStack ingot, int oreID) {
+        //XXX TODO IMPORTANT: Verify these yields!
+        //Smelt: 1.0 (implicit) [+]
+        //Slag: 1.2 [+]
+        //Grind -> Smelt: 1.4 (dirty ore gravel)
+        //Grind -> Slag: 1.6 (dirty ore gravel)
+        //Grind -> Wash -> Smelt: 1.8 (clean ore chunks)
+        //Grind -> Wash -> Slag -> Smelt: 2.0 (reduced ore chunks)
+        //Grind -> Wash -> Slag -> Crystallize -> Smelt: 3.0 (crystalline ore)
         //Crystallization will be a very slow & intensive & (energy) expensive.
-
+        ItemOreProcessing.enable(oreID);
+        ItemStack dirty = new ItemStack(ore_dirty_gravel, 1, oreID),
+                clean = new ItemStack(ore_clean_gravel, 1, oreID),
+                reduced = new ItemStack(ore_reduced, 1, oreID),
+                crystal = new ItemStack(ore_crystal, 1, oreID);
         TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, ingot, 0.4F, Block.stone);
-        //TODO: Make all the machines for the upgrade path...
+        TileEntityGrinder.addRecipe(ore, dirty, 1.4F);
+        TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.2F, ingot, 0.2F, Block.dirt);
+        FurnaceRecipes.smelting().addSmelting(dirty.itemID, dirty.getItemDamage(), ingot);
+        //TODO: Make all the machines for the processing path...
 
     }
 
@@ -673,8 +730,15 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             if (bestIngot == null) {
                 continue;
             }
+            int id = -1;
+            if (oreClass.equals("oreCopper")) {
+                id = ItemOreProcessing.COPPER;
+            }
+            if (oreClass.equals("oreTin")) {
+                id = ItemOreProcessing.TIN;
+            }
             for (ItemStack ore : oreList) {
-                createOreProcessingPath(ore, bestIngot);
+                createOreProcessingPath(ore, bestIngot, id);
             }
         }
     }

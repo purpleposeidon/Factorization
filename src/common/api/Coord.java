@@ -269,6 +269,10 @@ public class Coord {
         }
         return null;
     }
+    
+    public void rmTE() {
+        w.removeBlockTileEntity(x, y, z);
+    }
 
     public Block getBlock() {
         return Block.blocksList[getId()];

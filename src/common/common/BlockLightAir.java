@@ -168,7 +168,7 @@ public class BlockLightAir extends Block implements BlockProxy /* ??? */ {
         return 0;
     }
 
-    //@Override -- server. I am so sick and tired of your BULLSHIT
+    @Override //-- server. I am so sick and tired of your BULLSHIT
     public void randomDisplayTick(World w, int x, int y, int z, Random rand) {
         Core.proxy.randomDisplayTickFor(w, x, y, z, rand);
     }

@@ -10,9 +10,9 @@ public class ItemMirror extends Item {
 
     protected ItemMirror(int par1) {
         super(par1);
-        Core.proxy.addName(this, "Reflective Mirror");
+        setItemName("mirror");
         setTextureFile(Core.texture_file_item);
-        setTabToDisplayOn(CreativeTabs.tabRedstone);
+        //setTabToDisplayOn(CreativeTabs.tabRedstone);
     }
 
     
@@ -24,19 +24,8 @@ public class ItemMirror extends Item {
         return ret;
     }
 
-    //@Override
+    @Override
     public int getIconFromDamage(int par1) {
         return 9;
     }
-
-    @Override
-    public String getItemNameIS(ItemStack par1ItemStack) {
-        return "Reflective Mirror";
-    }
-
-    @Override
-    public String getItemName() {
-        return "ItemMirror";
-    }
-
 }

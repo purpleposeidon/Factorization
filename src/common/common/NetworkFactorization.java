@@ -294,6 +294,7 @@ public class NetworkFactorization implements IPacketHandler {
         if (!world.isRemote) {
             //Nothing for the server to deal with
         } else {
+            Coord here = new Coord(world, x, y, z);
             switch (messageType) {
             case MessageType.DemonEnterChest:
                 if (ent instanceof TileEntityChest) {
@@ -305,15 +306,18 @@ public class NetworkFactorization implements IPacketHandler {
                 break;
             case MessageType.PistonPush:
                 Block.pistonBase.onBlockEventReceived(world, x, y, z, 0, input.readInt());
-                new Coord(world, x, y, z).setId(0);
+                here.setId(0);
+                break;
+            case MessageType.BarrelLoss:
+                TileEntityBarrel.spawnBreakParticles(here, input.readInt());
                 break;
             default:
                 if (world.blockExists(x, y, z)) {
-                    Core.logWarning("Got unhandled message: " + messageType + " for " + (x + "," + y + "," + z));
+                    Core.logWarning("Got unhandled message: " + messageType + " for " + here);
                 }
                 else {
                     //XXX: Need to figure out how to keep the server from sending these things!
-                    Core.logWarning("Got message to unloaded chunk: " + messageType + " for " + (x + "," + y + "," + z));
+                    Core.logWarning("Got message to unloaded chunk: " + messageType + " for " + here);
                 }
                 break;
             }
@@ -337,7 +341,7 @@ public class NetworkFactorization implements IPacketHandler {
                 RouterLastSeen = 204, RouterMatchToVisit = 205, RouterDowngrade = 206,
                 RouterUpgradeState = 207, RouterEjectDirection = 208,
                 //
-                BarrelDescription = 300, BarrelItem = 301, BarrelCount = 302,
+                BarrelDescription = 300, BarrelItem = 301, BarrelCount = 302, BarrelLoss = 303,
                 //
                 BatteryLevel = 400,
                 //
@@ -345,7 +349,9 @@ public class NetworkFactorization implements IPacketHandler {
                 //
                 TurbineWater = 601, TurbineSpeed = 602,
                 //
-                HeaterHeat = 700
+                HeaterHeat = 700,
+                //
+                GrinderSpeed = 800
                 ;
     }
 

@@ -43,14 +43,17 @@ import factorization.api.Coord;
 import factorization.api.IFactoryType;
 import factorization.client.coremod.GuiKeyEvent;
 import factorization.client.gui.GuiCutter;
+import factorization.client.gui.GuiGrinder;
 import factorization.client.gui.GuiMaker;
 import factorization.client.gui.GuiMechaConfig;
 import factorization.client.gui.GuiPocketTable;
 import factorization.client.gui.GuiRouter;
 import factorization.client.gui.GuiSlag;
 import factorization.client.gui.GuiStamper;
+import factorization.client.render.BatteryItemRender;
 import factorization.client.render.BlockRenderBattery;
 import factorization.client.render.BlockRenderDefault;
+import factorization.client.render.BlockRenderGrinder;
 import factorization.client.render.BlockRenderHeater;
 import factorization.client.render.BlockRenderLamp;
 import factorization.client.render.BlockRenderMirrorStand;
@@ -62,12 +65,14 @@ import factorization.client.render.EntitySteamFX;
 import factorization.client.render.EntityWrathFlameFX;
 import factorization.client.render.FactorizationRender;
 import factorization.client.render.TileEntityBarrelRenderer;
+import factorization.client.render.TileEntityGrinderRender;
 import factorization.client.render.TileEntityHeaterRenderer;
 import factorization.client.render.TileEntityMirrorRenderer;
 import factorization.client.render.TileEntitySolarTurbineRender;
 import factorization.client.render.TileEntityWatchDemonRenderer;
 import factorization.common.Command;
 import factorization.common.ContainerFactorization;
+import factorization.common.ContainerGrinder;
 import factorization.common.ContainerMechaModder;
 import factorization.common.ContainerPocket;
 import factorization.common.ContainerSlagFurnace;
@@ -77,6 +82,7 @@ import factorization.common.FactoryType;
 import factorization.common.Registry;
 import factorization.common.TileEntityBarrel;
 import factorization.common.TileEntityFactorization;
+import factorization.common.TileEntityGrinder;
 import factorization.common.TileEntityHeater;
 import factorization.common.TileEntityMirror;
 import factorization.common.TileEntitySlagFurnace;
@@ -166,8 +172,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
         ContainerFactorization cont;
         if (ID == FactoryType.SLAGFURNACE.gui) {
             cont = new ContainerSlagFurnace(player, fac);
-        }
-        else {
+        } else if (ID == FactoryType.GRINDER.gui) {
+            cont = new ContainerGrinder(player, (TileEntityGrinder) fac);
+        } else {
             cont = new ContainerFactorization(player, fac);
         }
         GuiScreen gui = null;
@@ -186,6 +193,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
         if (ID == FactoryType.SLAGFURNACE.gui) {
             gui = new GuiSlag(cont);
         }
+        if (ID == FactoryType.GRINDER.gui) {
+            gui = new GuiGrinder(cont);
+        }
 
         cont.addSlotsForGui(fac, player.inventory);
         return gui;
@@ -197,15 +207,17 @@ public class FactorizationClientProxy extends FactorizationProxy {
     public void addName(Object objectToName, String name) {
         String objectName;
         if (objectToName instanceof Item) {
-            objectName=((Item)objectToName).getItemName();
+            objectName = ((Item)objectToName).getItemName();
         } else if (objectToName instanceof Block) {
-            objectName=((Block)objectToName).getBlockName();
+            objectName = ((Block)objectToName).getBlockName();
         } else if (objectToName instanceof ItemStack) {
-            objectName=((ItemStack)objectToName).getItem().getItemNameIS((ItemStack)objectToName);
+            objectName = ((ItemStack)objectToName).getItem().getItemNameIS((ItemStack)objectToName);
+        } else if (objectToName instanceof String) {
+            objectName = (String) objectToName;
         } else {
             throw new IllegalArgumentException(String.format("Illegal object for naming %s",objectToName));
         }
-        objectName+=".name";
+        objectName += ".name";
         LanguageRegistry.instance().addStringLocalization(objectName, "en_US", name);
     }
     
@@ -468,6 +480,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(clazz, r);
     }
     
+    
     @Override
     public void registerRenderers() {
         if (Core.render_barrel_item || Core.render_barrel_text) {
@@ -477,13 +490,14 @@ public class FactorizationClientProxy extends FactorizationProxy {
         setTileEntityRenderer(TileEntitySolarTurbine.class, new TileEntitySolarTurbineRender());
         setTileEntityRenderer(TileEntityHeater.class, new TileEntityHeaterRenderer());
         setTileEntityRenderer(TileEntityMirror.class, new TileEntityMirrorRenderer());
+        setTileEntityRenderer(TileEntityGrinder.class, new TileEntityGrinderRender());
         MinecraftForgeClient.preloadTexture(Core.texture_file_block);
         MinecraftForgeClient.preloadTexture(Core.texture_file_item);
         
         RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
         
         RenderingRegistry.registerBlockHandler(new FactorizationRender());
-        new BlockRenderBattery();
+        BlockRenderBattery renderBattery = new BlockRenderBattery();
         new BlockRenderDefault();
         new BlockRenderHeater();
         new BlockRenderLamp();
@@ -491,6 +505,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderSentryDemon();
         new BlockRenderSolarTurbine();
         new BlockRenderWire();
+        new BlockRenderGrinder();
+        
+        MinecraftForgeClient.registerItemRenderer(Core.registry.battery.shiftedIndex, new BatteryItemRender(renderBattery));
     }
     
     @ForgeSubscribe

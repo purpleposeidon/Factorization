@@ -65,14 +65,18 @@ public class ItemCraft extends Item  {
     }
 
 
-    // @Override -- XXX NOTE Can't override due to server
+    @Override // -- XXX NOTE Can't override due to server
     public void addInformation(ItemStack is, List list) {
         // super.addInformation(is, list); // XXX NOTE Can't call due to server
         String line = "";
         ArrayList<String> toAdd = new ArrayList<String>();
         int count = 0;
         if (is.getItemDamage() > 1) {
-            return;
+            if (is.getItemDamage() == Core.registry.diamond_shard_packet.getItemDamage() && is != Core.registry.diamond_shard_packet) {
+                addInformation(Core.registry.diamond_shard_packet, list);
+            } else {
+                return;
+            }
         }
 
         for (int i = 0; i < 9; i++) {
@@ -244,7 +248,7 @@ public class ItemCraft extends Item  {
         return is.getItemDamage() != 0;
     }
 
-    // @Override -- XXX NOTE: Can't override due to server
+    @Override // -- XXX NOTE: Can't override due to server
     public int getIconFromDamage(int damage) {
         if (damage == 0) {
             return 2;
@@ -252,18 +256,8 @@ public class ItemCraft extends Item  {
         return 3;
     }
 
-    // @Override -- XXX Waiting for MCP update
-    public boolean getShareNBT() {
+    @Override
+    public boolean getShareTag() {
         return true;
-    }
-
-    // @Override -- XXX TODO SERVER get___?
-    public boolean func_46003_i() {
-        return getShareNBT();
-    }
-
-    // @Override -- XXX TODO CLIENT get___?
-    public boolean func_46056_k() {
-        return getShareNBT();
     }
 }

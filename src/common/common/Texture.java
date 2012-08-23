@@ -77,14 +77,18 @@ public class Texture {
         }
 
         if (FactoryType.BARREL.is(md)) {
+            int delta = 0;
+            if (active) {
+                delta += 3;
+            }
             if (side == 0 || side == 1) {
-                return barrel_top;
+                return barrel_top + delta;
             }
             //TODO: Have barrel render info on one side only, and put a nice texture on that side.
             if (side == facing_direction) {
-                return barrel_side + 1;
+                return barrel_side + 1 + delta;
             }
-            return barrel_side;
+            return barrel_side + delta;
         }
 
         if (FactoryType.QUEUE.is(md)) {

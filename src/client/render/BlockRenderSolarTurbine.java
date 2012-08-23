@@ -61,7 +61,7 @@ public class BlockRenderSolarTurbine extends FactorizationBlockRender {
             renderItemIn2D(10);
             GL11.glPopMatrix();
         }
-        renderMotor(rb);
+        renderMotor(rb, 0);
         if (world_mode) {
             TileEntityWire fake_wire = new TileEntityWire();
             fake_wire.worldObj = me.w;
@@ -75,13 +75,6 @@ public class BlockRenderSolarTurbine extends FactorizationBlockRender {
                 renderCube(rc);
             }
         }
-    }
-
-    void renderMotor(RenderBlocks rb) {
-        int lead = Core.registry.lead_block_item.getIconIndex();
-        float d = 4.0F / 16.0F;
-        float yd = -d + 0.003F;
-        renderPart(rb, lead, d, d + yd, d, 1 - d, 1 - d + yd, 1 - d);
     }
     
     @Override

@@ -113,6 +113,10 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public boolean isBlockSolidOnSide(int side) {
         return true;
     }
+    
+    public boolean takeUpgrade(ItemStack is) {
+        return false;
+    }
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {

@@ -57,10 +57,6 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         setFacingDirectionFromEntity(player);
     }
 
-    public boolean takeUpgrade(ItemStack is) {
-        return false;
-    }
-
     //few of the stuff below would be overridden
 
     void setFacingDirectionFromEntity(Entity player) {
@@ -107,7 +103,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
 
     @Override
     public final Coord getCoord() {
-        return new Coord(worldObj, this);
+        return new Coord(this);
     }
 
     @Override

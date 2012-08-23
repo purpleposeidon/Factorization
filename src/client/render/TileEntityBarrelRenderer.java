@@ -42,8 +42,7 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
     }
 
     @Override
-    public void renderTileEntityAt(TileEntity ent, double x, double y, double z,
-            float partialTickTime) {
+    public void renderTileEntityAt(TileEntity ent, double x, double y, double z, float partialTickTime) {
         if (render_item == false && render_text == false) {
             return;
         }
@@ -61,8 +60,9 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
         final double d = 0.01;
 
         //GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glEnable(GL11.GL_LIGHTING);
         GL11.glDisable(GL11.GL_BLEND);
+        //GL11.glNormal3f(1, 1, 1);
+        GL11.glDisable(GL11.GL_LIGHTING);
         switch (barrel.facing_direction) {
         case 3:
             item_rotation = 0;
@@ -99,16 +99,15 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
                 renderItemCount(barrel, 3, x, y, z);
             break;
         }
+        GL11.glEnable(GL11.GL_LIGHTING);
     }
 
     void setupLight(TileEntityBarrel barrel, int dx, int dz) {
-        int br = barrel.getCoord().w.getLightBrightnessForSkyBlocks(barrel.xCoord + dx, barrel.yCoord,
-                barrel.zCoord + dz, 0 /* minimum */);
-        br = (int)(br * 0.55);
+        int br = barrel.getCoord().w.getLightBrightnessForSkyBlocks(barrel.xCoord + dx, barrel.yCoord, barrel.zCoord + dz, 0 /* minimum */);
+        br = (int)(br * 0.9F);
         int var11 = br % 65536;
         int var12 = br / 65536;
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) var11 / 1.0F,
-                (float) var12 / 1.0F);
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) var11 / 1.0F, (float) var12 / 1.0F);
     }
 
     void renderItemCount(TileEntityBarrel barrel, int side, double x, double y, double z) {
@@ -141,7 +140,7 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
             }
         }
         int color = 0xbbbbbb;
-        if (barrel.canExplode()) {
+        if (barrel.canLose()) {
             t = "!! " + t + " !!";
             //			if (barrel.worldObj.getWorldTime() / 40 % 2 == 0 && barrel.flamingExplosion()) {
             //				color = 0xccaaaa;
@@ -280,340 +279,4 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
     }
 
     
-//	public void doRenderItem(EntityItem par1EntityItem, double par2, double par4, double par6,
-//			float par8, float par9) {
-//		ItemStack var10 = par1EntityItem.item;
-//		GL11.glPushMatrix();
-//		float var12 = 0, var11 = 0;
-//		byte var13 = 1;
-//
-//		GL11.glTranslatef((float) par2, (float) par4 /* + var11 */, (float) par6);
-//		GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-//		int var15;
-//		float var19;
-//		float var18;
-//		float var23;
-//
-//		IItemRenderer customRenderer = MinecraftForgeClient.getItemRenderer(var10, ENTITY);
-//
-//		if (customRenderer != null) {
-//			//			if (customRenderer.shouldUseRenderHelper(ENTITY, var10, ENTITY_ROTATION)) {
-//			//				GL11.glRotatef(var12, 0.0F, 1.0F, 0.0F);
-//			//			}
-//			//			if (!customRenderer.shouldUseRenderHelper(ENTITY, var10, ENTITY_BOBBING)) {
-//			//				GL11.glTranslatef(0.0F, -var11, 0.0F);
-//			//			}
-//			boolean is3D = customRenderer.shouldUseRenderHelper(ENTITY, var10, BLOCK_3D);
-//
-//			if (var10.itemID < 256
-//					&& (is3D || RenderBlocks.renderItemIn3d(Block.blocksList[var10.itemID]
-//							.getRenderType()))) {
-//				mod_Factorization.loadTexture(itemRender, ForgeHooksClient.getTexture("/terrain.png", var10.getItem()));
-//				float var21 = 0.25F;
-//				var15 = Block.blocksList[var10.itemID].getRenderType();
-//
-//				if (var15 == 1 || var15 == 19 || var15 == 12 || var15 == 2) {
-//					var21 = 0.5F;
-//				}
-//
-//				GL11.glScalef(var21, var21, var21);
-//
-//				for (int j = 0; j < var13; j++) {
-//					GL11.glPushMatrix();
-//					if (j > 0) {
-//						GL11.glTranslatef(((random.nextFloat() * 2.0F - 1.0F) * 0.2F) / 0.5F,
-//								((random.nextFloat() * 2.0F - 1.0F) * 0.2F) / 0.5F,
-//								((random.nextFloat() * 2.0F - 1.0F) * 0.2F) / 0.5F);
-//					}
-//					customRenderer.renderItem(ENTITY, var10, renderBlocks, par1EntityItem);
-//					GL11.glPopMatrix();
-//				}
-//			} else {
-//				mod_Factorization.loadTexture(itemRender,
-//						ForgeHooksClient.getTexture(var10.itemID < 256 ? "/terrain.png" : "/gui/items.png", var10.getItem()));
-//				GL11.glScalef(0.5F, 0.5F, 0.5F);
-//				customRenderer.renderItem(ENTITY, var10, renderBlocks, par1EntityItem);
-//			}
-//
-//		} else if (var10.itemID < 256
-//				&& RenderBlocks.renderItemIn3d(Block.blocksList[var10.itemID].getRenderType())) {
-//			GL11.glRotatef(var12, 0.0F, 1.0F, 0.0F);
-//			mod_Factorization.loadTexture(itemRender,
-//					ForgeHooksClient.getTexture("/terrain.png", Block.blocksList[var10.itemID]));
-//			float var21 = 0.25F;
-//			var15 = Block.blocksList[var10.itemID].getRenderType();
-//
-//			if (var15 == 1 || var15 == 19 || var15 == 12 || var15 == 2) {
-//				var21 = 0.5F;
-//			}
-//
-//			GL11.glScalef(var21, var21, var21);
-//
-//			for (int var22 = 0; var22 < var13; ++var22) {
-//				GL11.glPushMatrix();
-//
-//				if (var22 > 0) {
-//					var23 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.2F / var21;
-//					var18 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.2F / var21;
-//					var19 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.2F / var21;
-//					GL11.glTranslatef(var23, var18, var19);
-//				}
-//
-//				var23 = 1.0F;
-//				this.renderBlocks.renderBlockAsItem(Block.blocksList[var10.itemID],
-//						var10.getItemDamage(), var23);
-//				GL11.glPopMatrix();
-//			}
-//		} else {
-//			int var14;
-//			float var16;
-//
-//			//if (var10.getItem().func_46058_c()) {
-//			if (var10.getItem().requiresMultipleRenderPasses()) {
-//				GL11.glScalef(0.5F, 0.5F, 0.5F);
-//				mod_Factorization.loadTexture(itemRender,
-//						ForgeHooksClient.getTexture("/gui/items.png", Item.itemsList[var10.itemID]));
-//
-//				for (var14 = 0; var14 < var10.getItem().getRenderPasses(var10.getItemDamage()); ++var14) {
-//					this.random.setSeed(187L); // Fixes Vanilla bug where layers would not render aligns properly.
-//					//func_46057_a
-//					//getIconFromDamageForRenderPass
-//					var15 = var10.getItem().func_46057_a(var10.getItemDamage(), var14);
-//					var16 = 1.0F;
-//
-//					if (this.field_27004_a) {
-//						int var17 = Item.itemsList[var10.itemID].getColorFromDamage(
-//								var10.getItemDamage(), var14);
-//						var18 = (float) (var17 >> 16 & 255) / 255.0F;
-//						var19 = (float) (var17 >> 8 & 255) / 255.0F;
-//						float var20 = (float) (var17 & 255) / 255.0F;
-//						GL11.glColor4f(var18 * var16, var19 * var16, var20 * var16, 1.0F);
-//					}
-//
-//					this.func_40267_a(var15, var13);
-//				}
-//			} else {
-//				GL11.glScalef(0.5F, 0.5F, 0.5F);
-//				var14 = var10.getIconIndex();
-//
-//				if (var10.itemID < 256) {
-//					mod_Factorization.loadTexture(itemRender,
-//							ForgeHooksClient.getTexture("/terrain.png", Block.blocksList[var10.itemID]));
-//				} else {
-//					mod_Factorization.loadTexture(itemRender,
-//							ForgeHooksClient.getTexture("/gui/items.png", Item.itemsList[var10.itemID]));
-//				}
-//
-//				if (this.field_27004_a) {
-//					var15 = Item.itemsList[var10.itemID].getColorFromDamage(var10.getItemDamage(),
-//							0);
-//					var16 = (float) (var15 >> 16 & 255) / 255.0F;
-//					var23 = (float) (var15 >> 8 & 255) / 255.0F;
-//					var18 = (float) (var15 & 255) / 255.0F;
-//					var19 = 1.0F;
-//					GL11.glColor4f(var16 * var19, var23 * var19, var18 * var19, 1.0F);
-//				}
-//
-//				this.func_40267_a(var14, var13);
-//			}
-//		}
-//
-//		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-//		GL11.glPopMatrix();
-//	}
-//
-//	private void func_40267_a(int par1, int par2) {
-//		Tessellator var3 = Tessellator.instance;
-//		float var4 = (float) (par1 % 16 * 16 + 0) / 256.0F;
-//		float var5 = (float) (par1 % 16 * 16 + 16) / 256.0F;
-//		float var6 = (float) (par1 / 16 * 16 + 0) / 256.0F;
-//		float var7 = (float) (par1 / 16 * 16 + 16) / 256.0F;
-//		float var8 = 1.0F;
-//		float var9 = 0.5F;
-//		float var10 = 0.25F;
-//
-//		for (int var11 = 0; var11 < par2; ++var11) {
-//			GL11.glPushMatrix();
-//
-//			if (var11 > 0) {
-//				float var12 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.3F;
-//				float var13 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.3F;
-//				float var14 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.3F;
-//				GL11.glTranslatef(var12, var13, var14);
-//			}
-//
-//			GL11.glRotatef(item_rotation, 0.0F, 1.0F, 0.0F);
-//			var3.startDrawingQuads();
-//			var3.setNormal(0.0F, 1.0F, 0.0F);
-//			var3.addVertexWithUV((double) (0.0F - var9), (double) (0.0F - var10), 0.0D,
-//					(double) var4, (double) var7);
-//			var3.addVertexWithUV((double) (var8 - var9), (double) (0.0F - var10), 0.0D,
-//					(double) var5, (double) var7);
-//			var3.addVertexWithUV((double) (var8 - var9), (double) (1.0F - var10), 0.0D,
-//					(double) var5, (double) var6);
-//			var3.addVertexWithUV((double) (0.0F - var9), (double) (1.0F - var10), 0.0D,
-//					(double) var4, (double) var6);
-//			var3.draw();
-//			GL11.glPopMatrix();
-//		}
-//	}
-//	
-//	
-    
-    
-//    public void doRenderItem(EntityItem par1EntityItem, double par2, double par4, double par6, float par8, float par9)
-//    {
-//        this.random.setSeed(187L);
-//        ItemStack var10 = par1EntityItem.item;
-//        GL11.glPushMatrix();
-//        float var11 = MathHelper.sin(((float)par1EntityItem.age + par9) / 10.0F + par1EntityItem.hoverStart) * 0.1F + 0.1F;
-//        float var12 = (((float)par1EntityItem.age + par9) / 20.0F + par1EntityItem.hoverStart) * (180F / (float)Math.PI);
-//        byte var13 = 1;
-//
-//        if (par1EntityItem.item.stackSize > 1)
-//        {
-//            var13 = 2;
-//        }
-//
-//        if (par1EntityItem.item.stackSize > 5)
-//        {
-//            var13 = 3;
-//        }
-//
-//        if (par1EntityItem.item.stackSize > 20)
-//        {
-//            var13 = 4;
-//        }
-//
-//        GL11.glTranslatef((float)par2, (float)par4 + var11, (float)par6);
-//        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-//        int var16;
-//        float var19;
-//        float var20;
-//        float var24;
-//
-//        if (ForgeHooksClient.renderEntityItem(par1EntityItem, var10, var11, var12, random, renderManager.renderEngine, renderBlocks))
-//        {
-//           ;
-//        }
-//        else if (var10.getItem() instanceof ItemBlock && RenderBlocks.renderItemIn3d(Block.blocksList[var10.itemID].getRenderType()))
-//        {
-//            GL11.glRotatef(var12, 0.0F, 1.0F, 0.0F);
-//            this.loadTexture(Block.blocksList[var10.itemID].getTextureFile());
-//            float var22 = 0.25F;
-//            var16 = Block.blocksList[var10.itemID].getRenderType();
-//
-//            if (var16 == 1 || var16 == 19 || var16 == 12 || var16 == 2)
-//            {
-//                var22 = 0.5F;
-//            }
-//
-//            GL11.glScalef(var22, var22, var22);
-//
-//            for (int var23 = 0; var23 < var13; ++var23)
-//            {
-//                GL11.glPushMatrix();
-//
-//                if (var23 > 0)
-//                {
-//                    var24 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.2F / var22;
-//                    var19 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.2F / var22;
-//                    var20 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.2F / var22;
-//                    GL11.glTranslatef(var24, var19, var20);
-//                }
-//
-//                var24 = 1.0F;
-//                this.renderBlocks.renderBlockAsItem(Block.blocksList[var10.itemID], var10.getItemDamage(), var24);
-//                GL11.glPopMatrix();
-//            }
-//        }
-//        else
-//        {
-//            int var15;
-//            float var17;
-//
-//            if (var10.getItem().requiresMultipleRenderPasses())
-//            {
-//                GL11.glScalef(0.5F, 0.5F, 0.5F);
-//                this.loadTexture(Item.itemsList[var10.itemID].getTextureFile());
-//
-//                for (var15 = 0; var15 <= var10.getItem().getRenderPasses(var10.getItemDamage()); ++var15)
-//                {
-//                    this.random.setSeed(187L); //Fixes Vanilla bug where layers would not render aligns properly.
-//                    var16 = var10.getItem().getIconFromDamageForRenderPass(var10.getItemDamage(), var15);
-//                    var17 = 1.0F;
-//
-//                    if (this.field_77024_a)
-//                    {
-//                        int var18 = Item.itemsList[var10.itemID].getColorFromDamage(var10.getItemDamage(), var15);
-//                        var19 = (float)(var18 >> 16 & 255) / 255.0F;
-//                        var20 = (float)(var18 >> 8 & 255) / 255.0F;
-//                        float var21 = (float)(var18 & 255) / 255.0F;
-//                        GL11.glColor4f(var19 * var17, var20 * var17, var21 * var17, 1.0F);
-//                    }
-//
-//                    this.func_77020_a(var16, var13);
-//                }
-//            }
-//            else
-//            {
-//                GL11.glScalef(0.5F, 0.5F, 0.5F);
-//                var15 = var10.getIconIndex();
-//
-//                this.loadTexture(var10.getItem().getTextureFile());
-//
-//                if (this.field_77024_a)
-//                {
-//                    var16 = Item.itemsList[var10.itemID].getColorFromDamage(var10.getItemDamage(), 0);
-//                    var17 = (float)(var16 >> 16 & 255) / 255.0F;
-//                    var24 = (float)(var16 >> 8 & 255) / 255.0F;
-//                    var19 = (float)(var16 & 255) / 255.0F;
-//                    var20 = 1.0F;
-//                    GL11.glColor4f(var17 * var20, var24 * var20, var19 * var20, 1.0F);
-//                }
-//
-//                this.func_77020_a(var15, var13);
-//            }
-//        }
-//
-//        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-//        GL11.glPopMatrix();
-//    }
-//
-//    private void func_77020_a(int par1, int par2)
-//    {
-//        Tessellator var3 = Tessellator.instance;
-//        float var4 = (float)(par1 % 16 * 16 + 0) / 256.0F;
-//        float var5 = (float)(par1 % 16 * 16 + 16) / 256.0F;
-//        float var6 = (float)(par1 / 16 * 16 + 0) / 256.0F;
-//        float var7 = (float)(par1 / 16 * 16 + 16) / 256.0F;
-//        float var8 = 1.0F;
-//        float var9 = 0.5F;
-//        float var10 = 0.25F;
-//
-//        for (int var11 = 0; var11 < par2; ++var11)
-//        {
-//            GL11.glPushMatrix();
-//
-//            if (var11 > 0)
-//            {
-//                float var12 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.3F;
-//                float var13 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.3F;
-//                float var14 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.3F;
-//                GL11.glTranslatef(var12, var13, var14);
-//            }
-//
-//            GL11.glRotatef(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-//            var3.startDrawingQuads();
-//            var3.setNormal(0.0F, 1.0F, 0.0F);
-//            var3.addVertexWithUV((double)(0.0F - var9), (double)(0.0F - var10), 0.0D, (double)var4, (double)var7);
-//            var3.addVertexWithUV((double)(var8 - var9), (double)(0.0F - var10), 0.0D, (double)var5, (double)var7);
-//            var3.addVertexWithUV((double)(var8 - var9), (double)(1.0F - var10), 0.0D, (double)var5, (double)var6);
-//            var3.addVertexWithUV((double)(0.0F - var9), (double)(1.0F - var10), 0.0D, (double)var4, (double)var6);
-//            var3.draw();
-//            GL11.glPopMatrix();
-//        }
-//    }
-
-
 }

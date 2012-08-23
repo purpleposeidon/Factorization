@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.IOException;
 
 import net.minecraft.src.Block;
+import net.minecraft.src.EntityItem;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.FactorizationHack;
 import net.minecraft.src.InventoryPlayer;
@@ -14,6 +15,7 @@ import net.minecraft.src.Packet;
 import net.minecraftforge.common.ISidedInventory;
 import net.minecraftforge.common.ForgeDirection;
 import static net.minecraftforge.common.ForgeDirection.*;
+import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
 
 //Based off of technology found stockpiled in the long-abandoned dwarven fortress of "Nod Semor, the Toad of Unity".
@@ -23,10 +25,10 @@ import factorization.common.NetworkFactorization.MessageType;
 //NO! We *can* have for the stackable items case have 1, and 1 even if there's less than 2 itemCount. Just clear it after the first one is emptied
 
 public class TileEntityBarrel extends TileEntityFactorization {
-
-    static final int maxBarrelSize = 1024 * 64;
+    static final int normalBarrelSize = 64*64;
+    static final int largeBarrelSize = 1024 * 64;
     // EMC of TNT is 964.
-    static final int explosionStackSize = 64; // how many stacks required for an explosion; depends on item.maxStackSize
+    static final int maxStackDrop = 64; // how many stacks required for an explosion; depends on item.maxStackSize
     static final float explosionStrength = 2.5F; //explosion base strength
     static final float explosionStrengthMin = 1.0F; //if items don't stack very high, explosion strength will be weakened
 
@@ -35,6 +37,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     private ItemStack topStack; //always 0 unless nearly full
     private int middleCount;
     private ItemStack bottomStack; //always full unless nearly empty
+    public int upgrade = 0;
 
     @Override
     public FactoryType getFactoryType() {
@@ -65,6 +68,13 @@ public class TileEntityBarrel extends TileEntityFactorization {
         }
         return topStack.stackSize + middleCount + bottomStack.stackSize;
     }
+    
+    public int getMaxSize() {
+        if (upgrade == 0) {
+            return normalBarrelSize;
+        }
+        return largeBarrelSize;
+    }
 
     /**
      * redistribute count to the item stacks.
@@ -81,7 +91,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
             middleCount = 0;
             return;
         }
-        int upperLine = maxBarrelSize - item.getMaxStackSize();
+        int upperLine = getMaxSize() - item.getMaxStackSize();
         if (count > upperLine) {
             topStack = item.copy();
             topStack.stackSize = count - upperLine;
@@ -97,7 +107,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
 
     public void changeItemCount(int delta) {
         middleCount = getItemCount() + delta;
-        if (!(middleCount >= 0 && middleCount < maxBarrelSize)) {
+        if (!(middleCount >= 0 && middleCount < getMaxSize())) {
             throw new Error("tried changing item count to out of range");
         }
         topStack = bottomStack = null;
@@ -222,7 +232,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     void info(EntityPlayer entityplayer) {
         if (item == null && getItemCount() == 0) {
             entityplayer.addChatMessage("This barrel is empty");
-        } else if (getItemCount() >= maxBarrelSize) {
+        } else if (getItemCount() >= getMaxSize()) {
             Core.proxy.broadcastTranslate(entityplayer, "This barrel is full of %s", Core.proxy.translateItemStack(item));
         } else {
             Core.proxy.broadcastTranslate(entityplayer, "This barrel contains %s %s", "" + getItemCount(), Core.proxy.translateItemStack(item));
@@ -236,7 +246,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
         if (getItemCount() != 0) {
             return;
         }
-        if (is.getMaxStackSize() >= maxBarrelSize) {
+        if (is.getMaxStackSize() >= getMaxSize()) {
             return;
         }
         item = is.copy();
@@ -263,7 +273,16 @@ public class TileEntityBarrel extends TileEntityFactorization {
             assert item != null;
         }
     }
-
+    
+    @Override
+    public boolean takeUpgrade(ItemStack is) {
+        if (is.getItem() == Core.registry.barrel_enlarge && upgrade == 0) {
+            upgrade = 1;
+            return true;
+        }
+        return false;
+    }
+    
     long lastClick = -1000; //NOTE: This really should be player-specific!
 
     //* 			Left-Click		Right-Click
@@ -312,7 +331,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
             }
             return true;
         }
-        int free = maxBarrelSize - getItemCount();
+        int free = getMaxSize() - getItemCount();
         if (free <= 0) {
             info(entityplayer);
             return true;
@@ -361,7 +380,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
         InventoryPlayer inv = entityplayer.inventory;
         int total_delta = 0;
         for (int i = 0; i < inv.getSizeInventory(); i++) {
-            int free_space = maxBarrelSize - (getItemCount() + total_delta);
+            int free_space = getMaxSize() - (getItemCount() + total_delta);
             if (free_space <= 0) {
                 break;
             }
@@ -387,54 +406,56 @@ public class TileEntityBarrel extends TileEntityFactorization {
             Core.proxy.updatePlayerInventory(entityplayer);
         }
     }
-
-    public boolean canExplode() {
-        return getItemCount() > explosionStackSize * item.getMaxStackSize();
-    }
-
-    public boolean flamingExplosion() {
-        if (item.getItem() == Item.gunpowder || item.itemID == Block.tnt.blockID) {
-            return true;
-        }
-        return getItemCount() > (maxBarrelSize / 2);
+    
+    public boolean canLose() {
+        return getItemCount() > maxStackDrop;
     }
 
     @Override
     public void dropContents() {
+        if (upgrade > 0) {
+            FactorizationUtil.spawnItemStack(getCoord(), new ItemStack(Core.registry.barrel_enlarge));
+        }
         if (item == null || getItemCount() <= 0) {
             return;
-        }
-        // If too big, explode. Explode before dropping the items so that some will survive.
-        if (canExplode()) {
-            float str = explosionStrength;
-            if (getItemCount() > (maxBarrelSize * 2 / 3)) {
-                str *= 3;
-            } else if (getItemCount() > (maxBarrelSize * 1 / 2)) {
-                str *= 2;
-            } else {
-                // compensate for items that don't stack
-                int sword_compensate = Math.min(item.getMaxStackSize(), 64);
-                str *= sword_compensate / 64F;
-                str = Math.max(str, explosionStrengthMin); // but not too much
-            }
-            if (item.getItem() == Item.gunpowder || item.itemID == Block.tnt.blockID) {
-                str *= 4;
-                //I have *no* idea how strong this is...
-            }
-            worldObj.newExplosion(null, xCoord, yCoord, zCoord, str, flamingExplosion());
         }
         // not all items will be dropped if it's big enough to blow up.
         // This replaces lag-o-death with explosion-o-death
         int count = getItemCount();
-        for (int i = 0; i < explosionStackSize; i++) {
+        for (int i = 0; i < maxStackDrop; i++) {
             int to_drop;
             to_drop = Math.min(item.getMaxStackSize(), count);
             count -= to_drop;
             ejectItem(makeStack(to_drop), getItemCount() > 64 * 16, null);
+            if (count <= 0) {
+                break;
+            }
+        }
+        if (count > 0) {
+            broadcastMessage(null, MessageType.BarrelLoss, upgrade);
         }
         topStack = null;
         middleCount = 0;
         bottomStack = null;
+    }
+    
+    static void spawnBreakParticles(Coord c, int upgrade) {
+        if (upgrade > 0) {
+            //ender particles. Also, drop the item.
+            for (int theta = 0; theta < 360; theta += 1) {
+                if (rand.nextInt(10) != 2) {
+                    continue;
+                }
+                float speed = 2F;
+                float start = -2F;
+                double a = Math.toRadians(theta);
+                //c.w.spawnParticle("portal", c.x+0.5F, c.y+0.5F, c.z+0.5F, 0, 0, 0);
+                c.w.spawnParticle("portal", c.x+0.5F + Math.cos(a)*start, c.y, c.z+0.5F + Math.sin(a)*start, Math.cos(a)*speed, 0, Math.sin(a)*speed);
+            }
+        } else {
+            //This technically shouldn't happen.
+            c.w.spawnParticle("largesmoke", c.x+0.5F, c.y+0.5F, c.z+0.5F, 0, 0, 0);
+        }
     }
 
     @Override
@@ -442,6 +463,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
         super.writeToNBT(tag);
         saveItem("item_type", tag, item);
         tag.setInteger("item_count", getItemCount());
+        tag.setInteger("upgrade", upgrade);
     }
 
     @Override
@@ -449,6 +471,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
         super.readFromNBT(tag);
         item = readItem("item_type", tag);
         setItemCount(tag.getInteger("item_count"));
+        upgrade = tag.getInteger("upgrade");
     }
 
     @Override

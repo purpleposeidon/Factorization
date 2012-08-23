@@ -24,6 +24,7 @@ public enum FactoryType {
     LEADWIRE(14, false, TileEntityWire.class, "factory_solder"),
     HEATER(15, false, TileEntityHeater.class, "factory_heater"), //work furnaces without fuel
     MIRROR(16, false, TileEntityMirror.class, "factory_mirror"), //reflect sunlight onto IReflectionTargets
+    GRINDER(17, true, TileEntityGrinder.class, "factory_grinder"), //grind
 
     POCKETCRAFTGUI(101, true),
     MECHATABLEGUICONFIG(102, true), //Mecha-armor editor

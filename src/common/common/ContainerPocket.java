@@ -198,7 +198,7 @@ public class ContainerPocket extends ContainerWorkbench {
         updateCraft();
     }
 
-    // @Override -- stupid server.
+    @Override //-- stupid server.
     public void putStacksInSlots(ItemStack[] par1ArrayOfItemStack) {
         // super.putStacksInSlots(par1ArrayOfItemStack);
         for (int var2 = 0; var2 < par1ArrayOfItemStack.length; ++var2) {

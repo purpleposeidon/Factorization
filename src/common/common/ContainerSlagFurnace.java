@@ -33,7 +33,7 @@ public class ContainerSlagFurnace extends ContainerFactorization {
         lastFuelItemBurnTime = furnace.currentFuelItemBurnTime;
     }
 
-    //@Override -- stupid server
+    @Override // -- stupid server
     public void updateProgressBar(int index, int val) {
         //		System.out.println("Updated progress bar! " + index + " to " + val);
         switch (index) {

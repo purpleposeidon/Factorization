@@ -184,7 +184,7 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
         return getItemName();
     }
 
-    // @Override // XXX NOTE: Can't override due to... the *fucking* server. >:|
+    @Override // XXX NOTE: Can't override due to... the *fucking* server. >:|
     public void addInformation(ItemStack is, List list) {
         // Bag of Holding
         // Stores 5 columns
@@ -257,7 +257,7 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
         return 16 + ((int) (System.currentTimeMillis() / 50000) % 5);
     }
 
-    // @Override // ...
+    @Override // ...
     public boolean hasEffect(ItemStack par1ItemStack) {
         return System.currentTimeMillis() / 75000 % 7 == 5;
     }
@@ -309,19 +309,10 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
         return did_something;
     }
 
-    // @Override -- XXX Waiting for MCP update
-    public boolean getShareNBT() {
+    @Override //-- XXX Waiting for MCP update
+    public boolean getShareTag() {
+        //Note: This function might be removed/unnecessary next MC version or something...
         return true;
-    }
-
-    // @Override -- XXX TODO SERVER get___?
-    public boolean func_46003_i() {
-        return getShareNBT();
-    }
-
-    // @Override -- XXX TODO CLIENT get___?
-    public boolean func_46056_k() {
-        return getShareNBT();
     }
 
     @Override

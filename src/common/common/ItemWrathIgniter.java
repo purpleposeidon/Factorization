@@ -38,7 +38,7 @@ public class ItemWrathIgniter extends Item implements IActOnCraft {
         return getItemName();
     }
 
-    //@Override hello, server.
+    @Override //hello, server.
     public int getIconFromDamage(int par1) {
         return (16 * 3) + 1;
     }

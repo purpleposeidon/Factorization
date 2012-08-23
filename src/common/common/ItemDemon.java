@@ -133,7 +133,7 @@ public class ItemDemon extends Item {
         return getItemName();
     }
 
-    // @Override -- DAMN YOU, SERVER!
+    @Override // -- DAMN YOU, SERVER!
     public void addInformation(ItemStack is, List list) {
         if (isBound(is)) {
             list.add("Less likely to bite");
@@ -154,7 +154,7 @@ public class ItemDemon extends Item {
         return Core.texture_file_item;
     }
 
-    // @Override -- can't override due to the stupidly typical reason.
+    @Override // -- can't override due to the stupidly typical reason.
     public int getIconFromDamage(int par1) {
         if (this == Core.registry.bound_tiny_demon) {
             return (2 * 16) + 1;

@@ -126,7 +126,8 @@ public class ItemWandOfCooling extends Item {
         }
         if (id == Core.lightair_id && md == Core.registry.lightair_block.fire_md) {
             newid = 0;
-            cost = 2;
+            cost = 1;
+            world.removeBlockTileEntity(x, y, z);
         }
         if (newid == -1) {
             return 0;
@@ -194,10 +195,12 @@ public class ItemWandOfCooling extends Item {
         changeArea(w, x, y, z, 1);
         int real_max_radius = max_radius;
         if (player.isSneaking()) {
-            real_max_radius *= 1.5;
+            real_max_radius++;
         }
         for (int r = 2; r < real_max_radius; r++) {
-            changeRadius(w, x, y, z, r);
+            for (int i = 0; i < 3; i++) {
+                changeRadius(w, x, y, z, r);
+            }
         }
 
         int damage = Math.min(max_change - change_count, 1);
@@ -219,7 +222,7 @@ public class ItemWandOfCooling extends Item {
         return Core.texture_file_item;
     }
 
-    // @Override -- can't override due to the stupidly typical reason.
+    @Override //-- can't override due to the stupidly typical reason.
     public int getIconFromDamage(int par1) {
         return (2 * 16) + 2;
     }

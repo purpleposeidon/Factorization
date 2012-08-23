@@ -28,6 +28,11 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     public BlockClass getBlockClass() {
         return BlockClass.Wire;
     }
+    
+    @Override
+    public boolean activate(EntityPlayer entityplayer) {
+        return false;
+    }
 
     @Override
     public Charge getCharge() {
@@ -122,7 +127,9 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
 
         if (!is_supported() && !find_support()) {
             Core.registry.factory_block.dropBlockAsItem(worldObj, xCoord, yCoord, zCoord, BlockClass.Wire.md, 0);
-            getCoord().setId(0);
+            Coord here = getCoord();
+            here.setId(0);
+            here.rmTE();
         }
     }
 

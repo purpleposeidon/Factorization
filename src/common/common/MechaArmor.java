@@ -284,19 +284,9 @@ public class MechaArmor extends ItemArmor
         return Core.texture_dir + "mecha_armor_1.png";
     }
 
-    // @Override -- XXX Waiting for MCP update
-    public boolean getShareNBT() {
+    @Override
+    public boolean getShareTag() {
         return true;
-    }
-
-    // @Override -- XXX TODO SERVER get___?
-    public boolean func_46003_i() {
-        return getShareNBT();
-    }
-
-    // @Override -- XXX TODO CLIENT get___?
-    public boolean func_46056_k() {
-        return getShareNBT();
     }
 
     @Override
@@ -389,7 +379,7 @@ public class MechaArmor extends ItemArmor
         return Core.texture_file_item;
     }
 
-    //@Override seeerveerr
+    @Override //seeerveerr
     public int getIconFromDamage(int par1) {
         return (4 + armorType) * 16;
     }
