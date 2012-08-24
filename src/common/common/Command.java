@@ -70,6 +70,7 @@ public enum Command {
             break;
         case craftClear:
             // move items from pocket crafting area into rest of inventory, or into a bag
+            craftClear(player);
             break;
         case craftMove:
             // do something smart with items in crafting area
@@ -119,6 +120,15 @@ public enum Command {
         }
     }
     
+    void craftClear(EntityPlayer player) {
+        if (!(player.craftingInventory instanceof ContainerPocket)) {
+            return;
+        }
+        ContainerPocket pocket = (ContainerPocket) player.craftingInventory;
+        for (int i : pocket.craftArea) {
+            pocket.transferStackInSlot(i);
+        }
+    }
     
     void craftMove(EntityPlayer player) {
         InventoryPlayer inv = player.inventory;
@@ -141,6 +151,9 @@ public enum Command {
             inv.setInventorySlotContents(15, carry);
         } else {
             player.dropPlayerItem(carry);
+        }
+        if (player.craftingInventory instanceof ContainerPocket) {
+            ((ContainerPocket) player.craftingInventory).updateMatrix();
         }
     }
     
@@ -205,6 +218,10 @@ public enum Command {
                     acc.stackCount--;
                 }
             }
+        }
+        
+        if (player.craftingInventory instanceof ContainerPocket) {
+            ((ContainerPocket) player.craftingInventory).updateMatrix();
         }
     }
 }

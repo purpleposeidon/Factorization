@@ -86,6 +86,7 @@ public class Core {
     public static boolean spread_wrathfire = true;
     public static boolean pocket_craft_anywhere = true;
     public static boolean bag_swap_anywhere = true;
+    public static String pocketActions = "xcz";
     
     // universal constant config
     public final static String texture_dir = "/factorization/texture/";
@@ -143,6 +144,14 @@ public class Core {
         gen_silver_ore = getBoolConfig("generateSilverOre", "general", gen_silver_ore, null);
         pocket_craft_anywhere = getBoolConfig("anywherePocketCraft", "general", pocket_craft_anywhere, "Lets you open the pocket crafting table from GUIs");
         bag_swap_anywhere = getBoolConfig("anywhereBagSwap", "general", bag_swap_anywhere, "Lets you use the bag from GUIs");
+        String attempt = getStringConfig("pocketCraftingActionKeys", "general", pocketActions, "3 keys for: clearing (x), cycling (c), balancing (z)");
+        if (attempt.length() == 3) {
+            pocketActions = attempt;
+        } else {
+            Property p = config.getOrCreateProperty("pocketCraftingActionKeys", "general", pocketActions);
+            p.value = pocketActions;
+            p.comment = "3 keys for: clearing (x), cycling (c), balancing (z)";
+        }
 
         block_item_id_offset = getIntConfig("blockItemIdOffset", "misc", block_item_id_offset, "Hopefully you'll never need to change these.");
         render_barrel_item = getBoolConfig("renderBarrelItem", "misc", render_barrel_item, null);

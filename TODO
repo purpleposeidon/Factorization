@@ -1,14 +1,20 @@
 http://www.minecraftforum.net/topic/1351802-factorization/
 
+[Features]
+Mixer
+Crystalizer
+square saw
+Some electricity related mecha-upgrades?
 
-
-barrel lighting (normals.)
+[High-priority Bugs]
 redstone signal on craftpacket maker/stamper
 solar turbines need to check if it's raining. It's okay if you're in a desert tho.
 verify ore processing yields
-put grinder in barrel, break, fix bad texture.
-
 pocket crafting, shift-clicking buckets with full inventory
+Test on a dedicated server. V_V
+*Real* textures for ore-processing items
+
+[Low-Priority Bugs]
 draw_active isn't marking the block dirty apparently?
 re-write the shift-clicking function to use slots!!!
 shift-clicking out of pocket crafting result slot should go into a hotbar slot... (And I guess the 3x3 should go to normal inv)
@@ -19,6 +25,8 @@ two issues with buttons in mecha-modder: doesn't update when blank armor put in;
 shift-clicking the shard recipe doesn't do the thing. *and*, stamping them doesn't work either!!!
 do block breaking animations properly (after 1.3). Look at src/minecraft/net/minecraft/src/RenderGlobal.java +1569 renderWorld()
 When placing wires, choose the side that's the least complex.
+drop several stacks instantaneously into a transposer running into a barrel. Only 1 stack will be put in.
+barrel lighting (normals.)
 
 
 have sentry demon send redstone signal when it senses shit

@@ -51,24 +51,24 @@ public class GuiPocketTable extends GuiContainer {
         // 'x' clears items out of the way. Fill inv, then bag (and make slurp
         // sound). [XXX TODO -- Doing this server-friendly'd require a packet or
         // something]
-        // 'f' in crafting area, balance items out. Then fill in with rest of
+        // 'z' in crafting area, balance items out. Then fill in with rest of
         // inventory.
-        // 'z' cycle layout, based on outer edge:
+        // 'c' cycle layout, based on outer edge:
         // - Full: rotate
         // - In a '\' corner: spread left/right
         // - In a '/' corner: spread up/down
         // - A line along a side: spread to the other side, skipping the middle.
         // - Two touching: fill the circumerfence, alternating.
         // - middle of a side: spread across center
-        if (key == 'x') {
+        if (key == Core.pocketActions.charAt(0) /* x */) {
             Command.craftClear.call(mc.thePlayer);
             return;
         }
-        if (key == 'c') {
+        if (key == Core.pocketActions.charAt(1) /* c */) {
             Command.craftMove.call(mc.thePlayer);
             return;
         }
-        if (key == 'z') {
+        if (key == Core.pocketActions.charAt(2) /* z */) {
             Command.craftBalance.call(mc.thePlayer);
             return;
         }

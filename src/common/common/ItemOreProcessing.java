@@ -53,7 +53,7 @@ public class ItemOreProcessing extends Item {
     @Override
     public void getSubItems(int id, CreativeTabs tab, List list) {
         for (int i = IRON; i <= COPPER; i++) {
-            if (enabled[i]) {
+            if (enabled[i] || true) {
                 list.add(new ItemStack(this, 1, i));
             }
         }

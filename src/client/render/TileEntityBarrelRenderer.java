@@ -164,7 +164,6 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
             float par9, int side) {
         GL11.glPushMatrix();
         GL11.glTranslated(x, y, z);
-        //GL11.glScalef(-1, -1, -1);
         GL11.glScalef(1, 1, -1);
         GL11.glRotatef(180, 0, 0, 1);
         GL11.glRotatef(180+item_rotation, 0, 1, 0);

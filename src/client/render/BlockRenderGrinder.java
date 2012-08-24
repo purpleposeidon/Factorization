@@ -2,7 +2,9 @@ package factorization.client.render;
 
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.src.RenderBlocks;
+import net.minecraft.src.RenderEngine;
 import net.minecraft.src.TexturedQuad;
 import factorization.common.Core;
 import factorization.common.FactoryType;
@@ -11,6 +13,10 @@ import factorization.common.Texture;
 public class BlockRenderGrinder extends FactorizationBlockRender {
     @Override
     void render(RenderBlocks rb) {
+        if (!world_mode) {
+            RenderEngine re = Minecraft.getMinecraft().renderEngine;
+            re.bindTexture(re.getTexture(Core.texture_file_block));
+        }
         renderMotor(rb, 8F/16F);
         float p = 1F/16F;
         float p2 = 2*p, p3 = 3*p;
