@@ -81,7 +81,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             router_thorough, router_throughput, router_eject;
     public ItemMachineUpgrade barrel_enlarge;
     public ItemStack fake_is;
-    public ItemCraftingComponent acid, magnet, insulated_coil, motor, fan;
+    public ItemCraftingComponent acid, magnet, insulated_coil, motor, fan, diamond_cutting_head;
     public ItemChargeMeter charge_meter;
     public ItemMirror mirror;
     public ItemBattery battery;
@@ -101,6 +101,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         GameRegistry.registerBlock(factory_block, ItemFactorization.class);
         GameRegistry.registerBlock(lightair_block);
         GameRegistry.registerBlock(resource_block, ItemBlockResource.class);
+        GameRegistry.registerCraftingHandler(this);
         
         factory_block.setCreativeTab(CreativeTabs.tabRedstone);
     }
@@ -144,6 +145,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         }
         added_ids.add(default_id);
         return id;
+    }
+    
+    <E extends Item> E tab(E item, CreativeTabs tab) {
+        item.setTabToDisplayOn(tab);
+        return item;
     }
 
     void makeItems() {
@@ -212,14 +218,14 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         wand_of_cooling = new ItemWandOfCooling(itemID("wandOfCooling", 9005));
         addName(wand_of_cooling, "Wand of Cooling");
 
-        router_item_filter = new ItemMachineUpgrade(itemID("routerItemFilter", 9016), "Router Upgrade: Item Filter", FactoryType.ROUTER, 0);
-        router_machine_filter = new ItemMachineUpgrade(itemID("routerMachineFilter", 9017), "Router Upgrade: Machine Filter", FactoryType.ROUTER, 1);
-        router_speed = new ItemMachineUpgrade(itemID("routerSpeed", 9018), "Router Upgrade: Speed Boost", FactoryType.ROUTER, 2);
-        router_thorough = new ItemMachineUpgrade(itemID("routerThorough", 9019), "Router Upgrade: Thoroughness", FactoryType.ROUTER, 3);
-        router_throughput = new ItemMachineUpgrade(itemID("routerThroughput", 9020), "Router Upgrade: Bandwidth", FactoryType.ROUTER, 4);
-        router_eject = new ItemMachineUpgrade(itemID("routerEject", 9031), "Router Upgrade: Ejector", FactoryType.ROUTER, 5);
+        router_item_filter = new ItemMachineUpgrade(itemID("routerItemFilter", 9016), "Item Filter", "Router Upgrade", FactoryType.ROUTER, 0);
+        router_machine_filter = new ItemMachineUpgrade(itemID("routerMachineFilter", 9017), "Machine Filter", "Router Upgrade", FactoryType.ROUTER, 1);
+        router_speed = new ItemMachineUpgrade(itemID("routerSpeed", 9018), "Speed Boost", "Router Upgrade", FactoryType.ROUTER, 2);
+        router_thorough = new ItemMachineUpgrade(itemID("routerThorough", 9019), "Thoroughness", "Router Upgrade", FactoryType.ROUTER, 3);
+        router_throughput = new ItemMachineUpgrade(itemID("routerThroughput", 9020), "Bandwidth", "Router Upgrade", FactoryType.ROUTER, 4);
+        router_eject = new ItemMachineUpgrade(itemID("routerEject", 9031), "Ejector", "Router Upgrade", FactoryType.ROUTER, 5);
         
-        barrel_enlarge = new ItemMachineUpgrade(itemID("barrelEnlarge", 9032), "Barrel Size Upgrade", FactoryType.BARREL, 6);
+        barrel_enlarge = new ItemMachineUpgrade(itemID("barrelEnlarge", 9032), "Extra-Dimensional Storage", "Barrel Upgrade", FactoryType.BARREL, 6);
 
         //Electricity
         acid = new ItemAcidBottle(itemID("acid", 9024), "Sulfuric Acid", 16 * 3 + 5);
@@ -227,6 +233,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         insulated_coil = new ItemCraftingComponent(itemID("coil", 9026), "Insulated Coil", 16 * 3 + 7);
         motor = new ItemCraftingComponent(itemID("motor", 9027), "Motor", 16 * 3 + 8);
         fan = new ItemCraftingComponent(itemID("fan", 9028), "Fan", 16 * 3 + 9);
+        diamond_cutting_head = new ItemCraftingComponent(itemID("diamondCuttingHead", 9038), "Diamond Cutting Head", 16*3+10);
         charge_meter = new ItemChargeMeter(itemID("chargemeter", 9029));
         addName(charge_meter, "Charge Meter");
         mirror = new ItemMirror(itemID("mirror", 9030));
@@ -255,9 +262,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         mecha_buoyant_barrel = new MechaBuoyantBarrel(itemID("mechaBouyantBarrel", 9021));
         mecha_cobble_drive = new MechaCobblestoneDrive(itemID("mechaCobbleDrive", 9022));
         mecha_mounted_piston = new MechaMountedPiston(itemID("mechaMountedPiston", 9023));
-        addName(mecha_buoyant_barrel, "Mecha-Upgrade: Buoyant Barrel");
-        addName(mecha_cobble_drive, "Mecha-Upgrade: Cobblestone Drive");
-        addName(mecha_mounted_piston, "Mecha-Upgrade: Mounted Piston");
+        addName(mecha_buoyant_barrel, "Buoyant Barrel");
+        addName(mecha_cobble_drive, "Cobblestone Drive");
+        addName(mecha_mounted_piston, "Mounted Piston");
 
         //Misc
         pocket_table = new ItemPocketTable(itemID("pocketCraftingTable", 9002));
@@ -566,12 +573,12 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'W', new ItemStack(wrath_igniter, 1, -1));
 
         //sentry demon
-        recipe(sentrydemon_item,
-                "###",
-                "#D#",
-                "###",
-                '#', Block.fenceIron,
-                'D', bound_tiny_demon);
+//		recipe(sentrydemon_item,
+//				"###",
+//				"#D#",
+//				"###",
+//				'#', Block.fenceIron,
+//				'D', bound_tiny_demon);
 
         //Slag furnace
         recipe(slagfurnace_item,
@@ -621,13 +628,23 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 '/', Item.stick,
                 'L', "ingotLead",
                 'I', Item.ingotIron);
-        oreRecipe(new ItemStack(battery),
+        oreRecipe(new ItemStack(battery, 1, 2),
                 "ILI",
                 "LAL",
                 "ILI",
                 'I', Item.ingotIron,
                 'L', "ingotLead",
                 'A', acid);
+        for (int damage : new int[] {1, 2}) {
+            recipe(new ItemStack(magnet),
+                    "WWW",
+                    "WIW",
+                    "WBW",
+                    'W', leadwire_item,
+                    'I', Item.ingotIron,
+                    'B', new ItemStack(battery, 1, damage));
+        }
+        
         oreRecipe(heater_item,
                 "CCC",
                 "L L",
@@ -660,15 +677,25 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "LLL",
                 "LLL",
                 'L', "ingotLead");
+        recipe(new ItemStack(diamond_cutting_head),
+                "SSS",
+                "SIS",
+                "SSS",
+                'S', diamond_shard,
+                'I', Item.ingotIron);
         recipe(grinder_item,
                 "IMI",
-                "DDD",
-                "OOO",
+                "IHI",
+                "LDL",
                 'I', Item.ingotIron,
                 'M', motor,
-                'D', diamond_shard,
-                'O', Block.obsidian);
-
+                'H', diamond_cutting_head,
+                'L', lead_ingot,
+                'D', dark_iron);
+        TileEntityGrinder.addRecipe(new ItemStack(Block.cobblestone), new ItemStack(Block.gravel), 1);
+        TileEntityGrinder.addRecipe(new ItemStack(Block.gravel), new ItemStack(Block.sand), 1);
+        TileEntityGrinder.addRecipe(new ItemStack(Block.grass), new ItemStack(Block.dirt), 1);
+        TileEntityGrinder.addRecipe(new ItemStack(Block.mycelium), new ItemStack(Block.dirt), 1);
         // Cutter
         //TODO: Remove the cutter
         //		recipe(cutter_item,
@@ -705,8 +732,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 crystal = new ItemStack(ore_crystal, 1, oreID);
         TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, ingot, 0.4F, Block.stone);
         TileEntityGrinder.addRecipe(ore, dirty, 1.4F);
-        TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.2F, ingot, 0.2F, Block.dirt);
-        FurnaceRecipes.smelting().addSmelting(dirty.itemID, dirty.getItemDamage(), ingot);
+        TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.142857142857143F, ingot, 0.2F, Block.dirt);
+        for (ItemStack is : new ItemStack[] {dirty, clean, reduced, crystal}) {
+            FurnaceRecipes.smelting().addSmelting(is.itemID, is.getItemDamage(), ingot);
+        }
         //TODO: Make all the machines for the processing path...
 
     }

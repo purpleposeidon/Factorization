@@ -1,5 +1,7 @@
 package factorization.common;
 
+import java.util.List;
+
 import net.minecraft.src.Block;
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.DamageSource;
@@ -104,4 +106,8 @@ public class MechaMountedPiston extends Item implements IMechaUpgrade {
         return "Push blocks";
     }
     
+    @Override
+    public void addInformation(ItemStack is, List list) {
+        list.add("Mecha-Upgrade");
+    }
 }

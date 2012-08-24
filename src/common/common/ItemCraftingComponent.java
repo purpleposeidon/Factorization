@@ -1,5 +1,6 @@
 package factorization.common;
 
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.Item;
 
 public class ItemCraftingComponent extends Item {
@@ -10,6 +11,7 @@ public class ItemCraftingComponent extends Item {
         setItemName(itemName);
         Core.proxy.addName(this, itemName);
         this.icon = icon;
+        setTabToDisplayOn(CreativeTabs.tabMaterials);
     }
 
     @Override

@@ -1,5 +1,8 @@
 package factorization.common;
 
+import java.util.List;
+
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 
@@ -21,6 +24,7 @@ public class ItemOreProcessing extends Item {
         setIconIndex(icon);
         this.type = type;
         setTextureFile(Core.texture_file_item);
+        setTabToDisplayOn(CreativeTabs.tabMaterials);
     }
 
     @Override
@@ -44,5 +48,14 @@ public class ItemOreProcessing extends Item {
     
     public static void enable(int oreID) {
         enabled[oreID] = true;
+    }
+    
+    @Override
+    public void getSubItems(int id, CreativeTabs tab, List list) {
+        for (int i = IRON; i <= COPPER; i++) {
+            if (enabled[i]) {
+                list.add(new ItemStack(this, 1, i));
+            }
+        }
     }
 }

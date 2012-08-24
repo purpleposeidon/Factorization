@@ -170,9 +170,9 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
             return;
         }
         int last_cut = water_level / 64;
-        int d = heat > water_level ? water_level : heat;
-        charge.addValue(d);
-        water_level -= d;
+        int delta = Math.min(heat, water_level);
+        charge.addValue(delta); //This is fine; heat depends on reflectors.
+        water_level -= delta;
         if (water_level / 64 != last_cut) {
             getCoord().dirty();
         }

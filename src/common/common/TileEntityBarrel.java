@@ -408,7 +408,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     }
     
     public boolean canLose() {
-        return getItemCount() > maxStackDrop;
+        return getItemCount() > maxStackDrop*item.getMaxStackSize();
     }
 
     @Override
@@ -483,10 +483,11 @@ public class TileEntityBarrel extends TileEntityFactorization {
 
     @Override
     public Packet getAuxillaryInfoPacket() {
-        if (item == null) {
-            return super.getAuxillaryInfoPacket();
+        int ic = getItemCount();
+        if (ic == 0) {
+            return getDescriptionPacketWith(MessageType.BarrelDescription, ic, upgrade, 0xDEAD);
         }
-        return getDescriptionPacketWith(MessageType.BarrelDescription, getItemCount(), item);
+        return getDescriptionPacketWith(MessageType.BarrelDescription, ic, upgrade, item);
     }
 
     @Override
@@ -517,7 +518,10 @@ public class TileEntityBarrel extends TileEntityFactorization {
             break;
         case MessageType.BarrelDescription:
             int i = input.readInt();
-            item = FactorizationHack.loadItemStackFromDataInput(input);
+            upgrade = input.readInt();
+            if (i > 0) {
+                item = FactorizationHack.loadItemStackFromDataInput(input);
+            }
             setItemCount(i);
             break;
         case MessageType.BarrelItem:

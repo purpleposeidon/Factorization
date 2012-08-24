@@ -1,5 +1,7 @@
 package factorization.common;
 
+import java.util.List;
+
 import net.minecraft.src.Block;
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.DamageSource;
@@ -77,5 +79,10 @@ class MechaBuoyantBarrel extends Item implements IMechaUpgrade {
     @Override
     public String getDescription() {
         return "Rise quickly when underwater";
+    }
+    
+    @Override
+    public void addInformation(ItemStack is, List list) {
+        list.add("Mecha-Upgrade");
     }
 }

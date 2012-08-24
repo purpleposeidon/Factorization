@@ -4,9 +4,10 @@
   The pocket crafting table & bag of holding now respond to key presses only if they are not otherwise handled. BWAH-HA-HA-HA-HA! [i]Ahem.[/i] I'm [b]quite positively certain[/b] that this feature would [b]never[/b] go away due to Forge sucking, and that there will be. No. Problems. At. All.
   The barrel renders blocks much nicer now.
   Wrath lamp recipe is now 4 dark iron & 2 silver.
+  Removed sentry demons chunk-loaders due to lack of confidence in their correctness. And also laziness. Use ChickenBone's chunkloaders instead. They may return with a change in job description.
 
   More Electricity:
-    The battery block is made using acid & lead. When crafted, it will be fully charged. They do not stack. Battery blocks keep their charge when broken. They are used to craft magnets, which are used in motors.
+    The battery block is made using acid & lead. When crafted, it will be fully charged. They do not stack. Battery blocks keep their charge when broken. They are used to craft magnets, which are used in motors. A battery block can't charge another battery block.
     The Grinder is the first step of the ore processing chain. A second use for diamond shards!
 
 0.4.0 -- Secretly Updated!

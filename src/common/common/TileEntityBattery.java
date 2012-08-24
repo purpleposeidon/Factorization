@@ -80,8 +80,8 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     }
 
     void updateMeter() {
-        getCoord().dirty();
         Core.network.broadcastMessage(null, getCoord(), MessageType.BatteryLevel, storage.getValue());
+        getCoord().dirty();
     }
 
     @Override

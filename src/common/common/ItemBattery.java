@@ -18,9 +18,9 @@ public class ItemBattery extends Item implements IActOnCraft {
     public ItemBattery(int id) {
         super(id);
         setItemName("battery");
-        setMaxDamage(2);
-        setNoRepair();
         setMaxStackSize(1);
+        setMaxDamage(0); //'2' is not the number for this.
+        setNoRepair();
     }
     
     public int getStorage(ItemStack is) {
@@ -31,8 +31,13 @@ public class ItemBattery extends Item implements IActOnCraft {
         return TileEntityBattery.max_storage;
     }
     
+    public void setStorage(ItemStack is, int new_charge) {
+        NBTTagCompound tag = FactorizationUtil.getTag(is);
+        tag.setInteger("storage", new_charge);
+    }
+    
+    int magnet_cost = (int) (TileEntityBattery.max_storage * 0.4);
     public void normalizeDamage(ItemStack is) {
-        int magnet_cost = (int) (TileEntityBattery.max_storage * 0.4);
         is.setItemDamage(getStorage(is)/magnet_cost);
     }
     
@@ -44,10 +49,20 @@ public class ItemBattery extends Item implements IActOnCraft {
 
     @Override
     public void onCraft(ItemStack is, IInventory craftMatrix, int craftSlot, ItemStack result, EntityPlayer player) {
+        normalizeDamage(is);
         int d = is.getItemDamage();
         if (d > 0) {
-            is.setItemDamage(d - 1);
+            int stor = getStorage(is);
+            stor -= magnet_cost;
+            setStorage(is, stor);
+            normalizeDamage(is);
             is.stackSize++;
+        }
+        for (int i = 0; i < craftMatrix.getSizeInventory(); i++) {
+            ItemStack wire = craftMatrix.getStackInSlot(i);
+            if (wire != null && wire.isItemEqual(Core.registry.leadwire_item)) {
+                wire.stackSize++;
+            }
         }
     }
 
@@ -59,5 +74,10 @@ public class ItemBattery extends Item implements IActOnCraft {
         boolean ret = proxy.getItem().tryPlaceIntoWorld(proxy, player, w, x, y, z, side, vecx, vecy, vecz);
         is.stackSize = proxy.stackSize;
         return ret;
+    }
+    
+    @Override
+    public boolean isDamageable() {
+        return false;
     }
 }

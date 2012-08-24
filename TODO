@@ -6,7 +6,7 @@ barrel lighting (normals.)
 redstone signal on craftpacket maker/stamper
 solar turbines need to check if it's raining. It's okay if you're in a desert tho.
 verify ore processing yields
-what happens if you put a lava bucket in the two furnaces?
+put grinder in barrel, break, fix bad texture.
 
 pocket crafting, shift-clicking buckets with full inventory
 draw_active isn't marking the block dirty apparently?

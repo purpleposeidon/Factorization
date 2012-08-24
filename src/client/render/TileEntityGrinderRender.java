@@ -32,8 +32,6 @@ import factorization.common.RenderingCube.Vector;
 import factorization.common.TileEntityGrinder;
 
 public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
-    
-    
     static class DiamondModel {
         TexturedQuad quads[] = new TexturedQuad[4];
         final float near = 2F/32F, far = 5F/32F, point = -10F/32F;
@@ -68,20 +66,24 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
         }
     }
     
-    DiamondModel diamondModel = new DiamondModel();
+    static DiamondModel diamondModel = new DiamondModel();
 
     @Override
     public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
         TileEntityGrinder grinder = (TileEntityGrinder) te;
-        RenderEngine re = Minecraft.getMinecraft().renderEngine;
         GL11.glPushMatrix();
         GL11.glTranslatef((float)(x + 0.5), (float)(y + 5F/16F), (float)(z + 0.5));
-        GL11.glRotatef(grinder.rotation/4.0F, 0, 1, 0);
+        GL11.glRotatef(grinder.rotation/30.0F, 0, 1, 0);
+        renderGrindHead();
+        GL11.glPopMatrix();
+    }
+    
+    static void renderGrindHead() {
+        RenderEngine re = Minecraft.getMinecraft().renderEngine;
         glDisable(GL_LIGHTING);
         
         re.bindTexture(re.getTexture("/terrain.png"));
         RenderingCube frame = new RenderingCube(16+6, new RenderingCube.Vector(5, 1, 5), null);
-        GL11.glEnable(GL_BLEND);
         Tessellator.instance.startDrawingQuads();
         Tessellator.instance.setColorOpaque_F(1, 1, 1);
         GL11.glTranslatef(0, 2F/16F, 0);
@@ -108,38 +110,7 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
             glPopMatrix();
         }
         
-        GL11.glPopMatrix();
         glEnable(GL_LIGHTING);
         glDisable(GL_BLEND);
-        
-        
-        diamondModel = new DiamondModel(); //XXX TODO REMOVE
-    }
-    
-    static FloatBuffer makeBuffer(Float... parts) {
-        ByteBuffer bb = ByteBuffer.allocateDirect(4*parts.length);
-        FloatBuffer fb = bb.asFloatBuffer();
-        for (float p : parts) {
-            fb.put(p);
-        }
-        fb.rewind();
-        return fb;
-    }
-
-    void drawShard() {
-        glEnable(GL_BLEND);
-//		GL11.glColor4f(0, 1, 1, 0.5F);
-        GL11.glColor4f(0, 1, 1, 0.98F);
-        
-        final float near = 2F/32F, far = 5F/32F, down = -12F/32F;
-        glBegin(GL11.GL_TRIANGLE_FAN);
-        glVertex3f(0, down, 0);
-        
-        glVertex3f(0, 0, -near);
-        glVertex3f(far, 0, 0);
-        glVertex3f(0, 0, +near);
-        glVertex3f(-far, 0, 0);
-        glVertex3f(0, 0, -near);
-        glEnd();
     }
 }

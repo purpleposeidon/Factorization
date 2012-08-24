@@ -30,7 +30,7 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
         //		super(id, Material.air);
         setHardness(2.0F);
         setResistance(5);
-        setLightOpacity(3);
+        setLightOpacity(1);
         canBlockGrass[id] = false;
         //setBlockBounds(0, -1000, 0, 0, -999, 0);
     }
@@ -242,11 +242,11 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
         //dark
         itemList.add(reg.router_item);
         itemList.add(reg.lamp_item);
-        itemList.add(reg.sentrydemon_item);
+        //itemList.add(reg.sentrydemon_item);
 
         //electric
         //itemList.add(reg.battery_item_hidden);
-        itemList.add(new ItemStack(reg.battery));
+        itemList.add(new ItemStack(reg.battery, 1, 2));
         itemList.add(reg.solar_turbine_item);
         //itemList.add(reg.mirror_item_hidden);
         itemList.add(new ItemStack(reg.mirror));

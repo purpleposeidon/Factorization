@@ -135,16 +135,19 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         Charge.update(this);
         if (worldObj.getWorldTime() % 3 == 0) {
             int val = getCharge().getValue();
-            if (val > 3 && energy < 30) {
+            if (val > 6 && energy < 30) {
                 int to_take = Math.max(3, Math.min(12, val));
                 to_take = Math.min(to_take, 30-energy);
                 val -= to_take;
-                energy += to_take;
+                energy += to_take/3;
                 getCharge().setValue(val);
             }
         }
         if (energy <= 0) {
             slowDown();
+            if (progress > 0) {
+                progress--;
+            }
             return;
         }
         if (canGrind()) {

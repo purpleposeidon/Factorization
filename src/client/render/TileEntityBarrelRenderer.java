@@ -54,7 +54,6 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
             return;
         }
 
-        entity.item = barrel.item;
         double idy = 0.40;
         itemRender = (RenderItem) RenderManager.instance.getEntityClassRenderObject(EntityItem.class);
         final double d = 0.01;
@@ -68,7 +67,7 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
             item_rotation = 0;
             setupLight(barrel, 0, 1);
             if (render_item)
-                handleRenderItem(entity, x + 0.5, y + idy, z + 1 + d, 0, 0, 2);
+                handleRenderItem(barrel.item, x + 0.5, y + idy, z + 1 + d, 0, 0, 2);
             if (render_text)
                 renderItemCount(barrel, 2, x, y, z);
             break;
@@ -77,7 +76,7 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
             item_rotation = -180;
             setupLight(barrel, 0, -1);
             if (render_item)
-                handleRenderItem(entity, x + 0.5, y + idy, z - d, 0, 0, 0);
+                handleRenderItem(barrel.item, x + 0.5, y + idy, z - d, 0, 0, 0);
             if (render_text)
                 renderItemCount(barrel, 0, x, y, z);
             break;
@@ -85,7 +84,7 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
             item_rotation = -90;
             setupLight(barrel, -1, 0);
             if (render_item)
-                handleRenderItem(entity, x - d, y + idy, z + 0.5, 0, 0, 1);
+                handleRenderItem(barrel.item, x - d, y + idy, z + 0.5, 0, 0, 1);
             if (render_text)
                 renderItemCount(barrel, 1, x, y, z);
             break;
@@ -94,7 +93,7 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
             item_rotation = 90;
             setupLight(barrel, 1, 0);
             if (render_item)
-                handleRenderItem(entity, x + 1 + d, y + idy, z + 0.5, 0, 0, 3);
+                handleRenderItem(barrel.item, x + 1 + d, y + idy, z + 0.5, 0, 0, 3);
             if (render_text)
                 renderItemCount(barrel, 3, x, y, z);
             break;
@@ -149,6 +148,7 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
         // XXX TODO: This sometimes renders too bright. Probably some OpenGL
         // state that some other part of the render is changing. Any ideas?
         // some possibilities: +TEXTURE_2D +BLEND ±LIGHTING
+        GL11.glDisable(GL11.GL_LIGHTING);
         fontRender.drawString(t, -fontRender.getStringWidth(t) / 2, 0, color);
         // Seems like using anything other than 0 for alpha fucks shit up?
         // That function is ass. I hate it.
@@ -158,125 +158,32 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
     }
 
     Random rand = new Random();
+    RenderItem renderItem = new RenderItem();
 
-    public void handleRenderItem(EntityItem entity, double x, double y, double z, float par8,
+    public void handleRenderItem(ItemStack is, double x, double y, double z, float par8,
             float par9, int side) {
-        ItemStack var10 = entity.item;
-        doRenderItem(entity, x, y, z, par8, par9);
-        //doRenderItem(entity, x, y, z, par8, par9);
-    }
-
-    
-    
-    //stole from RenderItem.doRenderItem (!!! *not* ItemRender !!!)
-    public void doRenderItem(EntityItem par1EntityItem, double par2, double par4, double par6, float par8, float par9)
-    {
-        this.random.setSeed(187L);
-        ItemStack var10 = par1EntityItem.item;
         GL11.glPushMatrix();
-        float var11 = MathHelper.sin(((float)par1EntityItem.age + par9) / 10.0F + par1EntityItem.hoverStart) * 0.1F + 0.1F;
-        float var12 = (((float)par1EntityItem.age + par9) / 20.0F + par1EntityItem.hoverStart) * (180F / (float)Math.PI);
-
-        GL11.glTranslatef((float)par2, (float)par4 + var11, (float)par6);
-        GL11.glPushMatrix(); //these 2 transforms aren't needed for normal items
-        GL11.glRotatef(item_rotation - 90, 0.0F, 1.0F, 0.0F);
-        GL11.glScalef(0.05F, 1.5F, 1.5F);
-        GL11.glRotatef(90/4, 0, 0, -1);
-        GL11.glRotatef(45, 0, 1, 0);
-        GL11.glTranslatef(0, -0.05F, 0);
-//        GL11.glTranslatef(1, 0, 0);
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        int var16;
-        float var19;
-        float var20;
-        float var24;
-
-        if (ForgeHooksClient.renderEntityItem(par1EntityItem, var10, var11, var12, random, Minecraft.getMinecraft().renderEngine, renderBlocks))
+        GL11.glTranslated(x, y, z);
+        //GL11.glScalef(-1, -1, -1);
+        GL11.glScalef(1, 1, -1);
+        GL11.glRotatef(180, 0, 0, 1);
+        GL11.glRotatef(180+item_rotation, 0, 1, 0);
+        GL11.glTranslatef(-0.5F, -0.5F, 0);
+        float scale = 1F/32F;
+        GL11.glScalef(scale, scale, scale);
+        GL11.glTranslatef(8, 6, 0);
+        GL11.glScalef(1, 1, 0.01F);
         {
-           GL11.glPopMatrix();
-        }
-        else if (var10.getItem() instanceof ItemBlock && RenderBlocks.renderItemIn3d(Block.blocksList[var10.itemID].getRenderType()))
-        {
-            this.loadTexture(Block.blocksList[var10.itemID].getTextureFile());
-            float var22 = 0.25F;
-            var16 = Block.blocksList[var10.itemID].getRenderType();
-
-            if (var16 == 1 || var16 == 19 || var16 == 12 || var16 == 2)
-            {
-                var22 = 0.5F;
-            }
-
-            GL11.glScalef(var22, var22, var22);
-
-            var24 = 1.0F;
-            this.renderBlocks.renderBlockAsItem(Block.blocksList[var10.itemID], var10.getItemDamage(), var24);
-            GL11.glPopMatrix();
-        }
-        else
-        {
-            GL11.glPopMatrix();
-            GL11.glRotatef(item_rotation, 0.0F, 1.0F, 0.0F);
-            GL11.glTranslatef(0, -0.1F, 0);
-            int var15;
-            float var17;
-            if (var10.getItem().requiresMultipleRenderPasses())
-            {
-                GL11.glScalef(0.5F, 0.5F, 0.5F);
-                this.loadTexture(Item.itemsList[var10.itemID].getTextureFile());
-
-                for (var15 = 0; var15 <= var10.getItem().getRenderPasses(var10.getItemDamage()); ++var15)
-                {
-                    this.random.setSeed(187L); //Fixes Vanilla bug where layers would not render aligns properly.
-                    var16 = var10.getItem().getIconFromDamageForRenderPass(var10.getItemDamage(), var15);
-                    var17 = 1.0F;
-                    this.func_77020_a(var16, 1);
-                }
-            }
-            else
-            {
-                GL11.glScalef(0.5F, 0.5F, 0.5F);
-                var15 = var10.getIconIndex();
-
-                this.loadTexture(var10.getItem().getTextureFile());
-
-                this.func_77020_a(var15, 1);
+            //Original call:
+            //renderItem.renderItemIntoGUI(getFontRenderer(), Minecraft.getMinecraft().renderEngine, is, 0, 0);
+            //However, this draws the sparkly effect, which causes problems.
+            RenderEngine re = Minecraft.getMinecraft().renderEngine;
+            FontRenderer fr = getFontRenderer();
+            if (!ForgeHooksClient.renderInventoryItem(renderBlocks, re, is, true, 0, 0, 0)) {
+                renderItem.drawItemIntoGui(fr, re, is.itemID, is.getItemDamage(), is.getIconIndex(), 0, 0);
             }
         }
-
-        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
         GL11.glPopMatrix();
     }
-
-    private void func_77020_a(int par1, int par2)
-    {
-        Tessellator var3 = Tessellator.instance;
-        float var4 = (float)(par1 % 16 * 16 + 0) / 256.0F;
-        float var5 = (float)(par1 % 16 * 16 + 16) / 256.0F;
-        float var6 = (float)(par1 / 16 * 16 + 0) / 256.0F;
-        float var7 = (float)(par1 / 16 * 16 + 16) / 256.0F;
-        float var8 = 1.0F;
-        float var9 = 0.5F;
-        float var10 = 0.25F;
-
-        GL11.glPushMatrix();
-        GL11.glTranslatef(0, -0.2F, 0);
-
-        //GL11.glRotatef(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-        var3.startDrawingQuads();
-        var3.setNormal(0.0F, 1.0F, 0.0F);
-        var3.addVertexWithUV((double)(0.0F - var9), (double)(0.0F - var10), 0.0D, (double)var4, (double)var7);
-        var3.addVertexWithUV((double)(var8 - var9), (double)(0.0F - var10), 0.0D, (double)var5, (double)var7);
-        var3.addVertexWithUV((double)(var8 - var9), (double)(1.0F - var10), 0.0D, (double)var5, (double)var6);
-        var3.addVertexWithUV((double)(0.0F - var9), (double)(1.0F - var10), 0.0D, (double)var4, (double)var6);
-        var3.draw();
-        GL11.glPopMatrix();
-    }
-    
-    protected void loadTexture(String par1Str)
-    {
-        RenderEngine var2 = Minecraft.getMinecraft().renderEngine;
-        var2.bindTexture(var2.getTexture(par1Str));
-    }
-
     
 }

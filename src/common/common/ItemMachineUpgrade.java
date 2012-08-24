@@ -1,5 +1,7 @@
 package factorization.common;
 
+import java.util.List;
+
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
@@ -10,18 +12,19 @@ import factorization.api.Coord;
 public class ItemMachineUpgrade extends Item {
     FactoryType machineType;
     public int upgradeId;
-    String name;
+    String name, type;
 
-    protected ItemMachineUpgrade(int id, String name, FactoryType machineType, int upgradeId) {
+    protected ItemMachineUpgrade(int id, String name, String type, FactoryType machineType, int upgradeId) {
         super(id);
         this.machineType = machineType;
         this.upgradeId = upgradeId;
         this.name = name;
+        this.type = type;
         setItemName(this.name);
         setIconIndex(9 * 16 + upgradeId);
         setMaxStackSize(16);
         Core.proxy.addName(this, this.name);
-        setTabToDisplayOn(CreativeTabs.tabRedstone);
+        setTabToDisplayOn(CreativeTabs.tabMisc);
     }
 
     @Override
@@ -43,4 +46,8 @@ public class ItemMachineUpgrade extends Item {
         return false;
     }
 
+    @Override
+    public void addInformation(ItemStack is, List list) {
+        list.add(type);
+    }
 }

@@ -1,5 +1,7 @@
 package factorization.common;
 
+import java.util.List;
+
 import net.minecraft.src.Block;
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.DamageSource;
@@ -62,5 +64,10 @@ public class MechaCobblestoneDrive extends Item implements IMechaUpgrade {
     @Override
     public String getDescription() {
         return "Generates cobblestone";
+    }
+    
+    @Override
+    public void addInformation(ItemStack is, List list) {
+        list.add("Mecha-Upgrade");
     }
 }
