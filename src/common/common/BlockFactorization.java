@@ -46,6 +46,7 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
         //If we had this behave normally, it'd just return garbage unfortunately.
         //Sooo... we return the other kind of garbage instead.
         //(This is what happens in Creative mode.)
+        //XXX TODO Make this nice
         return Block.cobblestone.blockID;
         //return super.idDropped(par1, par2Random, par3);
     }
@@ -221,6 +222,7 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
             NBTTagCompound tag = new NBTTagCompound();
             tag.setInteger("storage", bat.storage.getValue());
             is.setTagCompound(tag);
+            Core.registry.battery.normalizeDamage(is);
         }
         ret.add(is);
         return ret;
