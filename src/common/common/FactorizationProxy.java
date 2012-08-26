@@ -58,7 +58,9 @@ public abstract class FactorizationProxy implements IGuiHandler {
         if (ID == FactoryType.SLAGFURNACE.gui) {
             cont = new ContainerSlagFurnace(player, fac);
         } else if (ID == FactoryType.GRINDER.gui) {
-            cont = new ContainerGrinder(player, (TileEntityGrinder) fac);
+            cont = new ContainerGrinder(player, fac);
+        } else if (ID == FactoryType.MIXER.gui) {
+            cont = new ContainerMixer(player, fac);
         } else {
             cont = new ContainerFactorization(player, fac);
         }

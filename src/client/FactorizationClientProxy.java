@@ -46,6 +46,7 @@ import factorization.client.gui.GuiCutter;
 import factorization.client.gui.GuiGrinder;
 import factorization.client.gui.GuiMaker;
 import factorization.client.gui.GuiMechaConfig;
+import factorization.client.gui.GuiMixer;
 import factorization.client.gui.GuiPocketTable;
 import factorization.client.gui.GuiRouter;
 import factorization.client.gui.GuiSlag;
@@ -74,6 +75,7 @@ import factorization.common.Command;
 import factorization.common.ContainerFactorization;
 import factorization.common.ContainerGrinder;
 import factorization.common.ContainerMechaModder;
+import factorization.common.ContainerMixer;
 import factorization.common.ContainerPocket;
 import factorization.common.ContainerSlagFurnace;
 import factorization.common.Core;
@@ -173,7 +175,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
         if (ID == FactoryType.SLAGFURNACE.gui) {
             cont = new ContainerSlagFurnace(player, fac);
         } else if (ID == FactoryType.GRINDER.gui) {
-            cont = new ContainerGrinder(player, (TileEntityGrinder) fac);
+            cont = new ContainerGrinder(player, fac);
+        } else if (ID == FactoryType.MIXER.gui) {
+            cont = new ContainerMixer(player, fac);
         } else {
             cont = new ContainerFactorization(player, fac);
         }
@@ -195,6 +199,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }
         if (ID == FactoryType.GRINDER.gui) {
             gui = new GuiGrinder(cont);
+        }
+        if (ID == FactoryType.MIXER.gui) {
+            gui = new GuiMixer(cont);
         }
 
         cont.addSlotsForGui(fac, player.inventory);

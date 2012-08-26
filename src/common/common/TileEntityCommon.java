@@ -103,8 +103,10 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         FactoryType type = getFactoryType();
 
         if (type.hasGui) {
+            if (!entityplayer.worldObj.isRemote) {
+                sendFullDescription(entityplayer);
+            }
             entityplayer.openGui(Core.instance, type.gui, worldObj, xCoord, yCoord, zCoord);
-            sendFullDescription(entityplayer);
             return true;
         }
         return false;

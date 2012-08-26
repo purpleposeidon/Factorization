@@ -138,6 +138,19 @@ public class ContainerFactorization extends Container {
             addSlotToContainer(new Slot(grinder, 0, 56, 35));
             addSlotToContainer(new Slot(grinder, 1, 115, 34));
             break;
+        case MIXER:
+            TileEntityMixer mixer = (TileEntityMixer) ent;
+            //inputs
+            addSlotToContainer(new Slot(mixer, 0, 38, 25));
+            addSlotToContainer(new Slot(mixer, 1, 56, 25));
+            addSlotToContainer(new Slot(mixer, 2, 38, 43));
+            addSlotToContainer(new Slot(mixer, 3, 56, 43));
+            //outputs
+            addSlotToContainer(new Slot(mixer, 4, 112, 25));
+            addSlotToContainer(new Slot(mixer, 5, 130, 25));
+            addSlotToContainer(new Slot(mixer, 6, 112, 43));
+            addSlotToContainer(new Slot(mixer, 7, 130, 43));
+            break;
         default: //Fun fact: progress is done by subclassing; see ContainerSlagFurnace
             break;
         }

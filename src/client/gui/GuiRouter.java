@@ -415,7 +415,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
     @Override
     protected void keyTyped(char c, int i) {
         if (i == org.lwjgl.input.Keyboard.KEY_ESCAPE) {
-            router.broadcastItem(MessageType.RouterMatch, null);
+            //router.broadcastItem(MessageType.RouterMatch, null);
             super.keyTyped(c, i);
             return;
         }

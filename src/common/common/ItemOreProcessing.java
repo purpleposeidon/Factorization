@@ -25,6 +25,7 @@ public class ItemOreProcessing extends Item {
         this.type = type;
         setTextureFile(Core.texture_file_item);
         setTabToDisplayOn(CreativeTabs.tabMaterials);
+        setItemName("itemOreProcessing" + type);
     }
 
     @Override

@@ -11,6 +11,8 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.regex.Matcher;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.ItemStack;
@@ -367,7 +369,7 @@ public class TileEntityRouter extends TileEntityFactorization {
             return false;
         }
 
-        if (match == null || match.length() == 0) {
+        if (match == null || match.length() == 0 || upgradeMachineFilter == false) {
             return true;
         }
 
@@ -576,7 +578,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         target_slot = tag.getInteger("use_slot");
         is_input = tag.getBoolean("is_input");
         if (tag.hasKey("buffer")) {
-            //This is old!
+            //This is old & here for compat.
             buffer = ItemStack.loadItemStackFromNBT(tag.getCompoundTag("buffer"));
         }
         else {

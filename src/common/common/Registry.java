@@ -57,7 +57,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             barrel_item,
             queue_item, lamp_item, air_item, sentrydemon_item,
             slagfurnace_item, battery_item_hidden, solar_turbine_item, heater_item, mirror_item_hidden,
-            leadwire_item, grinder_item;
+            leadwire_item, grinder_item, mixer_item, crystallizer_item;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item, mechaworkshop_item;
     public ItemStack is_factory, is_lamp, is_lightair;
@@ -183,6 +183,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         mirror_item_hidden = FactoryType.MIRROR.itemStack("Reflective Mirror");
         leadwire_item = FactoryType.LEADWIRE.itemStack("Lead Wire");
         grinder_item = FactoryType.GRINDER.itemStack("Grinder");
+        mixer_item = FactoryType.MIXER.itemStack("Mixer");
+        crystallizer_item = FactoryType.CRYSTALLIZER.itemStack("Crystallizer");
 
         //BlockResource stuff
         silver_ore_item = ResourceType.SILVERORE.itemStack("Silver Ore");
@@ -692,10 +694,32 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'H', diamond_cutting_head,
                 'L', lead_ingot,
                 'D', dark_iron);
+        TileEntityGrinder.addRecipe(new ItemStack(Block.stone), new ItemStack(Block.cobblestone), 1);
         TileEntityGrinder.addRecipe(new ItemStack(Block.cobblestone), new ItemStack(Block.gravel), 1);
         TileEntityGrinder.addRecipe(new ItemStack(Block.gravel), new ItemStack(Block.sand), 1);
         TileEntityGrinder.addRecipe(new ItemStack(Block.grass), new ItemStack(Block.dirt), 1);
         TileEntityGrinder.addRecipe(new ItemStack(Block.mycelium), new ItemStack(Block.dirt), 1);
+        recipe(mixer_item,
+                "LML",
+                "LXL",
+                "LUL",
+                'L', lead_ingot,
+                'M', motor,
+                'X', fan,
+                'U', Item.cauldron
+                );
+        TileEntityMixer.addRecipe(
+                new ItemStack[] {new ItemStack(Item.slimeBall), new ItemStack(Item.bucketMilk), new ItemStack(Block.tallGrass)},
+                new ItemStack[] {new ItemStack(Item.slimeBall, 2), new ItemStack(Item.bucketEmpty)});
+        recipe(crystallizer_item,
+                "ISI",
+                "ABA",
+                "IUI",
+                'I', Item.ingotIron,
+                'S', Item.silk,
+                'A', acid,
+                'B', Item.slimeBall,
+                'U', Item.cauldron);
         // Cutter
         //TODO: Remove the cutter
         //		recipe(cutter_item,
@@ -733,6 +757,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, ingot, 0.4F, Block.stone);
         TileEntityGrinder.addRecipe(ore, dirty, 1.4F);
         TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.142857142857143F, ingot, 0.2F, Block.dirt);
+        TileEntityMixer.addRecipe(
+                new ItemStack[] {dirty, new ItemStack(Item.bucketWater)},
+                new ItemStack[] {clean, new ItemStack(Item.bucketEmpty)});
         for (ItemStack is : new ItemStack[] {dirty, clean, reduced, crystal}) {
             FurnaceRecipes.smelting().addSmelting(is.itemID, is.getItemDamage(), ingot);
         }

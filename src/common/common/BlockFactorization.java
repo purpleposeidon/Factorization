@@ -255,6 +255,8 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
         itemList.add(reg.heater_item);
         itemList.add(reg.leadwire_item);
         itemList.add(reg.grinder_item);
+        itemList.add(reg.mixer_item);
+        itemList.add(reg.crystallizer_item);
 
 
         //itemList.add(core.cutter_item);

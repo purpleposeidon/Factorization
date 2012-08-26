@@ -72,15 +72,18 @@ Burning an iron block with Wrath Fire will leave behind a Dark Iron block. This 
 
 [u][b]Demons[/b][/u]
 [img]http://i.imgur.com/1z6J2.png[/img]
-These adorable little beasts can be found only in the nether. To catch one, you need to trap it in a chest containing plenty of netherwort, and nothing else. Be aware that they will accumulate and may quickly eat up all the netherwort in the chest if they aren't tended to. Be careful with them, as they will attempt to kill you with their poisonous fangs when you handle them. You can get slightly more control over them by tying them up with a piece of string on a crafting table.
+Tiny demons are secretive creatures that can be found only in the nether, though they usually stay out of sight. Their favorite activities are eating netherwort, and biting you with their poisonous fangs. If they find a chest containing plenty of netherwort, they are sure to sneak in and become trapped inside. Be careful with them, as they will attempt to kill you when you handle them. You can get slightly more control over them by tying them up with a bit of string on a crafting table.
+
+A chest must have at least 24 netherwort to attract your first demon. If you are paying attention, you can remove it before it eats all your netherwort. No more than 1 demon will enter a chest per minute. Demons won't enter a chest if it has things other than netherwart and demons. Be aware that they will accumulate and eat up all the netherwort if they aren't tended to.
+
 
 [img]http://i.imgur.com/LpZAu.png[/img]
-A demon can be used to craft a Wand of Cooling. The demon operates the wand of cooling by seperating hot molecules from cooler molecules, and sending the hotter molecules to some other [url="http://dresdencodak.com/2009/02/16/exorcising-laplaces-demon/"]Place[/url]. Since the only limiting factor in this process is the enthusiasm and health of the demon, Wands of Cooling will last for quite a while. They will cool lava/water source blocks into obsidian/ice, and destroy fire, Wrath Fire, and non-source water/lava.
+A demon can be used to craft a Wand of Cooling. The demon operates the wand of cooling by seperating hot molecules from cooler molecules, and sending the hotter molecules [url="http://dresdencodak.com/2009/02/16/exorcising-laplaces-demon/"]to some other Place[/url]. Since the only limiting factor in this process is the enthusiasm and health of the demon, Wands of Cooling will last for quite a while. They will cool lava/water source blocks into obsidian/ice, and destroy fire, Wrath Fire, and non-source water/lava.
 
 [u]The [b]Item Router[/b][/u]
-The Item Router is a very flexible, very powerful machine. Making it requires the 3rd material Nether Fortresses provide, blaze powder, which is used to craft the Eye of Ender.
+The Item Router is a very flexible, very powerful machine. Making it requires the 3rd material Nether Fortresses provide: blaze powder, which is necessary for an Eye of Ender.
 [img]http://i.imgur.com/Mw3si.png[/img]
-The Router is a block that creates an item delivery network out of blobs of machines that are all next to eachother. (What I mean by "machine" is a block that has an inventory, such as a chest or furnace.) The router will visit each machine and either take or give a single item, depending on the mode set in the GUI. You can change what direction the machine is accessed from, or you can access a specific slot.
+The Router is a block that creates an item delivery network out of blobs of machines that are all next to eachother. (What I mean by "machine" is a block that has a permanent inventory, such as a chest or furnace.) The router will visit each machine and either take or give a single item, depending on the mode set in the GUI. You can change what direction the machine is accessed from, or you can access a specific item slot.
 
 The Item Router has a number of upgrades that can be applied to it by shift-right-clicking the router with the item in hand. This will add a "--" button in the GUI, which you can press to look at each upgrade. To remove an upgrade, press Delete while hovering the mouse over the button.
 

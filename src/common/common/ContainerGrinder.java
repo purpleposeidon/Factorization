@@ -6,9 +6,9 @@ import net.minecraft.src.ICrafting;
 public class ContainerGrinder extends ContainerFactorization {
     int lastProgress = -1;
     public TileEntityGrinder grinder;
-    public ContainerGrinder(EntityPlayer entityplayer, TileEntityGrinder grinder) {
+    public ContainerGrinder(EntityPlayer entityplayer, TileEntityFactorization grinder) {
         super(entityplayer, grinder.getFactoryType());
-        this.grinder = grinder; 
+        this.grinder = (TileEntityGrinder) grinder; 
     }
 
     @Override

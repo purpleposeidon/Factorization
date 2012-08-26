@@ -13,6 +13,7 @@ verify ore processing yields
 pocket crafting, shift-clicking buckets with full inventory
 Test on a dedicated server. V_V
 *Real* textures for ore-processing items
+mirror's trace check is off by 1/2
 
 [Low-Priority Bugs]
 draw_active isn't marking the block dirty apparently?
@@ -70,11 +71,6 @@ lo fatci roda daspo kakne gi'enai daspo .i'e
 
 
 
-pocket crafting table
-  default key to use is 'c' (or 'p'). Doesn't need to work everywhere. Works too often, in fact.
-
-tape measure -- surveyor's kit?
-
 rainbow chest
   ROY
   CWC
@@ -104,22 +100,6 @@ rainbow chest
 
   Okay. So items can be taken from the slots, but they can't be put in. They have to be inserted indirectly via the extra
   slots on the bottom.
-
-NEW FACTORIZATION
-=================
-The Mecha Suit:
-  Customizable super-suit
-
-diamond shards
-   OTO  obsidian (Or how about a firecharge instead? requires blaze powder tho...), TNT, Diamond block
-   TDT
-   OTO
-  gets you 12 diamond shards. Must be made in a stamper. The stamper makes an explosion noise instead of the usual. If crafted by player, spawn 4 explosions on them.
-
-Wrathfire Igniter
-  crafted like a flint&steel, but with a diamond shard and netherbrick.
-  Has 8 uses.
-
 
 DEMONS
 ======
@@ -159,45 +139,7 @@ Wand of Cooling:
 WRATH
 =====
 
-wrathfire:
-  spreads on: anything it can change (except ice/water), netherrack, lava
-  when spreading, obey some cellular automota rules; when dying, leave behind ordinary fire.
-  changes:
-    leaves -> air
-    wood -> air
-    wool -> air
-    ice -> air
-    grass -> dirt
-    sand -> glass
-    obsidian -> lava
-    cobble -> smoothstone
-    clay -> brick
-    stone brick -> cracked brick
-    mossy brick/cobble -> non-mossy
-    iron block -> dark iron block
-  occasionally spawn a blaze?
-  convert slimes to magmacubes?
-
-Wrath Furnace:
-  III
-  NWN Dark iron, Netherbrick, Wrathfire Igniter
-  NNN
-   The wrath furnace keeps a wrath flame kindled eternally. Netherrack is used as a fuel source. Lasts for 8 items? Probably a bit faster than a regular furnace.
-
-Router upgrades:
-  Remove the inventory name filter from the router & gui
-  upgrades:
-    inventory name filter (What we had originally) [spider eye]
-    use entire stacks (Another old feature) [chest... or ender chest!]
-    item filter [ha. Maybe a charcoal filter mechaupgrade? >.>]
-    vacuum: [might make a vacuum item...? Or a magnet item anyways. Well, a mechasuit upgrade]
-      Uses an inventory in some direction
-      if in INSERT: fill our slot from inventory
-      if in EXTRACT: move our slot into inventory
-
-  All upgrades should have their action happen in one spot in the router's code. Eg, the part where it transfers stuff....
-  put a [+] button in the corner of the UI. This opens another UI, gives you a place to add upgrades. Logistics pipe style.
-    
+   
 bag of holding
   Crafting recipe:
       lol   Leather, Ender pearl, dark iron
@@ -211,38 +153,6 @@ bag of holding
     Right click the bag to open up its inventory. Or ctrl-`?
 
 
-
-Slag Furnace:
-  CFC Cooblestone, Furnace
-  CFC
-  CFC
-    This furnace functions similarly to a regular furnace. Its extra slots allows additional resources to be extracted from ores. It is 85% as fuel-efficient as a regular furnace, but runs 15% faster.
-
-packager:
-  BRp
-  CRo
-  SdW
-
-  Bookcase, Reed, Piston, Craftmate, Reed, Clock, Stamper, dirt, water bucket
-  tries to craft a 3x3. Then tries to craft a 2x2. (Then a 1x1, but that's useless...?)
-
-  Not so sure about this. Why not just make a real one? (Because paper's hard)
-
-paper mill:
-  convert wood pulp into paper!?!?!?
-
-grinder:
-  smoothstone -> cobblestone -> gravel -> sand
-  log, planks, sapplings, sticks, sugarcane -> pulp
-
-Sand papers:
-  g  <gritty substance>, slimeball, paper. Gritty substance ∈ {Sand, gravel, nether rack}
-  O
-  P
-
-smelter:
-  so, like, purify iron ore or something?
-
 Mecha-upgrades:
   Free:
     bouyancy barrel
@@ -251,6 +161,7 @@ Mecha-upgrades:
   Electric:
     charcoal filter
     thermal environmental control
+    sugar water?
   Antium:
     upgrades from slowing falling to slight hovering to flying amongst the birds
     something to feed you
@@ -293,6 +204,7 @@ Clay
 Rockets
     Fueld with vast amounts of TNT. Must be made with high-fire clay... or extreme high fire clay? :O
   Some components made using clay molds (wings, heat shield tiling)
+  Possible idea: Let C = brick, B = Slimeball
   CCC
   CBC  - heat shield mold
   CCC
@@ -301,12 +213,16 @@ Rockets
   BBB   - Rocket wing
   CCC
 
+  BSB
+  SSS
+  BBB
+
   CBC
   BCB   - Rocket nozzle
   BCB
 
-  BCC
-  BCC   - Rocket seat
+  BCB
+  BCB   - Rocket seat
   BBB
 infused lapis?
 

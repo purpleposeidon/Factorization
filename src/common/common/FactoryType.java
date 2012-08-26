@@ -25,6 +25,8 @@ public enum FactoryType {
     HEATER(15, false, TileEntityHeater.class, "factory_heater"), //work furnaces without fuel
     MIRROR(16, false, TileEntityMirror.class, "factory_mirror"), //reflect sunlight onto IReflectionTargets
     GRINDER(17, true, TileEntityGrinder.class, "factory_grinder"), //grind
+    MIXER(18, true, TileEntityMixer.class, "factory_mixer"), //mix
+    CRYSTALLIZER(19, true, TileEntityCrystallizer.class, "factory_crystal"), //grow metallic crystals
 
     POCKETCRAFTGUI(101, true),
     MECHATABLEGUICONFIG(102, true), //Mecha-armor editor

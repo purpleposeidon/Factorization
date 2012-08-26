@@ -290,7 +290,6 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
         //if (host.id == Block.netherBrick.blockID) {
         if (netherBrick.equals(host) || netherStair.equals(host) || netherFence.equals(host)) {
             int furnace_size = 13;
-            int fueling = 4;
             //try to live forever
             int src_count = 0;
             for (Coord c : here.getRandomNeighborsDiagonal()) {
@@ -299,8 +298,8 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
                 }
                 if (c.is(Block.netherrack)) {
                     //maybe eat it up!
-                    if (age > fueling) {
-                        age -= fueling;
+                    if (age > 0) {
+                        age -= 1;
                         c.setId(Block.fire);
                     }
                 }
@@ -327,7 +326,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
                             continue; //don't burn something that we're just going to reverse
                         }
                         burnsTo.set(c);
-                        age += 1;
+                        age += 3;
                         return;
                     }
                 }
