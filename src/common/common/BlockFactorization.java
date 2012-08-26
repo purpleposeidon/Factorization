@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import cpw.mods.fml.common.registry.BlockProxy;
-
 import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.Block;
 import net.minecraft.src.BlockContainer;
@@ -22,7 +20,7 @@ import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
 
-public class BlockFactorization extends BlockContainer implements BlockProxy /* ??? */ {
+public class BlockFactorization extends BlockContainer {
     public boolean fake_normal_render = false;
 
     public BlockFactorization(int id) {
@@ -34,7 +32,7 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
         canBlockGrass[id] = false;
         //setBlockBounds(0, -1000, 0, 0, -999, 0);
     }
-    
+
     @Override
     public TileEntity createNewTileEntity(World world) {
         //The TileEntity needs to be set when the block is placed.
@@ -59,7 +57,7 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
     @Override
     public boolean isBlockSolid(IBlockAccess world, int x, int y, int z, int side) {
         TileEntity t = world.getBlockTileEntity(x, y, z);
-        if (t == null || ! (t instanceof TileEntityCommon)) {
+        if (t == null || !(t instanceof TileEntityCommon)) {
             return false;
         }
         TileEntityCommon te = (TileEntityCommon) t;
@@ -82,7 +80,8 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
     //TODO: Ctrl/alt clicking!
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer entityplayer, int side, float vecx, float vecy, float vecz) {
+    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer entityplayer,
+            int side, float vecx, float vecy, float vecz) {
         // right click
         if (entityplayer.isSneaking()) {
             return false;
@@ -92,11 +91,11 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
 
         if (t != null) {
             return t.activate(entityplayer);
-//			if (!world.isRemote) {
-//				return t.activate(entityplayer);
-//			}
-//
-//			return true;
+            //			if (!world.isRemote) {
+            //				return t.activate(entityplayer);
+            //			}
+            //
+            //			return true;
         }
         else {
             //info message
@@ -258,11 +257,10 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
         itemList.add(reg.mixer_item);
         itemList.add(reg.crystallizer_item);
 
-
         //itemList.add(core.cutter_item);
         //itemList.add(core.queue_item);
     }
-    
+
     @Override
     public void getSubBlocks(int par1, CreativeTabs par2CreativeTabs, List par3List) {
         if (this != Core.registry.factory_block) {
@@ -294,7 +292,8 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
     }
 
     @Override
-    public boolean isFlammable(IBlockAccess world, int x, int y, int z, int metadata, ForgeDirection face) {
+    public boolean isFlammable(IBlockAccess world, int x, int y, int z, int metadata,
+            ForgeDirection face) {
         return false;
         //Not really. But this keeps fire rendering.
         //		if (FactoryType.BARREL.is(metadata)) {
@@ -384,14 +383,14 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
     public boolean canProvidePower() {
         return true;
     }
-    
+
     @Override
     public boolean isIndirectlyPoweringTo(World w, int x, int y, int z, int side) {
         Coord here = new Coord(w, x, y, z);
         TileEntityCommon tec = here.getTE(TileEntityCommon.class);
         return tec == null ? false : tec.power();
     }
-    
+
     //	@Override
     //	public AxisAlignedBB getCollisionBoundingBoxFromPool(World w, int x, int y, int z) {
     //		//		int md = w.getBlockMetadata(x, y, z);
@@ -410,7 +409,8 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
     //		return super.getSelectedBoundingBoxFromPool(w, x, y, z);
     //	}
 
-    @Override //ser-ver ser-ver
+    @Override
+    //ser-ver ser-ver
     public void randomDisplayTick(World w, int x, int y, int z, Random rand) {
         Core.proxy.randomDisplayTickFor(w, x, y, z, rand);
     }
@@ -420,7 +420,8 @@ public class BlockFactorization extends BlockContainer implements BlockProxy /* 
         return pass == 0 || pass == 1;
     }
 
-    @Override // -- hello server asshole
+    @Override
+    // -- hello server asshole
     public int getRenderBlockPass() {
         return 1;
     }

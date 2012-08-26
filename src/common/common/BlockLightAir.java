@@ -2,8 +2,6 @@ package factorization.common;
 
 import java.util.Random;
 
-import cpw.mods.fml.common.registry.BlockProxy;
-
 import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.Block;
 import net.minecraft.src.IBlockAccess;
@@ -12,7 +10,7 @@ import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 import factorization.api.Coord;
 
-public class BlockLightAir extends Block implements BlockProxy /* ??? */ {
+public class BlockLightAir extends Block {
     static public final int air_md = 0;
     static public final int fire_md = 1;
 
@@ -139,7 +137,6 @@ public class BlockLightAir extends Block implements BlockProxy /* ??? */ {
         return 1; //can't push, but can overwrite
     }
 
-    
     @Override
     public TileEntity createTileEntity(World world, int md) {
         if (md == fire_md) {
@@ -168,7 +165,8 @@ public class BlockLightAir extends Block implements BlockProxy /* ??? */ {
         return 0;
     }
 
-    @Override //-- server. I am so sick and tired of your BULLSHIT
+    @Override
+    //-- server. I am so sick and tired of your BULLSHIT
     public void randomDisplayTick(World w, int x, int y, int z, Random rand) {
         Core.proxy.randomDisplayTickFor(w, x, y, z, rand);
     }

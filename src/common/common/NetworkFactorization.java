@@ -167,11 +167,7 @@ public class NetworkFactorization implements IPacketHandler {
     public void onPacketData(NetworkManager network, Packet250CustomPayload packet, Player player) {
         String channel = packet.channel;
         byte[] data = packet.data;
-        try {
-            currentPlayer.set((EntityPlayer) player);
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
+        currentPlayer.set((EntityPlayer) player);
         //currentPlayer = (EntityPlayer) player; //Core.proxy.getPlayer(network.getNetHandler());;
         ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
         DataInput input = new DataInputStream(inputStream);

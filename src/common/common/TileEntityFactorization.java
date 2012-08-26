@@ -130,7 +130,6 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         }
     }
 
-
     @Override
     void onRemove() {
         dropContents();

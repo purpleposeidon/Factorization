@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import cpw.mods.fml.common.registry.BlockProxy;
-
 import net.minecraft.src.Block;
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
@@ -13,7 +11,7 @@ import net.minecraft.src.Material;
 import net.minecraft.src.World;
 import factorization.api.Coord;
 
-public class BlockResource extends Block implements BlockProxy /* ??? */ {
+public class BlockResource extends Block {
     protected BlockResource(int id) {
         super(id, Material.rock);
         setHardness(2.0F);
@@ -52,15 +50,15 @@ public class BlockResource extends Block implements BlockProxy /* ??? */ {
         itemList.add(Core.registry.dark_iron_block_item);
         itemList.add(Core.registry.mechaworkshop_item);
     }
-    
+
     @Override
     public void getSubBlocks(int par1, CreativeTabs par2CreativeTabs, List par3List) {
         Core.addBlockToCreativeList(par3List, this);
     }
 
-    
     @Override
-    public boolean onBlockActivated(World w, int x, int y, int z, EntityPlayer player, int md, float vx, float vy, float vz) {
+    public boolean onBlockActivated(World w, int x, int y, int z, EntityPlayer player, int md,
+            float vx, float vy, float vz) {
         if (player.isSneaking()) {
             return false;
         }

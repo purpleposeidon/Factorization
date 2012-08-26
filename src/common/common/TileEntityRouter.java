@@ -868,15 +868,6 @@ public class TileEntityRouter extends TileEntityFactorization {
     }
 
     @Override
-    public void invalidate() {
-        //There should no longer be a problem here.
-        //		// X-XX T-ODO: This is a terrible non-solution to work with frames.
-        //		// Seems like we get infinite loops in isCoordConnected if we don't do
-        //		// this. Maybe we should have our coordinates's origin be delta-based?
-        //		resetGraph();
-    }
-
-    @Override
     public int getStartInventorySide(ForgeDirection side) {
         return 0;
     }
