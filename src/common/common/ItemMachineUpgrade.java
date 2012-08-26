@@ -14,7 +14,8 @@ public class ItemMachineUpgrade extends Item {
     public int upgradeId;
     String name, type;
 
-    protected ItemMachineUpgrade(int id, String name, String type, FactoryType machineType, int upgradeId) {
+    protected ItemMachineUpgrade(int id, String name, String type, FactoryType machineType,
+            int upgradeId) {
         super(id);
         this.machineType = machineType;
         this.upgradeId = upgradeId;
@@ -33,11 +34,11 @@ public class ItemMachineUpgrade extends Item {
     }
 
     @Override
-    public boolean tryPlaceIntoWorld(ItemStack stack, EntityPlayer player, World world, int X, int Y,
-            int Z, int side, float vecx, float vecy, float vecz) {
+    public boolean tryPlaceIntoWorld(ItemStack stack, EntityPlayer player, World world,
+            int X, int Y, int Z, int side, float vecx, float vecy, float vecz) {
         Coord here = new Coord(world, X, Y, Z);
         TileEntityCommon te = here.getTE(TileEntityCommon.class);
-        if (te.takeUpgrade(stack)) {
+        if (te != null && te.takeUpgrade(stack)) {
             if (!player.capabilities.isCreativeMode) {
                 stack.stackSize--;
             }

@@ -11,8 +11,6 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.regex.Matcher;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.ItemStack;
@@ -20,9 +18,8 @@ import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.World;
-import net.minecraftforge.common.ISidedInventory;
 import net.minecraftforge.common.ForgeDirection;
-import static net.minecraftforge.common.ForgeDirection.*;
+import net.minecraftforge.common.ISidedInventory;
 import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
 
@@ -158,6 +155,7 @@ public class TileEntityRouter extends TileEntityFactorization {
     }
 
     int last_eject = 0;
+
     void eject() {
         if (last_eject != 0) {
             last_eject--;
@@ -586,6 +584,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         }
         match = tag.getString("match");
         match_to_visit = tag.getBoolean("match_to_visit");
+        eject_direction = tag.getInteger("eject_side");
         upgradeItemFilter = tag.getBoolean("upgrade_item_filter");
         upgradeMachineFilter = tag.getBoolean("upgrade_machine_filter");
         upgradeSpeed = tag.getBoolean("upgrade_speed");
@@ -806,7 +805,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         }
         else {
             if (!worldObj.isRemote) {
-                player.addChatMessage("No upgrade");
+                //player.addChatMessage("No upgrade");
             }
         }
     }
@@ -848,6 +847,7 @@ public class TileEntityRouter extends TileEntityFactorization {
             upgradeSpeed = input.readBoolean();
             upgradeThorough = input.readBoolean();
             upgradeThroughput = input.readBoolean();
+            upgradeEject = input.readBoolean();
             verifyUpgrades();
             return true;
         }

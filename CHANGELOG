@@ -6,6 +6,7 @@
   Wrath lamp recipe is now 4 dark iron & 2 silver.
   Removed sentry demons chunk-loaders due to lack of confidence in their correctness. And also laziness. Use ChickenBone's chunkloaders instead. They may return with a change in job description.
   Wrath Forges are now more expensive to operate.
+  A few bug fixes for the Router GUI, and the auto-ejector.
 
   More Electricity:
     The battery block is made using acid & lead. When crafted, it will be fully charged. They do not stack. Battery blocks keep their charge when broken. They are used to craft magnets, which are used in motors. A battery block can't charge another battery block.

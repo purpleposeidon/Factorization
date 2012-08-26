@@ -413,9 +413,14 @@ public class GuiRouter extends GuiContainer implements IClickable {
     }
 
     @Override
+    public void onGuiClosed() {
+        router.broadcastItem(MessageType.RouterMatch, null);
+        super.onGuiClosed();
+    }
+
+    @Override
     protected void keyTyped(char c, int i) {
         if (i == org.lwjgl.input.Keyboard.KEY_ESCAPE) {
-            //router.broadcastItem(MessageType.RouterMatch, null);
             super.keyTyped(c, i);
             return;
         }
@@ -443,9 +448,9 @@ public class GuiRouter extends GuiContainer implements IClickable {
             if (upgrade_id == -1) {
                 return;
             }
-            router.broadcastMessage(null, MessageType.RouterDowngrade, upgrade_id);
             router.removeUpgrade(upgrade_id, Core.proxy.getClientPlayer());
             selectNextUpgrade(false);
+            router.broadcastMessage(null, MessageType.RouterDowngrade, upgrade_id);
             return;
         }
         if (current_set.focused_id == next_entity) {
