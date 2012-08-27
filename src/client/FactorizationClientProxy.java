@@ -23,13 +23,8 @@ import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.TileEntitySpecialRenderer;
 import net.minecraft.src.World;
 import net.minecraftforge.client.MinecraftForgeClient;
-import net.minecraftforge.client.event.DrawBlockHighlightEvent;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.Event;
 import net.minecraftforge.event.ForgeSubscribe;
-import net.minecraftforge.event.entity.EntityEvent;
-import net.minecraftforge.event.world.WorldEvent;
 
 import org.lwjgl.input.Keyboard;
 
@@ -58,6 +53,7 @@ import factorization.client.render.BlockRenderGrinder;
 import factorization.client.render.BlockRenderHeater;
 import factorization.client.render.BlockRenderLamp;
 import factorization.client.render.BlockRenderMirrorStand;
+import factorization.client.render.BlockRenderMixer;
 import factorization.client.render.BlockRenderSentryDemon;
 import factorization.client.render.BlockRenderSolarTurbine;
 import factorization.client.render.BlockRenderWire;
@@ -69,6 +65,7 @@ import factorization.client.render.TileEntityBarrelRenderer;
 import factorization.client.render.TileEntityGrinderRender;
 import factorization.client.render.TileEntityHeaterRenderer;
 import factorization.client.render.TileEntityMirrorRenderer;
+import factorization.client.render.TileEntityMixerRenderer;
 import factorization.client.render.TileEntitySolarTurbineRender;
 import factorization.client.render.TileEntityWatchDemonRenderer;
 import factorization.common.Command;
@@ -87,6 +84,7 @@ import factorization.common.TileEntityFactorization;
 import factorization.common.TileEntityGrinder;
 import factorization.common.TileEntityHeater;
 import factorization.common.TileEntityMirror;
+import factorization.common.TileEntityMixer;
 import factorization.common.TileEntitySlagFurnace;
 import factorization.common.TileEntitySolarTurbine;
 import factorization.common.TileEntityWatchDemon;
@@ -102,14 +100,14 @@ public class FactorizationClientProxy extends FactorizationProxy {
         registry.mecha_leg = new MechaArmorTextured(registry.itemID("mechaLeg", 9012), 2);
         registry.mecha_foot = new MechaArmorTextured(registry.itemID("mechaFoot", 9013), 3);
     }
-    
+
     @Override
     public File getWorldSaveDir(World world) {
         String dotmc = ModLoader.getMinecraftInstance().getMinecraftDir().getPath();
         char slash = File.separatorChar;
         return new File(dotmc + slash + "saves" + slash + world.getSaveHandler().getSaveDirectoryName());
     }
-    
+
     @Override
     public void broadcastTranslate(EntityPlayer who, String... msg) {
         String format = msg[0];
@@ -120,7 +118,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         } catch (IllegalFormatException e) {
         }
     }
-    
+
     @Override
     public void pokeChest(TileEntityChest chest) {
         float angle = 1.0F;
@@ -128,28 +126,28 @@ public class FactorizationClientProxy extends FactorizationProxy {
             chest.lidAngle = angle;
         }
     }
-    
+
     @Override
     public EntityPlayer getPlayer(NetHandler handler) {
         return ModLoader.getMinecraftInstance().thePlayer;
     }
-    
-//	@Override
-//	public void addPacket(EntityPlayer player, Packet packet) {
-//		World w = ModLoader.getMinecraftInstance().theWorld;
-//		if (w != null && w.isRemote) {
-//			if (Minecraft.getMinecraft().getSendQueue() == null) {
-//				return; //wow, what?
-//			}
-//			Minecraft.getMinecraft().getSendQueue().addToSendQueue(packet);
-//		}
-//	}
-    
+
+    //	@Override
+    //	public void addPacket(EntityPlayer player, Packet packet) {
+    //		World w = ModLoader.getMinecraftInstance().theWorld;
+    //		if (w != null && w.isRemote) {
+    //			if (Minecraft.getMinecraft().getSendQueue() == null) {
+    //				return; //wow, what?
+    //			}
+    //			Minecraft.getMinecraft().getSendQueue().addToSendQueue(packet);
+    //		}
+    //	}
+
     @Override
     public Profiler getProfiler() {
         return Minecraft.getMinecraft().mcProfiler;
     }
-    
+
     @Override
     public Object getClientGuiElement(int ID, EntityPlayer player, World world,
             int x, int y, int z) {
@@ -207,27 +205,26 @@ public class FactorizationClientProxy extends FactorizationProxy {
         cont.addSlotsForGui(fac, player.inventory);
         return gui;
     }
-    
-    
+
     //CLIENT
     @Override
     public void addName(Object objectToName, String name) {
         String objectName;
         if (objectToName instanceof Item) {
-            objectName = ((Item)objectToName).getItemName();
+            objectName = ((Item) objectToName).getItemName();
         } else if (objectToName instanceof Block) {
-            objectName = ((Block)objectToName).getBlockName();
+            objectName = ((Block) objectToName).getBlockName();
         } else if (objectToName instanceof ItemStack) {
-            objectName = ((ItemStack)objectToName).getItem().getItemNameIS((ItemStack)objectToName);
+            objectName = ((ItemStack) objectToName).getItem().getItemNameIS((ItemStack) objectToName);
         } else if (objectToName instanceof String) {
             objectName = (String) objectToName;
         } else {
-            throw new IllegalArgumentException(String.format("Illegal object for naming %s",objectToName));
+            throw new IllegalArgumentException(String.format("Illegal object for naming %s", objectToName));
         }
         objectName += ".name";
         LanguageRegistry.instance().addStringLocalization(objectName, "en_US", name);
     }
-    
+
     @Override
     public String translateItemStack(ItemStack is) {
         if (is == null) {
@@ -235,7 +232,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }
         return is.getItem().getItemDisplayName(is);
     }
-    
+
     @Override
     public void pokePocketCrafting() {
         // If the player has a pocket crafting table open, have it update
@@ -245,7 +242,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             gui.containerPocket.updateCraft();
         }
     }
-    
+
     int fireParticlesSpawned = 0;
     int fireParticlesMax = 5;
 
@@ -381,34 +378,34 @@ public class FactorizationClientProxy extends FactorizationProxy {
     public EntityPlayer getClientPlayer() {
         return Minecraft.getMinecraft().thePlayer;
     }
-    
+
     public static KeyBinding bag_swap_key = new KeyBinding("Bag of Holding", org.lwjgl.input.Keyboard.KEY_GRAVE);
     public static KeyBinding pocket_key = new KeyBinding("Pocket Crafting Table", org.lwjgl.input.Keyboard.KEY_C);
     public static KeyBinding mechas[] = new KeyBinding[Registry.MechaKeyCount];
 
     private static class CommandKeySet extends KeyHandler {
         Map<KeyBinding, Command> map;
-        
+
         static CommandKeySet create(Object... args) {
-            KeyBinding bindings[] = new KeyBinding[args.length/2];
-            boolean repeatings[] = new boolean[args.length/2];
+            KeyBinding bindings[] = new KeyBinding[args.length / 2];
+            boolean repeatings[] = new boolean[args.length / 2];
             Map<KeyBinding, Command> map = new HashMap();
             for (int i = 0; i < args.length; i += 2) {
                 KeyBinding key = (KeyBinding) args[i];
-                Command cmd = (Command) args[i+1];
+                Command cmd = (Command) args[i + 1];
                 map.put(key, cmd);
-                bindings[i/2] = key;
-                repeatings[i/2] = false;
+                bindings[i / 2] = key;
+                repeatings[i / 2] = false;
             }
             CommandKeySet ret = new CommandKeySet(bindings, repeatings);
             ret.map = map;
             return ret;
         }
-        
+
         private CommandKeySet(KeyBinding[] keyBindings, boolean[] repeatings) {
             super(keyBindings, repeatings);
         }
-        
+
         @Override
         public EnumSet<TickType> ticks() {
             return EnumSet.of(TickType.CLIENT, TickType.RENDER);
@@ -420,21 +417,23 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }
 
         @Override
-        public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd, boolean isRepeat) {
+        public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd,
+                boolean isRepeat) {
             GuiScreen gui = Minecraft.getMinecraft().currentScreen;
-            if (gui != null /*&& gui.doesGuiPauseGame() -- GuiKeyEvent'll save us. */) {
+            if (gui != null /* && gui.doesGuiPauseGame() -- GuiKeyEvent'll save us. */) {
                 return;
             }
             map.get(kb).call(Core.proxy.getClientPlayer());
         }
-        
+
         @Override
-        public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd) {}
+        public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd) {
+        }
     }
-    
-    
+
     private Map<KeyBinding, Byte> mechaIDmap = new HashMap();
-    public class MechaKeySet extends KeyHandler {		
+
+    public class MechaKeySet extends KeyHandler {
         public MechaKeySet(KeyBinding[] keyBindings, boolean[] repeatings) {
             super(keyBindings, repeatings);
         }
@@ -448,16 +447,17 @@ public class FactorizationClientProxy extends FactorizationProxy {
         public String getLabel() {
             return "MechaKeys";
         }
-        
+
         @Override
-        public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd, boolean isRepeat) {
+        public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd,
+                boolean isRepeat) {
             GuiScreen gui = Minecraft.getMinecraft().currentScreen;
             if (gui == null) {
                 return;
             }
             Command.mechaKeyOn.call(getClientPlayer(), mechaIDmap.get(kb));
         }
-        
+
         @Override
         public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd) {
             GuiScreen gui = Minecraft.getMinecraft().currentScreen;
@@ -468,7 +468,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }
 
     }
-    
+
     @Override
     public void registerKeys() {
         int defaults[] = new int[] { Keyboard.KEY_R, Keyboard.KEY_F, Keyboard.KEY_V, Keyboard.KEY_Z, Keyboard.KEY_X, Keyboard.KEY_B };
@@ -482,12 +482,11 @@ public class FactorizationClientProxy extends FactorizationProxy {
         KeyBindingRegistry.registerKeyBinding(new MechaKeySet(mechas, new boolean[mechas.length]));
         MinecraftForge.EVENT_BUS.register(this);
     }
-    
+
     private void setTileEntityRenderer(Class clazz, TileEntitySpecialRenderer r) {
         ClientRegistry.bindTileEntitySpecialRenderer(clazz, r);
     }
-    
-    
+
     @Override
     public void registerRenderers() {
         if (Core.render_barrel_item || Core.render_barrel_text) {
@@ -498,11 +497,12 @@ public class FactorizationClientProxy extends FactorizationProxy {
         setTileEntityRenderer(TileEntityHeater.class, new TileEntityHeaterRenderer());
         setTileEntityRenderer(TileEntityMirror.class, new TileEntityMirrorRenderer());
         setTileEntityRenderer(TileEntityGrinder.class, new TileEntityGrinderRender());
+        setTileEntityRenderer(TileEntityMixer.class, new TileEntityMixerRenderer());
         MinecraftForgeClient.preloadTexture(Core.texture_file_block);
         MinecraftForgeClient.preloadTexture(Core.texture_file_item);
-        
+
         RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
-        
+
         RenderingRegistry.registerBlockHandler(new FactorizationRender());
         BlockRenderBattery renderBattery = new BlockRenderBattery();
         new BlockRenderDefault();
@@ -513,10 +513,11 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderSolarTurbine();
         new BlockRenderWire();
         new BlockRenderGrinder();
-        
+        new BlockRenderMixer();
+
         MinecraftForgeClient.registerItemRenderer(Core.registry.battery.shiftedIndex, new BatteryItemRender(renderBattery));
     }
-    
+
     @ForgeSubscribe
     public void handledGuiKey(GuiKeyEvent event) {
         if (bag_swap_key.keyCode == event.symbol) {
@@ -530,5 +531,5 @@ public class FactorizationClientProxy extends FactorizationProxy {
             }
         }
     }
-    
+
 }

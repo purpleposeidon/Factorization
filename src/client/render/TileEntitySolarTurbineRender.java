@@ -5,7 +5,6 @@ import java.util.Random;
 import net.minecraft.src.ModelBase;
 import net.minecraft.src.ModelRenderer;
 import net.minecraft.src.TileEntity;
-import net.minecraft.src.TileEntityRenderer;
 import net.minecraft.src.TileEntitySpecialRenderer;
 
 import org.lwjgl.opengl.GL11;
@@ -18,6 +17,7 @@ public class TileEntitySolarTurbineRender extends TileEntitySpecialRenderer {
     class Spinner extends ModelBase
     {
         public ModelRenderer driveshaft;
+
         public Spinner() {
             int h = 4;
             this.textureHeight = 64;
@@ -38,27 +38,30 @@ public class TileEntitySolarTurbineRender extends TileEntitySpecialRenderer {
 
     Spinner axle = new Spinner();
     static Random rand = new Random();
+
     @Override
     public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
         TileEntitySolarTurbine turbine = (TileEntitySolarTurbine) te;
         GL11.glPushMatrix();
+        GL11.glTranslatef((float) x, (float) y + 1.0F, (float) z + 1.0F);
+        renderWithRotation(turbine.fan_rotation);
+        GL11.glPopMatrix();
+    }
+
+    void renderWithRotation(float rotation) {
         this.bindTextureByName(Core.texture_file_item);
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GL11.glTranslatef((float) x, (float) y + 1.0F, (float) z + 1.0F);
         GL11.glScalef(1.0F, -1.0F, -1.0F);
         GL11.glTranslatef(0.5F, 0.5F, 0.5F);
-        GL11.glRotatef(turbine.fan_rotation, 0, 1, 0);
+        GL11.glRotatef(rotation, 0, 1, 0);
         axle.renderAll();
 
         float s = 0.60f;
         GL11.glScalef(s, s, s);
         GL11.glRotatef(90, 1, 0, 0);
         GL11.glTranslatef(-0.5F, -0.5F, 0.4F);
-        //GL11.glTranslatef(0, 0, -0.7F); //or rotate 270 and use this
         drawProp();
-
-        GL11.glPopMatrix();
     }
 
     void drawProp() {

@@ -354,7 +354,8 @@ public class NetworkFactorization implements IPacketHandler {
                 //
                 HeaterHeat = 700,
                 //
-                GrinderSpeed = 800
+                GrinderSpeed = 800, MixerSpeed = 801
+                //
                 ;
     }
 
