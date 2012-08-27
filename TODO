@@ -13,9 +13,9 @@ verify ore processing yields
 pocket crafting, shift-clicking buckets with full inventory
 Test on a dedicated server. V_V
 *Real* textures for ore-processing items
-mirror's trace check is off by 1/2
 
 [Low-Priority Bugs]
+middle-clicking
 draw_active isn't marking the block dirty apparently?
 re-write the shift-clicking function to use slots!!!
 shift-clicking out of pocket crafting result slot should go into a hotbar slot... (And I guess the 3x3 should go to normal inv)
@@ -28,6 +28,7 @@ do block breaking animations properly (after 1.3). Look at src/minecraft/net/min
 When placing wires, choose the side that's the least complex.
 drop several stacks instantaneously into a transposer running into a barrel. Only 1 stack will be put in.
 barrel lighting (normals.)
+add "String getInformation()" to IConductor
 
 
 have sentry demon send redstone signal when it senses shit

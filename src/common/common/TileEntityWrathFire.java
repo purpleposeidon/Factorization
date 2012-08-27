@@ -243,15 +243,15 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
             return false;
         }
     }
-    
+
     @Override
     public Coord getCoord() {
         return new Coord(this.worldObj, this);
     }
 
     void die() {
+        invalidate();
         fire.set(getCoord());
-        getCoord().rmTE();
     }
 
     public static int updateCount = 0;

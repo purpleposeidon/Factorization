@@ -24,7 +24,6 @@ public class TileEntityMirror extends TileEntityCommon {
     //don't save, but *do* share w/ client
     int target_rotation = 0;
 
-
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.MIRROR;
@@ -56,7 +55,7 @@ public class TileEntityMirror extends TileEntityCommon {
             reflection_target = null;
         }
     }
-    
+
     @Override
     public void neighborChanged() {
         search_delay = trace_check = 1;
@@ -78,7 +77,7 @@ public class TileEntityMirror extends TileEntityCommon {
         boolean raining = worldObj.isRaining() && worldObj.getBiomeGenForCoords(xCoord, yCoord).rainfall > 0;
         return getCoord().canSeeSky() && worldObj.isDaytime() && !raining;
     }
-    
+
     void setRotation(int rotation) {
         if (this.rotation != rotation) {
             this.rotation = rotation;
@@ -103,7 +102,7 @@ public class TileEntityMirror extends TileEntityCommon {
             this.target_rotation = new_target;
         }
     }
-    
+
     @Override
     public Packet getAuxillaryInfoPacket() {
         return getDescriptionPacketWith(MessageType.MirrorDescription, rotation, getTargetInfo());
@@ -121,6 +120,7 @@ public class TileEntityMirror extends TileEntityCommon {
         case MessageType.MirrorTargetRotation:
             target_rotation = input.readInt();
             getCoord().dirty();
+            gotten_info_packet = true;
             return true;
         }
         return false;
@@ -153,11 +153,15 @@ public class TileEntityMirror extends TileEntityCommon {
         reflection_target = null;
     }
 
+    boolean gotten_info_packet = false;
+
     @Override
     public void updateEntity() {
         //		if we don't have a target, spin about
         if (worldObj.isRemote) {
-            //TODO: Wait for an info packet before spinning
+            if (!gotten_info_packet) {
+                return;
+            }
             if (target_rotation == -99) {
                 rotation++;
             } else if (target_rotation != rotation) {
@@ -231,7 +235,6 @@ public class TileEntityMirror extends TileEntityCommon {
         }
     }
 
-
     void findTarget() {
         if (reflection_target != null) {
             //make the old target forget about us
@@ -281,57 +284,37 @@ public class TileEntityMirror extends TileEntityCommon {
         setRotationTarget(new_target);
     }
 
-    //XXX NOTE: Stolen from TileEntityWrathLamp. Ah hah hah hah...
-    float div(int a, int b) {
+    double div(double a, double b) {
         if (b == 0) {
             return Math.signum(a) * 0xFFF;
         }
         return a / b;
     }
 
-    boolean myTrace(int x, int z) {
-        int dx = x - xCoord, dz = z - zCoord;
-        float idealm = div(dz, dx);
-
-        float old_dist = Float.MAX_VALUE;
-        boolean first = true;
-        while (true) {
-            if (x == xCoord && z == zCoord) {
+    boolean myTrace(double x, double z) {
+        x += 0.5;
+        z += 0.5;
+        double offset_x = x - (xCoord + 0.5), offset_z = z - (zCoord + 0.5);
+        double length = Math.hypot(offset_x, offset_z);
+        double dx = offset_x / length, dz = offset_z / length;
+        x -= dx;
+        z -= dz;
+        int bx = 0, bz = 0;
+        for (int i = 0; i < length; i++) {
+            bx = (int) Math.round(x + 0.5) - 1;
+            bz = (int) Math.round(z + 0.5) - 1;
+            if (bx == xCoord && bz == zCoord) {
                 return true;
             }
-            int id = worldObj.getBlockId(x, yCoord, z);
+            int id = worldObj.getBlockId(bx, yCoord, bz);
             Block b = Block.blocksList[id];
-            if (b != null && !first) {
-                if (!b.isAirBlock(worldObj, x, yCoord, z) || b.isOpaqueCube() || Block.lightOpacity[id] != 0) {
-                    return false;
-                }
+            if (b != null && !b.isAirBlock(worldObj, bx, yCoord, bz)) {
+                return false;
             }
-            first = false;
-            dx = x - xCoord;
-            dz = z - zCoord;
-            float m = div(dz, dx);
-            int addx = (int) -Math.signum(dx), addz = (int) -Math.signum(dz);
-            if (addx == 0 && addz == 0) {
-                return true;
-            }
-            if (addx == 0) {
-                z += addz;
-                continue;
-            }
-            if (addz == 0) {
-                x += addx;
-                continue;
-            }
-            float m_x = div(dz, dx + addx);
-            float m_z = div(dz + addz, dx);
-            if (Math.abs(idealm - m_x) <= Math.abs(idealm - m_z)) {
-                x += addx;
-            }
-            else {
-                z += addz;
-            }
+            x -= dx;
+            z -= dz;
         }
-
+        return false;
     }
 
     @Override
