@@ -2,7 +2,6 @@ package factorization.common;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.ConcurrentModificationException;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Random;
@@ -23,10 +22,8 @@ import net.minecraft.src.MapColor;
 import net.minecraft.src.Material;
 import net.minecraft.src.ModLoader;
 import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.TileEntityFurnace;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldGenMinable;
-import net.minecraft.src.WorldProviderHell;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
@@ -40,7 +37,6 @@ import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.TickType;
-import cpw.mods.fml.common.registry.BlockProxy;
 import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.api.IActOnCraft;
 
@@ -56,7 +52,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemStack cutter_item, router_item, maker_item, stamper_item, packager_item,
             barrel_item,
             queue_item, lamp_item, air_item, sentrydemon_item,
-            slagfurnace_item, battery_item_hidden, solar_turbine_item, heater_item, mirror_item_hidden,
+            slagfurnace_item, battery_item_hidden, solar_turbine_item, heater_item,
+            mirror_item_hidden,
             leadwire_item, grinder_item, mixer_item, crystallizer_item;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item, mechaworkshop_item;
@@ -88,7 +85,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemOreProcessing ore_dirty_gravel, ore_clean_gravel, ore_reduced, ore_crystal;
 
     public Material materialMachine = new Material(MapColor.ironColor);
-    
+
     WorldGenMinable silverGen;
 
     void makeBlocks() {
@@ -102,10 +99,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         GameRegistry.registerBlock(lightair_block);
         GameRegistry.registerBlock(resource_block, ItemBlockResource.class);
         GameRegistry.registerCraftingHandler(this);
-        
+
         factory_block.setCreativeTab(CreativeTabs.tabRedstone);
     }
-    
+
     void makeRenderHelperBlock() {
         // TODO: I'd like to do this as late as possible.
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
@@ -146,22 +143,22 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         added_ids.add(default_id);
         return id;
     }
-    
+
     <E extends Item> E tab(E item, CreativeTabs tab) {
         item.setTabToDisplayOn(tab);
         return item;
     }
 
     void makeItems() {
-        ore_dirty_gravel = new ItemOreProcessing(itemID("oreDirtyGravel", 9034), 2*16 + 4, "dirtyGravel");
-        ore_clean_gravel = new ItemOreProcessing(itemID("oreCleanGravel", 9035), 2*16 + 5, "cleanGravel");
-        ore_reduced = new ItemOreProcessing(itemID("oreReduced", 9036), 2*16 + 6, "reduced");
-        ore_crystal = new ItemOreProcessing(itemID("oreCrystal", 9037), 2*16 + 7, "crystal");
+        ore_dirty_gravel = new ItemOreProcessing(itemID("oreDirtyGravel", 9034), 2 * 16 + 4, "dirtyGravel");
+        ore_clean_gravel = new ItemOreProcessing(itemID("oreCleanGravel", 9035), 2 * 16 + 5, "cleanGravel");
+        ore_reduced = new ItemOreProcessing(itemID("oreReduced", 9036), 2 * 16 + 6, "reduced");
+        ore_crystal = new ItemOreProcessing(itemID("oreCrystal", 9037), 2 * 16 + 7, "crystal");
         ore_dirty_gravel.addEnglishNames("Dirty ", " Gravel");
         ore_clean_gravel.addEnglishNames("Clean ", " Chunks");
         ore_reduced.addEnglishNames("Reduced ", " Chunks");
         ore_crystal.addEnglishNames("Crystalline ", "");
-        
+
         //ItemBlocks
         item_factorization = (ItemFactorization) Item.itemsList[Core.factory_block_id];
         item_resource = (ItemBlockResource) Item.itemsList[resource_block.blockID];
@@ -226,7 +223,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         router_thorough = new ItemMachineUpgrade(itemID("routerThorough", 9019), "Thoroughness", "Router Upgrade", FactoryType.ROUTER, 3);
         router_throughput = new ItemMachineUpgrade(itemID("routerThroughput", 9020), "Bandwidth", "Router Upgrade", FactoryType.ROUTER, 4);
         router_eject = new ItemMachineUpgrade(itemID("routerEject", 9031), "Ejector", "Router Upgrade", FactoryType.ROUTER, 5);
-        
+
         barrel_enlarge = new ItemMachineUpgrade(itemID("barrelEnlarge", 9032), "Extra-Dimensional Storage", "Barrel Upgrade", FactoryType.BARREL, 6);
 
         //Electricity
@@ -235,7 +232,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         insulated_coil = new ItemCraftingComponent(itemID("coil", 9026), "Insulated Coil", 16 * 3 + 7);
         motor = new ItemCraftingComponent(itemID("motor", 9027), "Motor", 16 * 3 + 8);
         fan = new ItemCraftingComponent(itemID("fan", 9028), "Fan", 16 * 3 + 9);
-        diamond_cutting_head = new ItemCraftingComponent(itemID("diamondCuttingHead", 9038), "Diamond Cutting Head", 16*3+10);
+        diamond_cutting_head = new ItemCraftingComponent(itemID("diamondCuttingHead", 9038), "Diamond Cutting Head", 16 * 3 + 10);
         charge_meter = new ItemChargeMeter(itemID("chargemeter", 9029));
         addName(charge_meter, "Charge Meter");
         mirror = new ItemMirror(itemID("mirror", 9030));
@@ -297,7 +294,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "II",
                 "II",
                 'I', dark_iron);
-
 
         // Bag of holding
 
@@ -366,7 +362,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'T', Block.tnt,
                 'D', Block.blockDiamond);
 
-
         //wrathfire igniter
         recipe(new ItemStack(wrath_igniter),
                 "D ",
@@ -390,30 +385,25 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "InI",
                 "III",
                 'I', Item.ingotIron,
-                'n', Item.goldNugget
-                );
+                'n', Item.goldNugget);
         recipe(new ItemStack(mecha_head),
                 "###",
                 "# #",
-                '#', mecha_chasis
-                );
+                '#', mecha_chasis);
         recipe(new ItemStack(mecha_chest),
                 "# #",
                 "###",
                 "###",
-                '#', mecha_chasis
-                );
+                '#', mecha_chasis);
         recipe(new ItemStack(mecha_leg),
                 "###",
                 "# #",
                 "# #",
-                '#', mecha_chasis
-                );
+                '#', mecha_chasis);
         recipe(new ItemStack(mecha_foot),
                 "# #",
                 "# #",
-                '#', mecha_chasis
-                );
+                '#', mecha_chasis);
         //mecha armor upgrades
 
         recipe(new ItemStack(mecha_buoyant_barrel),
@@ -424,8 +414,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 '_', Block.pressurePlatePlanks,
                 'P', Block.pistonBase,
                 'B', barrel_item,
-                'V', Item.boat
-                );
+                'V', Item.boat);
 
         ItemStack is_cobble_drive = new ItemStack(mecha_cobble_drive);
         recipe(is_cobble_drive,
@@ -436,8 +425,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'P', Block.pistonBase,
                 'W', Item.bucketWater,
                 'T', Item.pickaxeSteel,
-                'L', Item.bucketLava
-                );
+                'L', Item.bucketLava);
         recipe(is_cobble_drive,
                 "OPO",
                 "LTW",
@@ -446,8 +434,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'P', Block.pistonBase,
                 'W', Item.bucketWater,
                 'T', Item.pickaxeSteel,
-                'L', Item.bucketLava
-                );
+                'L', Item.bucketLava);
         recipe(new ItemStack(mecha_mounted_piston),
                 "CNC",
                 "LSL",
@@ -455,8 +442,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'C', Block.cobblestone,
                 'S', Block.pistonStickyBase,
                 'N', Block.pistonBase,
-                'L', Block.lever
-                );
+                'L', Block.lever);
 
         // BlockFactorization recipes
         // router
@@ -575,12 +561,12 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'W', new ItemStack(wrath_igniter, 1, -1));
 
         //sentry demon
-//		recipe(sentrydemon_item,
-//				"###",
-//				"#D#",
-//				"###",
-//				'#', Block.fenceIron,
-//				'D', bound_tiny_demon);
+        //		recipe(sentrydemon_item,
+        //				"###",
+        //				"#D#",
+        //				"###",
+        //				'#', Block.fenceIron,
+        //				'D', bound_tiny_demon);
 
         //Slag furnace
         recipe(slagfurnace_item,
@@ -637,7 +623,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'I', Item.ingotIron,
                 'L', "ingotLead",
                 'A', acid);
-        for (int damage : new int[] {1, 2}) {
+        for (int damage : new int[] { 1, 2 }) {
             recipe(new ItemStack(magnet),
                     "WWW",
                     "WIW",
@@ -646,7 +632,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                     'I', Item.ingotIron,
                     'B', new ItemStack(battery, 1, damage));
         }
-        
+
         oreRecipe(heater_item,
                 "CCC",
                 "L L",
@@ -706,11 +692,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'L', lead_ingot,
                 'M', motor,
                 'X', fan,
-                'U', Item.cauldron
-                );
+                'U', Item.cauldron);
         TileEntityMixer.addRecipe(
-                new ItemStack[] {new ItemStack(Item.slimeBall), new ItemStack(Item.bucketMilk), new ItemStack(Block.tallGrass)},
-                new ItemStack[] {new ItemStack(Item.slimeBall, 2), new ItemStack(Item.bucketEmpty)});
+                new ItemStack[] { new ItemStack(Item.slimeBall), new ItemStack(Item.bucketMilk), new ItemStack(Block.tallGrass) },
+                new ItemStack[] { new ItemStack(Item.slimeBall, 2), new ItemStack(Item.bucketEmpty) });
         recipe(crystallizer_item,
                 "ISI",
                 "ABA",
@@ -750,17 +735,15 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //Grind -> Wash -> Slag -> Crystallize -> Smelt: 3.0 (crystalline ore)
         //Crystallization will be a very slow & intensive & (energy) expensive.
         ItemOreProcessing.enable(oreID);
-        ItemStack dirty = new ItemStack(ore_dirty_gravel, 1, oreID),
-                clean = new ItemStack(ore_clean_gravel, 1, oreID),
-                reduced = new ItemStack(ore_reduced, 1, oreID),
-                crystal = new ItemStack(ore_crystal, 1, oreID);
+        ItemStack dirty = new ItemStack(ore_dirty_gravel, 1, oreID), clean = new ItemStack(ore_clean_gravel, 1, oreID), reduced = new ItemStack(ore_reduced, 1, oreID), crystal = new ItemStack(ore_crystal, 1, oreID);
         TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, ingot, 0.4F, Block.stone);
         TileEntityGrinder.addRecipe(ore, dirty, 1.4F);
         TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.142857142857143F, ingot, 0.2F, Block.dirt);
         TileEntityMixer.addRecipe(
-                new ItemStack[] {dirty, new ItemStack(Item.bucketWater)},
-                new ItemStack[] {clean, new ItemStack(Item.bucketEmpty)});
-        for (ItemStack is : new ItemStack[] {dirty, clean, reduced, crystal}) {
+                new ItemStack[] { dirty, new ItemStack(Item.bucketWater) },
+                new ItemStack[] { clean, new ItemStack(Item.bucketEmpty) });
+        TileEntitySlagFurnace.SlagRecipes.register(clean, 1, reduced, 0.25F, reduced);
+        for (ItemStack is : new ItemStack[] { dirty, clean, reduced, crystal }) {
             FurnaceRecipes.smelting().addSmelting(is.itemID, is.getItemDamage(), ingot);
         }
         //TODO: Make all the machines for the processing path...
@@ -829,7 +812,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         BlockClass.Cage.harvest("pickaxe", 1);
         MinecraftForge.setBlockHarvestLevel(resource_block, "pickaxe", 2);
     }
-    
+
     public void makeOther() {
         silverGen = new WorldGenMinable(resource_block.blockID, 35);
     }
@@ -916,7 +899,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     }
 
     @Override
-    public void generate(Random rand, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
+    public void generate(Random rand, int chunkX, int chunkZ, World world,
+            IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
         if (!Core.gen_silver_ore) {
             return;
         }
@@ -932,17 +916,14 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         int y = 5 + rand.nextInt(48);
         silverGen.generate(world, rand, x, y, z);
     }
-    
-    
-
 
     private int demon_spawn_delay = 0;
-    
+
     @Override
     public void tickStart(EnumSet<TickType> type, Object... tickData) {
         demon_spawn_delay--;
         if (demon_spawn_delay < -1) {
-            demon_spawn_delay = 20*60;
+            demon_spawn_delay = 20 * 60;
         }
         if (type.contains(TickType.WORLD)) {
             World w = (World) tickData[0];
@@ -961,7 +942,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     }
 
     @Override
-    public void tickEnd(EnumSet<TickType> type, Object... tickData) {}
+    public void tickEnd(EnumSet<TickType> type, Object... tickData) {
+    }
 
     @Override
     public EnumSet<TickType> ticks() {
@@ -993,7 +975,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     }
 
     @Override
-    public void onSmelting(EntityPlayer player, ItemStack item) {}
-    
-    
+    public void onSmelting(EntityPlayer player, ItemStack item) {
+    }
+
 }

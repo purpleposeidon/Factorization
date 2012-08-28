@@ -29,6 +29,8 @@ When placing wires, choose the side that's the least complex.
 drop several stacks instantaneously into a transposer running into a barrel. Only 1 stack will be put in.
 barrel lighting (normals.)
 add "String getInformation()" to IConductor
+railgun, except for steve
+sign enchanting
 
 
 have sentry demon send redstone signal when it senses shit
