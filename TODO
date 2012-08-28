@@ -31,6 +31,7 @@ barrel lighting (normals.)
 add "String getInformation()" to IConductor
 railgun, except for steve
 sign enchanting
+continuous textures on wiring'd be kind of nice. (Put a UV-test on, see how badly they match up...)
 
 
 have sentry demon send redstone signal when it senses shit

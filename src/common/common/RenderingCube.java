@@ -62,8 +62,6 @@ public class RenderingCube {
         }
     }
 
-
-
     int icon;
     Vector corner, origin;
     public double ul, vl;
@@ -166,16 +164,16 @@ public class RenderingCube {
             ret[3] = new Vector(v.x, -v.y, v.z, c - v.x, c + v.y);
             break;
         case 4: //-x
-            ret[0] = new Vector(-v.x, v.y, v.z, c + v.y, c - v.z);
-            ret[1] = new Vector(-v.x, v.y, -v.z, c - v.y, c - v.z);
-            ret[2] = new Vector(-v.x, -v.y, -v.z, c - v.y, c + v.z);
-            ret[3] = new Vector(-v.x, -v.y, v.z, c + v.y, c + v.z);
+            ret[0] = new Vector(-v.x, v.y, v.z, c + v.z, c - v.y);
+            ret[1] = new Vector(-v.x, v.y, -v.z, c - v.z, c - v.y);
+            ret[2] = new Vector(-v.x, -v.y, -v.z, c - v.z, c + v.y);
+            ret[3] = new Vector(-v.x, -v.y, v.z, c + v.z, c + v.y);
             break;
         case 5: //+x
-            ret[0] = new Vector(v.x, v.y, v.z, c + v.y, c - v.z);
-            ret[1] = new Vector(v.x, -v.y, v.z, c + v.y, c + v.z);
-            ret[2] = new Vector(v.x, -v.y, -v.z, c - v.y, c + v.z);
-            ret[3] = new Vector(v.x, v.y, -v.z, c - v.y, c - v.z);
+            ret[0] = new Vector(v.x, v.y, v.z, c + v.z, c - v.y);
+            ret[1] = new Vector(v.x, -v.y, v.z, c + v.z, c + v.y);
+            ret[2] = new Vector(v.x, -v.y, -v.z, c - v.z, c + v.y);
+            ret[3] = new Vector(v.x, v.y, -v.z, c - v.z, c - v.y);
             break;
         }
         for (int i = 0; i < ret.length; i++) {
@@ -186,6 +184,5 @@ public class RenderingCube {
         }
         return ret;
     }
-
 
 }
