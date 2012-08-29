@@ -1,7 +1,5 @@
 package factorization.common;
 
-import java.util.TreeMap;
-
 import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.Block;
 import net.minecraft.src.EntityPlayer;
@@ -28,7 +26,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     public BlockClass getBlockClass() {
         return BlockClass.Wire;
     }
-    
+
     @Override
     public boolean activate(EntityPlayer entityplayer) {
         return false;
@@ -133,59 +131,54 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
         }
     }
 
-    @Override
-    void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
-        switch (side) {
-        case 0:
-            side = 1;
-            break;
-        case 1:
-            side = 0;
-            break;
-        case 4:
-            side = 5;
-            break;
-        case 5:
-            side = 4;
-            break;
-        case 3:
-            side = 2;
-            break;
-        case 2:
-            side = 3;
-            break;
-        }
-        supporting_side = (byte) side;
-
-        TreeMap<Byte, Byte> nmap = new TreeMap();
-        for (Coord c : getCoord().getNeighborsAdjacent()) {
-            TileEntityWire n = c.getTE(TileEntityWire.class);
-            if (n == null) {
+    int getComplexity(byte new_side) {
+        supporting_side = new_side;
+        int complexity = new WireConnections(this).getComplexity();
+        for (Coord ne : getCoord().getNeighborsAdjacent()) {
+            TileEntityWire w = ne.getTE(TileEntityWire.class);
+            if (w == null) {
                 continue;
             }
-            Byte b = nmap.get(n.supporting_side);
-            b = (b == null) ? 0 : b;
-            b++;
-            nmap.put(n.supporting_side, b);
+            complexity += new WireConnections(w).getComplexity();
         }
-        if (nmap.size() == 1) {
-            byte proper = nmap.keySet().iterator().next();
+        return complexity;
+    }
 
-            if (supporting_side != proper) {
-                byte old = supporting_side;
-                supporting_side = proper;
-                if (!is_directly_supported()) {
-                    supporting_side = old;
-                }
+    @Override
+    void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
+        side = new int[] { 1, 0, 3, 2, 5, 4, }[side];
+        if (player.isSneaking()) {
+            supporting_side = (byte) side;
+            if (is_supported()) {
+                return;
             }
         }
+        byte best_side = (byte) side;
+        int best_complexity = getComplexity(best_side) - 1;
+        if (!is_supported()) {
+            best_complexity = 0x999;
+        }
+        for (byte s = 0; s < 6; s++) {
+            if (s == side) {
+                continue;
+            }
+            supporting_side = s;
+            if (!is_supported()) {
+                continue;
+            }
+            int test = getComplexity(s);
+            if (test < best_complexity) {
+                best_complexity = test;
+                best_side = s;
+            }
+        }
+        supporting_side = best_side;
     }
 
     @Override
     public boolean isBlockSolidOnSide(int side) {
         return false;
     }
-
 
     @Override
     public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z, Vec3 startVec,

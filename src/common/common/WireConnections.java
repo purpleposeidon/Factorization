@@ -86,7 +86,8 @@ public class WireConnections {
         }
     }
 
-    void addNeighbor(DeltaCoord neighbor, TileEntityWire nte, CubeFace neighbor_face, CubeFace delta_face) {
+    void addNeighbor(DeltaCoord neighbor, TileEntityWire nte, CubeFace neighbor_face,
+            CubeFace delta_face) {
         //******************************************************************************************************************************
         //NOTE: Be *very* careful with this code, it's a huge PITA. git commit & check the wire testing area before & after any changes.
         //******************************************************************************************************************************
@@ -95,8 +96,8 @@ public class WireConnections {
             //neighbor's support is far away
             edge_to_add = delta_face.getEdgeFlags() & neighbor_face.getEdgeFlags();
             if (Long.bitCount(edge_to_add) > 1) {
-                        center_core = true;
-                        faces |= delta_face.getFaceFlag() | my_face.getFaceFlag();
+                center_core = true;
+                faces |= delta_face.getFaceFlag() | my_face.getFaceFlag();
             } else {
                 edges |= edge_to_add;
                 faces |= neighbor_face.getFaceFlag();
@@ -115,7 +116,11 @@ public class WireConnections {
             }
         }
     }
-    
+
+    int getComplexity() {
+        return Long.bitCount(edges) + Long.bitCount(faces) * 2 + (center_core ? 4 : 0);
+    }
+
     static RenderingCube cube(Vector corner, Vector origin) {
         final int icon = 11; //34... was old. 11 is right, but... what?
         return new RenderingCube(icon, corner, origin);
@@ -169,7 +174,7 @@ public class WireConnections {
         }
         return ret;
     }
-    
+
     static public Iterable<RenderingCube> getInventoryParts() {
         ArrayList<RenderingCube> ret = new ArrayList(2);
         ret.add(face_map[0].copy());
@@ -207,8 +212,8 @@ public class WireConnections {
         }
         min = min.add(8, 8, 8);
         max = max.add(8, 8, 8);
-        min.scale(1F/16F);
-        max.scale(1F/16F);
+        min.scale(1F / 16F);
+        max.scale(1F / 16F);
         float d = 0;
         block.setBlockBounds(min.x + d, min.y + d, min.z + d, max.x + d, max.y + d, max.z + d);
     }
