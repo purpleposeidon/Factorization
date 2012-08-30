@@ -115,7 +115,7 @@ public class NetworkFactorization implements IPacketHandler {
         //		if (!Core.proxy.isServer() && who == null) {
         //			return;
         //		}
-        Packet toSend = Core.network.messagePacket(src, messageType, msg);
+        Packet toSend = messagePacket(src, messageType, msg);
         if (who == null || !who.worldObj.isRemote) {
             broadcastPacket(who, src, toSend);
         }
@@ -338,24 +338,27 @@ public class NetworkFactorization implements IPacketHandler {
         public final static int
                 DrawActive = 0, FactoryType = 1,
                 //
-                MakerTarget = 101, MakerFuel = 102,
+                MakerTarget = 11, MakerFuel = 12,
                 //
-                RouterSlot = 200, RouterTargetSide = 201, RouterMatch = 202, RouterIsInput = 203,
-                RouterLastSeen = 204, RouterMatchToVisit = 205, RouterDowngrade = 206,
-                RouterUpgradeState = 207, RouterEjectDirection = 208,
+                RouterSlot = 20, RouterTargetSide = 21, RouterMatch = 22, RouterIsInput = 23,
+                RouterLastSeen = 24, RouterMatchToVisit = 25, RouterDowngrade = 26,
+                RouterUpgradeState = 27, RouterEjectDirection = 28,
                 //
-                BarrelDescription = 300, BarrelItem = 301, BarrelCount = 302, BarrelLoss = 303,
+                BarrelDescription = 40, BarrelItem = 41, BarrelCount = 42, BarrelLoss = 43,
                 //
-                BatteryLevel = 400,
+                BatteryLevel = 50,
                 //
-                MirrorTargetRotation = 500, MirrorDescription = 501,
+                MirrorTargetRotation = 60, MirrorDescription = 61,
                 //
-                TurbineWater = 601, TurbineSpeed = 602,
+                TurbineWater = 70, TurbineSpeed = 71,
                 //
-                HeaterHeat = 700,
+                HeaterHeat = 80,
                 //
-                GrinderSpeed = 800, MixerSpeed = 801
+                GrinderSpeed = 90,
                 //
+                MixerSpeed = 100,
+                //
+                CrystallizerInfo = 110
                 ;
     }
 

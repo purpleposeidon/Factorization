@@ -1,6 +1,7 @@
 package factorization.common;
 
 import java.util.Arrays;
+import java.util.List;
 
 import factorization.api.Coord;
 
@@ -185,7 +186,8 @@ public class ItemWandOfCooling extends Item {
     }
 
     @Override
-    public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side, float vecx, float vecy, float vecz) {
+    public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y,
+            int z, int side, float vecx, float vecy, float vecz) {
         if (w.isRemote) {
             return true;
         }
@@ -222,8 +224,15 @@ public class ItemWandOfCooling extends Item {
         return Core.texture_file_item;
     }
 
-    @Override //-- can't override due to the stupidly typical reason.
+    @Override
+    //-- can't override due to the stupidly typical reason.
     public int getIconFromDamage(int par1) {
         return (2 * 16) + 2;
+    }
+
+    @Override
+    public void addInformation(ItemStack is, List infoList) {
+        super.addInformation(is, infoList);
+        Core.brand(infoList);
     }
 }

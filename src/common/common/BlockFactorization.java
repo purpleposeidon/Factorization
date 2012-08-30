@@ -40,13 +40,25 @@ public class BlockFactorization extends BlockContainer {
     }
 
     @Override
-    public int idDropped(int par1, Random par2Random, int par3) {
-        //If we had this behave normally, it'd just return garbage unfortunately.
-        //Sooo... we return the other kind of garbage instead.
-        //(This is what happens in Creative mode.)
-        //XXX TODO Make this nice
-        return Block.cobblestone.blockID;
-        //return super.idDropped(par1, par2Random, par3);
+    public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
+        TileEntityCommon tec = new Coord(world, x, y, z).getTE(TileEntityCommon.class);
+        if (tec == null) {
+            return null;
+        }
+        FactoryType ft = tec.getFactoryType();
+        if (ft == FactoryType.MIRROR) {
+            return new ItemStack(Core.registry.mirror);
+        }
+        if (ft == FactoryType.BATTERY) {
+            ItemStack is = new ItemStack(Core.registry.battery);
+            TileEntityBattery bat = (TileEntityBattery) tec;
+            NBTTagCompound tag = new NBTTagCompound();
+            tag.setInteger("storage", bat.storage.getValue());
+            is.setTagCompound(tag);
+            Core.registry.battery.normalizeDamage(is);
+            return is;
+        }
+        return new ItemStack(Core.registry.item_factorization, 1, tec.getFactoryType().md);
     }
 
     @Override
@@ -430,4 +442,5 @@ public class BlockFactorization extends BlockContainer {
     public boolean isAirBlock(World world, int x, int y, int z) {
         return false;
     }
+
 }

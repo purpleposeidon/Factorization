@@ -17,6 +17,7 @@ import net.minecraft.src.IInventory;
 import net.minecraft.src.IRecipe;
 import net.minecraft.src.InventoryPlayer;
 import net.minecraft.src.Item;
+import net.minecraft.src.ItemDye;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.MapColor;
 import net.minecraft.src.Material;
@@ -83,6 +84,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemMirror mirror;
     public ItemBattery battery;
     public ItemOreProcessing ore_dirty_gravel, ore_clean_gravel, ore_reduced, ore_crystal;
+    public ItemStack antium;
 
     public Material materialMachine = new Material(MapColor.ironColor);
 
@@ -686,8 +688,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         TileEntityGrinder.addRecipe(new ItemStack(Block.grass), new ItemStack(Block.dirt), 1);
         TileEntityGrinder.addRecipe(new ItemStack(Block.mycelium), new ItemStack(Block.dirt), 1);
         recipe(mixer_item,
-                "LML",
-                "LXL",
+                " M ",
+                " X ",
                 "LUL",
                 'L', lead_ingot,
                 'M', motor,
@@ -697,14 +699,13 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 new ItemStack[] { new ItemStack(Item.slimeBall), new ItemStack(Item.bucketMilk), new ItemStack(Block.tallGrass) },
                 new ItemStack[] { new ItemStack(Item.slimeBall, 2), new ItemStack(Item.bucketEmpty) });
         recipe(crystallizer_item,
-                "ISI",
-                "ABA",
-                "IUI",
-                'I', Item.ingotIron,
+                "-S-",
+                "WUW",
+                '-', Item.stick,
                 'S', Item.silk,
-                'A', acid,
-                'B', Item.slimeBall,
+                'W', Block.planks,
                 'U', Item.cauldron);
+        TileEntityCrystallizer.addRecipe(new ItemStack(Item.dyePowder, 1, 10), new ItemStack(Item.slimeBall), new ItemStack(Item.bucketMilk), 0);
         // Cutter
         //TODO: Remove the cutter
         //		recipe(cutter_item,
@@ -735,7 +736,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //Grind -> Wash -> Slag -> Crystallize -> Smelt: 3.0 (crystalline ore)
         //Crystallization will be a very slow & intensive & (energy) expensive.
         ItemOreProcessing.enable(oreID);
-        ItemStack dirty = new ItemStack(ore_dirty_gravel, 1, oreID), clean = new ItemStack(ore_clean_gravel, 1, oreID), reduced = new ItemStack(ore_reduced, 1, oreID), crystal = new ItemStack(ore_crystal, 1, oreID);
+        ItemStack dirty = new ItemStack(ore_dirty_gravel, 1, oreID);
+        ItemStack clean = new ItemStack(ore_clean_gravel, 1, oreID);
+        ItemStack reduced = new ItemStack(ore_reduced, 1, oreID);
+        ItemStack crystal = new ItemStack(ore_crystal, 1, oreID);
+
         TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, ingot, 0.4F, Block.stone);
         TileEntityGrinder.addRecipe(ore, dirty, 1.4F);
         TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.142857142857143F, ingot, 0.2F, Block.dirt);
@@ -743,11 +748,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 new ItemStack[] { dirty, new ItemStack(Item.bucketWater) },
                 new ItemStack[] { clean, new ItemStack(Item.bucketEmpty) });
         TileEntitySlagFurnace.SlagRecipes.register(clean, 1, reduced, 0.25F, reduced);
+        TileEntityCrystallizer.addRecipe(reduced, crystal, new ItemStack(acid), 0);
         for (ItemStack is : new ItemStack[] { dirty, clean, reduced, crystal }) {
             FurnaceRecipes.smelting().addSmelting(is.itemID, is.getItemDamage(), ingot);
         }
-        //TODO: Make all the machines for the processing path...
-
     }
 
     void addDictOres() {

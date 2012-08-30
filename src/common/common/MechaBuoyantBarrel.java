@@ -19,10 +19,10 @@ class MechaBuoyantBarrel extends Item implements IMechaUpgrade {
     protected MechaBuoyantBarrel(int par1) {
         super(par1);
         setItemName("mecha.buoyantbarrel");
-        setIconIndex(16*10);
+        setIconIndex(16 * 10);
         setTabToDisplayOn(CreativeTabs.tabMisc);
     }
-    
+
     @Override
     public String getTextureFile() {
         return Core.texture_file_item;
@@ -80,9 +80,10 @@ class MechaBuoyantBarrel extends Item implements IMechaUpgrade {
     public String getDescription() {
         return "Rise quickly when underwater";
     }
-    
+
     @Override
     public void addInformation(ItemStack is, List list) {
         list.add("Mecha-Upgrade");
+        Core.brand(list);
     }
 }

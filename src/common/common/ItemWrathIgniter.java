@@ -1,5 +1,7 @@
 package factorization.common;
 
+import java.util.List;
+
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
@@ -38,13 +40,15 @@ public class ItemWrathIgniter extends Item implements IActOnCraft {
         return getItemName();
     }
 
-    @Override //hello, server.
+    @Override
+    //hello, server.
     public int getIconFromDamage(int par1) {
         return (16 * 3) + 1;
     }
 
     @Override
-    public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side, float vecx, float vecy, float vecz) {
+    public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y,
+            int z, int side, float vecx, float vecy, float vecz) {
         Coord baseBlock = new Coord(w, x, y, z);
         Coord fireBlock = baseBlock.copy().towardSide(side);
         if (fireBlock.getId() != 0) {
@@ -71,5 +75,11 @@ public class ItemWrathIgniter extends Item implements IActOnCraft {
                 is.stackSize += 1;
             }
         }
+    }
+
+    @Override
+    public void addInformation(ItemStack is, List infoList) {
+        super.addInformation(is, infoList);
+        Core.brand(infoList);
     }
 }

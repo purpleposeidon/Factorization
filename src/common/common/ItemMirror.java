@@ -1,5 +1,7 @@
 package factorization.common;
 
+import java.util.List;
+
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
@@ -15,8 +17,8 @@ public class ItemMirror extends Item {
         //setTabToDisplayOn(CreativeTabs.tabRedstone);
     }
 
-    
-    public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side, float vecx, float vecy, float vecz) {
+    public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y,
+            int z, int side, float vecx, float vecy, float vecz) {
         ItemStack proxy = Core.registry.mirror_item_hidden.copy();
         proxy.stackSize = is.stackSize;
         boolean ret = proxy.getItem().tryPlaceIntoWorld(proxy, player, w, x, y, z, side, vecx, vecy, vecz);
@@ -27,5 +29,11 @@ public class ItemMirror extends Item {
     @Override
     public int getIconFromDamage(int par1) {
         return 9;
+    }
+
+    @Override
+    public void addInformation(ItemStack is, List infoList) {
+        super.addInformation(is, infoList);
+        Core.brand(infoList);
     }
 }

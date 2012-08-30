@@ -1,5 +1,7 @@
 package factorization.common;
 
+import java.util.List;
+
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.InventoryPlayer;
@@ -72,7 +74,7 @@ public class ItemPocketTable extends Item {
     public ItemStack findPocket(EntityPlayer player) {
         InventoryPlayer inv = player.inventory;
         for (int i = 0; i < inv.getSizeInventory(); i++) {
-            if (i % 9 >= (9-3) && i > 9) {
+            if (i % 9 >= (9 - 3) && i > 9) {
                 continue;
             }
             ItemStack is = inv.getStackInSlot(i);
@@ -97,5 +99,11 @@ public class ItemPocketTable extends Item {
         }
         this.onItemRightClick(is, player.worldObj, player);
         return true;
+    }
+
+    @Override
+    public void addInformation(ItemStack is, List infoList) {
+        super.addInformation(is, infoList);
+        Core.brand(infoList);
     }
 }

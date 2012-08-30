@@ -22,10 +22,15 @@ import factorization.api.Coord;
 public abstract class FactorizationProxy implements IGuiHandler {
     //COMMON
     public abstract void makeItemsSide();
+
     public abstract File getWorldSaveDir(World world);
+
     public abstract void broadcastTranslate(EntityPlayer who, String... msg);
+
     public abstract void pokeChest(TileEntityChest chest);
+
     public abstract EntityPlayer getPlayer(NetHandler handler);
+
     /** Send packet to other side */
     public void addPacket(EntityPlayer player, Packet packet) {
         if (player.worldObj.isRemote) {
@@ -34,7 +39,9 @@ public abstract class FactorizationProxy implements IGuiHandler {
             PacketDispatcher.sendPacketToPlayer(packet, (Player) player);
         }
     }
+
     public abstract Profiler getProfiler();
+
     protected Container getContainer(int ID, EntityPlayer player, World world, int x, int y, int z) {
         if (ID == FactoryType.NULLGUI.gui) {
             player.craftingInventory = new ContainerPlayer(player.inventory);
@@ -61,21 +68,29 @@ public abstract class FactorizationProxy implements IGuiHandler {
             cont = new ContainerGrinder(player, fac);
         } else if (ID == FactoryType.MIXER.gui) {
             cont = new ContainerMixer(player, fac);
+        } else if (ID == FactoryType.CRYSTALLIZER.gui) {
+            cont = new ContainerCrystallizer(player, fac);
         } else {
             cont = new ContainerFactorization(player, fac);
         }
         cont.addSlotsForGui(fac, player.inventory);
         return cont;
     }
+
     @Override
-    public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) { return null; }
+    public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+        return null;
+    }
+
     @Override
-    public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) { 
+    public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
         return getContainer(ID, player, world, x, y, z);
     }
-    
+
     //CLIENT
-    public void addName(Object what, String string) {}
+    public void addName(Object what, String string) {
+    }
+
     public String translateItemStack(ItemStack is) {
         if (is == null) {
             return "<null itemstack; bug?>";
@@ -92,17 +107,32 @@ public abstract class FactorizationProxy implements IGuiHandler {
         }
         return n;
     }
+
     /** Tell the pocket crafting table to update the result */
-    public void pokePocketCrafting() {}
-    public void randomDisplayTickFor(World w, int x, int y, int z, Random rand) {}
-    public void playSoundFX(String src, float volume, float pitch) {}
-    public EntityPlayer getClientPlayer() { return null; }
-    public void registerKeys() {}
-    public void registerRenderers() {}
-    
+    public void pokePocketCrafting() {
+    }
+
+    public void randomDisplayTickFor(World w, int x, int y, int z, Random rand) {
+    }
+
+    public void playSoundFX(String src, float volume, float pitch) {
+    }
+
+    public EntityPlayer getClientPlayer() {
+        return null;
+    }
+
+    public void registerKeys() {
+    }
+
+    public void registerRenderers() {
+    }
+
     //SERVER
     /** If on SMP, send packet to tell player what he's holding */
-    public void updateHeldItem(EntityPlayer player) {}
+    public void updateHeldItem(EntityPlayer player) {
+    }
+
     public void updatePlayerInventory(EntityPlayer player) {
         if (player instanceof EntityPlayerMP) {
             EntityPlayerMP emp = (EntityPlayerMP) player;
@@ -110,9 +140,13 @@ public abstract class FactorizationProxy implements IGuiHandler {
             // updates entire inventory. Inefficient, I know, but... XXX
         }
     }
+
     public boolean playerListensToCoord(EntityPlayer player, Coord c) {
         //XXX TODO: Figure this out.
         return true;
     }
-    public boolean isPlayerAdmin(EntityPlayer player) { return false; }
+
+    public boolean isPlayerAdmin(EntityPlayer player) {
+        return false;
+    }
 }

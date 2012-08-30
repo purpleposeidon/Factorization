@@ -1,7 +1,10 @@
 package factorization.common;
 
+import java.util.List;
+
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.Item;
+import net.minecraft.src.ItemStack;
 
 public class ItemCraftingComponent extends Item {
     int icon;
@@ -19,8 +22,15 @@ public class ItemCraftingComponent extends Item {
         return Core.texture_file_item;
     }
 
-    @Override //-- SERVERf
+    @Override
+    //-- SERVERf
     public int getIconFromDamage(int par1) {
         return icon;
+    }
+
+    @Override
+    public void addInformation(ItemStack is, List infoList) {
+        super.addInformation(is, infoList);
+        Core.brand(infoList);
     }
 }

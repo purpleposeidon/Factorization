@@ -184,15 +184,18 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
         return getItemName();
     }
 
-    @Override // XXX NOTE: Can't override due to... the *fucking* server. >:|
+    @Override
+    // XXX NOTE: Can't override due to... the *fucking* server. >:|
     public void addInformation(ItemStack is, List list) {
         // Bag of Holding
         // Stores 5 columns
         if (is.getTagCompound() == null) {
+            Core.brand(list);
             return;
         }
         int n = getNumOfCols(is);
         list.add("Stores " + n + " columns");
+        Core.brand(list);
     }
 
     @Override
@@ -257,7 +260,8 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
         return 16 + ((int) (System.currentTimeMillis() / 50000) % 5);
     }
 
-    @Override // ...
+    @Override
+    // ...
     public boolean hasEffect(ItemStack par1ItemStack) {
         return System.currentTimeMillis() / 75000 % 7 == 5;
     }
@@ -309,7 +313,8 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
         return did_something;
     }
 
-    @Override //-- XXX Waiting for MCP update
+    @Override
+    //-- XXX Waiting for MCP update
     public boolean getShareTag() {
         //Note: This function might be removed/unnecessary next MC version or something...
         return true;

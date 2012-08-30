@@ -1,5 +1,7 @@
 package factorization.common;
 
+import java.util.List;
+
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
@@ -22,7 +24,8 @@ public class ItemChargeMeter extends Item {
     }
 
     @Override
-    public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side, float vecx, float vecy, float vecz) {
+    public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y,
+            int z, int side, float vecx, float vecy, float vecz) {
         Coord here = new Coord(w, x, y, z);
         IChargeConductor ic = here.getTE(IChargeConductor.class);
         if (ic == null) {
@@ -47,4 +50,9 @@ public class ItemChargeMeter extends Item {
         return true;
     }
 
+    @Override
+    public void addInformation(ItemStack is, List infoList) {
+        super.addInformation(is, infoList);
+        Core.brand(infoList);
+    }
 }

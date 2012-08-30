@@ -8,6 +8,7 @@ import net.minecraft.src.InventoryPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.Slot;
+import net.minecraft.src.SlotFurnace;
 
 public class ContainerFactorization extends Container {
     public TileEntityFactorization factory;
@@ -84,6 +85,7 @@ public class ContainerFactorization extends Container {
 
     public void addSlotsForGui(TileEntityFactorization ent, InventoryPlayer inventoryplayer) {
         FactoryType type = ent.getFactoryType();
+        EntityPlayer player = inventoryplayer.player;
         switch (type) {
         case ROUTER:
             TileEntityRouter router = (TileEntityRouter) ent;
@@ -130,13 +132,13 @@ public class ContainerFactorization extends Container {
             TileEntitySlagFurnace furnace = (TileEntitySlagFurnace) ent;
             addSlotToContainer(new Slot(furnace, 0, 56, 17));
             addSlotToContainer(new Slot(furnace, 1, 56, 53));
-            addSlotToContainer(new Slot(furnace, 2, 115, 34));
-            addSlotToContainer(new Slot(furnace, 3, 141, 34));
+            addSlotToContainer(new SlotFurnace(player, furnace, 2, 115, 34));
+            addSlotToContainer(new SlotFurnace(player, furnace, 3, 141, 34));
             break;
         case GRINDER:
             TileEntityGrinder grinder = (TileEntityGrinder) ent;
             addSlotToContainer(new Slot(grinder, 0, 56, 35));
-            addSlotToContainer(new Slot(grinder, 1, 115, 34));
+            addSlotToContainer(new SlotFurnace(player, grinder, 1, 115, 34));
             break;
         case MIXER:
             TileEntityMixer mixer = (TileEntityMixer) ent;
@@ -146,12 +148,26 @@ public class ContainerFactorization extends Container {
             addSlotToContainer(new Slot(mixer, 2, 38, 43));
             addSlotToContainer(new Slot(mixer, 3, 56, 43));
             //outputs
-            addSlotToContainer(new Slot(mixer, 4, 112, 25));
-            addSlotToContainer(new Slot(mixer, 5, 130, 25));
-            addSlotToContainer(new Slot(mixer, 6, 112, 43));
-            addSlotToContainer(new Slot(mixer, 7, 130, 43));
+            addSlotToContainer(new SlotFurnace(player, mixer, 4, 112, 25));
+            addSlotToContainer(new SlotFurnace(player, mixer, 5, 130, 25));
+            addSlotToContainer(new SlotFurnace(player, mixer, 6, 112, 43));
+            addSlotToContainer(new SlotFurnace(player, mixer, 7, 130, 43));
             break;
-        default: //Fun fact: progress is done by subclassing; see ContainerSlagFurnace
+        case CRYSTALLIZER:
+            TileEntityCrystallizer crys = (TileEntityCrystallizer) ent;
+            //surounding inputs
+            addSlotToContainer(new Slot(crys, 0, 80, 13));
+            addSlotToContainer(new Slot(crys, 1, 108, 29));
+            addSlotToContainer(new Slot(crys, 2, 108, 55));
+            addSlotToContainer(new Slot(crys, 3, 80, 69));
+            addSlotToContainer(new Slot(crys, 4, 52, 55));
+            addSlotToContainer(new Slot(crys, 5, 52, 29));
+            //central output
+            addSlotToContainer(new SlotFurnace(player, crys, 6, 80, 40));
+            break;
+        default:
+            //Fun Fact: progress is done by subclassing; see ContainerSlagFurnace
+            //Additional Fun Fact: Juse use SlotFurnace for output slots!
             break;
         }
         addPlayerSlots(inventoryplayer);
@@ -169,7 +185,7 @@ public class ContainerFactorization extends Container {
         }
 
         for (int j = 0; j < 9; j++) {
-            addSlotToContainer(new Slot(inventoryplayer, j, 8 + j * 18, 142));
+            addSlotToContainer(new Slot(inventoryplayer, j, 8 + j * 18, invdy + 142));
         }
         player_slot_end = inventorySlots.size();
         slot_start = 0;

@@ -18,7 +18,7 @@ import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.TileEntity;
 import net.minecraftforge.common.ForgeHooks;
 
-public class ItemCraft extends Item  {
+public class ItemCraft extends Item {
     private final int slot_length = 9;
     static List<IRecipe> recipes = new ArrayList();
 
@@ -64,8 +64,8 @@ public class ItemCraft extends Item  {
         craftAt(is, true, null);
     }
 
-
-    @Override // -- XXX NOTE Can't override due to server
+    @Override
+    // -- XXX NOTE Can't override due to server
     public void addInformation(ItemStack is, List list) {
         // super.addInformation(is, list); // XXX NOTE Can't call due to server
         String line = "";
@@ -75,6 +75,7 @@ public class ItemCraft extends Item  {
             if (is.getItemDamage() == Core.registry.diamond_shard_packet.getItemDamage() && is != Core.registry.diamond_shard_packet) {
                 addInformation(Core.registry.diamond_shard_packet, list);
             } else {
+                Core.brand(list);
                 return;
             }
         }
@@ -103,6 +104,7 @@ public class ItemCraft extends Item  {
         } else {
             list.add("Empty");
         }
+        Core.brand(list);
     }
 
     public boolean addItem(ItemStack is, int i, ItemStack what) {
@@ -248,7 +250,8 @@ public class ItemCraft extends Item  {
         return is.getItemDamage() != 0;
     }
 
-    @Override // -- XXX NOTE: Can't override due to server
+    @Override
+    // -- XXX NOTE: Can't override due to server
     public int getIconFromDamage(int damage) {
         if (damage == 0) {
             return 2;

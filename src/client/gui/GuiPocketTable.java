@@ -19,6 +19,7 @@ public class GuiPocketTable extends GuiContainer {
     }
 
     private int open_time = 0;
+
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int i, int j) {
         int k = mc.renderEngine.getTexture(Core.texture_dir + "pocketgui.png");
@@ -36,7 +37,8 @@ public class GuiPocketTable extends GuiContainer {
         // I'd like it to say "Pocket Crafting", but that doesn't fit.
         // Could also make the tab a bit longer...
         // this.fontRenderer.drawString("Crafting", 178, 10, 4210752);
-        this.fontRenderer.drawString("PcktCrftr", 178, 10, 4210752);
+        this.fontRenderer.drawString("PcktCrftng", 178, 10, 4210752);
+        this.fontRenderer.drawString("Keys: " + Core.pocketActions, 178, 51, 4210752);
         // this.fontRenderer.drawString("123456789", 178, 10, 4210752);
         // we can fit only that much
         // also maybe draw a nice reference for keys to press for below

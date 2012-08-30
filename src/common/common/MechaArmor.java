@@ -1,5 +1,6 @@
 package factorization.common;
 
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.src.Block;
@@ -255,6 +256,7 @@ public class MechaArmor extends ItemArmor
     double randDelta() {
         return (rand.nextGaussian() - 0.5) / 4;
     }
+
     public void spawnWoolParticles(EntityPlayer player, int id) {
         double reds[] = new double[] { 221, 219, 179, 107, 177, 65, 208, 64, 154, 46, 126, 46, 79, 53, 150, 25 };
         double greens[] = new double[] { 221, 125, 80, 138, 166, 174, 132, 64, 161, 110, 61, 56, 50, 70, 52, 22 };
@@ -379,8 +381,15 @@ public class MechaArmor extends ItemArmor
         return Core.texture_file_item;
     }
 
-    @Override //seeerveerr
+    @Override
+    //seeerveerr
     public int getIconFromDamage(int par1) {
         return (4 + armorType) * 16;
+    }
+
+    @Override
+    public void addInformation(ItemStack is, List infoList) {
+        super.addInformation(is, infoList);
+        Core.brand(infoList);
     }
 }

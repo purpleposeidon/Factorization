@@ -33,6 +33,13 @@ public class ContainerPocket extends ContainerWorkbench {
             18, 19, 20, 21, 22, 23, //
             27, 28, 29, 30, 31, 32, //
             0, 1, 2, 3, 4, 5, 6, 7, 8);
+    static final List<Integer> playerNormalInvSlotsAlt = Arrays.asList( //
+    // these are Inventory slots
+    0, 1, 2, 3, 4, 5, 6, 7, 8,
+            9, 10, 11, 12, 13, 14, //
+            18, 19, 20, 21, 22, 23, //
+            27, 28, 29, 30, 31, 32);
+
     static final List<Integer> playerCraftInvSlots = Arrays.asList( //
     // these are Inventory slots
     15, 16, 17, //
@@ -198,7 +205,8 @@ public class ContainerPocket extends ContainerWorkbench {
         updateCraft();
     }
 
-    @Override //-- stupid server.
+    @Override
+    //-- stupid server.
     public void putStacksInSlots(ItemStack[] par1ArrayOfItemStack) {
         // super.putStacksInSlots(par1ArrayOfItemStack);
         for (int var2 = 0; var2 < par1ArrayOfItemStack.length; ++var2) {
@@ -210,6 +218,7 @@ public class ContainerPocket extends ContainerWorkbench {
 
     @Override
     public void onCraftGuiClosed(EntityPlayer par1EntityPlayer) {
+        //NOTE: This is super.super.onCraftGuiClosed(par1EntityPlayer)
         InventoryPlayer var2 = par1EntityPlayer.inventory;
 
         if (var2.getItemStack() != null) {
@@ -269,6 +278,23 @@ public class ContainerPocket extends ContainerWorkbench {
             return;
         }
 
+        if (player.inventory.getItemStack() != null) {
+            int would_fit = 0;
+            for (int i : playerNormalInvSlots) {
+                ItemStack is = inv.getStackInSlot(i);
+                if (is == null) {
+                    would_fit += res.getMaxStackSize();
+                    continue;
+                }
+                if (is.isItemEqual(res)) {
+                    would_fit += is.getMaxStackSize() - is.stackSize;
+                }
+            }
+            if (would_fit < res.stackSize) {
+                return;
+            }
+        }
+
         int materialRemaining = res.getMaxStackSize();
         // figure out how many times we can craft
         for (int i : playerCraftInvSlots) {
@@ -291,7 +317,7 @@ public class ContainerPocket extends ContainerWorkbench {
             assert res != null;
             slotCrafting.onPickupFromSlot(res);
             craftResult.setInventorySlotContents(0, res);
-            ItemStack remainder = FactorizationUtil.transferStackToArea(craftResult, 0, player.inventory, playerNormalInvSlots);
+            ItemStack remainder = FactorizationUtil.transferStackToArea(craftResult, 0, player.inventory, playerNormalInvSlotsAlt);
 
             updateCraft();
             if (remainder != null && remainder.stackSize != 0) {

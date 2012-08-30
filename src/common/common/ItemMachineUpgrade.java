@@ -50,5 +50,6 @@ public class ItemMachineUpgrade extends Item {
     @Override
     public void addInformation(ItemStack is, List list) {
         list.add(type);
+        Core.brand(list);
     }
 }

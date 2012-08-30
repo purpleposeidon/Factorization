@@ -1,5 +1,7 @@
 package factorization.common;
 
+import java.util.List;
+
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EnumAction;
@@ -37,5 +39,11 @@ public class ItemAcidBottle extends ItemCraftingComponent {
         FactorizationHack.damageEntity(player, FactorizationHack.acidBurn, 12);
         player.getFoodStats().addStats(-20, 0);
         return is;
+    }
+
+    @Override
+    public void addInformation(ItemStack is, List infoList) {
+        super.addInformation(is, infoList);
+        //Core.brand(infoList); taken care of in super
     }
 }

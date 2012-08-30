@@ -127,7 +127,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
     int addGraceHeat(int burnTime) {
         return Math.max(4, burnTime);
     }
-    
+
     private class ProxiedHeatingResult {
         int burnTime, cookTime, topBurnTime;
 
@@ -137,7 +137,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
             this.topBurnTime = 200;
             calculate(furnace);
         }
-        
+
         private void calculate(Coord furnace) {
             for (int i = 0; i < 2; i++) {
                 if (heat <= maxHeat / 2) {
@@ -159,9 +159,9 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
             if (!TEF_canSmelt(furnace)) {
                 return;
             }
-            ProxiedHeatingResult pf = new ProxiedHeatingResult(new Coord(worldObj, te), furnace.furnaceBurnTime, furnace.furnaceCookTime);
+            ProxiedHeatingResult pf = new ProxiedHeatingResult(new Coord(te), furnace.furnaceBurnTime, furnace.furnaceCookTime);
             furnace.furnaceBurnTime = pf.burnTime;
-            furnace.furnaceCookTime = Math.min(pf.cookTime, 200-1);
+            furnace.furnaceCookTime = Math.min(pf.cookTime, 200 - 1);
             BlockFurnace.updateFurnaceBlockState(furnace.furnaceCookTime > 0, worldObj, te.xCoord, te.yCoord, te.zCoord);
         }
         if (te instanceof TileEntitySlagFurnace) {
@@ -169,9 +169,17 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
             if (!furnace.canSmelt()) {
                 return;
             }
-            ProxiedHeatingResult pf = new ProxiedHeatingResult(new Coord(worldObj, te), furnace.furnaceBurnTime, furnace.furnaceCookTime);
+            ProxiedHeatingResult pf = new ProxiedHeatingResult(new Coord(te), furnace.furnaceBurnTime, furnace.furnaceCookTime);
             furnace.furnaceBurnTime = pf.burnTime;
             furnace.furnaceCookTime = pf.cookTime;
+        }
+        if (te instanceof TileEntityCrystallizer) {
+            TileEntityCrystallizer crys = (TileEntityCrystallizer) te;
+            if (!crys.needHeat()) {
+                return;
+            }
+            crys.heat++;
+            heat--;
         }
     }
 

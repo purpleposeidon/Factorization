@@ -1,5 +1,7 @@
 package factorization.common;
 
+import java.util.List;
+
 import net.minecraft.src.ItemBlock;
 import net.minecraft.src.ItemStack;
 
@@ -57,4 +59,9 @@ public class ItemBlockResource extends ItemBlock {
         return "ItemFactorizationResource";
     }
 
+    @Override
+    public void addInformation(ItemStack is, List infoList) {
+        super.addInformation(is, infoList);
+        Core.brand(infoList);
+    }
 }

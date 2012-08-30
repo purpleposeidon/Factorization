@@ -121,6 +121,9 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
 
     @Override
     public void updateEntity() {
+        if (worldObj.isRemote) {
+            return;
+        }
         charge.update(this);
 
         if (!is_supported() && !find_support()) {

@@ -49,16 +49,15 @@ import factorization.api.Coord;
 @NetworkMod(
         clientSideRequired = true,
         packetHandler = NetworkFactorization.class,
-        channels = {NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel},
+        channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel },
         clientPacketHandlerSpec = @SidedPacketHandler(
                 packetHandler = NetworkFactorization.class,
-                channels = {NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel}
+                channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel }
         ),
         serverPacketHandlerSpec = @SidedPacketHandler(
                 packetHandler = NetworkFactorization.class,
-                channels = {NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel}
-        )
-)
+                channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel }
+        ))
 public class Core {
     public static final String version = "0.5.0";
     // runtime storage
@@ -86,13 +85,13 @@ public class Core {
     public static boolean spread_wrathfire = true;
     public static boolean pocket_craft_anywhere = true;
     public static boolean bag_swap_anywhere = true;
-    public static String pocketActions = "xcz";
-    
+    public static String pocketActions = "xcb";
+    public static boolean add_branding = false;
+
     // universal constant config
     public final static String texture_dir = "/factorization/texture/";
     public final static String texture_file_block = texture_dir + "blocks.png";
     public final static String texture_file_item = texture_dir + "items.png";
-
 
     private int getBlockConfig(String name, int defaultId, String comment) {
         Property prop = config.getOrCreateBlockIdProperty(name, defaultId);
@@ -126,7 +125,6 @@ public class Core {
         return prop.value;
     }
 
-
     @PreInit
     public void loadConfig(FMLPreInitializationEvent event) {
         config = new Configuration(event.getSuggestedConfigurationFile());
@@ -144,20 +142,20 @@ public class Core {
         gen_silver_ore = getBoolConfig("generateSilverOre", "general", gen_silver_ore, null);
         pocket_craft_anywhere = getBoolConfig("anywherePocketCraft", "general", pocket_craft_anywhere, "Lets you open the pocket crafting table from GUIs");
         bag_swap_anywhere = getBoolConfig("anywhereBagSwap", "general", bag_swap_anywhere, "Lets you use the bag from GUIs");
-        String attempt = getStringConfig("pocketCraftingActionKeys", "general", pocketActions, "3 keys for: clearing (x), cycling (c), balancing (z)");
+        String attempt = getStringConfig("pocketCraftingActionKeys", "general", pocketActions, "3 keys for: removing (x), cycling (c), balancing (b)");
         if (attempt.length() == 3) {
             pocketActions = attempt;
         } else {
             Property p = config.getOrCreateProperty("pocketCraftingActionKeys", "general", pocketActions);
             p.value = pocketActions;
-            p.comment = "3 keys for: clearing (x), cycling (c), balancing (z)";
+            p.comment = "3 keys for: removing (x), cycling (c), balancing (b)";
         }
 
         block_item_id_offset = getIntConfig("blockItemIdOffset", "misc", block_item_id_offset, "Hopefully you'll never need to change these.");
         render_barrel_item = getBoolConfig("renderBarrelItem", "misc", render_barrel_item, null);
         render_barrel_item = getBoolConfig("renderBarrelText", "misc", render_barrel_text, null);
 
-        watch_demon_chunk_range = getIntConfig("watchDemonChunkRange", "smpAdmin", watch_demon_chunk_range, "chunk radius to keep loaded");
+        //watch_demon_chunk_range = getIntConfig("watchDemonChunkRange", "smpAdmin", watch_demon_chunk_range, "chunk radius to keep loaded");
         spread_wrathfire = getBoolConfig("spreadWrathFire", "smpAdmin", spread_wrathfire, null);
         String p = getStringConfig("bannedRouterInventoriesRegex", "smpAdmin", "", null);
         if (p != null && p.length() != 0) {
@@ -175,21 +173,24 @@ public class Core {
             prop.value = "" + entity_relight_task_id;
             prop.comment = "This is a Java Regex to blacklist access to TE";
         }
+
+        add_branding = getBoolConfig("addBranding", "misc", add_branding, null);
+
         config.save();
-        
+
         registry = new Registry();
         registry.makeBlocks();
     }
-    
+
     @Init
     public void load(FMLInitializationEvent event) {
-        
+
         NetworkRegistry.instance().registerGuiHandler(this, proxy);
         MinecraftForge.EVENT_BUS.register(registry);
         //MinecraftForge.EVENT_BUS.register(TileEntityWatchDemon.loadHandler);
         TickRegistry.registerTickHandler(registry, Side.CLIENT);
         TickRegistry.registerTickHandler(registry, Side.SERVER);
-        
+
         registry.registerSimpleTileEntities();
         proxy.makeItemsSide();
         registry.makeItems();
@@ -317,22 +318,21 @@ public class Core {
         }
     }
 
-    
-//	public static boolean isCannonical() {
-//		if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-//			return false;
-//		}
-//		return true;
-//	}
-    
-//	public static boolean isServer() {
-//		return FMLCommonHandler.instance().getSide() != Side.CLIENT;
-//	}
-    
+    //	public static boolean isCannonical() {
+    //		if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+    //			return false;
+    //		}
+    //		return true;
+    //	}
+
+    //	public static boolean isServer() {
+    //		return FMLCommonHandler.instance().getSide() != Side.CLIENT;
+    //	}
+
     public static void logWarning(String format, Object... data) {
         FMLLog.warning("Factorization: " + format, data);
     }
-    
+
     public static void addBlockToCreativeList(List tab, Block block) {
         ArrayList a = new ArrayList<Object>();
         block.addCreativeItems(a);
@@ -340,13 +340,19 @@ public class Core {
             tab.add(o);
         }
     }
-    
+
     public static void profileStart(String section) {
         // :|
         //Core.proxy.getProfiler().startSection(section);
     }
-    
+
     public static void profileEnd() {
         //Core.proxy.getProfiler().endSection();
+    }
+
+    public static void brand(List list) {
+        if (add_branding) {
+            list.add("Factorization");
+        }
     }
 }

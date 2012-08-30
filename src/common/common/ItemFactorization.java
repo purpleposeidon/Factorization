@@ -26,7 +26,7 @@ public class ItemFactorization extends ItemBlock {
         setMaxDamage(0);
         setHasSubtypes(true);
     }
-    
+
     @Override
     public boolean placeBlockAt(ItemStack is, EntityPlayer player,
             World w, int x, int y, int z, int side, float hitX, float hitY,
@@ -86,5 +86,11 @@ public class ItemFactorization extends ItemBlock {
     @Override
     public String getItemName() {
         return "ItemFactorization";
+    }
+
+    @Override
+    public void addInformation(ItemStack is, List infoList) {
+        super.addInformation(is, infoList);
+        Core.brand(infoList);
     }
 }

@@ -37,6 +37,7 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
 import factorization.client.coremod.GuiKeyEvent;
+import factorization.client.gui.GuiCrystallizer;
 import factorization.client.gui.GuiCutter;
 import factorization.client.gui.GuiGrinder;
 import factorization.client.gui.GuiMaker;
@@ -48,6 +49,7 @@ import factorization.client.gui.GuiSlag;
 import factorization.client.gui.GuiStamper;
 import factorization.client.render.BatteryItemRender;
 import factorization.client.render.BlockRenderBattery;
+import factorization.client.render.BlockRenderCrystallizer;
 import factorization.client.render.BlockRenderDefault;
 import factorization.client.render.BlockRenderGrinder;
 import factorization.client.render.BlockRenderHeater;
@@ -62,6 +64,7 @@ import factorization.client.render.EntitySteamFX;
 import factorization.client.render.EntityWrathFlameFX;
 import factorization.client.render.FactorizationRender;
 import factorization.client.render.TileEntityBarrelRenderer;
+import factorization.client.render.TileEntityCrystallizerRender;
 import factorization.client.render.TileEntityGrinderRender;
 import factorization.client.render.TileEntityHeaterRenderer;
 import factorization.client.render.TileEntityMirrorRenderer;
@@ -69,6 +72,7 @@ import factorization.client.render.TileEntityMixerRenderer;
 import factorization.client.render.TileEntitySolarTurbineRender;
 import factorization.client.render.TileEntityWatchDemonRenderer;
 import factorization.common.Command;
+import factorization.common.ContainerCrystallizer;
 import factorization.common.ContainerFactorization;
 import factorization.common.ContainerGrinder;
 import factorization.common.ContainerMechaModder;
@@ -80,6 +84,7 @@ import factorization.common.FactorizationProxy;
 import factorization.common.FactoryType;
 import factorization.common.Registry;
 import factorization.common.TileEntityBarrel;
+import factorization.common.TileEntityCrystallizer;
 import factorization.common.TileEntityFactorization;
 import factorization.common.TileEntityGrinder;
 import factorization.common.TileEntityHeater;
@@ -176,6 +181,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
             cont = new ContainerGrinder(player, fac);
         } else if (ID == FactoryType.MIXER.gui) {
             cont = new ContainerMixer(player, fac);
+        } else if (ID == FactoryType.CRYSTALLIZER.gui) {
+            cont = new ContainerCrystallizer(player, fac);
         } else {
             cont = new ContainerFactorization(player, fac);
         }
@@ -200,6 +207,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }
         if (ID == FactoryType.MIXER.gui) {
             gui = new GuiMixer(cont);
+        }
+        if (ID == FactoryType.CRYSTALLIZER.gui) {
+            gui = new GuiCrystallizer(cont);
         }
 
         cont.addSlotsForGui(fac, player.inventory);
@@ -498,6 +508,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         setTileEntityRenderer(TileEntityMirror.class, new TileEntityMirrorRenderer());
         setTileEntityRenderer(TileEntityGrinder.class, new TileEntityGrinderRender());
         setTileEntityRenderer(TileEntityMixer.class, new TileEntityMixerRenderer());
+        setTileEntityRenderer(TileEntityCrystallizer.class, new TileEntityCrystallizerRender());
         MinecraftForgeClient.preloadTexture(Core.texture_file_block);
         MinecraftForgeClient.preloadTexture(Core.texture_file_item);
 
@@ -514,6 +525,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderWire();
         new BlockRenderGrinder();
         new BlockRenderMixer();
+        new BlockRenderCrystallizer();
 
         MinecraftForgeClient.registerItemRenderer(Core.registry.battery.shiftedIndex, new BatteryItemRender(renderBattery));
     }

@@ -29,8 +29,10 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
             box.render(Tessellator.instance, 1F / 16F);
         }
     }
+
     @Override
     public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
+        GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glPushMatrix();
         this.bindTextureByName(Core.texture_file_block);
         //GL11.glEnable(GL12.GL_RESCALE_NORMAL);
@@ -46,6 +48,7 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
         element.renderAll();
         GL11.glPopMatrix();
         GL11.glColor4f(1, 1, 1, 1);
+        GL11.glEnable(GL11.GL_LIGHTING);
     }
 
 }

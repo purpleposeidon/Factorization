@@ -18,10 +18,10 @@ public class MechaCobblestoneDrive extends Item implements IMechaUpgrade {
     protected MechaCobblestoneDrive(int par1) {
         super(par1);
         setItemName("mecha.cobbledrive");
-        setIconIndex(16*10 + 1);
+        setIconIndex(16 * 10 + 1);
         setTabToDisplayOn(CreativeTabs.tabMisc);
     }
-    
+
     @Override
     public String getTextureFile() {
         return Core.texture_file_item;
@@ -65,9 +65,10 @@ public class MechaCobblestoneDrive extends Item implements IMechaUpgrade {
     public String getDescription() {
         return "Generates cobblestone";
     }
-    
+
     @Override
     public void addInformation(ItemStack is, List list) {
         list.add("Mecha-Upgrade");
+        Core.brand(list);
     }
 }

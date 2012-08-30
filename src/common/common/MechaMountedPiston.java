@@ -21,7 +21,7 @@ public class MechaMountedPiston extends Item implements IMechaUpgrade {
         setIconIndex(16 * 10 + 2);
         setTabToDisplayOn(CreativeTabs.tabMisc);
     }
-    
+
     @Override
     public String getTextureFile() {
         return Core.texture_file_item;
@@ -53,7 +53,8 @@ public class MechaMountedPiston extends Item implements IMechaUpgrade {
     }
 
     @Override
-    public ItemStack tickUpgrade(EntityPlayer player, ItemStack armor, ItemStack upgrade, boolean isEnabled) {
+    public ItemStack tickUpgrade(EntityPlayer player, ItemStack armor, ItemStack upgrade,
+            boolean isEnabled) {
         if (!isEnabled) {
             return null;
         }
@@ -97,7 +98,8 @@ public class MechaMountedPiston extends Item implements IMechaUpgrade {
     }
 
     @Override
-    public boolean damageArmor(EntityLiving entity, ItemStack stack, DamageSource source, int damage, int slot) {
+    public boolean damageArmor(EntityLiving entity, ItemStack stack, DamageSource source,
+            int damage, int slot) {
         return false;
     }
 
@@ -105,9 +107,10 @@ public class MechaMountedPiston extends Item implements IMechaUpgrade {
     public String getDescription() {
         return "Push blocks";
     }
-    
+
     @Override
     public void addInformation(ItemStack is, List list) {
         list.add("Mecha-Upgrade");
+        Core.brand(list);
     }
 }
