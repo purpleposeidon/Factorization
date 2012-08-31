@@ -107,8 +107,12 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     }
 
     void makeRenderHelperBlock() {
-        // TODO: I'd like to do this as late as possible.
+        // It no longer matters when this is called. In fact, it doesn't even matter if factory_block_id's been changed.
         Block orig_block = Block.blocksList[Core.factory_block_id];
+        if (orig_block != factory_block) {
+            System.err.println("You changed a Factorization block. Why did you do that?");
+            System.err.println("If " + orig_block + " becomes weird, this is why.");
+        }
         Block.blocksList[Core.factory_block_id] = null;
         factory_rendering_block = new BlockFactorization(Core.factory_block_id);
         Block.blocksList[Core.factory_block_id] = orig_block;

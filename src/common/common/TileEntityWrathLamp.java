@@ -136,7 +136,9 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         Core.profileEnd();
     }
 
-    void onRemove() {
+    @Override
+    public void invalidate() {
+        super.invalidate();
         Core.profileStart("WrathLamp");
         for (int x = xCoord - radius; x <= xCoord + radius; x++) {
             for (int z = zCoord - radius; z <= zCoord + radius; z++) {
@@ -148,15 +150,10 @@ public class TileEntityWrathLamp extends TileEntityCommon {
             }
         }
         Core.profileEnd();
-    }
-
-    @Override
-    public void invalidate() {
-        super.invalidate();
         if (worldObj.isRemote) {
-//			RelightTask task = new RelightTask(worldObj);
-//			task.setPosition(xCoord, yCoord, zCoord);
-//			worldObj.spawnEntityInWorld(task);
+            RelightTask task = new RelightTask(worldObj);
+            task.setPosition(xCoord, yCoord, zCoord);
+            worldObj.spawnEntityInWorld(task);
         }
     }
 
@@ -166,18 +163,6 @@ public class TileEntityWrathLamp extends TileEntityCommon {
 
     boolean eq(double a, double b) {
         return Math.abs(a - b) < 0.9;
-    }
-
-    boolean trace(Vec3 a, Vec3 b) {
-        MovingObjectPosition trace = worldObj.rayTraceBlocks(a, b);
-        if (trace == null) {
-            return true;
-        }
-        Vec3 hit = trace.hitVec;
-        if (eq(hit.xCoord, b.xCoord) && eq(hit.yCoord, b.yCoord) && eq(hit.zCoord, b.zCoord)) {
-            return true;
-        }
-        return false;
     }
 
     float div(int a, int b) {
