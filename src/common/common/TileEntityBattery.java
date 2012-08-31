@@ -25,6 +25,12 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     }
 
     @Override
+    public String getInfo() {
+        float f = storage.getValue() * 100 / max_storage;
+        return "Storage: " + ((int) f) + "%";
+    }
+
+    @Override
     public BlockClass getBlockClass() {
         return BlockClass.Machine;
     }
@@ -57,7 +63,7 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
         charge.update(this);
         int val = getCharge().getValue();
         int delta = 0;
-        final int min_charge = 10, max_charge = 30;
+        final int min_charge = 20, max_charge = 30;
         if (val < min_charge) {
             delta = Math.min(min_charge - val, storage.getValue());
         } else if (val > max_charge) {

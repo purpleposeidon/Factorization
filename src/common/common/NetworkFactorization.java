@@ -358,7 +358,9 @@ public class NetworkFactorization implements IPacketHandler {
                 //
                 MixerSpeed = 100,
                 //
-                CrystallizerInfo = 110
+                CrystallizerInfo = 110,
+                //
+                WireFace = 121
                 ;
     }
 

@@ -38,6 +38,11 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
     }
 
     @Override
+    public String getInfo() {
+        return "Power: " + getHeat();
+    }
+
+    @Override
     public void addReflector(int strength) {
         reflectors += strength;
         if (reflectors < 0) {

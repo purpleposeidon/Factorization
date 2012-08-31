@@ -1,5 +1,8 @@
 package factorization.common;
 
+import java.io.DataInput;
+import java.io.IOException;
+
 import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.Block;
 import net.minecraft.src.EntityPlayer;
@@ -11,6 +14,7 @@ import net.minecraft.src.World;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
+import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityWire extends TileEntityCommon implements IChargeConductor {
     public byte supporting_side;
@@ -35,6 +39,11 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     @Override
     public Charge getCharge() {
         return charge;
+    }
+
+    @Override
+    public String getInfo() {
+        return null;
     }
 
     @Override
@@ -68,6 +77,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
         for (byte side = 0; side < 6; side++) {
             if (canPlaceAgainst(getCoord().towardSide(side), side)) {
                 supporting_side = side;
+                shareInfo();
                 return true;
             }
             //			if (here.towardSide(side).isSolidOnSide(Coord.oppositeSide(side))) {
@@ -153,6 +163,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
         if (player.isSneaking()) {
             supporting_side = (byte) side;
             if (is_supported()) {
+                shareInfo();
                 return;
             }
         }
@@ -176,6 +187,11 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
             }
         }
         supporting_side = best_side;
+        shareInfo();
+    }
+
+    void shareInfo() {
+        broadcastMessage(null, MessageType.WireFace, supporting_side);
     }
 
     @Override
@@ -200,5 +216,18 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     @Override
     public void setBlockBounds(Block b) {
         new WireConnections(this).setBlockBounds(b);
+    }
+
+    @Override
+    public boolean handleMessageFromServer(int messageType, DataInput input) throws IOException {
+        if (super.handleMessageFromServer(messageType, input)) {
+            return true;
+        }
+        if (messageType == MessageType.WireFace) {
+            supporting_side = input.readByte();
+            getCoord().dirty();
+            return true;
+        }
+        return false;
     }
 }

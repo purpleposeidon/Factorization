@@ -96,6 +96,11 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
 
     @Override
+    public String getInfo() {
+        return null;
+    }
+
+    @Override
     public FactoryType getFactoryType() {
         return FactoryType.MIXER;
     }
@@ -295,7 +300,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
             speed++;
         }
         progress += speed;
-        if (getRemainingProgress() <= 0) {
+        if (getRemainingProgress() <= 0 || Core.cheat) {
             progress = 0;
             addItems(output, copyArray(mr.outputs));
             dirty = true;

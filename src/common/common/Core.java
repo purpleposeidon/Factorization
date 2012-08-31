@@ -87,6 +87,7 @@ public class Core {
     public static boolean bag_swap_anywhere = true;
     public static String pocketActions = "xcb";
     public static boolean add_branding = false;
+    public static boolean cheat = false;
 
     // universal constant config
     public final static String texture_dir = "/factorization/texture/";
@@ -353,6 +354,9 @@ public class Core {
     public static void brand(List list) {
         if (add_branding) {
             list.add("Factorization");
+        }
+        if (cheat) {
+            list.add("Cheat mode!");
         }
     }
 }

@@ -20,7 +20,6 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
 
     public ItemStack growing_crystal, solution;
     public int heat, progress;
-    static boolean fast_crystallizers = false;
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {
@@ -164,9 +163,9 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
             share_delay = 0;
             current_state = 5;
         }
-        progress += fast_crystallizers ? 20 * 60 : 1;
-        if (getProgressRemaining() <= 0) {
-            heat = 0;
+        progress += 1;
+        if (getProgressRemaining() <= 0 || Core.cheat) {
+            heat = Core.cheat ? 80 : 0;
             progress = 0;
             match.apply(this);
             share_delay = 0;
@@ -201,11 +200,14 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
 
     static class CrystalRecipe {
         ItemStack input, output, solution;
+        float output_count;
         int antium_count;
 
-        public CrystalRecipe(ItemStack input, ItemStack output, ItemStack solution, int antium_count) {
+        public CrystalRecipe(ItemStack input, ItemStack output, float output_count,
+                ItemStack solution, int antium_count) {
             this.input = input;
             this.output = output;
+            this.output_count = output_count;
             this.solution = solution;
             this.antium_count = antium_count;
         }
@@ -215,7 +217,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
                 if (!crys.output.isItemEqual(output)) {
                     return false;
                 }
-                if (crys.output.stackSize + output.stackSize > crys.output.getMaxStackSize()) {
+                if (crys.output.stackSize + output_count > crys.output.getMaxStackSize()) {
                     return false;
                 }
             }
@@ -239,17 +241,22 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
                 crys.inputs[slot] = FactorizationUtil.normalize(crys.inputs[slot]);
                 is.stackSize--;
             }
+            int delta = (int) output_count;
+            if (rand.nextFloat() > (output_count - delta)) {
+                delta++;
+            }
             if (crys.output == null) {
                 crys.output = output.copy();
+                crys.output.stackSize = delta;
             } else {
-                crys.output.stackSize += output.stackSize;
+                crys.output.stackSize += delta;
             }
         }
     }
 
-    public static void addRecipe(ItemStack input, ItemStack output, ItemStack solution,
+    public static void addRecipe(ItemStack input, ItemStack output, float output_count, ItemStack solution,
             int antium_count) {
-        recipes.add(new CrystalRecipe(input, output, solution, antium_count));
+        recipes.add(new CrystalRecipe(input, output, output_count, solution, antium_count));
     }
 
     CrystalRecipe getMatchingRecipe() {

@@ -8,6 +8,7 @@
   Wrath Forges are now more expensive to operate.
   A few bug fixes for the Router GUI, and the auto-ejector.
   Slots.
+  Nerfed wrathforge. It's no longer refuelable, and will last for 36 blocks
 
   More Electricity:
     The battery block is made using acid & lead. When crafted, it will be fully charged. They do not stack. Battery blocks keep their charge when broken. They are used to craft magnets, which are used in motors. A battery block can't charge another battery block.

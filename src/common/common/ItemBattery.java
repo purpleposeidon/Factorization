@@ -2,9 +2,11 @@ package factorization.common;
 
 import java.util.List;
 
+import net.minecraft.src.Block;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.Item;
+import net.minecraft.src.ItemBlock;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.Packet;
@@ -12,10 +14,10 @@ import net.minecraft.src.World;
 import factorization.api.Coord;
 import factorization.api.IActOnCraft;
 
-public class ItemBattery extends Item implements IActOnCraft {
+public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     //3 States: Empty. Enough for 1 magnet. Enough for 2 magnets.
     public ItemBattery(int id) {
-        super(id);
+        super(id, Core.registry.battery_item_hidden);
         setItemName("battery");
         setMaxStackSize(1);
         setMaxDamage(0); //'2' is not the number for this.
@@ -66,17 +68,6 @@ public class ItemBattery extends Item implements IActOnCraft {
                 wire.stackSize++;
             }
         }
-    }
-
-    @Override
-    public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y,
-            int z, int side, float vecx, float vecy, float vecz) {
-        ItemStack proxy = Core.registry.battery_item_hidden.copy();
-        proxy.stackSize = is.stackSize;
-        proxy.setTagCompound(is.getTagCompound());
-        boolean ret = proxy.getItem().tryPlaceIntoWorld(proxy, player, w, x, y, z, side, vecx, vecy, vecz);
-        is.stackSize = proxy.stackSize;
-        return ret;
     }
 
     @Override

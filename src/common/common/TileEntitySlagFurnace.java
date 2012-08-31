@@ -14,8 +14,6 @@ import factorization.common.NetworkFactorization.MessageType;
 import net.minecraftforge.common.ForgeDirection;
 import static net.minecraftforge.common.ForgeDirection.*;
 
-
-
 public class TileEntitySlagFurnace extends TileEntityFactorization {
     ItemStack furnaceItemStacks[] = new ItemStack[4];
     public int furnaceBurnTime;
@@ -132,7 +130,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
         if (this.isBurning() && this.canSmelt()) {
             ++this.furnaceCookTime;
 
-            if (this.furnaceCookTime >= 200) {
+            if (this.furnaceCookTime >= 200 || Core.cheat) {
                 this.furnaceCookTime = 0;
                 this.smeltItem();
                 invChanged = true;

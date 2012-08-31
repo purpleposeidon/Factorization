@@ -2,33 +2,21 @@ package factorization.common;
 
 import java.util.List;
 
+import net.minecraft.src.Block;
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
+import net.minecraft.src.ItemBlock;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.World;
 
-public class ItemMirror extends Item {
+public class ItemMirror extends ItemBlockProxy {
 
     protected ItemMirror(int par1) {
-        super(par1);
+        super(par1, Core.registry.mirror_item_hidden);
         setItemName("mirror");
         setTextureFile(Core.texture_file_item);
-        //setTabToDisplayOn(CreativeTabs.tabRedstone);
-    }
-
-    public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y,
-            int z, int side, float vecx, float vecy, float vecz) {
-        ItemStack proxy = Core.registry.mirror_item_hidden.copy();
-        proxy.stackSize = is.stackSize;
-        boolean ret = proxy.getItem().tryPlaceIntoWorld(proxy, player, w, x, y, z, side, vecx, vecy, vecz);
-        is.stackSize = proxy.stackSize;
-        return ret;
-    }
-
-    @Override
-    public int getIconFromDamage(int par1) {
-        return 9;
+        setIconIndex(9);
     }
 
     @Override

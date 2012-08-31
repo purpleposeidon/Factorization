@@ -1,6 +1,5 @@
 package factorization.api;
 
-
 public interface IChargeConductor extends ICoord {
     /**
      * Generators: Increment charge every tick, up to a generator-specific point. Maybe 10? <br/>
@@ -9,4 +8,9 @@ public interface IChargeConductor extends ICoord {
      * charge at (maybe?) 3. This'll keep batteries from charging other batteries tho, unless there was a transformer or something.
      */
     public Charge getCharge();
+
+    /**
+     * @return a string to be shown along with energy information when right-clicked with a charge meter
+     */
+    public String getInfo();
 }

@@ -84,6 +84,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemMirror mirror;
     public ItemBattery battery;
     public ItemOreProcessing ore_dirty_gravel, ore_clean_gravel, ore_reduced, ore_crystal;
+    public ItemCraftingComponent sludge;
     public ItemStack antium;
 
     public Material materialMachine = new Material(MapColor.ironColor);
@@ -107,17 +108,12 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
     void makeRenderHelperBlock() {
         // TODO: I'd like to do this as late as possible.
-        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            factory_rendering_block = factory_block;
-            for (int i = Block.blocksList.length - 1; i > 0; i--) {
-                if (Block.blocksList[i] == null && Item.itemsList[i] == null) {
-                    factory_rendering_block = new BlockFactorization(i);
-                    System.out.println("Creating render helper block with ID " + i);
-                    GameRegistry.registerBlock(factory_rendering_block);
-                    return;
-                }
-            }
+        if (Block.blocksList[Core.factory_block_id] != factory_block) {
+            throw new RuntimeException("You changed my block. Why did you change my block?");
         }
+        Block.blocksList[Core.factory_block_id] = null;
+        factory_rendering_block = new BlockFactorization(Core.factory_block_id);
+        Block.blocksList[Core.factory_block_id] = factory_block;
     }
 
     void registerSimpleTileEntities() {
@@ -160,6 +156,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         ore_clean_gravel.addEnglishNames("Clean ", " Chunks");
         ore_reduced.addEnglishNames("Reduced ", " Chunks");
         ore_crystal.addEnglishNames("Crystalline ", "");
+        sludge = new ItemCraftingComponent(itemID("sludge", 9039), "item.sludge", 2 * 16 + 8);
+        addName(sludge, "Sludge");
 
         //ItemBlocks
         item_factorization = (ItemFactorization) Item.itemsList[Core.factory_block_id];
@@ -689,15 +687,19 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         TileEntityGrinder.addRecipe(new ItemStack(Block.mycelium), new ItemStack(Block.dirt), 1);
         recipe(mixer_item,
                 " M ",
-                " X ",
+                "WXW",
                 "LUL",
                 'L', lead_ingot,
                 'M', motor,
+                'W', Item.bucketWater,
                 'X', fan,
                 'U', Item.cauldron);
         TileEntityMixer.addRecipe(
-                new ItemStack[] { new ItemStack(Item.slimeBall), new ItemStack(Item.bucketMilk), new ItemStack(Block.tallGrass) },
-                new ItemStack[] { new ItemStack(Item.slimeBall, 2), new ItemStack(Item.bucketEmpty) });
+                new ItemStack[] { new ItemStack(sludge, 1), new ItemStack(Block.dirt), new ItemStack(Item.bucketWater) },
+                new ItemStack[] { new ItemStack(Item.clay), new ItemStack(Item.bucketEmpty) });
+        //		TileEntityMixer.addRecipe(
+        //				new ItemStack[] { new ItemStack(Item.slimeBall), new ItemStack(Item.bucketMilk), new ItemStack(Block.leaves) },
+        //				new ItemStack[] { new ItemStack(Item.slimeBall, 2), new ItemStack(Item.bucketEmpty) });
         recipe(crystallizer_item,
                 "-S-",
                 "WUW",
@@ -705,7 +707,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'S', Item.silk,
                 'W', Block.planks,
                 'U', Item.cauldron);
-        TileEntityCrystallizer.addRecipe(new ItemStack(Item.dyePowder, 1, 10), new ItemStack(Item.slimeBall), new ItemStack(Item.bucketMilk), 0);
+        ItemStack lime = new ItemStack(Item.dyePowder, 1, 10);
+        TileEntityCrystallizer.addRecipe(lime, new ItemStack(Item.slimeBall), 1, new ItemStack(Item.bucketMilk), 0);
         // Cutter
         //TODO: Remove the cutter
         //		recipe(cutter_item,
@@ -741,21 +744,27 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         ItemStack reduced = new ItemStack(ore_reduced, 1, oreID);
         ItemStack crystal = new ItemStack(ore_crystal, 1, oreID);
 
-        TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, ingot, 0.4F, Block.stone);
-        TileEntityGrinder.addRecipe(ore, dirty, 1.4F);
-        TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.142857142857143F, ingot, 0.2F, Block.dirt);
-        TileEntityMixer.addRecipe(
-                new ItemStack[] { dirty, new ItemStack(Item.bucketWater) },
-                new ItemStack[] { clean, new ItemStack(Item.bucketEmpty) });
-        TileEntitySlagFurnace.SlagRecipes.register(clean, 1, reduced, 0.25F, reduced);
-        TileEntityCrystallizer.addRecipe(reduced, crystal, new ItemStack(acid), 0);
+        //All processingg steps can be smelted
         for (ItemStack is : new ItemStack[] { dirty, clean, reduced, crystal }) {
             FurnaceRecipes.smelting().addSmelting(is.itemID, is.getItemDamage(), ingot);
         }
+
+        //ORES
+        TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, ingot, 0.4F, Block.stone);
+        TileEntityGrinder.addRecipe(ore, dirty, 1.4F);
+        //DIRTY GRAVEL
+        TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.42857142857143F, ingot, 0.2F, Block.dirt);
+        TileEntityMixer.addRecipe(
+                new ItemStack[] { dirty, new ItemStack(Item.bucketWater) },
+                new ItemStack[] { clean, new ItemStack(Item.bucketEmpty), new ItemStack(sludge) });
+        //CLEAN CHUNKS
+        TileEntitySlagFurnace.SlagRecipes.register(clean, 1, reduced, 0.42857142857143F, reduced);
+        //REDUCED CHUNKS
+        TileEntityCrystallizer.addRecipe(reduced, crystal, 1.5F, new ItemStack(acid), 0);
     }
 
     void addDictOres() {
-        for (String oreClass : Arrays.asList("oreCopper", "oreTin")) {
+        for (String oreClass : Arrays.asList("oreCopper", "oreTin", "oreSilver")) {
             ItemStack bestIngot = null;
             Iterable<ItemStack> oreList = OreDictionary.getOres(oreClass);
             if (oreList == null || !oreList.iterator().hasNext()) {
@@ -779,6 +788,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             }
             if (oreClass.equals("oreTin")) {
                 id = ItemOreProcessing.TIN;
+            }
+            if (oreClass.equals("oreSilver")) {
+                id = ItemOreProcessing.LEAD;
+                bestIngot = new ItemStack(lead_ingot);
             }
             for (ItemStack ore : oreList) {
                 createOreProcessingPath(ore, bestIngot, id);

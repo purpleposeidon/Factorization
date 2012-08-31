@@ -42,9 +42,16 @@ public class ItemChargeMeter extends Item {
         float density = ret.totalCharge / ((float) ret.conductorCount);
         String d = String.format("%.1f", density);
         //TODO: Let's put it somewhere better than the chat log
+        String inf = ic.getInfo();
+        if (inf == null) {
+            inf = "";
+        } else {
+            inf = "  " + inf;
+        }
         player.addChatMessage("Average: " + d
                 + "  Target: " + ic.getCharge().getValue()
                 + "  Conductors: " + ret.conductorCount
+                + inf
                 //+ "  Total: " + ret.totalCharge
                 );
         return true;

@@ -18,7 +18,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     int energy = 0;
     int speed = 0;
     final int grind_time = 400;
-    
+
     @Override
     public int getSizeInventory() {
         return 2;
@@ -44,7 +44,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
             output = is;
         }
     }
-    
+
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
@@ -54,7 +54,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         energy = tag.getInteger("energy");
         speed = tag.getInteger("speed");
     }
-    
+
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
@@ -89,24 +89,31 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     }
 
     @Override
+    public String getInfo() {
+        float p = speed * 100 / 50F;
+        return "Speed: " + ((int) p) + "%";
+    }
+
+    @Override
     public FactoryType getFactoryType() {
         return FactoryType.GRINDER;
     }
-    
+
     void slowDown() {
         if (speed > 0) {
             speed--;
         }
     }
-    
+
     int last_speed = 0;
+
     void shareSpeed() {
         if (speed != last_speed) {
             last_speed = speed;
             broadcastMessage(null, MessageType.GrinderSpeed, speed);
         }
     }
-    
+
     @Override
     public boolean handleMessageFromServer(int messageType, DataInput input)
             throws IOException {
@@ -119,15 +126,15 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         }
         return false;
     }
-    
+
     public int rotation;
-    
+
     @Override
     public void updateEntity() {
         rotation += speed;
         super.updateEntity();
     }
-    
+
     @Override
     void doLogic() {
         shareSpeed();
@@ -135,11 +142,10 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         Charge.update(this);
         if (worldObj.getWorldTime() % 3 == 0) {
             int val = getCharge().getValue();
-            if (val > 6 && energy < 30) {
-                int to_take = Math.max(3, Math.min(12, val));
-                to_take = Math.min(to_take, 30-energy);
+            if (val > 16 && energy < 30) {
+                int to_take = Math.min(30, val);
                 val -= to_take;
-                energy += to_take/3;
+                energy += to_take / 5;
                 getCharge().setValue(val);
             }
         }
@@ -153,15 +159,15 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         if (canGrind()) {
             if (speed < 50) {
                 speed++;
-                energy--;
+                energy -= 2;
             } else {
-                if (progress == grind_time) {
+                if (progress == grind_time || Core.cheat) {
                     progress = 0;
                     grind();
                 } else {
                     progress++;
                 }
-                energy--;
+                energy -= 1;
             }
         } else {
             slowDown();
@@ -174,12 +180,12 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         return BlockClass.Machine;
     }
 
-    
     static ArrayList<GrinderRecipe> recipes = new ArrayList();
+
     public static void addRecipe(ItemStack input, ItemStack output, float probability) {
         recipes.add(new GrinderRecipe(input, output, probability));
     }
-    
+
     boolean canGrind() {
         input = FactorizationUtil.normalize(input);
         if (input == null) {
@@ -193,7 +199,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
                 if (!output.isItemEqual(gr.output)) {
                     return false;
                 }
-                if (output.stackSize + ((int)gr.probability+.99) > output.getMaxStackSize()) {
+                if (output.stackSize + ((int) gr.probability + .99) > output.getMaxStackSize()) {
                     return false;
                 }
                 return true;
@@ -201,7 +207,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         }
         return false;
     }
-    
+
     void grind() {
         for (GrinderRecipe gr : recipes) {
             if (gr.input.isItemEqual(input)) {
@@ -218,15 +224,15 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
             }
         }
     }
-    
+
     public int getGrindProgressScaled(int total) {
-        return total*progress/grind_time;
+        return total * progress / grind_time;
     }
-    
+
     private static class GrinderRecipe {
         ItemStack input, output;
         float probability;
-        
+
         GrinderRecipe(ItemStack input, ItemStack output, float probability) {
             this.input = input;
             this.output = output;

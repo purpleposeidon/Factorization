@@ -35,6 +35,11 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
     }
 
     @Override
+    public String getInfo() {
+        return null;
+    }
+
+    @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
         charge.writeToNBT(tag, "charge");

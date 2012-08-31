@@ -296,13 +296,6 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
                 if (netherBrick.matches(c) || netherStair.matches(c) || netherFence.matches(c)) {
                     src_count += 1;
                 }
-                if (c.is(Block.netherrack)) {
-                    //maybe eat it up!
-                    if (age > 0) {
-                        age -= 1;
-                        c.setId(Block.fire);
-                    }
-                }
             }
             if (src_count < furnace_size) {
                 if (src_count == 0) {
@@ -326,7 +319,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
                             continue; //don't burn something that we're just going to reverse
                         }
                         burnsTo.set(c);
-                        age += 3;
+                        age++;
                         return;
                     }
                 }
