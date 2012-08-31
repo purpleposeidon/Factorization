@@ -108,12 +108,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
     void makeRenderHelperBlock() {
         // TODO: I'd like to do this as late as possible.
-        if (Block.blocksList[Core.factory_block_id] != factory_block) {
-            throw new RuntimeException("You changed my block. Why did you change my block?");
-        }
+        Block orig_block = Block.blocksList[Core.factory_block_id];
         Block.blocksList[Core.factory_block_id] = null;
         factory_rendering_block = new BlockFactorization(Core.factory_block_id);
-        Block.blocksList[Core.factory_block_id] = factory_block;
+        Block.blocksList[Core.factory_block_id] = orig_block;
     }
 
     void registerSimpleTileEntities() {
