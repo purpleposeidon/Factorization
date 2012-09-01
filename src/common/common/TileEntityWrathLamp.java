@@ -239,10 +239,15 @@ public class TileEntityWrathLamp extends TileEntityCommon {
 
     class InitialBuild extends Updater {
         int height = -100;
+        int start_delay = 20;
         Updater next_updater = new Idler();
 
         @Override
         public Updater update() {
+            if (start_delay >= 0) {
+                start_delay--;
+                return this;
+            }
             if (height == -100) {
                 if (start_height == -100) {
                     height = yCoord;

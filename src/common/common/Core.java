@@ -29,13 +29,18 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.NetworkMod.SidedPacketHandler;
 import cpw.mods.fml.common.registry.TickRegistry;
 
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Block;
+import net.minecraft.src.CommandHandler;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.ICommand;
+import net.minecraft.src.ICommandSender;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.ModLoader;
 import net.minecraft.src.NetHandler;
 import net.minecraft.src.Packet;
 import net.minecraft.src.Profiler;
+import net.minecraft.src.ServerCommandManager;
 import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldGenMinable;
@@ -43,6 +48,8 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.common.Configuration;
+import net.minecraftforge.event.CommandEvent;
+import net.minecraftforge.event.ForgeSubscribe;
 import factorization.api.Coord;
 
 @Mod(modid = "factorization", name = "Factorization", version = Core.version)
@@ -188,6 +195,7 @@ public class Core {
 
         NetworkRegistry.instance().registerGuiHandler(this, proxy);
         MinecraftForge.EVENT_BUS.register(registry);
+        MinecraftForge.EVENT_BUS.register(this);
         //MinecraftForge.EVENT_BUS.register(TileEntityWatchDemon.loadHandler);
         TickRegistry.registerTickHandler(registry, Side.CLIENT);
         TickRegistry.registerTickHandler(registry, Side.SERVER);
@@ -359,4 +367,5 @@ public class Core {
             list.add("Cheat mode!");
         }
     }
+    
 }

@@ -107,8 +107,11 @@ public class TileEntityBarrel extends TileEntityFactorization {
 
     public void changeItemCount(int delta) {
         middleCount = getItemCount() + delta;
-        if (!(middleCount >= 0 && middleCount < getMaxSize())) {
-            throw new Error("tried changing item count to out of range");
+        if (middleCount < 0) {
+            throw new Error("Tried making item count negative! At " + getCoord());
+        }
+        if (middleCount > getMaxSize()) {
+            System.err.println("Factorization barrel size " + middleCount + " is larger than the maximum, " + getMaxSize() + " at " + getCoord());
         }
         topStack = bottomStack = null;
         updateStacks();

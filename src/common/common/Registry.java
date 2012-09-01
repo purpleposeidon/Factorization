@@ -102,6 +102,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         GameRegistry.registerBlock(lightair_block);
         GameRegistry.registerBlock(resource_block, ItemBlockResource.class);
         GameRegistry.registerCraftingHandler(this);
+        GameRegistry.registerWorldGenerator(this);
 
         factory_block.setCreativeTab(CreativeTabs.tabRedstone);
     }
@@ -923,15 +924,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         if (!Core.gen_silver_ore) {
             return;
         }
-        //only gen in 1/4 of the chunks or something
-        if (rand.nextFloat() > 0.35) {
+        if ((chunkZ + 3*chunkX) % 5 != 0) {
             return;
         }
-        if (Math.abs(chunkX + chunkZ) % 3 == 1) {
-            return;
-        }
-        int x = chunkX + rand.nextInt(16);
-        int z = chunkZ + rand.nextInt(16);
+        int x = chunkX*16 + rand.nextInt(16);
+        int z = chunkZ*16 + rand.nextInt(16);
         int y = 5 + rand.nextInt(48);
         silverGen.generate(world, rand, x, y, z);
     }
