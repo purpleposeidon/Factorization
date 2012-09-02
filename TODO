@@ -5,11 +5,9 @@ square saw
 Some electricity related mecha-upgrades?
 
 [High-priority Bugs]
-move stuff on top of the motor in recipes
 check breaking on all new machines
 redstone signal on craftpacket maker/stamper
 solar turbines need to check if it's raining. It's okay if you're in a desert tho.
-Test on a dedicated server. V_V
 fill up a barrel all the way with redpower. Save and restart.
 
 [Low-Priority Bugs]
@@ -25,7 +23,6 @@ barrel lighting (normals.)
 railgun, except for steve
 sign enchanting
 continuous textures on wiring'd be kind of nice. (Put a UV-test on, see how badly they match up...)
-put a few-ticks delay between lamp-placing & lighting the world up
 
 
 have sentry demon send redstone signal when it senses shit

@@ -57,6 +57,7 @@ import factorization.api.Coord;
         clientSideRequired = true,
         packetHandler = NetworkFactorization.class,
         channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel },
+        //I bet this isn't necessary now.
         clientPacketHandlerSpec = @SidedPacketHandler(
                 packetHandler = NetworkFactorization.class,
                 channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel }
@@ -66,7 +67,7 @@ import factorization.api.Coord;
                 channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel }
         ))
 public class Core {
-    public static final String version = "0.5.0";
+    public static final String version = "0.5.1";
     // runtime storage
     @Instance
     public static Core instance;
@@ -176,7 +177,7 @@ public class Core {
         }
         entity_relight_task_id = config.getOrCreateIntProperty("entityRelightTask", "general", -1).getInt();
         if (entity_relight_task_id == -1) {
-            entity_relight_task_id = ModLoader.getUniqueEntityId(); //TODO - 0? Wtf?
+            entity_relight_task_id = ModLoader.getUniqueEntityId();
             Property prop = config.getOrCreateIntProperty("entityRelightTask", "general", entity_relight_task_id);
             prop.value = "" + entity_relight_task_id;
             prop.comment = "This is a Java Regex to blacklist access to TE";

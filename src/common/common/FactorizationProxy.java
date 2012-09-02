@@ -131,6 +131,9 @@ public abstract class FactorizationProxy implements IGuiHandler {
     //SERVER
     /** If on SMP, send packet to tell player what he's holding */
     public void updateHeldItem(EntityPlayer player) {
+        if (!player.worldObj.isRemote) {
+            ((EntityPlayerMP) player).sendInventoryToPlayer();
+        }
     }
 
     public void updatePlayerInventory(EntityPlayer player) {

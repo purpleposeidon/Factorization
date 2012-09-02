@@ -15,7 +15,8 @@ pushd reobf/minecraft  > /dev/zero
   cp -R ../../factorization/texture/ factorization/texture/
   cp ../../factorization/*.info ./
   rm -rf factorization/texture/ignore/
-  jar -cf ~/Dropbox/dev/Factorization-dev.jar *Factorization*.class *.info factorization/
+  jar -cf ~/Dropbox/dev/Factorization-dev.jar *.info factorization/
+  #jar -cf ~/Dropbox/dev/Factorization-dev.jar *Factorization*.class *.info factorization/
 popd > /dev/zero
 pushd ~/mc/
   ./install test

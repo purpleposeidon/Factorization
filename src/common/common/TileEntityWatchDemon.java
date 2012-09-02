@@ -21,7 +21,6 @@ import java.util.regex.Pattern;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.Entity;
-import net.minecraft.src.FactorizationHack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldProviderHell;

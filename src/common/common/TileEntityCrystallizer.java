@@ -8,7 +8,6 @@ import com.google.common.base.Preconditions;
 
 import factorization.common.NetworkFactorization.MessageType;
 
-import net.minecraft.src.FactorizationHack;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.Packet;

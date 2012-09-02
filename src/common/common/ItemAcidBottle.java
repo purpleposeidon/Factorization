@@ -5,7 +5,6 @@ import java.util.List;
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EnumAction;
-import net.minecraft.src.FactorizationHack;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.World;
 

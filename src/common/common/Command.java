@@ -53,9 +53,9 @@ public enum Command {
             return;
         }
         if (player.worldObj.isRemote) {
-            if (this == craftOpen && player.craftingInventory != null) {
-                ((EntityClientPlayerMP)player).closeScreen();
-            }
+//			if (this == craftOpen && player.craftingInventory != null) {
+//				((EntityClientPlayerMP)player).closeScreen();
+//			}
             Core.network.sendCommand(player, this, arg);
             if (!shareCommand) {
                 return;

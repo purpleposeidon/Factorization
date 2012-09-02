@@ -29,9 +29,6 @@ import net.minecraftforge.event.ForgeSubscribe;
 
 import org.lwjgl.input.Keyboard;
 
-import codechicken.nei.forge.GuiContainerManager;
-import codechicken.nei.forge.IContainerInputHandler;
-
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
