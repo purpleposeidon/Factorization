@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.src.Block;
 import net.minecraft.src.ContainerPlayer;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.GuiContainer;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
@@ -27,6 +28,9 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
 
 import org.lwjgl.input.Keyboard;
+
+import codechicken.nei.forge.GuiContainerManager;
+import codechicken.nei.forge.IContainerInputHandler;
 
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
@@ -492,6 +496,20 @@ public class FactorizationClientProxy extends FactorizationProxy {
         KeyBindingRegistry.registerKeyBinding(new MechaKeySet(mechas, new boolean[mechas.length]));
         MinecraftForge.EVENT_BUS.register(this);
     }
+    
+    @ForgeSubscribe
+    public void handledGuiKey(GuiKeyEvent event) {
+        if (bag_swap_key.keyCode == event.symbol) {
+            event.setCanceled(true);
+            Command.bagShuffle.call(getClientPlayer());
+        }
+        if (pocket_key.keyCode == event.symbol) {
+            event.setCanceled(true);
+            if (Core.registry.pocket_table.findPocket(getClientPlayer()) != null) {
+                Command.craftOpen.call(getClientPlayer());
+            }
+        }
+    }
 
     private void setTileEntityRenderer(Class clazz, TileEntitySpecialRenderer r) {
         ClientRegistry.bindTileEntitySpecialRenderer(clazz, r);
@@ -528,20 +546,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderCrystallizer();
 
         MinecraftForgeClient.registerItemRenderer(Core.registry.battery.shiftedIndex, new BatteryItemRender(renderBattery));
-    }
-
-    @ForgeSubscribe
-    public void handledGuiKey(GuiKeyEvent event) {
-        if (bag_swap_key.keyCode == event.symbol) {
-            event.setCanceled(true);
-            Command.bagShuffle.call(getClientPlayer());
-        }
-        if (pocket_key.keyCode == event.symbol) {
-            event.setCanceled(true);
-            if (Core.registry.pocket_table.findPocket(getClientPlayer()) != null) {
-                Command.craftOpen.call(getClientPlayer());
-            }
-        }
     }
 
 }

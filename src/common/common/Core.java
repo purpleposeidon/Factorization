@@ -176,7 +176,7 @@ public class Core {
         }
         entity_relight_task_id = config.getOrCreateIntProperty("entityRelightTask", "general", -1).getInt();
         if (entity_relight_task_id == -1) {
-            entity_relight_task_id = ModLoader.getUniqueEntityId();
+            entity_relight_task_id = ModLoader.getUniqueEntityId(); //TODO - 0? Wtf?
             Property prop = config.getOrCreateIntProperty("entityRelightTask", "general", entity_relight_task_id);
             prop.value = "" + entity_relight_task_id;
             prop.comment = "This is a Java Regex to blacklist access to TE";

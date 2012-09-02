@@ -5,6 +5,7 @@ square saw
 Some electricity related mecha-upgrades?
 
 [High-priority Bugs]
+move stuff on top of the motor in recipes
 check breaking on all new machines
 redstone signal on craftpacket maker/stamper
 solar turbines need to check if it's raining. It's okay if you're in a desert tho.
