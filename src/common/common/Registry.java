@@ -92,6 +92,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     WorldGenMinable silverGen;
 
     void makeBlocks() {
+        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+            //Theoretically, not necessary. I bet BUKKIT would flip its shit tho.
+            factory_rendering_block = new BlockFactorization(Core.factory_block_id);
+            Block.blocksList[Core.factory_block_id] = null;
+        }
         factory_block = new BlockFactorization(Core.factory_block_id);
         lightair_block = new BlockLightAir(Core.lightair_id);
         resource_block = new BlockResource(Core.resource_id);
@@ -105,18 +110,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         GameRegistry.registerWorldGenerator(this);
 
         factory_block.setCreativeTab(CreativeTabs.tabRedstone);
-    }
-
-    void makeRenderHelperBlock() {
-        // It no longer matters when this is called. In fact, it doesn't even matter if factory_block_id's been changed.
-        Block orig_block = Block.blocksList[Core.factory_block_id];
-        if (orig_block != factory_block) {
-            System.err.println("You changed a Factorization block. Why did you do that?");
-            System.err.println("If " + orig_block + " becomes weird, this is why.");
-        }
-        Block.blocksList[Core.factory_block_id] = null;
-        factory_rendering_block = new BlockFactorization(Core.factory_block_id);
-        Block.blocksList[Core.factory_block_id] = orig_block;
     }
 
     void registerSimpleTileEntities() {
@@ -675,12 +668,12 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'S', diamond_shard,
                 'I', Item.ingotIron);
         recipe(grinder_item,
+                "I*I",
                 "IMI",
-                "IHI",
                 "LDL",
                 'I', Item.ingotIron,
+                '*', diamond_cutting_head,
                 'M', motor,
-                'H', diamond_cutting_head,
                 'L', lead_ingot,
                 'D', dark_iron);
         TileEntityGrinder.addRecipe(new ItemStack(Block.stone), new ItemStack(Block.cobblestone), 1);
@@ -689,13 +682,13 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         TileEntityGrinder.addRecipe(new ItemStack(Block.grass), new ItemStack(Block.dirt), 1);
         TileEntityGrinder.addRecipe(new ItemStack(Block.mycelium), new ItemStack(Block.dirt), 1);
         recipe(mixer_item,
-                " M ",
-                "WXW",
+                " X ",
+                "WMW",
                 "LUL",
-                'L', lead_ingot,
-                'M', motor,
-                'W', Item.bucketWater,
                 'X', fan,
+                'W', Item.bucketWater,
+                'M', motor,
+                'L', lead_ingot,
                 'U', Item.cauldron);
         TileEntityMixer.addRecipe(
                 new ItemStack[] { new ItemStack(sludge, 1), new ItemStack(Block.dirt), new ItemStack(Item.bucketWater) },
@@ -704,8 +697,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //				new ItemStack[] { new ItemStack(Item.slimeBall), new ItemStack(Item.bucketMilk), new ItemStack(Block.leaves) },
         //				new ItemStack[] { new ItemStack(Item.slimeBall, 2), new ItemStack(Item.bucketEmpty) });
         recipe(crystallizer_item,
-                "-S-",
-                "WUW",
+                "-",
+                "S",
+                "U",
                 '-', Item.stick,
                 'S', Item.silk,
                 'W', Block.planks,
@@ -836,6 +830,21 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public void makeOther() {
         silverGen = new WorldGenMinable(resource_block.blockID, 35);
     }
+    
+    @Override
+    public void generate(Random rand, int chunkX, int chunkZ, World world,
+            IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
+        if (!Core.gen_silver_ore) {
+            return;
+        }
+        if ((chunkZ + 3*chunkX) % 5 != 0) {
+            return;
+        }
+        int x = chunkX*16 + rand.nextInt(16);
+        int z = chunkZ*16 + rand.nextInt(16);
+        int y = 5 + rand.nextInt(48);
+        silverGen.generate(world, rand, x, y, z);
+    }
 
     public void onTickPlayer(EntityPlayer player) {
         MechaArmor.onTickPlayer(player); //mecha-armor needs to tick on both sides
@@ -916,21 +925,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         Core.proxy.pokePocketCrafting();
         tiny_demon.bitePlayer(is, player, true);
         return true;
-    }
-
-    @Override
-    public void generate(Random rand, int chunkX, int chunkZ, World world,
-            IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
-        if (!Core.gen_silver_ore) {
-            return;
-        }
-        if ((chunkZ + 3*chunkX) % 5 != 0) {
-            return;
-        }
-        int x = chunkX*16 + rand.nextInt(16);
-        int z = chunkZ*16 + rand.nextInt(16);
-        int y = 5 + rand.nextInt(48);
-        silverGen.generate(world, rand, x, y, z);
     }
 
     private int demon_spawn_delay = 0;

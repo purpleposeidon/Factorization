@@ -217,7 +217,6 @@ public class Core {
     public void modsLoaded(FMLPostInitializationEvent event) {
         TileEntityWrathFire.setupBurning();
         registry.addDictOres();
-        registry.makeRenderHelperBlock();
     }
 
     ItemStack getExternalItem(String className, String classField, String description) {

@@ -9,10 +9,14 @@
   A few bug fixes for the Router GUI, and the auto-ejector.
   Slots.
   Nerfed wrathforge. It's no longer refuelable, and will last for 36 blocks
+  Silver ore nodes are now evenly distributed in every 5 chunks
 
   More Electricity:
     The battery block is made using acid & lead. When crafted, it will be fully charged. They do not stack. Battery blocks keep their charge when broken. They are used to craft magnets, which are used in motors. A battery block can't charge another battery block.
     The Grinder is the first step of the ore processing chain. A second use for diamond shards!
+    Also there is the Mixer, which is used for water-based recipes
+    Crystallizer; its recipes require 1 material, and a fluid to suspend them in. The fluid is not used up. It needs to be heated to get started. It takes 20 minutes to complete a recipe.
+
 
 0.4.0 -- Secretly Updated!
   Electricity:
