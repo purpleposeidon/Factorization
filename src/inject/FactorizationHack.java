@@ -1,32 +1,65 @@
-package net.minecraft.src;
+package factorization.common;
 
 import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-/**
- * This class is for getting around retarded java package shit.
- */
+import net.minecraft.src.DamageSource;
+import net.minecraft.src.EntityLiving;
+import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.IChunkProvider;
+import net.minecraft.src.ItemStack;
+import net.minecraft.src.NBTBase;
+import net.minecraft.src.NBTTagCompound;
+import net.minecraft.src.World;
+
+
 public class FactorizationHack {
+    //TODO: All this can be moved elsewhere
+    
+    static public DamageSource imp_bite = new ImpDamage("impbite");
+    static public DamageSource acidBurn = new AcidDamage("acidburn");
+    
+    static class ImpDamage extends DamageSource {
+        protected ImpDamage(String par1Str) {
+            super(par1Str);
+            setDamageBypassesArmor();
+        }
+        
+        @Override
+        public String getDeathMessage(EntityPlayer player) {
+            return player.getEntityName() + " was bit by a demon";
+            // TODO translates...
+            //return super.getDeathMessage(player);
+        }
+        
+    }
+    
+    static class AcidDamage extends DamageSource {
 
-    static public DamageSource imp_bite = new DamageSource("imp bite").setDamageBypassesArmor();
-    static public DamageSource acidBurn = new DamageSource("acid burn").setDamageBypassesArmor();
-
-    static public IChunkProvider getChunkProvider(World world) {
-        return world.chunkProvider;
+        protected AcidDamage(String par1Str) {
+            super(par1Str);
+            setDamageBypassesArmor();
+        }
+        
+        @Override
+        public String getDeathMessage(EntityPlayer player) {
+            return player.getEntityName() + " drank acid";
+            // TODO translation
+            // return super.getDeathMessage(par1EntityPlayer);
+        }
+        
     }
 
     static public void damageEntity(EntityLiving ent, DamageSource source, int i) {
-        ent.damageEntity(source, i);
+        ent.attackEntityFrom(source, i);
     }
 
     static public ItemStack loadItemStackFromDataInput(DataInput input) throws IOException {
-        NBTTagCompound tag = new NBTTagCompound();
-        tag.load(input);
-        return ItemStack.loadItemStackFromNBT(tag);
+        return ItemStack.loadItemStackFromNBT((NBTTagCompound) NBTBase.readNamedTag(input));
     }
 
     static public void tagWrite(NBTTagCompound tag, DataOutputStream output) throws IOException {
-        tag.write(output);
+        tag.writeNamedTag(tag, output);
     }
 }
