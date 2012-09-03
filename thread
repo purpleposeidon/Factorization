@@ -1,10 +1,8 @@
 [u][b][size=6][anchor=ABOUT]Factorization[/anchor][/size][/b][/u]
-This mod adds a some cool tools & machines. I am hoping to make a good playmate for [url="http://www.minecraftforum.net/topic/365357-"]RedPower[/url]. 
+This mod adds many machines for processing ore and crafting. It also has a few other useful things. The latest update brings electric Charge.
 
-[url="http://www.minecraftforum.net/topic/1351802-factorization/#entry16536762"]Laslon[/url] has made a mod spotlight!
+[url="http://www.minecraftforum.net/topic/1351802-factorization/#entry16536762"]Laslon[/url] has made a mod spotlight! (For 0.3.2)
 [youtube]http://www.youtube.com/watch?v=UlSohYZ3S40[/youtube]
-
-And I have spent a bit of time adding more information to this documentation below.
 
 [u][b][size=4][anchor=START]First Tools & Machines[/anchor][/size][/b][/u]
 [spoiler]
@@ -14,11 +12,11 @@ Did somebody order a 3x3 crafting grid to go? Craft directly from your inventory
 
 
 [u]The Almighty [b]Barrel[/b][/u]
-Based on quantum-stockpiling technology discovered in the recently abandoned Dwarven Fortress of [i]Nod Semor[/i], the barrel can store over one thousand stacks of a single item type. Never fill a chest with cobblestone again!
+Based on quantum-stockpiling technology discovered in the recently abandoned Dwarven Fortress of [i]Nod Semor[/i], the barrel can store 64 stacks of a single item type. Never fill a chest with cobblestone again!
 [img]http://i.imgur.com/pGWkx.png[/img]
 Right click a barrel with an item to drop it in; left-click to remove. Double-right clicking will dump all of the matching items in your inventory into a barrel, and shift-left click will pull out a single item.
 [img]http://i.imgur.com/6c7Q7.png[/img]
-Be warned that the contents of rather full barrels are under such high pressure as to be fused together: they will explode if the barrel is broken, and stacks will be lost. Two of the barrels in that picture would explode if not first emptied.
+Is 64 stacks not nearly enough for your cobblegen? There's an upgrade for that...
 
 
 [u]The [b]Crafting Machines[/b][/u]
@@ -80,12 +78,12 @@ You'll need to place a good number of them around the solar turbine. The turbine
 This is nearly the maximum amount of mirrors you can use:
 [img]http://i.imgur.com/Hek4d.png[/img]
 
-Back to wires:
+Back to [b]wires[/b]:
 [img]http://i.imgur.com/ZPB1b.png[/img]
 Wires can be run up walls, but must be supported by a solid block. You'll also need to place a bit of wire to go over corners. You can place a wire on top of another wire to do this. If you don't like the way a wire looks, you can try replacing it while holding shift.
 [img]http://i.imgur.com/2w7qx.png[/img]
 
-You can measure the charge in wires (and in other things) using the Charge Meter:
+You can measure the charge in wires (and in other things) using the [b]Charge Meter[/b]:
 [img]http://i.imgur.com/4ylHf.png[/img]
 This will measure the charge in the block you clicked on, and give you the average charge in the adjacent conductors. It may also give other info.
 
@@ -106,7 +104,7 @@ The [b]crystallizer[/b] must be heated up with a heater, but it only for a brief
 
 
 [b]Ore processing[/b] allows you to get extra ingot yields from your ores, ranging from 120% (using merely a slag furnace) to 300% (using several steps, ending with crystalline metal). This steps work with Iron, Gold, Lead (the primary metal in [url="http://en.wikipedia.org/wiki/Galena"]Silver Ore[/url]), and also Copper and Tin.
-[size=1]This got formatted badly. MCF needs to lern2table. Someone who isn't me is quite free to fix it.[/size]
+[size=1]This got formatted badly. MCF needs to lern2table. Someone who isn't me can fix it.[/size]
 
 
 [code]
@@ -153,7 +151,7 @@ Burning an iron block with Wrath Fire will leave behind a Dark Iron block. This 
 [img]http://i.imgur.com/1z6J2.png[/img]
 These tiny demons are secretive creatures that can be found only in the nether, though they usually stay out of sight. Their favorite activities are eating netherwort, and biting you with their poisonous fangs. If they find a chest containing plenty of netherwort, they are sure to sneak in and become trapped inside. Be careful with them, as they will attempt to kill you when you handle them. You can get slightly more control over them by tying them up with a bit of string on a crafting table.
 
-A chest must have at least 24 netherwort to attract your first demon. If you are paying attention, you can remove it before it eats all your netherwort. No more than 1 demon will enter a chest per minute. Demons won't enter a chest if it has things other than netherwart and demons. Be aware that they will accumulate and eat up all the netherwort if they aren't tended to.
+A chest must have at least 24 netherwort to attract your first demon. If you are paying attention, you can remove it before it eats all your netherwart. No more than 1 demon will enter a chest per minute. Demons won't enter a chest if it has things other than netherwart and demons. Be aware that they will accumulate and eat up all the netherwort if they aren't tended to.
 
 
 [img]http://i.imgur.com/LpZAu.png[/img]
@@ -186,6 +184,11 @@ This upgrade will make the router wait at a machine until it is completely full 
 [img]http://i.imgur.com/kbDLI.png[/img]
 This will cause the router to move entire stacks at a time instead of single items.
 
+[u]Ejector[/u]
+[img]http://i.imgur.com/qmkL3.png[/img]
+This upgrade will send received items into an adjacent inventory. It will need to be combined with a machine filter to prevent infinite item cycling.
+
+
 [u]The [b]Wrath Lamp[/b][/u]
 This lamp will light up a huge area!
 [img]http://i.imgur.com/2sYLG.png[/img]
@@ -206,7 +209,7 @@ Specifically, you'll want to place the bag such that the number of inventory col
 
 [u][b][size=4][anchor=MECHA]Mecha-Armor[/anchor][/size][/b][/u]
 [spoiler]
-Mecha-Armor isn't quite ready yet. It is waiting on a material that does not yet exist.
+Mecha-Armor isn't ready yet!
 
 [u]The [b]Mecha-Chasis[/b][/u]
 The Mecha-Chasis is a slightly expensive armor crafting component made by boxing a gold nugget inside 8 iron.
@@ -243,29 +246,29 @@ Push blocks everywhere! Be the Enderman! This will push a block that's in front 
 
 [u]Other Stuff/Future Plans[/u]
 [spoiler]
+NEI Integration
 More Mecha-Armor upgrades
 Ceramics
 ? ? ?
-
 [/spoiler]
 
 
 
 [u][b][size=6][anchor=INSTALL]Installation[/anchor][/size][/b][/u]
-This is a [url="http://lexmanos.no-ip.org:8080/job/Forge/Recommended/"]Minecraft Forge[/url] mod. It uses 3 block IDs, and a bunch of item IDs.
+This is a [url="http://jenkins.minecraftforge.net:7070/job/forge/forge-recommended/"]Minecraft Forge[/url] mod. It uses 3 block IDs, and a bunch of item IDs.
 
-1. Install [url="http://lexmanos.no-ip.org:8080/job/Forge/Recommended/"]Minecraft Forge[/url] by extracting the contents of the forge download into the Minecraft jar. Be sure to delete the META-INF/ folder ([u]unless you are installing a server![/u]). If you already have a version of forge that's as old as or newer than ???, it should work fine.
-2. Check that the forge install worked by running the client (or the server). Forge information should be on the title screen (or in the server's logs).
-3. Put Factorization.jar into the mods folder. Restart Minecraft.
-4. This instruction list is too short!
-5. There. That's better.
+1. Install [url="http://jenkins.minecraftforge.net:7070/job/forge/forge-recommended/"]Minecraft Forge[/url] by extracting the contents of the forge download into the Minecraft jar. Be sure to delete the META-INF/ folder ([u]unless you are installing a server![/u]). If you already have a version of forge that's as old as or newer than Build #241, it should work fine.
+2. Check that the forge install worked by running the client (or the server). Forge information should be on the title screen (or in the server's logs). Exit minecraft.
+3. Put Factorization.jar into the mods folder.
+4. Optional: Install [url="http://www.minecraftforum.net/topic/909223-125132-smp-chickenbones-mods/"]NEI[/url] by placing CodeChickenCore and NotEnoughItems into the [b][u]core[/u][/b]mods folder.
+
 
 
 [u][b][size=6][anchor=DOWNLOAD]Download[/anchor][/size][/b][/u]
-0.5.? (MC 1.3.2)
 Note that all proper Forge mods (such as this one) now use the same mod files for both server and client.
 
-I recommend you also install [url="http://www.minecraftforum.net/topic/365357-"]RedPower[/url] and [url="http://www.minecraftforum.net/topic/909223-"]NEI[/url].
+0.5.1 (MC 1.3.2) [url="http://www.mediafire.com/?tzi7e36pxrx6ck8"]adfly + MediaFire[/url], or [url="http://adf.ly/CVThQ"]adfly + DropBox[/url]
+
 
 Old versions
 [spoiler]
