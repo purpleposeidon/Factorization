@@ -104,9 +104,8 @@ The [b]crystallizer[/b] must be heated up with a heater, but it only for a brief
 
 
 [b]Ore processing[/b] allows you to get extra ingot yields from your ores, ranging from 120% (using merely a slag furnace) to 300% (using several steps, ending with crystalline metal). This steps work with Iron, Gold, Lead (the primary metal in [url="http://en.wikipedia.org/wiki/Galena"]Silver Ore[/url]), and also Copper and Tin.
+
 [size=1]This got formatted badly. MCF needs to lern2table. Someone who isn't me can fix it.[/size]
-
-
 [code]
 Ore                   The block you know and love.
                       Smelt: 100%   Slag: 120%[/code]
@@ -165,11 +164,11 @@ The Router is a block that creates an item delivery network out of blobs of mach
 The Item Router has a number of upgrades that can be applied to it by shift-right-clicking the router with the item in hand. This will add a "--" button in the GUI, which you can press to look at each upgrade. To remove an upgrade, press Delete while hovering the mouse over the button.
 
 [u]Item Filter[/u]
-[img]http://i.imgur.com/vQd06.png[/img]
+[img]http://i.imgur.com/ThSLU.png[/img]
 This lets you choose what items to extract from machines. This upgrade does nothing in insertion mode.
 
 [u]Machine Filter[/u]
-[img]http://i.imgur.com/KrhbR.png[/img]
+[img]http://i.imgur.com/pmFMx.png[/img]
 This lets you choose what machines to access. In the default mode, "visit all", machines that don't match will just be skipped over. In "visit near" mode, the router will not pass through non-matching machines. For example, if it's set to match only chests, a network setup like "router chest furnace chest" will only access the first chest. It will not even look past the furnace. In "visit all" mode, it will visit both chests, but otherwise ignore the furnace.
 
 [u]Speed Boost[/u]
@@ -267,7 +266,7 @@ This is a [url="http://jenkins.minecraftforge.net:7070/job/forge/forge-recommend
 [u][b][size=6][anchor=DOWNLOAD]Download[/anchor][/size][/b][/u]
 Note that all proper Forge mods (such as this one) now use the same mod files for both server and client.
 
-0.5.1 (MC 1.3.2) [url="http://www.mediafire.com/?tzi7e36pxrx6ck8"]adfly + MediaFire[/url], or [url="http://adf.ly/CVThQ"]adfly + DropBox[/url]
+0.5.1 (MC 1.3.2) [url="http://adf.ly/CVU5f"]adfly + MediaFire[/url], or [url="http://adf.ly/CVThQ"]adfly + DropBox[/url]
 
 
 Old versions

@@ -1,7 +1,7 @@
 0.5.0 -- Electrically Charged!
   Ported to Minecraft 1.3!
   Due to concurrency & laziness issues, the client will dynamically pick an additional block ID if possible. The block will be used only for rendering. I don't anticipate it causing problems with other mods. If you've somehow managed to use up all 4096 or so other block IDs, the real Factorization block will be used instead; this would cause occasional rendering glitches when using the integrated server.
-  The pocket crafting table & bag of holding now respond to key presses only if they are not otherwise handled. BWAH-HA-HA-HA-HA! [i]Ahem.[/i] I'm [b]quite positively certain[/b] that this feature would [b]never[/b] go away due to Forge sucking, and that there will be. No. Problems. At. All.
+  The pocket crafting table & bag of holding now respond to key presses only if they are not otherwise handled. BWAH-HA-HA-HA-HA!
   The barrel renders blocks much nicer now.
   Wrath lamp recipe is now 4 dark iron & 2 silver.
   Removed sentry demons chunk-loaders due to lack of confidence in their correctness. And also laziness. Use ChickenBone's chunkloaders instead. They may return with a change in job description.
