@@ -370,11 +370,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 " B",
                 'D', diamond_shard,
                 'B', Block.netherBrick);
-        recipe(new ItemStack(wrath_igniter),
-                "D ",
-                " B",
-                'D', Item.diamond,
-                'B', Block.netherBrick);
+        //recipe(new ItemStack(wrath_igniter), // ah hell naw
+        //		"D ",
+        //		" B",
+        //		'D', Item.diamond,
+        //		'B', Block.netherBrick);
 
         //Resources
         recipe(new ItemStack(lead_ingot, 9), "#", '#', lead_block_item);
@@ -529,7 +529,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "W W",
                 "WWW",
                 'W', Block.wood,
-                '-', new ItemStack(Block.stoneSingleSlab, 1, 2));
+                '-', new ItemStack(Block.woodSingleSlab, 1, -1));
 
         // Craft maker
         recipe(maker_item,
