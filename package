@@ -7,7 +7,7 @@ set -e
 cd ../
 
 pushd ~/mc > /dev/zero
-  ./install dev
+  ./install modded-1.3
 popd > /dev/zero
 
 echo Packaging client

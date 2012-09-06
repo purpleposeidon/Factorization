@@ -67,7 +67,7 @@ import factorization.api.Coord;
                 channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel }
         ))
 public class Core {
-    public static final String version = "0.5.1";
+    public static final String version = "0.5.2";
     // runtime storage
     @Instance
     public static Core instance;

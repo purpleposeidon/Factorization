@@ -518,6 +518,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             setTileEntityRenderer(TileEntityBarrel.class, new TileEntityBarrelRenderer(Core.render_barrel_item, Core.render_barrel_text));
         }
         setTileEntityRenderer(TileEntityWatchDemon.class, new TileEntityWatchDemonRenderer());
+        // This is entirely Azanor's fault.
         setTileEntityRenderer(TileEntitySolarTurbine.class, new TileEntitySolarTurbineRender());
         setTileEntityRenderer(TileEntityHeater.class, new TileEntityHeaterRenderer());
         setTileEntityRenderer(TileEntityMirror.class, new TileEntityMirrorRenderer());

@@ -289,10 +289,11 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
 
         //if (host.id == Block.netherBrick.blockID) {
         if (netherBrick.equals(host) || netherStair.equals(host) || netherFence.equals(host)) {
+            //wrath forge
             int furnace_size = 13;
             //try to live forever
             int src_count = 0;
-            for (Coord c : here.getRandomNeighborsDiagonal()) {
+            for (Coord c : here.getNeighborsDiagonal()) {
                 if (netherBrick.matches(c) || netherStair.matches(c) || netherFence.matches(c)) {
                     src_count += 1;
                 }
@@ -307,7 +308,6 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
             }
             //burn neighbors
             ArrayList<Coord> n = here.getRandomNeighborsAdjacent();
-            n.addAll(here.getRandomNeighborsDiagonal());
             for (Coord c : n) {
                 if (c.is(Block.netherBrick)) {
                     continue;
