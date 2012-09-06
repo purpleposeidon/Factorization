@@ -10,12 +10,13 @@ import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntityFurnace;
 import factorization.api.Charge;
+import factorization.api.ChargeSink;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityHeater extends TileEntityCommon implements IChargeConductor {
-    Charge charge = new Charge();
+    ChargeSink chargeSink = new ChargeSink();
     public byte heat = 0;
     public static final byte maxHeat = 32;
 
@@ -31,7 +32,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
 
     @Override
     public Charge getCharge() {
-        return charge;
+        return chargeSink.getCharge();
     }
 
     @Override
@@ -42,17 +43,17 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
-        charge.writeToNBT(tag, "charge");
+        chargeSink.writeToNBT(tag);
         tag.setByte("heat", heat);
     }
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
-        charge.readFromNBT(tag, "charge");
+        chargeSink.readFromNBT(tag);
         heat = tag.getByte("heat");
     }
-
+    
     int charge2heat(int i) {
         return (int) (i / 1.5);
     }
@@ -96,20 +97,19 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
         }
         updateClient();
         Coord here = getCoord();
-        int delta = Math.min(maxHeat - heat, charge.getValue());
         long now = worldObj.getWorldTime() + here.seed();
-        if (charge2heat(delta) > 0) {
-            if (now % 4 == 0 || heat == 0) {
+        if (now % 4 == 0) {
+            int delta = chargeSink.takeCharge(maxHeat - heat, 2);
+            if (delta > 0) {
                 heat += charge2heat(delta);
-                charge.addValue(-delta);
+            } else if (now % 200 == 0) {
+                //lose some heat if we're not being powered
+                int toLose = Math.max(1, heat / 8);
+                heat -= toLose;
+                heat = (byte) Math.max(0, heat);
             }
-        } else if (now % 200 == 0) {
-            //lose some heat if we're not being powered
-            int toLose = Math.max(1, heat / 8);
-            heat -= toLose;
-            heat = (byte) Math.max(0, heat);
         }
-        charge.update(this);
+        chargeSink.update(this);
 
         if (heat <= 0) {
             return;
