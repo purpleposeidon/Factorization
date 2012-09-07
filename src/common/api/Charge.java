@@ -12,6 +12,7 @@ import net.minecraft.src.World;
 import net.minecraftforge.common.ForgeDirection;
 import static net.minecraftforge.common.ForgeDirection.*;
 import factorization.common.Core;
+import factorization.common.TileEntityHeater;
 
 public class Charge {
     private int charge = 0;
@@ -61,10 +62,12 @@ public class Charge {
         int a = this.charge, b = other.charge;
         this.setValue(b);
         other.setValue(a);
+        ForgeDirection c = this.motion, d = other.motion;
+        this.motion = d;
+        other.motion = c;
     }
 
     //These are some functions for users to make good & healthy use of
-    static List<Coord> toMark = Collections.synchronizedList(new ArrayList<Coord>()); //XXX TODO: oh my god, pull this out before release
     
     static ArrayList<ForgeDirection> realDirections = new ArrayList();
     static {
@@ -81,29 +84,13 @@ public class Charge {
      *            A conductive TileEntity
      */
     public static void update(IChargeConductor te) {
-        Coord here = te.getCoord();
-        if (here.remote()) {
-            //XXX TODO: oh my god, pull this out before release
-            World w = te.getCoord().w;
-            if (w.getWorldTime() % 40 != 0) {
-                toMark.clear();
-                return;
-            }
-            while (toMark.size() > 0) {
-                Coord tm = toMark.remove(0);
-                tm.setWorld(w);
-                tm.mark();
-            }
-            return;
-        }
-
         Charge me = te.getCharge();
         //me.charge = 0;
         if (me.charge <= 0) {
             me.motion = UNKNOWN;
             return;
         }
-        toMark.add(te.getCoord());
+        Coord here = te.getCoord();
         if (me.motion == UNKNOWN) {
             me.pickDirection(here, UNKNOWN);
             if (me.motion == UNKNOWN) {
@@ -119,19 +106,11 @@ public class Charge {
             }
             moveTo = here.add(me.motion).getTE(IChargeConductor.class);
             if (moveTo == null) {
-                return; //never gonna happen
+                return; //this'll never happen
             }
         }
         
-        Charge toDisplace = moveTo.getCharge();
-        if (toDisplace.charge != 0) {
-            return;
-        }
-        
-        toDisplace.charge = me.charge;
-        toDisplace.motion = me.motion;
-        me.charge = 0;
-        me.motion = UNKNOWN;
+        me.swapWith(moveTo.getCharge());
     }
     
     void pickDirection(Coord here, ForgeDirection avoid) {
