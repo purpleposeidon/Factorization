@@ -8,12 +8,13 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Charge;
+import factorization.api.ChargeSink;
 import factorization.api.IChargeConductor;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityGrinder extends TileEntityFactorization implements IChargeConductor {
     ItemStack input, output;
-    Charge charge = new Charge();
+    ChargeSink chargeSink = new ChargeSink();
     int progress = 0;
     int energy = 0;
     int speed = 0;
@@ -49,7 +50,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
         readSlotsFromNBT(tag);
-        charge.readFromNBT(tag, "charge");
+        chargeSink.readFromNBT(tag);
         progress = tag.getInteger("progress");
         energy = tag.getInteger("energy");
         speed = tag.getInteger("speed");
@@ -59,7 +60,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
         writeSlotsToNBT(tag);
-        charge.writeToNBT(tag, "charge");
+        chargeSink.writeToNBT(tag);
         tag.setInteger("progress", progress);
         tag.setInteger("energy", energy);
         tag.setInteger("speed", speed);
@@ -85,7 +86,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
 
     @Override
     public Charge getCharge() {
-        return charge;
+        return chargeSink.getCharge();
     }
 
     @Override
@@ -141,12 +142,9 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         needLogic();
         Charge.update(this);
         if (worldObj.getWorldTime() % 3 == 0) {
-            int val = getCharge().getValue();
-            if (val > 16 && energy < 30) {
-                int to_take = Math.min(30, val);
-                val -= to_take;
+            if (energy < 30) {
+                int to_take = chargeSink.takeCharge(30);
                 energy += to_take / 5;
-                getCharge().setValue(val);
             }
         }
         if (energy <= 0) {
