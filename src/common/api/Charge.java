@@ -16,7 +16,7 @@ import factorization.common.TileEntityHeater;
 
 public class Charge {
     private int charge = 0;
-    private ForgeDirection motion = UNKNOWN;
+    private ForgeDirection last_motion = DOWN;
 
     public int getValue() {
         return charge;
@@ -46,15 +46,15 @@ public class Charge {
 
     public void writeToNBT(NBTTagCompound tag, String name) {
         tag.setInteger(name, charge);
-        tag.setInteger(name + "_motion", motion.ordinal());
+        tag.setInteger(name + "_dir", last_motion.ordinal());
     }
 
     public void readFromNBT(NBTTagCompound tag, String name) {
         setValue(tag.getInteger(name));
-        if (tag.hasKey(name + "_motion")) {
-            motion = ForgeDirection.values()[tag.getInteger(name + "_motion")];
+        if (tag.hasKey(name + "_dir")) {
+            last_motion = ForgeDirection.values()[tag.getInteger(name + "_dir")];
         } else {
-            motion = UNKNOWN;
+            last_motion = DOWN;
         }
     }
 
@@ -62,9 +62,6 @@ public class Charge {
         int a = this.charge, b = other.charge;
         this.setValue(b);
         other.setValue(a);
-        ForgeDirection c = this.motion, d = other.motion;
-        this.motion = d;
-        other.motion = c;
     }
 
     //These are some functions for users to make good & healthy use of
@@ -87,54 +84,48 @@ public class Charge {
         Charge me = te.getCharge();
         //me.charge = 0;
         if (me.charge <= 0) {
-            me.motion = UNKNOWN;
             return;
         }
         Coord here = te.getCoord();
-        if (me.motion == UNKNOWN) {
-            me.pickDirection(here, UNKNOWN);
-            if (me.motion == UNKNOWN) {
-                return;
-            }
-        }
-        
-        IChargeConductor moveTo = here.add(me.motion).getTE(IChargeConductor.class);
-        if (moveTo == null) {
-            me.pickDirection(here, me.motion.getOpposite());
-            if (me.motion == UNKNOWN) {
-                return;
-            }
-            moveTo = here.add(me.motion).getTE(IChargeConductor.class);
-            if (moveTo == null) {
-                return; //this'll never happen
-            }
-        }
-        
-        me.swapWith(moveTo.getCharge());
-    }
-    
-    void pickDirection(Coord here, ForgeDirection avoid) {
-        Collections.shuffle(realDirections);
-        for (ForgeDirection direction : realDirections) {
-            if (direction == avoid) {
+        ForgeDirection opposite = me.last_motion.getOpposite();
+        for (int i = me.last_motion.ordinal() + 1; i < UNKNOWN.ordinal(); i++) {
+            ForgeDirection dir = ForgeDirection.values()[i];
+            if (dir == opposite) {
                 continue;
             }
-            IChargeConductor conductor = here.add(direction).getTE(IChargeConductor.class);
-            if (conductor != null) {
-                motion = direction;
+            if (me.tryPush(here, dir)) {
+                me.last_motion = dir;
                 return;
             }
         }
-        if (avoid == UNKNOWN) {
-            motion = UNKNOWN;
-            return;
+        for (int i = 0; i <= me.last_motion.ordinal(); i++) {
+            ForgeDirection dir = ForgeDirection.values()[i];
+            if (dir == opposite) {
+                continue;
+            }
+            if (me.tryPush(here, dir)) {
+                me.last_motion = dir;
+                return;
+            }
         }
-        
-        IChargeConductor conductor = here.add(avoid).getTE(IChargeConductor.class);
-        if (conductor != null) {
-            motion = avoid;
-            return;
+        if (me.tryPush(here, opposite)) {
+            me.last_motion = opposite;
         }
+    }
+    
+    boolean tryPush(Coord here, ForgeDirection d) {
+        IChargeConductor con = here.add(d).getTE(IChargeConductor.class);
+        if (con == null) {
+            return false;
+        }
+        Charge neighborCharge = con.getCharge();
+        if (neighborCharge.charge != 0) {
+            return false;
+        }
+        neighborCharge.charge = charge;
+        neighborCharge.last_motion = d;
+        charge = 0;
+        return true;
     }
     
     private static ArrayList<IChargeConductor> frontier = new ArrayList(5 * 5 * 4);
@@ -185,7 +176,7 @@ public class Charge {
         ret.totalCharge = totalCharge;
         ret.conductorCount = visited.size();
         ret.maxCharge = maxCharge;
-        ret.motion = start.getCharge().motion;
+        ret.motion = start.getCharge().last_motion;
         return ret;
     }
 

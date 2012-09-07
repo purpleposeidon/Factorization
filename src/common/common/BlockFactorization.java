@@ -29,7 +29,7 @@ public class BlockFactorization extends BlockContainer {
         setHardness(2.0F);
         setResistance(5);
         setLightOpacity(1);
-        canBlockGrass[id] = false;
+        canBlockGrass[id] = true;
         //setBlockBounds(0, -1000, 0, 0, -999, 0);
     }
 
@@ -442,5 +442,4 @@ public class BlockFactorization extends BlockContainer {
     public boolean isAirBlock(World world, int x, int y, int z) {
         return false;
     }
-
 }
