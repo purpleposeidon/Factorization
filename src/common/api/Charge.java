@@ -6,8 +6,6 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 
-import org.omg.CORBA.UNKNOWN;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.World;
