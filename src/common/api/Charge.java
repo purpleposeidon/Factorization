@@ -10,17 +10,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.World;
 import net.minecraftforge.common.ForgeDirection;
+import static net.minecraftforge.common.ForgeDirection.*;
 import factorization.common.Core;
+import factorization.common.TileEntityHeater;
 
 public class Charge {
-    private int charge;
-    private int beaconAge;
-    private ForgeDirection beacon = ForgeDirection.UNKNOWN;
-    static final int maxBeaconAge = 20*20; // 20 seconds
-
-    public Charge() {
-        this.charge = 0;
-    }
+    private int charge = 0;
+    private ForgeDirection last_motion = DOWN;
 
     public int getValue() {
         return charge;
@@ -50,19 +46,15 @@ public class Charge {
 
     public void writeToNBT(NBTTagCompound tag, String name) {
         tag.setInteger(name, charge);
-        if (getBeacon() != ForgeDirection.UNKNOWN) {
-            tag.setInteger(name + "_beacon", beacon.ordinal());
-            tag.setInteger(name + "_beaconAge", beaconAge);
-        }
+        tag.setInteger(name + "_dir", last_motion.ordinal());
     }
 
     public void readFromNBT(NBTTagCompound tag, String name) {
         setValue(tag.getInteger(name));
-        if (tag.hasKey(name + "_beacon")) {
-            beacon = ForgeDirection.values()[tag.getInteger(name + "beacon")];
-            beaconAge = tag.getInteger(name + "_beaconAge");
+        if (tag.hasKey(name + "_dir")) {
+            last_motion = ForgeDirection.values()[tag.getInteger(name + "_dir")];
         } else {
-            beacon = ForgeDirection.UNKNOWN;
+            last_motion = DOWN;
         }
     }
 
@@ -73,7 +65,15 @@ public class Charge {
     }
 
     //These are some functions for users to make good & healthy use of
-    static List<Coord> toMark = Collections.synchronizedList(new ArrayList<Coord>());
+    
+    static ArrayList<ForgeDirection> realDirections = new ArrayList();
+    static {
+        for (ForgeDirection d : ForgeDirection.values()) {
+            if (d != UNKNOWN) {
+                realDirections.add(d);
+            }
+        }
+    }
     /**
      * This function spreads charge around with a random conducting neighbor of src. Call it every tick.
      * 
@@ -81,108 +81,59 @@ public class Charge {
      *            A conductive TileEntity
      */
     public static void update(IChargeConductor te) {
-        Coord here = te.getCoord();
-        if (here.remote()) {
-            //XXX TODO: oh my god, pull this out before release
-            World w = te.getCoord().w;
-            if (w.getWorldTime() % 40 != 0) {
-                toMark.clear();
-                return;
-            }
-            while (toMark.size() > 0) {
-                Coord tm = toMark.remove(0);
-                tm.setWorld(w);
-                tm.mark();
-            }
-            return;
-        }
-
         Charge me = te.getCharge();
-        int thisIsZero = me.charge == 0 ? 1 : 0;
-        if (me.charge > 0) {
-            toMark.add(te.getCoord());
-        }
-        
-        me.beaconAge++;
-        ForgeDirection beacon = me.getBeacon();
-        if (beacon != ForgeDirection.UNKNOWN) {
-            if (me.beaconAge == 0) {
-                me.shareBeacon(te);
-            }
-            IChargeConductor n = here.add(beacon).getTE(IChargeConductor.class);
-            if (n != null) {
-                Charge nc = n.getCharge();
-                if (me.charge > nc.charge) {
-                    //Excellent! We can move charge towards a sink.
-                    me.swapWith(nc);
-                    return;
-                }
-            }
-        }
-        
-        if (here.parity()) {
-            //In short lines, it's possible to swap and then swap back
-            //Anyways, a neighbor'll swap with us.
+        //me.charge = 0;
+        if (me.charge <= 0) {
             return;
         }
-        
-
-        for (Coord neighbor : here.getRandomNeighborsAdjacent()) {
-            IChargeConductor n = neighbor.getTE(IChargeConductor.class);
-            if (n == null) {
+        Coord here = te.getCoord();
+        ForgeDirection opposite = me.last_motion.getOpposite();
+        for (int i = me.last_motion.ordinal() + 1; i < UNKNOWN.ordinal(); i++) {
+            ForgeDirection dir = ForgeDirection.values()[i];
+            if (dir == opposite) {
                 continue;
             }
-            //This is a fine place for an error if me == null
-            Charge nCharge = n.getCharge();
-            int neighborIsZero = nCharge.charge == 0 ? 1 : 0;
-            if (thisIsZero + neighborIsZero == 1) {
-                me.swapWith(n.getCharge());
+            if (me.tryPush(here, dir)) {
+                me.last_motion = dir;
                 return;
             }
         }
-    }
-    
-    private ForgeDirection getBeacon() {
-        if (beaconAge > maxBeaconAge) {
-            return ForgeDirection.UNKNOWN;
-        }
-        return beacon;
-    }
-    
-    private void takeBeacon(ForgeDirection direction) {
-        if (getBeacon() == direction) {
-            //refresh
-            beaconAge = -1;
-        } else if (getBeacon() != ForgeDirection.UNKNOWN) {
-            //conflict
-            beacon = ForgeDirection.UNKNOWN;
-        } else {
-            beaconAge = -1;
-            beacon = direction;
-        }
-    }
-    
-    public void shareBeacon(IChargeConductor me) {
-        Coord here = me.getCoord();
-        ForgeDirection myBeacon = getBeacon();
-        for (ForgeDirection d : ForgeDirection.values()) {
-            if (d == ForgeDirection.UNKNOWN || d == myBeacon) {
+        for (int i = 0; i <= me.last_motion.ordinal(); i++) {
+            ForgeDirection dir = ForgeDirection.values()[i];
+            if (dir == opposite) {
                 continue;
             }
-            IChargeConductor neighbor = here.add(d).getTE(IChargeConductor.class);
-            if (neighbor == null) {
-                continue;
+            if (me.tryPush(here, dir)) {
+                me.last_motion = dir;
+                return;
             }
-            neighbor.getCharge().takeBeacon(d.getOpposite());
+        }
+        if (me.tryPush(here, opposite)) {
+            me.last_motion = opposite;
         }
     }
-
+    
+    boolean tryPush(Coord here, ForgeDirection d) {
+        IChargeConductor con = here.add(d).getTE(IChargeConductor.class);
+        if (con == null) {
+            return false;
+        }
+        Charge neighborCharge = con.getCharge();
+        if (neighborCharge.charge != 0) {
+            return false;
+        }
+        neighborCharge.charge = charge;
+        neighborCharge.last_motion = d;
+        charge = 0;
+        return true;
+    }
+    
     private static ArrayList<IChargeConductor> frontier = new ArrayList(5 * 5 * 4);
     private static HashSet<IChargeConductor> visited = new HashSet(5 * 5 * 5);
 
     public static class ChargeDensityReading {
         public int totalCharge, conductorCount, maxCharge;
-        public ForgeDirection beacon;
+        public ForgeDirection motion;
     }
     /**
      * Gets the average charge in the nearby connected network
@@ -225,7 +176,7 @@ public class Charge {
         ret.totalCharge = totalCharge;
         ret.conductorCount = visited.size();
         ret.maxCharge = maxCharge;
-        ret.beacon = start.getCharge().getBeacon();
+        ret.motion = start.getCharge().last_motion;
         return ret;
     }
 

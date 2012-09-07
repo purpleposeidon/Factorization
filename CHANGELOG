@@ -1,9 +1,8 @@
-0.5.2
-  Wrath forges will only burn what's directly adjacent to the flame, making them 433% cooler.
-
-0.5.1
-  Fixed barrel recipe
+0.5.3
   Added another slab recipe
+  Fixed barrel recipe
+  Wrath forges will only burn what's directly adjacent to the flame, making them 433% cooler.
+  Changed charge propagation. Long distances should work now.
 
 0.5.0 -- Electrically Charged!
   Ported to Minecraft 1.3!

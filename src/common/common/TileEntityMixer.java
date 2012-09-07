@@ -10,6 +10,7 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Charge;
+import factorization.api.ChargeSink;
 import factorization.api.IChargeConductor;
 import factorization.common.NetworkFactorization.MessageType;
 
@@ -19,12 +20,12 @@ public class TileEntityMixer extends TileEntityFactorization implements
     ItemStack input[] = new ItemStack[4], output[] = new ItemStack[4];
     int progress = 0;
     int speed = 0;
-    Charge charge = new Charge();
+    ChargeSink charge_sink = new ChargeSink();
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
-        charge.writeToNBT(tag, "charge");
+        charge_sink.writeToNBT(tag);
         tag.setInteger("progress", progress);
         tag.setInteger("speed", speed);
         writeSlotsToNBT(tag);
@@ -33,7 +34,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
-        charge.readFromNBT(tag, "charge");
+        charge_sink.readFromNBT(tag);
         progress = tag.getInteger("progress");
         speed = tag.getInteger("speed");
         readSlotsFromNBT(tag);
@@ -92,7 +93,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
 
     @Override
     public Charge getCharge() {
-        return charge;
+        return charge_sink.getCharge();
     }
 
     @Override
@@ -108,7 +109,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     @Override
     public void updateEntity() {
         super.updateEntity();
-        charge.update(this);
+        charge_sink.update(this);
         rotation += speed;
         shareRotationSpeed();
     }
@@ -273,12 +274,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
 
     boolean extractEnergy() {
-        int val = charge.getValue();
-        if (val == 0) {
-            return false;
-        }
-        charge.setValue(val - 1);
-        return true;
+        return charge_sink.takeCharge(1) == 1;
     }
 
     @Override

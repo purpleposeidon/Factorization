@@ -52,7 +52,7 @@ public class ItemChargeMeter extends Item {
                 + "  Target: " + ic.getCharge().getValue()
                 + "  Conductors: " + ret.conductorCount
                 + inf
-                + "  Beacon: " + ret.beacon
+                //+ "  C: " + ic.getCoord()
                 //+ "  Total: " + ret.totalCharge
                 );
         return true;
