@@ -1,5 +1,7 @@
 package factorization.api;
 
+import net.minecraftforge.common.ForgeDirection;
+
 public class DeltaCoord {
     public int x, y, z;
 
@@ -40,6 +42,15 @@ public class DeltaCoord {
 
     public double getAngleHorizontal() {
         return Math.atan2(z, -x);
+    }
+    
+    public ForgeDirection getDirection() {
+        for (ForgeDirection d : ForgeDirection.values()) {
+            if (d.offsetX == x && d.offsetY == y && d.offsetZ == z) {
+                return d;
+            }
+        }
+        return ForgeDirection.UNKNOWN;
     }
 
     public int getFaceSide() {

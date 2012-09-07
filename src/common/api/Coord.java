@@ -212,6 +212,10 @@ public class Coord {
     public Coord add(DeltaCoord d) {
         return add(d.x, d.y, d.z);
     }
+    
+    public Coord add(ForgeDirection d) {
+        return add(d.offsetX, d.offsetY, d.offsetZ);
+    }
 
     public Coord add(int x, int y, int z) {
         return new Coord(w, this.x + x, this.y + y, this.z + z);

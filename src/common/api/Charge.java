@@ -1,17 +1,21 @@
 package factorization.api;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.src.NBTTagCompound;
+import net.minecraft.src.World;
+import net.minecraftforge.common.ForgeDirection;
+import static net.minecraftforge.common.ForgeDirection.*;
 import factorization.common.Core;
 
 public class Charge {
-    private int charge;
-
-    public Charge() {
-        this.charge = 0;
-    }
+    private int charge = 0;
+    private ForgeDirection motion = UNKNOWN;
 
     public int getValue() {
         return charge;
@@ -25,13 +29,32 @@ public class Charge {
         setValue(charge + chargeToAdd);
         return charge;
     }
+    
+    public int deplete() {
+        int ret = getValue();
+        setValue(0);
+        return ret;
+    }
+    
+    public int deplete(int toTake) {
+        int c = getValue();
+        toTake = Math.min(toTake, c);
+        setValue(c - toTake);
+        return toTake;
+    }
 
     public void writeToNBT(NBTTagCompound tag, String name) {
         tag.setInteger(name, charge);
+        tag.setInteger(name + "_motion", motion.ordinal());
     }
 
     public void readFromNBT(NBTTagCompound tag, String name) {
         setValue(tag.getInteger(name));
+        if (tag.hasKey(name + "_motion")) {
+            motion = ForgeDirection.values()[tag.getInteger(name + "_motion")];
+        } else {
+            motion = UNKNOWN;
+        }
     }
 
     public void swapWith(Charge other) {
@@ -41,6 +64,16 @@ public class Charge {
     }
 
     //These are some functions for users to make good & healthy use of
+    static List<Coord> toMark = Collections.synchronizedList(new ArrayList<Coord>()); //XXX TODO: oh my god, pull this out before release
+    
+    static ArrayList<ForgeDirection> realDirections = new ArrayList();
+    static {
+        for (ForgeDirection d : ForgeDirection.values()) {
+            if (d != UNKNOWN) {
+                realDirections.add(d);
+            }
+        }
+    }
     /**
      * This function spreads charge around with a random conducting neighbor of src. Call it every tick.
      * 
@@ -50,32 +83,87 @@ public class Charge {
     public static void update(IChargeConductor te) {
         Coord here = te.getCoord();
         if (here.remote()) {
+            //XXX TODO: oh my god, pull this out before release
+            World w = te.getCoord().w;
+            if (w.getWorldTime() % 40 != 0) {
+                toMark.clear();
+                return;
+            }
+            while (toMark.size() > 0) {
+                Coord tm = toMark.remove(0);
+                tm.setWorld(w);
+                tm.mark();
+            }
             return;
         }
+
         Charge me = te.getCharge();
-
-        if (here.parity()) {
-            //In short lines, it's possible to swap and then swap back
-            //Anyways, a neighbor'll swap with us.
+        //me.charge = 0;
+        if (me.charge <= 0) {
+            me.motion = UNKNOWN;
             return;
         }
-
-        for (Coord neighbor : here.getRandomNeighborsAdjacent()) {
-            IChargeConductor n = neighbor.getTE(IChargeConductor.class);
-            if (n == null) {
+        toMark.add(te.getCoord());
+        if (me.motion == UNKNOWN) {
+            me.pickDirection(here, UNKNOWN);
+            if (me.motion == UNKNOWN) {
+                return;
+            }
+        }
+        
+        IChargeConductor moveTo = here.add(me.motion).getTE(IChargeConductor.class);
+        if (moveTo == null) {
+            me.pickDirection(here, me.motion.getOpposite());
+            if (me.motion == UNKNOWN) {
+                return;
+            }
+            moveTo = here.add(me.motion).getTE(IChargeConductor.class);
+            if (moveTo == null) {
+                return; //never gonna happen
+            }
+        }
+        
+        Charge toDisplace = moveTo.getCharge();
+        if (toDisplace.charge != 0) {
+            return;
+        }
+        
+        toDisplace.charge = me.charge;
+        toDisplace.motion = me.motion;
+        me.charge = 0;
+        me.motion = UNKNOWN;
+    }
+    
+    void pickDirection(Coord here, ForgeDirection avoid) {
+        Collections.shuffle(realDirections);
+        for (ForgeDirection direction : realDirections) {
+            if (direction == avoid) {
                 continue;
             }
-            //This is a fine place for an error if me == null
-            me.swapWith(n.getCharge());
+            IChargeConductor conductor = here.add(direction).getTE(IChargeConductor.class);
+            if (conductor != null) {
+                motion = direction;
+                return;
+            }
+        }
+        if (avoid == UNKNOWN) {
+            motion = UNKNOWN;
+            return;
+        }
+        
+        IChargeConductor conductor = here.add(avoid).getTE(IChargeConductor.class);
+        if (conductor != null) {
+            motion = avoid;
             return;
         }
     }
-
+    
     private static ArrayList<IChargeConductor> frontier = new ArrayList(5 * 5 * 4);
     private static HashSet<IChargeConductor> visited = new HashSet(5 * 5 * 5);
 
     public static class ChargeDensityReading {
         public int totalCharge, conductorCount, maxCharge;
+        public ForgeDirection motion;
     }
     /**
      * Gets the average charge in the nearby connected network
@@ -88,6 +176,7 @@ public class Charge {
      */
     public static ChargeDensityReading getChargeDensity(IChargeConductor start, int maxDistance) {
         int totalCharge = 0, maxCharge = 0;
+        Coord startCoord = start.getCoord();
         frontier.clear();
         visited.clear();
         frontier.add(start);
@@ -106,7 +195,7 @@ public class Charge {
                 if (visited.contains(neighbor)) {
                     continue;
                 }
-                if (neighborCoord.distanceManhatten(hereCoord) > maxDistance) {
+                if (neighborCoord.distanceManhatten(startCoord) > maxDistance) {
                     continue;
                 }
                 frontier.add(neighbor);
@@ -117,6 +206,7 @@ public class Charge {
         ret.totalCharge = totalCharge;
         ret.conductorCount = visited.size();
         ret.maxCharge = maxCharge;
+        ret.motion = start.getCharge().motion;
         return ret;
     }
 
