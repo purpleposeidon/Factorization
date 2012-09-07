@@ -3,6 +3,7 @@
   Fixed barrel recipe
   Wrath forges will only burn what's directly adjacent to the flame, making them 433% cooler.
   Changed charge propagation. Long distances should work now.
+  Blowing up a diamond block now gives you 18 diamond shards instead of 12
 
 0.5.0 -- Electrically Charged!
   Ported to Minecraft 1.3!

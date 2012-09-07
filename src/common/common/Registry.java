@@ -343,7 +343,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
         // diamond shard
         //How do we feel about 12 shards for 9 diamonds?
-        diamond_shard_recipe = FactorizationUtil.createShapedRecipe(new ItemStack(diamond_shard, 12),
+        diamond_shard_recipe = FactorizationUtil.createShapedRecipe(new ItemStack(diamond_shard, 18),
                 "OTO",
                 "TDT",
                 "OTO",

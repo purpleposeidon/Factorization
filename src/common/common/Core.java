@@ -56,18 +56,9 @@ import factorization.api.Coord;
 @NetworkMod(
         clientSideRequired = true,
         packetHandler = NetworkFactorization.class,
-        channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel },
-        //I bet this isn't necessary now.
-        clientPacketHandlerSpec = @SidedPacketHandler(
-                packetHandler = NetworkFactorization.class,
-                channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel }
-        ),
-        serverPacketHandlerSpec = @SidedPacketHandler(
-                packetHandler = NetworkFactorization.class,
-                channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel }
-        ))
+        channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel })
 public class Core {
-    public static final String version = "0.5.2";
+    public static final String version = "0.5.3";
     // runtime storage
     @Instance
     public static Core instance;
