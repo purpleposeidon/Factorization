@@ -59,26 +59,27 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
 
     @Override
     public void updateEntity() {
-        super.updateEntity();
-        charge.update(this);
-        int val = getCharge().getValue();
-        int delta = 0;
-        final int min_charge = 20, max_charge = 30;
-        if (val < min_charge) {
-            delta = Math.min(min_charge - val, storage.getValue());
-        } else if (val > max_charge) {
-            int free = max_storage - storage.getValue();
-            if (free <= 0) {
-                return;
-            }
-            delta = -Math.min(free, val - max_charge);
-        } else {
+        if (worldObj.isRemote) {
             return;
         }
+        charge.update(this);
+        int val = getCharge().getValue();
+        int store_delta = 0;
+        int charge_delta = 0;
+        if (val == 0) {
+            //dump a bit out
+            charge_delta = Math.min(20, storage.getValue());
+            store_delta = -charge_delta;
+        } else if (val > 30) {
+            //pull it all in!
+            charge_delta = -val;
+            int free = max_storage - storage.getValue();
+            store_delta = Math.min(val*2/3, free);
+        }
         int tier = storage.getValue() * 32 / max_storage;
-        if (delta != 0) {
-            charge.addValue(delta);
-            storage.addValue(-delta);
+        if (store_delta != 0) {
+            charge.addValue(charge_delta);
+            storage.addValue(store_delta);
         }
         if (tier != storage.getValue() * 32 / max_storage) {
             updateMeter();
@@ -87,7 +88,6 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
 
     void updateMeter() {
         Core.network.broadcastMessage(null, getCoord(), MessageType.BatteryLevel, storage.getValue());
-        getCoord().dirty();
     }
 
     @Override
@@ -97,6 +97,7 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
         }
         if (messageType == MessageType.BatteryLevel) {
             storage.setValue(input.readInt());
+            getCoord().dirty();
             return true;
         }
         return false;

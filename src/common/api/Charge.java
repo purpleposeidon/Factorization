@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.NBTTagCompound;
@@ -17,6 +18,7 @@ import factorization.common.TileEntityHeater;
 public class Charge {
     private int charge = 0;
     private ForgeDirection last_motion = DOWN;
+    private static Random rand = new Random();
 
     public int getValue() {
         return charge;
@@ -87,6 +89,18 @@ public class Charge {
             return;
         }
         Coord here = te.getCoord();
+        if (rand.nextInt(20) == 5) {
+            //jostle randomly
+            for (Coord neighbor : here.getRandomNeighborsAdjacent()) {
+                IChargeConductor cond = neighbor.getTE(IChargeConductor.class);
+                if (cond == null) {
+                    continue;
+                }
+                me.swapWith(cond.getCharge());
+                return;
+            }
+            return;
+        }
         ForgeDirection opposite = me.last_motion.getOpposite();
         for (int i = me.last_motion.ordinal() + 1; i < UNKNOWN.ordinal(); i++) {
             ForgeDirection dir = ForgeDirection.values()[i];
