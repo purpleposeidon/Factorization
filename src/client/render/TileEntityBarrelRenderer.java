@@ -58,9 +58,7 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
         itemRender = (RenderItem) RenderManager.instance.getEntityClassRenderObject(EntityItem.class);
         final double d = 0.01;
 
-        //GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glDisable(GL11.GL_BLEND);
-        //GL11.glNormal3f(1, 1, 1);
         GL11.glDisable(GL11.GL_LIGHTING);
         switch (barrel.facing_direction) {
         case 3:
@@ -103,10 +101,10 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
 
     void setupLight(TileEntityBarrel barrel, int dx, int dz) {
         int br = barrel.getCoord().w.getLightBrightnessForSkyBlocks(barrel.xCoord + dx, barrel.yCoord, barrel.zCoord + dz, 0 /* minimum */);
-        br = (int)(br * 0.9F);
         int var11 = br % 65536;
         int var12 = br / 65536;
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) var11 / 1.0F, (float) var12 / 1.0F);
+        float scale = 0.6F;
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, var11*scale, var12*scale);
     }
 
     void renderItemCount(TileEntityBarrel barrel, int side, double x, double y, double z) {
