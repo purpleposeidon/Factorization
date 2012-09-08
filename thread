@@ -14,7 +14,7 @@ Did somebody order a 3x3 crafting grid to go? Craft directly from your inventory
 [u]The Almighty [b]Barrel[/b][/u]
 Based on quantum-stockpiling technology discovered in the recently abandoned Dwarven Fortress of [i]Nod Semor[/i], the barrel can store 64 stacks of a single item type. Never fill a chest with cobblestone again!
 [img]http://i.imgur.com/pGWkx.png[/img]
-Right click a barrel with an item to drop it in; left-click to remove. Double-right clicking will dump all of the matching items in your inventory into a barrel, and shift-left click will pull out a single item.
+Right click a barrel with an item to drop it in; left-click to remove. Double-right clicking will dump all of the matching items in your inventory into a barrel, left-click will pull a stack out, and shift-left click will pull out a single item.
 [img]http://i.imgur.com/6c7Q7.png[/img]
 Is 64 stacks not nearly enough for your cobblegen? There's an upgrade for that...
 
@@ -52,6 +52,7 @@ The slag furnace works similarly to the vanilla furnace, but has an extra output
 [u][b]Diamond Shards[/b][/u]
 The recipe for Diamond Shards is very expensive and volatile. Diamond Shards can only be safely created in a Stamper. (You can make the Craft Packet directly from a crafting table.)
 [img]http://i.imgur.com/XzkE8.png[/img]
+(This picture is old, it now gives 18 shards)
 
 [/spoiler]
 
@@ -259,22 +260,23 @@ This is a [url="http://jenkins.minecraftforge.net:7070/job/forge/forge-recommend
 1. Install [url="http://jenkins.minecraftforge.net:7070/job/forge/forge-recommended/"]Minecraft Forge[/url] by extracting the contents of the forge download into the Minecraft jar. Be sure to delete the META-INF/ folder ([u]unless you are installing a server![/u]). If you already have a version of forge that's as old as or newer than Build #241, it should work fine.
 2. Check that the forge install worked by running the client (or the server). Forge information should be on the title screen (or in the server's logs). Exit minecraft.
 3. Put Factorization.jar into the mods folder.
-4. Optional: Install [url="http://www.minecraftforum.net/topic/909223-125132-smp-chickenbones-mods/"]NEI[/url] by placing CodeChickenCore and NotEnoughItems into the [b][u]core[/u][/b]mods folder.
+4. Optional: Install [url="http://www.minecraftforum.net/topic/909223-125132-smp-chickenbones-mods/"]NEI[/url] by placing CodeChickenCore and NotEnoughItems into the [b][u]core[/u][/b]mods folder. This will let you use the Pocket Crafting Table and Bag of Holding from within other GUIs.
 
 
 
 [u][b][size=6][anchor=DOWNLOAD]Download[/anchor][/size][/b][/u]
 Note that all proper Forge mods (such as this one) now use the same mod files for both server and client.
 
-0.5.1 (MC 1.3.2) [url="http://adf.ly/CVU5f"]adfly + MediaFire[/url], or [url="http://adf.ly/CVThQ"]adfly + DropBox[/url]
+Factorization 0.5.3 (MC 1.3.2)
+[url="http://adf.ly/Cf5F9"]adfly + MediaFire[/url], or [url="http://adf.ly/Cf5Q5"]adfly + DropBox[/url]
 
+Old versions [spoiler]
+0.5.1 (MC 1.3.2)
+[url="http://adf.ly/CVU5f"]adfly + MediaFire[/url], or [url="http://adf.ly/CVThQ"]adfly + DropBox[/url]
 
-Old versions
-[spoiler]
 0.4.0 (MC 1.2.5)
 [url="http://adf.ly/Bp1nf"]Client (adfly + MediaFire)[/url], or [url="http://adf.ly/Bp1x9"](adfly + DropBox)[/url]
 [url="http://adf.ly/Bp1po"]Server (adfly + MediaFire)[/url], or [url="http://adf.ly/Bp1v3"](adfly + DropBox)[/url]
-
 
 0.3.2
 [url="http://adf.ly/B8rGI"]Client (adfly + MediaFire)[/url], or [url="http://adf.ly/B8qrB"](adfly + DropBox)[/url]
