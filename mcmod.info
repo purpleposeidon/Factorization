@@ -1,20 +1,19 @@
 [
-{
-  "modid": "factorization",
-  "name": "Factorization",
-  "description": "",
-  "mcversion": "1.3.2",
-  "url": "http://minecraftforum.net/topic/1351802-",
-  "updateUrl": "",
+ {
+  "name": "Factorization", 
+  "parent": "", 
+  "url": "http://minecraftforum.net/topic/1351802-", 
+  "logoFile": "", 
+  "updateUrl": "", 
+  "credits": "", 
+  "version": "0.5.4", 
+  "modid": "factorization", 
   "authors": [
-    "neptunepink"
-  ],
-  "credits": "",
-  "logoFile": "",
-  "screenshots": [
-  ],
-  "parent":"",
-  "dependencies": [
-  ]
-}
+   "neptunepink"
+  ], 
+  "dependencies": [], 
+  "mcversion": "1.3.2", 
+  "screenshots": [], 
+  "description": "Auto-crafting, ore processing, barrels, and other toys"
+ }
 ]

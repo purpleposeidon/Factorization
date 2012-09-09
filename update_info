@@ -1,0 +1,17 @@
+#!/usr/bin/python
+
+import json
+
+info = json.load(open("mcmod.info"))
+versioning_file = "src/common/common/Core.java"
+
+version = None
+for line in open(versioning_file):
+  if "@VERSION@" in line:
+    version = line.split("=")[1].split(";")[0].strip().strip('"')
+    break
+
+print "Version:", version
+info[0]["version"] = version
+json.dump(info, open("mcmod.info", 'w'), indent=1)
+

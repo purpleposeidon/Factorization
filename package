@@ -2,12 +2,13 @@
 
 set -e
 
-./build_core_mod
+echo Packaging client
+./update_info
+#./build_core_mod
 
 cd ../
 
 
-echo Packaging client
 pushd reobf/minecraft  > /dev/zero
   cp -R ../../factorization/texture/ factorization/texture/
   cp ../../factorization/*.info ./
