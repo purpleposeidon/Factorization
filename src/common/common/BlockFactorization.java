@@ -259,10 +259,15 @@ public class BlockFactorization extends BlockContainer {
 
         //electric
         //itemList.add(reg.battery_item_hidden);
-        itemList.add(new ItemStack(reg.battery, 1, 2));
+        if (reg.battery != null) {
+            //These checks are for buildcraft, which is hatin'.
+            itemList.add(new ItemStack(reg.battery, 1, 2));
+        }
         itemList.add(reg.solar_turbine_item);
         //itemList.add(reg.mirror_item_hidden);
-        itemList.add(new ItemStack(reg.mirror));
+        if (reg.mirror != null) {
+            itemList.add(new ItemStack(reg.mirror));
+        }
         itemList.add(reg.heater_item);
         itemList.add(reg.leadwire_item);
         itemList.add(reg.grinder_item);

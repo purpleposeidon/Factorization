@@ -25,17 +25,18 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
         glTranslatef((float) x, (float) y, (float) z);
 
         //render a bit of string
-        glColor3f(1, 1, 1);
+        glColor4f(1, 1, 1, 1);
         glDisable(GL_TEXTURE_2D);
         glLineWidth(8);
-        glBegin(GL_LINE);
+        glBegin(GL_LINES);
         glVertex3f(0.5F, 15F / 16F, 0.5F);
         glVertex3f(0.5F, 0.25F, 0.5F);
         glEnd();
         glLineWidth(1);
-        glDisable(GL_LIGHTING);
         glEnable(GL_TEXTURE_2D);
-
+        
+        
+        glDisable(GL_LIGHTING);
         //render the item, growing as it nears completion
         if (crys.growing_crystal != null && crys.progress > 0) {
             glPushMatrix();
