@@ -1,5 +1,7 @@
 package factorization.common;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Side;
 import net.minecraft.src.Block;
 
 public class RenderingCube {
@@ -140,46 +142,78 @@ public class RenderingCube {
         int c = 8;
         switch (face) {
         case 0: //-y
-            ret[0] = new Vector(v.x, -v.y, v.z, c + v.x, c + v.z);
-            ret[1] = new Vector(-v.x, -v.y, v.z, c - v.x, c + v.z);
-            ret[2] = new Vector(-v.x, -v.y, -v.z, c - v.x, c - v.z);
-            ret[3] = new Vector(v.x, -v.y, -v.z, c + v.x, c - v.z);
+            ret[0] = new Vector(v.x, -v.y, v.z);
+            ret[1] = new Vector(-v.x, -v.y, v.z);
+            ret[2] = new Vector(-v.x, -v.y, -v.z);
+            ret[3] = new Vector(v.x, -v.y, -v.z);
             break;
         case 1: //+y
-            ret[0] = new Vector(v.x, v.y, -v.z, c + v.x, c - v.x);
-            ret[1] = new Vector(-v.x, v.y, -v.z, c - v.x, c - v.x);
-            ret[2] = new Vector(-v.x, v.y, v.z, c - v.x, c + v.x);
-            ret[3] = new Vector(v.x, v.y, v.z, c + v.x, c + v.x);
+            ret[0] = new Vector(v.x, v.y, -v.z);
+            ret[1] = new Vector(-v.x, v.y, -v.z);
+            ret[2] = new Vector(-v.x, v.y, v.z);
+            ret[3] = new Vector(v.x, v.y, v.z);
             break;
         case 2: //-z
-            ret[0] = new Vector(v.x, v.y, -v.z, c - v.x, c - v.y);
-            ret[1] = new Vector(v.x, -v.y, -v.z, c - v.x, c + v.y);
-            ret[2] = new Vector(-v.x, -v.y, -v.z, c + v.x, c + v.y);
-            ret[3] = new Vector(-v.x, v.y, -v.z, c + v.x, c - v.y);
+            ret[0] = new Vector(v.x, v.y, -v.z);
+            ret[1] = new Vector(v.x, -v.y, -v.z);
+            ret[2] = new Vector(-v.x, -v.y, -v.z);
+            ret[3] = new Vector(-v.x, v.y, -v.z);
             break;
         case 3: //+z
-            ret[0] = new Vector(v.x, v.y, v.z, c - v.x, c - v.y);
-            ret[1] = new Vector(-v.x, v.y, v.z, c + v.x, c - v.y);
-            ret[2] = new Vector(-v.x, -v.y, v.z, c + v.x, c + v.y);
-            ret[3] = new Vector(v.x, -v.y, v.z, c - v.x, c + v.y);
+            ret[0] = new Vector(v.x, v.y, v.z);
+            ret[1] = new Vector(-v.x, v.y, v.z);
+            ret[2] = new Vector(-v.x, -v.y, v.z);
+            ret[3] = new Vector(v.x, -v.y, v.z);
             break;
         case 4: //-x
-            ret[0] = new Vector(-v.x, v.y, v.z, c + v.z, c - v.y);
-            ret[1] = new Vector(-v.x, v.y, -v.z, c - v.z, c - v.y);
-            ret[2] = new Vector(-v.x, -v.y, -v.z, c - v.z, c + v.y);
-            ret[3] = new Vector(-v.x, -v.y, v.z, c + v.z, c + v.y);
+            ret[0] = new Vector(-v.x, v.y, v.z);
+            ret[1] = new Vector(-v.x, v.y, -v.z);
+            ret[2] = new Vector(-v.x, -v.y, -v.z);
+            ret[3] = new Vector(-v.x, -v.y, v.z);
             break;
         case 5: //+x
-            ret[0] = new Vector(v.x, v.y, v.z, c + v.z, c - v.y);
-            ret[1] = new Vector(v.x, -v.y, v.z, c + v.z, c + v.y);
-            ret[2] = new Vector(v.x, -v.y, -v.z, c - v.z, c + v.y);
-            ret[3] = new Vector(v.x, v.y, -v.z, c - v.z, c - v.y);
+            ret[0] = new Vector(v.x, v.y, v.z);
+            ret[1] = new Vector(v.x, -v.y, v.z);
+            ret[2] = new Vector(v.x, -v.y, -v.z);
+            ret[3] = new Vector(v.x, v.y, -v.z);
             break;
         }
-        for (int i = 0; i < ret.length; i++) {
-            ret[i].incr(origin);
-            if (theta != 0) {
-                ret[i].rotate(ax, ay, az, theta);
+        for (Vector vert : ret) {
+            vert.incr(origin);
+        }
+        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+            switch (face) {
+            case 0: //-y
+            case 1: //+y
+                for (Vector vert : ret) {
+                    //System.out.println(vert);
+                    vert.u = vert.x + 8;
+                    vert.v = vert.z + 8;
+                }
+                break;
+            case 2: //-z
+            case 3: //+z
+                for (Vector vert : ret) {
+                    vert.u = vert.x + 8;
+                    vert.v = vert.y + 8;
+                }
+                break;
+            case 4: //-x
+            case 5: //+x
+                for (Vector vert : ret) {
+                    vert.u = vert.y + 8;
+                    vert.v = vert.z + 8;
+                }
+                break;
+            }
+            for (Vector vert : ret) {
+                vert.u = Math.max(0, Math.min(vert.u, 16));
+                vert.v = Math.max(0, Math.min(vert.v, 16));
+            }
+        }
+        if (theta != 0) {
+            for (Vector vert : ret) {
+                vert.rotate(ax, ay, az, theta);
             }
         }
         return ret;
