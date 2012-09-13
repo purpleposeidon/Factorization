@@ -185,24 +185,34 @@ public class RenderingCube {
             switch (face) {
             case 0: //-y
             case 1: //+y
+                //Mirror these like MC does.
                 for (Vector vert : ret) {
-                    //System.out.println(vert);
                     vert.u = vert.x + 8;
                     vert.v = vert.z + 8;
                 }
                 break;
             case 2: //-z
+                for (Vector vert : ret) {
+                    vert.u = 16 - (vert.x + 8);
+                    vert.v = 16 - (vert.y + 8);
+                }
+                break;
             case 3: //+z
                 for (Vector vert : ret) {
                     vert.u = vert.x + 8;
-                    vert.v = vert.y + 8;
+                    vert.v = 16 - (vert.y + 8);
                 }
                 break;
             case 4: //-x
+                for (Vector vert : ret) {
+                    vert.u = 16 - (vert.y + 8);
+                    vert.v = (vert.z + 8);
+                }
+                break;
             case 5: //+x
                 for (Vector vert : ret) {
-                    vert.u = vert.y + 8;
-                    vert.v = vert.z + 8;
+                    vert.u = 16 - (vert.y + 8);
+                    vert.v = 16 - (vert.z + 8);
                 }
                 break;
             }
