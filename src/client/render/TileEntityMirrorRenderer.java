@@ -33,6 +33,7 @@ public class TileEntityMirrorRenderer extends TileEntitySpecialRenderer {
     MirrorModel model = new MirrorModel();
     @Override
     public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
+        Core.profileStartRender("mirror");
         GL11.glPushMatrix();
         TileEntityMirror mirror = (TileEntityMirror) te;
         float d = 0.5F - 2F / 16F - 1.35F / 32F; //....
@@ -50,6 +51,7 @@ public class TileEntityMirrorRenderer extends TileEntitySpecialRenderer {
         FactorizationBlockRender.renderItemIn2D(9); //Hello, magic # 9. I bet you're a mirror!
 
         GL11.glPopMatrix();
+        Core.profileEndRender();
     }
 
 }

@@ -1,9 +1,18 @@
 http://www.minecraftforum.net/topic/1351802-factorization/
 
+
 [Features]
 square saw
 Some electricity related mecha-upgrades?
 funny chicken noise on bandwidth upgrade
+
+[Mecha-Features]
+Nicen up the Mecha-Modder
+Armor-type specific upgrades
+Re-write the event system:
+  EventSources: Player state, key presses from client
+  EventShaders: Normal, Rising edge, falling edge, negated, toggle
+Anti-gravity (uses inverium'd lead blocks): Velocity limiting, hovering, high jumping
 
 [High-priority Bugs]
 check breaking on all new machines
@@ -23,7 +32,9 @@ drop several stacks instantaneously into a transposer running into a barrel. Onl
 barrel lighting (normals.)
 railgun, except for steve
 sign enchanting
-continuous textures on wiring'd be kind of nice. (Put a UV-test on, see how badly they match up...)
+optimize these TEs. Prolly use whatever it is that Entity Models use.
+  Mirror
+  grinder
 
 
 have sentry demon send redstone signal when it senses shit

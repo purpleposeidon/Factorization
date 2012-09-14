@@ -32,6 +32,7 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
 
     @Override
     public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
+        Core.profileStartRender("heater");
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glPushMatrix();
         this.bindTextureByName(Core.texture_file_block);
@@ -49,6 +50,7 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
         GL11.glPopMatrix();
         GL11.glColor4f(1, 1, 1, 1);
         GL11.glEnable(GL11.GL_LIGHTING);
+        Core.profileEndRender();
     }
 
 }

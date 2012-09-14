@@ -15,11 +15,7 @@ public class ItemCraftingComponent extends Item {
         Core.proxy.addName(this, itemName);
         this.icon = icon;
         setTabToDisplayOn(CreativeTabs.tabMaterials);
-    }
-
-    @Override
-    public String getTextureFile() {
-        return Core.texture_file_item;
+        setTextureFile(Core.texture_file_item);
     }
 
     @Override

@@ -85,7 +85,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemBattery battery;
     public ItemOreProcessing ore_dirty_gravel, ore_clean_gravel, ore_reduced, ore_crystal;
     public ItemCraftingComponent sludge;
-    public ItemStack antium;
+    public ItemCraftingComponent inverium;
 
     public Material materialMachine = new Material(MapColor.ironColor);
 
@@ -260,6 +260,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         addName(mecha_buoyant_barrel, "Buoyant Barrel");
         addName(mecha_cobble_drive, "Cobblestone Drive");
         addName(mecha_mounted_piston, "Mounted Piston");
+        
+        inverium = new ItemInverium(itemID("inverium", 9040), "item.inverium", 12*16 + 0, 11);
+        addName(inverium, "Inverium Drop");
 
         //Misc
         pocket_table = new ItemPocketTable(itemID("pocketCraftingTable", 9002));
@@ -449,6 +452,13 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'S', Block.pistonStickyBase,
                 'N', Block.pistonBase,
                 'L', Block.lever);
+        recipe(new ItemStack(inverium, 1, 1),
+                "LGL",
+                "GDG",
+                "LGL",
+                'L', lead_ingot,
+                'G', Item.ingotGold,
+                'D', Item.diamond);
 
         // BlockFactorization recipes
         // router

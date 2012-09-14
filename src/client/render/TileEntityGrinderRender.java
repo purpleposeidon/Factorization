@@ -19,6 +19,7 @@ import net.minecraft.src.Vec3;
 
 import org.lwjgl.opengl.GL11;
 
+import factorization.common.Core;
 import factorization.common.RenderingCube;
 import factorization.common.RenderingCube.Vector;
 import factorization.common.TileEntityGrinder;
@@ -62,12 +63,14 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
 
     @Override
     public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
+        Core.profileStartRender("grinder");
         TileEntityGrinder grinder = (TileEntityGrinder) te;
         GL11.glPushMatrix();
         GL11.glTranslatef((float) (x + 0.5), (float) (y + 5F / 16F), (float) (z + 0.5));
         GL11.glRotatef(grinder.rotation / 30.0F, 0, 1, 0);
         renderGrindHead();
         GL11.glPopMatrix();
+        Core.profileEndRender();
     }
 
     static void renderGrindHead() {

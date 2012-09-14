@@ -1,3 +1,8 @@
+0.6.0
+  Re-arranged the config.
+  Added a config setting to disable TE rendering
+  Added inverium with a temporary recipe. Inverium is used in the crystallizer to obtain exotic materials
+
 0.5.4
   Fixed recharging batteries
 

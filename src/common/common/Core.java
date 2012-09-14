@@ -11,6 +11,7 @@ import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
@@ -29,6 +30,7 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.NetworkMod.SidedPacketHandler;
 import cpw.mods.fml.common.registry.TickRegistry;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Block;
 import net.minecraft.src.CommandHandler;
@@ -58,7 +60,7 @@ import factorization.api.Coord;
         packetHandler = NetworkFactorization.class,
         channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel })
 public class Core {
-    public static final String version = "0.5.4"; //@VERSION@
+    public static final String version = "0.6.0"; //@VERSION@
     // runtime storage
     @Instance
     public static Core instance;
@@ -87,6 +89,7 @@ public class Core {
     public static String pocketActions = "xcb";
     public static boolean add_branding = false;
     public static boolean cheat = false;
+    public static boolean renderTEs = false;
 
     // universal constant config
     public final static String texture_dir = "/factorization/texture/";
@@ -138,26 +141,30 @@ public class Core {
         lightair_id = getBlockConfig("lightAirBlockId", lightair_id, "WrathFire and invisible lamp-air made by WrathLamps");
         resource_id = getBlockConfig("resourceBlockId", resource_id, "Ores and metal blocks mostly");
 
-        debug_light_air = getBoolConfig("debugLightAir", "general", debug_light_air, "Render invisible lamp-air");
-        gen_silver_ore = getBoolConfig("generateSilverOre", "general", gen_silver_ore, null);
-        pocket_craft_anywhere = getBoolConfig("anywherePocketCraft", "general", pocket_craft_anywhere, "Lets you open the pocket crafting table from GUIs");
-        bag_swap_anywhere = getBoolConfig("anywhereBagSwap", "general", bag_swap_anywhere, "Lets you use the bag from GUIs");
-        String attempt = getStringConfig("pocketCraftingActionKeys", "general", pocketActions, "3 keys for: removing (x), cycling (c), balancing (b)");
-        if (attempt.length() == 3) {
-            pocketActions = attempt;
-        } else {
-            Property p = config.getOrCreateProperty("pocketCraftingActionKeys", "general", pocketActions);
-            p.value = pocketActions;
-            p.comment = "3 keys for: removing (x), cycling (c), balancing (b)";
+        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+            debug_light_air = getBoolConfig("debugLightAir", "client", debug_light_air, "Render invisible lamp-air");
+            pocket_craft_anywhere = getBoolConfig("anywherePocketCraft", "client", pocket_craft_anywhere, "Lets you open the pocket crafting table from GUIs");
+            bag_swap_anywhere = getBoolConfig("anywhereBagSwap", "client", bag_swap_anywhere, "Lets you use the bag from GUIs");
+            render_barrel_item = getBoolConfig("renderBarrelItem", "client", render_barrel_item, null);
+            render_barrel_item = getBoolConfig("renderBarrelText", "client", render_barrel_text, null);
+            renderTEs = getBoolConfig("renderOtherTileEntities", "client", renderTEs, "Sacrifices slow ");
+            String attempt = getStringConfig("pocketCraftingActionKeys", "client", pocketActions, "3 keys for: removing (x), cycling (c), balancing (b)");
+            if (attempt.length() == 3) {
+                pocketActions = attempt;
+            } else {
+                Property p = config.getOrCreateProperty("pocketCraftingActionKeys", "client", pocketActions);
+                p.value = pocketActions;
+                p.comment = "3 keys for: removing (x), cycling (c), balancing (b)";
+            }
         }
 
-        block_item_id_offset = getIntConfig("blockItemIdOffset", "misc", block_item_id_offset, "Hopefully you'll never need to change these.");
-        render_barrel_item = getBoolConfig("renderBarrelItem", "misc", render_barrel_item, null);
-        render_barrel_item = getBoolConfig("renderBarrelText", "misc", render_barrel_text, null);
+        gen_silver_ore = getBoolConfig("generateSilverOre", "general", gen_silver_ore, null);
+        block_item_id_offset = getIntConfig("blockItemIdOffset", "general", block_item_id_offset, null);
+        add_branding = getBoolConfig("addBranding", "general", add_branding, null); //For our Tekkit friends
 
         //watch_demon_chunk_range = getIntConfig("watchDemonChunkRange", "smpAdmin", watch_demon_chunk_range, "chunk radius to keep loaded");
-        spread_wrathfire = getBoolConfig("spreadWrathFire", "smpAdmin", spread_wrathfire, null);
-        String p = getStringConfig("bannedRouterInventoriesRegex", "smpAdmin", "", null);
+        spread_wrathfire = getBoolConfig("spreadWrathFire", "server", spread_wrathfire, null);
+        String p = getStringConfig("bannedRouterInventoriesRegex", "server", "", null);
         if (p != null && p.length() != 0) {
             try {
                 routerBan = Pattern.compile(p);
@@ -174,7 +181,6 @@ public class Core {
             prop.comment = "This is a Java Regex to blacklist access to TE";
         }
 
-        add_branding = getBoolConfig("addBranding", "misc", add_branding, null);
 
         config.save();
 
@@ -203,6 +209,9 @@ public class Core {
         proxy.registerRenderers();
 
         config.save();
+        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+            isMainClientThread.set(true);
+        }
     }
 
     @PostInit
@@ -340,14 +349,32 @@ public class Core {
             tab.add(o);
         }
     }
+    
+    static ThreadLocal<Boolean> isMainClientThread = new ThreadLocal<Boolean>() {
+        protected Boolean initialValue() { return false; }
+    };
 
     public static void profileStart(String section) {
         // :|
-        //Core.proxy.getProfiler().startSection(section);
+        if (isMainClientThread.get()) {
+            Core.proxy.getProfiler().startSection(section);
+        }
     }
 
     public static void profileEnd() {
-        //Core.proxy.getProfiler().endSection();
+        if (isMainClientThread.get()) {
+            Core.proxy.getProfiler().endSection();
+        }
+    }
+    
+    public static void profileStartRender(String section) {
+        profileStart("factorization");
+        profileStart(section);
+    }
+    
+    public static void profileEndRender() {
+        profileEnd();
+        profileEnd();
     }
 
     public static void brand(List list) {

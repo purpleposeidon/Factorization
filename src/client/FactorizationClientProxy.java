@@ -517,14 +517,17 @@ public class FactorizationClientProxy extends FactorizationProxy {
         if (Core.render_barrel_item || Core.render_barrel_text) {
             setTileEntityRenderer(TileEntityBarrel.class, new TileEntityBarrelRenderer(Core.render_barrel_item, Core.render_barrel_text));
         }
-        setTileEntityRenderer(TileEntityWatchDemon.class, new TileEntityWatchDemonRenderer());
-        // This is entirely Azanor's fault.
-        setTileEntityRenderer(TileEntitySolarTurbine.class, new TileEntitySolarTurbineRender());
-        setTileEntityRenderer(TileEntityHeater.class, new TileEntityHeaterRenderer());
-        setTileEntityRenderer(TileEntityMirror.class, new TileEntityMirrorRenderer());
-        setTileEntityRenderer(TileEntityGrinder.class, new TileEntityGrinderRender());
-        setTileEntityRenderer(TileEntityMixer.class, new TileEntityMixerRenderer());
-        setTileEntityRenderer(TileEntityCrystallizer.class, new TileEntityCrystallizerRender());
+        if (Core.renderTEs) {
+            setTileEntityRenderer(TileEntityWatchDemon.class, new TileEntityWatchDemonRenderer());
+            // This is entirely Azanor's fault.
+            setTileEntityRenderer(TileEntitySolarTurbine.class, new TileEntitySolarTurbineRender());
+            setTileEntityRenderer(TileEntityHeater.class, new TileEntityHeaterRenderer());
+            setTileEntityRenderer(TileEntityMirror.class, new TileEntityMirrorRenderer());
+            setTileEntityRenderer(TileEntityGrinder.class, new TileEntityGrinderRender());
+            setTileEntityRenderer(TileEntityMixer.class, new TileEntityMixerRenderer());
+            setTileEntityRenderer(TileEntityCrystallizer.class, new TileEntityCrystallizerRender());
+        }
+        
         MinecraftForgeClient.preloadTexture(Core.texture_file_block);
         MinecraftForgeClient.preloadTexture(Core.texture_file_item);
 

@@ -24,6 +24,7 @@ import net.minecraftforge.client.ForgeHooksClient;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import factorization.common.Core;
 import factorization.common.TileEntityBarrel;
 
 public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
@@ -43,6 +44,13 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
 
     @Override
     public void renderTileEntityAt(TileEntity ent, double x, double y, double z, float partialTickTime) {
+        Core.profileStartRender("barrel");
+        doRender(ent, x, y, z, partialTickTime);
+        Core.profileEndRender();
+    }
+    
+    
+    void doRender(TileEntity ent, double x, double y, double z, float partialTickTime) {
         if (render_item == false && render_text == false) {
             return;
         }
