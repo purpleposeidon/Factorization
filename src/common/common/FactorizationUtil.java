@@ -6,11 +6,13 @@ import java.util.Random;
 
 import net.minecraft.src.Block;
 import net.minecraft.src.EntityItem;
+import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.IRecipe;
 import net.minecraft.src.InventoryLargeChest;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
+import net.minecraft.src.MathHelper;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.ShapedRecipes;
 import net.minecraft.src.ShapelessRecipes;
@@ -269,5 +271,18 @@ public class FactorizationUtil {
         entityitem.motionZ = rand.nextGaussian() * 0.02;
         c.w.spawnEntityInWorld(entityitem);
         return entityitem;
+    }
+    
+
+    public static int determineOrientation(EntityPlayer player) {
+        if (player.rotationPitch > 75) {
+            return 0;
+        }
+        if (player.rotationPitch <= -75) {
+            return 1;
+        }
+        //stolen from BlockPistonBase.determineOrientation. It was reversed, & we handle the y-axis differently
+        int var7 = MathHelper.floor_double((double) ((180 + player.rotationYaw) * 4.0F / 360.0F) + 0.5D) & 3;
+        return var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0)));
     }
 }

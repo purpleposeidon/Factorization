@@ -43,6 +43,8 @@ abstract public class FactorizationBlockRender implements ICoord {
         return ret;
     }
     
+    protected String cubeTexture = Core.texture_file_block;
+    
     public FactorizationBlockRender() {
         if (getFactoryType() != null) {
             renderMap[getFactoryType().md] = this;
@@ -144,7 +146,27 @@ abstract public class FactorizationBlockRender implements ICoord {
     protected void renderCube(RenderingCube rc) {
         if (!world_mode) {
             Tessellator.instance.startDrawingQuads();
-            ForgeHooksClient.bindTexture(Core.texture_file_block, 0);
+            ForgeHooksClient.bindTexture(cubeTexture, 0);
+            GL11.glDisable(GL11.GL_LIGHTING);
+        }
+        for (int face = 0; face < 6; face++) {
+            Vector[] vecs = rc.faceVerts(face);
+            for (int i = 0; i < vecs.length; i++) {
+                Vector vec = vecs[i];
+                vertex(rc, vec.x, vec.y, vec.z, vec.u, vec.v);
+            }
+        }
+        if (!world_mode) {
+            Tessellator.instance.draw();
+            ForgeHooksClient.unbindTexture();
+            GL11.glEnable(GL11.GL_LIGHTING);
+        }
+    }
+    
+    protected void renderClayCube(RenderingCube rc) {
+        if (!world_mode) {
+            Tessellator.instance.startDrawingQuads();
+            ForgeHooksClient.bindTexture(Core.texture_file_ceramics, 0);
             GL11.glDisable(GL11.GL_LIGHTING);
         }
         for (int face = 0; face < 6; face++) {

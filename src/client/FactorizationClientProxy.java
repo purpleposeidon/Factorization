@@ -57,6 +57,7 @@ import factorization.client.render.BlockRenderHeater;
 import factorization.client.render.BlockRenderLamp;
 import factorization.client.render.BlockRenderMirrorStand;
 import factorization.client.render.BlockRenderMixer;
+import factorization.client.render.BlockRenderSculpture;
 import factorization.client.render.BlockRenderSentryDemon;
 import factorization.client.render.BlockRenderSolarTurbine;
 import factorization.client.render.BlockRenderWire;
@@ -66,6 +67,7 @@ import factorization.client.render.EntityWrathFlameFX;
 import factorization.client.render.FactorizationRender;
 import factorization.client.render.TileEntityBarrelRenderer;
 import factorization.client.render.TileEntityCrystallizerRender;
+import factorization.client.render.TileEntityGreenwareRender;
 import factorization.client.render.TileEntityGrinderRender;
 import factorization.client.render.TileEntityHeaterRenderer;
 import factorization.client.render.TileEntityMirrorRenderer;
@@ -87,6 +89,7 @@ import factorization.common.Registry;
 import factorization.common.TileEntityBarrel;
 import factorization.common.TileEntityCrystallizer;
 import factorization.common.TileEntityFactorization;
+import factorization.common.TileEntityGreenware;
 import factorization.common.TileEntityGrinder;
 import factorization.common.TileEntityHeater;
 import factorization.common.TileEntityMirror;
@@ -526,10 +529,13 @@ public class FactorizationClientProxy extends FactorizationProxy {
             setTileEntityRenderer(TileEntityGrinder.class, new TileEntityGrinderRender());
             setTileEntityRenderer(TileEntityMixer.class, new TileEntityMixerRenderer());
             setTileEntityRenderer(TileEntityCrystallizer.class, new TileEntityCrystallizerRender());
+            // End section that is azanor's fault
+            setTileEntityRenderer(TileEntityGreenware.class, new TileEntityGreenwareRender());
         }
         
         MinecraftForgeClient.preloadTexture(Core.texture_file_block);
         MinecraftForgeClient.preloadTexture(Core.texture_file_item);
+        MinecraftForgeClient.preloadTexture(Core.texture_file_ceramics);
 
         RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
 
@@ -545,6 +551,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderGrinder();
         new BlockRenderMixer();
         new BlockRenderCrystallizer();
+        new BlockRenderSculpture();
 
         MinecraftForgeClient.registerItemRenderer(Core.registry.battery.shiftedIndex, new BatteryItemRender(renderBattery));
     }

@@ -176,6 +176,7 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
 
     @Override
     public String getItemName() {
+        //XXX Bluh localization plz2fix
         return "Bag of Holding";
     }
 

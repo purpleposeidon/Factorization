@@ -15,6 +15,7 @@ public class ItemPocketTable extends Item {
         super(id);
         setMaxStackSize(1);
         setTabToDisplayOn(CreativeTabs.tabTools);
+        setFull3D();
     }
 
     @Override

@@ -55,7 +55,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             queue_item, lamp_item, air_item, sentrydemon_item,
             slagfurnace_item, battery_item_hidden, solar_turbine_item, heater_item,
             mirror_item_hidden,
-            leadwire_item, grinder_item, mixer_item, crystallizer_item;
+            leadwire_item, grinder_item, mixer_item, crystallizer_item,
+            greenware_item;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item, mechaworkshop_item;
     public ItemStack is_factory, is_lamp, is_lightair;
@@ -86,6 +87,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemOreProcessing ore_dirty_gravel, ore_clean_gravel, ore_reduced, ore_crystal;
     public ItemCraftingComponent sludge;
     public ItemCraftingComponent inverium;
+    public ItemSculptingTool sculpt_tool;
 
     public Material materialMachine = new Material(MapColor.ironColor);
 
@@ -178,6 +180,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         grinder_item = FactoryType.GRINDER.itemStack("Grinder");
         mixer_item = FactoryType.MIXER.itemStack("Mixer");
         crystallizer_item = FactoryType.CRYSTALLIZER.itemStack("Crystallizer");
+        greenware_item = FactoryType.GREENWARE.itemStack("Sculpture Table");
 
         //BlockResource stuff
         silver_ore_item = ResourceType.SILVERORE.itemStack("Silver Ore");
@@ -260,6 +263,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         addName(mecha_buoyant_barrel, "Buoyant Barrel");
         addName(mecha_cobble_drive, "Cobblestone Drive");
         addName(mecha_mounted_piston, "Mounted Piston");
+        
+        //ceramics
+        sculpt_tool = new ItemSculptingTool(itemID("sculptTool", 9041));
+        addName(sculpt_tool, "Sculpting Tool");
         
         inverium = new ItemInverium(itemID("inverium", 9040), "item.inverium", 12*16 + 0, 11);
         addName(inverium, "Inverium Drop");
@@ -452,6 +459,16 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'S', Block.pistonStickyBase,
                 'N', Block.pistonBase,
                 'L', Block.lever);
+        
+        //ceramics
+        recipe(new ItemStack(sculpt_tool),
+                " c",
+                "/ ",
+                'c', Item.clay,
+                '/', Item.stick);
+        ItemSculptingTool.addModeChangeRecipes();
+        
+        //inverium
         recipe(new ItemStack(inverium, 1, 1),
                 "LGL",
                 "GDG",
@@ -615,6 +632,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'C', Block.workbench,
                 'M', mecha_chasis,
                 'i', Item.ingotIron);
+        recipe(greenware_item,
+                "c",
+                "-",
+                'c', Item.clay,
+                '-', new ItemStack(Block.woodSingleSlab, 1, -1));
 
         //Electricity
 

@@ -19,7 +19,8 @@ public enum BlockClass {
     WrathFire(6, false, 0, 4, 0),
     Machine(7, true, 0, 0, 3.5F),
     MachineLightable(8, true, 0, 13, 3.5F),
-    Wire(9, false, 0, 0, 0.25F);
+    Wire(9, false, 0, 0, 0.25F),
+    Ceramic(10, false, 0, 0, 1F);
 
     static {
         Wire.setAbnormal();

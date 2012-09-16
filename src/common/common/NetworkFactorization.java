@@ -60,12 +60,14 @@ public class NetworkFactorization implements IPacketHandler {
                     output.writeUTF((String) item);
                 } else if (item instanceof Boolean) {
                     output.writeBoolean((Boolean) item);
+                } else if (item instanceof Float) {
+                    output.writeFloat((Float) item);
                 } else if (item instanceof ItemStack) {
                     NBTTagCompound tag = new NBTTagCompound();
                     ((ItemStack) item).writeToNBT(tag);
                     FactorizationHack.tagWrite(tag, output);
                 } else {
-                    throw new RuntimeException("Argument is not Integer/Byte/String/Boolean/ItemStack: " + item);
+                    throw new RuntimeException("Argument is not Integer/Byte/String/Boolean/Float/ItemStack: " + item);
                 }
             }
             output.flush();
@@ -359,7 +361,9 @@ public class NetworkFactorization implements IPacketHandler {
                 //
                 CrystallizerInfo = 110,
                 //
-                WireFace = 121
+                WireFace = 121,
+                //
+                SculptDescription = 130, SculptSelect = 131, SculptNew = 132, SculptMove = 133, SculptRemove = 134
                 ;
     }
 

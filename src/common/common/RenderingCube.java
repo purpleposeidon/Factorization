@@ -1,8 +1,11 @@
 package factorization.common;
 
+import java.util.ArrayList;
+
+import net.minecraft.src.Block;
+import net.minecraft.src.NBTTagCompound;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Side;
-import net.minecraft.src.Block;
 
 public class RenderingCube {
     public static class Vector {
@@ -23,8 +26,12 @@ public class RenderingCube {
             this.u = u;
             this.v = v;
         }
+        
+        public boolean equals(Vector other) {
+            return this.x == other.x && this.y == other.y && this.z == other.z && this.u == other.u && this.v == other.v;
+        }
 
-        void rotate(float u, float v, float w, float argtheta) {
+        void rotate(float a, float b, float c, float argtheta) {
             //Thanks to http://inside.mines.edu/~gmurray/ArbitraryAxisRotation/
             //Be sure to double-check the signs!
             double theta = Math.toRadians(argtheta);
@@ -32,10 +39,10 @@ public class RenderingCube {
 
             float cos_theta = (float) Math.cos(theta);
             float sin_theta = (float) Math.sin(theta);
-            float product = (u * ox + v * oy + w * oz) * (1 - cos_theta);
-            this.x = u * product + ox * cos_theta + (-w * oy + v * oz) * sin_theta;
-            this.y = v * product + oy * cos_theta + (+w * ox - u * oz) * sin_theta;
-            this.z = w * product + oz * cos_theta + (-v * ox + u * oy) * sin_theta;
+            float product = (a * ox + b * oy + c * oz) * (1 - cos_theta);
+            this.x = a * product + ox * cos_theta + (-c * oy + b * oz) * sin_theta;
+            this.y = b * product + oy * cos_theta + (+c * ox - a * oz) * sin_theta;
+            this.z = c * product + oz * cos_theta + (-b * ox + a * oy) * sin_theta;
         }
 
         public Vector add(int dx, int dy, int dz) {
@@ -74,16 +81,55 @@ public class RenderingCube {
      * the center of the tile.
      */
     public RenderingCube(int icon, Vector corner, Vector origin) {
-        this.icon = icon;
         if (origin == null) {
             origin = new Vector(0, 0, 0, 0, 0);
         }
         this.corner = corner;
         this.origin = origin;
 
-        //XXX TODO NOTE: This might not work properly with large texture packs?
-        ul = ((icon & 0xf) << 4) / 256.0;
-        vl = (icon & 0xf0) / 256.0;
+        setIcon(icon);
+    }
+    
+    void writeToNBT(NBTTagCompound tag) {
+        tag.setInteger("icon", icon);
+        tag.setFloat("cx", corner.x);
+        tag.setFloat("cy", corner.y);
+        tag.setFloat("cz", corner.z);
+        tag.setFloat("ox", origin.x);
+        tag.setFloat("oy", origin.y);
+        tag.setFloat("oz", origin.z);
+    }
+    
+    static RenderingCube loadFromNBT(NBTTagCompound tag) {
+        int icon = tag.getInteger("icon");
+        Vector c = new Vector(tag.getFloat("cx"), tag.getFloat("cy"), tag.getFloat("cz"));
+        Vector o = new Vector(tag.getFloat("ox"), tag.getFloat("oy"), tag.getFloat("oz"));
+        return new RenderingCube(icon, c, o);
+    }
+    
+    void writeToArray(ArrayList<Object> args) {
+        args.add(icon);
+        args.add(corner.x);
+        args.add(corner.y);
+        args.add(corner.z);
+        args.add(origin.x);
+        args.add(origin.y);
+        args.add(origin.z);
+    }
+    
+    static float takeFloat(ArrayList<Object> args) {
+        return (Float) args.remove(0);
+    }
+    
+    static RenderingCube readFromArray(ArrayList<Object> args) {
+        int icon = (Integer) args.remove(0);
+        Vector c = new Vector(takeFloat(args), takeFloat(args), takeFloat(args));
+        Vector o = new Vector(takeFloat(args), takeFloat(args), takeFloat(args));
+        return new RenderingCube(icon, c, o);
+    }
+    
+    public boolean equals(RenderingCube other) {
+        return this.corner.equals(other.corner) && this.origin.equals(other.origin) && this.icon == other.icon; 
     }
 
     public RenderingCube copy() {
@@ -134,6 +180,13 @@ public class RenderingCube {
         this.az = az;
         this.theta = theta;
         return this;
+    }
+    
+    public void setIcon(int newIcon) {
+        icon = newIcon;
+        //XXX TODO NOTE: This might not work properly with large texture packs?
+        ul = ((icon & 0xf) << 4) / 256.0;
+        vl = (icon & 0xf0) / 256.0;
     }
 
     public Vector[] faceVerts(int face) {
@@ -216,9 +269,32 @@ public class RenderingCube {
                 }
                 break;
             }
-            for (Vector vert : ret) {
-                vert.u = Math.max(0, Math.min(vert.u, 16));
-                vert.v = Math.max(0, Math.min(vert.v, 16));
+            for (Vector main : ret) {
+                float udelta = 0, vdelta = 0;
+                int nada = 0;
+                if (main.u > 16) {
+                    udelta = main.u - 16;
+                } else if (main.u < 0) {
+                    udelta = main.u;
+                } else {
+                    nada++;
+                }
+                if (main.v > 16) {
+                    vdelta = main.v - 16;
+                } else if (main.v < 0) {
+                    vdelta = main.v;
+                } else {
+                    nada++;
+                }
+                if (nada == 2) {
+                    continue;
+                }
+                for (Vector other : ret) {
+                    other.u -= udelta;
+                    other.v -= vdelta;
+                }
+                //vert.u = Math.max(0, Math.min(vert.u, 16));
+                //vert.v = Math.max(0, Math.min(vert.v, 16));
             }
         }
         if (theta != 0) {

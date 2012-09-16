@@ -27,18 +27,6 @@ public class MechaMountedPiston extends Item implements IMechaUpgrade {
         return Core.texture_file_item;
     }
 
-    private static int determineOrientation(EntityPlayer player) {
-        if (player.rotationPitch > 75) {
-            return 0;
-        }
-        if (player.rotationPitch <= -75) {
-            return 1;
-        }
-        //stolen from BlockPistonBase.determineOrientation. It was reversed, & we handle the y-axis differently
-        int var7 = MathHelper.floor_double((double) ((180 + player.rotationYaw) * 4.0F / 360.0F) + 0.5D) & 3;
-        return var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0)));
-    }
-
     boolean tryPush(Coord c, int orientation) {
         if (!c.isAir()) {
             return false;
@@ -80,7 +68,7 @@ public class MechaMountedPiston extends Item implements IMechaUpgrade {
             order = new Coord[] { foot, head };
         }
         for (Coord c : order) {
-            if (tryPush(c, determineOrientation(player))) {
+            if (tryPush(c, FactorizationUtil.determineOrientation(player))) {
                 return upgrade;
             }
         }
