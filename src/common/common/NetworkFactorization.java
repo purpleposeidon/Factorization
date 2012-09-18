@@ -25,6 +25,7 @@ import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.Player;
 import factorization.api.Coord;
+import factorization.common.RenderingCube.Vector;
 
 public class NetworkFactorization implements IPacketHandler {
     protected final static String factorizeTEChannel = "factorizeTE"; //used for tile entities
@@ -66,8 +67,13 @@ public class NetworkFactorization implements IPacketHandler {
                     NBTTagCompound tag = new NBTTagCompound();
                     ((ItemStack) item).writeToNBT(tag);
                     FactorizationHack.tagWrite(tag, output);
+                } else if (item instanceof RenderingCube.Vector) {
+                    RenderingCube.Vector v = (Vector) item;
+                    output.writeFloat(v.x);
+                    output.writeFloat(v.y);
+                    output.writeFloat(v.z);
                 } else {
-                    throw new RuntimeException("Argument is not Integer/Byte/String/Boolean/Float/ItemStack: " + item);
+                    throw new RuntimeException("Argument is not Integer/Byte/String/Boolean/Float/ItemStack/RenderingCube.Vector: " + item);
                 }
             }
             output.flush();

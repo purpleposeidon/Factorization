@@ -135,6 +135,16 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         rotation += speed;
         super.updateEntity();
     }
+    
+    @Override
+    byte getExtraInfo2() {
+        return (byte) speed;
+    }
+    
+    @Override
+    void useExtraInfo2(byte b) {
+        speed = b;
+    }
 
     @Override
     void doLogic() {

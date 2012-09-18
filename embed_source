@@ -15,12 +15,12 @@ popd
 
 pushd src/minecraft/factorization
   ln -s $BASE/src/client ./
-  ln -s $BASE/src/inject/FactorizationHack.java ../net/minecraft/src/
+  #ln -s $BASE/src/inject/FactorizationHack.java ../net/minecraft/src/
 popd
 
 pushd src/minecraft_server/factorization/
   ln -s $BASE/src/server ./
-  ln -s $BASE/src/inject/FactorizationHack.java ../net/minecraft/src/
+  #ln -s $BASE/src/inject/FactorizationHack.java ../net/minecraft/src/
 popd
 
 mkdir -p lib/factorization

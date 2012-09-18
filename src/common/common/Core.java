@@ -60,7 +60,7 @@ import factorization.api.Coord;
         packetHandler = NetworkFactorization.class,
         channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel })
 public class Core {
-    public static final String version = "0.6.0"; //@VERSION@
+    public static final String version = "0.5.5"; //@VERSION@
     // runtime storage
     @Instance("factorization")
     public static Core instance;

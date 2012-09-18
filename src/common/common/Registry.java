@@ -88,6 +88,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemCraftingComponent sludge;
     public ItemCraftingComponent inverium;
     public ItemSculptingTool sculpt_tool;
+    public ItemAngularSaw angular_saw;
 
     public Material materialMachine = new Material(MapColor.ironColor);
 
@@ -263,10 +264,13 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         addName(mecha_buoyant_barrel, "Buoyant Barrel");
         addName(mecha_cobble_drive, "Cobblestone Drive");
         addName(mecha_mounted_piston, "Mounted Piston");
+        angular_saw = new ItemAngularSaw(itemID("angularSaw", 9042));
+        addName(angular_saw, "Angular Saw");
+        MinecraftForge.setToolClass(angular_saw, "pickaxe", 3);
         
         //ceramics
-        sculpt_tool = new ItemSculptingTool(itemID("sculptTool", 9041));
-        addName(sculpt_tool, "Sculpting Tool");
+        //sculpt_tool = new ItemSculptingTool(itemID("sculptTool", 9041));
+        //addName(sculpt_tool, "Sculpting Tool");
         
         inverium = new ItemInverium(itemID("inverium", 9040), "item.inverium", 12*16 + 0, 11);
         addName(inverium, "Inverium Drop");
@@ -459,14 +463,22 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'S', Block.pistonStickyBase,
                 'N', Block.pistonBase,
                 'L', Block.lever);
+        recipe(ItemAngularSaw.applyEnchant(new ItemStack(angular_saw)),
+                "OH",
+                "MY",
+                "! ",
+                'O', new ItemStack(diamond_cutting_head),
+                'M', new ItemStack(motor),
+                'Y', new ItemStack(Item.ingotIron),
+                '!', leadwire_item);
         
         //ceramics
-        recipe(new ItemStack(sculpt_tool),
-                " c",
-                "/ ",
-                'c', Item.clay,
-                '/', Item.stick);
-        ItemSculptingTool.addModeChangeRecipes();
+//		recipe(new ItemStack(sculpt_tool),
+//				" c",
+//				"/ ",
+//				'c', Item.clay,
+//				'/', Item.stick);
+//		ItemSculptingTool.addModeChangeRecipes();
         
         //inverium
         recipe(new ItemStack(inverium, 1, 1),
@@ -632,11 +644,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'C', Block.workbench,
                 'M', mecha_chasis,
                 'i', Item.ingotIron);
-        recipe(greenware_item,
-                "c",
-                "-",
-                'c', Item.clay,
-                '-', new ItemStack(Block.woodSingleSlab, 1, -1));
+//		recipe(greenware_item,
+//				"c",
+//				"-",
+//				'c', Item.clay,
+//				'-', new ItemStack(Block.woodSingleSlab, 1, -1));
 
         //Electricity
 
@@ -731,6 +743,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         TileEntityGrinder.addRecipe(new ItemStack(Block.gravel), new ItemStack(Block.sand), 1);
         TileEntityGrinder.addRecipe(new ItemStack(Block.grass), new ItemStack(Block.dirt), 1);
         TileEntityGrinder.addRecipe(new ItemStack(Block.mycelium), new ItemStack(Block.dirt), 1);
+        TileEntityGrinder.addRecipe(new ItemStack(Block.oreDiamond), new ItemStack(Item.diamond), 2.25F);
+        TileEntityGrinder.addRecipe(new ItemStack(Block.oreRedstone), new ItemStack(Item.redstone), 6.5F);
+        TileEntityGrinder.addRecipe(new ItemStack(Block.oreLapis), new ItemStack(Item.dyePowder, 1, 4), 8);
         recipe(mixer_item,
                 " X ",
                 "WMW",
@@ -919,6 +934,38 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         TileEntityWrathLamp.handleAirUpdates();
         TileEntityWrathFire.updateCount = 0;
         TileEntityWatchDemon.worldTick(world);
+    }
+    
+    public boolean extractEnergy(EntityPlayer player, int chargeCount) {
+        IInventory inv = player.inventory;
+        int totalCharge = 0;
+        for (int i = 0; i < inv.getSizeInventory(); i++) {
+            ItemStack is = inv.getStackInSlot(i);
+            if (is == null || is.getItem() != battery) {
+                continue;
+            }
+            totalCharge += battery.getStorage(is);
+        }
+        if (totalCharge < chargeCount) {
+            return false;
+        }
+        for (int i = 0; i < inv.getSizeInventory(); i++) {
+            ItemStack is = inv.getStackInSlot(i);
+            if (is == null || is.getItem() != battery) {
+                continue;
+            }
+            int storage = battery.getStorage(is);
+            int delta = Math.min(chargeCount, storage);
+            storage -= delta;
+            chargeCount -= delta;
+            if (delta > 0) {
+                battery.setStorage(is, storage);
+            }
+            if (chargeCount <= 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @ForgeSubscribe

@@ -276,7 +276,7 @@ public class BlockFactorization extends BlockContainer {
 
         //itemList.add(core.cutter_item);
         //itemList.add(core.queue_item);
-        itemList.add(reg.greenware_item);
+        //itemList.add(reg.greenware_item);
     }
 
     @Override

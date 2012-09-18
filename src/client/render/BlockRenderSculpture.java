@@ -1,10 +1,16 @@
 package factorization.client.render;
 
+import static org.lwjgl.opengl.GL11.*;
+import static java.lang.Math.abs;
+
+import org.lwjgl.opengl.GL11;
+
 import cpw.mods.fml.client.SpriteHelper;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.RenderBlocks;
 import net.minecraft.src.Tessellator;
+import net.minecraftforge.client.ForgeHooksClient;
 import factorization.api.Coord;
 import factorization.common.Core;
 import factorization.common.FactoryType;
@@ -17,43 +23,20 @@ public class BlockRenderSculpture extends FactorizationBlockRender {
     
     public BlockRenderSculpture() {
         instance = this;
-        cubeTexture = "/terrain.png";
+        cubeTexture = Core.texture_file_ceramics;
+        setup();
     }
     
     private boolean texture_init = false;
-    void setup() {
+    public void setup() {
         if (texture_init) {
             return;
         }
-        texture_init = true;
-        String free =
-                "1111111111111111" +
-                "1111111111111111" +
-                "1111111111111111" +
-                "1111111111111111" +
-                "1111111111111111" +
-                "1111111111111111" +
-                "1111111111111111" +
-                "1111111111111111" +
-                "1111111111111111" +
-                "1111111111111111" +
-                "1111111111111111" +
-                "1111111111111111" +
-                "1111111111111111" +
-                "1111111111111111" +
-                "1111111111111111" +
-                "1111111111111111";
-        SpriteHelper.registerSpriteMapForFile(Core.texture_file_ceramics, free);
-        //RenderingRegistry.addTextureOverride(Core.texture_file_ceramics, cubeTexture, TileEntityGreenware.clayIcon_src);
-        for (int i = 0; i < 16*16; i++) {
-            RenderingRegistry.addTextureOverride(cubeTexture, Core.texture_file_ceramics, i);
-            //RenderingRegistry.addTextureOverride(Core.texture_file_ceramics, cubeTexture, i);
-        }
+        //TODO: Copy some textures from terrain.png over here
     }
     
     @Override
     void render(RenderBlocks rb) {
-        setup();
         if (world_mode) {
             Tessellator.instance.setBrightness(Core.registry.factory_block.getMixedBrightnessForBlock(w, x, y, z));
         }
@@ -67,13 +50,26 @@ public class BlockRenderSculpture extends FactorizationBlockRender {
     }
     
     void renderDynamic(TileEntityGreenware greenware) {
-        setup();
         for (RenderingCube rc : greenware.parts) {
             if (rc == greenware.selected) {
                 rc.setIcon(greenware.selectedIcon); //portal
                 //rc.setIcon(0); //error texture
                 //rc.setIcon(16*16 - 1); //lava
                 //rc.setIcon(2*16 - 1); //fire
+                if (rc.theta != 0) {
+                    glDisable(GL_TEXTURE_2D);
+                    glPushMatrix();
+                    glTranslatef(0.5F, 0.5F, 0.5F);
+                    glColor4f(abs(rc.axis.x), 1, 1, 1);
+                    
+                    glBegin(GL_LINES);
+                    glVertex3f(rc.axis.x, rc.axis.y, rc.axis.z);
+                    glVertex3f(-rc.axis.x, -rc.axis.y, -rc.axis.z);
+                    glEnd();
+                    
+                    glPopMatrix();
+                    glEnable(GL_TEXTURE_2D);
+                }
             } else {
                 rc.setIcon(greenware.clayIcon);
             }
@@ -92,11 +88,10 @@ public class BlockRenderSculpture extends FactorizationBlockRender {
         }
     }
     
-    RenderingCube invWoodStand = new RenderingCube(4, new Vector(4, 1, 4), new Vector(0, -6, 0));
+    RenderingCube invWoodStand = new RenderingCube(2, new Vector(4, 1, 4), new Vector(0, -6, 0));
     RenderingCube worldWoodStand = new RenderingCube(16 + 8, new Vector(4, 1, 4), new Vector(0, -6, 0));
     
     void renderStand() {
-        worldWoodStand = new RenderingCube(16 + 8, new Vector(7, 0.5F, 7), new Vector(0, -7.5F, 0));
         if (world_mode) {
             renderClayCube(worldWoodStand);
         } else {

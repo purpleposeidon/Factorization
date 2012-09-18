@@ -1,0 +1,37 @@
+#!/usr/bin/python
+
+import os, random
+import update_info
+
+def run(cmd):
+  print cmd
+  os.system(cmd)
+
+run("./make")
+
+exp = os.path.expanduser
+
+version = update_info.version
+filename = "Factorization-{0}_{1}.jar".format(version, random.randrange(0, 1000))
+oldfile = exp("~/Dropbox/Public/old/" + filename)
+mfurl = exp("~/tmp/factorization_mediafire_url")
+run("cp ~/Dropbox/dev/Factorization-dev.jar " + oldfile)
+
+def adfly(url):
+  return "http://adf.ly/2137658/" + url
+  
+
+#Dropbox
+dropbox_url = "dl.dropbox.com/u/76265666/old/" + filename
+run("dropbox_uploader.sh upload " + oldfile + " Public/old/" + filename)
+
+#Mediafire
+run("mediafire upload --quiet " + oldfile + " > " + mfurl)
+mediafire_url = open(mfurl).read().strip("()").strip()
+
+print "\n"*4
+print "Factorization " + version
+print '''
+[url="{0}"]adfly + MediaFire[/url], or [url="{1}"]adfly + DropBox[/url]
+'''.format(adfly(dropbox_url), adfly(mediafire_url)).strip()
+print

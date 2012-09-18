@@ -1,5 +1,7 @@
 package factorization.common;
 
+import java.io.DataInput;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import net.minecraft.src.Block;
@@ -69,12 +71,35 @@ public class RenderingCube {
         public String toString() {
             return "<" + x + ", " + y + ", " + z + ">";
         }
+        
+        public void writeToTag(NBTTagCompound tag, String prefix) {
+            tag.setFloat(prefix + "x", x);
+            tag.setFloat(prefix + "y", y);
+            tag.setFloat(prefix + "z", z);
+        }
+        
+        public static Vector readFromTag(NBTTagCompound tag, String prefix) {
+            float x = tag.getFloat(prefix+"x");
+            float y = tag.getFloat(prefix+"y");
+            float z = tag.getFloat(prefix+"z");
+            return new Vector(x, y, z);
+        }
+        
+        public static Vector readFromDataInput(DataInput input) throws IOException {
+            return new Vector(input.readFloat(), input.readFloat(), input.readFloat());
+        }
+        
+        void addInfoToArray(ArrayList<Object> args) {
+            args.add(x);
+            args.add(y);
+            args.add(z);
+        }
     }
 
     int icon;
-    Vector corner, origin;
+    public Vector corner, origin, axis;
     public double ul, vl;
-    float ax, ay, az, theta;
+    public float theta;
 
     /**
      * Creates a lovely cube used to render with. The vectors are in texels with the center of the tile as the origin. The rotations will also be done around
@@ -86,35 +111,37 @@ public class RenderingCube {
         }
         this.corner = corner;
         this.origin = origin;
+        this.axis = new Vector(0, 0, 0);
+        this.theta = 0;
 
         setIcon(icon);
     }
     
     void writeToNBT(NBTTagCompound tag) {
         tag.setInteger("icon", icon);
-        tag.setFloat("cx", corner.x);
-        tag.setFloat("cy", corner.y);
-        tag.setFloat("cz", corner.z);
-        tag.setFloat("ox", origin.x);
-        tag.setFloat("oy", origin.y);
-        tag.setFloat("oz", origin.z);
+        corner.writeToTag(tag, "c");
+        origin.writeToTag(tag, "o");
+        axis.writeToTag(tag, "a");
+        tag.setFloat("theta", theta);
     }
     
     static RenderingCube loadFromNBT(NBTTagCompound tag) {
         int icon = tag.getInteger("icon");
-        Vector c = new Vector(tag.getFloat("cx"), tag.getFloat("cy"), tag.getFloat("cz"));
-        Vector o = new Vector(tag.getFloat("ox"), tag.getFloat("oy"), tag.getFloat("oz"));
-        return new RenderingCube(icon, c, o);
+        Vector c = Vector.readFromTag(tag, "c");
+        Vector o = Vector.readFromTag(tag, "o");
+        Vector a = Vector.readFromTag(tag, "a");
+        RenderingCube rc = new RenderingCube(icon, c, o);
+        rc.axis = a;
+        rc.theta = tag.getFloat("theta");
+        return rc;
     }
     
     void writeToArray(ArrayList<Object> args) {
         args.add(icon);
-        args.add(corner.x);
-        args.add(corner.y);
-        args.add(corner.z);
-        args.add(origin.x);
-        args.add(origin.y);
-        args.add(origin.z);
+        corner.addInfoToArray(args);
+        origin.addInfoToArray(args);
+        axis.addInfoToArray(args);
+        args.add(theta);
     }
     
     static float takeFloat(ArrayList<Object> args) {
@@ -125,7 +152,11 @@ public class RenderingCube {
         int icon = (Integer) args.remove(0);
         Vector c = new Vector(takeFloat(args), takeFloat(args), takeFloat(args));
         Vector o = new Vector(takeFloat(args), takeFloat(args), takeFloat(args));
-        return new RenderingCube(icon, c, o);
+        Vector a = new Vector(takeFloat(args), takeFloat(args), takeFloat(args));
+        RenderingCube rc = new RenderingCube(icon, c, o);
+        rc.axis = a;
+        rc.theta = takeFloat(args);
+        return rc;
     }
     
     public boolean equals(RenderingCube other) {
@@ -136,9 +167,7 @@ public class RenderingCube {
         RenderingCube ret = new RenderingCube(this.icon, this.corner.copy(), this.origin.copy());
         ret.ul = this.ul;
         ret.vl = this.vl;
-        ret.ax = this.ax;
-        ret.ay = this.ay;
-        ret.az = this.az;
+        ret.axis = this.axis.copy();
         ret.theta = this.theta;
         return ret;
     }
@@ -146,8 +175,8 @@ public class RenderingCube {
     public RenderingCube normalize() {
         Vector newCorner = corner.copy();
         Vector newOrigin = origin.copy();
-        newCorner.rotate(ax, ay, az, theta);
-        newOrigin.rotate(ax, ay, az, theta);
+        newCorner.rotate(axis.x, axis.y, axis.z, theta);
+        newOrigin.rotate(axis.x, axis.y, axis.z, theta);
         newCorner.x = Math.abs(newCorner.x);
         newCorner.y = Math.abs(newCorner.y);
         newCorner.z = Math.abs(newCorner.z);
@@ -172,12 +201,11 @@ public class RenderingCube {
 
     public RenderingCube rotate(float ax, float ay, float az, int theta) {
         if (theta == 0) {
-            this.ax = this.ay = this.az = this.theta = 0;
+            this.axis = new Vector(0, 0, 0);
+            this.theta = 0;
             return this;
         }
-        this.ax = ax;
-        this.ay = ay;
-        this.az = az;
+        this.axis = new Vector(ax, ay, az);
         this.theta = theta;
         return this;
     }
@@ -299,7 +327,7 @@ public class RenderingCube {
         }
         if (theta != 0) {
             for (Vector vert : ret) {
-                vert.rotate(ax, ay, az, theta);
+                vert.rotate(axis.x, axis.y, axis.z, theta);
             }
         }
         return ret;

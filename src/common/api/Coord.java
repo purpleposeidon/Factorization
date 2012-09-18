@@ -6,6 +6,8 @@ import java.util.Random;
 
 import net.minecraft.src.Block;
 import net.minecraft.src.Entity;
+import net.minecraft.src.EntityItem;
+import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
@@ -423,5 +425,9 @@ public class Coord {
     
     public boolean local() {
         return !w.isRemote;
+    }
+    
+    public void spawnItem(ItemStack is) {
+        w.spawnEntityInWorld(new EntityItem(w, x + 0.5, y + 0.5, z + 0.5, is));
     }
 }

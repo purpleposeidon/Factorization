@@ -551,7 +551,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderGrinder();
         new BlockRenderMixer();
         new BlockRenderCrystallizer();
-        new BlockRenderSculpture();
+        new BlockRenderSculpture().setup();
 
         MinecraftForgeClient.registerItemRenderer(Core.registry.battery.shiftedIndex, new BatteryItemRender(renderBattery));
     }

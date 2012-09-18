@@ -181,28 +181,29 @@ public class TileEntityGreenware extends TileEntityCommon {
         return true;
     }
     
-    void moveLump(int id, float cx, float cy, float cz, float ox, float oy, float oz) {
+    void updateLump(int id, Vector newCorner, Vector newOrigin, Vector newAxis, float theta) {
         if (id < 0 || id >= parts.size()) {
             return;
         }
         RenderingCube rc = parts.get(id);
-        Vector newCorner = new Vector(cx, cy, cz), newOrigin = new Vector(ox, oy, oz);
-        if (rc.corner.equals(newCorner) && rc.origin.equals(newOrigin)) {
+        if (rc.corner.equals(newCorner) && rc.origin.equals(newOrigin) && rc.axis.equals(newAxis) && rc.theta == theta) {
             return;
         }
         rc.corner = newCorner;
         rc.origin = newOrigin;
+        rc.axis = newAxis;
+        rc.theta = theta;
         if (worldObj.isRemote) {
             return;
         }
-        //XXX This only happens client-side
-        broadcastMessage(null, MessageType.SculptMove, id, cx, cy, cz, ox, oy, oz);
     }
     
     void shareLump(int id, RenderingCube selection) {
         broadcastMessage(null, MessageType.SculptMove, id,
-                selection.corner.x, selection.corner.y, selection.corner.z,
-                selection.origin.x, selection.origin.y, selection.origin.z);
+                selection.corner,
+                selection.origin,
+                selection.axis,
+                selection.theta);
     }
     
     private float getFloat(DataInput input) throws IOException {
@@ -239,16 +240,18 @@ public class TileEntityGreenware extends TileEntityCommon {
                 } catch (IOException e) {
                     break;
                 }
-                for (int i = 0; i < 6; i++) {
+                for (int i = 0; i < 10; i++) {
                     args.add(input.readFloat());
                 }
                 parts.add(RenderingCube.readFromArray(args));
             }
             break;
         case MessageType.SculptMove:
-            moveLump(input.readInt(), //id
-                    getFloat(input), getFloat(input), getFloat(input), //corner
-                    getFloat(input), getFloat(input), getFloat(input) //origin
+            updateLump(input.readInt(), //id
+                    Vector.readFromDataInput(input),
+                    Vector.readFromDataInput(input),
+                    Vector.readFromDataInput(input),
+                    getFloat(input) //theta
                     );
             break;
         case MessageType.SculptNew:

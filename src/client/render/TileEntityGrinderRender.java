@@ -67,7 +67,7 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
         TileEntityGrinder grinder = (TileEntityGrinder) te;
         GL11.glPushMatrix();
         GL11.glTranslatef((float) (x + 0.5), (float) (y + 5F / 16F), (float) (z + 0.5));
-        GL11.glRotatef(grinder.rotation / 30.0F, 0, 1, 0);
+        GL11.glRotatef(grinder.rotation / 5.0F, 0, 1, 0);
         renderGrindHead();
         GL11.glPopMatrix();
         Core.profileEndRender();

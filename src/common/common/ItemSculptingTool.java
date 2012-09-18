@@ -14,6 +14,7 @@ import net.minecraft.src.World;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
+import factorization.common.RenderingCube.Vector;
 import factorization.common.TileEntityGreenware.SelectionInfo;
 
 public class ItemSculptingTool extends Item {
@@ -154,9 +155,36 @@ public class ItemSculptingTool extends Item {
             w.spawnEntityInWorld(drop);
             break;
         case ROTATOR:
+            test = selection.copy();
+            rotate(test, player.isSneaking(), side);
+            if (TileEntityGreenware.isValidLump(test)) {
+                rotate(selection, player.isSneaking(), side);
+                gw.shareLump(sel.id, selection);
+            }
             break;
         }
         return true;
+    }
+    
+    void rotate(RenderingCube cube, boolean reverse, int side) {
+        if (cube.theta == 0) {
+            ForgeDirection direction = ForgeDirection.getOrientation(side);
+            cube.axis = new Vector(direction.offsetX, direction.offsetY, direction.offsetZ);
+        }
+        float delta = -360F/16F;
+        if (reverse) {
+            delta *= -1;
+        }
+        cube.theta += delta;
+        if (cube.theta >= 360) {
+            cube.theta -= 360;
+        }
+        if (cube.theta < 0) {
+            cube.theta += 360;
+        }
+        if (cube.theta == 0) {
+            cube.axis = new Vector(0, 0, 0);
+        }
     }
     
     void move(RenderingCube cube, boolean reverse, int side) {

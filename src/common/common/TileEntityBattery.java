@@ -116,13 +116,15 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
 
     @Override
     byte getExtraInfo() {
-        float perc = storage.getValue() / max_storage;
-        return (byte) (perc * 127);
+        float perc = storage.getValue() / (float) max_storage;
+        byte ret = (byte) (perc * 127);
+        return ret;
     }
 
     @Override
     void useExtraInfo(byte b) {
         float perc = (b / 127F);
-        storage.setValue((int) (max_storage * perc));
+        int new_storage = (int) (max_storage * perc);
+        storage.setValue(new_storage);
     }
 }

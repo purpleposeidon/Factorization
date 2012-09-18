@@ -11,7 +11,9 @@ for line in open(versioning_file):
     version = line.split("=")[1].split(";")[0].strip().strip('"')
     break
 
-print "Version:", version
+
+if __name__ == '__main__':
+  print "Version:", version
 info[0]["version"] = version
 json.dump(info, open("mcmod.info", 'w'), indent=1)
 
