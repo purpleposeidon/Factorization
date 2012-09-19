@@ -4,7 +4,6 @@ import static org.lwjgl.opengl.GL11.*;
 import factorization.common.Core;
 import factorization.common.FactoryType;
 import factorization.common.RenderingCube;
-import factorization.common.RenderingCube.Vector;
 import factorization.common.TileEntityGreenware;
 
 import net.minecraft.src.RenderBlocks;

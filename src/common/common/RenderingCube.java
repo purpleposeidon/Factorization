@@ -1,107 +1,16 @@
 package factorization.common;
 
-import java.io.DataInput;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import net.minecraft.src.Block;
 import net.minecraft.src.NBTTagCompound;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Side;
+import factorization.api.VectorUV;
 
 public class RenderingCube {
-    public static class Vector {
-        public float x, y, z, u, v;
-
-        public Vector(float x, float y, float z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.u = 0;
-            this.v = 0;
-        }
-
-        public Vector(float x, float y, float z, float u, float v) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.u = u;
-            this.v = v;
-        }
-        
-        public boolean equals(Vector other) {
-            return this.x == other.x && this.y == other.y && this.z == other.z && this.u == other.u && this.v == other.v;
-        }
-
-        void rotate(float a, float b, float c, float argtheta) {
-            //Thanks to http://inside.mines.edu/~gmurray/ArbitraryAxisRotation/
-            //Be sure to double-check the signs!
-            double theta = Math.toRadians(argtheta);
-            float ox = this.x, oy = this.y, oz = this.z;
-
-            float cos_theta = (float) Math.cos(theta);
-            float sin_theta = (float) Math.sin(theta);
-            float product = (a * ox + b * oy + c * oz) * (1 - cos_theta);
-            this.x = a * product + ox * cos_theta + (-c * oy + b * oz) * sin_theta;
-            this.y = b * product + oy * cos_theta + (+c * ox - a * oz) * sin_theta;
-            this.z = c * product + oz * cos_theta + (-b * ox + a * oy) * sin_theta;
-        }
-
-        public Vector add(int dx, int dy, int dz) {
-            return new Vector(x + dx, y + dy, z + dz, u, v);
-        }
-        
-        public Vector add(Vector o) {
-            return new Vector(x + o.x, y + o.y, z + o.z, u, v);
-        }
-
-        void scale(float d) {
-            x *= d;
-            y *= d;
-            z *= d;
-        }
-
-        void incr(Vector d) {
-            x += d.x;
-            y += d.y;
-            z += d.z;
-        }
-
-        Vector copy() {
-            return new Vector(x, y, z, u, v);
-        }
-
-        @Override
-        public String toString() {
-            return "<" + x + ", " + y + ", " + z + ">";
-        }
-        
-        public void writeToTag(NBTTagCompound tag, String prefix) {
-            tag.setFloat(prefix + "x", x);
-            tag.setFloat(prefix + "y", y);
-            tag.setFloat(prefix + "z", z);
-        }
-        
-        public static Vector readFromTag(NBTTagCompound tag, String prefix) {
-            float x = tag.getFloat(prefix+"x");
-            float y = tag.getFloat(prefix+"y");
-            float z = tag.getFloat(prefix+"z");
-            return new Vector(x, y, z);
-        }
-        
-        public static Vector readFromDataInput(DataInput input) throws IOException {
-            return new Vector(input.readFloat(), input.readFloat(), input.readFloat());
-        }
-        
-        void addInfoToArray(ArrayList<Object> args) {
-            args.add(x);
-            args.add(y);
-            args.add(z);
-        }
-    }
-
     int icon;
-    public Vector corner, origin, axis;
+    public VectorUV corner, origin, axis;
     public double ul, vl;
     public float theta;
 
@@ -109,13 +18,13 @@ public class RenderingCube {
      * Creates a lovely cube used to render with. The vectors are in texels with the center of the tile as the origin. The rotations will also be done around
      * the center of the tile.
      */
-    public RenderingCube(int icon, Vector corner, Vector origin) {
+    public RenderingCube(int icon, VectorUV corner, VectorUV origin) {
         if (origin == null) {
-            origin = new Vector(0, 0, 0, 0, 0);
+            origin = new VectorUV(0, 0, 0, 0, 0);
         }
         this.corner = corner;
         this.origin = origin;
-        this.axis = new Vector(0, 0, 0);
+        this.axis = new VectorUV(0, 0, 0);
         this.theta = 0;
 
         setIcon(icon);
@@ -131,9 +40,9 @@ public class RenderingCube {
     
     static RenderingCube loadFromNBT(NBTTagCompound tag) {
         int icon = tag.getInteger("icon");
-        Vector c = Vector.readFromTag(tag, "c");
-        Vector o = Vector.readFromTag(tag, "o");
-        Vector a = Vector.readFromTag(tag, "a");
+        VectorUV c = VectorUV.readFromTag(tag, "c");
+        VectorUV o = VectorUV.readFromTag(tag, "o");
+        VectorUV a = VectorUV.readFromTag(tag, "a");
         RenderingCube rc = new RenderingCube(icon, c, o);
         rc.axis = a;
         rc.theta = tag.getFloat("theta");
@@ -154,9 +63,9 @@ public class RenderingCube {
     
     static RenderingCube readFromArray(ArrayList<Object> args) {
         int icon = (Integer) args.remove(0);
-        Vector c = new Vector(takeFloat(args), takeFloat(args), takeFloat(args));
-        Vector o = new Vector(takeFloat(args), takeFloat(args), takeFloat(args));
-        Vector a = new Vector(takeFloat(args), takeFloat(args), takeFloat(args));
+        VectorUV c = new VectorUV(takeFloat(args), takeFloat(args), takeFloat(args));
+        VectorUV o = new VectorUV(takeFloat(args), takeFloat(args), takeFloat(args));
+        VectorUV a = new VectorUV(takeFloat(args), takeFloat(args), takeFloat(args));
         RenderingCube rc = new RenderingCube(icon, c, o);
         rc.axis = a;
         rc.theta = takeFloat(args);
@@ -177,8 +86,8 @@ public class RenderingCube {
     }
 
     public RenderingCube normalize() {
-        Vector newCorner = corner.copy();
-        Vector newOrigin = origin.copy();
+        VectorUV newCorner = corner.copy();
+        VectorUV newOrigin = origin.copy();
         newCorner.rotate(axis.x, axis.y, axis.z, theta);
         newOrigin.rotate(axis.x, axis.y, axis.z, theta);
         newCorner.x = Math.abs(newCorner.x);
@@ -189,8 +98,8 @@ public class RenderingCube {
 
     public void toBlockBounds(Block b) {
         RenderingCube cube = normalize();
-        Vector c = cube.corner;
-        Vector o = cube.origin;
+        VectorUV c = cube.corner;
+        VectorUV o = cube.origin;
         c.scale(1F / 16F);
         o = o.add(8, 8, 8);
         o.scale(1F / 16F);
@@ -205,11 +114,11 @@ public class RenderingCube {
 
     public RenderingCube rotate(float ax, float ay, float az, int theta) {
         if (theta == 0) {
-            this.axis = new Vector(0, 0, 0);
+            this.axis = new VectorUV(0, 0, 0);
             this.theta = 0;
             return this;
         }
-        this.axis = new Vector(ax, ay, az);
+        this.axis = new VectorUV(ax, ay, az);
         this.theta = theta;
         return this;
     }
@@ -221,49 +130,49 @@ public class RenderingCube {
         vl = (icon & 0xf0) / 256.0;
     }
 
-    public Vector[] faceVerts(int face) {
-        Vector ret[] = new Vector[4];
-        Vector v = corner;
+    public VectorUV[] faceVerts(int face) {
+        VectorUV ret[] = new VectorUV[4];
+        VectorUV v = corner;
         int c = 8;
         switch (face) {
         case 0: //-y
-            ret[0] = new Vector(v.x, -v.y, v.z);
-            ret[1] = new Vector(-v.x, -v.y, v.z);
-            ret[2] = new Vector(-v.x, -v.y, -v.z);
-            ret[3] = new Vector(v.x, -v.y, -v.z);
+            ret[0] = new VectorUV(v.x, -v.y, v.z);
+            ret[1] = new VectorUV(-v.x, -v.y, v.z);
+            ret[2] = new VectorUV(-v.x, -v.y, -v.z);
+            ret[3] = new VectorUV(v.x, -v.y, -v.z);
             break;
         case 1: //+y
-            ret[0] = new Vector(v.x, v.y, -v.z);
-            ret[1] = new Vector(-v.x, v.y, -v.z);
-            ret[2] = new Vector(-v.x, v.y, v.z);
-            ret[3] = new Vector(v.x, v.y, v.z);
+            ret[0] = new VectorUV(v.x, v.y, -v.z);
+            ret[1] = new VectorUV(-v.x, v.y, -v.z);
+            ret[2] = new VectorUV(-v.x, v.y, v.z);
+            ret[3] = new VectorUV(v.x, v.y, v.z);
             break;
         case 2: //-z
-            ret[0] = new Vector(v.x, v.y, -v.z);
-            ret[1] = new Vector(v.x, -v.y, -v.z);
-            ret[2] = new Vector(-v.x, -v.y, -v.z);
-            ret[3] = new Vector(-v.x, v.y, -v.z);
+            ret[0] = new VectorUV(v.x, v.y, -v.z);
+            ret[1] = new VectorUV(v.x, -v.y, -v.z);
+            ret[2] = new VectorUV(-v.x, -v.y, -v.z);
+            ret[3] = new VectorUV(-v.x, v.y, -v.z);
             break;
         case 3: //+z
-            ret[0] = new Vector(v.x, v.y, v.z);
-            ret[1] = new Vector(-v.x, v.y, v.z);
-            ret[2] = new Vector(-v.x, -v.y, v.z);
-            ret[3] = new Vector(v.x, -v.y, v.z);
+            ret[0] = new VectorUV(v.x, v.y, v.z);
+            ret[1] = new VectorUV(-v.x, v.y, v.z);
+            ret[2] = new VectorUV(-v.x, -v.y, v.z);
+            ret[3] = new VectorUV(v.x, -v.y, v.z);
             break;
         case 4: //-x
-            ret[0] = new Vector(-v.x, v.y, v.z);
-            ret[1] = new Vector(-v.x, v.y, -v.z);
-            ret[2] = new Vector(-v.x, -v.y, -v.z);
-            ret[3] = new Vector(-v.x, -v.y, v.z);
+            ret[0] = new VectorUV(-v.x, v.y, v.z);
+            ret[1] = new VectorUV(-v.x, v.y, -v.z);
+            ret[2] = new VectorUV(-v.x, -v.y, -v.z);
+            ret[3] = new VectorUV(-v.x, -v.y, v.z);
             break;
         case 5: //+x
-            ret[0] = new Vector(v.x, v.y, v.z);
-            ret[1] = new Vector(v.x, -v.y, v.z);
-            ret[2] = new Vector(v.x, -v.y, -v.z);
-            ret[3] = new Vector(v.x, v.y, -v.z);
+            ret[0] = new VectorUV(v.x, v.y, v.z);
+            ret[1] = new VectorUV(v.x, -v.y, v.z);
+            ret[2] = new VectorUV(v.x, -v.y, -v.z);
+            ret[3] = new VectorUV(v.x, v.y, -v.z);
             break;
         }
-        for (Vector vert : ret) {
+        for (VectorUV vert : ret) {
             vert.incr(origin);
         }
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
@@ -271,37 +180,37 @@ public class RenderingCube {
             case 0: //-y
             case 1: //+y
                 //Mirror these like MC does.
-                for (Vector vert : ret) {
+                for (VectorUV vert : ret) {
                     vert.u = vert.x + 8;
                     vert.v = vert.z + 8;
                 }
                 break;
             case 2: //-z
-                for (Vector vert : ret) {
+                for (VectorUV vert : ret) {
                     vert.u = 16 - (vert.x + 8);
                     vert.v = 16 - (vert.y + 8);
                 }
                 break;
             case 3: //+z
-                for (Vector vert : ret) {
+                for (VectorUV vert : ret) {
                     vert.u = vert.x + 8;
                     vert.v = 16 - (vert.y + 8);
                 }
                 break;
             case 4: //-x
-                for (Vector vert : ret) {
+                for (VectorUV vert : ret) {
                     vert.u = 16 - (vert.y + 8);
                     vert.v = (vert.z + 8);
                 }
                 break;
             case 5: //+x
-                for (Vector vert : ret) {
+                for (VectorUV vert : ret) {
                     vert.u = 16 - (vert.y + 8);
                     vert.v = 16 - (vert.z + 8);
                 }
                 break;
             }
-            for (Vector main : ret) {
+            for (VectorUV main : ret) {
                 float udelta = 0, vdelta = 0;
                 int nada = 0;
                 if (main.u > 16) {
@@ -321,7 +230,7 @@ public class RenderingCube {
                 if (nada == 2) {
                     continue;
                 }
-                for (Vector other : ret) {
+                for (VectorUV other : ret) {
                     other.u -= udelta;
                     other.v -= vdelta;
                 }
@@ -330,7 +239,7 @@ public class RenderingCube {
             }
         }
         if (theta != 0) {
-            for (Vector vert : ret) {
+            for (VectorUV vert : ret) {
                 vert.rotate(axis.x, axis.y, axis.z, theta);
             }
         }

@@ -13,8 +13,8 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.World;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
+import factorization.api.VectorUV;
 import factorization.common.NetworkFactorization.MessageType;
-import factorization.common.RenderingCube.Vector;
 import factorization.common.TileEntityGreenware.ClayState;
 import factorization.common.TileEntityGreenware.SelectionInfo;
 
@@ -190,7 +190,7 @@ public class ItemSculptingTool extends Item {
     void rotate(RenderingCube cube, boolean reverse, int side) {
         if (cube.theta == 0) {
             ForgeDirection direction = ForgeDirection.getOrientation(side);
-            cube.axis = new Vector(direction.offsetX, direction.offsetY, direction.offsetZ);
+            cube.axis = new VectorUV(direction.offsetX, direction.offsetY, direction.offsetZ);
         }
         float delta = -360F/32F;
         if (reverse) {
@@ -204,7 +204,7 @@ public class ItemSculptingTool extends Item {
             cube.theta += 360;
         }
         if (cube.theta == 0) {
-            cube.axis = new Vector(0, 0, 0);
+            cube.axis = new VectorUV(0, 0, 0);
         }
     }
     

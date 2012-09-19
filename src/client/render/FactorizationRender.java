@@ -22,7 +22,6 @@ import factorization.common.BlockFactorization;
 import factorization.common.Core;
 import factorization.common.FactoryType;
 import factorization.common.RenderingCube;
-import factorization.common.RenderingCube.Vector;
 import factorization.common.Texture;
 import factorization.common.TileEntityBattery;
 import factorization.common.TileEntityCommon;

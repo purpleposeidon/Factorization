@@ -1,10 +1,10 @@
 package factorization.client.render;
 
 import factorization.api.Coord;
+import factorization.api.VectorUV;
 import factorization.common.Core;
 import factorization.common.FactoryType;
 import factorization.common.RenderingCube;
-import factorization.common.RenderingCube.Vector;
 import factorization.common.TileEntityWire;
 import factorization.common.WireConnections;
 import net.minecraft.client.Minecraft;
@@ -12,7 +12,7 @@ import net.minecraft.src.RenderBlocks;
 import net.minecraft.src.Tessellator;
 
 public class BlockRenderWire extends FactorizationBlockRender {
-    RenderingCube bot = new RenderingCube(11, new Vector(1, 0, 0), new Vector(0, -1, 0));
+    RenderingCube bot = new RenderingCube(11, new VectorUV(1, 0, 0), new VectorUV(0, -1, 0));
     @Override
     void render(RenderBlocks rb) {
         if (world_mode) {

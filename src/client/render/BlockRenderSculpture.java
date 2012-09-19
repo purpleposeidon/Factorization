@@ -12,10 +12,10 @@ import net.minecraft.src.RenderBlocks;
 import net.minecraft.src.Tessellator;
 import net.minecraftforge.client.ForgeHooksClient;
 import factorization.api.Coord;
+import factorization.api.VectorUV;
 import factorization.common.Core;
 import factorization.common.FactoryType;
 import factorization.common.RenderingCube;
-import factorization.common.RenderingCube.Vector;
 import factorization.common.TileEntityGreenware.ClayState;
 import factorization.common.TileEntityGreenware;
 
@@ -96,8 +96,8 @@ public class BlockRenderSculpture extends FactorizationBlockRender {
         }
     }
     
-    RenderingCube invWoodStand = new RenderingCube(2, new Vector(4, 1, 4), new Vector(0, -6, 0));
-    RenderingCube worldWoodStand = new RenderingCube(16 + 8, new Vector(4, 1, 4), new Vector(0, -6, 0));
+    RenderingCube invWoodStand = new RenderingCube(2, new VectorUV(4, 1, 4), new VectorUV(0, -6, 0));
+    RenderingCube worldWoodStand = new RenderingCube(16 + 8, new VectorUV(4, 1, 4), new VectorUV(0, -6, 0));
     
     void renderStand() {
         if (world_mode) {

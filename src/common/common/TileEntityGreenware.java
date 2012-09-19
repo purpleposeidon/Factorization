@@ -16,8 +16,8 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NBTTagList;
 import net.minecraft.src.Packet;
+import factorization.api.VectorUV;
 import factorization.common.NetworkFactorization.MessageType;
-import factorization.common.RenderingCube.Vector;
 
 public class TileEntityGreenware extends TileEntityCommon {
 
@@ -99,7 +99,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     
     void initialize() {
         parts.clear();
-        parts.add(new RenderingCube(clayIconStart, new Vector(3, 5, 3), null));
+        parts.add(new RenderingCube(clayIconStart, new VectorUV(3, 5, 3), null));
         touch();
     }
     
@@ -235,7 +235,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     }
     
     void addLump(String creator) {
-        parts.add(new RenderingCube(clayIconStart, new Vector(4, 4, 4), null));
+        parts.add(new RenderingCube(clayIconStart, new VectorUV(4, 4, 4), null));
         if (!worldObj.isRemote) {
             broadcastMessage(null, MessageType.SculptNew, creator);
             selections.put(creator, new SelectionInfo(this, parts.size() - 1));
@@ -260,7 +260,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     public static boolean isValidLump(RenderingCube rc) {
         float edge = 8*3; //a cube and a half
         for (int i = 0; i < 6; i++) {
-            for (Vector vertex : rc.faceVerts(i)) {
+            for (VectorUV vertex : rc.faceVerts(i)) {
                 if (abs(vertex.x) > edge) {
                     return false;
                 }
@@ -284,7 +284,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         return true;
     }
     
-    void updateLump(int id, Vector newCorner, Vector newOrigin, Vector newAxis, float theta) {
+    void updateLump(int id, VectorUV newCorner, VectorUV newOrigin, VectorUV newAxis, float theta) {
         if (id < 0 || id >= parts.size()) {
             return;
         }
@@ -373,9 +373,9 @@ public class TileEntityGreenware extends TileEntityCommon {
             break;
         case MessageType.SculptMove:
             updateLump(input.readInt(), //id
-                    Vector.readFromDataInput(input),
-                    Vector.readFromDataInput(input),
-                    Vector.readFromDataInput(input),
+                    VectorUV.readFromDataInput(input),
+                    VectorUV.readFromDataInput(input),
+                    VectorUV.readFromDataInput(input),
                     getFloat(input) //theta
                     );
             break;

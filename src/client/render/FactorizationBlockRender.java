@@ -8,12 +8,12 @@ import cpw.mods.fml.client.registry.RenderingRegistry;
 
 import factorization.api.Coord;
 import factorization.api.ICoord;
+import factorization.api.VectorUV;
 import factorization.common.BlockFactorization;
 import factorization.common.Core;
 import factorization.common.FactoryType;
 import factorization.common.RenderingCube;
 import factorization.common.Texture;
-import factorization.common.RenderingCube.Vector;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.Block;
 import net.minecraft.src.IBlockAccess;
@@ -145,7 +145,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         GL11.glTranslatef(0.5F, 0.5F, 0.5F);
     }
     
-    static private float getNormalizedLighting(Vector[] vecs) {
+    static private float getNormalizedLighting(VectorUV[] vecs) {
         float x0 = vecs[0].x, y0 = vecs[0].y, z0 = vecs[0].z;
         float x1 = vecs[1].x, y1 = vecs[1].y, z1 = vecs[1].z;
         float x2 = vecs[2].x, y2 = vecs[2].y, z2 = vecs[2].z;
@@ -189,12 +189,12 @@ abstract public class FactorizationBlockRender implements ICoord {
         zfight *= rc.corner.z * (delta);
         zfight = 1.0025F;
         for (int face = 0; face < 6; face++) {
-            Vector[] vecs = rc.faceVerts(face);
+            VectorUV[] vecs = rc.faceVerts(face);
             float color = getNormalizedLighting(vecs);
             
             Tessellator.instance.setColorOpaque_F(color, color, color);
             for (int i = 0; i < vecs.length; i++) {
-                Vector vec = vecs[i];
+                VectorUV vec = vecs[i];
                 vertex(rc, vec.x*zfight, vec.y*zfight, vec.z*zfight, vec.u, vec.v);
             }
         }

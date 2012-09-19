@@ -9,7 +9,7 @@ import net.minecraft.src.World;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.IChargeConductor;
-import factorization.common.RenderingCube.Vector;
+import factorization.api.VectorUV;
 
 public class WireConnections {
     TileEntityWire me;
@@ -121,13 +121,13 @@ public class WireConnections {
         return Long.bitCount(edges) + Long.bitCount(faces) * 2 + (center_core ? 4 : 0);
     }
 
-    static RenderingCube cube(Vector corner, Vector origin) {
+    static RenderingCube cube(VectorUV corner, VectorUV origin) {
         final int icon = 11; //34... was old. 11 is right, but... what?
         return new RenderingCube(icon, corner, origin);
     }
 
     static final float h = 2, w = 4; //these are half of the actual size.
-    static RenderingCube base_face = cube(new Vector(w, h, w), new Vector(0, -8 + h, 0));
+    static RenderingCube base_face = cube(new VectorUV(w, h, w), new VectorUV(0, -8 + h, 0));
     static RenderingCube base_face_side = base_face.copy().rotate(1, 0, 0, 90).normalize();
     static RenderingCube face_map[] = {
             base_face.copy(),
@@ -137,7 +137,7 @@ public class WireConnections {
             base_face_side.rotate(0, 1, 0, 90 * 1).normalize(),
             base_face_side.rotate(0, 1, 0, 90 * 3).normalize(),
     };
-    static RenderingCube bottom_edge = cube(new Vector(w, h, h), new Vector(0, -8 + h, 8 - h)),
+    static RenderingCube bottom_edge = cube(new VectorUV(w, h, h), new VectorUV(0, -8 + h, 8 - h)),
             top_edge = bottom_edge.copy().rotate(1, 0, 0, 180).normalize(),
             side_edge = bottom_edge.copy().rotate(0, 0, 1, 90).normalize();
     static RenderingCube edge_map[] = {
@@ -158,7 +158,7 @@ public class WireConnections {
     public Iterable<RenderingCube> getParts() {
         ArrayList<RenderingCube> ret = new ArrayList(20);
         if (center_core) {
-            ret.add(cube(new Vector(w, w, w), null));
+            ret.add(cube(new VectorUV(w, w, w), null));
         }
         for (int face_index = 0; face_index < 6; face_index++) {
             if ((faces & (1 << face_index)) == 0) {
@@ -186,9 +186,9 @@ public class WireConnections {
         return ret;
     }
 
-    private void getExtremes(RenderingCube cube, Vector min, Vector max) {
+    private void getExtremes(RenderingCube cube, VectorUV min, VectorUV max) {
         for (int face = 0; face < 6; face++) {
-            for (Vector v : cube.faceVerts(face)) {
+            for (VectorUV v : cube.faceVerts(face)) {
                 min.x = Math.min(v.x, min.x);
                 min.y = Math.min(v.y, min.y);
                 min.z = Math.min(v.z, min.z);
@@ -200,7 +200,7 @@ public class WireConnections {
     }
 
     public void setBlockBounds(Block block) {
-        Vector min = null, max = null;
+        VectorUV min = null, max = null;
         boolean first = true;
         for (RenderingCube part : getParts()) {
             if (first) {
