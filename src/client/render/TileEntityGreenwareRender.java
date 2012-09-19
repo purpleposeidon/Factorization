@@ -16,6 +16,10 @@ public class TileEntityGreenwareRender extends TileEntitySpecialRenderer {
 
     @Override
     public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
+        TileEntityGreenware gw = (TileEntityGreenware) te;
+        if (!gw.canEdit()) {
+            return;
+        }
         Core.profileStartRender("ceramics");
         glPushMatrix();
         glTranslated(x, y, z);

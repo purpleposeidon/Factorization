@@ -95,7 +95,6 @@ public class Core {
     public final static String texture_dir = "/factorization/texture/";
     public final static String texture_file_block = texture_dir + "blocks.png";
     public final static String texture_file_item = texture_dir + "items.png";
-    public final static String texture_file_ceramics = texture_dir + "ceramics.png";
 
     private int getBlockConfig(String name, int defaultId, String comment) {
         Property prop = config.getOrCreateBlockIdProperty(name, defaultId);
@@ -385,7 +384,7 @@ public class Core {
         }
     }
     
-    public static void sendNotification(EntityPlayer player, Coord where, String msg) {
+    public static void notify(EntityPlayer player, Coord where, String msg) {
         //TODO: Have the client draw the notification somewhere in the world instead of using a chat message! It'll be awesome!
         if (player.worldObj.isRemote) {
             return;

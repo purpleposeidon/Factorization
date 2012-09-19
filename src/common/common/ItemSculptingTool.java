@@ -15,6 +15,7 @@ import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
 import factorization.common.RenderingCube.Vector;
+import factorization.common.TileEntityGreenware.ClayState;
 import factorization.common.TileEntityGreenware.SelectionInfo;
 
 public class ItemSculptingTool extends Item {
@@ -84,6 +85,25 @@ public class ItemSculptingTool extends Item {
         Coord here = new Coord(w, x, y, z);
         TileEntityGreenware gw = here.getTE(TileEntityGreenware.class);
         if (gw == null) {
+            return false;
+        }
+        ClayState state = gw.getState();
+        if (state != ClayState.WET) {
+            if (w.isRemote) {
+                return false;
+            }
+            switch (state) {
+            case DRY:
+                Core.notify(player, gw.getCoord(), "This clay is too dry. Add water with a bucket.");
+                break;
+            case BISQUED:
+            case GLAZED:
+                Core.notify(player, gw.getCoord(), "This clay has been fired and can not be reshaped.");
+                break;
+            default:
+                Core.notify(player, gw.getCoord(), "This clay can not be reshaped.");
+                break;
+            }
             return false;
         }
         ToolMode mode = getMode(is.getItemDamage());

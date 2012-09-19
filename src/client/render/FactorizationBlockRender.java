@@ -205,16 +205,6 @@ abstract public class FactorizationBlockRender implements ICoord {
         }
     }
     
-    protected void renderClayCube(RenderingCube rc) {
-        if (!world_mode) {
-            ForgeHooksClient.bindTexture(Core.texture_file_ceramics, 0);
-        }
-        renderCube(rc);
-        if (!world_mode) {
-            ForgeHooksClient.unbindTexture();
-        }
-    }
-    
     protected void vertex(RenderingCube rc, float x, float y, float z, float u, float v) {
         //all units are in texels; center of the cube is the origin. Or, like... not the center but the texel that's (8,8,8) away from the corner is.
         //u & v are in texels

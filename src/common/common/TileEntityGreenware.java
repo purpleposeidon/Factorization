@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.src.Block;
 import net.minecraft.src.EntityItem;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.InventoryPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
@@ -21,10 +23,11 @@ public class TileEntityGreenware extends TileEntityCommon {
 
     public ArrayList<RenderingCube> parts = new ArrayList();
     int lastTouched = 0;
+    int totalHeat = 0;
     
-    public static int dryTime = 20*60*10;
-    public static int clayIcon_src = 8 + 4*16;
-    public static int clayIcon = 0, selectedIcon = 1;
+    public static int dryTime = 20*60*5; //5 minutes
+    public static int bisqueHeat = 1000, glazeHeat = bisqueHeat*20;
+    public static final int clayIconStart = 12*16;
     
     static class SelectionInfo {
         TileEntityGreenware gw;
@@ -39,16 +42,45 @@ public class TileEntityGreenware extends TileEntityCommon {
     //client-side
     public static RenderingCube selected;
     
-    enum ClayState {
-        WET, DRY, BISQUED, FIRED;
+    public static enum ClayState {
+        WET, DRY, BISQUED, GLAZED;
     };
     
     public TileEntityGreenware() {
-        int a = 4;
     }
     
     public ClayState getState() {
+        if (lastTouched > dryTime) {
+            if (totalHeat > glazeHeat) {
+                return ClayState.GLAZED;
+            }
+            if (totalHeat > bisqueHeat) {
+                return ClayState.BISQUED;
+            }
+            return ClayState.DRY;
+        }
         return ClayState.WET;
+    }
+    
+    public int getIcon(RenderingCube rc) {
+        int icon = 0;
+        switch (getState()) {
+        case WET:
+            icon = 0;
+            if (isSelected(rc)) {
+                icon = 1;
+            }
+            break;
+        case DRY:
+            icon = 3;
+            break;
+        case BISQUED:
+            icon = 5;
+            break;
+        case GLAZED:
+            return rc.icon;
+        }
+        return clayIconStart + icon;
     }
     
     public void touch() {
@@ -62,12 +94,12 @@ public class TileEntityGreenware extends TileEntityCommon {
     }
     
     public boolean canEdit() {
-        return lastTouched < dryTime;
+        return getState() == ClayState.WET;
     }
     
     void initialize() {
         parts.clear();
-        parts.add(new RenderingCube(clayIcon, new Vector(3, 5, 3), null));
+        parts.add(new RenderingCube(clayIconStart, new Vector(3, 5, 3), null));
         touch();
     }
     
@@ -112,8 +144,9 @@ public class TileEntityGreenware extends TileEntityCommon {
     
     @Override
     public Packet getAuxillaryInfoPacket() {
-        ArrayList<Object> args = new ArrayList(1 + parts.size()*7);
+        ArrayList<Object> args = new ArrayList(2 + parts.size()*7);
         args.add(MessageType.SculptDescription);
+        args.add(getState().ordinal());
         for (RenderingCube rc : parts) {
             rc.writeToArray(args);
         }
@@ -136,22 +169,53 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
     }
     
+    private ClayState lastState = null;
     @Override
     public void updateEntity() {
         super.updateEntity();
-        if (!worldObj.isRemote && !worldObj.isRaining() && canEdit()) {
-            lastTouched++;
+        if (worldObj.isRemote) {
+            return;
         }
+        switch (getState()) {
+        case WET:
+            if (!worldObj.isRaining()) {
+                lastTouched++;
+            }
+            if (totalHeat > 0) {
+                totalHeat--;
+                lastTouched++;
+            }
+            break;
+        }
+        if (getState() != lastState) {
+            lastState = getState();
+            broadcastMessage(null, MessageType.SculptState, lastState.ordinal());
+        }
+    }
+    
+    public boolean isSelected(RenderingCube rc) {
+        return rc == selected;
     }
 
     @Override
     public boolean activate(EntityPlayer player) {
-        if (!player.worldObj.isRemote) {
+        if (getState() == ClayState.WET) {
             touch();
         }
         ItemStack held = player.getCurrentEquippedItem();
         if (held == null) {
             return false;
+        }
+        int heldId = held.getItem().shiftedIndex;
+        if (heldId == Item.bucketWater.shiftedIndex && getState() == ClayState.DRY) {
+            int ci = player.inventory.currentItem;
+            player.inventory.mainInventory[ci] = new ItemStack(Item.bucketEmpty);
+            lastTouched = 0;
+            return true;
+        }
+        if (heldId == Block.sponge.blockID) {
+            lastTouched = dryTime + 1;
+            return true;
         }
         if (held.getItem() != Item.clay || held.stackSize == 0) {
             return false;
@@ -171,7 +235,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     }
     
     void addLump(String creator) {
-        parts.add(new RenderingCube(clayIcon, new Vector(4, 4, 4), null));
+        parts.add(new RenderingCube(clayIconStart, new Vector(4, 4, 4), null));
         if (!worldObj.isRemote) {
             broadcastMessage(null, MessageType.SculptNew, creator);
             selections.put(creator, new SelectionInfo(this, parts.size() - 1));
@@ -262,6 +326,26 @@ public class TileEntityGreenware extends TileEntityCommon {
             selections.put(Core.network.getCurrentPlayer().username, new SelectionInfo(this, input.readInt()));
             return true;
         }
+        if (messageType == MessageType.SculptWater) {
+            InventoryPlayer inv = Core.network.getCurrentPlayer().inventory;
+            ItemStack is = inv.mainInventory[inv.currentItem];
+            if (is == null) {
+                return true;
+            }
+            Item item = is.getItem();
+            if (item == null) {
+                return true;
+            }
+            int id = item.shiftedIndex;
+            if (is.getItem() == Item.bucketWater && getState() == ClayState.DRY) {
+                is.itemID = Item.bucketWater.shiftedIndex;
+                lastTouched = 0;
+            }
+            if (id == Block.sponge.blockID) {
+                lastTouched = dryTime;
+            }
+            return true;
+        }
         return false;
     }
     
@@ -272,6 +356,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
         switch (messageType) {
         case MessageType.SculptDescription:
+            readStateChange(input);
             parts.clear();
             ArrayList<Object> args = new ArrayList();
             while (true) {
@@ -300,8 +385,29 @@ public class TileEntityGreenware extends TileEntityCommon {
         case MessageType.SculptRemove:
             removeLump(input.readInt());
             break;
+        case MessageType.SculptState:
+            readStateChange(input);
+            break;
         default: return false;
         }
         return true;
+    }
+    
+    private void readStateChange(DataInput input) throws IOException {
+        switch (ClayState.values()[input.readInt()]) {
+        case WET:
+            lastTouched = 0;
+            break;
+        case DRY:
+            lastTouched = dryTime + 10;
+            break;
+        case BISQUED:
+            totalHeat = bisqueHeat + 1;
+            break;
+        case GLAZED:
+            totalHeat = glazeHeat + 1;
+            break;
+        }
+        getCoord().dirty();
     }
 }

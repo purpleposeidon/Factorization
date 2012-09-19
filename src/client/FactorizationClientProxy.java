@@ -535,7 +535,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         
         MinecraftForgeClient.preloadTexture(Core.texture_file_block);
         MinecraftForgeClient.preloadTexture(Core.texture_file_item);
-        MinecraftForgeClient.preloadTexture(Core.texture_file_ceramics);
 
         RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
 

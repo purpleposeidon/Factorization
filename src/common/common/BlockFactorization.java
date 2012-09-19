@@ -25,12 +25,11 @@ public class BlockFactorization extends BlockContainer {
 
     public BlockFactorization(int id) {
         super(id, Core.registry.materialMachine);
-        //		super(id, Material.air);
         setHardness(2.0F);
         setResistance(5);
         setLightOpacity(1);
         canBlockGrass[id] = true;
-        //setBlockBounds(0, -1000, 0, 0, -999, 0);
+        setTextureFile(Core.texture_file_block);
     }
 
     @Override
@@ -172,12 +171,7 @@ public class BlockFactorization extends BlockContainer {
         // Is used for inventory!
         return Texture.pick(md, side, false, 3);
     }
-
-    @Override
-    public String getTextureFile() {
-        return Core.texture_file_block;
-    }
-
+    
     @Override
     protected int damageDropped(int i) {
         return i;
