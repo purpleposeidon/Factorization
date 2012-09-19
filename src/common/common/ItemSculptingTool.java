@@ -163,6 +163,7 @@ public class ItemSculptingTool extends Item {
             }
             break;
         }
+        
         return true;
     }
     
@@ -171,7 +172,7 @@ public class ItemSculptingTool extends Item {
             ForgeDirection direction = ForgeDirection.getOrientation(side);
             cube.axis = new Vector(direction.offsetX, direction.offsetY, direction.offsetZ);
         }
-        float delta = -360F/16F;
+        float delta = -360F/32F;
         if (reverse) {
             delta *= -1;
         }

@@ -3,7 +3,7 @@
 set -e
 
 echo Packaging client
-./update_info
+./update_info.py
 #./build_core_mod
 
 cd ../

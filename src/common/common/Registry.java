@@ -269,8 +269,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         MinecraftForge.setToolClass(angular_saw, "pickaxe", 3);
         
         //ceramics
-        //sculpt_tool = new ItemSculptingTool(itemID("sculptTool", 9041));
-        //addName(sculpt_tool, "Sculpting Tool");
+        sculpt_tool = new ItemSculptingTool(itemID("sculptTool", 9041));
+        addName(sculpt_tool, "Sculpting Tool");
         
         inverium = new ItemInverium(itemID("inverium", 9040), "item.inverium", 12*16 + 0, 11);
         addName(inverium, "Inverium Drop");
@@ -473,12 +473,12 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 '!', leadwire_item);
         
         //ceramics
-//		recipe(new ItemStack(sculpt_tool),
-//				" c",
-//				"/ ",
-//				'c', Item.clay,
-//				'/', Item.stick);
-//		ItemSculptingTool.addModeChangeRecipes();
+        recipe(new ItemStack(sculpt_tool),
+                " c",
+                "/ ",
+                'c', Item.clay,
+                '/', Item.stick);
+        ItemSculptingTool.addModeChangeRecipes();
         
         //inverium
         recipe(new ItemStack(inverium, 1, 1),
@@ -644,11 +644,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'C', Block.workbench,
                 'M', mecha_chasis,
                 'i', Item.ingotIron);
-//		recipe(greenware_item,
-//				"c",
-//				"-",
-//				'c', Item.clay,
-//				'-', new ItemStack(Block.woodSingleSlab, 1, -1));
+        recipe(greenware_item,
+                "c",
+                "-",
+                'c', Item.clay,
+                '-', new ItemStack(Block.woodSingleSlab, 1, -1));
 
         //Electricity
 
@@ -746,6 +746,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         TileEntityGrinder.addRecipe(new ItemStack(Block.oreDiamond), new ItemStack(Item.diamond), 2.25F);
         TileEntityGrinder.addRecipe(new ItemStack(Block.oreRedstone), new ItemStack(Item.redstone), 6.5F);
         TileEntityGrinder.addRecipe(new ItemStack(Block.oreLapis), new ItemStack(Item.dyePowder, 1, 4), 8);
+        TileEntityGrinder.addRecipe(new ItemStack(Block.oreCoal), new ItemStack(Item.coal), 3.5F);
         recipe(mixer_item,
                 " X ",
                 "WMW",

@@ -20,7 +20,9 @@ import factorization.common.RenderingCube.Vector;
 public class TileEntityGreenware extends TileEntityCommon {
 
     public ArrayList<RenderingCube> parts = new ArrayList();
+    int lastTouched = 0;
     
+    public static int dryTime = 20*60*10;
     public static int clayIcon_src = 8 + 4*16;
     public static int clayIcon = 0, selectedIcon = 1;
     
@@ -37,13 +39,36 @@ public class TileEntityGreenware extends TileEntityCommon {
     //client-side
     public static RenderingCube selected;
     
+    enum ClayState {
+        WET, DRY, BISQUED, FIRED;
+    };
     
     public TileEntityGreenware() {
+        int a = 4;
+    }
+    
+    public ClayState getState() {
+        return ClayState.WET;
+    }
+    
+    public void touch() {
+        if (getState() == ClayState.WET) {
+            lastTouched = 0;
+        }
+    }
+    
+    public boolean renderEfficient() {
+        return getState() != ClayState.WET;
+    }
+    
+    public boolean canEdit() {
+        return lastTouched < dryTime;
     }
     
     void initialize() {
         parts.clear();
         parts.add(new RenderingCube(clayIcon, new Vector(3, 5, 3), null));
+        touch();
     }
     
     @Override
@@ -66,6 +91,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             l.appendTag(rc_tag);
         }
         tag.setTag("parts", l);
+        tag.setInteger("touch", lastTouched);
     }
     
     @Override
@@ -81,6 +107,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             NBTTagCompound rc_tag = (NBTTagCompound) l.tagAt(i);
             parts.add(RenderingCube.loadFromNBT(rc_tag));
         }
+        lastTouched = tag.getInteger("touch");
     }
     
     @Override
@@ -108,9 +135,20 @@ public class TileEntityGreenware extends TileEntityCommon {
             worldObj.spawnEntityInWorld(drop);
         }
     }
+    
+    @Override
+    public void updateEntity() {
+        super.updateEntity();
+        if (!worldObj.isRemote && !worldObj.isRaining() && canEdit()) {
+            lastTouched++;
+        }
+    }
 
     @Override
     public boolean activate(EntityPlayer player) {
+        if (!player.worldObj.isRemote) {
+            touch();
+        }
         ItemStack held = player.getCurrentEquippedItem();
         if (held == null) {
             return false;
@@ -137,7 +175,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         if (!worldObj.isRemote) {
             broadcastMessage(null, MessageType.SculptNew, creator);
             selections.put(creator, new SelectionInfo(this, parts.size() - 1));
-            
+            touch();
         } else if (creator.equals(Minecraft.getMinecraft().thePlayer.username)) {
             //I added it, so select it
             selected = parts.get(parts.size() - 1);
@@ -151,6 +189,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         parts.remove(id);
         if (!worldObj.isRemote) {
             broadcastMessage(null, MessageType.SculptRemove, id);
+            touch();
         }
     }
     
@@ -196,6 +235,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         if (worldObj.isRemote) {
             return;
         }
+        touch();
     }
     
     void shareLump(int id, RenderingCube selection) {

@@ -60,7 +60,7 @@ import factorization.api.Coord;
         packetHandler = NetworkFactorization.class,
         channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel })
 public class Core {
-    public static final String version = "0.5.5"; //@VERSION@
+    public static final String version = "0.5.6"; //@VERSION@
     // runtime storage
     @Instance("factorization")
     public static Core instance;
@@ -128,10 +128,9 @@ public class Core {
         }
         return prop.value;
     }
-
-    @PreInit
-    public void loadConfig(FMLPreInitializationEvent event) {
-        config = new Configuration(event.getSuggestedConfigurationFile());
+    
+    private void loadConfig(File configFile) {
+        config = new Configuration(configFile);
         try {
             config.load();
         } catch (Exception e) {
@@ -148,7 +147,7 @@ public class Core {
             bag_swap_anywhere = getBoolConfig("anywhereBagSwap", "client", bag_swap_anywhere, "Lets you use the bag from GUIs");
             render_barrel_item = getBoolConfig("renderBarrelItem", "client", render_barrel_item, null);
             render_barrel_item = getBoolConfig("renderBarrelText", "client", render_barrel_text, null);
-            renderTEs = getBoolConfig("renderOtherTileEntities", "client", renderTEs, "Sacrifices slow ");
+            renderTEs = getBoolConfig("renderOtherTileEntities", "client", renderTEs, "If false, most TEs won't draw, making everything look broken but possibly improving FPS");
             String attempt = getStringConfig("pocketCraftingActionKeys", "client", pocketActions, "3 keys for: removing (x), cycling (c), balancing (b)");
             if (attempt.length() == 3) {
                 pocketActions = attempt;
@@ -184,18 +183,17 @@ public class Core {
 
 
         config.save();
-
-        registry = new Registry();
-        registry.makeBlocks();
     }
 
-    @Init
-    public void load(FMLInitializationEvent event) {
-
+    @PreInit
+    public void load(FMLPreInitializationEvent event) {
+        loadConfig(event.getSuggestedConfigurationFile());
+        registry = new Registry();
+        registry.makeBlocks();
+        
         NetworkRegistry.instance().registerGuiHandler(this, proxy);
         MinecraftForge.EVENT_BUS.register(registry);
         MinecraftForge.EVENT_BUS.register(this);
-        //MinecraftForge.EVENT_BUS.register(TileEntityWatchDemon.loadHandler);
         TickRegistry.registerTickHandler(registry, Side.CLIENT);
         TickRegistry.registerTickHandler(registry, Side.SERVER);
 
@@ -387,4 +385,11 @@ public class Core {
         }
     }
     
+    public static void sendNotification(EntityPlayer player, Coord where, String msg) {
+        //TODO: Have the client draw the notification somewhere in the world instead of using a chat message! It'll be awesome!
+        if (player.worldObj.isRemote) {
+            return;
+        }
+        player.addChatMessage(msg);
+    }
 }

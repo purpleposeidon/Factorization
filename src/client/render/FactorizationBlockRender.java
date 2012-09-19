@@ -19,9 +19,11 @@ import net.minecraft.src.Block;
 import net.minecraft.src.IBlockAccess;
 import net.minecraft.src.RenderBlocks;
 import net.minecraft.src.Tessellator;
+import net.minecraft.src.Vec3;
 import net.minecraft.src.World;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.common.ForgeDirection;
 
 abstract public class FactorizationBlockRender implements ICoord {
     static Block metal = Block.obsidian;
@@ -142,6 +144,37 @@ abstract public class FactorizationBlockRender implements ICoord {
         tessellator.draw();
         GL11.glTranslatef(0.5F, 0.5F, 0.5F);
     }
+    
+    static private float getNormalizedLighting(Vector[] vecs) {
+        float x0 = vecs[0].x, y0 = vecs[0].y, z0 = vecs[0].z;
+        float x1 = vecs[1].x, y1 = vecs[1].y, z1 = vecs[1].z;
+        float x2 = vecs[2].x, y2 = vecs[2].y, z2 = vecs[2].z;
+        
+        float x3 = x1 - x0, y3 = y1 - y0, z3 = z1 - z0;
+        float x4 = x1 - x2, y4 = y1 - y2, z4 = z1 - z2;
+        //this.yCoord * par1Vec3.zCoord - this.zCoord * par1Vec3.yCoord
+        //this.zCoord * par1Vec3.xCoord - this.xCoord * par1Vec3.zCoord
+        //this.xCoord * par1Vec3.yCoord - this.yCoord * par1Vec3.xCoord
+        //v4.crossProduct(v3);
+        float fx = y4*z3 - z4*y3;
+        float fy = z4*x3 - x4*z3;
+        float fz = x4*y3 - y4*x3;
+        double length = Math.sqrt(fx*fx + fy*fy + fz*fz);
+        fx /= length;
+        fy /= length;
+        fz /= length;
+        if (fy > 0) {
+            return 1;
+        }
+        if (fy < 0) {
+            return 0.5F;
+        }
+        float d = 0.7071067811865475F;
+        if (fz < d && fz > -d) {
+            return 0.6F;
+        }
+        return 0.8F;
+    }
 
     protected void renderCube(RenderingCube rc) {
         if (!world_mode) {
@@ -149,11 +182,20 @@ abstract public class FactorizationBlockRender implements ICoord {
             ForgeHooksClient.bindTexture(cubeTexture, 0);
             GL11.glDisable(GL11.GL_LIGHTING);
         }
+        
+        float delta = 1F/256F;
+        float zfight = rc.corner.x * delta;
+        zfight *= rc.corner.y * (delta);
+        zfight *= rc.corner.z * (delta);
+        zfight = 1.0025F;
         for (int face = 0; face < 6; face++) {
             Vector[] vecs = rc.faceVerts(face);
+            float color = getNormalizedLighting(vecs);
+            
+            Tessellator.instance.setColorOpaque_F(color, color, color);
             for (int i = 0; i < vecs.length; i++) {
                 Vector vec = vecs[i];
-                vertex(rc, vec.x, vec.y, vec.z, vec.u, vec.v);
+                vertex(rc, vec.x*zfight, vec.y*zfight, vec.z*zfight, vec.u, vec.v);
             }
         }
         if (!world_mode) {
@@ -165,28 +207,18 @@ abstract public class FactorizationBlockRender implements ICoord {
     
     protected void renderClayCube(RenderingCube rc) {
         if (!world_mode) {
-            Tessellator.instance.startDrawingQuads();
             ForgeHooksClient.bindTexture(Core.texture_file_ceramics, 0);
-            GL11.glDisable(GL11.GL_LIGHTING);
         }
-        for (int face = 0; face < 6; face++) {
-            Vector[] vecs = rc.faceVerts(face);
-            for (int i = 0; i < vecs.length; i++) {
-                Vector vec = vecs[i];
-                vertex(rc, vec.x, vec.y, vec.z, vec.u, vec.v);
-            }
-        }
+        renderCube(rc);
         if (!world_mode) {
-            Tessellator.instance.draw();
             ForgeHooksClient.unbindTexture();
-            GL11.glEnable(GL11.GL_LIGHTING);
         }
     }
     
     protected void vertex(RenderingCube rc, float x, float y, float z, float u, float v) {
         //all units are in texels; center of the cube is the origin. Or, like... not the center but the texel that's (8,8,8) away from the corner is.
         //u & v are in texels
-        Tessellator.instance.setColorOpaque_F(1, 1, 1);
+        //Tessellator.instance.setColorOpaque_F(1, 1, 1);
         Tessellator.instance.addVertexWithUV(
                 this.x + 0.5 + x / 16F,
                 this.y + 0.5 + y / 16F,

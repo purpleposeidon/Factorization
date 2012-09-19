@@ -50,6 +50,10 @@ public class RenderingCube {
         public Vector add(int dx, int dy, int dz) {
             return new Vector(x + dx, y + dy, z + dz, u, v);
         }
+        
+        public Vector add(Vector o) {
+            return new Vector(x + o.x, y + o.y, z + o.z, u, v);
+        }
 
         void scale(float d) {
             x *= d;

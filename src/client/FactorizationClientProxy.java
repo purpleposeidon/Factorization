@@ -520,6 +520,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         if (Core.render_barrel_item || Core.render_barrel_text) {
             setTileEntityRenderer(TileEntityBarrel.class, new TileEntityBarrelRenderer(Core.render_barrel_item, Core.render_barrel_text));
         }
+        setTileEntityRenderer(TileEntityGreenware.class, new TileEntityGreenwareRender());
         if (Core.renderTEs) {
             setTileEntityRenderer(TileEntityWatchDemon.class, new TileEntityWatchDemonRenderer());
             // This is entirely Azanor's fault.
@@ -530,7 +531,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
             setTileEntityRenderer(TileEntityMixer.class, new TileEntityMixerRenderer());
             setTileEntityRenderer(TileEntityCrystallizer.class, new TileEntityCrystallizerRender());
             // End section that is azanor's fault
-            setTileEntityRenderer(TileEntityGreenware.class, new TileEntityGreenwareRender());
         }
         
         MinecraftForgeClient.preloadTexture(Core.texture_file_block);

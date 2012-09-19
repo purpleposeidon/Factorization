@@ -60,7 +60,7 @@ public class BlockRenderSculpture extends FactorizationBlockRender {
                     glDisable(GL_TEXTURE_2D);
                     glPushMatrix();
                     glTranslatef(0.5F, 0.5F, 0.5F);
-                    glColor4f(abs(rc.axis.x), 1, 1, 1);
+                    glColor4f(abs(rc.axis.x), abs(rc.axis.y), abs(rc.axis.z), 1);
                     
                     glBegin(GL_LINES);
                     glVertex3f(rc.axis.x, rc.axis.y, rc.axis.z);
