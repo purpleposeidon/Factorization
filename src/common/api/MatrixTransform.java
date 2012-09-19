@@ -2,10 +2,13 @@ package factorization.api;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NBTTagList;
@@ -50,8 +53,8 @@ public class MatrixTransform {
     
     public static VectorUV tempApply = new VectorUV(0, 0, 0);
     public VectorUV apply(VectorUV orig) {
-        float rowSum;
         int row;
+        tempApply = new VectorUV(0, 0, 0, orig.u, orig.v);
         
         row = 0;
         tempApply.x =
@@ -71,11 +74,12 @@ public class MatrixTransform {
             M[row][1]*orig.y +
             M[row][2]*orig.z;
         
-        VectorUV ret = tempApply;
-        ret.u = orig.u;
-        ret.v = orig.v;
-        tempApply = orig;
-        return ret;
+        return tempApply;
+//		VectorUV ret = tempApply;
+//		ret.u = orig.u;
+//		ret.v = orig.v;
+//		tempApply = orig;
+        //return ret;
     }
 
     //http://www.fastgraph.com/makegames/3drotation/
@@ -164,12 +168,20 @@ public class MatrixTransform {
     
     public void translate(float x, float y, float z) {
         transTemp.reset();
-        
+        /* 
+         * 100x
+         * 010y
+         * 001z
+         * 0001
+         */
+        transTemp.M[3][0] = x;
+        transTemp.M[3][1] = y;
+        transTemp.M[3][2] = z;
         multiply(transTemp);
     }
     
     //reading & writing
-    public byte[] toByteArray() {
+    private byte[] toByteArray() {
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(outStream);
         for (int i = 0; i < 4; i++) {
@@ -185,7 +197,7 @@ public class MatrixTransform {
         return outStream.toByteArray();
     }
     
-    public static MatrixTransform fromByteArray(byte[] inputByte) {
+    private static MatrixTransform fromByteArray(byte[] inputByte) {
         MatrixTransform ret = new MatrixTransform();
         if (inputByte == null || inputByte.length == 0) {
             return ret;
@@ -203,6 +215,24 @@ public class MatrixTransform {
             }
         }
         return ret;
+    }
+    
+    public static MatrixTransform fromDataInput(DataInput input) throws IOException {
+        MatrixTransform ret = new MatrixTransform();
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                ret.M[i][j] = input.readFloat();
+            }
+        }
+        return ret;
+    }
+    
+    public void addToList(ArrayList<Object> list) {
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                list.add(M[i][j]);
+            }
+        }
     }
     
     public void writeToTag(NBTTagCompound tag, String name) {

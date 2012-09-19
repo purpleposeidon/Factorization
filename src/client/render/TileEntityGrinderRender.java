@@ -80,7 +80,7 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
         re.bindTexture(re.getTexture("/terrain.png"));
         //XXX TODO FIXME Move to somewhere more efficient
         //(Move the vector stuff out too...)
-        RenderingCube frame = new RenderingCube(16 + 6, new VectorUV(5, 1, 5), null);
+        RenderingCube frame = new RenderingCube(16 + 6, new VectorUV(5, 1, 5));
         Tessellator.instance.startDrawingQuads();
         Tessellator.instance.setColorOpaque_F(1, 1, 1);
         GL11.glTranslatef(0, 2F / 16F, 0);

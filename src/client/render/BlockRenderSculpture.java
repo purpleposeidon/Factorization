@@ -65,20 +65,20 @@ public class BlockRenderSculpture extends FactorizationBlockRender {
     
     void renderDynamic(TileEntityGreenware greenware) {
         for (RenderingCube rc : greenware.parts) {
-            if (greenware.isSelected(rc) && rc.theta != 0) {
-                glDisable(GL_TEXTURE_2D);
-                glPushMatrix();
-                glTranslatef(0.5F, 0.5F, 0.5F);
-                glColor4f(abs(rc.axis.x), abs(rc.axis.y), abs(rc.axis.z), 1);
-                
-                glBegin(GL_LINES);
-                glVertex3f(rc.axis.x, rc.axis.y, rc.axis.z);
-                glVertex3f(-rc.axis.x, -rc.axis.y, -rc.axis.z);
-                glEnd();
-                
-                glPopMatrix();
-                glEnable(GL_TEXTURE_2D);
-            }
+//			if (greenware.isSelected(rc) && rc.theta != 0) {
+//				glDisable(GL_TEXTURE_2D);
+//				glPushMatrix();
+//				glTranslatef(0.5F, 0.5F, 0.5F);
+//				glColor4f(abs(rc.axis.x), abs(rc.axis.y), abs(rc.axis.z), 1);
+//				
+//				glBegin(GL_LINES);
+//				glVertex3f(rc.axis.x, rc.axis.y, rc.axis.z);
+//				glVertex3f(-rc.axis.x, -rc.axis.y, -rc.axis.z);
+//				glEnd();
+//				
+//				glPopMatrix();
+//				glEnable(GL_TEXTURE_2D);
+//			}
             rc.setIcon(greenware.getIcon(rc));
             renderCube(rc);
         }
@@ -96,8 +96,12 @@ public class BlockRenderSculpture extends FactorizationBlockRender {
         }
     }
     
-    RenderingCube invWoodStand = new RenderingCube(2, new VectorUV(4, 1, 4), new VectorUV(0, -6, 0));
-    RenderingCube worldWoodStand = new RenderingCube(16 + 8, new VectorUV(4, 1, 4), new VectorUV(0, -6, 0));
+    static RenderingCube invWoodStand = new RenderingCube(2, new VectorUV(4, 1, 4)), worldWoodStand;
+    static {
+        invWoodStand.trans.translate(0, -6, 0);
+        worldWoodStand = invWoodStand.copy();
+        worldWoodStand.setIcon(16 + 8);
+    }
     
     void renderStand() {
         if (world_mode) {

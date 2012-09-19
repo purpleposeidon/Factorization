@@ -16,6 +16,7 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NBTTagList;
 import net.minecraft.src.Packet;
+import factorization.api.MatrixTransform;
 import factorization.api.VectorUV;
 import factorization.common.NetworkFactorization.MessageType;
 
@@ -25,7 +26,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     int lastTouched = 0;
     int totalHeat = 0;
     
-    public static int dryTime = 20*60*5; //5 minutes
+    public static int dryTime = 20*60*2; //2 minutes
     public static int bisqueHeat = 1000, glazeHeat = bisqueHeat*20;
     public static final int clayIconStart = 12*16;
     
@@ -99,7 +100,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     
     void initialize() {
         parts.clear();
-        parts.add(new RenderingCube(clayIconStart, new VectorUV(3, 5, 3), null));
+        parts.add(new RenderingCube(clayIconStart, new VectorUV(3, 5, 3)));
         touch();
     }
     
@@ -235,7 +236,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     }
     
     void addLump(String creator) {
-        parts.add(new RenderingCube(clayIconStart, new VectorUV(4, 4, 4), null));
+        parts.add(new RenderingCube(clayIconStart, new VectorUV(4, 4, 4)));
         if (!worldObj.isRemote) {
             broadcastMessage(null, MessageType.SculptNew, creator);
             selections.put(creator, new SelectionInfo(this, parts.size() - 1));
@@ -284,18 +285,15 @@ public class TileEntityGreenware extends TileEntityCommon {
         return true;
     }
     
-    void updateLump(int id, VectorUV newCorner, VectorUV newOrigin, VectorUV newAxis, float theta) {
+    void updateLump(int id, RenderingCube newCube) {
         if (id < 0 || id >= parts.size()) {
             return;
         }
         RenderingCube rc = parts.get(id);
-        if (rc.corner.equals(newCorner) && rc.origin.equals(newOrigin) && rc.axis.equals(newAxis) && rc.theta == theta) {
+        if (rc.equals(newCube)) {
             return;
         }
-        rc.corner = newCorner;
-        rc.origin = newOrigin;
-        rc.axis = newAxis;
-        rc.theta = theta;
+        rc = newCube;
         if (worldObj.isRemote) {
             return;
         }
@@ -303,11 +301,10 @@ public class TileEntityGreenware extends TileEntityCommon {
     }
     
     void shareLump(int id, RenderingCube selection) {
-        broadcastMessage(null, MessageType.SculptMove, id,
-                selection.corner,
-                selection.origin,
-                selection.axis,
-                selection.theta);
+        ArrayList<Object> toSend = new ArrayList();
+        toSend.add(id);
+        selection.writeToArray(toSend);
+        broadcastMessage(null, MessageType.SculptMove, toSend.toArray());
     }
     
     private float getFloat(DataInput input) throws IOException {
@@ -361,23 +358,14 @@ public class TileEntityGreenware extends TileEntityCommon {
             ArrayList<Object> args = new ArrayList();
             while (true) {
                 try {
-                    args.add(input.readInt());
+                    parts.add(RenderingCube.readFromDataInput(input));
                 } catch (IOException e) {
                     break;
                 }
-                for (int i = 0; i < 10; i++) {
-                    args.add(input.readFloat());
-                }
-                parts.add(RenderingCube.readFromArray(args));
             }
             break;
         case MessageType.SculptMove:
-            updateLump(input.readInt(), //id
-                    VectorUV.readFromDataInput(input),
-                    VectorUV.readFromDataInput(input),
-                    VectorUV.readFromDataInput(input),
-                    getFloat(input) //theta
-                    );
+            updateLump(input.readInt(), RenderingCube.readFromDataInput(input));
             break;
         case MessageType.SculptNew:
             addLump(input.readUTF());

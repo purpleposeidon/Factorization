@@ -1,126 +1,118 @@
 package factorization.common;
 
+import java.io.DataInput;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import net.minecraft.src.Block;
 import net.minecraft.src.NBTTagCompound;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Side;
+import cpw.mods.fml.common.asm.SideOnly;
+import factorization.api.MatrixTransform;
 import factorization.api.VectorUV;
 
 public class RenderingCube {
     int icon;
-    public VectorUV corner, origin, axis;
+    public VectorUV corner;
+    public MatrixTransform trans;
     public double ul, vl;
-    public float theta;
 
     /**
      * Creates a lovely cube used to render with. The vectors are in texels with the center of the tile as the origin. The rotations will also be done around
      * the center of the tile.
      */
-    public RenderingCube(int icon, VectorUV corner, VectorUV origin) {
-        if (origin == null) {
-            origin = new VectorUV(0, 0, 0, 0, 0);
-        }
+    public RenderingCube(int icon, VectorUV corner) {
         this.corner = corner;
-        this.origin = origin;
-        this.axis = new VectorUV(0, 0, 0);
-        this.theta = 0;
-
+        this.trans = new MatrixTransform();
         setIcon(icon);
+    }
+    
+    public RenderingCube(int icon, VectorUV corner, VectorUV offset) {
+        this(icon, corner);
+        trans.translate(offset.x, offset.y, offset.z);
     }
     
     void writeToNBT(NBTTagCompound tag) {
         tag.setInteger("icon", icon);
         corner.writeToTag(tag, "c");
-        origin.writeToTag(tag, "o");
-        axis.writeToTag(tag, "a");
-        tag.setFloat("theta", theta);
+        trans.writeToTag(tag, "t");
     }
     
     static RenderingCube loadFromNBT(NBTTagCompound tag) {
         int icon = tag.getInteger("icon");
         VectorUV c = VectorUV.readFromTag(tag, "c");
-        VectorUV o = VectorUV.readFromTag(tag, "o");
-        VectorUV a = VectorUV.readFromTag(tag, "a");
-        RenderingCube rc = new RenderingCube(icon, c, o);
-        rc.axis = a;
-        rc.theta = tag.getFloat("theta");
+        MatrixTransform trans = MatrixTransform.readFromTag(tag, "t");
+        RenderingCube rc = new RenderingCube(icon, c);
+        rc.trans = trans;
         return rc;
     }
     
     void writeToArray(ArrayList<Object> args) {
         args.add(icon);
         corner.addInfoToArray(args);
-        origin.addInfoToArray(args);
-        axis.addInfoToArray(args);
-        args.add(theta);
+        trans.addToList(args);
     }
     
     static float takeFloat(ArrayList<Object> args) {
         return (Float) args.remove(0);
     }
     
-    static RenderingCube readFromArray(ArrayList<Object> args) {
-        int icon = (Integer) args.remove(0);
-        VectorUV c = new VectorUV(takeFloat(args), takeFloat(args), takeFloat(args));
-        VectorUV o = new VectorUV(takeFloat(args), takeFloat(args), takeFloat(args));
-        VectorUV a = new VectorUV(takeFloat(args), takeFloat(args), takeFloat(args));
-        RenderingCube rc = new RenderingCube(icon, c, o);
-        rc.axis = a;
-        rc.theta = takeFloat(args);
-        return rc;
+    @SideOnly(Side.CLIENT)
+    static RenderingCube readFromDataInput(DataInput input) throws IOException {
+        int icon = input.readInt();
+        VectorUV c = new VectorUV(input.readFloat(), input.readFloat(), input.readFloat());
+        MatrixTransform trans = MatrixTransform.fromDataInput(input);
+        RenderingCube ret = new RenderingCube(icon, c);
+        ret.trans = trans;
+        return ret;
     }
     
     public boolean equals(RenderingCube other) {
-        return this.corner.equals(other.corner) && this.origin.equals(other.origin) && this.icon == other.icon; 
+        return this.corner.equals(other.corner) && this.icon == other.icon && this.trans.equals(other.trans); 
     }
 
     public RenderingCube copy() {
-        RenderingCube ret = new RenderingCube(this.icon, this.corner.copy(), this.origin.copy());
+        RenderingCube ret = new RenderingCube(this.icon, this.corner.copy());
         ret.ul = this.ul;
         ret.vl = this.vl;
-        ret.axis = this.axis.copy();
-        ret.theta = this.theta;
+        ret.trans = this.trans.copy();
         return ret;
     }
-
-    public RenderingCube normalize() {
-        VectorUV newCorner = corner.copy();
-        VectorUV newOrigin = origin.copy();
-        newCorner.rotate(axis.x, axis.y, axis.z, theta);
-        newOrigin.rotate(axis.x, axis.y, axis.z, theta);
-        newCorner.x = Math.abs(newCorner.x);
-        newCorner.y = Math.abs(newCorner.y);
-        newCorner.z = Math.abs(newCorner.z);
-        return new RenderingCube(icon, newCorner, newOrigin);
+    
+    public RenderingCube rotate(int x, int y, int z, int theta) {
+        RenderingCube ret = copy();
+        ret.trans.rotate(x, y, z, theta);
+        return ret;
     }
+    
+    public RenderingCube normalize() {
+        //Can't do this anymore! Sorry. Blame the matrix.
+        return this;
+    }
+
+//	public RenderingCube normalize() {
+//		VectorUV newCorner = corner.copy();
+//		VectorUV newOrigin = origin.copy();
+//		newCorner.rotate(axis.x, axis.y, axis.z, theta);
+//		newOrigin.rotate(axis.x, axis.y, axis.z, theta);
+//		newCorner.x = Math.abs(newCorner.x);
+//		newCorner.y = Math.abs(newCorner.y);
+//		newCorner.z = Math.abs(newCorner.z);
+//		return new RenderingCube(icon, newCorner, newOrigin);
+//	}
 
     public void toBlockBounds(Block b) {
-        RenderingCube cube = normalize();
-        VectorUV c = cube.corner;
-        VectorUV o = cube.origin;
-        c.scale(1F / 16F);
-        o = o.add(8, 8, 8);
-        o.scale(1F / 16F);
+        RenderingCube cube = this; // normalize();
+        VectorUV corner = cube.corner;
+        corner.scale(1F / 16F);
+        VectorUV opposite = corner.negate();
+        trans.apply(corner);
+        trans.apply(opposite);
+        //XXX TODO NOTE: This is wrong. Get vertices, get mins and maxes.
         b.setBlockBounds(
-                o.x - c.x, o.y - c.y, o.z - c.z,
-                o.x + c.x, o.y + c.y, o.z + c.z);
-    }
-
-    public RenderingCube rotate(double ax, double ay, double az, int theta) {
-        return rotate((float) ax, (float) ay, (float) az, theta);
-    }
-
-    public RenderingCube rotate(float ax, float ay, float az, int theta) {
-        if (theta == 0) {
-            this.axis = new VectorUV(0, 0, 0);
-            this.theta = 0;
-            return this;
-        }
-        this.axis = new VectorUV(ax, ay, az);
-        this.theta = theta;
-        return this;
+                opposite.x - corner.x, opposite.y - corner.y, opposite.z - corner.z,
+                opposite.x + corner.x, opposite.y + corner.y, opposite.z + corner.z);
     }
     
     public void setIcon(int newIcon) {
@@ -171,9 +163,6 @@ public class RenderingCube {
             ret[2] = new VectorUV(v.x, -v.y, -v.z);
             ret[3] = new VectorUV(v.x, v.y, -v.z);
             break;
-        }
-        for (VectorUV vert : ret) {
-            vert.incr(origin);
         }
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             switch (face) {
@@ -234,15 +223,15 @@ public class RenderingCube {
                     other.u -= udelta;
                     other.v -= vdelta;
                 }
-                //vert.u = Math.max(0, Math.min(vert.u, 16));
-                //vert.v = Math.max(0, Math.min(vert.v, 16));
             }
         }
-        if (theta != 0) {
-            for (VectorUV vert : ret) {
-                vert.rotate(axis.x, axis.y, axis.z, theta);
-            }
+        for (VectorUV vert : ret) {
+            //trans.apply(vert);
         }
+        trans.apply(ret[3]);
+        trans.apply(ret[0]);
+        trans.apply(ret[1]);
+        trans.apply(ret[2]);
         return ret;
     }
 

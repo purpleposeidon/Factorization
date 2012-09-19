@@ -188,24 +188,12 @@ public class ItemSculptingTool extends Item {
     }
     
     void rotate(RenderingCube cube, boolean reverse, int side) {
-        if (cube.theta == 0) {
-            ForgeDirection direction = ForgeDirection.getOrientation(side);
-            cube.axis = new VectorUV(direction.offsetX, direction.offsetY, direction.offsetZ);
-        }
-        float delta = -360F/32F;
+        float delta = (float) Math.toRadians(360F/32F);
         if (reverse) {
             delta *= -1;
         }
-        cube.theta += delta;
-        if (cube.theta >= 360) {
-            cube.theta -= 360;
-        }
-        if (cube.theta < 0) {
-            cube.theta += 360;
-        }
-        if (cube.theta == 0) {
-            cube.axis = new VectorUV(0, 0, 0);
-        }
+        ForgeDirection direction = ForgeDirection.getOrientation(side);
+        cube.trans.rotate(direction.offsetX, direction.offsetY, direction.offsetZ, delta);
     }
     
     void move(RenderingCube cube, boolean reverse, int side) {
@@ -221,28 +209,28 @@ public class ItemSculptingTool extends Item {
         float delta = reverse ? -0.5F : 0.5F;
         switch (dir) {
         case SOUTH:
-            cube.origin.z += delta;
             cube.corner.z += delta;
+            cube.trans.translate(0, 0, delta);
             break;
         case NORTH:
-            cube.origin.z -= delta;
             cube.corner.z += delta;
+            cube.trans.translate(0, 0, -delta);
             break;
         case EAST:
-            cube.origin.x += delta;
             cube.corner.x += delta;
+            cube.trans.translate(delta, 0, 0);
             break;
         case WEST:
-            cube.origin.x -= delta;
             cube.corner.x += delta;
+            cube.trans.translate(-delta, 0, 0);
             break;
         case UP:
-            cube.origin.y += delta;
             cube.corner.y += delta;
+            cube.trans.translate(0, delta, 0);
             break;
         case DOWN:
-            cube.origin.y -= delta;
             cube.corner.y += delta;
+            cube.trans.translate(0, -delta, 0);
             break;
         }
     }

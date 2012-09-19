@@ -66,6 +66,10 @@ public class VectorUV {
     public VectorUV copy() {
         return new VectorUV(x, y, z, u, v);
     }
+    
+    public VectorUV negate() {
+        return new VectorUV(-x, -y, -z, u, v);
+    }
 
     @Override
     public String toString() {
