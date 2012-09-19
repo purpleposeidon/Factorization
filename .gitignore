@@ -2,3 +2,10 @@ backup/
 OLD/
 *~
 .*.swp
+*.pyo
+*.pyc
+src.ohfuck
+cb
+cb.old
+Skin Guides/
+Skin Guides.zip
