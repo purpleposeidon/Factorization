@@ -103,16 +103,23 @@ public class RenderingCube {
 //	}
 
     public void toBlockBounds(Block b) {
-        RenderingCube cube = this; // normalize();
-        VectorUV corner = cube.corner;
-        corner.scale(1F / 16F);
-        VectorUV opposite = corner.negate();
-        trans.apply(corner);
-        trans.apply(opposite);
-        //XXX TODO NOTE: This is wrong. Get vertices, get mins and maxes.
-        b.setBlockBounds(
-                opposite.x - corner.x, opposite.y - corner.y, opposite.z - corner.z,
-                opposite.x + corner.x, opposite.y + corner.y, opposite.z + corner.z);
+        float minX, maxX, minY, maxY, minZ, maxZ;
+        minX = minY = minZ = 9999;
+        maxX = maxY = maxZ = -minX;
+        for (int face = 0; face < 2; face++) {
+            //just need top & bottom face. That's probably what 0 and 1 are.
+            for (VectorUV vec : faceVerts(face)) {
+                vec = trans.apply(vec);
+                minX = Math.min(vec.x, minX);
+                minY = Math.min(vec.y, minY);
+                minZ = Math.min(vec.z, minZ);
+                
+                maxX = Math.min(vec.x, maxX);
+                maxY = Math.min(vec.y, maxY);
+                maxZ = Math.min(vec.z, maxZ);
+            }
+        }
+        b.setBlockBounds(minX / 16, minY / 16, minZ/16, maxX/16, maxY/16, maxZ/16);
     }
     
     public void setIcon(int newIcon) {

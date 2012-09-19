@@ -74,6 +74,9 @@ public class MatrixTransform {
             M[row][1]*orig.y +
             M[row][2]*orig.z;
         
+        System.out.println(this);
+        System.out.println("Orig: " + orig);
+        System.out.println("ret: " + tempApply);
         return tempApply;
 //		VectorUV ret = tempApply;
 //		ret.u = orig.u;
@@ -177,6 +180,9 @@ public class MatrixTransform {
         transTemp.M[3][0] = x;
         transTemp.M[3][1] = y;
         transTemp.M[3][2] = z;
+        transTemp.M[0][3] = x;
+        transTemp.M[1][3] = y;
+        transTemp.M[2][3] = z;
         multiply(transTemp);
     }
     
@@ -250,5 +256,17 @@ public class MatrixTransform {
     
     public MatrixTransform copy() {
         return new MatrixTransform(M.clone());
+    }
+    
+    @Override
+    public String toString() {
+        String ret = "\n";
+        for (float[] F : M) {
+            for (float f : F) {
+                ret += f + " ";
+            }
+            ret += "\n";
+        }
+        return ret;
     }
 }
