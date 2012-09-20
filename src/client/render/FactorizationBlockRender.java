@@ -208,7 +208,8 @@ abstract public class FactorizationBlockRender implements ICoord {
     protected void vertex(RenderingCube rc, float x, float y, float z, float u, float v) {
         //all units are in texels; center of the cube is the origin. Or, like... not the center but the texel that's (8,8,8) away from the corner is.
         //u & v are in texels
-        //Tessellator.instance.setColorOpaque_F(1, 1, 1);
+        u = (int) u;
+        v = (int) v;
         Tessellator.instance.addVertexWithUV(
                 this.x + 0.5 + x / 16F,
                 this.y + 0.5 + y / 16F,

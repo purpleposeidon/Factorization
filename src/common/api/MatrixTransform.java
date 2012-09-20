@@ -41,7 +41,7 @@ public class MatrixTransform {
             for (int col = 0; col < 4; col++) {
                 float cellSum = 0;
                 for (int n = 0; n < 4; n++) {
-                    cellSum += M[row][n]*M[n][col];
+                    cellSum += M[row][n]*other.M[n][col];
                 }
                 multiplyTemp[row][col] = cellSum;
             }
@@ -60,23 +60,26 @@ public class MatrixTransform {
         tempApply.x =
             M[row][0]*orig.x +
             M[row][1]*orig.y +
-            M[row][2]*orig.z;
+            M[row][2]*orig.z +
+            M[row][3];
         
         row = 1;
         tempApply.y =
             M[row][0]*orig.x +
             M[row][1]*orig.y +
-            M[row][2]*orig.z;
+            M[row][2]*orig.z +
+            M[row][3];
         
         row = 2;
         tempApply.z =
             M[row][0]*orig.x +
             M[row][1]*orig.y +
-            M[row][2]*orig.z;
+            M[row][2]*orig.z +
+            M[row][3];
         
-        System.out.println(this);
-        System.out.println("Orig: " + orig);
-        System.out.println("ret: " + tempApply);
+//		System.out.println(this);
+//		System.out.println("Orig: " + orig);
+//		System.out.println("ret: " + tempApply);
         return tempApply;
 //		VectorUV ret = tempApply;
 //		ret.u = orig.u;
@@ -87,62 +90,6 @@ public class MatrixTransform {
 
     //http://www.fastgraph.com/makegames/3drotation/
     static MatrixTransform transTemp = new MatrixTransform();
-    public void rotateX(float theta) {
-        transTemp.reset();
-        float C = (float) Math.cos(theta);
-        float S = (float) Math.sin(theta);
-        float s = -S;
-        /* C = cos, c = -cos
-         * S = sin, s = -sin
-         * 1000
-         * 0Cs0
-         * 0SC0
-         * 0001
-         */
-        transTemp.M[1][1] = C;
-        transTemp.M[2][1] = s;
-        transTemp.M[1][2] = S;
-        transTemp.M[2][2] = C;
-        multiply(transTemp);
-    }
-
-    public void rotateY(float theta) {
-        transTemp.reset();
-        float C = (float) Math.cos(theta);
-        float S = (float) Math.sin(theta);
-        float s = -S;
-        /* C = cos, c = -cos
-         * S = sin, s = -sin
-         * C0S0
-         * 0100
-         * s0C0
-         * 0001
-         */
-        transTemp.M[0][0] = C;
-        transTemp.M[2][0] = S;
-        transTemp.M[0][2] = s;
-        transTemp.M[2][2] = C;
-        multiply(transTemp);
-    }
-
-    public void rotateZ(float theta) {
-        transTemp.reset();
-        float C = (float) Math.cos(theta);
-        float S = (float) Math.sin(theta);
-        float s = -S;
-        /* C = cos, c = -cos
-         * S = sin, s = -sin
-         * Cs00
-         * SC00
-         * 0010
-         * 0001
-         */
-        transTemp.M[0][0] = C;
-        transTemp.M[1][0] = s;
-        transTemp.M[0][1] = S;
-        transTemp.M[1][1] = C;
-        multiply(transTemp);
-    }
     
     public void rotate(float x, float y, float z, float theta) {
         //http://www.fastgraph.com/makegames/3drotation/image086.gif
@@ -176,10 +123,8 @@ public class MatrixTransform {
          * 010y
          * 001z
          * 0001
+         * Or is it the transpose? :)
          */
-        transTemp.M[3][0] = x;
-        transTemp.M[3][1] = y;
-        transTemp.M[3][2] = z;
         transTemp.M[0][3] = x;
         transTemp.M[1][3] = y;
         transTemp.M[2][3] = z;
@@ -255,7 +200,11 @@ public class MatrixTransform {
     }
     
     public MatrixTransform copy() {
-        return new MatrixTransform(M.clone());
+        float[][] m = new float[4][];
+        for (int i = 0; i < 4; i++) {
+            m[i] = M[i].clone();
+        }
+        return new MatrixTransform(m);
     }
     
     @Override

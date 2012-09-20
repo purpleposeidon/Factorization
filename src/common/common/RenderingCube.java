@@ -232,13 +232,9 @@ public class RenderingCube {
                 }
             }
         }
-        for (VectorUV vert : ret) {
-            //trans.apply(vert);
+        for (int i = 0; i < ret.length; i++) {
+            ret[i] = trans.apply(ret[i]);
         }
-        trans.apply(ret[3]);
-        trans.apply(ret[0]);
-        trans.apply(ret[1]);
-        trans.apply(ret[2]);
         return ret;
     }
 

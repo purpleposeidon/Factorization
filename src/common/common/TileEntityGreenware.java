@@ -289,15 +289,17 @@ public class TileEntityGreenware extends TileEntityCommon {
         if (id < 0 || id >= parts.size()) {
             return;
         }
-        RenderingCube rc = parts.get(id);
-        if (rc.equals(newCube)) {
+        RenderingCube old = parts.get(id);
+        if (old.equals(newCube)) {
             return;
         }
-        rc = newCube;
+        old.icon = newCube.icon;
+        old.corner = newCube.corner;
+        old.trans = newCube.trans;
+        touch();
         if (worldObj.isRemote) {
             return;
         }
-        touch();
     }
     
     void shareLump(int id, RenderingCube selection) {
