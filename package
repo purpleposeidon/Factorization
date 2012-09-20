@@ -12,14 +12,15 @@ cd ../
 pushd reobf/minecraft  > /dev/zero
   cp -R ../../factorization/texture/ factorization/texture/
   cp ../../factorization/*.info ./
+  cp ../../factorization/factorization_logo.png ./
   rm -rf factorization/texture/ignore/
-  jar -cf ~/Dropbox/dev/Factorization-dev.jar *.info factorization/
+  jar -cf ~/Dropbox/dev/Factorization-dev.jar factorization_logo.png *.info factorization/
   #jar -cf ~/Dropbox/dev/Factorization-dev.jar *Factorization*.class *.info factorization/
 popd > /dev/zero
-pushd ~/mc/
-  ./install modded-1.3
-popd
-cp ~/Dropbox/dev/Factorization-dev.jar ~/.minecraft/mods/
+#pushd ~/mc/
+#  ./install modded-1.3
+#popd
+#cp ~/Dropbox/dev/Factorization-dev.jar ~/.minecraft/mods/
 
 #echo Packaging server
 #pushd reobf/minecraft_server > /dev/zero
