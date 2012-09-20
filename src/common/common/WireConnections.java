@@ -129,33 +129,43 @@ public class WireConnections {
     static final float h = 2, w = 4; //these are half of the actual size.
     static RenderingCube base_face = cube(new VectorUV(w, h, w), new VectorUV(0, -8 + h, 0));
     static RenderingCube base_face_side = base_face.copy().rotate(1, 0, 0, 90).normalize();
-    static RenderingCube face_map[] = {
-            base_face.copy(),
-            base_face.rotate(1, 0, 0, 180).normalize(),
-            base_face_side.rotate(0, 1, 0, 90 * 0).normalize(),
-            base_face_side.rotate(0, 1, 0, 90 * 2).normalize(),
-            base_face_side.rotate(0, 1, 0, 90 * 1).normalize(),
-            base_face_side.rotate(0, 1, 0, 90 * 3).normalize(),
-    };
+    static RenderingCube face_map[];
     static RenderingCube bottom_edge = cube(new VectorUV(w, h, h), new VectorUV(0, -8 + h, 8 - h)),
             top_edge = bottom_edge.copy().rotate(1, 0, 0, 180).normalize(),
             side_edge = bottom_edge.copy().rotate(0, 0, 1, 90).normalize();
-    static RenderingCube edge_map[] = {
-            bottom_edge.rotate(0, 1, 0, 90 * 2).normalize(),
-            bottom_edge.rotate(0, 1, 0, 90 * 1).normalize(),
-            bottom_edge.rotate(0, 1, 0, 90 * 0).normalize(),
-            bottom_edge.rotate(0, 1, 0, 90 * 3).normalize(),
+    static RenderingCube edge_map[];
+    static {
+        initEdgeMap();
+    }
+    
+    static void initEdgeMap() {
+        face_map = new RenderingCube[] {
+                base_face.copy(),
+                base_face.rotate(1, 0, 0, 180).translate(0, -12, 0).normalize(),
+                base_face_side.translate(0, 6, 6).normalize(),
+                base_face_side.rotate(0, 1, 0, 90 * 2).translate(0, -6, -6).normalize(),
+                base_face_side.rotate(0, 0, 1, 90 * 1).translate(0, -6, 6).normalize(),
+                base_face_side.rotate(0, 0, 1, 90 * 3).translate(0, -6, 6).normalize(),
+        };
+        
+        edge_map = new RenderingCube[] {
+            bottom_edge.translate(0, 0, -12).normalize(),
+            bottom_edge.rotate(0, 1, 0, 90 * 1).translate(-6, 0, -6).normalize(),
+            bottom_edge,
+            cube(new VectorUV(h, h, w), new VectorUV(-6, -6, 0)),
             top_edge.rotate(0, 1, 0, 90 * 0).normalize(),
-            top_edge.rotate(0, 1, 0, 90 * 3).normalize(),
+            top_edge.rotate(0, 1, 0, 90 * 3).translate(-6, -12, 6).normalize(),
             top_edge.rotate(0, 1, 0, 90 * 2).normalize(),
-            top_edge.rotate(0, 1, 0, 90 * 1).normalize(),
+            top_edge.rotate(0, 1, 0, 90 * 1).translate(6, -12, 6).normalize(),
             side_edge.rotate(0, 1, 0, 90 * 1).normalize(),
             side_edge.rotate(0, 1, 0, 90 * 0).normalize(),
             side_edge.rotate(0, 1, 0, 90 * 3).normalize(),
             side_edge.rotate(0, 1, 0, 90 * 2).normalize(),
-    };
+        };
+    }
 
     public Iterable<RenderingCube> getParts() {
+        initEdgeMap(); //XXX TODO FIXME: Only call this during init!
         ArrayList<RenderingCube> ret = new ArrayList(20);
         if (center_core) {
             ret.add(cube(new VectorUV(w, w, w), null));

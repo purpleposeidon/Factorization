@@ -30,7 +30,9 @@ public class RenderingCube {
     
     public RenderingCube(int icon, VectorUV corner, VectorUV offset) {
         this(icon, corner);
-        trans.translate(offset.x, offset.y, offset.z);
+        if (offset != null) {
+            trans.translate(offset.x, offset.y, offset.z);
+        }
     }
     
     void writeToNBT(NBTTagCompound tag) {
@@ -82,7 +84,13 @@ public class RenderingCube {
     
     public RenderingCube rotate(int x, int y, int z, int theta) {
         RenderingCube ret = copy();
-        ret.trans.rotate(x, y, z, theta);
+        ret.trans.rotate(x, y, z, (float) Math.toRadians(theta));
+        return ret;
+    }
+    
+    public RenderingCube translate(int x, int y, int z) {
+        RenderingCube ret = copy();
+        ret.trans.translate(x, y, z);
         return ret;
     }
     
