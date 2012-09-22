@@ -14,6 +14,7 @@ import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NBTTagList;
 
 public class MatrixTransform {
+    //XXX TODO: The cached values aren't being used. Repair them!
     float M[][] = new float[4][4]; //row, column
     
     public MatrixTransform() {
@@ -86,6 +87,29 @@ public class MatrixTransform {
 //		ret.v = orig.v;
 //		tempApply = orig;
         //return ret;
+    }
+    
+    public void applyRotationOnly(VectorUV orig) {
+        int row;
+        tempApply = new VectorUV(0, 0, 0, orig.u, orig.v);
+        
+        row = 0;
+        tempApply.x =
+            M[row][0]*orig.x +
+            M[row][1]*orig.y +
+            M[row][2]*orig.z;
+        
+        row = 1;
+        tempApply.y =
+            M[row][0]*orig.x +
+            M[row][1]*orig.y +
+            M[row][2]*orig.z;
+        
+        row = 2;
+        tempApply.z =
+            M[row][0]*orig.x +
+            M[row][1]*orig.y +
+            M[row][2]*orig.z;
     }
 
     //http://www.fastgraph.com/makegames/3drotation/

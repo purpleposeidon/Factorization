@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import net.minecraft.src.NBTTagCompound;
+import net.minecraft.src.World;
 
 public class VectorUV {
     public float x, y, z, u, v;
@@ -24,7 +25,7 @@ public class VectorUV {
         this.u = u;
         this.v = v;
     }
-    
+
     public boolean equals(VectorUV other) {
         return this.x == other.x && this.y == other.y && this.z == other.z && this.u == other.u && this.v == other.v;
     }

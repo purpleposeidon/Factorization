@@ -1,5 +1,8 @@
 package factorization.client.render;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.src.RenderBlocks;
+import net.minecraft.src.Tessellator;
 import factorization.api.Coord;
 import factorization.api.VectorUV;
 import factorization.common.Core;
@@ -7,9 +10,7 @@ import factorization.common.FactoryType;
 import factorization.common.RenderingCube;
 import factorization.common.TileEntityWire;
 import factorization.common.WireConnections;
-import net.minecraft.client.Minecraft;
-import net.minecraft.src.RenderBlocks;
-import net.minecraft.src.Tessellator;
+import factorization.common.WireRenderingCube;
 
 public class BlockRenderWire extends FactorizationBlockRender {
     RenderingCube bot = new RenderingCube(11, new VectorUV(1, 0, 0), new VectorUV(0, -1, 0));
@@ -18,11 +19,11 @@ public class BlockRenderWire extends FactorizationBlockRender {
         if (world_mode) {
             Tessellator.instance.setBrightness(Core.registry.factory_block.getMixedBrightnessForBlock(w, x, y, z));
             Coord me = new Coord(Minecraft.getMinecraft().theWorld, x, y, z);
-            for (RenderingCube rc : new WireConnections(me.getTE(TileEntityWire.class)).getParts()) {
+            for (WireRenderingCube rc : new WireConnections(me.getTE(TileEntityWire.class)).getParts()) {
                 renderCube(rc);
             }
         } else {
-            for (RenderingCube rc : WireConnections.getInventoryParts()) {
+            for (WireRenderingCube rc : WireConnections.getInventoryParts()) {
                 renderCube(rc);
             }
 //			renderCube(bot);

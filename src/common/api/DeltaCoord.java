@@ -88,4 +88,41 @@ public class DeltaCoord {
     public boolean equals(DeltaCoord o) {
         return x == o.x && y == o.y && z == o.z;
     }
+    
+    public void alignToAxis() {
+        int ax = Math.abs(x);
+        int ay = Math.abs(y);
+        int az = Math.abs(z);
+        if (ax >= ay && ax >= az) {
+            x = (int) Math.signum(x);
+            return;
+        }
+        if (ay >= ax && ay >= az) {
+            y = (int) Math.signum(y);
+            return;
+        }
+        if (az >= ay && az >= ax) {
+            z = (int) Math.signum(z);
+            return;
+        }
+        x = y = z = 0;
+    }
+    
+    public int get(int id) {
+        switch (id) {
+        case 0: return x;
+        case 1: return y;
+        case 2: return z;
+        default: throw new RuntimeException("not an cardinal index");
+        }
+    }
+    
+    public void set(int id, int val) {
+        switch (id) {
+        case 0: x = val; break;
+        case 1: y = val; break;
+        case 2: z = val; break;
+        default: throw new RuntimeException("not an cardinal index");
+        }
+    }
 }

@@ -96,19 +96,13 @@ public class BlockRenderSculpture extends FactorizationBlockRender {
         }
     }
     
-    static RenderingCube invWoodStand = new RenderingCube(2, new VectorUV(4, 1, 4)), worldWoodStand;
+    static RenderingCube woodStand = new RenderingCube(16*12 + 2, new VectorUV(4, 1, 4));
     static {
-        invWoodStand.trans.translate(0, -6, 0);
-        worldWoodStand = invWoodStand.copy();
-        worldWoodStand.setIcon(16 + 8);
+        woodStand.trans.translate(0, -6, 0);
     }
     
     void renderStand() {
-        if (world_mode) {
-            renderCube(worldWoodStand);
-        } else {
-            renderCube(invWoodStand);
-        }
+        renderCube(woodStand);
     }
 
     @Override

@@ -7,6 +7,7 @@ import factorization.common.RenderingCube;
 import factorization.common.TileEntityGreenware;
 
 import net.minecraft.src.RenderBlocks;
+import net.minecraft.src.Tessellator;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntitySpecialRenderer;
 
@@ -14,17 +15,20 @@ import net.minecraft.src.TileEntitySpecialRenderer;
 public class TileEntityGreenwareRender extends TileEntitySpecialRenderer {
 
     @Override
-    public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
+    public void renderTileEntityAt(TileEntity te, double viewx, double viewy, double viewz, float partial) {
         TileEntityGreenware gw = (TileEntityGreenware) te;
         if (!gw.canEdit()) {
             return;
         }
         Core.profileStartRender("ceramics");
+        
         glPushMatrix();
-        glTranslated(x, y, z);
+        glTranslated(viewx, viewy, viewz);
+        
         
         TileEntityGreenware greenware = (TileEntityGreenware) te;
         BlockRenderSculpture.instance.renderInInventory();
+        BlockRenderSculpture.instance.setTileEntity(greenware);
         BlockRenderSculpture.instance.renderDynamic(greenware);
         glPopMatrix();
         Core.profileEndRender();

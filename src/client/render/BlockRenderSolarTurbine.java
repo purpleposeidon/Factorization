@@ -10,6 +10,7 @@ import factorization.common.Texture;
 import factorization.common.TileEntitySolarTurbine;
 import factorization.common.TileEntityWire;
 import factorization.common.WireConnections;
+import factorization.common.WireRenderingCube;
 import net.minecraft.src.RenderBlocks;
 import net.minecraftforge.client.MinecraftForgeClient;
 
@@ -71,7 +72,7 @@ public class BlockRenderSolarTurbine extends FactorizationBlockRender {
             fake_wire.supporting_side = 0;
             WireConnections con = new WireConnections(fake_wire);
             con.conductorRestrict();
-            for (RenderingCube rc : con.getParts()) {
+            for (WireRenderingCube rc : con.getParts()) {
                 renderCube(rc);
             }
         }

@@ -60,7 +60,7 @@ import factorization.api.Coord;
         packetHandler = NetworkFactorization.class,
         channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel })
 public class Core {
-    public static final String version = "0.5.6"; //@VERSION@
+    public static final String version = "0.5.7"; //@VERSION@
     // runtime storage
     @Instance("factorization")
     public static Core instance;
@@ -90,6 +90,7 @@ public class Core {
     public static boolean add_branding = false;
     public static boolean cheat = false;
     public static boolean renderTEs = true;
+    public static boolean renderAO = true;
 
     // universal constant config
     public final static String texture_dir = "/factorization/texture/";

@@ -16,6 +16,7 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NBTTagList;
 import net.minecraft.src.Packet;
+import net.minecraft.src.PlayerControllerMP;
 import factorization.api.MatrixTransform;
 import factorization.api.VectorUV;
 import factorization.common.NetworkFactorization.MessageType;
@@ -209,9 +210,12 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
         int heldId = held.getItem().shiftedIndex;
         if (heldId == Item.bucketWater.shiftedIndex && getState() == ClayState.DRY) {
+            lastTouched = 0;
+            if (player.capabilities.isCreativeMode) {
+                return true;
+            }
             int ci = player.inventory.currentItem;
             player.inventory.mainInventory[ci] = new ItemStack(Item.bucketEmpty);
-            lastTouched = 0;
             return true;
         }
         if (heldId == Block.sponge.blockID) {

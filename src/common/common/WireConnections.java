@@ -121,15 +121,15 @@ public class WireConnections {
         return Long.bitCount(edges) + Long.bitCount(faces) * 2 + (center_core ? 4 : 0);
     }
 
-    static RenderingCube cube(VectorUV corner, VectorUV origin) {
+    static WireRenderingCube cube(VectorUV corner, VectorUV origin) {
         final int icon = 11; //34... was old. 11 is right, but... what?
-        return new RenderingCube(icon, corner, origin);
+        return new WireRenderingCube(icon, corner, origin);
     }
 
     static final float h = 2, w = 4; //these are half of the actual size.
-    static RenderingCube base_face = cube(new VectorUV(w, h, w), new VectorUV(0, -8 + h, 0));
-    static RenderingCube base_face_side = base_face.copy().rotate(1, 0, 0, 90).normalize();
-    static RenderingCube face_map[] = {
+    static WireRenderingCube base_face = cube(new VectorUV(w, h, w), new VectorUV(0, -8 + h, 0));
+    static WireRenderingCube base_face_side = base_face.copy().rotate(1, 0, 0, 90).normalize();
+    static WireRenderingCube face_map[] = {
             base_face.copy(),
             base_face.rotate(1, 0, 0, 180).normalize(),
             base_face_side.rotate(0, 1, 0, 90 * 0).normalize(),
@@ -137,10 +137,10 @@ public class WireConnections {
             base_face_side.rotate(0, 1, 0, 90 * 1).normalize(),
             base_face_side.rotate(0, 1, 0, 90 * 3).normalize(),
     };
-    static RenderingCube bottom_edge = cube(new VectorUV(w, h, h), new VectorUV(0, -8 + h, 8 - h)),
+    static WireRenderingCube bottom_edge = cube(new VectorUV(w, h, h), new VectorUV(0, -8 + h, 8 - h)),
             top_edge = bottom_edge.copy().rotate(1, 0, 0, 180).normalize(),
             side_edge = bottom_edge.copy().rotate(0, 0, 1, 90).normalize();
-    static RenderingCube edge_map[] = {
+    static WireRenderingCube edge_map[] = {
             bottom_edge.rotate(0, 1, 0, 90 * 2).normalize(),
             bottom_edge.rotate(0, 1, 0, 90 * 1).normalize(),
             bottom_edge.rotate(0, 1, 0, 90 * 0).normalize(),
@@ -155,8 +155,8 @@ public class WireConnections {
             side_edge.rotate(0, 1, 0, 90 * 2).normalize(),
     };
 
-    public Iterable<RenderingCube> getParts() {
-        ArrayList<RenderingCube> ret = new ArrayList(20);
+    public Iterable<WireRenderingCube> getParts() {
+        ArrayList<WireRenderingCube> ret = new ArrayList(20);
         if (center_core) {
             ret.add(cube(new VectorUV(w, w, w), null));
         }
@@ -175,8 +175,8 @@ public class WireConnections {
         return ret;
     }
 
-    static public Iterable<RenderingCube> getInventoryParts() {
-        ArrayList<RenderingCube> ret = new ArrayList(2);
+    static public Iterable<WireRenderingCube> getInventoryParts() {
+        ArrayList<WireRenderingCube> ret = new ArrayList(2);
         ret.add(face_map[0].copy());
         ret.add(edge_map[0].copy());
         ret.add(edge_map[1].copy());
@@ -186,7 +186,7 @@ public class WireConnections {
         return ret;
     }
 
-    private void getExtremes(RenderingCube cube, VectorUV min, VectorUV max) {
+    private void getExtremes(WireRenderingCube cube, VectorUV min, VectorUV max) {
         for (int face = 0; face < 6; face++) {
             for (VectorUV v : cube.faceVerts(face)) {
                 min.x = Math.min(v.x, min.x);
@@ -202,7 +202,7 @@ public class WireConnections {
     public void setBlockBounds(Block block) {
         VectorUV min = null, max = null;
         boolean first = true;
-        for (RenderingCube part : getParts()) {
+        for (WireRenderingCube part : getParts()) {
             if (first) {
                 first = false;
                 min = max = part.faceVerts(0)[2];
@@ -220,7 +220,7 @@ public class WireConnections {
 
     public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z, Vec3 startVec,
             Vec3 endVec) {
-        for (RenderingCube part : getParts()) {
+        for (WireRenderingCube part : getParts()) {
             part.toBlockBounds(Core.registry.resource_block);
             MovingObjectPosition ret = Core.registry.resource_block.collisionRayTrace(w, x, y, z, startVec, endVec);
             if (ret != null) {
