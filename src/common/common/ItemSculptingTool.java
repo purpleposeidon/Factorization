@@ -37,6 +37,11 @@ public class ItemSculptingTool extends Item {
         ToolMode mode[] = ToolMode.values();
         for (int i = 0; i < length; i++) {
             int j = i + 1;
+            for (; j < length; j++) {
+                if (mode[j].craftable) {
+                    break;
+                }
+            }
             if (j == length) {
                 j = 0;
             }
@@ -44,12 +49,34 @@ public class ItemSculptingTool extends Item {
         }
     }
 
-    enum ToolMode {
-        SELECTOR("Select"), MOVER("Move"), STRETCHER("Stretch"), REMOVER("Remove"), ROTATOR("Rotate");
+    static enum ToolMode {
+        SELECTOR("Select", true),
+        MOVER("Move", true),
+        STRETCHER("Stretch", false),
+        REMOVER("Remove", true),
+        ROTATOR("Rotate", true),
+        RESETTER("Reset", false);
         
         String english;
-        private ToolMode(String english) {
+        boolean craftable;
+        ToolMode next;
+        private ToolMode(String english, boolean craftable) {
             this.english = english;
+            this.craftable = craftable;
+            this.next = this;
+        }
+        
+        static void group(ToolMode ...group) {
+            ToolMode prev = group[group.length - 1];
+            for (ToolMode me : group) {
+                me.next = prev;
+                prev = me;
+            }
+        }
+        
+        static {
+            group(MOVER, STRETCHER);
+            group(REMOVER, RESETTER);
         }
     }
     
@@ -74,8 +101,17 @@ public class ItemSculptingTool extends Item {
     
     @Override
     public void addInformation(ItemStack is, List list) {
-        list.add(getMode(is.getItemDamage()).english);
+        ToolMode mode = getMode(is.getItemDamage());
+        list.add(mode.english);
+        for (ToolMode nextMode = mode.next; nextMode != mode; nextMode = nextMode.next) {
+            list.add("(" + nextMode.english + ")");
+        }
         Core.brand(list);
+    }
+    
+    void changeMode(ItemStack is) {
+        ToolMode mode = getMode(is.getItemDamage());
+        is.setItemDamage(mode.next.ordinal());
     }
     
     @Override
@@ -85,6 +121,10 @@ public class ItemSculptingTool extends Item {
         Coord here = new Coord(w, x, y, z);
         TileEntityGreenware gw = here.getTE(TileEntityGreenware.class);
         if (gw == null) {
+            if (player.isSneaking()) {
+                changeMode(is);
+                return true;
+            }
             return false;
         }
         ClayState state = gw.getState();
@@ -181,6 +221,10 @@ public class ItemSculptingTool extends Item {
                 rotate(selection, player.isSneaking(), side);
                 gw.shareLump(sel.id, selection);
             }
+            break;
+        case RESETTER:
+            selection.trans.reset();
+            gw.shareLump(sel.id, selection);
             break;
         }
         
