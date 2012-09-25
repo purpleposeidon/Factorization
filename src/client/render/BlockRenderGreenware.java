@@ -19,10 +19,10 @@ import factorization.common.RenderingCube;
 import factorization.common.TileEntityGreenware.ClayState;
 import factorization.common.TileEntityGreenware;
 
-public class BlockRenderSculpture extends FactorizationBlockRender {
-    static BlockRenderSculpture instance;
+public class BlockRenderGreenware extends FactorizationBlockRender {
+    static BlockRenderGreenware instance;
     
-    public BlockRenderSculpture() {
+    public BlockRenderGreenware() {
         instance = this;
         setup();
     }
