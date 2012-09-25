@@ -5,6 +5,7 @@ import factorization.common.Core;
 import factorization.common.FactoryType;
 import factorization.common.RenderingCube;
 import factorization.common.TileEntityGreenware;
+import factorization.common.TileEntityGreenware.ClayState;
 
 import net.minecraft.src.RenderBlocks;
 import net.minecraft.src.Tessellator;
@@ -17,20 +18,26 @@ public class TileEntityGreenwareRender extends TileEntitySpecialRenderer {
     @Override
     public void renderTileEntityAt(TileEntity te, double viewx, double viewy, double viewz, float partial) {
         TileEntityGreenware gw = (TileEntityGreenware) te;
+        int dryTime = gw.dryTime;
         if (!gw.canEdit()) {
-            return;
+            if (gw.renderedAsBlock) {
+                return;
+            } else if (gw.getState() == ClayState.DRY) {
+                //prevents AO flickering on & off
+                gw.dryTime = Integer.MAX_VALUE;
+            }
         }
         Core.profileStartRender("ceramics");
         
         glPushMatrix();
         glTranslated(viewx, viewy, viewz);
         
-        
-        TileEntityGreenware greenware = (TileEntityGreenware) te;
         BlockRenderSculpture.instance.renderInInventory();
-        BlockRenderSculpture.instance.setTileEntity(greenware);
-        BlockRenderSculpture.instance.renderDynamic(greenware);
+        BlockRenderSculpture.instance.setTileEntity(gw);
+        BlockRenderSculpture.instance.renderDynamic(gw);
         glPopMatrix();
+        gw.renderedAsBlock = false;
+        gw.dryTime = dryTime;
         Core.profileEndRender();
     }
 

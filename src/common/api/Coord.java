@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+import javax.management.RuntimeErrorException;
+
 import net.minecraft.src.Block;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityItem;
@@ -66,6 +68,24 @@ public class Coord {
 
     public Coord copy() {
         return new Coord(w, x, y, z);
+    }
+    
+    public int get(int axis) {
+        switch (axis) {
+        case 0: return x;
+        case 1: return y;
+        case 2: return z;
+        default: throw new RuntimeException("Invalid argument");
+        }
+    }
+    
+    public void set(int axis, int value) {
+        switch (axis) {
+        case 0: x = value; return;
+        case 1: y = value; return;
+        case 2: z = value; return;
+        default: throw new RuntimeException("Invalid argument");
+        }
     }
 
     /** @return boolean for a check pattern */
@@ -416,7 +436,7 @@ public class Coord {
     }
 
     public void mark() {
-        w.spawnParticle("reddust", x, y, z, 0, 0, 0);
+        w.spawnParticle("reddust", x + 0.5, y + 0.5, z + 0.5, 0, 0, 0);
     }
     
     public boolean remote() {

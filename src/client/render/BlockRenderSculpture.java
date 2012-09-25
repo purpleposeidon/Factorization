@@ -55,6 +55,7 @@ public class BlockRenderSculpture extends FactorizationBlockRender {
         if (!gw.canEdit()) {
             renderStatic(gw);
         }
+        gw.renderedAsBlock = true;
 //		if (world_mode) {
 //			TileEntityGreenware teg = getCoord().getTE(TileEntityGreenware.class);
 //			if (teg != null) {

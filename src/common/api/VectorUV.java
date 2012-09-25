@@ -51,6 +51,10 @@ public class VectorUV {
     public VectorUV add(VectorUV o) {
         return new VectorUV(x + o.x, y + o.y, z + o.z, u, v);
     }
+    
+    public VectorUV subtract(VectorUV o) {
+        return new VectorUV(x - o.x, y - o.y, z - o.z, u, v);
+    }
 
     public void scale(float d) {
         x *= d;

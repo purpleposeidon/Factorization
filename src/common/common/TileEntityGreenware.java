@@ -24,8 +24,11 @@ import factorization.common.NetworkFactorization.MessageType;
 public class TileEntityGreenware extends TileEntityCommon {
 
     public ArrayList<RenderingCube> parts = new ArrayList();
-    int lastTouched = 0;
+    public int lastTouched = 0;
     int totalHeat = 0;
+    
+    //Client-side only
+    public boolean renderedAsBlock = true; //keep rendering while waiting for the chunk to redraw
     
     public static int dryTime = 20*60*2; //2 minutes
     public static int bisqueHeat = 1000, glazeHeat = bisqueHeat*20;
@@ -218,7 +221,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             player.inventory.mainInventory[ci] = new ItemStack(Item.bucketEmpty);
             return true;
         }
-        if (heldId == Block.sponge.blockID) {
+        if (heldId == Block.cloth.blockID) {
             lastTouched = dryTime + 1;
             return true;
         }
@@ -344,7 +347,7 @@ public class TileEntityGreenware extends TileEntityCommon {
                 is.itemID = Item.bucketWater.shiftedIndex;
                 lastTouched = 0;
             }
-            if (id == Block.sponge.blockID) {
+            if (id == Block.cloth.blockID) {
                 lastTouched = dryTime;
             }
             return true;

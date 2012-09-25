@@ -184,10 +184,30 @@ abstract public class FactorizationBlockRender implements ICoord {
     }
     
     private float getAmbientOcclusionLightValue(IBlockAccess w, int x, int y, int z) {
-        return w.isBlockNormalCube(x, y, z) ? 0.2F : 1.0F;
+        return Block.stone.getAmbientOcclusionLightValue(w, x, y, z);
     }
     
-    static private float getNormalizedLighting(VectorUV[] vecs) {
+    static private ForgeDirection getFaceDirection(VectorUV[] vecs, VectorUV center) {
+        VectorUV here = vecs[0].add(vecs[2]);
+        here.scale(0.5F);
+        here = here.add(center);
+        float x = Math.abs(here.x), y = Math.abs(here.y), z = Math.abs(here.z);
+        if (x >= y && x >= z) {
+            return here.x >= 0 ? ForgeDirection.WEST : ForgeDirection.EAST;
+        }
+        if (y >= x && y >= z) {
+            return here.y >= 0 ? ForgeDirection.UP : ForgeDirection.DOWN;
+        }
+        if (z >= x && z >= y) {
+            return here.z >= 0 ? ForgeDirection.SOUTH : ForgeDirection.NORTH;
+        }
+        return ForgeDirection.UP;
+    }
+    
+    static float[] directionLighting = new float[] {0.5F, 1F, 0.8F, 0.8F, 0.6F, 0.6F};
+    static private float getNormalizedLighting(VectorUV[] vecs, VectorUV center) {
+        return directionLighting[getFaceDirection(vecs, center).ordinal()];
+        /*
         float x0 = vecs[0].x, y0 = vecs[0].y, z0 = vecs[0].z;
         float x1 = vecs[1].x, y1 = vecs[1].y, z1 = vecs[1].z;
         float x2 = vecs[2].x, y2 = vecs[2].y, z2 = vecs[2].z;
@@ -215,63 +235,76 @@ abstract public class FactorizationBlockRender implements ICoord {
         if (fz < d && fz > -d) {
             return 0.6F;
         }
-        return 0.8F;
+        return 0.8F;*/
     }
 
     
     private void vectorAO(RenderingCube rc, VectorUV vec, ForgeDirection face) {
         DeltaCoord outward = new DeltaCoord(face.offsetX, face.offsetY, face.offsetZ);		
         DeltaCoord corner = new DeltaCoord((int) vec.x, (int) vec.y, (int)vec.z);
+        float s = 16;
+        Coord here = getCoord();
         int normalAxis = -1;
         for (int i = 0; i < 3; i++) {
-            //Is this loop pointless?
+            int caxis = corner.get(i);
+            if (Math.abs(caxis) > 8) {
+                here.set(i, (int) (here.get(i) + Math.signum(caxis)));
+            }
             if (Math.abs(outward.get(i)) == 1) {
                 corner.set(i, outward.get(i));
                 normalAxis = i;
             } else {
-                float sig = Math.signum(corner.get(i));
+                float sig = Math.signum(caxis);
                 corner.set(i, (int) sig);
             }
         }
-        
-        boolean blocksLight[] = new boolean[3]; 
+         
         int mixedBrightness[] = new int[3];
         float aoLightValue[] = new float[3];
-        Coord here = getCoord();
+        boolean aoGrass[] = new boolean[3];
         int array_index = 1;
         for (int i = 0; i < 3; i++) {
             if (i == normalAxis) {
                 //get the corner piece
                 Coord pos = here.add(corner);
-                blocksLight[0] = Block.canBlockGrass[pos.getId()];
                 {
                     mixedBrightness[0] = getMixedBrightnessForBlock(pos.w, pos.x, pos.y, pos.z);
                     aoLightValue[0] = getAmbientOcclusionLightValue(pos.w, pos.x, pos.y, pos.z);
+                    aoGrass[0] = Block.canBlockGrass[pos.getId()];
                 }
             } else {
                 int store = corner.get(i);
                 corner.set(i, 0);
                 Coord pos = here.add(corner);
-                
-                blocksLight[array_index] = Block.canBlockGrass[pos.add(corner).getId()];
                 {
                     mixedBrightness[array_index] = getMixedBrightnessForBlock(pos.w, pos.x, pos.y, pos.z);
                     aoLightValue[array_index] = getAmbientOcclusionLightValue(pos.w, pos.x, pos.y, pos.z);
+                    aoGrass[array_index] = Block.canBlockGrass[pos.getId()];
                 }
                 array_index++;
                 corner.set(i, store);
             }
         }
-        Tessellator tess = Tessellator.instance;
-        int brightness;
-        if (blocksLight[1] && blocksLight[2]) {
-            brightness = (mixedBrightness[1] + mixedBrightness[2])/2;
-        } else {
-            brightness = (mixedBrightness[0] + mixedBrightness[1] + mixedBrightness[2])/3;
+        Coord front = here.add(face);
+        int here_mixed = Block.stone.getMixedBrightnessForBlock(front.w, front.x, front.y, front.z);
+        float hereAmbient = getAmbientOcclusionLightValue(here.w, here.x, here.y, here.z);
+        if (!aoGrass[1] && !aoGrass[2]) {
+            mixedBrightness[0] = here_mixed;
+            aoLightValue[0] = hereAmbient;
         }
-        tess.setBrightness(brightness);
+        int brightness = getAoBrightness(mixedBrightness[0], mixedBrightness[1], mixedBrightness[2], here_mixed);
+        Tessellator.instance.setBrightness(brightness);
+        
+        float color = aoLightValue[0] + aoLightValue[1] + aoLightValue[2] + hereAmbient;
+        float scale = faceColor/3F; //So, uhm. Why does using 4 make this too dark? o_O
+        Tessellator.instance.setColorOpaque_F(color*scale, color*scale, color*scale);
         vertex(rc, vec);
     }
+    
+    float faceColor;
+    boolean isDebugVertex = false;
+    
+    static boolean force_inv = true;
 
     protected void renderCube(RenderingCube rc) {
         if (!world_mode) {
@@ -279,7 +312,7 @@ abstract public class FactorizationBlockRender implements ICoord {
             ForgeHooksClient.bindTexture(cubeTexture, 0);
             GL11.glDisable(GL11.GL_LIGHTING);
         }
-        
+        force_inv = false;
         float delta = 1F/256F;
         float zfight = rc.corner.x * delta; //TODO: Make this a field
         //also: zfight should just depend on size.
@@ -288,7 +321,10 @@ abstract public class FactorizationBlockRender implements ICoord {
         zfight *= rc.corner.z * (delta);
         zfight = 1.0025F;
         
-        if ((te != null || world_mode)) {
+        VectorUV center = rc.trans.apply(new VectorUV(0, 0, 0));
+        
+        
+        if ((te != null || world_mode) && !force_inv) {
             //<other stuff's supposed to go here>
             //for each vertex:
             //tess.setColorOpaque_F(color of that vertex)
@@ -297,30 +333,33 @@ abstract public class FactorizationBlockRender implements ICoord {
             Coord here = getCoord();
             if (Minecraft.isAmbientOcclusionEnabled() && Core.renderAO) {
                 for (int face = 0; face < 6; face++) {
+//					if (face != 2) {
+//						continue;
+//					}
                     VectorUV[] vecs = rc.faceVerts(face);
-                    float color = getNormalizedLighting(vecs);
-                    Tessellator.instance.setColorOpaque_F(color, color, color);
+                    faceColor = getNormalizedLighting(vecs, center);
                     for (int i = 0; i < vecs.length; i++) {
+                        isDebugVertex = i == 1;
                         vectorAO(rc, vecs[i], ForgeDirection.values()[face]);
                     }
                 }
             } else {
-                if (here != null) {
-                    int brightness = Core.registry.factory_rendering_block.getMixedBrightnessForBlock(here.w, here.x, here.y, here.z);
-                    //brightness = 0xf00000;
-                    //Tessellator.instance.setBrightness(brightness);
-                }
                 for (int face = 0; face < 6; face++) {
                     VectorUV[] vecs = rc.faceVerts(face);
-                    float color = getNormalizedLighting(vecs);
+                    float color = getNormalizedLighting(vecs, center);
                     Tessellator.instance.setColorOpaque_F(color, color, color);
-                    int cx = (int) (0.5 + ((vecs[0].x + vecs[2].x)/2)/8);
-                    int cy = (int) (0.5 + ((vecs[0].y + vecs[2].y)/2)/8);
-                    int cz = (int) (0.5 + ((vecs[0].z + vecs[2].z)/2)/8);
-                    cx += here.x;
-                    cy += here.y;
-                    cz += here.z;
-                    int brightness = Core.registry.factory_rendering_block.getMixedBrightnessForBlock(here.w, cx, cy, cz);
+                    int cx = here.x;
+                    int cy = here.y;
+                    int cz = here.z;
+                    cx += Math.signum((vecs[0].x + vecs[2].x)/2);
+                    cy += Math.signum((vecs[0].y + vecs[2].y)/2);
+                    cz += Math.signum((vecs[0].z + vecs[2].z)/2);
+                    //Not factory_rendering_block, the block at cx cy cz.
+                    int brightness = 0;
+                    Block block = Block.stone; //Block.blocksList[here.w.getBlockId(cx, cy, cz)];
+                    if (block != null) {
+                        brightness = block.getMixedBrightnessForBlock(here.w, cx, cy, cz);
+                    }
                     Tessellator.instance.setBrightness(brightness);
                     for (int i = 0; i < vecs.length; i++) {
                         vertex(rc, vecs[i]);
@@ -330,7 +369,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         } else {
             for (int face = 0; face < 6; face++) {
                 VectorUV[] vecs = rc.faceVerts(face);
-                float color = getNormalizedLighting(vecs);
+                float color = getNormalizedLighting(vecs, center);
                 Tessellator.instance.setColorOpaque_F(color, color, color);
                 
                 for (int i = 0; i < vecs.length; i++) {
@@ -359,7 +398,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         zfight = 1.0025F;
         for (int face = 0; face < 6; face++) {
             VectorUV[] vecs = rc.faceVerts(face);
-            float color = getNormalizedLighting(vecs);
+            float color = getNormalizedLighting(vecs, rc.origin);
             
             Tessellator.instance.setColorOpaque_F(color, color, color);
             for (int i = 0; i < vecs.length; i++) {
