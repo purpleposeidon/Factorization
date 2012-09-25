@@ -148,7 +148,6 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
         //demossing
         burn(new BlockMatch(Block.stoneBrick, 0x1), new BlockMatch(Block.stoneBrick, 0x0)); //mossy to normal
         burn(Block.cobblestoneMossy, Block.cobblestone);
-        burn(Block.blockClay, Block.brick);
 
         burn(Block.blockSteel, new BlockMatch(Core.registry.resource_block, ResourceType.DARKIRONBLOCK.md));
         //burn(new BlockMatch(Core.registry.resource_block, ResourceType.SILVERBLOCK.md), new BlockMatch(Core.registry.resource_block, ResourceType.LEADBLOCK.md));
