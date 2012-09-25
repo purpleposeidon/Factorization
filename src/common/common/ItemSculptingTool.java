@@ -123,6 +123,10 @@ public class ItemSculptingTool extends Item {
         if (gw == null) {
             if (player.isSneaking()) {
                 changeMode(is);
+                //creative mode has to go and over-complicate this.
+                if (player.inventory.mainInventory[player.inventory.currentItem] == is) {
+                    player.inventory.mainInventory[player.inventory.currentItem] = is.copy();
+                }
                 return true;
             }
             return false;
