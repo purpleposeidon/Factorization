@@ -103,4 +103,14 @@ public class VectorUV {
         args.add(y);
         args.add(z);
     }
+    
+
+    public float get(int axis) {
+        switch (axis) {
+        case 0: return x;
+        case 1: return y;
+        case 2: return z;
+        default: throw new RuntimeException("Invalid argument");
+        }
+    }
 }

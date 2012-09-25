@@ -207,42 +207,20 @@ abstract public class FactorizationBlockRender implements ICoord {
     static float[] directionLighting = new float[] {0.5F, 1F, 0.8F, 0.8F, 0.6F, 0.6F};
     static private float getNormalizedLighting(VectorUV[] vecs, VectorUV center) {
         return directionLighting[getFaceDirection(vecs, center).ordinal()];
-        /*
-        float x0 = vecs[0].x, y0 = vecs[0].y, z0 = vecs[0].z;
-        float x1 = vecs[1].x, y1 = vecs[1].y, z1 = vecs[1].z;
-        float x2 = vecs[2].x, y2 = vecs[2].y, z2 = vecs[2].z;
-        
-        float x3 = x1 - x0, y3 = y1 - y0, z3 = z1 - z0;
-        float x4 = x1 - x2, y4 = y1 - y2, z4 = z1 - z2;
-        //this.yCoord * par1Vec3.zCoord - this.zCoord * par1Vec3.yCoord
-        //this.zCoord * par1Vec3.xCoord - this.xCoord * par1Vec3.zCoord
-        //this.xCoord * par1Vec3.yCoord - this.yCoord * par1Vec3.xCoord
-        //v4.crossProduct(v3);
-        float fx = y4*z3 - z4*y3;
-        float fy = z4*x3 - x4*z3;
-        float fz = x4*y3 - y4*x3;
-        double length = Math.sqrt(fx*fx + fy*fy + fz*fz);
-        fx /= length;
-        fy /= length;
-        fz /= length;
-        if (fy > 0) {
-            return 1;
-        }
-        if (fy < 0) {
-            return 0.5F;
-        }
-        float d = 0.7071067811865475F;
-        if (fz < d && fz > -d) {
-            return 0.6F;
-        }
-        return 0.8F;*/
+    }
+    
+    private float interpolate(float a, float b, float scale) {
+        return a*scale + b*(1 - scale);
     }
 
+    float vertexColorResult;
+    int vertexBrightnessResult;
+    
+    
     
     private void vectorAO(RenderingCube rc, VectorUV vec, ForgeDirection face) {
         DeltaCoord outward = new DeltaCoord(face.offsetX, face.offsetY, face.offsetZ);		
         DeltaCoord corner = new DeltaCoord((int) vec.x, (int) vec.y, (int)vec.z);
-        float s = 16;
         Coord here = getCoord();
         int normalAxis = -1;
         for (int i = 0; i < 3; i++) {
@@ -259,27 +237,42 @@ abstract public class FactorizationBlockRender implements ICoord {
             }
         }
          
-        int mixedBrightness[] = new int[3];
-        float aoLightValue[] = new float[3];
-        boolean aoGrass[] = new boolean[3];
+        calculateAO(face, corner, here, normalAxis);
+        Tessellator.instance.setBrightness(vertexBrightnessResult);
+        float firstColor = vertexColorResult;
+        calculateAO(face, corner, here.add(face.getOpposite()), normalAxis);
+        int slide = ((int)vec.get(normalAxis)) % 8;
+        float scale = slide/16F;
+        vertexColorResult = interpolate(vertexColorResult, firstColor, scale);
+        Tessellator.instance.setColorOpaque_F(vertexColorResult, vertexColorResult, vertexColorResult);
+        vertex(rc, vec);
+    }
+
+    int mixedBrightness[] = new int[3];
+    float aoLightValue[] = new float[3];
+    boolean aoGrass[] = new boolean[3];
+    private void calculateAO(ForgeDirection face, DeltaCoord corner, Coord here, int normalAxis) {
         int array_index = 1;
         for (int i = 0; i < 3; i++) {
             if (i == normalAxis) {
-                //get the corner piece
+                //the corner
                 Coord pos = here.add(corner);
+                int ai = 0;
                 {
-                    mixedBrightness[0] = getMixedBrightnessForBlock(pos.w, pos.x, pos.y, pos.z);
-                    aoLightValue[0] = getAmbientOcclusionLightValue(pos.w, pos.x, pos.y, pos.z);
-                    aoGrass[0] = Block.canBlockGrass[pos.getId()];
+                    mixedBrightness[ai] = getMixedBrightnessForBlock(pos.w, pos.x, pos.y, pos.z);
+                    aoLightValue[ai] = getAmbientOcclusionLightValue(pos.w, pos.x, pos.y, pos.z);
+                    aoGrass[ai] = Block.canBlockGrass[pos.getId()];
                 }
             } else {
+                //one of the two sides
                 int store = corner.get(i);
                 corner.set(i, 0);
                 Coord pos = here.add(corner);
+                int ai = array_index;
                 {
-                    mixedBrightness[array_index] = getMixedBrightnessForBlock(pos.w, pos.x, pos.y, pos.z);
-                    aoLightValue[array_index] = getAmbientOcclusionLightValue(pos.w, pos.x, pos.y, pos.z);
-                    aoGrass[array_index] = Block.canBlockGrass[pos.getId()];
+                    mixedBrightness[ai] = getMixedBrightnessForBlock(pos.w, pos.x, pos.y, pos.z);
+                    aoLightValue[ai] = getAmbientOcclusionLightValue(pos.w, pos.x, pos.y, pos.z);
+                    aoGrass[ai] = Block.canBlockGrass[pos.getId()];
                 }
                 array_index++;
                 corner.set(i, store);
@@ -291,14 +284,14 @@ abstract public class FactorizationBlockRender implements ICoord {
         if (!aoGrass[1] && !aoGrass[2]) {
             mixedBrightness[0] = here_mixed;
             aoLightValue[0] = hereAmbient;
+            aoLightValue[0] = 1;
         }
-        int brightness = getAoBrightness(mixedBrightness[0], mixedBrightness[1], mixedBrightness[2], here_mixed);
-        Tessellator.instance.setBrightness(brightness);
+        vertexBrightnessResult = getAoBrightness(mixedBrightness[0], mixedBrightness[1], mixedBrightness[2], here_mixed);
         
         float color = aoLightValue[0] + aoLightValue[1] + aoLightValue[2] + hereAmbient;
-        float scale = faceColor/3F; //So, uhm. Why does using 4 make this too dark? o_O
-        Tessellator.instance.setColorOpaque_F(color*scale, color*scale, color*scale);
-        vertex(rc, vec);
+        color /= 3F; //So, uhm. Why does using 4 make this too dark? o_O (renderblocks uses 4)
+        color = Math.max(color, hereAmbient);
+        vertexColorResult = color * faceColor;
     }
     
     float faceColor;
