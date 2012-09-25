@@ -239,11 +239,11 @@ abstract public class FactorizationBlockRender implements ICoord {
          
         calculateAO(face, corner, here, normalAxis);
         Tessellator.instance.setBrightness(vertexBrightnessResult);
-        float firstColor = vertexColorResult;
-        calculateAO(face, corner, here.add(face.getOpposite()), normalAxis);
-        int slide = ((int)vec.get(normalAxis)) % 8;
-        float scale = slide/16F;
-        vertexColorResult = interpolate(vertexColorResult, firstColor, scale);
+//		float firstColor = vertexColorResult;
+//		calculateAO(face, corner, here.add(face.getOpposite()), normalAxis);
+//		int slide = ((int)vec.get(normalAxis)) % 8;
+//		float scale = slide/16F;
+//		vertexColorResult = interpolate(vertexColorResult, firstColor, scale);
         Tessellator.instance.setColorOpaque_F(vertexColorResult, vertexColorResult, vertexColorResult);
         vertex(rc, vec);
     }
