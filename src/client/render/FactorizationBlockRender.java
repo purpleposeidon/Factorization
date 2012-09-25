@@ -236,8 +236,12 @@ abstract public class FactorizationBlockRender implements ICoord {
                 corner.set(i, (int) sig);
             }
         }
-         
         calculateAO(face, corner, here, normalAxis);
+        /*if (Math.abs(vec.x) > 8 || Math.abs(vec.y) > 8 || Math.abs(vec.z) > 8) {
+            calculateAO(face, corner, here.add(face.getOpposite()), normalAxis);
+        } else {
+            calculateAO(face, corner, here, normalAxis);
+        }*/
         Tessellator.instance.setBrightness(vertexBrightnessResult);
 //		float firstColor = vertexColorResult;
 //		calculateAO(face, corner, here.add(face.getOpposite()), normalAxis);
