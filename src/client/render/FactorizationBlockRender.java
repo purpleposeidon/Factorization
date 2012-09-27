@@ -395,7 +395,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         zfight = 1.0025F;
         for (int face = 0; face < 6; face++) {
             VectorUV[] vecs = rc.faceVerts(face);
-            float color = getNormalizedLighting(vecs, rc.origin);
+            float color = directionLighting[face]; //getNormalizedLighting(vecs, rc.origin);
             
             Tessellator.instance.setColorOpaque_F(color, color, color);
             for (int i = 0; i < vecs.length; i++) {
