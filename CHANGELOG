@@ -1,5 +1,6 @@
 0.5.7
-  A new logo, thanks to Chikkenkiller
+  Grinder recipe no longer uses dark iron.
+
 
 0.5.6
   Initing earlier will hopefully prevent a different BC facade crash.
