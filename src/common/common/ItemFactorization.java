@@ -7,6 +7,7 @@ import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemBlock;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
+import net.minecraft.src.NBTTagList;
 import net.minecraft.src.Packet;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
@@ -91,6 +92,21 @@ public class ItemFactorization extends ItemBlock {
     @Override
     public void addInformation(ItemStack is, List infoList) {
         super.addInformation(is, infoList);
+        if (is.isItemEqual(Core.registry.greenware_item)) {
+            NBTTagCompound tag = is.getTagCompound();
+            if (tag != null && tag.hasKey("sculptureName")) {
+                String name = tag.getString("sculptureName");
+                if (name != null && name.length() > 0) {
+                    infoList.add(name);
+                }
+            } else if (tag != null && tag.hasKey("parts")) {
+                infoList.add("Use /nameclay to name this");
+            }
+            if (tag != null && tag.hasKey("parts")) {
+                NBTTagList l = tag.getTagList("parts");
+                infoList.add(l.tagCount() + " parts");
+            }
+        }
         Core.brand(infoList);
     }
 }
