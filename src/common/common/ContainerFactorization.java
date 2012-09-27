@@ -138,7 +138,7 @@ public class ContainerFactorization extends Container {
         case GRINDER:
             TileEntityGrinder grinder = (TileEntityGrinder) ent;
             addSlotToContainer(new Slot(grinder, 0, 56, 35));
-            addSlotToContainer(new SlotFurnace(player, grinder, 1, 115, 34));
+            addSlotToContainer(new SlotFurnace(player, grinder, 1, 116, 35));
             break;
         case MIXER:
             TileEntityMixer mixer = (TileEntityMixer) ent;
