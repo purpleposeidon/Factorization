@@ -57,6 +57,9 @@ public class BlockFactorization extends BlockContainer {
             Core.registry.battery.normalizeDamage(is);
             return is;
         }
+        if (ft == FactoryType.GREENWARE) {
+            return ((TileEntityGreenware) tec).getItem();
+        }
         return new ItemStack(Core.registry.item_factorization, 1, tec.getFactoryType().md);
     }
 
@@ -102,11 +105,6 @@ public class BlockFactorization extends BlockContainer {
 
         if (t != null) {
             return t.activate(entityplayer);
-            //			if (!world.isRemote) {
-            //				return t.activate(entityplayer);
-            //			}
-            //
-            //			return true;
         }
         else {
             //info message
@@ -228,6 +226,9 @@ public class BlockFactorization extends BlockContainer {
             tag.setInteger("storage", bat.storage.getValue());
             is.setTagCompound(tag);
             Core.registry.battery.normalizeDamage(is);
+        }
+        if (f.getFactoryType() == FactoryType.GREENWARE) {
+            is = ((TileEntityGreenware) f).getItem();
         }
         ret.add(is);
         return ret;
