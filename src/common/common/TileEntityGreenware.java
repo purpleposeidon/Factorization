@@ -14,6 +14,7 @@ import net.minecraft.src.InventoryPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
+import net.minecraft.src.NBTTagDouble;
 import net.minecraft.src.NBTTagList;
 import net.minecraft.src.Packet;
 import net.minecraft.src.PlayerControllerMP;
@@ -118,9 +119,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         return BlockClass.Ceramic;
     }
     
-    @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
+    void writeParts(NBTTagCompound tag) {
         NBTTagList l = new NBTTagList();
         for (RenderingCube rc : parts) {
             NBTTagCompound rc_tag = new NBTTagCompound();
@@ -132,19 +131,33 @@ public class TileEntityGreenware extends TileEntityCommon {
     }
     
     @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        NBTTagList l = (NBTTagList) tag.getTag("parts");
-        if (l == null) {
+    public void writeToNBT(NBTTagCompound tag) {
+        super.writeToNBT(tag);
+        writeParts(tag);
+    }
+    
+    void loadParts(NBTTagCompound tag) {
+        if (tag == null) {
+            initialize();
+            return;
+        }
+        NBTTagList partList = tag.getTagList("parts");
+        if (partList == null) {
             initialize();
             return;
         }
         parts.clear();
-        for (int i = 0; i < l.tagCount(); i++) {
-            NBTTagCompound rc_tag = (NBTTagCompound) l.tagAt(i);
+        for (int i = 0; i < partList.tagCount(); i++) {
+            NBTTagCompound rc_tag = (NBTTagCompound) partList.tagAt(i);
             parts.add(RenderingCube.loadFromNBT(rc_tag));
         }
         lastTouched = tag.getInteger("touch");
+    }
+    
+    @Override
+    public void readFromNBT(NBTTagCompound tag) {
+        super.readFromNBT(tag);
+        loadParts(tag);
     }
     
     @Override
@@ -161,17 +174,15 @@ public class TileEntityGreenware extends TileEntityCommon {
     @Override
     void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
         super.onPlacedBy(player, is, side);
-        initialize();
+        loadParts(is.getTagCompound());
     }
-    
-    @Override
-    void onRemove() {
-        super.onRemove();
-        int i = parts.size() - 1;
-        if (i > 0) {
-            EntityItem drop = new EntityItem(worldObj, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, new ItemStack(Item.clay, i));
-            worldObj.spawnEntityInWorld(drop);
-        }
+
+    ItemStack getItem() {
+        ItemStack ret = Core.registry.greenware_item.copy();
+        NBTTagCompound tag = new NBTTagCompound();
+        writeParts(tag);
+        ret.setTagCompound(tag);
+        return ret;
     }
     
     private ClayState lastState = null;

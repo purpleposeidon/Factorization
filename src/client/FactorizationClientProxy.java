@@ -57,7 +57,7 @@ import factorization.client.render.BlockRenderHeater;
 import factorization.client.render.BlockRenderLamp;
 import factorization.client.render.BlockRenderMirrorStand;
 import factorization.client.render.BlockRenderMixer;
-import factorization.client.render.BlockRenderSculpture;
+import factorization.client.render.BlockRenderGreenware;
 import factorization.client.render.BlockRenderSentryDemon;
 import factorization.client.render.BlockRenderSolarTurbine;
 import factorization.client.render.BlockRenderWire;
@@ -550,7 +550,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderGrinder();
         new BlockRenderMixer();
         new BlockRenderCrystallizer();
-        new BlockRenderSculpture().setup();
+        new BlockRenderGreenware().setup();
 
         MinecraftForgeClient.registerItemRenderer(Core.registry.battery.shiftedIndex, new BatteryItemRender(renderBattery));
     }

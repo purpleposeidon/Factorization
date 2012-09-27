@@ -39,6 +39,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
     void render(RenderBlocks rb) {
         if (!world_mode) {
             renderStand();
+            renderGenericLump();
             return;
         }
         TileEntityGreenware gw = getCoord().getTE(TileEntityGreenware.class);
@@ -98,12 +99,17 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
     }
     
     static RenderingCube woodStand = new RenderingCube(16*12 + 2, new VectorUV(4, 1, 4));
+    static RenderingCube genericLump = new RenderingCube(16*12, new VectorUV(3, 5, 3));
     static {
         woodStand.trans.translate(0, -6, 0);
     }
     
     void renderStand() {
         renderCube(woodStand);
+    }
+    
+    void renderGenericLump() {
+        renderCube(genericLump);
     }
 
     @Override

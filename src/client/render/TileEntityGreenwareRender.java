@@ -32,9 +32,9 @@ public class TileEntityGreenwareRender extends TileEntitySpecialRenderer {
         glPushMatrix();
         glTranslated(viewx, viewy, viewz);
         
-        BlockRenderSculpture.instance.renderInInventory();
-        BlockRenderSculpture.instance.setTileEntity(gw);
-        BlockRenderSculpture.instance.renderDynamic(gw);
+        BlockRenderGreenware.instance.renderInInventory();
+        BlockRenderGreenware.instance.setTileEntity(gw);
+        BlockRenderGreenware.instance.renderDynamic(gw);
         glPopMatrix();
         gw.renderedAsBlock = false;
         gw.dryTime = dryTime;
