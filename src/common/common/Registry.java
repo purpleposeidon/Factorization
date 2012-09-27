@@ -181,7 +181,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         grinder_item = FactoryType.GRINDER.itemStack("Grinder");
         mixer_item = FactoryType.MIXER.itemStack("Mixer");
         crystallizer_item = FactoryType.CRYSTALLIZER.itemStack("Crystallizer");
-        greenware_item = FactoryType.GREENWARE.itemStack("Sculpture Table");
+        greenware_item = FactoryType.GREENWARE.itemStack("Clay Sculpture");
 
         //BlockResource stuff
         silver_ore_item = ResourceType.SILVERORE.itemStack("Silver Ore");
