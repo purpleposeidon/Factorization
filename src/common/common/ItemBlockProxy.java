@@ -102,4 +102,9 @@ public class ItemBlockProxy extends Item {
             return false;
         }
     }
+    
+    @Override
+    public boolean getShareTag() {
+        return true;
+    }
 }
