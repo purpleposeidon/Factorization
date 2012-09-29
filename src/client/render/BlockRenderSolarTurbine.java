@@ -50,6 +50,7 @@ public class BlockRenderSolarTurbine extends FactorizationBlockRender {
         return;
     }
     
+    private TileEntityWire fake_wire = new TileEntityWire();
     void renderSolarTurbine(RenderBlocks rb, int water_height, Coord me) {
         int glass = Texture.lamp_iron + 10;
         int water = 7;
@@ -64,7 +65,6 @@ public class BlockRenderSolarTurbine extends FactorizationBlockRender {
         }
         renderMotor(rb, 0);
         if (world_mode) {
-            TileEntityWire fake_wire = new TileEntityWire();
             fake_wire.worldObj = me.w;
             fake_wire.xCoord = me.x;
             fake_wire.yCoord = me.y;
