@@ -1,5 +1,6 @@
 package factorization.common;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.src.CreativeTabs;
@@ -140,7 +141,7 @@ public class ItemDemon extends Item {
         } else {
             list.add("Beware its poisonous fangs!");
         }
-        Core.brand(list);
+        //Core.brand(list); -- I hereby disclaim all responsibility for this thing!
     }
 
     @Override
@@ -282,27 +283,30 @@ public class ItemDemon extends Item {
 
         ChestEnviron chosen = null;
         int i = 0;
-        for (Object e : world.loadedTileEntityList) {
-            TileEntity ent = (TileEntity) e;
-            if (!(ent instanceof TileEntityChest)) {
-                continue;
-            }
-            IInventory chest = FactorizationUtil.openDoubleChest((TileEntityChest) ent);
-            //XXX What happens here if the ent's actually a subclass of TEChest?
-            if (chest == null) {
-                continue;
-            }
-            ChestEnviron env = new ChestEnviron((TileEntityChest) ent, chest);
+        if (world.loadedTileEntityList instanceof ArrayList) {
+            ArrayList<TileEntity> tes = (ArrayList<TileEntity>) world.loadedTileEntityList;
+            for (int index = 0; index < tes.size(); index++) {
+                TileEntity ent = tes.get(index);
+                if (!(ent instanceof TileEntityChest)) {
+                    continue;
+                }
+                IInventory chest = FactorizationUtil.openDoubleChest((TileEntityChest) ent);
+                //XXX What happens here if the ent's actually a subclass of TEChest?
+                if (chest == null) {
+                    continue;
+                }
+                ChestEnviron env = new ChestEnviron((TileEntityChest) ent, chest);
 
-            env.updateDemonActivity();
-            if (env.cantHost()) {
-                continue;
-            }
+                env.updateDemonActivity();
+                if (env.cantHost()) {
+                    continue;
+                }
 
-            if (i == 0 || itemRand.nextInt(i) == 0) {
-                chosen = env;
+                if (i == 0 || itemRand.nextInt(i) == 0) {
+                    chosen = env;
+                }
+                i += 1;
             }
-            i += 1;
         }
 
         if (chosen != null) {
