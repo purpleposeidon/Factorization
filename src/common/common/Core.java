@@ -95,6 +95,7 @@ public class Core {
     public static boolean cheat = false;
     public static boolean renderTEs = true;
     public static boolean renderAO = true;
+    public static boolean spawnDemons = true;
 
     // universal constant config
     public final static String texture_dir = "/factorization/texture/";
@@ -152,6 +153,7 @@ public class Core {
             render_barrel_item = getBoolConfig("renderBarrelItem", "client", render_barrel_item, null);
             render_barrel_item = getBoolConfig("renderBarrelText", "client", render_barrel_text, null);
             renderTEs = getBoolConfig("renderOtherTileEntities", "client", renderTEs, "If false, most TEs won't draw, making everything look broken but possibly improving FPS");
+            renderAO = getBoolConfig("renderAmbientOcclusion", "client", renderAO, "If false, never use smooth lighting for drawing sculptures");
             String attempt = getStringConfig("pocketCraftingActionKeys", "client", pocketActions, "3 keys for: removing (x), cycling (c), balancing (b)");
             if (attempt.length() == 3) {
                 pocketActions = attempt;
@@ -165,9 +167,9 @@ public class Core {
         gen_silver_ore = getBoolConfig("generateSilverOre", "general", gen_silver_ore, null);
         block_item_id_offset = getIntConfig("blockItemIdOffset", "general", block_item_id_offset, null);
         add_branding = getBoolConfig("addBranding", "general", add_branding, null); //For our Tekkit friends
-
-        //watch_demon_chunk_range = getIntConfig("watchDemonChunkRange", "smpAdmin", watch_demon_chunk_range, "chunk radius to keep loaded");
+        
         spread_wrathfire = getBoolConfig("spreadWrathFire", "server", spread_wrathfire, null);
+        spawnDemons = getBoolConfig("spawnDemons", "general", spawnDemons, null);
         String p = getStringConfig("bannedRouterInventoriesRegex", "server", "", null);
         if (p != null && p.length() != 0) {
             try {

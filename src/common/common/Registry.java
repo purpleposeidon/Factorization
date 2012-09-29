@@ -25,6 +25,7 @@ import net.minecraft.src.ModLoader;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldGenMinable;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
@@ -89,6 +90,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemCraftingComponent inverium;
     public ItemSculptingTool sculpt_tool;
     public ItemAngularSaw angular_saw;
+    public ItemCraftingComponent heatHole, logicMatrix, logicMatrixProgrammer, logicMatrixIdentifier;
 
     public Material materialMachine = new Material(MapColor.ironColor);
 
@@ -213,6 +215,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         tiny_demon = new ItemDemon(itemID("tinyDemon", 9004));
         addName(bound_tiny_demon, "Bound Tiny Demon");
         addName(tiny_demon, "Tiny Demon");
+        logicMatrixProgrammer = new ItemCraftingComponent(itemID("logicMatrixProgrammer", 9043), "Logic Matrix Programmer", 1*16 + 6);
+        logicMatrix = new ItemCraftingComponent(itemID("logicMatrix", 9044), "Logic Matrix", 1*16 + 10);
+        logicMatrixIdentifier = new ItemCraftingComponent(itemID("logicMatrixID", 9045), "Logic Matrix", 1*16 + 11);
+        heatHole = new ItemCraftingComponent(itemID("heatHole", 9046), "Heat Hole", 1*16 + 9);
 
         wand_of_cooling = new ItemWandOfCooling(itemID("wandOfCooling", 9005));
         addName(wand_of_cooling, "Wand of Cooling");
@@ -272,7 +278,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         sculpt_tool = new ItemSculptingTool(itemID("sculptTool", 9041));
         addName(sculpt_tool, "Sculpting Tool");
         
-        inverium = new ItemInverium(itemID("inverium", 9040), "item.inverium", 12*16 + 0, 11);
+        //inverium = new ItemInverium(itemID("inverium", 9040), "item.inverium", 12*16 + 0, 11);
+        inverium = new ItemInverium(itemID("inverium", 9040), "item.inverium", 12*16 + 0, 1);
         addName(inverium, "Inverium Drop");
 
         //Misc
@@ -335,24 +342,28 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 '|', Item.stick);
 
         // tiny demons
-        shapelessRecipe(new ItemStack(bound_tiny_demon), tiny_demon, Item.silk);
+        recipe(new ItemStack(logicMatrixIdentifier),
+                "MiX",
+                'M', logicMatrix,
+                'i', Item.spiderEye,
+                'X', logicMatrixProgrammer);
+        
 
         // wand of cooling
+        TileEntityCrystallizer.addRecipe(new ItemStack(Block.obsidian), new ItemStack(heatHole), 0, new ItemStack(Item.potion), 1);
         recipe(new ItemStack(wand_of_cooling),
                 " OD",
-                " FO",
+                " IO",
                 "I  ",
                 'O', Block.obsidian,
-                'D', bound_tiny_demon,
-                'F', Item.flintAndSteel,
+                'D', heatHole,
                 'I', Item.ingotIron);
         recipe(new ItemStack(wand_of_cooling),
                 "DO ",
-                "OF ",
+                "OI ",
                 "  I",
                 'O', Block.obsidian,
-                'D', bound_tiny_demon,
-                'F', Item.flintAndSteel,
+                'D', heatHole,
                 'I', Item.ingotIron);
 
         // diamond shard
@@ -514,7 +525,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "ICI",
                 'I', dark_iron,
                 'T', Block.torchRedstoneActive,
-                'D', bound_tiny_demon,
+                'D', logicMatrixIdentifier,
                 'G', Item.ingotGold,
                 'C', Block.chest);
 
@@ -524,7 +535,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "IBI",
                 'I', dark_iron,
                 'T', Block.torchRedstoneActive,
-                'D', bound_tiny_demon,
+                'D', logicMatrixIdentifier,
                 'S', "ingotSilver",
                 'B', Item.book);
 
@@ -652,7 +663,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
         //Electricity
 
+        
         shapelessRecipe(new ItemStack(acid), Item.gunpowder, Item.gunpowder, Item.coal, Item.potion);
+        shapelessOreRecipe(new ItemStack(acid), "dustSulfur", Item.coal, Item.potion);
         recipe(new ItemStack(fan),
                 "I I",
                 " I ",
@@ -1032,22 +1045,23 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         return true;
     }
 
-    private int demon_spawn_delay = 0;
+    private final int demon_spawn_delay = 20*60*10;
+    private int demon_spawn_tick = 20*60;
 
     @Override
     public void tickStart(EnumSet<TickType> type, Object... tickData) {
-        demon_spawn_delay--;
-        if (demon_spawn_delay < -1) {
-            demon_spawn_delay = 20 * 60;
-        }
         if (type.contains(TickType.WORLD)) {
             World w = (World) tickData[0];
             if (w.isRemote) {
                 return;
             }
             onTickWorld(w);
-            if (demon_spawn_delay == 0) {
-                ItemDemon.spawnDemons(w);
+            if (DimensionManager.getWorld(-1) == w && Core.spawnDemons) {
+                demon_spawn_tick--;
+                if (demon_spawn_tick == 0) {
+                    ItemDemon.spawnDemons(w);
+                    demon_spawn_tick = demon_spawn_delay;
+                }
             }
         }
         if (type.contains(TickType.PLAYER)) {
