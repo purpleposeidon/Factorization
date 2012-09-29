@@ -15,5 +15,5 @@ for line in open(versioning_file):
 if __name__ == '__main__':
   print "Version:", version
 info[0]["version"] = version
-json.dump(info, open("mcmod.info", 'w'), indent=1)
+json.dump(info, open("mcmod.info", 'w'), indent=1, sort_keys=True)
 
