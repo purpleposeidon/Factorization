@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import net.minecraft.src.Block;
 import net.minecraft.src.MovingObjectPosition;
+import net.minecraft.src.TileEntity;
 import net.minecraft.src.Vec3;
 import net.minecraft.src.World;
 import factorization.api.Coord;
@@ -27,7 +28,7 @@ public class WireConnections {
         this.my_face_vector = my_face.toVector();
         this.here = me.getCoord();
 
-        Core.profileStart("factoryWire");
+        Core.profileStart("factoryWire"); //Looks like this is *very* efficient!
         calculate();
         Core.profileEnd();
     }
@@ -39,16 +40,20 @@ public class WireConnections {
         int wire_neighbor_count = 0;
         for (DeltaCoord d : DeltaCoord.directNeighbors) {
             Coord nc = here.add(d);
-            TileEntityWire n = nc.getTE(TileEntityWire.class);
+            TileEntity neighbor = nc.getTE();
+            if (neighbor == null) {
+                continue;
+            }
             CubeFace delta_face = CubeFace.fromVector(d);
-            if (n != null) {
+            
+            if (neighbor instanceof TileEntityWire) {
+                TileEntityWire n = (TileEntityWire) neighbor;
                 CubeFace neighbor_face = new CubeFace(n.supporting_side);
                 addNeighbor(d, n, neighbor_face, delta_face);
                 wire_neighbor_count++;
                 continue;
             }
-            IChargeConductor c = nc.getTE(IChargeConductor.class);
-            if (c != null) {
+            if (neighbor instanceof IChargeConductor) {
                 if (delta_face.equals(my_face)) {
                     //under us
                     faces |= my_face.getFaceFlag();
@@ -95,7 +100,9 @@ public class WireConnections {
         if (edge_to_add == 0) {
             //neighbor's support is far away
             edge_to_add = delta_face.getEdgeFlags() & neighbor_face.getEdgeFlags();
-            if (Long.bitCount(edge_to_add) > 1) {
+            if (edge_to_add == 0) {
+                //neighbor's on top of us. This doesn't happen with normal wire. Do nothing.
+            } else if (Long.bitCount(edge_to_add) > 1) {
                 center_core = true;
                 faces |= delta_face.getFaceFlag() | my_face.getFaceFlag();
             } else {
