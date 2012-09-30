@@ -26,6 +26,7 @@ import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldGenMinable;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.DungeonHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
@@ -216,8 +217,17 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         addName(bound_tiny_demon, "Bound Tiny Demon");
         addName(tiny_demon, "Tiny Demon");
         logicMatrixProgrammer = new ItemCraftingComponent(itemID("logicMatrixProgrammer", 9043), "Logic Matrix Programmer", 1*16 + 6);
+        DungeonHooks.addDungeonLoot(new ItemStack(logicMatrixProgrammer), 50);
+        DungeonHooks.addDungeonMob("Creeper", 1);
+        String THATS_SOME_VERY_NICE_SOURCE_CODE_YOU_HAVE_THERE[] = {
+                "##  ##",
+                "##  ##",
+                "  ##  ",
+                " #### ",
+                " #  # "
+        };
         logicMatrix = new ItemCraftingComponent(itemID("logicMatrix", 9044), "Logic Matrix", 1*16 + 10);
-        logicMatrixIdentifier = new ItemCraftingComponent(itemID("logicMatrixID", 9045), "Logic Matrix", 1*16 + 11);
+        logicMatrixIdentifier = new ItemCraftingComponent(itemID("logicMatrixID", 9045), "Logic Matrix: Identifierw", 1*16 + 11);
         heatHole = new ItemCraftingComponent(itemID("heatHole", 9046), "Heat Hole", 1*16 + 9);
 
         wand_of_cooling = new ItemWandOfCooling(itemID("wandOfCooling", 9005));
