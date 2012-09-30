@@ -27,3 +27,8 @@ mkdir -p lib/factorization
 pushd lib/factorization
   ln -s ../../factorization/texture/
 popd
+
+mkdir -p jars/saves
+pushd jars/saves
+  unzip ../../factorization/testworld.zip
+popd

@@ -24,7 +24,12 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
 
     public abstract BlockClass getBlockClass();
 
-    @Override
+//	@Override
+//	public Packet getDescriptionPacket() {
+//		//Wow. Would you people please *stop* fucking with the names?
+//		return getAuxillaryInfoPacket();
+//	}
+    
     public Packet getAuxillaryInfoPacket() {
         Packet p = Core.network.messagePacket(getCoord(), MessageType.FactoryType, getFactoryType().md, getExtraInfo(), getExtraInfo2());
         p.isChunkDataPacket = true;

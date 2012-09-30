@@ -37,7 +37,7 @@ public class ItemPocketTable extends Item {
     // }
     //
     // @Override
-    // public boolean onItemUse(ItemStack stack,
+    // public boolean tryPlaceIntoWorld(ItemStack stack,
     // EntityPlayer player, World world, int X, int Y,
     // int Z, int side) {
     // // TODO Auto-generated method stub

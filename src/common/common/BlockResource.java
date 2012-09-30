@@ -15,7 +15,7 @@ public class BlockResource extends Block {
     protected BlockResource(int id) {
         super(id, Material.rock);
         setHardness(2.0F);
-        setCreativeTab(CreativeTabs.tabBlock);
+        setTabToDisplayOn(CreativeTabs.tabBlock);
     }
 
     @Override

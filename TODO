@@ -2,6 +2,13 @@ http://www.minecraftforum.net/topic/1351802-factorization/
 
 ask chikkenkiller for transparent version of logo, proper attribution, and maybe a URL?
 
+TOP LIST
+--------
+Excorsize demons
+Re-write electricity to use sets.
+back to ceramics?
+
+
 
 [Features]
 Some electricity related mecha-upgrades?
@@ -23,7 +30,8 @@ http://i.imgur.com/db3Ij.jpg -- see the holes? Are those still a problem?
 test high block IDs
 check breaking on all new machines
 solar turbines need to check if it's raining. It's okay if you're in a desert tho.
-fill up a barrel all the way with redpower. Save and restart.
+<OvermindDL1> For note, the grinder keeps not accepting power, breaking and replacing it fixes it for an MC day or so, then it breaks again
+craft packet makers shouldn't eat paper.
 
 [Low-Priority Bugs]
 draw_active isn't marking the block dirty apparently?

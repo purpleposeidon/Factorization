@@ -196,22 +196,25 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     }
 
     static ArrayList<CrystalRecipe> recipes = new ArrayList();
-
+    
     static class CrystalRecipe {
         ItemStack input, output, solution;
         float output_count;
-        int antium_count;
+        int inverium_count;
 
         public CrystalRecipe(ItemStack input, ItemStack output, float output_count,
-                ItemStack solution, int antium_count) {
+                ItemStack solution, int inverium_count) {
             this.input = input;
             this.output = output;
             this.output_count = output_count;
             this.solution = solution;
-            this.antium_count = antium_count;
+            this.inverium_count = inverium_count;
         }
 
         boolean matches(TileEntityCrystallizer crys) {
+            if (crys.countMaterial(new ItemStack(Core.registry.inverium)) < inverium_count) {
+                return false;
+            }
             if (crys.output != null) {
                 if (!crys.output.isItemEqual(output)) {
                     return false;
@@ -250,12 +253,28 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
             } else {
                 crys.output.stackSize += delta;
             }
+            int dead_inverium = inverium_count;
+            for (int slot = 0; slot < crys.inputs.length; slot++) {
+                if (dead_inverium == 0) {
+                    break;
+                }
+                ItemStack inverium = crys.inputs[slot];
+                if (inverium == null || inverium.getItem() != Core.registry.inverium) {
+                    continue;
+                }
+                int toRemove = Math.min(dead_inverium, inverium.stackSize);
+                inverium.stackSize -= toRemove;
+                dead_inverium -= toRemove;
+                if (inverium.stackSize <= 0) {
+                    crys.inputs[slot] = null;
+                }
+            }
         }
     }
 
     public static void addRecipe(ItemStack input, ItemStack output, float output_count, ItemStack solution,
-            int antium_count) {
-        recipes.add(new CrystalRecipe(input, output, output_count, solution, antium_count));
+            int inverium_count) {
+        recipes.add(new CrystalRecipe(input, output, output_count, solution, inverium_count));
     }
 
     CrystalRecipe getMatchingRecipe() {

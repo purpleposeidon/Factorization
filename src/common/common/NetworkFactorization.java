@@ -146,6 +146,8 @@ public class NetworkFactorization implements IPacketHandler {
             //send to everyone in range
             int max_dist = (int) (3 * Math.pow(32, 2));
             for (EntityPlayer player : (Iterable<EntityPlayer>) src.w.playerEntities) {
+                //XXX TODO: Make this not lame!
+                //if (entityplayermp.loadedChunks.contains(chunkcoordintpair))
                 if (src.distanceSq(new Coord(player)) > max_dist) {
                     continue;
                 }

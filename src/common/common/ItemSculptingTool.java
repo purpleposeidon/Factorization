@@ -114,6 +114,8 @@ public class ItemSculptingTool extends Item {
         is.setItemDamage(mode.next.ordinal());
     }
     
+    
+    
     @Override
     public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player,
             World w, int x, int y, int z, int side,

@@ -22,6 +22,8 @@ public class ItemChargeMeter extends Item {
         setTextureFile(Core.texture_file_item);
         setTabToDisplayOn(CreativeTabs.tabRedstone);
     }
+    
+    
 
     @Override
     public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y,

@@ -114,7 +114,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         GameRegistry.registerCraftingHandler(this);
         GameRegistry.registerWorldGenerator(this);
 
-        factory_block.setCreativeTab(CreativeTabs.tabRedstone);
+        factory_block.setTabToDisplayOn(CreativeTabs.tabRedstone);
     }
 
     void registerSimpleTileEntities() {
@@ -143,7 +143,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         return id;
     }
 
-    <E extends Item> E tab(E item, CreativeTabs tab) {
+    Item tab(Item item, CreativeTabs tab) {
         item.setTabToDisplayOn(tab);
         return item;
     }
