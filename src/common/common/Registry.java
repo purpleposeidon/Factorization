@@ -115,7 +115,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         GameRegistry.registerCraftingHandler(this);
         GameRegistry.registerWorldGenerator(this);
 
-        factory_block.setTabToDisplayOn(CreativeTabs.tabRedstone);
+        factory_block.setCreativeTab(CreativeTabs.tabRedstone);
     }
 
     void registerSimpleTileEntities() {
