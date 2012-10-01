@@ -52,7 +52,7 @@ public class BlockFactorization extends BlockContainer {
             ItemStack is = new ItemStack(Core.registry.battery);
             TileEntityBattery bat = (TileEntityBattery) tec;
             NBTTagCompound tag = new NBTTagCompound();
-            tag.setInteger("storage", bat.storage.getValue());
+            tag.setInteger("storage", bat.storage);
             is.setTagCompound(tag);
             Core.registry.battery.normalizeDamage(is);
             return is;
@@ -223,7 +223,7 @@ public class BlockFactorization extends BlockContainer {
             is = new ItemStack(Core.registry.battery);
             TileEntityBattery bat = (TileEntityBattery) f;
             NBTTagCompound tag = new NBTTagCompound();
-            tag.setInteger("storage", bat.storage.getValue());
+            tag.setInteger("storage", bat.storage);
             is.setTagCompound(tag);
             Core.registry.battery.normalizeDamage(is);
         }

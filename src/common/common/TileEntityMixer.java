@@ -10,7 +10,6 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Charge;
-import factorization.api.ChargeSink;
 import factorization.api.IChargeConductor;
 import factorization.common.NetworkFactorization.MessageType;
 
@@ -20,12 +19,12 @@ public class TileEntityMixer extends TileEntityFactorization implements
     ItemStack input[] = new ItemStack[4], output[] = new ItemStack[4];
     int progress = 0;
     int speed = 0;
-    ChargeSink charge_sink = new ChargeSink();
+    Charge charge = new Charge(this);
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
-        charge_sink.writeToNBT(tag);
+        charge.writeToNBT(tag);
         tag.setInteger("progress", progress);
         tag.setInteger("speed", speed);
         writeSlotsToNBT(tag);
@@ -34,7 +33,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
-        charge_sink.readFromNBT(tag);
+        charge.readFromNBT(tag);
         progress = tag.getInteger("progress");
         speed = tag.getInteger("speed");
         readSlotsFromNBT(tag);
@@ -93,7 +92,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
 
     @Override
     public Charge getCharge() {
-        return charge_sink.getCharge();
+        return charge;
     }
 
     @Override
@@ -109,7 +108,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     @Override
     public void updateEntity() {
         super.updateEntity();
-        charge_sink.update(this);
+        charge.update();
         rotation += speed;
         shareRotationSpeed();
     }
@@ -274,7 +273,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
 
     boolean extractEnergy() {
-        return charge_sink.takeCharge(1) == 1;
+        return charge.tryTake(1) > 0;
     }
 
     @Override

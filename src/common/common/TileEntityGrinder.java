@@ -8,13 +8,12 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Charge;
-import factorization.api.ChargeSink;
 import factorization.api.IChargeConductor;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityGrinder extends TileEntityFactorization implements IChargeConductor {
     ItemStack input, output;
-    ChargeSink chargeSink = new ChargeSink();
+    Charge charge = new Charge(this);
     int progress = 0;
     int energy = 0;
     int speed = 0;
@@ -50,7 +49,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
         readSlotsFromNBT(tag);
-        chargeSink.readFromNBT(tag);
+        charge.readFromNBT(tag);
         progress = tag.getInteger("progress");
         energy = tag.getInteger("energy");
         speed = tag.getInteger("speed");
@@ -60,7 +59,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
         writeSlotsToNBT(tag);
-        chargeSink.writeToNBT(tag);
+        charge.writeToNBT(tag);
         tag.setInteger("progress", progress);
         tag.setInteger("energy", energy);
         tag.setInteger("speed", speed);
@@ -86,7 +85,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
 
     @Override
     public Charge getCharge() {
-        return chargeSink.getCharge();
+        return charge;
     }
 
     @Override
@@ -133,6 +132,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     @Override
     public void updateEntity() {
         rotation += speed;
+        charge.update();
         super.updateEntity();
     }
     
@@ -145,17 +145,14 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     void useExtraInfo2(byte b) {
         speed = b;
     }
-
+    
     @Override
     void doLogic() {
         shareSpeed();
         needLogic();
-        Charge.update(this);
-        if (worldObj.getWorldTime() % 3 == 0) {
-            if (energy < 30) {
-                int to_take = chargeSink.takeCharge(30);
-                energy += to_take / 5;
-            }
+        if (energy < 30) {
+            int to_take = charge.deplete(30);
+            energy += to_take / 5;
         }
         if (energy <= 0) {
             slowDown();

@@ -14,7 +14,7 @@ import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeConductor,
         IReflectionTarget {
-    Charge charge = new Charge();
+    Charge charge = new Charge(this);
     int reflectors = 0;
     public int water_level = 0;
     public static int max_water = 256 * 4;
@@ -59,13 +59,13 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
-        charge.writeToNBT(tag, "charge");
+        charge.writeToNBT(tag);
     }
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
-        charge.readFromNBT(tag, "charge");
+        charge.readFromNBT(tag);
         fan_rotation = rand.nextInt(90);
     }
 
@@ -141,7 +141,7 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
             return;
         }
         updateClients();
-        charge.update(this);
+        charge.update();
         if (water_level <= 0) {
             Coord below = getCoord().add(0, -1, 0);
             if (below.is(Block.waterMoving) || below.is(Block.waterStill)) {

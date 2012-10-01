@@ -36,11 +36,7 @@ public class ItemChargeMeter extends Item {
         if (w.isRemote) {
             return true;
         }
-        int toLook = 5;
-        if (player.isSneaking()) {
-            toLook = 10;
-        }
-        ChargeDensityReading ret = Charge.getChargeDensity(ic, toLook);
+        ChargeDensityReading ret = Charge.getChargeDensity(ic);
         float density = ret.totalCharge / ((float) ret.conductorCount);
         String d = String.format("%.1f", density);
         //TODO: Let's put it somewhere better than the chat log
@@ -50,8 +46,9 @@ public class ItemChargeMeter extends Item {
         } else {
             inf = "  " + inf;
         }
-        player.addChatMessage("Average: " + d
-                + "  Target: " + ic.getCharge().getValue()
+        player.addChatMessage("Target: " + ic.getCharge().getValue()
+                + "  Average: " + d
+                + "  Total: " + ret.totalCharge
                 + "  Conductors: " + ret.conductorCount
                 + inf
                 //+ "  C: " + ic.getCoord()

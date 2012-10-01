@@ -16,21 +16,34 @@ import factorization.common.Core;
 import factorization.common.TileEntityHeater;
 
 public class Charge {
-    private int charge = 0;
-    private ForgeDirection last_motion = DOWN;
-    private static Random rand = new Random();
-
+    ConductorSet conductorSet = null;
+    IChargeConductor conductor = null;
+    boolean isConductorSetLeader = false;
+    boolean justCreated = true;
+    
+    public Charge(IChargeConductor conductor) {
+        this.conductor = conductor;
+    }
+    
     public int getValue() {
-        return charge;
+        if (conductorSet == null || conductorSet.memberCount == 0) {
+            return 0;
+        }
+        int chargeShare = conductorSet.totalCharge / conductorSet.memberCount;
+        if (isConductorSetLeader) {
+            chargeShare += conductorSet.totalCharge % conductorSet.memberCount;
+        }
+        return chargeShare;
     }
 
     public void setValue(int newCharge) {
-        this.charge = Math.max(0, newCharge);
+        createOrJoinConductorSet();
+        conductorSet.totalCharge += newCharge - getValue();
     }
 
     public int addValue(int chargeToAdd) {
-        setValue(charge + chargeToAdd);
-        return charge;
+        createOrJoinConductorSet();
+        return conductorSet.totalCharge += chargeToAdd;
     }
     
     public int deplete() {
@@ -45,109 +58,90 @@ public class Charge {
         setValue(c - toTake);
         return toTake;
     }
+    
+    public int tryTake(int toTake) {
+        int c = getValue();
+        if (c < toTake) {
+            return 0;
+        }
+        setValue(c - toTake);
+        return toTake;
+    }
 
     public void writeToNBT(NBTTagCompound tag, String name) {
-        tag.setInteger(name, charge);
-        tag.setInteger(name + "_dir", last_motion.ordinal());
+        tag.setInteger(name, getValue());
+    }
+    
+    public void writeToNBT(NBTTagCompound tag) {
+        writeToNBT(tag, "charge");
     }
 
     public void readFromNBT(NBTTagCompound tag, String name) {
         setValue(tag.getInteger(name));
-        if (tag.hasKey(name + "_dir")) {
-            last_motion = ForgeDirection.values()[tag.getInteger(name + "_dir")];
-        } else {
-            last_motion = DOWN;
-        }
     }
-
-    public void swapWith(Charge other) {
-        int a = this.charge, b = other.charge;
-        this.setValue(b);
-        other.setValue(a);
-    }
-
-    //These are some functions for users to make good & healthy use of
     
-    static ArrayList<ForgeDirection> realDirections = new ArrayList();
-    static {
-        for (ForgeDirection d : ForgeDirection.values()) {
-            if (d != UNKNOWN) {
-                realDirections.add(d);
-            }
-        }
+    public void readFromNBT(NBTTagCompound tag) {
+        readFromNBT(tag, "charge");
     }
-    /**
-     * This function spreads charge around with a random conducting neighbor of src. Call it every tick.
-     * 
-     * @param te
-     *            A conductive TileEntity
-     */
-    public static void update(IChargeConductor te) {
-        Charge me = te.getCharge();
-        //me.charge = 0;
-        if (me.charge <= 0) {
+    
+    void createOrJoinConductorSet() {
+        if (conductorSet != null) {
             return;
         }
-        Coord here = te.getCoord();
-        if (rand.nextInt(20) == 5) {
-            //jostle randomly
-            for (Coord neighbor : here.getRandomNeighborsAdjacent()) {
-                IChargeConductor cond = neighbor.getTE(IChargeConductor.class);
-                if (cond == null) {
-                    continue;
+        Coord here = conductor.getCoord();
+        if (here.w == null) {
+            //BAH! BAH I say! Can't do this nicely because we don't have a world!
+            new ConductorSet(conductor);
+            return;
+        }
+        Iterable<IChargeConductor> neighbors = conductor.getCoord().getAdjacentTEs(IChargeConductor.class);
+        for (IChargeConductor neighbor : neighbors) {
+            Charge n = neighbor.getCharge();
+            if (n.conductorSet == null) {
+                continue;
+            }
+            if (n.conductorSet.addConductor(this.conductor)) {
+                //we've got ourself added to a set. Inform the set of any adjacent sets.
+                for (IChargeConductor otherNeighbor : neighbors) {
+                    conductorSet.addNeighbor(otherNeighbor.getCharge().conductorSet);
                 }
-                me.swapWith(cond.getCharge());
                 return;
             }
+        }
+        new ConductorSet(conductor);
+    }
+
+    public void update() {
+        Coord here = conductor.getCoord();
+        if (here.w.isRemote) {
             return;
         }
-        ForgeDirection opposite = me.last_motion.getOpposite();
-        for (int i = me.last_motion.ordinal() + 1; i < UNKNOWN.ordinal(); i++) {
-            ForgeDirection dir = ForgeDirection.values()[i];
-            if (dir == opposite) {
-                continue;
-            }
-            if (me.tryPush(here, dir)) {
-                me.last_motion = dir;
-                return;
-            }
+        createOrJoinConductorSet();
+        if (isConductorSetLeader) {
+            conductorSet.update();
         }
-        for (int i = 0; i <= me.last_motion.ordinal(); i++) {
-            ForgeDirection dir = ForgeDirection.values()[i];
-            if (dir == opposite) {
-                continue;
+        if (justCreated || (here.w.getWorldTime() + here.seed()) % 300 == 0) {
+            justCreated = false;
+            for (IChargeConductor neighbor : here.getAdjacentTEs(IChargeConductor.class)) {
+                conductorSet.addNeighbor(neighbor.getCharge().conductorSet);
             }
-            if (me.tryPush(here, dir)) {
-                me.last_motion = dir;
-                return;
-            }
-        }
-        if (me.tryPush(here, opposite)) {
-            me.last_motion = opposite;
         }
     }
     
-    boolean tryPush(Coord here, ForgeDirection d) {
-        IChargeConductor con = here.add(d).getTE(IChargeConductor.class);
-        if (con == null) {
-            return false;
+    public void remove(IChargeConductor brokenTileEntity) {
+        if (conductorSet == null) {
+            return;
         }
-        Charge neighborCharge = con.getCharge();
-        if (neighborCharge.charge != 0) {
-            return false;
+        for (IChargeConductor hereConductor : conductorSet.getMembers(brokenTileEntity)) {
+            Charge hereCharge = hereConductor.getCharge();
+            int saveCharge = hereCharge.getValue();
+            new ConductorSet(hereCharge.conductor);
+            hereCharge.setValue(saveCharge);
         }
-        neighborCharge.charge = charge;
-        neighborCharge.last_motion = d;
-        charge = 0;
-        return true;
     }
     
-    private static ArrayList<IChargeConductor> frontier = new ArrayList(5 * 5 * 4);
-    private static HashSet<IChargeConductor> visited = new HashSet(5 * 5 * 5);
-
     public static class ChargeDensityReading {
-        public int totalCharge, conductorCount, maxCharge;
-        public ForgeDirection motion;
+        public int totalCharge, conductorCount;
     }
     /**
      * Gets the average charge in the nearby connected network
@@ -158,39 +152,14 @@ public class Charge {
      *            Only checks this range. Manhatten distance.
      * @return
      */
-    public static ChargeDensityReading getChargeDensity(IChargeConductor start, int maxDistance) {
-        int totalCharge = 0, maxCharge = 0;
-        Coord startCoord = start.getCoord();
-        frontier.clear();
-        visited.clear();
-        frontier.add(start);
-        visited.add(start);
-        while (frontier.size() > 0) {
-            IChargeConductor here = frontier.remove(0);
-            Coord hereCoord = here.getCoord();
-            int hereCharge = here.getCharge().charge;
-            totalCharge += hereCharge;
-            maxCharge = Math.max(maxCharge, hereCharge);
-            for (Coord neighborCoord : hereCoord.getNeighborsAdjacent()) {
-                IChargeConductor neighbor = neighborCoord.getTE(IChargeConductor.class);
-                if (neighbor == null) {
-                    continue;
-                }
-                if (visited.contains(neighbor)) {
-                    continue;
-                }
-                if (neighborCoord.distanceManhatten(startCoord) > maxDistance) {
-                    continue;
-                }
-                frontier.add(neighbor);
-                visited.add(neighbor);
-            }
+    public static ChargeDensityReading getChargeDensity(IChargeConductor start) {
+        ConductorSet cs = start.getCharge().conductorSet;
+        if (cs == null) {
+            return new ChargeDensityReading();
         }
         ChargeDensityReading ret = new ChargeDensityReading();
-        ret.totalCharge = totalCharge;
-        ret.conductorCount = visited.size();
-        ret.maxCharge = maxCharge;
-        ret.motion = start.getCharge().last_motion;
+        ret.totalCharge = cs.totalCharge;
+        ret.conductorCount = cs.memberCount;
         return ret;
     }
 

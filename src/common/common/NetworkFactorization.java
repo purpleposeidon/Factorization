@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.IllegalFormatException;
 
 import net.minecraft.src.Block;
+import net.minecraft.src.Chunk;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NetworkManager;
@@ -145,7 +147,11 @@ public class NetworkFactorization implements IPacketHandler {
         if (who == null) {
             //send to everyone in range
             int max_dist = (int) (3 * Math.pow(32, 2));
+            Chunk srcChunk = src.getChunk();
             for (EntityPlayer player : (Iterable<EntityPlayer>) src.w.playerEntities) {
+//				if (player.chunksToLoad.contains(srcChunk)) {
+//					Core.proxy.addPacket(player, toSend);
+//				}
                 //XXX TODO: Make this not lame!
                 //if (entityplayermp.loadedChunks.contains(chunkcoordintpair))
                 if (src.distanceSq(new Coord(player)) > max_dist) {

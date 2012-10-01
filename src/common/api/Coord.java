@@ -7,6 +7,7 @@ import java.util.Random;
 import javax.management.RuntimeErrorException;
 
 import net.minecraft.src.Block;
+import net.minecraft.src.Chunk;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityItem;
 import net.minecraft.src.ItemStack;
@@ -126,6 +127,17 @@ public class Coord {
         ArrayList<Coord> ret = new ArrayList(6);
         for (DeltaCoord d : DeltaCoord.directNeighbors) {
             ret.add(this.add(d));
+        }
+        return ret;
+    }
+    
+    public <T> Iterable<T> getAdjacentTEs(Class<T> clazz) {
+        ArrayList<T> ret = new ArrayList(6);
+        for (Coord n : getNeighborsAdjacent()) {
+            T toAdd = n.getTE(clazz);
+            if (toAdd != null) {
+                ret.add(toAdd);
+            }
         }
         return ret;
     }
@@ -298,6 +310,10 @@ public class Coord {
     
     public void rmTE() {
         w.removeBlockTileEntity(x, y, z);
+    }
+    
+    public Chunk getChunk() {
+        return w.getChunkFromBlockCoords(x, z);
     }
 
     public Block getBlock() {

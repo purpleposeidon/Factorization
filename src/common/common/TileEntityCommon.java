@@ -15,6 +15,7 @@ import net.minecraft.src.TileEntity;
 import net.minecraft.src.Vec3;
 import net.minecraft.src.World;
 import factorization.api.Coord;
+import factorization.api.IChargeConductor;
 import factorization.api.ICoord;
 import factorization.api.IFactoryType;
 import factorization.common.NetworkFactorization.MessageType;
@@ -37,6 +38,9 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     }
 
     void onRemove() {
+        if (this instanceof IChargeConductor) {
+            ((IChargeConductor) this).getCharge().remove((IChargeConductor) this);
+        }
     }
 
     byte getExtraInfo() {

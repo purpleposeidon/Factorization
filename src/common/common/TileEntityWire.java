@@ -19,7 +19,7 @@ import factorization.common.NetworkFactorization.MessageType;
 public class TileEntityWire extends TileEntityCommon implements IChargeConductor {
     public byte supporting_side;
     private boolean extended_wire = false;
-    Charge charge = new Charge();
+    Charge charge = new Charge(this);
 
     @Override
     public FactoryType getFactoryType() {
@@ -134,7 +134,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
         if (worldObj.isRemote) {
             return;
         }
-        charge.update(this);
+        charge.update();
 
         if (!is_supported() && !find_support()) {
             Core.registry.factory_block.dropBlockAsItem(worldObj, xCoord, yCoord, zCoord, BlockClass.Wire.md, 0);

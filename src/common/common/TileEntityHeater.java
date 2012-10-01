@@ -10,13 +10,12 @@ import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntityFurnace;
 import factorization.api.Charge;
-import factorization.api.ChargeSink;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityHeater extends TileEntityCommon implements IChargeConductor {
-    ChargeSink chargeSink = new ChargeSink();
+    Charge charge = new Charge(this);
     public byte heat = 0;
     public static final byte maxHeat = 32;
 
@@ -32,7 +31,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
 
     @Override
     public Charge getCharge() {
-        return chargeSink.getCharge();
+        return charge;
     }
 
     @Override
@@ -43,14 +42,14 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
-        chargeSink.writeToNBT(tag);
+        charge.writeToNBT(tag);
         tag.setByte("heat", heat);
     }
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
-        chargeSink.readFromNBT(tag);
+        charge.readFromNBT(tag);
         heat = tag.getByte("heat");
     }
     
@@ -99,7 +98,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
         Coord here = getCoord();
         long now = worldObj.getWorldTime() + here.seed();
         if (now % 4 == 0) {
-            int delta = chargeSink.takeCharge(maxHeat - heat, 2);
+            int delta = charge.deplete(maxHeat - heat);
             if (delta > 0) {
                 heat += charge2heat(delta);
             } else if (now % 200 == 0) {
@@ -109,7 +108,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
                 heat = (byte) Math.max(0, heat);
             }
         }
-        chargeSink.update(this);
+        charge.update();
 
         if (heat <= 0) {
             return;
