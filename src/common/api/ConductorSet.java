@@ -60,9 +60,9 @@ class ConductorSet implements Comparable {
         totalCharge = ourCharge - hisNewCharge;
     }
     
-    public void addNeighbor(ConductorSet neighbor) {
+    public boolean addNeighbor(ConductorSet neighbor) {
         if (neighbor == this || neighbor == null) {
-            return;
+            return false;
         }
         if (neighbors == null) {
             neighbors = new TreeSet<ConductorSet>();
@@ -70,13 +70,18 @@ class ConductorSet implements Comparable {
         if (neighbors.add(neighbor)) {
             neighborIterator = null;
             neighbor.addNeighbor(this); //Recurses thrice. ({b}, {}) -> ({b}, {a}) -> ({b, b}, {a})
+            return true;
         }
+        return false;
     }
     
     private static ArrayList<IChargeConductor> frontier = new ArrayList<IChargeConductor>(5 * 5 * 4);
     private static HashSet<IChargeConductor> visited = new HashSet<IChargeConductor>(5 * 5 * 5);
     
     public Iterable<IChargeConductor> getMembers(IChargeConductor seed) {
+        if (seed == null) {
+            return new ArrayList<IChargeConductor>(0);
+        }
         frontier.clear();
         visited.clear();
         frontier.add(seed);

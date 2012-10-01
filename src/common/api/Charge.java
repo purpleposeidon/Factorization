@@ -120,10 +120,13 @@ public class Charge {
         if (isConductorSetLeader) {
             conductorSet.update();
         }
-        if (justCreated || (here.w.getWorldTime() + here.seed()) % 300 == 0) {
+        if (justCreated || (here.w.getWorldTime() + here.seed()) % 600 == 0) {
             justCreated = false;
+            if (conductorSet.leader == null) {
+                conductorSet.leader = conductor;
+            }
             for (IChargeConductor neighbor : here.getAdjacentTEs(IChargeConductor.class)) {
-                conductorSet.addNeighbor(neighbor.getCharge().conductorSet);
+                justCreated |= conductorSet.addNeighbor(neighbor.getCharge().conductorSet);
             }
         }
     }
@@ -148,8 +151,6 @@ public class Charge {
      * 
      * @param start
      *            where to measure from
-     * @param maxDistance
-     *            Only checks this range. Manhatten distance.
      * @return
      */
     public static ChargeDensityReading getChargeDensity(IChargeConductor start) {
@@ -161,6 +162,17 @@ public class Charge {
         ret.totalCharge = cs.totalCharge;
         ret.conductorCount = cs.memberCount;
         return ret;
+    }
+
+    public void invalidate() {
+        if (conductorSet == null) {
+            return;
+        }
+        if (conductorSet.leader == this) {
+            conductorSet.leader = null;
+        }
+        conductorSet.totalCharge -= getValue();
+        conductorSet.memberCount--;
     }
 
 }

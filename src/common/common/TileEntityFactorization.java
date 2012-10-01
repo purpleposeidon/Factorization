@@ -13,7 +13,9 @@ import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NBTTagList;
 import net.minecraft.src.Vec3;
 import net.minecraftforge.common.ISidedInventory;
+import factorization.api.Charge;
 import factorization.api.Coord;
+import factorization.api.IChargeConductor;
 import factorization.api.ICoord;
 import factorization.api.IFactoryType;
 import factorization.common.NetworkFactorization.MessageType;
@@ -329,5 +331,14 @@ public abstract class TileEntityFactorization extends TileEntityCommon
             return true;
         }
         return false;
+    }
+    
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        if (this instanceof IChargeConductor) {
+            Charge c = ((IChargeConductor) this).getCharge();
+            c.invalidate();
+        }
     }
 }
