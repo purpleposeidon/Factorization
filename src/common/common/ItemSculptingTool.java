@@ -14,6 +14,7 @@ import net.minecraft.src.World;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.VectorUV;
+import factorization.common.Core.TabType;
 import factorization.common.NetworkFactorization.MessageType;
 import factorization.common.TileEntityGreenware.ClayState;
 import factorization.common.TileEntityGreenware.SelectionInfo;
@@ -28,7 +29,7 @@ public class ItemSculptingTool extends Item {
         setMaxDamage(0);
         setMaxStackSize(1);
         setItemName("item.sculptTool");
-        setTabToDisplayOn(CreativeTabs.tabDeco);
+        Core.tab(this, TabType.TOOLS);
         setFull3D();
     }
     
@@ -114,9 +115,14 @@ public class ItemSculptingTool extends Item {
         is.setItemDamage(mode.next.ordinal());
     }
     
-    
-    
     @Override
+    public boolean onItemUse(ItemStack par1ItemStack,
+            EntityPlayer par2EntityPlayer, World par3World, int par4, int par5,
+            int par6, int par7, float par8, float par9, float par10) {
+        return tryPlaceIntoWorld(par1ItemStack, par2EntityPlayer, par3World, par4, par5,
+                par6, par7, par8, par9, par10);
+    }
+    
     public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player,
             World w, int x, int y, int z, int side,
             float vx, float vy, float vz) {

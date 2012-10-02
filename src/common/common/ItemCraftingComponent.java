@@ -2,6 +2,8 @@ package factorization.common;
 
 import java.util.List;
 
+import factorization.common.Core.TabType;
+
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
@@ -14,7 +16,7 @@ public class ItemCraftingComponent extends Item {
         setItemName(itemName);
         Core.proxy.addName(this, itemName);
         this.icon = icon;
-        setTabToDisplayOn(CreativeTabs.tabMaterials);
+        Core.tab(this, TabType.MATERIALS);
         setTextureFile(Core.texture_file_item);
     }
 

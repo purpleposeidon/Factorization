@@ -11,6 +11,7 @@ import factorization.api.Charge;
 import factorization.api.Charge.ChargeDensityReading;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
+import factorization.common.Core.TabType;
 
 public class ItemChargeMeter extends Item {
 
@@ -20,12 +21,17 @@ public class ItemChargeMeter extends Item {
         Core.proxy.addName(this, "Charge Meter");
         setIconIndex(6);
         setTextureFile(Core.texture_file_item);
-        setTabToDisplayOn(CreativeTabs.tabRedstone);
+        Core.tab(this, TabType.REDSTONE);
     }
     
-    
-
     @Override
+    public boolean onItemUse(ItemStack par1ItemStack,
+            EntityPlayer par2EntityPlayer, World par3World, int par4, int par5,
+            int par6, int par7, float par8, float par9, float par10) {
+        return tryPlaceIntoWorld(par1ItemStack, par2EntityPlayer, par3World, par4, par5,
+                par6, par7, par8, par9, par10);
+    }
+
     public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y,
             int z, int side, float vecx, float vecy, float vecz) {
         Coord here = new Coord(w, x, y, z);

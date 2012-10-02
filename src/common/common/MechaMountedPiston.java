@@ -13,13 +13,14 @@ import net.minecraft.src.MathHelper;
 import net.minecraftforge.common.ISpecialArmor.ArmorProperties;
 import factorization.api.Coord;
 import factorization.api.IMechaUpgrade;
+import factorization.common.Core.TabType;
 
 public class MechaMountedPiston extends Item implements IMechaUpgrade {
     protected MechaMountedPiston(int par1) {
         super(par1);
         setItemName("mecha.mountedpiston");
         setIconIndex(16 * 10 + 2);
-        setTabToDisplayOn(CreativeTabs.tabMisc);
+        Core.tab(this, TabType.MISC);
     }
 
     @Override

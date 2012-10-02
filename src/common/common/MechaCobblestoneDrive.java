@@ -12,6 +12,7 @@ import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraftforge.common.ISpecialArmor.ArmorProperties;
 import factorization.api.IMechaUpgrade;
+import factorization.common.Core.TabType;
 
 public class MechaCobblestoneDrive extends Item implements IMechaUpgrade {
 
@@ -19,7 +20,7 @@ public class MechaCobblestoneDrive extends Item implements IMechaUpgrade {
         super(par1);
         setItemName("mecha.cobbledrive");
         setIconIndex(16 * 10 + 1);
-        setTabToDisplayOn(CreativeTabs.tabMisc);
+        Core.tab(this, TabType.MISC);
     }
 
     @Override

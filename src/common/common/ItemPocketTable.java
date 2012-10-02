@@ -2,6 +2,8 @@ package factorization.common;
 
 import java.util.List;
 
+import factorization.common.Core.TabType;
+
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.InventoryPlayer;
@@ -14,7 +16,7 @@ public class ItemPocketTable extends Item {
     public ItemPocketTable(int id) {
         super(id);
         setMaxStackSize(1);
-        setTabToDisplayOn(CreativeTabs.tabTools);
+        Core.tab(this, TabType.TOOLS);
         setFull3D();
     }
 

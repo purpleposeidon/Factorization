@@ -2,6 +2,8 @@ package factorization.common;
 
 import java.util.List;
 
+import factorization.common.Core.TabType;
+
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
@@ -25,7 +27,7 @@ public class ItemOreProcessing extends Item {
         setIconIndex(icon);
         this.type = type;
         setTextureFile(Core.texture_file_item);
-        setTabToDisplayOn(CreativeTabs.tabMaterials);
+        Core.tab(this, TabType.MATERIALS);
         setItemName("itemOreProcessing" + type);
     }
 

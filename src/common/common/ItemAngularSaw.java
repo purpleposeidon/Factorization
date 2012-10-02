@@ -1,6 +1,7 @@
 package factorization.common;
 
 import factorization.api.Coord;
+import factorization.common.Core.TabType;
 import net.minecraft.src.Block;
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.Enchantment;
@@ -23,7 +24,7 @@ public class ItemAngularSaw extends Item {
         setIconCoord(5, 1);
         setItemName("angularSaw");
         setTextureFile(Core.texture_file_item);
-        setTabToDisplayOn(CreativeTabs.tabTools);
+        Core.tab(this, TabType.TOOLS);
         setMaxStackSize(1);
         setFull3D();
     }

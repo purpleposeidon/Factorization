@@ -3,6 +3,8 @@ package factorization.common;
 import java.util.ArrayList;
 import java.util.List;
 
+import factorization.common.Core.TabType;
+
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityLiving;
@@ -24,7 +26,7 @@ public class ItemDemon extends Item {
     public ItemDemon(int par1) {
         super(par1);
         setMaxStackSize(1);
-        setTabToDisplayOn(CreativeTabs.tabMisc);
+        Core.tab(this, TabType.MISC);
     }
 
     static void init(ItemStack is) {

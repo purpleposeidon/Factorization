@@ -2,6 +2,8 @@ package factorization.common;
 
 import java.util.List;
 
+import factorization.common.Core.TabType;
+
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EnumAction;
@@ -12,7 +14,7 @@ public class ItemAcidBottle extends ItemCraftingComponent {
 
     public ItemAcidBottle(int id, String itemName, int icon) {
         super(id, itemName, icon);
-        setTabToDisplayOn(CreativeTabs.tabMisc);
+        Core.tab(this, TabType.MISC);
     }
 
     public int getMaxItemUseDuration(ItemStack par1ItemStack) {

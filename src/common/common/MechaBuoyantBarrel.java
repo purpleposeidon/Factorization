@@ -13,6 +13,7 @@ import net.minecraft.src.Material;
 import net.minecraftforge.common.ISpecialArmor.ArmorProperties;
 import factorization.api.Coord;
 import factorization.api.IMechaUpgrade;
+import factorization.common.Core.TabType;
 
 class MechaBuoyantBarrel extends Item implements IMechaUpgrade {
 
@@ -20,7 +21,7 @@ class MechaBuoyantBarrel extends Item implements IMechaUpgrade {
         super(par1);
         setItemName("mecha.buoyantbarrel");
         setIconIndex(16 * 10);
-        setTabToDisplayOn(CreativeTabs.tabMisc);
+        Core.tab(this, TabType.MISC);
     }
 
     @Override

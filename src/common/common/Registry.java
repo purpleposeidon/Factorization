@@ -144,11 +144,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         return id;
     }
 
-    Item tab(Item item, CreativeTabs tab) {
-        item.setTabToDisplayOn(tab);
-        return item;
-    }
-
     void makeItems() {
         ore_dirty_gravel = new ItemOreProcessing(itemID("oreDirtyGravel", 9034), 2 * 16 + 4, "dirtyGravel");
         ore_clean_gravel = new ItemOreProcessing(itemID("oreCleanGravel", 9035), 2 * 16 + 5, "cleanGravel");

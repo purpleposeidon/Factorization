@@ -38,9 +38,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Block;
 import net.minecraft.src.CommandHandler;
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ICommand;
 import net.minecraft.src.ICommandSender;
+import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.ModLoader;
 import net.minecraft.src.NetHandler;
@@ -404,5 +406,19 @@ public class Core {
             return;
         }
         player.addChatMessage(msg);
+    }
+    
+    enum TabType {
+        REDSTONE(CreativeTabs.tabRedstone), TOOLS(CreativeTabs.tabTools), MISC(CreativeTabs.tabMisc), MATERIALS(CreativeTabs.tabMaterials);
+        CreativeTabs type;
+        TabType(CreativeTabs type) {
+            this.type = type;
+        }
+    }
+    
+    public static Item tab(Item item, TabType tabType) {
+        CreativeTabs tab = tabType.type;
+        item.setCreativeTab(tab);
+        return item;
     }
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cpw.mods.fml.common.registry.GameRegistry;
+import factorization.common.Core.TabType;
 
 import net.minecraft.src.Container;
 import net.minecraft.src.CraftingManager;
@@ -26,7 +27,7 @@ public class ItemCraft extends Item {
 		super(i);
 		maxStackSize = 1;
 		setHasSubtypes(true);
-		setTabToDisplayOn(CreativeTabs.tabMisc);
+		Core.tab(this, TabType.MISC);
 	}
 
 	public static void addStamperRecipe(IRecipe recipe) {
