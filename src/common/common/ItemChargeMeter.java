@@ -47,15 +47,18 @@ public class ItemChargeMeter extends Item {
         String d = String.format("%.1f", density);
         //TODO: Let's put it somewhere better than the chat log
         String inf = ic.getInfo();
-        if (inf == null) {
+        if (inf == null || inf.length() == 0) {
             inf = "";
         } else {
-            inf = "  " + inf;
+            inf = "\n" + inf;
         }
-        player.addChatMessage("Target: " + ic.getCharge().getValue()
-                + "  Average: " + d
-                + "  Total: " + ret.totalCharge
-                + "  Conductors: " + ret.conductorCount
+        /*
+         * targetCharge/totalCharge
+         * Conductors:
+         */
+        Core.notify(player, here,
+                "Charge: " + ic.getCharge().getValue() + "/" + ret.totalCharge
+                + "\nConductors: " + ret.conductorCount
                 + inf
                 //+ "  C: " + ic.getCoord()
                 //+ "  Total: " + ret.totalCharge

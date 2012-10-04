@@ -1,0 +1,8 @@
+#!/bin/sh
+
+pushd cb
+  ./install.sh
+popd
+./embed_source
+echo "Remember to set the lib/ classpath in eclipse!"
+read

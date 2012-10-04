@@ -21,6 +21,7 @@ class ConductorSet implements Comparable {
         Charge lc = leader.getCharge();
         lc.conductorSet = this;
         lc.isConductorSetLeader = true;
+        lc.justCreated = true;
     }
     
     boolean addConductor(IChargeConductor other) {

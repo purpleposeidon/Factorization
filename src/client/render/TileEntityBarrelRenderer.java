@@ -168,6 +168,7 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
 
     public void handleRenderItem(ItemStack is, double x, double y, double z, float par8,
             float par9, int side) {
+        //Got problems? Consider looking at ForgeHooksClient.renderInventoryItem, that might be better than this here.
         GL11.glPushMatrix();
         GL11.glTranslated(x, y, z);
         GL11.glScalef(1, 1, -1);

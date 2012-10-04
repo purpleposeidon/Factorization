@@ -59,15 +59,16 @@ import net.minecraftforge.common.Configuration;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.ForgeSubscribe;
 import factorization.api.Coord;
+import factorization.client.gui.FactorizationNotify;
 
 @Mod(modid = "factorization", name = "Factorization", version = Core.version)
 @NetworkMod(
         clientSideRequired = true,
         packetHandler = NetworkFactorization.class,
-        channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel })
+        channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel, NetworkFactorization.factorizeNtfyChannel })
 public class Core {
     //The comment below is a marker used by the build script.
-    public static final String version = "0.6.0"; //@VERSION@
+    public static final String version = "0.6.2"; //@VERSION@
     // runtime storage
     @Instance("factorization")
     public static Core instance;
@@ -400,12 +401,13 @@ public class Core {
         }
     }
     
-    public static void notify(EntityPlayer player, Coord where, String msg) {
+    public static void notify(EntityPlayer player, Coord where, String format, String ...args) {
         //TODO: Have the client draw the notification somewhere in the world instead of using a chat message! It'll be awesome!
         if (player.worldObj.isRemote) {
-            return;
+            FactorizationNotify.addMessage(where, format, args);
+        } else {
+            proxy.addPacket(player, network.notifyPacket(where, format, args));
         }
-        player.addChatMessage(msg);
     }
     
     enum TabType {

@@ -45,7 +45,7 @@ public class BlockRenderSolarTurbine extends FactorizationBlockRender {
         int water_height = st.water_level;
         //Tessellator.instance.setColorOpaque_F(0.5F, 0.5F, 0.5F);
         //Tessellator.instance.setColorOpaque(255, 0, 255);
-        renderPart(rb, 7, d, 0.001F, d, 1 - d, (0.99F + water_height / (TileEntitySolarTurbine.max_water / 4)) / 16F, 1 - d);
+        renderPart(rb, 7, d, 0.001F, d, 1 - d, (0.95F + water_height / (TileEntitySolarTurbine.max_water / 4)) / 16F, 1 - d);
         //			renderPart(rb, glass, 1 - d, 1 - d, 1 - d, d, 0.02F, d);
         return;
     }

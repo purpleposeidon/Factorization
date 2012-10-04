@@ -91,7 +91,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemCraftingComponent inverium;
     public ItemSculptingTool sculpt_tool;
     public ItemAngularSaw angular_saw;
-    public ItemCraftingComponent heatHole, logicMatrix, logicMatrixProgrammer, logicMatrixIdentifier;
+    public ItemCraftingComponent heatHole, logicMatrix, logicMatrixIdentifier, logicMatrixProgrammer;
 
     public Material materialMachine = new Material(MapColor.ironColor);
 
@@ -211,7 +211,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         tiny_demon = new ItemDemon(itemID("tinyDemon", 9004));
         addName(bound_tiny_demon, "Bound Tiny Demon");
         addName(tiny_demon, "Tiny Demon");
-        logicMatrixProgrammer = new ItemCraftingComponent(itemID("logicMatrixProgrammer", 9043), "Logic Matrix Programmer", 1*16 + 6);
+        logicMatrixProgrammer = new ItemMatrixProgrammer(itemID("logicMatrixProgrammer", 9043), "Logic Matrix Programmer", 1*16 + 6);
         DungeonHooks.addDungeonLoot(new ItemStack(logicMatrixProgrammer), 50);
         DungeonHooks.addDungeonMob("Creeper", 1);
         String THATS_SOME_VERY_NICE_SOURCE_CODE_YOU_HAVE_THERE[] = {
@@ -706,6 +706,12 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                     "WBW",
                     'W', leadwire_item,
                     'I', Item.ingotIron,
+                    'B', new ItemStack(battery, 1, damage));
+            recipe(new ItemStack(battery, 1, damage - 1),
+                    "W",
+                    "B",
+                    "W",
+                    'W', leadwire_item,
                     'B', new ItemStack(battery, 1, damage));
         }
 

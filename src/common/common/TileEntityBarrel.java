@@ -233,11 +233,11 @@ public class TileEntityBarrel extends TileEntityFactorization {
 
     void info(EntityPlayer entityplayer) {
         if (item == null && getItemCount() == 0) {
-            entityplayer.addChatMessage("This barrel is empty");
+            Core.notify(entityplayer, getCoord(), "Empty");
         } else if (getItemCount() >= getMaxSize()) {
-            Core.proxy.broadcastTranslate(entityplayer, "This barrel is full of %s", Core.proxy.translateItemStack(item));
+            Core.notify(entityplayer, getCoord(), "Full of %s", Core.proxy.translateItemStack(item));
         } else {
-            Core.proxy.broadcastTranslate(entityplayer, "This barrel contains %s %s", "" + getItemCount(), Core.proxy.translateItemStack(item));
+            Core.notify(entityplayer, getCoord(), "%s %s", "" + getItemCount(), Core.proxy.translateItemStack(item));
         }
     }
 
@@ -316,7 +316,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
 
         if (is.isItemDamaged()) {
             if (getItemCount() == 0) {
-                entityplayer.addChatMessage("Damaged items can not be stored");
+                Core.notify(entityplayer, getCoord(), "Damaged items can not be stored");
             } else {
                 info(entityplayer);
             }
@@ -327,7 +327,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
 
         if (!itemMatch(is)) {
             if (Core.proxy.translateItemStack(is).equals(Core.proxy.translateItemStack(item))) {
-                entityplayer.addChatMessage("That item is different");
+                Core.notify(entityplayer, getCoord(), "That item is different");
             } else {
                 info(entityplayer);
             }
@@ -373,7 +373,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
         }
         if (hand != null && !itemMatch(hand)) {
             if (Core.proxy.translateItemStack(hand).equals(Core.proxy.translateItemStack(item))) {
-                entityplayer.addChatMessage("That item is different");
+                Core.notify(entityplayer, getCoord(), "That item is different");
             } else {
                 info(entityplayer);
             }

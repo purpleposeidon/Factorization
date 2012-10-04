@@ -135,6 +135,7 @@ public class Charge {
         if (conductorSet == null) {
             return;
         }
+        justCreated = true;
         for (IChargeConductor hereConductor : conductorSet.getMembers(brokenTileEntity)) {
             Charge hereCharge = hereConductor.getCharge();
             int saveCharge = hereCharge.getValue();
@@ -173,6 +174,7 @@ public class Charge {
         }
         conductorSet.totalCharge -= getValue();
         conductorSet.memberCount--;
+        justCreated = true;
     }
 
 }

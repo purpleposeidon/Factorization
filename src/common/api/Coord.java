@@ -6,6 +6,7 @@ import java.util.Random;
 
 import javax.management.RuntimeErrorException;
 
+import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.Block;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.Entity;
@@ -465,5 +466,13 @@ public class Coord {
     
     public void spawnItem(ItemStack is) {
         w.spawnEntityInWorld(new EntityItem(w, x + 0.5, y + 0.5, z + 0.5, is));
+    }
+    
+    public AxisAlignedBB getCollisionBoundingBoxFromPool() {
+        Block b = getBlock();
+        if (b == null) {
+            return null;
+        }
+        return b.getCollisionBoundingBoxFromPool(w, x, y, z);
     }
 }

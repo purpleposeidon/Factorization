@@ -1,8 +1,15 @@
+0.6.2
+  Added in-world notification system; it's not quite perfect.
+  Fixed problem placing certain items related to forge update.
+  The proper battery now shows up in NEI.
+
+0.6.1
+  Using forge 272
+
 0.6.0
   Grinder recipe no longer uses dark iron.
   Excorsized demons. 
   Rewrote the energy net. 3rd time's the charm?
-  Forge 272
 
 
 0.5.6

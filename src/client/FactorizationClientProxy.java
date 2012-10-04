@@ -24,6 +24,7 @@ import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.TileEntitySpecialRenderer;
 import net.minecraft.src.World;
 import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
 
@@ -38,6 +39,7 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
 import factorization.client.coremod.GuiKeyEvent;
+import factorization.client.gui.FactorizationNotify;
 import factorization.client.gui.GuiCrystallizer;
 import factorization.client.gui.GuiCutter;
 import factorization.client.gui.GuiGrinder;
@@ -100,6 +102,7 @@ import factorization.common.TileEntityWatchDemon;
 import factorization.common.TileEntityWrathLamp;
 
 public class FactorizationClientProxy extends FactorizationProxy {
+    
     //COMMON
     @Override
     public void makeItemsSide() {
@@ -496,20 +499,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         KeyBindingRegistry.registerKeyBinding(new MechaKeySet(mechas, new boolean[mechas.length]));
         MinecraftForge.EVENT_BUS.register(this);
     }
-    
-    @ForgeSubscribe
-    public void handledGuiKey(GuiKeyEvent event) {
-        if (bag_swap_key.keyCode == event.symbol) {
-            event.setCanceled(true);
-            Command.bagShuffle.call(getClientPlayer());
-        }
-        if (pocket_key.keyCode == event.symbol) {
-            event.setCanceled(true);
-            if (Core.registry.pocket_table.findPocket(getClientPlayer()) != null) {
-                Command.craftOpen.call(getClientPlayer());
-            }
-        }
-    }
 
     private void setTileEntityRenderer(Class clazz, TileEntitySpecialRenderer r) {
         ClientRegistry.bindTileEntitySpecialRenderer(clazz, r);
@@ -553,6 +542,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderGreenware().setup();
 
         MinecraftForgeClient.registerItemRenderer(Core.registry.battery.shiftedIndex, new BatteryItemRender(renderBattery));
+        MinecraftForge.EVENT_BUS.register(new FactorizationNotify());
     }
-
 }

@@ -11,6 +11,7 @@ import net.minecraft.src.MovingObjectPosition;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.Vec3;
 import net.minecraft.src.World;
+import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
@@ -153,6 +154,10 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
                 continue;
             }
             complexity += new WireConnections(w).getComplexity();
+        }
+        TileEntityWire below = getCoord().add(ForgeDirection.getOrientation(supporting_side)).getTE(TileEntityWire.class);
+        if (below != null && below.supporting_side == supporting_side) {
+            complexity += 16;
         }
         return complexity;
     }

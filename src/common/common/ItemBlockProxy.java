@@ -30,7 +30,8 @@ public class ItemBlockProxy extends Item {
 
     //NOTE: Copied from ItemBlock, *EXCEPT* that in the final check, I've changed the AABB check is done w/ null instead of the player.
     //Why is that even necessary...?
-    public boolean tryPlaceIntoWorld(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, World par3World, int par4,
+    @Override
+    public boolean onItemUse(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, World par3World, int par4,
             int par5, int par6, int par7, float par8, float par9, float par10)
     {
         int var11 = par3World.getBlockId(par4, par5, par6);

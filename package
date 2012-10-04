@@ -13,7 +13,8 @@ pushd reobf/minecraft  > /dev/zero
   cp -R ../../factorization/texture/ factorization/texture/
   rm -rf factorization/texture/ignore/
   cp ../../factorization/*.info ./
-  jar -cf ~/Dropbox/dev/Factorization-dev.jar *.info factorization/
+  cp ../../factorization/CHANGELOG ./
+  jar -cf ~/Dropbox/dev/Factorization-dev.jar CHANGELOG *.info factorization/
   #jar -cf ~/Dropbox/dev/Factorization-dev.jar *Factorization*.class *.info factorization/
 popd > /dev/zero
 #pushd ~/mc/

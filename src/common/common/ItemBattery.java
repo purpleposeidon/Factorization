@@ -3,6 +3,7 @@ package factorization.common;
 import java.util.List;
 
 import net.minecraft.src.Block;
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.Item;
@@ -45,8 +46,22 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
 
     @Override
     public void addInformation(ItemStack is, List list) {
-        float fullness = TileEntityBattery.getFullness(getStorage(is));
-        list.add((int) (fullness * 100) + "% charged");
+        if (is.getTagCompound() != null && is.getTagCompound().hasKey("storage")) {
+            float fullness = TileEntityBattery.getFullness(getStorage(is));
+            list.add((int) (fullness * 100) + "% charged");
+        } else {
+            switch (is.getItemDamage()) {
+            case 0:
+                list.add("Low charge");
+                break;
+            case 1:
+                list.add("Medium charge");
+                break;
+            case 2:
+                list.add("Full charge");
+                break;
+            }
+        }
         Core.brand(list);
     }
 
@@ -62,6 +77,12 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
             normalizeDamage(is);
             is.stackSize++;
         }
+        if (result.getItem() == Core.registry.battery) {
+            is.stackSize--;
+            result.itemID = is.itemID;
+            result.stackSize = is.stackSize;
+            result.setTagCompound(is.getTagCompound());
+        }
         for (int i = 0; i < craftMatrix.getSizeInventory(); i++) {
             ItemStack wire = craftMatrix.getStackInSlot(i);
             if (wire != null && wire.isItemEqual(Core.registry.leadwire_item)) {
@@ -73,5 +94,10 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     @Override
     public boolean isDamageable() {
         return false;
+    }
+    
+    @Override
+    public void getSubItems(int itemIndexThisIsARetardedParameterJustFYI, CreativeTabs tab, List list) {
+        list.add(new ItemStack(Core.registry.battery, 1, 2));
     }
 }

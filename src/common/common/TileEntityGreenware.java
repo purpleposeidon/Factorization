@@ -244,8 +244,8 @@ public class TileEntityGreenware extends TileEntityCommon {
             //Let the server tell us the results
             return true;
         }
-        if (parts.size() >= 64) {
-            player.addChatMessage("This piece is too complex");
+        if (parts.size() >= 32) {
+            Core.notify(player, getCoord(), "Too complex");
             held.stackSize++;
             return false;
         }

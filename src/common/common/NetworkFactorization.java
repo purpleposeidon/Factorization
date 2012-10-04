@@ -12,7 +12,6 @@ import java.util.IllegalFormatException;
 import net.minecraft.src.Block;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NetworkManager;
@@ -28,11 +27,13 @@ import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.Player;
 import factorization.api.Coord;
 import factorization.api.VectorUV;
+import factorization.client.gui.FactorizationNotify;
 
 public class NetworkFactorization implements IPacketHandler {
     protected final static String factorizeTEChannel = "factorizeTE"; //used for tile entities
     protected final static String factorizeMsgChannel = "factorizeMsg"; //used for sending translatable chat messages
     protected final static String factorizeCmdChannel = "factorizeCmd"; //used for player keys
+    protected final static String factorizeNtfyChannel = "factorizeNtfy"; //used to show messages in-world
 
     public NetworkFactorization() {
         //		if (Core.network != null) {
@@ -100,6 +101,30 @@ public class NetworkFactorization implements IPacketHandler {
             output.flush();
             Packet250CustomPayload packet = new Packet250CustomPayload();
             packet.channel = factorizeMsgChannel;
+            packet.data = outputStream.toByteArray();
+            packet.length = packet.data.length;
+            return packet;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    public Packet250CustomPayload notifyPacket(Coord where, String format, String ...args) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            DataOutputStream output = new DataOutputStream(outputStream);
+            output.writeInt(where.x);
+            output.writeInt(where.y);
+            output.writeInt(where.z);
+            output.writeUTF(format);
+            output.writeInt(args.length);
+            for (String a : args) {
+                output.writeUTF(a);
+            }
+            output.flush();
+            Packet250CustomPayload packet = new Packet250CustomPayload();
+            packet.channel = factorizeNtfyChannel;
             packet.data = outputStream.toByteArray();
             packet.length = packet.data.length;
             return packet;
@@ -182,7 +207,8 @@ public class NetworkFactorization implements IPacketHandler {
     public void onPacketData(NetworkManager network, Packet250CustomPayload packet, Player player) {
         String channel = packet.channel;
         byte[] data = packet.data;
-        currentPlayer.set((EntityPlayer) player);
+        EntityPlayer me = (EntityPlayer) player;
+        currentPlayer.set(me);
         //currentPlayer = (EntityPlayer) player; //Core.proxy.getPlayer(network.getNetHandler());;
         ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
         DataInput input = new DataInputStream(inputStream);
@@ -192,6 +218,21 @@ public class NetworkFactorization implements IPacketHandler {
             handleMsg(input);
         } else if (channel.equals(factorizeCmdChannel)) {
             handleCmd(data);
+        } else if (channel.equals(factorizeNtfyChannel)) {
+            if (FMLCommonHandler.instance().getSide() == Side.CLIENT && me.worldObj.isRemote) {
+                try {
+                    int x = input.readInt(), y = input.readInt(), z = input.readInt();
+                    String msg = input.readUTF();
+                    int argCount = input.readInt();
+                    String args[] = new String[argCount];
+                    for (int i = 0; i < argCount; i++) {
+                        args[i] = input.readUTF();
+                    }
+                    Core.notify(me, new Coord(me.worldObj, x, y, z), msg, args);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         currentPlayer.set(null);

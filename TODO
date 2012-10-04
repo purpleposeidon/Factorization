@@ -4,11 +4,13 @@ ask chikkenkiller for transparent version of logo, proper attribution, and maybe
 
 TOP LIST
 --------
+upgrade to forge 298
 Get some testing done with the new set-based energy net; throw stuff at Overminddl?
 fix mecha-armor!
 add inverium-based mecha-upgrades
 examine the GUIs more carefully
 notifications
+battery recipe issue. (need to add the battery with damage value of 2 in...)
 "Everything's shiny!" release
 back to ceramics?
 
@@ -55,6 +57,8 @@ optimize these TEs. Prolly use whatever it is that Entity Models use.
 bukkit?
 http://3.bp.blogspot.com/_b5hcKABPlGI/SxB8DW-Xv-I/AAAAAAAAaxU/qmqqFtiwZ1A/s1600/6-509a.bmp . Discussion with Greys and Overminddl about solar towers.
 log of ad331b15956bfb43e5f5a022084605c6ade83901
+[16:48:56] <pig> neptunepink: err. Check the portalgun topic its right down there. Just a try catch for the class when the mod loads, that would work.
+[16:49:14] <pig> package is portalgun.common.PortalGun.class
 
 
 left-handled BoH: craft with a compass (get the compass back?) This can be reversed of course.
