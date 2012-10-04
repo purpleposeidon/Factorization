@@ -100,6 +100,7 @@ public class Core {
     public static boolean renderTEs = true;
     public static boolean renderAO = true;
     public static boolean spawnDemons = true;
+    public static boolean debug_network = false;
 
     // universal constant config
     public final static String texture_dir = "/factorization/texture/";

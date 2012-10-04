@@ -293,8 +293,14 @@ public class NetworkFactorization implements IPacketHandler {
             }
             boolean handled;
             if (target.w.isRemote) {
+                if (Core.debug_network) {
+                    System.out.println("FN: " + messageType + "      " + target);
+                }
                 handled = tec.handleMessageFromServer(messageType, input);
             } else {
+                if (Core.debug_network) {
+                    System.out.println("FN: " + messageType + "      " + target);
+                }
                 handled = tec.handleMessageFromClient(messageType, input);
             }
             if (!handled) {

@@ -96,13 +96,20 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
 
     int last_speed = -99, last_quart_water_level = -99;
 
+    boolean distant(int original, int curent, float delta) {
+        int d = (int) (original*delta);
+        return (curent < original - d) || (original + d < curent);
+    }
+    
     void updateClients() {
         if (last_speed != fan_speed) {
+        //if (distant(fan_speed, last_speed, 1F)) {
             broadcastMessage(null, MessageType.TurbineSpeed, fan_speed);
             last_speed = fan_speed;
         }
         int quart_water_level = water_level / 4;
         if (last_quart_water_level != quart_water_level) {
+        //if (distant(quart_water_level, last_quart_water_level, 0.25F)) {
             broadcastMessage(null, MessageType.TurbineWater, water_level);
             last_quart_water_level = quart_water_level;
         }
