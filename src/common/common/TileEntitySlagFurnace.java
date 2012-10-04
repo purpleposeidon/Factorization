@@ -236,11 +236,11 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
         return this.furnaceBurnTime * par1 / this.currentFuelItemBurnTime;
     }
 
-    static class SmeltingResult {
+    public static class SmeltingResult {
         //Java doesn't need tuples or anything at all like that -- Oh wait, yes it does.
-        ItemStack input;
-        float prob1, prob2;
-        ItemStack output1, output2;
+        public ItemStack input;
+        public float prob1, prob2;
+        public ItemStack output1, output2;
 
         SmeltingResult(ItemStack input, float prob1, ItemStack output1, float prob2,
                 ItemStack output2) {
@@ -253,9 +253,9 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
         }
     }
 
-    static class SlagRecipes {
+    public static class SlagRecipes {
 
-        static ArrayList<SmeltingResult> smeltingResults = new ArrayList();
+        public static ArrayList<SmeltingResult> smeltingResults = new ArrayList();
 
         static void register(Object o_input, float prob1, Object o_output1, float prob2,
                 Object o_output2) {

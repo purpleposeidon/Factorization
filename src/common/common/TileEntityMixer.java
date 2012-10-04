@@ -149,11 +149,11 @@ public class TileEntityMixer extends TileEntityFactorization implements
         return rotation;
     }
 
-    static ArrayList<MixRecipe> recipes = new ArrayList();
+    public static ArrayList<MixRecipe> recipes = new ArrayList();
     static boolean sorted = false;
 
-    static class MixRecipe {
-        final ItemStack inputs[], outputs[];
+    public static class MixRecipe {
+        final public ItemStack inputs[], outputs[];
 
         public MixRecipe(ItemStack inputs[], ItemStack outputs[]) {
             this.inputs = inputs;
@@ -184,6 +184,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
 
     MixRecipe getRecipe() {
         if (!sorted) {
+            //this is pointless.
             Collections.sort(recipes, new Comparator<MixRecipe>() {
                 @Override
                 public int compare(MixRecipe a, MixRecipe b) {

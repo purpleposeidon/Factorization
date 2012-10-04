@@ -195,12 +195,12 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         return count;
     }
 
-    static ArrayList<CrystalRecipe> recipes = new ArrayList();
+    public static ArrayList<CrystalRecipe> recipes = new ArrayList();
     
-    static class CrystalRecipe {
-        ItemStack input, output, solution;
-        float output_count;
-        int inverium_count;
+    public static class CrystalRecipe {
+        public ItemStack input, output, solution;
+        public float output_count;
+        public int inverium_count;
 
         public CrystalRecipe(ItemStack input, ItemStack output, float output_count,
                 ItemStack solution, int inverium_count) {

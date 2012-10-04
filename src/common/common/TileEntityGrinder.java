@@ -185,7 +185,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         return BlockClass.Machine;
     }
 
-    static ArrayList<GrinderRecipe> recipes = new ArrayList();
+    public static ArrayList<GrinderRecipe> recipes = new ArrayList();
 
     public static void addRecipe(ItemStack input, ItemStack output, float probability) {
         recipes.add(new GrinderRecipe(input, output, probability));
@@ -234,9 +234,9 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         return total * progress / grind_time;
     }
 
-    private static class GrinderRecipe {
-        ItemStack input, output;
-        float probability;
+    public static class GrinderRecipe {
+        public ItemStack input, output;
+        public float probability;
 
         GrinderRecipe(ItemStack input, ItemStack output, float probability) {
             this.input = input;
