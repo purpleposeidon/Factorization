@@ -1,5 +1,6 @@
 package factorization.nei;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import codechicken.nei.api.IConfigureNEI;
 import codechicken.nei.recipe.FurnaceRecipeHandler;
 import codechicken.nei.recipe.GuiRecipe;
 import codechicken.nei.recipe.TemplateRecipeHandler;
+import codechicken.nei.recipe.TemplateRecipeHandler.RecipeTransferRect;
 import factorization.client.gui.GuiSlag;
 import factorization.common.Core;
 import factorization.common.TileEntitySlagFurnace;
@@ -21,6 +23,7 @@ public class NEI_SlagRecipeConfig extends TemplateRecipeHandler implements IConf
     @Override
     public void loadConfig() {
         API.registerRecipeHandler(this);
+        API.registerUsageHandler(this);
     }
 
     @Override
@@ -37,16 +40,32 @@ public class NEI_SlagRecipeConfig extends TemplateRecipeHandler implements IConf
     public void loadCraftingRecipes(ItemStack result) {
         //XXX NOTE: This is probably a lame implementation of this function.
         for (SmeltingResult sr : TileEntitySlagFurnace.SlagRecipes.smeltingResults) {
-            if (result == null || result.isItemEqual(sr.output1) || result.isItemEqual(sr.output2) || result.isItemEqual(sr.input)) {
+            if (result == null || result.isItemEqual(sr.output1) || result.isItemEqual(sr.output2)) {
                 arecipes.add(new CachedSlagRecipe(sr));
             }
         }
     }
     
     @Override
-    public void loadUsageRecipes(ItemStack ingredient) {
-        // TODO Auto-generated method stub
-        super.loadUsageRecipes(ingredient);
+    public void loadCraftingRecipes(String outputId, Object... results) {
+        if (outputId.equals("slagging")) {
+            loadCraftingRecipes(null);
+        } else {
+            super.loadCraftingRecipes(outputId, results);
+        }
+    }
+    
+    @Override
+    public void loadUsageRecipes(String inputId, Object... ingredients) {
+        if (!inputId.equals("slagging")) {
+            return;
+        }
+        ItemStack ingredient = (ItemStack) ingredients[0];
+        for (SmeltingResult sr : TileEntitySlagFurnace.SlagRecipes.smeltingResults) {
+            if (ingredient == null || ingredient.isItemEqual(sr.input)) {
+                arecipes.add(new CachedSlagRecipe(sr));
+            }
+        }
     }
 
     class CachedSlagRecipe extends CachedRecipe {
@@ -110,7 +129,7 @@ public class NEI_SlagRecipeConfig extends TemplateRecipeHandler implements IConf
 
     @Override
     public void loadTransferRects() {
-        // XXX TODO (if this is even actually necessary? What's it do?) (It might give you places to click on to bring up the recipes list.)
+        transferRects.add(new RecipeTransferRect(new Rectangle(74, 23, 24, 18), "slagging"));
     }
 
     @Override

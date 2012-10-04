@@ -1,5 +1,6 @@
 package factorization.nei;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import codechicken.nei.forge.GuiContainerManager;
 import codechicken.nei.recipe.FurnaceRecipeHandler;
 import codechicken.nei.recipe.GuiRecipe;
 import codechicken.nei.recipe.TemplateRecipeHandler;
+import codechicken.nei.recipe.TemplateRecipeHandler.RecipeTransferRect;
 import factorization.client.gui.GuiCrystallizer;
 import factorization.client.gui.GuiSlag;
 import factorization.common.Core;
@@ -27,6 +29,7 @@ public class NEI_CrystallizerRecipeConfig extends TemplateRecipeHandler implemen
     @Override
     public void loadConfig() {
         API.registerRecipeHandler(this);
+        API.registerUsageHandler(this);
     }
 
     @Override
@@ -43,16 +46,31 @@ public class NEI_CrystallizerRecipeConfig extends TemplateRecipeHandler implemen
     public void loadCraftingRecipes(ItemStack result) {
         //XXX NOTE: This is probably a lame implementation of this function.
         for (CrystalRecipe cr : TileEntityCrystallizer.recipes) {
-            if (result == null || result.isItemEqual(cr.input) || result.isItemEqual(cr.output) || result.getItem() == Core.registry.inverium) {
+            if (result == null || result.isItemEqual(cr.output)) {
                 arecipes.add(new CachedCrystallizerRecipe(cr));
             }
         }
     }
     
     @Override
+    public void loadCraftingRecipes(String outputId, Object... results) {
+        if (outputId.equals("crystallizing")) {
+            loadCraftingRecipes(null);
+            return;
+        }
+        super.loadCraftingRecipes(outputId, results);
+    }
+    
+    @Override
     public void loadUsageRecipes(ItemStack ingredient) {
-        // TODO Auto-generated method stub
-        super.loadUsageRecipes(ingredient);
+        //XXX NOTE: This is probably a lame implementation of this function.
+        for (CrystalRecipe cr : TileEntityCrystallizer.recipes) {
+            if (ingredient == null
+                    || ingredient.isItemEqual(cr.input)
+                    || ingredient.getItem() == Core.registry.inverium) {
+                arecipes.add(new CachedCrystallizerRecipe(cr));
+            }
+        }
     }
 
     class CachedCrystallizerRecipe extends CachedRecipe {
@@ -79,8 +97,10 @@ public class NEI_CrystallizerRecipeConfig extends TemplateRecipeHandler implemen
             if (cr.inverium_count > 0) {
                 ItemStack inverium = new ItemStack(Core.registry.inverium, cr.inverium_count);
                 ret.add(new PositionedStack(inverium, 103, 44 + 15));
+                ret.add(new PositionedStack(cr.solution, 47, 44 + 15));
+            } else {
+                ret.add(new PositionedStack(cr.solution, 75, 58 + 15));
             }
-            ret.add(new PositionedStack(cr.solution, 47, 44 + 15));
             return ret;
         }
 
@@ -93,7 +113,7 @@ public class NEI_CrystallizerRecipeConfig extends TemplateRecipeHandler implemen
         }
         CrystalRecipe cr = ((CachedCrystallizerRecipe)arecipes.get(recipe)).cr;
         if (stack.isItemEqual(cr.output)) {
-            float prob = cr.output.stackSize*100 + cr.output_count;
+            float prob = cr.output_count*100;
             if (prob != 100) {
                 currenttip.add((int)prob + "%");
             }
@@ -104,6 +124,7 @@ public class NEI_CrystallizerRecipeConfig extends TemplateRecipeHandler implemen
     @Override
     public void loadTransferRects() {
         // XXX TODO (if this is even actually necessary? What's it do?) (It might give you places to click on to bring up the recipes list.)
+        transferRects.add(new RecipeTransferRect(new Rectangle(35, 78, 95, 16), "crystallizing"));
     }
 
     @Override
@@ -123,7 +144,7 @@ public class NEI_CrystallizerRecipeConfig extends TemplateRecipeHandler implemen
 
     @Override
     public String getOverlayIdentifier() {
-        return "crystallizer";
+        return "crystallizing";
     }
     
     public void drawBackground(GuiContainerManager gui, int recipe)

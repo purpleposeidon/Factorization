@@ -6,6 +6,7 @@ upgrade to forge 298
 
 NEI recipe handlers for everything!
 examine the GUIs carefully
+fix pocket crafting table 'c' key. Possibly add magic.
 craft packet makers shouldn't eat paper.
 redstone signal on craftpacket maker/stamper
 

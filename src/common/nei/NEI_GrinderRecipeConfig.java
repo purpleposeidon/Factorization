@@ -1,5 +1,6 @@
 package factorization.nei;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import codechicken.nei.api.IConfigureNEI;
 import codechicken.nei.recipe.FurnaceRecipeHandler;
 import codechicken.nei.recipe.GuiRecipe;
 import codechicken.nei.recipe.TemplateRecipeHandler;
+import codechicken.nei.recipe.TemplateRecipeHandler.RecipeTransferRect;
 import factorization.client.gui.GuiGrinder;
 import factorization.client.gui.GuiSlag;
 import factorization.common.Core;
@@ -24,6 +26,7 @@ public class NEI_GrinderRecipeConfig extends TemplateRecipeHandler implements IC
     @Override
     public void loadConfig() {
         API.registerRecipeHandler(this);
+        API.registerUsageHandler(this);
     }
 
     @Override
@@ -38,7 +41,7 @@ public class NEI_GrinderRecipeConfig extends TemplateRecipeHandler implements IC
 
     @Override
     public void loadCraftingRecipes(ItemStack result) {
-        //XXX NOTE: This is probably a lame implementation of this function.
+        //XXX NOTE: This is probably a lame implementation of this function. 
         for (GrinderRecipe gr : TileEntityGrinder.recipes) {
             if (result == null || result.isItemEqual(gr.output)) {
                 arecipes.add(new CachedGrinderRecipe(gr));
@@ -47,9 +50,22 @@ public class NEI_GrinderRecipeConfig extends TemplateRecipeHandler implements IC
     }
     
     @Override
+    public void loadCraftingRecipes(String outputId, Object... results) {
+        if (outputId.equals("grinding")) {
+            loadCraftingRecipes(null);
+            return;
+        }
+        super.loadCraftingRecipes(outputId, results);
+    }
+    
+    @Override
     public void loadUsageRecipes(ItemStack ingredient) {
-        // TODO Auto-generated method stub
-        super.loadUsageRecipes(ingredient);
+        //XXX NOTE: This is probably a lame implementation of this function.
+        for (GrinderRecipe gr : TileEntityGrinder.recipes) {
+            if (ingredient == null || ingredient.isItemEqual(gr.input)) {
+                arecipes.add(new CachedGrinderRecipe(gr));
+            }
+        }
     }
 
     class CachedGrinderRecipe extends CachedRecipe {
@@ -89,7 +105,7 @@ public class NEI_GrinderRecipeConfig extends TemplateRecipeHandler implements IC
 
     @Override
     public void loadTransferRects() {
-        // XXX TODO (if this is even actually necessary? What's it do?) (It might give you places to click on to bring up the recipes list.)
+        transferRects.add(new RecipeTransferRect(new Rectangle(74, 23, 24, 18), "grinding"));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package factorization.nei;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,8 @@ import codechicken.nei.api.IConfigureNEI;
 import codechicken.nei.recipe.FurnaceRecipeHandler;
 import codechicken.nei.recipe.GuiRecipe;
 import codechicken.nei.recipe.TemplateRecipeHandler;
+import codechicken.nei.recipe.TemplateRecipeHandler.RecipeTransferRect;
+import factorization.client.gui.GuiMixer;
 import factorization.client.gui.GuiSlag;
 import factorization.common.Core;
 import factorization.common.TileEntityMixer;
@@ -23,6 +26,7 @@ public class NEI_MixerRecipeConfig extends TemplateRecipeHandler implements ICon
     @Override
     public void loadConfig() {
         API.registerRecipeHandler(this);
+        API.registerUsageHandler(this);
     }
 
     @Override
@@ -49,8 +53,28 @@ public class NEI_MixerRecipeConfig extends TemplateRecipeHandler implements ICon
                     continue outerloop;
                 }
             }
+        }
+    }
+    
+    @Override
+    public void loadCraftingRecipes(String outputId, Object... results) {
+        if (outputId.equals("mixing")) {
+            loadCraftingRecipes(null);
+            return;
+        }
+        super.loadCraftingRecipes(outputId, results);
+    }
+    
+    @Override
+    public void loadUsageRecipes(ItemStack ingredient) {
+        //XXX NOTE: This is probably a lame implementation of this function.
+        outerloop: for (MixRecipe mr : TileEntityMixer.recipes) {
+            if (ingredient == null) {
+                arecipes.add(new CachedMixerRecipe(mr));
+                continue outerloop;
+            }
             for (ItemStack is : mr.inputs) {
-                if (result.isItemEqual(is)) {
+                if (ingredient.isItemEqual(is)) {
                     arecipes.add(new CachedMixerRecipe(mr));
                     continue outerloop;
                 }
@@ -110,12 +134,12 @@ public class NEI_MixerRecipeConfig extends TemplateRecipeHandler implements ICon
 
     @Override
     public void loadTransferRects() {
-        // XXX TODO (if this is even actually necessary? What's it do?) (It might give you places to click on to bring up the recipes list.)
+        transferRects.add(new RecipeTransferRect(new Rectangle(74, 23, 24, 18), "mixing"));
     }
 
     @Override
     public Class<? extends GuiContainer> getGuiClass() {
-        return GuiSlag.class;
+        return GuiMixer.class;
     }
 
     @Override
