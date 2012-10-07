@@ -151,8 +151,9 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         shareSpeed();
         needLogic();
         if (energy < 30) {
-            int to_take = charge.deplete(30);
-            energy += to_take / 7F;
+            if (charge.getValue() >= 25) {
+                energy += charge.deplete(60) / 10;
+            }
         }
         if (energy <= 0) {
             slowDown();

@@ -8,7 +8,7 @@ This mod adds many machines for processing ore and crafting. It also has a few o
 [spoiler]
 [u]The [b]Pocket Crafting Table[/b][/u]
 [img]http://i.imgur.com/CfoGQ.png[/img]
-Did somebody order a 3x3 crafting grid to go? Craft directly from your inventory, at any time! Press 'c' to use. Of course, you'll have to clear out that extra junk in your inventory before you can use it. But don't worry; with this mod, that won't be a problem for long! If you have NEI installed, you can use it while in other GUIs.
+Did somebody order a 3x3 crafting grid to go? Craft directly from your inventory, at any time! Press 'c' to use. Of course, you'll have to clear out that extra junk in your inventory before you can use it. But don't worry; with this mod, that won't be a problem for long! If you have NEI installed, you can use it while in other GUIs. If you press the 'c' key with the window open, it will drag and rotate the items around the perimeter. If you press the 'b' key, it will balance the item stacks. The 'x' key will try to clear the crafting area.
 
 
 [u]The Almighty [b]Barrel[/b][/u]
@@ -47,7 +47,7 @@ This mod adds silver ore. It can be found between y-level 7 and 55. It generates
 
 [u]The [b]Slag Furnace[/b][/u]
 [img]http://i.imgur.com/E3v37.png[/img]
-The slag furnace works similarly to the vanilla furnace, but has an extra output slot. It also uses twice the fuel. For most ores, it will produce an ingot with a low chance of making two instead of one, and also some stone. Silver ore will make silver ingots and lead ingots. Lead (will) be used for electricity, and silver will be used for... well, I certainly wouldn't want to spoil the surprise.
+The slag furnace works similarly to the vanilla furnace, but has an extra output slot. It also uses twice the fuel. For most ores, it will produce an ingot with a low chance of making two instead of one, and also some stone. Silver ore will make silver ingots and lead ingots. Silver is used for mirrors, and lead is used for electrical wiring.
 
 [u][b]Diamond Shards[/b][/u]
 The recipe for Diamond Shards is very expensive and volatile. Diamond Shards can only be safely created in a Stamper. (You can make the Craft Packet directly from a crafting table.)
@@ -72,9 +72,9 @@ To make the turbine, we'll need a motor, and a fan. Magnets are needed, and quit
 [img]http://i.imgur.com/y8raO.png[/img]
 [img]http://i.imgur.com/OVbie.png[/img]
 
-To power the solar turbine, you need to craft a few mirrors.
+To power the solar turbine, you need to use the silver to craft a few mirrors.
 [img]http://i.imgur.com/FwhpS.png[/img]
-You'll need to place a good number of them around the solar turbine. The turbine itself needs access to water, so place an infinite water source beneath it.
+You'll need to place a good number of them around the solar turbine. The turbine itself needs access to water, so make an infinite water source beneath it.
 [img]http://i.imgur.com/iJ29G.png[/img]
 This is nearly the maximum amount of mirrors you can use:
 [img]http://i.imgur.com/Hek4d.png[/img]
@@ -86,16 +86,14 @@ Wires can be run up walls, but must be supported by a solid block. You'll also n
 
 You can measure the charge in wires (and in other things) using the [b]Charge Meter[/b]:
 [img]http://i.imgur.com/4ylHf.png[/img]
-This will measure the charge in the block you clicked on, and give you the average charge in the adjacent conductors. It may also give other info.
-
-Charge moves randomly in conductive blocks. Every tick, all the conductors will swap their charges with a neighbor chosen at random. Each conductor block has a charge value from zero on up. The solar turbine will increase the charge in itself up to how many mirrors it has. High charge will flood out low charge. Charge will move just as well through other conductive blocks just as well as wires, so you won't need to wire up adjacent machines.
+This will show you how much charge is in the block you clicked on. It may also give other info.
 [/spoiler]
 
 [u][b][size=4][anchor=MACHINES]Machines and Ore Processing[/anchor][/size][/b][/u]
 [spoiler]
-All of these machines require [b]charge[/b] to run. Here's a bunch of crafting recipes:
+All of these machines require charge to run. Here's a bunch of crafting recipes:
 [img]http://i.imgur.com/gyhwb.png[/img]
-The [b]heater[/b] should be placed next to a furnace, a slag furnace, or a crystallizer. It will provide heat to the furnaces, and will heat the solution in the crystallizer. It takes about 5 mirrors to run a heater. You can put multiple heaters next to a furnace to pump extra heat into it. This will make it reach max temperature quicker, and run faster.
+The [b]heater[/b] should be placed next to a furnace, a slag furnace, or a crystallizer. It will provide heat to the furnaces, and will heat the solution in the crystallizer. It takes about 5 mirrors to run a heater. You can put multiple heaters by a block to pump extra heat into it. This will make it reach max temperature quicker, and run faster.
 
 The [b]grinder[/b] will grind ores. This is the start of the full ore processing chain. It takes 11 mirrors to get it started, and once it's at full speed, only needs half the power. Obtaining the [b]Dark Iron Ingot[/b] is described in "Demons and Wrath".
 
@@ -134,7 +132,7 @@ Here's how to crystallize lead:
 You don't need to process all the way! You can stop whenever you want. But the farther you go, the better yields you will get.
 [/spoiler]
 
-[u][b][size=4][anchor=WRATH]Demons and Wrath[/anchor][/size][/b][/u]
+[u][b][size=4][anchor=WRATH]Wrath[/anchor][/size][/b][/u]
 [spoiler]
 All of these recipes require access to a fully stocked Nether Fortress.
 [u]The [b]Wrath Igniter[/b][/u]
@@ -144,18 +142,7 @@ Wrathfire is a very special kind of fire. It will only burn on the block you cli
 A Wrath Forge needs to have a certain amount of netherbrick, or else the Wrath Fire will die out. Placing fuels, such as Iron Blocks, next to the Wrath Fire will burn it, but will also weaken the fire. If the fire becomes weak enough, it will be extinguished.
 
 [u][b]Dark Iron[/b][/u]
-Burning an iron block with Wrath Fire will leave behind a Dark Iron block. This block can be uncrafted into 4 Dark Iron ingots. This metal appears to be Ender-aligned, and has a few good uses, which will be discussed after Demons.
-
-
-[u][b]Demons[/b][/u]
-[img]http://i.imgur.com/1z6J2.png[/img]
-These tiny demons are secretive creatures that can be found only in the nether, though they usually stay out of sight. Their favorite activities are eating netherwort, and biting you with their poisonous fangs. If they find a chest containing plenty of netherwort, they are sure to sneak in and become trapped inside. Be careful with them, as they will attempt to kill you when you handle them. You can get slightly more control over them by tying them up with a bit of string on a crafting table.
-
-A chest must have at least 24 netherwort to attract your first demon. If you are paying attention, you can remove it before it eats all your netherwart. No more than 1 demon will enter a chest per minute. Demons won't enter a chest if it has things other than netherwart and demons. Be aware that they will accumulate and eat up all the netherwort if they aren't tended to.
-
-
-[img]http://i.imgur.com/LpZAu.png[/img]
-A demon can be used to craft a Wand of Cooling. The demon operates the wand of cooling by seperating hot molecules from cooler molecules, and sending the hotter molecules [url="http://dresdencodak.com/2009/02/16/exorcising-laplaces-demon/"]to some other Place[/url]. Since the only limiting factor in this process is the enthusiasm and health of the demon, Wands of Cooling will last for quite a while. They will cool lava/water source blocks into obsidian/ice, and destroy fire, Wrath Fire, and non-source water/lava.
+Burning an iron block with Wrath Fire will leave behind a Dark Iron block. This block can be uncrafted into 4 Dark Iron ingots. This metal appears to be Ender-aligned, and has a few good uses.
 
 [u]The [b]Item Router[/b][/u]
 The Item Router is a very flexible, very powerful machine. Making it requires the 3rd material Nether Fortresses provide: blaze powder, which is necessary for an Eye of Ender.
@@ -165,11 +152,9 @@ The Router is a block that creates an item delivery network out of blobs of mach
 The Item Router has a number of upgrades that can be applied to it by shift-right-clicking the router with the item in hand. This will add a "--" button in the GUI, which you can press to look at each upgrade. To remove an upgrade, press Delete while hovering the mouse over the button.
 
 [u]Item Filter[/u]
-[img]http://i.imgur.com/ThSLU.png[/img]
 This lets you choose what items to extract from machines. This upgrade does nothing in insertion mode.
 
 [u]Machine Filter[/u]
-[img]http://i.imgur.com/pmFMx.png[/img]
 This lets you choose what machines to access. In the default mode, "visit all", machines that don't match will just be skipped over. In "visit near" mode, the router will not pass through non-matching machines. For example, if it's set to match only chests, a network setup like "router chest furnace chest" will only access the first chest. It will not even look past the furnace. In "visit all" mode, it will visit both chests, but otherwise ignore the furnace.
 
 [u]Speed Boost[/u]
@@ -246,7 +231,6 @@ Push blocks everywhere! Be the Enderman! This will push a block that's in front 
 
 [u]Other Stuff/Future Plans[/u]
 [spoiler]
-NEI Integration
 More Mecha-Armor upgrades
 Ceramics
 ? ? ?
@@ -255,9 +239,9 @@ Ceramics
 
 
 [u][b][size=6][anchor=INSTALL]Installation[/anchor][/size][/b][/u]
-This is a [url="http://jenkins.minecraftforge.net:7070/job/forge/forge-recommended/"]Minecraft Forge[/url] mod. It uses 3 block IDs, and a bunch of item IDs.
+This is a [url="http://files.minecraftforge.net/"]Minecraft Forge[/url] mod. It uses 3 block IDs, and a bunch of item IDs.
 
-1. Install [url="http://jenkins.minecraftforge.net:7070/job/forge/forge-recommended/"]Minecraft Forge[/url] by extracting the contents of the forge download into the Minecraft jar. Be sure to delete the META-INF/ folder ([u]unless you are installing a server![/u]). If you already have a version of forge that's as old as or newer than Build #241, it should work fine.
+1. Install [url="http://files.minecraftforge.net/"]Minecraft Forge[/url] by extracting the contents of the forge download into the Minecraft jar. Be sure to delete the META-INF/ folder ([u]unless you are installing a server![/u]). The version of Forge that I'm using is given by the download link. Anything newer will usually work, and sometimes older versions will work as well.
 2. Check that the forge install worked by running the client (or the server). Forge information should be on the title screen (or in the server's logs). Exit minecraft.
 3. Put Factorization.jar into the mods folder.
 4. Optional: Install [url="http://www.minecraftforum.net/topic/909223-125132-smp-chickenbones-mods/"]NEI[/url] by placing CodeChickenCore and NotEnoughItems into the [b][u]core[/u][/b]mods folder. This will let you use the Pocket Crafting Table and Bag of Holding from within other GUIs.
@@ -270,6 +254,7 @@ Note that all proper Forge mods (such as this one) now use the same mod files fo
 Factorization 0.5.6 (MC 1.3.2)
 [url="http://adf.ly/2137658/http://www.mediafire.com/?d4mz283dapwzaox"]adfly + MediaFire[/url], or [url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.5.6_948.jar"]adfly + DropBox[/url]
 Built against Forge 4.1.2.261
+
 
 Old versions [spoiler]
 Factorization 0.5.5 (MC 1.3.2)

@@ -39,7 +39,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
 
     void onRemove() {
         if (this instanceof IChargeConductor) {
-            ((IChargeConductor) this).getCharge().remove((IChargeConductor) this);
+            ((IChargeConductor) this).getCharge().remove();
         }
     }
 
@@ -151,5 +151,14 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
 
     void broadcastMessage(EntityPlayer who, Packet toSend) {
         Core.network.broadcastPacket(who, getCoord(), toSend);
+    }
+    
+    @Override
+    public void invalidate() {
+        if (this instanceof IChargeConductor) {
+            IChargeConductor me = (IChargeConductor) this;
+            me.getCharge().invalidate();
+        }
+        super.invalidate();
     }
 }

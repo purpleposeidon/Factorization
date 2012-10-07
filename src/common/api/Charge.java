@@ -131,12 +131,11 @@ public class Charge {
         }
     }
     
-    public void remove(IChargeConductor brokenTileEntity) {
+    public void remove() {
         if (conductorSet == null) {
             return;
         }
-        justCreated = true;
-        for (IChargeConductor hereConductor : conductorSet.getMembers(brokenTileEntity)) {
+        for (IChargeConductor hereConductor : conductorSet.getMembers(conductor)) {
             Charge hereCharge = hereConductor.getCharge();
             int saveCharge = hereCharge.getValue();
             new ConductorSet(hereCharge.conductor);
@@ -169,12 +168,7 @@ public class Charge {
         if (conductorSet == null) {
             return;
         }
-        if (conductorSet.leader == this) {
-            conductorSet.leader = null;
-        }
-        conductorSet.totalCharge -= getValue();
-        conductorSet.memberCount--;
-        justCreated = true;
+        remove();
     }
 
 }

@@ -332,13 +332,4 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         }
         return false;
     }
-    
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        if (this instanceof IChargeConductor) {
-            Charge c = ((IChargeConductor) this).getCharge();
-            c.invalidate();
-        }
-    }
 }
