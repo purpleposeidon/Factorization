@@ -57,10 +57,14 @@ public class NEI_SlagRecipeConfig extends TemplateRecipeHandler implements IConf
     
     @Override
     public void loadUsageRecipes(String inputId, Object... ingredients) {
-        if (!inputId.equals("slagging")) {
+        ItemStack ingredient;
+        if (inputId.equals("slagging")) {
+            ingredient = null;
+        } else if (inputId.equals("item")) {
+            ingredient = (ItemStack) ingredients[0];
+        } else {
             return;
-        }
-        ItemStack ingredient = (ItemStack) ingredients[0];
+        } 
         for (SmeltingResult sr : TileEntitySlagFurnace.SlagRecipes.smeltingResults) {
             if (ingredient == null || ingredient.isItemEqual(sr.input)) {
                 arecipes.add(new CachedSlagRecipe(sr));
