@@ -56,10 +56,13 @@ public class ItemPocketTable extends Item {
         }
         //XXX TODO: Chests stay open. Man, how do I fix this?
         //player.openGui(Core.instance, FactoryType.NULLGUI.gui, null, 0, 0, 0);
-        player.openGui(Core.instance, FactoryType.POCKETCRAFTGUI.gui, null, 0, 0, 0);
-        if (save != null) {
-            player.inventory.setItemStack(save);
-            Core.proxy.updateHeldItem(player);
+        if (!world.isRemote) {
+            //...this may be troublesome for stack saving! :O
+            player.openGui(Core.instance, FactoryType.POCKETCRAFTGUI.gui, null, 0, 0, 0);
+            if (save != null) {
+                player.inventory.setItemStack(save);
+                Core.proxy.updateHeldItem(player);
+            }
         }
         return stack;
     }

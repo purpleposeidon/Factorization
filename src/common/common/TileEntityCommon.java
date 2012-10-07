@@ -114,8 +114,8 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         if (type.hasGui) {
             if (!entityplayer.worldObj.isRemote) {
                 sendFullDescription(entityplayer);
+                entityplayer.openGui(Core.instance, type.gui, worldObj, xCoord, yCoord, zCoord);
             }
-            entityplayer.openGui(Core.instance, type.gui, worldObj, xCoord, yCoord, zCoord);
             return true;
         }
         return false;
