@@ -9,56 +9,67 @@ import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 
 public class ItemOreProcessing extends Item {
-    public static final int IRON = 0, GOLD = 1, LEAD = 2, TIN = 3, COPPER = 4; //damage value mapping
-    private static final int[] colorMap = {
-            0xF0F0F0,
-            0xFFFB00,
-            0x2F2C3C,
-            0xD7F7FF,
-            0xFF6208
-    };
-    public static final String[] en_names = { "Iron", "Gold", "Lead", "Tin", "Copper" };
-    static boolean enabled[] = new boolean[colorMap.length];
-    String type;
+    public static enum OreType {
+        IRON(0, 0xF0F0F0, "Iron"),
+        GOLD(1, 0xFFFB00, "Gold"),
+        LEAD(2, 0x2F2C3C, "Lead"),
+        TIN(3, 0xD7F7FF, "Tin"),
+        COPPER(4, 0xFF6208, "Copper"),
+        SILVER(5, 0x7B96B9, "Silver"),
+        GALENA(6, 0x687B99, "Galena")
+        ;
+        int ID;
+        int color;
+        String en_name;
+        boolean enabled = false;
+        private OreType(int ID, int color, String en_name) {
+            this.ID = ID;
+            this.color = color;
+            this.en_name = en_name;
+        }
+        
+        public void enable() {
+            this.enabled = true;
+        }
+    }
+    
+    String stateName;
 
-    protected ItemOreProcessing(int itemID, int icon, String type) {
+    protected ItemOreProcessing(int itemID, int icon, String stateName) {
         super(itemID);
+        setTextureFile(Core.texture_file_item);
         setHasSubtypes(true);
         setIconIndex(icon);
-        this.type = type;
-        setTextureFile(Core.texture_file_item);
+        this.stateName = stateName;
         Core.tab(this, TabType.MATERIALS);
-        setItemName("itemOreProcessing" + type);
+        setItemName("itemOreProcessing" + stateName);
     }
 
     @Override
     public int getColorFromDamage(int damage, int renderPass) {
-        if (damage < 0 || damage > colorMap.length) {
-            return 0;
+        try {
+            return OreType.values()[damage].color;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return 0xFFFF00;
         }
-        return colorMap[damage];
     }
 
     @Override
     public String getItemNameIS(ItemStack is) {
-        return "item.oreProcessing" + type + is.getItemDamage();
+        return "item.oreProcessing" + stateName + is.getItemDamage();
     }
 
     void addEnglishNames(String prefix, String postfix) {
-        for (int i = IRON; i <= COPPER; i++) {
-            Core.proxy.addName("item.oreProcessing" + type + i, prefix + en_names[i] + postfix);
+        for (OreType oreType : OreType.values()) {
+            Core.proxy.addName("item.oreProcessing" + stateName + oreType.ID, prefix + oreType.en_name + postfix);
         }
-    }
-
-    public static void enable(int oreID) {
-        enabled[oreID] = true;
     }
 
     @Override
     public void getSubItems(int id, CreativeTabs tab, List list) {
-        for (int i = IRON; i <= COPPER; i++) {
-            if (enabled[i]) {
-                list.add(new ItemStack(this, 1, i));
+        for (OreType oreType : OreType.values()) {
+            if (oreType.enabled) {
+                list.add(new ItemStack(this, 1, oreType.ID));
             }
         }
     }
@@ -67,5 +78,9 @@ public class ItemOreProcessing extends Item {
     public void addInformation(ItemStack is, List infoList) {
         super.addInformation(is, infoList);
         Core.brand(infoList);
+    }
+    
+    public ItemStack makeStack(OreType ot) {
+        return new ItemStack(this, 1, ot.ID);
     }
 }

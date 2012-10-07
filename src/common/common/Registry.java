@@ -644,8 +644,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "CFC",
                 'C', Block.cobblestone,
                 'F', Block.stoneOvenIdle);
-        createOreProcessingPath(new ItemStack(Block.oreIron), new ItemStack(Item.ingotIron), ItemOreProcessing.IRON);
-        createOreProcessingPath(new ItemStack(Block.oreGold), new ItemStack(Item.ingotGold), ItemOreProcessing.GOLD);
+        createOreProcessingPath(new ItemStack(Block.oreIron), new ItemStack(Item.ingotIron), ItemOreProcessing.OreType.IRON);
+        createOreProcessingPath(new ItemStack(Block.oreGold), new ItemStack(Item.ingotGold), ItemOreProcessing.OreType.GOLD);
         for (Block redstone : Arrays.asList(Block.oreRedstone, Block.oreRedstoneGlowing)) {
             TileEntitySlagFurnace.SlagRecipes.register(redstone, 5.8F, Item.redstone, 0.2F, Block.stone);
             //most ores give 0.4F stone, but redstone is dense.
@@ -822,8 +822,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //				'C', Block.chest);
     }
 
-    void createOreProcessingPath(ItemStack ore, ItemStack ingot, int oreID) {
-        //XXX TODO IMPORTANT: Verify these yields!
+    void createOreProcessingPath(ItemStack ore, ItemStack ingot, ItemOreProcessing.OreType oreType) {
         //Smelt: 1.0 (implicit) [+]
         //Slag: 1.2 [+]
         //Grind -> Smelt: 1.4 (dirty ore gravel)
@@ -831,14 +830,13 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //Grind -> Wash -> Smelt: 1.8 (clean ore chunks)
         //Grind -> Wash -> Slag -> Smelt: 2.0 (reduced ore chunks)
         //Grind -> Wash -> Slag -> Crystallize -> Smelt: 3.0 (crystalline ore)
-        //Crystallization will be a very slow & intensive & (energy) expensive.
-        ItemOreProcessing.enable(oreID);
-        ItemStack dirty = new ItemStack(ore_dirty_gravel, 1, oreID);
-        ItemStack clean = new ItemStack(ore_clean_gravel, 1, oreID);
-        ItemStack reduced = new ItemStack(ore_reduced, 1, oreID);
-        ItemStack crystal = new ItemStack(ore_crystal, 1, oreID);
+        oreType.enable();
+        ItemStack dirty = ore_dirty_gravel.makeStack(oreType);
+        ItemStack clean = ore_clean_gravel.makeStack(oreType);
+        ItemStack reduced = ore_reduced.makeStack(oreType);
+        ItemStack crystal = ore_crystal.makeStack(oreType);
 
-        //All processingg steps can be smelted
+        //All processing steps can be smelted
         for (ItemStack is : new ItemStack[] { dirty, clean, reduced, crystal }) {
             FurnaceRecipes.smelting().addSmelting(is.itemID, is.getItemDamage(), ingot);
         }
@@ -855,6 +853,44 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         TileEntitySlagFurnace.SlagRecipes.register(clean, 1, reduced, 0.42857142857143F, reduced);
         //REDUCED CHUNKS
         TileEntityCrystallizer.addRecipe(reduced, crystal, 1.5F, new ItemStack(acid), 0);
+    }
+    
+    void createDualOreProcessingPath(ItemStack ore, ItemStack ingotA, ItemStack ingotB, ItemOreProcessing.OreType oreType_start, ItemOreProcessing.OreType oreType_A, ItemOreProcessing.OreType oreType_B) {
+        oreType_start.enable();
+        oreType_A.enable();
+        oreType_B.enable();
+        ItemStack dirty = ore_dirty_gravel.makeStack(oreType_start);
+        ItemStack clean = ore_clean_gravel.makeStack(oreType_start);
+        
+        ItemStack reduced_A = ore_reduced.makeStack(oreType_A);
+        ItemStack crystal_A = ore_crystal.makeStack(oreType_A);
+        ItemStack reduced_B = ore_reduced.makeStack(oreType_B);
+        ItemStack crystal_B = ore_crystal.makeStack(oreType_B);
+        
+        for (ItemStack is : new ItemStack[] { dirty, clean, reduced_A, crystal_A }) {
+            FurnaceRecipes.smelting().addSmelting(is.itemID, is.getItemDamage(), ingotA);
+        }
+        
+        for (ItemStack is : new ItemStack[] { reduced_B, crystal_B }) {
+            FurnaceRecipes.smelting().addSmelting(is.itemID, is.getItemDamage(), ingotA);
+        }
+        
+        //NOTE: skip the ORE slag furnace recipe!
+        //ORE
+        TileEntityGrinder.addRecipe(ore, dirty, 1.4F);
+        //DIRTY GRAVEL
+        TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.42857142857143F, ingotA, 0.2F, Block.dirt); //XXX TODO: This is lame.
+        TileEntityMixer.addRecipe(
+                new ItemStack[] { dirty, new ItemStack(Item.bucketWater) },
+                new ItemStack[] { clean, new ItemStack(Item.bucketEmpty), new ItemStack(sludge) });
+        //CLEAN CHUNKS
+        TileEntitySlagFurnace.SlagRecipes.register(clean, 1.1F, reduced_A, 1.6F, reduced_B);
+        //REDUCED CHUNKS
+        //And now we split.
+        TileEntityCrystallizer.addRecipe(reduced_A, crystal_A, 1.5F, new ItemStack(acid), 0);
+        TileEntityCrystallizer.addRecipe(reduced_B, crystal_B, 1.5F, new ItemStack(acid), 0);
+        
+        
     }
 
     void addDictOres() {
@@ -876,19 +912,26 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             if (bestIngot == null) {
                 continue;
             }
-            int id = -1;
-            if (oreClass.equals("oreCopper")) {
-                id = ItemOreProcessing.COPPER;
-            }
-            if (oreClass.equals("oreTin")) {
-                id = ItemOreProcessing.TIN;
-            }
             if (oreClass.equals("oreSilver")) {
-                id = ItemOreProcessing.LEAD;
-                bestIngot = new ItemStack(lead_ingot);
-            }
-            for (ItemStack ore : oreList) {
-                createOreProcessingPath(ore, bestIngot, id);
+                ItemStack silver = new ItemStack(silver_ingot);
+                ItemStack lead = new ItemStack(lead_ingot);
+                for (ItemStack ore : oreList) {
+                    createDualOreProcessingPath(ore, silver, lead, ItemOreProcessing.OreType.GALENA, ItemOreProcessing.OreType.SILVER, ItemOreProcessing.OreType.LEAD);
+                }
+            } else {
+                ItemOreProcessing.OreType ot = null;
+                if (oreClass.equals("oreCopper")) {
+                    ot = ItemOreProcessing.OreType.COPPER;
+                }
+                if (oreClass.equals("oreTin")) {
+                    ot = ItemOreProcessing.OreType.TIN;
+                }
+                if (ot == null) {
+                    continue;
+                }
+                for (ItemStack ore : oreList) {
+                    createOreProcessingPath(ore, bestIngot, ot);
+                }
             }
         }
     }
