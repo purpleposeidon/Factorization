@@ -168,6 +168,7 @@ public class NetworkFactorization implements IPacketHandler {
      */
     public void broadcastPacket(EntityPlayer who, Coord src, Packet toSend) {
         if (src.w == null) {
+            new NullPointerException("Coord is null").printStackTrace();
             return;
         }
         if (who == null) {
@@ -242,18 +243,32 @@ public class NetworkFactorization implements IPacketHandler {
 
     void handleTE(DataInput input) {
         try {
+            World world = getCurrentPlayer().worldObj;
             int x = input.readInt();
             int y = input.readInt();
             int z = input.readInt();
             int messageType = input.readInt();
+            Coord here = new Coord(world, x, y, z);
+            
+            if (Core.debug_network) {
+                System.out.println("FactorNet: " + messageType + "      " + here);
+            }
 
-            if (!getCurrentPlayer().worldObj.blockExists(x, y, z)) {
+            if (!here.blockExists() && world.isRemote) {
                 // I suppose we can't avoid this.
                 // (Unless we can get a proper server-side check)
                 return;
             }
+            
+            if (messageType == MessageType.DescriptionRequest && !world.isRemote) {
+                TileEntityCommon tec = here.getTE(TileEntityCommon.class);
+                if (tec != null) {
+                    broadcastPacket(getCurrentPlayer(), here, tec.getDescriptionPacket());
+                }
+                return;
+            }
 
-            if (messageType == MessageType.FactoryType) {
+            if (messageType == MessageType.FactoryType && world.isRemote) {
                 //create a Tile Entity of that type there.
                 FactoryType ft = FactoryType.fromMd(input.readInt());
                 byte extraData = input.readByte();
@@ -264,8 +279,6 @@ public class NetworkFactorization implements IPacketHandler {
                 } catch (IOException e) {
                     messageType = -1;
                 }
-                World world = getCurrentPlayer().worldObj;
-                Coord here = new Coord(world, x, y, z);
                 TileEntityCommon spawn = here.getTE(TileEntityCommon.class);
                 if (spawn != null && spawn.getFactoryType() != ft) {
                     world.removeBlockTileEntity(x, y, z);
@@ -287,26 +300,19 @@ public class NetworkFactorization implements IPacketHandler {
                 return;
             }
 
-            Coord target = new Coord(getCurrentPlayer().worldObj, x, y, z);
-            TileEntityCommon tec = target.getTE(TileEntityCommon.class);
+            TileEntityCommon tec = here.getTE(TileEntityCommon.class);
             if (tec == null) {
-                handleForeignMessage(getCurrentPlayer().worldObj, x, y, z, tec, messageType, input);
+                handleForeignMessage(world, x, y, z, tec, messageType, input);
                 return;
             }
             boolean handled;
-            if (target.w.isRemote) {
-                if (Core.debug_network) {
-                    System.out.println("FN: " + messageType + "      " + target);
-                }
+            if (here.w.isRemote) {
                 handled = tec.handleMessageFromServer(messageType, input);
             } else {
-                if (Core.debug_network) {
-                    System.out.println("FN: " + messageType + "      " + target);
-                }
                 handled = tec.handleMessageFromClient(messageType, input);
             }
             if (!handled) {
-                handleForeignMessage(getCurrentPlayer().worldObj, x, y, z, tec, messageType, input);
+                handleForeignMessage(world, x, y, z, tec, messageType, input);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -400,7 +406,7 @@ public class NetworkFactorization implements IPacketHandler {
         public final static int DemonEnterChest = 10, PlaySound = 11, PistonPush = 12;
         //TEF messages
         public final static int
-                DrawActive = 0, FactoryType = 1,
+                DrawActive = 0, FactoryType = 1, DescriptionRequest = 2,
                 //
                 MakerTarget = 11, MakerFuel = 12,
                 //

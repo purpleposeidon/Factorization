@@ -19,6 +19,7 @@ import net.minecraft.src.World;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
+import factorization.common.NetworkFactorization.MessageType;
 
 public class BlockFactorization extends BlockContainer {
     public boolean fake_normal_render = false;
@@ -101,18 +102,26 @@ public class BlockFactorization extends BlockContainer {
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer entityplayer,
             int side, float vecx, float vecy, float vecz) {
         // right click
+        Coord here = new Coord(world, x, y, z);
         if (entityplayer.isSneaking()) {
+            if (here.getTE() == null && world.isRemote) {
+                Core.network.broadcastMessage(null, here, MessageType.DescriptionRequest);
+            }
             return false;
         }
 
-        TileEntityCommon t = new Coord(world, x, y, z).getTE(TileEntityCommon.class);
+        TileEntityCommon t = here.getTE(TileEntityCommon.class);
 
         if (t != null) {
             return t.activate(entityplayer);
-        }
-        else {
+        } else {
             //info message
             if (world.isRemote) {
+                if (here.getTE() == null) {
+                    //we may be about to get a GUI, incidentally...
+                    Core.network.broadcastMessage(null, here, MessageType.DescriptionRequest);
+                    return false;
+                }
                 return false; //...?
             }
             entityplayer.addChatMessage("This block is missing its TileEntity, possibly due to a bug in Factorization.");
