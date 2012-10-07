@@ -235,11 +235,10 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
                 return true;
             }
         }
-
-        void apply(TileEntityCrystallizer crys) {
+        
+        private void applyTo(TileEntityCrystallizer crys, int slot) {
             ItemStack is = input.copy();
             while (is.stackSize > 0) {
-                int slot = crys.pickInputSlot(is);
                 crys.inputs[slot].stackSize--;
                 crys.inputs[slot] = FactorizationUtil.normalize(crys.inputs[slot]);
                 is.stackSize--;
@@ -255,11 +254,11 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
                 crys.output.stackSize += delta;
             }
             int dead_inverium = inverium_count;
-            for (int slot = 0; slot < crys.inputs.length; slot++) {
+            for (int inverium_slot = 0; inverium_slot < crys.inputs.length; inverium_slot++) {
                 if (dead_inverium == 0) {
                     break;
                 }
-                ItemStack inverium = crys.inputs[slot];
+                ItemStack inverium = crys.inputs[inverium_slot];
                 if (inverium == null || inverium.getItem() != Core.registry.inverium) {
                     continue;
                 }
@@ -267,7 +266,19 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
                 inverium.stackSize -= toRemove;
                 dead_inverium -= toRemove;
                 if (inverium.stackSize <= 0) {
-                    crys.inputs[slot] = null;
+                    crys.inputs[inverium_slot] = null;
+                }
+            }
+        }
+
+        void apply(TileEntityCrystallizer crys) {
+            ItemStack inverium = new ItemStack(Core.registry.inverium);
+            for (int i = 0; i < crys.inputs.length; i++) {
+                ItemStack is = crys.inputs[i];
+                if (is != null && input.isItemEqual(is)) {
+                    if (crys.countMaterial(inverium) >= inverium_count) {
+                        applyTo(crys, i);
+                    }
                 }
             }
         }

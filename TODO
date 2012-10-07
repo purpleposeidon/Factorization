@@ -2,9 +2,6 @@ http://www.minecraftforum.net/topic/1351802-factorization/
 
 TOP LIST
 --------
-upgrade to forge 298
-
-NEI recipe handlers for everything!
 examine the GUIs carefully
 fix pocket crafting table 'c' key. Possibly add magic.
 craft packet makers shouldn't eat paper.
@@ -41,6 +38,8 @@ check breaking on all new machines
 solar turbines need to check if it's raining. It's okay if you're in a desert tho.
 
 [Low-Priority Bugs]
+something about a "metallurgy" mod?
+is the macerator not working on silver a IC2 bug or a factorization bug?
 draw_active isn't marking the block dirty apparently?
 re-write the shift-clicking function to use slots!!!
 silver ore needs to be toughened up just a tad!

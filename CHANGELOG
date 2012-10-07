@@ -1,7 +1,15 @@
 0.6.2
+  Processing silver ore will now give you both silver and iron ingots. Any dirty lead gravel and clean lead chunks will no longer be usable.
+  The extra slots in the crystallizer are now useful: If you place extra stacks of the material in them, they will be crystallized together.
+  There are now NEI recipe handlers for all ore processing equipment. Clicking on the progress arrow in the GUI will show you all the recipes for that machine.
+  Grinding is faster.
   Added in-world notification system; it's not quite perfect.
   Fixed problem placing certain items related to forge update.
   The proper battery now shows up in NEI.
+  Using forge 298
+  Battery discharging recipe
+  This file is now in the Factorization jar.
+
 
 0.6.1
   Using forge 272
