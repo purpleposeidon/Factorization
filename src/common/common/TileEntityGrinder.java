@@ -15,9 +15,9 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     ItemStack input, output;
     Charge charge = new Charge(this);
     int progress = 0;
-    int energy = 0;
+    float energy = 0;
     int speed = 0;
-    final int grind_time = 400;
+    final int grind_time = 200;
 
     @Override
     public int getSizeInventory() {
@@ -51,7 +51,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         readSlotsFromNBT(tag);
         charge.readFromNBT(tag);
         progress = tag.getInteger("progress");
-        energy = tag.getInteger("energy");
+        energy = tag.getFloat("fenergy");
         speed = tag.getInteger("speed");
     }
 
@@ -61,7 +61,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         writeSlotsToNBT(tag);
         charge.writeToNBT(tag);
         tag.setInteger("progress", progress);
-        tag.setInteger("energy", energy);
+        tag.setFloat("fenergy", energy);
         tag.setInteger("speed", speed);
     }
 
@@ -152,13 +152,14 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         needLogic();
         if (energy < 30) {
             int to_take = charge.deplete(30);
-            energy += to_take / 5;
+            energy += to_take / 7F;
         }
         if (energy <= 0) {
             slowDown();
             if (progress > 0) {
                 progress--;
             }
+            energy = 0;
             return;
         }
         if (canGrind()) {

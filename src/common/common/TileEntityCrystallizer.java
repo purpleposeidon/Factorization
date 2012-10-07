@@ -19,6 +19,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
 
     public ItemStack growing_crystal, solution;
     public int heat, progress;
+    public final static int topHeat = 300;
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {
@@ -118,7 +119,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     }
 
     boolean needHeat() {
-        if (heat >= 100) {
+        if (heat >= topHeat) {
             return false;
         }
         return getMatchingRecipe() != null;
@@ -151,7 +152,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
             share_delay = 0;
             current_state = 3;
         }
-        if (heat < 100) {
+        if (heat < topHeat) {
             current_state = 4;
             shareState();
             return;
@@ -164,7 +165,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         }
         progress += 1;
         if (getProgressRemaining() <= 0 || Core.cheat) {
-            heat = Core.cheat ? 80 : 0;
+            heat = Core.cheat ? topHeat - 20 : 0;
             progress = 0;
             match.apply(this);
             share_delay = 0;
