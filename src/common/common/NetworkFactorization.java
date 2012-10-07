@@ -158,6 +158,7 @@ public class NetworkFactorization implements IPacketHandler {
         }
     }
 
+    private double maxBroadcastDistSq = 2 * Math.pow(64, 2);
     /**
      * @param who
      *            Player to send packet to; if null, send to everyone in range.
@@ -171,7 +172,6 @@ public class NetworkFactorization implements IPacketHandler {
         }
         if (who == null) {
             //send to everyone in range
-            int max_dist = (int) (3 * Math.pow(32, 2));
             Chunk srcChunk = src.getChunk();
             for (EntityPlayer player : (Iterable<EntityPlayer>) src.w.playerEntities) {
 //				if (player.chunksToLoad.contains(srcChunk)) {
@@ -179,7 +179,9 @@ public class NetworkFactorization implements IPacketHandler {
 //				}
                 //XXX TODO: Make this not lame!
                 //if (entityplayermp.loadedChunks.contains(chunkcoordintpair))
-                if (src.distanceSq(new Coord(player)) > max_dist) {
+                double x = src.x - player.posX;
+                double z = src.z - player.posZ;
+                if (x*x + z*z > maxBroadcastDistSq) {
                     continue;
                 }
                 if (!Core.proxy.playerListensToCoord(player, src)) {
