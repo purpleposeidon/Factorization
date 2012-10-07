@@ -48,6 +48,8 @@ public class FactorizationNotify {
             if (m.locus.equals(locus)) {
                 m.set(locus, msg);
                 return;
+            } else if (m.locus.distanceManhatten(locus) == 1) {
+                m.creationTime = 0;
             }
         }
         messages.add(new Message().set(locus, msg));
