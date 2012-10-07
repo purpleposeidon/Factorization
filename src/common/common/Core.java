@@ -108,7 +108,7 @@ public class Core {
     public final static String texture_file_item = texture_dir + "items.png";
 
     private int getBlockConfig(String name, int defaultId, String comment) {
-        Property prop = config.getOrCreateBlockIdProperty(name, defaultId);
+        Property prop = config.getBlock(name, defaultId);
         if (comment != null && comment.length() != 0) {
             prop.comment = comment;
         }
@@ -116,7 +116,7 @@ public class Core {
     }
 
     private int getIntConfig(String category, String name, int defaultValue, String comment) {
-        Property prop = config.getOrCreateIntProperty(category, name, defaultValue);
+        Property prop = config.get(category, name, defaultValue);
         if (comment != null && comment.length() != 0) {
             prop.comment = comment;
         }
@@ -124,7 +124,7 @@ public class Core {
     }
 
     private boolean getBoolConfig(String category, String name, boolean defaultValue, String comment) {
-        Property prop = config.getOrCreateBooleanProperty(category, name, defaultValue);
+        Property prop = config.get(category, name, defaultValue);
         if (comment != null && comment.length() != 0) {
             prop.comment = comment;
         }
@@ -132,7 +132,7 @@ public class Core {
     }
 
     private String getStringConfig(String category, String name, String defaultValue, String comment) {
-        Property prop = config.getOrCreateProperty(category, name, defaultValue);
+        Property prop = config.get(category, name, defaultValue);
         if (comment != null && comment.length() != 0) {
             prop.comment = comment;
         }
