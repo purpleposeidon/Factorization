@@ -40,4 +40,8 @@ public class NameClayCommand extends CommandBase {
         player.sendChatToPlayer("That item can not be named.");
     }
 
+    @Override
+    public String getCommandUsage(ICommandSender par1iCommandSender) {
+        return super.getCommandUsage(par1iCommandSender) + " name for held sculpture";
+    }
 }

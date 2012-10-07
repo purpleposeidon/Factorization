@@ -49,23 +49,31 @@ public class TileEntityGreenware extends TileEntityCommon {
     public static RenderingCube selected;
     
     public static enum ClayState {
-        WET, DRY, BISQUED, GLAZED;
+        WET("Wet Greenware"), DRY("Bone-Dry Greenware"), BISQUED("Bisqued"), GLAZED("High-Fire Glazed");
+        public String english;
+        ClayState(String en) {
+            this.english = en;
+        }
     };
     
     public TileEntityGreenware() {
     }
     
-    public ClayState getState() {
-        if (lastTouched > dryTime) {
-            if (totalHeat > glazeHeat) {
-                return ClayState.GLAZED;
-            }
-            if (totalHeat > bisqueHeat) {
-                return ClayState.BISQUED;
-            }
+    public static ClayState getStateFromInfo(int touch, int heat) {
+        if (heat > glazeHeat) {
+            return ClayState.GLAZED;
+        }
+        if (heat > bisqueHeat) {
+            return ClayState.BISQUED;
+        }
+        if (touch > dryTime) {
             return ClayState.DRY;
         }
         return ClayState.WET;
+    }
+    
+    public ClayState getState() {
+        return getStateFromInfo(lastTouched, totalHeat);
     }
     
     public int getIcon(RenderingCube rc) {
