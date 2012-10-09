@@ -6,6 +6,7 @@ import java.util.List;
 import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.common.Core.TabType;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.src.Container;
 import net.minecraft.src.CraftingManager;
 import net.minecraft.src.CreativeTabs;
@@ -185,11 +186,15 @@ public class ItemCraft extends Item {
 			}
 		} else {
 			ret.add(result);
-			if (!fake) {
-				if (Core.registry.diamond_shard_recipe.matches(craft) && where != null) {
+			if (!fake && where != null) {
+				if (Core.registry.diamond_shard_recipe.matches(craft)) {
 					Sound.shardMake.playAt(where);
 				}
-				GameRegistry.onItemCrafted(null, result, craft);
+				EntityPlayer fakePlayer = new EntityPlayer(where.worldObj) {
+					@Override public void sendChatToPlayer(String var1) {}
+					@Override public boolean canCommandSenderUseCommand(String var1) { return false; }
+				};
+				GameRegistry.onItemCrafted(fakePlayer, result, craft);
 			}
 
 			for (int i = 0; i < craft.getSizeInventory(); i++) {

@@ -163,7 +163,7 @@ public class Core {
             if (attempt.length() == 3) {
                 pocketActions = attempt;
             } else {
-                Property p = config.getOrCreateProperty("pocketCraftingActionKeys", "client", pocketActions);
+                Property p = config.get("pocketCraftingActionKeys", "client", pocketActions);
                 p.value = pocketActions;
                 p.comment = "3 keys for: removing (x), cycling (c), balancing (b)";
             }
@@ -184,10 +184,10 @@ public class Core {
                 System.err.println("Factorization: config has invalid Java Regex for banned_router_inventories: " + p);
             }
         }
-        entity_relight_task_id = config.getOrCreateIntProperty("entityRelightTask", "general", -1).getInt();
+        entity_relight_task_id = config.get("entityRelightTask", "general", -1).getInt();
         if (entity_relight_task_id == -1) {
             entity_relight_task_id = ModLoader.getUniqueEntityId();
-            Property prop = config.getOrCreateIntProperty("entityRelightTask", "general", entity_relight_task_id);
+            Property prop = config.get("entityRelightTask", "general", entity_relight_task_id);
             prop.value = "" + entity_relight_task_id;
             prop.comment = "This is a Java Regex to blacklist access to TE";
         }

@@ -872,7 +872,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         }
         
         for (ItemStack is : new ItemStack[] { reduced_B, crystal_B }) {
-            FurnaceRecipes.smelting().addSmelting(is.itemID, is.getItemDamage(), ingotA);
+            FurnaceRecipes.smelting().addSmelting(is.itemID, is.getItemDamage(), ingotB);
         }
         
         //NOTE: skip the ORE slag furnace recipe!
