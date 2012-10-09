@@ -42,17 +42,6 @@ public class GuiMaker extends GuiContainer {
         }
     }
 
-    int getPageSize() {
-        if (maker.fuel == 0) {
-            return 0;
-        }
-        int ret = (int) Math.log(maker.fuel);
-        if (12 < ret) {
-            ret = 12;
-        }
-        return ret;
-    }
-
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int i, int j) {
         int k = mc.renderEngine
@@ -63,13 +52,6 @@ public class GuiMaker extends GuiContainer {
         int i1 = (height - ySize) / 2;
         drawTexturedModalRect(l, i1, 0, 0, xSize, ySize);
 
-        // draw pages
-        int pageSize = getPageSize();
-        drawTexturedModalRect(l + 58, (i1 + 39) + 12 - pageSize, // x, y
-                184, 12 - pageSize, // u, v (seems to be texture offset)
-                15, pageSize // width, height
-        );
-
         // draw buttons
         updateGui();
         for (GuiButton button : buttons) {
@@ -79,29 +61,8 @@ public class GuiMaker extends GuiContainer {
 
     protected void drawGuiContainerForegroundLayer() {
         fontRenderer.drawString("Target slot", 84, 6, 0x404040);
-        String paper = "No paper"; // Pa-pa-pa-paper!
-
-        if (maker.fuel == 1) {
-            paper = "1 page";
-        }
-        if (maker.fuel > 1) {
-            if (maker.fuel > 1000) {
-                java.text.DecimalFormat formatter = new java.text.DecimalFormat(
-                        "0.#E0");
-                paper = formatter.format(maker.fuel) + " pgs";
-            } else if (maker.fuel > 99) {
-                paper = maker.fuel + " pages";
-            } else {
-                paper = maker.fuel + " pages";
-            }
-        }
-        if (maker.fuel < 0) {
-            paper = "Reams!"; // Well-prepared!
-        }
-
-        fontRenderer.drawString(paper, 6, 40, 0x404040);
         fontRenderer.drawString("Maker", 6, 6, 0x404040);
-        fontRenderer.drawString("X", 48, 23, 0x0);
+        fontRenderer.drawString("X", 41, 23, 0x0);
     }
 
     private void updateGui() {

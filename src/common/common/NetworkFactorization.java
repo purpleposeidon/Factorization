@@ -408,7 +408,7 @@ public class NetworkFactorization implements IPacketHandler {
         public final static int
                 DrawActive = 0, FactoryType = 1, DescriptionRequest = 2,
                 //
-                MakerTarget = 11, MakerFuel = 12,
+                MakerTarget = 11,
                 //
                 RouterSlot = 20, RouterTargetSide = 21, RouterMatch = 22, RouterIsInput = 23,
                 RouterLastSeen = 24, RouterMatchToVisit = 25, RouterDowngrade = 26,

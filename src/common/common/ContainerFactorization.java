@@ -112,15 +112,15 @@ public class ContainerFactorization extends Container {
             TileEntityMaker maker = (TileEntityMaker) ent;
             int[] ic = { Core.registry.item_craft.shiftedIndex };
             // input: No item_craft allowed!
-            addSlotToContainer(new FactorySlot(maker, 0, 58, 19, null, ic));
-            int[] fuel = { Core.registry.item_craft.shiftedIndex,
-                    Item.paper.shiftedIndex, Item.book.shiftedIndex,
-                    Block.bookShelf.blockID, Item.painting.shiftedIndex,
-                    Item.map.shiftedIndex };
-            // craft: Must be paper/craft
-            addSlotToContainer(new FactorySlot(maker, 1, 58, 55, fuel, null));
+            addSlotToContainer(new FactorySlot(maker, 0, 51, 19, null, ic));
+            int[] paper = { Item.paper.shiftedIndex };
+            int[] packet = { Core.registry.item_craft.shiftedIndex };
+            // paper: Must be paper
+            addSlotToContainer(new FactorySlot(maker, 1, 42, 55, paper, null));
+            // craft: Must be a craft packet
+            addSlotToContainer(new FactorySlot(maker, 2, 60, 55, packet, null));
             // output: Nothing goes in
-            addSlotToContainer(new FactorySlot(maker, 2, 152, 37, null, null));
+            addSlotToContainer(new FactorySlot(maker, 3, 152, 37, null, null));
             break;
         case STAMPER:
         case PACKAGER:

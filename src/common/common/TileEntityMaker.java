@@ -17,15 +17,14 @@ import factorization.common.NetworkFactorization.MessageType;
 public class TileEntityMaker extends TileEntityFactorization implements
         ISidedInventory {
     // Save these guys
-    public int fuel = 0; // pagecount; increased by putting
-    // paper/books/bookcases into craft
     public boolean targets[] = new boolean[9]; // slots that should be filled
     ItemStack input;
-    ItemStack craft; // Should be empty, fuel, or ItemCraft
+    ItemStack paper;
+    ItemStack craft; // Should be ItemCraft
     ItemStack output;
 
     // settings
-    private final int input_slot = 0, craft_slot = 1, output_slot = 2;
+    private final int input_slot = 0, paper_slot = 1, craft_slot = 2, output_slot = 3;
 
     public TileEntityMaker() {
         super();
@@ -39,7 +38,7 @@ public class TileEntityMaker extends TileEntityFactorization implements
 
     @Override
     public int getSizeInventory() {
-        return 3;
+        return 4;
     }
 
     @Override
@@ -47,6 +46,8 @@ public class TileEntityMaker extends TileEntityFactorization implements
         switch (i) {
         case input_slot:
             return input;
+        case paper_slot:
+            return paper;
         case craft_slot:
             return craft;
         case output_slot:
@@ -61,6 +62,9 @@ public class TileEntityMaker extends TileEntityFactorization implements
         switch (i) {
         case input_slot:
             input = itemstack;
+            break;
+        case paper_slot:
+            paper = itemstack;
             break;
         case craft_slot:
             craft = itemstack;
@@ -112,52 +116,51 @@ public class TileEntityMaker extends TileEntityFactorization implements
         }
         return false;
     }
-
-    void changeFuel(int delta) {
-        fuel += delta;
-        broadcastFuel(null);
-    }
-
-    void handleFuel() {
-        if (craft != null) {
-            // burn any paper
-            // a plank is worth 6
-            // a stick is worth 1.5
-            // a bookcase has a bunch of books, from somewhere???
-            // In any case, a stack of output for a bookcase is Nice.
-            int value = 0;
-            if (craft.getItem() == Item.paper) {
-                value = 1;
-            }
-            if (craft.getItem() == Item.painting) {
-                value = 13;
-            }
-            if (craft.getItem() == Item.map) {
-                value = 8;
-            }
-            if (craft.getItem() == Item.book) {
-                value = 9;
-            }
-            if (craft.getItem() instanceof ItemBlock) {
-                ItemBlock c = (ItemBlock) craft.getItem();
-                if (c.getBlockID() == Block.bookShelf.blockID) {
-                    value = 64;
-                }
-            }
-            if (value != 0) {
-                changeFuel(value * craft.stackSize);
-                craft = null; // burn everything at once
-            }
+    
+    boolean havePaper() {
+        if (paper == null) {
+            return false;
         }
+        if (paper.getItem() == Item.paper) {
+            return true;
+        }
+        return false;
+    }
+    
+    void eatPaper() {
+        assert paper.getItem() == Item.paper;
+        paper.stackSize--;
+        paper = FactorizationUtil.normalize(paper);
+    }
+    
+    @Override
+    int getLogicSpeed() {
+        return 10;
     }
 
     void doLogic() {
-        handleFuel();
-
-        boolean have_craft = craft != null
-                && craft.getItem() instanceof ItemCraft;
-        boolean is_armed = input != null && input.stackSize > 0
-                && !(input.getItem() instanceof ItemCraft) && output == null;
+        if (paper != null && craft == null && paper.getItem() instanceof ItemCraft) {
+            //move craft packet to the correct slot
+            craft = paper;
+            paper = null;
+        }
+        if (paper == null && craft != null && craft.getItem() == Item.paper) {
+            //move paper to the correct slot
+            paper = craft;
+            craft = null;
+        }
+        if (paper != null && paper.getItem() == Item.paper && craft != null && craft.getItem() == Item.paper) {
+            //pull in overflow paper
+            int free = paper.getMaxStackSize() - paper.stackSize;
+            if (free > 0) {
+                free = Math.min(free, craft.stackSize);
+                craft.stackSize -= free;
+                paper.stackSize += free;
+                craft = FactorizationUtil.normalize(craft);
+            }
+        }
+        boolean have_craft = craft != null && craft.getItem() instanceof ItemCraft;
+        boolean is_armed = input != null && input.stackSize > 0 && !(input.getItem() instanceof ItemCraft) && output == null;
         boolean could_move = craft != null && output == null;
 
         boolean haveFlag = false;
@@ -168,11 +171,11 @@ public class TileEntityMaker extends TileEntityFactorization implements
             is_armed = false;
         }
 
-        if (craft == null && fuel != 0 && is_armed) {
+        if (is_armed && havePaper() && craft == null) {
             // create a new blank packet
-            have_craft = true;
             craft = new ItemStack(Core.registry.item_craft);
-            changeFuel(-1);
+            have_craft = true;
+            eatPaper();
         }
 
         if (have_craft && (is_armed || could_move)) {
@@ -192,7 +195,6 @@ public class TileEntityMaker extends TileEntityFactorization implements
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
-        tag.setInteger("fuel", fuel);
         for (int i = 0; i < 9; i++) {
             tag.setBoolean("target" + i, targets[i]);
         }
@@ -204,7 +206,6 @@ public class TileEntityMaker extends TileEntityFactorization implements
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
-        fuel = tag.getInteger("fuel");
         for (int i = 0; i < 9; i++) {
             targets[i] = tag.getBoolean("target" + i);
         }
@@ -217,7 +218,7 @@ public class TileEntityMaker extends TileEntityFactorization implements
     public int getStartInventorySide(ForgeDirection side) {
         switch (side) {
         case DOWN:
-            return craft_slot;
+            return paper_slot;
         case UP:
             return input_slot;
         default:
@@ -227,22 +228,20 @@ public class TileEntityMaker extends TileEntityFactorization implements
 
     @Override
     public int getSizeInventorySide(ForgeDirection side) {
+        if (side == DOWN) {
+            return 2;
+        }
         return 1;
     }
 
     @Override
     void sendFullDescription(EntityPlayer player) {
         super.sendFullDescription(player);
-        broadcastFuel(player);
         for (int i = 0; i < 9; i++) {
             broadcastTarget(player, i);
         }
     }
-
-    void broadcastFuel(EntityPlayer who) {
-        broadcastMessage(who, MessageType.MakerFuel, fuel);
-    }
-
+    
     void broadcastTarget(EntityPlayer who, int slot) {
         broadcastMessage(who, MessageType.MakerTarget, slot, targets[slot]);
     }
@@ -273,10 +272,6 @@ public class TileEntityMaker extends TileEntityFactorization implements
             return true;
         }
         if (handleMessageFromAny(messageType, input)) {
-            return true;
-        }
-        if (messageType == MessageType.MakerFuel) {
-            fuel = input.readInt();
             return true;
         }
         return false;
