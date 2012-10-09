@@ -41,7 +41,13 @@ public class BatteryItemRender implements IItemRenderer {
         }
         if (type == ItemRenderType.EQUIPPED) {
             GL11.glTranslatef(0, 1, 1);
-            GL11.glRotatef(45, 1, 1, 0);
+            //GL11.glRotatef(45, 1, 1, 0);
+            
+            GL11.glRotatef(50.0F, 0.0F, 1.0F, 0.0F);
+            GL11.glRotatef(335.0F, 0.0F, 0.0F, 1.0F);
+        }
+        if (type == ItemRenderType.INVENTORY) {
+            
         }
         RenderEngine re = Minecraft.getMinecraft().renderEngine;
         re.bindTexture(re.getTexture(Core.texture_file_block));
