@@ -8,10 +8,12 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.EntityLiving;
+import net.minecraft.src.FontRenderer;
 import net.minecraft.src.ModelBase;
 import net.minecraft.src.RenderLiving;
 import net.minecraft.src.RenderManager;
 import net.minecraft.src.StatCollector;
+import net.minecraft.src.Tessellator;
 import net.minecraft.src.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.ForgeSubscribe;
@@ -38,7 +40,8 @@ public class FactorizationNotify {
     
     public static void addMessage(Coord locus, String format, String ...args) {
         for (int i = 0; i < args.length; i++) {
-            args[i] = StatCollector.translateToLocal(args[i]);
+            String translated = StatCollector.translateToLocal(args[i]);
+            args[i] = translated;
         }
         String msg = String.format(format, (Object[]) args);
         if (messages.size() > 2) {
@@ -54,41 +57,13 @@ public class FactorizationNotify {
         }
         messages.add(new Message().set(locus, msg));
     }
-    
-    static class NameEntity extends EntityLiving {
 
-        public NameEntity(World par1World) {
-            super(par1World);
-        }
-
-        @Override
-        public int getMaxHealth() {
-            return 0;
-        }
-        
-    }
-    
-    static class NameEntityRenderer extends RenderLiving {
-
-        public NameEntityRenderer(ModelBase par1ModelBase, float par2) {
-            super(par1ModelBase, par2);
-        }
-        
-        void renderLabel(NameEntity ent, String label) {
-            renderManager = RenderManager.instance;
-            this.renderLivingLabel(ent, label, ent.posX, ent.posY, ent.posZ, 27);
-        }
-        
-    }
-    
-    static NameEntityRenderer ner = new NameEntityRenderer(null, 0);
-    
     @ForgeSubscribe
     public void renderMessages(RenderWorldLastEvent event) {
-        doRender(event); //Forge events are too hard for eclipse to hot-swap?
+        doRenderMessages(event); //Forge events are too hard for eclipse to hot-swap?
     }
     
-    void doRender(RenderWorldLastEvent event) {
+    void doRenderMessages(RenderWorldLastEvent event) {
         World w = Minecraft.getMinecraft().theWorld;
         if (w == null) {
             return;
@@ -97,7 +72,6 @@ public class FactorizationNotify {
             return;
         }
         Core.profileStart("factorizationNotify");
-        NameEntity namer = new NameEntity(w);
         Iterator<Message> it = messages.iterator();
         long deathTime = System.currentTimeMillis() - 1000*6;
         EntityLiving camera = Minecraft.getMinecraft().renderViewEntity;
@@ -115,38 +89,69 @@ public class FactorizationNotify {
                 it.remove();
                 continue;
             }
-            
-            namer.posX = m.locus.x + 0.5;
-            namer.posY = m.locus.y - 2;
-            
-            
-            double boundAdd = 0;
-            AxisAlignedBB bb = m.locus.getCollisionBoundingBoxFromPool();
-            if (bb != null) {
-                boundAdd = bb.maxY - bb.minY;
-            }
-            for (DeltaCoord dc : DeltaCoord.directNeighbors) {
-                if (dc.y != 0) {
-                    continue;
-                }
-                Coord here = m.locus.add(dc);
-                bb = here.getCollisionBoundingBoxFromPool();
-                if (bb != null) {
-                    boundAdd = Math.max(boundAdd, bb.maxY - bb.minY);
-                }
-            }
-            
-            namer.posY += boundAdd;
-            namer.posZ = m.locus.z + 0.5;
-            String[] lines = m.msg.split("\n");
-            namer.posY += (lines.length - 1)*0.25;
-            for (String line : lines) {
-                ner.renderLabel(namer, line);
-                namer.posY -= 0.25F;
-            }
+            renderMessage(m);
         }
         GL11.glPopMatrix();
         GL11.glPopAttrib();
         Core.profileEnd();
+    }
+    
+    private void renderMessage(Message m) {
+        int width = 0;
+        int height = 0;
+        String[] lines = m.msg.split("\n");
+        FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
+        for (String line : lines) {
+            height += fr.FONT_HEIGHT + 2;
+            width = Math.max(width, fr.getStringWidth(line));
+        }
+        width += 2;
+        
+        
+        float scaling = 1.6F/60F;
+        GL11.glPushMatrix();
+        AxisAlignedBB bb = m.locus.getCollisionBoundingBoxFromPool();
+        float y = m.locus.y;
+        if (bb != null) {
+            y += bb.maxY - bb.minY;
+        } else {
+            y += 0.5F;
+        }
+        GL11.glTranslatef(m.locus.x + 0.5F, y, m.locus.z + 0.5F);
+        GL11.glNormal3f(0.0F, 1.0F, 0.0F);
+        GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
+        GL11.glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
+        GL11.glScalef(-scaling, -scaling, scaling);
+        GL11.glTranslatef(0, -10*lines.length, 0);
+        GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glDepthMask(false);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        Tessellator tess = Tessellator.instance;
+        int var16 = (lines.length - 1)*10;
+
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        tess.startDrawingQuads();
+        int var17 = width / 2;
+        tess.setColorRGBA_F(0.0F, 0.0F, 0.0F, 0.5F);
+        tess.addVertex((double)(-var17 - 1), (double)(-1), 0.0D);
+        tess.addVertex((double)(-var17 - 1), (double)(8 + var16), 0.0D);
+        tess.addVertex((double)(var17 + 1), (double)(8 + var16), 0.0D);
+        tess.addVertex((double)(var17 + 1), (double)(-1), 0.0D);
+        tess.draw();
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        int i = 0;
+        for (String line : lines) {
+            fr.drawString(line, -fr.getStringWidth(line) / 2, 10*i, -1);
+            i++;
+        }
+        
+        
+        GL11.glEnable(GL11.GL_LIGHTING);
+        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glPopMatrix();
+        
     }
 }

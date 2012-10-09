@@ -424,4 +424,31 @@ public class Core {
         item.setCreativeTab(tab);
         return item;
     }
+    
+    public static String getTranslationKey(ItemStack is) {
+        if (is == null) {
+            return "<null itemstack; bug?>";
+        }
+        String n = is.getItem().getItemNameIS(is);
+        if (n != null && n.length() != 0) {
+            n += ".name";
+        }
+        if (n == null || n.length() == 0) {
+            n = is.getItem().getItemName() + ".name";
+        }
+        if (n == null || n.length() == 0) {
+            n = is.getItemName() + ".name";
+        }
+        if (n == null || n.length() == 0) {
+            n = "???";
+        }
+        return n;
+    }
+    
+    public static String getTranslationKey(Item i) {
+        if (i == null) {
+            return "<null item; bug?>";
+        }
+        return i.getItemName() + ".name";
+    }
 }

@@ -235,9 +235,9 @@ public class TileEntityBarrel extends TileEntityFactorization {
         if (item == null && getItemCount() == 0) {
             Core.notify(entityplayer, getCoord(), "Empty");
         } else if (getItemCount() >= getMaxSize()) {
-            Core.notify(entityplayer, getCoord(), "Full of %s", Core.proxy.translateItemStack(item));
+            Core.notify(entityplayer, getCoord(), "Full of %s", Core.getTranslationKey(item));
         } else {
-            Core.notify(entityplayer, getCoord(), "%s %s", "" + getItemCount(), Core.proxy.translateItemStack(item));
+            Core.notify(entityplayer, getCoord(), "%s %s", "" + getItemCount(), Core.getTranslationKey(item));
         }
     }
 
@@ -326,7 +326,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
         taintBarrel(is);
 
         if (!itemMatch(is)) {
-            if (Core.proxy.translateItemStack(is).equals(Core.proxy.translateItemStack(item))) {
+            if (Core.getTranslationKey(is.getItem()).equals(Core.getTranslationKey(item))) {
                 Core.notify(entityplayer, getCoord(), "That item is different");
             } else {
                 info(entityplayer);
@@ -372,7 +372,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
             taintBarrel(hand);
         }
         if (hand != null && !itemMatch(hand)) {
-            if (Core.proxy.translateItemStack(hand).equals(Core.proxy.translateItemStack(item))) {
+            if (Core.getTranslationKey(hand).equals(Core.getTranslationKey(item))) {
                 Core.notify(entityplayer, getCoord(), "That item is different");
             } else {
                 info(entityplayer);

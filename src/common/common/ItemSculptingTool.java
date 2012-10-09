@@ -146,7 +146,7 @@ public class ItemSculptingTool extends Item {
             }
             switch (state) {
             case DRY:
-                Core.notify(player, gw.getCoord(), "This clay is too dry.\nAdd water with a bucket.");
+                Core.notify(player, gw.getCoord(), "The clay is dry\nUse a %s.", Core.getTranslationKey(Item.bucketWater));
                 break;
             case BISQUED:
             case GLAZED:
