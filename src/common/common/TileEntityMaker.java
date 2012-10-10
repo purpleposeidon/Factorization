@@ -12,6 +12,7 @@ import net.minecraft.src.NBTTagCompound;
 import net.minecraftforge.common.ISidedInventory;
 import net.minecraftforge.common.ForgeDirection;
 import static net.minecraftforge.common.ForgeDirection.*;
+import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityMaker extends TileEntityFactorization implements
@@ -187,6 +188,11 @@ public class TileEntityMaker extends TileEntityFactorization implements
                 output = craft;
                 craft = null;
                 drawActive(3);
+                Coord here = getCoord();
+                int myId = here.getId();
+                for (Coord c : here.getNeighborsAdjacent()) {
+                    c.notifyOfNeighborChange(myId);
+                }
             }
         }
 

@@ -475,4 +475,8 @@ public class Coord {
         }
         return b.getCollisionBoundingBoxFromPool(w, x, y, z);
     }
+    
+    public void notifyOfNeighborChange(int neighborId) {
+        w.notifyBlocksOfNeighborChange(x, y, z, neighborId);
+    }
 }

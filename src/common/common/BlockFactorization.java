@@ -410,31 +410,15 @@ public class BlockFactorization extends BlockContainer {
     public boolean canProvidePower() {
         return true;
     }
-
+    
     @Override
-    public boolean isIndirectlyPoweringTo(World w, int x, int y, int z, int side) {
-        Coord here = new Coord(w, x, y, z);
-        TileEntityCommon tec = here.getTE(TileEntityCommon.class);
-        return tec == null ? false : tec.power();
+    public boolean isPoweringTo(IBlockAccess w, int x, int y, int z, int side) {
+        TileEntity te = w.getBlockTileEntity(x, y, z);
+        if (te instanceof TileEntityCommon) {
+            return ((TileEntityCommon) te).power();
+        }
+        return false;
     }
-
-    //	@Override
-    //	public AxisAlignedBB getCollisionBoundingBoxFromPool(World w, int x, int y, int z) {
-    //		//		int md = w.getBlockMetadata(x, y, z);
-    //		//		if (FactoryType.LAMP.is(md)) {
-    //		//			return AxisAlignedBB.getBoundingBoxFromPool(x + lamp_pad, y + lamp_pad, z + lamp_pad, x + 1 - lamp_pad, y + 1 - lamp_pad, z + 1 - lamp_pad);
-    //		//		}
-    //		return super.getCollisionBoundingBoxFromPool(w, x, y, z);
-    //	}
-    //
-    //	@Override
-    //	public AxisAlignedBB getSelectedBoundingBoxFromPool(World w, int x, int y, int z) {
-    //		int md = w.getBlockMetadata(x, y, z);
-    //		if (FactoryType.LAMP.is(md)) {
-    //			return AxisAlignedBB.getBoundingBoxFromPool(x + lamp_pad, y + lamp_pad, z + lamp_pad, x + 1 - lamp_pad, y + 1 - lamp_pad, z + 1 - lamp_pad);
-    //		}
-    //		return super.getSelectedBoundingBoxFromPool(w, x, y, z);
-    //	}
 
     @Override
     //ser-ver ser-ver
