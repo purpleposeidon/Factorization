@@ -574,11 +574,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 '_', Block.pressurePlatePlanks,
                 'P', Block.pistonBase);
         recipe(new ItemStack(barrel_enlarge),
-                "IWI",
-                "BOB",
+                "IOI",
+                "BWB",
                 "ILI",
                 'I', dark_iron,
-                'W', Block.wood,
+                'W', barrel_item,
                 'O', Item.enderPearl,
                 'B', Item.blazeRod,
                 'L', Item.leather);
