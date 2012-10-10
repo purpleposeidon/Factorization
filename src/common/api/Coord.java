@@ -439,6 +439,10 @@ public class Coord {
     public boolean setId(Block block) {
         return setId(block.blockID);
     }
+    
+    public void notifyBlockChange() {
+        w.notifyBlockChange(x, y, z, getId());
+    }
 
     public void writeToNBT(String prefix, NBTTagCompound tag) {
         tag.setInteger(prefix + "x", x);
