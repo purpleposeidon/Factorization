@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -236,7 +238,7 @@ public class Core {
             StatFileWriter sfw = Minecraft.getMinecraft().statFileWriter;
             if (sfw != null && !sfw.hasAchievementUnlocked(AchievementList.openInventory)) {
                 sfw.readStat(AchievementList.openInventory, 1);
-                logWarning("Achievement Get! You've opened your inventory hundreds of times already!");
+                logInfo("Achievement Get! You've opened your inventory hundreds of times already! Yes! You're welcome!");
             }
         }
     }
@@ -251,7 +253,7 @@ public class Core {
             Class c = Class.forName(className);
             return (ItemStack) c.getField(classField).get(null);
         } catch (Exception err) {
-            System.out.println("Could not get " + description);
+            logWarning("Could not get %s (from %s.%s)", description, className, classField);
         }
         return null;
 
@@ -353,19 +355,17 @@ public class Core {
         }
     }
 
-    //	public static boolean isCannonical() {
-    //		if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-    //			return false;
-    //		}
-    //		return true;
-    //	}
-
-    //	public static boolean isServer() {
-    //		return FMLCommonHandler.instance().getSide() != Side.CLIENT;
-    //	}
-
+    static Logger factorizationLog = Logger.getLogger("Factorization");
+    static {
+        factorizationLog.setParent(Logger.getLogger("ForgeModLoader"));
+    }
+    
     public static void logWarning(String format, Object... data) {
-        FMLLog.warning("[Factorization] " + format, data);
+        factorizationLog.log(Level.WARNING, format, data);
+    }
+    
+    public static void logInfo(String format, Object... data) {
+        factorizationLog.log(Level.INFO, format, data);
     }
 
     public static void addBlockToCreativeList(List tab, Block block) {

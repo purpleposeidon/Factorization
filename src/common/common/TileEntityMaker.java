@@ -304,4 +304,9 @@ public class TileEntityMaker extends TileEntityFactorization implements
     void makeNoise() {
         Sound.makerUse.playAt(this);
     }
+    
+    @Override
+    public boolean power() {
+        return true;
+    }
 }
