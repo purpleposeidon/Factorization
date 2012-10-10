@@ -36,6 +36,7 @@ import cpw.mods.fml.common.registry.TickRegistry;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.AchievementList;
 import net.minecraft.src.Block;
 import net.minecraft.src.CommandHandler;
 import net.minecraft.src.CreativeTabs;
@@ -49,6 +50,8 @@ import net.minecraft.src.NetHandler;
 import net.minecraft.src.Packet;
 import net.minecraft.src.Profiler;
 import net.minecraft.src.ServerCommandManager;
+import net.minecraft.src.StatCollector;
+import net.minecraft.src.StatFileWriter;
 import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldGenMinable;
@@ -115,7 +118,7 @@ public class Core {
         return prop.getInt(defaultId);
     }
 
-    private int getIntConfig(String category, String name, int defaultValue, String comment) {
+    private int getIntConfig(String name, String category, int defaultValue, String comment) {
         Property prop = config.get(category, name, defaultValue);
         if (comment != null && comment.length() != 0) {
             prop.comment = comment;
@@ -123,7 +126,7 @@ public class Core {
         return prop.getInt(defaultValue);
     }
 
-    private boolean getBoolConfig(String category, String name, boolean defaultValue, String comment) {
+    private boolean getBoolConfig(String name, String category, boolean defaultValue, String comment) {
         Property prop = config.get(category, name, defaultValue);
         if (comment != null && comment.length() != 0) {
             prop.comment = comment;
@@ -131,7 +134,7 @@ public class Core {
         return prop.getBoolean(defaultValue);
     }
 
-    private String getStringConfig(String category, String name, String defaultValue, String comment) {
+    private String getStringConfig(String name, String category, String defaultValue, String comment) {
         Property prop = config.get(category, name, defaultValue);
         if (comment != null && comment.length() != 0) {
             prop.comment = comment;
@@ -175,7 +178,7 @@ public class Core {
         
         spread_wrathfire = getBoolConfig("spreadWrathFire", "server", spread_wrathfire, null);
         spawnDemons = getBoolConfig("spawnDemons", "general", spawnDemons, null);
-        String p = getStringConfig("bannedRouterInventoriesRegex", "server", "", null);
+        String p = getStringConfig("bannedRouterInventoriesRegex", "server", "", "This is a Java Regex to blacklist router access");
         if (p != null && p.length() != 0) {
             try {
                 routerBan = Pattern.compile(p);
@@ -184,12 +187,11 @@ public class Core {
                 System.err.println("Factorization: config has invalid Java Regex for banned_router_inventories: " + p);
             }
         }
-        entity_relight_task_id = config.get("entityRelightTask", "general", -1).getInt();
+        entity_relight_task_id = config.get("general", "entityRelightTask", -1).getInt();
         if (entity_relight_task_id == -1) {
             entity_relight_task_id = ModLoader.getUniqueEntityId();
-            Property prop = config.get("entityRelightTask", "general", entity_relight_task_id);
+            Property prop = config.get("general", "entityRelightTask", entity_relight_task_id);
             prop.value = "" + entity_relight_task_id;
-            prop.comment = "This is a Java Regex to blacklist access to TE";
         }
 
 
@@ -228,8 +230,16 @@ public class Core {
     public void modsLoaded(FMLPostInitializationEvent event) {
         TileEntityWrathFire.setupBurning();
         registry.addDictOres();
+        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+            //give the first achievement, because it is stupid and nobody cares.
+            //If you're using this mod, you've probably opened your inventory before anyways.
+            StatFileWriter sfw = Minecraft.getMinecraft().statFileWriter;
+            if (sfw != null && !sfw.hasAchievementUnlocked(AchievementList.openInventory)) {
+                sfw.readStat(AchievementList.openInventory, 1);
+                logWarning("Achievement Get! You've opened your inventory hundreds of times already!");
+            }
+        }
     }
-    
     
     @ServerStarting
     public void registerServerCommands(FMLServerStartingEvent event) {
@@ -355,7 +365,7 @@ public class Core {
     //	}
 
     public static void logWarning(String format, Object... data) {
-        FMLLog.warning("Factorization: " + format, data);
+        FMLLog.warning("[Factorization] " + format, data);
     }
 
     public static void addBlockToCreativeList(List tab, Block block) {
