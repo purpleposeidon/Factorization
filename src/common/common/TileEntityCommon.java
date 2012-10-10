@@ -70,8 +70,18 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public void neighborChanged() {
     }
     
+    private static boolean poweringState = false;
+    
+    public void pulse() {
+        poweringState = true;
+        Coord here = getCoord();
+        here.notifyBlockChange();
+        here.scheduleUpdate(6);
+        poweringState = false;
+    }
+    
     public boolean power() {
-        return false;
+        return poweringState;
     }
 
     public AxisAlignedBB getCollisionBoundingBoxFromPool() {

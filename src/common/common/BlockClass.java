@@ -24,6 +24,7 @@ public enum BlockClass {
 
     static {
         Wire.setAbnormal();
+        Machine.setAbnormal();
     }
 
     static class Md {

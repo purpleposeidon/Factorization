@@ -483,4 +483,8 @@ public class Coord {
     public void notifyOfNeighborChange(int neighborId) {
         w.notifyBlocksOfNeighborChange(x, y, z, neighborId);
     }
+    
+    public void scheduleUpdate(int delay) {
+        w.scheduleBlockUpdate(x, y, z, getId(), delay);
+    }
 }

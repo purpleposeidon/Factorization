@@ -31,6 +31,7 @@ public class BlockFactorization extends BlockContainer {
         setLightOpacity(1);
         canBlockGrass[id] = true;
         setTextureFile(Core.texture_file_block);
+        setTickRandomly(false);
     }
 
     @Override
@@ -298,8 +299,10 @@ public class BlockFactorization extends BlockContainer {
 
     @Override
     public boolean canConnectRedstone(IBlockAccess world, int x, int y, int z, int dir) {
-        if (FactoryType.ROUTER.is(world.getBlockMetadata(x, y, z))) {
-            return true;
+        TileEntity te = world.getBlockTileEntity(x, y, z);
+        if (te instanceof TileEntityCommon) {
+            TileEntityCommon tec = (TileEntityCommon) te;
+            return tec.getFactoryType().connectRedstone();
         }
         return false;
     }
@@ -409,6 +412,11 @@ public class BlockFactorization extends BlockContainer {
     @Override
     public boolean canProvidePower() {
         return true;
+    }
+    
+    @Override
+    public void updateTick(World w, int x, int y, int z, Random rand) {
+        new Coord(w, x, y, z).notifyBlockChange();
     }
     
     @Override

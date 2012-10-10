@@ -188,11 +188,7 @@ public class TileEntityMaker extends TileEntityFactorization implements
                 output = craft;
                 craft = null;
                 drawActive(3);
-                Coord here = getCoord();
-                int myId = here.getId();
-                for (Coord c : here.getNeighborsAdjacent()) {
-                    c.notifyOfNeighborChange(myId);
-                }
+                pulse();
             }
         }
 
@@ -303,10 +299,5 @@ public class TileEntityMaker extends TileEntityFactorization implements
     @Override
     void makeNoise() {
         Sound.makerUse.playAt(this);
-    }
-    
-    @Override
-    public boolean power() {
-        return true;
     }
 }

@@ -114,4 +114,8 @@ public enum FactoryType {
             ModLoader.registerTileEntity(ft.clazz, ft.te_id);
         }
     }
+
+    public boolean connectRedstone() {
+        return this == ROUTER || this == MAKER || this == STAMPER || this == PACKAGER;
+    }
 }

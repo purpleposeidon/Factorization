@@ -70,6 +70,7 @@ public class TileEntityPackager extends TileEntityStamper {
                 outputBuffer = craftResult;
                 needLogic();
                 drawActive(3);
+                pulse();
                 input.stackSize -= to_remove;
             }
         }

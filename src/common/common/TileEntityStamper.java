@@ -152,13 +152,11 @@ public class TileEntityStamper extends TileEntityFactorization {
                 ic.addItem(toCraft, 4, craftInput);
             }
 
-            ArrayList<ItemStack> fakeResult = Core.registry.item_craft
-                    .craftAt(toCraft, true, this);
+            ArrayList<ItemStack> fakeResult = Core.registry.item_craft.craftAt(toCraft, true, this);
 
             if (canMerge(fakeResult)) {
                 //really craft
-                ArrayList<ItemStack> craftResult = Core.registry.item_craft
-                        .craftAt(toCraft, false, this);
+                ArrayList<ItemStack> craftResult = Core.registry.item_craft.craftAt(toCraft, false, this);
                 input.stackSize--;
                 outputBuffer = craftResult;
                 needLogic();
@@ -208,6 +206,9 @@ public class TileEntityStamper extends TileEntityFactorization {
         if (input_count != new_input_count) {
             needLogic();
         }
+        if (need_logic_check) {
+            pulse();
+        }
     }
 
     @Override
@@ -223,5 +224,10 @@ public class TileEntityStamper extends TileEntityFactorization {
     @Override
     public boolean power() {
         return draw_active > 0;
+    }
+    
+    @Override
+    int getLogicSpeed() {
+        return 10;
     }
 }
