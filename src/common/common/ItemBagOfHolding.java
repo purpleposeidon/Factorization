@@ -1,6 +1,8 @@
 package factorization.common;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import factorization.api.IActOnCraft;
@@ -55,14 +57,20 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
     }
 
     ArrayList<ItemStack> getRow(ItemStack is, int row) {
+        ArrayList<ItemStack> empty = new ArrayList();
+        int colCount = getNumOfCols(is);
+        for (int i = 0; i < colCount; i++) {
+            empty.add(null);
+        }
         ArrayList<ItemStack> ret = new ArrayList();
+        
         NBTTagCompound tag = is.getTagCompound();
         if (tag == null) {
-            return ret;
+            return empty;
         }
         NBTTagList items = tag.getTagList("row" + row);
-        if (items == null) {
-            return ret;
+        if (items == null || items.tagCount() != colCount) {
+            return empty;
         }
         for (int i = 0; i < items.tagCount(); i++) {
             NBTTagCompound item = (NBTTagCompound) items.tagAt(i);
