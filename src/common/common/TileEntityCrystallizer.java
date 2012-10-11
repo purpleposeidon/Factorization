@@ -276,7 +276,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         }
 
         void apply(TileEntityCrystallizer crys) {
-            ItemStack inverium = new ItemStack(Core.registry.inverium);
+            ItemStack inverium = new ItemStack(Core.registry.inverium, 0, -1);
             for (int i = 0; i < crys.inputs.length; i++) {
                 ItemStack is = crys.inputs[i];
                 if (is != null && input.isItemEqual(is)) {
