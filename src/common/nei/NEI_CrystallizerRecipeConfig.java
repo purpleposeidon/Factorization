@@ -67,7 +67,8 @@ public class NEI_CrystallizerRecipeConfig extends TemplateRecipeHandler implemen
         for (CrystalRecipe cr : TileEntityCrystallizer.recipes) {
             if (ingredient == null
                     || ingredient.isItemEqual(cr.input)
-                    || ingredient.getItem() == Core.registry.inverium) {
+                    || (ingredient.getItem() == Core.registry.inverium && cr.inverium_count > 0)
+                    || ingredient.isItemEqual(cr.solution)) {
                 arecipes.add(new CachedCrystallizerRecipe(cr));
             }
         }

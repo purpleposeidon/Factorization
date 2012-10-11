@@ -189,7 +189,11 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     int countMaterial(ItemStack toMatch) {
         int count = 0;
         for (ItemStack is : inputs) {
-            if (is != null && is.isItemEqual(toMatch)) {
+            if (is == null) {
+                continue;
+            } else  if (toMatch.getItemDamage() == -1 && is.itemID == toMatch.itemID) {
+                count += is.stackSize;
+            } else  if (is.isItemEqual(toMatch)) {
                 count += is.stackSize;
             }
         }
@@ -213,7 +217,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         }
 
         boolean matches(TileEntityCrystallizer crys) {
-            if (crys.countMaterial(new ItemStack(Core.registry.inverium)) < inverium_count) {
+            if (crys.countMaterial(new ItemStack(Core.registry.inverium, 1, -1)) < inverium_count) {
                 return false;
             }
             if (crys.output != null) {
