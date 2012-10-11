@@ -28,6 +28,10 @@ public class ItemDemon extends Item {
         setMaxStackSize(1);
         Core.tab(this, TabType.MISC);
     }
+    
+    @Override
+    public void getSubItems(int id, CreativeTabs tab, List itemList) {
+    }
 
     static void init(ItemStack is) {
         NBTTagCompound tag = is.getTagCompound();
