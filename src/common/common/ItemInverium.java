@@ -1,5 +1,7 @@
 package factorization.common;
 
+import java.util.List;
+
 import net.minecraft.src.ItemStack;
 
 public class ItemInverium extends ItemCraftingComponent {
@@ -28,5 +30,13 @@ public class ItemInverium extends ItemCraftingComponent {
         int g = Math.min(0xFF, r*2);
         int b = 0x20;
         return (r << 16) + (g << 8) + b;
+    }
+    
+    @Override
+    public void addInformation(ItemStack is, List infoList) {
+        if (is.getItemDamage() == 1) {
+            infoList.add("Temporary recipe");
+        }
+        super.addInformation(is, infoList);
     }
 }
