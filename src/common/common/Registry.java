@@ -213,7 +213,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         addName(bound_tiny_demon, "Bound Tiny Demon");
         addName(tiny_demon, "Tiny Demon");
         logicMatrixProgrammer = new ItemMatrixProgrammer(itemID("logicMatrixProgrammer", 9043), "Logic Matrix Programmer", 1*16 + 6);
-        DungeonHooks.addDungeonLoot(new ItemStack(logicMatrixProgrammer), 50);
+        DungeonHooks.addDungeonLoot(new ItemStack(logicMatrixProgrammer), 50); //XXX TODO: Temporary, put these on asteroids.
         DungeonHooks.addDungeonMob("Creeper", 1);
         String THATS_SOME_VERY_NICE_SOURCE_CODE_YOU_HAVE_THERE[] = {
                 "##  ##",
@@ -354,7 +354,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'i', Item.spiderEye,
                 'X', logicMatrixProgrammer);
         
-
+        TileEntityCrystallizer.addRecipe(new ItemStack(Block.blockLapis), new ItemStack(logicMatrix), 0, new ItemStack(acid), 1);
         // wand of cooling
         TileEntityCrystallizer.addRecipe(new ItemStack(Block.obsidian), new ItemStack(heatHole), 0, new ItemStack(Item.potion), 1);
         recipe(new ItemStack(wand_of_cooling),
