@@ -31,6 +31,9 @@ public class ItemDemon extends Item {
     
     @Override
     public void getSubItems(int id, CreativeTabs tab, List itemList) {
+        if (id == Core.registry.tiny_demon.shiftedIndex) {
+            super.getSubItems(id, tab, itemList);
+        }
     }
 
     static void init(ItemStack is) {
