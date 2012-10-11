@@ -114,4 +114,9 @@ public class ItemFactorization extends ItemBlock {
         }
         Core.brand(infoList);
     }
+    
+    @Override
+    public boolean getShareTag() {
+        return true;
+    }
 }
