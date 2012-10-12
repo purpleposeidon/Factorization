@@ -55,28 +55,33 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
         init(is);
         return 3 + is.getTagCompound().getInteger("pearlcount");
     }
+    
+    private ArrayList<ItemStack> padRow(ArrayList<ItemStack> row, int columnCount) {
+        columnCount -= row.size();
+        while (columnCount > 0) {
+            columnCount--;
+            row.add(null);
+        }
+        return row;
+    }
 
     ArrayList<ItemStack> getRow(ItemStack is, int row) {
-        ArrayList<ItemStack> empty = new ArrayList();
         int colCount = getNumOfCols(is);
-        for (int i = 0; i < colCount; i++) {
-            empty.add(null);
-        }
         ArrayList<ItemStack> ret = new ArrayList();
         
         NBTTagCompound tag = is.getTagCompound();
         if (tag == null) {
-            return empty;
+            return padRow(ret, colCount);
         }
         NBTTagList items = tag.getTagList("row" + row);
         if (items == null || items.tagCount() != colCount) {
-            return empty;
+            return padRow(ret, colCount);
         }
         for (int i = 0; i < items.tagCount(); i++) {
             NBTTagCompound item = (NBTTagCompound) items.tagAt(i);
             ret.add(ItemStack.loadItemStackFromNBT(item));
         }
-        return ret;
+        return padRow(ret, colCount);
     }
 
     void writeRow(ItemStack is, ArrayList<ItemStack> items, int row) {
