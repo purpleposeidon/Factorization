@@ -21,6 +21,7 @@ public class MechaCobblestoneDrive extends Item implements IMechaUpgrade {
         setItemName("mecha.cobbledrive");
         setIconIndex(16 * 10 + 1);
         Core.tab(this, TabType.MISC);
+        setMaxStackSize(1);
     }
 
     @Override

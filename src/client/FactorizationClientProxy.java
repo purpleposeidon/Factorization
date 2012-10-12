@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.src.Block;
 import net.minecraft.src.ContainerPlayer;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.GameSettings;
 import net.minecraft.src.GuiContainer;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.Item;
@@ -488,7 +489,25 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
     @Override
     public void registerKeys() {
-        int defaults[] = new int[] { Keyboard.KEY_R, Keyboard.KEY_F, Keyboard.KEY_V, Keyboard.KEY_Z, Keyboard.KEY_X, Keyboard.KEY_B };
+        //we use numpad keys as our default, unless they're being used for movement (implying a left-handed user, using mouse w/ right hand)
+        //If that's the case, we use our original keybindings.
+        int defaults_main[] = new int[] { Keyboard.KEY_NUMPAD1, Keyboard.KEY_NUMPAD2, Keyboard.KEY_NUMPAD3, Keyboard.KEY_NUMPAD4, Keyboard.KEY_NUMPAD5, Keyboard.KEY_NUMPAD6 };
+        int defaults_alt[] = new int[] { Keyboard.KEY_R, Keyboard.KEY_F, Keyboard.KEY_V, Keyboard.KEY_Z, Keyboard.KEY_X, Keyboard.KEY_B };
+        int defaults[] = defaults_main;
+        GameSettings gs = Minecraft.getMinecraft().gameSettings;
+        int conflict_check[] = new int[] { gs.keyBindForward.keyCode, gs.keyBindLeft.keyCode, gs.keyBindRight.keyCode, gs.keyBindBack.keyCode };
+        outer: for (int vanilla_kc : conflict_check) {
+            for (int default_kc : defaults_main) {
+                if (default_kc == vanilla_kc) {
+                    if (default_kc == vanilla_kc) {
+                        defaults = defaults_alt;
+                        break outer;
+                    }
+                }
+            }
+        }
+        
+        
         for (byte i = 0; i < mechas.length; i++) {
             mechas[i] = new KeyBinding("Mecha" + (i + 1), defaults[i]);
             mechaIDmap.put(mechas[i], i);

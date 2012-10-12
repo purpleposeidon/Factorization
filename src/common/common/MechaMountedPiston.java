@@ -21,6 +21,7 @@ public class MechaMountedPiston extends Item implements IMechaUpgrade {
         setItemName("mecha.mountedpiston");
         setIconIndex(16 * 10 + 2);
         Core.tab(this, TabType.MISC);
+        setMaxStackSize(1);
     }
 
     @Override

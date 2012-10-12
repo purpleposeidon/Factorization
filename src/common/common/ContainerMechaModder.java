@@ -11,6 +11,7 @@ import net.minecraft.src.InventoryPlayer;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.Slot;
 import factorization.api.Coord;
+import factorization.api.IMechaUpgrade;
 
 public class ContainerMechaModder extends Container {
     Coord benchLocation;
@@ -168,6 +169,34 @@ public class ContainerMechaModder extends Container {
 
     }
 
+    class SlotMechaUpgrade extends Slot {
+        int mechaIndex;
+        public SlotMechaUpgrade(int mechaIndex, IInventory inv, int slotIndex, int posX, int posY) {
+            super(inv, slotIndex, posX, posY);
+            this.mechaIndex = mechaIndex;
+        }
+        
+        @Override
+        public boolean isItemValid(ItemStack is) {
+            if (is == null) {
+                return false;
+            }
+            if (!(is.getItem() instanceof IMechaUpgrade)) {
+                return false;
+            }
+            ItemStack armor = armorSlot.getStack();
+            if (armor == null) {
+                return false;
+            }
+            if (!(armor.getItem() instanceof MechaArmor)) {
+                return false;
+            }
+            MechaArmor ma = (MechaArmor) armor.getItem();
+            return ma.slotCount > mechaIndex;
+        }
+        
+    }
+    
     public ContainerMechaModder(EntityPlayer player, Coord benchLocation) {
         this.benchLocation = benchLocation;
         this.inv = player.inventory;
@@ -192,7 +221,7 @@ public class ContainerMechaModder extends Container {
         //slots for upgrades
         ArrayList<Slot> upgrades = new ArrayList(8);
         for (int col = 0; col < 8; col++) {
-            Slot u = new Slot(upgrader, 101 + col, 27 + col * 18, 7);
+            Slot u = new SlotMechaUpgrade(col, upgrader, 101 + col, 27 + col * 18, 7);
             this.addSlotToContainer(u);
             upgrades.add(u);
         }

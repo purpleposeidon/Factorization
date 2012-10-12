@@ -22,6 +22,7 @@ class MechaBuoyantBarrel extends Item implements IMechaUpgrade {
         setItemName("mecha.buoyantbarrel");
         setIconIndex(16 * 10);
         Core.tab(this, TabType.MISC);
+        setMaxStackSize(1);
     }
 
     @Override

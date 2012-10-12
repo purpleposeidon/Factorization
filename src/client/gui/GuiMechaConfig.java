@@ -94,12 +94,6 @@ public class GuiMechaConfig extends GuiContainer {
             IMechaUpgrade up = (IMechaUpgrade) upgrade.getItem();
             description = up.getDescription();
         }
-        else if (upgrade.getItem() instanceof ItemBlock) {
-            ItemBlock ib = (ItemBlock) upgrade.getItem();
-            if (ib.getBlockID() == Block.cloth.blockID) {
-                description = "Emits colored particles";
-            }
-        }
         if (description == null) {
             return;
         }
@@ -108,7 +102,7 @@ public class GuiMechaConfig extends GuiContainer {
         String action = "";
         if (mode.key >= 0) {
             int key = ((FactorizationClientProxy) Core.proxy).mechas[mode.key].keyCode;
-            action = GameSettings.getKeyDisplayString(key) + " is pressed";
+            action = GameSettings.getKeyDisplayString(key);
         }
         else {
             action = Core.ExtraKey.fromInt(mode.key).text;
@@ -124,6 +118,20 @@ public class GuiMechaConfig extends GuiContainer {
         int l = (width - xSize) / 2;
         int i1 = (height - ySize) / 2;
         drawTexturedModalRect(l, i1, 0, 0, xSize, ySize);
+        MechaArmor armor = getArmor();
+        int usableSlots = 0;
+        if (armor != null) {
+            usableSlots = armor.slotCount;
+        }
+        GL11.glColor4f(1, 1, 1, 0.5F);
+        GL11.glEnable(GL11.GL_BLEND);
+        for (int i = 0; i < 8; i++) {
+            if (i >= usableSlots) {
+                drawTexturedModalRect(l + 26 + 18*i, i1 + 6, 188, 6, 18, 18);
+            }
+        }
+        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glColor4f(1, 1, 1, 1);
 
         updateButtons();
         for (GuiButton button : buttons) {
