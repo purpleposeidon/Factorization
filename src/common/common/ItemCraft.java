@@ -19,6 +19,8 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.TileEntity;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 
 public class ItemCraft extends Item {
 	private final int slot_length = 9;
@@ -186,15 +188,20 @@ public class ItemCraft extends Item {
 			}
 		} else {
 			ret.add(result);
+			EntityPlayer fakePlayer = null;
 			if (!fake && where != null) {
 				if (Core.registry.diamond_shard_recipe.matches(craft)) {
 					Sound.shardMake.playAt(where);
 				}
-				EntityPlayer fakePlayer = new EntityPlayer(where.worldObj) {
+				fakePlayer = new EntityPlayer(where.worldObj) {
 					@Override public void sendChatToPlayer(String var1) {}
 					@Override public boolean canCommandSenderUseCommand(String var1) { return false; }
 				};
+				fakePlayer.posX = where.xCoord;
+				fakePlayer.posY = where.yCoord;
+				fakePlayer.posZ = where.zCoord;
 				GameRegistry.onItemCrafted(fakePlayer, result, craft);
+				result.onCrafting(where.worldObj, fakePlayer, 1);
 			}
 
 			for (int i = 0; i < craft.getSizeInventory(); i++) {
@@ -203,15 +210,21 @@ public class ItemCraft extends Item {
 					continue;
 				}
 				if (fake) {
-					// maybe there's some crazy mod that tracks items
+					// maybe there's some crazy mod that tracks items?
 					here = here.copy();
 				}
 				here.stackSize -= 1;
 				if (here.getItem().hasContainerItem()) {
-					ret.add(new ItemStack(here.getItem().getContainerItem()));
-				}
-
-				if (here.stackSize > 0) {
+					ItemStack cis = here.getItem().getContainerItemStack(here);
+					if (cis.isItemDamaged() && cis.getItemDamage() >= cis.getMaxDamage() && fakePlayer != null) {
+						MinecraftForge.EVENT_BUS.post(new PlayerDestroyItemEvent(fakePlayer, cis));
+						cis = null;
+					}
+					if (cis != null && cis.stackSize > 0) {
+						ret.add(cis);
+					}
+					
+				} else if (here.stackSize > 0) {
 					ret.add(here);
 				}
 			}
