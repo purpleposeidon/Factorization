@@ -6,15 +6,6 @@ import net.minecraft.src.ItemBlock;
 import net.minecraft.src.ItemStack;
 
 public class ItemBlockResource extends ItemBlock {
-
-    public ItemBlockResource() {
-        super(Core.registry.factory_block.blockID
-                + Core.block_item_id_offset);
-        new Exception().printStackTrace();
-        setMaxDamage(0);
-        setHasSubtypes(true);
-    }
-
     public ItemBlockResource(int id) {
         super(id);
         //Y'know, that -256 is really retarded.

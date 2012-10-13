@@ -89,7 +89,6 @@ public class Core {
     public static int lightair_id = 253;
     public static int resource_id = 252;
     public static Pattern routerBan;
-    public static int block_item_id_offset = -256;
     public static boolean render_barrel_item = true;
     public static boolean render_barrel_text = true;
     public static boolean debug_light_air = false;
@@ -175,7 +174,6 @@ public class Core {
         }
 
         gen_silver_ore = getBoolConfig("generateSilverOre", "general", gen_silver_ore, null);
-        block_item_id_offset = getIntConfig("blockItemIdOffset", "general", block_item_id_offset, null);
         add_branding = getBoolConfig("addBranding", "general", add_branding, null); //For our Tekkit friends
         
         spread_wrathfire = getBoolConfig("spreadWrathFire", "server", spread_wrathfire, null);

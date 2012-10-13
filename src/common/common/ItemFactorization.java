@@ -15,13 +15,6 @@ import factorization.api.Coord;
 import factorization.common.TileEntityGreenware.ClayState;
 
 public class ItemFactorization extends ItemBlock {
-    public ItemFactorization() {
-        super(Core.registry.factory_block.blockID + Core.block_item_id_offset);
-        new Exception().printStackTrace();
-        setMaxDamage(0);
-        setHasSubtypes(true);
-    }
-
     public ItemFactorization(int id) {
         super(id);
         //Y'know, that -256 is really retarded.
