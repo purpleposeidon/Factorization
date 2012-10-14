@@ -83,6 +83,11 @@ public class BlockFactorization extends BlockContainer {
         TileEntityCommon te = (TileEntityCommon) t;
         return te.isBlockSolidOnSide(side);
     }
+    
+    @Override
+    public boolean isBlockSolidOnSide(World world, int x, int y, int z, ForgeDirection side) {
+        return isBlockSolid(world, x, y, z, side.ordinal());
+    }
 
     @Override
     public void onNeighborBlockChange(World w, int x, int y, int z, int l) {
