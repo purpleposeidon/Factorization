@@ -74,6 +74,10 @@ public enum Sound {
             return;
         }
     }
+    
+    public void playAt(Coord c) {
+        playAt(c.w, c.x, c.y, c.z);
+    }
 
     public void playAt(Entity ent) {
         ent.worldObj.playSoundAtEntity(ent, src, volume, pitch);

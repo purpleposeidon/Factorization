@@ -387,9 +387,11 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
         }
         if (netherBrick.matches(baseBlock) || netherFence.matches(baseBlock) || netherStair.matches(baseBlock)) {
             Sound.wrathForge.playAt(player);
+            //This doesn't need to be logged.
         }
         else {
-            Sound.wrathLight.playAt(player);
+            Sound.wrathLight.playAt(fireBlock);
+            Core.logInfo("Wrath Igniter used at " + fireBlock + " by '" + player.username + "'");
         }
         fire.setTarget(baseBlock.getId(), baseBlock.getMd());
     }
