@@ -17,7 +17,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     int progress = 0;
     float energy = 0;
     int speed = 0;
-    final int grind_time = 200;
+    final int grind_time = 75;
 
     @Override
     public int getSizeInventory() {
@@ -151,7 +151,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         shareSpeed();
         needLogic();
         if (energy < 30) {
-            if (charge.getValue() >= 25) {
+            if (charge.getValue() >= 15) {
                 energy += charge.deplete(60) / 10;
             }
         }
