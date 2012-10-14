@@ -391,7 +391,9 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
         }
         else {
             Sound.wrathLight.playAt(fireBlock);
-            Core.logInfo("Wrath Igniter used at " + fireBlock + " by '" + player.username + "'");
+            if (!fireBlock.w.isRemote) {
+                Core.logInfo("Wrath Igniter used at " + fireBlock + " by '" + player.username + "'");
+            }
         }
         fire.setTarget(baseBlock.getId(), baseBlock.getMd());
     }
