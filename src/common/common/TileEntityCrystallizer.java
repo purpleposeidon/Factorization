@@ -241,15 +241,18 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         }
         
         private void applyTo(TileEntityCrystallizer crys, int slot) {
+            int delta = (int) output_count;
+            if (rand.nextFloat() > (output_count - delta)) {
+                delta++;
+            }
+            if (crys.output != null && crys.output.stackSize + delta > crys.output.getMaxStackSize()) {
+                return;
+            }
             ItemStack is = input.copy();
             while (is.stackSize > 0) {
                 crys.inputs[slot].stackSize--;
                 crys.inputs[slot] = FactorizationUtil.normalize(crys.inputs[slot]);
                 is.stackSize--;
-            }
-            int delta = (int) output_count;
-            if (rand.nextFloat() > (output_count - delta)) {
-                delta++;
             }
             if (crys.output == null) {
                 crys.output = output.copy();
@@ -290,6 +293,14 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
 
     public static void addRecipe(ItemStack input, ItemStack output, float output_count, ItemStack solution,
             int inverium_count) {
+        if (output.stackSize != 1) {
+            throw new RuntimeException("Stacksize should be 1");
+        }
+        if (output_count == 0) {
+            throw new RuntimeException("output_count is 0");
+        }
+        output = output.copy();
+        output.stackSize = 0;
         recipes.add(new CrystalRecipe(input, output, output_count, solution, inverium_count));
     }
 

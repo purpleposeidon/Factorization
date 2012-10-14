@@ -115,7 +115,7 @@ public class NEI_CrystallizerRecipeConfig extends TemplateRecipeHandler implemen
         CrystalRecipe cr = ((CachedCrystallizerRecipe)arecipes.get(recipe)).cr;
         if (stack.isItemEqual(cr.output)) {
             float prob = cr.output_count*100;
-            if (prob != 100) {
+            if (prob != 100 || true) {
                 currenttip.add((int)prob + "%");
             }
         }

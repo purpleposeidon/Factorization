@@ -354,9 +354,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'i', Item.spiderEye,
                 'X', logicMatrixProgrammer);
         
-        TileEntityCrystallizer.addRecipe(new ItemStack(Block.stone), new ItemStack(logicMatrix), 0, new ItemStack(Item.potion), 1);
+        TileEntityCrystallizer.addRecipe(new ItemStack(Block.stone), new ItemStack(logicMatrix), 1, new ItemStack(Item.potion), 1);
         // wand of cooling
-        TileEntityCrystallizer.addRecipe(new ItemStack(Item.magmaCream), new ItemStack(heatHole), 0, new ItemStack(Item.potion), 1);
+        TileEntityCrystallizer.addRecipe(new ItemStack(Item.magmaCream), new ItemStack(heatHole), 1, new ItemStack(Item.potion), 1);
         recipe(new ItemStack(wand_of_cooling),
                 " OD",
                 " IO",
