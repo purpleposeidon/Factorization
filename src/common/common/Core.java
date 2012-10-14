@@ -92,7 +92,7 @@ public class Core {
     public static boolean render_barrel_item = true;
     public static boolean render_barrel_text = true;
     public static boolean render_barrel_close = false;
-    public static boolean debug_light_air = false;
+    public static boolean notify_in_chat = false;
     public static int watch_demon_chunk_range = 3;
     public static int entity_relight_task_id = -1;
     public static boolean gen_silver_ore = true;
@@ -100,11 +100,12 @@ public class Core {
     public static boolean pocket_craft_anywhere = true;
     public static boolean bag_swap_anywhere = true;
     public static String pocketActions = "xcb";
-    public static boolean add_branding = false;
-    public static boolean cheat = true;
     public static boolean renderTEs = true;
     public static boolean renderAO = true;
     public static boolean spawnDemons = true;
+    public static boolean add_branding = false;
+    public static boolean cheat = false;
+    public static boolean debug_light_air = false;
     public static boolean debug_network = false;
 
     // universal constant config
@@ -163,6 +164,7 @@ public class Core {
             render_barrel_item = getBoolConfig("renderBarrelItem", "client", render_barrel_item, null);
             render_barrel_item = getBoolConfig("renderBarrelText", "client", render_barrel_text, null);
             render_barrel_close = getBoolConfig("renderBarrelClose", "client", render_barrel_close, "If true, render barrel info only when nearby");
+            notify_in_chat = getBoolConfig("notifyInChat", "client", notify_in_chat, "If true, notifications are put in the chat log instead in the world");
             renderTEs = getBoolConfig("renderOtherTileEntities", "client", renderTEs, "If false, most TEs won't draw, making everything look broken but possibly improving FPS");
             renderAO = getBoolConfig("renderAmbientOcclusion", "client", renderAO, "If false, never use smooth lighting for drawing sculptures");
             String attempt = getStringConfig("pocketCraftingActionKeys", "client", pocketActions, "3 keys for: removing (x), cycling (c), balancing (b)");
