@@ -19,6 +19,7 @@ import net.minecraft.src.RenderManager;
 import net.minecraft.src.Tessellator;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntitySpecialRenderer;
+import net.minecraft.src.World;
 import net.minecraftforge.client.ForgeHooksClient;
 
 import org.lwjgl.opengl.GL11;
@@ -36,6 +37,7 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
     static boolean field_27004_a = true;
     float item_rotation = 0;
     boolean render_item, render_text;
+    boolean is_obscured = false;
 
     public TileEntityBarrelRenderer(boolean render_item, boolean render_text) {
         this.render_item = render_item;
@@ -72,35 +74,35 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
         case 3:
             item_rotation = 0;
             setupLight(barrel, 0, 1);
-            if (render_item)
+            if (render_item && !is_obscured)
                 handleRenderItem(barrel.item, x + 0.5, y + idy, z + 1 + d, 0, 0, 2);
-            if (render_text)
+            if (render_text && !is_obscured)
                 renderItemCount(barrel, 2, x, y, z);
             break;
 
         case 2:
             item_rotation = -180;
             setupLight(barrel, 0, -1);
-            if (render_item)
+            if (render_item && !is_obscured)
                 handleRenderItem(barrel.item, x + 0.5, y + idy, z - d, 0, 0, 0);
-            if (render_text)
+            if (render_text && !is_obscured)
                 renderItemCount(barrel, 0, x, y, z);
             break;
         case 4:
             item_rotation = -90;
             setupLight(barrel, -1, 0);
-            if (render_item)
+            if (render_item && !is_obscured)
                 handleRenderItem(barrel.item, x - d, y + idy, z + 0.5, 0, 0, 1);
-            if (render_text)
+            if (render_text && !is_obscured)
                 renderItemCount(barrel, 1, x, y, z);
             break;
         case 5:
         default: //Need to keep a default in case something is messed up
             item_rotation = 90;
             setupLight(barrel, 1, 0);
-            if (render_item)
+            if (render_item && !is_obscured)
                 handleRenderItem(barrel.item, x + 1 + d, y + idy, z + 0.5, 0, 0, 3);
-            if (render_text)
+            if (render_text && !is_obscured)
                 renderItemCount(barrel, 3, x, y, z);
             break;
         }
@@ -108,7 +110,13 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
     }
 
     void setupLight(TileEntityBarrel barrel, int dx, int dz) {
-        int br = barrel.getCoord().w.getLightBrightnessForSkyBlocks(barrel.xCoord + dx, barrel.yCoord, barrel.zCoord + dz, 0 /* minimum */);
+        World w = barrel.worldObj;
+        if (w.isBlockOpaqueCube(barrel.xCoord + dx, barrel.yCoord, barrel.zCoord + dz)) {
+            is_obscured = true;
+            return;
+        }
+        is_obscured = false;
+        int br = w.getLightBrightnessForSkyBlocks(barrel.xCoord + dx, barrel.yCoord, barrel.zCoord + dz, 0 /* minimum */);
         int var11 = br % 65536;
         int var12 = br / 65536;
         float scale = 0.6F;

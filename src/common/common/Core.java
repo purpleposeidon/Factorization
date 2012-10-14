@@ -91,6 +91,7 @@ public class Core {
     public static Pattern routerBan;
     public static boolean render_barrel_item = true;
     public static boolean render_barrel_text = true;
+    public static boolean render_barrel_close = false;
     public static boolean debug_light_air = false;
     public static int watch_demon_chunk_range = 3;
     public static int entity_relight_task_id = -1;
@@ -100,7 +101,7 @@ public class Core {
     public static boolean bag_swap_anywhere = true;
     public static String pocketActions = "xcb";
     public static boolean add_branding = false;
-    public static boolean cheat = false;
+    public static boolean cheat = true;
     public static boolean renderTEs = true;
     public static boolean renderAO = true;
     public static boolean spawnDemons = true;
@@ -161,6 +162,7 @@ public class Core {
             bag_swap_anywhere = getBoolConfig("anywhereBagSwap", "client", bag_swap_anywhere, "Lets you use the bag from GUIs");
             render_barrel_item = getBoolConfig("renderBarrelItem", "client", render_barrel_item, null);
             render_barrel_item = getBoolConfig("renderBarrelText", "client", render_barrel_text, null);
+            render_barrel_close = getBoolConfig("renderBarrelClose", "client", render_barrel_close, "If true, render barrel info only when nearby");
             renderTEs = getBoolConfig("renderOtherTileEntities", "client", renderTEs, "If false, most TEs won't draw, making everything look broken but possibly improving FPS");
             renderAO = getBoolConfig("renderAmbientOcclusion", "client", renderAO, "If false, never use smooth lighting for drawing sculptures");
             String attempt = getStringConfig("pocketCraftingActionKeys", "client", pocketActions, "3 keys for: removing (x), cycling (c), balancing (b)");
