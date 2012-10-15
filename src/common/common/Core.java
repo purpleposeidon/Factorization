@@ -73,7 +73,7 @@ import factorization.client.gui.FactorizationNotify;
         channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel, NetworkFactorization.factorizeNtfyChannel })
 public class Core {
     //The comment below is a marker used by the build script.
-    public static final String version = "0.6.5"; //@VERSION@
+    public static final String version = "0.6.6"; //@VERSION@
     // runtime storage
     @Instance("factorization")
     public static Core instance;
@@ -177,7 +177,7 @@ public class Core {
             }
         }
 
-        gen_silver_ore = getBoolConfig("generateSilverOre", "general", gen_silver_ore, null);
+        gen_silver_ore = getBoolConfig("generateSilverOre", "general", gen_silver_ore, "This disables silver ore generation");
         add_branding = getBoolConfig("addBranding", "general", add_branding, null); //For our Tekkit friends
         
         spread_wrathfire = getBoolConfig("spreadWrathFire", "server", spread_wrathfire, null);
