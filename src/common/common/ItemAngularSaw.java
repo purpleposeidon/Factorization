@@ -4,8 +4,6 @@ import factorization.api.Coord;
 import factorization.common.Core.TabType;
 import net.minecraft.src.Block;
 import net.minecraft.src.CreativeTabs;
-import net.minecraft.src.Enchantment;
-import net.minecraft.src.EnchantmentHelper;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EnumRarity;
 import net.minecraft.src.EnumToolMaterial;
@@ -17,10 +15,11 @@ import net.minecraft.src.NBTTagList;
 import net.minecraft.src.World;
 
 public class ItemAngularSaw extends Item {
-    static Block[] oreBlocks = {Block.oreDiamond, Block.oreRedstone, Block.oreLapis, Block.oreCoal};
+    static Block[] cuttableBlocks = {Block.oreDiamond, Block.oreRedstone, Block.oreLapis, Block.oreCoal,
+        Block.stone, Block.glass, Block.glowStone };
     public ItemAngularSaw(int itemID) {
         super(itemID);
-        setMaxDamage(64);
+        setMaxDamage(0); //used to be 64
         setIconCoord(5, 1);
         setItemName("angularSaw");
         setTextureFile(Core.texture_file_item);
@@ -31,47 +30,13 @@ public class ItemAngularSaw extends Item {
     
     @Override
     public boolean canHarvestBlock(Block block) {
-        for (Block b : oreBlocks) {
+        for (Block b : cuttableBlocks) {
             if (b == block) {
                 return true;
             }
         }
         return false;
     }
-    
-    @Override
-    public void onCreated(ItemStack is, World w, EntityPlayer player) {
-        super.onCreated(is, w, player);
-        applyEnchant(is);
-    }
-    
-    public static ItemStack applyEnchant(ItemStack is) {
-        NBTTagCompound tag = FactorizationUtil.getTag(is);
-        NBTTagList ench = new NBTTagList();
-        NBTTagCompound silk = new NBTTagCompound();
-        silk.setShort("id", (short) Enchantment.silkTouch.effectId);
-        silk.setShort("lvl", (short) 1);
-        ench.appendTag(silk);
-        tag.setTag("ench", ench);
-        return is;
-    }
-    
-    public static ItemStack removeEnchant(ItemStack is) {
-        NBTTagCompound tag = FactorizationUtil.getTag(is);
-        tag.setTag("ench", new NBTTagList());
-        return is;
-    }
-    
-    @Override
-    public boolean hasEffect(ItemStack par1ItemStack) {
-        return false;
-    }
-    
-    @Override
-    public EnumRarity getRarity(ItemStack par1ItemStack) {
-        return EnumRarity.common;
-    }
-    
     
     @Override
     public float getStrVsBlock(ItemStack itemstack, Block block, int metadata) {
@@ -84,6 +49,9 @@ public class ItemAngularSaw extends Item {
     @Override
     public boolean onBlockStartBreak(ItemStack itemstack, int X, int Y, int Z,
             EntityPlayer player) {
+        if (!player.capabilities.allowEdit) {
+            return false;
+        }
         Coord here = new Coord(player.worldObj, X, Y, Z);
         Block block = here.getBlock();
         if (!player.worldObj.canMineBlock(player, X, Y, Z)) {
@@ -92,7 +60,6 @@ public class ItemAngularSaw extends Item {
             //Let someone else figure it out.
         }
         if (!canHarvestBlock(block)) {
-            removeEnchant(itemstack);
             return false;
         }
         int damage = 1;
@@ -104,16 +71,19 @@ public class ItemAngularSaw extends Item {
         if (!Core.registry.extractEnergy(player, damage*100)) {
             return true;
         }
-        itemstack.damageItem(damage, player);
-        here.setId(0);
         if (!player.worldObj.isRemote) {
-            here.spawnItem(new ItemStack(block));
-        }
-        if (itemstack.stackSize <= 0) {
-            if (itemstack == player.getCurrentEquippedItem()) {
-                player.inventory.mainInventory[player.inventory.currentItem] = null;
+            int md = player.worldObj.getBlockMetadata(X, Y, Z);
+            if (block.canSilkHarvest(player.worldObj, player, X, Y, Z, md)) {
+                here.spawnItem(new ItemStack(block, 1, md));
             }
         }
+        here.setId(0);
+//		itemstack.damageItem(damage, player);
+//		if (itemstack.stackSize <= 0) {
+//			if (itemstack == player.getCurrentEquippedItem()) {
+//				player.inventory.mainInventory[player.inventory.currentItem] = null;
+//			}
+//		}
         return true;
     }
     

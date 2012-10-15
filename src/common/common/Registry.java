@@ -480,7 +480,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'S', Block.pistonStickyBase,
                 'N', Block.pistonBase,
                 'L', Block.lever);
-        recipe(ItemAngularSaw.applyEnchant(new ItemStack(angular_saw)),
+        recipe(new ItemStack(angular_saw),
                 "OH",
                 "MY",
                 "! ",
