@@ -8,6 +8,7 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.EntityLiving;
+import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.FontRenderer;
 import net.minecraft.src.ModelBase;
 import net.minecraft.src.RenderLiving;
@@ -44,6 +45,13 @@ public class FactorizationNotify {
             args[i] = translated;
         }
         String msg = String.format(format, (Object[]) args);
+        if (Core.notify_in_chat) {
+            EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+            if (player != null) {
+                player.addChatMessage(msg);
+            }
+            return;
+        }
         if (messages.size() > 2) {
             messages.remove(0);
         }
