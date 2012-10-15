@@ -284,16 +284,18 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                         continue;
                     }
                     int block = worldObj.getBlockId(x, height, z);
+                    int belowBlock = worldObj.getBlockId(x, height - 3, z);
+                    if (belowBlock != 0 && belowBlock != Core.lightair_id && height != yCoord) {
+                        beamDepths[index] = (short) height;
+                        continue;
+                    }
                     if (block == 0) {
                         worldObj.setBlockWithNotify(x, height, z, Core.lightair_id);
-                    }
-                    else if (block == Core.lightair_id) {
-                    }
-                    else if (x == xCoord && height == yCoord && z == zCoord) {
+                    } else if (block == Core.lightair_id) {
+                    } else if (x == xCoord && height == yCoord && z == zCoord) {
                         //this is ourself. Hi, self.
-                        //Don't ourself terminate the beamDepth early.
-                    }
-                    else {
+                        //Don't terminate the beamDepth early.
+                    } else {
                         beamDepths[index] = (short) height;
                     }
 
