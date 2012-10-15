@@ -10,7 +10,7 @@ public class NameClayCommand extends CommandBase {
 
     @Override
     public String getCommandName() {
-        return "nameclay";
+        return "namesculpture";
     }
 
     @Override
@@ -43,5 +43,10 @@ public class NameClayCommand extends CommandBase {
     @Override
     public String getCommandUsage(ICommandSender par1iCommandSender) {
         return super.getCommandUsage(par1iCommandSender) + " name for held sculpture";
+    }
+    
+    @Override
+    public boolean canCommandSenderUseCommand(ICommandSender sender) {
+        return sender instanceof EntityPlayer;
     }
 }
