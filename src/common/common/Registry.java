@@ -223,7 +223,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 " #  # "
         };
         logicMatrix = new ItemCraftingComponent(itemID("logicMatrix", 9044), "Logic Matrix", 1*16 + 10);
-        logicMatrixIdentifier = new ItemCraftingComponent(itemID("logicMatrixID", 9045), "Logic Matrix: Identifierw", 1*16 + 11);
+        logicMatrixIdentifier = new ItemCraftingComponent(itemID("logicMatrixID", 9045), "Logic Matrix: Identifier", 1*16 + 11);
         heatHole = new ItemCraftingComponent(itemID("heatHole", 9046), "Heat Hole", 1*16 + 9);
 
         wand_of_cooling = new ItemWandOfCooling(itemID("wandOfCooling", 9005));
@@ -352,6 +352,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "MiX",
                 'M', logicMatrix,
                 'i', Item.spiderEye,
+                'X', logicMatrixProgrammer);
+        recipe(new ItemStack(logicMatrixProgrammer),
+                "MiX",
+                'M', logicMatrix,
+                'i', dark_iron,
                 'X', logicMatrixProgrammer);
         
         TileEntityCrystallizer.addRecipe(new ItemStack(Block.stone), new ItemStack(logicMatrix), 1, new ItemStack(Item.potion), 1);
@@ -487,7 +492,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'O', new ItemStack(diamond_cutting_head),
                 'M', new ItemStack(motor),
                 'Y', new ItemStack(Item.ingotIron),
-                '!', leadwire_item);
+                '!', lead_ingot);
         
         //ceramics
         recipe(new ItemStack(sculpt_tool),
