@@ -3,6 +3,7 @@ package factorization.common;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 
@@ -18,7 +19,6 @@ import net.minecraft.src.IInventory;
 import net.minecraft.src.IRecipe;
 import net.minecraft.src.InventoryPlayer;
 import net.minecraft.src.Item;
-import net.minecraft.src.ItemDye;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.MapColor;
 import net.minecraft.src.Material;
@@ -43,6 +43,7 @@ import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.api.IActOnCraft;
+import factorization.common.ItemOreProcessing.OreType;
 
 public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler {
     static public final int MechaKeyCount = 3;
@@ -419,6 +420,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //Resources
         recipe(new ItemStack(lead_ingot, 9), "#", '#', lead_block_item);
         recipe(new ItemStack(silver_ingot, 9), "#", '#', silver_block_item);
+        oreRecipe(lead_block_item, "###", "###", "###", '#', "ingotLead");
+        oreRecipe(silver_block_item, "###", "###", "###", '#', "ingotSilver");
         FurnaceRecipes.smelting().addSmelting(resource_block.blockID, 0 /* MD for silver */, new ItemStack(silver_ingot));
 
         //mecha armor
@@ -899,7 +902,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         
         
     }
-
+    
+    private HashMap<String, ItemStack> bestIngots = new HashMap();
     void addDictOres() {
         for (String oreClass : Arrays.asList("oreCopper", "oreTin", "oreSilver")) {
             ItemStack bestIngot = null;
@@ -940,6 +944,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                     createOreProcessingPath(ore, bestIngot, ot);
                 }
             }
+            bestIngots.put(oreClass, bestIngot);
         }
     }
 
@@ -947,18 +952,27 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public void registerOre(OreRegisterEvent evt) {
         String oreClass = evt.Name;
         ItemStack ore = evt.Ore;
-        if (oreClass.equals("ingotLead")) {
-            //NOTE: I think it'd be cool to have the recipe for lead blocks be 5x5 instead of 3x3...
-            ModLoader.addRecipe(lead_block_item, "###", "###", "###", '#', ore);
-            return;
-        }
-        if (oreClass.equals("ingotSilver")) {
-            ModLoader.addRecipe(silver_block_item, "###", "###", "###", '#', ore);
-            return;
-        }
         if (oreClass.equals("oreSilver")) {
             TileEntitySlagFurnace.SlagRecipes.register(ore, 0.9F, new ItemStack(silver_ingot), 1.4F, new ItemStack(lead_ingot));
             return;
+        }
+        if (bestIngots.containsKey(oreClass)) {
+            //You're late.
+            if (oreClass.equals("oreSilver")) {
+                ItemStack silver = new ItemStack(silver_ingot);
+                ItemStack lead = new ItemStack(lead_ingot);
+                createDualOreProcessingPath(ore, silver, lead, ItemOreProcessing.OreType.GALENA, ItemOreProcessing.OreType.SILVER, ItemOreProcessing.OreType.LEAD);
+            } else {
+                OreType ot;
+                if (oreClass.equals("oreTin")) {
+                    ot = OreType.TIN;
+                } else if (oreClass.equals("oreCopper")) {
+                    ot = OreType.COPPER;
+                } else {
+                    return;
+                }
+                createOreProcessingPath(ore, bestIngots.get(oreClass), ot);
+            }
         }
     }
 

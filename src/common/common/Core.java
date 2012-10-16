@@ -66,7 +66,7 @@ import net.minecraftforge.event.ForgeSubscribe;
 import factorization.api.Coord;
 import factorization.client.gui.FactorizationNotify;
 
-@Mod(modid = "factorization", name = "Factorization", version = Core.version)
+@Mod(modid = "factorization", name = "Factorization", version = Core.version, dependencies = "after: IC2")
 @NetworkMod(
         clientSideRequired = true,
         packetHandler = NetworkFactorization.class,
@@ -74,6 +74,12 @@ import factorization.client.gui.FactorizationNotify;
 public class Core {
     //The comment below is a marker used by the build script.
     public static final String version = "0.6.6"; //@VERSION@
+    public Core() {
+        registry = new Registry();
+        MinecraftForge.EVENT_BUS.register(registry);
+        MinecraftForge.EVENT_BUS.register(this);
+    }
+    
     // runtime storage
     @Instance("factorization")
     public static Core instance;
@@ -205,12 +211,9 @@ public class Core {
     @PreInit
     public void load(FMLPreInitializationEvent event) {
         loadConfig(event.getSuggestedConfigurationFile());
-        registry = new Registry();
         registry.makeBlocks();
         
         NetworkRegistry.instance().registerGuiHandler(this, proxy);
-        MinecraftForge.EVENT_BUS.register(registry);
-        MinecraftForge.EVENT_BUS.register(this);
         TickRegistry.registerTickHandler(registry, Side.CLIENT);
         TickRegistry.registerTickHandler(registry, Side.SERVER);
 
