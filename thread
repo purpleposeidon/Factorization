@@ -12,7 +12,7 @@ Did somebody order a 3x3 crafting grid to go? Craft directly from your inventory
 
 
 [u]The Almighty [b]Barrel[/b][/u]
-Based on quantum-stockpiling technology discovered in the recently abandoned Dwarven Fortress of [i]Nod Semor[/i], the barrel can store 64 stacks of a single item type. Never fill a chest with cobblestone again!
+Based on item-stockpiling technology discovered in the recently abandoned Fortress of [i]Nod Semor[/i], the barrel can store 64 stacks of a single item type. Never fill a chest with cobblestone again!
 [img]http://i.imgur.com/pGWkx.png[/img]
 Right click a barrel with an item to drop it in; left-click to remove. Double-right clicking will dump all of the matching items in your inventory into a barrel, left-click will pull a stack out, and shift-left click will pull out a single item.
 [img]http://i.imgur.com/6c7Q7.png[/img]
@@ -27,7 +27,7 @@ The crafting automation tools found in certain other mods makes automatic crafti
 [img]http://i.imgur.com/qxOOx.png[/img]
 The Maker makes craftpackets. This is fueled by paper, which goes in the bottom slot. Then you need to select which crafting slots items will go in. Place items in the top slot to put those items into a craftpacket. When there are items in all the selected slots, the craftpacket will be moved to the right slot. If the craftpacket is blue, that means it can be crafted into something.
 [img]http://i.imgur.com/cCYot.png[/img]
-Place craftpackets in the left slot of stamper to craft the packet. If you place an invalid or incomplete craftpacket in, the contents will be dumped to the other slot. You can also put in, for example, bones to get bonemeal.
+Place craftpackets in the left slot of stamper to craft the packet. If you place an invalid or incomplete craftpacket in, the contents will be dumped to the other slot. You can also put in, for example, bones to get bonemeal. If a recipe has multiple results, such as for making cake, all the other used ingredients will be placed into the output slot.
 
 This is how you can make an axe.
 [img]http://i.imgur.com/wJFAA.png[/img]
@@ -99,7 +99,7 @@ The [b]grinder[/b] will grind ores. This is the start of the full ore processing
 
 The [b]mixer[/b] mixes up various materials with water. It needs only 2 mirrors to run.
 
-The [b]crystallizer[/b] must be heated up with a heater, but it only for a brief period of time. After that, it must be left alone to cool off as the crystal forms. This process takes 20 minutes. 
+The [b]crystallizer[/b] must be heated up with a heater, but it only for a brief period of time. After that, it must be left alone to cool off as the crystal forms. This process takes 20 minutes. If you put more material in the extra slots, they will crystallize in parallel. This lets you process up to five stacks at once in a single crystallizer.
 
 
 [b]Ore processing[/b] allows you to get extra ingot yields from your ores, ranging from 120% (using merely a slag furnace) to 300% (using several steps, ending with crystalline metal). This steps work with Iron, Gold, Lead (the primary metal in [url="http://en.wikipedia.org/wiki/Galena"]Silver Ore[/url]), and also Copper and Tin.
@@ -151,6 +151,8 @@ The Router is a block that creates an item delivery network out of blobs of mach
 
 The Item Router has a number of upgrades that can be applied to it by shift-right-clicking the router with the item in hand. This will add a "--" button in the GUI, which you can press to look at each upgrade. To remove an upgrade, press Delete while hovering the mouse over the button.
 
+
+
 [u]Item Filter[/u]
 This lets you choose what items to extract from machines. This upgrade does nothing in insertion mode.
 
@@ -172,6 +174,11 @@ This will cause the router to move entire stacks at a time instead of single ite
 [u]Ejector[/u]
 [img]http://i.imgur.com/qmkL3.png[/img]
 This upgrade will send received items into an adjacent inventory. It will need to be combined with a machine filter to prevent infinite item cycling.
+
+
+[u][b]Logic Matrices[/b][/u]
+The Logic Matrix is created in a crystallizer using a new substance, Inverium. They are used to craft a few of the more advanced upgrades. To make a blank logic matrix, you need to crystallize a block of lapis lazuli with an Inverium droplet with water from a water bottle. This blank slate must be programmed using a Logic Matrix Programmer, which is an ancient code repository. These are, presently, found in dungeons.
+[img]http://i.imgur.com/2R6HW.png[/img]
 
 
 [u]The [b]Wrath Lamp[/b][/u]
@@ -249,14 +256,18 @@ This is a [url="http://files.minecraftforge.net/"]Minecraft Forge[/url] mod. It 
 
 
 [u][b][size=6][anchor=DOWNLOAD]Download[/anchor][/size][/b][/u]
-Note that all proper Forge mods (such as this one) now use the same mod files for both server and client.
+This Forge mod uses the same file for the client and the server.
 
+Factorization 0.6.6 (MC 1.3.2)
+[url="http://adf.ly/2137658/http://www.mediafire.com/?jrmgr022rtnambb"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.6.6_738.jar"]adfly + DropBox[/url]
+Built on 2012-10-15 against Minecraft Forge 4.1.4.298
+
+Old versions [spoiler]
 Factorization 0.5.6 (MC 1.3.2)
 [url="http://adf.ly/2137658/http://www.mediafire.com/?d4mz283dapwzaox"]adfly + MediaFire[/url], or [url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.5.6_948.jar"]adfly + DropBox[/url]
 Built against Forge 4.1.2.261
 
-
-Old versions [spoiler]
 Factorization 0.5.5 (MC 1.3.2)
 [url="http://adf.ly/2137658/http://www.mediafire.com/?8l3b6z7vhtrfad8"]adfly + MediaFire[/url], or [url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.5.5_312.jar"]adfly + DropBox[/url]
 Built against Forge 4.1.2.261

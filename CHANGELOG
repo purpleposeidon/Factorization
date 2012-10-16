@@ -1,3 +1,17 @@
+0.6.6 -- Buffed!
+  The grinder is 60% faster
+  The angular saw now has infinite use, and works on stone & glass.
+  Since neither Notch nor nobody check isAirBlock, the wrath now lamp lights up 3 blocks away from the floor. (But it will light up at least 1, so you may need to raise them off the floor if there are problems.) This should help with most forestry farms and the railcraft Tunnel Boring Machine.
+
+0.6.5
+  Crystallizer inverium recipes actually work now.
+  fixed BoH bug
+
+0.6.4
+  Fixed barrel enlargement recipe
+  crafting machines emit a redstone signal
+  craftpacket maker now has a dedicated slot for paper, and can no longer store infinite paper. Other paper-based products can no longer be used to make packets.
+
 0.6.2
   Processing silver ore will now give you both silver and iron ingots. Any dirty lead gravel and clean lead chunks will no longer be usable.
   The extra slots in the crystallizer are now useful: If you place extra stacks of the material in them, they will be crystallized together.
@@ -10,13 +24,12 @@
   Battery discharging recipe
   This file is now in the Factorization jar.
 
-
 0.6.1
   Using forge 272
 
 0.6.0
   Grinder recipe no longer uses dark iron.
-  Excorsized demons. 
+  Excorsized demons in favor of Inverium.
   Rewrote the energy net. 3rd time's the charm?
 
 

@@ -9,7 +9,7 @@ def getForgeVersion():
   for line in open(forge_version_file):
     if "=" in line:
       version.append(line.split("=")[1].strip(";\n").strip())
-  return "Forge " + ".".join(version)
+  return "Minecraft Forge " + ".".join(version)
 
 
 def run(cmd):
@@ -48,5 +48,5 @@ print '''
   adfly(mediafire_url),
   adfly(dropbox_url)
 ).strip()
-print "Built against " + getForgeVersion(), "on", time.strftime("%F")
+print "Built on", time.strftime("%F"), "against", getForgeVersion()
 print
