@@ -100,4 +100,17 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     public void getSubItems(int itemIndexThisIsARetardedParameterJustFYI, CreativeTabs tab, List list) {
         list.add(new ItemStack(Core.registry.battery, 1, 2));
     }
+    
+    @Override
+    public void onCreated(ItemStack is, World w, EntityPlayer player) {
+        if (is.getTagCompound() == null) {
+            NBTTagCompound tag = FactorizationUtil.getTag(is);
+            tag.setInteger("storage", getStorage(is));
+        }
+    }
+    
+    @Override
+    public boolean getShareTag() {
+        return true;
+    }
 }
