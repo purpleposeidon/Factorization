@@ -1,68 +1,39 @@
 package factorization.common;
 
 import java.io.File;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.Init;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.Mod.PostInit;
-import cpw.mods.fml.common.Mod.PreInit;
-import cpw.mods.fml.common.Mod.ServerStarted;
-import cpw.mods.fml.common.Mod.ServerStarting;
-import cpw.mods.fml.common.Side;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartedEvent;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.common.network.IGuiHandler;
-import cpw.mods.fml.common.network.NetworkMod;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.network.NetworkMod.SidedPacketHandler;
-import cpw.mods.fml.common.registry.TickRegistry;
-
 import net.minecraft.client.Minecraft;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.AchievementList;
 import net.minecraft.src.Block;
-import net.minecraft.src.CommandHandler;
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.ICommand;
-import net.minecraft.src.ICommandSender;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.ModLoader;
-import net.minecraft.src.NetHandler;
-import net.minecraft.src.Packet;
-import net.minecraft.src.Profiler;
-import net.minecraft.src.ServerCommandManager;
-import net.minecraft.src.StatCollector;
 import net.minecraft.src.StatFileWriter;
-import net.minecraft.src.TileEntityChest;
-import net.minecraft.src.World;
-import net.minecraft.src.WorldGenMinable;
+import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
-import net.minecraftforge.oredict.OreDictionary;
-import net.minecraftforge.common.Configuration;
-import net.minecraftforge.event.CommandEvent;
-import net.minecraftforge.event.ForgeSubscribe;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.FMLLog;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.Mod.PostInit;
+import cpw.mods.fml.common.Mod.PreInit;
+import cpw.mods.fml.common.Mod.ServerStarting;
+import cpw.mods.fml.common.Side;
+import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.network.NetworkMod;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.registry.TickRegistry;
 import factorization.api.Coord;
 import factorization.client.gui.FactorizationNotify;
 
@@ -156,7 +127,7 @@ public class Core {
         try {
             config.load();
         } catch (Exception e) {
-            FMLLog.severe("Error loading config: %s", e.toString());
+            logWarning("Error loading config: %s", e.toString());
             e.printStackTrace();
         }
         factory_block_id = getBlockConfig("factoryBlockId", factory_block_id, "Factorization Machines.");
@@ -231,6 +202,11 @@ public class Core {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             isMainClientThread.set(true);
         }
+    }
+    
+    @ServerStarting
+    public void setMainServerThread(FMLServerStartingEvent event) {
+        isMainServerThread.set(true);
     }
 
     @PostInit
@@ -359,18 +335,13 @@ public class Core {
             }
         }
     }
-
-    static Logger factorizationLog = Logger.getLogger("Factorization");
-    static {
-        factorizationLog.setParent(Logger.getLogger("ForgeModLoader"));
+    
+    public static void logWarning(String format, Object... formatParameters) {
+        System.err.println("[Factorization] " + String.format(format, formatParameters));
     }
     
-    public static void logWarning(String format, Object... data) {
-        factorizationLog.log(Level.WARNING, format, data);
-    }
-    
-    public static void logInfo(String format, Object... data) {
-        factorizationLog.log(Level.INFO, format, data);
+    public static void logInfo(String format, Object... formatParameters) {
+        System.out.println("[Factorization] " + String.format(format, formatParameters));
     }
 
     public static void addBlockToCreativeList(List tab, Block block) {
@@ -384,11 +355,15 @@ public class Core {
     static ThreadLocal<Boolean> isMainClientThread = new ThreadLocal<Boolean>() {
         protected Boolean initialValue() { return false; }
     };
+    
+    static ThreadLocal<Boolean> isMainServerThread = new ThreadLocal<Boolean>() {
+        protected Boolean initialValue() { return false; }
+    };
 
     public static void profileStart(String section) {
         // :|
         if (isMainClientThread.get()) {
-            Core.proxy.getProfiler().startSection(section);
+            proxy.getProfiler().startSection(section);
         }
     }
 
