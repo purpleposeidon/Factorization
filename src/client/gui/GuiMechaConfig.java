@@ -1,27 +1,30 @@
 package factorization.client.gui;
 
 import java.util.ArrayList;
+import java.util.IllegalFormatException;
 
-import net.minecraft.src.Block;
 import net.minecraft.src.Container;
 import net.minecraft.src.GameSettings;
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiContainer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemArmor;
-import net.minecraft.src.ItemBlock;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.ModLoader;
+import net.minecraft.src.StatCollector;
 
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.common.registry.LanguageRegistry;
+
 import factorization.api.IMechaUpgrade;
+import factorization.api.MechaStateShader;
+import factorization.api.MechaStateType;
 import factorization.client.FactorizationClientProxy;
 import factorization.common.Command;
 import factorization.common.ContainerMechaModder;
 import factorization.common.Core;
 import factorization.common.MechaArmor;
-import factorization.common.MechaArmor.MechaMode;
 
 public class GuiMechaConfig extends GuiContainer {
     ContainerMechaModder cont;
@@ -59,10 +62,8 @@ public class GuiMechaConfig extends GuiContainer {
             if (!m.isValidUpgrade(cont.upgrader.upgrades[slot + 1])) {
                 continue;
             }
-            buttons.add(new GuiButton(slot * 2, left + slot * (size + 2), top, size, size + 4, "A"));
-            if (!m.getSlotMechaMode(armor, slot).isConstant()) {
-                buttons.add(new GuiButton(slot * 2 + 1, left + slot * (size + 2), top + 22, size, size + 4, "K"));
-            }
+            buttons.add(new GuiButton(slot * 2, left + slot * (size + 2), top, size, size + 4, "E")); //Event
+            buttons.add(new GuiButton(slot * 2 + 1, left + slot * (size + 2), top + 22, size, size + 4, "S")); //Shader
         }
     }
 
@@ -97,17 +98,24 @@ public class GuiMechaConfig extends GuiContainer {
         if (description == null) {
             return;
         }
-        fontRenderer.drawString(description, left, top, 4210752);
-        MechaMode mode = armor.getSlotMechaMode(cont.upgrader.armor, slot);
-        String action = "";
-        if (mode.key >= 0) {
-            int key = ((FactorizationClientProxy) Core.proxy).mechas[mode.key].keyCode;
-            action = GameSettings.getKeyDisplayString(key);
+        MechaStateType mst = armor.getMechaStateType(cont.upgrader.armor, slot);
+        MechaStateShader mss = armor.getMechaStateShader(cont.upgrader.armor, slot);
+        String eventShader = "";
+        if (mst.key > 0) {
+            int key = ((FactorizationClientProxy) Core.proxy).mechas[mst.key - 1].keyCode;
+            String keyName = GameSettings.getKeyDisplayString(key);
+            String localKey = mst.when(mss) + ".name";
+            String localFormat = LanguageRegistry.instance().getStringLocalization(localKey);
+            try {
+                eventShader = String.format(localFormat, keyName);
+            } catch (IllegalFormatException e) {
+                eventShader = "Bad format for " + localKey + ": " + e.getLocalizedMessage();
+            }
+        } else {
+            eventShader = LanguageRegistry.instance().getStringLocalization(mst.when(mss) + ".name");
         }
-        else {
-            action = Core.ExtraKey.fromInt(mode.key).text;
-        }
-        fontRenderer.drawString(mode.mode.describe(action), left, top + delta, 4210752);
+        fontRenderer.drawString(eventShader, left, top, 4210752);
+        fontRenderer.drawString(description, left, top + delta, 4210752);
     }
 
     @Override

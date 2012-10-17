@@ -12,7 +12,6 @@ import net.minecraft.src.Block;
 import net.minecraft.src.ContainerPlayer;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.GameSettings;
-import net.minecraft.src.GuiContainer;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
@@ -25,9 +24,7 @@ import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.TileEntitySpecialRenderer;
 import net.minecraft.src.World;
 import net.minecraftforge.client.MinecraftForgeClient;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ForgeSubscribe;
 
 import org.lwjgl.input.Keyboard;
 
@@ -39,7 +36,6 @@ import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
-import factorization.client.coremod.GuiKeyEvent;
 import factorization.client.gui.FactorizationNotify;
 import factorization.client.gui.GuiCrystallizer;
 import factorization.client.gui.GuiCutter;
@@ -55,12 +51,12 @@ import factorization.client.render.BatteryItemRender;
 import factorization.client.render.BlockRenderBattery;
 import factorization.client.render.BlockRenderCrystallizer;
 import factorization.client.render.BlockRenderDefault;
+import factorization.client.render.BlockRenderGreenware;
 import factorization.client.render.BlockRenderGrinder;
 import factorization.client.render.BlockRenderHeater;
 import factorization.client.render.BlockRenderLamp;
 import factorization.client.render.BlockRenderMirrorStand;
 import factorization.client.render.BlockRenderMixer;
-import factorization.client.render.BlockRenderGreenware;
 import factorization.client.render.BlockRenderSentryDemon;
 import factorization.client.render.BlockRenderSolarTurbine;
 import factorization.client.render.BlockRenderWire;
@@ -144,17 +140,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
     public EntityPlayer getPlayer(NetHandler handler) {
         return ModLoader.getMinecraftInstance().thePlayer;
     }
-
-    //	@Override
-    //	public void addPacket(EntityPlayer player, Packet packet) {
-    //		World w = ModLoader.getMinecraftInstance().theWorld;
-    //		if (w != null && w.isRemote) {
-    //			if (Minecraft.getMinecraft().getSendQueue() == null) {
-    //				return; //wow, what?
-    //			}
-    //			Minecraft.getMinecraft().getSendQueue().addToSendQueue(packet);
-    //		}
-    //	}
 
     @Override
     public Profiler getProfiler() {
@@ -438,7 +423,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd,
                 boolean isRepeat) {
             GuiScreen gui = Minecraft.getMinecraft().currentScreen;
-            if (gui != null /* && gui.doesGuiPauseGame() -- GuiKeyEvent'll save us. */) {
+            if (gui != null) {
                 return;
             }
             map.get(kb).call(Core.proxy.getClientPlayer());
@@ -491,8 +476,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
     public void registerKeys() {
         //we use numpad keys as our default, unless they're being used for movement (implying a left-handed user, using mouse w/ right hand)
         //If that's the case, we use our original keybindings.
-        int defaults_main[] = new int[] { Keyboard.KEY_NUMPAD1, Keyboard.KEY_NUMPAD2, Keyboard.KEY_NUMPAD3, Keyboard.KEY_NUMPAD4, Keyboard.KEY_NUMPAD5, Keyboard.KEY_NUMPAD6 };
-        int defaults_alt[] = new int[] { Keyboard.KEY_R, Keyboard.KEY_F, Keyboard.KEY_V, Keyboard.KEY_Z, Keyboard.KEY_X, Keyboard.KEY_B };
+        int defaults_main[] = new int[] { Keyboard.KEY_NUMPAD1, Keyboard.KEY_NUMPAD2, Keyboard.KEY_NUMPAD3 };
+        int defaults_alt[] = new int[] { Keyboard.KEY_R, Keyboard.KEY_F, Keyboard.KEY_V };
         int defaults[] = defaults_main;
         GameSettings gs = Minecraft.getMinecraft().gameSettings;
         int conflict_check[] = new int[] { gs.keyBindForward.keyCode, gs.keyBindLeft.keyCode, gs.keyBindRight.keyCode, gs.keyBindBack.keyCode };
@@ -516,7 +501,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 bag_swap_key, Command.bagShuffle,
                 pocket_key, Command.craftOpen));
         KeyBindingRegistry.registerKeyBinding(new MechaKeySet(mechas, new boolean[mechas.length]));
-        MinecraftForge.EVENT_BUS.register(this);
     }
 
     private void setTileEntityRenderer(Class clazz, TileEntitySpecialRenderer r) {

@@ -3,124 +3,23 @@ package factorization.common;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.src.Block;
 import net.minecraft.src.DamageSource;
 import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EnumArmorMaterial;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemArmor;
-import net.minecraft.src.ItemBlock;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraftforge.common.ISpecialArmor;
-import net.minecraftforge.common.ISpecialArmor.ArmorProperties;
 import factorization.api.IMechaUpgrade;
+import factorization.api.MechaStateShader;
+import factorization.api.MechaStateType;
+import factorization.common.MechaCore.MechaPlayerState;
 
 public class MechaArmor extends ItemArmor
         implements ISpecialArmor {
     public int slotCount = 2;
-
-    public enum ActivationMode {
-        ALWAYS_ON, ALWAYS_OFF, HOLD_ON, SINGLEFIRE;
-
-        int toInt() {
-            for (int i = 0; i < values().length; i++) {
-                if (values()[i] == this) {
-                    return i;
-                }
-            }
-            return 0;
-        }
-
-        static ActivationMode fromInt(int i) {
-            return values()[i];
-        }
-
-        public String describe(String action) {
-            switch (this) {
-            case ALWAYS_ON:
-                return "Always on";
-            case ALWAYS_OFF:
-                return "Never on";
-            case HOLD_ON:
-                return "Hold " + action;
-            case SINGLEFIRE:
-                return "Fires once if " + action;
-            }
-            return "Always off (?)";
-        }
-    }
-
-    public static class MechaMode {
-        public int key = 0;
-        public ActivationMode mode = ActivationMode.HOLD_ON;
-
-        void writeToNbt(int slot, NBTTagCompound tag) {
-            tag.setInteger("modeKey" + slot, key);
-            tag.setInteger("activationMode" + slot, mode.toInt());
-        }
-
-        static MechaMode loadFromNbt(int slot, NBTTagCompound tag) {
-            MechaMode ret = new MechaMode();
-            if (tag == null) {
-                return ret;
-            }
-            ret.key = tag.getInteger("modeKey" + slot);
-            ret.mode = ActivationMode.fromInt(tag.getInteger("activationMode" + slot));
-            return ret;
-        }
-
-        boolean getState(EntityPlayer player) {
-            if (mode == ActivationMode.ALWAYS_OFF) {
-                return false;
-            }
-            if (mode == ActivationMode.ALWAYS_ON) {
-                return true;
-            }
-            if (mode == ActivationMode.SINGLEFIRE) {
-                return Core.instance.getPlayerKeyState(player, key) == Core.KeyState.KEYSTART;
-            }
-            if (mode == ActivationMode.HOLD_ON) {
-                return Core.instance.getPlayerKeyState(player, key).isPressed();
-            }
-            //TOOD: Hmm, how are we going to do toggling?
-            return false;
-        }
-
-        public boolean isConstant() {
-            return mode == ActivationMode.ALWAYS_ON || mode == ActivationMode.ALWAYS_OFF;
-        }
-
-        public void nextActivationMode(int d) {
-            int o = mode.toInt() + d;
-            int end = ActivationMode.values().length - 1;
-            if (o == -1) {
-                mode = ActivationMode.values()[end];
-                return;
-            }
-            if (o > end) {
-                mode = ActivationMode.values()[0];
-                return;
-            }
-            mode = ActivationMode.fromInt(o);
-        }
-
-        public void nextKey(int d) {
-            key += d;
-            if (key >= Registry.MechaKeyCount) {
-                key = Core.ExtraKey_minimum;
-            }
-            if (key < Core.ExtraKey_minimum) {
-                key = Registry.MechaKeyCount - 1;
-            }
-            if (mode == ActivationMode.SINGLEFIRE) {
-                key = Math.max(0, key);
-                //XXX TODO: Too lazy to keep track of states properly
-            }
-        }
-    }
-
     public MechaArmor(int par1, int armorType) {
         super(par1, EnumArmorMaterial.CHAIN, 0, armorType);
         setMaxDamage(0); //never break!
@@ -194,46 +93,65 @@ public class MechaArmor extends ItemArmor
         return false;
     }
 
-    public void setSlotMechaMode(ItemStack is, int slot, MechaMode mode) {
-        if (is.getTagCompound() == null) {
-            is.setTagCompound(new NBTTagCompound());
+    public void setMechaStateType(ItemStack is, int slot, MechaStateType mst) {
+        NBTTagCompound tag = FactorizationUtil.getTag(is);
+        tag.setInteger("MST" + slot, mst.ordinal());
+    }
+    
+    public MechaStateType getMechaStateType(ItemStack is, int slot) {
+        NBTTagCompound tag = FactorizationUtil.getTag(is);
+        int typeOrdinal = tag.getInteger("MST" + slot);
+        try {
+            return MechaStateType.values()[typeOrdinal];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            setMechaStateType(is, slot, MechaStateType.NEVER);
+            return MechaStateType.NEVER;
         }
-        mode.writeToNbt(slot, is.getTagCompound());
+    }
+    
+    public void setMechaStateShader(ItemStack is, int slot, MechaStateShader mss) {
+        NBTTagCompound tag = FactorizationUtil.getTag(is);
+        tag.setInteger("MSS" + slot, mss.ordinal());
+    }
+    
+    public MechaStateShader getMechaStateShader(ItemStack is, int slot) {
+        NBTTagCompound tag = FactorizationUtil.getTag(is);
+        int typeOrdinal = tag.getInteger("MSS" + slot);
+        try {
+            return MechaStateShader.values()[typeOrdinal];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            setMechaStateShader(is, slot, MechaStateShader.NORMAL);
+            return MechaStateShader.NORMAL;
+        }
     }
 
-    public MechaMode getSlotMechaMode(ItemStack is, int slot) {
-        return MechaMode.loadFromNbt(slot, is.getTagCompound());
-    }
-
-    static void onTickPlayer(EntityPlayer player) {
+    static void onTickPlayer(EntityPlayer player, MechaPlayerState mps) {
         for (ItemStack armorStack : player.inventory.armorInventory) {
             if (armorStack == null) {
                 continue;
             }
             if (armorStack.getItem() instanceof MechaArmor) {
-                ((MechaArmor) armorStack.getItem()).tickArmor(player, armorStack);
+                ((MechaArmor) armorStack.getItem()).tickArmor(player, mps, armorStack);
             }
         }
     }
 
-    void tickArmor(EntityPlayer player, ItemStack armorStack) {
-        for (int i = 0; i < slotCount; i++) {
-            ItemStack is = getStackInSlot(armorStack, i);
+    void tickArmor(EntityPlayer player, MechaPlayerState mps, ItemStack armorStack) {
+        for (int slot = 0; slot < slotCount; slot++) {
+            ItemStack is = getStackInSlot(armorStack, slot);
             if (is == null) {
                 continue;
             }
             IMechaUpgrade up = getUpgrade(is);
             if (up != null) {
-                boolean active = getSlotMechaMode(armorStack, i).getState(player);
+                MechaStateShader mss = getMechaStateShader(is, slot);
+                MechaStateType mst = getMechaStateType(is, slot);
+                boolean active = mss.apply(mps.getStateActivation(mst));
                 ItemStack ret = up.tickUpgrade(player, armorStack, is, active);
-                getSlotMechaMode(armorStack, i).getState(player);
                 if (ret == null) {
                     continue;
                 }
-                if (ret.stackSize == 0) {
-                    setStackInSlot(armorStack, i, null);
-                }
-                setStackInSlot(armorStack, i, ret);
+                setStackInSlot(armorStack, slot, FactorizationUtil.normalize(ret));
             }
         }
     }

@@ -1008,10 +1008,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     }
 
     public void onTickPlayer(EntityPlayer player) {
-        MechaArmor.onTickPlayer(player); //mecha-armor needs to tick on both sides
-        if (player.worldObj.isRemote) {
-            return;
-        }
         // If in a GUI and holding a demon, BITE!
         // Otherwise, if not in a GUI and holding in hand... BITE!
         if (player.inventory.getItemStack() != null) {

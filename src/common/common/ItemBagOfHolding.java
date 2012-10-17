@@ -22,6 +22,7 @@ import net.minecraftforge.common.ISidedInventory;
 import net.minecraftforge.common.ForgeDirection;
 
 public class ItemBagOfHolding extends Item implements IActOnCraft {
+    //XXX: Sending NBT data of all the items might not be a good idea. We might force it to not be shared, and use the damage value for the pearl count.
     public ItemBagOfHolding(int id) {
         super(id);
         setMaxStackSize(1);

@@ -2,16 +2,12 @@ package factorization.common;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-
-import cpw.mods.fml.common.FMLCommonHandler;
 
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.InventoryPlayer;
 import net.minecraft.src.ItemStack;
-import net.minecraft.src.EntityClientPlayerMP;
-import factorization.common.MechaArmor.MechaMode;
+import factorization.api.MechaStateShader;
+import factorization.api.MechaStateType;
 
 public enum Command {
     bagShuffle(1), craftClear(2), craftMove(3), craftBalance(4), craftOpen(5, true),
@@ -85,7 +81,7 @@ public enum Command {
             break;
         case mechaKeyOff:
         case mechaKeyOn:
-            Core.instance.putPlayerKey(player, arg, this == mechaKeyOn);
+            Core.mechaCore.buttonPressed(player, arg, this == mechaKeyOn);
             break;
         case mechaModLeftClick:
         case mechaModRightClick:
@@ -94,25 +90,18 @@ public enum Command {
                 ItemStack armor = cont.upgrader.armor;
                 MechaArmor m = (MechaArmor) armor.getItem();
                 int slot = arg / 2;
-                boolean activationButton = 0 == (arg % 2);
-                MechaMode mode = m.getSlotMechaMode(armor, slot);
-                if (activationButton) {
-                    if (this == mechaModLeftClick) {
-                        mode.nextActivationMode(1);
-                    }
-                    else {
-                        mode.nextActivationMode(-1);
-                    }
+                boolean changeMechaType = 0 == (arg % 2);
+                int deltaDirection = this == mechaModLeftClick ? 1 : -1;
+                if (changeMechaType) {
+                    MechaStateType mst = m.getMechaStateType(armor, slot);
+                    mst = FactorizationUtil.shiftEnum(mst, MechaStateType.values(), deltaDirection);
+                    m.setMechaStateType(armor, slot, mst);
+                } else {
+                    //changeMechaShader
+                    MechaStateShader mss = m.getMechaStateShader(armor, slot);
+                    mss = FactorizationUtil.shiftEnum(mss, MechaStateShader.values(), deltaDirection);
+                    m.setMechaStateShader(armor, slot, mss);
                 }
-                else {
-                    if (this == mechaModLeftClick) {
-                        mode.nextKey(1);
-                    }
-                    else {
-                        mode.nextKey(-1);
-                    }
-                }
-                m.setSlotMechaMode(armor, slot, mode);
             }
             break;
         default:

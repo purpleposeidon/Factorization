@@ -47,14 +47,17 @@ public class Core {
     public static final String version = "0.6.6"; //@VERSION@
     public Core() {
         registry = new Registry();
-        MinecraftForge.EVENT_BUS.register(registry);
+        mechaCore = new MechaCore();
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(registry);
+        MinecraftForge.EVENT_BUS.register(mechaCore);
     }
     
     // runtime storage
     @Instance("factorization")
     public static Core instance;
     public static Registry registry;
+    public static MechaCore mechaCore;
     @SidedProxy(clientSide = "factorization.client.FactorizationClientProxy", serverSide = "factorization.common.FactorizationServerProxy")
     public static FactorizationProxy proxy;
     public static NetworkFactorization network;
@@ -238,102 +241,6 @@ public class Core {
         }
         return null;
 
-    }
-
-    enum KeyState {
-        KEYOFF, KEYSTART, KEYON;
-
-        boolean isPressed() {
-            return this != KEYOFF;
-        }
-    }
-
-    HashMap<EntityPlayer, KeyState[]> keyStateMap = new HashMap();
-
-    void putPlayerKey(EntityPlayer player, int key, boolean state) {
-        KeyState pmap[] = keyStateMap.get(player);
-        if (pmap == null) {
-            pmap = new KeyState[Registry.MechaKeyCount];
-            keyStateMap.put(player, pmap);
-        }
-        if (state) {
-            pmap[key] = KeyState.KEYSTART;
-        }
-        else {
-            pmap[key] = KeyState.KEYOFF;
-        }
-    }
-
-    static int ExtraKey_minimum = 0;
-
-    public enum ExtraKey {
-        SNEAK(-1, "sneaking"), INAIR(-2, "in the air"), RUN(-3, "running");
-
-        int id;
-        public String text;
-
-        ExtraKey(int id, String text) {
-            this.id = id;
-            this.text = text;
-            ExtraKey_minimum = Math.min(ExtraKey_minimum, id);
-        }
-
-        public static ExtraKey fromInt(int i) {
-            for (ExtraKey ek : values()) {
-                if (ek.id == i) {
-                    return ek;
-                }
-            }
-            return INAIR;
-        }
-
-        boolean isActive(EntityPlayer player) {
-            switch (this) {
-            case SNEAK:
-                return player.isSneaking();
-            case INAIR:
-                return player.isAirBorne;
-            case RUN:
-                return player.isSprinting();
-            }
-            return false;
-        }
-    }
-
-    KeyState getPlayerKeyState(EntityPlayer player, int key) {
-        if (player == null) {
-            return KeyState.KEYOFF;
-        }
-        if (key < 0) {
-            return ExtraKey.fromInt(key).isActive(player) ? KeyState.KEYON : KeyState.KEYOFF;
-        }
-        KeyState arr[] = keyStateMap.get(player);
-        if (arr == null) {
-            putPlayerKey(player, 0, false);
-            return KeyState.KEYOFF;
-        }
-        KeyState ret = arr[key];
-        if (ret == null) {
-            return KeyState.KEYOFF;
-        }
-        return ret;
-    }
-
-    boolean hasPlayerKey(EntityPlayer player, int key) {
-        return getPlayerKeyState(player, key).isPressed();
-    }
-
-    public void updatePlayerKeys() {
-        for (KeyState states[] : keyStateMap.values()) {
-            for (int i = 0; i < states.length; i++) {
-                if (states[i] == KeyState.KEYSTART) {
-                    states[i] = KeyState.KEYON;
-                }
-                if (states[i] == null) {
-                    states[i] = KeyState.KEYOFF;
-                }
-            }
-        }
     }
     
     public static void logWarning(String format, Object... formatParameters) {

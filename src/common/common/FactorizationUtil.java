@@ -32,7 +32,7 @@ public class FactorizationUtil {
     }
 
     public static boolean itemCanFire(World w, ItemStack is, int tickDelay) {
-        NBTTagCompound tag = FactorizationUtil.getTag(is);
+        NBTTagCompound tag = getTag(is);
         long t = tag.getLong("lf");
         if (t > w.getWorldTime()) {
             tag.setLong("lf", w.getWorldTime());
@@ -284,5 +284,16 @@ public class FactorizationUtil {
         //stolen from BlockPistonBase.determineOrientation. It was reversed, & we handle the y-axis differently
         int var7 = MathHelper.floor_double((double) ((180 + player.rotationYaw) * 4.0F / 360.0F) + 0.5D) & 3;
         return var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0)));
+    }
+    
+    public static <E extends Enum> E shiftEnum(E current, E values[], int delta) {
+        int next = current.ordinal() + delta;
+        if (next < 0) {
+            return values[values.length - 1];
+        }
+        if (next >= values.length) {
+            return values[0];
+        }
+        return values[next];
     }
 }
