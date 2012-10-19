@@ -411,7 +411,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
         @Override
         public EnumSet<TickType> ticks() {
-            return EnumSet.of(TickType.CLIENT, TickType.RENDER);
+            return EnumSet.of(TickType.CLIENT);
         }
 
         @Override
@@ -455,7 +455,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd,
                 boolean isRepeat) {
             GuiScreen gui = Minecraft.getMinecraft().currentScreen;
-            if (gui == null) {
+            if (gui != null) {
                 return;
             }
             Command.mechaKeyOn.call(getClientPlayer(), mechaIDmap.get(kb));
@@ -464,7 +464,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         @Override
         public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd) {
             GuiScreen gui = Minecraft.getMinecraft().currentScreen;
-            if (gui == null) {
+            if (gui != null) {
                 return;
             }
             Command.mechaKeyOff.call(getClientPlayer(), mechaIDmap.get(kb));

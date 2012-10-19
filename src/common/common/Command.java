@@ -81,6 +81,12 @@ public enum Command {
             break;
         case mechaKeyOff:
         case mechaKeyOn:
+            if (player.worldObj.isRemote) {
+                if (this == mechaKeyOn) {
+                    new Exception().printStackTrace();
+                }
+                System.out.println("Mecha-key: " + this + " for " + arg);
+            }
             Core.mechaCore.buttonPressed(player, arg, this == mechaKeyOn);
             break;
         case mechaModLeftClick:
@@ -92,14 +98,23 @@ public enum Command {
                 int slot = arg / 2;
                 boolean changeMechaType = 0 == (arg % 2);
                 int deltaDirection = this == mechaModLeftClick ? 1 : -1;
+                MechaStateType mst = m.getMechaStateType(armor, slot);
+                MechaStateShader mss = m.getMechaStateShader(armor, slot);
                 if (changeMechaType) {
-                    MechaStateType mst = m.getMechaStateType(armor, slot);
                     mst = FactorizationUtil.shiftEnum(mst, MechaStateType.values(), deltaDirection);
                     m.setMechaStateType(armor, slot, mst);
                 } else {
                     //changeMechaShader
-                    MechaStateShader mss = m.getMechaStateShader(armor, slot);
-                    mss = FactorizationUtil.shiftEnum(mss, MechaStateShader.values(), deltaDirection);
+                    if (mst == MechaStateType.NEVER) {
+                        //Only use the first two, as the others don't make sense for a constant.
+                        if (mss != MechaStateShader.NORMAL) {
+                            mss = MechaStateShader.NORMAL;
+                        } else {
+                            mss = MechaStateShader.INVERSE;
+                        }
+                    } else {
+                        mss = FactorizationUtil.shiftEnum(mss, MechaStateShader.values(), deltaDirection);
+                    }
                     m.setMechaStateShader(armor, slot, mss);
                 }
             }

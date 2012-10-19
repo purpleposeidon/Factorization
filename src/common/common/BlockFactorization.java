@@ -357,7 +357,8 @@ public class BlockFactorization extends BlockContainer {
 
     @Override
     public float getBlockHardness(World w, int x, int y, int z) {
-        return BlockClass.get(w.getBlockMetadata(x, y, z)).hardness;
+        BlockClass bc = BlockClass.get(w.getBlockMetadata(x, y, z));
+        return bc.hardness;
     }
 
     //smack these blocks up

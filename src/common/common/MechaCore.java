@@ -5,13 +5,14 @@ import java.util.EnumSet;
 import java.util.HashMap;
 
 import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.ItemStack;
+import net.minecraft.src.EntityPlayerSP;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.TickType;
-import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import factorization.api.MechaStateActivation;
+import factorization.api.MechaStateShader;
 import factorization.api.MechaStateType;
 
 public class MechaCore implements ITickHandler {
@@ -25,10 +26,13 @@ public class MechaCore implements ITickHandler {
     private static HashMap<String, MechaPlayerState> playerMap = new HashMap();
     public static class MechaPlayerState {
         private MechaStateActivation state[] = new MechaStateActivation[MechaStateType.values().length];
+        private boolean toggle[] = new boolean[MechaStateType.values().length];
         private EntityPlayer player;
         private MechaPlayerState(EntityPlayer player) {
             this.player = player;
-            state[MechaStateType.NEVER.ordinal()] = MechaStateActivation.OFF;
+            for (int i = 0; i < state.length; i++) {
+                state[i] = MechaStateActivation.OFF;
+            }
             playerMap.put(player.username, this);
         }
         
@@ -36,6 +40,8 @@ public class MechaCore implements ITickHandler {
             for (int i = 0; i < state.length; i++) {
                 if (state[i] == MechaStateActivation.FIRSTON) {
                     state[i] = MechaStateActivation.ON;
+                } else if (state[i] == MechaStateActivation.FIRSTOFF) {
+                    state[i] = MechaStateActivation.OFF;
                 }
             }
             touchState(MechaStateType.EATING, player.isEating());
@@ -51,15 +57,33 @@ public class MechaCore implements ITickHandler {
         }
         
         private void touchState(MechaStateType type, boolean isOn) {
-            if (!isOn) {
-                state[type.ordinal()] = MechaStateActivation.OFF;
-            } else if (state[type.ordinal()] == MechaStateActivation.OFF) {
-                state[type.ordinal()] = MechaStateActivation.FIRSTON;
+            final int i = type.ordinal();
+            MechaStateActivation origState = state[i];
+            if (isOn != origState.on) {
+                if (isOn && !origState.on) {
+                    state[i] = MechaStateActivation.FIRSTON; //turn it on
+                    toggle[i] = !toggle[i];
+                } else if (!isOn && origState.on) {
+                    state[i] = MechaStateActivation.FIRSTOFF; //turn it off
+                }
             }
         }
         
         public MechaStateActivation getStateActivation(MechaStateType type) {
             return state[type.ordinal()];
+        }
+        
+        public boolean getIsActive(MechaStateType mst, MechaStateShader mss) {
+            MechaStateActivation msa = getStateActivation(mst);
+            switch (mss) {
+            default:
+            case NORMAL: return msa.on;
+            case INVERSE: return !msa.on;
+            case RISINGEDGE: return msa == MechaStateActivation.FIRSTON;
+            case FALLINGEDGE: return msa == MechaStateActivation.FIRSTOFF;
+            case TOGGLE: return toggle[mst.ordinal()];
+            case INVTOGGLE: return !toggle[mst.ordinal()];
+            }
         }
     }
     
@@ -92,6 +116,9 @@ public class MechaCore implements ITickHandler {
             playerMap.remove(player.username);
             return;
         }
+        if (!(player instanceof EntityPlayerSP) && FMLCommonHandler.instance().getSide() != Side.CLIENT) {
+            playerMap.remove(player.username);
+        }
         MechaPlayerState mps = getPlayerState(player);
         mps.update();
         MechaArmor.onTickPlayer(player, mps);
@@ -100,9 +127,9 @@ public class MechaCore implements ITickHandler {
     public static void buttonPressed(EntityPlayer player, int button, boolean isOn) {
         MechaStateType mst = null;
         switch (button) {
-        case 1: mst = MechaStateType.BUTTON1; break;
-        case 2: mst = MechaStateType.BUTTON2; break;
-        case 3: mst = MechaStateType.BUTTON3; break;
+        case 0: mst = MechaStateType.BUTTON1; break;
+        case 1: mst = MechaStateType.BUTTON2; break;
+        case 2: mst = MechaStateType.BUTTON3; break;
         }
         if (mst != null) {
             getPlayerState(player).touchState(mst, isOn);

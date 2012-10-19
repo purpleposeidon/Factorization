@@ -80,7 +80,7 @@ class MechaBuoyantBarrel extends Item implements IMechaUpgrade {
 
     @Override
     public String getDescription() {
-        return "Rise quickly when underwater";
+        return "Rise quickly underwater";
     }
 
     @Override

@@ -144,9 +144,10 @@ public class MechaArmor extends ItemArmor
             }
             IMechaUpgrade up = getUpgrade(is);
             if (up != null) {
-                MechaStateShader mss = getMechaStateShader(is, slot);
-                MechaStateType mst = getMechaStateType(is, slot);
-                boolean active = mss.apply(mps.getStateActivation(mst));
+                MechaStateShader mss = getMechaStateShader(armorStack, slot);
+                MechaStateType mst = getMechaStateType(armorStack, slot);
+                boolean active = mps.getIsActive(mst, mss);
+                //System.out.println(mst.when(mss) + " = " + active);
                 ItemStack ret = up.tickUpgrade(player, armorStack, is, active);
                 if (ret == null) {
                     continue;
@@ -282,6 +283,19 @@ public class MechaArmor extends ItemArmor
     @Override
     public void addInformation(ItemStack is, List infoList) {
         super.addInformation(is, infoList);
+        for (int i = 0; i < slotCount; i++) {
+            ItemStack upgrade = getStackInSlot(is, i);
+            if (upgrade == null) {
+                continue;
+            }
+            String s = upgrade.getItem().getItemDisplayName(upgrade);
+            if (s != null && s.length() > 0) {
+                MechaStateType mst = getMechaStateType(is, i);
+                MechaStateShader mss = getMechaStateShader(is, i);
+                s += "  " + mss.brief() + mst.brief();
+                infoList.add(s);
+            }
+        }
         Core.brand(infoList);
     }
 }

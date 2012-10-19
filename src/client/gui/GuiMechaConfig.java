@@ -3,6 +3,7 @@ package factorization.client.gui;
 import java.util.ArrayList;
 import java.util.IllegalFormatException;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.src.Container;
 import net.minecraft.src.GameSettings;
 import net.minecraft.src.GuiButton;
@@ -10,13 +11,10 @@ import net.minecraft.src.GuiContainer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemArmor;
 import net.minecraft.src.ItemStack;
-import net.minecraft.src.ModLoader;
-import net.minecraft.src.StatCollector;
 
 import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.common.registry.LanguageRegistry;
-
 import factorization.api.IMechaUpgrade;
 import factorization.api.MechaStateShader;
 import factorization.api.MechaStateType;
@@ -101,10 +99,10 @@ public class GuiMechaConfig extends GuiContainer {
         MechaStateType mst = armor.getMechaStateType(cont.upgrader.armor, slot);
         MechaStateShader mss = armor.getMechaStateShader(cont.upgrader.armor, slot);
         String eventShader = "";
+        String localKey = mst.when(mss) + ".name";
         if (mst.key > 0) {
             int key = ((FactorizationClientProxy) Core.proxy).mechas[mst.key - 1].keyCode;
             String keyName = GameSettings.getKeyDisplayString(key);
-            String localKey = mst.when(mss) + ".name";
             String localFormat = LanguageRegistry.instance().getStringLocalization(localKey);
             try {
                 eventShader = String.format(localFormat, keyName);
@@ -112,7 +110,10 @@ public class GuiMechaConfig extends GuiContainer {
                 eventShader = "Bad format for " + localKey + ": " + e.getLocalizedMessage();
             }
         } else {
-            eventShader = LanguageRegistry.instance().getStringLocalization(mst.when(mss) + ".name");
+            eventShader = LanguageRegistry.instance().getStringLocalization(localKey);
+        }
+        if (eventShader == null || eventShader.length() == 0) {
+            eventShader = localKey;
         }
         fontRenderer.drawString(eventShader, left, top, 4210752);
         fontRenderer.drawString(description, left, top + delta, 4210752);
@@ -161,7 +162,7 @@ public class GuiMechaConfig extends GuiContainer {
         if (!(cont.upgrader.armor.getItem() instanceof MechaArmor)) {
             return;
         }
-        (leftClick ? Command.mechaModLeftClick : Command.mechaModRightClick).call(ModLoader.getMinecraftInstance().thePlayer, (byte) button.id);
+        (leftClick ? Command.mechaModLeftClick : Command.mechaModRightClick).call(Minecraft.getMinecraft().thePlayer, (byte) button.id);
     }
 
     @Override

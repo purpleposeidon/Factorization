@@ -1,6 +1,11 @@
 package factorization.api;
 
 import static factorization.api.MechaStateShader.*;
+import net.minecraft.src.GameSettings;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Side;
+import cpw.mods.fml.common.asm.SideOnly;
+import factorization.client.FactorizationClientProxy;
 import factorization.common.Core;
 
 public enum MechaStateType {
@@ -76,6 +81,13 @@ public enum MechaStateType {
         en(INWATER.when(NORMAL), "While in water");
         en(INWATER.when(INVERSE), "While not in the water");
         en(INWATER.when(RISINGEDGE), "When entering water");
-        System.out.println("XXX Added MST l##n");
+    }
+
+    public String brief() {
+        if (this.key > 0 && FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+            int key = ((FactorizationClientProxy) Core.proxy).mechas[this.key - 1].keyCode;
+            return GameSettings.getKeyDisplayString(key);
+        }
+        return this.toString();
     }
 }

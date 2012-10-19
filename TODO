@@ -2,9 +2,6 @@ http://www.minecraftforum.net/topic/1351802-factorization/
 
 TOP LIST
 --------
-"Buffed!" Release.
-look at interactions with: GregTech (? wtf is that?) Metallurgy
-
 [Mecha-Features]
 fix mecha-armor!
 Nicen up the Mecha-Modder
@@ -12,11 +9,18 @@ Armor-type specific upgrades
 Re-write the event system:
   EventSources: Player state, key presses from client
   EventShaders: Normal, Rising edge, falling edge, negated, toggle
-Anti-gravity (uses inverium'd lead blocks): Velocity limiting, hovering, high jumping
 add inverium-based mecha-upgrades
+These upgrades:
+  Lead boots
+  Wall Springs
+  Armor Dropper
+  Anti-gravity (uses inverium'd lead blocks): Velocity limiting, hovering, high jumping
+    Acceleration Dampener
+    Acceleration Stopper
 Some electricity related mecha-upgrades?
+Rename "Mecha-Armor" to "Modular Armor".
 
-http://i.imgur.com/db3Ij.jpg -- see the holes? Are those still a problem?
+http://i.imgur.com/db3Ij.jpg -- fix the distant metric. Also, switch to euclidean with max distance such that current cubes will just fit.
 
 "Everything's shiny!" release
 back to ceramics?
@@ -31,8 +35,6 @@ test high block IDs
 solar turbines need to check if it's raining. It's okay if you're in a desert tho.
 
 [Low-Priority Bugs]
-something about a "metallurgy" mod?
-is the macerator not working on silver a IC2 bug or a factorization bug?
 nikolite grinding! Once RedPower comes out...
 draw_active isn't marking the block dirty apparently?
 re-write the shift-clicking function to use slots!!!
@@ -289,4 +291,8 @@ Nothin' you can do, 'cause you'll be dead
 Then some douchebag what thinks he's you
 Will wake up with a computanium head
 
-
+Caused by: java.lang.RuntimeException: Invalid shaped ore recipe: BBB,  G , ZMZ, B, ingotBrass, G, aga@50eda677, Z, 1xnull@0, M, null, 1xnull@0
+        at net.minecraftforge.oredict.ShapedOreRecipe.<init>(ShapedOreRecipe.java:105)
+        at com.eloraam.redpower.core.CraftLib.addOreRecipe(CraftLib.java:20)
+        at RedPowerCompat.setupBlocks(RedPowerCompat.java:114)
+        at RedPowerCompat.load(RedPowerCompat.java:47)
