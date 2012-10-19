@@ -30,7 +30,7 @@ public enum FactoryType {
     GREENWARE(20, false, TileEntityGreenware.class, "factory_greenware"), //unfired clay sculpture
 
     POCKETCRAFTGUI(101, true),
-    MECHATABLEGUICONFIG(102, true), //Mecha-armor editor
+    EXOTABLEGUICONFIG(102, true), //Exo-armor editor
     NULLGUI(103, true), ;
 
     final public int md;

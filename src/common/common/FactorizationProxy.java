@@ -52,8 +52,8 @@ public abstract class FactorizationProxy implements IGuiHandler {
             return new ContainerPocket(player);
         }
 
-        if (ID == FactoryType.MECHATABLEGUICONFIG.gui) {
-            return new ContainerMechaModder(player, new Coord(world, x, y, z));
+        if (ID == FactoryType.EXOTABLEGUICONFIG.gui) {
+            return new ContainerExoModder(player, new Coord(world, x, y, z));
         }
 
         TileEntity te = world.getBlockTileEntity(x, y, z);

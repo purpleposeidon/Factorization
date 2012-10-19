@@ -1,6 +1,6 @@
 package factorization.api;
 
-import static factorization.api.MechaStateShader.*;
+import static factorization.api.ExoStateShader.*;
 import net.minecraft.src.GameSettings;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Side;
@@ -8,34 +8,34 @@ import cpw.mods.fml.common.asm.SideOnly;
 import factorization.client.FactorizationClientProxy;
 import factorization.common.Core;
 
-public enum MechaStateType {
+public enum ExoStateType {
     NEVER, BUTTON1(1), BUTTON2(2), BUTTON3(3), EATING(
-            MechaArmorRestriction.HEAD), HURT(MechaArmorRestriction.HEAD), WOUNDED(
-            MechaArmorRestriction.HEAD), MOVING(MechaArmorRestriction.CHEST), ONFIRE(
-            MechaArmorRestriction.CHEST), SNEAKING(MechaArmorRestriction.PANTS), RIDING(
-            MechaArmorRestriction.PANTS), SPRINTING(MechaArmorRestriction.FEET), ONGROUND(
-            MechaArmorRestriction.FEET), INWATER(MechaArmorRestriction.FEET);
+            ExoArmorRestriction.HEAD), HURT(ExoArmorRestriction.HEAD), WOUNDED(
+            ExoArmorRestriction.HEAD), MOVING(ExoArmorRestriction.CHEST), ONFIRE(
+            ExoArmorRestriction.CHEST), SNEAKING(ExoArmorRestriction.PANTS), RIDING(
+            ExoArmorRestriction.PANTS), SPRINTING(ExoArmorRestriction.FEET), ONGROUND(
+            ExoArmorRestriction.FEET), INWATER(ExoArmorRestriction.FEET);
 
-    public final MechaArmorRestriction armorRestriction;
+    public final ExoArmorRestriction armorRestriction;
     public final int key;
 
-    MechaStateType() {
-        armorRestriction = MechaArmorRestriction.NONE;
+    ExoStateType() {
+        armorRestriction = ExoArmorRestriction.NONE;
         key = 0;
     }
 
-    MechaStateType(int key) {
-        armorRestriction = MechaArmorRestriction.NONE;
+    ExoStateType(int key) {
+        armorRestriction = ExoArmorRestriction.NONE;
         this.key = key;
     }
 
-    MechaStateType(MechaArmorRestriction ar) {
+    ExoStateType(ExoArmorRestriction ar) {
         armorRestriction = ar;
         key = 0;
     }
 
-    public String when(MechaStateShader shader) {
-        return "mecha." + this + "." + shader;
+    public String when(ExoStateShader shader) {
+        return "exo." + this + "." + shader;
     }
 
     private static void en(String local, String en) {
@@ -46,7 +46,7 @@ public enum MechaStateType {
         en(NEVER.when(NORMAL), "Never");
         en(NEVER.when(INVERSE), "Always");
         en(NEVER.when(RISINGEDGE), "Never (rising edge)");
-        for (MechaStateType button : new MechaStateType[] { BUTTON1, BUTTON2, BUTTON3 }) {
+        for (ExoStateType button : new ExoStateType[] { BUTTON1, BUTTON2, BUTTON3 }) {
             en(button.when(NORMAL), "While %s is held");
             en(button.when(INVERSE), "While %s is not held");
             en(button.when(RISINGEDGE), "When %s is tapped");
@@ -85,7 +85,7 @@ public enum MechaStateType {
 
     public String brief() {
         if (this.key > 0 && FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            int key = ((FactorizationClientProxy) Core.proxy).mechas[this.key - 1].keyCode;
+            int key = ((FactorizationClientProxy) Core.proxy).exoKeys[this.key - 1].keyCode;
             return GameSettings.getKeyDisplayString(key);
         }
         return this.toString();

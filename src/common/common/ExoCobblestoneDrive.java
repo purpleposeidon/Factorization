@@ -11,14 +11,14 @@ import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraftforge.common.ISpecialArmor.ArmorProperties;
-import factorization.api.IMechaUpgrade;
+import factorization.api.IExoUpgrade;
 import factorization.common.Core.TabType;
 
-public class MechaCobblestoneDrive extends Item implements IMechaUpgrade {
+public class ExoCobblestoneDrive extends Item implements IExoUpgrade {
 
-    protected MechaCobblestoneDrive(int par1) {
+    protected ExoCobblestoneDrive(int par1) {
         super(par1);
-        setItemName("mecha.cobbledrive");
+        setItemName("exo.cobbledrive");
         setIconIndex(16 * 10 + 1);
         Core.tab(this, TabType.MISC);
         setMaxStackSize(1);
@@ -70,7 +70,7 @@ public class MechaCobblestoneDrive extends Item implements IMechaUpgrade {
 
     @Override
     public void addInformation(ItemStack is, List list) {
-        list.add("Mecha-Upgrade");
+        list.add("Exo-Upgrade");
         Core.brand(list);
     }
 }

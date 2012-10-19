@@ -21,14 +21,14 @@ public class BlockResource extends Block {
 
     @Override
     public int getBlockTextureFromSideAndMetadata(int side, int md) {
-        if (ResourceType.MECHAMODDER.is(md)) {
+        if (ResourceType.EXOMODDER.is(md)) {
             if (side == 0) {
-                return Texture.mecha_bottom;
+                return Texture.exo_bottom;
             }
             if (side == 1) {
-                return Texture.mecha_config;
+                return Texture.exo_config;
             }
-            return Texture.mecha_side;
+            return Texture.exo_side;
         }
         return (16 * 2) + md;
     }
@@ -49,7 +49,7 @@ public class BlockResource extends Block {
         itemList.add(Core.registry.silver_block_item);
         itemList.add(Core.registry.lead_block_item);
         itemList.add(Core.registry.dark_iron_block_item);
-        itemList.add(Core.registry.mechaworkshop_item);
+        itemList.add(Core.registry.exoworkshop_item);
     }
 
     @Override
@@ -64,8 +64,8 @@ public class BlockResource extends Block {
             return false;
         }
         Coord here = new Coord(w, x, y, z);
-        if (ResourceType.MECHAMODDER.is(here.getMd())) {
-            player.openGui(Core.instance, FactoryType.MECHATABLEGUICONFIG.gui, w, x, y, z);
+        if (ResourceType.EXOMODDER.is(here.getMd())) {
+            player.openGui(Core.instance, FactoryType.EXOTABLEGUICONFIG.gui, w, x, y, z);
             return true;
         }
         return false;

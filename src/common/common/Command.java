@@ -6,13 +6,13 @@ import java.util.HashMap;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.InventoryPlayer;
 import net.minecraft.src.ItemStack;
-import factorization.api.MechaStateShader;
-import factorization.api.MechaStateType;
+import factorization.api.ExoStateShader;
+import factorization.api.ExoStateType;
 
 public enum Command {
     bagShuffle(1), craftClear(2), craftMove(3), craftBalance(4), craftOpen(5, true),
-    bagShuffleReverse(6), mechaKeyOn(7, true), mechaKeyOff(8, true), mechaModLeftClick(9),
-    mechaModRightClick(10);
+    bagShuffleReverse(6), exoKeyOn(7, true), exoKeyOff(8, true), exoModLeftClick(9),
+    exoModRightClick(10);
 
     static class name {
         static HashMap<Byte, Command> map = new HashMap();
@@ -79,43 +79,43 @@ public enum Command {
         case craftOpen:
             Core.registry.pocket_table.tryOpen(player);
             break;
-        case mechaKeyOff:
-        case mechaKeyOn:
+        case exoKeyOff:
+        case exoKeyOn:
             if (player.worldObj.isRemote) {
-                if (this == mechaKeyOn) {
+                if (this == exoKeyOn) {
                     new Exception().printStackTrace();
                 }
-                System.out.println("Mecha-key: " + this + " for " + arg);
+                System.out.println("Exo-key: " + this + " for " + arg);
             }
-            Core.mechaCore.buttonPressed(player, arg, this == mechaKeyOn);
+            Core.exoCore.buttonPressed(player, arg, this == exoKeyOn);
             break;
-        case mechaModLeftClick:
-        case mechaModRightClick:
-            if (player.craftingInventory instanceof ContainerMechaModder) {
-                ContainerMechaModder cont = (ContainerMechaModder) player.craftingInventory;
+        case exoModLeftClick:
+        case exoModRightClick:
+            if (player.craftingInventory instanceof ContainerExoModder) {
+                ContainerExoModder cont = (ContainerExoModder) player.craftingInventory;
                 ItemStack armor = cont.upgrader.armor;
-                MechaArmor m = (MechaArmor) armor.getItem();
+                ExoArmor m = (ExoArmor) armor.getItem();
                 int slot = arg / 2;
-                boolean changeMechaType = 0 == (arg % 2);
-                int deltaDirection = this == mechaModLeftClick ? 1 : -1;
-                MechaStateType mst = m.getMechaStateType(armor, slot);
-                MechaStateShader mss = m.getMechaStateShader(armor, slot);
-                if (changeMechaType) {
-                    mst = FactorizationUtil.shiftEnum(mst, MechaStateType.values(), deltaDirection);
-                    m.setMechaStateType(armor, slot, mst);
+                boolean changeExoType = 0 == (arg % 2);
+                int deltaDirection = this == exoModLeftClick ? 1 : -1;
+                ExoStateType mst = m.getExoStateType(armor, slot);
+                ExoStateShader mss = m.getExoStateShader(armor, slot);
+                if (changeExoType) {
+                    mst = FactorizationUtil.shiftEnum(mst, ExoStateType.values(), deltaDirection);
+                    m.setExoStateType(armor, slot, mst);
                 } else {
-                    //changeMechaShader
-                    if (mst == MechaStateType.NEVER) {
+                    //changeExoShader
+                    if (mst == ExoStateType.NEVER) {
                         //Only use the first two, as the others don't make sense for a constant.
-                        if (mss != MechaStateShader.NORMAL) {
-                            mss = MechaStateShader.NORMAL;
+                        if (mss != ExoStateShader.NORMAL) {
+                            mss = ExoStateShader.NORMAL;
                         } else {
-                            mss = MechaStateShader.INVERSE;
+                            mss = ExoStateShader.INVERSE;
                         }
                     } else {
-                        mss = FactorizationUtil.shiftEnum(mss, MechaStateShader.values(), deltaDirection);
+                        mss = FactorizationUtil.shiftEnum(mss, ExoStateShader.values(), deltaDirection);
                     }
-                    m.setMechaStateShader(armor, slot, mss);
+                    m.setExoStateShader(armor, slot, mss);
                 }
             }
             break;

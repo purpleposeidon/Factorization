@@ -3,7 +3,7 @@ package factorization.common;
 import net.minecraft.src.ItemStack;
 
 public enum ResourceType {
-    SILVERORE(0), SILVERBLOCK(1), LEADBLOCK(2), DARKIRONBLOCK(3), MECHAMODDER(4);
+    SILVERORE(0), SILVERBLOCK(1), LEADBLOCK(2), DARKIRONBLOCK(3), EXOMODDER(4);
 
     final public int md;
 

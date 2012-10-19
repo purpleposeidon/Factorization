@@ -1,6 +1,6 @@
 package factorization.api;
 
-public enum MechaStateActivation {
+public enum ExoStateActivation {
     OFF, FIRSTON, ON, FIRSTOFF;
     public boolean on = false;
     public boolean changing = false;

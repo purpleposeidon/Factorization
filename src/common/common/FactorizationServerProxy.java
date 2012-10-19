@@ -24,13 +24,13 @@ public class FactorizationServerProxy extends FactorizationProxy {
     @Override
     public void makeItemsSide() {
         Registry registry = Core.registry;
-        registry.mecha_head = new MechaArmor(
+        registry.exo_head = new ExoArmor(
                 registry.itemID("mechaHead", 9010), 0);
-        registry.mecha_chest = new MechaArmor(registry.itemID("mechaChest",
+        registry.exo_chest = new ExoArmor(registry.itemID("mechaChest",
                 9011), 1);
-        registry.mecha_leg = new MechaArmor(registry.itemID("mechaLeg", 9012),
+        registry.exo_leg = new ExoArmor(registry.itemID("mechaLeg", 9012),
                 2);
-        registry.mecha_foot = new MechaArmor(
+        registry.exo_foot = new ExoArmor(
                 registry.itemID("mechaFoot", 9013), 3);
     }
 

@@ -47,17 +47,17 @@ public class Core {
     public static final String version = "0.6.6"; //@VERSION@
     public Core() {
         registry = new Registry();
-        mechaCore = new MechaCore();
+        exoCore = new ExoCore();
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(registry);
-        MinecraftForge.EVENT_BUS.register(mechaCore);
+        MinecraftForge.EVENT_BUS.register(exoCore);
     }
     
     // runtime storage
     @Instance("factorization")
     public static Core instance;
     public static Registry registry;
-    public static MechaCore mechaCore;
+    public static ExoCore exoCore;
     @SidedProxy(clientSide = "factorization.client.FactorizationClientProxy", serverSide = "factorization.common.FactorizationServerProxy")
     public static FactorizationProxy proxy;
     public static NetworkFactorization network;

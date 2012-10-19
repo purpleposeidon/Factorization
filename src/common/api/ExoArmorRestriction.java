@@ -1,5 +1,5 @@
 package factorization.api;
 
-public enum MechaArmorRestriction {
+public enum ExoArmorRestriction {
     NONE, HEAD, CHEST, PANTS, FEET;
 }

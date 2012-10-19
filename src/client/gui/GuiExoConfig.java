@@ -15,21 +15,21 @@ import net.minecraft.src.ItemStack;
 import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.common.registry.LanguageRegistry;
-import factorization.api.IMechaUpgrade;
-import factorization.api.MechaStateShader;
-import factorization.api.MechaStateType;
+import factorization.api.IExoUpgrade;
+import factorization.api.ExoStateShader;
+import factorization.api.ExoStateType;
 import factorization.client.FactorizationClientProxy;
 import factorization.common.Command;
-import factorization.common.ContainerMechaModder;
+import factorization.common.ContainerExoModder;
 import factorization.common.Core;
-import factorization.common.MechaArmor;
+import factorization.common.ExoArmor;
 
-public class GuiMechaConfig extends GuiContainer {
-    ContainerMechaModder cont;
+public class GuiExoConfig extends GuiContainer {
+    ContainerExoModder cont;
 
-    public GuiMechaConfig(Container cont) {
+    public GuiExoConfig(Container cont) {
         super(cont);
-        this.cont = (ContainerMechaModder) cont;
+        this.cont = (ContainerExoModder) cont;
         xSize = 175;
         ySize = 197;
     }
@@ -49,10 +49,10 @@ public class GuiMechaConfig extends GuiContainer {
             return;
         }
         Item i = armor.getItem();
-        if (!(i instanceof MechaArmor)) {
+        if (!(i instanceof ExoArmor)) {
             return;
         }
-        MechaArmor m = (MechaArmor) i;
+        ExoArmor m = (ExoArmor) i;
         int left = guiLeft + 27;
         int top = guiTop + 26;
         int size = 16;
@@ -65,18 +65,18 @@ public class GuiMechaConfig extends GuiContainer {
         }
     }
 
-    MechaArmor getArmor() {
+    ExoArmor getArmor() {
         if (cont.upgrader.armor == null) {
             return null;
         }
         if (cont.upgrader.armor.getItem() instanceof ItemArmor) {
-            return (MechaArmor) cont.upgrader.armor.getItem();
+            return (ExoArmor) cont.upgrader.armor.getItem();
         }
         return null;
     }
 
     void drawSlotInfo(int slot) {
-        MechaArmor armor = getArmor();
+        ExoArmor armor = getArmor();
         if (armor == null) {
             return;
         }
@@ -89,19 +89,19 @@ public class GuiMechaConfig extends GuiContainer {
         int top = guiTop + 72;
         int delta = 12;
         String description = null;
-        if (upgrade.getItem() instanceof IMechaUpgrade) {
-            IMechaUpgrade up = (IMechaUpgrade) upgrade.getItem();
+        if (upgrade.getItem() instanceof IExoUpgrade) {
+            IExoUpgrade up = (IExoUpgrade) upgrade.getItem();
             description = up.getDescription();
         }
         if (description == null) {
             return;
         }
-        MechaStateType mst = armor.getMechaStateType(cont.upgrader.armor, slot);
-        MechaStateShader mss = armor.getMechaStateShader(cont.upgrader.armor, slot);
+        ExoStateType mst = armor.getExoStateType(cont.upgrader.armor, slot);
+        ExoStateShader mss = armor.getExoStateShader(cont.upgrader.armor, slot);
         String eventShader = "";
         String localKey = mst.when(mss) + ".name";
         if (mst.key > 0) {
-            int key = ((FactorizationClientProxy) Core.proxy).mechas[mst.key - 1].keyCode;
+            int key = ((FactorizationClientProxy) Core.proxy).exoKeys[mst.key - 1].keyCode;
             String keyName = GameSettings.getKeyDisplayString(key);
             String localFormat = LanguageRegistry.instance().getStringLocalization(localKey);
             try {
@@ -121,13 +121,13 @@ public class GuiMechaConfig extends GuiContainer {
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
-        int k = mc.renderEngine.getTexture(Core.texture_dir + "mechamodder.png");
+        int k = mc.renderEngine.getTexture(Core.texture_dir + "exomodder.png");
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         mc.renderEngine.bindTexture(k);
         int l = (width - xSize) / 2;
         int i1 = (height - ySize) / 2;
         drawTexturedModalRect(l, i1, 0, 0, xSize, ySize);
-        MechaArmor armor = getArmor();
+        ExoArmor armor = getArmor();
         int usableSlots = 0;
         if (armor != null) {
             usableSlots = armor.slotCount;
@@ -159,10 +159,10 @@ public class GuiMechaConfig extends GuiContainer {
         if (cont.upgrader.armor == null) {
             return;
         }
-        if (!(cont.upgrader.armor.getItem() instanceof MechaArmor)) {
+        if (!(cont.upgrader.armor.getItem() instanceof ExoArmor)) {
             return;
         }
-        (leftClick ? Command.mechaModLeftClick : Command.mechaModRightClick).call(Minecraft.getMinecraft().thePlayer, (byte) button.id);
+        (leftClick ? Command.exoModLeftClick : Command.exoModRightClick).call(Minecraft.getMinecraft().thePlayer, (byte) button.id);
     }
 
     @Override
@@ -173,12 +173,6 @@ public class GuiMechaConfig extends GuiContainer {
                 actionPerformed(button, mouseButton == 0);
             }
         }
-    }
-
-    @Override
-    protected void drawGuiContainerForegroundLayer() {
-        super.drawGuiContainerForegroundLayer();
-        //this.fontRenderer.drawString("Mecha-Modder", 7, 26, 4210752);
     }
 
 }

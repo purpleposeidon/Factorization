@@ -6,7 +6,7 @@ import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
 import net.minecraftforge.common.ISpecialArmor.ArmorProperties;
 
-public interface IMechaUpgrade {
+public interface IExoUpgrade {
     /**
      * 
      * @param player

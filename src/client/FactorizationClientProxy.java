@@ -41,7 +41,7 @@ import factorization.client.gui.GuiCrystallizer;
 import factorization.client.gui.GuiCutter;
 import factorization.client.gui.GuiGrinder;
 import factorization.client.gui.GuiMaker;
-import factorization.client.gui.GuiMechaConfig;
+import factorization.client.gui.GuiExoConfig;
 import factorization.client.gui.GuiMixer;
 import factorization.client.gui.GuiPocketTable;
 import factorization.client.gui.GuiRouter;
@@ -77,7 +77,7 @@ import factorization.common.Command;
 import factorization.common.ContainerCrystallizer;
 import factorization.common.ContainerFactorization;
 import factorization.common.ContainerGrinder;
-import factorization.common.ContainerMechaModder;
+import factorization.common.ContainerExoModder;
 import factorization.common.ContainerMixer;
 import factorization.common.ContainerPocket;
 import factorization.common.ContainerSlagFurnace;
@@ -104,10 +104,10 @@ public class FactorizationClientProxy extends FactorizationProxy {
     @Override
     public void makeItemsSide() {
         Registry registry = Core.registry;
-        registry.mecha_head = new MechaArmorTextured(registry.itemID("mechaHead", 9010), 0);
-        registry.mecha_chest = new MechaArmorTextured(registry.itemID("mechaChest", 9011), 1);
-        registry.mecha_leg = new MechaArmorTextured(registry.itemID("mechaLeg", 9012), 2);
-        registry.mecha_foot = new MechaArmorTextured(registry.itemID("mechaFoot", 9013), 3);
+        registry.exo_head = new ExoArmorTextured(registry.itemID("mechaHead", 9010), 0);
+        registry.exo_chest = new ExoArmorTextured(registry.itemID("mechaChest", 9011), 1);
+        registry.exo_leg = new ExoArmorTextured(registry.itemID("mechaLeg", 9012), 2);
+        registry.exo_foot = new ExoArmorTextured(registry.itemID("mechaFoot", 9013), 3);
     }
 
     @Override
@@ -158,8 +158,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
             return new GuiPocketTable(new ContainerPocket(player));
         }
 
-        if (ID == FactoryType.MECHATABLEGUICONFIG.gui) {
-            return new GuiMechaConfig(new ContainerMechaModder(player, new Coord(world, x, y, z)));
+        if (ID == FactoryType.EXOTABLEGUICONFIG.gui) {
+            return new GuiExoConfig(new ContainerExoModder(player, new Coord(world, x, y, z)));
         }
 
         TileEntity te = world.getBlockTileEntity(x, y, z);
@@ -384,7 +384,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
     public static KeyBinding bag_swap_key = new KeyBinding("Bag of Holding", org.lwjgl.input.Keyboard.KEY_GRAVE);
     public static KeyBinding pocket_key = new KeyBinding("Pocket Crafting Table", org.lwjgl.input.Keyboard.KEY_C);
-    public static KeyBinding mechas[] = new KeyBinding[Registry.MechaKeyCount];
+    public static KeyBinding exoKeys[] = new KeyBinding[Registry.ExoKeyCount];
 
     private static class CommandKeySet extends KeyHandler {
         Map<KeyBinding, Command> map;
@@ -434,10 +434,10 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }
     }
 
-    private Map<KeyBinding, Byte> mechaIDmap = new HashMap();
+    private Map<KeyBinding, Byte> exoIDmap = new HashMap();
 
-    public class MechaKeySet extends KeyHandler {
-        public MechaKeySet(KeyBinding[] keyBindings, boolean[] repeatings) {
+    public class ExoKeySet extends KeyHandler {
+        public ExoKeySet(KeyBinding[] keyBindings, boolean[] repeatings) {
             super(keyBindings, repeatings);
         }
 
@@ -448,7 +448,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
         @Override
         public String getLabel() {
-            return "MechaKeys";
+            return "ExoKeys";
         }
 
         @Override
@@ -458,7 +458,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             if (gui != null) {
                 return;
             }
-            Command.mechaKeyOn.call(getClientPlayer(), mechaIDmap.get(kb));
+            Command.exoKeyOn.call(getClientPlayer(), exoIDmap.get(kb));
         }
 
         @Override
@@ -467,7 +467,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             if (gui != null) {
                 return;
             }
-            Command.mechaKeyOff.call(getClientPlayer(), mechaIDmap.get(kb));
+            Command.exoKeyOff.call(getClientPlayer(), exoIDmap.get(kb));
         }
 
     }
@@ -493,14 +493,14 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }
         
         
-        for (byte i = 0; i < mechas.length; i++) {
-            mechas[i] = new KeyBinding("Mecha" + (i + 1), defaults[i]);
-            mechaIDmap.put(mechas[i], i);
+        for (byte i = 0; i < exoKeys.length; i++) {
+            exoKeys[i] = new KeyBinding("Exo" + (i + 1), defaults[i]);
+            exoIDmap.put(exoKeys[i], i);
         }
         KeyBindingRegistry.registerKeyBinding(CommandKeySet.create(
                 bag_swap_key, Command.bagShuffle,
                 pocket_key, Command.craftOpen));
-        KeyBindingRegistry.registerKeyBinding(new MechaKeySet(mechas, new boolean[mechas.length]));
+        KeyBindingRegistry.registerKeyBinding(new ExoKeySet(exoKeys, new boolean[exoKeys.length]));
     }
 
     private void setTileEntityRenderer(Class clazz, TileEntitySpecialRenderer r) {

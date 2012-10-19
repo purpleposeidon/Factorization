@@ -12,13 +12,13 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.MathHelper;
 import net.minecraftforge.common.ISpecialArmor.ArmorProperties;
 import factorization.api.Coord;
-import factorization.api.IMechaUpgrade;
+import factorization.api.IExoUpgrade;
 import factorization.common.Core.TabType;
 
-public class MechaMountedPiston extends Item implements IMechaUpgrade {
-    protected MechaMountedPiston(int par1) {
+public class ExoMountedPiston extends Item implements IExoUpgrade {
+    protected ExoMountedPiston(int par1) {
         super(par1);
-        setItemName("mecha.mountedpiston");
+        setItemName("exo.mountedpiston");
         setIconIndex(16 * 10 + 2);
         Core.tab(this, TabType.MISC);
         setMaxStackSize(1);
@@ -100,7 +100,7 @@ public class MechaMountedPiston extends Item implements IMechaUpgrade {
 
     @Override
     public void addInformation(ItemStack is, List list) {
-        list.add("Mecha-Upgrade");
+        list.add("Exo-Upgrade");
         Core.brand(list);
     }
 }

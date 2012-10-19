@@ -11,14 +11,14 @@ import net.minecraft.src.InventoryPlayer;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.Slot;
 import factorization.api.Coord;
-import factorization.api.IMechaUpgrade;
+import factorization.api.IExoUpgrade;
 
-public class ContainerMechaModder extends Container {
+public class ContainerExoModder extends Container {
     Coord benchLocation;
     InventoryPlayer inv;
     EntityPlayer player;
     public InventoryUpgrader upgrader;
-    SlotMechaArmor armorSlot;
+    SlotExoArmor armorSlot;
     ArrayList<Slot> upgradeSlots = new ArrayList(), playerSlots = new ArrayList<Slot>();
 
     public class InventoryUpgrader implements IInventory {
@@ -81,7 +81,7 @@ public class ContainerMechaModder extends Container {
 
         @Override
         public String getInvName() {
-            return "Mecha-Modder";
+            return "Exo-Modder";
         }
 
         @Override
@@ -106,10 +106,10 @@ public class ContainerMechaModder extends Container {
 
     }
 
-    class SlotMechaArmor extends Slot {
+    class SlotExoArmor extends Slot {
         ArrayList<Slot> upgradeSlots;
 
-        public SlotMechaArmor(IInventory par1iInventory, int par2, int par3, int par4,
+        public SlotExoArmor(IInventory par1iInventory, int par2, int par3, int par4,
                 ArrayList<Slot> upgradeSlots) {
             super(par1iInventory, par2, par3, par4);
             this.upgradeSlots = upgradeSlots;
@@ -122,10 +122,10 @@ public class ContainerMechaModder extends Container {
             if (is == null) {
                 return null;
             }
-            if (!(is.getItem() instanceof MechaArmor)) {
+            if (!(is.getItem() instanceof ExoArmor)) {
                 return is;
             }
-            MechaArmor armor = (MechaArmor) is.getItem();
+            ExoArmor armor = (ExoArmor) is.getItem();
             for (int slot = 0; slot < armor.slotCount; slot++) {
                 Slot upgradeSlot = upgradeSlots.get(slot);
                 ItemStack upgrade = armor.getStackInSlot(is, slot);
@@ -152,10 +152,10 @@ public class ContainerMechaModder extends Container {
             if (is == null) {
                 return;
             }
-            if (!(is.getItem() instanceof MechaArmor)) {
+            if (!(is.getItem() instanceof ExoArmor)) {
                 return;
             }
-            MechaArmor armor = (MechaArmor) is.getItem();
+            ExoArmor armor = (ExoArmor) is.getItem();
             for (int slot = 0; slot < armor.slotCount; slot++) {
                 Slot upgradeSlot = upgradeSlots.get(slot);
                 ItemStack upgrade = armor.getStackInSlot(is, slot);
@@ -169,11 +169,11 @@ public class ContainerMechaModder extends Container {
 
     }
 
-    class SlotMechaUpgrade extends Slot {
-        int mechaIndex;
-        public SlotMechaUpgrade(int mechaIndex, IInventory inv, int slotIndex, int posX, int posY) {
+    class SlotExoUpgrade extends Slot {
+        int exoIndex;
+        public SlotExoUpgrade(int exoIndex, IInventory inv, int slotIndex, int posX, int posY) {
             super(inv, slotIndex, posX, posY);
-            this.mechaIndex = mechaIndex;
+            this.exoIndex = exoIndex;
         }
         
         @Override
@@ -181,23 +181,23 @@ public class ContainerMechaModder extends Container {
             if (is == null) {
                 return false;
             }
-            if (!(is.getItem() instanceof IMechaUpgrade)) {
+            if (!(is.getItem() instanceof IExoUpgrade)) {
                 return false;
             }
             ItemStack armor = armorSlot.getStack();
             if (armor == null) {
                 return false;
             }
-            if (!(armor.getItem() instanceof MechaArmor)) {
+            if (!(armor.getItem() instanceof ExoArmor)) {
                 return false;
             }
-            MechaArmor ma = (MechaArmor) armor.getItem();
-            return ma.slotCount > mechaIndex;
+            ExoArmor ma = (ExoArmor) armor.getItem();
+            return ma.slotCount > exoIndex;
         }
         
     }
     
-    public ContainerMechaModder(EntityPlayer player, Coord benchLocation) {
+    public ContainerExoModder(EntityPlayer player, Coord benchLocation) {
         this.benchLocation = benchLocation;
         this.inv = player.inventory;
         this.player = player;
@@ -221,12 +221,12 @@ public class ContainerMechaModder extends Container {
         //slots for upgrades
         ArrayList<Slot> upgrades = new ArrayList(8);
         for (int col = 0; col < 8; col++) {
-            Slot u = new SlotMechaUpgrade(col, upgrader, 101 + col, 27 + col * 18, 7);
+            Slot u = new SlotExoUpgrade(col, upgrader, 101 + col, 27 + col * 18, 7);
             this.addSlotToContainer(u);
             upgrades.add(u);
         }
         //slot for the armor
-        armorSlot = new SlotMechaArmor(upgrader, 100, 7, 7, upgrades);
+        armorSlot = new SlotExoArmor(upgrader, 100, 7, 7, upgrades);
         this.addSlotToContainer(armorSlot);
         upgradeSlots.add(armorSlot);
         upgradeSlots.addAll(upgrades);
@@ -234,7 +234,7 @@ public class ContainerMechaModder extends Container {
 
     @Override
     public boolean canInteractWith(EntityPlayer player) {
-        if (benchLocation.getId() == Core.resource_id && ResourceType.MECHAMODDER.is(benchLocation.getMd())) {
+        if (benchLocation.getId() == Core.resource_id && ResourceType.EXOMODDER.is(benchLocation.getMd())) {
             Coord p = new Coord(player);
             return benchLocation.distance(p) <= 8;
         }

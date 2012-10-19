@@ -12,14 +12,14 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.Material;
 import net.minecraftforge.common.ISpecialArmor.ArmorProperties;
 import factorization.api.Coord;
-import factorization.api.IMechaUpgrade;
+import factorization.api.IExoUpgrade;
 import factorization.common.Core.TabType;
 
-class MechaBuoyantBarrel extends Item implements IMechaUpgrade {
+class ExoBuoyantBarrel extends Item implements IExoUpgrade {
 
-    protected MechaBuoyantBarrel(int par1) {
+    protected ExoBuoyantBarrel(int par1) {
         super(par1);
-        setItemName("mecha.buoyantbarrel");
+        setItemName("exo.buoyantbarrel");
         setIconIndex(16 * 10);
         Core.tab(this, TabType.MISC);
         setMaxStackSize(1);
@@ -48,7 +48,7 @@ class MechaBuoyantBarrel extends Item implements IMechaUpgrade {
             if (headInWater) {
                 accel = 0.1F;
             }
-            if (armor.getItem() == Core.registry.mecha_foot) {
+            if (armor.getItem() == Core.registry.exo_foot) {
                 //bonus for water-walking...
                 maxSpeed = 0.8F;
                 accel *= 1.2;
@@ -85,7 +85,7 @@ class MechaBuoyantBarrel extends Item implements IMechaUpgrade {
 
     @Override
     public void addInformation(ItemStack is, List list) {
-        list.add("Mecha-Upgrade");
+        list.add("Exo-Upgrade");
         Core.brand(list);
     }
 }

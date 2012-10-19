@@ -46,7 +46,7 @@ import factorization.api.IActOnCraft;
 import factorization.common.ItemOreProcessing.OreType;
 
 public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler {
-    static public final int MechaKeyCount = 3;
+    static public final int ExoKeyCount = 3;
 
     public ItemFactorization item_factorization;
     public ItemBlockResource item_resource;
@@ -62,7 +62,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             leadwire_item, grinder_item, mixer_item, crystallizer_item,
             greenware_item;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
-            dark_iron_block_item, mechaworkshop_item;
+            dark_iron_block_item, exoworkshop_item;
     public ItemStack is_factory, is_lamp, is_lightair;
     public ItemCraft item_craft;
     public ItemBagOfHolding bag_of_holding;
@@ -75,11 +75,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public IRecipe boh_upgrade_recipe;
     public ItemWrathIgniter wrath_igniter;
     public ItemCraftingComponent silver_ingot, lead_ingot, dark_iron;
-    public ItemCraftingComponent mecha_chasis;
-    public MechaArmor mecha_head, mecha_chest, mecha_leg, mecha_foot;
-    public MechaBuoyantBarrel mecha_buoyant_barrel;
-    public MechaCobblestoneDrive mecha_cobble_drive;
-    public MechaMountedPiston mecha_mounted_piston;
+    public ItemCraftingComponent exo_chasis;
+    public ExoArmor exo_head, exo_chest, exo_leg, exo_foot;
+    public ExoBuoyantBarrel exo_buoyant_barrel;
+    public ExoCobblestoneDrive exo_cobble_drive;
+    public ExoMountedPiston exo_mounted_piston;
     public ItemMachineUpgrade router_item_filter, router_machine_filter, router_speed,
             router_thorough, router_throughput, router_eject;
     public ItemMachineUpgrade barrel_enlarge;
@@ -188,7 +188,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         silver_block_item = ResourceType.SILVERBLOCK.itemStack("Block of Silver");
         lead_block_item = ResourceType.LEADBLOCK.itemStack("Block of Lead");
         dark_iron_block_item = ResourceType.DARKIRONBLOCK.itemStack("Block of Dark Iron");
-        mechaworkshop_item = ResourceType.MECHAMODDER.itemStack("Mecha-Modder");
+        exoworkshop_item = ResourceType.EXOMODDER.itemStack("Exo-Modder");
 
         lead_ingot = new ItemCraftingComponent(itemID("leadIngot", 9014), "Lead Ingot", 16 * 3 + 3);
         silver_ingot = new ItemCraftingComponent(itemID("silverIngot", 9015), "Silver Ingot", 16 * 3 + 4);
@@ -257,26 +257,26 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         item_craft = new ItemCraft(itemID("itemCraftId", 9000));
         addName(item_craft, "Craftpacket");
 
-        //Mecha-items
-        mecha_head.setSlotCount(5);
-        mecha_chest.setSlotCount(8);
-        mecha_leg.setSlotCount(6);
-        mecha_foot.setSlotCount(4);
+        //Exo-items
+        exo_head.setSlotCount(5);
+        exo_chest.setSlotCount(8);
+        exo_leg.setSlotCount(6);
+        exo_foot.setSlotCount(4);
 
-        mecha_chasis = new ItemCraftingComponent(itemID("mechaChasis", 9009), "item.mechachasis", 5);
-        addName(mecha_chasis, "Mecha-Chassis");
-        //mecha_ITEMS created in make_recipes_side()
-        //Mecha-armor uses up to Item ID 9013.
-        addName(mecha_head, "Mecha-Helmet");
-        addName(mecha_chest, "Mecha-Chestplate");
-        addName(mecha_leg, "Mecha-Leggings");
-        addName(mecha_foot, "Mecha-Boots");
-        mecha_buoyant_barrel = new MechaBuoyantBarrel(itemID("mechaBouyantBarrel", 9021));
-        mecha_cobble_drive = new MechaCobblestoneDrive(itemID("mechaCobbleDrive", 9022));
-        mecha_mounted_piston = new MechaMountedPiston(itemID("mechaMountedPiston", 9023));
-        addName(mecha_buoyant_barrel, "Buoyant Barrel");
-        addName(mecha_cobble_drive, "Cobblestone Drive");
-        addName(mecha_mounted_piston, "Mounted Piston");
+        exo_chasis = new ItemCraftingComponent(itemID("mechaChasis", 9009), "item.exochasis", 5);
+        addName(exo_chasis, "Exo-Chassis");
+        //exo_ITEMS created in make_recipes_side()
+        //Exo-armor uses up to Item ID 9013.
+        addName(exo_head, "Exo-Helmet");
+        addName(exo_chest, "Exo-Chestplate");
+        addName(exo_leg, "Exo-Leggings");
+        addName(exo_foot, "Exo-Boots");
+        exo_buoyant_barrel = new ExoBuoyantBarrel(itemID("mechaBouyantBarrel", 9021));
+        exo_cobble_drive = new ExoCobblestoneDrive(itemID("mechaCobbleDrive", 9022));
+        exo_mounted_piston = new ExoMountedPiston(itemID("mechaMountedPiston", 9023));
+        addName(exo_buoyant_barrel, "Buoyant Barrel");
+        addName(exo_cobble_drive, "Cobblestone Drive");
+        addName(exo_mounted_piston, "Mounted Piston");
         angular_saw = new ItemAngularSaw(itemID("angularSaw", 9042));
         addName(angular_saw, "Angular Saw");
         MinecraftForge.setToolClass(angular_saw, "pickaxe", 3);
@@ -424,34 +424,34 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         oreRecipe(silver_block_item, "###", "###", "###", '#', "ingotSilver");
         FurnaceRecipes.smelting().addSmelting(resource_block.blockID, 0 /* MD for silver */, new ItemStack(silver_ingot));
 
-        //mecha armor
-        recipe(new ItemStack(mecha_chasis),
+        //exo armor
+        recipe(new ItemStack(exo_chasis),
                 "III",
                 "InI",
                 "III",
                 'I', Item.ingotIron,
                 'n', Item.goldNugget);
-        recipe(new ItemStack(mecha_head),
+        recipe(new ItemStack(exo_head),
                 "###",
                 "# #",
-                '#', mecha_chasis);
-        recipe(new ItemStack(mecha_chest),
+                '#', exo_chasis);
+        recipe(new ItemStack(exo_chest),
                 "# #",
                 "###",
                 "###",
-                '#', mecha_chasis);
-        recipe(new ItemStack(mecha_leg),
+                '#', exo_chasis);
+        recipe(new ItemStack(exo_leg),
                 "###",
                 "# #",
                 "# #",
-                '#', mecha_chasis);
-        recipe(new ItemStack(mecha_foot),
+                '#', exo_chasis);
+        recipe(new ItemStack(exo_foot),
                 "# #",
                 "# #",
-                '#', mecha_chasis);
-        //mecha armor upgrades
+                '#', exo_chasis);
+        //exo armor upgrades
 
-        recipe(new ItemStack(mecha_buoyant_barrel),
+        recipe(new ItemStack(exo_buoyant_barrel),
                 "W_W",
                 "PBP",
                 "WVW",
@@ -461,7 +461,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'B', barrel_item,
                 'V', Item.boat);
 
-        ItemStack is_cobble_drive = new ItemStack(mecha_cobble_drive);
+        ItemStack is_cobble_drive = new ItemStack(exo_cobble_drive);
         recipe(is_cobble_drive,
                 "OPO",
                 "WTL",
@@ -480,7 +480,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'W', Item.bucketWater,
                 'T', Item.pickaxeSteel,
                 'L', Item.bucketLava);
-        recipe(new ItemStack(mecha_mounted_piston),
+        recipe(new ItemStack(exo_mounted_piston),
                 "CNC",
                 "LSL",
                 "CCC",
@@ -662,13 +662,13 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             //mining redstone normally gives 4 to 6 ore. 5.8F should get you a slightly better yield.
         }
 
-        //mecha-workshop
-        recipe(mechaworkshop_item,
+        //exo-workshop
+        recipe(exoworkshop_item,
                 "MCM",
                 "i i",
                 "i i",
                 'C', Block.workbench,
-                'M', mecha_chasis,
+                'M', exo_chasis,
                 'i', Item.ingotIron);
         recipe(greenware_item,
                 "c",

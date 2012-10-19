@@ -37,8 +37,8 @@ public class ItemBlockResource extends ItemBlock {
         if (ResourceType.DARKIRONBLOCK.is(md)) {
             return "Block of Dark Iron";
         }
-        if (ResourceType.MECHAMODDER.is(md)) {
-            return "Mecha-Workshop";
+        if (ResourceType.EXOMODDER.is(md)) {
+            return "Exo-Workshop";
         }
         System.err.println("NOTE: ItemBlock is missing a name: " + itemstack);
         System.err.println("   MD = " + md);

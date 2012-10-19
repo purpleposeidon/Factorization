@@ -1,6 +1,6 @@
 package factorization.api;
 
-public enum MechaStateShader {
+public enum ExoStateShader {
     NORMAL, INVERSE, RISINGEDGE, FALLINGEDGE, TOGGLE, INVTOGGLE;
 
     public String brief() {

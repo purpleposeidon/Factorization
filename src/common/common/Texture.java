@@ -23,10 +23,10 @@ public class Texture {
     static final int block_iron = 3;
     static final int glass = 4;
     static final int bars = 5;
-    static final int mecha_top = 16;
-    static final int mecha_side = mecha_top + 1;
-    static final int mecha_bottom = mecha_top + 2;
-    static final int mecha_config = mecha_top + 3;
+    static final int exo_top = 16;
+    static final int exo_side = exo_top + 1;
+    static final int exo_bottom = exo_top + 2;
+    static final int exo_config = exo_top + 3;
     static final int furnace_start = 16 * 4 + 2;
     static public final int heater_coil = 8, heater_element = heater_coil + 1;
     static public final int silver = 1 + 16 * 2;
