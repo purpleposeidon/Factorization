@@ -245,7 +245,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
 
     @Override
     public Coord getCoord() {
-        return new Coord(this.worldObj, this);
+        return new Coord(this);
     }
 
     void die() {

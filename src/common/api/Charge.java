@@ -46,6 +46,10 @@ public class Charge {
         return conductorSet.totalCharge += chargeToAdd;
     }
     
+    /**
+     * Removes all the charge.
+     * @return how much charge there was
+     */
     public int deplete() {
         int ret = getValue();
         setValue(0);
@@ -111,6 +115,9 @@ public class Charge {
         new ConductorSet(conductor);
     }
 
+    /*** 
+     * Call this function every tick.
+     */
     public void update() {
         Coord here = conductor.getCoord();
         if (here.w.isRemote) {
@@ -131,6 +138,9 @@ public class Charge {
         }
     }
     
+    /**
+     * Call when the IChargeConductor containing the charge is removed.
+     */
     public void remove() {
         if (conductorSet == null) {
             return;
@@ -164,6 +174,9 @@ public class Charge {
         return ret;
     }
 
+    /**
+     * Call this function when the IChargeConductor is invalidated.
+     */
     public void invalidate() {
         if (conductorSet == null) {
             return;

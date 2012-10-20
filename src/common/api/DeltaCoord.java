@@ -113,7 +113,7 @@ public class DeltaCoord {
         case 0: return x;
         case 1: return y;
         case 2: return z;
-        default: throw new RuntimeException("not an cardinal index");
+        default: throw new RuntimeException("not an dimension index");
         }
     }
     
@@ -122,7 +122,7 @@ public class DeltaCoord {
         case 0: x = val; break;
         case 1: y = val; break;
         case 2: z = val; break;
-        default: throw new RuntimeException("not an cardinal index");
+        default: throw new RuntimeException("not an dimension index");
         }
     }
 }

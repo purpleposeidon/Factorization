@@ -33,7 +33,7 @@ public interface IExoUpgrade {
     /**
      * @param is
      *            the upgrade
-     * @return how many halves of armor to draw
+     * @return how many halves of armor to draw on the HUD
      */
     int getArmorDisplay(ItemStack is);
 

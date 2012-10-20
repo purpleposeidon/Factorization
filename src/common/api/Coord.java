@@ -28,18 +28,13 @@ public class Coord {
         this.y = y;
         this.z = z;
     }
-    
-    @Deprecated
-    public Coord(World w, TileEntity te) {
-        this(w, te.xCoord, te.yCoord, te.zCoord);
-    }
 
     public Coord(TileEntity te) {
         this(te.worldObj, te.xCoord, te.yCoord, te.zCoord);
     }
 
     public Coord(Entity ent) {
-        this(ent.worldObj, (int) ent.posX, (int) (ent.posY + ent.yOffset), (int) ent.posZ);
+        this(ent.worldObj, ent.posX, ent.posY + ent.yOffset, ent.posZ);
     }
 
     public Coord(World w, double x, double y, double z) {
@@ -50,6 +45,10 @@ public class Coord {
         String ret = "(" + x + ", " + y + ", " + z + ")";
         if (w != null) {
             ret += " a " + getBlock();
+            TileEntity te = getTE();
+            if (te != null) {
+                ret += " with TE " + te;
+            }
         }
         return ret;
     }
@@ -90,7 +89,7 @@ public class Coord {
         }
     }
 
-    /** @return boolean for a check pattern */
+    /** @return boolean for a checkerboard pattern */
     public boolean parity() {
         return ((x + y + z) & 1) == 0;
     }
@@ -175,10 +174,6 @@ public class Coord {
         return this.add(DeltaCoord.directNeighbors[r]);
     }
 
-    public Coord d(int dx, int dy, int dz) {
-        return new Coord(w, x + dx, y + dy, z + dz);
-    }
-
     public Coord[] getNeighborsInPlane(int side) {
         //For god's sake, don't change the order of these return values.
         //That would mess up wire rendering.
@@ -186,26 +181,26 @@ public class Coord {
         case 0:
         case 1: //y
             return new Coord[] {
-                    d(-1, 0, 0),
-                    d(+1, 0, 0),
-                    d(0, 0, -1),
-                    d(0, 0, +1)
+                    add(-1, 0, 0),
+                    add(+1, 0, 0),
+                    add(0, 0, -1),
+                    add(0, 0, +1)
             };
         case 2:
         case 3: //z
             return new Coord[] {
-                    d(-1, 0, 0),
-                    d(+1, 0, 0),
-                    d(0, -1, 0),
-                    d(0, +1, 0)
+                    add(-1, 0, 0),
+                    add(+1, 0, 0),
+                    add(0, -1, 0),
+                    add(0, +1, 0)
             };
         case 4:
         case 5: //x
             return new Coord[] {
-                    d(0, 0, -1),
-                    d(0, 0, +1),
-                    d(0, -1, 0),
-                    d(0, +1, 0)
+                    add(0, 0, -1),
+                    add(0, 0, +1),
+                    add(0, -1, 0),
+                    add(0, +1, 0)
             };
         }
         return null;
@@ -216,20 +211,20 @@ public class Coord {
         case 0:
         case 1: //y
             return new Coord[] {
-                    d(0, -1, 0),
-                    d(0, +1, 0)
+                    add(0, -1, 0),
+                    add(0, +1, 0)
             };
         case 2:
         case 3: //z
             return new Coord[] {
-                    d(0, 0, -1),
-                    d(0, 0, +1),
+                    add(0, 0, -1),
+                    add(0, 0, +1),
             };
         case 4:
         case 5: //x
             return new Coord[] {
-                    d(-1, 0, 0),
-                    d(+1, 0, 0),
+                    add(-1, 0, 0),
+                    add(+1, 0, 0),
             };
         }
         return null;
@@ -239,7 +234,6 @@ public class Coord {
         return y < o.y || x < o.x || z < o.z;
     }
 
-    //Impure methods
     public void setWorld(World newWorld) {
         this.w = newWorld;
     }
@@ -255,19 +249,7 @@ public class Coord {
     public Coord add(int x, int y, int z) {
         return new Coord(w, this.x + x, this.y + y, this.z + z);
     }
-
-    public void dirty() {
-        w.markBlocksDirty(x, y, z, x, y, z);
-    }
-
-    public void updateLight() {
-        w.updateAllLightTypes(x, y, z);
-    }
-
-    public void setTE(TileEntity te) {
-        w.setBlockTileEntity(x, y, z, te);
-    }
-
+    
     /**
      * Adjusts position. 0, 1: y; 2, 3: z; 4, 5: x
      * 
@@ -295,8 +277,21 @@ public class Coord {
         }
         return this;
     }
+    
+    //Methods on the world
 
-    //world gets/sets
+    public void dirty() {
+        w.markBlocksDirty(x, y, z, x, y, z);
+    }
+
+    public void updateLight() {
+        w.updateAllLightTypes(x, y, z);
+    }
+
+    public void setTE(TileEntity te) {
+        w.setBlockTileEntity(x, y, z, te);
+    }
+
     public TileEntity getTE() {
         return w.getBlockTileEntity(x, y, z);
     }

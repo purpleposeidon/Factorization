@@ -115,7 +115,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
 
     @Override
     public Coord getCoord() {
-        return new Coord(worldObj, this);
+        return new Coord(this);
     }
 
     public boolean activate(EntityPlayer entityplayer) {

@@ -15,7 +15,7 @@ class ConductorSet implements Comparable {
     TreeSet<ConductorSet> neighbors = null;
     Iterator<ConductorSet> neighborIterator = null;
     
-    public ConductorSet(IChargeConductor leader) {
+    ConductorSet(IChargeConductor leader) {
         this.leader = leader;
         this.memberCount = 1;
         Charge lc = leader.getCharge();
@@ -33,7 +33,7 @@ class ConductorSet implements Comparable {
         return true;
     }
     
-    public void update() {
+    void update() {
         if (neighbors == null || neighbors.size() == 0) {
             neighbors = null;
             return;
@@ -61,7 +61,7 @@ class ConductorSet implements Comparable {
         totalCharge = ourCharge - hisNewCharge;
     }
     
-    public boolean addNeighbor(ConductorSet neighbor) {
+    boolean addNeighbor(ConductorSet neighbor) {
         if (neighbor == this || neighbor == null) {
             return false;
         }
@@ -79,7 +79,7 @@ class ConductorSet implements Comparable {
     private static ArrayList<IChargeConductor> frontier = new ArrayList<IChargeConductor>(5 * 5 * 4);
     private static HashSet<IChargeConductor> visited = new HashSet<IChargeConductor>(5 * 5 * 5);
     
-    public Iterable<IChargeConductor> getMembers(IChargeConductor seed) {
+    Iterable<IChargeConductor> getMembers(IChargeConductor seed) {
         if (seed == null) {
             return new ArrayList<IChargeConductor>(0);
         }
