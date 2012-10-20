@@ -59,6 +59,15 @@ public class FactorizationUtil {
         return is.stackSize;
     }
 
+    /**
+     * Use transferSlotToSlots
+     * @param srcInv
+     * @param slotIndex
+     * @param destInv
+     * @param targetSlots
+     * @return
+     */
+    @Deprecated
     public static ItemStack transferStackToArea(IInventory srcInv, int slotIndex,
             IInventory destInv, Iterable<Integer> targetSlots) {
         //this is probably all wrong. >_>
