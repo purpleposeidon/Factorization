@@ -2,8 +2,8 @@ package factorization.common;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -20,7 +20,6 @@ import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod.PostInit;
@@ -87,6 +86,8 @@ public class Core {
     public static boolean cheat = false;
     public static boolean debug_light_air = false;
     public static boolean debug_network = false;
+    
+    public static boolean dev_environ = System.getProperty("user.dir", "").startsWith("/home/poseidon/Development/");
 
     // universal constant config
     public final static String texture_dir = "/factorization/texture/";
@@ -296,6 +297,9 @@ public class Core {
         }
         if (cheat) {
             list.add("Cheat mode!");
+        }
+        if (dev_environ) {
+            list.add("Development!");
         }
     }
     
