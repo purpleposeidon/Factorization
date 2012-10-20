@@ -16,6 +16,7 @@ public class BlockResource extends Block {
         super(id, Material.rock);
         setHardness(2.0F);
         setCreativeTab(CreativeTabs.tabBlock);
+        setBlockName("factorizationResourceBlock");
         //setTabToDisplayOn(CreativeTabs.tabBlock);
     }
 
@@ -37,12 +38,7 @@ public class BlockResource extends Block {
     public String getTextureFile() {
         return Core.texture_file_block;
     }
-
-    @Override
-    public String getBlockName() {
-        return "Factorization Resource";
-    }
-
+    
     @Override
     public void addCreativeItems(ArrayList itemList) {
         itemList.add(Core.registry.silver_ore_item);
@@ -74,10 +70,5 @@ public class BlockResource extends Block {
     @Override
     protected int damageDropped(int i) {
         return i;
-    }
-
-    @Override
-    public int quantityDropped(int meta, int fortune, Random random) {
-        return 1;
     }
 }

@@ -25,31 +25,13 @@ public class ItemBlockResource extends ItemBlock {
     public String getItemNameIS(ItemStack itemstack) {
         // I don't think this actually gets called...
         int md = itemstack.getItemDamage();
-        if (ResourceType.SILVERORE.is(md)) {
-            return "Silver Ore";
-        }
-        if (ResourceType.SILVERBLOCK.is(md)) {
-            return "Block of Silver";
-        }
-        if (ResourceType.LEADBLOCK.is(md)) {
-            return "Block of Lead";
-        }
-        if (ResourceType.DARKIRONBLOCK.is(md)) {
-            return "Block of Dark Iron";
-        }
-        if (ResourceType.EXOMODDER.is(md)) {
-            return "Exo-Workshop";
-        }
-        System.err.println("NOTE: ItemBlock is missing a name: " + itemstack);
-        System.err.println("   MD = " + md);
-        return "??? It's a Mystery!!!";
+        if (md < ResourceType.values().length && md >= 0) {
+            ResourceType rs = ResourceType.values()[md];
+            return getItemName() + "." + rs;
+        } 
+        return getItemName() + ".unknownMd" + md;
     }
-
-    @Override
-    public String getItemName() {
-        return "ItemFactorizationResource";
-    }
-
+    
     @Override
     public void addInformation(ItemStack is, List infoList) {
         super.addInformation(is, infoList);
