@@ -2,12 +2,13 @@ package factorization.common;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
 import net.minecraft.src.Container;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.InventoryPlayer;
+import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.Slot;
 import factorization.api.Coord;
@@ -19,7 +20,7 @@ public class ContainerExoModder extends Container {
     EntityPlayer player;
     public InventoryUpgrader upgrader;
     SlotExoArmor armorSlot;
-    ArrayList<Slot> upgradeSlots = new ArrayList(), playerSlots = new ArrayList<Slot>();
+    ArrayList<Slot> upgradeSlots = new ArrayList<Slot>(8), playerSlots = new ArrayList<Slot>(9*4);
 
     public class InventoryUpgrader implements IInventory {
         public ItemStack armor;
@@ -146,6 +147,10 @@ public class ContainerExoModder extends Container {
             super.putStack(is);
             unpackArmor();
         }
+        
+        void packArmor() {
+            super.putStack(decrStackSize(1));
+        }
 
         void unpackArmor() {
             ItemStack is = getStack();
@@ -192,6 +197,10 @@ public class ContainerExoModder extends Container {
                 return false;
             }
             ExoArmor ma = (ExoArmor) armor.getItem();
+            IExoUpgrade upgrade = (IExoUpgrade) is.getItem();
+            if (!upgrade.canUpgradeArmor(armor, ma.armorType)) {
+                return false;
+            }
             return ma.slotCount > exoIndex;
         }
         
@@ -219,17 +228,14 @@ public class ContainerExoModder extends Container {
         }
 
         //slots for upgrades
-        ArrayList<Slot> upgrades = new ArrayList(8);
         for (int col = 0; col < 8; col++) {
             Slot u = new SlotExoUpgrade(col, upgrader, 101 + col, 27 + col * 18, 7);
             this.addSlotToContainer(u);
-            upgrades.add(u);
+            upgradeSlots.add(u);
         }
         //slot for the armor
-        armorSlot = new SlotExoArmor(upgrader, 100, 7, 7, upgrades);
+        armorSlot = new SlotExoArmor(upgrader, 100, 7, 7, upgradeSlots);
         this.addSlotToContainer(armorSlot);
-        upgradeSlots.add(armorSlot);
-        upgradeSlots.addAll(upgrades);
     }
 
     @Override
@@ -257,43 +263,30 @@ public class ContainerExoModder extends Container {
     }
 
     @Override
-    public ItemStack transferStackInSlot(int slot) {
+    public ItemStack transferStackInSlot(int slotNumber) {
         try {
-            ArrayList<Integer> invArea = new ArrayList();
-            for (int i = 0; i < 9 * 4; i++) {
-                invArea.add(i);
+            Slot clickedSlot = (Slot) inventorySlots.get(slotNumber);
+            Iterable<Slot> targetSlots;
+            if (clickedSlot.getStack() == null) {
+                return null;
             }
-            ArrayList<Integer> upgradeArea = new ArrayList();
-            for (int i = 100; i < 109; i++) {
-                upgradeArea.add(i);
-            }
-            List<Integer> shorty = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8);
-
-            if (slot == 44) {
-                if (!armorSlot.getHasStack()) {
+            Item clickedItem = clickedSlot.getStack().getItem();
+            if (clickedSlot == armorSlot) {
+                //pack the armor
+                armorSlot.packArmor();
+                targetSlots = playerSlots;
+            } else if (clickedSlot instanceof SlotExoUpgrade) {
+                targetSlots = playerSlots;
+            } else {
+                if (clickedItem instanceof ExoArmor) {
+                    targetSlots = (Iterable) Arrays.asList(armorSlot);
+                } else if (clickedItem instanceof IExoUpgrade) {
+                    targetSlots = upgradeSlots;
+                } else {
                     return null;
                 }
-                //stuff the armor, then sneak it back in
-                ItemStack is = armorSlot.decrStackSize(armorSlot.getStack().stackSize);
-                armorSlot.inventory.setInventorySlotContents(100, is);
-
-                //				FactorizationUtil.transferSlotToSlots(armorSlot, playerSlots);
-                //				return null;
-                return FactorizationUtil.transferStackToArea(upgrader, 100, inv, invArea);
             }
-            else if (slot >= 9 * 4) {
-                //				FactorizationUtil.transferSlotToSlots(upgradeSlots.get(slot - 9 * 4), playerSlots);
-                //				return null;
-                return FactorizationUtil.transferStackToArea(upgrader, slot - 9 * 4 + 101, inv, invArea);
-            }
-            slot += 9;
-            if (slot >= 9 * 4) {
-                slot -= 9 * 4;
-            }
-            //			FactorizationUtil.transferSlotToSlots(playerSlots.get(slot), upgradeSlots);
-            //			return null;
-            return FactorizationUtil.transferStackToArea(inv, slot, upgrader, upgradeArea);
-
+            return FactorizationUtil.transferSlotToSlots(clickedSlot, targetSlots);
         } finally {
             armorSlot.unpackArmor();
         }

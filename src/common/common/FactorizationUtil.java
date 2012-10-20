@@ -103,41 +103,54 @@ public class FactorizationUtil {
         srcInv.setInventorySlotContents(slotIndex, is);
         return is;
     }
-
-    public static void transferSlotToSlots(Slot src, Iterable<Slot> destination) {
-        if (src == null || destination == null || !destination.iterator().hasNext()) {
-            return;
+    
+    public static ItemStack transferSlotToSlots(Slot clickSlot, Iterable<Slot> destinations) {
+        ItemStack clickStack = normalize(clickSlot.getStack());
+        if (clickStack == null) {
+            return null;
         }
-        ItemStack sis = src.getStack();
-        if (sis == null || sis.stackSize < 1) {
-            return;
-        }
-        for (Slot slot : destination) {
-            ItemStack is = slot.getStack();
-            if (is != null) {
-                if (slot.getStack().stackSize >= slot.getSlotStackLimit()) {
-                    continue;
-                }
-                if (!is.isStackEqual(sis)) {
-                    continue;
-                }
-                int avail = slot.getSlotStackLimit() - is.stackSize;
-                int toput = Math.min(sis.stackSize, avail);
-                is.stackSize += toput;
-                slot.putStack(is);
-                sis.stackSize -= toput;
-                if (sis.stackSize == 0) {
-                    sis = null;
-                }
-                src.putStack(sis);
-                return;
-
-            } else {
-                int toput = Math.min(slot.getSlotStackLimit(), src.getStack().stackSize);
-                slot.putStack(src.decrStackSize(toput));
-                return;
+        //try to fill up partially filled slots
+        for (Slot slot : destinations) {
+            ItemStack is = normalize(slot.getStack());
+            if (is == null || !is.isItemEqual(clickStack)) {
+                continue;
+            }
+            int freeSpace = Math.min(is.getMaxStackSize() - is.stackSize, slot.getSlotStackLimit() - is.stackSize);
+            if (freeSpace <= 0) {
+                continue;
+            }
+            if (!slot.isItemValid(clickStack)) {
+                continue;
+            }
+            int delta = Math.min(freeSpace, clickStack.stackSize);
+            is.stackSize += delta;
+            slot.putStack(is);
+            clickStack.stackSize -= delta;
+            if (clickStack.stackSize <= 0) {
+                clickSlot.putStack(null);
+                return null;
             }
         }
+        //try to fill up empty slots
+        for (Slot slot : destinations) {
+            if (slot.getHasStack() || !slot.isItemValid(clickStack)) {
+                continue;
+            }
+            int freeSpace = Math.min(slot.getSlotStackLimit(), clickStack.getMaxStackSize());
+            int delta = Math.min(freeSpace, clickStack.stackSize);
+            ItemStack toPut = clickStack.copy();
+            toPut.stackSize = delta;
+            slot.putStack(toPut);
+            clickStack.stackSize -= delta;
+            clickStack = normalize(clickStack);
+            if (clickStack == null) {
+                clickSlot.putStack(null);
+                return null;
+            }
+        }
+        
+        clickSlot.putStack(normalize(clickStack));
+        return null;
     }
 
     /**
