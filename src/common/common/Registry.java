@@ -276,7 +276,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         exo_mounted_piston = new ExoMountedPiston(itemID("mechaMountedPiston", 9023));
         addName(exo_buoyant_barrel, "Buoyant Barrel");
         addName(exo_cobble_drive, "Cobblestone Drive");
-        addName(exo_mounted_piston, "Mounted Piston");
+        addName(exo_mounted_piston, "Shoulder-Mounted Piston");
         angular_saw = new ItemAngularSaw(itemID("angularSaw", 9042));
         addName(angular_saw, "Angular Saw");
         MinecraftForge.setToolClass(angular_saw, "pickaxe", 3);
