@@ -9,6 +9,14 @@ import net.minecraftforge.common.ISpecialArmor.ArmorProperties;
 public interface IExoUpgrade {
     /**
      * 
+     * @param is - The upgrade's ItemStack
+     * @param armorIndex - Armor type. 0 = head, 1 = chest, 2 = legs, 3 = feet
+     * @return
+     */
+    boolean canUpgradeArmor(ItemStack is, int armorIndex);
+    
+    /**
+     * 
      * @param player
      * @param armor
      *            Armor that contains the upgrade

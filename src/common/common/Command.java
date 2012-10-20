@@ -101,7 +101,9 @@ public enum Command {
                 ExoStateType mst = m.getExoStateType(armor, slot);
                 ExoStateShader mss = m.getExoStateShader(armor, slot);
                 if (changeExoType) {
-                    mst = FactorizationUtil.shiftEnum(mst, ExoStateType.values(), deltaDirection);
+                    do {
+                        mst = FactorizationUtil.shiftEnum(mst, ExoStateType.values(), deltaDirection);
+                    } while (mst.armorRestriction.canUse(m.armorType));
                     m.setExoStateType(armor, slot, mst);
                 } else {
                     //changeExoShader

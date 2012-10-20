@@ -23,11 +23,12 @@ class ExoBuoyantBarrel extends Item implements IExoUpgrade {
         setIconIndex(16 * 10);
         Core.tab(this, TabType.MISC);
         setMaxStackSize(1);
+        setTextureFile(Core.texture_file_item);
     }
-
+    
     @Override
-    public String getTextureFile() {
-        return Core.texture_file_item;
+    public boolean canUpgradeArmor(ItemStack is, int armorIndex) {
+        return true;
     }
 
     @Override

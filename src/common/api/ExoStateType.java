@@ -9,12 +9,11 @@ import factorization.client.FactorizationClientProxy;
 import factorization.common.Core;
 
 public enum ExoStateType {
-    NEVER, BUTTON1(1), BUTTON2(2), BUTTON3(3), EATING(
-            ExoArmorRestriction.HEAD), HURT(ExoArmorRestriction.HEAD), WOUNDED(
-            ExoArmorRestriction.HEAD), MOVING(ExoArmorRestriction.CHEST), ONFIRE(
-            ExoArmorRestriction.CHEST), SNEAKING(ExoArmorRestriction.PANTS), RIDING(
-            ExoArmorRestriction.PANTS), SPRINTING(ExoArmorRestriction.FEET), ONGROUND(
-            ExoArmorRestriction.FEET), INWATER(ExoArmorRestriction.FEET);
+    NEVER, BUTTON1(1), BUTTON2(2), BUTTON3(3),
+    EATING(ExoArmorRestriction.HEAD), HURT(ExoArmorRestriction.HEAD), WOUNDED(ExoArmorRestriction.HEAD),
+    MOVING(ExoArmorRestriction.CHEST), ONFIRE(ExoArmorRestriction.CHEST),
+    SNEAKING(ExoArmorRestriction.PANTS), RIDING(ExoArmorRestriction.PANTS),
+    SPRINTING(ExoArmorRestriction.FEET), ONGROUND(ExoArmorRestriction.FEET), INWATER(ExoArmorRestriction.FEET);
 
     public final ExoArmorRestriction armorRestriction;
     public final int key;
@@ -46,7 +45,8 @@ public enum ExoStateType {
         en(NEVER.when(NORMAL), "Never");
         en(NEVER.when(INVERSE), "Always");
         en(NEVER.when(RISINGEDGE), "Never (rising edge)");
-        for (ExoStateType button : new ExoStateType[] { BUTTON1, BUTTON2, BUTTON3 }) {
+        for (ExoStateType button : new ExoStateType[] { BUTTON1, BUTTON2,
+                BUTTON3 }) {
             en(button.when(NORMAL), "While %s is held");
             en(button.when(INVERSE), "While %s is not held");
             en(button.when(RISINGEDGE), "When %s is tapped");
@@ -84,7 +84,8 @@ public enum ExoStateType {
     }
 
     public String brief() {
-        if (this.key > 0 && FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+        if (this.key > 0
+                && FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             int key = ((FactorizationClientProxy) Core.proxy).exoKeys[this.key - 1].keyCode;
             return GameSettings.getKeyDisplayString(key);
         }
