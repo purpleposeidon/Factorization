@@ -2,9 +2,10 @@ http://www.minecraftforum.net/topic/1351802-factorization/
 
 TOP LIST
 --------
+router:
+  searching for avilable inv names; what's IC doing?
+make that thingie in the pocket crafter! The c thing! Yes!
 [Mecha-Features]
-fix mecha-armor!
-Nicen up the Mecha-Modder
 Armor-type specific upgrades
 Re-write the event system:
   EventSources: Player state, key presses from client
@@ -43,8 +44,8 @@ check normal fire interactions w/ our TEs
 two issues with buttons in mecha-modder: doesn't update when blank armor put in; reinforcing w/ vanilla armor doesn't hide buttons
 shift-clicking the shard recipe doesn't do the thing. *and*, stamping them doesn't work either!!!
 do block breaking animations properly (after 1.3). Look at src/minecraft/net/minecraft/src/RenderGlobal.java +1569 renderWorld()
-drop several stacks instantaneously into a transposer running into a barrel. Only 1 stack will be put in.
-barrel lighting (normals.)
+drop several stacks instantaneously using NEI into a transposer running into a barrel. Only 1 stack will be put in.
+barrel lighting (normals.); it's a bit dark on dark mode.
 railgun, except for steve
 sign enchanting
 optimize these TEs. Prolly use whatever it is that Entity Models use.
@@ -53,16 +54,9 @@ optimize these TEs. Prolly use whatever it is that Entity Models use.
 bukkit?
 http://3.bp.blogspot.com/_b5hcKABPlGI/SxB8DW-Xv-I/AAAAAAAAaxU/qmqqFtiwZ1A/s1600/6-509a.bmp . Discussion with Greys and Overminddl about solar towers.
 log of ad331b15956bfb43e5f5a022084605c6ade83901
-[16:48:56] <pig> neptunepink: err. Check the portalgun topic its right down there. Just a try catch for the class when the mod loads, that would work.
-[16:49:14] <pig> package is portalgun.common.PortalGun.class
 
 
 left-handled BoH: craft with a compass (get the compass back?) This can be reversed of course.
-have sentry demon send redstone signal when it senses shit
-  player: signal on top.
-  mob: signal to side
-Convert to using a single block ID & MD for everything. There's a nice function in ItemBlock....
-  will use MD for various block properties tho
 wrath lamp:
   every 5 seconds, check if powered. If so, remove lightair (And change to an unlight block?)
 
@@ -79,17 +73,14 @@ redstone! We want the router to behave like glass...
 When updating router could pick the closest of N (where N is small, say 2-4) off the top of the frontier
 TODO: Configuration value: A regex of TileEntities that the router may not connect to
                            And also a regex of TileEntities that may only be accessed via a side?
-on item pickup: only consider biting if not poisoned...? Need to do something proper. Maaaybe.... well, if the guy's inv is full, it's only a problem.
-should be possible to die through sloppy carelessness. Should be easy to stay safe if you're careful.
 it'd be nice if the pocketcrafter restored the previous GUI when closed. It seems that simply restoring the old GuiScreen on close doesn't work...
 barrel bug: damaged items can be inserted via tubes. Not solvable at this time. But we can verify BC's...
 
 Need more uses for diamond shards!
-  Grinding head. Saw blade. Shard spear? :o  Something about dark crystals. 
+  Shard spear? :o  Something about dark crystals. 
 
 
 backup occasionally, eh?
-do vararg functions have to be for Objects?
 
 ro da noi lo fatci cu kakne lo nu ri 
 ∀ x ∃ y : y can destroy x → y should destroy x
@@ -128,40 +119,10 @@ rainbow chest
   Okay. So items can be taken from the slots, but they can't be put in. They have to be inserted indirectly via the extra
   slots on the bottom.
 
-DEMONS
-======
-Tiny Demon
-  24+ netherwort in a chest in the nether
-  Tiny demons are secretive creatures that can be found in the nether, though they usually stay out of sight. Their favorite activities are eating netherwort, and biting you with their poisonous fangs. If they find a chest containing plenty of netherwort, they are sure to sneak in and become trapped inside. They will certainly bite you when handled.
-  A chest must have at least 24 netherwort to attract your first demon. If you are paying attention, you can remove it before it eats all your netherwort. No more than 1 demon will enter a chest per minute.
-    
-Bound Tiny Demon:
-  ~D  String, tiny demon
-  Tying a bit of string to a demon permits safer handling and allows you to put it to work.
-
-Demon On A Stick:
-  B Bound demon, A Stick
-  |
-  |
-    Tying a bound tiny demon onto the end of a long stick enables you to apply its poisonous fangs directly to your enemies without hurting yourself.
-    Doesn't last very long. Probably as long as a wooden sword? Or a golden sword?
-  
-
 Wand of Cooling:
-   OD   Bound tiny demon, obsidian, flint&steel, iron ingot
-   FO
-  I  
-    The Wand of Cooling is made by binding a demon to a mini-portal. The demon allows high-energy air molecules through the portal, but keeps lower energy molecules out, thus lowering the average temperature of the surounding area. The molecules will be sent to some other Place. The wand of cooling will:
-      Put you out if you're on fire
-      Eliminate any lava that you're in (TODO: works poorly)
-      Cool lava into obsidian
-      Freezes water
-      removes non-source lava and water blocks.
-      Extinguish normal fire, and Wrath Fire.
-    Due to the durability & simplicity of its components, the Wand of Cooling lasts for a fairly long time.
-
+  Eliminate any lava that you're in (TODO: works poorly)
+  Due to the durability & simplicity of its components, the Wand of Cooling lasts for a fairly long time.
   Used to make a refrigerator? Carnot engines?
-  Uses Laplaces demon connected to an nether portal. 
 
 WRATH
 =====
@@ -189,7 +150,7 @@ Mecha-upgrades:
     charcoal filter
     thermal environmental control
     sugar water?
-  Antium:
+  Inverium:
     upgrades from slowing falling to slight hovering to flying amongst the birds
     something to feed you
     
@@ -253,13 +214,6 @@ Rockets
   BBB
 infused lapis?
 
-We want stuff that's made using all the different kinds of ore storage blocks!
-  Diamond: Diamond shards
-  Iron: Dark iron
-  Lapis: ??? Possibly some kind of cooling thing...
-  Gold: ??? Possibly some kind of electricity thing???
-
-
 
 
 
@@ -290,6 +244,16 @@ Nothin' you can do, 'cause you'll be dead
 (And then they'll eat your brains!)
 Then some douchebag what thinks he's you
 Will wake up with a computanium head
+
+
+BBB
+ G 
+ZMZ
+
+B, ingotBrass,
+G, aga@50eda677,
+Z, 1xnull@0,
+M, null, 1xnull@0
 
 Caused by: java.lang.RuntimeException: Invalid shaped ore recipe: BBB,  G , ZMZ, B, ingotBrass, G, aga@50eda677, Z, 1xnull@0, M, null, 1xnull@0
         at net.minecraftforge.oredict.ShapedOreRecipe.<init>(ShapedOreRecipe.java:105)
