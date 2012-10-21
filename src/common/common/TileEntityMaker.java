@@ -230,9 +230,6 @@ public class TileEntityMaker extends TileEntityFactorization implements
 
     @Override
     public int getSizeInventorySide(ForgeDirection side) {
-        if (side == DOWN) {
-            return 2;
-        }
         return 1;
     }
 
