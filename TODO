@@ -1,19 +1,19 @@
 http://www.minecraftforum.net/topic/1351802-factorization/
+figure out what to do with http://pastebin.com/pHhHp633
 
 TOP LIST
 --------
+ore dict usage of "logWood" and "plankWood"
 router:
   searching for avilable inv names; what's IC doing?
+  that other filter mode! What's it do? It stocks!
+  How about... he said something else only worked one way? Uhm. Oh, I don't think I want the ejector to do extract from invs.
 make that thingie in the pocket crafter! The c thing! Yes!
 [Mecha-Features]
-Armor-type specific upgrades
-Re-write the event system:
-  EventSources: Player state, key presses from client
-  EventShaders: Normal, Rising edge, falling edge, negated, toggle
 add inverium-based mecha-upgrades
 These upgrades:
   Lead boots
-  Wall Springs
+  Wall Jumping Boots -- Make sure to require sprinting! And take away some hunger while you're at it!
   Armor Dropper
   Anti-gravity (uses inverium'd lead blocks): Velocity limiting, hovering, high jumping
     Acceleration Dampener
@@ -53,7 +53,7 @@ optimize these TEs. Prolly use whatever it is that Entity Models use.
   grinder
 bukkit?
 http://3.bp.blogspot.com/_b5hcKABPlGI/SxB8DW-Xv-I/AAAAAAAAaxU/qmqqFtiwZ1A/s1600/6-509a.bmp . Discussion with Greys and Overminddl about solar towers.
-log of ad331b15956bfb43e5f5a022084605c6ade83901
+log of git commit ad331b15956bfb43e5f5a022084605c6ade83901
 
 
 left-handled BoH: craft with a compass (get the compass back?) This can be reversed of course.
