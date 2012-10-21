@@ -81,12 +81,6 @@ public enum Command {
             break;
         case exoKeyOff:
         case exoKeyOn:
-            if (player.worldObj.isRemote) {
-                if (this == exoKeyOn) {
-                    new Exception().printStackTrace();
-                }
-                System.out.println("Exo-key: " + this + " for " + arg);
-            }
             Core.exoCore.buttonPressed(player, arg, this == exoKeyOn);
             break;
         case exoModLeftClick:
@@ -103,7 +97,7 @@ public enum Command {
                 if (changeExoType) {
                     do {
                         mst = FactorizationUtil.shiftEnum(mst, ExoStateType.values(), deltaDirection);
-                    } while (mst.armorRestriction.canUse(m.armorType));
+                    } while (!mst.armorRestriction.canUse(m.armorType));
                     m.setExoStateType(armor, slot, mst);
                 } else {
                     //changeExoShader
