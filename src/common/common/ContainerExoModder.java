@@ -9,6 +9,7 @@ import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.InventoryPlayer;
 import net.minecraft.src.Item;
+import net.minecraft.src.ItemArmor;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.Slot;
 import factorization.api.Coord;
@@ -186,9 +187,6 @@ public class ContainerExoModder extends Container {
             if (is == null) {
                 return false;
             }
-            if (!(is.getItem() instanceof IExoUpgrade)) {
-                return false;
-            }
             ItemStack armor = armorSlot.getStack();
             if (armor == null) {
                 return false;
@@ -197,8 +195,18 @@ public class ContainerExoModder extends Container {
                 return false;
             }
             ExoArmor ma = (ExoArmor) armor.getItem();
-            IExoUpgrade upgrade = (IExoUpgrade) is.getItem();
-            if (!upgrade.canUpgradeArmor(armor, ma.armorType)) {
+            Item item = is.getItem();
+            if (item instanceof IExoUpgrade) {
+                IExoUpgrade upgrade = (IExoUpgrade) is.getItem();
+                if (!upgrade.canUpgradeArmor(armor, ma.armorType)) {
+                    return false;
+                }
+            } else if (item instanceof ItemArmor) {
+                ItemArmor armorModule = (ItemArmor) item;
+                if (armorModule.armorType != ma.armorType) {
+                    return false;
+                }
+            } else {
                 return false;
             }
             return ma.slotCount > exoIndex;
@@ -280,7 +288,7 @@ public class ContainerExoModder extends Container {
             } else {
                 if (clickedItem instanceof ExoArmor) {
                     targetSlots = (Iterable) Arrays.asList(armorSlot);
-                } else if (clickedItem instanceof IExoUpgrade) {
+                } else if (clickedItem instanceof IExoUpgrade || clickedItem instanceof ItemArmor) {
                     targetSlots = upgradeSlots;
                 } else {
                     return null;

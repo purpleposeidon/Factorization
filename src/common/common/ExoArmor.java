@@ -290,9 +290,11 @@ public class ExoArmor extends ItemArmor
             }
             String s = upgrade.getItem().getItemDisplayName(upgrade);
             if (s != null && s.length() > 0) {
-                ExoStateType mst = getExoStateType(is, i);
-                ExoStateShader mss = getExoStateShader(is, i);
-                s += "  " + mss.brief() + mst.brief();
+                if (upgrade.getItem() instanceof IExoUpgrade) {
+                    ExoStateType mst = getExoStateType(is, i);
+                    ExoStateShader mss = getExoStateShader(is, i);
+                    s += "  " + mss.brief() + mst.brief();
+                }
                 infoList.add(s);
             }
         }

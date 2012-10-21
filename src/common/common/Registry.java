@@ -80,6 +80,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ExoBuoyantBarrel exo_buoyant_barrel;
     public ExoCobblestoneDrive exo_cobble_drive;
     public ExoMountedPiston exo_mounted_piston;
+    public ExoWallJump exo_wall_jump;
     public ItemMachineUpgrade router_item_filter, router_machine_filter, router_speed,
             router_thorough, router_throughput, router_eject;
     public ItemMachineUpgrade barrel_enlarge;
@@ -274,9 +275,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         exo_buoyant_barrel = new ExoBuoyantBarrel(itemID("mechaBouyantBarrel", 9021));
         exo_cobble_drive = new ExoCobblestoneDrive(itemID("mechaCobbleDrive", 9022));
         exo_mounted_piston = new ExoMountedPiston(itemID("mechaMountedPiston", 9023));
+        exo_wall_jump = new ExoWallJump(itemID("mechaSpring", 9047));
         addName(exo_buoyant_barrel, "Buoyant Barrel");
         addName(exo_cobble_drive, "Cobblestone Drive");
         addName(exo_mounted_piston, "Shoulder-Mounted Piston");
+        addName(exo_wall_jump, "Wall Jumping Boots");
         angular_saw = new ItemAngularSaw(itemID("angularSaw", 9042));
         addName(angular_saw, "Angular Saw");
         MinecraftForge.setToolClass(angular_saw, "pickaxe", 3);
@@ -496,6 +499,14 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'M', new ItemStack(motor),
                 'Y', new ItemStack(Item.ingotIron),
                 '!', lead_ingot);
+        recipe(new ItemStack(exo_wall_jump),
+                "LIL",
+                "LBL",
+                "OOO",
+                'L', Item.leather,
+                'I', Item.ingotIron,
+                'B', Item.bootsLeather,
+                'O', Item.slimeBall);
         
         //ceramics
         recipe(new ItemStack(sculpt_tool),
