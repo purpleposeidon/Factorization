@@ -50,6 +50,7 @@ public class ItemMachineUpgrade extends Item {
             if (!player.capabilities.isCreativeMode) {
                 stack.stackSize--;
             }
+            here.dirty();
             return true;
         }
         return false;
