@@ -10,6 +10,7 @@ import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.EnumMovingObjectType;
+import net.minecraft.src.GuiGameOver;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.MovingObjectPosition;
@@ -45,16 +46,20 @@ public class ExoWallJump extends Item implements IExoUpgrade, ITickHandler {
     @Override
     public ItemStack tickUpgrade(EntityPlayer player, ItemStack armor, ItemStack upgrade, boolean isEnabled) {
         NBTTagCompound tag = FactorizationUtil.getTag(upgrade);
-        boolean triggered = tag.getBoolean("T");
-        if (triggered) {
+        final int maxChargeCount = 1;
+        int charges = tag.getInteger("C");
+        if (charges < maxChargeCount && !isEnabled) {
             if (!player.onGround) {
                 return null;
             } else {
-                tag.setBoolean("T", false);
-                FactorizationUtil.itemCanFire(player.worldObj, upgrade, 20*2);
-                return upgrade;
+                if (FactorizationUtil.itemCanFire(player.worldObj, upgrade, 20*2)) {
+                    tag.setInteger("C", charges + 1);
+                    return upgrade;
+                }
+                return null;
             }
-        } else if (isEnabled) {
+        }
+        if (isEnabled && charges > 0) {
             //if the player is looking at a block, and it's solid, and the distance is < 1m, push player away from it
             if (FactorizationUtil.itemCanFire(player.worldObj, upgrade, 20*2)) {
                 Vec3 position = Vec3.getVec3Pool().getVecFromPool(player.posX, player.posY, player.posZ);
@@ -89,7 +94,7 @@ public class ExoWallJump extends Item implements IExoUpgrade, ITickHandler {
                     }
                     turningFrames = 0;
                 }
-                tag.setBoolean("T", true);
+                tag.setInteger("C", charges - 1);
                 return upgrade;
             }
         }
