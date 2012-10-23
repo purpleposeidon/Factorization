@@ -4,13 +4,11 @@ import java.util.EnumSet;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.DamageSource;
 import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.EnumMovingObjectType;
-import net.minecraft.src.GuiGameOver;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.MovingObjectPosition;
@@ -18,11 +16,11 @@ import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.Vec3;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.ISpecialArmor.ArmorProperties;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.registry.TickRegistry;
+import factorization.api.Coord;
 import factorization.api.IExoUpgrade;
 import factorization.common.Core.TabType;
 
@@ -71,6 +69,9 @@ public class ExoWallJump extends Item implements IExoUpgrade, ITickHandler {
                     return null;
                 }
                 ForgeDirection dir = ForgeDirection.values()[selected.sideHit];
+                if (!player.worldObj.isBlockSolidOnSide(selected.blockX, selected.blockY, selected.blockZ, dir)) {
+                    return null;
+                }
                 if (dir.offsetY != 0) {
                     return null;
                 }
@@ -157,11 +158,17 @@ public class ExoWallJump extends Item implements IExoUpgrade, ITickHandler {
 
     @Override
     public EnumSet<TickType> ticks() {
-        return EnumSet.of(TickType.PLAYER);
+        return EnumSet.of(TickType.CLIENT);
     }
 
     @Override
     public String getLabel() {
         return "exospring";
+    }
+    
+    @Override
+    public void addInformation(ItemStack is, List list) {
+        list.add("Exo-Upgrade");
+        Core.brand(list);
     }
 }
