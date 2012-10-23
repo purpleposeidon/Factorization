@@ -16,6 +16,7 @@ public enum FactoryType {
     LAMP(6, false, TileEntityWrathLamp.class, "factory_lamp"), //spawn a bunch of AIR blocks around and below
     //7 -- this was the BlockDarkIron, which got moved.
     PACKAGER(8, true, STAMPER.gui, TileEntityPackager.class, "factory_packager"), //crafts its input as a 3x3 or 2x2
+    @Deprecated
     SENTRYDEMON(9, false, TileEntityWatchDemon.class, "factory_watchdemon"), //load a chunk
     WRATHFIRE(10, false, TileEntityWrathFire.class, "factory_fire"), //burn things
     SLAGFURNACE(11, true, TileEntitySlagFurnace.class, "factory_slag"), //get extra ore output
