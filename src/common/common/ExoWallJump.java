@@ -76,6 +76,7 @@ public class ExoWallJump extends Item implements IExoUpgrade, ITickHandler {
                     return null;
                 }
                 player.fallDistance = 0;
+                player.addExhaustion(0.8F);
                 if (player instanceof EntityPlayerMP && !player.worldObj.isRemote) {
                     EntityPlayerMP mp = (EntityPlayerMP) player;
                     mp.playerNetServerHandler.ticksForFloatKick = 0;
