@@ -33,8 +33,7 @@ public class NEI_FactorizationInputConfig implements IConfigureNEI {
                     return true;
                 }
                 if (FactorizationClientProxy.pocket_key.keyCode == keyID) {
-                    if (Core.registry.pocket_table.findPocket(Core.proxy
-                            .getClientPlayer()) != null) {
+                    if (Core.registry.pocket_table.findPocket(Core.proxy.getClientPlayer()) != null) {
                         Command.craftOpen.call(Core.proxy.getClientPlayer());
                     }
                     return true;
