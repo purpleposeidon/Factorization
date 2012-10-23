@@ -346,8 +346,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         boh_upgrade_recipe = FactorizationUtil.createShapelessRecipe(BOH, BOH, dark_iron, Item.enderPearl, Item.leather);
         // Pocket Crafting Table (pocket table)
         recipe(new ItemStack(pocket_table),
-                "# ",
-                " |",
+                " #",
+                "| ",
                 '#', Block.workbench,
                 '|', Item.stick);
 
