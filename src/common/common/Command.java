@@ -2,6 +2,7 @@ package factorization.common;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.InventoryPlayer;
@@ -19,16 +20,16 @@ public enum Command {
     }
 
     public byte id;
-    boolean shareCommand = false;
+    boolean executeLocally = false;
 
     Command(int id) {
         this.id = (byte) id;
         name.map.put(this.id, this);
     }
 
-    Command(int id, boolean shareCommand) {
+    Command(int id, boolean executeLocally) {
         this(id);
-        this.shareCommand = shareCommand;
+        this.executeLocally = executeLocally;
     }
 
     static void fromNetwork(EntityPlayer player, byte s, byte arg) {
@@ -53,7 +54,7 @@ public enum Command {
 //				((EntityClientPlayerMP)player).closeScreen();
 //			}
             Core.network.sendCommand(player, this, arg);
-            if (!shareCommand) {
+            if (!executeLocally) {
                 return;
             }
         }
@@ -130,30 +131,77 @@ public enum Command {
         }
     }
     
+    private boolean rotateAll(InventoryPlayer inv, int slots[]) {
+        int empty = 0;
+        for (int slot : slots) {
+            if (FactorizationUtil.normalize(inv.getStackInSlot(slot)) == null) {
+                empty++;
+            }
+        }
+        if (empty >= 2) {
+            return false;
+        }
+        ArrayList<ItemStack> buffer = new ArrayList(8);
+        for (int slot : slots) {
+            ItemStack toAdd = inv.getStackInSlot(slot);
+            buffer.add(buffer.size(), toAdd);
+        }
+        buffer.add(0, buffer.remove(buffer.size() - 1));
+        for (int slot : slots) {
+            ItemStack toSet = buffer.remove(0);
+            inv.setInventorySlotContents(slot, toSet);
+        }
+        return true;
+    }
+    
+    private boolean smear(InventoryPlayer inv, int slots[]) {
+        int stackSrcSlotIndex = 0;
+        boolean foundNonEmpty = false;
+        for (int slot : slots) {
+            if (inv.getStackInSlot(slot) != null) {
+                foundNonEmpty = true;
+                continue;
+            }
+            if (!foundNonEmpty) {
+                continue;
+            }
+            //loop around looking for something that's spreadable
+            ItemStack toDrop = null;
+            for (int count = 0; count < slots.length; count++) {
+                ItemStack here = inv.getStackInSlot(slots[stackSrcSlotIndex]);
+                stackSrcSlotIndex++;
+                if (stackSrcSlotIndex == slots.length) {
+                    stackSrcSlotIndex = 0;
+                }
+                if (here == null || here.stackSize <= 1) {
+                    continue;
+                }
+                toDrop = here;
+                break;
+            }
+            if (toDrop == null) {
+                return true;
+            }
+            inv.setInventorySlotContents(slot, toDrop.splitStack(1));
+        }
+        return true;
+    }
+    
     void craftMove(EntityPlayer player) {
         InventoryPlayer inv = player.inventory;
         //spin the crafting grid
-        int slot[] = {24, 15, 16, 17, 26, 35, 34, 33, 24, 15};
-        ItemStack carry = null;
-        for (int i = 1; i < 9; i++) {
-            ItemStack here = inv.getStackInSlot(slot[i]);
-            if (here == null && carry != null) {
-                //drop just 1
-                inv.setInventorySlotContents(slot[i], carry.splitStack(1));
-            } else {
-                //swap
-                inv.setInventorySlotContents(slot[i], carry);
-                carry = here;
+        int slots[] = {15, 16, 17, 26, 35, 34, 33, 24};
+        try {
+            if (rotateAll(inv, slots)) {
+                return;
             }
-            carry = FactorizationUtil.normalize(carry);
-        }
-        if (inv.getStackInSlot(15) == null) {
-            inv.setInventorySlotContents(15, carry);
-        } else {
-            player.dropPlayerItem(carry);
-        }
-        if (player.craftingInventory instanceof ContainerPocket) {
-            ((ContainerPocket) player.craftingInventory).updateMatrix();
+            if (smear(inv, slots)) {
+                return;
+            }			
+        } finally {
+            if (player.craftingInventory instanceof ContainerPocket) {
+                ((ContainerPocket) player.craftingInventory).updateMatrix();
+            }
         }
     }
     
