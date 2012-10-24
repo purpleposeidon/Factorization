@@ -1,35 +1,58 @@
 package factorization.common;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import factorization.common.Core.TabType;
 
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
+import factorization.common.Core.TabType;
 
 public class ItemOreProcessing extends Item {
+    public static ArrayList<String> OD_ores = new ArrayList(), OD_ingots = new ArrayList();
     public static enum OreType {
-        IRON(0, 0xF0F0F0, "Iron"),
-        GOLD(1, 0xFFFB00, "Gold"),
-        LEAD(2, 0x2F2C3C, "Lead"),
-        TIN(3, 0xD7F7FF, "Tin"),
-        COPPER(4, 0xFF6208, "Copper"),
-        SILVER(5, 0x7B96B9, "Silver"),
-        GALENA(6, 0x687B99, "Galena")
+        IRON(0, 0xF0F0F0, "Iron", "oreIron", "ingotIron"),
+        GOLD(1, 0xFFFB00, "Gold", "oreGold", "ingotGold"),
+        LEAD(2, 0x2F2C3C, "Lead", null, "ingotLead"),
+        TIN(3, 0xD7F7FF, "Tin", "oreTin", "ingotTin"),
+        COPPER(4, 0xFF6208, "Copper", "oreCopper", "ingotCopper"),
+        SILVER(5, 0x7B96B9, "Silver", null, "ingotSilver"),
+        GALENA(6, 0x687B99, "Galena", "oreSilver", null)
         ;
         int ID;
         int color;
         String en_name;
+        String OD_ore, OD_ingot;
         boolean enabled = false;
-        private OreType(int ID, int color, String en_name) {
+        ItemStack processingResult = null;
+        private OreType(int ID, int color, String en_name, String OD_ore, String OD_ingot) {
             this.ID = ID;
             this.color = color;
             this.en_name = en_name;
+            this.OD_ore = OD_ore;
+            this.OD_ingot = OD_ingot;
+            if (OD_ore != null) {
+                OD_ores.add(OD_ore);
+            }
+            if (OD_ingot != null) {
+                OD_ingots.add(OD_ingot);
+            }
         }
         
         public void enable() {
             this.enabled = true;
+        }
+        
+        public static OreType fromOreClass(String oreClass) {
+            for (OreType ot : values()) {
+                if (ot.OD_ingot != null && ot.OD_ingot.equals(oreClass)) {
+                    return ot;
+                }
+                if (ot.OD_ore != null && ot.OD_ore.equals(oreClass)) {
+                    return ot;
+                }
+            }
+            return null;
         }
     }
     

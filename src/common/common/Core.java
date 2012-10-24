@@ -36,7 +36,7 @@ import cpw.mods.fml.common.registry.TickRegistry;
 import factorization.api.Coord;
 import factorization.client.gui.FactorizationNotify;
 
-@Mod(modid = "factorization", name = "Factorization", version = Core.version, dependencies = "after: IC2")
+@Mod(modid = "factorization", name = "Factorization", version = Core.version)
 @NetworkMod(
         clientSideRequired = true,
         packetHandler = NetworkFactorization.class,
