@@ -132,8 +132,8 @@ public class ContainerFactorization extends Container {
             TileEntitySlagFurnace furnace = (TileEntitySlagFurnace) ent;
             addSlotToContainer(new Slot(furnace, 0, 56, 17));
             addSlotToContainer(new Slot(furnace, 1, 56, 53));
-            addSlotToContainer(new SlotFurnace(player, furnace, 2, 115, 34));
-            addSlotToContainer(new SlotFurnace(player, furnace, 3, 141, 34));
+            addSlotToContainer(new SlotFurnace(player, furnace, 2, 114, 22));
+            addSlotToContainer(new SlotFurnace(player, furnace, 3, 114, 48));
             break;
         case GRINDER:
             TileEntityGrinder grinder = (TileEntityGrinder) ent;

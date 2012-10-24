@@ -92,10 +92,10 @@ public class NEI_SlagRecipeConfig extends TemplateRecipeHandler implements IConf
         @Override
         public ArrayList<PositionedStack> getOtherStacks() {
             ArrayList<PositionedStack> ret = new ArrayList();
-            int h = 24;
-            int w = 111;
-            ret.add(new PositionedStack(sr.output1, w, h));
-            ret.add(new PositionedStack(sr.output2, w+26, h));
+            int h = 11;
+            int w = 109;
+            ret.add(new PositionedStack(sr.output2, w, h));
+            ret.add(new PositionedStack(sr.output1, w, h+26));
             ItemStack f = FurnaceRecipeHandler.afuels.get((cycleticks/48) % FurnaceRecipeHandler.afuels.size()).stack.item;
             ret.add(new PositionedStack(f, 56 - 5, 42));
             return ret;
