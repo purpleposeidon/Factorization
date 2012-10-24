@@ -671,11 +671,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         OreDictionary.registerOre("ingotGold", new ItemStack(Item.ingotGold));
         
         MinecraftForge.EVENT_BUS.register(Core.foph);
-        for (Block redstone : Arrays.asList(Block.oreRedstone, Block.oreRedstoneGlowing)) {
-            TileEntitySlagFurnace.SlagRecipes.register(redstone, 5.8F, Item.redstone, 0.2F, Block.stone);
-            //most ores give 0.4F stone, but redstone is dense.
-            //mining redstone normally gives 4 to 6 ore. 5.8F should get you a slightly better yield.
-        }
+        //most ores give 0.4F stone, but redstone is dense.
+        //mining redstone normally gives 4 to 6 ore. 5.8F should get you a slightly better yield.
+        TileEntitySlagFurnace.SlagRecipes.register(Block.oreRedstone, 5.8F, Item.redstone, 0.2F, Block.stone);
 
         //exo-workshop
         recipe(exoworkshop_item,
