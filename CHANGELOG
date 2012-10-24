@@ -1,3 +1,21 @@
+0.6.7
+  Improved the pocket crafting table's "c" action. Some examples of its behavior: If you have two stacks of A and B like this:
+    [AB-]
+    [---]
+    [---]
+  and press c, it'll become
+    [ABA]
+    [B-B]
+    [ABA]
+  and if you have a stack of 5 wood like so
+    [---]
+    [--W]
+    [---]
+  it'll change to
+    [---]
+    [W-W]
+    [WWW]    
+
 0.6.6 -- Buffed!
   The grinder is 60% faster
   The angular saw now has infinite use, and works on stone & glass.
