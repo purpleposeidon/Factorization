@@ -143,7 +143,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         for (int x = xCoord - radius; x <= xCoord + radius; x++) {
             for (int z = zCoord - radius; z <= zCoord + radius; z++) {
                 int id = worldObj.getBlockId(x, yCoord, z);
-                if (id == Core.lightair_id) {
+                if (id == Core.registry.lightair_block.blockID) {
                     worldObj.setBlockWithNotify(x, yCoord, z, 0);
                     //worldObj.setBlock(x, yCoord, z, 0);
                 }
@@ -285,13 +285,13 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                     }
                     int block = worldObj.getBlockId(x, height, z);
                     int belowBlock = worldObj.getBlockId(x, height - 3, z);
-                    if (belowBlock != 0 && belowBlock != Core.lightair_id && height != yCoord) {
+                    if (belowBlock != 0 && belowBlock != Core.registry.lightair_block.blockID && height != yCoord) {
                         beamDepths[index] = (short) height;
                         continue;
                     }
                     if (block == 0) {
-                        worldObj.setBlockWithNotify(x, height, z, Core.lightair_id);
-                    } else if (block == Core.lightair_id) {
+                        worldObj.setBlockWithNotify(x, height, z, Core.registry.lightair_block.blockID);
+                    } else if (block == Core.registry.lightair_block.blockID) {
                     } else if (x == xCoord && height == yCoord && z == zCoord) {
                         //this is ourself. Hi, self.
                         //Don't terminate the beamDepth early.

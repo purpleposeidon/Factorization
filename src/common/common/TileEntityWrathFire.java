@@ -229,7 +229,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
         if (rand.nextInt(3) == 0) {
             return true;
         }
-        c.setIdMd(Core.lightair_id, Core.registry.lightair_block.fire_md);
+        c.setIdMd(Core.registry.lightair_block.blockID, Core.registry.lightair_block.fire_md);
         TileEntityWrathFire fire = c.getTE(TileEntityWrathFire.class);
         if (fire != null) {
             fire.inherit(this);
@@ -380,7 +380,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
     }
 
     public static void ignite(Coord baseBlock, Coord fireBlock, EntityPlayer player) {
-        fireBlock.setIdMd(Core.lightair_id, BlockLightAir.fire_md);
+        fireBlock.setIdMd(Core.registry.lightair_block.blockID, BlockLightAir.fire_md);
         TileEntityWrathFire fire = fireBlock.getTE(TileEntityWrathFire.class);
         if (fire == null) {
             return;

@@ -248,7 +248,7 @@ public class ContainerExoModder extends Container {
 
     @Override
     public boolean canInteractWith(EntityPlayer player) {
-        if (benchLocation.getId() == Core.resource_id && ResourceType.EXOMODDER.is(benchLocation.getMd())) {
+        if (benchLocation.getId() == Core.registry.resource_block.blockID && ResourceType.EXOMODDER.is(benchLocation.getMd())) {
             Coord p = new Coord(player);
             return benchLocation.distance(p) <= 8;
         }

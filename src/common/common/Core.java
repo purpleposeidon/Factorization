@@ -43,13 +43,15 @@ import factorization.client.gui.FactorizationNotify;
         channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel, NetworkFactorization.factorizeNtfyChannel })
 public class Core {
     //The comment below is a marker used by the build script.
-    public static final String version = "0.6.6"; //@VERSION@
+    public static final String version = "0.6.7"; //@VERSION@
     public Core() {
         registry = new Registry();
         exoCore = new ExoCore();
+        foph = new FactorizationOreProcessingHandler();
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(registry);
         MinecraftForge.EVENT_BUS.register(exoCore);
+        //We don't register foph yet.
     }
     
     // runtime storage
@@ -57,6 +59,7 @@ public class Core {
     public static Core instance;
     public static Registry registry;
     public static ExoCore exoCore;
+    public static FactorizationOreProcessingHandler foph;
     @SidedProxy(clientSide = "factorization.client.FactorizationClientProxy", serverSide = "factorization.common.FactorizationServerProxy")
     public static FactorizationProxy proxy;
     public static NetworkFactorization network;
@@ -64,9 +67,9 @@ public class Core {
 
     // Configuration
     public static Configuration config;
-    public static int factory_block_id = 254;
-    public static int lightair_id = 253;
-    public static int resource_id = 252;
+    static int factory_block_id = 254;
+    static int lightair_id = 253;
+    static int resource_id = 252;
     public static Pattern routerBan;
     public static boolean render_barrel_item = true;
     public static boolean render_barrel_text = true;
@@ -216,7 +219,7 @@ public class Core {
     @PostInit
     public void modsLoaded(FMLPostInitializationEvent event) {
         TileEntityWrathFire.setupBurning();
-        registry.addDictOres();
+        foph.addDictOres();
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             //give the first achievement, because it is stupid and nobody cares.
             //If you're using this mod, you've probably opened your inventory before anyways.

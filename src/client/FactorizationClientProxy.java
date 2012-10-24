@@ -254,7 +254,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         Coord here = new Coord(w, x, y, z);
         int id = w.getBlockId(x, y, z);
         int md = w.getBlockMetadata(x, y, z);
-        if (id == Core.factory_block_id) {
+        if (id == Core.registry.factory_block.blockID) {
             TileEntity te = w.getBlockTileEntity(x, y, z);
             if (!(te instanceof IFactoryType)) {
                 return;
@@ -318,7 +318,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 }
             }
         }
-        if (id == Core.lightair_id) {
+        if (id == Core.registry.lightair_block.blockID) {
             if (md == Core.registry.lightair_block.fire_md) {
                 int to_spawn = 1;
                 EntityPlayer player = Core.proxy.getClientPlayer();

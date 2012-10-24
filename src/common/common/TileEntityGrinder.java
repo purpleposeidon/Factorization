@@ -190,7 +190,13 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     public static ArrayList<GrinderRecipe> recipes = new ArrayList();
 
     public static void addRecipe(ItemStack input, ItemStack output, float probability) {
-        recipes.add(new GrinderRecipe(input, output, probability));
+        GrinderRecipe toAdd = new GrinderRecipe(input, output, probability);
+        for (GrinderRecipe gr : recipes) {
+            if (gr.input.equals(toAdd.input)) {
+                return;
+            }
+        }
+        recipes.add(toAdd);
     }
 
     boolean canGrind() {

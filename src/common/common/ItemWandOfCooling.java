@@ -126,7 +126,7 @@ public class ItemWandOfCooling extends Item {
                 cost = 1; // make destroying derpfluid real cheap
             }
         }
-        if (id == Core.lightair_id && md == Core.registry.lightair_block.fire_md) {
+        if (id == Core.registry.lightair_block.blockID && md == Core.registry.lightair_block.fire_md) {
             newid = 0;
             cost = 1;
             world.removeBlockTileEntity(x, y, z);
