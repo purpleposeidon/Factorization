@@ -46,7 +46,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
     ButtonSet current_set = allSets[0];
 
     String[] side_names = { "bottom sides", "top sides", "§asouth§r sides", "§3north§r sides", "§eeast§r sides",
-            "§5west§r sides", "any sides" };
+            "§5west§r sides", "anywhere" };
     String[] ejection_side_names = { "eject to bottom", "eject to top", "eject to §asouth§r", "eject to §3north§r", "eject to §eeast§r",
             "eject to §5west§r" };
     static final String any_inv = "all machines in network";
