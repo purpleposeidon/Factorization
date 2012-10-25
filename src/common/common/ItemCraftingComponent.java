@@ -2,11 +2,10 @@ package factorization.common;
 
 import java.util.List;
 
-import factorization.common.Core.TabType;
-
-import net.minecraft.src.CreativeTabs;
+import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
+import factorization.common.Core.TabType;
 
 public class ItemCraftingComponent extends Item {
     int icon;
@@ -27,8 +26,7 @@ public class ItemCraftingComponent extends Item {
     }
 
     @Override
-    public void addInformation(ItemStack is, List infoList) {
-        super.addInformation(is, infoList);
+    public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
         Core.brand(infoList);
     }
 }

@@ -144,7 +144,7 @@ public class ItemDemon extends Item {
 
     @Override
     // -- DAMN YOU, SERVER!
-    public void addInformation(ItemStack is, List list) {
+    public void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         if (isBound(is)) {
             list.add("Less likely to bite");
         } else {

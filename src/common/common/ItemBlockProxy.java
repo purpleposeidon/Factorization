@@ -31,8 +31,7 @@ public class ItemBlockProxy extends Item {
     //NOTE: Copied from ItemBlock, *EXCEPT* that in the final check, I've changed the AABB check is done w/ null instead of the player.
     //Why is that even necessary...?
     @Override
-    public boolean onItemUse(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, World par3World, int par4,
-            int par5, int par6, int par7, float par8, float par9, float par10)
+    public boolean onItemUse(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, World par3World, int par4, int par5, int par6, int par7, float par8, float par9, float par10)
     {
         int var11 = par3World.getBlockId(par4, par5, par6);
 
@@ -78,7 +77,7 @@ public class ItemBlockProxy extends Item {
         {
             return false;
         }
-        else if (!par2EntityPlayer.canPlayerEdit(par4, par5, par6))
+        else if (!par2EntityPlayer.canPlayerEdit(par4, par5, par6, par7, par1ItemStack))
         {
             return false;
         }
@@ -86,13 +85,13 @@ public class ItemBlockProxy extends Item {
         {
             return false;
         }
-        else if (par3World.canPlaceEntityOnSide(this.blockID, par4, par5, par6, false, par7, null))
+        else if (par3World.canPlaceEntityOnSide(this.blockID, par4, par5, par6, false, par7, par2EntityPlayer))
         {
             Block var12 = Block.blocksList[this.blockID];
 
             if (placeBlockAt(par1ItemStack, par2EntityPlayer, par3World, par4, par5, par6, par7, par8, par9, par10))
             {
-                par3World.playSoundEffect((double) ((float) par4 + 0.5F), (double) ((float) par5 + 0.5F), (double) ((float) par6 + 0.5F), var12.stepSound.getStepSound(), (var12.stepSound.getVolume() + 1.0F) / 2.0F, var12.stepSound.getPitch() * 0.8F);
+                par3World.playSoundEffect((double)((float)par4 + 0.5F), (double)((float)par5 + 0.5F), (double)((float)par6 + 0.5F), var12.stepSound.func_82593_b(), (var12.stepSound.getVolume() + 1.0F) / 2.0F, var12.stepSound.getPitch() * 0.8F);
                 --par1ItemStack.stackSize;
             }
 
@@ -103,6 +102,7 @@ public class ItemBlockProxy extends Item {
             return false;
         }
     }
+
     
     @Override
     public boolean getShareTag() {

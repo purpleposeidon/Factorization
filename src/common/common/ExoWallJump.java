@@ -14,6 +14,7 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.MovingObjectPosition;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.Vec3;
+import net.minecraft.src.Vec3Pool;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.ISpecialArmor.ArmorProperties;
 import cpw.mods.fml.common.ITickHandler;
@@ -60,7 +61,7 @@ public class ExoWallJump extends Item implements IExoUpgrade, ITickHandler {
         if (isEnabled && charges > 0) {
             //if the player is looking at a block, and it's solid, and the distance is < 1m, push player away from it
             if (FactorizationUtil.itemCanFire(player.worldObj, upgrade, 20*2)) {
-                Vec3 position = Vec3.getVec3Pool().getVecFromPool(player.posX, player.posY, player.posZ);
+                Vec3 position = Vec3.createVectorHelper(player.posX, player.posY, player.posZ);
                 Vec3 incidence = player.getLookVec();
                 double dist = 2;
                 Vec3 var6 = position.addVector(incidence.xCoord * dist, incidence.yCoord * dist, incidence.zCoord * dist);
@@ -168,8 +169,8 @@ public class ExoWallJump extends Item implements IExoUpgrade, ITickHandler {
     }
     
     @Override
-    public void addInformation(ItemStack is, List list) {
-        list.add("Exo-Upgrade");
-        Core.brand(list);
+    public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
+        infoList.add("Exo-Upgrade");
+        Core.brand(infoList);
     }
 }

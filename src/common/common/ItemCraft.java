@@ -3,24 +3,26 @@ package factorization.common;
 import java.util.ArrayList;
 import java.util.List;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import factorization.common.Core.TabType;
-
-import net.minecraft.client.Minecraft;
+import net.minecraft.src.ChunkCoordinates;
 import net.minecraft.src.Container;
 import net.minecraft.src.CraftingManager;
-import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.IRecipe;
+import net.minecraft.src.ISaveHandler;
 import net.minecraft.src.InventoryCrafting;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
+import net.minecraft.src.Profiler;
 import net.minecraft.src.TileEntity;
-import net.minecraftforge.common.ForgeHooks;
+import net.minecraft.src.World;
+import net.minecraft.src.WorldProvider;
+import net.minecraft.src.WorldSettings;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
+import cpw.mods.fml.common.registry.GameRegistry;
+import factorization.common.Core.TabType;
 
 public class ItemCraft extends Item {
 	private final int slot_length = 9;
@@ -53,7 +55,7 @@ public class ItemCraft extends Item {
 		return ItemStack.loadItemStackFromNBT(slot);
 	}
 
-	private void setSlot(ItemStack is, int i, ItemStack origWhat) {
+	private void setSlot(ItemStack is, int i, ItemStack origWhat, TileEntity where) {
 		ItemStack what = origWhat.copy();
 		what.stackSize = 1;
 		NBTTagCompound tag = is.getTagCompound();
@@ -65,19 +67,19 @@ public class ItemCraft extends Item {
 		NBTTagCompound saved = new NBTTagCompound();
 		what.writeToNBT(saved);
 		tag.setTag("slot" + i, saved);
-		craftAt(is, true, null);
+		craftAt(is, true, where);
 	}
 
 	@Override
 	// -- XXX NOTE Can't override due to server
-	public void addInformation(ItemStack is, List list) {
+	public void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
 		// super.addInformation(is, list); // XXX NOTE Can't call due to server
 		String line = "";
 		ArrayList<String> toAdd = new ArrayList<String>();
 		int count = 0;
 		if (is.getItemDamage() > 1) {
 			if (is.getItemDamage() == Core.registry.diamond_shard_packet.getItemDamage() && is != Core.registry.diamond_shard_packet) {
-				addInformation(Core.registry.diamond_shard_packet, list);
+				addInformation(Core.registry.diamond_shard_packet, player, list, verbose);
 			} else {
 				Core.brand(list);
 				return;
@@ -111,7 +113,7 @@ public class ItemCraft extends Item {
 		Core.brand(list);
 	}
 
-	public boolean addItem(ItemStack is, int i, ItemStack what) {
+	public boolean addItem(ItemStack is, int i, ItemStack what, TileEntity where) {
 		if (i < 0 || 8 < i) {
 			throw new RuntimeException("out of range");
 		}
@@ -122,7 +124,7 @@ public class ItemCraft extends Item {
 		if (getSlot(is, i) != null) {
 			return false;
 		}
-		setSlot(is, i, what);
+		setSlot(is, i, what, where);
 		return true;
 	}
 
@@ -145,15 +147,15 @@ public class ItemCraft extends Item {
 		return craft;
 	}
 
-	ItemStack findMatchingRecipe(InventoryCrafting craft) {
+	ItemStack findMatchingRecipe(InventoryCrafting craft, World world) {
 		for (IRecipe recipe : recipes) {
-			if (recipe.matches(craft)) {
+			if (recipe.matches(craft, world)) {
 				return recipe.getCraftingResult(craft);
 			}
 		}
-		return CraftingManager.getInstance().findMatchingRecipe(craft);
+		return CraftingManager.getInstance().findMatchingRecipe(craft, world);
 	}
-
+	
 	public ArrayList<ItemStack> craftAt(ItemStack is, boolean fake, TileEntity where) {
 		// Return the crafting result, and any leftover ingredients (buckets)
 		// If the crafting recipe fails, return our contents.
@@ -171,7 +173,11 @@ public class ItemCraft extends Item {
 
 		ItemStack result;
 
-		result = findMatchingRecipe(craft);
+		if (where == null || where.worldObj == null) {
+			result = findMatchingRecipe(craft, null);
+		} else {
+			result = findMatchingRecipe(craft, where.worldObj);
+		}
 		if (result == null) {
 			is.setItemDamage(0);
 		}
@@ -190,12 +196,15 @@ public class ItemCraft extends Item {
 			ret.add(result);
 			EntityPlayer fakePlayer = null;
 			if (!fake && where != null) {
-				if (Core.registry.diamond_shard_recipe.matches(craft)) {
+				if (Core.registry.diamond_shard_recipe.matches(craft, where.worldObj)) {
 					Sound.shardMake.playAt(where);
 				}
 				fakePlayer = new EntityPlayer(where.worldObj) {
 					@Override public void sendChatToPlayer(String var1) {}
-					@Override public boolean canCommandSenderUseCommand(String var1) { return false; }
+					@Override
+					public boolean canCommandSenderUseCommand(int var1, String var2) { return false; }
+					@Override
+					public ChunkCoordinates func_82114_b() { return new ChunkCoordinates(0, 0, 0); }
 				};
 				fakePlayer.posX = where.xCoord;
 				fakePlayer.posY = where.yCoord;

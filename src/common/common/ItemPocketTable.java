@@ -108,8 +108,7 @@ public class ItemPocketTable extends Item {
     }
 
     @Override
-    public void addInformation(ItemStack is, List infoList) {
-        super.addInformation(is, infoList);
+    public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
         Core.brand(infoList);
     }
 }

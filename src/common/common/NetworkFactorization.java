@@ -12,9 +12,9 @@ import java.util.IllegalFormatException;
 import net.minecraft.src.Block;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.INetworkManager;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.NetworkManager;
 import net.minecraft.src.Packet;
 import net.minecraft.src.Packet250CustomPayload;
 import net.minecraft.src.StringTranslate;
@@ -27,7 +27,6 @@ import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.Player;
 import factorization.api.Coord;
 import factorization.api.VectorUV;
-import factorization.client.gui.FactorizationNotify;
 
 public class NetworkFactorization implements IPacketHandler {
     protected final static String factorizeTEChannel = "factorizeTE"; //used for tile entities
@@ -207,7 +206,7 @@ public class NetworkFactorization implements IPacketHandler {
     }
 
     @Override
-    public void onPacketData(NetworkManager network, Packet250CustomPayload packet, Player player) {
+    public void onPacketData(INetworkManager network, Packet250CustomPayload packet, Player player) {
         String channel = packet.channel;
         byte[] data = packet.data;
         EntityPlayer me = (EntityPlayer) player;

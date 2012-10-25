@@ -70,13 +70,13 @@ public class ContainerPocket extends ContainerWorkbench {
         }
 
         @Override
-        public void onPickupFromSlot(ItemStack par1ItemStack) {
+        public void onPickupFromSlot(EntityPlayer player, ItemStack par1ItemStack) {
             updateMatrix();
             for (int i : craftArea) {
                 i += 9;
                 player.inventory.setInventorySlotContents(i, Core.registry.fake_is);
             }
-            super.onPickupFromSlot(par1ItemStack);
+            super.onPickupFromSlot(player, par1ItemStack);
             int j = 0;
             for (int i : craftArea) {
                 i += 9;
@@ -226,14 +226,14 @@ public class ContainerPocket extends ContainerWorkbench {
             var2.setItemStack((ItemStack) null);
         }
     }
-
+    
     @Override
-    public ItemStack transferStackInSlot(int i) {
+    public ItemStack transferStackInSlot(EntityPlayer player, int i) {
         ItemStack ret = null;
 
         if (i == 36) {
             // crafting result slot
-            transferCraftResults();
+            transferCraftResults(player);
         } else if (craftArea.contains(i)) {
             ret = FactorizationUtil.transferStackToArea(player.inventory, i + 9, player.inventory,
                     playerNormalInvSlots);
@@ -264,14 +264,14 @@ public class ContainerPocket extends ContainerWorkbench {
                 freeSpace += res.getMaxStackSize();
                 continue;
             }
-            if (is.isStackEqual(res)) {
+            if (is.isItemEqual(res)) {
                 freeSpace += is.getMaxStackSize() - is.stackSize;
             }
         }
         return freeSpace >= res.getMaxStackSize();
     }
 
-    void transferCraftResults() {
+    void transferCraftResults(EntityPlayer player) {
         // move 1 or (maxStackSize - 1)
         ItemStack res = craftResult.getStackInSlot(0);
         if (res == null) {
@@ -315,7 +315,7 @@ public class ContainerPocket extends ContainerWorkbench {
             productRemaining -= res.stackSize;
             materialRemaining--;
             assert res != null;
-            slotCrafting.onPickupFromSlot(res);
+            slotCrafting.onPickupFromSlot(player, res);
             craftResult.setInventorySlotContents(0, res);
             ItemStack remainder = FactorizationUtil.transferStackToArea(craftResult, 0, player.inventory, playerNormalInvSlotsAlt);
 

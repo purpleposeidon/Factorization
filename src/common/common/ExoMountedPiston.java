@@ -100,8 +100,8 @@ public class ExoMountedPiston extends Item implements IExoUpgrade {
     }
 
     @Override
-    public void addInformation(ItemStack is, List list) {
-        list.add("Exo-Upgrade");
-        Core.brand(list);
+    public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
+        infoList.add("Exo-Upgrade");
+        Core.brand(infoList);
     }
 }

@@ -84,8 +84,7 @@ public class ItemFactorization extends ItemBlock {
     }
 
     @Override
-    public void addInformation(ItemStack is, List infoList) {
-        super.addInformation(is, infoList);
+    public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
         if (is.isItemEqual(Core.registry.greenware_item)) {
             NBTTagCompound tag = is.getTagCompound();
             if (tag != null) {

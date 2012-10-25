@@ -101,7 +101,7 @@ public class ItemSculptingTool extends Item {
     }
     
     @Override
-    public void addInformation(ItemStack is, List list) {
+    public void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         ToolMode mode = getMode(is.getItemDamage());
         list.add(mode.english);
         for (ToolMode nextMode = mode.next; nextMode != mode; nextMode = nextMode.next) {

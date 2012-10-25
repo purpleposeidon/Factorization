@@ -31,7 +31,7 @@ public class TileEntityPackager extends TileEntityStamper {
             if (input.stackSize >= 9) {
                 toCraft = new ItemStack(ic);
                 for (int i = 0; i < 9; i++) {
-                    ic.addItem(toCraft, i, craftInput);
+                    ic.addItem(toCraft, i, craftInput, this);
                 }
                 ic.craftAt(toCraft, true, this);
                 if (!ic.isValidCraft(toCraft)) {
@@ -43,10 +43,10 @@ public class TileEntityPackager extends TileEntityStamper {
             }
             if (input.stackSize >= 4 && toCraft == null) {
                 toCraft = new ItemStack(ic);
-                ic.addItem(toCraft, 0, craftInput);
-                ic.addItem(toCraft, 1, craftInput);
-                ic.addItem(toCraft, 3, craftInput);
-                ic.addItem(toCraft, 4, craftInput);
+                ic.addItem(toCraft, 0, craftInput, this);
+                ic.addItem(toCraft, 1, craftInput, this);
+                ic.addItem(toCraft, 3, craftInput, this);
+                ic.addItem(toCraft, 4, craftInput, this);
                 ic.craftAt(toCraft, true, this);
                 if (!ic.isValidCraft(toCraft)) {
                     toCraft = null;

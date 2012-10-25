@@ -68,7 +68,7 @@ public class BlockResource extends Block {
     }
 
     @Override
-    protected int damageDropped(int i) {
+    public int damageDropped(int i) {
         return i;
     }
 }

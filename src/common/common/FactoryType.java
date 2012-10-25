@@ -32,7 +32,7 @@ public enum FactoryType {
 
     POCKETCRAFTGUI(101, true),
     EXOTABLEGUICONFIG(102, true), //Exo-armor editor
-    NULLGUI(103, true), ;
+    ;
 
     final public int md;
     final public int gui;

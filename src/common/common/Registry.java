@@ -136,7 +136,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     HashSet<Integer> added_ids = new HashSet();
 
     public int itemID(String name, int default_id) {
-        int id = Integer.parseInt(Core.config.getOrCreateIntProperty(name, "item", default_id).value);
+        int id = Integer.parseInt(Core.config.get("item", name, default_id).value);
         if (added_ids.contains(default_id)) {
             throw new RuntimeException("Default ID already used: " + default_id);
         }
@@ -394,12 +394,12 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         diamond_shard_packet = new ItemStack(item_craft);
         diamond_shard_packet.setItemDamage(0xFF);
         for (int i : new int[] { 0, 2, 6, 8 }) {
-            item_craft.addItem(diamond_shard_packet, i, new ItemStack(Block.obsidian));
+            item_craft.addItem(diamond_shard_packet, i, new ItemStack(Block.obsidian), null);
         }
         for (int i : new int[] { 1, 3, 5, 7 }) {
-            item_craft.addItem(diamond_shard_packet, i, new ItemStack(Block.tnt));
+            item_craft.addItem(diamond_shard_packet, i, new ItemStack(Block.tnt), null);
         }
-        item_craft.addItem(diamond_shard_packet, 4, new ItemStack(Block.blockDiamond));
+        item_craft.addItem(diamond_shard_packet, 4, new ItemStack(Block.blockDiamond), null);
         recipe(diamond_shard_packet,
                 "OTO",
                 "TDT",
@@ -609,6 +609,12 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "W W",
                 "WWW",
                 'W', Block.wood,
+                '-', new ItemStack(Block.woodSingleSlab, 1, -1));
+        oreRecipe(barrel_item,
+                "W-W",
+                "W W",
+                "WWW",
+                'W', "logWood",
                 '-', new ItemStack(Block.woodSingleSlab, 1, -1));
 
         // Craft maker

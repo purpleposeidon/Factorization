@@ -57,7 +57,7 @@ public class ItemMachineUpgrade extends Item {
     }
 
     @Override
-    public void addInformation(ItemStack is, List list) {
+    public void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         list.add(type);
         Core.brand(list);
     }

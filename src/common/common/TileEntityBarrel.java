@@ -544,8 +544,8 @@ public class TileEntityBarrel extends TileEntityFactorization {
     @Override
     public double getRenderDistance() {
         if (Core.render_barrel_close) {
-            return 5;
+            return 25; //5²
         }
-        return 32;
+        return 1024; //32²
     }
 }

@@ -2,6 +2,7 @@ package factorization.common;
 
 import java.util.List;
 
+import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
 
 public class ItemInverium extends ItemCraftingComponent {
@@ -24,7 +25,7 @@ public class ItemInverium extends ItemCraftingComponent {
     }
     
     @Override
-    public int getColorFromDamage(int par1, int par2) {
+    public int getColorFromDamage(ItemStack is, int renderPass) {
         int now = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
         int r = (int) (Math.abs(Math.cos(now/32000))*0x20) + 0xD0;
         int g = Math.min(0xFF, r*2);
@@ -33,10 +34,10 @@ public class ItemInverium extends ItemCraftingComponent {
     }
     
     @Override
-    public void addInformation(ItemStack is, List infoList) {
+    public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
         if (is.getItemDamage() == 1) {
             infoList.add("Temporary recipe");
         }
-        super.addInformation(is, infoList);
+        super.addInformation(is, player, infoList, verbose);
     }
 }

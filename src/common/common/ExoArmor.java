@@ -281,8 +281,8 @@ public class ExoArmor extends ItemArmor
     }
 
     @Override
-    public void addInformation(ItemStack is, List infoList) {
-        super.addInformation(is, infoList);
+    public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
+        super.addInformation(is, player, infoList, verbose);
         for (int i = 0; i < slotCount; i++) {
             ItemStack upgrade = getStackInSlot(is, i);
             if (upgrade == null) {

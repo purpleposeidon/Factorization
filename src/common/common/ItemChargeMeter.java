@@ -67,8 +67,7 @@ public class ItemChargeMeter extends Item {
     }
 
     @Override
-    public void addInformation(ItemStack is, List infoList) {
-        super.addInformation(is, infoList);
-        Core.brand(infoList);
+    public void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
+        Core.brand(list);
     }
 }

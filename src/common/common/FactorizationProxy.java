@@ -43,11 +43,6 @@ public abstract class FactorizationProxy implements IGuiHandler {
     public abstract Profiler getProfiler();
 
     protected Container getContainer(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        if (ID == FactoryType.NULLGUI.gui) {
-            player.craftingInventory = new ContainerPlayer(player.inventory);
-            //ModLoader.getMinecraftInstance().displayGuiScreen(null);
-            return null;
-        }
         if (ID == FactoryType.POCKETCRAFTGUI.gui) {
             return new ContainerPocket(player);
         }

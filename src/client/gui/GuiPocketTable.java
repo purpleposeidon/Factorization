@@ -30,10 +30,10 @@ public class GuiPocketTable extends GuiContainer {
         drawTexturedModalRect(l, i1, 0, 0, xSize, ySize);
         open_time++;
     }
-
+    
     @Override
-    protected void drawGuiContainerForegroundLayer() {
-        super.drawGuiContainerForegroundLayer();
+    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+        super.drawGuiContainerForegroundLayer(mouseX, mouseY);
         // I'd like it to say "Pocket Crafting", but that doesn't fit.
         // Could also make the tab a bit longer...
         // this.fontRenderer.drawString("Crafting", 178, 10, 4210752);

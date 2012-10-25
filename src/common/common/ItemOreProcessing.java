@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.src.CreativeTabs;
+import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import factorization.common.Core.TabType;
@@ -69,9 +70,9 @@ public class ItemOreProcessing extends Item {
     }
 
     @Override
-    public int getColorFromDamage(int damage, int renderPass) {
+    public int getColorFromDamage(ItemStack is, int renderPass) {
         try {
-            return OreType.values()[damage].color;
+            return OreType.values()[is.getItemDamage()].color;
         } catch (ArrayIndexOutOfBoundsException e) {
             return 0xFFFF00;
         }
@@ -98,8 +99,7 @@ public class ItemOreProcessing extends Item {
     }
 
     @Override
-    public void addInformation(ItemStack is, List infoList) {
-        super.addInformation(is, infoList);
+    public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
         Core.brand(infoList);
     }
     

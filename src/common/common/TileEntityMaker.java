@@ -105,7 +105,7 @@ public class TileEntityMaker extends TileEntityFactorization implements
 
         ItemStack toAdd = input.copy();
         toAdd.stackSize = 1;
-        if (ic.addItem(craft, targetSlot, toAdd)) {
+        if (ic.addItem(craft, targetSlot, toAdd, this)) {
             input.stackSize--;
             if (input.stackSize < 1) {
                 input = null;

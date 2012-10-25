@@ -202,7 +202,7 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
 
     @Override
     // XXX NOTE: Can't override due to... the *fucking* server. >:|
-    public void addInformation(ItemStack is, List list) {
+    public void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         // Bag of Holding
         // Stores 5 columns
         if (is.getTagCompound() == null) {

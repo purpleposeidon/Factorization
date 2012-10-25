@@ -149,7 +149,7 @@ public class TileEntityStamper extends TileEntityFactorization {
                 toCraft = new ItemStack(ic);
                 ItemStack craftInput = input.copy();
                 craftInput.stackSize = 1;
-                ic.addItem(toCraft, 4, craftInput);
+                ic.addItem(toCraft, 4, craftInput, this);
             }
 
             ArrayList<ItemStack> fakeResult = Core.registry.item_craft.craftAt(toCraft, true, this);

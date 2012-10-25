@@ -147,13 +147,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
     }
 
     @Override
-    public Object getClientGuiElement(int ID, EntityPlayer player, World world,
-            int x, int y, int z) {
-        if (ID == FactoryType.NULLGUI.gui) {
-            player.craftingInventory = new ContainerPlayer(player.inventory);
-            //ModLoader.getMinecraftInstance().displayGuiScreen(null);
-            return null;
-        }
+    public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
         if (ID == FactoryType.POCKETCRAFTGUI.gui) {
             return new GuiPocketTable(new ContainerPocket(player));
         }
