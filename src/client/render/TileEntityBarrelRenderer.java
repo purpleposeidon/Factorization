@@ -34,7 +34,7 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
     RenderItem itemRender; // = new RenderItem();
     Random random = new Random();
     private RenderBlocks renderBlocks = new RenderBlocks();
-    static boolean field_27004_a = true;
+    static boolean field_77024_a = true;
     float item_rotation = 0;
     boolean render_item, render_text;
     boolean is_obscured = false;

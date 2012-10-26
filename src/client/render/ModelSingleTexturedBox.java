@@ -32,7 +32,7 @@ public class ModelSingleTexturedBox
 
     /** Z vertex coordinate of upper box corner */
     public final float posZ2;
-    public String field_40673_g;
+    public String field_78247_g;
 
     public ModelSingleTexturedBox(ModelRenderer par1ModelRenderer, int par2, int par3, float par4, float par5, float par6, int par7, int par8, int par9, float par10)
     {
@@ -112,9 +112,9 @@ public class ModelSingleTexturedBox
         }
     }
 
-    public ModelSingleTexturedBox func_40671_a(String par1Str)
+    public ModelSingleTexturedBox func_78244_a(String par1Str)
     {
-        this.field_40673_g = par1Str;
+        this.field_78247_g = par1Str;
         return this;
     }
 }

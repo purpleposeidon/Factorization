@@ -271,7 +271,8 @@ public class ContainerExoModder extends Container {
     }
 
     @Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int slotNumber) {
+    //transferStackInSlot
+    public ItemStack func_82846_b(EntityPlayer player, int slotNumber) {
         try {
             Slot clickedSlot = (Slot) inventorySlots.get(slotNumber);
             Iterable<Slot> targetSlots;

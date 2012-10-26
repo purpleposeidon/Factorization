@@ -127,7 +127,8 @@ public enum Command {
         }
         ContainerPocket pocket = (ContainerPocket) player.craftingInventory;
         for (int i : pocket.craftArea) {
-            pocket.transferStackInSlot(player, i);
+            //transferStackInSlot
+            pocket.func_82846_b(player, i);
         }
     }
     

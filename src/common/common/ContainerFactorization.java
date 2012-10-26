@@ -201,7 +201,8 @@ public class ContainerFactorization extends Container {
     }
 
     @Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int i) {
+    //transferStackInSlot
+    public ItemStack func_82846_b(EntityPlayer player, int i) {
         ItemStack itemstack = null;
         Slot slot = (Slot) inventorySlots.get(i);
         if (slot != null && slot.getHasStack()) {
@@ -221,7 +222,7 @@ public class ContainerFactorization extends Container {
                 slot.onSlotChanged();
             }
             if (itemstack1.stackSize != itemstack.stackSize) {
-                slot.onPickupFromSlot(player, itemstack1);
+                slot.func_82870_a(player, itemstack1);
             } else {
                 return null;
             }

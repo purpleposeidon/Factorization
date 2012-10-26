@@ -540,9 +540,10 @@ public class TileEntityBarrel extends TileEntityFactorization {
     public String toString() {
         return "Barrel of " + getItemCount() + " " + item;
     }
-    
+
     @Override
-    public double getRenderDistance() {
+    //getRenderDistanceSquared
+    public double func_82115_m() {
         if (Core.render_barrel_close) {
             return 25; //5²
         }

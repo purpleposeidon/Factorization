@@ -347,7 +347,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     }
     
     @Override
-    public double getRenderDistance() {
+    public double func_82115_m() {
         return 1024; //32²
     }
 }

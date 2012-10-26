@@ -2,10 +2,6 @@ package factorization.common;
 
 import java.util.List;
 
-import org.lwjgl.opengl.SharedDrawable;
-
-import net.minecraft.src.Block;
-import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityItem;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
@@ -13,7 +9,6 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.World;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
-import factorization.api.VectorUV;
 import factorization.common.Core.TabType;
 import factorization.common.NetworkFactorization.MessageType;
 import factorization.common.TileEntityGreenware.ClayState;

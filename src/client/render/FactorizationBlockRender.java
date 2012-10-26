@@ -542,9 +542,10 @@ abstract public class FactorizationBlockRender implements ICoord {
     
 
     void renderMotor(RenderBlocks rb, float yoffset) {
-        int lead = Core.registry.lead_block_item.getIconIndex();
+        int metal = Core.registry.lead_block_item.getIconIndex();
+        metal = 11;
         float d = 4.0F / 16.0F;
         float yd = -d + 0.003F;
-        renderPart(rb, lead, d, d + yd + yoffset, d, 1 - d, 1 - (d + 0F/16F) + yd + yoffset, 1 - d);
+        renderPart(rb, metal, d, d + yd + yoffset, d, 1 - d, 1 - (d + 0F/16F) + yd + yoffset, 1 - d);
     }
 }
