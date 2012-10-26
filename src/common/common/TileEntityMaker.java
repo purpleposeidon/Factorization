@@ -203,6 +203,7 @@ public class TileEntityMaker extends TileEntityFactorization implements
         saveItem("input", tag, input);
         saveItem("craft", tag, craft);
         saveItem("output", tag, output);
+        saveItem("paper", tag, paper);
     }
 
     @Override
@@ -214,6 +215,7 @@ public class TileEntityMaker extends TileEntityFactorization implements
         input = readItem("input", tag);
         craft = readItem("craft", tag);
         output = readItem("output", tag);
+        paper = readItem("paper", tag);
     }
 
     @Override
