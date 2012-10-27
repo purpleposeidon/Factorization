@@ -29,10 +29,10 @@ import factorization.api.Coord;
 import factorization.api.VectorUV;
 
 public class NetworkFactorization implements IPacketHandler {
-    protected final static String factorizeTEChannel = "factorizeTE"; //used for tile entities
-    protected final static String factorizeMsgChannel = "factorizeMsg"; //used for sending translatable chat messages
-    protected final static String factorizeCmdChannel = "factorizeCmd"; //used for player keys
-    protected final static String factorizeNtfyChannel = "factorizeNtfy"; //used to show messages in-world
+    protected final static String factorizeTEChannel = "fz"; //used for tile entities
+    protected final static String factorizeMsgChannel = "fzMsg"; //used for sending translatable chat messages
+    protected final static String factorizeCmdChannel = "fzK"; //used for player keys
+    protected final static String factorizeNtfyChannel = "fzNtc"; //used to show messages in-world
 
     public NetworkFactorization() {
         //		if (Core.network != null) {
@@ -417,7 +417,7 @@ public class NetworkFactorization implements IPacketHandler {
                 //
                 BatteryLevel = 50,
                 //
-                MirrorTargetRotation = 60, MirrorDescription = 61,
+                MirrorDescription = 60,
                 //
                 TurbineWater = 70, TurbineSpeed = 71,
                 //
