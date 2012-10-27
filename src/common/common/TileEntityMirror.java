@@ -21,7 +21,7 @@ public class TileEntityMirror extends TileEntityCommon {
     int search_delay = 0;
     int trace_check = 0;
     //don't save, but *do* share w/ client
-    public int target_rotation = 0;
+    public int target_rotation = -99;
 
     @Override
     public FactoryType getFactoryType() {
@@ -114,15 +114,7 @@ public class TileEntityMirror extends TileEntityCommon {
         }
         return false;
     }
-
-    @Override
-    void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
-        if (player == null) {
-            return;
-        }
-        target_rotation = clipAngle(-clipAngle((int) player.rotationYaw + 270));
-    }
-
+    
     @Override
     void onRemove() {
         super.onRemove();
