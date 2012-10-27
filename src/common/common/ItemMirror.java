@@ -15,8 +15,8 @@ public class ItemMirror extends ItemBlockProxy {
     protected ItemMirror(int par1) {
         super(par1, Core.registry.mirror_item_hidden);
         setItemName("mirror");
-        setTextureFile(Core.texture_file_item);
-        setIconIndex(9);
+        setTextureFile(Core.texture_file_block);
+        setIconIndex(Texture.mirrorStart);
     }
 
     @Override

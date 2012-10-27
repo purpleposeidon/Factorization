@@ -305,7 +305,7 @@ abstract public class FactorizationBlockRender implements ICoord {
     boolean isDebugVertex = false;
     
     static boolean force_inv = true;
-    static private int allFaces[] = { 0, 1, 2, 3, 4, 5, 6 };
+    static private int allFaces[] = { 0, 1, 2, 3, 4, 5 };
     protected void renderCube(RenderingCube rc) {
         renderCube(rc, allFaces);
     }

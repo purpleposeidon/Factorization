@@ -213,6 +213,8 @@ public class RenderingCube {
                     vert.v = 16 - (vert.z + 8);
                 }
                 break;
+            default:
+                throw new RuntimeException("Invalid face number");
             }
             for (VectorUV main : ret) {
                 float udelta = 0, vdelta = 0;

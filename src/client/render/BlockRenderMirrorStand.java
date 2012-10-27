@@ -27,7 +27,7 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
         if (world_mode) {
             TileEntityMirror tem = getCoord().getTE(TileEntityMirror.class);
             if (tem != null && tem.target_rotation >= 0) {
-                mirror.trans.rotate(0, -1, 0, (float) Math.toRadians(tem.rotation + 90));
+                mirror.trans.rotate(0, -1, 0, (float) Math.toRadians(tem.target_rotation + 90));
                 mirror.trans.rotate(1, 0, 0, (float) Math.toRadians(-45));
             }
         }

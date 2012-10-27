@@ -85,7 +85,7 @@ public class ItemBlockProxy extends Item {
         {
             return false;
         }
-        else if (par3World.canPlaceEntityOnSide(this.blockID, par4, par5, par6, false, par7, par2EntityPlayer))
+        else if (par3World.canPlaceEntityOnSide(this.blockID, par4, par5, par6, false, par7, null))
         {
             Block var12 = Block.blocksList[this.blockID];
 

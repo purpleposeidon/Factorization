@@ -17,7 +17,6 @@ public class TileEntityMirror extends TileEntityCommon {
     Coord reflection_target = null;
 
     //don't save
-    public int rotation = 0;
     public boolean is_lit = false;
     int search_delay = 0;
     int trace_check = 0;
@@ -49,7 +48,6 @@ public class TileEntityMirror extends TileEntityCommon {
             reflection_target = getCoord();
             reflection_target.readFromNBT("target", tag);
             updateRotation();
-            rotation = target_rotation;
         }
         else {
             reflection_target = null;
@@ -78,17 +76,11 @@ public class TileEntityMirror extends TileEntityCommon {
         return getCoord().canSeeSky() && worldObj.isDaytime() && !raining;
     }
 
-    void setRotation(int rotation) {
-        if (this.rotation != rotation) {
-            this.rotation = rotation;
-        }
-    }
-
     int last_shared = -1;
 
     void broadcastTargetInfo() {
         if (getTargetInfo() != last_shared) {
-            broadcastMessage(null, MessageType.MirrorTargetRotation, getTargetInfo());
+            broadcastMessage(null, MessageType.MirrorDescription, getTargetInfo());
             last_shared = getTargetInfo();
         }
     }
@@ -105,7 +97,7 @@ public class TileEntityMirror extends TileEntityCommon {
 
     @Override
     public Packet getAuxillaryInfoPacket() {
-        return getDescriptionPacketWith(MessageType.MirrorDescription, rotation, getTargetInfo());
+        return getDescriptionPacketWith(MessageType.MirrorDescription, target_rotation, getTargetInfo());
     }
 
     @Override
@@ -115,9 +107,6 @@ public class TileEntityMirror extends TileEntityCommon {
         }
         switch (messageType) {
         case MessageType.MirrorDescription:
-            rotation = input.readInt();
-            //$FALL-THROUGH$
-        case MessageType.MirrorTargetRotation:
             target_rotation = input.readInt();
             getCoord().dirty();
             gotten_info_packet = true;
@@ -131,10 +120,7 @@ public class TileEntityMirror extends TileEntityCommon {
         if (player == null) {
             return;
         }
-        setRotation(clipAngle(-clipAngle((int) player.rotationYaw + 270)));
-        //		if (Core.isCannonical()) {
-        //			broadcastMessage(null, getAuxillaryInfoPacket());
-        //		}
+        target_rotation = clipAngle(-clipAngle((int) player.rotationYaw + 270));
     }
 
     @Override
@@ -166,25 +152,10 @@ public class TileEntityMirror extends TileEntityCommon {
     public void updateEntity() {
         //		if we don't have a target, spin about
         if (worldObj.isRemote) {
-            if (!gotten_info_packet) {
-                return;
-            }
-            if (target_rotation == -99) {
-                rotation++;
-            } else if (target_rotation != rotation) {
-                int dist = target_rotation - rotation;
-                if (dist > 180 || (dist < 0 && dist > -180)) {
-                    rotation--;
-                } else {
-                    rotation++;
-                }
-                rotation = clipAngle(rotation);
-            }
             return;
         }
         broadcastTargetInfo();
         if (reflection_target == null) {
-            rotation++;
             if (search_delay > 0) {
                 search_delay--;
                 return;
@@ -208,19 +179,6 @@ public class TileEntityMirror extends TileEntityCommon {
             }
             return;
         }
-        rotation = clipAngle(rotation);
-        if (rotation != target_rotation) {
-            int dist = target_rotation - rotation;
-            if (dist > 180 || (dist < 0 && dist > -180)) {
-                rotation--;
-            } else {
-                rotation++;
-            }
-            rotation = clipAngle(rotation);
-            if (rotation == target_rotation) {
-                trace_check = 1;
-            }
-        }
         if (trace_check == 0) {
             trace_check = 20 * 30 + rand.nextInt(20);
             if (!myTrace(reflection_target.x, reflection_target.z)) {
@@ -236,7 +194,7 @@ public class TileEntityMirror extends TileEntityCommon {
             trace_check--;
         }
 
-        if (hasSun() != is_lit && rotation == target_rotation) {
+        if (hasSun() != is_lit) {
             is_lit = hasSun();
             target.addReflector(is_lit ? getPower() : -getPower());
         }
