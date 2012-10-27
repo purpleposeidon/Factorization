@@ -136,7 +136,7 @@ public class TileEntityMaker extends TileEntityFactorization implements
     
     @Override
     int getLogicSpeed() {
-        return 10;
+        return 16;
     }
 
     void doLogic() {

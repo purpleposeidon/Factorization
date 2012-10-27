@@ -228,6 +228,6 @@ public class TileEntityStamper extends TileEntityFactorization {
     
     @Override
     int getLogicSpeed() {
-        return 10;
+        return 16;
     }
 }
