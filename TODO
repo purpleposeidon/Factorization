@@ -7,18 +7,16 @@ slow stamper & packager & maker so as to not jam filters. also have stamper puls
 router:
   searching for avilable inv names; what's IC doing?
   that other filter mode! What's it do? It stocks!
-  How about... he said something else only worked one way? Uhm. Oh, I don't think I want the ejector to do extract from invs.
+  Okay. Let's not make the machine filter required for the ejector.
 [Mecha-Features]
 add inverium-based mecha-upgrades
 These upgrades:
   Lead boots
-  Wall Jumping Boots -- Make sure to require sprinting! And take away some hunger while you're at it!
   Armor Dropper
   Anti-gravity (uses inverium'd lead blocks): Velocity limiting, hovering, high jumping
     Acceleration Dampener
     Acceleration Stopper
 Some electricity related mecha-upgrades?
-Rename "Mecha-Armor" to "Modular Armor".
 
 http://i.imgur.com/db3Ij.jpg -- fix the distant metric. Also, switch to euclidean with max distance such that current cubes will just fit.
 watch dire's bug video a second time
@@ -33,13 +31,11 @@ https://github.com/pahimar/Equivalent-Exchange-3/commit/e1ed736955b9af238431358b
 
 [High-priority Bugs]
 test high block IDs
-solar turbines need to check if it's raining. It's okay if you're in a desert tho.
 
 [Low-Priority Bugs]
 nikolite grinding! Once RedPower comes out...
 draw_active isn't marking the block dirty apparently?
 re-write the shift-clicking function to use slots!!!
-silver ore needs to be toughened up just a tad!
 check normal fire interactions w/ our TEs
 two issues with buttons in mecha-modder: doesn't update when blank armor put in; reinforcing w/ vanilla armor doesn't hide buttons
 shift-clicking the shard recipe doesn't do the thing. *and*, stamping them doesn't work either!!!
@@ -250,13 +246,3 @@ BBB
  G 
 ZMZ
 
-B, ingotBrass,
-G, aga@50eda677,
-Z, 1xnull@0,
-M, null, 1xnull@0
-
-Caused by: java.lang.RuntimeException: Invalid shaped ore recipe: BBB,  G , ZMZ, B, ingotBrass, G, aga@50eda677, Z, 1xnull@0, M, null, 1xnull@0
-        at net.minecraftforge.oredict.ShapedOreRecipe.<init>(ShapedOreRecipe.java:105)
-        at com.eloraam.redpower.core.CraftLib.addOreRecipe(CraftLib.java:20)
-        at RedPowerCompat.setupBlocks(RedPowerCompat.java:114)
-        at RedPowerCompat.load(RedPowerCompat.java:47)
