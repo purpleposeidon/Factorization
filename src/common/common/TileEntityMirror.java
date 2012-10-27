@@ -22,7 +22,7 @@ public class TileEntityMirror extends TileEntityCommon {
     int search_delay = 0;
     int trace_check = 0;
     //don't save, but *do* share w/ client
-    int target_rotation = 0;
+    public int target_rotation = 0;
 
     @Override
     public FactoryType getFactoryType() {

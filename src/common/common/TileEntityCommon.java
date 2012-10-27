@@ -73,8 +73,11 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     private static TileEntityCommon pulsingTE = null;
     
     public void pulse() {
-        pulsingTE = this;
         Coord here = getCoord();
+        if (here.w.isRemote) {
+            return;
+        }
+        pulsingTE = this;
         here.notifyBlockChange();
         here.scheduleUpdate(4);
         pulsingTE = null;

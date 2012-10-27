@@ -124,7 +124,7 @@ abstract public class FactorizationBlockRender implements ICoord {
             float b4, float b5, float b6) {
         BlockFactorization block = Core.registry.factory_rendering_block;
         rb.func_83020_a(b1, b2, b3, b4, b5, b6);
-        //block.setBlockBounds(b1, b2, b3, b4, b5, b6);
+        block.setBlockBounds(b1, b2, b3, b4, b5, b6);
         if (world_mode) {
             Texture.force_texture = texture;
             rb.renderStandardBlock(block, x, y, z);
@@ -134,7 +134,7 @@ abstract public class FactorizationBlockRender implements ICoord {
             renderPartInvTexture(rb, block, texture);
         }
         rb.func_83020_a(0, 0, 0, 1, 1, 1);
-        //block.setBlockBounds(0, 0, 0, 1, 1, 1);
+        block.setBlockBounds(0, 0, 0, 1, 1, 1);
     }
 
     private void renderPartInvTexture(RenderBlocks renderblocks,
@@ -305,8 +305,12 @@ abstract public class FactorizationBlockRender implements ICoord {
     boolean isDebugVertex = false;
     
     static boolean force_inv = true;
-
+    static private int allFaces[] = { 0, 1, 2, 3, 4, 5, 6 };
     protected void renderCube(RenderingCube rc) {
+        renderCube(rc, allFaces);
+    }
+    
+    protected void renderCube(RenderingCube rc, int facesToDraw[]) {
         if (!world_mode) {
             Tessellator.instance.startDrawingQuads();
             ForgeHooksClient.bindTexture(cubeTexture, 0);
@@ -332,7 +336,7 @@ abstract public class FactorizationBlockRender implements ICoord {
             //add vertex
             Coord here = getCoord();
             if (Minecraft.isAmbientOcclusionEnabled() && Core.renderAO) {
-                for (int face = 0; face < 6; face++) {
+                for (int face : facesToDraw) {
 //					if (face != 2) {
 //						continue;
 //					}
@@ -344,7 +348,7 @@ abstract public class FactorizationBlockRender implements ICoord {
                     }
                 }
             } else {
-                for (int face = 0; face < 6; face++) {
+                for (int face : facesToDraw) {
                     VectorUV[] vecs = rc.faceVerts(face);
                     float color = getNormalizedLighting(vecs, center);
                     Tessellator.instance.setColorOpaque_F(color, color, color);
@@ -367,7 +371,7 @@ abstract public class FactorizationBlockRender implements ICoord {
                 }
             }
         } else {
-            for (int face = 0; face < 6; face++) {
+            for (int face : facesToDraw) {
                 VectorUV[] vecs = rc.faceVerts(face);
                 float color = getNormalizedLighting(vecs, center);
                 Tessellator.instance.setColorOpaque_F(color, color, color);

@@ -30,6 +30,7 @@ public class Texture {
     static final int furnace_start = 16 * 4 + 2;
     static public final int heater_coil = 8, heater_element = heater_coil + 1;
     static public final int silver = 1 + 16 * 2;
+    static public final int mirrorStart = 1*16 + 12;
 
     static int pick(int md, int side, boolean active, int facing_direction) {
         if (FactoryType.ROUTER.is(md)) {
