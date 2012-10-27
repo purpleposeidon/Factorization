@@ -116,7 +116,7 @@ public class TileEntityMirror extends TileEntityCommon {
         switch (messageType) {
         case MessageType.MirrorDescription:
             rotation = input.readInt();
-            //FALL THROUGH
+            //$FALL-THROUGH$
         case MessageType.MirrorTargetRotation:
             target_rotation = input.readInt();
             getCoord().dirty();
@@ -139,6 +139,7 @@ public class TileEntityMirror extends TileEntityCommon {
 
     @Override
     void onRemove() {
+        super.onRemove();
         if (reflection_target == null) {
             return;
         }
@@ -151,6 +152,12 @@ public class TileEntityMirror extends TileEntityCommon {
             is_lit = false;
         }
         reflection_target = null;
+    }
+    
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        onRemove();
     }
 
     boolean gotten_info_packet = false;
