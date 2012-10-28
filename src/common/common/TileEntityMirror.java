@@ -205,12 +205,13 @@ public class TileEntityMirror extends TileEntityCommon {
             is_lit = false;
         }
 
-        int search_distance = 8;
+        int search_distance = 11;
         IReflectionTarget closest = null;
         int last_dist = Integer.MAX_VALUE;
         Coord me = getCoord();
-        for (int x = xCoord - search_distance; x < xCoord + search_distance; x++) {
-            for (int z = zCoord - search_distance; z < zCoord + search_distance; z++) {
+        double maxRadiusSq = 8.9*8.9;
+        for (int x = xCoord - search_distance; x <= xCoord + search_distance; x++) {
+            for (int z = zCoord - search_distance; z <= zCoord + search_distance; z++) {
                 Coord here = new Coord(worldObj, x, yCoord, z);
                 IReflectionTarget target = here.getTE(IReflectionTarget.class);
                 if (target == null) {
@@ -220,7 +221,7 @@ public class TileEntityMirror extends TileEntityCommon {
                     continue;
                 }
                 int new_dist = me.distanceSq(here);
-                if (new_dist < last_dist) {
+                if (new_dist < last_dist && new_dist <= maxRadiusSq) {
                     last_dist = new_dist;
                     closest = target;
                 }
