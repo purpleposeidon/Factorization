@@ -323,10 +323,20 @@ public class Core {
         }
     }
     
+    public static CreativeTabs tabFactorization = new CreativeTabs("factorizationTab");
+    
     public static Item tab(Item item, TabType tabType) {
         CreativeTabs tab = tabType.type;
-        item.setCreativeTab(tab);
+        //item.setCreativeTab(tab);
+        item.setCreativeTab(tabFactorization);
         return item;
+    }
+    
+    public static Block tab(Block block, TabType tabType) {
+        CreativeTabs tab = tabType.type;
+        //block.setCreativeTab(tab);
+        block.setCreativeTab(tabFactorization);
+        return block;
     }
     
     public static String getTranslationKey(ItemStack is) {

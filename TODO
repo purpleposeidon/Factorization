@@ -3,7 +3,6 @@ figure out what to do with http://pastebin.com/pHhHp633
 
 TOP LIST
 --------
-slow stamper & packager & maker so as to not jam filters. also have stamper pulse for each item... (cakes)
 router:
   searching for avilable inv names; what's IC doing?
   that other filter mode! What's it do? It stocks!
@@ -33,6 +32,7 @@ https://github.com/pahimar/Equivalent-Exchange-3/commit/e1ed736955b9af238431358b
 test high block IDs
 
 [Low-Priority Bugs]
+slow stamper & packager & maker so as to not jam filters. also have stamper pulse for each item... (cakes)
 nikolite grinding! Once RedPower comes out...
 draw_active isn't marking the block dirty apparently?
 re-write the shift-clicking function to use slots!!!
@@ -240,9 +240,4 @@ Nothin' you can do, 'cause you'll be dead
 (And then they'll eat your brains!)
 Then some douchebag what thinks he's you
 Will wake up with a computanium head
-
-
-BBB
- G 
-ZMZ
 
