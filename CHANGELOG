@@ -1,3 +1,9 @@
+0.6.9 -- Polished
+  Fixed a bunch of terrible, awful bugs
+  Fixed some long standing bugs, notably:
+    - Mecha armor is now actually usable (?)
+    - Slag furnace is no longer obsidian
+
 0.6.8
   Made mirrors less heretical
   Made mirror arrangement more heretical

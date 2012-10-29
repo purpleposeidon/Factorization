@@ -250,7 +250,11 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
 
     void die() {
         invalidate();
-        fire.set(getCoord());
+        if (rand.nextFloat() < 0.3333) {
+            fire.set(getCoord());
+        } else {
+            getCoord().setId(0);
+        }
     }
 
     public static int updateCount = 0;

@@ -3,10 +3,12 @@ package factorization.common;
 import java.io.File;
 import java.util.Random;
 
+import net.minecraft.src.Block;
 import net.minecraft.src.Container;
 import net.minecraft.src.ContainerPlayer;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerMP;
+import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NetHandler;
 import net.minecraft.src.Packet;
@@ -83,7 +85,23 @@ public abstract class FactorizationProxy implements IGuiHandler {
     }
 
     //CLIENT
-    public void addName(Object what, String string) {
+    public void addName(Object objectToName, String name) {
+        String objectName;
+        if (objectToName instanceof Item) {
+            objectName = ((Item) objectToName).getItemName();
+        } else if (objectToName instanceof Block) {
+            objectName = ((Block) objectToName).getBlockName();
+        } else if (objectToName instanceof ItemStack) {
+            objectName = ((ItemStack) objectToName).getItem().getItemNameIS((ItemStack) objectToName);
+        } else if (objectToName instanceof String) {
+            objectName = (String) objectToName;
+        } else {
+            throw new IllegalArgumentException(String.format("Illegal object for naming %s", objectToName));
+        }
+        addNameDirect(objectName + ".name", name);
+    }
+    
+    public void addNameDirect(String localId, String translate) {
     }
 
     public String translateItemStack(ItemStack is) {

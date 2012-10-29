@@ -168,21 +168,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
     //CLIENT
     @Override
-    public void addName(Object objectToName, String name) {
-        String objectName;
-        if (objectToName instanceof Item) {
-            objectName = ((Item) objectToName).getItemName();
-        } else if (objectToName instanceof Block) {
-            objectName = ((Block) objectToName).getBlockName();
-        } else if (objectToName instanceof ItemStack) {
-            objectName = ((ItemStack) objectToName).getItem().getItemNameIS((ItemStack) objectToName);
-        } else if (objectToName instanceof String) {
-            objectName = (String) objectToName;
-        } else {
-            throw new IllegalArgumentException(String.format("Illegal object for naming %s", objectToName));
-        }
-        objectName += ".name";
-        LanguageRegistry.instance().addStringLocalization(objectName, "en_US", name);
+    public void addNameDirect(String localId, String translation) {
+        LanguageRegistry.instance().addStringLocalization(localId, "en_US", translation);
     }
 
     @Override
@@ -409,8 +396,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }
 
         @Override
-        public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd,
-                boolean isRepeat) {
+        public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd, boolean isRepeat) {
             GuiScreen gui = Minecraft.getMinecraft().currentScreen;
             if (gui != null) {
                 return;

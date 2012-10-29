@@ -500,11 +500,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'Y', new ItemStack(Item.ingotIron),
                 '!', lead_ingot);
         recipe(new ItemStack(exo_wall_jump),
-                "LIL",
-                "LBL",
+                "ILI",
+                "IBI",
                 "OOO",
-                'L', Item.leather,
                 'I', Item.ingotIron,
+                'L', Item.leather,
                 'B', Item.bootsLeather,
                 'O', Item.slimeBall);
         

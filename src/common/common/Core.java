@@ -209,8 +209,7 @@ public class Core {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             isMainClientThread.set(true);
         }
-        LanguageRegistry.instance().addStringLocalization(tabFactorization.getTranslatedTabLabel(), "en_US", "Factorization");
-        //proxy.addName(tabFactorization.getTranslatedTabLabel(), "Factorization");
+        proxy.addNameDirect("itemGroup.factorizationTab", "Factorization");
     }
     
     @ServerStarting

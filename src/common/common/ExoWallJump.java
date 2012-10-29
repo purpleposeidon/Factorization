@@ -28,7 +28,7 @@ public class ExoWallJump extends Item implements IExoUpgrade, ITickHandler {
         super(par1);
         setItemName("exo.wallJump");
         Core.tab(this, TabType.MISC);
-        setIconIndex(16 * 10);
+        setIconIndex(16 * 10 + 3);
         setMaxStackSize(1);
         setTextureFile(Core.texture_file_item);
         TickRegistry.registerTickHandler(this, Side.CLIENT);
