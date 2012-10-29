@@ -155,13 +155,20 @@ public class TileEntityRouter extends TileEntityFactorization {
     }
 
     int last_eject = 0;
+    
+    Coord getEjectCoord() {
+        if (!upgradeEject) {
+            return null;
+        }
+        return getCoord().add(new CubeFace(eject_direction).toVector());
+    }
 
     void eject() {
         if (last_eject != 0) {
             last_eject--;
         }
         last_eject = 20;
-        Coord target = getCoord().add(new CubeFace(eject_direction).toVector());
+        Coord target = getEjectCoord();
         IInventory inv = target.getTE(IInventory.class);
         if (inv == null) {
             return;
@@ -364,6 +371,9 @@ public class TileEntityRouter extends TileEntityFactorization {
         }
         String invName = getIInventoryName(t);
         if (invName == null || isIInventoryBanned(invName)) {
+            return false;
+        }
+        if (upgradeEject && t == getEjectCoord().getTE(IInventory.class)) {
             return false;
         }
 
