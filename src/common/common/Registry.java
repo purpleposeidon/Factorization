@@ -136,7 +136,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     HashSet<Integer> added_ids = new HashSet();
 
     public int itemID(String name, int default_id) {
-        int id = Integer.parseInt(Core.config.get("item", name, default_id).value);
+        int id = Integer.parseInt(Core.config.getItem("item", name, default_id).value);
         if (added_ids.contains(default_id)) {
             throw new RuntimeException("Default ID already used: " + default_id);
         }
@@ -859,6 +859,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         BlockClass.DarkIron.harvest("pickaxe", 2);
         BlockClass.Barrel.harvest("axe", 1);
         BlockClass.Machine.harvest("pickaxe", 0);
+        BlockClass.MachineLightable.harvest("pickaxe", 0);
         BlockClass.Cage.harvest("pickaxe", 1);
         MinecraftForge.setBlockHarvestLevel(resource_block, "pickaxe", 2);
     }

@@ -1,3 +1,7 @@
+0.6.8
+  Made mirrors less heretical
+  Made mirror arrangement more heretical
+
 0.6.7
   Improved the pocket crafting table's "c" action. Some examples of its behavior: If you have two stacks of A and B like this:
     [AB-]
@@ -14,7 +18,8 @@
   it'll change to
     [---]
     [W-W]
-    [WWW]    
+    [WWW]
+  Fixed mecha armors
 
 0.6.6 -- Buffed!
   The grinder is 60% faster

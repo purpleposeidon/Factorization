@@ -41,8 +41,7 @@ public enum BlockClass {
     float hardness; //Our default is 2
     boolean normal_cube = true;
 
-    BlockClass(Block block, int md, boolean normalCube, int flamability, int lightValue,
-            float hardness) {
+    BlockClass(Block block, int md, boolean normalCube, int flamability, int lightValue, float hardness) {
         this.block = block;
         this.md = md;
         this.normalCube = normalCube;
@@ -57,8 +56,7 @@ public enum BlockClass {
         Md.map[this.md] = this;
     }
 
-    BlockClass(int md, boolean normalCube, int flamability, int lightValue,
-            float hardness) {
+    BlockClass(int md, boolean normalCube, int flamability, int lightValue, float hardness) {
         this(Core.registry.factory_block, md, normalCube, flamability, lightValue, hardness);
     }
 

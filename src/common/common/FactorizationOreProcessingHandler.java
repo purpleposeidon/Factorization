@@ -47,8 +47,12 @@ public class FactorizationOreProcessingHandler {
         }
         
         //SLAG
-        TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, ingot, 0.4F, Block.stone);
-        TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.42857142857143F, ingot, 0.2F, Block.dirt);
+        if (oreType != OreType.LEAD && oreType != OreType.SILVER) {
+            TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, ingot, 0.4F, Block.stone);
+            TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.42857142857143F, ingot, 0.2F, Block.dirt);
+        } else if (oreType == OreType.SILVER) {
+            TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, new ItemStack(Core.registry.lead_ingot), 1F, ingot);
+        }
     }
     
     ArrayList<OreType> createdBodies = new ArrayList();
@@ -73,7 +77,7 @@ public class FactorizationOreProcessingHandler {
             ItemStack crystal_silver = Core.registry.ore_crystal.makeStack(OreType.SILVER);
             ItemStack crystal_lead = Core.registry.ore_crystal.makeStack(OreType.LEAD);
             
-            TileEntitySlagFurnace.SlagRecipes.register(clean, 1.1F, reduced_silver, 1.6F, reduced_lead);
+            TileEntitySlagFurnace.SlagRecipes.register(clean, 1.6F, reduced_lead, 1.1F, reduced_silver);
             TileEntityCrystallizer.addRecipe(reduced_silver, crystal_silver, 1.5F, new ItemStack(Core.registry.acid), 0);
             TileEntityCrystallizer.addRecipe(reduced_lead, crystal_lead, 1.5F, new ItemStack(Core.registry.acid), 0);
         } else {

@@ -10,7 +10,7 @@ import factorization.common.Core;
 
 public enum ExoStateType {
     NEVER, BUTTON1(1), BUTTON2(2), BUTTON3(3),
-    EATING(ExoArmorRestriction.HEAD), HURT(ExoArmorRestriction.HEAD), WOUNDED(ExoArmorRestriction.HEAD),
+    /*EATING(ExoArmorRestriction.HEAD), */ HURT(ExoArmorRestriction.HEAD), WOUNDED(ExoArmorRestriction.HEAD),
     MOVING(ExoArmorRestriction.CHEST), ONFIRE(ExoArmorRestriction.CHEST),
     SNEAKING(ExoArmorRestriction.PANTS), RIDING(ExoArmorRestriction.PANTS),
     SPRINTING(ExoArmorRestriction.FEET), ONGROUND(ExoArmorRestriction.FEET), INWATER(ExoArmorRestriction.FEET);
@@ -51,9 +51,9 @@ public enum ExoStateType {
             en(button.when(INVERSE), "While %s is not held");
             en(button.when(RISINGEDGE), "When %s is tapped");
         }
-        en(EATING.when(NORMAL), "While eating");
-        en(EATING.when(INVERSE), "While not eating");
-        en(EATING.when(RISINGEDGE), "When first eating");
+        //en(EATING.when(NORMAL), "While eating");
+        //en(EATING.when(INVERSE), "While not eating");
+        //en(EATING.when(RISINGEDGE), "When first eating");
         en(HURT.when(NORMAL), "While being hurt");
         en(HURT.when(INVERSE), "While not being hurt");
         en(HURT.when(RISINGEDGE), "When first hurt");

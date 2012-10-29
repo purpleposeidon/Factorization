@@ -8,6 +8,7 @@ import net.minecraft.src.Block;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
+import net.minecraft.src.Packet;
 import net.minecraft.src.TileEntityFurnace;
 import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
@@ -111,6 +112,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
 
         if (this.furnaceBurnTime <= 0 && this.canSmelt()) {
             this.currentFuelItemBurnTime = this.furnaceBurnTime = TileEntityFurnace.getItemBurnTime(this.furnaceItemStacks[fuel]) / 2;
+            broadcastMessage(null, MessageType.FurnaceBurnTime, this.furnaceBurnTime);
 
             if (this.furnaceBurnTime > 0)
             {
@@ -292,10 +294,21 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
 
     @Override
     public boolean handleMessageFromServer(int messageType, DataInput input) throws IOException {
-        boolean r = super.handleMessageFromServer(messageType, input);
-        if (messageType == MessageType.DrawActive) {
-            getCoord().updateLight();
+        if (super.handleMessageFromServer(messageType, input)) {
+            if (messageType == MessageType.DrawActive) {
+                getCoord().updateLight();
+            }
+            return true;
         }
-        return r;
+        if (messageType == MessageType.FurnaceBurnTime) {
+            this.furnaceBurnTime = input.readInt();
+            return true;
+        }
+        return false;
+    }
+    
+    @Override
+    public Packet getDescriptionPacket() {
+        return super.getDescriptionPacketWith(MessageType.FurnaceBurnTime, this.furnaceBurnTime);
     }
 }

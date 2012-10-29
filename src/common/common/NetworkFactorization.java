@@ -431,7 +431,9 @@ public class NetworkFactorization implements IPacketHandler {
                 //
                 WireFace = 121,
                 //
-                SculptDescription = 130, SculptSelect = 131, SculptNew = 132, SculptMove = 133, SculptRemove = 134, SculptState = 135, SculptWater = 136
+                SculptDescription = 130, SculptSelect = 131, SculptNew = 132, SculptMove = 133, SculptRemove = 134, SculptState = 135, SculptWater = 136,
+                //
+                FurnaceBurnTime = 140
                 ;
     }
 

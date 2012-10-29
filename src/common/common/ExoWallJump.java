@@ -3,7 +3,6 @@ package factorization.common;
 import java.util.EnumSet;
 import java.util.List;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.src.DamageSource;
 import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityPlayer;
@@ -14,14 +13,12 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.MovingObjectPosition;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.Vec3;
-import net.minecraft.src.Vec3Pool;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.ISpecialArmor.ArmorProperties;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.registry.TickRegistry;
-import factorization.api.Coord;
 import factorization.api.IExoUpgrade;
 import factorization.common.Core.TabType;
 
@@ -135,7 +132,7 @@ public class ExoWallJump extends Item implements IExoUpgrade, ITickHandler {
         final float totalFrames = 5;
         if (turningFrames < totalFrames && Core.isMainClientThread.get()) {
             turningFrames++;
-            EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+            EntityPlayer player = Core.proxy.getClientPlayer();
             double motionTheta = Math.toDegrees(Math.atan2(player.motionZ, player.motionX));
             motionTheta += 360*(int)(player.rotationYaw/360) - 90;
             float perc = (turningFrames) / totalFrames;

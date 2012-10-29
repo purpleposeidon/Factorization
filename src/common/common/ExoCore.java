@@ -44,7 +44,7 @@ public class ExoCore implements ITickHandler {
                     state[i] = ExoStateActivation.OFF;
                 }
             }
-            touchState(ExoStateType.EATING, player.isEating());
+            //touchState(ExoStateType.EATING, player.isEating());
             touchState(ExoStateType.HURT, player.hurtResistantTime > 0);
             touchState(ExoStateType.WOUNDED, player.getHealth() / (float) player.getMaxHealth() <= 0.333F);
             touchState(ExoStateType.MOVING, Math.abs(player.motionX) + Math.abs(player.motionY) + Math.abs(player.motionZ) > 0.1);
@@ -112,12 +112,9 @@ public class ExoCore implements ITickHandler {
     }
     
     public static void tickPlayer(EntityPlayer player) {
-        if (player.isDead) {
+        if (player.isDead && !player.worldObj.isRemote) {
             playerMap.remove(player.username);
             return;
-        }
-        if (!(player instanceof EntityPlayerSP) && FMLCommonHandler.instance().getSide() != Side.CLIENT) {
-            playerMap.remove(player.username);
         }
         ExoPlayerState mps = getPlayerState(player);
         mps.update();

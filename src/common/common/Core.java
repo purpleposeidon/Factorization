@@ -32,6 +32,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import factorization.api.Coord;
 import factorization.client.gui.FactorizationNotify;
@@ -43,15 +44,14 @@ import factorization.client.gui.FactorizationNotify;
         channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel, NetworkFactorization.factorizeNtfyChannel })
 public class Core {
     //The comment below is a marker used by the build script.
-    public static final String version = "0.6.8"; //@VERSION@
+    public static final String version = "0.6.9"; //@VERSION@
     public Core() {
         registry = new Registry();
         exoCore = new ExoCore();
-        foph = new FactorizationOreProcessingHandler();
+        foph = new FactorizationOreProcessingHandler(); //We don't register foph yet.
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(registry);
         MinecraftForge.EVENT_BUS.register(exoCore);
-        //We don't register foph yet.
     }
     
     // runtime storage
@@ -209,6 +209,8 @@ public class Core {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             isMainClientThread.set(true);
         }
+        LanguageRegistry.instance().addStringLocalization(tabFactorization.getTranslatedTabLabel(), "en_US", "Factorization");
+        //proxy.addName(tabFactorization.getTranslatedTabLabel(), "Factorization");
     }
     
     @ServerStarting
@@ -323,7 +325,12 @@ public class Core {
         }
     }
     
-    public static CreativeTabs tabFactorization = new CreativeTabs("factorizationTab");
+    public static CreativeTabs tabFactorization = new CreativeTabs("factorizationTab") {
+        @Override
+        public Item getTabIconItem() {
+            return registry.pocket_table;
+        }
+    };
     
     public static Item tab(Item item, TabType tabType) {
         CreativeTabs tab = tabType.type;
