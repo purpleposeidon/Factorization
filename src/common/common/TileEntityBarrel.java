@@ -316,7 +316,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
 
         if (is.isItemDamaged()) {
             if (getItemCount() == 0) {
-                Core.notify(entityplayer, getCoord(), "Damaged items can not be stored");
+                Core.notify(entityplayer, getCoord(), "No storing damaged items");
             } else {
                 info(entityplayer);
             }
