@@ -60,8 +60,10 @@ public class GuiExoConfig extends GuiContainer {
             if (!m.isValidUpgrade(cont.upgrader.upgrades[slot + 1])) {
                 continue;
             }
-            buttons.add(new GuiButton(slot * 2, left + slot * (size + 2), top, size, size + 4, "E")); //Event
-            buttons.add(new GuiButton(slot * 2 + 1, left + slot * (size + 2), top + 22, size, size + 4, "S")); //Shader
+            if (cont.upgrader.upgrades[slot + 1].getItem() instanceof IExoUpgrade) {
+                buttons.add(new GuiButton(slot * 2, left + slot * (size + 2), top, size, size + 4, "E")); //Event
+                buttons.add(new GuiButton(slot * 2 + 1, left + slot * (size + 2), top + 22, size, size + 4, "S")); //Shader
+            }
         }
     }
 
