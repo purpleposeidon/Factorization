@@ -1,14 +1,18 @@
 package factorization.common;
 
-import net.minecraft.src.Block;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import net.minecraft.src.Container;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.FurnaceRecipes;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.InventoryPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.Slot;
 import net.minecraft.src.SlotFurnace;
+import net.minecraft.src.TileEntityFurnace;
 
 public class ContainerFactorization extends Container {
     public TileEntityFactorization factory;
@@ -35,8 +39,7 @@ public class ContainerFactorization extends Container {
         int[] allowed;
         int[] forbidden;
 
-        public FactorySlot(IInventory iinventory, int slotNumber, int posX,
-                int posY, int[] a, int[] f) {
+        public FactorySlot(IInventory iinventory, int slotNumber, int posX, int posY, int[] a, int[] f) {
             super(iinventory, slotNumber, posX, posY);
             allowed = a;
             forbidden = f;
@@ -203,29 +206,55 @@ public class ContainerFactorization extends Container {
     @Override
     //transferStackInSlot
     public ItemStack func_82846_b(EntityPlayer player, int i) {
-        ItemStack itemstack = null;
         Slot slot = (Slot) inventorySlots.get(i);
-        if (slot != null && slot.getHasStack()) {
-            ItemStack itemstack1 = slot.getStack();
-            itemstack = itemstack1.copy();
-            if (i < slot_end) {
-                if (!mergeItemStack(itemstack1, player_slot_start,
-                        player_slot_end, true)) {
-                    return null;
+        ItemStack itemstack = slot.getStack();
+        if (itemstack == null) {
+            return null;
+        }
+        
+        switch (type) {
+        //inventory shift click, need special logic
+        case SLAGFURNACE:
+            if (i >= 4) {
+                if (TileEntityFurnace.getItemBurnTime(itemstack) > 0) {
+                    return FactorizationUtil.transferSlotToSlots(slot, Arrays.asList((Slot) inventorySlots.get(1)));
+                } else {
+                    return FactorizationUtil.transferSlotToSlots(slot, Arrays.asList((Slot) inventorySlots.get(0)));
                 }
-            } else if (!mergeItemStack(itemstack1, slot_start, slot_end, false)) {
+            }
+            break;
+        case MAKER:
+            if (i >= 4) {
+                Item item = itemstack.getItem();
+                if (item == Item.paper) {
+                    return FactorizationUtil.transferSlotToSlots(slot, Arrays.asList((Slot) inventorySlots.get(1), (Slot) inventorySlots.get(0)));
+                }
+                if (item == Core.registry.item_craft) {
+                    return FactorizationUtil.transferSlotToSlots(slot, Arrays.asList((Slot) inventorySlots.get(2)));
+                }
+                return FactorizationUtil.transferSlotToSlots(slot, Arrays.asList((Slot) inventorySlots.get(0)));
+            }
+            break;
+        }
+        
+        ItemStack itemstack1 = slot.getStack();
+        itemstack = itemstack1.copy();
+        if (i < slot_end) {
+            if (!mergeItemStack(itemstack1, player_slot_start, player_slot_end, true)) {
                 return null;
             }
-            if (itemstack1.stackSize == 0) {
-                slot.putStack(null);
-            } else {
-                slot.onSlotChanged();
-            }
-            if (itemstack1.stackSize != itemstack.stackSize) {
-                slot.func_82870_a(player, itemstack1);
-            } else {
-                return null;
-            }
+        } else if (!mergeItemStack(itemstack1, slot_start, slot_end, false)) {
+            return null;
+        }
+        if (itemstack1.stackSize == 0) {
+            slot.putStack(null);
+        } else {
+            slot.onSlotChanged();
+        }
+        if (itemstack1.stackSize != itemstack.stackSize) {
+            slot.func_82870_a(player, itemstack1);
+        } else {
+            return null;
         }
         return itemstack;
     }
