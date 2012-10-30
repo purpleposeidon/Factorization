@@ -71,7 +71,7 @@ public class GuiExoConfig extends GuiContainer {
         if (cont.upgrader.armor == null) {
             return null;
         }
-        if (cont.upgrader.armor.getItem() instanceof ItemArmor) {
+        if (cont.upgrader.armor.getItem() instanceof ExoArmor) {
             return (ExoArmor) cont.upgrader.armor.getItem();
         }
         return null;
@@ -117,6 +117,7 @@ public class GuiExoConfig extends GuiContainer {
         if (eventShader == null || eventShader.length() == 0) {
             eventShader = localKey;
         }
+        left += 20;
         fontRenderer.drawString(eventShader, left, top, 4210752);
         fontRenderer.drawString(description, left, top + delta, 4210752);
     }

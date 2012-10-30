@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import net.minecraft.src.Container;
+import net.minecraft.src.ContainerPlayer;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.InventoryPlayer;
@@ -12,6 +13,7 @@ import net.minecraft.src.Item;
 import net.minecraft.src.ItemArmor;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.Slot;
+import net.minecraft.src.SlotArmor;
 import factorization.api.Coord;
 import factorization.api.IExoUpgrade;
 
@@ -241,9 +243,14 @@ public class ContainerExoModder extends Container {
             this.addSlotToContainer(u);
             upgradeSlots.add(u);
         }
-        //slot for the armor
+        //slot for the upgrading armor
         armorSlot = new SlotExoArmor(upgrader, 100, 7, 7, upgradeSlots);
         this.addSlotToContainer(armorSlot);
+        //slots for the worn armor
+        ContainerPlayer cp = new ContainerPlayer(inv, !player.worldObj.isRemote, player);
+        for (int i = 0; i < 4; i++) {
+            this.addSlotToContainer(new SlotArmor(cp, inv, inv.getSizeInventory() - 1 - i, 7, 8 + (1 + i) * 18, i));
+        }
     }
 
     @Override
