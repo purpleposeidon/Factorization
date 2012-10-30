@@ -1,16 +1,12 @@
 http://www.minecraftforum.net/topic/1351802-factorization/
-figure out what to do with http://pastebin.com/pHhHp633
 
 TOP LIST
 --------
-slag furnace:
-  lighting state not updating
-Wrath lamp:
-  Why isn't it leaving that extra space? o_O
+*** Make shift-clicking in all of the GUIs decent!
+*** add player's armor slots to mecha modder
 router:
-  searching for avilable inv names; what's IC doing?
+  searching for avilable inv names; what's IC doing? Bunch of mods aren't actually setting their TE's inv name?
   that other filter mode! What's it do? It stocks!
-  Okay. Let's not make the machine filter required for the ejector.
 test with dedicated server (not from eclipse....)
 [Mecha-Features]
 add inverium-based mecha-upgrades
@@ -22,7 +18,6 @@ These upgrades:
     Acceleration Stopper
 Some electricity related mecha-upgrades?
 
-watch dire's bug video a second time
 "Everything's shiny!" release
 back to ceramics?
 https://github.com/MinecraftForge/MinecraftForge/commit/34ebfcd9785c3c50c3ac743eb1e9cbf000df10dc
@@ -33,57 +28,78 @@ https://github.com/MinecraftForge/MinecraftForge/commit/34ebfcd9785c3c50c3ac743e
 https://github.com/pahimar/Equivalent-Exchange-3/commit/e1ed736955b9af238431358bad405e306833f36a
 
 [High-priority Bugs]
+** two issues with buttons in mecha-modder: doesn't update when blank armor put in; reinforcing w/ vanilla armor doesn't hide buttons
+** shift-clicking the shard recipe doesn't do the thing. *and*, stamping them doesn't work either!!!
 test high block IDs
+Re-write barrel to use replacement for ISidedInventory. (Assuming it *ever* gets released...)
 
 [Low-Priority Bugs]
-slow stamper & packager & maker so as to not jam filters. also have stamper pulse for each item... (cakes)
-nikolite grinding! Once RedPower comes out...
-draw_active isn't marking the block dirty apparently?
-re-write the shift-clicking function to use slots!!!
-check normal fire interactions w/ our TEs
-two issues with buttons in mecha-modder: doesn't update when blank armor put in; reinforcing w/ vanilla armor doesn't hide buttons
-shift-clicking the shard recipe doesn't do the thing. *and*, stamping them doesn't work either!!!
-do block breaking animations properly (after 1.3). Look at src/minecraft/net/minecraft/src/RenderGlobal.java +1569 renderWorld()
-drop several stacks instantaneously using NEI into a transposer running into a barrel. Only 1 stack will be put in.
 barrel lighting (normals.); it's a bit dark on dark mode.
+Remove old crap. (Demons, unused TEs)
+Test: slow stamper & packager & maker so as to not jam filters. also have stamper pulse for each item... (cakes)
+nikolite grinding! Once RedPower comes out...
+check normal fire interactions w/ our TEs; fire's invisible on certain blocks? (Slag furnace maybe.)
+do block breaking animations properly (after 1.3). Look at src/minecraft/net/minecraft/src/RenderGlobal.java +1569 renderWorld()
 railgun, except for steve
-sign enchanting
-optimize these TEs. Prolly use whatever it is that Entity Models use.
-  Mirror
+optimize these TEs. Prolly use whatever it is that Entity Models use?
   grinder
-bukkit?
 http://3.bp.blogspot.com/_b5hcKABPlGI/SxB8DW-Xv-I/AAAAAAAAaxU/qmqqFtiwZ1A/s1600/6-509a.bmp . Discussion with Greys and Overminddl about solar towers.
-log of git commit ad331b15956bfb43e5f5a022084605c6ade83901
+Go over our API stuff. Clean up. Make sure other people can actually use stuff. (Maybe test this?)
 
-
-left-handled BoH: craft with a compass (get the compass back?) This can be reversed of course.
-wrath lamp:
-  every 5 seconds, check if powered. If so, remove lightair (And change to an unlight block?)
-
-
-does the regexp ban work?
-Can we convert the TE filter to use a regexp?
-spam-clicking the barrel on SMP gets the client confused
 
 always test everything in SMP! jegus!
-redstone! We want the router to behave like glass...
-  - Don't spread signal (like glass)
-  - Allow redstone to be put on it (unlike glass)
-  Wait! What about glowstone?
-When updating router could pick the closest of N (where N is small, say 2-4) off the top of the frontier
-TODO: Configuration value: A regex of TileEntities that the router may not connect to
-                           And also a regex of TileEntities that may only be accessed via a side?
-it'd be nice if the pocketcrafter restored the previous GUI when closed. It seems that simply restoring the old GuiScreen on close doesn't work...
-barrel bug: damaged items can be inserted via tubes. Not solvable at this time. But we can verify BC's...
 
 Need more uses for diamond shards!
   Shard spear? :o  Something about dark crystals. 
 
-
 backup occasionally, eh?
 
+
+SPACE
+=====
+WORLD ENTITIES
+--------------
+Space needs "WorldEntities" (WE). These will let you move sets of blocks around however you like; they can translate smoothly, and rotate arbitrarily. We may also like to let them support nesting and scaling. It will be possible for players and other entities to hop onto a WEW, and between WEWs/the vanilla world.
+Code structure for a WEW:
+  class WorldEntity extends Entity { //WE
+    class WorldEntityWorld extends World { } //WEW
+  }
+Implementation thoughts:
+  Wrap the WEW ticks with a "push/pop world to entity" network packet. If this turns out that this is sending a lot of "push NO-OP pop", we might be able to have it be sent only when other packets are.
+  Client: When we get a WEW change, we'll change Minecraft.theWorld, and Minecraft.thePlayer.theWorld (a local change)
+  We may need to do something funky for cross-WEW interactions (such as mining/placing blocks, or drawing the bounding box)
+  Active rotation will be difficult, but *very* much wanted. Collisions may be difficult.
+  We will need a function to convert one WEW's coords & rotation to another.
+  Not a core requirement, but it might be good to create "ghost entities" that reflect the player's coords across WEWs so that skeles can accurately shoot between WEWs
+  When an entity intersects/leaves the bounds of a WEW, its worldObj must be adusted.
+  If entity IDs aren't universally unique & constant, there may be trouble with nesting and transferring.
+Rendering:
+  This shouldn't be too difficult, actually! I expect this will render just as efficiently as regular stuff. But try to use as much Mojang code as possible! I'll need to read more MC code.
+  If we're lucky, we can do something really easy like "Minecraft.renderWorld(WEW)", altho might need to swap out global vars or something.
+
+Uses:
+  Asteroids (Natural/Artificial Satelites, Planetoids, motherships)
+  Space ships
+  Megabosses
+  Rotatable Frames? Robotics? Real Mecha Suits?
+ASTEROIDS
+---------
+Asteroids are WEs. 
+
+
+COSMOLOGY
+---------
+The world is an infinite plane. Other dimensions (nether, end, mystcraft ages) are not something you can walk to. The Farlands/End of the World don't actually exist, since that's just an artificial limitation of the computer game.
+Light has no speed limit, but it does have a propagation limit. Light comes in several classes. A photon has these properties: Color, direction, travel distance, and class (sky illumination, torch/block illumination, reflection of illumination, and entity/FX-emitted). Steve's retinas can only perceieve reflected and emitted light, not illumination; they also can not detect photons that have travelled over a certain distance.
+The world of Minecraft is an infinite plane suspend above over an infinite black hole. The black hole plane will crush anything that gets near it. It can bend light (causing void fog). If you fall into the void, your view will be squashed!
+Inverium is what prevents the world from falling into the void. It can be found only underneath bedrock. Don't mine it; that would cause the world to fall into the void. Inverium is anti-void. You can try dropping it into the void, but it will float at around y=1
+Inverium can also be found in the asteroids above. If you remove the inverium from them, they will (eventually, not immediately) fall to the ground. (But they will most likely burn up in the atmosphere?)
+The inverium supporting the overworld has guardians. We wouldn't want the world to fall down, now would we?
+
+
+
 ro da noi lo fatci cu kakne lo nu ri 
-∀ x ∃ y : y can destroy x → y should destroy x
+∀x∀y: y is truth able to destroy x → y should destroy x
 
 lo fatci roda daspo kakne gi'enai daspo .i'e
 
