@@ -425,7 +425,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         recipe(new ItemStack(silver_ingot, 9), "#", '#', silver_block_item);
         oreRecipe(lead_block_item, "###", "###", "###", '#', "ingotLead");
         oreRecipe(silver_block_item, "###", "###", "###", '#', "ingotSilver");
-        FurnaceRecipes.smelting().addSmelting(resource_block.blockID, 0 /* MD for silver */, new ItemStack(silver_ingot));
+        FurnaceRecipes.smelting().addSmelting(resource_block.blockID, 0 /* MD for silver */, new ItemStack(silver_ingot), 0.3F);
+        
+        FurnaceRecipes.smelting().addSmelting(Item.bucketWater.shiftedIndex, new ItemStack(Item.bucketEmpty), 0);
 
         //exo armor
         recipe(new ItemStack(exo_chasis),
@@ -604,18 +606,12 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'L', Item.leather);
 
         // Barrel
-        recipe(barrel_item,
-                "W-W",
-                "W W",
-                "WWW",
-                'W', Block.wood,
-                '-', new ItemStack(Block.woodSingleSlab, 1, -1));
         oreRecipe(barrel_item,
                 "W-W",
                 "W W",
                 "WWW",
                 'W', "logWood",
-                '-', new ItemStack(Block.woodSingleSlab, 1, -1));
+                '-', "slabWood");
 
         // Craft maker
         recipe(maker_item,
@@ -816,9 +812,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'M', motor,
                 'L', lead_ingot,
                 'U', Item.cauldron);
-        TileEntityMixer.addRecipe(
-                new ItemStack[] { new ItemStack(sludge, 1), new ItemStack(Block.dirt), new ItemStack(Item.bucketWater) },
-                new ItemStack[] { new ItemStack(Item.clay), new ItemStack(Item.bucketEmpty) });
+        FurnaceRecipes.smelting().addSmelting(sludge.shiftedIndex, 0, new ItemStack(Item.clay), 0.1F);
+//		TileEntityMixer.addRecipe(
+//				new ItemStack[] { new ItemStack(sludge, 1), new ItemStack(Block.dirt), new ItemStack(Item.bucketWater) },
+//				new ItemStack[] { new ItemStack(Item.clay), new ItemStack(Item.bucketEmpty) });
         //		TileEntityMixer.addRecipe(
         //				new ItemStack[] { new ItemStack(Item.slimeBall), new ItemStack(Item.bucketMilk), new ItemStack(Block.leaves) },
         //				new ItemStack[] { new ItemStack(Item.slimeBall, 2), new ItemStack(Item.bucketEmpty) });
