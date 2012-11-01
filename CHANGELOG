@@ -1,3 +1,6 @@
+0.6.10
+  All GUIs do shift clicking properly now
+
 0.6.9 -- Polished
   Fixed a bunch of terrible, awful bugs
   Fixed some long standing bugs, notably:
@@ -26,7 +29,7 @@
         [W-W]
         [WWW]
   Exo-armor: (Formerly known as Mecha-armor)
-    - Rewrote event system (Localization is incomplete ATM)
+    - Rewrote event system; it is now more flexible & useful (Localization is incomplete ATM)
     - Changed default exo-keys to be less intrusive
     - Added a "Wall Jump" mecha armor upgrade. Run at a wall, jump, and activate the upgrade. The effect stacks, of course.
 

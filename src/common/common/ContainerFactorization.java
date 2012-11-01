@@ -235,6 +235,31 @@ public class ContainerFactorization extends Container {
                 return FactorizationUtil.transferSlotToSlots(slot, Arrays.asList((Slot) inventorySlots.get(0)));
             }
             break;
+        case STAMPER:
+        case PACKAGER:
+        case GRINDER:
+            if (i >= 2) {
+                return FactorizationUtil.transferSlotToSlots(slot, Arrays.asList((Slot) inventorySlots.get(0)));
+            }
+            break;
+        case MIXER:
+            if (i >= 8) {
+                ArrayList<Slot> av = new ArrayList(4);
+                for (int j = 0; j < 4; j++) {
+                    av.add((Slot)inventorySlots.get(j));
+                }
+                return FactorizationUtil.transferSlotToSlots(slot, av);
+            }
+            break;
+        case CRYSTALLIZER:
+            if (i >= 8) {
+                ArrayList<Slot> av = new ArrayList(6);
+                for (int j = 0; j < 6; j++) {
+                    av.add((Slot)inventorySlots.get(j));
+                }
+                return FactorizationUtil.transferSlotToSlots(slot, av);
+            }
+            break;
         }
         
         ItemStack itemstack1 = slot.getStack();
