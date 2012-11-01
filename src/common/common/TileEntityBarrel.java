@@ -472,8 +472,8 @@ public class TileEntityBarrel extends TileEntityFactorization {
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
         item = readItem("item_type", tag);
-        setItemCount(tag.getInteger("item_count"));
         upgrade = tag.getInteger("upgrade");
+        setItemCount(tag.getInteger("item_count"));
     }
 
     @Override
