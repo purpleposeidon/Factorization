@@ -1,7 +1,16 @@
 #!/bin/bash
 
+pushd ../
+  mv eclipse/ eclipse.backup/
+popd
+
 pushd cb
   ./install.sh
 popd
 ./embed_source
 echo "Remember to set the lib/ classpath in eclipse!"
+
+pushd ../
+  rm -rf eclipse/
+  mv eclipse.backup/ eclipse/
+popd
