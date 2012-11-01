@@ -320,21 +320,17 @@ public class BlockFactorization extends BlockContainer {
     @Override
     public int getFlammability(IBlockAccess world, int x, int y, int z,
             int md, ForgeDirection face) {
-        if (FactoryType.BARREL.is(md)) {
-            return 25;
+        if (BlockClass.Barrel.md == md) {
+            return 20;
         }
         return 0;
     }
 
     @Override
-    public boolean isFlammable(IBlockAccess world, int x, int y, int z, int metadata,
-            ForgeDirection face) {
-        return false;
+    public boolean isFlammable(IBlockAccess world, int x, int y, int z, int metadata, ForgeDirection face) {
         //Not really. But this keeps fire rendering.
-        //		if (FactoryType.BARREL.is(metadata)) {
-        //			return true;
-        //		}
-        //		return false;
+        //return true;
+        return BlockClass.Barrel.md == metadata;
     }
 
     //Lightair/lamp stuff
@@ -397,7 +393,7 @@ public class BlockFactorization extends BlockContainer {
         if (fake_normal_render) {
             return true;
         }
-        return false;
+        return true;
     }
 
     @Override
@@ -427,6 +423,9 @@ public class BlockFactorization extends BlockContainer {
     
     @Override
     public boolean isPoweringTo(IBlockAccess w, int x, int y, int z, int side) {
+        if (side < 2) {
+            return false;
+        }
         TileEntity te = w.getBlockTileEntity(x, y, z);
         if (te instanceof TileEntityCommon) {
             return ((TileEntityCommon) te).power();
