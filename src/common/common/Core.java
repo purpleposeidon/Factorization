@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -20,6 +22,7 @@ import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod.PostInit;
@@ -248,12 +251,19 @@ public class Core {
 
     }
     
+    static Logger FZLogger = Logger.getLogger("FZ");
+    static {
+        FZLogger.setParent(FMLLog.getLogger());
+    }
+    
+    
+    
     public static void logWarning(String format, Object... formatParameters) {
-        System.err.println("[Factorization] " + String.format(format, formatParameters));
+        FZLogger.log(Level.WARNING, String.format(format,  formatParameters));
     }
     
     public static void logInfo(String format, Object... formatParameters) {
-        System.out.println("[Factorization] " + String.format(format, formatParameters));
+        FZLogger.log(Level.INFO, String.format(format, formatParameters));
     }
 
     public static void addBlockToCreativeList(List tab, Block block) {
