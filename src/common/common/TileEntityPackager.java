@@ -19,10 +19,9 @@ public class TileEntityPackager extends TileEntityStamper {
     @Override
     void doLogic() {
         int input_count = (input == null) ? 0 : input.stackSize;
-        boolean can_add = output == null
-                || output.stackSize < output.getMaxStackSize();
-        if (outputBuffer == null && can_add && input != null
-                && input.stackSize > 0) {
+        boolean need_pulse = false;
+        boolean can_add = output == null || output.stackSize < output.getMaxStackSize();
+        if (outputBuffer == null && can_add && input != null && input.stackSize > 0) {
             ItemStack toCraft = null;
             int to_remove = 0;
 
@@ -65,13 +64,12 @@ public class TileEntityPackager extends TileEntityStamper {
 
             if (canMerge(fakeResult)) {
                 //really craft
-                ArrayList<ItemStack> craftResult = Core.registry.item_craft
-                        .craftAt(toCraft, false, this);
+                ArrayList<ItemStack> craftResult = Core.registry.item_craft.craftAt(toCraft, false, this);
                 outputBuffer = craftResult;
                 needLogic();
                 drawActive(3);
-                pulse();
                 input.stackSize -= to_remove;
+                need_pulse = true;
             }
         }
 
@@ -116,6 +114,9 @@ public class TileEntityPackager extends TileEntityStamper {
         int new_input_count = (input == null) ? 0 : input.stackSize;
         if (input_count != new_input_count) {
             needLogic();
+        }
+        if (need_pulse) {
+            pulse();
         }
     }
 

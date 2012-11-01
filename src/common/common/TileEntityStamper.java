@@ -63,9 +63,9 @@ public class TileEntityStamper extends TileEntityFactorization {
         if (i == 1) {
             output = itemstack;
         }
-        needLogic();
+        onInventoryChanged();
     }
-
+    
     @Override
     public String getInvName() {
         return "Stamper";
