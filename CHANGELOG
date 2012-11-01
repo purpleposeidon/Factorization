@@ -1,5 +1,7 @@
 0.6.10
   All GUIs do shift clicking properly now
+  Fire is now visible when ontop of blocks
+  Barrels are flamable
 
 0.6.9 -- Polished
   Fixed a bunch of terrible, awful bugs
