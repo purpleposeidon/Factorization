@@ -63,7 +63,7 @@ public class BlockRenderBattery extends FactorizationBlockRender {
         if (world_mode) {
             brightness = Core.registry.factory_block.getMixedBrightnessForBlock(ModLoader.getMinecraftInstance().theWorld, x, y, z);
         } else {
-            brightness = 12583104;
+            brightness = 0xc000c0;
         }
         tes.setBrightness(brightness);
         float color = Math.min(1, fullness * .8F + 0.2F);
