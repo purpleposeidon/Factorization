@@ -2,8 +2,9 @@ http://www.minecraftforum.net/topic/1351802-factorization/
 
 TOP LIST
 --------
-*** Make shift-clicking in all of the GUIs decent!
-*** add player's armor slots to mecha modder
+*** add player's armor slots to mecha modder (And make it nice)
+RP heating
+Verify that the new armor slots in the exomodder don't crash a dedi server
 router:
   searching for avilable inv names; what's IC doing? Bunch of mods aren't actually setting their TE's inv name?
   that other filter mode! What's it do? It stocks!
@@ -28,7 +29,7 @@ https://github.com/MinecraftForge/MinecraftForge/commit/34ebfcd9785c3c50c3ac743e
 https://github.com/pahimar/Equivalent-Exchange-3/commit/e1ed736955b9af238431358bad405e306833f36a
 
 [High-priority Bugs]
-** two issues with buttons in mecha-modder: doesn't update when blank armor put in; reinforcing w/ vanilla armor doesn't hide buttons
+** two issues with buttons in mecha-modder: doesn't update when blank armor put in
 ** shift-clicking the shard recipe doesn't do the thing. *and*, stamping them doesn't work either!!!
 test high block IDs
 Re-write barrel to use replacement for ISidedInventory. (Assuming it *ever* gets released...)
@@ -45,6 +46,10 @@ optimize these TEs. Prolly use whatever it is that Entity Models use?
   grinder
 http://3.bp.blogspot.com/_b5hcKABPlGI/SxB8DW-Xv-I/AAAAAAAAaxU/qmqqFtiwZ1A/s1600/6-509a.bmp . Discussion with Greys and Overminddl about solar towers.
 Go over our API stuff. Clean up. Make sure other people can actually use stuff. (Maybe test this?)
+Re. heaters on RP furnaces:
+<Eloraam> well you could easily add fuel...  you're welcome to change burntime and totalburn from TileAlloyFurnace... probably via reflection?
+<Eloraam> they're both public, work just like the vanilla furnace iirc
+<Eloraam> i'd prefer not changing the actual cook time tho
 
 
 always test everything in SMP! jegus!
