@@ -2,6 +2,7 @@ package factorization.common;
 
 import java.io.DataInput;
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 import net.minecraft.src.BlockFurnace;
 import net.minecraft.src.FurnaceRecipes;
@@ -157,6 +158,18 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
         }
     }
 
+    static Class<? extends TileEntity> rpAlloyFurnace = null;
+    static {
+        //Waiting for Elo to set up something on her end so that we can check if it's heatable
+//		try {
+//			rpAlloyFurnace = (Class<? extends TileEntity>) Class.forName("com.eloraam.redpower.base.TileAlloyFurnace");
+//			Core.logInfo("Heaters will work on RedPower Alloy Furnaces");
+//		} catch (ClassNotFoundException e) {
+//			Core.logInfo("Couldn't find AlloyFurnace");
+//			e.printStackTrace();
+//		}
+    }
+    
     void sendHeat(TileEntity te) {
         if (te instanceof TileEntityFurnace) {
             TileEntityFurnace furnace = (TileEntityFurnace) te;
@@ -167,8 +180,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
             furnace.furnaceBurnTime = pf.burnTime;
             furnace.furnaceCookTime = Math.min(pf.cookTime, 200 - 1);
             BlockFurnace.updateFurnaceBlockState(furnace.furnaceCookTime > 0, worldObj, te.xCoord, te.yCoord, te.zCoord);
-        }
-        if (te instanceof TileEntitySlagFurnace) {
+        } else if (te instanceof TileEntitySlagFurnace) {
             TileEntitySlagFurnace furnace = (TileEntitySlagFurnace) te;
             if (!furnace.canSmelt()) {
                 return;
@@ -176,14 +188,35 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
             ProxiedHeatingResult pf = new ProxiedHeatingResult(new Coord(te), furnace.furnaceBurnTime, furnace.furnaceCookTime);
             furnace.furnaceBurnTime = pf.burnTime;
             furnace.furnaceCookTime = pf.cookTime;
-        }
-        if (te instanceof TileEntityCrystallizer) {
+        } else if (te instanceof TileEntityCrystallizer) {
             TileEntityCrystallizer crys = (TileEntityCrystallizer) te;
             if (!crys.needHeat()) {
                 return;
             }
             crys.heat++;
             heat--;
+        } else if (rpAlloyFurnace != null && rpAlloyFurnace.isInstance(te)) {
+            Exception err = null;
+            try {
+                Field burntimeField = rpAlloyFurnace.getField("burntime");
+                //Field totalburnField = rpAlloyFurnace.getField("totalburn");
+                ProxiedHeatingResult pf = new ProxiedHeatingResult(new Coord(te), burntimeField.getInt(te), 0 /* Elo doesn't want speedy. :( */);
+                burntimeField.setInt(te, pf.burnTime);
+            } catch (SecurityException e) {
+                err = e;
+            } catch (NoSuchFieldException e) {
+                err = e;
+            } catch (IllegalArgumentException e) {
+                err = e;
+            } catch (IllegalAccessException e) {
+                err = e;
+            } finally {
+                if (err != null) {
+                    rpAlloyFurnace = null;
+                    Core.logWarning("Failed to reflect into RedPower AlloyFurnace; heating disabled.");
+                    err.printStackTrace();
+                }
+            }
         }
     }
 
