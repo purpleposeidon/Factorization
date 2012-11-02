@@ -254,6 +254,7 @@ public class Core {
     static Logger FZLogger = Logger.getLogger("FZ");
     static {
         FZLogger.setParent(FMLLog.getLogger());
+        logInfo("This is Factorization " + version);
     }
     
     
