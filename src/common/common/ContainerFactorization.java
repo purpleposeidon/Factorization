@@ -97,20 +97,6 @@ public class ContainerFactorization extends Container {
                 addSlotToContainer(new StackLimitedSlot(1, router, 1 + i, 8 + i * 18, 44 - 0xFFFFFF));
             }
             break;
-        case CUTTER:
-            TileEntityCutter cutter = (TileEntityCutter) ent;
-            addSlotToContainer(new Slot(cutter, 8, 80, 17));
-            for (int i = 0; i < 8; i++) {
-                int top = 41;
-                int left = 53;
-                if (i >= 4) {
-                    top = 60;
-                }
-                left += (i % 4) * 18;
-
-                addSlotToContainer(new Slot(cutter, i, left, top));
-            }
-            break;
         case MAKER:
             TileEntityMaker maker = (TileEntityMaker) ent;
             int[] ic = { Core.registry.item_craft.shiftedIndex };

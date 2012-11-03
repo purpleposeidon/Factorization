@@ -13,7 +13,8 @@ test with dedicated server (not from eclipse....)
 add inverium-based mecha-upgrades
 These upgrades:
   Lead boots
-  Armor Dropper
+  Damage Absorber (It has to be trained on a particular damage type.)
+  Armor Remover (?)
   Anti-gravity (uses inverium'd lead blocks): Velocity limiting, hovering, high jumping
     Acceleration Dampener
     Acceleration Stopper

@@ -50,10 +50,6 @@ public class Texture {
             }
         }
 
-        if (FactoryType.CUTTER.is(md)) {
-            return cutter_normal;
-        }
-
         if (FactoryType.MAKER.is(md) || FactoryType.STAMPER.is(md) || FactoryType.PACKAGER.is(md)) {
             int start = 0;
             if (FactoryType.MAKER.is(md)) {
@@ -92,26 +88,10 @@ public class Texture {
             return barrel_side + delta;
         }
 
-        if (FactoryType.QUEUE.is(md)) {
-            if (side == 0) {
-                return queue_bottom;
-            }
-            if (side == 1) {
-                return queue_top;
-            }
-            return queue_side;
-        }
-
         if (FactoryType.LAMP.is(md)) {
             return lamp_iron;
         }
-
-        if (FactoryType.SENTRYDEMON.is(md)) {
-            if (side == 0 || side == 1) {
-                return bars + 1;
-            }
-            return bars;
-        }
+        
         if (FactoryType.SLAGFURNACE.is(md)) {
             if (side == 0 || side == 1) {
                 //verts

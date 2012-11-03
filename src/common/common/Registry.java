@@ -1,17 +1,12 @@
 package factorization.common;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Random;
 
 import net.minecraft.src.AchievementList;
 import net.minecraft.src.Block;
 import net.minecraft.src.CraftingManager;
-import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityItem;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.FurnaceRecipes;
@@ -27,13 +22,11 @@ import net.minecraft.src.ModLoader;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldGenMinable;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.DungeonHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.oredict.OreDictionary;
-import net.minecraftforge.oredict.OreDictionary.OreRegisterEvent;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -41,12 +34,10 @@ import cpw.mods.fml.common.ICraftingHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.Side;
-import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.api.IActOnCraft;
-import factorization.common.ItemOreProcessing.OreType;
 
-public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler {
+public class Registry implements ICraftingHandler, IWorldGenerator {
     static public final int ExoKeyCount = 3;
 
     public ItemFactorization item_factorization;
@@ -55,9 +46,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public BlockLightAir lightair_block;
     public BlockResource resource_block;
 
-    public ItemStack cutter_item, router_item, maker_item, stamper_item, packager_item,
+    public ItemStack router_item, maker_item, stamper_item, packager_item,
             barrel_item,
-            queue_item, lamp_item, air_item, sentrydemon_item,
+            lamp_item, air_item,
             slagfurnace_item, battery_item_hidden, solar_turbine_item, heater_item,
             mirror_item_hidden,
             leadwire_item, grinder_item, mixer_item, crystallizer_item,
@@ -68,7 +59,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemCraft item_craft;
     public ItemBagOfHolding bag_of_holding;
     public ItemPocketTable pocket_table;
-    public ItemDemon tiny_demon, bound_tiny_demon;
     public ItemWandOfCooling wand_of_cooling;
     public ItemCraftingComponent diamond_shard;
     public IRecipe diamond_shard_recipe;
@@ -165,14 +155,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
         //BlockFactorization stuff
         router_item = FactoryType.ROUTER.itemStack("Router");
-        cutter_item = FactoryType.CUTTER.itemStack("Stack Cutter");
         barrel_item = FactoryType.BARREL.itemStack("Barrel");
-        queue_item = FactoryType.QUEUE.itemStack("Queue");
         maker_item = FactoryType.MAKER.itemStack("Craftpacket Maker");
         stamper_item = FactoryType.STAMPER.itemStack("Craftpacket Stamper");
         lamp_item = FactoryType.LAMP.itemStack("Wrathlamp");
         packager_item = FactoryType.PACKAGER.itemStack("Packager");
-        sentrydemon_item = FactoryType.SENTRYDEMON.itemStack("Sentry Demon");
         slagfurnace_item = FactoryType.SLAGFURNACE.itemStack("Slag Furnace");
         battery_item_hidden = FactoryType.BATTERY.itemStack("Battery Block");
         solar_turbine_item = FactoryType.SOLARTURBINE.itemStack("Solar Turbine");
@@ -209,11 +196,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
         bag_of_holding = new ItemBagOfHolding(itemID("bagOfHolding", 9001));
         addName(bag_of_holding, "Bag of Holding");
-
-        bound_tiny_demon = new ItemDemon(itemID("boundTinyDemon", 9003));
-        tiny_demon = new ItemDemon(itemID("tinyDemon", 9004));
-        addName(bound_tiny_demon, "Bound Tiny Demon");
-        addName(tiny_demon, "Tiny Demon");
+        
         logicMatrixProgrammer = new ItemMatrixProgrammer(itemID("logicMatrixProgrammer", 9043), "Logic Matrix Programmer", 1*16 + 6);
         DungeonHooks.addDungeonLoot(new ItemStack(logicMatrixProgrammer), 50); //XXX TODO: Temporary, put these on asteroids.
         DungeonHooks.addDungeonMob("Creeper", 1);
@@ -342,8 +325,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'I', dark_iron,
                 'O', Item.enderPearl,
                 'L', Item.leather); // LOL!
-        shapelessRecipe(BOH, BOH, dark_iron, Item.enderPearl, Item.leather);
-        boh_upgrade_recipe = FactorizationUtil.createShapelessRecipe(BOH, BOH, dark_iron, Item.enderPearl, Item.leather);
+        shapelessRecipe(BOH, BOH, dark_iron, Item.enderPearl, Item.leather); //ILI!
+        boh_upgrade_recipe = FactorizationUtil.createShapelessRecipe(BOH, BOH, dark_iron, Item.enderPearl, Item.leather); // I !
         // Pocket Crafting Table (pocket table)
         recipe(new ItemStack(pocket_table),
                 " #",
@@ -370,13 +353,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 " OD",
                 " IO",
                 "I  ",
-                'O', Block.obsidian,
-                'D', heatHole,
-                'I', Item.ingotIron);
-        recipe(new ItemStack(wand_of_cooling),
-                "DO ",
-                "OI ",
-                "  I",
                 'O', Block.obsidian,
                 'D', heatHole,
                 'I', Item.ingotIron);
@@ -456,11 +432,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 '#', exo_chasis);
         //exo armor upgrades
 
-        recipe(new ItemStack(exo_buoyant_barrel),
+        oreRecipe(new ItemStack(exo_buoyant_barrel),
                 "W_W",
                 "PBP",
                 "WVW",
-                'W', Block.planks,
+                'W', "woodPlank",
                 '_', Block.pressurePlatePlanks,
                 'P', Block.pistonBase,
                 'B', barrel_item,
@@ -494,7 +470,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'N', Block.pistonBase,
                 'L', Block.lever);
         recipe(new ItemStack(angular_saw),
-                "OH",
+                "O ",
                 "MY",
                 "! ",
                 'O', new ItemStack(diamond_cutting_head),
@@ -586,12 +562,12 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'I', dark_iron,
                 'B', Item.blazePowder,
                 '!', Item.egg);
-        recipe(new ItemStack(router_eject),
+        oreRecipe(new ItemStack(router_eject),
                 "IWI",
                 "C_C",
                 "IPI",
                 'I', dark_iron,
-                'W', Block.planks,
+                'W', "woodPlank",
                 'C', Block.cobblestone,
                 '_', Block.pressurePlatePlanks,
                 'P', Block.pistonBase);
@@ -652,14 +628,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'G', Block.thinGlass,
                 'W', new ItemStack(wrath_igniter, 1, -1));
 
-        //sentry demon
-        //		recipe(sentrydemon_item,
-        //				"###",
-        //				"#D#",
-        //				"###",
-        //				'#', Block.fenceIron,
-        //				'D', bound_tiny_demon);
-
         //Slag furnace
         recipe(slagfurnace_item,
                 "CFC",
@@ -685,11 +653,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'C', Block.workbench,
                 'M', exo_chasis,
                 'i', Item.ingotIron);
-        recipe(greenware_item,
+        oreRecipe(greenware_item,
                 "c",
                 "-",
                 'c', Item.clay,
-                '-', new ItemStack(Block.woodSingleSlab, 1, -1));
+                '-', "woodSlab");
 
         //Electricity
 
@@ -825,27 +793,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "U",
                 '-', Item.stick,
                 'S', Item.silk,
-                'W', Block.planks,
                 'U', Item.cauldron);
         ItemStack lime = new ItemStack(Item.dyePowder, 1, 10);
-        TileEntityCrystallizer.addRecipe(lime, new ItemStack(Item.slimeBall), 1, new ItemStack(Item.bucketMilk), 0);
-        // Cutter
-        //TODO: Remove the cutter
-        //		recipe(cutter_item,
-        //				"> P",
-        //				" > ",
-        //				"> P",
-        //				'>', Item.shears,
-        //				'P', Block.pistonBase);
-        // Queue
-        //		recipe(queue_item,
-        //				" -P",
-        //				" C_",
-        //				"  P",
-        //				'-', Block.pressurePlatePlanks,
-        //				'P', Block.pistonBase,
-        //				'_', new ItemStack(Block.stairSingle, 1, 0),
-        //				'C', Block.chest);
     }
 
     public void setToolEffectiveness() {
@@ -880,16 +829,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         silverGen.generate(world, rand, x, y, z);
     }
 
-    public void onTickPlayer(EntityPlayer player) {
-        // If in a GUI and holding a demon, BITE!
-        // Otherwise, if not in a GUI and holding in hand... BITE!
-        if (player.inventory.getItemStack() != null) {
-            tiny_demon.playerHolding(player.inventory.getItemStack(), player);
-        } else {
-            tiny_demon.playerHolding(player.inventory.getCurrentItem(), player);
-        }
-    }
-
     public void onTickWorld(World world) {
         if (world.isRemote) {
             return;
@@ -898,7 +837,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //(Like THAT would ever happen, ah ha ha ha ha ha ha ha ha ha ha ha ha ha.)
         TileEntityWrathLamp.handleAirUpdates();
         TileEntityWrathFire.updateCount = 0;
-        TileEntityWatchDemon.worldTick(world);
     }
     
     public boolean extractEnergy(EntityPlayer player, int chargeCount) {
@@ -985,47 +923,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             }
         }
         Core.proxy.pokePocketCrafting();
-        tiny_demon.bitePlayer(is, player, true);
         return true;
-    }
-
-    private final int demon_spawn_delay = 20*60*10;
-    private int demon_spawn_tick = 20*60;
-
-    @Override
-    public void tickStart(EnumSet<TickType> type, Object... tickData) {
-        if (type.contains(TickType.WORLD)) {
-            World w = (World) tickData[0];
-            if (w.isRemote) {
-                return;
-            }
-            onTickWorld(w);
-            if (DimensionManager.getWorld(-1) == w && Core.spawnDemons) {
-                demon_spawn_tick--;
-                if (demon_spawn_tick == 0) {
-                    ItemDemon.spawnDemons(w);
-                    demon_spawn_tick = demon_spawn_delay;
-                }
-            }
-        }
-        if (type.contains(TickType.PLAYER)) {
-            EntityPlayer player = (EntityPlayer) tickData[0];
-            onTickPlayer(player);
-        }
-    }
-
-    @Override
-    public void tickEnd(EnumSet<TickType> type, Object... tickData) {
-    }
-
-    @Override
-    public EnumSet<TickType> ticks() {
-        return EnumSet.of(TickType.WORLD, TickType.PLAYER);
-    }
-
-    @Override
-    public String getLabel() {
-        return "factorization-world";
     }
 
     @Override

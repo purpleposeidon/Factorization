@@ -358,7 +358,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         if (invName == null || invName.length() == 0) {
             String className = t.getClass().getSimpleName();
             if (className == null || className.length() == 0) {
-                return null;
+                return t.toString();
             }
             return className.toLowerCase();
         }

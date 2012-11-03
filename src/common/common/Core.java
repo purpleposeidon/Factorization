@@ -195,8 +195,6 @@ public class Core {
         registry.makeBlocks();
         
         NetworkRegistry.instance().registerGuiHandler(this, proxy);
-        TickRegistry.registerTickHandler(registry, Side.CLIENT);
-        TickRegistry.registerTickHandler(registry, Side.SERVER);
 
         registry.registerSimpleTileEntities();
         proxy.makeItemsSide();

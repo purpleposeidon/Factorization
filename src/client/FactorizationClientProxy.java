@@ -8,11 +8,9 @@ import java.util.Map;
 import java.util.Random;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.Block;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.GameSettings;
 import net.minecraft.src.GuiScreen;
-import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.KeyBinding;
 import net.minecraft.src.ModLoader;
@@ -35,8 +33,39 @@ import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
-import factorization.client.gui.*;
-import factorization.client.render.*;
+import factorization.client.gui.FactorizationNotify;
+import factorization.client.gui.GuiCrystallizer;
+import factorization.client.gui.GuiExoConfig;
+import factorization.client.gui.GuiGrinder;
+import factorization.client.gui.GuiMaker;
+import factorization.client.gui.GuiMixer;
+import factorization.client.gui.GuiPocketTable;
+import factorization.client.gui.GuiRouter;
+import factorization.client.gui.GuiSlag;
+import factorization.client.gui.GuiStamper;
+import factorization.client.render.BatteryItemRender;
+import factorization.client.render.BlockRenderBattery;
+import factorization.client.render.BlockRenderCrystallizer;
+import factorization.client.render.BlockRenderDefault;
+import factorization.client.render.BlockRenderGreenware;
+import factorization.client.render.BlockRenderGrinder;
+import factorization.client.render.BlockRenderHeater;
+import factorization.client.render.BlockRenderLamp;
+import factorization.client.render.BlockRenderMirrorStand;
+import factorization.client.render.BlockRenderMixer;
+import factorization.client.render.BlockRenderSolarTurbine;
+import factorization.client.render.BlockRenderWire;
+import factorization.client.render.EmptyRender;
+import factorization.client.render.EntitySteamFX;
+import factorization.client.render.EntityWrathFlameFX;
+import factorization.client.render.FactorizationRender;
+import factorization.client.render.TileEntityBarrelRenderer;
+import factorization.client.render.TileEntityCrystallizerRender;
+import factorization.client.render.TileEntityGreenwareRender;
+import factorization.client.render.TileEntityGrinderRender;
+import factorization.client.render.TileEntityHeaterRenderer;
+import factorization.client.render.TileEntityMixerRenderer;
+import factorization.client.render.TileEntitySolarTurbineRender;
 import factorization.common.Command;
 import factorization.common.ContainerCrystallizer;
 import factorization.common.ContainerExoModder;
@@ -58,7 +87,6 @@ import factorization.common.TileEntityHeater;
 import factorization.common.TileEntityMixer;
 import factorization.common.TileEntitySlagFurnace;
 import factorization.common.TileEntitySolarTurbine;
-import factorization.common.TileEntityWatchDemon;
 import factorization.common.TileEntityWrathLamp;
 
 public class FactorizationClientProxy extends FactorizationProxy {
@@ -139,9 +167,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         GuiScreen gui = null;
         if (ID == FactoryType.ROUTER.gui) {
             gui = new GuiRouter(cont);
-        }
-        if (ID == FactoryType.CUTTER.gui) {
-            gui = new GuiCutter(cont);
         }
         if (ID == FactoryType.MAKER.gui) {
             gui = new GuiMaker(cont);
@@ -457,7 +482,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }
         setTileEntityRenderer(TileEntityGreenware.class, new TileEntityGreenwareRender());
         if (Core.renderTEs) {
-            setTileEntityRenderer(TileEntityWatchDemon.class, new TileEntityWatchDemonRenderer());
             // This is entirely Azanor's fault.
             setTileEntityRenderer(TileEntitySolarTurbine.class, new TileEntitySolarTurbineRender());
             setTileEntityRenderer(TileEntityHeater.class, new TileEntityHeaterRenderer());
@@ -479,7 +503,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderHeater();
         new BlockRenderLamp();
         new BlockRenderMirrorStand();
-        new BlockRenderSentryDemon();
         new BlockRenderSolarTurbine();
         new BlockRenderWire();
         new BlockRenderGrinder();

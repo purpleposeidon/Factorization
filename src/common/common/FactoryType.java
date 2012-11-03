@@ -6,18 +6,15 @@ import net.minecraft.src.TileEntity;
 
 public enum FactoryType {
     ROUTER(0, true, TileEntityRouter.class, "factory_router"), // Send/retrieve items from connected inventories
-    @Deprecated
-    CUTTER(1, false, TileEntityCutter.class, "factory_cutter"),
+    //1 -- This used to be CUTTER
     MAKER(2, true, TileEntityMaker.class, "factory_maker"), // Create Craft Packets and put items into them.
     STAMPER(3, true, TileEntityStamper.class, "factory_stamper"), // Crafts craft packets, and outputs results
-    @Deprecated
-    QUEUE(4, false, TileEntityQueue.class, "factory_queue"), // Store up to 16 items in a list, without merging.
+    //4 -- This used to be QUEUE
     BARREL(5, false, TileEntityBarrel.class, "factory_barrel"), // Store huge quantities of identical items
     LAMP(6, false, TileEntityWrathLamp.class, "factory_lamp"), //spawn a bunch of AIR blocks around and below
     //7 -- this was the BlockDarkIron, which got moved.
     PACKAGER(8, true, STAMPER.gui, TileEntityPackager.class, "factory_packager"), //crafts its input as a 3x3 or 2x2
-    @Deprecated
-    SENTRYDEMON(9, false, TileEntityWatchDemon.class, "factory_watchdemon"), //load a chunk
+    //9 -- This used to be SENTRYDEMON
     WRATHFIRE(10, false, TileEntityWrathFire.class, "factory_fire"), //burn things
     SLAGFURNACE(11, true, TileEntitySlagFurnace.class, "factory_slag"), //get extra ore output
     BATTERY(12, false, TileEntityBattery.class, "factory_battery"),
@@ -28,7 +25,7 @@ public enum FactoryType {
     GRINDER(17, true, TileEntityGrinder.class, "factory_grinder"), //grind
     MIXER(18, true, TileEntityMixer.class, "factory_mixer"), //mix
     CRYSTALLIZER(19, true, TileEntityCrystallizer.class, "factory_crystal"), //grow metallic crystals
-    GREENWARE(20, false, TileEntityGreenware.class, "factory_greenware"), //unfired clay sculpture
+    GREENWARE(20, false, TileEntityGreenware.class, "factory_greenware"), //clay sculpture
 
     POCKETCRAFTGUI(101, true),
     EXOTABLEGUICONFIG(102, true), //Exo-armor editor
