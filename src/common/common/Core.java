@@ -47,7 +47,7 @@ import factorization.client.gui.FactorizationNotify;
         channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel, NetworkFactorization.factorizeNtfyChannel })
 public class Core {
     //The comment below is a marker used by the build script.
-    public static final String version = "0.6.10"; //@VERSION@
+    public static final String version = "0.6.11"; //@VERSION@
     public Core() {
         registry = new Registry();
         exoCore = new ExoCore();
