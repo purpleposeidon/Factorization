@@ -15,7 +15,7 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.World;
 
 public class ItemWandOfCooling extends Item {
-    static int changeArray[] = new int[0xFF];
+    static int changeArray[] = new int[Block.blocksList.length];
     final int max_change = 70;
     final int radius_tries = 50;
     final int max_radius = 3;
