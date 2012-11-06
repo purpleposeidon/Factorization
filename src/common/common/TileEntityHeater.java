@@ -98,11 +98,13 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
         updateClient();
         Coord here = getCoord();
         long now = worldObj.getWorldTime() + here.seed();
-        if (now % 4 == 0) {
-            int delta = charge.deplete(maxHeat - heat);
-            if (delta > 0) {
-                heat += charge2heat(delta);
-            } else if (now % 200 == 0) {
+        int rate = 4;
+        if (now % rate == 0) {
+            int heatToRemove = maxHeat - heat;
+            int avail = Math.min(heatToRemove, charge.getValue());
+            if (avail > 0 && charge2heat(heatToRemove) > 0) {
+                heat += charge2heat(charge.deplete(heatToRemove));
+            } else if (now % 200 <= rate) {
                 //lose some heat if we're not being powered
                 int toLose = Math.max(1, heat / 8);
                 heat -= toLose;
@@ -180,7 +182,8 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
             furnace.furnaceBurnTime = pf.burnTime;
             furnace.furnaceCookTime = Math.min(pf.cookTime, 200 - 1);
             BlockFurnace.updateFurnaceBlockState(furnace.furnaceCookTime > 0, worldObj, te.xCoord, te.yCoord, te.zCoord);
-        } else if (te instanceof TileEntitySlagFurnace) {
+        }
+        if (te instanceof TileEntitySlagFurnace) {
             TileEntitySlagFurnace furnace = (TileEntitySlagFurnace) te;
             if (!furnace.canSmelt()) {
                 return;
@@ -188,14 +191,16 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
             ProxiedHeatingResult pf = new ProxiedHeatingResult(new Coord(te), furnace.furnaceBurnTime, furnace.furnaceCookTime);
             furnace.furnaceBurnTime = pf.burnTime;
             furnace.furnaceCookTime = pf.cookTime;
-        } else if (te instanceof TileEntityCrystallizer) {
+        } 
+        if (te instanceof TileEntityCrystallizer) {
             TileEntityCrystallizer crys = (TileEntityCrystallizer) te;
             if (!crys.needHeat()) {
                 return;
             }
             crys.heat++;
             heat--;
-        } else if (rpAlloyFurnace != null && rpAlloyFurnace.isInstance(te)) {
+        } 
+        if (rpAlloyFurnace != null && rpAlloyFurnace.isInstance(te)) {
             Exception err = null;
             try {
                 Field burntimeField = rpAlloyFurnace.getField("burntime");
