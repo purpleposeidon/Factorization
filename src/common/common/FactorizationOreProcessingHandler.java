@@ -24,7 +24,8 @@ public class FactorizationOreProcessingHandler {
     /** This (maybe) adds an ore to the processing ends (converting anything to ingots). It only does this if the ingot is better. */
     void addProcessingEnds(OreType oreType, ItemStack ore, ItemStack ingot) {
         //Everything can be slagged
-        if (oreType != OreType.LEAD && oreType != OreType.SILVER) {
+        oreType.enable();
+        if (oreType != OreType.LEAD && oreType != OreType.SILVER && oreType != OreType.GALENA) {
             TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, ingot, 0.4F, Block.stone);
         } else if (oreType == OreType.SILVER) {
             TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, new ItemStack(Core.registry.lead_ingot), 1F, ingot);
@@ -110,6 +111,7 @@ public class FactorizationOreProcessingHandler {
                 if (oreType == OreType.GALENA) {
                     addProcessingEnds(OreType.LEAD, ore, new ItemStack(Core.registry.lead_ingot));
                     addProcessingEnds(OreType.SILVER, ore, new ItemStack(Core.registry.silver_ingot));
+                    addProcessingEnds(OreType.GALENA, ore, new ItemStack(Core.registry.silver_ingot));
                 } else {
                     addProcessingEnds(oreType, ore, ingot);
                     oreType.processingResult = ingot;
