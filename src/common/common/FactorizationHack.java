@@ -16,24 +16,7 @@ import net.minecraft.src.World;
 
 public class FactorizationHack {
     //TODO: All this can be moved elsewhere
-    
-    static public DamageSource imp_bite = new ImpDamage("impbite");
     static public DamageSource acidBurn = new AcidDamage("acidburn");
-    
-    static class ImpDamage extends DamageSource {
-        protected ImpDamage(String par1Str) {
-            super(par1Str);
-            setDamageBypassesArmor();
-        }
-        
-        @Override
-        public String getDeathMessage(EntityPlayer player) {
-            return player.getEntityName() + " was bit by a demon";
-            // TODO translates...
-            //return super.getDeathMessage(player);
-        }
-        
-    }
     
     static class AcidDamage extends DamageSource {
 
