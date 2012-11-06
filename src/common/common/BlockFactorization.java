@@ -22,6 +22,7 @@ import factorization.api.IFactoryType;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class BlockFactorization extends BlockContainer {
+    public boolean fake_normal_render = false;
     public BlockFactorization(int id) {
         super(id, Core.registry.materialMachine);
         setHardness(2.0F);
