@@ -242,7 +242,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         
         private void applyTo(TileEntityCrystallizer crys, int slot) {
             int delta = (int) output_count;
-            if (rand.nextFloat() > (output_count - delta)) {
+            if (delta != output_count && rand.nextFloat() > (output_count - delta)) {
                 delta++;
             }
             if (crys.output != null && crys.output.stackSize + delta > crys.output.getMaxStackSize()) {
@@ -256,10 +256,10 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
             }
             if (crys.output == null) {
                 crys.output = output.copy();
-                crys.output.stackSize = delta;
-            } else {
-                crys.output.stackSize += delta;
+                assert output.stackSize == 0: "output stack size is specified in the output_count";
+                crys.output.stackSize = 0;
             }
+            crys.output.stackSize += delta;
             int dead_inverium = inverium_count;
             for (int inverium_slot = 0; inverium_slot < crys.inputs.length; inverium_slot++) {
                 if (dead_inverium == 0) {
