@@ -390,10 +390,7 @@ public class BlockFactorization extends BlockContainer {
 
     @Override
     public boolean renderAsNormalBlock() {
-        if (fake_normal_render) {
-            return true;
-        }
-        return true;
+        return false;
     }
 
     @Override
