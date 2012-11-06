@@ -64,6 +64,9 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
             return;
         }
         charge.update();
+        //if (getCoord().seed() + worldObj.getWorldTime() % 10 != 0) {
+        //	return;
+        //}
         int val = getCharge().getValue();
         int store_delta = 0;
         int charge_delta = 0;
