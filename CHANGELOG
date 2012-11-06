@@ -1,3 +1,9 @@
+0.6.13
+  Wires are now cheaper
+  Heaters don't consume energy quite as much
+  fixed crystallizer recipe bug
+  Fire is now invisible ontop of the machines. :|
+
 0.6.10
   All GUIs do shift clicking properly now (Finally!)
   Fire is now visible when ontop of blocks
@@ -5,7 +11,6 @@
   Ore Dictionary/Ore Processing are now working perfectly.
   ...
   AH HA HA HA HA. Oh man, I'm the best.
-  Mixer probably doesn't flicker anymore.
   Sludge now smelts into clay balls.
 
 0.6.9 -- Polished
