@@ -7,6 +7,7 @@ import net.minecraft.src.Block;
 import net.minecraft.src.FurnaceRecipes;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.OreDictionary.OreRegisterEvent;
@@ -149,6 +150,7 @@ public class FactorizationOreProcessingHandler {
                 handleNewOre(oreClass, ore);
             }
         }
+        MinecraftForge.EVENT_BUS.register(this);
     }
     
 }

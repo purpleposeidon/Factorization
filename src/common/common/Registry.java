@@ -34,8 +34,11 @@ import cpw.mods.fml.common.ICraftingHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.Side;
+import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.EntityRegistry.EntityRegistration;
 import factorization.api.IActOnCraft;
+import factorization.common.astro.WorldEntity;
 
 public class Registry implements ICraftingHandler, IWorldGenerator {
     static public final int ExoKeyCount = 3;
@@ -114,9 +117,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
 
     void registerSimpleTileEntities() {
         FactoryType.registerTileEntities();
-        //TileEntity renderers are registered in the client's mod_Factorization
+        //TileEntity renderers are registered in the client proxy
 
         ModLoader.registerEntityID(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", Core.entity_relight_task_id);
+        EntityRegistry.registerModEntity(WorldEntity.class, "fzwe", 1, Core.instance, 64, 20, true);
     }
 
     private void addName(Object what, String name) {
@@ -586,8 +590,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
                 "W-W",
                 "W W",
                 "WWW",
-                'W', "logWood",
-                '-', "slabWood");
+                'W', "woodLog",
+                '-', "woodSlab");
 
         // Craft maker
         recipe(maker_item,
@@ -640,7 +644,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
         OreDictionary.registerOre("ingotIron", new ItemStack(Item.ingotIron));
         OreDictionary.registerOre("ingotGold", new ItemStack(Item.ingotGold));
         
-        MinecraftForge.EVENT_BUS.register(Core.foph);
         //most ores give 0.4F stone, but redstone is dense.
         //mining redstone normally gives 4 to 6 ore. 5.8F should get you a slightly better yield.
         TileEntitySlagFurnace.SlagRecipes.register(Block.oreRedstone, 5.8F, Item.redstone, 0.2F, Block.stone);
@@ -795,6 +798,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
                 'S', Item.silk,
                 'U', Item.cauldron);
         ItemStack lime = new ItemStack(Item.dyePowder, 1, 10);
+        TileEntityCrystallizer.addRecipe(lime, new ItemStack(Item.slimeBall), 1, new ItemStack(Item.bucketMilk), 0);
     }
 
     public void setToolEffectiveness() {
