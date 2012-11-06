@@ -387,11 +387,11 @@ public class NetworkFactorization implements IPacketHandler {
                 break;
             default:
                 if (world.blockExists(x, y, z)) {
-                    Core.logWarning("Got unhandled message: " + messageType + " for " + here);
+                    Core.logInfo("Got unhandled message: " + messageType + " for " + here);
                 }
                 else {
                     //XXX: Need to figure out how to keep the server from sending these things!
-                    Core.logWarning("Got message to unloaded chunk: " + messageType + " for " + here);
+                    Core.logInfo("Got message to unloaded chunk: " + messageType + " for " + here);
                 }
                 break;
             }
