@@ -39,6 +39,7 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import factorization.api.Coord;
 import factorization.client.gui.FactorizationNotify;
+import factorization.common.astro.FZWECommand;
 
 @Mod(modid = "factorization", name = "Factorization", version = Core.version)
 @NetworkMod(
@@ -47,7 +48,7 @@ import factorization.client.gui.FactorizationNotify;
         channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel, NetworkFactorization.factorizeNtfyChannel })
 public class Core {
     //The comment below is a marker used by the build script.
-    public static final String version = "0.6.11"; //@VERSION@
+    public static final String version = "0.6.13"; //@VERSION@
     public Core() {
         registry = new Registry();
         exoCore = new ExoCore();
@@ -236,6 +237,9 @@ public class Core {
     @ServerStarting
     public void registerServerCommands(FMLServerStartingEvent event) {
         event.registerServerCommand(new NameClayCommand());
+        if (dev_environ) {
+            event.registerServerCommand(new FZWECommand());
+        }
     }
 
     ItemStack getExternalItem(String className, String classField, String description) {
@@ -317,7 +321,6 @@ public class Core {
     }
     
     public static void notify(EntityPlayer player, Coord where, String format, String ...args) {
-        //TODO: Have the client draw the notification somewhere in the world instead of using a chat message! It'll be awesome!
         if (player.worldObj.isRemote) {
             FactorizationNotify.addMessage(where, format, args);
         } else {
