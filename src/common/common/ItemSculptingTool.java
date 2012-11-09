@@ -9,6 +9,7 @@ import net.minecraft.src.ItemStack;
 import net.minecraft.src.World;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
+import factorization.api.VectorUV;
 import factorization.common.Core.TabType;
 import factorization.common.NetworkFactorization.MessageType;
 import factorization.common.TileEntityGreenware.ClayState;
@@ -51,7 +52,7 @@ public class ItemSculptingTool extends Item {
         STRETCHER("Stretch", false),
         REMOVER("Remove", true),
         ROTATOR("Rotate", true),
-        RESETTER("Reset", false);
+        RESETTER("Unrotate", false);
         
         String english;
         boolean craftable;
@@ -135,6 +136,7 @@ public class ItemSculptingTool extends Item {
             return false;
         }
         ClayState state = gw.getState();
+        ToolMode mode = getMode(is.getItemDamage());
         if (state != ClayState.WET) {
             if (w.isRemote) {
                 return false;
@@ -153,7 +155,6 @@ public class ItemSculptingTool extends Item {
             }
             return false;
         }
-        ToolMode mode = getMode(is.getItemDamage());
         if (w.isRemote) {
             if (mode == ToolMode.SELECTOR) {
                 if (gw.parts.size() == 0) {
