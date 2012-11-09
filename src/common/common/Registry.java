@@ -741,7 +741,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
         with_8.stackSize = 8;
         oreRecipe(with_8,
                 "LLL",
-                "LLL",
                 'L', "ingotLead");
         recipe(new ItemStack(diamond_cutting_head),
                 "SSS",
