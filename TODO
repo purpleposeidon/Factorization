@@ -31,13 +31,10 @@ https://github.com/pahimar/Equivalent-Exchange-3/commit/e1ed736955b9af238431358b
 
 [High-priority Bugs]
 ** two issues with buttons in mecha-modder: doesn't update when blank armor put in
-** shift-clicking the shard recipe doesn't do the thing. *and*, stamping them doesn't work either!!!
-test high block IDs
 Re-write barrel to use replacement for ISidedInventory. (Assuming it *ever* gets released...)
 
 [Low-Priority Bugs]
 barrel lighting (normals.); it's a bit dark on dark mode.
-Remove old crap. (Demons, unused TEs)
 Test: slow stamper & packager & maker so as to not jam filters. also have stamper pulse for each item... (cakes)
 nikolite grinding! Once RedPower comes out...
 check normal fire interactions w/ our TEs; fire's invisible on certain blocks? (Slag furnace maybe.)
