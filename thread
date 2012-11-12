@@ -245,6 +245,16 @@ More Mecha-Armor upgrades
 ? ? ?
 [/spoiler]
 
+Ceramics is a WIP, and there's no guarantee that sculptures won't be destroyed between versions.
+[spoiler]
+The clay sculpting tool is crafted with a bit of clay on a stick. Different classes of tools can be gotten at by crafting the tool by itself. And there's a second layer of tools that you can get at by shift-right-clicking the ground with them. In most cases the opposite effect (rotating the other way, or stretching the other way) can be gotten by holding shift while using.
+Another lump can be added by clicking on the sculpture with a clay ball.
+A single lump can't be larger than 1m³. They can be moved out of the sculpture's block, but must stay within the 3³ area.
+The purple tool selects a clay lump, and the currently selected lump is drawn slightly purple.
+Right click on the sculpture with wool to dry it up. Sculptures will also dry if they aren't handled.
+There is no firing or glazing at this time.
+[/spoiler]
+
 
 
 [u][b][size=6][anchor=INSTALL]Installation[/anchor][/size][/b][/u]
@@ -260,21 +270,26 @@ This is a [url="http://files.minecraftforge.net/"]Minecraft Forge[/url] mod. It 
 [u][b][size=6][anchor=DOWNLOAD]Download[/anchor][/size][/b][/u]
 This Forge mod uses the same file for the client and the server.
 
+Factorization 0.6.13 (MC 1.4.2)
+[url="http://adf.ly/2137658/http://www.mediafire.com/?wpaeqxh53xmx7th"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.6.13_310.jar"]adfly + DropBox[/url]
+Built on 2012-11-07 against Minecraft Forge 6.0.1.351
+
+Old versions [spoiler]
 Factorization 0.6.9 (MC 1.4.2)
 [url="http://adf.ly/2137658/http://www.mediafire.com/?0e56n3z9ndevuf2"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.6.9_563.jar"]adfly + DropBox[/url]
 Built on 2012-10-28 against Minecraft Forge 6.0.1.337
 
-Factorization 0.6.6 (MC 1.3.2)
-[url="http://adf.ly/2137658/http://www.mediafire.com/?jrmgr022rtnambb"]adfly + MediaFire[/url], or
-[url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.6.6_738.jar"]adfly + DropBox[/url]
-Built on 2012-10-15 against Minecraft Forge 4.1.4.298
-
-Old versions [spoiler]
 Factorization 0.6.8 (MC 1.4.2)
 [url="http://adf.ly/2137658/http://www.mediafire.com/?0ndd8luq82oyg1g"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.6.8_73.jar"]adfly + DropBox[/url]
 Built on 2012-10-27 against Minecraft Forge 6.0.1.337
+
+Factorization 0.6.6 (MC 1.3.2)
+[url="http://adf.ly/2137658/http://www.mediafire.com/?jrmgr022rtnambb"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.6.6_738.jar"]adfly + DropBox[/url]
+Built on 2012-10-15 against Minecraft Forge 4.1.4.298
 
 Factorization 0.5.6 (MC 1.3.2)
 [url="http://adf.ly/2137658/http://www.mediafire.com/?d4mz283dapwzaox"]adfly + MediaFire[/url], or [url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.5.6_948.jar"]adfly + DropBox[/url]
@@ -305,4 +320,7 @@ Factorization 0.5.3 (MC 1.3.2)
 [/spoiler]
 
 [u][b][size=6][anchor=LICENSE]License[/anchor][/size][/b][/u]
-Do not distribute! Unless you have my permission.
+Do not distribute! Unless you have my permission. This mod may be used in modpacks under the following conditions:
+1. You post in this thread that this is being used in a modpack. If it is a public modpack, then it must include the pack's name and the primary URL where the modpack can be found.
+2. If the modpack is, or is derived from, the modpacks known as "tekkit" or "technic", or is kept in company with them, or uses their launcher, then the configuration file "factorization.cfg" must have "addBranding" set to "true", such that this is the default value for all users of the modpack. (Users of the modpack may change this value themselves if they wish.)
+3. The modpack must include in it a text file listing for each public mod: the name of the mod, the mod's author, and the mod's forum thread or website.
