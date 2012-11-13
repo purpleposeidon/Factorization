@@ -68,15 +68,15 @@ public class ContainerPocket extends ContainerWorkbench {
                 IInventory par3iInventory, int par4, int par5, int par6) {
             super(par1EntityPlayer, par2iInventory, par3iInventory, par4, par5, par6);
         }
-
+        
         @Override
-        public void func_82870_a(EntityPlayer player, ItemStack par1ItemStack) {
+        public void onPickupFromSlot(EntityPlayer player, ItemStack par1ItemStack) {
             updateMatrix();
             for (int i : craftArea) {
                 i += 9;
                 player.inventory.setInventorySlotContents(i, Core.registry.fake_is);
             }
-            super.func_82870_a(player, par1ItemStack);
+            super.onPickupFromSlot(player, par1ItemStack);
             int j = 0;
             for (int i : craftArea) {
                 i += 9;
@@ -229,7 +229,7 @@ public class ContainerPocket extends ContainerWorkbench {
     
     @Override
     //transferStackInSlot
-    public ItemStack func_82846_b(EntityPlayer player, int i) {
+    public ItemStack transferStackInSlot(EntityPlayer player, int i) {
         ItemStack ret = null;
 
         if (i == 36) {
@@ -316,7 +316,7 @@ public class ContainerPocket extends ContainerWorkbench {
             productRemaining -= res.stackSize;
             materialRemaining--;
             assert res != null;
-            slotCrafting.func_82870_a(player, res);
+            slotCrafting.onPickupFromSlot(player, res);
             craftResult.setInventorySlotContents(0, res);
             ItemStack remainder = FactorizationUtil.transferStackToArea(craftResult, 0, player.inventory, playerNormalInvSlotsAlt);
 

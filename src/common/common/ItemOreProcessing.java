@@ -70,7 +70,7 @@ public class ItemOreProcessing extends Item {
     }
 
     @Override
-    public int func_82790_a(ItemStack is, int renderPass) {
+    public int getColorFromItemStack(ItemStack is, int renderPass) {
         try {
             return OreType.values()[is.getItemDamage()].color;
         } catch (ArrayIndexOutOfBoundsException e) {

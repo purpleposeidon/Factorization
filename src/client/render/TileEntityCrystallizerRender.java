@@ -52,7 +52,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             RenderEngine re = Minecraft.getMinecraft().renderEngine;
             re.bindTexture(re.getTexture(crys.growing_crystal.getItem().getTextureFile()));
 
-            int var18 = crys.growing_crystal.getItem().func_82790_a(crys.growing_crystal, 0);
+            int var18 = crys.growing_crystal.getItem().getColorFromItemStack(crys.growing_crystal, 0);
             float r = (float) (var18 >> 16 & 255) / 255.0F;
             float g = (float) (var18 >> 8 & 255) / 255.0F;
             float b = (float) (var18 & 255) / 255.0F;

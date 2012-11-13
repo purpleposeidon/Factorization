@@ -25,7 +25,7 @@ public class ItemFactorization extends ItemBlock {
     @Override
     public boolean placeBlockAt(ItemStack is, EntityPlayer player,
             World w, int x, int y, int z, int side, float hitX, float hitY,
-            float hitZ) {
+            float hitZ, int md) {
         Coord here = new Coord(w, x, y, z);
         FactoryType f = FactoryType.fromMd(is.getItemDamage());
         if (f == null) {
@@ -39,7 +39,7 @@ public class ItemFactorization extends ItemBlock {
                 return false;
             }
         }
-        if (super.placeBlockAt(is, player, w, x, y, z, side, hitX, hitY, hitZ)) {
+        if (super.placeBlockAt(is, player, w, x, y, z, side, hitX, hitY, hitZ, md)) {
             //create our TileEntityFactorization
             //Coord c = new Coord(w, x, y, z).towardSide(side);
 

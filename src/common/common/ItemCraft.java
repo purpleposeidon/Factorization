@@ -153,7 +153,7 @@ public class ItemCraft extends Item {
                 return recipe.getCraftingResult(craft);
             }
         }
-        return CraftingManager.getInstance().func_82787_a(craft, world);
+        return CraftingManager.getInstance().findMatchingRecipe(craft, world);
     }
     
     public ArrayList<ItemStack> craftAt(ItemStack is, boolean fake, TileEntity where) {
@@ -204,7 +204,7 @@ public class ItemCraft extends Item {
                     @Override
                     public boolean canCommandSenderUseCommand(int var1, String var2) { return false; }
                     @Override
-                    public ChunkCoordinates func_82114_b() { return new ChunkCoordinates(0, 0, 0); }
+                    public ChunkCoordinates getPlayerCoordinates() { return new ChunkCoordinates(0, 0, 0); }
                 };
                 fakePlayer.posX = where.xCoord;
                 fakePlayer.posY = where.yCoord;

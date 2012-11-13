@@ -108,7 +108,7 @@ abstract public class FactorizationBlockRender implements ICoord {
     protected void renderNormalBlock(RenderBlocks rb, int md) {
 //		renderPart(rb, Core.registry.factory_block.getBlockTextureFromSideAndMetadata(0, md), 0, 0, 0, 1, 1, 1);
         Block b = Core.registry.factory_rendering_block;
-        rb.func_83020_a(0, 0, 0, 1, 1, 1);
+        rb.setRenderMinMax(0, 0, 0, 1, 1, 1);
         //b.setBlockBounds(0, 0, 0, 1, 1, 1);
         if (world_mode) {
             rb.renderStandardBlock(b, x, y, z);
@@ -123,7 +123,7 @@ abstract public class FactorizationBlockRender implements ICoord {
     protected void renderPart(RenderBlocks rb, int texture, float b1, float b2, float b3,
             float b4, float b5, float b6) {
         BlockFactorization block = Core.registry.factory_rendering_block;
-        rb.func_83020_a(b1, b2, b3, b4, b5, b6);
+        rb.setRenderMinMax(b1, b2, b3, b4, b5, b6);
         block.setBlockBounds(b1, b2, b3, b4, b5, b6);
         if (world_mode) {
             Texture.force_texture = texture;
@@ -133,7 +133,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         else {
             renderPartInvTexture(rb, block, texture);
         }
-        rb.func_83020_a(0, 0, 0, 1, 1, 1);
+        rb.setRenderMinMax(0, 0, 0, 1, 1, 1);
         block.setBlockBounds(0, 0, 0, 1, 1, 1);
     }
 

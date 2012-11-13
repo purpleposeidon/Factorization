@@ -27,7 +27,7 @@ public class ItemInverium extends ItemCraftingComponent {
     
     //getColorFromDamage (or maybe getColorForRenderPass)
     @Override
-    public int func_82790_a(ItemStack is, int renderPass) {
+    public int getColorFromItemStack(ItemStack is, int renderPass) {
         int now = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
         int r = (int) (Math.abs(Math.cos(now/32000))*0x20) + 0xD0;
         int g = Math.min(0xFF, r*2);

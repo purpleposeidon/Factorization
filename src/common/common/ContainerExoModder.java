@@ -2,7 +2,6 @@ package factorization.common;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 
 import net.minecraft.src.Container;
 import net.minecraft.src.ContainerPlayer;
@@ -278,8 +277,7 @@ public class ContainerExoModder extends Container {
     }
 
     @Override
-    //transferStackInSlot
-    public ItemStack func_82846_b(EntityPlayer player, int slotNumber) {
+    public ItemStack transferStackInSlot(EntityPlayer player, int slotNumber) {
         try {
             Slot clickedSlot = (Slot) inventorySlots.get(slotNumber);
             Iterable<Slot> targetSlots;

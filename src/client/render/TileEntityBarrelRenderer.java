@@ -194,8 +194,8 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
             RenderEngine re = Minecraft.getMinecraft().renderEngine;
             FontRenderer fr = getFontRenderer();
             if (!ForgeHooksClient.renderInventoryItem(renderBlocks, re, is, true, 0, 0, 0)) {
-                renderItem.func_82406_b(fr, re, is, 0, 0);
-                //renderItem.drawItemIntoGui(fr, re, is, 0, 0);
+                //renderItem.func_82406_b(fr, re, is, 0, 0);
+                renderItem.renderItemIntoGUI(fr, re, is, 0, 0);
                 //renderItem.drawItemIntoGui(fr, re, is.itemID, is.getItemDamage(), is.getIconIndex(), 0, 0);
             }
         }

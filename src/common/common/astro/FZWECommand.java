@@ -10,6 +10,7 @@ import net.minecraft.src.ICommandSender;
 import net.minecraft.src.ServerConfigurationManager;
 import net.minecraft.src.Teleporter;
 import net.minecraft.src.World;
+import net.minecraft.src.WorldServer;
 
 public class FZWECommand extends CommandBase {
     private static WorldEntity currentWE = null;
@@ -36,27 +37,37 @@ public class FZWECommand extends CommandBase {
             }
         }
         ServerConfigurationManager manager = MinecraftServer.getServerConfigurationManager(MinecraftServer.getServer());
-        Teleporter tp = new Teleporter() {
+        Teleporter tp = new Teleporter((WorldServer) player.worldObj) {
             @Override
-            public boolean placeInExistingPortal(World par1World,
-                    Entity par2Entity, double par3, double par5,
-                    double par7, float par9) {
-                        return false;
-            }
-            @Override
-            public boolean createPortal(World par1World, Entity par2Entity) {
-                // TODO Auto-generated method stub
+            public boolean placeInExistingPortal(Entity par1Entity,
+                    double par2, double par4, double par6, float par8) {
                 return false;
             }
             
-            @Override
-            public void placeInPortal(World world, Entity player,
-                    double par3, double par5, double par7, float par9) {
-                player.posY = Math.max(128, world.getTopSolidOrLiquidBlock((int)player.posX, (int) player.posZ));
-                world.setBlock((int)player.posX, (int)player.posY - 3, (int)player.posZ, 1);
-            }
+            
             
         };
+//		Teleporter tp = new Teleporter() {
+//			@Override
+//			public boolean placeInExistingPortal(World par1World,
+//					Entity par2Entity, double par3, double par5,
+//					double par7, float par9) {
+//						return false;
+//			}
+//			@Override
+//			public boolean createPortal(World par1World, Entity par2Entity) {
+//				// TODO Auto-generated method stub
+//				return false;
+//			}
+//			
+//			@Override
+//			public void placeInPortal(World world, Entity player,
+//					double par3, double par5, double par7, float par9) {
+//				player.posY = Math.max(128, world.getTopSolidOrLiquidBlock((int)player.posX, (int) player.posZ));
+//				world.setBlock((int)player.posX, (int)player.posY - 3, (int)player.posZ, 1);
+//			}
+//			
+//		};
         if (cmd.equalsIgnoreCase("go")) {
             manager.transferPlayerToDimension(player, -2, tp);
         }

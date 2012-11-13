@@ -23,7 +23,7 @@ public class ItemBlockProxy extends Item {
             float hitX, float hitY, float hitZ) {
         proxy.stackSize = stack.stackSize;
         proxy.setTagCompound(stack.getTagCompound());
-        boolean ret = ((ItemBlock) proxy.getItem()).placeBlockAt(proxy, player, world, x, y, z, side, hitX, hitY, hitZ);
+        boolean ret = ((ItemBlock) proxy.getItem()).placeBlockAt(proxy, player, world, x, y, z, side, hitX, hitY, hitZ, 0);
         stack.stackSize = proxy.stackSize;
         return ret;
     }
@@ -91,7 +91,7 @@ public class ItemBlockProxy extends Item {
 
             if (placeBlockAt(par1ItemStack, par2EntityPlayer, par3World, par4, par5, par6, par7, par8, par9, par10))
             {
-                par3World.playSoundEffect((double)((float)par4 + 0.5F), (double)((float)par5 + 0.5F), (double)((float)par6 + 0.5F), var12.stepSound.func_82593_b(), (var12.stepSound.getVolume() + 1.0F) / 2.0F, var12.stepSound.getPitch() * 0.8F);
+                par3World.playSoundEffect((double)((float)par4 + 0.5F), (double)((float)par5 + 0.5F), (double)((float)par6 + 0.5F), var12.stepSound.getPlaceSound(), (var12.stepSound.getVolume() + 1.0F) / 2.0F, var12.stepSound.getPitch() * 0.8F);
                 --par1ItemStack.stackSize;
             }
 

@@ -33,20 +33,7 @@ public class FactorizationServerProxy extends FactorizationProxy {
         registry.exo_foot = new ExoArmor(
                 registry.itemID("mechaFoot", 9013), 3);
     }
-
-    @Override
-    public File getWorldSaveDir(World world) {
-        ISaveHandler handler = world.getSaveHandler();
-        SaveHandler sh = (SaveHandler) world.getSaveHandler();
-        File save_dir = ReflectionHelper.getPrivateValue(SaveHandler.class, sh,
-                1);
-        String save_folder = world.provider.getSaveFolder();
-        if (save_folder == null) {
-            return save_dir;
-        }
-        return new File(save_dir, save_folder);
-    }
-
+    
     @Override
     public void broadcastTranslate(EntityPlayer who, String... msg) {
         Packet p = Core.network.translatePacket(msg);
