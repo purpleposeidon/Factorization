@@ -2,6 +2,7 @@ package factorization.common;
 
 import java.util.List;
 
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.ItemStack;
 
@@ -40,5 +41,9 @@ public class ItemInverium extends ItemCraftingComponent {
             infoList.add("Temporary recipe");
         }
         super.addInformation(is, player, infoList, verbose);
+    }
+    
+    public void getSubItems(int itemID, CreativeTabs tab, List list) {
+        list.add(new ItemStack(itemID, 1, 1));
     }
 }

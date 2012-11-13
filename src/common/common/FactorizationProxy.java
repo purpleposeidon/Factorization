@@ -8,10 +8,12 @@ import net.minecraft.src.Container;
 import net.minecraft.src.ContainerPlayer;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerMP;
+import net.minecraft.src.INetworkManager;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NetHandler;
 import net.minecraft.src.Packet;
+import net.minecraft.src.Packet1Login;
 import net.minecraft.src.Profiler;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntityChest;
@@ -24,8 +26,6 @@ import factorization.api.Coord;
 public abstract class FactorizationProxy implements IGuiHandler {
     //COMMON
     public abstract void makeItemsSide();
-
-    public abstract File getWorldSaveDir(World world);
 
     public abstract void broadcastTranslate(EntityPlayer who, String... msg);
 
@@ -165,4 +165,6 @@ public abstract class FactorizationProxy implements IGuiHandler {
     public boolean isPlayerAdmin(EntityPlayer player) {
         return false;
     }
+    
+    public void hammerClientLogin(NetHandler clientHandler, INetworkManager manager, Packet1Login login) {}
 }

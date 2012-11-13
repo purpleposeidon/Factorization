@@ -14,12 +14,18 @@ import net.minecraft.src.World;
 import net.minecraft.src.WorldServer;
 
 public class WorldEntity extends Entity {
-    WEWorld wew;
     Object worldRenderer = null, oldWorldRenderer = null;
+    int renderCounts = 0;
     public WorldEntity(World world) {
         super(world);
-        wew = new WEWorld(this);
-        ignoreFrustumCheck = true; //kinda lame.
+        ignoreFrustumCheck = true; //kinda lame; should give ourselves big bounding box
+    }
+    
+    public void discardRenderer() {
+        if (oldWorldRenderer == null) {
+            oldWorldRenderer = worldRenderer;
+            worldRenderer = null;
+        }
     }
 
     @Override
@@ -43,7 +49,6 @@ public class WorldEntity extends Entity {
     @Override
     public void onEntityUpdate() {
         super.onEntityUpdate();
-        wew.tick();
     }
 
 }

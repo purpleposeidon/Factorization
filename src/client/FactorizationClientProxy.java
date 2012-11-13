@@ -1,6 +1,5 @@
 package factorization.client;
 
-import java.io.File;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.IllegalFormatException;
@@ -11,15 +10,19 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.GameSettings;
 import net.minecraft.src.GuiScreen;
+import net.minecraft.src.INetworkManager;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.KeyBinding;
-import net.minecraft.src.ModLoader;
+import net.minecraft.src.NetClientHandler;
 import net.minecraft.src.NetHandler;
+import net.minecraft.src.Packet1Login;
 import net.minecraft.src.Profiler;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.TileEntitySpecialRenderer;
 import net.minecraft.src.World;
+import net.minecraft.src.WorldClient;
+import net.minecraft.src.WorldSettings;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -29,8 +32,10 @@ import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
+import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.registry.LanguageRegistry;
+import cpw.mods.fml.common.registry.TickRegistry;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
 import factorization.client.gui.FactorizationNotify;
@@ -104,13 +109,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
     }
 
     @Override
-    public File getWorldSaveDir(World world) {
-        String dotmc = ModLoader.getMinecraftInstance().getMinecraftDir().getPath();
-        char slash = File.separatorChar;
-        return new File(dotmc + slash + "saves" + slash + world.getSaveHandler().getSaveDirectoryName());
-    }
-
-    @Override
     public void broadcastTranslate(EntityPlayer who, String... msg) {
         String format = msg[0];
         String params[] = new String[msg.length - 1];
@@ -131,7 +129,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
     @Override
     public EntityPlayer getPlayer(NetHandler handler) {
-        return ModLoader.getMinecraftInstance().thePlayer;
+        return Minecraft.getMinecraft().thePlayer;
     }
 
     @Override
@@ -210,7 +208,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
     @Override
     public void pokePocketCrafting() {
         // If the player has a pocket crafting table open, have it update
-        Minecraft minecraft = ModLoader.getMinecraftInstance();
+        Minecraft minecraft = Minecraft.getMinecraft();
         if (minecraft.currentScreen instanceof GuiPocketTable) {
             GuiPocketTable gui = (GuiPocketTable) minecraft.currentScreen;
             gui.containerPocket.updateCraft();
@@ -240,7 +238,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
                     EntityWrathFlameFX flame = new EntityWrathFlameFX(w,
                             X, y + 0.2 + rand.nextFloat() * 0.1, Z,
                             0.001 - rand.nextFloat() * 0.002, 0.01, 0.001 - rand.nextFloat() * 0.002);
-                    ModLoader.getMinecraftInstance().effectRenderer.addEffect(flame, flame);
+                    Minecraft.getMinecraft().effectRenderer.addEffect(flame, flame);
                 }
             }
             if (ft == FactoryType.SLAGFURNACE) {
@@ -285,7 +283,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
                     Z += rand.nextFloat() * 2 / 16;
                     double Y = y + (0.99F + sol.water_level / (TileEntitySolarTurbine.max_water / 4)) / 16F;
                     EntitySteamFX steam = new EntitySteamFX(w, X, Y, Z);
-                    ModLoader.getMinecraftInstance().effectRenderer.addEffect(steam, null);
+                    Minecraft.getMinecraft().effectRenderer.addEffect(steam, null);
                 }
             }
         }
@@ -337,7 +335,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
                     if (big) {
                         flame.setScale(4);
                     }
-                    ModLoader.getMinecraftInstance().effectRenderer.addEffect(flame, flame);
+                    Minecraft.getMinecraft().effectRenderer.addEffect(flame, flame);
                 }
             }
         }
@@ -345,7 +343,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
     @Override
     public void playSoundFX(String src, float volume, float pitch) {
-        ModLoader.getMinecraftInstance().sndManager.playSoundFX(src, volume, pitch);
+        Minecraft.getMinecraft().sndManager.playSoundFX(src, volume, pitch);
     }
 
     @Override
@@ -498,7 +496,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
         MinecraftForgeClient.preloadTexture(Core.texture_file_item);
 
         RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
-        RenderingRegistry.registerEntityRenderingHandler(WorldEntity.class, new RenderWorldEntity());
+        RenderWorldEntity rwe = new RenderWorldEntity();
+        RenderingRegistry.registerEntityRenderingHandler(WorldEntity.class, rwe);
+        TickRegistry.registerScheduledTickHandler(rwe, Side.CLIENT);
 
         RenderingRegistry.registerBlockHandler(new FactorizationRender());
         BlockRenderBattery renderBattery = new BlockRenderBattery();
@@ -515,5 +515,15 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
         MinecraftForgeClient.registerItemRenderer(Core.registry.battery.shiftedIndex, new BatteryItemRender(renderBattery));
         MinecraftForge.EVENT_BUS.register(new FactorizationNotify());
+    }
+    
+    @Override
+    public void hammerClientLogin(NetHandler clientHandler, INetworkManager manager, Packet1Login login) {
+        NetClientHandler nch = (NetClientHandler) clientHandler;
+        Core.hammerManager.hammerWorldClient = new WorldClient(nch,
+                new WorldSettings(0L, login.gameType, false, login.field_73560_c, login.terrainType),
+                Core.hammerManager.dimensionID,
+                login.difficultySetting,
+                Core.proxy.getProfiler());
     }
 }

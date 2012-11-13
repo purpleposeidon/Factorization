@@ -1,5 +1,15 @@
 http://www.minecraftforum.net/topic/1351802-factorization/
 
+HAMMER
+------
+Step 1 is "Create a dimension"
+Step 2 is "make the client keep a reference to that dimension, create pseudoplayer, have packets sent to the pseudoplayer be sent to the real player, and render part of the dimension"
+Step 3 is to get player/WorldEntity interaction working.
+Step 4 is rockets & shit.
+Step 5 is watch mod interaction burst into flames.
+Step 6 is "drop into the pending mods folder; run away giggling."
+
+
 TOP LIST
 --------
 *** add player's armor slots to mecha modder (And make it nice)
@@ -24,6 +34,9 @@ Some electricity related mecha-upgrades?
 back to ceramics?
 https://github.com/MinecraftForge/MinecraftForge/commit/34ebfcd9785c3c50c3ac743eb1e9cbf000df10dc
 
+[Reported bugs]
+FTB, ore genned silver doesn't work?
+Uhm, why am I seeing "spawnDemons" in the config?
 
 
 [Features]
@@ -43,11 +56,16 @@ railgun, except for steve
 optimize these TEs. Prolly use whatever it is that Entity Models use?
   grinder
 http://3.bp.blogspot.com/_b5hcKABPlGI/SxB8DW-Xv-I/AAAAAAAAaxU/qmqqFtiwZ1A/s1600/6-509a.bmp . Discussion with Greys and Overminddl about solar towers.
+sideways barrels (and possibly upsidedown barrels)
+slowpoke discussion re. barrel balancing. Maybe an upgrade for automating barrel content access?
+ore processing for dark iron (and possibly wrath-burn other blocks besides iron)
 Go over our API stuff. Clean up. Make sure other people can actually use stuff. (Maybe test this?)
-Re. heaters on RP furnaces:
+Re. heaters on RP alloy furnaces:
 <Eloraam> well you could easily add fuel...  you're welcome to change burntime and totalburn from TileAlloyFurnace... probably via reflection?
 <Eloraam> they're both public, work just like the vanilla furnace iirc
 <Eloraam> i'd prefer not changing the actual cook time tho
+^ no speedy cooking? LAAAAAAAAME
+
 
 
 always test everything in SMP! jegus!

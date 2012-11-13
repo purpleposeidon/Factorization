@@ -3,7 +3,6 @@ package factorization.common;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -16,7 +15,6 @@ import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
-import net.minecraft.src.ModLoader;
 import net.minecraft.src.StatFileWriter;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
@@ -35,11 +33,11 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.registry.LanguageRegistry;
-import cpw.mods.fml.common.registry.TickRegistry;
+import cpw.mods.fml.common.registry.EntityRegistry;
 import factorization.api.Coord;
 import factorization.client.gui.FactorizationNotify;
 import factorization.common.astro.FZWECommand;
+import factorization.common.astro.HammerManager;
 
 @Mod(modid = "factorization", name = "Factorization", version = Core.version)
 @NetworkMod(
@@ -53,9 +51,11 @@ public class Core {
         registry = new Registry();
         exoCore = new ExoCore();
         foph = new FactorizationOreProcessingHandler(); //We don't register foph yet.
-        MinecraftForge.EVENT_BUS.register(this);
+        hammerManager = new HammerManager();
         MinecraftForge.EVENT_BUS.register(registry);
         MinecraftForge.EVENT_BUS.register(exoCore);
+        MinecraftForge.EVENT_BUS.register(hammerManager);
+        NetworkRegistry.instance().registerConnectionHandler(hammerManager);
     }
     
     // runtime storage
@@ -63,6 +63,7 @@ public class Core {
     public static Core instance;
     public static Registry registry;
     public static ExoCore exoCore;
+    public static HammerManager hammerManager;
     public static FactorizationOreProcessingHandler foph;
     @SidedProxy(clientSide = "factorization.client.FactorizationClientProxy", serverSide = "factorization.common.FactorizationServerProxy")
     public static FactorizationProxy proxy;
@@ -181,7 +182,7 @@ public class Core {
         }
         entity_relight_task_id = config.get("general", "entityRelightTask", -1).getInt();
         if (entity_relight_task_id == -1) {
-            entity_relight_task_id = ModLoader.getUniqueEntityId();
+            entity_relight_task_id = EntityRegistry.findGlobalUniqueEntityId();
             Property prop = config.get("general", "entityRelightTask", entity_relight_task_id);
             prop.value = "" + entity_relight_task_id;
         }
@@ -212,6 +213,7 @@ public class Core {
             isMainClientThread.set(true);
         }
         proxy.addNameDirect("itemGroup.factorizationTab", "Factorization");
+        HammerManager.setup();
     }
     
     @ServerStarting

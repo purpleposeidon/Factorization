@@ -18,7 +18,6 @@ import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.MapColor;
 import net.minecraft.src.Material;
-import net.minecraft.src.ModLoader;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldGenMinable;
@@ -31,12 +30,10 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ICraftingHandler;
-import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.EntityRegistry.EntityRegistration;
 import factorization.api.IActOnCraft;
 import factorization.common.astro.WorldEntity;
 
@@ -68,7 +65,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
     public ItemStack diamond_shard_packet;
     public IRecipe boh_upgrade_recipe;
     public ItemWrathIgniter wrath_igniter;
-    public ItemCraftingComponent silver_ingot, lead_ingot, dark_iron;
+    public ItemCraftingComponent silver_ingot, lead_ingot;
+    public ItemCraftingComponent dark_iron;
     public ItemCraftingComponent exo_chasis;
     public ExoArmor exo_head, exo_chest, exo_leg, exo_foot;
     public ExoBuoyantBarrel exo_buoyant_barrel;
@@ -119,7 +117,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
         FactoryType.registerTileEntities();
         //TileEntity renderers are registered in the client proxy
 
-        ModLoader.registerEntityID(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", Core.entity_relight_task_id);
+        EntityRegistry.registerGlobalEntityID(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", Core.entity_relight_task_id);
         EntityRegistry.registerModEntity(WorldEntity.class, "fzwe", 1, Core.instance, 64, 20, true);
     }
 
@@ -285,11 +283,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
     }
 
     void recipe(ItemStack res, Object... params) {
-        ModLoader.addRecipe(res, params);
+        GameRegistry.addRecipe(res, params);
     }
 
     void shapelessRecipe(ItemStack res, Object... params) {
-        ModLoader.addShapelessRecipe(res, params);
+        GameRegistry.addShapelessRecipe(res, params);
     }
 
     void oreRecipe(ItemStack res, Object... params) {
@@ -473,14 +471,14 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
                 'S', Block.pistonStickyBase,
                 'N', Block.pistonBase,
                 'L', Block.lever);
-        recipe(new ItemStack(angular_saw),
+        oreRecipe(new ItemStack(angular_saw),
                 "O ",
                 "MY",
                 "! ",
                 'O', new ItemStack(diamond_cutting_head),
                 'M', new ItemStack(motor),
                 'Y', new ItemStack(Item.ingotIron),
-                '!', lead_ingot);
+                '!', "ingotLead");
         recipe(new ItemStack(exo_wall_jump),
                 "ILI",
                 "IBI",
@@ -499,11 +497,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
         ItemSculptingTool.addModeChangeRecipes();
         
         //inverium
-        recipe(new ItemStack(inverium, 1, 1),
+        oreRecipe(new ItemStack(inverium, 1, 1),
                 "LGL",
                 "GDG",
                 "LGL",
-                'L', lead_ingot,
+                'L', "ingotLead",
                 'G', Item.ingotGold,
                 'D', Item.diamond);
 
@@ -748,22 +746,22 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
                 "SSS",
                 'S', diamond_shard,
                 'I', Item.ingotIron);
-        recipe(grinder_item,
+        oreRecipe(grinder_item,
                 "I*I",
                 "IMI",
                 "LIL",
                 'I', Item.ingotIron,
                 '*', diamond_cutting_head,
                 'M', motor,
-                'L', lead_ingot);
-        recipe(grinder_item,
+                'L', "ingotLead");
+        oreRecipe(grinder_item,
                 "IMI",
                 "I*I",
                 "LIL",
                 'I', Item.ingotIron,
                 '*', diamond_cutting_head,
                 'M', motor,
-                'L', lead_ingot);
+                'L', "ingotLead");
         TileEntityGrinder.addRecipe(new ItemStack(Block.stone), new ItemStack(Block.cobblestone), 1);
         TileEntityGrinder.addRecipe(new ItemStack(Block.cobblestone), new ItemStack(Block.gravel), 1);
         TileEntityGrinder.addRecipe(new ItemStack(Block.gravel), new ItemStack(Block.sand), 1);
@@ -773,14 +771,14 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
         TileEntityGrinder.addRecipe(new ItemStack(Block.oreRedstone), new ItemStack(Item.redstone), 6.5F);
         TileEntityGrinder.addRecipe(new ItemStack(Block.oreLapis), new ItemStack(Item.dyePowder, 1, 4), 8);
         TileEntityGrinder.addRecipe(new ItemStack(Block.oreCoal), new ItemStack(Item.coal), 3.5F);
-        recipe(mixer_item,
+        oreRecipe(mixer_item,
                 " X ",
                 "WMW",
                 "LUL",
                 'X', fan,
                 'W', Item.bucketWater,
                 'M', motor,
-                'L', lead_ingot,
+                'L', "ingotLead",
                 'U', Item.cauldron);
         FurnaceRecipes.smelting().addSmelting(sludge.shiftedIndex, 0, new ItemStack(Item.clay), 0.1F);
 //		TileEntityMixer.addRecipe(

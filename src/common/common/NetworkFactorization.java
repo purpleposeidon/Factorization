@@ -24,6 +24,7 @@ import net.minecraft.src.World;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.network.IPacketHandler;
+import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
 import factorization.api.Coord;
 import factorization.api.VectorUV;
@@ -172,6 +173,7 @@ public class NetworkFactorization implements IPacketHandler {
         }
         if (who == null) {
             //send to everyone in range
+            //PacketDispatcher.sendPacketToAllAround(src.x, src.y, src.z, 128, src.w.getWorldInfo().getDimension(), toSend);
             Chunk srcChunk = src.getChunk();
             for (EntityPlayer player : (Iterable<EntityPlayer>) src.w.playerEntities) {
 //				if (player.chunksToLoad.contains(srcChunk)) {

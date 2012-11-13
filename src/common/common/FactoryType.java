@@ -1,5 +1,7 @@
 package factorization.common;
 
+import cpw.mods.fml.common.registry.EntityRegistry;
+import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.ModLoader;
 import net.minecraft.src.TileEntity;
@@ -109,7 +111,7 @@ public enum FactoryType {
             if (ft.clazz == null || ft.te_id == null) {
                 continue;
             }
-            ModLoader.registerTileEntity(ft.clazz, ft.te_id);
+            GameRegistry.registerTileEntity(ft.clazz, ft.te_id);
         }
     }
 

@@ -1,33 +1,14 @@
 package factorization.client.render;
 
-import java.util.ArrayList;
-
-import net.minecraft.client.Minecraft;
 import net.minecraft.src.Block;
 import net.minecraft.src.IBlockAccess;
-import net.minecraft.src.ModLoader;
 import net.minecraft.src.RenderBlocks;
-import net.minecraft.src.Tessellator;
 import net.minecraft.src.TileEntity;
 import net.minecraftforge.client.MinecraftForgeClient;
-
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
-
-import factorization.api.Coord;
-import factorization.api.IFactoryType;
-import factorization.common.BlockFactorization;
 import factorization.common.Core;
-import factorization.common.FactoryType;
-import factorization.common.RenderingCube;
-import factorization.common.Texture;
-import factorization.common.TileEntityBattery;
 import factorization.common.TileEntityCommon;
-import factorization.common.TileEntitySolarTurbine;
-import factorization.common.TileEntityWire;
-import factorization.common.WireConnections;
 
 public class FactorizationRender implements ISimpleBlockRenderingHandler {
     public FactorizationRender() {

@@ -1,14 +1,13 @@
 package factorization.client.render;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.ModLoader;
 import net.minecraft.src.RenderBlocks;
 import net.minecraft.src.RenderEngine;
 import net.minecraft.src.Tessellator;
 import net.minecraftforge.client.IItemRenderer.ItemRenderType;
-import static net.minecraftforge.client.IItemRenderer.ItemRenderType.*;
+
+import org.lwjgl.opengl.GL11;
+
 import factorization.api.Coord;
 import factorization.common.Core;
 import factorization.common.FactoryType;
@@ -61,7 +60,7 @@ public class BlockRenderBattery extends FactorizationBlockRender {
         final double d = 1.0 / 128.0;
         int brightness;
         if (world_mode) {
-            brightness = Core.registry.factory_block.getMixedBrightnessForBlock(ModLoader.getMinecraftInstance().theWorld, x, y, z);
+            brightness = Core.registry.factory_block.getMixedBrightnessForBlock(getCoord().w, x, y, z);
         } else {
             brightness = 0xc000c0;
         }
