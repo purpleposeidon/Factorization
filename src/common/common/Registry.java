@@ -35,7 +35,7 @@ import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.api.IActOnCraft;
-import factorization.common.astro.WorldEntity;
+import factorization.common.astro.DimensionSliceEntity;
 
 public class Registry implements ICraftingHandler, IWorldGenerator {
     static public final int ExoKeyCount = 3;
@@ -118,7 +118,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
         //TileEntity renderers are registered in the client proxy
 
         EntityRegistry.registerGlobalEntityID(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", Core.entity_relight_task_id);
-        EntityRegistry.registerModEntity(WorldEntity.class, "fzwe", 1, Core.instance, 64, 20, true);
+        EntityRegistry.registerModEntity(DimensionSliceEntity.class, "fzwe", 1, Core.instance, 64, 20, true);
     }
 
     private void addName(Object what, String name) {

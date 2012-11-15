@@ -93,8 +93,8 @@ import factorization.common.TileEntityMixer;
 import factorization.common.TileEntitySlagFurnace;
 import factorization.common.TileEntitySolarTurbine;
 import factorization.common.TileEntityWrathLamp;
-import factorization.common.astro.RenderWorldEntity;
-import factorization.common.astro.WorldEntity;
+import factorization.common.astro.RenderDimensionSliceEntity;
+import factorization.common.astro.DimensionSliceEntity;
 
 public class FactorizationClientProxy extends FactorizationProxy {
     
@@ -496,8 +496,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
         MinecraftForgeClient.preloadTexture(Core.texture_file_item);
 
         RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
-        RenderWorldEntity rwe = new RenderWorldEntity();
-        RenderingRegistry.registerEntityRenderingHandler(WorldEntity.class, rwe);
+        RenderDimensionSliceEntity rwe = new RenderDimensionSliceEntity();
+        RenderingRegistry.registerEntityRenderingHandler(DimensionSliceEntity.class, rwe);
         TickRegistry.registerScheduledTickHandler(rwe, Side.CLIENT);
 
         RenderingRegistry.registerBlockHandler(new FactorizationRender());

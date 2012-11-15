@@ -36,7 +36,7 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import factorization.api.Coord;
 import factorization.client.gui.FactorizationNotify;
-import factorization.common.astro.FZWECommand;
+import factorization.common.astro.FZDSCommand;
 import factorization.common.astro.HammerManager;
 
 @Mod(modid = "factorization", name = "Factorization", version = Core.version)
@@ -46,7 +46,7 @@ import factorization.common.astro.HammerManager;
         channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel, NetworkFactorization.factorizeNtfyChannel })
 public class Core {
     //The comment below is a marker used by the build script.
-    public static final String version = "0.6.13"; //@VERSION@
+    public static final String version = "0.7.0"; //@VERSION@
     public Core() {
         registry = new Registry();
         exoCore = new ExoCore();
@@ -80,20 +80,21 @@ public class Core {
     public static boolean render_barrel_text = true;
     public static boolean render_barrel_close = false;
     public static boolean notify_in_chat = false;
-    public static int watch_demon_chunk_range = 3;
     public static int entity_relight_task_id = -1;
     public static boolean gen_silver_ore = true;
+    public static boolean enable_dimension_slice = false;
+    public static int dimension_slice_dimid = -7;
     public static boolean spread_wrathfire = true;
     public static boolean pocket_craft_anywhere = true;
     public static boolean bag_swap_anywhere = true;
     public static String pocketActions = "xcb";
     public static boolean renderTEs = true;
     public static boolean renderAO = true;
-    public static boolean spawnDemons = true;
     public static boolean add_branding = false;
     public static boolean cheat = false;
     public static boolean debug_light_air = false;
     public static boolean debug_network = false;
+    public static boolean dimension_slice_allow_smooth = true;
     
     public static boolean dev_environ = System.getProperty("user.dir", "").startsWith("/home/poseidon/Development/");
 
@@ -169,8 +170,10 @@ public class Core {
         gen_silver_ore = getBoolConfig("generateSilverOre", "general", gen_silver_ore, "This disables silver ore generation");
         add_branding = getBoolConfig("addBranding", "general", add_branding, null); //For our Tekkit friends
         
+        enable_dimension_slice = dev_environ;
+        enable_dimension_slice = getBoolConfig("enableDimensionSlices", "general", enable_dimension_slice, "work in progress; may be unstable");
+        dimension_slice_dimid = getIntConfig("sliceDimensionID", "general", dimension_slice_dimid, null);
         spread_wrathfire = getBoolConfig("spreadWrathFire", "server", spread_wrathfire, null);
-        spawnDemons = getBoolConfig("spawnDemons", "general", spawnDemons, null);
         String p = getStringConfig("bannedRouterInventoriesRegex", "server", "", "This is a Java Regex to blacklist router access");
         if (p != null && p.length() != 0) {
             try {
@@ -239,8 +242,8 @@ public class Core {
     @ServerStarting
     public void registerServerCommands(FMLServerStartingEvent event) {
         event.registerServerCommand(new NameClayCommand());
-        if (dev_environ) {
-            event.registerServerCommand(new FZWECommand());
+        if (enable_dimension_slice) {
+            event.registerServerCommand(new FZDSCommand());
         }
     }
 

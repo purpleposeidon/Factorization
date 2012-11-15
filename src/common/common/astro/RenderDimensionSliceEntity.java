@@ -9,8 +9,10 @@ import static org.lwjgl.opengl.GL11.glRotatef;
 import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +31,11 @@ import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntityRenderer;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldRenderer;
+import net.minecraftforge.event.ForgeSubscribe;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.world.WorldEvent;
 
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
 import cpw.mods.fml.common.IScheduledTickHandler;
@@ -37,7 +43,7 @@ import cpw.mods.fml.common.TickType;
 import factorization.common.Core;
 
 
-public class RenderWorldEntity extends Render implements IScheduledTickHandler {
+public class RenderDimensionSliceEntity extends Render implements IScheduledTickHandler {
     void checkGLError(String op) {
         int var2 = glGetError();
 
@@ -50,53 +56,68 @@ public class RenderWorldEntity extends Render implements IScheduledTickHandler {
         }
     }
     
-    HashMap<WorldEntity, Long> displayListUseTracker = new HashMap();
+    Set<DSRenderInfo> renderInfoTracker = new HashSet();
     long megatickCount = 0;
     
-    void removeOldWorldRender(WorldEntity we) {
-        if (we.oldWorldRenderer != null) {
-            int displayList = ((WorldRenderer)we.oldWorldRenderer).getGLCallListForPass(0);
-            GLAllocation.deleteDisplayLists(displayList);
-            displayListUseTracker.remove(displayList);
-            we.oldWorldRenderer = null;
+    class DSRenderInfo {
+        int renderCounts = 0;
+        long lastRenderInMegaticks = megatickCount;
+        boolean dirty = false;
+        private int renderList = -1;
+        WorldRenderer worldRenderer = null;
+        
+        int getRenderList() {
+            if (renderList == -1) {
+                renderList = GLAllocation.generateDisplayLists(3);
+                renderInfoTracker.add(this);
+            }
+            return renderList;
+        }
+        
+        void discardRenderList() {
+            if (renderList != -1) {
+                GLAllocation.deleteDisplayLists(renderList);
+                renderList = -1;
+            }
+            worldRenderer = null;
         }
     }
-    
     
     int nest = 0;
     @Override
     public void doRender(Entity ent, double x, double y, double z, float yaw, float partialTicks) {
-        //XXX TODO: We don't need an old world renderer; we can just use WorldRenderer.markDirty()
-        WorldEntity we = (WorldEntity) ent;
+        //XXX TODO: Don't render if we're far away! (This should maybe be done in some other function?)
+        if (ent.isDead) {
+            return;
+        }
+        DimensionSliceEntity we = (DimensionSliceEntity) ent;
+        if (we.renderInfo == null) {
+            we.renderInfo = new DSRenderInfo();
+        }
+        DSRenderInfo renderInfo = (DSRenderInfo) we.renderInfo;
         if (nest == 0) {
             Core.profileStart("fzwe");
-            we.renderCounts++;
-            if (we.renderCounts >= 60 || we.isDead) {
-                we.discardRenderer();
-                we.renderCounts = 0;
+            renderInfo.lastRenderInMegaticks = megatickCount;
+            renderInfo.renderCounts++;
+            if (renderInfo.renderCounts >= 60) {
+                renderInfo.renderCounts = 0;
+                if (renderInfo.worldRenderer != null) {
+                    renderInfo.worldRenderer.needsUpdate = true;
+                }
             }
         }
         nest++;
         try {
             World subWorld = we.worldObj; // we.wew;
-            WorldRenderer wr = (WorldRenderer) we.worldRenderer;
+            WorldRenderer wr = renderInfo.worldRenderer;
             checkGLError("FZWE before render");
-            removeOldWorldRender(we);
-            if (we.isDead) {
-                return;
-            }
-            if (wr == null && !we.isDead) {
-                int chunkDisplayList = GLAllocation.generateDisplayLists(3);
+            if (wr == null) {
                 checkGLError("FZWE list alloc");
-                wr = new WorldRenderer(subWorld, subWorld.loadedTileEntityList, 0, 0, 0, chunkDisplayList);
+                wr = new WorldRenderer(subWorld, subWorld.loadedTileEntityList, 0, 0, 0, renderInfo.getRenderList());
                 wr.needsUpdate = true;
-                wr.updateRenderer();
-                we.worldRenderer = wr;
-                checkGLError("FZWE build");
-                we.worldRenderer = wr;
             }
+            wr.updateRenderer();
             float s = 1F/2F;
-            displayListUseTracker.put(we, megatickCount);
             glPushMatrix();
             glTranslatef((float)x, (float)y, (float)z);
             glRotatef(-10, 0, 1, 0);
@@ -104,6 +125,9 @@ public class RenderWorldEntity extends Render implements IScheduledTickHandler {
             glColor3f(1, 1, 1);
             wr.isInFrustum = true;
             RenderHelper.disableStandardItemLighting();
+            if (Minecraft.getMinecraft().isAmbientOcclusionEnabled() && Core.dimension_slice_allow_smooth) {
+                GL11.glShadeModel(GL11.GL_SMOOTH);
+            }
             for (int pass = 0; pass < 2; pass++) {
                 int displayList = wr.getGLCallListForPass(pass);
                 if (displayList >= 0) {
@@ -120,7 +144,7 @@ public class RenderWorldEntity extends Render implements IScheduledTickHandler {
             Chunk here = subWorld.getChunkFromBlockCoords(0, 0);
             for (List<Entity> ents : (List<Entity>[]) here.entityLists) {
                 for (Entity e : ents) {
-                    if (e instanceof WorldEntity && nest >= 2) {
+                    if (e instanceof DimensionSliceEntity && nest >= 2) {
                         continue;
                     }
                     RenderManager.instance.renderEntity(e, partialTicks);
@@ -141,6 +165,26 @@ public class RenderWorldEntity extends Render implements IScheduledTickHandler {
             }
         }
     }
+    
+    void discardOldRenderLists() {
+        //discard unused renderlists
+        //The display list will be deallocated if it hasn't been used recently.
+        Iterator<DSRenderInfo> it = renderInfoTracker.iterator();
+        while (it.hasNext()) {
+            DSRenderInfo renderInfo = it.next();
+            if (renderInfo.lastRenderInMegaticks < megatickCount - 1) {
+                renderInfo.discardRenderList();
+                it.remove();
+            }
+        }
+    }
+    
+    @ForgeSubscribe
+    public void worldChanged(WorldEvent.Unload unloadEvent) {
+        //This only happens when a local server is unloaded.
+        //This probably happens on a different thread, so let the usual tick handler clean it up.
+        megatickCount += 100;
+    }
 
     @Override
     public void tickStart(EnumSet<TickType> type, Object... tickData) {
@@ -149,17 +193,7 @@ public class RenderWorldEntity extends Render implements IScheduledTickHandler {
 
     @Override
     public void tickEnd(EnumSet<TickType> type, Object... tickData) {
-        Set<Entry<WorldEntity, Long>> entrySet = displayListUseTracker.entrySet();
-        Iterator<Entry<WorldEntity, Long>> it = entrySet.iterator();
-        while (it.hasNext()) {
-            Entry<WorldEntity, Long> entry = it.next();
-            if (entry.getValue() != megatickCount) {
-                WorldEntity we = entry.getKey();
-                we.discardRenderer();
-                removeOldWorldRender(we);
-                it.remove();
-            }
-        }
+        discardOldRenderLists();
     }
 
     EnumSet<TickType> renderTicks = EnumSet.of(TickType.RENDER);
@@ -170,11 +204,13 @@ public class RenderWorldEntity extends Render implements IScheduledTickHandler {
 
     @Override
     public String getLabel() {
-        return "fzweRenderDealloc";
+        return "fzdsRenderDealloc";
     }
 
     @Override
     public int nextTickSpacing() {
-        return 20*5; //every 5 seconds
+        return 20*60;
+        //20*60 would be "every minute". This actually isn't quite correct, since MC doesn't render at 20 FPS.
+        //I mean, other people's MC doesn't render at 20 FPS. So, let's say you're getting 60 FPS.
     }
 }

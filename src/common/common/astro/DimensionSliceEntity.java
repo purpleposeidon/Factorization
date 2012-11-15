@@ -13,21 +13,14 @@ import net.minecraft.src.SpawnerAnimals;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldServer;
 
-public class WorldEntity extends Entity {
-    Object worldRenderer = null, oldWorldRenderer = null;
-    int renderCounts = 0;
-    public WorldEntity(World world) {
+public class DimensionSliceEntity extends Entity {
+    Object renderInfo = null;
+    
+    public DimensionSliceEntity(World world) {
         super(world);
         ignoreFrustumCheck = true; //kinda lame; should give ourselves big bounding box
     }
     
-    public void discardRenderer() {
-        if (oldWorldRenderer == null) {
-            oldWorldRenderer = worldRenderer;
-            worldRenderer = null;
-        }
-    }
-
     @Override
     protected void entityInit() {
         // TODO Auto-generated method stub

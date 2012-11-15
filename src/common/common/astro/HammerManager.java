@@ -12,9 +12,13 @@ import cpw.mods.fml.common.network.Player;
 import factorization.common.Core;
 
 public class HammerManager implements IConnectionHandler {
-    public static int dimensionID = -2;
+    public static int dimensionID;
     public static World hammerWorldClient = null;
     public static void setup() {
+        if (!Core.enable_dimension_slice) {
+            return;
+        }
+        dimensionID = Core.dimension_slice_dimid;
         DimensionManager.registerProviderType(dimensionID, HammerWorldProvider.class, false);
         DimensionManager.registerDimension(dimensionID, dimensionID);
     }
