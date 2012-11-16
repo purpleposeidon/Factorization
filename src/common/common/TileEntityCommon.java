@@ -32,7 +32,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     }
     
     public Packet getAuxillaryInfoPacket() {
-        Packet p = Core.network.messagePacket(getCoord(), MessageType.FactoryType, getFactoryType().md, getExtraInfo(), getExtraInfo2());
+        Packet p = Core.network.TEmessagePacket(getCoord(), MessageType.FactoryType, getFactoryType().md, getExtraInfo(), getExtraInfo2());
         p.isChunkDataPacket = true;
         return p;
     }
@@ -111,7 +111,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         for (int i = 0; i < args.length; i++) {
             suffix[i + 3] = args[i];
         }
-        Packet p = Core.network.messagePacket(getCoord(), MessageType.FactoryType, suffix);
+        Packet p = Core.network.TEmessagePacket(getCoord(), MessageType.FactoryType, suffix);
         p.isChunkDataPacket = true;
         return p;
     }

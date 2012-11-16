@@ -15,7 +15,9 @@ import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.INetworkManager;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
+import net.minecraft.src.NetHandler;
 import net.minecraft.src.Packet;
+import net.minecraft.src.Packet131MapData;
 import net.minecraft.src.Packet250CustomPayload;
 import net.minecraft.src.StringTranslate;
 import net.minecraft.src.TileEntity;
@@ -24,25 +26,23 @@ import net.minecraft.src.World;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.network.IPacketHandler;
+import cpw.mods.fml.common.network.ITinyPacketHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
 import factorization.api.Coord;
 import factorization.api.VectorUV;
 
-public class NetworkFactorization implements IPacketHandler {
-    protected final static String factorizeTEChannel = "fz"; //used for tile entities
-    protected final static String factorizeMsgChannel = "fzMsg"; //used for sending translatable chat messages
-    protected final static String factorizeCmdChannel = "fzK"; //used for player keys
-    protected final static String factorizeNtfyChannel = "fzNtc"; //used to show messages in-world
+public class NetworkFactorization implements ITinyPacketHandler {
+    protected final static short factorizeTEChannel = 0; //used for tile entities
+    protected final static short factorizeMsgChannel = 1; //used for sending translatable chat messages
+    protected final static short factorizeCmdChannel = 2; //used for player keys
+    protected final static short factorizeNtfyChannel = 3; //used to show messages in-world
 
     public NetworkFactorization() {
-        //		if (Core.network != null) {
-        //			throw new RuntimeException();
-        //		}
         Core.network = this;
     }
 
-    public Packet250CustomPayload messagePacket(Coord src, int messageType, Object... items) {
+    public Packet TEmessagePacket(Coord src, int messageType, Object... items) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream output = new DataOutputStream(outputStream);
@@ -80,18 +80,14 @@ public class NetworkFactorization implements IPacketHandler {
                 }
             }
             output.flush();
-            Packet250CustomPayload packet = new Packet250CustomPayload();
-            packet.channel = factorizeTEChannel;
-            packet.data = outputStream.toByteArray();
-            packet.length = packet.data.length; // XXX this is stupid.
-            return packet;
+            return PacketDispatcher.getTinyPacket(Core.instance, (short) 0, outputStream.toByteArray());
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public Packet250CustomPayload translatePacket(String... items) {
+    public Packet translatePacket(String... items) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream output = new DataOutputStream(outputStream);
@@ -99,18 +95,14 @@ public class NetworkFactorization implements IPacketHandler {
                 output.writeUTF(i);
             }
             output.flush();
-            Packet250CustomPayload packet = new Packet250CustomPayload();
-            packet.channel = factorizeMsgChannel;
-            packet.data = outputStream.toByteArray();
-            packet.length = packet.data.length;
-            return packet;
+            return PacketDispatcher.getTinyPacket(Core.instance, factorizeMsgChannel, outputStream.toByteArray());
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
     }
     
-    public Packet250CustomPayload notifyPacket(Coord where, String format, String ...args) {
+    public Packet notifyPacket(Coord where, String format, String ...args) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream output = new DataOutputStream(outputStream);
@@ -123,11 +115,7 @@ public class NetworkFactorization implements IPacketHandler {
                 output.writeUTF(a);
             }
             output.flush();
-            Packet250CustomPayload packet = new Packet250CustomPayload();
-            packet.channel = factorizeNtfyChannel;
-            packet.data = outputStream.toByteArray();
-            packet.length = packet.data.length;
-            return packet;
+            return new PacketDispatcher().getTinyPacket(Core.instance, factorizeNtfyChannel, outputStream.toByteArray());
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -135,12 +123,10 @@ public class NetworkFactorization implements IPacketHandler {
     }
 
     public void sendCommand(EntityPlayer player, Command cmd, byte arg) {
-        Packet250CustomPayload packet = new Packet250CustomPayload();
-        packet.channel = factorizeCmdChannel;
-        packet.data = new byte[2];
-        packet.data[0] = cmd.id;
-        packet.data[1] = arg;
-        packet.length = packet.data.length;
+        byte data[] = new byte[2];
+        data[0] = cmd.id;
+        data[1] = arg;
+        Packet packet = PacketDispatcher.getTinyPacket(Core.instance, factorizeCmdChannel, data);
         Core.proxy.addPacket(player, packet);
     }
 
@@ -149,7 +135,7 @@ public class NetworkFactorization implements IPacketHandler {
         //		if (!Core.proxy.isServer() && who == null) {
         //			return;
         //		}
-        Packet toSend = messagePacket(src, messageType, msg);
+        Packet toSend = TEmessagePacket(src, messageType, msg);
         if (who == null || !who.worldObj.isRemote) {
             broadcastPacket(who, src, toSend);
         }
@@ -206,40 +192,24 @@ public class NetworkFactorization implements IPacketHandler {
         }
         return ret;
     }
-
-    @Override
-    public void onPacketData(INetworkManager network, Packet250CustomPayload packet, Player player) {
-        String channel = packet.channel;
-        byte[] data = packet.data;
-        EntityPlayer me = (EntityPlayer) player;
+    
+    void handlePacketData(int channel, byte[] data, EntityPlayer me) {
         currentPlayer.set(me);
-        //currentPlayer = (EntityPlayer) player; //Core.proxy.getPlayer(network.getNetHandler());;
         ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
         DataInput input = new DataInputStream(inputStream);
-        if (channel.equals(factorizeTEChannel)) {
-            handleTE(input);
-        } else if (channel.equals(factorizeMsgChannel)) {
-            handleMsg(input);
-        } else if (channel.equals(factorizeCmdChannel)) {
-            handleCmd(data);
-        } else if (channel.equals(factorizeNtfyChannel)) {
-            if (FMLCommonHandler.instance().getSide() == Side.CLIENT && me.worldObj.isRemote) {
-                try {
-                    int x = input.readInt(), y = input.readInt(), z = input.readInt();
-                    String msg = input.readUTF();
-                    int argCount = input.readInt();
-                    String args[] = new String[argCount];
-                    for (int i = 0; i < argCount; i++) {
-                        args[i] = input.readUTF();
-                    }
-                    Core.notify(me, new Coord(me.worldObj, x, y, z), msg, args);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        switch (channel) {
+        case factorizeTEChannel: handleTE(input); break;
+        case factorizeMsgChannel: handleMsg(input); break;
+        case factorizeCmdChannel: handleCmd(data); break;
+        case factorizeNtfyChannel: handleNtfy(input); break;
         }
 
         currentPlayer.set(null);
+    }
+    
+    @Override
+    public void handle(NetHandler handler, Packet131MapData mapData) {
+        handlePacketData(factorizeTEChannel, mapData.itemData, handler.getPlayer());
     }
 
     void handleTE(DataInput input) {
@@ -401,6 +371,27 @@ public class NetworkFactorization implements IPacketHandler {
 
     }
 
+    void handleNtfy(DataInput input) {
+        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+            EntityPlayer me = getCurrentPlayer();
+            if (!me.worldObj.isRemote) {
+                return;
+            }
+            try {
+                int x = input.readInt(), y = input.readInt(), z = input.readInt();
+                String msg = input.readUTF();
+                int argCount = input.readInt();
+                String args[] = new String[argCount];
+                for (int i = 0; i < argCount; i++) {
+                    args[i] = input.readUTF();
+                }
+                Core.notify(me, new Coord(me.worldObj, x, y, z), msg, args);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
     static public class MessageType {
         //Non TEF messages
         public final static int ShareAll = -1;

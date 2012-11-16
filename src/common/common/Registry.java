@@ -588,8 +588,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
                 "W-W",
                 "W W",
                 "WWW",
-                'W', "woodLog",
-                '-', "woodSlab");
+                'W', "logWood",
+                '-', "slabWood");
 
         // Craft maker
         recipe(maker_item,
@@ -658,7 +658,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
                 "c",
                 "-",
                 'c', Item.clay,
-                '-', "woodSlab");
+                '-', "slabWood");
 
         //Electricity
 

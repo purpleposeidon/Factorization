@@ -42,11 +42,11 @@ import factorization.common.astro.HammerManager;
 @Mod(modid = "factorization", name = "Factorization", version = Core.version)
 @NetworkMod(
         clientSideRequired = true,
-        packetHandler = NetworkFactorization.class,
-        channels = { NetworkFactorization.factorizeTEChannel, NetworkFactorization.factorizeMsgChannel, NetworkFactorization.factorizeCmdChannel, NetworkFactorization.factorizeNtfyChannel })
+        tinyPacketHandler = NetworkFactorization.class
+        )
 public class Core {
     //The comment below is a marker used by the build script.
-    public static final String version = "0.7.0"; //@VERSION@
+    public static final String version = "0.7.1"; //@VERSION@
     public Core() {
         registry = new Registry();
         exoCore = new ExoCore();
@@ -68,7 +68,7 @@ public class Core {
     @SidedProxy(clientSide = "factorization.client.FactorizationClientProxy", serverSide = "factorization.common.FactorizationServerProxy")
     public static FactorizationProxy proxy;
     public static NetworkFactorization network;
-    public static int factory_rendertype;
+    public static int factory_rendertype = -1;
 
     // Configuration
     public static Configuration config;
