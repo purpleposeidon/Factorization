@@ -11,13 +11,14 @@ import net.minecraft.src.EnumCreatureType;
 import net.minecraft.src.IChunkProvider;
 import net.minecraft.src.IProgressUpdate;
 import net.minecraft.src.World;
+import factorization.api.Coord;
 
 public class HammerChunkProvider implements IChunkProvider {
 
-    //each cell is 3 chunks wide, with a chunk of bedrock between
-    int cellWidth = 3;
-    int wallWidth = 1;
-    int wallHeight = 16*10;
+    //each cell is a few chunks wide, with chunks of bedrock between.
+    static int cellWidth = 3;
+    static int wallWidth = 2; //for production: 16
+    static int wallHeight = 16*8; //for production: 16*10
     
     private World world;
     
@@ -29,15 +30,22 @@ public class HammerChunkProvider implements IChunkProvider {
     public boolean chunkExists(int var1, int var2) {
         return true;
     }
+    
+    public static Coord getCellStart(World hammerWorld, int cellIndex) {
+        int cellSize = (cellWidth + wallWidth)*16;
+        return new Coord(hammerWorld, cellSize*cellIndex, wallHeight, wallWidth*16);
+    }
 
     @Override
     public Chunk provideChunk(int chunkX, int chunkZ) {
+        if (chunkZ < -1  || chunkZ > cellWidth || chunkX < -1) {
+            return new Chunk(world, chunkX, chunkZ);
+        }
         int totalWidth = cellWidth + wallWidth;
         int x = chunkX % totalWidth;
         int z = chunkZ % totalWidth;
         if (x < 0) x += totalWidth;
         if (z < 0) z += totalWidth;
-        System.out.println(x + " & " + z);
         if (x >= cellWidth || z >= cellWidth) {
             //this is a wall chunk
             byte bedrock[] = new byte[16*16*wallHeight];

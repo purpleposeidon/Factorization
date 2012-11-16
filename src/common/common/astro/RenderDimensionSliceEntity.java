@@ -31,6 +31,7 @@ import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntityRenderer;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldRenderer;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -96,29 +97,35 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         }
         DSRenderInfo renderInfo = (DSRenderInfo) we.renderInfo;
         if (nest == 0) {
-            Core.profileStart("fzwe");
+            Core.profileStart("fzds");
             renderInfo.lastRenderInMegaticks = megatickCount;
-            renderInfo.renderCounts++;
-            if (renderInfo.renderCounts >= 60) {
-                renderInfo.renderCounts = 0;
-                if (renderInfo.worldRenderer != null) {
-                    renderInfo.worldRenderer.needsUpdate = true;
-                }
-            }
+        } else if (nest == 1) {
+            Core.profileStart("recursion");
         }
         nest++;
+        glPushMatrix();
         try {
-            World subWorld = we.worldObj; // we.wew;
-            WorldRenderer wr = renderInfo.worldRenderer;
-            checkGLError("FZWE before render");
-            if (wr == null) {
-                checkGLError("FZWE list alloc");
-                wr = new WorldRenderer(subWorld, subWorld.loadedTileEntityList, 0, 0, 0, renderInfo.getRenderList());
-                wr.needsUpdate = true;
+            World subWorld = DimensionManager.getWorld(Core.dimension_slice_dimid); // we.wew;
+            if (subWorld == null) {
+                subWorld = we.worldObj;
+                //return;
+            } else {
+                System.out.println("uh");
             }
-            wr.updateRenderer();
+            WorldRenderer wr = renderInfo.worldRenderer;
+            checkGLError("FZDS before render");
+            if (wr == null) {
+                wr = new WorldRenderer(subWorld, subWorld.loadedTileEntityList, 0, 0, 0, renderInfo.getRenderList());
+                renderInfo.worldRenderer = wr;
+                checkGLError("FZDS render list");
+            }
+            wr.needsUpdate = renderInfo.renderCounts == 0;
+            if (nest == 0) {
+                Core.profileStart("build");
+                wr.updateRenderer();
+                Core.profileEnd();
+            }
             float s = 1F/2F;
-            glPushMatrix();
             glTranslatef((float)x, (float)y, (float)z);
             glRotatef(-10, 0, 1, 0);
             glScalef(s, s, s);
@@ -154,13 +161,14 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             for (TileEntity te : ((Map<ChunkCoordinates, TileEntity>)here.chunkTileEntityMap).values()) {
                 TileEntityRenderer.instance.renderTileEntity(te, partialTicks);
             }
-            glPopMatrix();
-            
-            
-            checkGLError("FZWE after render");
+            checkGLError("FZDS after render");
         } finally {
+            glPopMatrix();
             nest--;
             if (nest == 0) {
+                renderInfo.renderCounts = (1 + renderInfo.renderCounts) % 60;
+                Core.profileEnd();
+            } else if (nest == 1) {
                 Core.profileEnd();
             }
         }

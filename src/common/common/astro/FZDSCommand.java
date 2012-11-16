@@ -3,20 +3,53 @@ package factorization.common.astro;
 import java.util.List;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.Block;
+import net.minecraft.src.ChunkProviderServer;
 import net.minecraft.src.CommandBase;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.ICommandSender;
+import net.minecraft.src.Packet11PlayerPosition;
 import net.minecraft.src.ServerConfigurationManager;
 import net.minecraft.src.Teleporter;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldServer;
+import net.minecraftforge.common.DimensionManager;
+import factorization.api.Coord;
+import factorization.common.Core;
 
 public class FZDSCommand extends CommandBase {
     private static DimensionSliceEntity currentWE = null;
     @Override
     public String getCommandName() {
         return "fzds";
+    }
+    
+    class DSTeleporter extends Teleporter {
+        public DSTeleporter(WorldServer par1WorldServer) {
+            super(par1WorldServer);
+        }
+        
+        Coord destination;
+        @Override
+        public void placeInPortal(Entity player, double par2, double par4, double par6, float par8) {
+            destination.x--;
+            destination.moveToTopBlock();
+            if (player.worldObj == DimensionManager.getWorld(Core.dimension_slice_dimid)) {
+                destination.y = Math.min(HammerChunkProvider.wallHeight, destination.y);
+            }
+            destination.setAsEntityLocation(player);
+            Coord below = new Coord(player);
+            below = below.add(0, -3, 0);
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    Coord platform = below.add(dx, 0, dz);
+                    if (platform.isAir()) {
+                        platform.setId(Block.stone);
+                    }
+                }
+            }
+        }
     }
     
     @Override
@@ -27,7 +60,7 @@ public class FZDSCommand extends CommandBase {
         }
         String cmd = args[0];
         if (sender instanceof EntityPlayerMP) {
-            EntityPlayerMP player = (EntityPlayerMP) sender;
+            final EntityPlayerMP player = (EntityPlayerMP) sender;
             if (cmd.equalsIgnoreCase("spawn")) {
                 DimensionSliceEntity we = new DimensionSliceEntity(player.worldObj);
                 we.setPosition(player.posX, player.posY, player.posZ);
@@ -42,42 +75,27 @@ public class FZDSCommand extends CommandBase {
                 }
             }
             ServerConfigurationManager manager = MinecraftServer.getServerConfigurationManager(MinecraftServer.getServer());
-            Teleporter tp = new Teleporter((WorldServer) player.worldObj) {
-                @Override
-                public boolean placeInExistingPortal(Entity par1Entity,
-                        double par2, double par4, double par6, float par8) {
-                    return false;
-                }
-                
-                
-                
-            };
-    //		Teleporter tp = new Teleporter() {
-    //			@Override
-    //			public boolean placeInExistingPortal(World par1World,
-    //					Entity par2Entity, double par3, double par5,
-    //					double par7, float par9) {
-    //						return false;
-    //			}
-    //			@Override
-    //			public boolean createPortal(World par1World, Entity par2Entity) {
-    //				// TODO Auto-generated method stub
-    //				return false;
-    //			}
-    //			
-    //			@Override
-    //			public void placeInPortal(World world, Entity player,
-    //					double par3, double par5, double par7, float par9) {
-    //				player.posY = Math.max(128, world.getTopSolidOrLiquidBlock((int)player.posX, (int) player.posZ));
-    //				world.setBlock((int)player.posX, (int)player.posY - 3, (int)player.posZ, 1);
-    //			}
-    //			
-    //		};
+            DSTeleporter tp = new DSTeleporter((WorldServer) player.worldObj);
+            tp.destination = new Coord (player.worldObj, 0, 0, 0);
             if (cmd.equalsIgnoreCase("go")) {
-                manager.transferPlayerToDimension(player, -2, tp);
+                World hammerWorld = player.worldObj;
+                int destinationCell = 0;
+                if (args.length == 2) {
+                    destinationCell = Integer.parseInt(args[1]);
+                }
+                tp.destination = HammerChunkProvider.getCellStart(hammerWorld, destinationCell); 
+                if (DimensionManager.getWorld(Core.dimension_slice_dimid) != player.worldObj) {
+                    manager.transferPlayerToDimension(player, Core.dimension_slice_dimid, tp);
+                } else {
+                    tp.destination.x--;
+                    tp.destination.moveToTopBlock();
+                    player.setPositionAndUpdate(tp.destination.x + 0.5, tp.destination.y, tp.destination.z + 0.5);
+                }
             }
             if (cmd.equalsIgnoreCase("leave")) {
-                manager.transferPlayerToDimension(player, 0, tp);
+                if (DimensionManager.getWorld(0) != player.worldObj) {
+                    manager.transferPlayerToDimension(player, 0, tp);
+                }
             }
         }
         if (cmd.equals("removeall")) {

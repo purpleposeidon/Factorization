@@ -4,7 +4,7 @@ HAMMER
 ------
 Step 1 is "Create a dimension"
 Step 2 is "make the client keep a reference to that dimension, create pseudoplayer, have packets sent to the pseudoplayer be sent to the real player, and render part of the dimension"
-Step 3 is to get player/WorldEntity interaction working.
+Step 3 is to get player/DimensionSlice interaction working.
 Step 4 is rockets & shit.
 Step 5 is watch mod interaction burst into flames.
 Step 6 is "drop into the pending mods folder; run away giggling."
@@ -12,9 +12,11 @@ Step 6 is "drop into the pending mods folder; run away giggling."
 
 TOP LIST
 --------
-*** add player's armor slots to mecha modder (And make it nice)
 RP heating
-Verify that the new armor slots in the exomodder don't crash a dedi server
+regularize fluid volumes for mixer/crystallizer; how can we make buckets of aqua regia?
+either figure out how to get mystcraft (?) loading TEs properly, or have the client automatically request the proper TE
+  (perhaps change that new TileEntity() in BlockFZ to new UnloadedFZTE()
+remove failed packet spam for everyone who isn't me
 router:
   searching for avilable inv names; what's IC doing? Bunch of mods aren't actually setting their TE's inv name?
   that other filter mode! What's it do? It stocks!

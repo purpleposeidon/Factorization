@@ -19,7 +19,7 @@ public class HammerManager implements IConnectionHandler {
             return;
         }
         dimensionID = Core.dimension_slice_dimid;
-        DimensionManager.registerProviderType(dimensionID, HammerWorldProvider.class, false);
+        DimensionManager.registerProviderType(dimensionID, HammerWorldProvider.class, true);
         DimensionManager.registerDimension(dimensionID, dimensionID);
     }
     

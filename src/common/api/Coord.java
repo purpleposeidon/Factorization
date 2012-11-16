@@ -482,4 +482,18 @@ public class Coord {
     public void scheduleUpdate(int delay) {
         w.scheduleBlockUpdate(x, y, z, getId(), delay);
     }
+    
+    public void setAsEntityLocation(Entity ent) {
+        ent.posX = x + 0.5;
+        ent.posY = y;
+        ent.posZ = z + 0.5;
+    }
+    
+    public void moveToTopBlock() {
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                y = Math.max(y,  w.getTopSolidOrLiquidBlock(x + dx, z + dz));
+            }
+        }
+    }
 }
