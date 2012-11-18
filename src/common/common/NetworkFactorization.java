@@ -209,7 +209,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
     
     @Override
     public void handle(NetHandler handler, Packet131MapData mapData) {
-        handlePacketData(factorizeTEChannel, mapData.itemData, handler.getPlayer());
+        handlePacketData(mapData.uniqueID, mapData.itemData, handler.getPlayer());
     }
 
     void handleTE(DataInput input) {

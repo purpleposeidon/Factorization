@@ -40,7 +40,7 @@ public class BlockFactorization extends BlockContainer {
         //This is because portalgun relies on this to make a TE that won't drop anything when it's moving it.
         //But when this returned null, it wouldn't remove the real TE. So, the tile entity was both having its block broken, and being moved.
         //Returning a generic TE won't be an issue for us as we always use coord.getTE, and never assume, right?
-        return new TileEntity();
+        return new TileEntity(); //XXX TODO: have a FZ-specific null TE to help with issues
     }
 
     @Override
