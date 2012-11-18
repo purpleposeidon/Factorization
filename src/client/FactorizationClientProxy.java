@@ -521,7 +521,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
     public void hammerClientLogin(NetHandler clientHandler, INetworkManager manager, Packet1Login login) {
         NetClientHandler nch = (NetClientHandler) clientHandler;
         Core.hammerManager.hammerWorldClient = new WorldClient(nch,
-                new WorldSettings(0L, login.gameType, false, login.field_73560_c, login.terrainType),
+                new WorldSettings(0L, login.gameType, false, login.hardcoreMode, login.terrainType),
                 Core.hammerManager.dimensionID,
                 login.difficultySetting,
                 Core.proxy.getProfiler());

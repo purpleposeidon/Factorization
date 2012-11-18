@@ -16,7 +16,7 @@ public class ContainerGrinder extends ContainerFactorization {
         super.updateCraftingResults();
         for (ICrafting crafter : (Iterable<ICrafting>) crafters) {
             if (grinder.progress != lastProgress) {
-                crafter.updateCraftingInventoryInfo(this, 0, grinder.progress);
+                crafter.sendProgressBarUpdate(this, 0, grinder.progress);
             }
         }
         lastProgress = grinder.progress;

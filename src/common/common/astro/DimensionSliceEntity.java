@@ -15,10 +15,16 @@ import net.minecraft.src.WorldServer;
 
 public class DimensionSliceEntity extends Entity {
     Object renderInfo = null;
+    int cell;
     
     public DimensionSliceEntity(World world) {
         super(world);
         ignoreFrustumCheck = true; //kinda lame; should give ourselves big bounding box
+    }
+    
+    public DimensionSliceEntity(World world, int cell) {
+        this(world);
+        this.cell = cell;
     }
     
     @Override
@@ -28,15 +34,13 @@ public class DimensionSliceEntity extends Entity {
     }
 
     @Override
-    protected void readEntityFromNBT(NBTTagCompound var1) {
-        // TODO Auto-generated method stub
-
+    protected void readEntityFromNBT(NBTTagCompound tag) {
+        cell = tag.getInteger("cell");
     }
 
     @Override
-    protected void writeEntityToNBT(NBTTagCompound var1) {
-        // TODO Auto-generated method stub
-
+    protected void writeEntityToNBT(NBTTagCompound tag) {
+        tag.setInteger("cell", cell);
     }
     
     @Override

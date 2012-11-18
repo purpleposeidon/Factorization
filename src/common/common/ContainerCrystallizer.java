@@ -19,10 +19,10 @@ public class ContainerCrystallizer extends ContainerFactorization {
         super.updateCraftingResults();
         for (ICrafting crafter : (Iterable<ICrafting>) crafters) {
             if (crys.heat != last_heat) {
-                crafter.updateCraftingInventoryInfo(this, 0, crys.heat);
+                crafter.sendProgressBarUpdate(this, 0, crys.heat);
             }
             if (crys.progress != last_progress) {
-                crafter.updateCraftingInventoryInfo(this, 1, crys.progress);
+                crafter.sendProgressBarUpdate(this, 1, crys.progress);
             }
         }
         last_progress = crys.progress;

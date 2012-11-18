@@ -62,10 +62,7 @@ public class FZDSCommand extends CommandBase {
         if (sender instanceof EntityPlayerMP) {
             final EntityPlayerMP player = (EntityPlayerMP) sender;
             if (cmd.equalsIgnoreCase("spawn")) {
-                DimensionSliceEntity we = new DimensionSliceEntity(player.worldObj);
-                we.setPosition(player.posX, player.posY, player.posZ);
-                player.worldObj.spawnEntityInWorld(we);
-                currentWE = we;
+                currentWE = Core.hammerManager.allocateSlice(new Coord(player));
             }
             if (cmd.equalsIgnoreCase("remove")) {
                 for (Entity ent : (List<Entity>)player.worldObj.loadedEntityList) {

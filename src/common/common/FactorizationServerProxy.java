@@ -60,15 +60,10 @@ public class FactorizationServerProxy extends FactorizationProxy {
     }
 
     @Override
-    public void updateHeldItem(EntityPlayer player) {
-        ((EntityPlayerMP) player).sendInventoryToPlayer();
-    }
-
-    @Override
     public void updatePlayerInventory(EntityPlayer player) {
         if (player instanceof EntityPlayerMP) {
             EntityPlayerMP emp = (EntityPlayerMP) player;
-            emp.sendContainerToPlayer(emp.inventorySlots);
+            emp.sendContainerToPlayer(emp.inventoryContainer);
             // updates entire inventory. Inefficient, I know, but... XXX
         }
     }

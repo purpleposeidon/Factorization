@@ -281,7 +281,7 @@ public class Coord {
     //Methods on the world
 
     public void dirty() {
-        w.markBlocksDirty(x, y, z, x, y, z);
+        w.markBlockForRenderUpdate(x, y, z);
     }
 
     public void updateLight() {

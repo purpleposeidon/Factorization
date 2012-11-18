@@ -18,14 +18,14 @@ public class ContainerSlagFurnace extends ContainerFactorization {
         //		System.out.println(crafters.size());
         for (ICrafting crafter : (Iterable<ICrafting>) crafters) {
             if (furnace.furnaceBurnTime != lastBurnTime) {
-                crafter.updateCraftingInventoryInfo(this, 0, furnace.furnaceBurnTime);
+                crafter.sendProgressBarUpdate(this, 0, furnace.furnaceBurnTime);
                 //				System.out.println(crafter + " burn time is now " + furnace.furnaceBurnTime);
             }
             if (furnace.furnaceCookTime != lastCookTime) {
-                crafter.updateCraftingInventoryInfo(this, 1, furnace.furnaceCookTime);
+                crafter.sendProgressBarUpdate(this, 1, furnace.furnaceCookTime);
             }
             if (furnace.currentFuelItemBurnTime != lastFuelItemBurnTime) {
-                crafter.updateCraftingInventoryInfo(this, 2, furnace.currentFuelItemBurnTime);
+                crafter.sendProgressBarUpdate(this, 2, furnace.currentFuelItemBurnTime);
             }
         }
         lastBurnTime = furnace.furnaceBurnTime;

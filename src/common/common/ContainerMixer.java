@@ -16,7 +16,7 @@ public class ContainerMixer extends ContainerFactorization {
         super.updateCraftingResults();
         for (ICrafting crafter : (Iterable<ICrafting>) crafters) {
             if (mixer.progress != last_progress) {
-                crafter.updateCraftingInventoryInfo(this, 0, mixer.progress);	
+                crafter.sendProgressBarUpdate(this, 0, mixer.progress);	
             }
         }
         last_progress = mixer.progress;

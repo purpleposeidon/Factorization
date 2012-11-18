@@ -418,7 +418,7 @@ public class BlockFactorization extends BlockContainer {
     }
     
     @Override
-    public boolean isPoweringTo(IBlockAccess w, int x, int y, int z, int side) {
+    public boolean isProvidingStrongPower(IBlockAccess w, int x, int y, int z, int side) {
         if (side < 2) {
             return false;
         }

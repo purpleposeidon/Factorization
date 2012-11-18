@@ -92,7 +92,7 @@ public class ItemPocketTable extends Item {
             }
         }
         ItemStack mouse_item = player.inventory.getItemStack();
-        if (mouse_item != null && mouse_item.getItem() == this && player.craftingInventory instanceof ContainerPocket) {
+        if (mouse_item != null && mouse_item.getItem() == this && player.openContainer instanceof ContainerPocket) {
             return mouse_item;
         }
         return null;

@@ -309,7 +309,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         //TODO: draw_active oughta be used to make the machines draw nicer.
         if (draw_active > 0) {
             makeNoise();
-            worldObj.markBlockNeedsUpdate(xCoord, yCoord, zCoord);
+            worldObj.markBlockForRenderUpdate(xCoord, yCoord, zCoord);
             draw_active--;
         }
         if (worldObj.isRemote) {

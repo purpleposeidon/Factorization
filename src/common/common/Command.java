@@ -86,8 +86,8 @@ public enum Command {
             break;
         case exoModLeftClick:
         case exoModRightClick:
-            if (player.craftingInventory instanceof ContainerExoModder) {
-                ContainerExoModder cont = (ContainerExoModder) player.craftingInventory;
+            if (player.openContainer instanceof ContainerExoModder) {
+                ContainerExoModder cont = (ContainerExoModder) player.openContainer;
                 ItemStack armor = cont.upgrader.armor;
                 ExoArmor m = (ExoArmor) armor.getItem();
                 int slot = arg / 2;
@@ -122,10 +122,10 @@ public enum Command {
     }
     
     void craftClear(EntityPlayer player) {
-        if (!(player.craftingInventory instanceof ContainerPocket)) {
+        if (!(player.openContainer instanceof ContainerPocket)) {
             return;
         }
-        ContainerPocket pocket = (ContainerPocket) player.craftingInventory;
+        ContainerPocket pocket = (ContainerPocket) player.openContainer;
         for (int i : pocket.craftArea) {
             //transferStackInSlot
             pocket.transferStackInSlot(player, i);
@@ -200,8 +200,8 @@ public enum Command {
                 return;
             }			
         } finally {
-            if (player.craftingInventory instanceof ContainerPocket) {
-                ((ContainerPocket) player.craftingInventory).updateMatrix();
+            if (player.openContainer instanceof ContainerPocket) {
+                ((ContainerPocket) player.openContainer).updateMatrix();
             }
         }
     }
@@ -269,8 +269,8 @@ public enum Command {
             }
         }
         
-        if (player.craftingInventory instanceof ContainerPocket) {
-            ((ContainerPocket) player.craftingInventory).updateMatrix();
+        if (player.openContainer instanceof ContainerPocket) {
+            ((ContainerPocket) player.openContainer).updateMatrix();
         }
     }
 }

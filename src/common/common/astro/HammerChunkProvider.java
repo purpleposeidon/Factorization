@@ -101,10 +101,8 @@ public class HammerChunkProvider implements IChunkProvider {
     public int getLoadedChunkCount() {
         return 0;
     }
-
+    
     @Override
-    public void func_82695_e(int var1, int var2) {
-        // Generates special terrain features or something. Not needed here.
-    }
+    public void recreateStructures(int var1, int var2) { }
 
 }

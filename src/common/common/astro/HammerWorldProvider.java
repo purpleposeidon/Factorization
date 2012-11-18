@@ -14,13 +14,13 @@ public class HammerWorldProvider extends WorldProvider {
     }
     
     @Override
-    public IChunkProvider getChunkProvider() {
+    public IChunkProvider createChunkGenerator() {
         if (chunkProvider == null) {
             chunkProvider = new HammerChunkProvider(worldObj);
         }
         return chunkProvider;
     }
-
+    
     @Override
     public String getWelcomeMessage() {
         return "Entering FZ Hammerspace";

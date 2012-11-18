@@ -48,7 +48,15 @@ https://github.com/pahimar/Equivalent-Exchange-3/commit/e1ed736955b9af238431358b
 ** two issues with buttons in mecha-modder: doesn't update when blank armor put in
 Re-write barrel to use replacement for ISidedInventory. (Assuming it *ever* gets released...)
 
+[High-rez texture bugs]
+wrath lamp particles
+GUIs ?????
+clay statue probably has bad UV or something
+make multiple copies of the metal texture for each ore processing machine
+http://www.minecraftforum.net/index.php?app=members&module=messaging&section=view&do=showConversation&topicID=1984385&st=0#msg3439990
+
 [Low-Priority Bugs]
+EBXL cracked sand + water = sand
 barrel lighting (normals.); it's a bit dark on dark mode.
 Test: slow stamper & packager & maker so as to not jam filters. also have stamper pulse for each item... (cakes)
 nikolite grinding! Once RedPower comes out...

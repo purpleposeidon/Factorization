@@ -3,6 +3,7 @@ package factorization.common;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -15,13 +16,18 @@ import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
+import net.minecraft.src.NBTBase;
+import net.minecraft.src.NBTTagCompound;
+import net.minecraft.src.SaveHandler;
 import net.minecraft.src.StatFileWriter;
+import net.minecraft.src.WorldInfo;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.WorldAccessContainer;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod.PostInit;
 import cpw.mods.fml.common.Mod.PreInit;
@@ -216,7 +222,7 @@ public class Core {
             isMainClientThread.set(true);
         }
         proxy.addNameDirect("itemGroup.factorizationTab", "Factorization");
-        HammerManager.setup();
+        hammerManager.setup();
     }
     
     @ServerStarting
