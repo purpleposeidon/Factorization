@@ -1,3 +1,6 @@
+0.7.2
+  Made network code actually work probably
+
 0.7.1
   made network code more efficient
   config should turn FZDS off completely
