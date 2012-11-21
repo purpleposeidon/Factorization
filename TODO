@@ -14,6 +14,8 @@ TOP LIST
 --------
 RP heating
 FZNullTE
+put some things in the OD for azanor to waggles his eyebrows at
+Modularize FZ/astro so that astro has no deps & can be removed for public release
 regularize fluid volumes for mixer/crystallizer; how can we make buckets of aqua regia?
 either figure out how to get mystcraft (?) loading TEs properly, or have the client automatically request the proper TE
   (perhaps change that new TileEntity() in BlockFZ to new UnloadedFZTE()
@@ -57,6 +59,9 @@ make multiple copies of the metal texture for each ore processing machine
 http://www.minecraftforum.net/index.php?app=members&module=messaging&section=view&do=showConversation&topicID=1984385&st=0#msg3439990
 
 [Low-Priority Bugs]
+rotating barrels
+implementing that generic block rotation API when it comes out if ever
+we miiight let you use capsules & shit in the mixer
 EBXL cracked sand + water = sand
 barrel lighting (normals.); it's a bit dark on dark mode.
 Test: slow stamper & packager & maker so as to not jam filters. also have stamper pulse for each item... (cakes)
