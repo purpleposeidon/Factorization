@@ -31,12 +31,15 @@ import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
 import factorization.api.Coord;
 import factorization.api.VectorUV;
+import factorization.common.astro.DimensionSliceEntity;
 
 public class NetworkFactorization implements ITinyPacketHandler {
     protected final static short factorizeTEChannel = 0; //used for tile entities
     protected final static short factorizeMsgChannel = 1; //used for sending translatable chat messages
     protected final static short factorizeCmdChannel = 2; //used for player keys
     protected final static short factorizeNtfyChannel = 3; //used to show messages in-world
+    protected final static short factorizeWorldPushChannel = 4; //push world to hammer space
+    protected final static short factorizeWorldPopChannel = 5; //return to real world
 
     public NetworkFactorization() {
         Core.network = this;
@@ -122,6 +125,22 @@ public class NetworkFactorization implements ITinyPacketHandler {
         }
     }
 
+    public Packet worldPushPacket(DimensionSliceEntity dse) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            new DataOutputStream(baos).writeInt(dse.entityId);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return PacketDispatcher.getTinyPacket(Core.instance, factorizeWorldPushChannel, baos.toByteArray());
+    }
+    
+    static byte empty[] = new byte[0];
+    public Packet worldPopPacket() {
+        return PacketDispatcher.getTinyPacket(Core.instance, factorizeWorldPopChannel, empty);
+    }
+    
     public void sendCommand(EntityPlayer player, Command cmd, byte arg) {
         byte data[] = new byte[2];
         data[0] = cmd.id;
