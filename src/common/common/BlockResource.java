@@ -37,17 +37,22 @@ public class BlockResource extends Block {
         return Core.texture_file_block;
     }
     
-    @Override
-    public void addCreativeItems(ArrayList itemList) {
+    public void addCreativeItems(List itemList) {
         itemList.add(Core.registry.silver_ore_item);
         itemList.add(Core.registry.silver_block_item);
         itemList.add(Core.registry.lead_block_item);
         itemList.add(Core.registry.dark_iron_block_item);
         itemList.add(Core.registry.exoworkshop_item);
     }
+    
+    @Override
+    public void addCreativeItems(ArrayList itemList) {
+        addCreativeItems((List) itemList);
+    }
 
     @Override
     public void getSubBlocks(int par1, CreativeTabs par2CreativeTabs, List par3List) {
+        addCreativeItems(par3List);
         Core.addBlockToCreativeList(par3List, this);
     }
 

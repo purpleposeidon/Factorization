@@ -35,6 +35,7 @@ import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.api.IActOnCraft;
+import factorization.common.Core.TabType;
 import factorization.common.astro.DimensionSliceEntity;
 
 public class Registry implements ICraftingHandler, IWorldGenerator {
@@ -154,6 +155,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
         //ItemBlocks
         item_factorization = (ItemFactorization) Item.itemsList[factory_block.blockID];
         item_resource = (ItemBlockResource) Item.itemsList[resource_block.blockID];
+        Core.instance.tab(resource_block, TabType.MATERIALS);
 
         //BlockFactorization stuff
         router_item = FactoryType.ROUTER.itemStack("Router");
