@@ -6,9 +6,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.INetworkManager;
 import net.minecraft.src.NetHandler;
 import net.minecraft.src.NetLoginHandler;
@@ -18,6 +21,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.world.WorldEvent;
 import cpw.mods.fml.common.IScheduledTickHandler;
+import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.network.IConnectionHandler;
@@ -166,4 +170,50 @@ public class HammerManager implements IConnectionHandler, IScheduledTickHandler 
     }
     @Override
     public void tickStart(EnumSet<TickType> type, Object... tickData) {}
+    
+    public class NetworkDimensionStateTicker implements ITickHandler {
+        ArrayList<PacketProxyingNetworkPlayer> proxiedPlayers = new ArrayList();
+        @Override
+        public void tickStart(EnumSet<TickType> type, Object... tickData) {
+            World world = (World) tickData[0];
+            if (!(world.getChunkProvider() instanceof HammerChunkProvider)) {
+                //not the best check, but should be efficient.
+                return;
+            }
+            proxiedPlayers.clear();
+            for (EntityPlayer ep : (List<EntityPlayer>) world.playerEntities) {
+                if (ep instanceof PacketProxyingNetworkPlayer) {
+                    PacketProxyingNetworkPlayer ppnp = (PacketProxyingNetworkPlayer) ep; 
+                    proxiedPlayers.add(ppnp);
+                    ppnp.enterTick();
+                }
+            }
+        }
+
+        @Override
+        public void tickEnd(EnumSet<TickType> type, Object... tickData) {
+            World world = (World) tickData[0];
+            if (!(world.getChunkProvider() instanceof HammerChunkProvider)) {
+                //not the best check, but should be efficient.
+                return;
+            }
+            for (int i = 0; i < proxiedPlayers.size(); i++) {
+                PacketProxyingNetworkPlayer ppnp = proxiedPlayers.get(i);
+                ppnp.leaveTick();
+            }
+        }
+
+        EnumSet<TickType> worldTicks = EnumSet.of(TickType.WORLD);
+        
+        @Override
+        public EnumSet<TickType> ticks() {
+            return worldTicks;
+        }
+
+        @Override
+        public String getLabel() {
+            return "FZDS network";
+        }
+        
+    }
 }
