@@ -136,7 +136,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
 
     @Override
     int getLogicSpeed() {
-        return 8;
+        return 4;
     }
 
     int getRemainingProgress() {
