@@ -279,9 +279,19 @@ public class Coord {
     }
     
     //Methods on the world
+    
+    public void markBlockForUpdate() {
+        //this will re-send block values & TE description to the client, which will also do a redraw()
+        w.markBlockForUpdate(x, y, z);
+    }
 
-    public void dirty() {
+    public void redraw() {
         w.markBlockForRenderUpdate(x, y, z);
+    }
+    
+    public void notifyNeighbors() {
+        //this will probably take care of our redstone issues
+        w.notifyBlocksOfNeighborChange(x, y, z, getId());
     }
 
     public void updateLight() {
@@ -495,5 +505,9 @@ public class Coord {
                 y = Math.max(y,  w.getTopSolidOrLiquidBlock(x + dx, z + dz));
             }
         }
+    }
+
+    public void removeTE() {
+        w.removeBlockTileEntity(x, y, z);
     }
 }

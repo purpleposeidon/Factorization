@@ -78,7 +78,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
             return;
         }
         pulsingTE = this;
-        here.notifyBlockChange();
+        here.notifyNeighbors();
         here.scheduleUpdate(4);
         pulsingTE = null;
     }

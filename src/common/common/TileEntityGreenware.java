@@ -424,6 +424,6 @@ public class TileEntityGreenware extends TileEntityCommon {
             totalHeat = glazeHeat + 1;
             break;
         }
-        getCoord().dirty();
+        getCoord().redraw();
     }
 }

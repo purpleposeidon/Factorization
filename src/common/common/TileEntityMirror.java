@@ -108,7 +108,7 @@ public class TileEntityMirror extends TileEntityCommon {
         switch (messageType) {
         case MessageType.MirrorDescription:
             target_rotation = input.readInt();
-            getCoord().dirty();
+            getCoord().redraw();
             gotten_info_packet = true;
             return true;
         }

@@ -55,7 +55,8 @@ public class ItemFactorization extends ItemBlock {
                     Core.network.broadcastPacket(null, here, p); //XXX TODO: Is this necessary?
                 }
             }
-            here.dirty();
+            
+            here.markBlockForUpdate();
             return true;
         }
         return false;

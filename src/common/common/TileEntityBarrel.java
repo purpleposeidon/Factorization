@@ -532,7 +532,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
         default:
             return false;
         }
-        getCoord().dirty();
+        //getCoord().redraw();
         return true;
     }
     

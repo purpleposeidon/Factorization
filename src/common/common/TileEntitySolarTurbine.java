@@ -126,7 +126,7 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
             return true;
         case MessageType.TurbineWater:
             water_level = input.readInt();
-            getCoord().dirty();
+            getCoord().redraw();
             return true;
         }
         return false;
@@ -155,7 +155,7 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
                 if (below.getMd() == 0) {
                     below.setId(0);
                     water_level = max_water;
-                    getCoord().dirty();
+                    getCoord().redraw();
                 }
             }
         }
@@ -186,7 +186,7 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
         charge.addValue(delta); //This is fine; heat depends on reflectors.
         water_level -= delta;
         if (water_level / 64 != last_cut) {
-            getCoord().dirty();
+            getCoord().redraw();
         }
     }
 

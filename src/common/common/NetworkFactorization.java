@@ -12,6 +12,7 @@ import java.util.IllegalFormatException;
 import net.minecraft.src.Block;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.INetworkManager;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
@@ -23,6 +24,7 @@ import net.minecraft.src.StringTranslate;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.World;
+import net.minecraft.src.WorldServer;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.network.IPacketHandler;
@@ -194,6 +196,14 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 if (!Core.proxy.playerListensToCoord(player, src)) {
                     continue;
                 }
+                //Apparently the below doesn't actually work. Huge fucking surprise.
+//				if (player instanceof EntityPlayerMP && src.w instanceof WorldServer) {
+//					EntityPlayerMP emp = (EntityPlayerMP) player;
+//					WorldServer world = (WorldServer) src.w;
+//					if (!world.getPlayerManager().isPlayerWatchingChunk(emp, src.x >> 4, src.y >> 4)) {
+//						continue;
+//					}
+//				}
                 Core.proxy.addPacket(player, toSend);
             }
         }
@@ -221,6 +231,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
         case factorizeMsgChannel: handleMsg(input); break;
         case factorizeCmdChannel: handleCmd(data); break;
         case factorizeNtfyChannel: handleNtfy(input); break;
+        default: Core.logWarning("Got packet with invalid channel %i with player = %s ", channel, me);break;
         }
 
         currentPlayer.set(null);
@@ -378,11 +389,11 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 break;
             default:
                 if (world.blockExists(x, y, z)) {
-                    Core.logInfo("Got unhandled message: " + messageType + " for " + here);
+                    Core.logFine("Got unhandled message: " + messageType + " for " + here);
                 }
                 else {
                     //XXX: Need to figure out how to keep the server from sending these things!
-                    Core.logInfo("Got message to unloaded chunk: " + messageType + " for " + here);
+                    Core.logFine("Got message to unloaded chunk: " + messageType + " for " + here);
                 }
                 break;
             }

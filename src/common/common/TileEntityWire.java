@@ -230,7 +230,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
         }
         if (messageType == MessageType.WireFace) {
             supporting_side = input.readByte();
-            getCoord().dirty();
+            getCoord().redraw();
             return true;
         }
         return false;

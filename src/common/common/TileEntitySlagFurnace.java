@@ -146,7 +146,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
             draw_active = -1;
             drawActive(furnaceBurnTime > 0 ? 2 : 0);
             Coord here = getCoord();
-            here.dirty();
+            here.redraw();
             here.updateLight();
         }
 

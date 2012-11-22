@@ -327,7 +327,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         }
         if (messageType == MessageType.DrawActive) {
             draw_active = input.readByte();
-            getCoord().dirty();
+            getCoord().redraw();
             return true;
         }
         return false;
