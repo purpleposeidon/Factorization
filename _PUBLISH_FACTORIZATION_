@@ -22,7 +22,7 @@ def adfly(url):
 exp = os.path.expanduser
 
 version = update_info.version
-filename = "Factorization-{0}_{1}.jar".format(version, random.randrange(0, 1000))
+filename = "Factorization-{0}.jar".format(version, random.randrange(0, 1000))
 oldfile = exp("~/Dropbox/Public/old/" + filename)
 mfurl = exp("~/tmp/factorization_mediafire_url")
 run("rm " + mfurl)
