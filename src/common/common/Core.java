@@ -101,6 +101,7 @@ public class Core {
     public static boolean debug_light_air = false;
     public static boolean debug_network = false;
     public static boolean dimension_slice_allow_smooth = true;
+    public static boolean show_fine_logging = false;
     
     public static boolean dev_environ = System.getProperty("user.dir", "").startsWith("/home/poseidon/Development/");
 
@@ -228,6 +229,7 @@ public class Core {
     @ServerStarting
     public void setMainServerThread(FMLServerStartingEvent event) {
         isMainServerThread.set(true);
+        hammerManager.serverStarting(event);
     }
 
     @PostInit
@@ -264,7 +266,7 @@ public class Core {
 
     }
     
-    static Logger FZLogger = Logger.getLogger("FZ");
+    public static Logger FZLogger = Logger.getLogger("FZ");
     static {
         FZLogger.setParent(FMLLog.getLogger());
         logInfo("This is Factorization " + version);
@@ -278,6 +280,10 @@ public class Core {
     
     public static void logInfo(String format, Object... formatParameters) {
         FZLogger.log(Level.INFO, String.format(format, formatParameters));
+    }
+    
+    public static void logFine(String format, Object... formatParameters) {
+        FZLogger.log(Level.FINE, String.format(format, formatParameters));
     }
 
     public static void addBlockToCreativeList(List tab, Block block) {

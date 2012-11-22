@@ -17,13 +17,18 @@ import net.minecraft.src.NetHandler;
 import net.minecraft.src.NetLoginHandler;
 import net.minecraft.src.Packet1Login;
 import net.minecraft.src.World;
+import net.minecraft.src.WorldManager;
+import net.minecraft.src.WorldServer;
+import net.minecraft.src.WorldServerMulti;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.world.WorldEvent;
 import cpw.mods.fml.common.IScheduledTickHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.IConnectionHandler;
 import cpw.mods.fml.common.network.Player;
 import cpw.mods.fml.common.registry.TickRegistry;
@@ -42,6 +47,10 @@ public class HammerManager implements IConnectionHandler, IScheduledTickHandler 
         dimensionID = Core.dimension_slice_dimid;
         DimensionManager.registerProviderType(dimensionID, HammerWorldProvider.class, true);
         DimensionManager.registerDimension(dimensionID, dimensionID);
+    }
+    
+    public void serverStarting(FMLServerStartingEvent event) {
+        DimensionManager.initDimension(dimensionID);
     }
     
     DimensionSliceEntity allocateSlice(Coord spawnCoords) {
@@ -63,7 +72,9 @@ public class HammerManager implements IConnectionHandler, IScheduledTickHandler 
     }
     
     private File getInfoFile() {
-        File saveDir = new File(DimensionManager.getWorld(dimensionID).getSaveHandler().getSaveDirectoryName());
+        World hammerWorld = DimensionManager.getWorld(dimensionID);
+        File saveDir = new File("saves", hammerWorld.getSaveHandler().getSaveDirectoryName());
+        saveDir = saveDir.getAbsoluteFile();
         return new File(saveDir, "fzds");
     }
     
@@ -100,7 +111,12 @@ public class HammerManager implements IConnectionHandler, IScheduledTickHandler 
     public void saveCellAllocations() {
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(getInfoFile());
+            File infoFile = getInfoFile();
+            if (!infoFile.exists()) {
+                infoFile.createNewFile();
+            }
+            fos = new FileOutputStream(infoFile);
+            
             DataOutputStream dos = new DataOutputStream(fos);
             dos.write(allocated_cells);
         } catch (Exception e) {
