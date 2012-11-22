@@ -14,6 +14,7 @@ TOP LIST
 --------
 RP heating
 put some things in the OD for azanor to waggles his eyebrows at
+fix middle clicking
 Modularize FZ/astro so that astro has no deps & can be removed for public release
 regularize fluid volumes for mixer/crystallizer; how can we make buckets of aqua regia?
 either figure out how to get mystcraft (?) loading TEs properly, or have the client automatically request the proper TE
