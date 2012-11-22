@@ -119,7 +119,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
         //TileEntity renderers are registered in the client proxy
 
         EntityRegistry.registerGlobalEntityID(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", Core.entity_relight_task_id);
-        EntityRegistry.registerModEntity(DimensionSliceEntity.class, "fzwe", 1, Core.instance, 64, 20, true);
+        if (Core.enable_dimension_slice) {
+            EntityRegistry.registerModEntity(DimensionSliceEntity.class, "fzwe", 1, Core.instance, 64, 20, true);
+        }
     }
 
     private void addName(Object what, String name) {
