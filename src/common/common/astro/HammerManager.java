@@ -50,6 +50,9 @@ public class HammerManager implements IConnectionHandler, IScheduledTickHandler 
     }
     
     public void serverStarting(FMLServerStartingEvent event) {
+    if (!Core.enable_dimension_slice) {
+      return;
+    }
         DimensionManager.initDimension(dimensionID);
     }
     

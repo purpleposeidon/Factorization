@@ -13,6 +13,7 @@ Step 6 is "drop into the pending mods folder; run away giggling."
 TOP LIST
 --------
 RP heating
+other stuff working with the mixer...
 fix middle clicking
 Modularize FZ/astro so that astro has no deps & can be removed for public release
 regularize fluid volumes for mixer/crystallizer; how can we make buckets of aqua regia?
@@ -40,8 +41,8 @@ https://github.com/MinecraftForge/MinecraftForge/commit/34ebfcd9785c3c50c3ac743e
 
 [Reported bugs]
 FTB, ore genned silver doesn't work?
-Uhm, why am I seeing "spawnDemons" in the config?
-
+Igneous Extruders (from Thermal Expansion) don't want to work with the router.
+exo in creative list twice when searching
 
 [Features]
 https://github.com/pahimar/Equivalent-Exchange-3/commit/e1ed736955b9af238431358bad405e306833f36a

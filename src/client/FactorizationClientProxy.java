@@ -497,9 +497,11 @@ public class FactorizationClientProxy extends FactorizationProxy {
         MinecraftForgeClient.preloadTexture(Core.texture_file_item);
 
         RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
-        RenderDimensionSliceEntity rwe = new RenderDimensionSliceEntity();
-        RenderingRegistry.registerEntityRenderingHandler(DimensionSliceEntity.class, rwe);
-        TickRegistry.registerScheduledTickHandler(rwe, Side.CLIENT);
+        if (Core.enable_dimension_slice) {
+            RenderDimensionSliceEntity rwe = new RenderDimensionSliceEntity();
+            RenderingRegistry.registerEntityRenderingHandler(DimensionSliceEntity.class, rwe);
+            TickRegistry.registerScheduledTickHandler(rwe, Side.CLIENT);
+        }
 
         RenderingRegistry.registerBlockHandler(new FactorizationRender());
         BlockRenderBattery renderBattery = new BlockRenderBattery();
@@ -524,11 +526,13 @@ public class FactorizationClientProxy extends FactorizationProxy {
     
     @Override
     public void hammerClientLogin(NetHandler clientHandler, INetworkManager manager, Packet1Login login) {
-        NetClientHandler nch = (NetClientHandler) clientHandler;
-        Core.hammerManager.hammerWorldClient = new WorldClient(nch,
-                new WorldSettings(0L, login.gameType, false, login.hardcoreMode, login.terrainType),
-                Core.hammerManager.dimensionID,
-                login.difficultySetting,
-                Core.proxy.getProfiler());
+        if (Core.enable_dimension_slice) {
+            NetClientHandler nch = (NetClientHandler) clientHandler;
+            Core.hammerManager.hammerWorldClient = new WorldClient(nch,
+                    new WorldSettings(0L, login.gameType, false, login.hardcoreMode, login.terrainType),
+                    Core.hammerManager.dimensionID,
+                    login.difficultySetting,
+                    Core.proxy.getProfiler());
+        }
     }
 }
