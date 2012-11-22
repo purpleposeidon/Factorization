@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.IllegalFormatException;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.EntityPlayer;
@@ -515,6 +516,10 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
         MinecraftForgeClient.registerItemRenderer(Core.registry.battery.shiftedIndex, new BatteryItemRender(renderBattery));
         MinecraftForge.EVENT_BUS.register(new FactorizationNotify());
+        
+        if (Minecraft.getMinecraft().session.username.equals("neptunepink")) {
+            Core.FZLogger.setLevel(Level.FINE);
+        }
     }
     
     @Override

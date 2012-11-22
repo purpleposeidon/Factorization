@@ -428,6 +428,11 @@ public class BlockFactorization extends BlockContainer {
         }
         return false;
     }
+    
+    @Override
+    public boolean isProvidingWeakPower(IBlockAccess w, int x, int y, int z, int side) {
+        return isProvidingStrongPower(w, x, y, z, side);
+    }
 
     @Override
     //ser-ver ser-ver
