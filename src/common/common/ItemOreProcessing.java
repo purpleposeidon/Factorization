@@ -7,6 +7,7 @@ import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
 import factorization.common.Core.TabType;
 
 public class ItemOreProcessing extends Item {
@@ -41,6 +42,16 @@ public class ItemOreProcessing extends Item {
         }
         
         public void enable() {
+            if (!this.enabled) {
+                ItemStack dirty = Core.registry.ore_dirty_gravel.makeStack(this);
+                ItemStack clean = Core.registry.ore_clean_gravel.makeStack(this);
+                ItemStack reduced = Core.registry.ore_reduced.makeStack(this);
+                ItemStack crystal = Core.registry.ore_crystal.makeStack(this);
+                OreDictionary.registerOre("dirtyGravel" + this.en_name, dirty);
+                OreDictionary.registerOre("cleanGravel" + this.en_name, clean);
+                OreDictionary.registerOre("reduced" + this.en_name, reduced);
+                OreDictionary.registerOre("crystalline" + this.en_name, crystal);
+            }
             this.enabled = true;
         }
         

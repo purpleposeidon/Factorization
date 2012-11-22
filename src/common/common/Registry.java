@@ -152,6 +152,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
         ore_crystal.addEnglishNames("Crystalline ", "");
         sludge = new ItemCraftingComponent(itemID("sludge", 9039), "item.sludge", 2 * 16 + 8);
         addName(sludge, "Sludge");
+        OreDictionary.registerOre("FZ.sludge", sludge);
         //ItemBlocks
         item_factorization = (ItemFactorization) Item.itemsList[factory_block.blockID];
         item_resource = (ItemBlockResource) Item.itemsList[resource_block.blockID];
@@ -193,10 +194,12 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
         //Darkness & Evil
         diamond_shard = new ItemCraftingComponent(itemID("diamondShard", 9006), "item.diamondshard", 3 * 16);
         addName(diamond_shard, "Diamond Shard");
+        OreDictionary.registerOre("FZ.diamondShard", diamond_shard);
         wrath_igniter = new ItemWrathIgniter(itemID("wrathIgniter", 9007));
         addName(wrath_igniter, "Wrath Igniter");
         dark_iron = new ItemCraftingComponent(itemID("darkIron", 9008), "item.darkiron", 3 * 16 + 2);
         addName(dark_iron, "Dark Iron Ingot");
+        OreDictionary.registerOre("FZ.darkIron", dark_iron);
 
         bag_of_holding = new ItemBagOfHolding(itemID("bagOfHolding", 9001));
         addName(bag_of_holding, "Bag of Holding");
@@ -229,6 +232,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
 
         //Electricity
         acid = new ItemAcidBottle(itemID("acid", 9024), "Sulfuric Acid", 16 * 3 + 5);
+        OreDictionary.registerOre("sulfuricAcid", acid);
         magnet = new ItemCraftingComponent(itemID("magnet", 9025), "Magnet", 16 * 3 + 6);
         insulated_coil = new ItemCraftingComponent(itemID("coil", 9026), "Insulated Coil", 16 * 3 + 7);
         motor = new ItemCraftingComponent(itemID("motor", 9027), "Motor", 16 * 3 + 8);
@@ -278,6 +282,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
         //inverium = new ItemInverium(itemID("inverium", 9040), "item.inverium", 12*16 + 0, 11);
         inverium = new ItemInverium(itemID("inverium", 9040), "item.inverium", 12*16 + 0, 1);
         addName(inverium, "Inverium Drop");
+        OreDictionary.registerOre("FZ.inverium", inverium);
 
         //Misc
         pocket_table = new ItemPocketTable(itemID("pocketCraftingTable", 9002));
