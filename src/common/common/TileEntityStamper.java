@@ -45,6 +45,7 @@ public class TileEntityStamper extends TileEntityFactorization {
 
     @Override
     public ItemStack getStackInSlot(int i) {
+        needLogic(); //Hey there, Builcraft. Fix your shit!
         switch (i) {
         case 0:
             return input;
