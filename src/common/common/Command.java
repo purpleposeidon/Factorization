@@ -18,9 +18,15 @@ public enum Command {
     static class name {
         static HashMap<Byte, Command> map = new HashMap();
     }
+    
+    static {
+        bagShuffle.setReverse(bagShuffleReverse);
+        exoModLeftClick.setReverse(exoModRightClick);
+    }
 
     public byte id;
     boolean executeLocally = false;
+    public Command reverse = this;
 
     Command(int id) {
         this.id = (byte) id;
@@ -30,6 +36,11 @@ public enum Command {
     Command(int id, boolean executeLocally) {
         this(id);
         this.executeLocally = executeLocally;
+    }
+    
+    void setReverse(Command rev) {
+        rev.reverse = this;
+        this.reverse = rev;
     }
 
     static void fromNetwork(EntityPlayer player, byte s, byte arg) {

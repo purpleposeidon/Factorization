@@ -1,5 +1,8 @@
 package factorization.nei;
 
+import org.lwjgl.input.Keyboard;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.src.GuiContainer;
 import codechicken.nei.api.IConfigureNEI;
 import codechicken.nei.forge.GuiContainerManager;
@@ -29,7 +32,11 @@ public class NEI_FactorizationInputConfig implements IConfigureNEI {
 
             public boolean lastKeyTyped(GuiContainer gui, char keyChar, int keyID) {
                 if (FactorizationClientProxy.bag_swap_key.keyCode == keyID) {
-                    Command.bagShuffle.call(Core.proxy.getClientPlayer());
+                    Command cmd = Command.bagShuffle;
+                    if (Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.keyCode)) {
+                        cmd = cmd.reverse;
+                    }
+                    cmd.call(Core.proxy.getClientPlayer());
                     return true;
                 }
                 if (FactorizationClientProxy.pocket_key.keyCode == keyID) {

@@ -400,6 +400,13 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 return;
             }
             Command command = map.get(kb);
+            EntityPlayer player = Core.proxy.getClientPlayer();
+            if (player == null) {
+                return;
+            }
+            if (player.isSneaking()) {
+                command = command.reverse;
+            }
             command.call(Core.proxy.getClientPlayer());
         }
 
