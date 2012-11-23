@@ -52,7 +52,7 @@ public class BlockResource extends Block {
 
     @Override
     public void getSubBlocks(int par1, CreativeTabs par2CreativeTabs, List par3List) {
-        addCreativeItems(par3List);
+        //addCreativeItems(par3List);
         Core.addBlockToCreativeList(par3List, this);
     }
 
@@ -73,5 +73,15 @@ public class BlockResource extends Block {
     @Override
     public int damageDropped(int i) {
         return i;
+    }
+    
+    @Override
+    public boolean isBeaconBase(World worldObj, int x, int y, int z,
+            int beaconX, int beaconY, int beaconZ) {
+        Coord here = new Coord(worldObj, x, y, z);
+        int md = here.getMd();
+        return md == Core.registry.silver_block_item.getItemDamage()
+                || md == Core.registry.lead_block_item.getItemDamage()
+                || md == Core.registry.dark_iron_block_item.getItemDamage();
     }
 }
