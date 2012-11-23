@@ -392,11 +392,15 @@ public class FactorizationClientProxy extends FactorizationProxy {
         @Override
         public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd,
                 boolean isRepeat) {
+            if (tickEnd) {
+                return;
+            }
             GuiScreen gui = Minecraft.getMinecraft().currentScreen;
             if (gui != null) {
                 return;
             }
-            map.get(kb).call(Core.proxy.getClientPlayer());
+            Command command = map.get(kb);
+            command.call(Core.proxy.getClientPlayer());
         }
 
         @Override
@@ -423,6 +427,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
         @Override
         public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd, boolean isRepeat) {
+            if (tickEnd) {
+                return;
+            }
             GuiScreen gui = Minecraft.getMinecraft().currentScreen;
             if (gui != null) {
                 return;
