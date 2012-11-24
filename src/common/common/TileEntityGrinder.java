@@ -163,11 +163,14 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
             energy = 0;
             return;
         }
-        if (canGrind()) {
+        
+        boolean powered = getCoord().isPowered();
+        boolean grind_flag = canGrind();
+        if (grind_flag || powered) {
             if (speed < 50) {
                 speed++;
                 energy -= 2;
-            } else {
+            } else if (grind_flag) {
                 if (progress == grind_time || Core.cheat) {
                     progress = 0;
                     grind();
@@ -178,6 +181,8 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
             }
         } else {
             slowDown();
+        }
+        if (!grind_flag) {
             progress = 0;
         }
     }
