@@ -510,4 +510,8 @@ public class Coord {
     public void removeTE() {
         w.removeBlockTileEntity(x, y, z);
     }
+    
+    public boolean isPowered() {
+        return w.isBlockGettingPowered(x, y, z);
+    }
 }
