@@ -123,6 +123,12 @@ public class FactorizationOreProcessingHandler {
 
     @ForgeSubscribe
     public void registerOre(OreRegisterEvent evt) {
+        if (evt.Name.equals("sandCracked")) {
+            TileEntityMixer.addRecipe(
+                    new ItemStack[] { evt.Ore.copy(), new ItemStack(Item.bucketWater) },
+                    new ItemStack[] { new ItemStack(Block.sand), new ItemStack(Item.bucketEmpty) }
+            );
+        }
         handleNewOre(evt.Name, evt.Ore);
     }
     
