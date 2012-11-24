@@ -52,7 +52,7 @@ import factorization.common.astro.HammerManager;
         )
 public class Core {
     //The comment below is a marker used by the build script.
-    public static final String version = "0.7.3"; //@VERSION@
+    public static final String version = "0.7.4"; //@VERSION@
     public Core() {
         registry = new Registry();
         exoCore = new ExoCore();
@@ -240,7 +240,7 @@ public class Core {
             //give the first achievement, because it is stupid and nobody cares.
             //If you're using this mod, you've probably opened your inventory before anyways.
             StatFileWriter sfw = Minecraft.getMinecraft().statFileWriter;
-            if (sfw != null && !sfw.hasAchievementUnlocked(AchievementList.openInventory)) {
+            if (sfw != null && !sfw.hasAchievementUnlocked(AchievementList.openInventory) && !add_branding) {
                 sfw.readStat(AchievementList.openInventory, 1);
                 logInfo("Achievement Get! You've opened your inventory hundreds of times already! Yes! You're welcome!");
             }
