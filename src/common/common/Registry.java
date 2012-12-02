@@ -447,7 +447,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
                 "W_W",
                 "PBP",
                 "WVW",
-                'W', "woodPlank",
+                'W', "plankWood",
                 '_', Block.pressurePlatePlanks,
                 'P', Block.pistonBase,
                 'B', barrel_item,
@@ -578,7 +578,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
                 "C_C",
                 "IPI",
                 'I', dark_iron,
-                'W', "woodPlank",
+                'W', "plankWood",
                 'C', Block.cobblestone,
                 '_', Block.pressurePlatePlanks,
                 'P', Block.pistonBase);
