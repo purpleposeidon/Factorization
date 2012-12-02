@@ -24,12 +24,9 @@ import factorization.common.NetworkFactorization.MessageType;
 //NO! We *can* have for the stackable items case have 1, and 1 even if there's less than 2 itemCount. Just clear it after the first one is emptied
 
 public class TileEntityBarrel extends TileEntityFactorization {
-    static final int normalBarrelSize = 64*64;
-    static final int largeBarrelSize = 1024 * 64;
-    // EMC of TNT is 964.
-    static final int maxStackDrop = 64; // how many stacks required for an explosion; depends on item.maxStackSize
-    static final float explosionStrength = 2.5F; //explosion base strength
-    static final float explosionStrengthMin = 1.0F; //if items don't stack very high, explosion strength will be weakened
+    public static final int normalBarrelSize = 64*64;
+    public static final int largeBarrelSize = 1024 * 64;
+    public static final int maxStackDrop = 64;
 
     // save these guys
     public ItemStack item;
