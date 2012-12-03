@@ -56,12 +56,11 @@ public class GuiRouter extends GuiContainer implements IClickable {
 
         this.router = (TileEntityRouter) cont.factory;
         HashMap<String, Integer> names = new HashMap<String, Integer>();
-        int max_dist = 24 * 24;
+        int max_dist = 32 * 32;
         for (Object obj : router.worldObj.loadedTileEntityList) {
             if (obj instanceof IInventory && obj instanceof TileEntity) {
                 TileEntity ent = (TileEntity) obj;
-                double invDistance = ent.getDistanceFrom(router.xCoord,
-                        router.yCoord, router.zCoord);
+                double invDistance = ent.getDistanceFrom(router.xCoord, router.yCoord, router.zCoord);
                 if (invDistance > max_dist) {
                     continue;
                 }
@@ -87,6 +86,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
         }
         inv_names = new ArrayList<String>(names.keySet());
         Collections.sort(inv_names, new NamesComparator(names));
+        inv_names.add(router.getIInventoryName(router));
     }
 
     @Override

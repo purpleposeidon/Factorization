@@ -19,6 +19,8 @@ import net.minecraft.src.ShapelessRecipes;
 import net.minecraft.src.Slot;
 import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.World;
+import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.ISidedInventory;
 import factorization.api.Coord;
 
 public class FactorizationUtil {
@@ -317,5 +319,66 @@ public class FactorizationUtil {
             return values[0];
         }
         return values[next];
+    }
+    
+    public static class ISidedWrapper implements IInventory {
+        ISidedInventory isi;
+        ForgeDirection side;
+        public ISidedWrapper(ISidedInventory isi, ForgeDirection side) {
+            this.isi = isi;
+            this.side = side;
+        }
+        
+        @Override
+        public int getSizeInventory() {
+            return isi.getSizeInventorySide(side);
+        }
+        
+        private int getSlot(int slotIndex) {
+            return isi.getStartInventorySide(side) + slotIndex;
+        }
+
+        @Override
+        public ItemStack getStackInSlot(int slotIndex) {
+            return isi.getStackInSlot(getSlot(slotIndex));
+        }
+
+        @Override
+        public ItemStack decrStackSize(int slotIndex, int amount) {
+            return isi.decrStackSize(getSlot(slotIndex), amount);
+        }
+
+        @Override
+        public void setInventorySlotContents(int slotIndex, ItemStack stack) {
+            isi.setInventorySlotContents(getSlot(slotIndex), stack);
+        }
+
+        @Override
+        public String getInvName() {
+            return isi.getInvName();
+        }
+
+        @Override
+        public int getInventoryStackLimit() {
+            return isi.getInventoryStackLimit();
+        }
+
+        @Override
+        public void onInventoryChanged() {
+            isi.onInventoryChanged();
+        }
+
+        @Override
+        public ItemStack getStackInSlotOnClosing(int var1) { return null; }
+        
+        @Override
+        public boolean isUseableByPlayer(EntityPlayer var1) { return true; }
+
+        @Override
+        public void openChest() {}
+
+        @Override
+        public void closeChest() {}
+        
     }
 }

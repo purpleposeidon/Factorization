@@ -428,8 +428,39 @@ public class TileEntityRouter extends TileEntityFactorization {
         }
         return false;
     }
+    
+    boolean itemPassesInsertFilter(IInventory inv, ItemStack is) {
+        if (!upgradeItemFilter) {
+            return true;
+        }
+        int matching_count = 0;
+        boolean empty_filter = true;
+        for (int i = 0; i < filter.length; i++) {
+            ItemStack here = filter[i];
+            if (here == null) {
+                continue;
+            }
+            empty_filter = false;
+            if (here.isItemEqual(is)) {
+                matching_count += here.stackSize;
+            }
+        }
+        if (empty_filter) {
+            return true;
+        }
+        for (int i = 0; i < inv.getSizeInventory(); i++) {
+            ItemStack here = inv.getStackInSlot(i);
+            if (here == null) {
+                continue;
+            }
+            if (here.isItemEqual(is)) {
+                matching_count -= here.stackSize;
+            }
+        }
+        return matching_count > 0;
+    }
 
-    boolean itemPassesFilter(ItemStack is) {
+    boolean itemPassesExtractFilter(ItemStack is) {
         if (!upgradeItemFilter) {
             return true;
         }
@@ -445,11 +476,9 @@ public class TileEntityRouter extends TileEntityFactorization {
             if (filter[i].isItemEqual(is)) {
                 //NOTE: Ignores NBT data. I think this will be more useful.
                 return true;
-            } else if (filter[i].itemID == is.itemID) {
+            } else if (filter[i].itemID == is.itemID && is.getItem().isDamageable() && filter[i].isItemDamaged() && is.isItemDamaged()) {
                 //a slightly damaged sword will match all other damaged swords. A new sword should not.
-                if (filter[i].isItemDamaged() && is.isItemDamaged()) {
-                    return true;
-                }
+                return true;
             }
         }
         return hits == 0;
@@ -459,7 +488,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         if (t == null) {
             return false;
         }
-        if (t instanceof TileEntityRouter) {
+        if (t instanceof TileEntityRouter && !(upgradeMachineFilter && match != null && !match.isEmpty())) {
             // ignore ourselves!
             return false;
         }
@@ -488,6 +517,10 @@ public class TileEntityRouter extends TileEntityFactorization {
                 return false;
             }
         }
+        IInventory wrapped = t;
+        if (t instanceof ISidedInventory && target_side < 6 && target_side >= 0) {
+            t = new FactorizationUtil.ISidedWrapper((ISidedInventory) t, ForgeDirection.getOrientation(target_side));
+        }
         for (int slot = start; slot < end; slot++) {
             // XXX: Should onInventoryChanged() happen at moveStack for both inventories? Probably.
             if (!legalSlot(t, slot)) {
@@ -495,6 +528,9 @@ public class TileEntityRouter extends TileEntityFactorization {
             }
             //So, about that item filtering...
             if (is_input) {
+                if (!itemPassesInsertFilter(t, buffer)) {
+                    continue;
+                }
                 //Filtering the input doesn't sound useful.
                 //XXX TODO: Maybe do nothing if buffer doesn't match the filter? That might be useful for a very complicated auto-processor
                 if (moveStack(this, 0, t, slot)) {
@@ -503,7 +539,7 @@ public class TileEntityRouter extends TileEntityFactorization {
                     return true;
                 }
             } else {
-                if (!itemPassesFilter(t.getStackInSlot(slot))) {
+                if (!itemPassesExtractFilter(t.getStackInSlot(slot))) {
                     continue;
                 }
                 if (moveStack(t, slot, this, 0)) {

@@ -1,3 +1,12 @@
+0.7.5
+  Routers:
+    Item filters now work when inserting: They will limit how much goes into the inventory
+    The machine filter lets you access routers if you say so explicitly.
+
+0.7.4
+  Fixed NEI plugins & key handlers
+  Few other bug fixes
+
 0.7.3
   Redstone pulses work
   Halved mixer time

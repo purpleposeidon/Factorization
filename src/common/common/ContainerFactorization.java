@@ -94,7 +94,7 @@ public class ContainerFactorization extends Container {
             TileEntityRouter router = (TileEntityRouter) ent;
             addSlotToContainer(new Slot(router, 0, 62, 22));
             for (int i = 0; i < 9; i++) {
-                addSlotToContainer(new StackLimitedSlot(1, router, 1 + i, 8 + i * 18, 44 - 0xFFFFFF));
+                addSlotToContainer(new StackLimitedSlot(64, router, 1 + i, 8 + i * 18, 44 - 0xFFFFFF));
             }
             break;
         case MAKER:
