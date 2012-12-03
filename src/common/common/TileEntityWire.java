@@ -212,10 +212,11 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
 
     @Override
     public AxisAlignedBB getCollisionBoundingBoxFromPool() {
-        setBlockBounds(Core.registry.resource_block);
-        AxisAlignedBB ret = Core.registry.resource_block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
-        Core.registry.resource_block.setBlockBounds(0, 0, 0, 1, 1, 1);
-        return ret;
+        return null;
+//		setBlockBounds(Core.registry.resource_block);
+//		AxisAlignedBB ret = Core.registry.resource_block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
+//		Core.registry.resource_block.setBlockBounds(0, 0, 0, 1, 1, 1);
+//		return ret;
     }
 
     @Override
