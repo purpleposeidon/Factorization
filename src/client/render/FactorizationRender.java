@@ -29,29 +29,34 @@ public class FactorizationRender implements ISimpleBlockRenderingHandler {
     @Override
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z,
             Block block, int modelId, RenderBlocks renderBlocks) {
-        int md = world.getBlockMetadata(x, y, z);
-        int renderPass = MinecraftForgeClient.getRenderPass();
-        TileEntity te = world.getBlockTileEntity(x, y, z);
-        if (te instanceof TileEntityCommon) {
-            TileEntityCommon tec = (TileEntityCommon) te;
-            int fmd = tec.getFactoryType().md;
-            FactorizationBlockRender FBR = FactorizationBlockRender.getRenderer(fmd);
-            FBR.renderInWorld(world, x, y, z);
-            FBR.setMetadata(fmd);
-            if (renderPass == 0) {
-                FBR.render(renderBlocks);
-            } else if (renderPass == 1) {
-                FBR.renderSecondPass(renderBlocks);
+        Core.profileStart("fz");
+        try {
+            int md = world.getBlockMetadata(x, y, z);
+            int renderPass = MinecraftForgeClient.getRenderPass();
+            TileEntity te = world.getBlockTileEntity(x, y, z);
+            if (te instanceof TileEntityCommon) {
+                TileEntityCommon tec = (TileEntityCommon) te;
+                int fmd = tec.getFactoryType().md;
+                FactorizationBlockRender FBR = FactorizationBlockRender.getRenderer(fmd);
+                FBR.renderInWorld(world, x, y, z);
+                FBR.setMetadata(fmd);
+                if (renderPass == 0) {
+                    FBR.render(renderBlocks);
+                } else if (renderPass == 1) {
+                    FBR.renderSecondPass(renderBlocks);
+                }
+                return true;
             }
-            return true;
-        }
-        if (block == Core.registry.lightair_block) {
-            if (md == Core.registry.lightair_block.air_md) {
-                return false;
+            if (block == Core.registry.lightair_block) {
+                if (md == Core.registry.lightair_block.air_md) {
+                    return false;
+                }
+                return true;
             }
-            return true;
+            return false;
+        } finally {
+            Core.profileEnd();
         }
-        return false;
     }
 
     @Override
