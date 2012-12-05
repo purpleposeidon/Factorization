@@ -59,10 +59,18 @@ public class FZDSCommand extends CommandBase {
             return;
         }
         String cmd = args[0];
+        if (cmd.equalsIgnoreCase("test")) {
+            Core.proxy.setClientWorld(HammerManager.getClientWorld());
+            return;
+        }
         if (sender instanceof EntityPlayerMP) {
             final EntityPlayerMP player = (EntityPlayerMP) sender;
             if (cmd.equalsIgnoreCase("spawn")) {
                 currentWE = Core.hammerManager.allocateSlice(new Coord(player));
+                PacketProxyingPlayer ppp = new PacketProxyingPlayer(player, currentWE);
+                currentWE.hammerCell.setAsEntityLocation(ppp);
+                ppp.posY += 4;
+                player.worldObj.spawnEntityInWorld(ppp);
             }
             if (cmd.equalsIgnoreCase("remove")) {
                 for (Entity ent : (List<Entity>)player.worldObj.loadedEntityList) {

@@ -106,12 +106,12 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         glPushMatrix();
         try {
             World subWorld = DimensionManager.getWorld(Core.dimension_slice_dimid); // we.wew;
+            subWorld = DimensionManager.getWorld(0);
             if (subWorld == null) {
+                //Huh. Lame.
                 subWorld = we.worldObj;
-                //return;
-            } else {
-                System.out.println("uh");
             }
+            //subWorld = we.worldObj;
             WorldRenderer wr = renderInfo.worldRenderer;
             checkGLError("FZDS before render");
             if (wr == null) {
@@ -120,16 +120,15 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 checkGLError("FZDS render list");
             }
             wr.needsUpdate = renderInfo.renderCounts == 0;
-            if (nest == 0) {
+            if (nest == 1) {
                 Core.profileStart("build");
                 wr.updateRenderer();
                 Core.profileEnd();
             }
-            float s = 1F/2F;
+            float s = 2F/1F;
             glTranslatef((float)x, (float)y, (float)z);
-            glRotatef(-10, 0, 1, 0);
+            //glRotatef(45, 1, 1, 0);
             glScalef(s, s, s);
-            glColor3f(1, 1, 1);
             wr.isInFrustum = true;
             RenderHelper.disableStandardItemLighting();
             if (Minecraft.getMinecraft().isAmbientOcclusionEnabled() && Core.dimension_slice_allow_smooth) {
@@ -151,7 +150,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             Chunk here = subWorld.getChunkFromBlockCoords(0, 0);
             for (List<Entity> ents : (List<Entity>[]) here.entityLists) {
                 for (Entity e : ents) {
-                    if (e instanceof DimensionSliceEntity && nest >= 2) {
+                    if (e instanceof DimensionSliceEntity && nest >= 3) {
                         continue;
                     }
                     RenderManager.instance.renderEntity(e, partialTicks);
@@ -162,7 +161,11 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 TileEntityRenderer.instance.renderTileEntity(te, partialTicks);
             }
             checkGLError("FZDS after render");
-        } finally {
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
             glPopMatrix();
             nest--;
             if (nest == 0) {
@@ -197,6 +200,10 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
     @Override
     public void tickStart(EnumSet<TickType> type, Object... tickData) {
         megatickCount++;
+        if (nest != 0) {
+            nest = 0;
+            Core.logFine("FZDS render nesting depth was not 0");
+        }
     }
 
     @Override

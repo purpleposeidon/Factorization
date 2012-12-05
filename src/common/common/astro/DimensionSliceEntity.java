@@ -1,21 +1,14 @@
 package factorization.common.astro;
 
-import java.util.Iterator;
-
-import factorization.common.Core;
-
-import net.minecraft.src.BlockEventData;
 import net.minecraft.src.Entity;
 import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.Packet54PlayNoteBlock;
-import net.minecraft.src.PlayerManager;
-import net.minecraft.src.SpawnerAnimals;
 import net.minecraft.src.World;
-import net.minecraft.src.WorldServer;
+import factorization.api.Coord;
 
 public class DimensionSliceEntity extends Entity {
     Object renderInfo = null;
     int cell;
+    public Coord hammerCell;
     
     public DimensionSliceEntity(World world) {
         super(world);

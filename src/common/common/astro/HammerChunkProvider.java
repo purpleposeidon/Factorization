@@ -17,8 +17,8 @@ public class HammerChunkProvider implements IChunkProvider {
 
     //each cell is a few chunks wide, with chunks of bedrock between.
     static int cellWidth = 3;
-    static int wallWidth = 2; //for production: 16
-    static int wallHeight = 16*8; //for production: 16*10
+    static int wallWidth = 16;
+    static int wallHeight = 16*8; //for production: 16*10 (16*8 is the minimum or something)
     
     private World world;
     
@@ -33,7 +33,8 @@ public class HammerChunkProvider implements IChunkProvider {
     
     public static Coord getCellStart(World hammerWorld, int cellIndex) {
         int cellSize = (cellWidth + wallWidth)*16;
-        return new Coord(hammerWorld, cellSize*cellIndex, wallHeight, wallWidth*16);
+        return new Coord(hammerWorld, cellSize*cellIndex - 2, wallHeight, (1 + cellWidth)*16/2);
+        //return new Coord(hammerWorld, cellSize*cellIndex, wallHeight, cellSize / 2);
     }
 
     @Override

@@ -37,7 +37,7 @@ import factorization.common.Core;
 
 public class HammerManager implements IConnectionHandler, IScheduledTickHandler {
     public static int dimensionID;
-    public static World hammerWorldClient = null;
+    public static World hammerWorldClient = null; //This is actually a WorldClient
     
     public void setup() {
         if (!Core.enable_dimension_slice) {
@@ -47,20 +47,24 @@ public class HammerManager implements IConnectionHandler, IScheduledTickHandler 
         dimensionID = Core.dimension_slice_dimid;
         DimensionManager.registerProviderType(dimensionID, HammerWorldProvider.class, true);
         DimensionManager.registerDimension(dimensionID, dimensionID);
+        assert DimensionManager.shouldLoadSpawn(dimensionID);
     }
     
     public void serverStarting(FMLServerStartingEvent event) {
-    if (!Core.enable_dimension_slice) {
-      return;
-    }
+        if (!Core.enable_dimension_slice) {
+          return;
+        }
         DimensionManager.initDimension(dimensionID);
+        assert DimensionManager.shouldLoadSpawn(dimensionID);
     }
     
     DimensionSliceEntity allocateSlice(Coord spawnCoords) {
-        World sliceWorld = DimensionManager.getWorld(HammerManager.dimensionID);
+        World sliceWorld = getServerWorld();
+        Coord cellLocation = new Coord(DimensionManager.getWorld(0), 0, 0, 0);
         DimensionSliceEntity dse = new DimensionSliceEntity(spawnCoords.w, takeCellId());
         spawnCoords.setAsEntityLocation(dse);
         spawnCoords.w.spawnEntityInWorld(dse);
+        dse.hammerCell = cellLocation;
         return dse;
     }
     
@@ -74,9 +78,17 @@ public class HammerManager implements IConnectionHandler, IScheduledTickHandler 
         return allocated_cells++;
     }
     
+    static public World getServerWorld() {
+        return DimensionManager.getWorld(dimensionID);
+    }
+    
+    static public World getClientWorld() {
+        return hammerWorldClient;
+    }
+    
     private File getInfoFile() {
-        World hammerWorld = DimensionManager.getWorld(dimensionID);
-        File saveDir = new File("saves", hammerWorld.getSaveHandler().getSaveDirectoryName());
+        World baseWorld = DimensionManager.getWorld(0);
+        File saveDir = new File("saves", baseWorld.getSaveHandler().getSaveDirectoryName());
         saveDir = saveDir.getAbsoluteFile();
         return new File(saveDir, "fzds");
     }
@@ -121,7 +133,8 @@ public class HammerManager implements IConnectionHandler, IScheduledTickHandler 
             fos = new FileOutputStream(infoFile);
             
             DataOutputStream dos = new DataOutputStream(fos);
-            dos.write(allocated_cells);
+            dos.writeInt(allocated_cells);
+            dos.flush();
         } catch (Exception e) {
             Core.logWarning("Unable to save FZDS info");
             e.printStackTrace();
@@ -191,7 +204,6 @@ public class HammerManager implements IConnectionHandler, IScheduledTickHandler 
     public void tickStart(EnumSet<TickType> type, Object... tickData) {}
     
     public class NetworkDimensionStateTicker implements ITickHandler {
-        ArrayList<PacketProxyingNetworkPlayer> proxiedPlayers = new ArrayList();
         @Override
         public void tickStart(EnumSet<TickType> type, Object... tickData) {
             World world = (World) tickData[0];
@@ -199,11 +211,9 @@ public class HammerManager implements IConnectionHandler, IScheduledTickHandler 
                 //not the best check, but should be efficient.
                 return;
             }
-            proxiedPlayers.clear();
             for (EntityPlayer ep : (List<EntityPlayer>) world.playerEntities) {
-                if (ep instanceof PacketProxyingNetworkPlayer) {
-                    PacketProxyingNetworkPlayer ppnp = (PacketProxyingNetworkPlayer) ep; 
-                    proxiedPlayers.add(ppnp);
+                if (ep instanceof PacketProxyingPlayer) {
+                    PacketProxyingPlayer ppnp = (PacketProxyingPlayer) ep;
                     ppnp.enterTick();
                 }
             }
@@ -216,9 +226,11 @@ public class HammerManager implements IConnectionHandler, IScheduledTickHandler 
                 //not the best check, but should be efficient.
                 return;
             }
-            for (int i = 0; i < proxiedPlayers.size(); i++) {
-                PacketProxyingNetworkPlayer ppnp = proxiedPlayers.get(i);
-                ppnp.leaveTick();
+            for (EntityPlayer ep : (List<EntityPlayer>) world.playerEntities) {
+                if (ep instanceof PacketProxyingPlayer) {
+                    PacketProxyingPlayer ppnp = (PacketProxyingPlayer) ep;
+                    ppnp.leaveTick();
+                }
             }
         }
 
