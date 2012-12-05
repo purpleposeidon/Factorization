@@ -8,6 +8,7 @@ import java.util.Random;
 import java.util.logging.Level;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.src.AchievementList;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.GameSettings;
 import net.minecraft.src.GuiScreen;
@@ -18,6 +19,7 @@ import net.minecraft.src.NetClientHandler;
 import net.minecraft.src.NetHandler;
 import net.minecraft.src.Packet1Login;
 import net.minecraft.src.Profiler;
+import net.minecraft.src.StatFileWriter;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.TileEntitySpecialRenderer;
@@ -33,6 +35,7 @@ import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.registry.LanguageRegistry;
@@ -548,5 +551,29 @@ public class FactorizationClientProxy extends FactorizationProxy {
                     login.difficultySetting,
                     Core.proxy.getProfiler());
         }
+    }
+    
+    @Override
+    public void setClientWorld(World w) {
+        Minecraft.getMinecraft().theWorld = (WorldClient) w;
+    }
+    
+    @Override
+    public void fixAchievements() {
+        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+            //give the first achievement, because it is stupid and nobody cares.
+            //If you're using this mod, you've probably opened your inventory before anyways.
+            StatFileWriter sfw = Minecraft.getMinecraft().statFileWriter;
+            if (sfw != null && !sfw.hasAchievementUnlocked(AchievementList.openInventory) && !Core.add_branding) {
+                sfw.readStat(AchievementList.openInventory, 1);
+                Core.logInfo("Achievement Get! You've opened your inventory hundreds of times already! Yes! You're welcome!");
+            }
+        }
+    }
+    
+    @Override
+    public String getExoKeyBrief(int keyindex) {
+        int key = ((FactorizationClientProxy) Core.proxy).exoKeys[keyindex - 1].keyCode;
+        return GameSettings.getKeyDisplayString(key);
     }
 }

@@ -84,11 +84,6 @@ public enum ExoStateType {
     }
 
     public String brief() {
-        if (this.key > 0
-                && FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            int key = ((FactorizationClientProxy) Core.proxy).exoKeys[this.key - 1].keyCode;
-            return GameSettings.getKeyDisplayString(key);
-        }
-        return this.toString();
+        return Core.proxy.getExoKeyBrief(this.key);
     }
 }

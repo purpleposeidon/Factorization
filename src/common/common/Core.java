@@ -236,15 +236,7 @@ public class Core {
     public void modsLoaded(FMLPostInitializationEvent event) {
         TileEntityWrathFire.setupBurning();
         foph.addDictOres();
-        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            //give the first achievement, because it is stupid and nobody cares.
-            //If you're using this mod, you've probably opened your inventory before anyways.
-            StatFileWriter sfw = Minecraft.getMinecraft().statFileWriter;
-            if (sfw != null && !sfw.hasAchievementUnlocked(AchievementList.openInventory) && !add_branding) {
-                sfw.readStat(AchievementList.openInventory, 1);
-                logInfo("Achievement Get! You've opened your inventory hundreds of times already! Yes! You're welcome!");
-            }
-        }
+        proxy.fixAchievements();
     }
     
     @ServerStarting
