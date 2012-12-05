@@ -125,4 +125,10 @@ public class DeltaCoord {
         default: throw new RuntimeException("not an dimension index");
         }
     }
+    
+    public void init(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
 }
