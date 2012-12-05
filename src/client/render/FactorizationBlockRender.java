@@ -220,10 +220,10 @@ abstract public class FactorizationBlockRender implements ICoord {
     int vertexBrightnessResult;
     
     
-    
+    DeltaCoord outward = new DeltaCoord(), corner = new DeltaCoord();
     private void vectorAO(RenderingCube rc, VectorUV vec, ForgeDirection face) {
-        DeltaCoord outward = new DeltaCoord(face.offsetX, face.offsetY, face.offsetZ);		
-        DeltaCoord corner = new DeltaCoord((int) vec.x, (int) vec.y, (int)vec.z);
+        outward.init(face.offsetX, face.offsetY, face.offsetZ);
+        corner.init((int) vec.x, (int) vec.y, (int)vec.z);
         Coord here = getCoord();
         int normalAxis = -1;
         for (int i = 0; i < 3; i++) {
@@ -263,30 +263,33 @@ abstract public class FactorizationBlockRender implements ICoord {
         for (int i = 0; i < 3; i++) {
             if (i == normalAxis) {
                 //the corner
-                Coord pos = here.add(corner);
+                int px = here.x + corner.x;
+                int py = here.y + corner.y;
+                int pz = here.z + corner.z;
                 int ai = 0;
                 {
-                    mixedBrightness[ai] = getMixedBrightnessForBlock(pos.w, pos.x, pos.y, pos.z);
-                    aoLightValue[ai] = getAmbientOcclusionLightValue(pos.w, pos.x, pos.y, pos.z);
-                    aoGrass[ai] = Block.canBlockGrass[pos.getId()];
+                    mixedBrightness[ai] = getMixedBrightnessForBlock(here.w, px, py, pz);
+                    aoLightValue[ai] = getAmbientOcclusionLightValue(here.w, px, py, pz);
+                    aoGrass[ai] = Block.canBlockGrass[here.w.getBlockId(px, py, pz)];
                 }
             } else {
                 //one of the two sides
                 int store = corner.get(i);
                 corner.set(i, 0);
-                Coord pos = here.add(corner);
+                int px = here.x + corner.x;
+                int py = here.y + corner.y;
+                int pz = here.z + corner.z;
                 int ai = array_index;
                 {
-                    mixedBrightness[ai] = getMixedBrightnessForBlock(pos.w, pos.x, pos.y, pos.z);
-                    aoLightValue[ai] = getAmbientOcclusionLightValue(pos.w, pos.x, pos.y, pos.z);
-                    aoGrass[ai] = Block.canBlockGrass[pos.getId()];
+                    mixedBrightness[ai] = getMixedBrightnessForBlock(here.w, px, py, pz);
+                    aoLightValue[ai] = getAmbientOcclusionLightValue(here.w, px, py, pz);
+                    aoGrass[ai] = Block.canBlockGrass[here.w.getBlockId(px, py, pz)];
                 }
                 array_index++;
                 corner.set(i, store);
             }
         }
-        Coord front = here.add(face);
-        int here_mixed = Block.stone.getMixedBrightnessForBlock(front.w, front.x, front.y, front.z);
+        int here_mixed = Block.stone.getMixedBrightnessForBlock(here.w, here.x + face.offsetX, here.y + face.offsetY, here.z + face.offsetZ);
         float hereAmbient = getAmbientOcclusionLightValue(here.w, here.x, here.y, here.z);
         if (!aoGrass[1] && !aoGrass[2]) {
             mixedBrightness[0] = here_mixed;
