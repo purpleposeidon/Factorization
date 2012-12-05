@@ -18,6 +18,7 @@ import net.minecraft.src.Profiler;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.World;
+import net.minecraft.src.WorldClient;
 import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
@@ -167,4 +168,12 @@ public abstract class FactorizationProxy implements IGuiHandler {
     }
     
     public void hammerClientLogin(NetHandler clientHandler, INetworkManager manager, Packet1Login login) {}
+    
+    public void setClientWorld(World w) {}
+
+    public void fixAchievements() { }
+
+    public String getExoKeyBrief(int keyindex) {
+        return "ExoKey" + keyindex;
+    }
 }
