@@ -79,7 +79,7 @@ public enum ExoStateType {
         en(ONGROUND.when(INVERSE), "While not on the ground");
         en(ONGROUND.when(RISINGEDGE), "When first touching the ground");
         en(INWATER.when(NORMAL), "While in water");
-        en(INWATER.when(INVERSE), "While not in the water");
+        en(INWATER.when(INVERSE), "While not in water");
         en(INWATER.when(RISINGEDGE), "When entering water");
     }
 
