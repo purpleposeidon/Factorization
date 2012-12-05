@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.IllegalFormatException;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.src.Block;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.EntityPlayer;
@@ -34,6 +35,7 @@ import cpw.mods.fml.common.network.Player;
 import factorization.api.Coord;
 import factorization.api.VectorUV;
 import factorization.common.astro.DimensionSliceEntity;
+import factorization.common.astro.HammerManager;
 
 public class NetworkFactorization implements ITinyPacketHandler {
     protected final static short factorizeTEChannel = 0; //used for tile entities
@@ -222,6 +224,11 @@ public class NetworkFactorization implements ITinyPacketHandler {
         return ret;
     }
     
+    @Override
+    public void handle(NetHandler handler, Packet131MapData mapData) {
+        handlePacketData(mapData.uniqueID, mapData.itemData, handler.getPlayer());
+    }
+    
     void handlePacketData(int channel, byte[] data, EntityPlayer me) {
         currentPlayer.set(me);
         ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
@@ -231,15 +238,12 @@ public class NetworkFactorization implements ITinyPacketHandler {
         case factorizeMsgChannel: handleMsg(input); break;
         case factorizeCmdChannel: handleCmd(data); break;
         case factorizeNtfyChannel: handleNtfy(input); break;
-        default: Core.logWarning("Got packet with invalid channel %i with player = %s ", channel, me);break;
+        case factorizeWorldPushChannel: break;
+        case factorizeWorldPopChannel: break;
+        default: Core.logWarning("Got packet with invalid channel %i with player = %s ", channel, me); break;
         }
 
         currentPlayer.set(null);
-    }
-    
-    @Override
-    public void handle(NetHandler handler, Packet131MapData mapData) {
-        handlePacketData(mapData.uniqueID, mapData.itemData, handler.getPlayer());
     }
 
     void handleTE(DataInput input) {
@@ -356,15 +360,6 @@ public class NetworkFactorization implements ITinyPacketHandler {
         }
     }
 
-    void handleCmd(byte[] data) {
-        if (data == null || data.length < 2) {
-            return;
-        }
-        byte s = data[0];
-        byte arg = data[1];
-        Command.fromNetwork(getCurrentPlayer(), s, arg);
-    }
-
     void handleForeignMessage(World world, int x, int y, int z, TileEntity ent, int messageType,
             DataInput input) throws IOException {
         if (!world.isRemote) {
@@ -400,6 +395,15 @@ public class NetworkFactorization implements ITinyPacketHandler {
         }
 
     }
+    
+    void handleCmd(byte[] data) {
+        if (data == null || data.length < 2) {
+            return;
+        }
+        byte s = data[0];
+        byte arg = data[1];
+        Command.fromNetwork(getCurrentPlayer(), s, arg);
+    }
 
     void handleNtfy(DataInput input) {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
@@ -420,6 +424,33 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 e.printStackTrace();
             }
         }
+    }
+
+    private World storedWorld = null;
+    
+    void handleWorldPush(DataInput input) {
+        if (!currentPlayer.get().worldObj.isRemote) {
+            return;
+        }
+        if (storedWorld != null) {
+            Core.logWarning("Tried to push more than once");
+        } else {
+            storedWorld = HammerManager.getClientWorld();
+            Core.proxy.setClientWorld(storedWorld);
+        }
+    }
+    
+    void handleWorldPop(DataInput input) {
+        if (!currentPlayer.get().worldObj.isRemote) {
+            return;
+        }
+        if (storedWorld == null) {
+            Core.logWarning("Tried to pop null world");
+        } else {
+            Core.proxy.setClientWorld(storedWorld);
+            storedWorld = null;
+        }
+        
     }
     
     static public class MessageType {
