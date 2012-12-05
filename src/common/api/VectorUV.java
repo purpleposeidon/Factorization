@@ -9,6 +9,10 @@ import net.minecraft.src.World;
 
 public class VectorUV {
     public float x, y, z, u, v;
+    
+    public VectorUV() {
+        this(0, 0, 0);
+    }
 
     public VectorUV(float x, float y, float z) {
         this.x = x;
