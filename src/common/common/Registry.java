@@ -1,6 +1,7 @@
 package factorization.common;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Random;
 
@@ -30,15 +31,17 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ICraftingHandler;
+import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.Side;
+import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.api.IActOnCraft;
 import factorization.common.Core.TabType;
 import factorization.common.astro.DimensionSliceEntity;
 
-public class Registry implements ICraftingHandler, IWorldGenerator {
+public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler {
     static public final int ExoKeyCount = 3;
 
     public ItemFactorization item_factorization;
@@ -962,6 +965,27 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
 
     @Override
     public void onSmelting(EntityPlayer player, ItemStack item) {
+    }
+
+    @Override
+    public void tickStart(EnumSet<TickType> type, Object... tickData) {
+        this.onTickWorld((World) tickData[0]);
+    }
+
+    @Override
+    public void tickEnd(EnumSet<TickType> type, Object... tickData) {
+        
+    }
+
+    private EnumSet<TickType> worldTicks = EnumSet.of(TickType.WORLD);
+    @Override
+    public EnumSet<TickType> ticks() {
+        return worldTicks;
+    }
+
+    @Override
+    public String getLabel() {
+        return "FZ_registry";
     }
 
 }

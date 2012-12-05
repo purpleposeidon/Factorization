@@ -49,12 +49,6 @@ public class ItemFactorization extends ItemBlock {
                 tec.onPlacedBy(player, is, side);
                 tec.getBlockClass().enforce(here);
             }
-            if (!w.isRemote) {
-                if (te instanceof TileEntityCommon) {
-                    Packet p = ((TileEntityCommon) te).getAuxillaryInfoPacket();
-                    Core.network.broadcastPacket(null, here, p); //XXX TODO: Is this necessary?
-                }
-            }
             
             here.markBlockForUpdate();
             return true;

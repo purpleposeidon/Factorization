@@ -40,6 +40,7 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
+import cpw.mods.fml.common.registry.TickRegistry;
 import factorization.api.Coord;
 import factorization.client.gui.FactorizationNotify;
 import factorization.common.astro.FZDSCommand;
@@ -205,6 +206,7 @@ public class Core {
     public void load(FMLPreInitializationEvent event) {
         loadConfig(event.getSuggestedConfigurationFile());
         registry.makeBlocks();
+        TickRegistry.registerTickHandler(registry, Side.SERVER);
         
         NetworkRegistry.instance().registerGuiHandler(this, proxy);
 

@@ -12,6 +12,7 @@ Step 6 is "drop into the pending mods folder; run away giggling."
 
 TOP LIST
 --------
+-1225 64 -1187
 dirty galena only gives silver
 RP heating
 other stuff working with the mixer...
@@ -21,9 +22,6 @@ regularize fluid volumes for mixer/crystallizer; how can we make buckets of aqua
 either figure out how to get mystcraft (?) loading TEs properly, or have the client automatically request the proper TE
   (perhaps change that new TileEntity() in BlockFZ to new UnloadedFZTE()
 remove failed packet spam for everyone who isn't me
-router:
-  searching for avilable inv names; what's IC doing? Bunch of mods aren't actually setting their TE's inv name?
-  that other filter mode! What's it do? It stocks!
 test with dedicated server (not from eclipse....)
 [Mecha-Features]
 add inverium-based mecha-upgrades
