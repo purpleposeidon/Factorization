@@ -348,6 +348,6 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     
     @Override
     public double func_82115_m() {
-        return 1024; //32²
+        return 576; //24²
     }
 }
