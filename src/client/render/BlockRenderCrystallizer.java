@@ -3,12 +3,14 @@ package factorization.client.render;
 import net.minecraft.src.Block;
 import net.minecraft.src.BlockCauldron;
 import net.minecraft.src.RenderBlocks;
+import factorization.common.Core;
 import factorization.common.FactoryType;
 
 public class BlockRenderCrystallizer extends FactorizationBlockRender {
 
     @Override
     void render(RenderBlocks rb) {
+        Core.profileStart("crystallizer");
         int metal = 14, wood = 8 + 16;
         float width = 2F / 16F;
         float mheight = 1 - 0;
@@ -21,6 +23,7 @@ public class BlockRenderCrystallizer extends FactorizationBlockRender {
         float start = 7F / 16F;
         float sheight = 1 - width;
         renderPart(rb, wood, width, sheight, start, 1 - width, 1, start + width);
+        Core.profileEnd();
     }
 
     @Override

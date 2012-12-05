@@ -1,6 +1,7 @@
 package factorization.client.render;
 
 import factorization.api.VectorUV;
+import factorization.common.Core;
 import factorization.common.FactoryType;
 import factorization.common.RenderingCube;
 import factorization.common.Texture;
@@ -15,6 +16,7 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
     private static final int sideFace[] = {2, 3, 4, 5};
     @Override
     void render(RenderBlocks rb) {
+        Core.profileStart("mirror");
         float height = 7.25F / 16F;
         float radius = 1F / 16F;
         float c = 0.5F;
@@ -38,6 +40,7 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
         renderCube(mirror, backFace);
         mirror.setIcon(Texture.mirrorStart + 2);
         renderCube(mirror, sideFace);
+        Core.profileEnd();
     }
     
     @Override
