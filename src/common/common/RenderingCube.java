@@ -136,47 +136,60 @@ public class RenderingCube {
         ul = ((icon & 0xf) << 4) / 256.0;
         vl = (icon & 0xf0) / 256.0;
     }
+    
+    static VectorUV[] cache = new VectorUV[4];
+    static {
+        for (int i = 0; i < cache.length; i++) {
+            cache[i] = new VectorUV();
+        }
+    }
+    
+    
+    void set(int i, float x, float y, float z) {
+        cache[i].x = x;
+        cache[i].y = y;
+        cache[i].z = z;
+    }
 
     public VectorUV[] faceVerts(int face) {
-        VectorUV ret[] = new VectorUV[4];
         VectorUV v = corner;
         int c = 8;
         switch (face) {
         case 0: //-y
-            ret[0] = new VectorUV(v.x, -v.y, v.z);
-            ret[1] = new VectorUV(-v.x, -v.y, v.z);
-            ret[2] = new VectorUV(-v.x, -v.y, -v.z);
-            ret[3] = new VectorUV(v.x, -v.y, -v.z);
+            set(0, v.x, -v.y, v.z);
+            set(1, -v.x, -v.y, v.z);
+            set(2, -v.x, -v.y, -v.z);
+            set(3, v.x, -v.y, -v.z);
             break;
         case 1: //+y
-            ret[0] = new VectorUV(v.x, v.y, -v.z);
-            ret[1] = new VectorUV(-v.x, v.y, -v.z);
-            ret[2] = new VectorUV(-v.x, v.y, v.z);
-            ret[3] = new VectorUV(v.x, v.y, v.z);
+            set(0, v.x, v.y, -v.z);
+            set(1, -v.x, v.y, -v.z);
+            set(2, -v.x, v.y, v.z);
+            set(3, v.x, v.y, v.z);
             break;
         case 2: //-z
-            ret[0] = new VectorUV(v.x, v.y, -v.z);
-            ret[1] = new VectorUV(v.x, -v.y, -v.z);
-            ret[2] = new VectorUV(-v.x, -v.y, -v.z);
-            ret[3] = new VectorUV(-v.x, v.y, -v.z);
+            set(0, v.x, v.y, -v.z);
+            set(1, v.x, -v.y, -v.z);
+            set(2, -v.x, -v.y, -v.z);
+            set(3, -v.x, v.y, -v.z);
             break;
         case 3: //+z
-            ret[0] = new VectorUV(v.x, v.y, v.z);
-            ret[1] = new VectorUV(-v.x, v.y, v.z);
-            ret[2] = new VectorUV(-v.x, -v.y, v.z);
-            ret[3] = new VectorUV(v.x, -v.y, v.z);
+            set(0, v.x, v.y, v.z);
+            set(1, -v.x, v.y, v.z);
+            set(2, -v.x, -v.y, v.z);
+            set(3, v.x, -v.y, v.z);
             break;
         case 4: //-x
-            ret[0] = new VectorUV(-v.x, v.y, v.z);
-            ret[1] = new VectorUV(-v.x, v.y, -v.z);
-            ret[2] = new VectorUV(-v.x, -v.y, -v.z);
-            ret[3] = new VectorUV(-v.x, -v.y, v.z);
+            set(0, -v.x, v.y, v.z);
+            set(1, -v.x, v.y, -v.z);
+            set(2, -v.x, -v.y, -v.z);
+            set(3, -v.x, -v.y, v.z);
             break;
         case 5: //+x
-            ret[0] = new VectorUV(v.x, v.y, v.z);
-            ret[1] = new VectorUV(v.x, -v.y, v.z);
-            ret[2] = new VectorUV(v.x, -v.y, -v.z);
-            ret[3] = new VectorUV(v.x, v.y, -v.z);
+            set(0, v.x, v.y, v.z);
+            set(1, v.x, -v.y, v.z);
+            set(2, v.x, -v.y, -v.z);
+            set(3, v.x, v.y, -v.z);
             break;
         }
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
@@ -184,31 +197,36 @@ public class RenderingCube {
             case 0: //-y
             case 1: //+y
                 //Mirror these like MC does.
-                for (VectorUV vert : ret) {
+                for (int i = 0; i < cache.length; i++) {
+                    VectorUV vert = cache[i];
                     vert.u = vert.x + 8;
                     vert.v = vert.z + 8;
                 }
                 break;
             case 2: //-z
-                for (VectorUV vert : ret) {
+                for (int i = 0; i < cache.length; i++) {
+                    VectorUV vert = cache[i];
                     vert.u = 16 - (vert.x + 8);
                     vert.v = 16 - (vert.y + 8);
                 }
                 break;
             case 3: //+z
-                for (VectorUV vert : ret) {
+                for (int i = 0; i < cache.length; i++) {
+                    VectorUV vert = cache[i];
                     vert.u = vert.x + 8;
                     vert.v = 16 - (vert.y + 8);
                 }
                 break;
             case 4: //-x
-                for (VectorUV vert : ret) {
+                for (int i = 0; i < cache.length; i++) {
+                    VectorUV vert = cache[i];
                     vert.u = 16 - (vert.y + 8);
                     vert.v = (vert.z + 8);
                 }
                 break;
             case 5: //+x
-                for (VectorUV vert : ret) {
+                for (int i = 0; i < cache.length; i++) {
+                    VectorUV vert = cache[i];
                     vert.u = 16 - (vert.y + 8);
                     vert.v = 16 - (vert.z + 8);
                 }
@@ -216,7 +234,8 @@ public class RenderingCube {
             default:
                 throw new RuntimeException("Invalid face number");
             }
-            for (VectorUV main : ret) {
+            for (int i = 0; i < cache.length; i++) {
+                VectorUV main = cache[i];
                 float udelta = 0, vdelta = 0;
                 int nada = 0;
                 if (main.u > 16) {
@@ -236,16 +255,17 @@ public class RenderingCube {
                 if (nada == 2) {
                     continue;
                 }
-                for (VectorUV other : ret) {
+                for (int J = 0; J < cache.length; J++) {
+                    VectorUV other = cache[J];
                     other.u -= udelta;
                     other.v -= vdelta;
                 }
             }
         }
-        for (int i = 0; i < ret.length; i++) {
-            ret[i] = trans.apply(ret[i]);
+        for (int i = 0; i < cache.length; i++) {
+            cache[i] = trans.apply(cache[i]);
         }
-        return ret;
+        return cache;
     }
 
 }
