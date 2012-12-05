@@ -310,16 +310,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator {
     }
 
     void makeRecipes() {
-        recipe(new ItemStack(Block.stoneDoubleSlab, 2, 6),
-                " - ",
-                "-S-",
-                " - ",
-                '-', new ItemStack(Block.stoneSingleSlab, 1, 0),
-                'S', Block.stone);
-    recipe(new ItemStack(Block.stoneDoubleSlab, 2, 6),
-        "-",
-        "-",
-        '-', new ItemStack(Block.stoneSingleSlab, 1, 6));
+        recipe(new ItemStack(Block.stoneDoubleSlab),
+                "-",
+                "-",
+                '-', new ItemStack(Block.stoneSingleSlab, 1));
         shapelessRecipe(new ItemStack(dark_iron, 4), dark_iron_block_item);
         recipe(dark_iron_block_item,
                 "II",
