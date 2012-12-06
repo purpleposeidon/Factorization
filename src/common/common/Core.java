@@ -53,16 +53,13 @@ import factorization.common.astro.HammerManager;
         )
 public class Core {
     //The comment below is a marker used by the build script.
-    public static final String version = "0.7.4"; //@VERSION@
+    public static final String version = "0.7.6"; //@VERSION@
     public Core() {
         registry = new Registry();
         exoCore = new ExoCore();
         foph = new FactorizationOreProcessingHandler(); //We don't register foph yet.
-        hammerManager = new HammerManager();
         MinecraftForge.EVENT_BUS.register(registry);
         MinecraftForge.EVENT_BUS.register(exoCore);
-        MinecraftForge.EVENT_BUS.register(hammerManager);
-        NetworkRegistry.instance().registerConnectionHandler(hammerManager);
     }
     
     // runtime storage
@@ -225,13 +222,20 @@ public class Core {
             isMainClientThread.set(true);
         }
         proxy.addNameDirect("itemGroup.factorizationTab", "Factorization");
-        hammerManager.setup();
+        if (enable_dimension_slice) {
+            hammerManager = new HammerManager();
+            MinecraftForge.EVENT_BUS.register(hammerManager);
+            NetworkRegistry.instance().registerConnectionHandler(hammerManager);
+            hammerManager.setup();
+        }
     }
     
     @ServerStarting
     public void setMainServerThread(FMLServerStartingEvent event) {
         isMainServerThread.set(true);
-        hammerManager.serverStarting(event);
+        if (enable_dimension_slice) {
+            hammerManager.serverStarting(event);
+        }
     }
 
     @PostInit

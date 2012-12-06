@@ -496,17 +496,12 @@ public class TileEntityRouter extends TileEntityFactorization {
             return false;
         }
         int start, end;
+        if (t instanceof ISidedInventory && target_side < 6 && target_side >= 0) {
+            t = new FactorizationUtil.ISidedWrapper((ISidedInventory) t, ForgeDirection.getOrientation(target_side));
+        }
         if (target_slot < 0) {
-            // Get/Put from one of the sides
-            if (t instanceof ISidedInventory && target_side < 6 && target_side >= 0) {
-                ISidedInventory inv = (ISidedInventory) t;
-                start = inv.getStartInventorySide(ForgeDirection.getOrientation(target_side));
-                end = start + inv.getSizeInventorySide(ForgeDirection.getOrientation(target_side));
-            } else {
-                start = 0;
-                end = t.getSizeInventory();
-            }
-
+            start = 0;
+            end = t.getSizeInventory();
         } else {
             if (isLocked(t)) {
                 return false;
@@ -516,10 +511,6 @@ public class TileEntityRouter extends TileEntityFactorization {
             if (start >= t.getSizeInventory()) {
                 return false;
             }
-        }
-        IInventory wrapped = t;
-        if (t instanceof ISidedInventory && target_side < 6 && target_side >= 0) {
-            t = new FactorizationUtil.ISidedWrapper((ISidedInventory) t, ForgeDirection.getOrientation(target_side));
         }
         for (int slot = start; slot < end; slot++) {
             // XXX: Should onInventoryChanged() happen at moveStack for both inventories? Probably.

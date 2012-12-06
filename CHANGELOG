@@ -1,7 +1,11 @@
+0.7.6
+  Router bugfix
+
 0.7.5
   Routers:
     Item filters now work when inserting: They will limit how much goes into the inventory
     The machine filter lets you access routers if you say so explicitly.
+  Fixed wrath lamp breaking
 
 0.7.4
   Fixed NEI plugins & key handlers
