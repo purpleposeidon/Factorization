@@ -18,8 +18,7 @@ public class TileEntityMirror extends TileEntityCommon {
 
     //don't save
     public boolean is_lit = false;
-    int search_delay = 0;
-    int trace_check = 0;
+    int next_check = 1;
     //don't save, but *do* share w/ client
     public int target_rotation = -99;
 
@@ -53,10 +52,16 @@ public class TileEntityMirror extends TileEntityCommon {
             reflection_target = null;
         }
     }
+    
+    @Override
+    public boolean activate(EntityPlayer entityplayer) {
+        neighborChanged();
+        return false;
+    }
 
     @Override
     public void neighborChanged() {
-        search_delay = trace_check = 1;
+        next_check = -1;
     }
 
     int getPower() {
@@ -78,7 +83,7 @@ public class TileEntityMirror extends TileEntityCommon {
 
     int last_shared = -1;
 
-    void broadcastTargetInfo() {
+    void broadcastTargetInfoIfChanged() {
         if (getTargetInfo() != last_shared) {
             broadcastMessage(null, MessageType.MirrorDescription, getTargetInfo());
             last_shared = getTargetInfo();
@@ -139,56 +144,55 @@ public class TileEntityMirror extends TileEntityCommon {
     }
 
     boolean gotten_info_packet = false;
-
+    
+    void setNextCheck() {
+        next_check = 20 * 120 + 20*rand.nextInt(20);
+    }
+    
     @Override
     public void updateEntity() {
-        //		if we don't have a target, spin about
         if (worldObj.isRemote) {
             return;
         }
-        broadcastTargetInfo();
-        if (reflection_target == null) {
-            if (search_delay > 0) {
-                search_delay--;
-                return;
-            }
-            findTarget();
-            if (reflection_target == null) {
-                search_delay = 60;
-                return;
-            }
-            trace_check = 20 * 15;
-        } else {
-            reflection_target.setWorld(worldObj);
-        }
-        //we *do* have a target coord by this point. Is there a TE there tho?
-        IReflectionTarget target = null;
-        target = reflection_target.getTE(IReflectionTarget.class);
-        if (target == null) {
-            if (reflection_target.blockExists()) {
-                reflection_target = null;
-                is_lit = false;
-            }
-            return;
-        }
-        if (trace_check == 0) {
-            trace_check = 20 * 30 + rand.nextInt(20);
-            if (!myTrace(reflection_target.x, reflection_target.z)) {
-                if (is_lit) {
-                    is_lit = false;
-                    target.addReflector(-getPower());
-                    reflection_target = null;
-                    setRotationTarget(-99);
+        System.out.println(next_check);
+        if (next_check-- <= 0) {
+            try {
+                setNextCheck();
+                if (reflection_target == null) {
+                    findTarget();
+                    if (reflection_target == null) {
+                        return;
+                    }
+                } else {
+                    reflection_target.setWorld(worldObj);
+                }
+                //we *do* have a target coord by this point. Is there a TE there tho?
+                IReflectionTarget target = null;
+                target = reflection_target.getTE(IReflectionTarget.class);
+                if (target == null) {
+                    if (reflection_target.blockExists()) {
+                        reflection_target = null;
+                        is_lit = false;
+                    }
                     return;
                 }
+                if (!myTrace(reflection_target.x, reflection_target.z)) {
+                    if (is_lit) {
+                        is_lit = false;
+                        target.addReflector(-getPower());
+                        reflection_target = null;
+                        setRotationTarget(-99);
+                        return;
+                    }
+                }
+    
+                if (hasSun() != is_lit) {
+                    is_lit = hasSun();
+                    target.addReflector(is_lit ? getPower() : -getPower());
+                }
+            } finally {
+                broadcastTargetInfoIfChanged();
             }
-        } else {
-            trace_check--;
-        }
-
-        if (hasSun() != is_lit) {
-            is_lit = hasSun();
-            target.addReflector(is_lit ? getPower() : -getPower());
         }
     }
 
@@ -266,7 +270,14 @@ public class TileEntityMirror extends TileEntityCommon {
             }
             int id = worldObj.getBlockId(bx, yCoord, bz);
             Block b = Block.blocksList[id];
-            if (b != null && !b.isAirBlock(worldObj, bx, yCoord, bz)) {
+            boolean air_like = false;
+            if (b == null) {
+                air_like = true;
+            } else {
+                air_like = b.isAirBlock(worldObj, bx, yCoord, bz);
+                air_like |= b.getCollisionBoundingBoxFromPool(worldObj, bx, yCoord, bz) == null;
+            }
+            if (!air_like) {
                 return false;
             }
             x -= dx;

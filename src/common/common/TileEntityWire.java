@@ -136,8 +136,11 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
             return;
         }
         charge.update();
-
-        if (!is_supported() && !find_support()) {
+    }
+    
+    @Override
+    public void neighborChanged() {
+        if (!is_supported() /*&& !find_support()*/ ) {
             Core.registry.factory_block.dropBlockAsItem(worldObj, xCoord, yCoord, zCoord, BlockClass.Wire.md, 0);
             Coord here = getCoord();
             here.setId(0);
