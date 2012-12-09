@@ -105,8 +105,10 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         nest++;
         glPushMatrix();
         try {
-            World subWorld = DimensionManager.getWorld(Core.dimension_slice_dimid); // we.wew;
-            subWorld = DimensionManager.getWorld(0);
+            //World subWorld = DimensionManager.getWorld(Core.dimension_slice_dimid); // we.wew;
+            //subWorld = DimensionManager.getWorld(0);
+            World subWorld = DimensionManager.getWorld(0); // we.wew;
+            subWorld = HammerManager.getClientWorld();
             if (subWorld == null) {
                 //Huh. Lame.
                 subWorld = we.worldObj;
@@ -125,7 +127,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 wr.updateRenderer();
                 Core.profileEnd();
             }
-            float s = 2F/1F;
+            float s = 1F/16F;
             glTranslatef((float)x, (float)y, (float)z);
             //glRotatef(45, 1, 1, 0);
             glScalef(s, s, s);
@@ -148,8 +150,10 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             glTranslatef((float)we.posX, (float)we.posY, (float)we.posZ);
             //Maybe we should use RenderGlobal.renderEntities ???
             Chunk here = subWorld.getChunkFromBlockCoords(0, 0);
-            for (List<Entity> ents : (List<Entity>[]) here.entityLists) {
-                for (Entity e : ents) {
+            for (int i1 = 0; i1 < here.entityLists.length; i1++) {
+                List<Entity> ents = here.entityLists[i1];
+                for (int i2 = 0; i2 < ents.size(); i2++) {
+                    Entity e = ents.get(i2);
                     if (e instanceof DimensionSliceEntity && nest >= 3) {
                         continue;
                     }
@@ -158,6 +162,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             }
             RenderHelper.enableStandardItemLighting();
             for (TileEntity te : ((Map<ChunkCoordinates, TileEntity>)here.chunkTileEntityMap).values()) {
+                //I warned you about comods, bro! I told you, dawg!
                 TileEntityRenderer.instance.renderTileEntity(te, partialTicks);
             }
             checkGLError("FZDS after render");

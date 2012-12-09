@@ -541,11 +541,26 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }
     }
     
+    class HammerWorldClient extends WorldClient {
+        //NOTE: Temporary, to make it easier to check
+        public HammerWorldClient(NetClientHandler par1NetClientHandler, WorldSettings par2WorldSettings, int par3, int par4, Profiler par5Profiler) {
+            super(par1NetClientHandler, par2WorldSettings, par3, par4, par5Profiler);
+        }
+        
+        @Override
+        public boolean setBlockAndMetadataAndInvalidate(int par1, int par2,
+                int par3, int par4, int par5) {
+            System.out.println("Client changing: " + new Coord(this, par1, par2, par3));
+            return super.setBlockAndMetadataAndInvalidate(par1, par2, par3, par4, par5);
+        }
+        
+    }
+    
     @Override
     public void hammerClientLogin(NetHandler clientHandler, INetworkManager manager, Packet1Login login) {
         if (Core.enable_dimension_slice) {
             NetClientHandler nch = (NetClientHandler) clientHandler;
-            Core.hammerManager.hammerWorldClient = new WorldClient(nch,
+            Core.hammerManager.hammerWorldClient = new HammerWorldClient(nch,
                     new WorldSettings(0L, login.gameType, false, login.hardcoreMode, login.terrainType),
                     Core.hammerManager.dimensionID,
                     login.difficultySetting,
@@ -555,20 +570,23 @@ public class FactorizationClientProxy extends FactorizationProxy {
     
     @Override
     public void setClientWorld(World w) {
-        Minecraft.getMinecraft().theWorld = (WorldClient) w;
+        Minecraft mc = Minecraft.getMinecraft();
+        mc.theWorld = (WorldClient) w;
+        mc.thePlayer.worldObj = w;
+        ((NetClientHandler)mc.myNetworkManager).worldClient = (WorldClient) w;
     }
     
     @Override
     public void fixAchievements() {
-        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            //give the first achievement, because it is stupid and nobody cares.
-            //If you're using this mod, you've probably opened your inventory before anyways.
-            StatFileWriter sfw = Minecraft.getMinecraft().statFileWriter;
-            if (sfw != null && !sfw.hasAchievementUnlocked(AchievementList.openInventory) && !Core.add_branding) {
-                sfw.readStat(AchievementList.openInventory, 1);
-                Core.logInfo("Achievement Get! You've opened your inventory hundreds of times already! Yes! You're welcome!");
-            }
+        //give the first achievement, because it is stupid and nobody cares.
+        //If you're using this mod, you've probably opened your inventory before anyways.
+        StatFileWriter sfw = Minecraft.getMinecraft().statFileWriter;
+        if (sfw != null && !sfw.hasAchievementUnlocked(AchievementList.openInventory) && !Core.add_branding) {
+            sfw.readStat(AchievementList.openInventory, 1);
+            Core.logInfo("Achievement Get! You've opened your inventory hundreds of times already! Yes! You're welcome!");
         }
+        Minecraft.memoryReserve = new byte[0]; //Consider it an experiment. Would this break anything? I've *never* seen the out of memory screen.
+        System.gc();
     }
     
     @Override

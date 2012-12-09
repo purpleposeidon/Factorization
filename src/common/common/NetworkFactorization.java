@@ -238,8 +238,8 @@ public class NetworkFactorization implements ITinyPacketHandler {
         case factorizeMsgChannel: handleMsg(input); break;
         case factorizeCmdChannel: handleCmd(data); break;
         case factorizeNtfyChannel: handleNtfy(input); break;
-        case factorizeWorldPushChannel: break;
-        case factorizeWorldPopChannel: break;
+        case factorizeWorldPushChannel: handleWorldPush(input); break;
+        case factorizeWorldPopChannel: handleWorldPop(input); break;
         default: Core.logWarning("Got packet with invalid channel %i with player = %s ", channel, me); break;
         }
 

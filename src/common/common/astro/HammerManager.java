@@ -44,6 +44,7 @@ public class HammerManager implements IConnectionHandler, IScheduledTickHandler 
             return;
         }
         TickRegistry.registerScheduledTickHandler(Core.hammerManager, Side.SERVER);
+        TickRegistry.registerTickHandler(new NetworkDimensionStateTicker(), Side.SERVER);
         dimensionID = Core.dimension_slice_dimid;
         DimensionManager.registerProviderType(dimensionID, HammerWorldProvider.class, true);
         DimensionManager.registerDimension(dimensionID, dimensionID);
@@ -58,12 +59,10 @@ public class HammerManager implements IConnectionHandler, IScheduledTickHandler 
         assert DimensionManager.shouldLoadSpawn(dimensionID);
     }
     
-    DimensionSliceEntity allocateSlice(Coord spawnCoords) {
+    DimensionSliceEntity allocateSlice(World spawnWorld) {
         World sliceWorld = getServerWorld();
         Coord cellLocation = new Coord(DimensionManager.getWorld(0), 0, 0, 0);
-        DimensionSliceEntity dse = new DimensionSliceEntity(spawnCoords.w, takeCellId());
-        spawnCoords.setAsEntityLocation(dse);
-        spawnCoords.w.spawnEntityInWorld(dse);
+        DimensionSliceEntity dse = new DimensionSliceEntity(spawnWorld, takeCellId());
         dse.hammerCell = cellLocation;
         return dse;
     }
@@ -185,7 +184,7 @@ public class HammerManager implements IConnectionHandler, IScheduledTickHandler 
     }
     @Override
     public String getLabel() {
-        return "FZDS_saveinfo";
+        return "FZDS saveinfo";
     }
     
     @Override
