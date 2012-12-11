@@ -57,7 +57,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP {
     
     int savePlayerViewRadius() {
         try {
-            return ObfuscationReflectionHelper.getPrivateValue(PlayerManager.class, getServerForPlayer().getPlayerManager(), PlayerManager_playerViewRadius_field);
+            return ObfuscationReflectionHelper.<Integer, PlayerManager>getPrivateValue(PlayerManager.class, getServerForPlayer().getPlayerManager(), PlayerManager_playerViewRadius_field);
         } catch (Exception e) {
             return -1;
         }
