@@ -21,18 +21,6 @@ import factorization.common.NetworkFactorization.MessageType;
 
 public class FactorizationServerProxy extends FactorizationProxy {
     //XXX TODO: This is *all* wrong. Err, except maybe makeItemsSide().
-    @Override
-    public void makeItemsSide() {
-        Registry registry = Core.registry;
-        registry.exo_head = new ExoArmor(
-                registry.itemID("mechaHead", 9010), 0);
-        registry.exo_chest = new ExoArmor(registry.itemID("mechaChest",
-                9011), 1);
-        registry.exo_leg = new ExoArmor(registry.itemID("mechaLeg", 9012),
-                2);
-        registry.exo_foot = new ExoArmor(
-                registry.itemID("mechaFoot", 9013), 3);
-    }
     
     @Override
     public void broadcastTranslate(EntityPlayer who, String... msg) {

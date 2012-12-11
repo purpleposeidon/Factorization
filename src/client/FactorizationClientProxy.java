@@ -102,17 +102,6 @@ import factorization.common.astro.DimensionSliceEntity;
 import factorization.common.astro.RenderDimensionSliceEntity;
 
 public class FactorizationClientProxy extends FactorizationProxy {
-    
-    //COMMON
-    @Override
-    public void makeItemsSide() {
-        Registry registry = Core.registry;
-        registry.exo_head = new ExoArmorTextured(registry.itemID("mechaHead", 9010), 0);
-        registry.exo_chest = new ExoArmorTextured(registry.itemID("mechaChest", 9011), 1);
-        registry.exo_leg = new ExoArmorTextured(registry.itemID("mechaLeg", 9012), 2);
-        registry.exo_foot = new ExoArmorTextured(registry.itemID("mechaFoot", 9013), 3);
-    }
-
     @Override
     public void broadcastTranslate(EntityPlayer who, String... msg) {
         String format = msg[0];

@@ -255,14 +255,13 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         addName(item_craft, "Craftpacket");
 
         //Exo-items
-        exo_head.setSlotCount(5);
-        exo_chest.setSlotCount(8);
-        exo_leg.setSlotCount(6);
-        exo_foot.setSlotCount(4);
+        exo_head = new ExoArmor(itemID("mechaHead", 9010), 0).setSlotCount(5);
+        exo_chest = new ExoArmor(itemID("mechaChest", 9011), 1).setSlotCount(8);
+        exo_leg = new ExoArmor(itemID("mechaLeg", 9012), 2).setSlotCount(6);
+        exo_foot = new ExoArmor(itemID("mechaFoot", 9013), 3).setSlotCount(4);
 
         exo_chasis = new ItemCraftingComponent(itemID("mechaChasis", 9009), "item.exochasis", 5);
         addName(exo_chasis, "Exo-Chassis");
-        //exo_ITEMS created in make_recipes_side()
         //Exo-armor uses up to Item ID 9013.
         addName(exo_head, "Exo-Helmet");
         addName(exo_chest, "Exo-Chestplate");

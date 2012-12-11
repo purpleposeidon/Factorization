@@ -25,9 +25,6 @@ import cpw.mods.fml.common.network.Player;
 import factorization.api.Coord;
 
 public abstract class FactorizationProxy implements IGuiHandler {
-    //COMMON
-    public abstract void makeItemsSide();
-
     public abstract void broadcastTranslate(EntityPlayer who, String... msg);
 
     public abstract void pokeChest(TileEntityChest chest);

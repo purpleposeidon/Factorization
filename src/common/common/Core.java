@@ -208,7 +208,6 @@ public class Core {
         NetworkRegistry.instance().registerGuiHandler(this, proxy);
 
         registry.registerSimpleTileEntities();
-        proxy.makeItemsSide();
         registry.makeItems();
         config.save();
         registry.makeOther();
