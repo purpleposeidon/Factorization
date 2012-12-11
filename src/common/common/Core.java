@@ -53,7 +53,7 @@ import factorization.common.astro.HammerManager;
         )
 public class Core {
     //The comment below is a marker used by the build script.
-    public static final String version = "0.7.7"; //@VERSION@
+    public static final String version = "0.7.8"; //@VERSION@
     public Core() {
         registry = new Registry();
         exoCore = new ExoCore();
@@ -86,6 +86,7 @@ public class Core {
     public static boolean notify_in_chat = false;
     public static int entity_relight_task_id = -1;
     public static boolean gen_silver_ore = true;
+    public static int silver_ore_node_size = 25;
     public static boolean enable_dimension_slice = false;
     public static int dimension_slice_dimid = -7;
     public static boolean spread_wrathfire = true;
@@ -173,6 +174,8 @@ public class Core {
         }
 
         gen_silver_ore = getBoolConfig("generateSilverOre", "general", gen_silver_ore, "This disables silver ore generation");
+        int config_silver_size = getIntConfig("silverOreNodeSize", "general", silver_ore_node_size, "The size of silver ore nodes. Between 5 & 35. Default is 25");
+        silver_ore_node_size = Math.max(5, Math.min(config_silver_size, 35));
         add_branding = getBoolConfig("addBranding", "general", add_branding, null); //For our Tekkit friends
         
         enable_dimension_slice = dev_environ;

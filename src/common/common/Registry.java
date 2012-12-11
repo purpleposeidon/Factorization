@@ -816,8 +816,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         MinecraftForge.setBlockHarvestLevel(resource_block, "pickaxe", 2);
     }
 
-    public void makeOther() {
-        silverGen = new WorldGenMinable(resource_block.blockID, 35);
+    public void makeOther() { 
+        silverGen = new WorldGenMinable(resource_block.blockID, Core.silver_ore_node_size);
     }
     
     @Override

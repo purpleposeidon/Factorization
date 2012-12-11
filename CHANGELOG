@@ -1,3 +1,6 @@
+0.7.8
+  Added config option for silver ore node size
+
 0.7.7
   Fixed the issue with ExoArmorTextured & Forge 436 enfocing identical items
   Router bugfix: Slot#-specific access ignores the side selection
