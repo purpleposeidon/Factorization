@@ -59,19 +59,15 @@ public class FZDSCommand extends CommandBase {
             return;
         }
         String cmd = args[0];
-        if (cmd.equalsIgnoreCase("test")) {
-            Core.proxy.setClientWorld(HammerManager.getClientWorld());
-            return;
-        }
         if (sender instanceof EntityPlayerMP) {
             final EntityPlayerMP player = (EntityPlayerMP) sender;
             if (cmd.equalsIgnoreCase("spawn")) {
                 currentWE = Core.hammerManager.allocateSlice(player.worldObj);
                 currentWE.setPosition(player.posX, player.posY, player.posZ);
                 currentWE.worldObj.spawnEntityInWorld(currentWE);
-                PacketProxyingPlayer ppp = new PacketProxyingPlayer(player, currentWE);
-                currentWE.hammerCell.setAsEntityLocation(ppp);
-                ppp.posY += 4;
+                //This should be moved to the FZDS entity
+                PacketProxyingPlayer ppp = new PacketProxyingPlayer(player, currentWE, currentWE.hammerCell);
+                ppp.posY += 60;
                 ppp.worldObj.spawnEntityInWorld(ppp);
             }
             if (cmd.equalsIgnoreCase("remove")) {

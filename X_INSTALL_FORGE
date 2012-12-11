@@ -1,7 +1,7 @@
 #!/bin/bash
 
 pushd ../
-#  mv eclipse/ eclipse.backup/
+  mv eclipse/ eclipse.backup/
 popd
 
 pushd cb
@@ -11,6 +11,6 @@ popd
 echo "Remember to set the lib/ classpath in eclipse!"
 
 pushd ../
-#  rm -rf eclipse/
-#  mv eclipse.backup/ eclipse/
+  rm -rf eclipse/
+  mv eclipse.backup/ eclipse/
 popd

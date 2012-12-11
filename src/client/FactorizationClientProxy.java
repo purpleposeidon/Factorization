@@ -9,7 +9,9 @@ import java.util.logging.Level;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.AchievementList;
+import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.GameSettings;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.INetworkManager;
@@ -35,7 +37,6 @@ import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.registry.LanguageRegistry;
@@ -97,8 +98,8 @@ import factorization.common.TileEntityMixer;
 import factorization.common.TileEntitySlagFurnace;
 import factorization.common.TileEntitySolarTurbine;
 import factorization.common.TileEntityWrathLamp;
-import factorization.common.astro.RenderDimensionSliceEntity;
 import factorization.common.astro.DimensionSliceEntity;
+import factorization.common.astro.RenderDimensionSliceEntity;
 
 public class FactorizationClientProxy extends FactorizationProxy {
     
@@ -568,12 +569,34 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }
     }
     
+    private void setWorldAndPlayer(WorldClient wc, EntityClientPlayerMP player) {
+        Minecraft mc = Minecraft.getMinecraft();
+        mc.theWorld = wc;
+        ((NetClientHandler)mc.myNetworkManager).worldClient = wc;
+        mc.thePlayer = player;
+    }
+    
+    EntityClientPlayerMP real_player = null;
+    WorldClient real_world = null;
+    
     @Override
     public void setClientWorld(World w) {
         Minecraft mc = Minecraft.getMinecraft();
-        mc.theWorld = (WorldClient) w;
-        mc.thePlayer.worldObj = w;
-        ((NetClientHandler)mc.myNetworkManager).worldClient = (WorldClient) w;
+        if (real_player == null) {
+            real_player = mc.thePlayer;
+        }
+        if (real_world == null) {
+            real_world = mc.theWorld;
+        }
+        EntityClientPlayerMP fake_player = new EntityClientPlayerMP(mc, mc.theWorld, mc.session, real_player.sendQueue /* not sure about this one. */);
+        setWorldAndPlayer((WorldClient) w, fake_player);
+    }
+    
+    @Override
+    public void restoreClientWorld() {
+        setWorldAndPlayer(real_world, real_player);
+        real_world = null;
+        real_player = null;
     }
     
     @Override

@@ -2,9 +2,6 @@ package factorization.common.astro;
 
 import java.net.SocketAddress;
 
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
-import cpw.mods.fml.relauncher.ReflectionHelper;
-
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.INetworkManager;
@@ -12,9 +9,18 @@ import net.minecraft.src.ItemInWorldManager;
 import net.minecraft.src.NetHandler;
 import net.minecraft.src.NetServerHandler;
 import net.minecraft.src.Packet;
+import net.minecraft.src.Packet18Animation;
+import net.minecraft.src.Packet31RelEntityMove;
+import net.minecraft.src.Packet33RelEntityMoveLook;
+import net.minecraft.src.Packet35EntityHeadRotation;
+import net.minecraft.src.Packet40EntityMetadata;
+import net.minecraft.src.Packet52MultiBlockChange;
+import net.minecraft.src.Packet53BlockChange;
 import net.minecraft.src.PlayerManager;
-import net.minecraft.src.ServerConfigurationManager;
 import net.minecraft.src.WorldServer;
+import cpw.mods.fml.common.ObfuscationReflectionHelper;
+import cpw.mods.fml.relauncher.ReflectionHelper;
+import factorization.api.Coord;
 import factorization.common.Core;
 
 public class PacketProxyingPlayer extends EntityPlayerMP {
@@ -23,7 +29,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP {
     DimensionNetworkManager wrappedNetworkManager;
     static boolean useShortViewRadius = false;
     
-    public PacketProxyingPlayer(EntityPlayerMP proxiedPlayer, DimensionSliceEntity dimensionSlice) {
+    public PacketProxyingPlayer(EntityPlayerMP proxiedPlayer, DimensionSliceEntity dimensionSlice, Coord cellLocation) {
         super(proxiedPlayer.mcServer, dimensionSlice.hammerCell.w, "FZDS.PlayerProxy:" + dimensionSlice.cell, new ItemInWorldManager(dimensionSlice.hammerCell.w));
         if (proxiedPlayer instanceof PacketProxyingPlayer) {
             throw new RuntimeException("tried to nest player dimension proxies");
@@ -32,6 +38,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP {
         this.dimensionSlice = dimensionSlice;
         wrappedNetworkManager = new DimensionNetworkManager(proxiedPlayer.playerNetServerHandler.netManager);
         this.playerNetServerHandler = new NetServerHandler(proxiedPlayer.mcServer, wrappedNetworkManager, this);
+        cellLocation.setAsEntityLocation(this);
         WorldServer ws = (WorldServer) dimensionSlice.worldObj;
         if (useShortViewRadius) {
             int orig = savePlayerViewRadius();
@@ -84,11 +91,31 @@ public class PacketProxyingPlayer extends EntityPlayerMP {
 
         @Override
         public void addToSendQueue(Packet packet) {
+            //These packets get us "Illegal Stance":
+            //Packet31RelEntityMove
+            //Packet33RelEntityMoveLook
+            //idea: so one of the below causes us to freeze up. Determine which one it is, isolate it (or them...). Trace the execution path of it.
+            if (packet instanceof Packet18Animation
+                    || packet instanceof Packet31RelEntityMove
+                    || packet instanceof Packet35EntityHeadRotation
+                    || packet instanceof Packet40EntityMetadata
+                    || packet instanceof Packet33RelEntityMoveLook) {
+                //Yep.
+                return;
+            } else {
+                
+            }
+//			if (packet instanceof Packet53BlockChange
+//					|| packet instanceof Packet52MultiBlockChange) {
+//				//yep
+//			} else {
+//				return;
+//			}
+            System.out.println("Proxying packet: " + packet);
             if (packetsSentThisTick == 0 && inTick) {
                 sendWorldPush();
             }
             packetsSentThisTick++;
-            System.out.println("Proxying packet: " + packet);
             wrapped.addToSendQueue(packet);
         }
         

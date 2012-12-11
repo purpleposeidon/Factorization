@@ -425,32 +425,19 @@ public class NetworkFactorization implements ITinyPacketHandler {
             }
         }
     }
-
-    private World storedWorld = null;
     
     void handleWorldPush(DataInput input) {
         if (!currentPlayer.get().worldObj.isRemote) {
             return;
         }
-        if (storedWorld != null) {
-            Core.logWarning("Tried to push more than once");
-        } else {
-            storedWorld = HammerManager.getClientWorld();
-            Core.proxy.setClientWorld(storedWorld);
-        }
+        Core.proxy.setClientWorld(HammerManager.getClientWorld());
     }
     
     void handleWorldPop(DataInput input) {
         if (!currentPlayer.get().worldObj.isRemote) {
             return;
         }
-        if (storedWorld == null) {
-            Core.logWarning("Tried to pop null world");
-        } else {
-            Core.proxy.setClientWorld(storedWorld);
-            storedWorld = null;
-        }
-        
+        Core.proxy.restoreClientWorld();
     }
     
     static public class MessageType {
