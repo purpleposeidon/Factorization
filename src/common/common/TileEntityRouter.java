@@ -496,7 +496,7 @@ public class TileEntityRouter extends TileEntityFactorization {
             return false;
         }
         int start, end;
-        if (t instanceof ISidedInventory && target_side < 6 && target_side >= 0) {
+        if (t instanceof ISidedInventory && target_side < 6 && target_side >= 0 && target_slot < 0) {
             t = new FactorizationUtil.ISidedWrapper((ISidedInventory) t, ForgeDirection.getOrientation(target_side));
         }
         if (target_slot < 0) {

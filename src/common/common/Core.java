@@ -53,7 +53,7 @@ import factorization.common.astro.HammerManager;
         )
 public class Core {
     //The comment below is a marker used by the build script.
-    public static final String version = "0.7.6"; //@VERSION@
+    public static final String version = "0.7.7"; //@VERSION@
     public Core() {
         registry = new Registry();
         exoCore = new ExoCore();
