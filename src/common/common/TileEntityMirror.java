@@ -154,7 +154,6 @@ public class TileEntityMirror extends TileEntityCommon {
         if (worldObj.isRemote) {
             return;
         }
-        System.out.println(next_check);
         if (next_check-- <= 0) {
             try {
                 setNextCheck();
