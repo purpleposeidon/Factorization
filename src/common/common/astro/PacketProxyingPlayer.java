@@ -10,12 +10,16 @@ import net.minecraft.src.NetHandler;
 import net.minecraft.src.NetServerHandler;
 import net.minecraft.src.Packet;
 import net.minecraft.src.Packet18Animation;
+import net.minecraft.src.Packet201PlayerInfo;
+import net.minecraft.src.Packet255KickDisconnect;
 import net.minecraft.src.Packet31RelEntityMove;
 import net.minecraft.src.Packet33RelEntityMoveLook;
 import net.minecraft.src.Packet35EntityHeadRotation;
+import net.minecraft.src.Packet3Chat;
 import net.minecraft.src.Packet40EntityMetadata;
 import net.minecraft.src.Packet52MultiBlockChange;
 import net.minecraft.src.Packet53BlockChange;
+import net.minecraft.src.Packet56MapChunks;
 import net.minecraft.src.PlayerManager;
 import net.minecraft.src.WorldServer;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
@@ -95,28 +99,36 @@ public class PacketProxyingPlayer extends EntityPlayerMP {
             //Packet31RelEntityMove
             //Packet33RelEntityMoveLook
             //idea: so one of the below causes us to freeze up. Determine which one it is, isolate it (or them...). Trace the execution path of it.
-            if (packet instanceof Packet18Animation
-                    || packet instanceof Packet31RelEntityMove
-                    || packet instanceof Packet35EntityHeadRotation
-                    || packet instanceof Packet40EntityMetadata
-                    || packet instanceof Packet33RelEntityMoveLook) {
-                //Yep.
-                return;
-            } else {
-                
-            }
+//			if (packet instanceof Packet18Animation
+//					|| packet instanceof Packet31RelEntityMove
+//					|| packet instanceof Packet35EntityHeadRotation
+//					|| packet instanceof Packet40EntityMetadata
+//					|| packet instanceof Packet33RelEntityMoveLook) {
+//				//Yep.
+//				//return;
+//			} else {
+//				
+//			}
 //			if (packet instanceof Packet53BlockChange
-//					|| packet instanceof Packet52MultiBlockChange) {
+//					|| packet instanceof Packet52MultiBlockChange
+//					|| packet instanceof Packet56MapChunks) {
 //				//yep
 //			} else {
 //				return;
 //			}
-            System.out.println("Proxying packet: " + packet);
-            if (packetsSentThisTick == 0 && inTick) {
+            if (inTick) {
+                System.out.println("Proxying packet: " + packet);
+                if (packetsSentThisTick == 0 && inTick) {
+                    sendWorldPush();
+                }
+                packetsSentThisTick++;
+                wrapped.addToSendQueue(packet);
+            } else {
+                System.out.println("proxying packet outside of Tick: " + packet);
                 sendWorldPush();
+                wrapped.addToSendQueue(packet);
+                sendWorldPop();
             }
-            packetsSentThisTick++;
-            wrapped.addToSendQueue(packet);
         }
         
         void sendWorldPush() {
@@ -179,6 +191,18 @@ public class PacketProxyingPlayer extends EntityPlayerMP {
     @Override
     public void onUpdate() {
         this.isDead = this.dimensionSlice.isDead;
+        if (this.isDead) {
+            endProxy();
+        }
         super.onUpdate();
+    }
+    
+    public void endProxy() {
+        //From playerNetServerHandler.mcServer.getConfigurationManager().playerLoggedOut(this);
+        WorldServer var2 = getServerForPlayer();
+        var2.setEntityDead(this);
+        var2.getPlayerManager().removePlayer(this); //No comod?
+        var2.getMinecraftServer().getConfigurationManager().playerEntityList.remove(playerNetServerHandler);
+        this.isDead = true;
     }
 }

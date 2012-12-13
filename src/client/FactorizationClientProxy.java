@@ -561,8 +561,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
     private void setWorldAndPlayer(WorldClient wc, EntityClientPlayerMP player) {
         Minecraft mc = Minecraft.getMinecraft();
         mc.theWorld = wc;
-        ((NetClientHandler)mc.myNetworkManager).worldClient = wc;
         mc.thePlayer = player;
+        real_world.sendQueue.worldClient = wc;
+        //((NetClientHandler)mc.thePlayer.sendQueue.netManager).worldClient = wc;
     }
     
     EntityClientPlayerMP real_player = null;
