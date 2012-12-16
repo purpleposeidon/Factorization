@@ -13,11 +13,11 @@ import factorization.common.Core.TabType;
 public class ItemOreProcessing extends Item {
     public static ArrayList<String> OD_ores = new ArrayList(), OD_ingots = new ArrayList();
     public static enum OreType {
-        IRON(0, 0xF0F0F0, "Iron", "oreIron", "ingotIron"),
-        GOLD(1, 0xFFFB00, "Gold", "oreGold", "ingotGold"),
+        IRON(0, 0xD8D8D8, "Iron", "oreIron", "ingotIron"),
+        GOLD(1, 0xEEEB28, "Gold", "oreGold", "ingotGold"),
         LEAD(2, 0x2F2C3C, "Lead", null, "ingotLead"),
         TIN(3, 0xD7F7FF, "Tin", "oreTin", "ingotTin"),
-        COPPER(4, 0xFF6208, "Copper", "oreCopper", "ingotCopper"),
+        COPPER(4, 0xD68C39, "Copper", "oreCopper", "ingotCopper"),
         SILVER(5, 0x7B96B9, "Silver", null, "ingotSilver"),
         GALENA(6, 0x687B99, "Galena", "oreSilver", null)
         ;
