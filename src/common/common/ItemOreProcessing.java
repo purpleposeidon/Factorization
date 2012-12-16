@@ -104,7 +104,18 @@ public class ItemOreProcessing extends Item {
     public void getSubItems(int id, CreativeTabs tab, List list) {
         for (OreType oreType : OreType.values()) {
             if (oreType.enabled) {
-                list.add(new ItemStack(this, 1, oreType.ID));
+                boolean show = true;
+                if ((this == Core.registry.ore_crystal || this == Core.registry.ore_reduced) && oreType == OreType.GALENA) {
+                    show = false;
+                }
+                if (this == Core.registry.ore_dirty_gravel || this == Core.registry.ore_clean_gravel) {
+                    if (oreType == OreType.SILVER || oreType == OreType.LEAD) {
+                        show = false;
+                    }
+                }
+                if (show) {
+                    list.add(new ItemStack(this, 1, oreType.ID));
+                }
             }
         }
     }
