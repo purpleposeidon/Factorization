@@ -78,15 +78,16 @@ public class ExoArmor extends ItemArmor
         is.getTagCompound().setCompoundTag("slot" + slot, itemTag);
     }
 
-    public boolean isValidUpgrade(ItemStack is) {
+    public boolean isValidUpgrade(ItemStack theArmor, ItemStack is) {
         if (is == null) {
             return false;
         }
         Item item = is.getItem();
         if (item instanceof IExoUpgrade) {
-            return true;
+            IExoUpgrade upgrade = (IExoUpgrade) is.getItem();
+            return upgrade.canUpgradeArmor(theArmor, armorType);
         }
-        if (is.getItem().getClass() == ItemArmor.class) {
+        if (is.getItem() instanceof ItemArmor && !(is.getItem() instanceof ISpecialArmor)) {
             if (((ItemArmor) is.getItem()).armorType == armorType) {
                 return true;
             }

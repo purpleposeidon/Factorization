@@ -84,6 +84,9 @@ public enum ExoStateType {
     }
 
     public String brief() {
-        return Core.proxy.getExoKeyBrief(this.key);
+        if (this.key > 0) {
+            return Core.proxy.getExoKeyBrief(this.key);
+        }
+        return this.name();
     }
 }

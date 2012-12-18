@@ -57,7 +57,7 @@ public class GuiExoConfig extends GuiContainer {
         int top = guiTop + 26;
         int size = 16;
         for (int slot = 0; slot < m.slotCount; slot++) {
-            if (!m.isValidUpgrade(cont.upgrader.upgrades[slot + 1])) {
+            if (!m.isValidUpgrade(armor, cont.upgrader.upgrades[slot + 1])) {
                 continue;
             }
             if (cont.upgrader.upgrades[slot + 1].getItem() instanceof IExoUpgrade) {

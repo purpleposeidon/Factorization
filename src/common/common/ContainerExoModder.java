@@ -139,7 +139,7 @@ public class ContainerExoModder extends Container {
                     continue;
                 }
                 ItemStack up = upgradeSlot.getStack();
-                if (armor.isValidUpgrade(up)) {
+                if (armor.isValidUpgrade(is, up)) {
                     armor.setStackInSlot(is, slot, upgradeSlot.decrStackSize(1));
                 }
             }
@@ -199,21 +199,7 @@ public class ContainerExoModder extends Container {
                 return false;
             }
             ExoArmor ma = (ExoArmor) armor.getItem();
-            Item item = is.getItem();
-            if (item instanceof IExoUpgrade) {
-                IExoUpgrade upgrade = (IExoUpgrade) is.getItem();
-                if (!upgrade.canUpgradeArmor(armor, ma.armorType)) {
-                    return false;
-                }
-            } else if (item instanceof ItemArmor) {
-                ItemArmor armorModule = (ItemArmor) item;
-                if (armorModule.armorType != ma.armorType) {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-            return ma.slotCount > exoIndex;
+            return ma.isValidUpgrade(armor, is) && ma.slotCount > exoIndex;
         }
         
     }
