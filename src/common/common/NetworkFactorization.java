@@ -6,6 +6,7 @@ import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.IllegalFormatException;
 
@@ -42,8 +43,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
     protected final static short factorizeMsgChannel = 1; //used for sending translatable chat messages
     protected final static short factorizeCmdChannel = 2; //used for player keys
     protected final static short factorizeNtfyChannel = 3; //used to show messages in-world
-    protected final static short factorizeWorldPushChannel = 4; //push world to hammer space
-    protected final static short factorizeWorldPopChannel = 5; //return to real world
+    protected final static short factorizeDsPacketWrap = 6; //TODO: Use this instead of push/pop; we need it to be atomic.
 
     public NetworkFactorization() {
         Core.network = this;
@@ -57,7 +57,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
             output.writeInt(src.x);
             output.writeInt(src.y);
             output.writeInt(src.z);
-            output.writeInt(messageType);
+            output.writeShort(messageType);
 
             for (Object item : items) {
                 if (item == null) {
@@ -128,21 +128,18 @@ public class NetworkFactorization implements ITinyPacketHandler {
             return null;
         }
     }
-
-    public Packet worldPushPacket(DimensionSliceEntity dse) {
+    
+    public Packet wrapPacket(Packet toWrap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(baos);
         try {
-            new DataOutputStream(baos).writeInt(dse.entityId);
+            dos.write(toWrap.getPacketId());
+            toWrap.writePacketData(dos);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
-        return PacketDispatcher.getTinyPacket(Core.instance, factorizeWorldPushChannel, baos.toByteArray());
-    }
-    
-    static byte empty[] = new byte[0];
-    public Packet worldPopPacket() {
-        return PacketDispatcher.getTinyPacket(Core.instance, factorizeWorldPopChannel, empty);
+        return new PacketDispatcher().getTinyPacket(Core.instance, factorizeDsPacketWrap, baos.toByteArray());
     }
     
     public void sendCommand(EntityPlayer player, Command cmd, byte arg) {
@@ -219,40 +216,39 @@ public class NetworkFactorization implements ITinyPacketHandler {
     EntityPlayer getCurrentPlayer() {
         EntityPlayer ret = currentPlayer.get();
         if (ret == null) {
-            throw new NullPointerException("currentPlayer was unset");
+            throw new NullPointerException("currentPlayer wasn't set");
         }
         return ret;
     }
     
     @Override
     public void handle(NetHandler handler, Packet131MapData mapData) {
-        handlePacketData(mapData.uniqueID, mapData.itemData, handler.getPlayer());
+        handlePacketData(handler, mapData.uniqueID, mapData.itemData, handler.getPlayer());
     }
     
-    void handlePacketData(int channel, byte[] data, EntityPlayer me) {
+    void handlePacketData(NetHandler handler, int channel, byte[] data, EntityPlayer me) {
         currentPlayer.set(me);
         ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
-        DataInput input = new DataInputStream(inputStream);
+        DataInputStream input = new DataInputStream(inputStream);
         switch (channel) {
         case factorizeTEChannel: handleTE(input); break;
         case factorizeMsgChannel: handleMsg(input); break;
         case factorizeCmdChannel: handleCmd(data); break;
         case factorizeNtfyChannel: handleNtfy(input); break;
-        case factorizeWorldPushChannel: handleWorldPush(input); break;
-        case factorizeWorldPopChannel: handleWorldPop(input); break;
+        case factorizeDsPacketWrap: handleDsWrap(handler, input); break;
         default: Core.logWarning("Got packet with invalid channel %i with player = %s ", channel, me); break;
         }
 
         currentPlayer.set(null);
     }
 
-    void handleTE(DataInput input) {
+    void handleTE(DataInputStream input) {
         try {
             World world = getCurrentPlayer().worldObj;
             int x = input.readInt();
             int y = input.readInt();
             int z = input.readInt();
-            int messageType = input.readInt();
+            int messageType = input.readShort();
             Coord here = new Coord(world, x, y, z);
             
             if (Core.debug_network) {
@@ -324,7 +320,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
         }
     }
 
-    void handleMsg(DataInput input) {
+    void handleMsg(DataInputStream input) {
         if (FMLCommonHandler.instance().getSide() != Side.CLIENT) {
             return; // so, an SMP client sends *us* a message? Nah.
         }
@@ -367,11 +363,6 @@ public class NetworkFactorization implements ITinyPacketHandler {
         } else {
             Coord here = new Coord(world, x, y, z);
             switch (messageType) {
-            case MessageType.DemonEnterChest:
-                if (ent instanceof TileEntityChest) {
-                    Core.proxy.pokeChest((TileEntityChest) ent);
-                }
-                break;
             case MessageType.PlaySound:
                 Sound.receive(input);
                 break;
@@ -405,7 +396,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
         Command.fromNetwork(getCurrentPlayer(), s, arg);
     }
 
-    void handleNtfy(DataInput input) {
+    void handleNtfy(DataInputStream input) {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             EntityPlayer me = getCurrentPlayer();
             if (!me.worldObj.isRemote) {
@@ -426,14 +417,33 @@ public class NetworkFactorization implements ITinyPacketHandler {
         }
     }
     
-    void handleWorldPush(DataInput input) {
+    static Socket fakeSocket = new Socket();
+    void handleDsWrap(NetHandler handler, DataInputStream input) {
+        Packet wrapped;
+        try {
+            wrapped = Packet.readPacket(input, false, fakeSocket);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+        Core.proxy.setClientWorld(HammerManager.getClientWorld());
+        try {
+            wrapped.processPacket(handler);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            Core.proxy.restoreClientWorld();
+        }
+    }
+    
+    void XhandleWorldPush(DataInput input) {
         if (!currentPlayer.get().worldObj.isRemote) {
             return;
         }
         Core.proxy.setClientWorld(HammerManager.getClientWorld());
     }
     
-    void handleWorldPop(DataInput input) {
+    void XhandleWorldPop(DataInput input) {
         if (!currentPlayer.get().worldObj.isRemote) {
             return;
         }
@@ -443,7 +453,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
     static public class MessageType {
         //Non TEF messages
         public final static int ShareAll = -1;
-        public final static int DemonEnterChest = 10, PlaySound = 11, PistonPush = 12;
+        public final static int PlaySound = 11, PistonPush = 12;
         //TEF messages
         public final static int
                 DrawActive = 0, FactoryType = 1, DescriptionRequest = 2,

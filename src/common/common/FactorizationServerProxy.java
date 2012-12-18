@@ -30,14 +30,6 @@ public class FactorizationServerProxy extends FactorizationProxy {
     }
 
     @Override
-    public void pokeChest(TileEntityChest chest) {
-        if (chest.numUsingPlayers == 0) {
-            Core.network.broadcastMessage(null, new Coord(chest),
-                    MessageType.DemonEnterChest);
-        }
-    }
-
-    @Override
     public EntityPlayer getPlayer(NetHandler handler) {
         return ((NetServerHandler) handler).getPlayer();
     }

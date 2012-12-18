@@ -27,8 +27,6 @@ import factorization.api.Coord;
 public abstract class FactorizationProxy implements IGuiHandler {
     public abstract void broadcastTranslate(EntityPlayer who, String... msg);
 
-    public abstract void pokeChest(TileEntityChest chest);
-
     public abstract EntityPlayer getPlayer(NetHandler handler);
 
     /** Send packet to other side */

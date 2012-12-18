@@ -114,14 +114,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
     }
 
     @Override
-    public void pokeChest(TileEntityChest chest) {
-        float angle = 1.0F;
-        if (chest.lidAngle < angle) {
-            chest.lidAngle = angle;
-        }
-    }
-
-    @Override
     public EntityPlayer getPlayer(NetHandler handler) {
         return Minecraft.getMinecraft().thePlayer;
     }
