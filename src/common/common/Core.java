@@ -378,10 +378,6 @@ public class Core {
         if (is == null) {
             return "<null itemstack; bug?>";
         }
-        String display_name = is.getItem().getItemDisplayName(is);
-        if (display_name != null && display_name.length() != 0) {
-            return display_name;
-        }
         String n = is.getItem().getItemNameIS(is);
         if (n != null && n.length() != 0) {
             n += ".name";

@@ -1,22 +1,18 @@
 package factorization.common.astro;
 
 import static org.lwjgl.opengl.GL11.glCallList;
-import static org.lwjgl.opengl.GL11.glColor3f;
 import static org.lwjgl.opengl.GL11.glGetError;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glRotatef;
 import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import net.minecraft.client.Minecraft;
@@ -33,7 +29,6 @@ import net.minecraft.src.World;
 import net.minecraft.src.WorldRenderer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.ForgeSubscribe;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
 import org.lwjgl.opengl.GL11;
@@ -41,6 +36,7 @@ import org.lwjgl.util.glu.GLU;
 
 import cpw.mods.fml.common.IScheduledTickHandler;
 import cpw.mods.fml.common.TickType;
+import factorization.api.Coord;
 import factorization.common.Core;
 
 
@@ -61,15 +57,93 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
     long megatickCount = 0;
     
     class DSRenderInfo {
+        static final int width = 1;
+        static final int height = 8;
+        static final int cubicChunkCount = width*width*height;
+        static final int wr_display_list_size = 3; //how many display lists a WorldRenderer uses
+        
         int renderCounts = 0;
         long lastRenderInMegaticks = megatickCount;
         boolean dirty = false;
         private int renderList = -1;
-        WorldRenderer worldRenderer = null;
+        WorldRenderer renderers[] = new WorldRenderer[cubicChunkCount];
+        Coord corner;
+        
+        public DSRenderInfo(Coord corner) {
+            this.corner = corner;
+            int xzSize = width*width;
+            int i = 0;
+            checkGLError("FZDS before render");
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    for (int z = 0; z < width; z++) {
+                        renderers[i] = new WorldRenderer(corner.w, corner.w.loadedTileEntityList, corner.x + x*16, corner.y + y*16, corner.z + z*16, getRenderList() + i*wr_display_list_size);
+                        checkGLError("FZDS WorldRenderer init");
+                        i++;
+                    }
+                }
+            }
+        }
+        
+        void update() {
+            Core.profileStart("update");
+            checkGLError("FZDS before WorldRender update");
+            for (int i = 0; i < renderers.length; i++) {
+                renderers[i].needsUpdate = renderCounts == 0;
+                renderers[i].updateRenderer();
+                renderers[i].isInFrustum = true;
+                checkGLError("FZDS WorldRender update");
+            }
+            Core.profileEnd();
+        }
+        
+        void renderTerrain() {
+            RenderHelper.disableStandardItemLighting();
+            if (Minecraft.getMinecraft().isAmbientOcclusionEnabled() && Core.dimension_slice_allow_smooth) {
+                GL11.glShadeModel(GL11.GL_SMOOTH);
+            }
+            
+            for (int pass = 0; pass < 2; pass++) {
+                for (int i = 0; i < renderers.length; i++) {
+                    WorldRenderer wr = renderers[i];
+                    int displayList = wr.getGLCallListForPass(pass);
+                    if (displayList >= 0) {
+                        loadTexture("/terrain.png");
+                        glCallList(displayList);
+                    }
+                }
+            }
+        }
+        
+        void renderEntities(float partialTicks) {
+            RenderHelper.enableStandardItemLighting();
+            //Maybe we should use RenderGlobal.renderEntities ???
+            for (int cdx = 0; cdx < width; cdx++) {
+                for (int cdz = 0; cdz < width; cdz++) {
+                    Chunk here = corner.w.getChunkFromBlockCoords(corner.x + cdx*16, corner.z + cdz*16);
+                    for (int i1 = 0; i1 < here.entityLists.length; i1++) {
+                        List<Entity> ents = here.entityLists[i1];
+                        for (int i2 = 0; i2 < ents.size(); i2++) {
+                            Entity e = ents.get(i2);
+                            if (e instanceof DimensionSliceEntity && nest >= 3) {
+                                continue;
+                            }
+                            //if e is a proxying player, don't render it?
+                            RenderManager.instance.renderEntity(e, partialTicks);
+                        }
+                    }
+                    RenderHelper.enableStandardItemLighting();
+                    for (TileEntity te : ((Map<ChunkCoordinates, TileEntity>)here.chunkTileEntityMap).values()) {
+                        //I warned you about comods, bro! I told you, dawg!
+                        TileEntityRenderer.instance.renderTileEntity(te, partialTicks);
+                    }
+                }
+            }
+        }
         
         int getRenderList() {
             if (renderList == -1) {
-                renderList = GLAllocation.generateDisplayLists(3);
+                renderList = GLAllocation.generateDisplayLists(wr_display_list_size*cubicChunkCount);
                 renderInfoTracker.add(this);
             }
             return renderList;
@@ -80,7 +154,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 GLAllocation.deleteDisplayLists(renderList);
                 renderList = -1;
             }
-            worldRenderer = null;
+            Arrays.fill(renderers, (WorldRenderer) null);
         }
     }
     
@@ -91,9 +165,11 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         if (ent.isDead) {
             return;
         }
+        World subWorld = DimensionManager.getWorld(0); // we.wew;
+        subWorld = HammerManager.getClientWorld();
         DimensionSliceEntity we = (DimensionSliceEntity) ent;
         if (we.renderInfo == null) {
-            we.renderInfo = new DSRenderInfo();
+            we.renderInfo = new DSRenderInfo(new Coord(subWorld, -16, 0, -16));
         }
         DSRenderInfo renderInfo = (DSRenderInfo) we.renderInfo;
         if (nest == 0) {
@@ -104,67 +180,23 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         }
         nest++;
         glPushMatrix();
+        
         try {
-            //World subWorld = DimensionManager.getWorld(Core.dimension_slice_dimid); // we.wew;
-            //subWorld = DimensionManager.getWorld(0);
-            World subWorld = DimensionManager.getWorld(0); // we.wew;
-            subWorld = HammerManager.getClientWorld();
-            if (subWorld == null) {
-                //Huh. Lame.
-                subWorld = we.worldObj;
-            }
-            //subWorld = we.worldObj;
-            WorldRenderer wr = renderInfo.worldRenderer;
-            checkGLError("FZDS before render");
-            if (wr == null) {
-                wr = new WorldRenderer(subWorld, subWorld.loadedTileEntityList, 0, 0, 0, renderInfo.getRenderList());
-                renderInfo.worldRenderer = wr;
-                checkGLError("FZDS render list");
-            }
-            wr.needsUpdate = renderInfo.renderCounts == 0;
             if (nest == 1) {
                 Core.profileStart("build");
-                wr.updateRenderer();
+                renderInfo.update();
                 Core.profileEnd();
             }
-            float s = 1F/16F;
+            float s = 1F/4F;
             glTranslatef((float)x, (float)y, (float)z);
             //glRotatef(45, 1, 1, 0);
             glScalef(s, s, s);
-            wr.isInFrustum = true;
-            RenderHelper.disableStandardItemLighting();
-            if (Minecraft.getMinecraft().isAmbientOcclusionEnabled() && Core.dimension_slice_allow_smooth) {
-                GL11.glShadeModel(GL11.GL_SMOOTH);
-            }
-            for (int pass = 0; pass < 2; pass++) {
-                int displayList = wr.getGLCallListForPass(pass);
-                if (displayList >= 0) {
-                    loadTexture("/terrain.png");
-                    glCallList(displayList);
-                }
-            }
-            RenderHelper.enableStandardItemLighting();
             
-            //glRotatef(-45, 1, 0, 0);
+            renderInfo.renderTerrain();
             glTranslatef((float)-x, (float)-y, (float)-z);
             glTranslatef((float)we.posX, (float)we.posY, (float)we.posZ);
-            //Maybe we should use RenderGlobal.renderEntities ???
-            Chunk here = subWorld.getChunkFromBlockCoords(0, 0);
-            for (int i1 = 0; i1 < here.entityLists.length; i1++) {
-                List<Entity> ents = here.entityLists[i1];
-                for (int i2 = 0; i2 < ents.size(); i2++) {
-                    Entity e = ents.get(i2);
-                    if (e instanceof DimensionSliceEntity && nest >= 3) {
-                        continue;
-                    }
-                    RenderManager.instance.renderEntity(e, partialTicks);
-                }
-            }
-            RenderHelper.enableStandardItemLighting();
-            for (TileEntity te : ((Map<ChunkCoordinates, TileEntity>)here.chunkTileEntityMap).values()) {
-                //I warned you about comods, bro! I told you, dawg!
-                TileEntityRenderer.instance.renderTileEntity(te, partialTicks);
-            }
+            renderInfo.renderEntities(partialTicks);
+            
             checkGLError("FZDS after render");
         }
         catch (Exception e) {

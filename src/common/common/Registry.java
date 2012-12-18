@@ -835,10 +835,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         silverGen.generate(world, rand, x, y, z);
     }
 
-    public void onTickWorld(World world) {
-        if (world.isRemote) {
-            return;
-        }
+    public void onTickServer() {
         //NOTE: This might bug out if worlds don't tick at the same rate or something! Or if they're in different threads!
         //(Like THAT would ever happen, ah ha ha ha ha ha ha ha ha ha ha ha ha ha.)
         TileEntityWrathLamp.handleAirUpdates();
@@ -968,7 +965,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
     @Override
     public void tickStart(EnumSet<TickType> type, Object... tickData) {
-        this.onTickWorld((World) tickData[0]);
+        this.onTickServer();
     }
 
     @Override
@@ -976,10 +973,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         
     }
 
-    private EnumSet<TickType> worldTicks = EnumSet.of(TickType.WORLD);
+    private EnumSet<TickType> serverTicks = EnumSet.of(TickType.SERVER);
     @Override
     public EnumSet<TickType> ticks() {
-        return worldTicks;
+        return serverTicks;
     }
 
     @Override

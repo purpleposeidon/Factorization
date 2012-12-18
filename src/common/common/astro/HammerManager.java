@@ -44,7 +44,6 @@ public class HammerManager implements IConnectionHandler, IScheduledTickHandler 
             return;
         }
         TickRegistry.registerScheduledTickHandler(Core.hammerManager, Side.SERVER);
-        TickRegistry.registerTickHandler(new NetworkDimensionStateTicker(), Side.SERVER);
         dimensionID = Core.dimension_slice_dimid;
         DimensionManager.registerProviderType(dimensionID, HammerWorldProvider.class, true);
         DimensionManager.registerDimension(dimensionID, dimensionID);
@@ -201,49 +200,4 @@ public class HammerManager implements IConnectionHandler, IScheduledTickHandler 
     }
     @Override
     public void tickStart(EnumSet<TickType> type, Object... tickData) {}
-    
-    public class NetworkDimensionStateTicker implements ITickHandler {
-        @Override
-        public void tickStart(EnumSet<TickType> type, Object... tickData) {
-            World world = (World) tickData[0];
-            if (!(world.getChunkProvider() instanceof HammerChunkProvider)) {
-                //not the best check, but should be efficient.
-                return;
-            }
-            for (EntityPlayer ep : (List<EntityPlayer>) world.playerEntities) {
-                if (ep instanceof PacketProxyingPlayer) {
-                    PacketProxyingPlayer ppnp = (PacketProxyingPlayer) ep;
-                    ppnp.enterTick();
-                }
-            }
-        }
-
-        @Override
-        public void tickEnd(EnumSet<TickType> type, Object... tickData) {
-            World world = (World) tickData[0];
-            if (!(world.getChunkProvider() instanceof HammerChunkProvider)) {
-                //not the best check, but should be efficient.
-                return;
-            }
-            for (EntityPlayer ep : (List<EntityPlayer>) world.playerEntities) {
-                if (ep instanceof PacketProxyingPlayer) {
-                    PacketProxyingPlayer ppnp = (PacketProxyingPlayer) ep;
-                    ppnp.leaveTick();
-                }
-            }
-        }
-
-        EnumSet<TickType> worldTicks = EnumSet.of(TickType.WORLD);
-        
-        @Override
-        public EnumSet<TickType> ticks() {
-            return worldTicks;
-        }
-
-        @Override
-        public String getLabel() {
-            return "FZDS network";
-        }
-        
-    }
 }

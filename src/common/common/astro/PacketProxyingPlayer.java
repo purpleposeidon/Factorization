@@ -10,16 +10,14 @@ import net.minecraft.src.NetHandler;
 import net.minecraft.src.NetServerHandler;
 import net.minecraft.src.Packet;
 import net.minecraft.src.Packet18Animation;
-import net.minecraft.src.Packet201PlayerInfo;
-import net.minecraft.src.Packet255KickDisconnect;
+import net.minecraft.src.Packet24MobSpawn;
+import net.minecraft.src.Packet28EntityVelocity;
 import net.minecraft.src.Packet31RelEntityMove;
+import net.minecraft.src.Packet32EntityLook;
 import net.minecraft.src.Packet33RelEntityMoveLook;
+import net.minecraft.src.Packet34EntityTeleport;
 import net.minecraft.src.Packet35EntityHeadRotation;
-import net.minecraft.src.Packet3Chat;
 import net.minecraft.src.Packet40EntityMetadata;
-import net.minecraft.src.Packet52MultiBlockChange;
-import net.minecraft.src.Packet53BlockChange;
-import net.minecraft.src.Packet56MapChunks;
 import net.minecraft.src.PlayerManager;
 import net.minecraft.src.WorldServer;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
@@ -99,16 +97,21 @@ public class PacketProxyingPlayer extends EntityPlayerMP {
             //Packet31RelEntityMove
             //Packet33RelEntityMoveLook
             //idea: so one of the below causes us to freeze up. Determine which one it is, isolate it (or them...). Trace the execution path of it.
-//			if (packet instanceof Packet18Animation
-//					|| packet instanceof Packet31RelEntityMove
-//					|| packet instanceof Packet35EntityHeadRotation
-//					|| packet instanceof Packet40EntityMetadata
-//					|| packet instanceof Packet33RelEntityMoveLook) {
-//				//Yep.
-//				//return;
-//			} else {
-//				
-//			}
+            if (packet instanceof Packet18Animation
+                    || packet instanceof Packet31RelEntityMove
+                    || packet instanceof Packet35EntityHeadRotation
+                    || packet instanceof Packet40EntityMetadata
+                    || packet instanceof Packet33RelEntityMoveLook
+                    ) {
+                //Yep.
+                return;
+            } else {
+                
+            }
+            if (packet instanceof Packet28EntityVelocity || packet instanceof Packet32EntityLook || packet instanceof Packet34EntityTeleport || packet instanceof Packet24MobSpawn) {
+                return;
+            }
+            
 //			if (packet instanceof Packet53BlockChange
 //					|| packet instanceof Packet52MultiBlockChange
 //					|| packet instanceof Packet56MapChunks) {
@@ -116,29 +119,11 @@ public class PacketProxyingPlayer extends EntityPlayerMP {
 //			} else {
 //				return;
 //			}
-            if (inTick) {
-                System.out.println("Proxying packet: " + packet);
-                if (packetsSentThisTick == 0 && inTick) {
-                    sendWorldPush();
-                }
-                packetsSentThisTick++;
-                wrapped.addToSendQueue(packet);
-            } else {
-                System.out.println("proxying packet outside of Tick: " + packet);
-                sendWorldPush();
-                wrapped.addToSendQueue(packet);
-                sendWorldPop();
-            }
+            System.out.println("DS Wrapping: " + packet);
+            wrapped.addToSendQueue(Core.network.wrapPacket(packet));
+            return;
         }
         
-        void sendWorldPush() {
-            wrapped.addToSendQueue(Core.network.worldPushPacket(dimensionSlice));
-        }
-        
-        void sendWorldPop() {
-            wrapped.addToSendQueue(Core.network.worldPopPacket());
-        }
-
         @Override
         public void wakeThreads() {
             wrapped.wakeThreads();
@@ -174,18 +159,6 @@ public class PacketProxyingPlayer extends EntityPlayerMP {
             wrapped.closeConnections();
         }
         
-    }
-
-    public void enterTick() {
-        packetsSentThisTick = 0;
-        inTick = true;
-    }
-    
-    public void leaveTick() {
-        if (packetsSentThisTick > 0) {
-            wrappedNetworkManager.sendWorldPop();
-        }
-        inTick = false;
     }
     
     @Override

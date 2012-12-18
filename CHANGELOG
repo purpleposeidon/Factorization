@@ -1,6 +1,7 @@
 0.7.8
   Added config option for silver ore node size
   Removed spam
+  Changed the colors of semiprocessed ore for the better.
 
 0.7.7
   Fixed the issue with ExoArmorTextured & Forge 436 enfocing identical items
