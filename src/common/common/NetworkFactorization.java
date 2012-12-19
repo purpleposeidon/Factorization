@@ -427,20 +427,6 @@ public class NetworkFactorization implements ITinyPacketHandler {
         }
     }
     
-    void XhandleWorldPush(DataInput input) {
-        if (!currentPlayer.get().worldObj.isRemote) {
-            return;
-        }
-        Core.proxy.setClientWorld(HammerManager.getClientWorld());
-    }
-    
-    void XhandleWorldPop(DataInput input) {
-        if (!currentPlayer.get().worldObj.isRemote) {
-            return;
-        }
-        Core.proxy.restoreClientWorld();
-    }
-    
     static public class MessageType {
         //Non TEF messages
         public final static int ShareAll = -1;
