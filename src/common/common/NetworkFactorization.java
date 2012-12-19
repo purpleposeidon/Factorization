@@ -10,33 +10,24 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.IllegalFormatException;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.src.Block;
 import net.minecraft.src.Chunk;
 import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.EntityPlayerMP;
-import net.minecraft.src.INetworkManager;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NetHandler;
 import net.minecraft.src.Packet;
 import net.minecraft.src.Packet131MapData;
-import net.minecraft.src.Packet250CustomPayload;
 import net.minecraft.src.StringTranslate;
 import net.minecraft.src.TileEntity;
-import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.World;
-import net.minecraft.src.WorldServer;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Side;
-import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.ITinyPacketHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
-import cpw.mods.fml.common.network.Player;
 import factorization.api.Coord;
 import factorization.api.VectorUV;
-import factorization.common.astro.DimensionSliceEntity;
-import factorization.common.astro.HammerManager;
+import factorization.common.fzds.HammerManager;
 
 public class NetworkFactorization implements ITinyPacketHandler {
     protected final static short factorizeTEChannel = 0; //used for tile entities

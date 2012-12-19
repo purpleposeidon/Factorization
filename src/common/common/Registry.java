@@ -39,7 +39,7 @@ import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.api.IActOnCraft;
 import factorization.common.Core.TabType;
-import factorization.common.astro.DimensionSliceEntity;
+import factorization.common.fzds.DimensionSliceEntity;
 
 public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler {
     static public final int ExoKeyCount = 3;

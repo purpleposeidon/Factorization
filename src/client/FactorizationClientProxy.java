@@ -11,7 +11,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.src.AchievementList;
 import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.GameSettings;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.INetworkManager;
@@ -23,7 +22,6 @@ import net.minecraft.src.Packet1Login;
 import net.minecraft.src.Profiler;
 import net.minecraft.src.StatFileWriter;
 import net.minecraft.src.TileEntity;
-import net.minecraft.src.TileEntityChest;
 import net.minecraft.src.TileEntitySpecialRenderer;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldClient;
@@ -98,8 +96,8 @@ import factorization.common.TileEntityMixer;
 import factorization.common.TileEntitySlagFurnace;
 import factorization.common.TileEntitySolarTurbine;
 import factorization.common.TileEntityWrathLamp;
-import factorization.common.astro.DimensionSliceEntity;
-import factorization.common.astro.RenderDimensionSliceEntity;
+import factorization.common.fzds.DimensionSliceEntity;
+import factorization.common.fzds.RenderDimensionSliceEntity;
 
 public class FactorizationClientProxy extends FactorizationProxy {
     @Override

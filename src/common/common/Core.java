@@ -3,31 +3,22 @@ package factorization.common;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.src.AchievementList;
 import net.minecraft.src.Block;
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
-import net.minecraft.src.NBTBase;
-import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.SaveHandler;
-import net.minecraft.src.StatFileWriter;
-import net.minecraft.src.WorldInfo;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.WorldAccessContainer;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod.PostInit;
 import cpw.mods.fml.common.Mod.PreInit;
@@ -43,8 +34,8 @@ import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import factorization.api.Coord;
 import factorization.client.gui.FactorizationNotify;
-import factorization.common.astro.FZDSCommand;
-import factorization.common.astro.HammerManager;
+import factorization.common.fzds.FZDSCommand;
+import factorization.common.fzds.HammerManager;
 
 @Mod(modid = "factorization", name = "Factorization", version = Core.version)
 @NetworkMod(
