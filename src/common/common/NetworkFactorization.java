@@ -34,7 +34,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
     protected final static short factorizeMsgChannel = 1; //used for sending translatable chat messages
     protected final static short factorizeCmdChannel = 2; //used for player keys
     protected final static short factorizeNtfyChannel = 3; //used to show messages in-world
-    protected final static short factorizeDsPacketWrap = 6; //TODO: Use this instead of push/pop; we need it to be atomic.
+    protected final static short factorizeDsPacketWrap = 6; //wraps an arbitrary packet from the DS dimension
 
     public NetworkFactorization() {
         Core.network = this;
@@ -410,7 +410,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
     
     static Socket fakeSocket = new Socket();
     void handleDsWrap(NetHandler handler, DataInputStream input) {
-        Packet wrapped;
+        Packet wrapped = null;
         try {
             wrapped = Packet.readPacket(input, false, fakeSocket);
         } catch (IOException e) {

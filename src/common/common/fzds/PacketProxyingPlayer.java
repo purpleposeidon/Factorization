@@ -32,7 +32,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP {
     static boolean useShortViewRadius = false;
     
     public PacketProxyingPlayer(EntityPlayerMP proxiedPlayer, DimensionSliceEntity dimensionSlice, Coord cellLocation) {
-        super(proxiedPlayer.mcServer, dimensionSlice.hammerCell.w, "FZDS.PlayerProxy:" + dimensionSlice.cell, new ItemInWorldManager(dimensionSlice.hammerCell.w));
+        super(proxiedPlayer.mcServer, dimensionSlice.hammerCell.w, "FZDS" + dimensionSlice.cell, new ItemInWorldManager(dimensionSlice.hammerCell.w));
         if (proxiedPlayer instanceof PacketProxyingPlayer) {
             throw new RuntimeException("tried to nest player dimension proxies");
         }

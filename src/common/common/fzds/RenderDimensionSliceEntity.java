@@ -1,11 +1,6 @@
 package factorization.common.fzds;
 
-import static org.lwjgl.opengl.GL11.glCallList;
-import static org.lwjgl.opengl.GL11.glGetError;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslatef;
+import static org.lwjgl.opengl.GL11.*;
 
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -58,7 +53,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
     
     class DSRenderInfo {
         static final int width = 1;
-        static final int height = 8;
+        static final int height = 1;
         static final int cubicChunkCount = width*width*height;
         static final int wr_display_list_size = 3; //how many display lists a WorldRenderer uses
         
@@ -107,6 +102,11 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 for (int i = 0; i < renderers.length; i++) {
                     WorldRenderer wr = renderers[i];
                     int displayList = wr.getGLCallListForPass(pass);
+                    glBegin(GL_TRIANGLES);
+                    glVertex3f(pass, 0 + i, 0);
+                    glVertex3f(pass, 1 + i, 0);
+                    glVertex3f(pass, 1 + i, 1);
+                    glEnd();
                     if (displayList >= 0) {
                         loadTexture("/terrain.png");
                         glCallList(displayList);
@@ -158,16 +158,16 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         }
     }
     
-    int nest = 0;
+    public static int nest = 0;
     @Override
     public void doRender(Entity ent, double x, double y, double z, float yaw, float partialTicks) {
         //XXX TODO: Don't render if we're far away! (This should maybe be done in some other function?)
         if (ent.isDead) {
             return;
         }
-        World subWorld = DimensionManager.getWorld(0); // we.wew;
-        subWorld = HammerManager.getClientWorld();
         DimensionSliceEntity we = (DimensionSliceEntity) ent;
+        World subWorld = we.worldObj; //DimensionManager.getWorld(0);
+        //subWorld = HammerManager.getClientWorld();
         if (we.renderInfo == null) {
             we.renderInfo = new DSRenderInfo(new Coord(subWorld, -16, 0, -16));
         }
@@ -187,14 +187,15 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 renderInfo.update();
                 Core.profileEnd();
             }
-            float s = 1F/4F;
+            float s = 1F/8F;
             glTranslatef((float)x, (float)y, (float)z);
-            //glRotatef(45, 1, 1, 0);
+            //glRotatef(1, 1, 1, 0);
             glScalef(s, s, s);
             
-            renderInfo.renderTerrain();
             glTranslatef((float)-x, (float)-y, (float)-z);
             glTranslatef((float)we.posX, (float)we.posY, (float)we.posZ);
+            
+            renderInfo.renderTerrain();
             renderInfo.renderEntities(partialTicks);
             
             checkGLError("FZDS after render");
