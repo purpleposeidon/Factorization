@@ -97,20 +97,20 @@ public class PacketProxyingPlayer extends EntityPlayerMP {
             //Packet31RelEntityMove
             //Packet33RelEntityMoveLook
             //idea: so one of the below causes us to freeze up. Determine which one it is, isolate it (or them...). Trace the execution path of it.
-            if (packet instanceof Packet18Animation
-                    || packet instanceof Packet31RelEntityMove
-                    || packet instanceof Packet35EntityHeadRotation
-                    || packet instanceof Packet40EntityMetadata
-                    || packet instanceof Packet33RelEntityMoveLook
-                    ) {
-                //Yep.
-                return;
-            } else {
-                
-            }
-            if (packet instanceof Packet28EntityVelocity || packet instanceof Packet32EntityLook || packet instanceof Packet34EntityTeleport || packet instanceof Packet24MobSpawn) {
-                return;
-            }
+//			if (packet instanceof Packet18Animation
+//					|| packet instanceof Packet31RelEntityMove
+//					|| packet instanceof Packet35EntityHeadRotation
+//					|| packet instanceof Packet40EntityMetadata
+//					|| packet instanceof Packet33RelEntityMoveLook
+//					) {
+//				//Yep.
+//				return;
+//			} else {
+//				
+//			}
+//			if (packet instanceof Packet28EntityVelocity || packet instanceof Packet32EntityLook || packet instanceof Packet34EntityTeleport || packet instanceof Packet24MobSpawn) {
+//				return;
+//			}
             
 //			if (packet instanceof Packet53BlockChange
 //					|| packet instanceof Packet52MultiBlockChange
@@ -119,7 +119,6 @@ public class PacketProxyingPlayer extends EntityPlayerMP {
 //			} else {
 //				return;
 //			}
-            System.out.println("DS Wrapping: " + packet);
             wrapped.addToSendQueue(Core.network.wrapPacket(packet));
             return;
         }

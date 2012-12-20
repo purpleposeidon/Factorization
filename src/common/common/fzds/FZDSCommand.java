@@ -67,8 +67,8 @@ public class FZDSCommand extends CommandBase {
                 currentWE.worldObj.spawnEntityInWorld(currentWE);
                 //This should be moved to the FZDS entity
                 PacketProxyingPlayer ppp = new PacketProxyingPlayer(player, currentWE, currentWE.hammerCell);
-                ppp.posY += 60;
                 ppp.worldObj.spawnEntityInWorld(ppp);
+                ((EntityPlayerMP) sender).addChatMessage("Created FZDS " + currentWE.cell);
             }
             if (cmd.equalsIgnoreCase("remove")) {
                 for (Entity ent : (List<Entity>)player.worldObj.loadedEntityList) {

@@ -14,7 +14,7 @@ import net.minecraft.src.World;
 import factorization.api.Coord;
 
 public class HammerChunkProvider implements IChunkProvider {
-
+    //TODO: Move to HammerManager
     //each cell is a few chunks wide, with chunks of bedrock between.
     static int cellWidth = 3;
     static int wallWidth = 16;

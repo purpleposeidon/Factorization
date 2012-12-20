@@ -24,6 +24,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.world.WorldEvent;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.IScheduledTickHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Side;
@@ -58,10 +59,14 @@ public class HammerManager implements IConnectionHandler, IScheduledTickHandler 
         assert DimensionManager.shouldLoadSpawn(dimensionID);
     }
     
+    Coord getCoordForCell(int cellId) {
+        return HammerChunkProvider.getCellStart(FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT ? getClientWorld() : getServerWorld(), cellId);
+    }
+    
     DimensionSliceEntity allocateSlice(World spawnWorld) {
-        World sliceWorld = getServerWorld();
+        int cell_id = takeCellId();
         Coord cellLocation = new Coord(DimensionManager.getWorld(0), 0, 0, 0);
-        DimensionSliceEntity dse = new DimensionSliceEntity(spawnWorld, takeCellId());
+        DimensionSliceEntity dse = new DimensionSliceEntity(spawnWorld, cell_id);
         dse.hammerCell = cellLocation;
         return dse;
     }

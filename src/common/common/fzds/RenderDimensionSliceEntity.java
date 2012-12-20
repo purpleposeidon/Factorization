@@ -52,8 +52,8 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
     long megatickCount = 0;
     
     class DSRenderInfo {
-        static final int width = 1;
-        static final int height = 1;
+        static final int width = 3;
+        static final int height = 8;
         static final int cubicChunkCount = width*width*height;
         static final int wr_display_list_size = 3; //how many display lists a WorldRenderer uses
         
@@ -72,7 +72,11 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
                     for (int z = 0; z < width; z++) {
+                        //We could allocate lists per WR instead?
                         renderers[i] = new WorldRenderer(corner.w, corner.w.loadedTileEntityList, corner.x + x*16, corner.y + y*16, corner.z + z*16, getRenderList() + i*wr_display_list_size);
+                        renderers[i].posXClip = x*16;
+                        renderers[i].posYClip = y*16;
+                        renderers[i].posZClip = z*16;
                         checkGLError("FZDS WorldRenderer init");
                         i++;
                     }
@@ -82,11 +86,13 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         
         void update() {
             Core.profileStart("update");
+            if (renderCounts != 0) {
+                return;
+            }
             checkGLError("FZDS before WorldRender update");
             for (int i = 0; i < renderers.length; i++) {
-                renderers[i].needsUpdate = renderCounts == 0;
+                renderers[i].needsUpdate = true;
                 renderers[i].updateRenderer();
-                renderers[i].isInFrustum = true;
                 checkGLError("FZDS WorldRender update");
             }
             Core.profileEnd();
@@ -101,12 +107,8 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             for (int pass = 0; pass < 2; pass++) {
                 for (int i = 0; i < renderers.length; i++) {
                     WorldRenderer wr = renderers[i];
+                    wr.isInFrustum = true; //XXX might not be necessary
                     int displayList = wr.getGLCallListForPass(pass);
-                    glBegin(GL_TRIANGLES);
-                    glVertex3f(pass, 0 + i, 0);
-                    glVertex3f(pass, 1 + i, 0);
-                    glVertex3f(pass, 1 + i, 1);
-                    glEnd();
                     if (displayList >= 0) {
                         loadTexture("/terrain.png");
                         glCallList(displayList);
@@ -135,6 +137,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                     RenderHelper.enableStandardItemLighting();
                     for (TileEntity te : ((Map<ChunkCoordinates, TileEntity>)here.chunkTileEntityMap).values()) {
                         //I warned you about comods, bro! I told you, dawg!
+                        //(Shouldn't actually be a problem if we're rendering properly)
                         TileEntityRenderer.instance.renderTileEntity(te, partialTicks);
                     }
                 }
@@ -166,8 +169,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             return;
         }
         DimensionSliceEntity we = (DimensionSliceEntity) ent;
-        World subWorld = we.worldObj; //DimensionManager.getWorld(0);
-        //subWorld = HammerManager.getClientWorld();
+        World subWorld = HammerManager.getClientWorld();
         if (we.renderInfo == null) {
             we.renderInfo = new DSRenderInfo(new Coord(subWorld, -16, 0, -16));
         }
@@ -178,26 +180,24 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         } else if (nest == 1) {
             Core.profileStart("recursion");
         }
+        
         nest++;
         glPushMatrix();
-        
         try {
             if (nest == 1) {
                 Core.profileStart("build");
                 renderInfo.update();
                 Core.profileEnd();
             }
-            float s = 1F/8F;
+            float s = 1/16F;
             glTranslatef((float)x, (float)y, (float)z);
             //glRotatef(1, 1, 1, 0);
             glScalef(s, s, s);
-            
+            renderInfo.renderTerrain();
             glTranslatef((float)-x, (float)-y, (float)-z);
             glTranslatef((float)we.posX, (float)we.posY, (float)we.posZ);
-            
-            renderInfo.renderTerrain();
+            glTranslatef(16, 0, 16);
             renderInfo.renderEntities(partialTicks);
-            
             checkGLError("FZDS after render");
         }
         catch (Exception e) {
