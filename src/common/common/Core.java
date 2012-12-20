@@ -400,7 +400,7 @@ public class Core {
         if (ret == null || ret.length() == 0) {
             return false;
         }
-        return ret.equals(str);
+        return !ret.equals(str);
     }
     
     public static String getTranslationKey(Item i) {

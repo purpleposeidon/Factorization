@@ -104,11 +104,6 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
             int avail = Math.min(heatToRemove, charge.getValue());
             if (avail > 0 && charge2heat(heatToRemove) > 0) {
                 heat += charge2heat(charge.deplete(heatToRemove));
-            } else if (now % 200 <= rate) {
-                //lose some heat if we're not being powered
-                int toLose = Math.max(1, heat / 8);
-                heat -= toLose;
-                heat = (byte) Math.max(0, heat);
             }
         }
         charge.update();
