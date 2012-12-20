@@ -34,7 +34,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP {
     public PacketProxyingPlayer(EntityPlayerMP proxiedPlayer, DimensionSliceEntity dimensionSlice, Coord cellLocation) {
         super(proxiedPlayer.mcServer, dimensionSlice.hammerCell.w, "FZDS" + dimensionSlice.cell, new ItemInWorldManager(dimensionSlice.hammerCell.w));
         if (proxiedPlayer instanceof PacketProxyingPlayer) {
-            throw new RuntimeException("tried to nest player dimension proxies");
+            throw new RuntimeException("tried to nest FZDS player proxy");
         }
         this.proxiedPlayer = proxiedPlayer;
         this.dimensionSlice = dimensionSlice;
@@ -119,6 +119,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP {
 //			} else {
 //				return;
 //			}
+            System.out.println("Proxying: " + packet);
             wrapped.addToSendQueue(Core.network.wrapPacket(packet));
             return;
         }

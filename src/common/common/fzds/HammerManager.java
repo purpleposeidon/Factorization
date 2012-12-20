@@ -59,15 +59,14 @@ public class HammerManager implements IConnectionHandler, IScheduledTickHandler 
         assert DimensionManager.shouldLoadSpawn(dimensionID);
     }
     
-    Coord getCoordForCell(int cellId) {
+    public static Coord getCoordForCell(int cellId) {
         return HammerChunkProvider.getCellStart(FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT ? getClientWorld() : getServerWorld(), cellId);
     }
     
     DimensionSliceEntity allocateSlice(World spawnWorld) {
-        int cell_id = takeCellId();
-        Coord cellLocation = new Coord(DimensionManager.getWorld(0), 0, 0, 0);
+        int cell_id = 76; //takeCellId();
         DimensionSliceEntity dse = new DimensionSliceEntity(spawnWorld, cell_id);
-        dse.hammerCell = cellLocation;
+        dse.hammerCell = getCoordForCell(cell_id);
         return dse;
     }
     

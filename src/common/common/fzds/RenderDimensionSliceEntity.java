@@ -171,7 +171,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         DimensionSliceEntity we = (DimensionSliceEntity) ent;
         World subWorld = HammerManager.getClientWorld();
         if (we.renderInfo == null) {
-            we.renderInfo = new DSRenderInfo(new Coord(subWorld, -16, 0, -16));
+            we.renderInfo = new DSRenderInfo(HammerManager.getCoordForCell(we.cell));
         }
         DSRenderInfo renderInfo = (DSRenderInfo) we.renderInfo;
         if (nest == 0) {
@@ -191,7 +191,6 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             }
             float s = 1/16F;
             glTranslatef((float)x, (float)y, (float)z);
-            //glRotatef(1, 1, 1, 0);
             glScalef(s, s, s);
             renderInfo.renderTerrain();
             glTranslatef((float)-x, (float)-y, (float)-z);
