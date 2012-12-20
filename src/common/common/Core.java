@@ -13,6 +13,7 @@ import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
+import net.minecraft.src.StatCollector;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
@@ -365,24 +366,41 @@ public class Core {
         return block;
     }
     
-    public static String getTranslationKey(ItemStack is) {
-        if (is == null) {
-            return "<null itemstack; bug?>";
-        }
+    public static String getProperKey(ItemStack is) {
         String n = is.getItem().getItemNameIS(is);
-        if (n != null && n.length() != 0) {
-            n += ".name";
+        if (n == null || n.length() == 0) {
+            n = is.getItem().getItemName();
         }
         if (n == null || n.length() == 0) {
-            n = is.getItem().getItemName() + ".name";
-        }
-        if (n == null || n.length() == 0) {
-            n = is.getItemName() + ".name";
+            n = is.getItemName();
         }
         if (n == null || n.length() == 0) {
             n = "???";
         }
         return n;
+    }
+    
+    public static String getTranslationKey(ItemStack is) {
+        //Get the key for translating is.
+        if (is == null) {
+            return "<null itemstack; bug?>";
+        }
+        String key = getProperKey(is);
+        if (canTranslate(key + ".name")) {
+            return key + ".name";
+        }
+        if (canTranslate(key)) {
+            return key;
+        }
+        return is.getDisplayName();
+    }
+    
+    static boolean canTranslate(String str) {
+        String ret = StatCollector.translateToLocal(str);
+        if (ret == null || ret.length() == 0) {
+            return false;
+        }
+        return ret.equals(str);
     }
     
     public static String getTranslationKey(Item i) {
