@@ -45,7 +45,7 @@ import factorization.common.fzds.HammerManager;
         )
 public class Core {
     //The comment below is a marker used by the build script.
-    public static final String version = "0.7.8"; //@VERSION@
+    public static final String version = "0.7.9"; //@VERSION@
     public Core() {
         registry = new Registry();
         exoCore = new ExoCore();
