@@ -1,9 +1,9 @@
 package factorization.common;
 
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.IInventory;
-import net.minecraft.src.Item;
-import net.minecraft.src.ItemStack;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import factorization.api.IActOnCraft;
 
 public class ItemMatrixProgrammer extends ItemCraftingComponent {

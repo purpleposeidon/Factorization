@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.src.GuiContainer;
-import net.minecraft.src.ItemStack;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.item.ItemStack;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.api.API;
 import codechicken.nei.api.IConfigureNEI;

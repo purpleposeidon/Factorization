@@ -4,12 +4,12 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import net.minecraft.src.Block;
-import net.minecraft.src.Item;
-import net.minecraft.src.ItemStack;
-import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.Packet;
-import net.minecraft.src.TileEntityFurnace;
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.tileentity.TileEntityFurnace;
 import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
 import net.minecraftforge.common.ForgeDirection;

@@ -4,23 +4,13 @@ set -e
 BASE=$(dirname `pwd`/$0)/
 cd $BASE/../
 
-#Now in MCP
-mkdir -p src/common/factorization
+#Now in FZ/forge shared directory
+cd forge/mcp
+#Now in forge/mcp
+
 mkdir -p src/minecraft/factorization/
-mkdir -p src/minecraft_server/factorization
-
-pushd src/common/factorization
-  ln -s $BASE/src/common/* ./
-popd
-
 pushd src/minecraft/factorization
-  ln -s $BASE/src/client ./
-  #ln -s $BASE/src/inject/FactorizationHack.java ../net/minecraft/src/
-popd
-
-pushd src/minecraft_server/factorization/
-  ln -s $BASE/src/server ./
-  #ln -s $BASE/src/inject/FactorizationHack.java ../net/minecraft/src/
+  ln -s $BASE/src/common/* ./
 popd
 
 mkdir -p lib/factorization
@@ -30,5 +20,5 @@ popd
 
 mkdir -p jars/saves
 pushd jars/saves
-  unzip ../../factorization/testworld.zip
+  unzip $BASE/testworld.zip
 popd

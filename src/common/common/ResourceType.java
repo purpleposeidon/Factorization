@@ -1,6 +1,6 @@
 package factorization.common;
 
-import net.minecraft.src.ItemStack;
+import net.minecraft.item.ItemStack;
 
 public enum ResourceType {
     SILVERORE(0), SILVERBLOCK(1), LEADBLOCK(2), DARKIRONBLOCK(3), EXOMODDER(4);

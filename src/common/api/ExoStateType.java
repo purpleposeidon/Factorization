@@ -1,11 +1,8 @@
 package factorization.api;
 
-import static factorization.api.ExoStateShader.*;
-import net.minecraft.src.GameSettings;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Side;
-import cpw.mods.fml.common.asm.SideOnly;
-import factorization.client.FactorizationClientProxy;
+import static factorization.api.ExoStateShader.INVERSE;
+import static factorization.api.ExoStateShader.NORMAL;
+import static factorization.api.ExoStateShader.RISINGEDGE;
 import factorization.common.Core;
 
 public enum ExoStateType {

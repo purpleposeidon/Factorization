@@ -5,23 +5,23 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Random;
 
-import net.minecraft.src.AchievementList;
-import net.minecraft.src.Block;
-import net.minecraft.src.CraftingManager;
-import net.minecraft.src.EntityItem;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.FurnaceRecipes;
-import net.minecraft.src.IChunkProvider;
-import net.minecraft.src.IInventory;
-import net.minecraft.src.IRecipe;
-import net.minecraft.src.InventoryPlayer;
-import net.minecraft.src.Item;
-import net.minecraft.src.ItemStack;
-import net.minecraft.src.MapColor;
-import net.minecraft.src.Material;
-import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.World;
-import net.minecraft.src.WorldGenMinable;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.MapColor;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.stats.AchievementList;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraftforge.common.DungeonHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
@@ -33,10 +33,10 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ICraftingHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.IWorldGenerator;
-import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
 import factorization.common.Core.TabType;
 import factorization.common.fzds.DimensionSliceEntity;
@@ -108,9 +108,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         is_factory = new ItemStack(factory_block);
         is_lightair = new ItemStack(lightair_block);
 
-        GameRegistry.registerBlock(factory_block, ItemFactorization.class);
-        GameRegistry.registerBlock(lightair_block);
-        GameRegistry.registerBlock(resource_block, ItemBlockResource.class);
+        GameRegistry.registerBlock(factory_block, ItemFactorization.class, "FZ factory");
+        GameRegistry.registerBlock(lightair_block, "FZ Lightair");
+        GameRegistry.registerBlock(resource_block, ItemBlockResource.class, "FZ resource");
         GameRegistry.registerCraftingHandler(this);
         GameRegistry.registerWorldGenerator(this);
 
@@ -878,13 +878,13 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public boolean onItemPickup(EntityItemPickupEvent event) {
         EntityPlayer player = event.entityPlayer;
         EntityItem item = event.item;
-        if (item == null || item.item == null || item.item.stackSize == 0) {
+        ItemStack is = item.func_92014_d();
+        if (item == null || is == null || is.stackSize == 0) {
             return true;
         }
         if (player.isDead) {
             return true;
         }
-        ItemStack is = item.item;
         InventoryPlayer inv = player.inventory;
         // If the item would take a new slot in our inventory, look for bags of
         // holding to put it into

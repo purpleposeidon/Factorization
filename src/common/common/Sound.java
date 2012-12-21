@@ -4,10 +4,10 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import net.minecraft.src.Entity;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.TileEntity;
-import net.minecraft.src.World;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
 

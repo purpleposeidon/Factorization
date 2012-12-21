@@ -4,12 +4,12 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.lang.reflect.Field;
 
-import net.minecraft.src.BlockFurnace;
-import net.minecraft.src.FurnaceRecipes;
-import net.minecraft.src.ItemStack;
-import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.TileEntity;
-import net.minecraft.src.TileEntityFurnace;
+import net.minecraft.block.BlockFurnace;
+import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityFurnace;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;

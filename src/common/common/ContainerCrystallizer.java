@@ -1,7 +1,7 @@
 package factorization.common;
 
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.ICrafting;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.ICrafting;
 
 public class ContainerCrystallizer extends ContainerFactorization {
     TileEntityCrystallizer crys;

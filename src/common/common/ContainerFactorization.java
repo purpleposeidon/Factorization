@@ -3,16 +3,16 @@ package factorization.common;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import net.minecraft.src.Container;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.FurnaceRecipes;
-import net.minecraft.src.IInventory;
-import net.minecraft.src.InventoryPlayer;
-import net.minecraft.src.Item;
-import net.minecraft.src.ItemStack;
-import net.minecraft.src.Slot;
-import net.minecraft.src.SlotFurnace;
-import net.minecraft.src.TileEntityFurnace;
+import net.minecraft.inventory.Container;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.SlotFurnace;
+import net.minecraft.tileentity.TileEntityFurnace;
 
 public class ContainerFactorization extends Container {
     public TileEntityFactorization factory;

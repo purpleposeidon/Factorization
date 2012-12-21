@@ -8,12 +8,12 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import net.minecraft.src.Block;
-import net.minecraft.src.CreativeTabs;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.Item;
-import net.minecraft.src.ItemStack;
-import net.minecraft.src.StatCollector;
+import net.minecraft.block.Block;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
@@ -24,7 +24,6 @@ import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod.PostInit;
 import cpw.mods.fml.common.Mod.PreInit;
 import cpw.mods.fml.common.Mod.ServerStarting;
-import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -33,6 +32,7 @@ import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
+import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.client.gui.FactorizationNotify;
 import factorization.common.fzds.FZDSCommand;
@@ -45,7 +45,7 @@ import factorization.common.fzds.HammerManager;
         )
 public class Core {
     //The comment below is a marker used by the build script.
-    public static final String version = "0.7.9"; //@VERSION@
+    public static final String version = "0.7.10"; //@VERSION@
     public Core() {
         registry = new Registry();
         exoCore = new ExoCore();
@@ -93,6 +93,7 @@ public class Core {
     public static boolean debug_network = false;
     public static boolean dimension_slice_allow_smooth = true;
     public static boolean show_fine_logging = false;
+    public static boolean serverside_translate = true;
     
     public static boolean dev_environ = System.getProperty("user.dir", "").startsWith("/home/poseidon/Development/");
 
@@ -102,7 +103,12 @@ public class Core {
     public final static String texture_file_item = texture_dir + "items.png";
 
     private int getBlockConfig(String name, int defaultId, String comment) {
-        Property prop = config.getBlock(name, defaultId);
+        Property prop = null;
+        if (dev_environ) {
+            return defaultId;
+        } else {
+            prop = config.getBlock(name, defaultId);
+        }
         if (comment != null && comment.length() != 0) {
             prop.comment = comment;
         }
@@ -189,6 +195,7 @@ public class Core {
             Property prop = config.get("general", "entityRelightTask", entity_relight_task_id);
             prop.value = "" + entity_relight_task_id;
         }
+        serverside_translate = getBoolConfig("serversideTranslate", "server", serverside_translate, "If false, notifications will be translated by the client");
 
 
         config.save();

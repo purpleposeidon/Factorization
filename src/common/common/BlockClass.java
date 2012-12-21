@@ -1,6 +1,6 @@
 package factorization.common;
 
-import net.minecraft.src.Block;
+import net.minecraft.block.Block;
 import net.minecraftforge.common.MinecraftForge;
 import factorization.api.Coord;
 

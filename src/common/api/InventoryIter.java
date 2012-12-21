@@ -3,8 +3,8 @@ package factorization.api;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import net.minecraft.src.IInventory;
-import net.minecraft.src.ItemStack;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
 
 public class InventoryIter implements Iterator<ItemStack> {
     ArrayList<InvIter> iters = new ArrayList();

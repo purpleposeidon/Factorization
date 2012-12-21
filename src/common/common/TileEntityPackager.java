@@ -3,7 +3,7 @@ package factorization.common;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import net.minecraft.src.ItemStack;
+import net.minecraft.item.ItemStack;
 
 public class TileEntityPackager extends TileEntityStamper {
     @Override

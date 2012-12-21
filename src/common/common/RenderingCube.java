@@ -4,11 +4,10 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import net.minecraft.src.Block;
-import net.minecraft.src.NBTTagCompound;
+import net.minecraft.nbt.NBTTagCompound;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Side;
-import cpw.mods.fml.common.asm.SideOnly;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.MatrixTransform;
 import factorization.api.VectorUV;
 

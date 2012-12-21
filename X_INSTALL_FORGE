@@ -1,8 +1,6 @@
 #!/bin/bash
 
-pushd ../
-  mv eclipse/ eclipse.backup/
-popd
+mv ../forge/mcp/eclipse ../
 
 pushd cb
   ./install.sh
@@ -10,7 +8,6 @@ popd
 ./embed_source
 echo "Remember to set the lib/ classpath in eclipse!"
 
-pushd ../
-  rm -rf eclipse/
-  mv eclipse.backup/ eclipse/
-popd
+rm -rf ../forge/mcp/eclipse
+mv ../eclipse ../forge/mcp/
+

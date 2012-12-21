@@ -2,9 +2,9 @@ package factorization.common;
 
 import java.util.List;
 
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.ItemBlock;
-import net.minecraft.src.ItemStack;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 
 public class ItemBlockResource extends ItemBlock {
     public ItemBlockResource(int id) {
