@@ -385,14 +385,15 @@ public class Core {
         if (is == null) {
             return "<null itemstack; bug?>";
         }
-        String key = getProperKey(is);
-        if (canTranslate(key + ".name")) {
-            return key + ".name";
-        }
-        if (canTranslate(key)) {
-            return key;
-        }
         return is.getDisplayName();
+//		String key = getProperKey(is);
+//		if (canTranslate(key + ".name")) {
+//			return key + ".name";
+//		}
+//		if (canTranslate(key)) {
+//			return key;
+//		}
+//		return is.getDisplayName();
     }
     
     static boolean canTranslate(String str) {
