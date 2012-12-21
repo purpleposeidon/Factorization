@@ -6,6 +6,7 @@ import factorization.api.Coord;
 import factorization.common.Core.TabType;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.EnumToolMaterial;
@@ -17,7 +18,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
 
 public class ItemAngularSaw extends Item {
-    static Block[] cuttableBlocks = {Block.oreDiamond, Block.oreRedstone, Block.oreLapis, Block.oreCoal,
+    static Block[] cuttableBlocks = {Block.oreDiamond, Block.oreRedstone, Block.oreLapis, Block.oreCoal, Block.oreEmerald,
         Block.stone, Block.glass, Block.glowStone };
     public ItemAngularSaw(int itemID) {
         super(itemID);
@@ -49,6 +50,13 @@ public class ItemAngularSaw extends Item {
     }
     
     @Override
+    public boolean hitEntity(ItemStack par1ItemStack,
+            EntityLiving par2EntityLiving, EntityLiving par3EntityLiving) {
+        // TODO Auto-generated method stub
+        return super.hitEntity(par1ItemStack, par2EntityLiving, par3EntityLiving);
+    }
+    
+    @Override
     public boolean onBlockStartBreak(ItemStack itemstack, int X, int Y, int Z,
             EntityPlayer player) {
         if (!player.capabilities.allowEdit) {
@@ -62,6 +70,7 @@ public class ItemAngularSaw extends Item {
             //Let someone else figure it out.
         }
         if (!canHarvestBlock(block)) {
+            Core.notify(player, here, "No cut");
             return false;
         }
         int damage = 1;
@@ -71,6 +80,15 @@ public class ItemAngularSaw extends Item {
             }
         }
         if (!Core.registry.extractEnergy(player, damage*100)) {
+            for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
+                ItemStack is = player.inventory.getStackInSlot(i);
+                if (is == null || is.getItem() != Core.registry.battery) {
+                    continue;
+                }
+                Core.notify(player, here, "No charge");
+                return true;
+            }
+            Core.notify(player, here, "No battery");
             return true;
         }
         if (!player.worldObj.isRemote) {

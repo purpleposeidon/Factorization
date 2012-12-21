@@ -1,5 +1,12 @@
+0.7.10
+  Ported to 1.4.6
+  Notifications are smaller
+  The angular saw now gives out notifications
+  Fixed battery damage value bug from angular saw
+  Emerald ore is now grindable & sawable
+
 0.7.9
-  Translations happen on the server instead of the client now.
+  Translations happen on the server instead of the client now. (There is a config option to change this.)
   Heaters stay hot
 
 0.7.8

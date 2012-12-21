@@ -117,6 +117,7 @@ public class FactorizationNotify {
         
         
         float scaling = 1.6F/60F;
+        scaling *= 2F/3F;
         GL11.glPushMatrix();
         AxisAlignedBB bb = m.locus.getCollisionBoundingBoxFromPool();
         float y = m.locus.y;

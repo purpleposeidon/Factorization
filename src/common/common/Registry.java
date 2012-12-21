@@ -773,6 +773,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         TileEntityGrinder.addRecipe(new ItemStack(Block.grass), new ItemStack(Block.dirt), 1);
         TileEntityGrinder.addRecipe(new ItemStack(Block.mycelium), new ItemStack(Block.dirt), 1);
         TileEntityGrinder.addRecipe(new ItemStack(Block.oreDiamond), new ItemStack(Item.diamond), 2.25F);
+        TileEntityGrinder.addRecipe(new ItemStack(Block.oreEmerald), new ItemStack(Item.emerald), 2.25F);
         TileEntityGrinder.addRecipe(new ItemStack(Block.oreRedstone), new ItemStack(Item.redstone), 6.5F);
         TileEntityGrinder.addRecipe(new ItemStack(Block.oreLapis), new ItemStack(Item.dyePowder, 1, 4), 8);
         TileEntityGrinder.addRecipe(new ItemStack(Block.oreCoal), new ItemStack(Item.coal), 3.5F);

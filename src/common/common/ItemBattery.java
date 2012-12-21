@@ -36,6 +36,7 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     public void setStorage(ItemStack is, int new_charge) {
         NBTTagCompound tag = FactorizationUtil.getTag(is);
         tag.setInteger("storage", new_charge);
+        normalizeDamage(is);
     }
 
     int magnet_cost = (int) (TileEntityBattery.max_storage * 0.4);
