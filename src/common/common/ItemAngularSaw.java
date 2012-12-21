@@ -1,5 +1,7 @@
 package factorization.common;
 
+import java.util.List;
+
 import factorization.api.Coord;
 import factorization.common.Core.TabType;
 import net.minecraft.block.Block;
@@ -87,5 +89,9 @@ public class ItemAngularSaw extends Item {
         return true;
     }
     
-    
+    @Override
+    public void addInformation(ItemStack is, EntityPlayer player, List list, boolean detailed) {
+        super.addInformation(is, player, list, detailed);
+        Core.brand(list);
+    }
 }
