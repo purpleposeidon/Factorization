@@ -4,7 +4,7 @@ import os, random, time
 import update_info
 
 def getForgeVersion():
-  forge_version_file = "../src/common/net/minecraftforge/common/ForgeVersion.java"
+  forge_version_file = "../forge/mcp/src/minecraft/net/minecraftforge/common/ForgeVersion.java"
   version = []
   for line in open(forge_version_file):
     if "=" in line:

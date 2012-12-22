@@ -6,14 +6,13 @@ echo Packaging client
 ./update_info.py
 #./build_core_mod
 
-cd ../
+FZ=`pwd`
 
-
-pushd reobf/minecraft  > /dev/zero
-  cp -R ../../factorization/texture/ factorization/texture/
+pushd ../forge/mcp/reobf/minecraft  > /dev/zero
+  cp -R $FZ/texture/ factorization/texture/
   rm -rf factorization/texture/ignore/
-  cp ../../factorization/*.info ./
-  cp ../../factorization/CHANGELOG ./
+  cp $FZ/*.info ./
+  cp $FZ/CHANGELOG ./
   jar -cf ~/Dropbox/dev/Factorization-dev.jar CHANGELOG *.info factorization/
   #jar -cf ~/Dropbox/dev/Factorization-dev.jar *Factorization*.class *.info factorization/
 popd > /dev/zero

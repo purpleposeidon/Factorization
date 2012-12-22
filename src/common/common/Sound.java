@@ -4,6 +4,10 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -21,7 +25,8 @@ public enum Sound {
     bagSlurp("random.drink", 0.6, 8.0, false),
     demonSqueek("mob.enderman.scream", 0.9, 8, true),
     wandCool("random.fizz", .2, 0.5, true),
-    shardMake("random.old_explode", 0.7, 1, true),
+    //shardMake("random.old_explode", 0.7, 1, true),
+    shardMake("random.explode", 0.7, 1, true),
     wrathLight("mob.zombie.metal", 1, 3),
     wrathForge("ambient.cave.cave", 1, 1),
     acidBurn("random.fizz", 1, 1, true),
@@ -42,6 +47,7 @@ public enum Sound {
         this.pitch = (float) pitch;
         this.index = sound.list.size();
         sound.list.add(this);
+        
     }
 
     Sound(String src, double volume, double pitch) {
@@ -65,6 +71,7 @@ public enum Sound {
     }
 
     static void receive(DataInput input) {
+        //TODO: We can pass a coord here anyways!
         try {
             int index = input.readInt(), x = input.readInt(), y = input.readInt(), z = input.readInt();
             EntityPlayer player = Core.proxy.getClientPlayer();
@@ -87,7 +94,12 @@ public enum Sound {
     }
 
     public void playAt(World world, double x, double y, double z) {
-        world.playSoundEffect(x, y, z, src, volume, pitch);
+        if (this != shardMake) {
+            return;
+        }
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+            world.playSound(x, y, z, src, volume, pitch, false);
+        }
         share(world, (int) x, (int) y, (int) z);
     }
 

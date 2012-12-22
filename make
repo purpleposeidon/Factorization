@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-pushd ../
+pushd ../forge/mcp/
   ./recompile.sh
   ./reobfuscate.sh
 popd

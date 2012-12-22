@@ -68,9 +68,9 @@ public class Core {
 
     // Configuration
     public static Configuration config;
-    static int factory_block_id = 254;
-    static int lightair_id = 253;
-    static int resource_id = 252;
+    static int factory_block_id = 1000;
+    static int lightair_id = 1001;
+    static int resource_id = 1002;
     public static Pattern routerBan;
     public static boolean render_barrel_item = true;
     public static boolean render_barrel_text = true;

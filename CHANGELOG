@@ -11,6 +11,7 @@
 
 0.7.8
   Added config option for silver ore node size
+  Silver nodes are smaller
   Removed spam
   Changed the colors of semiprocessed ore for the better.
 
