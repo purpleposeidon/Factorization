@@ -56,7 +56,7 @@ public class HammerManager implements IConnectionHandler, IScheduledTickHandler 
     }
     
     DimensionSliceEntity allocateSlice(World spawnWorld) {
-        int cell_id = 76; //takeCellId();
+        int cell_id = 0; //takeCellId();
         DimensionSliceEntity dse = new DimensionSliceEntity(spawnWorld, cell_id);
         dse.hammerCell = getCoordForCell(cell_id);
         return dse;

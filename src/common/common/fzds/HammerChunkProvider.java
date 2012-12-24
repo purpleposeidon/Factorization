@@ -33,7 +33,7 @@ public class HammerChunkProvider implements IChunkProvider {
     
     public static Coord getCellStart(World hammerWorld, int cellIndex) {
         int cellSize = (cellWidth + wallWidth)*16;
-        return new Coord(hammerWorld, cellSize*cellIndex - 2, wallHeight, (1 + cellWidth)*16/2);
+        return new Coord(hammerWorld, cellSize*cellIndex - 2, 0 /*wallHeight*/, (1 + cellWidth)*16/2);
         //return new Coord(hammerWorld, cellSize*cellIndex, wallHeight, cellSize / 2);
     }
 
@@ -47,15 +47,22 @@ public class HammerChunkProvider implements IChunkProvider {
         int z = chunkZ % totalWidth;
         if (x < 0) x += totalWidth;
         if (z < 0) z += totalWidth;
+        Chunk ret;
         if (x >= cellWidth || z >= cellWidth) {
             //this is a wall chunk
             byte bedrock[] = new byte[16*16*wallHeight];
             Arrays.fill(bedrock, (byte)Block.bedrock.blockID);
-            return new Chunk(world, bedrock, chunkX, chunkZ);
+            ret = new Chunk(world, bedrock, chunkX, chunkZ);
         } else {
             //this is a cell chunk
-            return new Chunk(world, chunkX, chunkZ);
+            ret = new Chunk(world, chunkX, chunkZ);
         }
+        for (int i = 0; i < 16; i++) {
+            for (int j = 0; j < 16; j++) {
+                ret.setBlockID(i, 5, j, 1);
+            }
+        }
+        return ret;
     }
 
     @Override

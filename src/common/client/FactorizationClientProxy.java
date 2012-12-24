@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.NetClientHandler;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
@@ -26,6 +27,7 @@ import net.minecraft.stats.StatFileWriter;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
+import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -521,6 +523,14 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }
     }
     
+    class HammerChunkProviderClient extends ChunkProviderClient {
+
+        public HammerChunkProviderClient(World par1World) {
+            super(par1World);
+        }
+        
+    }
+    
     class HammerWorldClient extends WorldClient {
         //NOTE: Temporary, to make it easier to check
         public HammerWorldClient(NetClientHandler par1NetClientHandler, WorldSettings par2WorldSettings, int par3, int par4, Profiler par5Profiler) {
@@ -534,6 +544,11 @@ public class FactorizationClientProxy extends FactorizationProxy {
             return super.setBlockAndMetadataAndInvalidate(par1, par2, par3, par4, par5);
         }
         
+        @Override
+        protected IChunkProvider createChunkProvider() {
+            this.clientChunkProvider = new HammerChunkProviderClient(this);
+            return this.clientChunkProvider;
+        }
     }
     
     @Override
@@ -552,7 +567,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         Minecraft mc = Minecraft.getMinecraft();
         mc.theWorld = wc;
         mc.thePlayer = player;
-        real_world.sendQueue.worldClient = wc;
+        real_world.sendQueue.worldClient = wc; //NOTE: This will require an AT
         //((NetClientHandler)mc.thePlayer.sendQueue.netManager).worldClient = wc;
     }
     

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.util.ChunkCoordinates;
@@ -52,7 +53,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
     long megatickCount = 0;
     
     class DSRenderInfo {
-        static final int width = 3;
+        static final int width = 3; //XXX this should be 3
         static final int height = 8;
         static final int cubicChunkCount = width*width*height;
         static final int wr_display_list_size = 3; //how many display lists a WorldRenderer uses
@@ -162,6 +163,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
     }
     
     public static int nest = 0;
+    public static Chunk myChunk = null;
     @Override
     public void doRender(Entity ent, double x, double y, double z, float yaw, float partialTicks) {
         //XXX TODO: Don't render if we're far away! (This should maybe be done in some other function?)
@@ -169,9 +171,16 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             return;
         }
         DimensionSliceEntity we = (DimensionSliceEntity) ent;
-        World subWorld = HammerManager.getClientWorld();
         if (we.renderInfo == null) {
-            we.renderInfo = new DSRenderInfo(HammerManager.getCoordForCell(we.cell));
+            //we.renderInfo = new DSRenderInfo(new Coord(Minecraft.getMinecraft().theWorld, 0, 0, 0)); //The real world
+            we.renderInfo = new DSRenderInfo(HammerManager.getCoordForCell(we.cell)); //The shadow world
+        }
+        Coord n = HammerManager.getCoordForCell(we.cell);
+        for (int i = 0; i < 80; i++) {
+            n.setId(1);
+            n.y++;
+            n.x++;
+            n.z++;
         }
         DSRenderInfo renderInfo = (DSRenderInfo) we.renderInfo;
         if (nest == 0) {
@@ -182,28 +191,31 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         }
         
         nest++;
-        glPushMatrix();
         try {
             if (nest == 1) {
                 Core.profileStart("build");
                 renderInfo.update();
                 Core.profileEnd();
             }
-            float s = 1/16F;
-            glTranslatef((float)x, (float)y, (float)z);
-            glScalef(s, s, s);
-            renderInfo.renderTerrain();
-            glTranslatef((float)-x, (float)-y, (float)-z);
-            glTranslatef((float)we.posX, (float)we.posY, (float)we.posZ);
-            glTranslatef(16, 0, 16);
-            renderInfo.renderEntities(partialTicks);
-            checkGLError("FZDS after render");
+            glPushMatrix();
+            try {
+                float s = 1/16F;
+                glTranslatef((float)x, (float)y, (float)z);
+                glScalef(s, s, s);
+                renderInfo.renderTerrain();
+                glTranslatef((float)-x, (float)-y, (float)-z);
+                glTranslatef((float)we.posX, (float)we.posY, (float)we.posZ);
+                glTranslatef(16, 0, 16);
+                renderInfo.renderEntities(partialTicks);
+                checkGLError("FZDS after render");
+            } finally {
+                glPopMatrix();
+            }
         }
         catch (Exception e) {
             e.printStackTrace();
         }
         finally {
-            glPopMatrix();
             nest--;
             if (nest == 0) {
                 renderInfo.renderCounts = (1 + renderInfo.renderCounts) % 60;
