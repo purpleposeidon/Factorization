@@ -161,12 +161,6 @@ public abstract class FactorizationProxy implements IGuiHandler {
     public boolean isPlayerAdmin(EntityPlayer player) {
         return false;
     }
-    
-    public void hammerClientLogin(NetHandler clientHandler, INetworkManager manager, Packet1Login login) {}
-    
-    public void setClientWorld(World w) {}
-    
-    public void restoreClientWorld() {}
 
     public void fixAchievements() { }
 

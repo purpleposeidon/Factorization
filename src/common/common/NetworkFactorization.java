@@ -27,14 +27,12 @@ import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.VectorUV;
-import factorization.common.fzds.HammerManager;
 
 public class NetworkFactorization implements ITinyPacketHandler {
     protected final static short factorizeTEChannel = 0; //used for tile entities
     protected final static short factorizeMsgChannel = 1; //used for sending translatable chat messages
     protected final static short factorizeCmdChannel = 2; //used for player keys
     protected final static short factorizeNtfyChannel = 3; //used to show messages in-world
-    protected final static short factorizeDsPacketWrap = 6; //wraps an arbitrary packet from the DS dimension
 
     public NetworkFactorization() {
         Core.network = this;
@@ -118,19 +116,6 @@ public class NetworkFactorization implements ITinyPacketHandler {
             e.printStackTrace();
             return null;
         }
-    }
-    
-    public Packet wrapPacket(Packet toWrap) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(baos);
-        try {
-            dos.write(toWrap.getPacketId());
-            toWrap.writePacketData(dos);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-        return new PacketDispatcher().getTinyPacket(Core.instance, factorizeDsPacketWrap, baos.toByteArray());
     }
     
     public void sendCommand(EntityPlayer player, Command cmd, byte arg) {
@@ -226,7 +211,6 @@ public class NetworkFactorization implements ITinyPacketHandler {
         case factorizeMsgChannel: handleMsg(input); break;
         case factorizeCmdChannel: handleCmd(data); break;
         case factorizeNtfyChannel: handleNtfy(input); break;
-        case factorizeDsPacketWrap: handleDsWrap(handler, input); break;
         default: Core.logWarning("Got packet with invalid channel %i with player = %s ", channel, me); break;
         }
 
@@ -405,25 +389,6 @@ public class NetworkFactorization implements ITinyPacketHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-    }
-    
-    static Socket fakeSocket = new Socket();
-    void handleDsWrap(NetHandler handler, DataInputStream input) {
-        Packet wrapped = null;
-        try {
-            wrapped = Packet.readPacket(input, false, fakeSocket);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-        Core.proxy.setClientWorld(HammerManager.getClientWorld());
-        try {
-            wrapped.processPacket(handler);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            Core.proxy.restoreClientWorld();
         }
     }
     

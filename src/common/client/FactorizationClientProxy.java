@@ -98,8 +98,8 @@ import factorization.common.TileEntityMixer;
 import factorization.common.TileEntitySlagFurnace;
 import factorization.common.TileEntitySolarTurbine;
 import factorization.common.TileEntityWrathLamp;
-import factorization.common.fzds.DimensionSliceEntity;
-import factorization.common.fzds.RenderDimensionSliceEntity;
+import factorization.fzds.DimensionSliceEntity;
+import factorization.fzds.RenderDimensionSliceEntity;
 
 public class FactorizationClientProxy extends FactorizationProxy {
     @Override
@@ -521,77 +521,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         if (Minecraft.getMinecraft().session.username.equals("neptunepink")) {
             Core.FZLogger.setLevel(Level.FINE);
         }
-    }
-    
-    class HammerChunkProviderClient extends ChunkProviderClient {
-
-        public HammerChunkProviderClient(World par1World) {
-            super(par1World);
-        }
-        
-    }
-    
-    class HammerWorldClient extends WorldClient {
-        //NOTE: Temporary, to make it easier to check
-        public HammerWorldClient(NetClientHandler par1NetClientHandler, WorldSettings par2WorldSettings, int par3, int par4, Profiler par5Profiler) {
-            super(par1NetClientHandler, par2WorldSettings, par3, par4, par5Profiler);
-        }
-        
-        @Override
-        public boolean setBlockAndMetadataAndInvalidate(int par1, int par2,
-                int par3, int par4, int par5) {
-            System.out.println("Client changing: " + new Coord(this, par1, par2, par3));
-            return super.setBlockAndMetadataAndInvalidate(par1, par2, par3, par4, par5);
-        }
-        
-        @Override
-        protected IChunkProvider createChunkProvider() {
-            this.clientChunkProvider = new HammerChunkProviderClient(this);
-            return this.clientChunkProvider;
-        }
-    }
-    
-    @Override
-    public void hammerClientLogin(NetHandler clientHandler, INetworkManager manager, Packet1Login login) {
-        if (Core.enable_dimension_slice) {
-            NetClientHandler nch = (NetClientHandler) clientHandler;
-            Core.hammerManager.hammerWorldClient = new HammerWorldClient(nch,
-                    new WorldSettings(0L, login.gameType, false, login.hardcoreMode, login.terrainType),
-                    Core.hammerManager.dimensionID,
-                    login.difficultySetting,
-                    Core.proxy.getProfiler());
-        }
-    }
-    
-    private void setWorldAndPlayer(WorldClient wc, EntityClientPlayerMP player) {
-        Minecraft mc = Minecraft.getMinecraft();
-        mc.theWorld = wc;
-        mc.thePlayer = player;
-        real_world.sendQueue.worldClient = wc; //NOTE: This will require an AT
-        //((NetClientHandler)mc.thePlayer.sendQueue.netManager).worldClient = wc;
-    }
-    
-    EntityClientPlayerMP real_player = null;
-    WorldClient real_world = null;
-    
-    @Override
-    public void setClientWorld(World w) {
-        Minecraft mc = Minecraft.getMinecraft();
-        if (real_player == null) {
-            real_player = mc.thePlayer;
-        }
-        if (real_world == null) {
-            real_world = mc.theWorld;
-        }
-        EntityClientPlayerMP fake_player = new EntityClientPlayerMP(mc, mc.theWorld, mc.session, real_player.sendQueue /* not sure about this one. */);
-        setWorldAndPlayer((WorldClient) w, fake_player);
-    }
-    
-    @Override
-    public void restoreClientWorld() {
-        setWorldAndPlayer(real_world, real_player);
-        real_world = null;
-        real_player = null;
     }
     
     @Override

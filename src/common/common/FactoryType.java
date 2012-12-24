@@ -68,7 +68,7 @@ public enum FactoryType {
 
     TileEntityCommon makeTileEntity() {
         if (clazz == null) {
-            System.err.println("Note: " + this + " is a FactoryType with no associated TE");
+            Core.logWarning("Note: " + this + " is a FactoryType with no associated TE");
             return null;
         }
         try {
@@ -100,10 +100,6 @@ public enum FactoryType {
         ItemStack ret = new ItemStack(Core.registry.item_factorization, 1, this.md);
         Core.proxy.addName(ret, name);
         return ret;
-    }
-
-    public static boolean isDark(int md) {
-        return md == ROUTER.md || md == LAMP.md;
     }
 
     public static void registerTileEntities() {

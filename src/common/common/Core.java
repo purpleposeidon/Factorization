@@ -35,15 +35,15 @@ import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.client.gui.FactorizationNotify;
-import factorization.common.fzds.FZDSCommand;
-import factorization.common.fzds.HammerManager;
 
-@Mod(modid = "factorization", name = "Factorization", version = Core.version)
+@Mod(modid = Core.modId, name = Core.name, version = Core.version)
 @NetworkMod(
         clientSideRequired = true,
         tinyPacketHandler = NetworkFactorization.class
         )
 public class Core {
+    public static final String modId = "factorization";
+    public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
     public static final String version = "0.7.10"; //@VERSION@
     public static final boolean RichardG_touches_himself_while_reading_my_code = true;
@@ -60,7 +60,6 @@ public class Core {
     public static Core instance;
     public static Registry registry;
     public static ExoCore exoCore;
-    public static HammerManager hammerManager;
     public static FactorizationOreProcessingHandler foph;
     @SidedProxy(clientSide = "factorization.client.FactorizationClientProxy", serverSide = "factorization.common.FactorizationServerProxy")
     public static FactorizationProxy proxy;
@@ -178,8 +177,7 @@ public class Core {
         add_branding = getBoolConfig("addBranding", "general", add_branding, null); //For our Tekkit friends
         
         enable_dimension_slice = dev_environ;
-        enable_dimension_slice = getBoolConfig("enableDimensionSlices", "general", enable_dimension_slice, "work in progress; may be unstable");
-        dimension_slice_dimid = getIntConfig("sliceDimensionID", "general", dimension_slice_dimid, null);
+        enable_dimension_slice = getBoolConfig("enableDimensionSlices", "dimensionSlices", enable_dimension_slice, "work in progress; may be unstable");
         spread_wrathfire = getBoolConfig("spreadWrathFire", "server", spread_wrathfire, null);
         String p = getStringConfig("bannedRouterInventoriesRegex", "server", "", "This is a Java Regex to blacklist router access");
         if (p != null && p.length() != 0) {
@@ -187,7 +185,7 @@ public class Core {
                 routerBan = Pattern.compile(p);
             } catch (PatternSyntaxException e) {
                 e.printStackTrace();
-                System.err.println("Factorization: config has invalid Java Regex for banned_router_inventories: " + p);
+                logWarning("Factorization: config has invalid Java Regex for banned_router_inventories: " + p);
             }
         }
         entity_relight_task_id = config.get("general", "entityRelightTask", -1).getInt();
@@ -224,20 +222,6 @@ public class Core {
             isMainClientThread.set(true);
         }
         proxy.addNameDirect("itemGroup.factorizationTab", "Factorization");
-        if (enable_dimension_slice) {
-            hammerManager = new HammerManager();
-            MinecraftForge.EVENT_BUS.register(hammerManager);
-            NetworkRegistry.instance().registerConnectionHandler(hammerManager);
-            hammerManager.setup();
-        }
-    }
-    
-    @ServerStarting
-    public void setMainServerThread(FMLServerStartingEvent event) {
-        isMainServerThread.set(true);
-        if (enable_dimension_slice) {
-            hammerManager.serverStarting(event);
-        }
     }
 
     @PostInit
@@ -249,10 +233,8 @@ public class Core {
     
     @ServerStarting
     public void registerServerCommands(FMLServerStartingEvent event) {
+        isMainServerThread.set(true);
         event.registerServerCommand(new NameClayCommand());
-        if (enable_dimension_slice) {
-            event.registerServerCommand(new FZDSCommand());
-        }
     }
 
     ItemStack getExternalItem(String className, String classField, String description) {
