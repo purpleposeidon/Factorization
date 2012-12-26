@@ -8,26 +8,18 @@ import java.util.Random;
 import java.util.logging.Level;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.multiplayer.ChunkProviderClient;
-import net.minecraft.client.multiplayer.NetClientHandler;
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.NetHandler;
-import net.minecraft.network.packet.Packet1Login;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatFileWriter;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldSettings;
-import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -68,6 +60,7 @@ import factorization.client.render.BlockRenderWire;
 import factorization.client.render.EmptyRender;
 import factorization.client.render.EntitySteamFX;
 import factorization.client.render.EntityWrathFlameFX;
+import factorization.client.render.FactorizationBlockRender;
 import factorization.client.render.FactorizationRender;
 import factorization.client.render.TileEntityBarrelRenderer;
 import factorization.client.render.TileEntityCrystallizerRender;
@@ -514,6 +507,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderMixer();
         new BlockRenderCrystallizer();
         new BlockRenderGreenware().setup();
+        for (FactoryType ft : new FactoryType[] { FactoryType.ROUTER, FactoryType.MAKER, FactoryType.STAMPER, FactoryType.BARREL, FactoryType.PACKAGER, FactoryType.SLAGFURNACE }) {
+            FactorizationBlockRender.setDefaultRender(ft);
+        }
 
         MinecraftForgeClient.registerItemRenderer(Core.registry.battery.shiftedIndex, new BatteryItemRender(renderBattery));
         MinecraftForge.EVENT_BUS.register(new FactorizationNotify());

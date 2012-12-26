@@ -47,6 +47,11 @@ abstract public class FactorizationBlockRender implements ICoord {
     private static FactorizationBlockRender renderMap[] = new FactorizationBlockRender[0xFF];
     private static FactorizationBlockRender defaultRender;
     
+    public static void setDefaultRender(FactoryType ft) {
+        assert defaultRender != null;
+        renderMap[ft.md] = defaultRender;
+    }
+    
     public static FactorizationBlockRender getRenderer(int md) {
         FactorizationBlockRender ret = renderMap[md];
         if (ret == null) {

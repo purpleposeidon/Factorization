@@ -86,6 +86,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     static HashSet<Chunk> toVisit = new HashSet(9 * 5);
 
     static TileEntityWrathLamp findLightAirParent(World world, int x, int y, int z) {
+        //NOTE: This could be optimized. Probably not really worth it tho.
         toVisit.clear();
         for (int dcx : deltas) {
             for (int dcz : deltas) {
