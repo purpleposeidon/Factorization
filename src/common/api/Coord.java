@@ -4,23 +4,22 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-import javax.management.RuntimeErrorException;
-
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.block.Block;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.ForgeDirection;
 
 public class Coord {
     public World w;
     public int x, y, z;
     static private Random rand = new Random();
+    static private ThreadLocal<Coord> staticCoord = new ThreadLocal();
 
     public Coord(World w, int x, int y, int z) {
         this.w = w;
@@ -40,6 +39,17 @@ public class Coord {
     public Coord(World w, double x, double y, double z) {
         this(w, (int) x, (int) y, (int) z);
     }
+    
+    public static Coord of(World w, int x, int y, int z) {
+        Coord ret = staticCoord.get();
+        if (ret == null) {
+            ret = new Coord(w, x, y, z);
+            staticCoord.set(ret);
+            return ret;
+        }
+        ret.set(w, x, y, z);
+        return ret;
+    }
 
     public String toString() {
         String ret = "(" + x + ", " + y + ", " + z + ")";
@@ -51,6 +61,13 @@ public class Coord {
             }
         }
         return ret;
+    }
+    
+    public void set(World w, int x, int y, int z) {
+        this.w = w;
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
     @Override
