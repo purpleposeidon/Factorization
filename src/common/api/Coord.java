@@ -40,6 +40,14 @@ public class Coord {
         this(w, (int) x, (int) y, (int) z);
     }
     
+    public static Coord of(int x, int y, int z) {
+        return of((World) null, x, y, z);
+    }
+    
+    public static Coord of(double x, double y, double z) {
+        return of((World) null, (int) x, (int) y, (int) z);
+    }
+    
     public static Coord of(World w, int x, int y, int z) {
         Coord ret = staticCoord.get();
         if (ret == null) {
