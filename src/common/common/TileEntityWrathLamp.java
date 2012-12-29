@@ -154,7 +154,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         if (worldObj.isRemote) {
             RelightTask task = new RelightTask(worldObj);
             task.setPosition(xCoord, yCoord, zCoord);
-            worldObj.spawnEntityInWorld(task);
+            worldObj.spawnEntityInWorld(task); //No comods, right? Right?
         }
     }
 
@@ -289,6 +289,9 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                     if (belowBlock != 0 && belowBlock != Core.registry.lightair_block.blockID && height != yCoord) {
                         beamDepths[index] = (short) height;
                         continue;
+                    }
+                    if (block == 0 && worldObj.getBlockId(x, height - 1, z) == Block.cobblestoneWall.blockID) {
+                        block = -1;
                     }
                     if (block == 0) {
                         worldObj.setBlockWithNotify(x, height, z, Core.registry.lightair_block.blockID);

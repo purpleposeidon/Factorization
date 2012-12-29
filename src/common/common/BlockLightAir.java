@@ -2,17 +2,23 @@ package factorization.common;
 
 import java.util.Random;
 
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.block.Block;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialTransparent;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import factorization.api.Coord;
 
 public class BlockLightAir extends Block {
     static public final int air_md = 0;
     static public final int fire_md = 1;
+    static MaterialTransparent actuallyTransparentMaterial = new MaterialTransparent(Material.air.materialMapColor) {
+        public boolean isOpaque() {
+            return true;
+        }
+    };
 
     public BlockLightAir(int id) {
         super(id, Material.air);
@@ -58,8 +64,13 @@ public class BlockLightAir extends Block {
     public void onNeighborBlockChange(World w, int x, int y, int z, int neighborID) {
         int md = w.getBlockMetadata(x, y, z);
         if (md == air_md) {
-            TileEntityWrathLamp.doAirCheck(w, x, y, z);
             Coord here = new Coord(w, x, y, z);
+            if (neighborID == Block.cobblestoneWall.blockID) {
+                if (w.getBlockId(x, y - 1, z) == Block.cobblestoneWall.blockID) {
+                    here.setId(0);
+                }
+            }
+            TileEntityWrathLamp.doAirCheck(w, x, y, z);
             Coord above = new Coord(w, x, y + 1, z);
             Block b = above.getBlock();
             if (b != null && !above.isAir()) {
