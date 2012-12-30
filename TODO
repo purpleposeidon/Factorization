@@ -3,15 +3,24 @@ http://www.minecraftforum.net/topic/1351802-factorization/
 HAMMER
 ------
 Step 1 is "Create a dimension"
-Step 2 is "make the client keep a reference to that dimension, create pseudoplayer, have packets sent to the pseudoplayer be sent to the real player, and render part of the dimension"
-Step 3 is to get player/DimensionSlice interaction working.
-Step 4 is rockets & shit.
-Step 5 is watch mod interaction burst into flames.
-Step 6 is "drop into the pending mods folder; run away giggling."
+Step 2 is "make the client keep a reference to that dimension
+Step 3 is "create pseudoplayer, have packets sent to the pseudoplayer be sent to the real players, and render part of the dimension"
+    -    have packets go to all players near the DSE; single PacketProxyingPlayer per DSE
+    -    subscribe nearby players to chunk
+Step 4 is to make the DSE interact with the real world
+    -    external entity collisions
+    -    DSE persistence
+Step 5 is to get the player moving in & out
+    -    player entry/leaving
+    -    rendering correctly with embedded player
+Step 5 is rockets & shit.
+Step 6 is watch mod interaction burst into flames.
+Step 7 is "drop into the pending mods folder; run away giggling."
 
 
-TOP LIST
+TOP LIST (that's become somewhat less tops. Oops.)
 --------
+Test barrel's new ticklessness
 Change turbine to use up less water
 Grinder acting weird?
 dirty galena only gives silver
@@ -35,8 +44,8 @@ These upgrades:
     Acceleration Stopper
 Some electricity related mecha-upgrades?
 RS signal to keep the grinder grinding
+Placing/breaking wrath lamp in hammerspace seems to cause the client to crap its pants
 
-"Everything's shiny!" release
 back to ceramics?
 https://github.com/MinecraftForge/MinecraftForge/commit/34ebfcd9785c3c50c3ac743eb1e9cbf000df10dc
 
@@ -96,34 +105,11 @@ backup occasionally, eh?
 
 SPACE
 =====
-WORLD ENTITIES
---------------
-Space needs "WorldEntities" (WE). These will let you move sets of blocks around however you like; they can translate smoothly, and rotate arbitrarily. We may also like to let them support nesting and scaling. It will be possible for players and other entities to hop onto a WEW, and between WEWs/the vanilla world.
-Code structure for a WEW:
-  class WorldEntity extends Entity { //WE
-    class WorldEntityWorld extends World { } //WEW
-  }
-Implementation thoughts:
-  Wrap the WEW ticks with a "push/pop world to entity" network packet. If this turns out that this is sending a lot of "push NO-OP pop", we might be able to have it be sent only when other packets are.
-  Client: When we get a WEW change, we'll change Minecraft.theWorld, and Minecraft.thePlayer.theWorld (a local change)
-  We may need to do something funky for cross-WEW interactions (such as mining/placing blocks, or drawing the bounding box)
-  Active rotation will be difficult, but *very* much wanted. Collisions may be difficult.
-  We will need a function to convert one WEW's coords & rotation to another.
-  Not a core requirement, but it might be good to create "ghost entities" that reflect the player's coords across WEWs so that skeles can accurately shoot between WEWs
-  When an entity intersects/leaves the bounds of a WEW, its worldObj must be adusted.
-  If entity IDs aren't universally unique & constant, there may be trouble with nesting and transferring.
-Rendering:
-  This shouldn't be too difficult, actually! I expect this will render just as efficiently as regular stuff. But try to use as much Mojang code as possible! I'll need to read more MC code.
-  If we're lucky, we can do something really easy like "Minecraft.renderWorld(WEW)", altho might need to swap out global vars or something.
-
-Uses:
+FZDS Uses:
   Asteroids (Natural/Artificial Satelites, Planetoids, motherships)
   Space ships
   Megabosses
   Rotatable Frames? Robotics? Real Mecha Suits?
-ASTEROIDS
----------
-Asteroids are WEs. 
 
 
 COSMOLOGY
@@ -243,54 +229,19 @@ Clay
   glazed pieces can be fired again to get rid of the modelling stand, and make them permament.
 
 
-
 Rockets
-    Fueld with vast amounts of TNT. Must be made with high-fire clay... or extreme high fire clay? :O
-  Some components made using clay molds (wings, heat shield tiling)
-  Possible idea: Let C = brick, B = Slimeball
-  CCC
-  CBC  - heat shield mold
-  CCC
+  BIB  Rocket Nozzle
+  I I  iron Block, Iron
 
-  CBC
-  BBB   - Rocket wing
-  CCC
+  I I  Rocket Fuel tank
+  O O  Iron, Obsidian
+  I I
 
-  BSB
-  SSS
-  BBB
+  Nether powder is made by grinding netherrack a few times
+    1 netherrack -> 1 netherrack gravel -> 1 netherrack sand -> 3-5 netherrack powder
+  rocket propellant: 8 netherrack powder + 1 fire charge (How much does it make? How good is this fuel?)
+    [Interesting note: Apparently sugar can be used for rocket fuel...]
 
-  CBC
-  BCB   - Rocket nozzle
-  BCB
-
-  BCB
-  BCB   - Rocket seat
-  BBB
-infused lapis?
-
-
-
-
-[19:02:37] <ShaRose> ok
-[19:03:04] <ShaRose> we can't (easily) use bytecode hackery to edit every mod that hardcodes -256 to -4096
-[19:03:18] <ShaRose> but if they use that method, we change that one method and we don't need to do anything else
-[19:05:09] <CowedOffACliff> okay now I see the difference
-[19:07:53] <absurdHuman> What are we supposed to do instead of subtract 256 from everything?
-[19:08:17] <CowedOffACliff> What class does that method actually want though?....
-[19:08:34] <-- armed_troop has left this server (Quit: armed_troop).
-[19:08:37] <CowedOffACliff> does it want a subclass of ItemBlock, or ItemBlock itself?
-[19:10:20] <ShaRose> absurdHuman honestly, the way I did it for ID resolver (detecting the offset) was to check the first item
-[19:10:26] <ShaRose> I think it's shovelsteel?
-[19:10:34] <ShaRose> just get the index from that, that's the offset to use
-[19:10:38] <absurdHuman> hmm
-[19:10:48] <cpw> cowed any subclass of ItemBlock
-[19:10:52] <ShaRose> if forge decides to move blocks higher than 256 to 32001+ though, that won't work either
-[19:10:54] <cpw> or just ItemBlock
-[19:11:00] <ShaRose> yeah
-[19:11:01] <cpw> look at ironchest for an example of use
-[19:11:02] <CowedOffACliff> I guess I just don't have the right constructor
-[19:11:06] <CowedOffACliff> or something
 
 
 Whatchya gonna do, oh, whatchya gonna do
