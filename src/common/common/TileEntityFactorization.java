@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.Random;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -145,6 +146,13 @@ public abstract class TileEntityFactorization extends TileEntityCommon
             FactorizationUtil.spawnItemStack(here, getStackInSlot(i));
         }
     }
+    
+    double round(double c) {
+        if (Math.abs(c) < 0.5) {
+            return 0;
+        }
+        return Math.copySign(1, c);
+    }
 
     void ejectItem(ItemStack is, boolean violent, EntityPlayer player) {
         if (is == null || is.stackSize == 0) {
@@ -159,13 +167,15 @@ public abstract class TileEntityFactorization extends TileEntityCommon
             // point velocity towards player
             Vec3 vec = Vec3.createVectorHelper(player.posX - xCoord, player.posY - yCoord,
                     player.posZ - zCoord);
-            vec.normalize();
+            vec = vec.normalize();
             ent.motionX = vec.xCoord;
             ent.motionY = vec.yCoord;
             ent.motionZ = vec.zCoord;
             double d = 0.25;
             // move item to near the edge
             ent.moveEntity(vec.xCoord * d, vec.yCoord * d, vec.zCoord * d);
+            ent.moveEntity(round(vec.xCoord), round(vec.yCoord), round(vec.zCoord));
+            //Minecraft.getMinecraft().theWorld.spawnParticle("reddust", ent.posX, ent.posY, ent.posZ, 0, 0, 0);
         } else {
             // random velocity
             ent.motionX = rand.nextGaussian();
