@@ -7,6 +7,7 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.NetClientHandler;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -181,6 +182,7 @@ public class HammerClientProxy extends HammerProxy {
         mc.theWorld = wc;
         mc.thePlayer = player;
         TileEntityRenderer.instance.worldObj = wc;
+        RenderManager.instance.worldObj = wc;
         setSendQueueWorld(wc);
         //send_queue.worldClient = wc; //NOTE: This will require an AT
         //((NetClientHandler)mc.thePlayer.sendQueue.netManager).worldClient = wc;
