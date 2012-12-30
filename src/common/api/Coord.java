@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.ForgeDirection;
@@ -76,6 +77,10 @@ public class Coord {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+    
+    public void set(ChunkCoordinates cc) {
+        set(w, cc.posX, cc.posY, cc.posZ);
     }
 
     @Override
