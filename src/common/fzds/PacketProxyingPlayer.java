@@ -1,46 +1,36 @@
 package factorization.fzds;
 
 import java.net.SocketAddress;
+import java.util.HashSet;
+import java.util.List;
 
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.INetworkManager;
 import net.minecraft.item.ItemInWorldManager;
-import net.minecraft.network.packet.NetHandler;
+import net.minecraft.network.INetworkManager;
 import net.minecraft.network.NetServerHandler;
+import net.minecraft.network.packet.NetHandler;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.Packet18Animation;
-import net.minecraft.network.packet.Packet24MobSpawn;
-import net.minecraft.network.packet.Packet28EntityVelocity;
-import net.minecraft.network.packet.Packet31RelEntityMove;
-import net.minecraft.network.packet.Packet32EntityLook;
-import net.minecraft.network.packet.Packet33RelEntityMoveLook;
-import net.minecraft.network.packet.Packet34EntityTeleport;
-import net.minecraft.network.packet.Packet35EntityHeadRotation;
-import net.minecraft.network.packet.Packet40EntityMetadata;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerManager;
 import net.minecraft.world.WorldServer;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.api.Coord;
-import factorization.common.Core;
+import factorization.fzds.api.IFzdsEntryControl;
 
-public class PacketProxyingPlayer extends EntityPlayerMP {
-    EntityPlayerMP proxiedPlayer;
+public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryControl, INetworkManager {
     DimensionSliceEntity dimensionSlice;
-    DimensionNetworkManager wrappedNetworkManager;
     static boolean useShortViewRadius = false;
     
-    public PacketProxyingPlayer(EntityPlayerMP proxiedPlayer, DimensionSliceEntity dimensionSlice, Coord cellLocation) {
-        super(proxiedPlayer.mcServer, dimensionSlice.hammerCell.w, "FZDS" + dimensionSlice.cell, new ItemInWorldManager(dimensionSlice.hammerCell.w));
-        if (proxiedPlayer instanceof PacketProxyingPlayer) {
-            throw new RuntimeException("tried to nest FZDS player proxy");
-        }
-        this.proxiedPlayer = proxiedPlayer;
+    private HashSet<EntityPlayerMP> trackedPlayers;
+    
+    public PacketProxyingPlayer(DimensionSliceEntity dimensionSlice) {
+        super(MinecraftServer.getServer(), dimensionSlice.hammerCell.w, "FZDS" + dimensionSlice.cell, new ItemInWorldManager(dimensionSlice.hammerCell.w));
         this.dimensionSlice = dimensionSlice;
-        wrappedNetworkManager = new DimensionNetworkManager(proxiedPlayer.playerNetServerHandler.netManager);
-        this.playerNetServerHandler = new NetServerHandler(proxiedPlayer.mcServer, wrappedNetworkManager, this);
-        cellLocation.setAsEntityLocation(this);
+        this.playerNetServerHandler = new NetServerHandler(MinecraftServer.getServer(), this, this);
+        Coord c = Hammer.getCellCenter(dimensionSlice.cell);
+        c.y = -8;
+        c.setAsEntityLocation(this);
         WorldServer ws = (WorldServer) dimensionSlice.worldObj;
         if (useShortViewRadius) {
             int orig = savePlayerViewRadius();
@@ -53,6 +43,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP {
         } else {
             MinecraftServer.getServerConfigurationManager(mcServer).func_72375_a(this, null);
         }
+        ticks_since_last_update = (int) (Math.random()*20);
     }
     
     private final int PlayerManager_playerViewRadius_field = 4;
@@ -71,103 +62,39 @@ public class PacketProxyingPlayer extends EntityPlayerMP {
         }
         ReflectionHelper.setPrivateValue(PlayerManager.class, getServerForPlayer().getPlayerManager(), orig, PlayerManager_playerViewRadius_field);
     }
-
     
-    EntityPlayerMP getProxiedPlayer() {
-        return proxiedPlayer;
-    }
-    
-    int packetsSentThisTick = 0;
-    boolean inTick = false;
-    
-    class DimensionNetworkManager implements INetworkManager {
-        INetworkManager wrapped;
-        public DimensionNetworkManager(INetworkManager wrapped) {
-            this.wrapped = wrapped;
-        }
-        
-        @Override
-        public void setNetHandler(NetHandler netHandler) {
-            //wrapped.setNetHandler(netHandler);
-        }
-
-        @Override
-        public void addToSendQueue(Packet packet) {
-            //These packets get us "Illegal Stance":
-            //Packet31RelEntityMove
-            //Packet33RelEntityMoveLook
-            //idea: so one of the below causes us to freeze up. Determine which one it is, isolate it (or them...). Trace the execution path of it.
-//			if (packet instanceof Packet18Animation
-//					|| packet instanceof Packet31RelEntityMove
-//					|| packet instanceof Packet35EntityHeadRotation
-//					|| packet instanceof Packet40EntityMetadata
-//					|| packet instanceof Packet33RelEntityMoveLook
-//					) {
-//				//Yep.
-//				return;
-//			} else {
-//				
-//			}
-//			if (packet instanceof Packet28EntityVelocity || packet instanceof Packet32EntityLook || packet instanceof Packet34EntityTeleport || packet instanceof Packet24MobSpawn) {
-//				return;
-//			}
-            
-//			if (packet instanceof Packet53BlockChange
-//					|| packet instanceof Packet52MultiBlockChange
-//					|| packet instanceof Packet56MapChunks) {
-//				//yep
-//			} else {
-//				return;
-//			}
-            wrapped.addToSendQueue(new Packet220FzdsWrap(packet));
-            System.out.println(packet);
-            return;
-        }
-        
-        @Override
-        public void wakeThreads() {
-            wrapped.wakeThreads();
-        }
-
-        @Override
-        public void processReadPackets() {
-            //wrapped.processReadPackets();
-        }
-
-        @Override
-        public SocketAddress getSocketAddress() {
-            return wrapped.getSocketAddress();
-        }
-
-        @Override
-        public void serverShutdown() {
-            //wrapped.serverShutdown();
-        }
-
-        @Override
-        public int packetSize() {
-            return wrapped.packetSize();
-        }
-
-        @Override
-        public void networkShutdown(String str, Object... args) {
-            wrapped.networkShutdown(str, args);
-        }
-
-        @Override
-        public void closeConnections() {
-            wrapped.closeConnections();
-        }
-        
-    }
-    
+    private int ticks_since_last_update = 0;
     @Override
     public void onUpdate() {
-        this.isDead = this.dimensionSlice.isDead;
-        if (this.isDead) {
+        if (this.dimensionSlice.isDead) {
             endProxy();
+        } else if (ticks_since_last_update == 0) {
+            ticks_since_last_update = 20;
+        } else {
+            ticks_since_last_update--;
+            List playerList = dimensionSlice.worldObj.playerEntities;
+            for (int i = 0; i < playerList.size(); i++) {
+                Object o = playerList.get(i);
+                if (!(o instanceof EntityPlayerMP)) {
+                    continue;
+                }
+                EntityPlayerMP player = (EntityPlayerMP) o;
+                if (isPlayerInUpdateRange(player)) {
+                    
+                } else {
+                    trackedPlayers.remove(player);
+                }
+            }
         }
-        super.onUpdate();
+        super.onUpdate(); //we probably want to keep this one
+    }
+     
+    boolean isPlayerInUpdateRange(EntityPlayerMP player) {
+        return dimensionSlice.getDistanceSqToEntity(player) <= Hammer.DSE_ChunkUpdateRangeSquared;
+    }
+    
+    void sendChunkMapDataToPlayer(EntityPlayerMP target) {
+        
     }
     
     public void endProxy() {
@@ -176,6 +103,71 @@ public class PacketProxyingPlayer extends EntityPlayerMP {
         var2.setEntityDead(this);
         var2.getPlayerManager().removePlayer(this); //No comod?
         var2.getMinecraftServer().getConfigurationManager().playerEntityList.remove(playerNetServerHandler);
-        this.isDead = true;
+        setDead();
+        //Might be able to get away with just setDead() here.
     }
+
+    
+    
+    //INetworkManager implementation -- or whatever this is.
+    @Override
+    public void setNetHandler(NetHandler netHandler) { }
+
+    @Override
+    public void addToSendQueue(Packet packet) {
+        Packet wrappedPacket = new Packet220FzdsWrap(packet);
+        for (EntityPlayerMP player : trackedPlayers) {
+            player.playerNetServerHandler.sendPacketToPlayer(wrappedPacket);
+        }
+        return;
+    }
+    
+    @Override
+    public void wakeThreads() { }
+
+    @Override
+    public void processReadPackets() { }
+
+    @Override
+    public SocketAddress getSocketAddress() {
+        return new SocketAddress() {
+            @Override
+            public String toString() {
+                return "<Packet Proxying Player for FZDS " + dimensionSlice + ">";
+            }
+        };
+    }
+
+    @Override
+    public void serverShutdown() { }
+
+    @Override
+    public int packetSize() {
+        //usages suggests this is used only to delay sending item map data, and that only happens if this is <= 5. Yeaaah. No.
+        //The real player should be receiving that kind of details anyways. Besides, PPP won't be carrying items.
+        return 10;
+    }
+
+    @Override
+    public void networkShutdown(String str, Object... args) { }
+
+    @Override
+    public void closeConnections() { }
+    
+
+    
+    
+    //IFzdsEntryControl implementation
+    
+    @Override
+    public boolean canEnter(DimensionSliceEntity dse) { return false; } //PPP must stay in the shadow (It stays out of range anyways.)
+    
+    @Override
+    public boolean canExit(DimensionSliceEntity dse) { return false; }
+    
+    @Override
+    public void onEnter(DimensionSliceEntity dse) { }
+    
+    @Override
+    public void onExit(DimensionSliceEntity dse) { }
 }

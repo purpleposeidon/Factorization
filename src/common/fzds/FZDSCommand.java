@@ -2,15 +2,14 @@ package factorization.fzds;
 
 import java.util.List;
 
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.block.Block;
-import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.network.packet.Packet11PlayerPosition;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -63,20 +62,23 @@ public class FZDSCommand extends CommandBase {
             final EntityPlayerMP player = (EntityPlayerMP) sender;
             if (cmd.equalsIgnoreCase("spawn")) {
                 currentWE = Hammer.allocateSlice(player.worldObj);
-                currentWE.setPosition(player.posX, player.posY, player.posZ);
+                currentWE.setPosition((int)player.posX, (int)player.posY, (int)player.posZ);
                 currentWE.worldObj.spawnEntityInWorld(currentWE);
                 //This should be moved to the FZDS entity
-                PacketProxyingPlayer ppp = new PacketProxyingPlayer(player, currentWE, currentWE.hammerCell);
+                PacketProxyingPlayer ppp = new PacketProxyingPlayer(currentWE);
                 ppp.worldObj.spawnEntityInWorld(ppp);
                 ((EntityPlayerMP) sender).addChatMessage("Created FZDS " + currentWE.cell);
             }
             if (cmd.equalsIgnoreCase("show")) {
-                int cell = Integer.valueOf(args[1]);
+                int cell = 0;
+                if (args.length == 2) {
+                    cell = Integer.valueOf(args[1]);
+                }
                 currentWE = Hammer.spawnSlice(player.worldObj, cell);
-                currentWE.setPosition(player.posX, player.posY, player.posZ);
+                currentWE.setPosition((int)player.posX, (int)player.posY, (int)player.posZ);
                 currentWE.worldObj.spawnEntityInWorld(currentWE);
                 //This should be moved to the FZDS entity
-                PacketProxyingPlayer ppp = new PacketProxyingPlayer(player, currentWE, currentWE.hammerCell);
+                PacketProxyingPlayer ppp = new PacketProxyingPlayer(currentWE);
                 ppp.worldObj.spawnEntityInWorld(ppp);
                 ((EntityPlayerMP) sender).addChatMessage("Showing FZDS " + currentWE.cell);
             }
@@ -87,16 +89,23 @@ public class FZDSCommand extends CommandBase {
                     }
                 }
             }
+            if (cmd.equalsIgnoreCase("grass")) {
+                new Coord(player).add(0, -1, 0).setId(Block.grass);
+            }
             ServerConfigurationManager manager = MinecraftServer.getServerConfigurationManager(MinecraftServer.getServer());
             DSTeleporter tp = new DSTeleporter((WorldServer) player.worldObj);
             tp.destination = new Coord (player.worldObj, 0, 0, 0);
-            if (cmd.equalsIgnoreCase("go")) {
+            if (cmd.equalsIgnoreCase("go") || cmd.equalsIgnoreCase("goc")) {
                 World hammerWorld = player.worldObj;
                 int destinationCell = 0;
                 if (args.length == 2) {
                     destinationCell = Integer.parseInt(args[1]);
+                } 
+                if (cmd.equalsIgnoreCase("goc")) {
+                    tp.destination = Hammer.getCellCenter(destinationCell);
+                } else {
+                    tp.destination = Hammer.getCellLookout(destinationCell);
                 }
-                tp.destination = Hammer.getCellLookout(destinationCell); 
                 if (DimensionManager.getWorld(Core.dimension_slice_dimid) != player.worldObj) {
                     manager.transferPlayerToDimension(player, Core.dimension_slice_dimid, tp);
                 } else {
@@ -107,18 +116,25 @@ public class FZDSCommand extends CommandBase {
             }
             if (cmd.equalsIgnoreCase("leave")) {
                 if (DimensionManager.getWorld(0) != player.worldObj) {
+                    ChunkCoordinates target = player.getBedLocation();
+                    if (target != null) {
+                        tp.destination.set(target);
+                    }
                     manager.transferPlayerToDimension(player, 0, tp);
                 }
             }
         }
         if (cmd.equals("removeall")) {
+            int i = 0;
             for (World w : MinecraftServer.getServer().worldServers) {
                 for (Entity ent : (List<Entity>)w.loadedEntityList) {
                     if (ent instanceof DimensionSliceEntity) {
                         ent.setDead();
+                        i++;
                     }
                 }
             }
+            sender.sendChatToPlayer("Removed " + i);
         }
     }
     

@@ -207,7 +207,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             try {
                 float s = 1/4F;
                 glTranslatef((float)x, (float)y, (float)z);
-                glScalef(s, s, s);
+                //glScalef(s, s, s);
                 renderInfo.renderTerrain();
                 glTranslatef((float)-x, (float)-y, (float)-z);
                 glTranslatef((float)we.posX, (float)we.posY, (float)we.posZ);
@@ -223,7 +223,8 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             }
         }
         catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("FZDS failed to render");
+            e.printStackTrace(System.err);
         }
         finally {
             nest--;

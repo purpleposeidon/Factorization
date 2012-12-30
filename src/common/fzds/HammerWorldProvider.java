@@ -52,4 +52,9 @@ public class HammerWorldProvider extends WorldProvider {
         int cellCenter = Hammer.cellWidth*16/2;
         return new ChunkCoordinates(cellCenter, 64, cellCenter);
     }
+    
+    @Override
+    public boolean getWorldHasVoidParticles() {
+        return false;
+    }
 }

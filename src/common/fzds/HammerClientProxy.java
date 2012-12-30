@@ -1,5 +1,7 @@
 package factorization.fzds;
 
+import java.lang.reflect.Field;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
@@ -12,13 +14,12 @@ import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.NetHandler;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet1Login;
-import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.profiler.Profiler;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
-import net.minecraft.world.chunk.IChunkProvider;
-import factorization.api.Coord;
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.common.Core;
 
 public class HammerClientProxy extends HammerProxy {
@@ -33,6 +34,11 @@ public class HammerClientProxy extends HammerProxy {
     public static class HammerWorldClient extends WorldClient {
         public HammerWorldClient(NetClientHandler par1NetClientHandler, WorldSettings par2WorldSettings, int par3, int par4, Profiler par5Profiler) {
             super(par1NetClientHandler, par2WorldSettings, par3, par4, par5Profiler);
+        }
+        
+        @Override
+        public void playSoundAtEntity(Entity par1Entity, String par2Str, float par3, float par4) {
+            super.playSoundAtEntity(par1Entity, par2Str, par3, par4);
         }
     }
     
@@ -54,65 +60,52 @@ public class HammerClientProxy extends HammerProxy {
         @Override
         public void markBlockForUpdate(int var1, int var2, int var3) {
             // TODO: *definitely* need something here...
-            realWorld.markBlockForRenderUpdate(var1, var2, var3);
         }
 
         @Override
         public void markBlockForRenderUpdate(int var1, int var2, int var3) {
             // TODO: *definitely* need something here...
-            realWorld.markBlockForRenderUpdate(var1, var2, var3);
         }
 
         @Override
         public void markBlockRangeForRenderUpdate(int var1, int var2, int var3,
                 int var4, int var5, int var6) {
             // TODO: *definitely* need something here...
-            realWorld.markBlockRangeForRenderUpdate(var1, var2, var3, var4, var5, var6);
         }
 
         @Override
         public void playSound(String sound, double x, double y, double z, float volume, float pitch) {
-            synchronized (Hammer.slices) {
-                World real_world = Hammer.getClientRealWorld();
-                EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-                if (player == null || real_world == null) {
-                    return;
-                }
-                DimensionSliceEntity closest = null;
-                int correct_id = Hammer.getIdFromCoord(Coord.of(x, y, z));
-                for (DimensionSliceEntity here : Hammer.slices) {
-                    if (here.worldObj != real_world) {
-                        continue;
-                    }
-                    
-                }
+            Vec3 realCoords = Hammer.shadow2nearestReal(x, y, z);
+            if (realCoords == null) {
+                return;
             }
+            realWorld.playSound(realCoords.xCoord, realCoords.yCoord, realCoords.zCoord, sound, volume, pitch, false);
         }
 
         @Override
         public void func_85102_a(EntityPlayer var1, String var2, double var3,
                 double var5, double var7, float var9, float var10) {
             // TODO Auto-generated method stub
-            
+            //This is another sound-placing method; appears to be murder-related.
         }
 
         @Override
-        public void spawnParticle(String var1, double var2, double var4,
-                double var6, double var8, double var10, double var12) {
-            // TODO Auto-generated method stub
-            
+        public void spawnParticle(String particle, double x, double y, double z, double vx, double vy, double vz) {
+            Vec3 realCoords = Hammer.shadow2nearestReal(x, y, z);
+            if (realCoords == null) {
+                return;
+            }
+            realWorld.spawnParticle(particle, realCoords.xCoord, realCoords.yCoord, realCoords.zCoord, vx, vy, vz);
         }
 
         @Override
         public void obtainEntitySkin(Entity var1) {
-            // TODO Auto-generated method stub
-            
+            // TODO: This is probably used mainly for player skins. Likely need (even more) more ATs
         }
 
         @Override
         public void releaseEntitySkin(Entity var1) {
-            // TODO Auto-generated method stub
-            
+            // TODO: This is probably used mainly for player skins. Likely need (even more) more ATs
         }
 
         @Override
@@ -153,6 +146,10 @@ public class HammerClientProxy extends HammerProxy {
                     Hammer.dimensionID,
                     login.difficultySetting,
                     Core.proxy.getProfiler());
+            Hammer.worldClient.addWorldAccess(new HammerRenderGlobal(Minecraft.getMinecraft().theWorld));
+            send_queue = Minecraft.getMinecraft().getSendQueue();
+            NCH_class = (Class<NetClientHandler>)send_queue.getClass();
+            NCH_worldClient_field = ReflectionHelper.findField(NCH_class, "worldClient", "i");
         }
     }
     
@@ -160,6 +157,23 @@ public class HammerClientProxy extends HammerProxy {
     public void clientLogout(INetworkManager manager) {
         //TODO: what else we can do here to cleanup?
         Hammer.worldClient = null;
+        send_queue = null;
+    }
+    
+    private static NetClientHandler send_queue;
+    private static Class<NetClientHandler> NCH_class;
+    private static Field NCH_worldClient_field;
+    
+    private void setSendQueueWorld(WorldClient wc) {
+        try {
+            NCH_worldClient_field.set(send_queue, wc);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            new RuntimeException("Failed to set SendQueue world due to reflection failure");
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            new RuntimeException("Failed to set SendQueue world due to reflection failure");
+        }
     }
     
     private void setWorldAndPlayer(WorldClient wc, EntityClientPlayerMP player) {
@@ -167,7 +181,8 @@ public class HammerClientProxy extends HammerProxy {
         mc.theWorld = wc;
         mc.thePlayer = player;
         TileEntityRenderer.instance.worldObj = wc;
-        real_world.sendQueue.worldClient = wc; //NOTE: This will require an AT
+        setSendQueueWorld(wc);
+        //send_queue.worldClient = wc; //NOTE: This will require an AT
         //((NetClientHandler)mc.thePlayer.sendQueue.netManager).worldClient = wc;
     }
     

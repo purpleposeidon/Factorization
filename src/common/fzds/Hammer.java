@@ -5,12 +5,18 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.NetLoginHandler;
 import net.minecraft.network.packet.NetHandler;
 import net.minecraft.network.packet.Packet1Login;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.PlayerManager;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -46,6 +52,7 @@ public class Hammer {
     public static boolean enabled;
     public static int dimensionID;
     public static World worldClient = null; //This is actually a WorldClient
+    public static double DSE_ChunkUpdateRangeSquared = Math.pow(16*8, 2); //This is actually set when the server starts
     //Two important things:
     //1) Use a synchronized block while iterating
     //2) This will be shared with the client & integrated server.
@@ -76,6 +83,21 @@ public class Hammer {
         return new Coord(getWorld(), cellSize*cellId - 2, 0 /*wallHeight*/, (1 + cellWidth)*16/2);
     }
     
+    public static Coord getCellCorner(int cellId) {
+        //return new Coord(getWorld(), 0, 0, 0);
+        //return getCellLookout(cellId);
+        int cellSize = (cellWidth + wallWidth)*16;
+        return new Coord(getWorld(), cellSize*cellId, 0, 0);
+    }
+    
+    public static Coord getCellCenter(int cellId) {
+        return getCellCorner(cellId).add(cellWidth*16/2, wallHeight/2, cellWidth*16/2);
+    }
+    
+    public static Coord getCellOppositeCorner(int cellId) {
+        return getCellCorner(cellId).add(cellWidth*16, wallHeight, cellWidth*16);
+    }
+    
     public static int getIdFromCoord(Coord c) {
         if (c.x < 0 || c.z < 0 || c.z > cellWidth*16) {
             return -1;
@@ -84,11 +106,15 @@ public class Hammer {
         return c.x / depth_per_cell;
     }
     
-    public static Coord getCellCorner(int cellId) {
-        //return new Coord(getWorld(), 0, 0, 0);
-        //return getCellLookout(cellId);
-        int cellSize = (cellWidth + wallWidth)*16;
-        return new Coord(getWorld(), cellSize*cellId, 0, 0);
+    public static Chunk[] getChunks(int cellId) {
+        Coord corner = getCellCorner(cellId);
+        int i = 0;
+        for (int dx = 0; dx < cellWidth; dx++) {
+            for (int dz = 0; dz < cellWidth; dz++) {
+                hChunks[i++] = corner.w.getChunkFromBlockCoords(corner.x + 16*dx, corner.z + 16*dz);
+            }
+        }
+        return hChunks;
     }
     
     public static DimensionSliceEntity allocateSlice(World spawnWorld) {
@@ -105,6 +131,8 @@ public class Hammer {
     static final int cellWidth = 4;
     static final int wallWidth = 16;
     static final int wallHeight = 16*8; //16*8 is the minimum or something... I'd rather go with 16*4. Meh.
+    
+    private static Chunk[] hChunks = new Chunk[cellWidth*cellWidth];
     
     @PreInit
     public void setup(FMLPreInitializationEvent event) {
@@ -202,7 +230,50 @@ public class Hammer {
         event.registerServerCommand(new FZDSCommand());
         DimensionManager.initDimension(dimensionID);
         assert DimensionManager.shouldLoadSpawn(dimensionID);
-        
+        int view_distance = MinecraftServer.getServer().getConfigurationManager().getViewDistance();
+        //the undeobfed method comes after "isPlayerWatchingChunk", also in uses of ServerConfigurationManager.getViewDistance()
+        //It returns how many blocks are visible.
+        DSE_ChunkUpdateRangeSquared = Math.pow(PlayerManager.func_72686_a(view_distance) + 16*cellWidth, 2);
     }
     
+    public static DimensionSliceEntity findClosest(Entity target, int cellId) {
+        if (target == null) {
+            return null;
+        }
+        DimensionSliceEntity closest = null;
+        double dist = Double.POSITIVE_INFINITY;
+        World real_world = getClientRealWorld();
+        
+        synchronized (Hammer.slices) {
+            for (DimensionSliceEntity here : Hammer.slices) {
+                if (here.worldObj != real_world && here.cell != cellId) {
+                    continue;
+                }
+                if (closest == null) {
+                    closest = here;
+                    continue;
+                }
+                double here_dist = target.getDistanceSqToEntity(here);
+                if (here_dist < dist) {
+                    dist = here_dist;
+                    closest = here;
+                }
+            }
+        }
+        return closest;
+    }
+    
+    public static Vec3 shadow2nearestReal(double x, double y, double z) {
+        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+        int correct_cell_id = Hammer.getIdFromCoord(Coord.of(x, y, z));
+        DimensionSliceEntity closest = Hammer.findClosest(player, correct_cell_id);
+        if (closest == null) {
+            return null;
+        }
+        return closest.shadow2real(Vec3.createVectorHelper(x, y, z));
+    }
+    
+    public static Vec3 ent2vec(Entity ent) {
+        return Vec3.createVectorHelper(ent.posX, ent.posY, ent.posZ);
+    }
 }
