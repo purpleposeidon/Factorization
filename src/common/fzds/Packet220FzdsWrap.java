@@ -19,6 +19,7 @@ public class Packet220FzdsWrap extends Packet {
     
     public Packet220FzdsWrap(Packet toWrap) {
         this.wrapped = toWrap;
+        this.isChunkDataPacket = toWrap.isChunkDataPacket;
     }
     
     private static Socket fakeSocket = new Socket();
