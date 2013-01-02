@@ -34,6 +34,8 @@ public class TileEntityBarrel extends TileEntityFactorization {
     private int middleCount;
     private ItemStack bottomStack; //always full unless nearly empty
     public int upgrade = 0;
+    
+    private int lastCount = 0;
 
     @Override
     public FactoryType getFactoryType() {
@@ -260,7 +262,8 @@ public class TileEntityBarrel extends TileEntityFactorization {
 
     void broadcastItemCount() {
         if (worldObj != null && !worldObj.isRemote) {
-            Core.network.broadcastMessage(null, getCoord(), MessageType.BarrelCount, getItemCount());
+            lastCount = getItemCount();
+            Core.network.broadcastMessage(null, getCoord(), MessageType.BarrelCount, lastCount);
         }
     }
 
@@ -500,11 +503,14 @@ public class TileEntityBarrel extends TileEntityFactorization {
         return false;
     }
 
-//	@Override
-//	public void updateEntity() {
-//		super.updateEntity();
-//		updateStacks();
-//	}
+    @Override
+    public void updateEntity() {
+        super.updateEntity();
+        updateStacks();
+        if (lastCount != getItemCount()) {
+            broadcastItem(); //Thanks to buildcraft (and the general lack of decent API), we get to lag the server a bit more than necessary.
+        }
+    }
 
     @Override
     public boolean handleMessageFromServer(int messageType, DataInput input) throws IOException {
