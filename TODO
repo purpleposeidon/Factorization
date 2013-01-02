@@ -9,6 +9,11 @@ Step 3 is "create pseudoplayer, have packets sent to the pseudoplayer be sent to
     -    subscribe nearby players to chunk
 Step 4 is to make the DSE interact with the real world
     -    external entity collisions
+            -- We need either a base edit to let entities have more than one collision bounding box, ooorrr....
+            -- We need to think of some other way to work around it; maybe using prev position...
+            -- just act like a boring old box; enjoy solid air
+            -- when an entity collides with us, act there
+            -- Custom AABB <-- **use this one!!!**
     -    DSE persistence
 Step 5 is to get the player moving in & out
     -    player entry/leaving
@@ -69,6 +74,7 @@ make multiple copies of the metal texture for each ore processing machine
 http://www.minecraftforum.net/index.php?app=members&module=messaging&section=view&do=showConversation&topicID=1984385&st=0#msg3439990
 
 [Low-Priority Bugs]
+Get rid of as many getEffectiveSide() calls as we can; we often have a World hanging around somewhere we can use instead.
 rotating barrels (We *still* don't have a rotation API, do we?)
 Fun fact: High-quality batteries can be made out of silver. Mmmm. But this can't really be used as an alternative... altho... maybe they could require greater charge to charge.
 implementing that generic block rotation API when it comes out if ever
@@ -250,4 +256,15 @@ Nothin' you can do, 'cause you'll be dead
 (And then they'll eat your brains!)
 Then some douchebag what thinks he's you
 Will wake up with a computanium head
+
+
+Boats. Of course, you'll need a splash potion-like to set them afloat. This will, obviously, require the most annoying ingredients available:
+    Ghast tear, ink sack, cyan dye, leather, feather...
+
+ Ceremonial Bottle:
+  IGC    leather, ink sack, water bottle, cyan dye, ghast tear
+   W 
+   L 
+
+
 
