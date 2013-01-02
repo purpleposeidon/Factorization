@@ -15,7 +15,7 @@ popd
 
 mkdir -p lib/factorization
 pushd lib/factorization
-  ln -s ../../factorization/texture/
+  ln -s $BASE/texture/
 popd
 
 mkdir -p jars/saves

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mv ../forge/mcp/eclipse ../
+#mv ../forge/mcp/eclipse ../
 
 pushd cb
   ./install.sh
@@ -8,6 +8,7 @@ popd
 ./embed_source
 echo "Remember to set the lib/ classpath in eclipse!"
 
-rm -rf ../forge/mcp/eclipse
-mv ../eclipse ../forge/mcp/
+#rm -r ../forge/mcp/eclipse
+#ln -s `pwd`/../eclipse ../forge/mcp
+#mv ../eclipse ../forge/mcp/
 
