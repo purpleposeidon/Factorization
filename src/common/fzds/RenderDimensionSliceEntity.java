@@ -1,6 +1,10 @@
 package factorization.fzds;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.glCallList;
+import static org.lwjgl.opengl.GL11.glGetError;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glTranslatef;
 
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -10,25 +14,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.entity.Entity;
 import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.world.World;
 import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraftforge.common.DimensionManager;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.entity.Entity;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.ChunkPosition;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.world.WorldEvent;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
+
+import com.google.common.collect.Range;
 
 import cpw.mods.fml.common.IScheduledTickHandler;
 import cpw.mods.fml.common.TickType;
@@ -51,6 +54,11 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
     
     Set<DSRenderInfo> renderInfoTracker = new HashSet();
     static long megatickCount = 0;
+    static RenderDimensionSliceEntity instance;
+    
+    public RenderDimensionSliceEntity() {
+        instance = this;
+    }
     
     class DSRenderInfo {
         final int width = Hammer.cellWidth;
@@ -62,10 +70,12 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         long lastRenderInMegaticks = megatickCount;
         boolean dirty = false;
         private int renderList = -1;
-        WorldRenderer renderers[] = new WorldRenderer[cubicChunkCount];
+        private WorldRenderer renderers[] = new WorldRenderer[cubicChunkCount];
         Coord corner;
+        DimensionSliceEntity dse;
         
-        public DSRenderInfo(Coord corner) {
+        public DSRenderInfo(DimensionSliceEntity dse, Coord corner) {
+            this.dse = dse;
             this.corner = corner;
             int xzSize = width*width;
             int i = 0;
@@ -83,16 +93,13 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                     }
                 }
             }
+            assert i == cubicChunkCount;
         }
         
         void update() {
             Core.profileStart("update");
-            if (renderCounts != 0) {
-                return;
-            }
             checkGLError("FZDS before WorldRender update");
             for (int i = 0; i < renderers.length; i++) {
-                renderers[i].needsUpdate = true;
                 renderers[i].updateRenderer();
                 checkGLError("FZDS WorldRender update");
             }
@@ -124,34 +131,38 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             double sx = TileEntityRenderer.instance.playerX;
             double sy = TileEntityRenderer.instance.playerY;
             double sz = TileEntityRenderer.instance.playerZ;
-            for (int cdx = 0; cdx < width; cdx++) {
-                for (int cdz = 0; cdz < width; cdz++) {
-                    Chunk here = corner.w.getChunkFromBlockCoords(corner.x + cdx*16, corner.z + cdz*16);
-                    for (int i1 = 0; i1 < here.entityLists.length; i1++) {
-                        List<Entity> ents = here.entityLists[i1];
-                        for (int i2 = 0; i2 < ents.size(); i2++) {
-                            Entity e = ents.get(i2);
-                            if (e instanceof DimensionSliceEntity && nest >= 3) {
-                                continue;
+            try {
+                for (int cdx = 0; cdx < width; cdx++) {
+                    for (int cdz = 0; cdz < width; cdz++) {
+                        Chunk here = corner.w.getChunkFromBlockCoords(corner.x + cdx*16, corner.z + cdz*16);
+                        for (int i1 = 0; i1 < here.entityLists.length; i1++) {
+                            List<Entity> ents = here.entityLists[i1];
+                            for (int i2 = 0; i2 < ents.size(); i2++) {
+                                Entity e = ents.get(i2);
+                                if (nest >= 3 && e instanceof DimensionSliceEntity) {
+                                    continue;
+                                }
+                                //if e is a proxying player, don't render it?
+                                RenderManager.instance.renderEntity(e, partialTicks);
                             }
-                            //if e is a proxying player, don't render it?
-                            RenderManager.instance.renderEntity(e, partialTicks);
+                        }
+                        for (TileEntity te : ((Map<ChunkPosition, TileEntity>)here.chunkTileEntityMap).values()) {
+                            //I warned you about comods, bro! I told you, dawg! (Shouldn't actually be a problem if we're rendering properly)
+                            
+                            //Since we don't know the actual distance from the player to the TE, we need to cheat.
+                            //(We *could* calculate it, I suppose... Or maybe just not render entities when the player's far away)
+                            TileEntityRenderer.instance.playerX = te.xCoord;
+                            TileEntityRenderer.instance.playerY = te.yCoord;
+                            TileEntityRenderer.instance.playerZ = te.zCoord;
+                            TileEntityRenderer.instance.renderTileEntity(te, partialTicks);
                         }
                     }
-                    for (TileEntity te : ((Map<ChunkCoordinates, TileEntity>)here.chunkTileEntityMap).values()) {
-                        //I warned you about comods, bro! I told you, dawg!
-                        //(Shouldn't actually be a problem if we're rendering properly)
-                        //Since we don't know the actual distance from the player to the TE, we need to cheat.
-                        TileEntityRenderer.instance.playerX = te.xCoord;
-                        TileEntityRenderer.instance.playerY = te.yCoord;
-                        TileEntityRenderer.instance.playerZ = te.zCoord;
-                        TileEntityRenderer.instance.renderTileEntity(te, partialTicks);
-                    }
                 }
+            } finally {
+                TileEntityRenderer.instance.playerX = sx;
+                TileEntityRenderer.instance.playerY = sy;
+                TileEntityRenderer.instance.playerZ = sz;
             }
-            TileEntityRenderer.instance.playerX = sx;
-            TileEntityRenderer.instance.playerY = sy;
-            TileEntityRenderer.instance.playerZ = sz;
         }
         
         int getRenderList() {
@@ -168,24 +179,50 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 renderList = -1;
             }
             Arrays.fill(renderers, (WorldRenderer) null);
+            dse.renderInfo = null;
         }
     }
     
-    public static int nest = 0;
+    static boolean intersect(int la, int ha, int lb, int hb) {
+        //If we don't intersect, then we're overlapping.
+        //If we're not overlapping, then one is to the right of the other.
+        //<--- (la ha) -- (lb hb) -->
+        //<--- (lb hb) -- (la ha) -->
+        return !(ha < lb || hb < la);
+    }
+    
+    static void markBlocksForUpdate(DimensionSliceEntity dse, int lx, int ly, int lz, int hx, int hy, int hz) {
+        if (dse.renderInfo == null) {
+            return;
+            //dse.renderInfo = instance.new DSRenderInfo(dse, dse.hammerCell);
+        }
+        DSRenderInfo renderInfo = (DSRenderInfo) dse.renderInfo;
+        for (int i = 0; i < renderInfo.renderers.length; i++) {
+            WorldRenderer wr = renderInfo.renderers[i];
+            if (intersect(lx, lx, wr.posX, wr.posX + 16) &&
+                    intersect(ly, ly, wr.posY, wr.posY + 16) && 
+                    intersect(lz, lz, wr.posZ, wr.posZ + 16)) {
+                wr.markDirty();
+            }
+        }
+    }
+    
+    public static int nest = 0; //is 0 usually. Gets incremented right before we start actually rendering.
     @Override
     public void doRender(Entity ent, double x, double y, double z, float yaw, float partialTicks) {
-        //XXX TODO: Don't render if we're far away! (This should maybe be done in some other function?)
+        //need to do: Don't render if we're far away! (This should maybe be done in some other function?)
         if (ent.isDead) {
             return;
         }
-        DimensionSliceEntity we = (DimensionSliceEntity) ent;
-        if (we.renderInfo == null) {
-            //we.renderInfo = new DSRenderInfo(new Coord(Minecraft.getMinecraft().theWorld, 0, 0, 0)); //The real world
-            we.renderInfo = new DSRenderInfo(Hammer.getCellCorner(we.cell)); //The shadow world
-        }
-        DSRenderInfo renderInfo = (DSRenderInfo) we.renderInfo;
+        DimensionSliceEntity dse = (DimensionSliceEntity) ent;
+        DSRenderInfo renderInfo = (DSRenderInfo) dse.renderInfo;
         if (nest == 0) {
             Core.profileStart("fzds");
+            checkGLError("FZDS before render -- somebody left a mess!");
+            if (dse.renderInfo == null) {
+                //we.renderInfo = new DSRenderInfo(new Coord(Minecraft.getMinecraft().theWorld, 0, 0, 0)); //The real world
+                dse.renderInfo = renderInfo = new DSRenderInfo(dse, Hammer.getCellCorner(dse.worldObj, dse.cell)); //The shadow world
+            }
             renderInfo.lastRenderInMegaticks = megatickCount;
         } else if (nest == 1) {
             Core.profileStart("recursion");
@@ -209,27 +246,28 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 glTranslatef((float)x, (float)y, (float)z);
                 //glScalef(s, s, s);
                 renderInfo.renderTerrain();
+                checkGLError("FZDS terrain display list render");
                 glTranslatef((float)-x, (float)-y, (float)-z);
-                glTranslatef((float)we.posX, (float)we.posY, (float)we.posZ);
+                glTranslatef((float)dse.posX, (float)dse.posY, (float)dse.posZ);
                 Hammer.proxy.setClientWorld(Hammer.getClientShadowWorld());
                 try {
                     renderInfo.renderEntities(partialTicks);
                 } finally {
                     Hammer.proxy.restoreClientWorld();
                 }
-                checkGLError("FZDS after render");
+                checkGLError("FZDS entity render");
             } finally {
                 glPopMatrix();
             }
         }
-        catch (Exception e) {
+        /*catch (Exception e) {
             System.err.println("FZDS failed to render");
             e.printStackTrace(System.err);
-        }
+        }*/
         finally {
             nest--;
             if (nest == 0) {
-                renderInfo.renderCounts = (1 + renderInfo.renderCounts) % 60;
+                checkGLError("FZDS after render");
                 Core.profileEnd();
             } else if (nest == 1) {
                 Core.profileEnd();
@@ -284,7 +322,8 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
 
     @Override
     public int nextTickSpacing() {
-        return 20*60;
+        return 20;
+        //return 20*60; //XXX TODO
         //20*60 would be "every minute". This actually isn't quite correct, since MC doesn't render at 20 FPS.
         //I mean, other people's MC doesn't render at 20 FPS. So, let's say you're getting 60 FPS.
     }

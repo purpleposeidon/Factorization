@@ -1,12 +1,14 @@
 package factorization.fzds;
 
 import java.lang.reflect.Field;
+import java.util.Iterator;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.NetClientHandler;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.particle.EntityReddustFX;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.entity.Entity;
@@ -21,6 +23,7 @@ import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import factorization.api.Coord;
 import factorization.common.Core;
 
 public class HammerClientProxy extends HammerProxy {
@@ -51,6 +54,10 @@ public class HammerClientProxy extends HammerProxy {
         return Minecraft.getMinecraft().theWorld;
     }
     
+    /***
+     * Inspired, obviously, by RenderGlobal.
+     * The World has a list of IWorldAccess, which it passes various events to. This one  
+     */
     static class HammerRenderGlobal implements IWorldAccess {
         private World realWorld;
         public HammerRenderGlobal(World realWorld) {
@@ -60,23 +67,40 @@ public class HammerClientProxy extends HammerProxy {
         
         @Override
         public void markBlockForUpdate(int var1, int var2, int var3) {
-            // TODO: *definitely* need something here...
+            markBlocksForUpdate(var1 - 1, var2 - 1, var3 - 1, var1 + 1, var2 + 1, var3 + 1);
         }
 
         @Override
         public void markBlockForRenderUpdate(int var1, int var2, int var3) {
-            // TODO: *definitely* need something here...
+            markBlocksForUpdate(var1 - 1, var2 - 1, var3 - 1, var1 + 1, var2 + 1, var3 + 1);
         }
 
         @Override
         public void markBlockRangeForRenderUpdate(int var1, int var2, int var3,
                 int var4, int var5, int var6) {
-            // TODO: *definitely* need something here...
+            markBlocksForUpdate(var1 - 1, var2 - 1, var3 - 1, var4 + 1, var5 + 1, var6 + 1);
+        }
+        
+        Coord center = new Coord(Hammer.getClientShadowWorld(), 0, 0, 0);
+        void markBlocksForUpdate(int lx, int ly, int lz, int hx, int hy, int hz) {
+            //Sorry, it could probably be a bit more efficient.
+            World realClientWorld = Hammer.getClientRealWorld();
+            World shadow = Hammer.getWorld(realClientWorld);
+            center.set(shadow, (lx + hx)/2, (ly + hy)/2, (lz + hz)/2);
+            int cellId = Hammer.getIdFromCoord(center);
+            if (cellId < 0) {
+                return;
+            }
+            for (DimensionSliceEntity dse : Hammer.getSlices(realClientWorld)) {
+                if (dse.cell == cellId && dse.worldObj == realClientWorld) {
+                    RenderDimensionSliceEntity.markBlocksForUpdate(dse, lx, ly, lz, hx, hy, hz);
+                }
+            }
         }
 
         @Override
         public void playSound(String sound, double x, double y, double z, float volume, float pitch) {
-            Vec3 realCoords = Hammer.shadow2nearestReal(x, y, z);
+            Vec3 realCoords = Hammer.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, x, y, z);
             if (realCoords == null) {
                 return;
             }
@@ -92,7 +116,7 @@ public class HammerClientProxy extends HammerProxy {
 
         @Override
         public void spawnParticle(String particle, double x, double y, double z, double vx, double vy, double vz) {
-            Vec3 realCoords = Hammer.shadow2nearestReal(x, y, z);
+            Vec3 realCoords = Hammer.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, x, y, z);
             if (realCoords == null) {
                 return;
             }
@@ -151,6 +175,7 @@ public class HammerClientProxy extends HammerProxy {
             send_queue = Minecraft.getMinecraft().getSendQueue();
             NCH_class = (Class<NetClientHandler>)send_queue.getClass();
             NCH_worldClient_field = ReflectionHelper.findField(NCH_class, "worldClient", "i");
+            Minecraft mc = Minecraft.getMinecraft();
         }
     }
     
@@ -159,6 +184,7 @@ public class HammerClientProxy extends HammerProxy {
         //TODO: what else we can do here to cleanup?
         Hammer.worldClient = null;
         send_queue = null;
+        fake_player = null;
     }
     
     private static NetClientHandler send_queue;
@@ -179,17 +205,19 @@ public class HammerClientProxy extends HammerProxy {
     
     private void setWorldAndPlayer(WorldClient wc, EntityClientPlayerMP player) {
         Minecraft mc = Minecraft.getMinecraft();
+        //For logic
         mc.theWorld = wc;
         mc.thePlayer = player;
+        setSendQueueWorld(wc);
+        
+        //For rendering
         TileEntityRenderer.instance.worldObj = wc;
         RenderManager.instance.worldObj = wc;
-        setSendQueueWorld(wc);
-        //send_queue.worldClient = wc; //NOTE: This will require an AT
-        //((NetClientHandler)mc.thePlayer.sendQueue.netManager).worldClient = wc;
     }
     
     EntityClientPlayerMP real_player = null;
     WorldClient real_world = null;
+    EntityClientPlayerMP fake_player = null;
     
     @Override
     public void setClientWorld(World w) {
@@ -201,7 +229,9 @@ public class HammerClientProxy extends HammerProxy {
             real_world = mc.theWorld;
         }
         real_player.worldObj = w;
-        EntityClientPlayerMP fake_player = new EntityClientPlayerMP(mc, w, mc.session, real_player.sendQueue /* not sure about this one. */);
+        if (fake_player == null || real_world != fake_player.worldObj) {
+            fake_player = new EntityClientPlayerMP(mc, mc.theWorld, mc.session, real_player.sendQueue /* not sure about this one. */);
+        }
         setWorldAndPlayer((WorldClient) w, fake_player);
     }
     

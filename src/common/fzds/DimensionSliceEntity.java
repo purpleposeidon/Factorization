@@ -18,7 +18,8 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl {
     
     public Coord hammerCell;
     Object renderInfo = null;
-    AxisAlignedBB shadowArea = null, realArea = null;
+    AxisAlignedBB shadowArea = null, shadowCollisionArea = null, realArea = null, realCollisionArea = null;
+    PacketProxyingPlayer proxy = null;
     
     public DimensionSliceEntity(World world) {
         super(world);
@@ -28,7 +29,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl {
     public DimensionSliceEntity(World world, int cell) {
         this(world);
         this.cell = cell;
-        this.hammerCell = Hammer.getCellCorner(cell);
+        this.hammerCell = Hammer.getCellCorner(world, cell);
     }
     
     public Vec3 real2shadow(Vec3 realCoords) {
@@ -41,7 +42,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl {
     
     public Vec3 shadow2real(Vec3 shadowCoords) {
         //NOTE: This ignores transformations! Need to fix!
-        this.hammerCell = Hammer.getCellCorner(cell);
+        this.hammerCell = Hammer.getCellCorner(worldObj, cell);
         double diffX = shadowCoords.xCoord - hammerCell.x;
         double diffY = shadowCoords.yCoord - hammerCell.y;
         double diffZ = shadowCoords.zCoord - hammerCell.z;
@@ -57,6 +58,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl {
     @Override
     protected void readEntityFromNBT(NBTTagCompound tag) {
         cell = tag.getInteger("cell");
+        
     }
 
     @Override
@@ -71,12 +73,13 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl {
     }
     
     public void updateArea() {
-        Coord c = Hammer.getCellCorner(this.cell);
-        Coord d = Hammer.getCellOppositeCorner(this.cell);
+        Coord c = this.hammerCell;
+        Coord d = Hammer.getCellOppositeCorner(worldObj, this.cell);
         AxisAlignedBB fullRange = AxisAlignedBB.getBoundingBox(c.x, c.y, c.z, d.x, d.y, d.z);
         List<AxisAlignedBB> blockBoxes = c.w.getAllCollidingBoundingBoxes(fullRange);
         if (blockBoxes.size() <= 0) {
             shadowArea = null;
+            shadowCollisionArea = null;
             return;
         }
         AxisAlignedBB start = blockBoxes.get(0);
@@ -90,31 +93,55 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl {
             start.maxZ = Math.max(start.maxZ, b.maxZ);
         }
         shadowArea = start.copy();
+        shadowCollisionArea = shadowArea.expand(2, 2, 2);
         realArea = shadowArea.copy().getOffsetBoundingBox(posX - c.x, posY - c.z, posZ - c.z); //NOTE: Will need to update realArea when we move
+        realCollisionArea = shadowCollisionArea.copy().getOffsetBoundingBox(posX - c.x, posY - c.z, posZ - c.z);
+    }
+    
+    void init() {
+        if (hammerCell == null) {
+            this.hammerCell = Hammer.getCellCorner(worldObj, cell);
+        }
+        Hammer.getSlices(worldObj).add(this);
+        updateArea();
     }
     
     @Override
     public void onEntityUpdate() {
         //We don't want to call super, because it does a bunch of stuff that makes no sense for us.
-        if (this.ticksExisted < 2) {
-            Hammer.slices.add(this);
-        }
         if (worldObj.isRemote) {
-            return;
-        }
-        if (shadowArea == null) {
-            updateArea();
-        }
-        if (shadowArea == null) {
-            setDead();
+            if (hammerCell == null) {
+                init();
+            }
         } else {
-            Coord corner = Hammer.getCellCorner(cell);
-            takeInteriorEntities();
-            removeExteriorEntities();
+            if (proxy == null && !isDead) {
+                init();
+                proxy = new PacketProxyingPlayer(this);
+                proxy.worldObj.spawnEntityInWorld(proxy);
+                return;
+            }
         }
-        if (this.isDead) {
-            endSlice();
+        
+        if (!worldObj.isRemote) {
+            //Do teleportations and stuff
+            if (shadowArea == null) {
+                updateArea();
+            }
+            if (shadowArea == null) {
+                setDead();
+            } else {
+                Coord corner = Hammer.getCellCorner(worldObj, cell);
+                takeInteriorEntities();
+                removeExteriorEntities();
+            }
+            if (isDead) {
+                endSlice();
+                return;
+            }
         }
+        
+        //Do collisions...? :(
+        
     }
     
     private void takeInteriorEntities() {
@@ -131,7 +158,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl {
     
     private void removeExteriorEntities() {
         //Move entities outside the bounds in the shadow world into the real world
-        Chunk[] mychunks = Hammer.getChunks(cell);
+        Chunk[] mychunks = Hammer.getChunks(worldObj, cell);
         for (int i = 0; i < mychunks.length; i++) {
             Chunk chunk = mychunks[i];
             for (int j = 0; j < chunk.entityLists.length; j++) {
@@ -220,7 +247,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl {
     }
     
     void endSlice() {
-        Hammer.slices.remove(this);
+        Hammer.getSlices(worldObj).remove(this);
         //TODO: teleport entities into the real world
     }
     

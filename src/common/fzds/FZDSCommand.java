@@ -64,9 +64,6 @@ public class FZDSCommand extends CommandBase {
                 currentWE = Hammer.allocateSlice(player.worldObj);
                 currentWE.setPosition((int)player.posX, (int)player.posY, (int)player.posZ);
                 currentWE.worldObj.spawnEntityInWorld(currentWE);
-                //This should be moved to the FZDS entity
-                PacketProxyingPlayer ppp = new PacketProxyingPlayer(currentWE);
-                ppp.worldObj.spawnEntityInWorld(ppp);
                 ((EntityPlayerMP) sender).addChatMessage("Created FZDS " + currentWE.cell);
             }
             if (cmd.equalsIgnoreCase("show")) {
@@ -77,17 +74,7 @@ public class FZDSCommand extends CommandBase {
                 currentWE = Hammer.spawnSlice(player.worldObj, cell);
                 currentWE.setPosition((int)player.posX, (int)player.posY, (int)player.posZ);
                 currentWE.worldObj.spawnEntityInWorld(currentWE);
-                //This should be moved to the FZDS entity
-                PacketProxyingPlayer ppp = new PacketProxyingPlayer(currentWE);
-                ppp.worldObj.spawnEntityInWorld(ppp);
                 ((EntityPlayerMP) sender).addChatMessage("Showing FZDS " + currentWE.cell);
-            }
-            if (cmd.equalsIgnoreCase("remove")) {
-                for (Entity ent : (List<Entity>)player.worldObj.loadedEntityList) {
-                    if (ent instanceof DimensionSliceEntity) {
-                        ent.setDead();
-                    }
-                }
             }
             if (cmd.equalsIgnoreCase("grass")) {
                 new Coord(player).add(0, -1, 0).setId(Block.grass);
@@ -102,9 +89,9 @@ public class FZDSCommand extends CommandBase {
                     destinationCell = Integer.parseInt(args[1]);
                 } 
                 if (cmd.equalsIgnoreCase("goc")) {
-                    tp.destination = Hammer.getCellCenter(destinationCell);
+                    tp.destination = Hammer.getCellCenter(player.worldObj, destinationCell);
                 } else {
-                    tp.destination = Hammer.getCellLookout(destinationCell);
+                    tp.destination = Hammer.getCellLookout(player.worldObj, destinationCell);
                 }
                 if (DimensionManager.getWorld(Core.dimension_slice_dimid) != player.worldObj) {
                     manager.transferPlayerToDimension(player, Core.dimension_slice_dimid, tp);
@@ -135,6 +122,19 @@ public class FZDSCommand extends CommandBase {
                 }
             }
             sender.sendChatToPlayer("Removed " + i);
+        }
+        if (cmd.equalsIgnoreCase("remove")) {
+            if (currentWE == null) {
+                sender.sendChatToPlayer("No selection");
+            } else {
+                currentWE.setDead();
+                currentWE = null;
+                sender.sendChatToPlayer("Made dead");
+            }
+        }
+        if (cmd.equals("force_cell_allocation_count")) {
+            int newCount = Integer.parseInt(args[1]);
+            Hammer.instance.hammerInfo.setAllocationCount(newCount);
         }
     }
     

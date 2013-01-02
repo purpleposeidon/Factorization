@@ -1,6 +1,7 @@
 package factorization.fzds;
 
 import java.net.SocketAddress;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -10,11 +11,16 @@ import net.minecraft.network.INetworkManager;
 import net.minecraft.network.NetServerHandler;
 import net.minecraft.network.packet.NetHandler;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.Packet56MapChunks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerManager;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.Chunk;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import cpw.mods.fml.server.FMLServerHandler;
 import factorization.api.Coord;
 import factorization.fzds.api.IFzdsEntryControl;
 
@@ -22,14 +28,14 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
     DimensionSliceEntity dimensionSlice;
     static boolean useShortViewRadius = false;
     
-    private HashSet<EntityPlayerMP> trackedPlayers;
+    private HashSet<EntityPlayerMP> trackedPlayers = new HashSet();
     
     public PacketProxyingPlayer(DimensionSliceEntity dimensionSlice) {
         super(MinecraftServer.getServer(), dimensionSlice.hammerCell.w, "FZDS" + dimensionSlice.cell, new ItemInWorldManager(dimensionSlice.hammerCell.w));
         this.dimensionSlice = dimensionSlice;
         this.playerNetServerHandler = new NetServerHandler(MinecraftServer.getServer(), this, this);
-        Coord c = Hammer.getCellCenter(dimensionSlice.cell);
-        c.y = -8;
+        Coord c = Hammer.getCellCenter(worldObj, dimensionSlice.cell);
+        c.y = -8; //lurk in the void; we should catch most mod's packets.
         c.setAsEntityLocation(this);
         WorldServer ws = (WorldServer) dimensionSlice.worldObj;
         if (useShortViewRadius) {
@@ -44,6 +50,8 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
             MinecraftServer.getServerConfigurationManager(mcServer).func_72375_a(this, null);
         }
         ticks_since_last_update = (int) (Math.random()*20);
+        //TODO: I think the chunks are unloading despite the PPP's presence.
+        //Either figure out how to get this to act like an actual player, or make chunk loaders happen as well
     }
     
     private final int PlayerManager_playerViewRadius_field = 4;
@@ -80,13 +88,16 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
                 }
                 EntityPlayerMP player = (EntityPlayerMP) o;
                 if (isPlayerInUpdateRange(player)) {
-                    
+                    boolean new_player = trackedPlayers.add(player);
+                    if (new_player) {
+                        sendChunkMapDataToPlayer(player); //welcome to the club. This may be a bit inefficient.
+                    }
                 } else {
                     trackedPlayers.remove(player);
                 }
             }
         }
-        super.onUpdate(); //we probably want to keep this one
+        super.onUpdate(); //we probably want to keep this one, just for the EntityMP stuff
     }
      
     boolean isPlayerInUpdateRange(EntityPlayerMP player) {
@@ -94,7 +105,36 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
     }
     
     void sendChunkMapDataToPlayer(EntityPlayerMP target) {
-        
+        //Inspired by EntityPlayerMP.onUpdate. Shame we can't just add chunks... but there'd be no wrapper for the packets.
+        ArrayList<Chunk> chunks = new ArrayList();
+        ArrayList<TileEntity> tileEntities = new ArrayList();
+        Coord corner = Hammer.getCellCorner(target.worldObj, dimensionSlice.cell);
+        World world = Hammer.getServerShadowWorld();
+        for (int dx = 0; dx < Hammer.cellWidth; dx++) {
+            for (int dz = 0; dz < Hammer.cellWidth; dz++) {
+                int x = corner.x + 16*dx, z = corner.z + 16*dz;
+                if (!world.blockExists(x, 0, z)) {
+                    continue;
+                }
+                Chunk chunk = world.getChunkFromBlockCoords(x, z);
+                chunks.add(chunk);
+                tileEntities.addAll(chunk.chunkTileEntityMap.values());
+            }
+        }
+        NetServerHandler net = target.playerNetServerHandler;
+        if (!chunks.isEmpty()) {
+            Packet toSend = new Packet220FzdsWrap(new Packet56MapChunks(chunks));
+            net.sendPacketToPlayer(toSend);
+        }
+        if (!tileEntities.isEmpty()) {
+            for (TileEntity te : tileEntities) {
+                Packet description = te.getDescriptionPacket();
+                if (description == null) {
+                    continue;
+                }
+                net.sendPacketToPlayer(new Packet220FzdsWrap(description));
+            }
+        }
     }
     
     public void endProxy() {
@@ -103,8 +143,9 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
         var2.setEntityDead(this);
         var2.getPlayerManager().removePlayer(this); //No comod?
         var2.getMinecraftServer().getConfigurationManager().playerEntityList.remove(playerNetServerHandler);
+        //The stuff above might not be necessary.
         setDead();
-        //Might be able to get away with just setDead() here.
+        dimensionSlice.proxy = null;
     }
 
     

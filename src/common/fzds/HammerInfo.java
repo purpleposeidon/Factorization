@@ -33,6 +33,11 @@ public class HammerInfo {
         return allocated_cells++;
     }
     
+    void setAllocationCount(int count) {
+        allocated_cells = count;
+        saveCellAllocations();
+    }
+    
     private File getInfoFile() {
         World baseWorld = DimensionManager.getWorld(0);
         File saveDir = new File("saves", baseWorld.getSaveHandler().getSaveDirectoryName());
@@ -51,6 +56,7 @@ public class HammerInfo {
             fis = new FileInputStream(infoFile);
             DataInputStream ios = new DataInputStream(fis);
             allocated_cells = ios.readInt();
+            unsaved_allocations = 0;
         } catch (Exception e) {
             Core.logWarning("Unable to load FZDS info");
             e.printStackTrace();
@@ -75,8 +81,9 @@ public class HammerInfo {
             DataOutputStream dos = new DataOutputStream(fos);
             dos.writeInt(allocated_cells);
             dos.flush();
+            unsaved_allocations = 0;
         } catch (Exception e) {
-            Core.logWarning("Unable to save FZDS info");
+            Core.logWarning("Unable to save FZDS info (cell allocation count = " + allocated_cells + ". Might need to restore this with /fzds force_cell_allocation_count)");
             e.printStackTrace();
         } finally {
             if (fos != null) {

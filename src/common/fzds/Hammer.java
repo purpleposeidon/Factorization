@@ -25,10 +25,12 @@ import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.PreInit;
 import cpw.mods.fml.common.Mod.ServerStarting;
+import cpw.mods.fml.common.Mod.ServerStopping;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.event.FMLServerStoppingEvent;
 import cpw.mods.fml.common.network.IConnectionHandler;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -45,7 +47,7 @@ public class Hammer {
     
     
     public static final String modId = Core.modId + ".dimensionalSlice";
-    public static final String name = "FZDS";
+    public static final String name = "Factorization Dimensional Slices";
     public static Hammer instance; //@Instance seems to give the parent?
     @SidedProxy(clientSide = "factorization.fzds.HammerClientProxy", serverSide = "factorization.fzds.HammerProxy")
     public static HammerProxy proxy;
@@ -53,10 +55,18 @@ public class Hammer {
     public static int dimensionID;
     public static World worldClient = null; //This is actually a WorldClient
     public static double DSE_ChunkUpdateRangeSquared = Math.pow(16*8, 2); //This is actually set when the server starts
-    //Two important things:
-    //1) Use a synchronized block while iterating
-    //2) This will be shared with the client & integrated server.
-    static Set<DimensionSliceEntity> slices = Collections.synchronizedSet(new HashSet());
+    
+    private static Set<DimensionSliceEntity> serverSlices = new HashSet(), clientSlices = new HashSet();
+    static Set<DimensionSliceEntity> getSlices(World w) {
+        if (w == null) {
+            if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+                return clientSlices;
+            } else {
+                return serverSlices;
+            }
+        }
+        return w.isRemote ? clientSlices : serverSlices;
+    }
     
     public Hammer() {
         Hammer.instance = this;
@@ -74,31 +84,38 @@ public class Hammer {
         return proxy.getClientRealWorld();
     }
     
-    public static World getWorld() {
-        return FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT ? getClientShadowWorld() : getServerShadowWorld();
+    /***
+     * @return the thread-appropriate shadow world
+     */
+    public static World getWorld(World realWorld) {
+        if (realWorld == null) {
+            return FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT ? getClientShadowWorld() : getServerShadowWorld();
+        }
+        return realWorld.isRemote ? getClientShadowWorld() : getServerShadowWorld();
     }
     
-    public static Coord getCellLookout(int cellId) {
+    public static Coord getCellLookout(World realWorld, int cellId) {
         int cellSize = (cellWidth + wallWidth)*16;
-        return new Coord(getWorld(), cellSize*cellId - 2, 0 /*wallHeight*/, (1 + cellWidth)*16/2);
+        return new Coord(getWorld(realWorld), cellSize*cellId - 2, 0 /*wallHeight*/, (1 + cellWidth)*16/2);
     }
     
-    public static Coord getCellCorner(int cellId) {
+    public static Coord getCellCorner(World realWorld, int cellId) {
         //return new Coord(getWorld(), 0, 0, 0);
         //return getCellLookout(cellId);
         int cellSize = (cellWidth + wallWidth)*16;
-        return new Coord(getWorld(), cellSize*cellId, 0, 0);
+        return new Coord(getWorld(realWorld), cellSize*cellId, 0, 0);
     }
     
-    public static Coord getCellCenter(int cellId) {
-        return getCellCorner(cellId).add(cellWidth*16/2, wallHeight/2, cellWidth*16/2);
+    public static Coord getCellCenter(World realWorld, int cellId) {
+        return getCellCorner(realWorld, cellId).add(cellWidth*16/2, wallHeight/2, cellWidth*16/2);
     }
     
-    public static Coord getCellOppositeCorner(int cellId) {
-        return getCellCorner(cellId).add(cellWidth*16, wallHeight, cellWidth*16);
+    public static Coord getCellOppositeCorner(World realWorld, int cellId) {
+        return getCellCorner(realWorld, cellId).add(cellWidth*16, wallHeight, cellWidth*16);
     }
     
     public static int getIdFromCoord(Coord c) {
+        //You're not allowed to write getIdFromXCoordinate
         if (c.x < 0 || c.z < 0 || c.z > cellWidth*16) {
             return -1;
         }
@@ -106,8 +123,8 @@ public class Hammer {
         return c.x / depth_per_cell;
     }
     
-    public static Chunk[] getChunks(int cellId) {
-        Coord corner = getCellCorner(cellId);
+    public static Chunk[] getChunks(World realWorld, int cellId) {
+        Coord corner = getCellCorner(realWorld, cellId);
         int i = 0;
         for (int dx = 0; dx < cellWidth; dx++) {
             for (int dz = 0; dz < cellWidth; dz++) {
@@ -126,7 +143,7 @@ public class Hammer {
     }
     
     private final static EnumSet<TickType> serverTicks = EnumSet.of(TickType.SERVER);
-    private final static HammerInfo hammerInfo = new HammerInfo();
+    final static HammerInfo hammerInfo = new HammerInfo();
     //each cell is a few chunks wide, with chunks of bedrock between.
     static final int cellWidth = 4;
     static final int wallWidth = 16;
@@ -236,6 +253,11 @@ public class Hammer {
         DSE_ChunkUpdateRangeSquared = Math.pow(PlayerManager.func_72686_a(view_distance) + 16*cellWidth, 2);
     }
     
+    @ServerStopping
+    public void saveInfo(FMLServerStoppingEvent event) {
+        hammerInfo.saveCellAllocations();
+    }
+    
     public static DimensionSliceEntity findClosest(Entity target, int cellId) {
         if (target == null) {
             return null;
@@ -244,27 +266,24 @@ public class Hammer {
         double dist = Double.POSITIVE_INFINITY;
         World real_world = getClientRealWorld();
         
-        synchronized (Hammer.slices) {
-            for (DimensionSliceEntity here : Hammer.slices) {
-                if (here.worldObj != real_world && here.cell != cellId) {
-                    continue;
-                }
-                if (closest == null) {
-                    closest = here;
-                    continue;
-                }
-                double here_dist = target.getDistanceSqToEntity(here);
-                if (here_dist < dist) {
-                    dist = here_dist;
-                    closest = here;
-                }
+        for (DimensionSliceEntity here : Hammer.getSlices(target.worldObj)) {
+            if (here.worldObj != real_world && here.cell != cellId) {
+                continue;
+            }
+            if (closest == null) {
+                closest = here;
+                continue;
+            }
+            double here_dist = target.getDistanceSqToEntity(here);
+            if (here_dist < dist) {
+                dist = here_dist;
+                closest = here;
             }
         }
         return closest;
     }
     
-    public static Vec3 shadow2nearestReal(double x, double y, double z) {
-        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+    public static Vec3 shadow2nearestReal(Entity player, double x, double y, double z) {
         int correct_cell_id = Hammer.getIdFromCoord(Coord.of(x, y, z));
         DimensionSliceEntity closest = Hammer.findClosest(player, correct_cell_id);
         if (closest == null) {
