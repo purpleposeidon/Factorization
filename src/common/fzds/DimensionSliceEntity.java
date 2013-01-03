@@ -32,21 +32,29 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl {
         this.hammerCell = Hammer.getCellCorner(world, cell);
     }
     
+    private static Vec3 buffer = Vec3.createVectorHelper(0, 0, 0);
+    
     public Vec3 real2shadow(Vec3 realCoords) {
         //NOTE: This ignores transformations! Need to fix!
         double diffX = realCoords.xCoord - posX;
         double diffY = realCoords.yCoord - posY;
         double diffZ = realCoords.zCoord - posZ;
-        return Vec3.createVectorHelper(hammerCell.x + diffX, hammerCell.y + diffY, hammerCell.z + diffZ);
+        buffer.xCoord = hammerCell.x + diffX;
+        buffer.yCoord = hammerCell.y + diffY;
+        buffer.zCoord = hammerCell.z + diffZ;
+        return buffer;
     }
     
     public Vec3 shadow2real(Vec3 shadowCoords) {
         //NOTE: This ignores transformations! Need to fix!
-        this.hammerCell = Hammer.getCellCorner(worldObj, cell);
+        //this.hammerCell = Hammer.getCellCorner(worldObj, cell);
         double diffX = shadowCoords.xCoord - hammerCell.x;
         double diffY = shadowCoords.yCoord - hammerCell.y;
         double diffZ = shadowCoords.zCoord - hammerCell.z;
-        return Vec3.createVectorHelper(posX + diffX, posY + diffY, posZ + diffZ);
+        buffer.xCoord = posX + diffX;
+        buffer.yCoord = posY + diffY;
+        buffer.zCoord = posZ + diffZ;
+        return buffer;
     }
     
     @Override
@@ -249,6 +257,12 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl {
     void endSlice() {
         Hammer.getSlices(worldObj).remove(this);
         //TODO: teleport entities/blocks into the real world
+    }
+    
+    @Override
+    public void setDead() {
+        super.setDead();
+        Hammer.getSlices(worldObj).remove(this);
     }
     
     @Override

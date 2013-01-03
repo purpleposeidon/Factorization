@@ -1,6 +1,7 @@
 package factorization.fzds;
 
 import java.lang.reflect.Field;
+import java.util.Iterator;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -21,8 +22,6 @@ import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ForgeSubscribe;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.api.Coord;
 import factorization.common.Core;
@@ -52,10 +51,10 @@ public class HammerClientProxy extends HammerProxy {
     
     @Override
     public World getClientRealWorld() {
-        if (real_world != null) {
-            return real_world;
+        if (real_world == null) {
+            return Minecraft.getMinecraft().theWorld;
         }
-        return Minecraft.getMinecraft().theWorld;
+        return real_world;
     }
     
     /***
@@ -95,7 +94,13 @@ public class HammerClientProxy extends HammerProxy {
             if (cellId < 0) {
                 return;
             }
-            for (DimensionSliceEntity dse : Hammer.getSlices(realClientWorld)) {
+            Iterator<DimensionSliceEntity> it = Hammer.getSlices(realClientWorld).iterator();
+            while (it.hasNext()) {
+                DimensionSliceEntity dse = it.next();
+                if (dse.isDead) {
+                    it.remove(); //should be handled now. Keeping it anyways.
+                    continue;
+                }
                 if (dse.cell == cellId && dse.worldObj == realClientWorld) {
                     RenderDimensionSliceEntity.markBlocksForUpdate(dse, lx, ly, lz, hx, hy, hz);
                 }
@@ -167,9 +172,17 @@ public class HammerClientProxy extends HammerProxy {
         
     }
     
+    private static World lastWorld = null;
     @Override
     public void checkForWorldChange() {
-        
+        WorldClient currentWorld = Minecraft.getMinecraft().theWorld;
+        if (currentWorld != lastWorld) {
+            lastWorld = currentWorld;
+            if (lastWorld == null) {
+                return;
+            }
+            Hammer.worldClient.addWorldAccess(new HammerRenderGlobal(currentWorld));
+        }
     }
     
     @Override
@@ -181,7 +194,6 @@ public class HammerClientProxy extends HammerProxy {
                     Hammer.dimensionID,
                     login.difficultySetting,
                     Core.proxy.getProfiler());
-            Hammer.worldClient.addWorldAccess(new HammerRenderGlobal(Minecraft.getMinecraft().theWorld));
             send_queue = Minecraft.getMinecraft().getSendQueue();
             NCH_class = (Class<NetClientHandler>)send_queue.getClass();
             NCH_worldClient_field = ReflectionHelper.findField(NCH_class, "worldClient", "i");
@@ -205,11 +217,9 @@ public class HammerClientProxy extends HammerProxy {
         try {
             NCH_worldClient_field.set(send_queue, wc);
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            new RuntimeException("Failed to set SendQueue world due to reflection failure");
+            new RuntimeException("Failed to set SendQueue world due to reflection failure", e);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            new RuntimeException("Failed to set SendQueue world due to reflection failure");
+            new RuntimeException("Failed to set SendQueue world due to reflection failure", e);
         }
     }
     

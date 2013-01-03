@@ -15,6 +15,7 @@ import net.minecraft.network.packet.Packet1Login;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerManager;
 import net.minecraft.util.Vec3;
+import net.minecraft.util.Vec3Pool;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DimensionManager;
@@ -199,7 +200,9 @@ public class Hammer {
                 }
                 
                 @Override
-                public void tickStart(EnumSet<TickType> type, Object... tickData) { }
+                public void tickStart(EnumSet<TickType> type, Object... tickData) {
+                    proxy.checkForWorldChange();
+                }
                 
                 @Override
                 public void tickEnd(EnumSet<TickType> type, Object... tickData) {
@@ -283,13 +286,20 @@ public class Hammer {
         return closest;
     }
     
+    private static Vec3 buffer = Vec3.createVectorHelper(0, 0, 0);
+    
     public static Vec3 shadow2nearestReal(Entity player, double x, double y, double z) {
+        //The JVM sometimes segfaults in this function.
         int correct_cell_id = Hammer.getIdFromCoord(Coord.of(x, y, z));
         DimensionSliceEntity closest = Hammer.findClosest(player, correct_cell_id);
         if (closest == null) {
             return null;
         }
-        return closest.shadow2real(Vec3.createVectorHelper(x, y, z));
+        buffer.xCoord = x;
+        buffer.yCoord = y;
+        buffer.zCoord = z;
+        Vec3 ret = closest.shadow2real(buffer);
+        return ret;
     }
     
     public static Vec3 ent2vec(Entity ent) {
