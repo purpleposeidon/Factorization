@@ -20,5 +20,8 @@ public class HammerProxy {
     
     public void clientInit() { }
 
+    //Why is there no event for this? Is there an event for this?
+    public void checkForWorldChange() { }
+    
     public void runShadowTick() { }
 }

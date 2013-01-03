@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
@@ -15,6 +16,8 @@ import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.ForgeDirection;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class Coord {
     public World w;
@@ -492,7 +495,8 @@ public class Coord {
     }
 
     public void mark() {
-        w.spawnParticle("reddust", x + 0.5, y + 0.5, z + 0.5, 0, 0, 0);
+        World use_world = w;
+        use_world.spawnParticle("reddust", x + 0.5, y + 0.5, z + 0.5, 0, 0, 0);
     }
     
     public boolean remote() {

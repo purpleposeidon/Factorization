@@ -145,9 +145,9 @@ public class Hammer {
     private final static EnumSet<TickType> serverTicks = EnumSet.of(TickType.SERVER);
     final static HammerInfo hammerInfo = new HammerInfo();
     //each cell is a few chunks wide, with chunks of bedrock between.
-    static final int cellWidth = 4;
+    static final int cellWidth = 3;
     static final int wallWidth = 16;
-    static final int wallHeight = 16*8; //16*8 is the minimum or something... I'd rather go with 16*4. Meh.
+    static final int wallHeight = 16*8; //16*8 is the minimum or something. (For the Chunk constructor that we're using.) I'd rather go with 16*4. Meh.
     
     private static Chunk[] hChunks = new Chunk[cellWidth*cellWidth];
     

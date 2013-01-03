@@ -1,14 +1,12 @@
 package factorization.fzds;
 
 import java.lang.reflect.Field;
-import java.util.Iterator;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.NetClientHandler;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.particle.EntityReddustFX;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.entity.Entity;
@@ -22,11 +20,17 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.ForgeSubscribe;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.api.Coord;
 import factorization.common.Core;
 
 public class HammerClientProxy extends HammerProxy {
+    public HammerClientProxy() {
+        MinecraftForge.EVENT_BUS.register(this);
+    }
     
     //These two classes below make it easy to see in a debugger.
     public static class HammerChunkProviderClient extends ChunkProviderClient {
@@ -120,6 +124,7 @@ public class HammerClientProxy extends HammerProxy {
             if (realCoords == null) {
                 return;
             }
+            //this doesn't happen because world doesn't get update when you switch...
             realWorld.spawnParticle(particle, realCoords.xCoord, realCoords.yCoord, realCoords.zCoord, vx, vy, vz);
         }
 
@@ -159,6 +164,11 @@ public class HammerClientProxy extends HammerProxy {
             // TODO Auto-generated method stub
             
         }
+        
+    }
+    
+    @Override
+    public void checkForWorldChange() {
         
     }
     

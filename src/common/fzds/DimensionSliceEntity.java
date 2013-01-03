@@ -248,9 +248,13 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl {
     
     void endSlice() {
         Hammer.getSlices(worldObj).remove(this);
-        //TODO: teleport entities into the real world
+        //TODO: teleport entities/blocks into the real world
     }
     
+    @Override
+    public boolean isInRangeToRenderDist(double par1) {
+        return true;
+    }
     
     @Override
     public boolean canEnter(DimensionSliceEntity dse) { return false; }

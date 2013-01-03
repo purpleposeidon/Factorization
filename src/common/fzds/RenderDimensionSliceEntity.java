@@ -77,6 +77,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         public DSRenderInfo(DimensionSliceEntity dse, Coord corner) {
             this.dse = dse;
             this.corner = corner;
+            
             int xzSize = width*width;
             int i = 0;
             checkGLError("FZDS before render");
@@ -88,6 +89,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                         renderers[i].posXClip = x*16;
                         renderers[i].posYClip = y*16;
                         renderers[i].posZClip = z*16;
+                        renderers[i].markDirty();
                         checkGLError("FZDS WorldRenderer init");
                         i++;
                     }
@@ -169,6 +171,9 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             if (renderList == -1) {
                 renderList = GLAllocation.generateDisplayLists(wr_display_list_size*cubicChunkCount);
                 renderInfoTracker.add(this);
+                if (renderList == -1) {
+                    Core.logWarning("GL display list allocation failed!");
+                }
             }
             return renderList;
         }
@@ -178,7 +183,6 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 GLAllocation.deleteDisplayLists(renderList);
                 renderList = -1;
             }
-            Arrays.fill(renderers, (WorldRenderer) null);
             dse.renderInfo = null;
         }
     }
@@ -193,8 +197,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
     
     static void markBlocksForUpdate(DimensionSliceEntity dse, int lx, int ly, int lz, int hx, int hy, int hz) {
         if (dse.renderInfo == null) {
-            return;
-            //dse.renderInfo = instance.new DSRenderInfo(dse, dse.hammerCell);
+            dse.renderInfo = instance.new DSRenderInfo(dse, dse.hammerCell);
         }
         DSRenderInfo renderInfo = (DSRenderInfo) dse.renderInfo;
         for (int i = 0; i < renderInfo.renderers.length; i++) {
@@ -242,7 +245,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             }
             glPushMatrix();
             try {
-                float s = 1/4F;
+                float s = 1/4F;;
                 glTranslatef((float)x, (float)y, (float)z);
                 //glScalef(s, s, s);
                 renderInfo.renderTerrain();
@@ -259,11 +262,10 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             } finally {
                 glPopMatrix();
             }
-        }
-        /*catch (Exception e) {
+        } catch (Exception e) {
             System.err.println("FZDS failed to render");
             e.printStackTrace(System.err);
-        }*/
+        }
         finally {
             nest--;
             if (nest == 0) {
