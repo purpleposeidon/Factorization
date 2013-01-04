@@ -22,6 +22,8 @@ import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraftforge.common.MinecraftForge;
+import cpw.mods.fml.common.Mod.PostInit;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.api.Coord;
 import factorization.common.Core;
@@ -129,24 +131,26 @@ public class HammerClientProxy extends HammerProxy {
             if (realCoords == null) {
                 return;
             }
-            //this doesn't happen because world doesn't get update when you switch...
             realWorld.spawnParticle(particle, realCoords.xCoord, realCoords.yCoord, realCoords.zCoord, vx, vy, vz);
         }
 
         @Override
         public void obtainEntitySkin(Entity var1) {
-            // TODO: This is probably used mainly for player skins. Likely need (even more) more ATs
+            Minecraft.getMinecraft().renderGlobal.obtainEntitySkin(var1);
         }
 
         @Override
         public void releaseEntitySkin(Entity var1) {
-            // TODO: This is probably used mainly for player skins. Likely need (even more) more ATs
+            Minecraft.getMinecraft().renderGlobal.releaseEntitySkin(var1);
         }
 
         @Override
-        public void playRecord(String var1, int var2, int var3, int var4) {
-            // TODO Auto-generated method stub
-            
+        public void playRecord(String recordName, int x, int y, int z) {
+            Vec3 realCoords = Hammer.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, x, y, z);
+            if (realCoords == null) {
+                return;
+            }
+            Minecraft.getMinecraft().renderGlobal.playRecord(recordName, (int)realCoords.xCoord, (int)realCoords.yCoord, (int)realCoords.zCoord);
         }
 
         @Override
@@ -167,7 +171,7 @@ public class HammerClientProxy extends HammerProxy {
         public void destroyBlockPartially(int var1, int var2, int var3,
                 int var4, int var5) {
             // TODO Auto-generated method stub
-            
+            //Prooooobably not.
         }
         
     }

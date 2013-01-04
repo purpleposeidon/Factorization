@@ -20,10 +20,15 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl {
     Object renderInfo = null;
     AxisAlignedBB shadowArea = null, shadowCollisionArea = null, realArea = null, realCollisionArea = null;
     PacketProxyingPlayer proxy = null;
+    boolean needAreaUpdate = true;
+    
+    static final double offsetXZ = Hammer.cellWidth*16/2.0;
+    static final double offsetY = 0; //TODO?
     
     public DimensionSliceEntity(World world) {
         super(world);
         ignoreFrustumCheck = true; //kinda lame; we should give ourselves a proper bounding box?
+        //noClip = true;
     }
     
     public DimensionSliceEntity(World world, int cell) {
@@ -36,9 +41,9 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl {
     
     public Vec3 real2shadow(Vec3 realCoords) {
         //NOTE: This ignores transformations! Need to fix!
-        double diffX = realCoords.xCoord - posX;
-        double diffY = realCoords.yCoord - posY;
-        double diffZ = realCoords.zCoord - posZ;
+        double diffX = realCoords.xCoord + offsetXZ - posX;
+        double diffY = realCoords.yCoord + offsetY - posY;
+        double diffZ = realCoords.zCoord + offsetXZ - posZ;
         buffer.xCoord = hammerCell.x + diffX;
         buffer.yCoord = hammerCell.y + diffY;
         buffer.zCoord = hammerCell.z + diffZ;
@@ -51,33 +56,48 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl {
         double diffX = shadowCoords.xCoord - hammerCell.x;
         double diffY = shadowCoords.yCoord - hammerCell.y;
         double diffZ = shadowCoords.zCoord - hammerCell.z;
-        buffer.xCoord = posX + diffX;
-        buffer.yCoord = posY + diffY;
-        buffer.zCoord = posZ + diffZ;
+        buffer.xCoord = posX + diffX - offsetXZ;
+        buffer.yCoord = posY + diffY - offsetY;
+        buffer.zCoord = posZ + diffZ - offsetXZ;
         return buffer;
     }
     
     @Override
-    protected void entityInit() {
-        // TODO Auto-generated method stub
-
+    public AxisAlignedBB getBoundingBox() {
+        return boundingBox;
     }
+    
+    @Override
+    public void onCollideWithPlayer(EntityPlayer player) {
+//		if (!worldObj.isRemote) {
+//			//System.out.println("X");
+//			return;
+//		}
+//		player.motionY = Math.max(player.motionY, 0);
+//		player.onGround = true;
+    }
+    
+    @Override
+    protected void entityInit() { }
 
     @Override
     protected void readEntityFromNBT(NBTTagCompound tag) {
         cell = tag.getInteger("cell");
-        
     }
 
     @Override
     protected void writeEntityToNBT(NBTTagCompound tag) {
-        //this.ticksExisted = 1;
         tag.setInteger("cell", cell);
     }
     
     @Override
     public boolean canBeCollidedWith() {
-        return !this.isDead;
+        return true;
+    }
+    
+    @Override
+    public boolean canBePushed() {
+        return false;
     }
     
     public void updateArea() {
@@ -86,8 +106,13 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl {
         AxisAlignedBB fullRange = AxisAlignedBB.getBoundingBox(c.x, c.y, c.z, d.x, d.y, d.z);
         List<AxisAlignedBB> blockBoxes = c.w.getAllCollidingBoundingBoxes(fullRange);
         if (blockBoxes.size() <= 0) {
+            //This would be a fine time to die, don't you think?
             shadowArea = null;
             shadowCollisionArea = null;
+            shadowArea = AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
+            shadowCollisionArea = shadowArea.copy();
+            realArea = shadowArea.copy();
+            realCollisionArea= shadowArea.copy();
             return;
         }
         AxisAlignedBB start = blockBoxes.get(0);
@@ -102,8 +127,10 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl {
         }
         shadowArea = start.copy();
         shadowCollisionArea = shadowArea.expand(2, 2, 2);
-        realArea = shadowArea.copy().getOffsetBoundingBox(posX - c.x, posY - c.z, posZ - c.z); //NOTE: Will need to update realArea when we move
-        realCollisionArea = shadowCollisionArea.copy().getOffsetBoundingBox(posX - c.x, posY - c.z, posZ - c.z);
+        realArea = shadowArea.copy().getOffsetBoundingBox(posX - c.x - offsetXZ, posY - c.y - offsetY, posZ - c.z - offsetXZ); //NOTE: Will need to update realArea when we move
+        realCollisionArea = shadowCollisionArea.copy().getOffsetBoundingBox(posX - c.x - offsetXZ, posY - c.y - offsetY, posZ - c.z - offsetXZ);
+        needAreaUpdate = false;
+        this.boundingBox.setBB(realArea);
     }
     
     void init() {
@@ -111,7 +138,12 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl {
             this.hammerCell = Hammer.getCellCorner(worldObj, cell);
         }
         Hammer.getSlices(worldObj).add(this);
-        updateArea();
+    }
+    
+    @Override
+    public void setPosition(double par1, double par3, double par5) {
+        super.setPosition(par1, par3, par5);
+        needAreaUpdate = true;
     }
     
     @Override
@@ -126,8 +158,11 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl {
                 init();
                 proxy = new PacketProxyingPlayer(this);
                 proxy.worldObj.spawnEntityInWorld(proxy);
-                return;
             }
+        }
+        
+        if (needAreaUpdate) {
+            updateArea();
         }
         
         if (!worldObj.isRemote) {

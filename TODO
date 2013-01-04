@@ -2,25 +2,20 @@ http://www.minecraftforum.net/topic/1351802-factorization/
 
 HAMMER
 ------
-Step 1 is "Create a dimension"
-Step 2 is "make the client keep a reference to that dimension
-Step 3 is "create pseudoplayer, have packets sent to the pseudoplayer be sent to the real players, and render part of the dimension"
-    -    have packets go to all players near the DSE; single PacketProxyingPlayer per DSE
-    -    subscribe nearby players to chunk
-Step 4 is to make the DSE interact with the real world
-    -    external entity collisions
-            -- We need either a base edit to let entities have more than one collision bounding box, ooorrr....
-            -- We need to think of some other way to work around it; maybe using prev position...
-            -- just act like a boring old box; enjoy solid air
-            -- when an entity collides with us, act there
-            -- Custom AABB <-- **use this one!!!**
-    -    DSE persistence
-Step 5 is to get the player moving in & out
-    -    player entry/leaving
-    -    rendering correctly with embedded player
-Step 5 is rockets & shit.
-Step 6 is watch mod interaction burst into flames.
-Step 7 is "drop into the pending mods folder; run away giggling."
+✓ Step 1 is "create a dimension"
+✓ Step 2 is "give the client an extra world for that dimension"
+✓ Step 3 is "create pseudoplayer, have packets sent to the pseudoplayer be sent to the real players, and render part of the dimension"
+✓     -    have packets go to all players near the DSE; single PacketProxyingPlayer per DSE
+✓     -    send chunks to players
+  Step 4 is to make the DSE interact with the real world
+      -    external entity collisions, using custom AABBs
+✓     -    DSE persistence
+  Step 5 is to get the player moving in & out
+      -    player entry/leaving
+      -    rendering correctly with embedded player
+  Step 5 is rockets & shit.
+  Step 6 is watch mod interaction burst into flames.
+  Step 7 is "drop into the pending mods folder; run away giggling."
 
 
 TOP LIST (that's become somewhat less tops. Oops.)

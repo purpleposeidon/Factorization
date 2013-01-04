@@ -81,6 +81,7 @@ public class Core {
     public static int silver_ore_node_size = 25;
     public static boolean enable_dimension_slice = false;
     public static int dimension_slice_dimid = -7;
+    public static int force_max_entity_radius = -1;
     public static boolean spread_wrathfire = true;
     public static boolean pocket_craft_anywhere = true;
     public static boolean bag_swap_anywhere = true;
@@ -94,7 +95,6 @@ public class Core {
     public static boolean dimension_slice_allow_smooth = true;
     public static boolean show_fine_logging = false;
     public static boolean serverside_translate = true;
-    
     public static boolean dev_environ = System.getProperty("user.dir", "").startsWith("/home/poseidon/Development/");
 
     // universal constant config

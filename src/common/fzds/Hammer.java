@@ -24,11 +24,13 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.IScheduledTickHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.Mod.PostInit;
 import cpw.mods.fml.common.Mod.PreInit;
 import cpw.mods.fml.common.Mod.ServerStarting;
 import cpw.mods.fml.common.Mod.ServerStopping;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppingEvent;
@@ -303,6 +305,22 @@ public class Hammer {
     }
     
     public static Vec3 ent2vec(Entity ent) {
-        return Vec3.createVectorHelper(ent.posX, ent.posY, ent.posZ);
+        return ent.worldObj.getWorldVec3Pool().getVecFromPool(ent.posX, ent.posY, ent.posZ);
+    }
+    
+    @PostInit
+    public void modsLoaded(FMLPostInitializationEvent event) {
+        double desired_radius = cellWidth*16/2;
+        if (Core.force_max_entity_radius >= 0 && Core.force_max_entity_radius < desired_radius) {
+            desired_radius = Core.force_max_entity_radius;
+            Core.logFine("Using %f as FZDS's maximum entity radius; this could cause failure to collide with FZDS entities");
+        }
+        if (desired_radius < World.MAX_ENTITY_RADIUS) {
+            Core.logFine("Enlarging World.MAX_ENTITY_RADIUS from %f to %f", World.MAX_ENTITY_RADIUS, desired_radius);
+            Core.logFine("Please let the author know if this causes problems.");
+            World.MAX_ENTITY_RADIUS = desired_radius;
+        } else {
+            Core.logFine("World.MAX_ENTITY_RADIUS was already set to %f, which is large enough for our purposes (%f)", World.MAX_ENTITY_RADIUS, desired_radius);
+        }
     }
 }

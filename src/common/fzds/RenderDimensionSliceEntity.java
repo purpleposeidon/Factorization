@@ -40,6 +40,16 @@ import factorization.common.Core;
 
 
 public class RenderDimensionSliceEntity extends Render implements IScheduledTickHandler {
+    public static int update_frequency = 16;
+    public static RenderDimensionSliceEntity instance;
+    
+    private Set<DSRenderInfo> renderInfoTracker = new HashSet();
+    private static long megatickCount = 0;
+    
+    public RenderDimensionSliceEntity() {
+        instance = this;
+    }
+    
     static void checkGLError(String op) {
         int var2 = glGetError();
 
@@ -50,14 +60,6 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             System.out.println("@ " + op);
             System.out.println(var2 + ": " + var3);
         }
-    }
-    
-    Set<DSRenderInfo> renderInfoTracker = new HashSet();
-    static long megatickCount = 0;
-    static RenderDimensionSliceEntity instance;
-    
-    public RenderDimensionSliceEntity() {
-        instance = this;
     }
     
     class DSRenderInfo {
@@ -98,13 +100,32 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             assert i == cubicChunkCount;
         }
         
+        int last_update_index = 0;
+        int render_skips = 0;
         void update() {
+            render_skips++;
+            if (render_skips < update_frequency) {
+                render_skips = 0;
+            } else {
+                return;
+            }
             Core.profileStart("update");
             checkGLError("FZDS before WorldRender update");
-            for (int i = 0; i < renderers.length; i++) {
-                renderers[i].updateRenderer();
-                checkGLError("FZDS WorldRender update");
+            while (last_update_index < renderers.length) {
+                if (renderers[last_update_index].needsUpdate) {
+                    renderers[last_update_index].updateRenderer();
+                    last_update_index++;
+                    break;
+                }
+                last_update_index++;
             }
+            if (last_update_index == renderers.length) {
+                last_update_index = 0;
+            }
+//			for (int i = 0; i < renderers.length; i++) {
+//				renderers[i].updateRenderer();
+//				checkGLError("FZDS WorldRender update");
+//			}
             Core.profileEnd();
         }
         
@@ -246,7 +267,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             glPushMatrix();
             try {
                 float s = 1/4F;;
-                glTranslatef((float)x, (float)y, (float)z);
+                glTranslatef((float)(x - DimensionSliceEntity.offsetXZ), (float)(y - DimensionSliceEntity.offsetY), (float)(z - DimensionSliceEntity.offsetXZ));
                 //glScalef(s, s, s);
                 renderInfo.renderTerrain();
                 checkGLError("FZDS terrain display list render");
