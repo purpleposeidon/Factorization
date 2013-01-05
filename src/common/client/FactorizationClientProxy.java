@@ -31,8 +31,6 @@ import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.registry.LanguageRegistry;
-import cpw.mods.fml.common.registry.TickRegistry;
-import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
 import factorization.client.gui.FactorizationNotify;
@@ -91,8 +89,6 @@ import factorization.common.TileEntityMixer;
 import factorization.common.TileEntitySlagFurnace;
 import factorization.common.TileEntitySolarTurbine;
 import factorization.common.TileEntityWrathLamp;
-import factorization.fzds.DimensionSliceEntity;
-import factorization.fzds.RenderDimensionSliceEntity;
 
 public class FactorizationClientProxy extends FactorizationProxy {
     @Override
@@ -489,11 +485,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         MinecraftForgeClient.preloadTexture(Core.texture_file_item);
 
         RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
-        if (Core.enable_dimension_slice) {
-            RenderDimensionSliceEntity rwe = new RenderDimensionSliceEntity();
-            RenderingRegistry.registerEntityRenderingHandler(DimensionSliceEntity.class, rwe);
-            TickRegistry.registerScheduledTickHandler(rwe, Side.CLIENT);
-        }
 
         RenderingRegistry.registerBlockHandler(new FactorizationRender());
         BlockRenderBattery renderBattery = new BlockRenderBattery();
