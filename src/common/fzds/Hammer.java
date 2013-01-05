@@ -38,6 +38,7 @@ import cpw.mods.fml.common.network.IConnectionHandler;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.Player;
+import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
@@ -149,6 +150,7 @@ public class Hammer {
     final static HammerInfo hammerInfo = new HammerInfo();
     //each cell is a few chunks wide, with chunks of bedrock between.
     static final int cellWidth = 3;
+    static final int cellHeight = cellWidth;
     static final int wallWidth = 16;
     static final int wallHeight = 16*8; //16*8 is the minimum or something. (For the Chunk constructor that we're using.) I'd rather go with 16*4. Meh.
     
@@ -161,6 +163,9 @@ public class Hammer {
         if (!enabled) {
             return;
         }
+        
+        EntityRegistry.registerModEntity(DimensionSliceEntity.class, "fzds", 1, this, 64, 20, true);
+        EntityRegistry.registerModEntity(DseCollider.class, "fzdsC", 2, this, 0, 20, false);
         
         //Create the hammer dimension
         dimensionID = Core.dimension_slice_dimid;
@@ -310,12 +315,12 @@ public class Hammer {
     
     @PostInit
     public void modsLoaded(FMLPostInitializationEvent event) {
-        double desired_radius = cellWidth*16/2;
+        double desired_radius = 16/2;
         if (Core.force_max_entity_radius >= 0 && Core.force_max_entity_radius < desired_radius) {
             desired_radius = Core.force_max_entity_radius;
             Core.logFine("Using %f as FZDS's maximum entity radius; this could cause failure to collide with FZDS entities");
         }
-        if (desired_radius < World.MAX_ENTITY_RADIUS) {
+        if (World.MAX_ENTITY_RADIUS < desired_radius) {
             Core.logFine("Enlarging World.MAX_ENTITY_RADIUS from %f to %f", World.MAX_ENTITY_RADIUS, desired_radius);
             Core.logFine("Please let the author know if this causes problems.");
             World.MAX_ENTITY_RADIUS = desired_radius;
