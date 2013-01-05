@@ -26,7 +26,7 @@ import factorization.fzds.api.IFzdsEntryControl;
 
 public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryControl, INetworkManager {
     DimensionSliceEntity dimensionSlice;
-    static boolean useShortViewRadius = false;
+    static boolean useShortViewRadius = false; //true doesn't actually change the view radius
     
     private HashSet<EntityPlayerMP> trackedPlayers = new HashSet();
     
@@ -76,10 +76,10 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
     public void onUpdate() {
         if (this.dimensionSlice.isDead) {
             endProxy();
-        } else if (ticks_since_last_update == 0) {
-            ticks_since_last_update = 20;
-        } else {
+        } else if (ticks_since_last_update > 0) {
             ticks_since_last_update--;
+        } else {
+            ticks_since_last_update = 20;
             List playerList = dimensionSlice.worldObj.playerEntities;
             for (int i = 0; i < playerList.size(); i++) {
                 Object o = playerList.get(i);
@@ -90,7 +90,8 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
                 if (isPlayerInUpdateRange(player)) {
                     boolean new_player = trackedPlayers.add(player);
                     if (new_player) {
-                        sendChunkMapDataToPlayer(player); //welcome to the club. This may be a bit inefficient.
+                        //welcome to the club. This may net-lag a bit. (Well, it depends on the chunk's contents. Air compresses well tho.)
+                        sendChunkMapDataToPlayer(player);
                     }
                 } else {
                     trackedPlayers.remove(player);
@@ -113,7 +114,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
         for (int dx = 0; dx < Hammer.cellWidth; dx++) {
             for (int dz = 0; dz < Hammer.cellWidth; dz++) {
                 int x = corner.x + 16*dx, z = corner.z + 16*dz;
-                if (!world.blockExists(x, 0, z)) {
+                if (!world.blockExists(x+1, 0, z+1)) {
                     continue;
                 }
                 Chunk chunk = world.getChunkFromBlockCoords(x, z);
@@ -121,6 +122,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
                 tileEntities.addAll(chunk.chunkTileEntityMap.values());
             }
         }
+        //NOTE: This has the potential to go badly if there's a large amount of data in the chunks.
         NetServerHandler net = target.playerNetServerHandler;
         if (!chunks.isEmpty()) {
             Packet toSend = new Packet220FzdsWrap(new Packet56MapChunks(chunks));
