@@ -3,6 +3,7 @@ package factorization.fzds;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -20,7 +21,6 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.relauncher.ReflectionHelper;
-import cpw.mods.fml.server.FMLServerHandler;
 import factorization.api.Coord;
 import factorization.fzds.api.IFzdsEntryControl;
 
@@ -156,11 +156,19 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
 
     @Override
     public void addToSendQueue(Packet packet) {
-        Packet wrappedPacket = new Packet220FzdsWrap(packet);
-        for (EntityPlayerMP player : trackedPlayers) {
-            player.playerNetServerHandler.sendPacketToPlayer(wrappedPacket);
+        if (trackedPlayers.isEmpty()) {
+            return;
         }
-        return;
+        Packet wrappedPacket = new Packet220FzdsWrap(packet);
+        Iterator<EntityPlayerMP> it = trackedPlayers.iterator();
+        while (it.hasNext()) {
+            EntityPlayerMP player = it.next();
+            if (player.isDead) {
+                it.remove();
+            } else {
+                player.playerNetServerHandler.sendPacketToPlayer(wrappedPacket);
+            }
+        }
     }
     
     @Override
