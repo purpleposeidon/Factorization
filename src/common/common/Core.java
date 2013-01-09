@@ -265,7 +265,7 @@ public class Core {
     }
     
     public static void logFine(String format, Object... formatParameters) {
-        FZLogger.log(Level.FINE, String.format(format, formatParameters));
+        FZLogger.log(dev_environ ? Level.INFO : Level.FINE, String.format(format, formatParameters));
     }
 
     public static void addBlockToCreativeList(List tab, Block block) {
@@ -284,6 +284,7 @@ public class Core {
         protected Boolean initialValue() { return false; }
     };
 
+    //TODO: Pass World to these? They've got profiler fields.
     public static void profileStart(String section) {
         // :|
         if (isMainClientThread.get()) {
