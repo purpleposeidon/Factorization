@@ -1,11 +1,13 @@
 package factorization.fzds;
 
+import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
@@ -16,6 +18,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import factorization.api.Coord;
 import factorization.common.Core;
+import factorization.fzds.api.IFzdsEntryControl;
 
 public class FZDSCommand extends CommandBase {
     private static DimensionSliceEntity currentWE = null;
@@ -54,7 +57,10 @@ public class FZDSCommand extends CommandBase {
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
         if (args.length == 0) {
-            sender.sendChatToPlayer("Sub-commands: spawn remove go leave removeall (only removeall works from console)");
+            //TODO: Non-shitty command interface
+            sender.sendChatToPlayer("Player: spawn (show #) grass (go [#=0]) (goc [#=0]) leave");
+            sender.sendChatToPlayer("Selected: selection + - remove (d|v +|= x y z)");
+            sender.sendChatToPlayer("removeall force_cell_allocation_count kill_most_entities");
             return;
         }
         String cmd = args[0];
@@ -65,6 +71,7 @@ public class FZDSCommand extends CommandBase {
                 currentWE.setPosition((int)player.posX, (int)player.posY, (int)player.posZ);
                 currentWE.worldObj.spawnEntityInWorld(currentWE);
                 ((EntityPlayerMP) sender).addChatMessage("Created FZDS " + currentWE.cell);
+                return;
             }
             if (cmd.equalsIgnoreCase("show")) {
                 int cell = 0;
@@ -75,9 +82,11 @@ public class FZDSCommand extends CommandBase {
                 currentWE.setPosition((int)player.posX, (int)player.posY, (int)player.posZ);
                 currentWE.worldObj.spawnEntityInWorld(currentWE);
                 ((EntityPlayerMP) sender).addChatMessage("Showing FZDS " + currentWE.cell);
+                return;
             }
             if (cmd.equalsIgnoreCase("grass")) {
                 new Coord(player).add(0, -1, 0).setId(Block.grass);
+                return;
             }
             ServerConfigurationManager manager = MinecraftServer.getServerConfigurationManager(MinecraftServer.getServer());
             DSTeleporter tp = new DSTeleporter((WorldServer) player.worldObj);
@@ -100,6 +109,7 @@ public class FZDSCommand extends CommandBase {
                     tp.destination.moveToTopBlock();
                     player.setPositionAndUpdate(tp.destination.x + 0.5, tp.destination.y, tp.destination.z + 0.5);
                 }
+                return;
             }
             if (cmd.equalsIgnoreCase("leave")) {
                 if (DimensionManager.getWorld(0) != player.worldObj) {
@@ -109,6 +119,7 @@ public class FZDSCommand extends CommandBase {
                     }
                     manager.transferPlayerToDimension(player, 0, tp);
                 }
+                return;
             }
         }
         if (cmd.equals("removeall")) {
@@ -122,6 +133,52 @@ public class FZDSCommand extends CommandBase {
                 }
             }
             sender.sendChatToPlayer("Removed " + i);
+            return;
+        }
+        if (cmd.equals("selection")) {
+            sender.sendChatToPlayer("> " + currentWE);
+            return;
+        }
+        if (cmd.equals("+") || cmd.equals("-")) {
+            boolean add = cmd.equals("+");
+            Iterator<DimensionSliceEntity> it = Hammer.getSlices(MinecraftServer.getServer().worldServerForDimension(0)).iterator();
+            DimensionSliceEntity first = null, prev = null, next = null, last = null;
+            boolean found_current = false;
+            while (it.hasNext()) {
+                DimensionSliceEntity here = it.next();
+                if (here.isDead) {
+                    continue;
+                }
+                last = here;
+                if (first == null) {
+                    first = last;
+                }
+                if (!found_current) {
+                    prev = last;
+                }
+                if (found_current && next == null) {
+                    next = last;
+                }
+                if (last == currentWE) {
+                    found_current = true;
+                }
+            }
+            if (first == null) {
+                sender.sendChatToPlayer("There are no DSEs loaded");
+                return;
+            }
+            if (currentWE == null) {
+                //initialize selection
+                currentWE = add ? first : last;
+            } else if (currentWE == last && add) {
+                currentWE = first;
+            } else if (currentWE == first && !add) {
+                currentWE = last;
+            } else {
+                currentWE = add ? next : prev;
+            }
+            sender.sendChatToPlayer("> " + currentWE);
+            return;
         }
         if (cmd.equalsIgnoreCase("remove")) {
             if (currentWE == null) {
@@ -131,11 +188,49 @@ public class FZDSCommand extends CommandBase {
                 currentWE = null;
                 sender.sendChatToPlayer("Made dead");
             }
+            return;
         }
         if (cmd.equals("force_cell_allocation_count")) {
             int newCount = Integer.parseInt(args[1]);
             Hammer.instance.hammerInfo.setAllocationCount(newCount);
+            return;
         }
+        if (cmd.equals("kill_most_entities")) {
+            for (World w : MinecraftServer.getServer().worldServers) {
+                for (Entity e : (Iterable<Entity>)w.loadedEntityList) {
+                    if (e instanceof EntityPlayer) {
+                        continue;
+                    }
+                    if (e instanceof DimensionSliceEntity || e instanceof IFzdsEntryControl) {
+                        continue;
+                    }
+                    e.setDead();
+                }
+            }
+            return;
+        }
+        if (cmd.equals("d") || cmd.equals("v")) {
+            double x = Double.parseDouble(args[2]);
+            double y = Double.parseDouble(args[3]);
+            double z = Double.parseDouble(args[4]);
+            if (args[1].equals("+")) {
+                if (cmd.equals("d")) {
+                    currentWE.posX += x;
+                    currentWE.posY += y;
+                    currentWE.posZ += z;
+                } else {
+                    currentWE.addVelocity(x, y, z);
+                }
+            } else {
+                if (cmd.equals("d")) {
+                    currentWE.setPosition(x, y, z);
+                } else {
+                    currentWE.setVelocity(x, y, z);
+                }
+            }
+            return;
+        }
+        sender.sendChatToPlayer("Not a command");
     }
     
     

@@ -3,6 +3,7 @@ package factorization.fzds;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import net.minecraft.client.Minecraft;
@@ -16,6 +17,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerManager;
 import net.minecraft.util.Vec3;
 import net.minecraft.util.Vec3Pool;
+import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DimensionManager;
@@ -165,7 +167,7 @@ public class Hammer {
         }
         
         EntityRegistry.registerModEntity(DimensionSliceEntity.class, "fzds", 1, this, 64, 20, true);
-        EntityRegistry.registerModEntity(DseCollider.class, "fzdsC", 2, this, 0, 20, false);
+        EntityRegistry.registerModEntity(DseCollider.class, "fzdsC", 2, this, 64, 80000, false);
         
         //Create the hammer dimension
         dimensionID = Core.dimension_slice_dimid;
@@ -257,6 +259,58 @@ public class Hammer {
         event.registerServerCommand(new FZDSCommand());
         DimensionManager.initDimension(dimensionID);
         assert DimensionManager.shouldLoadSpawn(dimensionID);
+        World hammerWorld = DimensionManager.getWorld(dimensionID);
+        hammerWorld.addWorldAccess(new IWorldAccess() {
+            //Should lets DSEs know that they need to update their area when a block is changed 
+            @Override public void spawnParticle(String var1, double var2, double var4, double var6, double var8, double var10, double var12) { }
+            @Override public void releaseEntitySkin(Entity var1) { }
+            @Override public void playSound(String var1, double var2, double var4, double var6, float var8, float var9) { }
+            @Override public void playRecord(String var1, int var2, int var3, int var4) { }
+            @Override public void playAuxSFX(EntityPlayer var1, int var2, int var3, int var4, int var5, int var6) { }
+            @Override public void obtainEntitySkin(Entity var1) { }
+            
+            @Override
+            public void markBlockRangeForRenderUpdate(int lx, int ly, int lz, int hx, int hy, int hz) {
+                markBlocksForUpdate(lx, ly, lz, hx, hy, hz);
+            }
+            
+            @Override
+            public void markBlockForUpdate(int x, int y, int z) {
+                markBlocksForUpdate(x, y, z, x, y, z);
+            }
+            
+            @Override
+            public void markBlockForRenderUpdate(int x, int y, int z) {
+                markBlocksForUpdate(x, y, z, x, y, z);
+            }
+            
+            Coord center = new Coord(Hammer.getClientShadowWorld(), 0, 0, 0);
+            void markBlocksForUpdate(int lx, int ly, int lz, int hx, int hy, int hz) {
+                //Sorry, it could probably be a bit more efficient.
+                World shadow = Hammer.getServerShadowWorld();
+                center.set(shadow, (lx + hx)/2, (ly + hy)/2, (lz + hz)/2);
+                int cellId = Hammer.getIdFromCoord(center);
+                if (cellId < 0) {
+                    return;
+                }
+                Iterator<DimensionSliceEntity> it = Hammer.getSlices(shadow).iterator();
+                while (it.hasNext()) {
+                    DimensionSliceEntity dse = it.next();
+                    if (dse.isDead) {
+                        it.remove(); //should be handled now. Keeping it anyways.
+                        continue;
+                    }
+                    if (dse.cell == cellId && dse.worldObj == shadow) {
+                        dse.blocksChanged(lx, ly, lz);
+                        dse.blocksChanged(hx, hy, hz);
+                    }
+                }
+            }
+            
+            @Override public void func_85102_a(EntityPlayer var1, String var2, double var3, double var5, double var7, float var9, float var10) { }
+            @Override public void destroyBlockPartially(int var1, int var2, int var3, int var4, int var5) { }
+            @Override public void broadcastSound(int var1, int var2, int var3, int var4, int var5) { }
+        });
         int view_distance = MinecraftServer.getServer().getConfigurationManager().getViewDistance();
         //the undeobfed method comes after "isPlayerWatchingChunk", also in uses of ServerConfigurationManager.getViewDistance()
         //It returns how many blocks are visible.

@@ -273,6 +273,11 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 checkGLError("FZDS terrain display list render");
                 glTranslatef((float)-x, (float)-y, (float)-z);
                 glTranslatef((float)dse.posX, (float)dse.posY, (float)dse.posZ);
+//				GL11.glBegin(GL11.GL_TRIANGLES);
+//				GL11.glVertex3f(0, 0, 0);
+//				GL11.glVertex3f(10, 0, 0);
+//				GL11.glVertex3f(0, 0, 10);
+//				GL11.glEnd();
                 Hammer.proxy.setClientWorld(Hammer.getClientShadowWorld());
                 try {
                     renderInfo.renderEntities(partialTicks);

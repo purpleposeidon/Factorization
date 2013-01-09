@@ -12,9 +12,13 @@ public class HammerProxy {
     
     public World getClientRealWorld() { return null; }
 
-    public void setClientWorld(World w) { }
+    public void setClientWorld(World w) {
+        throw new RuntimeException("Tried to setClientWorld on server");
+    }
 
-    public void restoreClientWorld() { }
+    public void restoreClientWorld() {
+        throw new RuntimeException("Tried to restoreClientWorld on server");
+    }
 
     public boolean isInShadowWorld() { return false; }
     

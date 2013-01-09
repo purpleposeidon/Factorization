@@ -22,15 +22,24 @@ import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraftforge.common.MinecraftForge;
+import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.Mod.PostInit;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
+import factorization.client.render.EmptyRender;
 import factorization.common.Core;
+import factorization.common.TileEntityWrathLamp;
 
 public class HammerClientProxy extends HammerProxy {
     public HammerClientProxy() {
         MinecraftForge.EVENT_BUS.register(this);
+        //RenderingRegistry.registerEntityRenderingHandler(DseCollider.class, new EmptyRender());
+        RenderDimensionSliceEntity rwe = new RenderDimensionSliceEntity();
+        RenderingRegistry.registerEntityRenderingHandler(DimensionSliceEntity.class, rwe);
+        TickRegistry.registerScheduledTickHandler(rwe, Side.CLIENT);
     }
     
     //These two classes below make it easy to see in a debugger.
@@ -105,6 +114,8 @@ public class HammerClientProxy extends HammerProxy {
                 }
                 if (dse.cell == cellId && dse.worldObj == realClientWorld) {
                     RenderDimensionSliceEntity.markBlocksForUpdate(dse, lx, ly, lz, hx, hy, hz);
+                    dse.blocksChanged(lx, ly, lz);
+                    dse.blocksChanged(hx, hy, hz);
                 }
             }
         }
