@@ -8,26 +8,47 @@ HAMMER
 ✓     -    have packets go to all players near the DSE; single PacketProxyingPlayer per DSE
 ✓     -    send chunks to players
   Step 4 is to make the DSE interact with the real world
-      -    external entity collisions, using custom AABBs
 ✓     -    DSE persistence
+      -    external entity collisions, using custom AABBs
   Step 5 is to get the player moving in & out
       -    player entry/leaving
       -    rendering correctly with embedded player
-  Step 5 is rockets & shit.
-  Step 6 is watch mod interaction burst into flames.
-  Step 7 is "drop into the pending mods folder; run away giggling."
+  Step 6 is to get rotations working
+  Step 7 is rockets & shit.
+      -    Refactor DSE & its rendering for Oracles
+      -    Proper command system
+  Step 8 is watch mod interaction burst into flames.
+  Step 9 is "drop into the pending mods folder; run away giggling."
+
+REARCHITECTING
+--------------
+Kill Wrath (This will make the mod so much simpler...):
+  - Wrath lamp will take something inverium'd (dark iron? That might be a bit too... intense.)
+  - Dark iron obtained in ore form from asteroids (or if that takes too long, from inverium-ing iron blocks)
+  - Actual wrath fire will be gone. So:
+      - No more wrath forges
+      - No more lighting things on fire
+      - No more terrible particle effects
+  - This will remove a use for diamond shards
+
+Adjust ore yields to 2.4 prior to crystallization
+  - Even less reason to use IC2!
 
 
 TOP LIST (that's become somewhat less tops. Oops.)
 --------
+Barrel of buildcraft pipes causes an error on SMP; likely (sigh) translation related
+Look at what errors we get if the FZDS code isn't in
+either bats are spawning in the hammer dimension, or we're getting entity updates that we shouldn't be
 Test barrel's new ticklessness
 Exo-armor needs a look-through
-Wall jump only works when moving up?
-Change turbine to use up less water
+Make exo-armor not look terrible (Maybe use those armor slot symbols...). Also the on-player armor, needs some noise & sparklies. Also, is it too rigid?
+Wall jump only works when moving up? Make wall jump bouncing you off the wall at a 45° angle
+Change turbine to use up less water; a fully powered one causes too many block updates
 Grinder acting weird?
 dirty galena only gives silver
 RP heating
-other stuff working with the mixer...
+Forestry liquid containers/vanilla water bottles working in the mixer
 fix middle clicking
 Modularize FZ/astro so that astro has no deps & can be removed for public release
 regularize fluid volumes for mixer/crystallizer; how can we make buckets of aqua regia?
@@ -39,13 +60,15 @@ test with dedicated server (not from eclipse....)
 add inverium-based mecha-upgrades
 These upgrades:
   Lead boots
-  Damage Absorber (It has to be trained on a particular damage type.) Memory Plating
+  Damage Absorber (It has to be trained on a particular damage type.) Memory Plating/Conditioned Armor
   Armor Remover (?)
   Anti-gravity (uses inverium'd lead blocks): Velocity limiting, hovering, high jumping
     Acceleration Dampener
     Acceleration Stopper
 Some electricity related mecha-upgrades?
-RS signal to keep the grinder grinding
+Flying: Antigravity bits (Depends on inverium)
+Strong, but balanced, armor: Memory Plating/Conditioned Armor (More inverium)
+Good mining tools
 Placing/breaking wrath lamp in hammerspace seems to cause the client to crap its pants
 
 back to ceramics?
