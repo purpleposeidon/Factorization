@@ -27,6 +27,8 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     public Coord hammerCell;
     Object renderInfo = null;
     AxisAlignedBB shadowArea = null, shadowCollisionArea = null, realArea = null, realCollisionArea = null;
+    MetaAxisAlignedBB metaAABB = null;
+    
     PacketProxyingPlayer proxy = null;
     boolean needAreaUpdate = true;
     ArrayList<DseCollider> children = null; //we don't init here so that it's easy to see if we need to init it
@@ -38,6 +40,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
         super(world);
         ignoreFrustumCheck = true; //kinda lame; we should give ourselves a proper bounding box?
         //noClip = true;
+        boundingBox.setBounds(0, 0, 0, 0, 0, 0);
     }
     
     public DimensionSliceEntity(World world, int cell) {
@@ -169,11 +172,9 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
         
         shadowArea = cloneAABB(start);
         shadowCollisionArea = shadowArea.expand(2, 2, 2);
-        {
-            double dx = posX - c.x - offsetXZ, dy = posY - c.y - offsetY, dz = posZ - c.z - offsetXZ;
-            realArea = offsetAABB(shadowArea, dx, dy, dz); //NOTE: Will need to update realArea when we move
-            realCollisionArea = offsetAABB(shadowCollisionArea, dx, dy, dz);
-        }
+        double odx = posX - c.x - offsetXZ, ody = posY - c.y - offsetY, odz = posZ - c.z - offsetXZ;
+        realArea = offsetAABB(shadowArea, odx, ody, odz); //NOTE: Will need to update realArea when we move
+        realCollisionArea = offsetAABB(shadowCollisionArea, odx, ody, odz);
         needAreaUpdate = false;
         //this.boundingBox.setBB(realArea);
         if (children == null && worldObj.isRemote) {
@@ -193,6 +194,8 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
                 }
             }
         }
+        metaAABB = new MetaAxisAlignedBB(hammerCell.w, shadowArea, Vec3.createVectorHelper(odx, ody, odz));
+        metaAABB.setUnderlying(realArea);
     }
     
     void init() {
