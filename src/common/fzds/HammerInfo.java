@@ -7,12 +7,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import factorization.common.Core;
-
-import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.world.WorldEvent;
+import factorization.common.Core;
 
 public class HammerInfo {
     private int allocated_cells = 0;
@@ -39,8 +38,8 @@ public class HammerInfo {
     }
     
     private File getInfoFile() {
-        World baseWorld = DimensionManager.getWorld(0);
-        File saveDir = new File("saves", baseWorld.getSaveHandler().getSaveDirectoryName());
+        WorldServer baseWorld = DimensionManager.getWorld(0);
+        File saveDir = baseWorld.getChunkSaveLocation();
         saveDir = saveDir.getAbsoluteFile();
         return new File(saveDir, "fzds");
     }
