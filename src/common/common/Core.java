@@ -267,6 +267,10 @@ public class Core {
     public static void logFine(String format, Object... formatParameters) {
         FZLogger.log(dev_environ ? Level.INFO : Level.FINE, String.format(format, formatParameters));
     }
+    
+    public static void logSevere(String format, Object... formatParameters) {
+        FZLogger.log(Level.SEVERE, String.format(format, formatParameters));
+    }
 
     public static void addBlockToCreativeList(List tab, Block block) {
         ArrayList a = new ArrayList<Object>();
