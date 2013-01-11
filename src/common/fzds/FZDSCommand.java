@@ -41,7 +41,7 @@ public class FZDSCommand extends CommandBase {
                 destination.y = Math.min(Hammer.wallHeight, destination.y);
             }
             destination.setAsEntityLocation(player);
-            Coord below = new Coord(player);
+            /*Coord below = new Coord(player);
             below = below.add(0, -3, 0);
             for (int dx = -1; dx <= 1; dx++) {
                 for (int dz = -1; dz <= 1; dz++) {
@@ -50,7 +50,7 @@ public class FZDSCommand extends CommandBase {
                         platform.setId(Block.stone);
                     }
                 }
-            }
+            }*/
         }
     }
     
