@@ -385,7 +385,9 @@ public class Core {
             if (s != null && s.length() > 0) {
                 return s;
             }
-        } catch (Exception e) { }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         String key = getProperKey(is);
         if (canTranslate(key + ".name")) {
             return key + ".name";
