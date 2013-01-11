@@ -178,6 +178,9 @@ public class TileEntityBarrel extends TileEntityFactorization {
         if (is == null) {
             return null;
         }
+        if (getItemCount() - amount < 0) {
+            return null;
+        }
         ItemStack ret = is.splitStack(amount);
         updateStacks();
         broadcastItemCount();
