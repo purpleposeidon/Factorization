@@ -106,10 +106,12 @@ public class TileEntityBarrel extends TileEntityFactorization {
     public void changeItemCount(int delta) {
         middleCount = getItemCount() + delta;
         if (middleCount < 0) {
-            throw new Error("Tried making item count negative! At " + getCoord());
+            Core.logSevere("Tried to set the item count to negative value " + middleCount + " at " + getCoord());
+            middleCount = 0;
+            item = null;
         }
         if (middleCount > getMaxSize()) {
-            System.err.println("Factorization barrel size " + middleCount + " is larger than the maximum, " + getMaxSize() + " at " + getCoord());
+            Core.logSevere("Factorization barrel size " + middleCount + " is larger than the maximum, " + getMaxSize() + " at " + getCoord());
         }
         topStack = bottomStack = null;
         updateStacks();
@@ -124,7 +126,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
 
     private ItemStack makeStack(int count) {
         if (item == null) {
-            throw new Error();
+            return null;
         }
         ItemStack ret = item.copy();
         ret.stackSize = count;
