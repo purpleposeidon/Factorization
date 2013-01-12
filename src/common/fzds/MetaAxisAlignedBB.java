@@ -76,5 +76,17 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
         }
         return currentOffset;
     }
+    
+    @Override
+    public boolean intersectsWith(AxisAlignedBB collider) {
+        AxisAlignedBB shadow_version = AabbReal2Shadow(collider);
+        List<AxisAlignedBB> bbs = getUnderlying(shadow_version);
+        for (int i = 0; i < bbs.size(); i++) {
+            if (bbs.get(i).intersectsWith(shadow_version)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

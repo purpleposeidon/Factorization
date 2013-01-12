@@ -87,6 +87,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
 //		}
 //		player.motionY = Math.max(player.motionY, 0);
 //		player.onGround = true;
+        //TODO: Maybe adjust our velocities?
     }
     
     @Override
@@ -104,7 +105,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     
     @Override
     public boolean canBeCollidedWith() {
-        return true;
+        return false;
     }
     
     @Override
@@ -385,9 +386,10 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     }
     
     @Override
-    public boolean isInRangeToRenderDist(double par1) {
-        //TODO NORELEASE: Common sense
-        return true;
+    public boolean isInRangeToRenderDist(double distSquared) {
+        //NOTE: This doesn't actually render entities as far as it should
+        int s = 8*16;
+        return distSquared < s*s;
     }
     
     @Override
