@@ -249,6 +249,8 @@ public class TileEntityRouter extends TileEntityFactorization {
         TileEntity here = popFrontier();
 
         if (tryInsert(here) && upgradeThorough) {
+            resetGraph();
+            frontier.add(0, here);
             return;
         }
 
