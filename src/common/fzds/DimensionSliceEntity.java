@@ -293,7 +293,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
                     setDead();
                     Core.logFine("%s dying due to empty area", this.toString());
                 } else {
-                    needAreaUpdate = true; //sometime soon, please
+                    needAreaUpdate = true; //Hopefully it will load up soon...
                 }
             } else {
                 Coord corner = Hammer.getCellCorner(worldObj, cell);
