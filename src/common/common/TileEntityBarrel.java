@@ -505,7 +505,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     public boolean canUpdate() {
         //XXX TODO: Barrels don't need this. (Just to make sure the MD is enforced, since an incorrect MD'd be so dangerous)
         //Can probably get rid of it in... well, several versions. Maybe in September?
-        return false;
+        return true;
     }
 
     @Override
