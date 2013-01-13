@@ -3,20 +3,21 @@ package factorization.fzds;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteArrayDataOutput;
-
-import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
-
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+
+import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteArrayDataOutput;
+
+import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import factorization.api.Coord;
 import factorization.common.Core;
 import factorization.fzds.api.IFzdsEntryControl;
@@ -39,7 +40,6 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     public DimensionSliceEntity(World world) {
         super(world);
         ignoreFrustumCheck = true; //kinda lame; we should give ourselves a proper bounding box?
-        //noClip = true;
         boundingBox.setBounds(0, 0, 0, 0, 0, 0);
     }
     
@@ -129,8 +129,36 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
                 orig.maxX + dx, orig.maxY + dy, orig.maxZ + dz);
     }
     
-    public void updateArea() {
-        Coord c = this.hammerCell;
+    public void updateRealArea() {
+        Coord c = hammerCell;
+        double odx = posX - c.x - offsetXZ, ody = posY - c.y - offsetY, odz = posZ - c.z - offsetXZ;
+        realArea = offsetAABB(shadowArea, odx, ody, odz); //NOTE: Will need to update realArea when we move
+        realCollisionArea = offsetAABB(shadowCollisionArea, odx, ody, odz);
+        needAreaUpdate = false;
+        //this.boundingBox.setBB(realArea);
+        if (children == null && worldObj.isRemote) {
+            children = new ArrayList((int) Math.pow(Hammer.cellWidth, 3));
+            //The array will be filled as the server sends us children
+        } else if (children == null && !worldObj.isRemote) {
+            children = new ArrayList((int) Math.pow(Hammer.cellWidth, 3));
+            int width = Hammer.cellWidth*16;
+            int height = Hammer.cellHeight*16;
+            for (int dx = -width/2; dx < width/2; dx += 16) {
+                for (int dy = 0; dy < height; dy += 16) {
+                    for (int dz = -width/2; dz < width/2; dz += 16) {
+                        Entity e = new DseCollider(this, Vec3.createVectorHelper(dx, dy, dz));
+                        e.onEntityUpdate();
+                        worldObj.spawnEntityInWorld(e);
+                    }
+                }
+            }
+        }
+        metaAABB = new MetaAxisAlignedBB(hammerCell.w, shadowArea, Vec3.createVectorHelper(odx, ody, odz));
+        metaAABB.setUnderlying(realArea);
+    }
+    
+    public void updateShadowArea() {
+        Coord c = hammerCell;
         Coord d = Hammer.getCellOppositeCorner(worldObj, this.cell);
         
         AxisAlignedBB start = null;
@@ -158,7 +186,6 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
                 }
             }
         }
-        System.out.println("DSE area: " + start); //NORELEASE
         if (start == null) {
             if (worldObj.isRemote) {
                 return;
@@ -173,30 +200,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
         
         shadowArea = cloneAABB(start);
         shadowCollisionArea = shadowArea.expand(2, 2, 2);
-        double odx = posX - c.x - offsetXZ, ody = posY - c.y - offsetY, odz = posZ - c.z - offsetXZ;
-        realArea = offsetAABB(shadowArea, odx, ody, odz); //NOTE: Will need to update realArea when we move
-        realCollisionArea = offsetAABB(shadowCollisionArea, odx, ody, odz);
-        needAreaUpdate = false;
-        //this.boundingBox.setBB(realArea);
-        if (children == null && worldObj.isRemote) {
-            children = new ArrayList((int) Math.pow(Hammer.cellWidth, 3));
-            //The array will be filled as the server sends us children
-        } else if (children == null && !worldObj.isRemote) {
-            children = new ArrayList((int) Math.pow(Hammer.cellWidth, 3));
-            int width = Hammer.cellWidth*16;
-            int height = Hammer.cellHeight*16;
-            for (int dx = -width/2; dx < width/2; dx += 16) {
-                for (int dy = 0; dy < height; dy += 16) {
-                    for (int dz = -width/2; dz < width/2; dz += 16) {
-                        Entity e = new DseCollider(this, Vec3.createVectorHelper(dx, dy, dz));
-                        e.onEntityUpdate();
-                        worldObj.spawnEntityInWorld(e);
-                    }
-                }
-            }
-        }
-        metaAABB = new MetaAxisAlignedBB(hammerCell.w, shadowArea, Vec3.createVectorHelper(odx, ody, odz));
-        metaAABB.setUnderlying(realArea);
+        updateRealArea();
     }
     
     void init() {
@@ -221,6 +225,45 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
         needAreaUpdate = true;
     }
     
+    void updateMotion() {
+        if (motionX == 0 && motionY == 0 && motionZ == 0) {
+            return;
+        }
+        if (realArea == null || metaAABB == null) {
+            return;
+        }
+        prevPosX = posX;
+        prevPosY = posY;
+        prevPosZ = posZ;
+        
+        posX += motionX;
+        posY += motionY;
+        posZ += motionZ;
+        boolean moved = true;
+        if (!noClip) {
+            List<AxisAlignedBB> collisions = worldObj.getCollidingBoundingBoxes(this, realArea);
+            AxisAlignedBB collision = null;
+            for (int i = 0; i < collisions.size(); i++) {
+                AxisAlignedBB solid = collisions.get(i);
+                if (metaAABB.intersectsWith(solid) && solid != metaAABB) {
+                    collision = solid;
+                    break;
+                }
+            }
+            if (collision != null) {
+                //XXX TODO: This collision is terrible
+                posX -= motionX;
+                posY -= motionY;
+                posZ -= motionZ;
+                moved = false;
+                setVelocity(0, 0, 0);
+            }
+        }
+        if (moved) {
+            updateRealArea();
+        }
+    }
+    
     void doUpdate() {
         if (worldObj.isRemote) {
             if (hammerCell == null) {
@@ -233,16 +276,17 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
             proxy.worldObj.spawnEntityInWorld(proxy);
             return;
         }
+        updateMotion();
         if (needAreaUpdate) {
             Core.profileStart("updateArea");
-            updateArea();
+            updateShadowArea();
             Core.profileEnd();
         }
         
         if (!worldObj.isRemote) {
             //Do teleportations and stuff
             if (shadowArea == null) {
-                updateArea();
+                updateShadowArea();
             }
             if (shadowArea == null) {
                 if (hammerCell.blockExists()) {
@@ -267,7 +311,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     @Override
     public void onEntityUpdate() {
         //We don't want to call super, because it does a bunch of stuff that makes no sense for us.
-        Core.profileStart("FZDSE");
+        Core.profileStart("FZDSEntityTick");
         doUpdate();
         Core.profileEnd();
     }
