@@ -7,9 +7,9 @@ HAMMER
 ✓ Step 3 is "create pseudoplayer, have packets sent to the pseudoplayer be sent to the real players, and render part of the dimension"
 ✓     -    have packets go to all players near the DSE; single PacketProxyingPlayer per DSE
 ✓     -    send chunks to players
-  Step 4 is to make the DSE interact with the real world
+✓ Step 4 is to make the DSE interact with the real world
 ✓     -    DSE persistence
-      -    external entity collisions, using custom AABBs
+✓     -    external entity collisions, using custom AABBs
   Step 5 is to get the player moving in & out
       -    player entry/leaving
       -    rendering correctly with embedded player
