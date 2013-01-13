@@ -56,6 +56,15 @@ public class FZDSCommand extends CommandBase {
     
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
+        if (sender instanceof EntityPlayerMP) {
+            EntityPlayerMP player = (EntityPlayerMP) sender;
+            boolean op = MinecraftServer.getServer().getConfigurationManager().areCommandsAllowed(player.username);
+            boolean cr = player.capabilities.isCreativeMode;
+            if (!(op || cr)) {
+                sender.sendChatToPlayer("You must be op or in creative mode to use these commands");
+                return;
+            }
+        }
         if (args.length == 0) {
             //TODO: Non-shitty command interface
             sender.sendChatToPlayer("Player: spawn (show #) grass (go [#=0]) (goc [#=0]) leave");
@@ -210,23 +219,36 @@ public class FZDSCommand extends CommandBase {
             return;
         }
         if (cmd.equals("d") || cmd.equals("v")) {
+            if (args.length != 5) {
+                sender.sendChatToPlayer("Usage: /fzds d(isplacement)|v(elocity) =|+ X Y Z");
+                return;
+            }
             double x = Double.parseDouble(args[2]);
             double y = Double.parseDouble(args[3]);
             double z = Double.parseDouble(args[4]);
+            boolean d = cmd.equals("d");
+            boolean v = cmd.equals("v");
+            if (!(d || v)) {
+                sender.sendChatToPlayer("displacement or velocity?");
+                return;
+            }
             if (args[1].equals("+")) {
-                if (cmd.equals("d")) {
-                    currentWE.posX += x;
-                    currentWE.posY += y;
-                    currentWE.posZ += z;
+                if (d) {
+                    currentWE.setPosition(currentWE.posX + x, currentWE.posY + y, currentWE.posZ + z);
                 } else {
-                    currentWE.addVelocity(x, y, z);
+                    currentWE.addVelocity(x/20, y/20, z/20);
                 }
-            } else {
-                if (cmd.equals("d")) {
+            } else if (args[1].equals("=")) {
+                if (d) {
                     currentWE.setPosition(x, y, z);
                 } else {
-                    currentWE.setVelocity(x, y, z);
+                    currentWE.motionX = 0;
+                    currentWE.motionY = 0;
+                    currentWE.motionZ = 0;
+                    currentWE.addVelocity(x/20, y/20, z/20);
                 }
+            } else {
+                sender.sendChatToPlayer("Are you setting or adding?");
             }
             return;
         }
