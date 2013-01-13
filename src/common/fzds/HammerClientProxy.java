@@ -36,7 +36,7 @@ import factorization.common.TileEntityWrathLamp;
 public class HammerClientProxy extends HammerProxy {
     public HammerClientProxy() {
         MinecraftForge.EVENT_BUS.register(this);
-        //RenderingRegistry.registerEntityRenderingHandler(DseCollider.class, new EmptyRender());
+        RenderingRegistry.registerEntityRenderingHandler(DseCollider.class, new EmptyRender());
         RenderDimensionSliceEntity rwe = new RenderDimensionSliceEntity();
         RenderingRegistry.registerEntityRenderingHandler(DimensionSliceEntity.class, rwe);
         TickRegistry.registerScheduledTickHandler(rwe, Side.CLIENT);
