@@ -31,7 +31,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
     private HashSet<EntityPlayerMP> trackedPlayers = new HashSet();
     
     public PacketProxyingPlayer(DimensionSliceEntity dimensionSlice) {
-        super(MinecraftServer.getServer(), dimensionSlice.hammerCell.w, "FZDS" + dimensionSlice.cell, new ItemInWorldManager(dimensionSlice.hammerCell.w));
+        super(MinecraftServer.getServer(), dimensionSlice.hammerCell.w, "[FZDS" + dimensionSlice.cell + "]", new ItemInWorldManager(dimensionSlice.hammerCell.w));
         this.dimensionSlice = dimensionSlice;
         this.playerNetServerHandler = new NetServerHandler(MinecraftServer.getServer(), this, this);
         Coord c = Hammer.getCellCenter(worldObj, dimensionSlice.cell);
