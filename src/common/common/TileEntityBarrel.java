@@ -513,7 +513,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
         super.updateEntity();
         updateStacks();
         if (lastCount != getItemCount()) {
-            broadcastItem(); //Thanks to buildcraft (and the general lack of decent API), we get to lag the server a bit more than necessary.
+            broadcastItemCount();
         }
     }
 

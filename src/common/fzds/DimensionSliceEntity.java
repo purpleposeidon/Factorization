@@ -349,23 +349,13 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
         }
     }
     
-    boolean forbidEntityToEnter(Entity ent) {
-        if (ent.timeUntilPortal > 0) {
-            return true;
-        }
-        return ent instanceof EntityPlayer /* Just for now */;
-    }
-    
-    boolean forceKeepEntityInside(Entity ent) {
-        if (ent.timeUntilPortal > 0) {
-            return true;
-        }
-        return ent instanceof EntityPlayer /* Just for now */;
+    boolean forbidEntityTransfer(Entity ent) {
+        return ent.timeUntilPortal > 0 && !(ent instanceof EntityPlayer);
     }
     
     void takeEntity(Entity ent) {
         //TODO: Take transformations into account
-        if (forbidEntityToEnter(ent)) {
+        if (forbidEntityTransfer(ent)) {
             return;
         }
         IFzdsEntryControl ifec = null;
@@ -385,7 +375,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     
     void ejectEntity(Entity ent) {
         //TODO: Take transformations into account
-        if (forceKeepEntityInside(ent)) {
+        if (forbidEntityTransfer(ent)) {
             return;
         }
         IFzdsEntryControl ifec = null;

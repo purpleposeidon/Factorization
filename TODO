@@ -37,7 +37,7 @@ Adjust ore yields to 2.4 prior to crystallization
 
 TOP LIST (that's become somewhat less tops. Oops.)
 --------
-Barrel of buildcraft pipes causes an error on SMP; likely (sigh) translation related
+pane recipe for turbine
 Look at what errors we get if the FZDS code isn't in
 either bats are spawning in the hammer dimension, or we're getting entity updates that we shouldn't be
 Test barrel's new ticklessness
