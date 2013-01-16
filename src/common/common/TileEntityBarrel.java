@@ -285,6 +285,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     public boolean takeUpgrade(ItemStack is) {
         if (is.getItem() == Core.registry.barrel_enlarge && upgrade == 0) {
             upgrade = 1;
+            broadcastMessage(null, getAuxillaryInfoPacket());
             return true;
         }
         return false;
