@@ -675,7 +675,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "###",
                 "#F#",
                 "#M#",
-                '#', Block.glass,
+                '#', Block.thinGlass,
                 'F', fan,
                 'M', motor);
         oreRecipe(new ItemStack(charge_meter),
