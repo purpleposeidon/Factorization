@@ -17,7 +17,7 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
     Charge charge = new Charge(this);
     int reflectors = 0;
     public int water_level = 0;
-    public static int max_water = 256 * 4;
+    public final static int max_water = 256 * 16 * 4;
     int fan_speed = 0;
 
     public float fan_rotation = 0;
