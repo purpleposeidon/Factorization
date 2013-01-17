@@ -121,6 +121,12 @@ public class Texture {
             }
             return start;
         }
+        if (FactoryType.MIXER.is(md) || FactoryType.CRYSTALLIZER.is(md)) {
+            if (side == 1) {
+                return 10 + 16;
+            }
+            return 14;
+        }
         return 0;
     }
 }
