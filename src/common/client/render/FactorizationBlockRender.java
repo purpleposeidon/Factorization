@@ -127,6 +127,56 @@ abstract public class FactorizationBlockRender implements ICoord {
         }
     }
     
+    protected void renderCauldron(RenderBlocks rb, int metal, int lid) {
+        BlockFactorization block = Core.registry.factory_rendering_block;
+        Tessellator tessellator = Tessellator.instance;
+        //render the outside
+        rb.setRenderMinMax(0, 0, 0, 1, 1, 1);
+        block.setBlockBounds(0, 0, 0, 1, 1, 1);
+        if (world_mode) {
+            rb.renderStandardBlock(block, x, y, z);
+        } else {
+            GL11.glPushAttrib(GL11.GL_POLYGON_BIT);
+            GL11.glDisable(GL11.GL_CULL_FACE);
+            RenderBlocks renderblocks = rb;
+            int texture = metal;
+            GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
+            tessellator.startDrawingQuads();
+            tessellator.setNormal(0.0F, -1F, 0.0F);
+            renderblocks.renderBottomFace(block, 0.0D, 0.0D, 0.0D, texture);
+            tessellator.setNormal(0.0F, 1.0F, 0.0F);
+            renderblocks.renderTopFace(block, 0.0D, 0.0D, 0.0D, lid);
+            tessellator.setNormal(0.0F, 0.0F, -1F);
+            renderblocks.renderEastFace(block, 0.0D, 0.0D, 0.0D, texture);
+            tessellator.setNormal(0.0F, 0.0F, 1.0F);
+            renderblocks.renderWestFace(block, 0.0D, 0.0D, 0.0D, texture);
+            tessellator.setNormal(-1F, 0.0F, 0.0F);
+            renderblocks.renderNorthFace(block, 0.0D, 0.0D, 0.0D, texture);
+            tessellator.setNormal(1.0F, 0.0F, 0.0F);
+            renderblocks.renderSouthFace(block, 0.0D, 0.0D, 0.0D, texture);
+            tessellator.draw();
+            GL11.glTranslatef(0.5F, 0.5F, 0.5F);
+            GL11.glPopAttrib();
+        }
+        if (world_mode) {
+            //render the inside
+            //We don't need an inventory_mode because it draws both faces
+            float d = 2F/16F;
+            boolean origAO = rb.enableAO;
+            rb.setRenderMinMax(d, d, d, 1 - d, 1, 1 - d);
+            block.setBlockBounds(d, d, d, 1 - d, 1 - d, 1 - d);
+            rb.enableAO = false;
+            rb.renderNorthFace(block, x + 1 - 2*d, y, z, metal);
+            rb.renderEastFace(block, x, y, z + 1 - 2*d, metal);
+            rb.renderSouthFace(block, x - 1 + 2*d, y, z, metal);
+            rb.renderWestFace(block, x, y, z - 1 + 2*d, metal);
+            rb.renderTopFace(block, x, y - 1 + 1*d, z, metal);
+            rb.enableAO = origAO;
+            rb.setRenderMinMax(0, 0, 0, 1, 1, 1);
+            block.setBlockBounds(0, 0, 0, 1, 1, 1);
+        }
+    }
+    
     protected void renderPart(RenderBlocks rb, int texture, float b1, float b2, float b3,
             float b4, float b5, float b6) {
         BlockFactorization block = Core.registry.factory_rendering_block;
@@ -154,24 +204,14 @@ abstract public class FactorizationBlockRender implements ICoord {
         tessellator.startDrawingQuads();
         tessellator.setNormal(0.0F, -1F, 0.0F);
         renderblocks.renderBottomFace(block, 0.0D, 0.0D, 0.0D, texture);
-        tessellator.draw();
-        tessellator.startDrawingQuads();
         tessellator.setNormal(0.0F, 1.0F, 0.0F);
         renderblocks.renderTopFace(block, 0.0D, 0.0D, 0.0D, texture);
-        tessellator.draw();
-        tessellator.startDrawingQuads();
         tessellator.setNormal(0.0F, 0.0F, -1F);
         renderblocks.renderEastFace(block, 0.0D, 0.0D, 0.0D, texture);
-        tessellator.draw();
-        tessellator.startDrawingQuads();
         tessellator.setNormal(0.0F, 0.0F, 1.0F);
         renderblocks.renderWestFace(block, 0.0D, 0.0D, 0.0D, texture);
-        tessellator.draw();
-        tessellator.startDrawingQuads();
         tessellator.setNormal(-1F, 0.0F, 0.0F);
         renderblocks.renderNorthFace(block, 0.0D, 0.0D, 0.0D, texture);
-        tessellator.draw();
-        tessellator.startDrawingQuads();
         tessellator.setNormal(1.0F, 0.0F, 0.0F);
         renderblocks.renderSouthFace(block, 0.0D, 0.0D, 0.0D, texture);
         tessellator.draw();

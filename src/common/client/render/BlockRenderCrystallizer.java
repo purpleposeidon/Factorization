@@ -11,14 +11,10 @@ public class BlockRenderCrystallizer extends FactorizationBlockRender {
     @Override
     void render(RenderBlocks rb) {
         Core.profileStart("crystallizer");
-        int metal = 14, wood = 8 + 16;
+        int metal = 14, wood = 8 + 16, hollow = 10 + 16;
         float width = 2F / 16F;
         float mheight = 1 - 0;
-        renderPart(rb, metal, width, 0, width, 1 - width, width, 1 - width);
-        renderPart(rb, metal, 0, 0, 0, width, mheight, 1);
-        renderPart(rb, metal, 1 - width, 0, 0, 1, mheight, 1);
-        renderPart(rb, metal, width, 0, 0, 1 - width, mheight, width);
-        renderPart(rb, metal, width, 0, 1 - width, 1 - width, mheight, 1);
+        renderCauldron(rb, metal, hollow);
 
         float start = 7F / 16F;
         float sheight = 1 - width;
