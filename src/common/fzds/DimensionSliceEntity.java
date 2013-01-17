@@ -6,12 +6,15 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 
 import com.google.common.io.ByteArrayDataInput;
@@ -350,7 +353,13 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     }
     
     boolean forbidEntityTransfer(Entity ent) {
-        return ent.timeUntilPortal > 0 && !(ent instanceof EntityPlayer);
+        if (ent instanceof EntityPlayerMP) {
+            EntityPlayerMP player = (EntityPlayerMP) ent;
+            if (player.capabilities.isCreativeMode) {
+                return true;
+            }
+        }
+        return ent.timeUntilPortal > 0;
     }
     
     void takeEntity(Entity ent) {
@@ -365,6 +374,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
                 return;
             }
         }
+        System.out.println(ent);
         World shadowWorld = Hammer.getServerShadowWorld();
         Vec3 newLocation = real2shadow(Hammer.ent2vec(ent));
         transferEntity(ent, shadowWorld, newLocation);
@@ -393,19 +403,27 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     }
     
     void transferEntity(Entity ent, World newWorld, Vec3 newPosition) {
-        //Inspired by Entity.travelToDimension
-        ent.worldObj.setEntityDead(ent);
-        ent.isDead = false;
-        
-        Entity phoenix = EntityList.createEntityByName(EntityList.getEntityString(ent), newWorld); //Like a phoenix rising from the ashes!
-        if (phoenix == null) {
-            return; //Or not.
+        if (ent instanceof EntityPlayerMP) {
+            EntityPlayerMP player = (EntityPlayerMP) ent;
+            ServerConfigurationManager manager = MinecraftServer.getServerConfigurationManager(MinecraftServer.getServer());
+            DSTeleporter tp = new DSTeleporter((WorldServer) player.worldObj);
+            tp.preciseDestination = newPosition;
+            manager.transferPlayerToDimension(player, Core.dimension_slice_dimid, tp);
+        } else {
+            //Inspired by Entity.travelToDimension
+            ent.worldObj.setEntityDead(ent);
+            ent.isDead = false;
+            
+            Entity phoenix = EntityList.createEntityByName(EntityList.getEntityString(ent), newWorld); //Like a phoenix rising from the ashes!
+            if (phoenix == null) {
+                return; //Or not.
+            }
+            phoenix.copyDataFrom(ent, true);
+            phoenix.timeUntilPortal = phoenix.getPortalCooldown();
+            ent.isDead = true;
+            phoenix.setPosition(newPosition.xCoord, newPosition.yCoord, newPosition.zCoord);
+            newWorld.spawnEntityInWorld(phoenix);
         }
-        phoenix.copyDataFrom(ent, true);
-        phoenix.timeUntilPortal = phoenix.getPortalCooldown();
-        ent.isDead = true;
-        phoenix.setPosition(newPosition.xCoord, newPosition.yCoord, newPosition.zCoord);
-        newWorld.spawnEntityInWorld(phoenix);
     }
     
     void endSlice() {
@@ -466,5 +484,13 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     @Override
     public void readSpawnData(ByteArrayDataInput data) {
         cell = data.readInt();
+    }
+    
+    @Override
+    public void setPositionAndRotation2(double par1, double par3, double par5, float par7, float par8, int par9)
+    {
+        //This is required because we have some self-interference
+        this.setPosition(par1, par3, par5);
+        this.setRotation(par7, par8);
     }
 }

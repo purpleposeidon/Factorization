@@ -59,7 +59,7 @@ public class Hammer {
     public static HammerProxy proxy;
     public static boolean enabled;
     public static int dimensionID;
-    public static World worldClient = null; //This is actually a WorldClient
+    public static World worldClient = null; //This is actually a WorldClient that is actually HammerClientProxy.HammerWorldClient
     public static double DSE_ChunkUpdateRangeSquared = Math.pow(16*8, 2); //This is actually set when the server starts
     
     private static Set<DimensionSliceEntity> serverSlices = new HashSet(), clientSlices = new HashSet();
@@ -166,7 +166,7 @@ public class Hammer {
             return;
         }
         
-        EntityRegistry.registerModEntity(DimensionSliceEntity.class, "fzds", 1, this, 64, 20, true);
+        EntityRegistry.registerModEntity(DimensionSliceEntity.class, "fzds", 1, this, 64, 1, true);
         EntityRegistry.registerModEntity(DseCollider.class, "fzdsC", 2, this, 64, 80000, false);
         
         //Create the hammer dimension

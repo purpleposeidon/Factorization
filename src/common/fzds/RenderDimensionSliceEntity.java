@@ -266,11 +266,13 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             }
             glPushMatrix();
             try {
+                float pdx = (float) ((dse.posX - dse.lastTickPosX)*partialTicks);
+                float pdy = (float) ((dse.posY - dse.lastTickPosY)*partialTicks);
+                float pdz = (float) ((dse.posZ - dse.lastTickPosZ)*partialTicks);
                 glTranslatef((float)(x - DimensionSliceEntity.offsetXZ), (float)(y - DimensionSliceEntity.offsetY), (float)(z - DimensionSliceEntity.offsetXZ));
                 renderInfo.renderTerrain();
                 checkGLError("FZDS terrain display list render");
-                glTranslatef((float)-x, (float)-y, (float)-z);
-                glTranslatef((float)dse.posX, (float)dse.posY, (float)dse.posZ);
+                glTranslatef((float)(dse.posX - x), (float)(dse.posY - y), (float)(dse.posZ - z));
                 Hammer.proxy.setClientWorld(Hammer.getClientShadowWorld());
                 try {
                     renderInfo.renderEntities(partialTicks);

@@ -134,6 +134,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
                 if (description == null) {
                     continue;
                 }
+                System.out.println("Description: " + description);
                 net.sendPacketToPlayer(new Packet220FzdsWrap(description));
             }
         }
@@ -165,8 +166,9 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
         Iterator<EntityPlayerMP> it = trackedPlayers.iterator();
         while (it.hasNext()) {
             EntityPlayerMP player = it.next();
-            if (player.isDead) {
+            if (player.isDead || player.worldObj != dimensionSlice.worldObj) {
                 it.remove();
+                System.out.println("removing " + player); //NORELEASE
             } else {
                 player.playerNetServerHandler.sendPacketToPlayer(wrappedPacket);
             }

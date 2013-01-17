@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+import net.minecraft.client.multiplayer.NetClientHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.packet.NetHandler;
 import net.minecraft.network.packet.Packet;
@@ -20,6 +21,7 @@ public class Packet220FzdsWrap extends Packet {
     public Packet220FzdsWrap(Packet toWrap) {
         this.wrapped = toWrap;
         this.isChunkDataPacket = toWrap.isChunkDataPacket;
+        System.out.println("-->" + toWrap);
     }
     
     private static Socket fakeSocket = new Socket();

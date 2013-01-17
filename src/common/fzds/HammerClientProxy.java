@@ -58,6 +58,10 @@ public class HammerClientProxy extends HammerProxy {
         public void playSoundAtEntity(Entity par1Entity, String par2Str, float par3, float par4) {
             super.playSoundAtEntity(par1Entity, par2Str, par3, par4);
         }
+        
+        public void clearAccesses() {
+            worldAccesses.clear();
+        }
     }
     
     @Override
@@ -196,6 +200,7 @@ public class HammerClientProxy extends HammerProxy {
             if (lastWorld == null) {
                 return;
             }
+            ((HammerWorldClient)Hammer.worldClient).clearAccesses();
             Hammer.worldClient.addWorldAccess(new HammerRenderGlobal(currentWorld));
         }
     }
@@ -243,6 +248,7 @@ public class HammerClientProxy extends HammerProxy {
         //For logic
         mc.theWorld = wc;
         mc.thePlayer = player;
+        mc.thePlayer.worldObj = wc; //XXX Oh boy. Maybe I should make a new EntityPlayer instead?
         setSendQueueWorld(wc);
         
         //For rendering
@@ -256,7 +262,9 @@ public class HammerClientProxy extends HammerProxy {
     
     @Override
     public void setClientWorld(World w) {
+        //System.out.println("Setting world");
         Minecraft mc = Minecraft.getMinecraft();
+        assert w != null;
         if (real_player == null) {
             real_player = mc.thePlayer;
         }
@@ -272,6 +280,7 @@ public class HammerClientProxy extends HammerProxy {
     
     @Override
     public void restoreClientWorld() {
+        //System.out.println("Restoring world");
         real_player.worldObj = real_world;
         setWorldAndPlayer(real_world, real_player);
         real_world = null;
