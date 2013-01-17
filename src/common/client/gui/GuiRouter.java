@@ -9,8 +9,9 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
-import net.minecraft.util.StatCollector;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.StatCollector;
+import net.minecraft.world.chunk.Chunk;
 
 import org.lwjgl.opengl.GL11;
 
@@ -57,18 +58,26 @@ public class GuiRouter extends GuiContainer implements IClickable {
         this.router = (TileEntityRouter) cont.factory;
         HashMap<String, Integer> names = new HashMap<String, Integer>();
         int max_dist = 32 * 32;
-        for (Object obj : router.worldObj.loadedTileEntityList) {
-            if (obj instanceof IInventory && obj instanceof TileEntity) {
-                TileEntity ent = (TileEntity) obj;
-                double invDistance = ent.getDistanceFrom(router.xCoord, router.yCoord, router.zCoord);
-                if (invDistance > max_dist) {
-                    continue;
+        ArrayList<TileEntity> entities = new ArrayList();
+        for (int cdx = -3; cdx <= 3; cdx++) {
+            for (int cdz = -3; cdz <= 3; cdz++) {
+                Chunk chunk = router.worldObj.getChunkFromBlockCoords(router.xCoord + cdx*16, router.zCoord + cdz*16);
+                for (TileEntity te : chunk.chunkTileEntityMap.values()) {
+                    if (te instanceof IInventory) {
+                        entities.add(te);
+                    }
                 }
-                String invName = router.getIInventoryName((IInventory) obj);
-                Integer orig = names.get(invName);
-                if (orig == null || invDistance < orig) {
-                    names.put(invName, new Integer((int) invDistance));
-                }
+            }
+        }
+        for (TileEntity ent : entities) {
+            double invDistance = ent.getDistanceFrom(router.xCoord, router.yCoord, router.zCoord);
+            if (invDistance > max_dist) {
+                continue;
+            }
+            String invName = router.getIInventoryName((IInventory) ent);
+            Integer orig = names.get(invName);
+            if (orig == null || invDistance < orig) {
+                names.put(invName, new Integer((int) invDistance));
             }
         }
         names.remove(router.getIInventoryName(router));
