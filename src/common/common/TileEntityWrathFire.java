@@ -105,6 +105,9 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
     static BlockMatch netherBrick = new BlockMatch(Block.netherBrick);
     static BlockMatch netherFence = new BlockMatch(Block.netherFence);
     static BlockMatch netherStair = new BlockMatch(Block.stairsNetherBrick);
+    static BlockMatch netherSlab = new BlockMatch(Block.stoneSingleSlab, 6);
+    static BlockMatch netherSlabUp = new BlockMatch(Block.stoneSingleSlab, 0x8 | 6);
+    static BlockMatch netherDoubleSlab = new BlockMatch(Block.stoneDoubleSlab, 6);
 
     public static void burn(Object key) {
         burn(key, air);
@@ -291,13 +294,13 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
         Coord here = getCoord();
 
         //if (host.id == Block.netherBrick.blockID) {
-        if (netherBrick.equals(host) || netherStair.equals(host) || netherFence.equals(host)) {
+        if (netherBrick.equals(host) || netherStair.equals(host) || netherFence.equals(host) || netherSlab.equals(host) || netherSlabUp.equals(host) || netherDoubleSlab.equals(host)) {
             //wrath forge
             int furnace_size = 13;
             //try to live forever
             int src_count = 0;
             for (Coord c : here.getNeighborsDiagonal()) {
-                if (netherBrick.matches(c) || netherStair.matches(c) || netherFence.matches(c)) {
+                if (netherBrick.matches(c) || netherStair.matches(c) || netherFence.matches(c) || netherSlab.matches(c) || netherSlabUp.matches(c) || netherDoubleSlab.matches(c)) {
                     src_count += 1;
                 }
             }
@@ -362,7 +365,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
                 return true;
             }
         }
-        if (netherBrick.isType(id, md) || netherFence.isType(id, md) || netherStair.isType(id, md)) {
+        if (netherBrick.isType(id, md) || netherFence.isType(id, md) || netherStair.isType(id, md) || netherSlab.isType(id,  md) || netherSlabUp.isType(id,  md) || netherDoubleSlab.isType(id, md)) {
             host = netherBrick;
             return true;
         }
@@ -389,7 +392,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
         if (fire == null) {
             return;
         }
-        if (netherBrick.matches(baseBlock) || netherFence.matches(baseBlock) || netherStair.matches(baseBlock)) {
+        if (netherBrick.matches(baseBlock) || netherFence.matches(baseBlock) || netherStair.matches(baseBlock) || netherSlab.matches(baseBlock) || netherSlabUp.matches(baseBlock) || netherDoubleSlab.matches(baseBlock) ) {
             Sound.wrathForge.playAt(player);
             //This doesn't need to be logged.
         }
