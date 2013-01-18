@@ -266,6 +266,10 @@ public class Coord {
     public boolean isSubmissiveTo(Coord o) {
         return y < o.y || x < o.x || z < o.z;
     }
+    
+    public boolean isCompletelySubmissiveTo(Coord o) {
+        return x < o.x && y < o.y && z < o.z;
+    }
 
     public void setWorld(World newWorld) {
         this.w = newWorld;
@@ -413,8 +417,10 @@ public class Coord {
     }
 
     public boolean canSeeSky() {
+        Coord skyLook = this.copy();
         for (int i = y + 1; i < w.getHeight(); i++) {
-            if (!new Coord(w, x, i, z).canBeSeenThrough()) {
+            skyLook.y = i;
+            if (!skyLook.canBeSeenThrough()) {
                 return false;
             }
         }
