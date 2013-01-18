@@ -11,6 +11,8 @@ public class HammerProxy {
     public void clientLogout(INetworkManager manager) { }
     
     public World getClientRealWorld() { return null; }
+    
+    public World getOppositeWorld() { return null; }
 
     public void setClientWorld(World w) {
         throw new RuntimeException("Tried to setClientWorld on server");
@@ -28,4 +30,6 @@ public class HammerProxy {
     public void checkForWorldChange() { }
     
     public void runShadowTick() { }
+
+    public void setPlayerIsEmbedded(DimensionSliceEntity dse) { }
 }

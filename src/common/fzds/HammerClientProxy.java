@@ -8,6 +8,8 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.NetClientHandler;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.entity.Entity;
@@ -17,21 +19,24 @@ import net.minecraft.network.packet.NetHandler;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet1Login;
 import net.minecraft.profiler.Profiler;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.ForgeSubscribe;
+
+import org.lwjgl.opengl.GL11;
+
 import cpw.mods.fml.client.registry.RenderingRegistry;
-import cpw.mods.fml.common.Mod.PostInit;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.client.render.EmptyRender;
 import factorization.common.Core;
-import factorization.common.TileEntityWrathLamp;
 
 public class HammerClientProxy extends HammerProxy {
     public HammerClientProxy() {
@@ -260,6 +265,8 @@ public class HammerClientProxy extends HammerProxy {
     WorldClient real_world = null;
     EntityClientPlayerMP fake_player = null;
     
+    WorldClient reverse_shadow_world = null; //the world that the DSE is in when the client player is embedded in the DSE
+    
     @Override
     public void setClientWorld(World w) {
         //System.out.println("Setting world");
@@ -320,5 +327,50 @@ public class HammerClientProxy extends HammerProxy {
     @Override
     public void clientInit() {
         Packet.addIdClassMapping(220, true /* client side */, false /* server side */, Packet220FzdsWrap.class);
+    }
+    
+    
+    private static DimensionSliceEntity embedded;
+    private static RenderGlobal realityRender; //used with renderWorld
+    @Override
+    public void setPlayerIsEmbedded(DimensionSliceEntity dse) {
+        embedded = dse;
+        if (embedded == null) {
+            realityRender = null;
+        } else {
+            Minecraft mc = Minecraft.getMinecraft();
+            realityRender = mc.renderGlobal;
+            Minecraft.getMinecraft().renderGlobal = new RenderGlobal(mc, mc.renderEngine);
+            reverse_shadow_world = (WorldClient) getClientRealWorld();
+        }
+    }
+    
+    boolean rendering = false;
+    @ForgeSubscribe
+    public void renderReality(RenderWorldLastEvent event) {
+        if (realityRender == null) {
+            return;
+        }
+        if (rendering) {
+            return;
+        }
+        rendering = true;
+        try {
+            ICamera customCamera = new ICamera() {
+                @Override
+                public void setPosition(double var1, double var3, double var5) { }
+                
+                @Override
+                public boolean isBoundingBoxInFrustum(AxisAlignedBB var1) {
+                    // TODO
+                    return true;
+                }
+            };
+            Vec3 pos = Minecraft.getMinecraft().renderViewEntity.getPosition(event.partialTicks);
+            realityRender.renderAllRenderLists(0 /*ignored */, event.partialTicks);
+            realityRender.renderEntities(pos, customCamera, event.partialTicks);
+        } finally {
+            rendering = false;
+        }
     }
 }

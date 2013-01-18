@@ -21,7 +21,6 @@ public class Packet220FzdsWrap extends Packet {
     public Packet220FzdsWrap(Packet toWrap) {
         this.wrapped = toWrap;
         this.isChunkDataPacket = toWrap.isChunkDataPacket;
-        System.out.println("-->" + toWrap);
     }
     
     private static Socket fakeSocket = new Socket();
@@ -38,8 +37,7 @@ public class Packet220FzdsWrap extends Packet {
 
     @Override
     public void processPacket(NetHandler netHandler) {
-        World shadow_world = Hammer.getClientShadowWorld();
-        Hammer.proxy.setClientWorld(shadow_world);
+        Hammer.proxy.setClientWorld(Hammer.proxy.getOppositeWorld());
         try {
             wrapped.processPacket(netHandler);
         } finally {

@@ -86,7 +86,7 @@ public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdd
         if (e instanceof DimensionSliceEntity) {
             parent = (DimensionSliceEntity) e;
         } else {
-            Core.logFine("DseCollider's parent didn't exist");
+            Core.logFine("DseCollider's parent didn't exist. (Could be out of range)");
             setDead();
         }
     }

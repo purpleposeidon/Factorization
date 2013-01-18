@@ -47,7 +47,7 @@ import factorization.api.Coord;
 import factorization.common.Core;
 
 @Mod(modid = Hammer.modId, name = Hammer.name, version = Core.version, dependencies = "required-after: " + Core.modId)
-@NetworkMod(clientSideRequired = true)
+@NetworkMod(clientSideRequired = true, channels = {HammerNet.teleport}, packetHandler = HammerNet.class)
 public class Hammer {
     static final String lore = "Anvil's Hammer";
     

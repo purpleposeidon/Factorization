@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemInWorldManager;
 import net.minecraft.network.INetworkManager;
@@ -31,7 +32,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
     private HashSet<EntityPlayerMP> trackedPlayers = new HashSet();
     
     public PacketProxyingPlayer(DimensionSliceEntity dimensionSlice) {
-        super(MinecraftServer.getServer(), dimensionSlice.hammerCell.w, "[FZDS" + dimensionSlice.cell + "]", new ItemInWorldManager(dimensionSlice.hammerCell.w));
+        super(MinecraftServer.getServer(), dimensionSlice.hammerCell.w, "[" + getPrefix() + dimensionSlice.cell + "]", new ItemInWorldManager(dimensionSlice.hammerCell.w));
         this.dimensionSlice = dimensionSlice;
         this.playerNetServerHandler = new NetServerHandler(MinecraftServer.getServer(), this, this);
         Coord c = Hammer.getCellCenter(worldObj, dimensionSlice.cell);
@@ -52,6 +53,10 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
         ticks_since_last_update = (int) (Math.random()*20);
         //TODO: I think the chunks are unloading despite the PPP's presence.
         //Either figure out how to get this to act like an actual player, or make chunk loaders happen as well
+    }
+    
+    static String getPrefix() {
+        return "FZDS";
     }
     
     private final int PlayerManager_playerViewRadius_field = 4;
@@ -78,9 +83,11 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
             endProxy();
         } else if (ticks_since_last_update > 0) {
             ticks_since_last_update--;
+        } else if (worldObj.isRemote) {
+            //Just call super
         } else {
             ticks_since_last_update = 20;
-            List playerList = dimensionSlice.worldObj.playerEntities;
+            List playerList = getTargetablePlayers();
             for (int i = 0; i < playerList.size(); i++) {
                 Object o = playerList.get(i);
                 if (!(o instanceof EntityPlayerMP)) {
@@ -89,7 +96,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
                 EntityPlayerMP player = (EntityPlayerMP) o;
                 if (isPlayerInUpdateRange(player)) {
                     boolean new_player = trackedPlayers.add(player);
-                    if (new_player) {
+                    if (new_player && shouldShareChunks()) {
                         //welcome to the club. This may net-lag a bit. (Well, it depends on the chunk's contents. Air compresses well tho.)
                         sendChunkMapDataToPlayer(player);
                     }
@@ -100,9 +107,17 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
         }
         super.onUpdate(); //we probably want to keep this one, just for the EntityMP stuff
     }
+    
+    List getTargetablePlayers() {
+        return dimensionSlice.worldObj.playerEntities;
+    }
      
     boolean isPlayerInUpdateRange(EntityPlayerMP player) {
-        return dimensionSlice.getDistanceSqToEntity(player) <= Hammer.DSE_ChunkUpdateRangeSquared;
+        return !player.isDead && dimensionSlice.getDistanceSqToEntity(player) <= Hammer.DSE_ChunkUpdateRangeSquared;
+    }
+    
+    boolean shouldShareChunks() {
+        return true;
     }
     
     void sendChunkMapDataToPlayer(EntityPlayerMP target) {
@@ -168,7 +183,6 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
             EntityPlayerMP player = it.next();
             if (player.isDead || player.worldObj != dimensionSlice.worldObj) {
                 it.remove();
-                System.out.println("removing " + player); //NORELEASE
             } else {
                 player.playerNetServerHandler.sendPacketToPlayer(wrappedPacket);
             }

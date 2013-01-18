@@ -34,6 +34,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     MetaAxisAlignedBB metaAABB = null;
     
     PacketProxyingPlayer proxy = null;
+    ReversePacketProxyingPlayer reverseProxy = null;
     boolean needAreaUpdate = true;
     ArrayList<DseCollider> children = null; //we don't init here so that it's easy to see if we need to init it
     
@@ -277,6 +278,8 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
             init();
             proxy = new PacketProxyingPlayer(this);
             proxy.worldObj.spawnEntityInWorld(proxy);
+            reverseProxy = new ReversePacketProxyingPlayer(this);
+            reverseProxy.worldObj.spawnEntityInWorld(reverseProxy);
             return;
         }
         updateMotion();
@@ -353,12 +356,12 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     }
     
     boolean forbidEntityTransfer(Entity ent) {
-        if (ent instanceof EntityPlayerMP) {
-            EntityPlayerMP player = (EntityPlayerMP) ent;
-            if (player.capabilities.isCreativeMode) {
-                return true;
-            }
-        }
+//		if (ent instanceof EntityPlayerMP) {
+//			EntityPlayerMP player = (EntityPlayerMP) ent;
+//			if (player.capabilities.isCreativeMode) {
+//				return true;
+//			}
+//		}
         return ent.timeUntilPortal > 0;
     }
     
@@ -404,11 +407,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     
     void transferEntity(Entity ent, World newWorld, Vec3 newPosition) {
         if (ent instanceof EntityPlayerMP) {
-            EntityPlayerMP player = (EntityPlayerMP) ent;
-            ServerConfigurationManager manager = MinecraftServer.getServerConfigurationManager(MinecraftServer.getServer());
-            DSTeleporter tp = new DSTeleporter((WorldServer) player.worldObj);
-            tp.preciseDestination = newPosition;
-            manager.transferPlayerToDimension(player, Core.dimension_slice_dimid, tp);
+            HammerNet.transferPlayer((EntityPlayerMP) ent, this, newWorld, newPosition);
         } else {
             //Inspired by Entity.travelToDimension
             ent.worldObj.setEntityDead(ent);
