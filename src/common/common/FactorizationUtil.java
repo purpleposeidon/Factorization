@@ -60,6 +60,11 @@ public class FactorizationUtil {
         }
         return is.stackSize;
     }
+    
+    public static int getFreeSpace(ItemStack is, int stackLimit) {
+        int max = Math.min(is.getMaxStackSize(), stackLimit);
+        return Math.max(0, max - is.stackSize);
+    }
 
     /**
      * Use transferSlotToSlots
