@@ -33,14 +33,15 @@ public class HammerNet implements IPacketHandler {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream output = new DataOutputStream(outputStream);
             output.writeInt(newWorld.getWorldInfo().getDimension());
-            output.writeInt(dse.entityId);
+            int dse_id = dse == null ? -1 : dse.entityId;
+            output.writeInt(dse_id);
             output.flush();
             toSend = PacketDispatcher.getPacket(teleport, outputStream.toByteArray());
         } catch (IOException e) {
             e.printStackTrace();
         }
         Core.proxy.addPacket(player, toSend);
-        manager.transferPlayerToDimension(player, Core.dimension_slice_dimid, tp);
+        manager.transferPlayerToDimension(player, newWorld.getWorldInfo().getDimension(), tp);
     }
     
     @Override

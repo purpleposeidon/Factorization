@@ -3,6 +3,7 @@ package factorization.fzds;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.packet.Packet;
 
 import factorization.api.Coord;
 
@@ -42,5 +43,11 @@ public class ReversePacketProxyingPlayer extends PacketProxyingPlayer {
         }
         Coord p = new Coord(player);
         return a.isCompletelySubmissiveTo(p) && p.isCompletelySubmissiveTo(b);
+    }
+    
+    @Override
+    public void addToSendQueue(Packet packet) {
+        //System.out.println("<-- " + packet); //NORELEASE
+        super.addToSendQueue(packet);
     }
 }

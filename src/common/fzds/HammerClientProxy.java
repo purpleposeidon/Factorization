@@ -8,6 +8,7 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.NetClientHandler;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -75,6 +76,14 @@ public class HammerClientProxy extends HammerProxy {
             return Minecraft.getMinecraft().theWorld;
         }
         return real_world;
+    }
+    
+    @Override
+    public World getOppositeWorld() {
+        if (reverse_shadow_world != null) {
+            return reverse_shadow_world;
+        }
+        return Hammer.getClientShadowWorld();
     }
     
     /***
@@ -250,6 +259,9 @@ public class HammerClientProxy extends HammerProxy {
     
     private void setWorldAndPlayer(WorldClient wc, EntityClientPlayerMP player) {
         Minecraft mc = Minecraft.getMinecraft();
+        if (wc == null) {
+            System.out.println("Uh-oh"); //NORELEASE (well...)
+        }
         //For logic
         mc.theWorld = wc;
         mc.thePlayer = player;
@@ -366,9 +378,16 @@ public class HammerClientProxy extends HammerProxy {
                     return true;
                 }
             };
+            RenderGlobal rg = realityRender;
+            //rg = Minecraft.getMinecraft().renderGlobal;
             Vec3 pos = Minecraft.getMinecraft().renderViewEntity.getPosition(event.partialTicks);
-            realityRender.renderAllRenderLists(0 /*ignored */, event.partialTicks);
-            realityRender.renderEntities(pos, customCamera, event.partialTicks);
+            GL11.glPushMatrix();
+            float s = 0.01F;
+            GL11.glScalef(s, s, s);
+            EntityRenderer er = Minecraft.getMinecraft().entityRenderer;
+            EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+            rg.sortAndRender(player, 0 /* render pass */, event.partialTicks /* partial ticks */);
+            GL11.glPopMatrix();
         } finally {
             rendering = false;
         }

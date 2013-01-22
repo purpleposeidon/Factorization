@@ -12,9 +12,11 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
+import codechicken.core.Vector3;
 import factorization.api.Coord;
 import factorization.common.Core;
 import factorization.fzds.api.IFzdsEntryControl;
@@ -93,12 +95,18 @@ public class FZDSCommand extends CommandBase {
                 return;
             }
             if (cmd.equalsIgnoreCase("leave")) {
-                if (DimensionManager.getWorld(0) != player.worldObj) {
+                World w = DimensionManager.getWorld(0);
+                if (w != player.worldObj) {
                     ChunkCoordinates target = player.getBedLocation();
-                    if (target != null) {
-                        tp.destination.set(target);
+                    if (target == null) {
+                        target = w.getSpawnPoint(); 
                     }
-                    manager.transferPlayerToDimension(player, 0, tp);
+                    Vec3 v = Vec3.createVectorHelper(target.posX, target.posY + 1, target.posZ);
+                    HammerNet.transferPlayer(player, (DimensionSliceEntity)null, w, v);
+//					if (target != null) {
+//						tp.destination.set(target);
+//					}
+//					manager.transferPlayerToDimension(player, 0, tp);
                 }
                 return;
             }

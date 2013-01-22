@@ -1,3 +1,10 @@
+0.7.14
+  Solar turbine recipe uses glass panes instead of glass blocks
+  Solar turbine uses less water; this prevents a fully powered one from causing block updates every half second.
+  Mixers & Crystallizers now render more efficiently
+  Wrath furnace handles netherbrick slabs
+  Upgrading barrels is broadcast to other players
+
 0.7.13
   Barrel network spam bugfix
 
@@ -6,7 +13,7 @@
   router thoroughness upgrade makes it reset
 
 0.7.11
-  Changed how barrels put out items when clicked
+  Changed how barrels put out items when clicked (Still isn't perfect tho)
   FZDS has motion & collision
 
 0.7.10
