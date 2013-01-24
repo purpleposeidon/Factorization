@@ -30,7 +30,7 @@ public class NameClayCommand extends CommandBase {
         }
         EntityPlayer player = (EntityPlayer) sender;
         ItemStack is = player.getCurrentEquippedItem();
-        if (is != null && is.isItemEqual(Core.registry.greenware_item)) {
+        if (is != null && is.isItemEqual(Core.registry.greenware_item) /* no NBT okay */ ) {
             NBTTagCompound tag = is.getTagCompound();
             if (tag != null && tag.hasKey("parts")) {
                 tag.setString("sculptureName", name);

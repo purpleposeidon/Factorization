@@ -1,5 +1,6 @@
 package factorization.api.recipe;
 
+import factorization.common.FactorizationUtil;
 import net.minecraft.item.ItemStack;
 
 public class InputItemStack implements IGenericRecipeInput {
@@ -14,7 +15,7 @@ public class InputItemStack implements IGenericRecipeInput {
         if (me.getItemDamage() == -1) {
             return is.getItem() == me.getItem();
         }
-        return me.isItemEqual(is);
+        return FactorizationUtil.identical(me, is);
     }
 
 }

@@ -308,7 +308,7 @@ public class TileEntityRouter extends TileEntityFactorization {
                 destStack.stackSize = 0;
             }
         }
-        if (!srcStack.isItemEqual(destStack)) {
+        if (!ItemStack.areItemStacksEqual(srcStack, destStack)) {
             return false;
         }
         if (destStack.stackSize >= destStack.getMaxStackSize()) {
@@ -443,7 +443,7 @@ public class TileEntityRouter extends TileEntityFactorization {
                 continue;
             }
             empty_filter = false;
-            if (here.isItemEqual(is)) {
+            if (FactorizationUtil.identical(here, is)) {
                 matching_count += here.stackSize;
             }
         }
@@ -455,7 +455,7 @@ public class TileEntityRouter extends TileEntityFactorization {
             if (here == null) {
                 continue;
             }
-            if (here.isItemEqual(is)) {
+            if (FactorizationUtil.identical(here, is)) {
                 matching_count -= here.stackSize;
             }
         }
@@ -475,7 +475,7 @@ public class TileEntityRouter extends TileEntityFactorization {
                 continue;
             }
             hits++;
-            if (filter[i].isItemEqual(is)) {
+            if (filter[i].isItemEqual(is) /* no NBT okay */) {
                 //NOTE: Ignores NBT data. I think this will be more useful.
                 return true;
             } else if (filter[i].itemID == is.itemID && is.getItem().isDamageable() && filter[i].isItemDamaged() && is.isItemDamaged()) {

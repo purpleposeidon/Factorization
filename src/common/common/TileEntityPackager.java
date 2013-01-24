@@ -92,7 +92,7 @@ public class TileEntityPackager extends TileEntityStamper {
                     needLogic();
                     continue;
                 }
-                if (output.isItemEqual(here)) {
+                if (FactorizationUtil.identical(output, here)) {
                     needLogic();
                     int can_take = output.getMaxStackSize() - output.stackSize;
                     if (here.stackSize > can_take) {

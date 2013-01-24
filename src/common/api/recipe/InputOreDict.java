@@ -2,6 +2,8 @@ package factorization.api.recipe;
 
 import java.util.ArrayList;
 
+import factorization.common.FactorizationUtil;
+
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -21,7 +23,7 @@ public class InputOreDict implements IGenericRecipeInput {
                     return true;
                 }
             }
-            if (is.isItemEqual(ore)) {
+            if (FactorizationUtil.identical(is, ore)) {
                 return true;
             }
         }

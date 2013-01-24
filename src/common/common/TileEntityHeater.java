@@ -230,7 +230,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
                 return false;
             if (diss.getStackInSlot(2) == null)
                 return true;
-            if (!diss.getStackInSlot(2).isItemEqual(var1))
+            if (!diss.getStackInSlot(2).isItemEqual(var1) /* no NBT okay (vanilla source) */ )
                 return false;
             int result = diss.getStackInSlot(2).stackSize + var1.stackSize;
             return (result <= diss.getInventoryStackLimit() && result <= var1.getMaxStackSize());

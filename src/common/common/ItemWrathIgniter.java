@@ -73,7 +73,7 @@ public class ItemWrathIgniter extends Item implements IActOnCraft {
     @Override
     public void onCraft(ItemStack is, IInventory craftMatrix, int craftSlot, ItemStack result,
             EntityPlayer player) {
-        if (result.isItemEqual(Core.registry.lamp_item)) {
+        if (result.isItemEqual(Core.registry.lamp_item) /* no NBT okay */) {
             if (player != null) {
                 is.damageItem(1, player);
             }

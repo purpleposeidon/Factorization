@@ -265,7 +265,7 @@ public class ContainerPocket extends ContainerWorkbench {
                 freeSpace += res.getMaxStackSize();
                 continue;
             }
-            if (is.isItemEqual(res)) {
+            if (FactorizationUtil.identical(is, res)) {
                 freeSpace += is.getMaxStackSize() - is.stackSize;
             }
         }
@@ -287,7 +287,7 @@ public class ContainerPocket extends ContainerWorkbench {
                     would_fit += res.getMaxStackSize();
                     continue;
                 }
-                if (is.isItemEqual(res)) {
+                if (FactorizationUtil.identical(is, res)) {
                     would_fit += is.getMaxStackSize() - is.stackSize;
                 }
             }

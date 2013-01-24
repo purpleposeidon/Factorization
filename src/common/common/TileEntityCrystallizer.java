@@ -97,7 +97,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         slot = -1;
         max_size = -99;
         for (int i = 0; i < inputs.length; i++) {
-            if (must_match != null && inputs[i] != null && !must_match.isItemEqual(inputs[i])) {
+            if (must_match != null && inputs[i] != null && !FactorizationUtil.identical(must_match, inputs[i])) {
                 continue;
             }
             int here_size = FactorizationUtil.getStackSize(inputs[i]);
@@ -193,7 +193,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
                 continue;
             } else  if (toMatch.getItemDamage() == -1 && is.itemID == toMatch.itemID) {
                 count += is.stackSize;
-            } else  if (is.isItemEqual(toMatch)) {
+            } else  if (FactorizationUtil.identical(is, toMatch)) {
                 count += is.stackSize;
             }
         }
@@ -221,7 +221,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
                 return false;
             }
             if (crys.output != null) {
-                if (!crys.output.isItemEqual(output)) {
+                if (!FactorizationUtil.identical(crys.output, output)) {
                     return false;
                 }
                 if (crys.output.stackSize + output_count > crys.output.getMaxStackSize()) {
@@ -282,7 +282,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
             ItemStack inverium = new ItemStack(Core.registry.inverium, 0, -1);
             for (int i = 0; i < crys.inputs.length; i++) {
                 ItemStack is = crys.inputs[i];
-                if (is != null && input.isItemEqual(is)) {
+                if (is != null && FactorizationUtil.identical(input, is)) {
                     if (crys.countMaterial(inverium) >= inverium_count) {
                         applyTo(crys, i);
                     }
@@ -321,7 +321,8 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     }
 
     ItemStack unfake(ItemStack is) {
-        if (is.isItemEqual(Core.registry.crystallizer_item)) {
+        //err, why is this here...
+        if (is.isItemEqual(Core.registry.crystallizer_item) /* no NBT okay */) {
             return null;
         }
         return is;

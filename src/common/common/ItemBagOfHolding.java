@@ -300,7 +300,7 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
                     here.stackSize = 0;
                     row.set(col, here);
                 }
-                if (here == null || !here.isItemEqual(add)) {
+                if (here == null || !FactorizationUtil.identical(here, add)) {
                     continue;
                 }
                 should_add = true;

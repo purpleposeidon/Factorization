@@ -121,7 +121,7 @@ public class TileEntityStamper extends TileEntityFactorization {
             if (item == null) {
                 continue;
             }
-            if (!output.isItemEqual(item)) {
+            if (!FactorizationUtil.identical(output, item)) {
                 return false;
             }
             if (output.stackSize + item.stackSize > output.getMaxStackSize()) {
@@ -184,7 +184,7 @@ public class TileEntityStamper extends TileEntityFactorization {
                     needLogic();
                     continue;
                 }
-                if (output.isItemEqual(here)) {
+                if (FactorizationUtil.identical(output, here)) {
                     needLogic();
                     int can_take = output.getMaxStackSize() - output.stackSize;
                     if (here.stackSize > can_take) {

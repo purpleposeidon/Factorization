@@ -24,6 +24,21 @@ import net.minecraftforge.common.ISidedInventory;
 import factorization.api.Coord;
 
 public class FactorizationUtil {
+    public static boolean identical(ItemStack a, ItemStack b) {
+        //Checks NBT data
+        return ItemStack.areItemStacksEqual(a, b);
+    }
+    
+    public static boolean similar(ItemStack a, ItemStack b) {
+        if (a == null || b == null) {
+            if (a == null && b == null) {
+                return true;
+            }
+            return false;
+        }
+        return a.isItemEqual(b);
+    }
+    
     public static NBTTagCompound getTag(ItemStack is) {
         NBTTagCompound ret = is.getTagCompound();
         if (ret == null) {
@@ -88,7 +103,7 @@ public class FactorizationUtil {
             if (target == null) {
                 continue;
             }
-            if (is.isItemEqual(target)) {
+            if (FactorizationUtil.identical(is, target)) {
                 int free_space = target.getMaxStackSize() - target.stackSize;
                 int incr = Math.min(free_space, is.stackSize);
                 if (incr <= 0) {
@@ -128,7 +143,7 @@ public class FactorizationUtil {
         //try to fill up partially filled slots
         for (Slot slot : destinations) {
             ItemStack is = normalize(slot.getStack());
-            if (is == null || !is.isItemEqual(clickStack)) {
+            if (is == null || !FactorizationUtil.identical(is, clickStack)) {
                 continue;
             }
             int freeSpace = Math.min(is.getMaxStackSize() - is.stackSize, slot.getSlotStackLimit() - is.stackSize);

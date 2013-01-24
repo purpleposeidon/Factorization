@@ -230,7 +230,7 @@ public enum Command {
             }
             
             boolean add(ItemStack ta, int slot) {
-                if (toMatch.isItemEqual(ta)) {
+                if (FactorizationUtil.identical(toMatch, ta)) {
                     stackCount += ta.stackSize;
                     ta.stackSize = 0;
                     matchingSlots.add(slot);

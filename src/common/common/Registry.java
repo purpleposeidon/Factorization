@@ -893,7 +893,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 free_slots += 1;
                 continue;
             }
-            if (is.isItemEqual(here)) {
+            if (FactorizationUtil.identical(is, here)) {
                 int free = here.getMaxStackSize() - here.stackSize;
                 remaining_size -= free;
                 if (remaining_size <= 0) {

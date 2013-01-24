@@ -210,11 +210,11 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
             return false;
         }
         for (GrinderRecipe gr : recipes) {
-            if (gr.input.isItemEqual(input)) {
+            if (FactorizationUtil.identical(gr.input, input)) {
                 if (output == null) {
                     return true;
                 }
-                if (!output.isItemEqual(gr.output)) {
+                if (!FactorizationUtil.identical(output, gr.output)) {
                     return false;
                 }
                 if (output.stackSize + ((int) gr.probability + .99) > output.getMaxStackSize()) {
@@ -228,7 +228,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
 
     void grind() {
         for (GrinderRecipe gr : recipes) {
-            if (gr.input.isItemEqual(input)) {
+            if (FactorizationUtil.identical(gr.input, input)) {
                 if (output == null) {
                     output = gr.output.copy();
                     output.stackSize = 0;

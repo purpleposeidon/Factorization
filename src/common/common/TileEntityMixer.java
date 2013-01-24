@@ -164,7 +164,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
             for (ItemStack is : inputs) {
                 boolean found = false;
                 for (ItemStack inp : mixer_inv) {
-                    if (inp != null && is.isItemEqual(inp)) {
+                    if (inp != null && FactorizationUtil.identical(is, inp)) {
                         found = true;
                         break;
                     }
@@ -215,7 +215,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         for (ItemStack is : src) {
             //increase already-started stacks
             for (int i = 0; i < out.length; i++) {
-                if (out[i] != null && is.isItemEqual(out[i])) {
+                if (out[i] != null && FactorizationUtil.identical(is, out[i])) {
                     int free = out[i].getMaxStackSize() - out[i].stackSize;
                     int delta = Math.min(free, is.stackSize);
                     is.stackSize -= delta;
@@ -305,7 +305,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
                     if (input[i] == null) {
                         continue;
                     }
-                    if (rec.isItemEqual(input[i])) {
+                    if (FactorizationUtil.identical(rec, input[i])) {
                         int d = Math.min(input[i].stackSize, rec.stackSize);
                         input[i].stackSize -= d;
                         rec.stackSize -= d;
