@@ -326,8 +326,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
         return Minecraft.getMinecraft().thePlayer;
     }
 
-    public static KeyBinding bag_swap_key = new KeyBinding("Bag of Holding", org.lwjgl.input.Keyboard.KEY_GRAVE);
-    public static KeyBinding pocket_key = new KeyBinding("Pocket Crafting Table", org.lwjgl.input.Keyboard.KEY_C);
+    public static KeyBinding bag_swap_key = new KeyBinding("FZ:Bag of Holding", org.lwjgl.input.Keyboard.KEY_GRAVE);
+    public static KeyBinding pocket_key = new KeyBinding("FZ:Pocket Crafting Table", org.lwjgl.input.Keyboard.KEY_C);
     public static KeyBinding exoKeys[] = new KeyBinding[Registry.ExoKeyCount];
 
     private static class CommandKeySet extends KeyHandler {
@@ -451,7 +451,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         
         
         for (byte i = 0; i < exoKeys.length; i++) {
-            exoKeys[i] = new KeyBinding("Exo" + (i + 1), defaults[i]);
+            exoKeys[i] = new KeyBinding("FZ:Exo" + (i + 1), defaults[i]);
             exoIDmap.put(exoKeys[i], i);
         }
         KeyBindingRegistry.registerKeyBinding(CommandKeySet.create(
