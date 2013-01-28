@@ -32,5 +32,5 @@ public class HammerProxy {
     
     public void runShadowTick() { }
 
-    public void setPlayerIsEmbedded(DimensionSliceEntity dse) { }
+    public void setPuppet(PuppetPlayer puppet) { }
 }

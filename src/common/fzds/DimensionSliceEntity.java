@@ -23,6 +23,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import factorization.api.Coord;
 import factorization.common.Core;
+import factorization.fzds.api.IFzdsCustomTeleport;
 import factorization.fzds.api.IFzdsEntryControl;
 
 public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, IEntityAdditionalSpawnData {
@@ -34,7 +35,6 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     MetaAxisAlignedBB metaAABB = null;
     
     PacketProxyingPlayer proxy = null;
-    ReversePacketProxyingPlayer reverseProxy = null;
     boolean needAreaUpdate = true;
     ArrayList<DseCollider> children = null; //we don't init here so that it's easy to see if we need to init it
     
@@ -278,8 +278,6 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
             init();
             proxy = new PacketProxyingPlayer(this);
             proxy.worldObj.spawnEntityInWorld(proxy);
-            reverseProxy = new ReversePacketProxyingPlayer(this);
-            reverseProxy.worldObj.spawnEntityInWorld(reverseProxy);
             return;
         }
         updateMotion();
@@ -377,7 +375,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
                 return;
             }
         }
-        System.out.println(ent);
+        System.out.println("DSE taking: " + ent); //NORELEASE
         World shadowWorld = Hammer.getServerShadowWorld();
         Vec3 newLocation = real2shadow(Hammer.ent2vec(ent));
         transferEntity(ent, shadowWorld, newLocation);
@@ -406,6 +404,10 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     }
     
     void transferEntity(Entity ent, World newWorld, Vec3 newPosition) {
+        if (ent instanceof IFzdsCustomTeleport) {
+            ((IFzdsCustomTeleport) ent).transferEntity(worldObj, newPosition);
+            return;
+        }
         if (ent instanceof EntityPlayerMP) {
             HammerNet.transferPlayer((EntityPlayerMP) ent, this, newWorld, newPosition);
         } else {
@@ -491,5 +493,11 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
         //This is required because we have some self-interference
         this.setPosition(par1, par3, par5);
         this.setRotation(par7, par8);
+    }
+    
+    @Override
+    public void addVelocity(double par1, double par3, double par5) {
+        super.addVelocity(par1, par3, par5);
+        isAirBorne = false; //If this is true, we get packet spam
     }
 }

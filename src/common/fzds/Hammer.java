@@ -47,7 +47,7 @@ import factorization.api.Coord;
 import factorization.common.Core;
 
 @Mod(modid = Hammer.modId, name = Hammer.name, version = Core.version, dependencies = "required-after: " + Core.modId)
-@NetworkMod(clientSideRequired = true, channels = {HammerNet.teleport}, packetHandler = HammerNet.class)
+@NetworkMod(clientSideRequired = true, channels = {HammerNet.teleport, HammerNet.puppet}, packetHandler = HammerNet.class)
 public class Hammer {
     static final String lore = "Anvil's Hammer";
     
@@ -168,6 +168,7 @@ public class Hammer {
         
         EntityRegistry.registerModEntity(DimensionSliceEntity.class, "fzds", 1, this, 64, 1, true);
         EntityRegistry.registerModEntity(DseCollider.class, "fzdsC", 2, this, 64, 80000, false);
+        EntityRegistry.registerModEntity(PuppetPlayer.class, "fzdsPuppet", 3, this, 64, 1, false);
         
         //Create the hammer dimension
         dimensionID = Core.dimension_slice_dimid;

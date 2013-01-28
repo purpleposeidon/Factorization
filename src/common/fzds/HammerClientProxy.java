@@ -342,7 +342,29 @@ public class HammerClientProxy extends HammerProxy {
     }
     
     
-    private static DimensionSliceEntity embedded;
+    private EntityClientPlayerMP puppetMaster = null;
+    private EntityClientPlayerMP currentPuppet;
+    @Override
+    public void setPuppet(PuppetPlayer puppet) {
+        Minecraft mc = Minecraft.getMinecraft();
+        currentPuppet = new EntityClientPlayerMP(mc, mc.theWorld, mc.session, mc.thePlayer.sendQueue /* not sure about this one. */);
+        puppetMaster = mc.thePlayer;
+        mc.thePlayer = currentPuppet;
+        //mc.playerController.
+        /*
+        if (puppet == null) {
+            mc.renderViewEntity = puppetMaster;
+            puppetMaster = null;
+        } else {
+            mc.renderViewEntity = puppet;
+            puppetMaster = mc.thePlayer;
+        }
+        System.out.println("renderViewEntity: " + mc.renderViewEntity); //NORELEASE
+        currentPuppet = puppet;*/
+    }
+    
+    //private static DimensionSliceEntity embedded;
+    /*
     private static RenderGlobal realityRender; //used with renderWorld
     @Override
     public void setPlayerIsEmbedded(DimensionSliceEntity dse) {
@@ -355,41 +377,41 @@ public class HammerClientProxy extends HammerProxy {
             Minecraft.getMinecraft().renderGlobal = new RenderGlobal(mc, mc.renderEngine);
             reverse_shadow_world = (WorldClient) getClientRealWorld();
         }
-    }
+    }*/
     
     boolean rendering = false;
     @ForgeSubscribe
     public void renderReality(RenderWorldLastEvent event) {
-        if (realityRender == null) {
-            return;
-        }
-        if (rendering) {
-            return;
-        }
-        rendering = true;
-        try {
-            ICamera customCamera = new ICamera() {
-                @Override
-                public void setPosition(double var1, double var3, double var5) { }
-                
-                @Override
-                public boolean isBoundingBoxInFrustum(AxisAlignedBB var1) {
-                    // TODO
-                    return true;
-                }
-            };
-            RenderGlobal rg = realityRender;
-            //rg = Minecraft.getMinecraft().renderGlobal;
-            Vec3 pos = Minecraft.getMinecraft().renderViewEntity.getPosition(event.partialTicks);
-            GL11.glPushMatrix();
-            float s = 0.01F;
-            GL11.glScalef(s, s, s);
-            EntityRenderer er = Minecraft.getMinecraft().entityRenderer;
-            EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-            rg.sortAndRender(player, 0 /* render pass */, event.partialTicks /* partial ticks */);
-            GL11.glPopMatrix();
-        } finally {
-            rendering = false;
-        }
+//		if (realityRender == null) {
+//			return;
+//		}
+//		if (rendering) {
+//			return;
+//		}
+//		rendering = true;
+//		try {
+//			ICamera customCamera = new ICamera() {
+//				@Override
+//				public void setPosition(double var1, double var3, double var5) { }
+//				
+//				@Override
+//				public boolean isBoundingBoxInFrustum(AxisAlignedBB var1) {
+//					// TODO
+//					return true;
+//				}
+//			};
+//			RenderGlobal rg = realityRender;
+//			//rg = Minecraft.getMinecraft().renderGlobal;
+//			Vec3 pos = Minecraft.getMinecraft().renderViewEntity.getPosition(event.partialTicks);
+//			GL11.glPushMatrix();
+//			float s = 0.01F;
+//			GL11.glScalef(s, s, s);
+//			EntityRenderer er = Minecraft.getMinecraft().entityRenderer;
+//			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+//			rg.sortAndRender(player, 0 /* render pass */, event.partialTicks /* partial ticks */);
+//			GL11.glPopMatrix();
+//		} finally {
+//			rendering = false;
+//		}
     }
 }

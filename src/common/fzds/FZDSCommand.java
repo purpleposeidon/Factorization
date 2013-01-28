@@ -9,6 +9,8 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemInWorldManager;
+import net.minecraft.network.NetServerHandler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.util.ChunkCoordinates;
@@ -49,6 +51,14 @@ public class FZDSCommand extends CommandBase {
         String cmd = args[0];
         if (sender instanceof EntityPlayerMP) {
             final EntityPlayerMP player = (EntityPlayerMP) sender;
+            if (cmd.equalsIgnoreCase("puppet")) {
+                MinecraftServer ms = MinecraftServer.getServer();
+                World w = player.worldObj;
+                ItemInWorldManager iiwm = new ItemInWorldManager(w);
+                PuppetPlayer puppet = new PuppetPlayer(ms, w, "neptunepink", iiwm);
+                HammerNet.puppetPlayer(player, puppet);
+                return;
+            }
             if (cmd.equalsIgnoreCase("spawn")) {
                 currentWE = Hammer.allocateSlice(player.worldObj);
                 currentWE.setPosition((int)player.posX, (int)player.posY, (int)player.posZ);
