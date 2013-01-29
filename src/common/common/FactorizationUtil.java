@@ -8,25 +8,29 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.inventory.InventoryLargeChest;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.MathHelper;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
-import net.minecraft.inventory.Slot;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.ISidedInventory;
+import net.minecraftforge.liquids.LiquidEvent;
+import net.minecraftforge.liquids.LiquidStack;
+import net.minecraftforge.liquids.LiquidTank;
 import factorization.api.Coord;
 
 public class FactorizationUtil {
     public static boolean identical(ItemStack a, ItemStack b) {
         //Checks NBT data
-        return ItemStack.areItemStacksEqual(a, b);
+        //return ItemStack.areItemStacksEqual(a, b);
+        return a.isItemEqual(b) && ItemStack.areItemStackTagsEqual(a, b);
     }
     
     public static boolean similar(ItemStack a, ItemStack b) {
@@ -400,5 +404,28 @@ public class FactorizationUtil {
         @Override
         public void closeChest() {}
         
+    }
+    
+    public static void writeTank(NBTTagCompound tag, LiquidTank tank, String name) {
+        LiquidStack ls = tank.getLiquid();
+        if (ls == null) {
+            return;
+        }
+        NBTTagCompound liquid_tag = new NBTTagCompound(name);
+        ls.writeToNBT(liquid_tag);
+        tag.setTag(name, liquid_tag);
+    }
+    
+    public static void readTank(NBTTagCompound tag, LiquidTank tank, String name) {
+        NBTTagCompound liquid_tag = tag.getCompoundTag(name);
+        LiquidStack ls = LiquidStack.loadLiquidStackFromNBT(liquid_tag);
+        tank.setLiquid(ls);
+    }
+    
+    public static void spill(Coord where, LiquidStack what) {
+        if (what == null || what.amount < 0) {
+            return;
+        }
+        LiquidEvent.fireEvent(new LiquidEvent.LiquidSpilledEvent(what, where.w, where.x, where.y, where.z));
     }
 }
