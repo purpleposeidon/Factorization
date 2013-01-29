@@ -308,7 +308,7 @@ public class TileEntityRouter extends TileEntityFactorization {
                 destStack.stackSize = 0;
             }
         }
-        if (!ItemStack.areItemStacksEqual(srcStack, destStack)) {
+        if (!FactorizationUtil.identical(srcStack, destStack)) {
             return false;
         }
         if (destStack.stackSize >= destStack.getMaxStackSize()) {
@@ -334,9 +334,7 @@ public class TileEntityRouter extends TileEntityFactorization {
             dest.setInventorySlotContents(dest_slot, destStack);
         } else {
             srcStack.stackSize--;
-            if (srcStack.stackSize <= 0) {
-                srcStack = null;
-            }
+            srcStack = FactorizationUtil.normalize(srcStack);
             destStack.stackSize++;
             src.setInventorySlotContents(src_slot, srcStack);
             dest.setInventorySlotContents(dest_slot, destStack);
