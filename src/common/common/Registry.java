@@ -771,21 +771,13 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'S', diamond_shard,
                 'I', Item.ingotIron);
         oreRecipe(grinder_item,
+                "LIL",
                 "I*I",
                 "IMI",
-                "LIL",
+                'L', "ingotLead",
                 'I', Item.ingotIron,
                 '*', diamond_cutting_head,
-                'M', motor,
-                'L', "ingotLead");
-        oreRecipe(grinder_item,
-                "IMI",
-                "I*I",
-                "LIL",
-                'I', Item.ingotIron,
-                '*', diamond_cutting_head,
-                'M', motor,
-                'L', "ingotLead");
+                'M', motor);
         TileEntityGrinder.addRecipe(new ItemStack(Block.stone), new ItemStack(Block.cobblestone), 1);
         TileEntityGrinder.addRecipe(new ItemStack(Block.cobblestone), new ItemStack(Block.gravel), 1);
         TileEntityGrinder.addRecipe(new ItemStack(Block.gravel), new ItemStack(Block.sand), 1);
