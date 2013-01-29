@@ -19,7 +19,7 @@ public enum Sound {
     // it might be kinda cool to have this be configable?
     rightClick("random.click", 1.0, 1.25),
     leftClick("random.click", 1.0, 0.75),
-    routerCluck("mob.chicken", 0.5, 0.66, false),
+    routerCluck("mob.chicken.say", 0.5, 0.66, false),
     stamperUse("tile.piston.in", 0.1, 1.1, false),
     makerUse("tile.piston.out", 0.08, 0.5 * 0.3 + 1.1, false),
     bagSlurp("random.drink", 0.6, 8.0, false),
@@ -94,9 +94,6 @@ public enum Sound {
     }
 
     public void playAt(World world, double x, double y, double z) {
-        if (this != shardMake) {
-            return;
-        }
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
             world.playSound(x, y, z, src, volume, pitch, false);
         }
