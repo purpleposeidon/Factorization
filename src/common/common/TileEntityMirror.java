@@ -140,7 +140,9 @@ public class TileEntityMirror extends TileEntityCommon {
     @Override
     public void invalidate() {
         super.invalidate();
-        onRemove();
+        if (worldObj != null) {
+            onRemove();
+        }
     }
 
     boolean gotten_info_packet = false;
