@@ -11,6 +11,7 @@ import factorization.api.Charge;
 import factorization.api.Charge.ChargeDensityReading;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
+import factorization.api.IMeterInfo;
 import factorization.common.Core.TabType;
 
 public class ItemChargeMeter extends Item {
@@ -37,7 +38,15 @@ public class ItemChargeMeter extends Item {
         Coord here = new Coord(w, x, y, z);
         IChargeConductor ic = here.getTE(IChargeConductor.class);
         if (ic == null) {
-            return false;
+            IMeterInfo im = here.getTE(IMeterInfo.class);
+            if (im == null) {
+                return false;
+            }
+            if (w.isRemote) {
+                return true;
+            }
+            Core.notify(player, here, im.getInfo());
+            return true;
         }
         if (w.isRemote) {
             return true;
