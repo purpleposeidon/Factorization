@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -65,7 +66,11 @@ public class ItemChargeMeter extends Item {
          * targetCharge/totalCharge
          * Conductors:
          */
-        Core.notify(player, here,
+        EntityPlayer toNotify = player;
+        if (player.getClass() != EntityPlayerMP.class || player.username == null || player.username.length() == 0 || player.username.startsWith("[")) {
+            toNotify = null;
+        }
+        Core.notify(toNotify, here,
                 "Charge: " + ic.getCharge().getValue() + "/" + ret.totalCharge
                 + "\nConductors: " + ret.conductorCount
                 + inf
