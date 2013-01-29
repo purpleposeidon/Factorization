@@ -277,6 +277,8 @@ public class BlockFactorization extends BlockContainer {
             itemList.add(new ItemStack(reg.battery, 1, 2));
         }
         itemList.add(reg.solar_turbine_item);
+        itemList.add(reg.solarboiler_item);
+        itemList.add(reg.steamturbine_item);
         //itemList.add(reg.mirror_item_hidden);
         if (reg.mirror != null) {
             itemList.add(new ItemStack(reg.mirror));

@@ -25,7 +25,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         implements IInventory, ISidedInventory, ICoord, IFactoryType {
 
     //Save & Share
-    byte draw_active;
+    public byte draw_active;
     public byte facing_direction = 3;
 
     //Runtime

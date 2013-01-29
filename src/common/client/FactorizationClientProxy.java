@@ -54,6 +54,7 @@ import factorization.client.render.BlockRenderLamp;
 import factorization.client.render.BlockRenderMirrorStand;
 import factorization.client.render.BlockRenderMixer;
 import factorization.client.render.BlockRenderSolarTurbine;
+import factorization.client.render.BlockRenderSteamTurbine;
 import factorization.client.render.BlockRenderWire;
 import factorization.client.render.EmptyRender;
 import factorization.client.render.EntitySteamFX;
@@ -67,6 +68,7 @@ import factorization.client.render.TileEntityGrinderRender;
 import factorization.client.render.TileEntityHeaterRenderer;
 import factorization.client.render.TileEntityMixerRenderer;
 import factorization.client.render.TileEntitySolarTurbineRender;
+import factorization.client.render.TileEntitySteamTurbineRender;
 import factorization.common.Command;
 import factorization.common.ContainerCrystallizer;
 import factorization.common.ContainerExoModder;
@@ -88,6 +90,7 @@ import factorization.common.TileEntityHeater;
 import factorization.common.TileEntityMixer;
 import factorization.common.TileEntitySlagFurnace;
 import factorization.common.TileEntitySolarTurbine;
+import factorization.common.TileEntitySteamTurbine;
 import factorization.common.TileEntityWrathLamp;
 
 public class FactorizationClientProxy extends FactorizationProxy {
@@ -218,9 +221,12 @@ public class FactorizationClientProxy extends FactorizationProxy {
             }
             if (ft == FactoryType.SLAGFURNACE) {
                 TileEntitySlagFurnace slag = (TileEntitySlagFurnace) te;
-                if (!slag.isBurning()) {
+                if (slag.draw_active <= 0) {
                     return;
                 }
+//				if (!slag.isBurning()) {
+//					return;
+//				}
                 int var6 = slag.facing_direction;
                 float var7 = (float) x + 0.5F;
                 float var8 = (float) y + 0.0F + rand.nextFloat() * 6.0F / 16.0F;
@@ -478,6 +484,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             setTileEntityRenderer(TileEntityGrinder.class, new TileEntityGrinderRender());
             setTileEntityRenderer(TileEntityMixer.class, new TileEntityMixerRenderer());
             setTileEntityRenderer(TileEntityCrystallizer.class, new TileEntityCrystallizerRender());
+            setTileEntityRenderer(TileEntitySteamTurbine.class, new TileEntitySteamTurbineRender());
             // End section that is azanor's fault
         }
         
@@ -493,6 +500,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderLamp();
         new BlockRenderMirrorStand();
         new BlockRenderSolarTurbine();
+        new BlockRenderSteamTurbine();
         new BlockRenderWire();
         new BlockRenderGrinder();
         new BlockRenderMixer();

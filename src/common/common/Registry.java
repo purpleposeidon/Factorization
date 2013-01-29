@@ -52,7 +52,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemStack router_item, maker_item, stamper_item, packager_item,
             barrel_item,
             lamp_item, air_item,
-            slagfurnace_item, battery_item_hidden, solar_turbine_item, heater_item,
+            slagfurnace_item, battery_item_hidden, solar_turbine_item, heater_item, steamturbine_item, solarboiler_item,
             mirror_item_hidden,
             leadwire_item, grinder_item, mixer_item, crystallizer_item,
             greenware_item;
@@ -90,6 +90,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemSculptingTool sculpt_tool;
     public ItemAngularSaw angular_saw;
     public ItemCraftingComponent heatHole, logicMatrix, logicMatrixIdentifier, logicMatrixProgrammer;
+    public Item fz_steam;
 
     public Material materialMachine = new Material(MapColor.ironColor);
 
@@ -169,6 +170,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         slagfurnace_item = FactoryType.SLAGFURNACE.itemStack("Slag Furnace");
         battery_item_hidden = FactoryType.BATTERY.itemStack("Battery Block");
         solar_turbine_item = FactoryType.SOLARTURBINE.itemStack("Solar Turbine");
+        steamturbine_item = FactoryType.STEAMTURBINE.itemStack("Steam Turbine");
+        solarboiler_item = FactoryType.SOLARBOILER.itemStack("Solar Boiler");
         heater_item = FactoryType.HEATER.itemStack("Furnace Heater");
         mirror_item_hidden = FactoryType.MIRROR.itemStack("Reflective Mirror");
         leadwire_item = FactoryType.LEADWIRE.itemStack("Lead Wire");
@@ -287,6 +290,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //Misc
         pocket_table = new ItemPocketTable(itemID("pocketCraftingTable", 9002));
         addName(pocket_table, "Pocket Crafting Table");
+        fz_steam = new Item(itemID("steam", 9049));
+        fz_steam.setTextureFile(Block.lavaStill.getTextureFile());
+        fz_steam.setIconIndex(Block.lavaStill.getBlockTextureFromSideAndMetadata(0, 0));
     }
 
     void recipe(ItemStack res, Object... params) {
@@ -678,6 +684,23 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 '#', Block.thinGlass,
                 'F', fan,
                 'M', motor);
+        recipe(solarboiler_item,
+                "I#I",
+                "I I",
+                "III",
+                'I', Item.ingotIron,
+                '#', Block.fenceIron
+                );
+        oreRecipe(steamturbine_item,
+                "I#I",
+                "GXG",
+                "LML",
+                'I', Item.ingotIron,
+                '#', Block.fenceIron,
+                'G', Block.thinGlass,
+                'X', fan,
+                'L', "ingotLead",
+                'M', motor );
         oreRecipe(new ItemStack(charge_meter),
                 "WSW",
                 "W/W",

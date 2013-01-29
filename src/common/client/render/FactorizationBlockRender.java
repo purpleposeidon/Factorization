@@ -66,7 +66,11 @@ abstract public class FactorizationBlockRender implements ICoord {
     
     public FactorizationBlockRender() {
         if (getFactoryType() != null) {
-            renderMap[getFactoryType().md] = this;
+            int md = getFactoryType().md;
+            if (renderMap[md] != null) {
+                throw new RuntimeException("Tried to overwrite a renderer");
+            }
+            renderMap[md] = this;
         } else {
             defaultRender = this;
         }

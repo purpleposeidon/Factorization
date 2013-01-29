@@ -99,6 +99,9 @@ public class ItemFactorization extends ItemBlock {
                 infoList.add(state.english);
             }
         }
+        if (FactorizationUtil.similar(is, Core.registry.solar_turbine_item)) {
+            infoList.add("Deprecated");
+        }
         Core.brand(infoList);
     }
     

@@ -127,6 +127,21 @@ public class Texture {
             }
             return 14;
         }
+        if (FactoryType.SOLARBOILER.is(md)) {
+            if (side == 1) {
+                return 16*3 + 1;
+            }
+            return 14;
+        }
+        if (FactoryType.STEAMTURBINE.is(md)) {
+            if (side == 0) {
+                return 11;
+            }
+            if (side == 1) {
+                return 16*3 + 2;
+            }
+            return 16*3 + 3;
+        }
         return 0;
     }
 }

@@ -96,6 +96,8 @@ public class Core {
     public static boolean show_fine_logging = false;
     public static boolean serverside_translate = true;
     public static boolean dev_environ = System.getProperty("user.dir", "").startsWith("/home/poseidon/Development/");
+    public static boolean boilers_suck_water = true;
+    public static double steam_output_adjust = 1.0;
 
     // universal constant config
     public final static String texture_dir = "/factorization/texture/";
@@ -129,6 +131,14 @@ public class Core {
             prop.comment = comment;
         }
         return prop.getBoolean(defaultValue);
+    }
+    
+    private double getDoubleConfig(String name, String category, double defaultValue, String comment) {
+        Property prop = config.get(category, name, defaultValue);
+        if (comment != null && comment.length() != 0) {
+            prop.comment = comment;
+        }
+        return prop.getDouble(defaultValue);
     }
 
     private String getStringConfig(String name, String category, String defaultValue, String comment) {
@@ -195,7 +205,8 @@ public class Core {
             prop.value = "" + entity_relight_task_id;
         }
         serverside_translate = getBoolConfig("serversideTranslate", "server", serverside_translate, "If false, notifications will be translated by the client");
-
+        boilers_suck_water = getBoolConfig("boilersSuckWater", "server", boilers_suck_water, "If false, water must be piped in");
+        steam_output_adjust = getDoubleConfig("steamOutputAdjustment", "server", steam_output_adjust, "Scale how much steam is produced by the solar boiler");
 
         config.save();
     }
@@ -227,6 +238,7 @@ public class Core {
     @PostInit
     public void modsLoaded(FMLPostInitializationEvent event) {
         TileEntityWrathFire.setupBurning();
+        TileEntitySolarBoiler.setupSteam();
         foph.addDictOres();
         proxy.fixAchievements();
     }
