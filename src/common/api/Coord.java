@@ -340,6 +340,9 @@ public class Coord {
     }
 
     public TileEntity getTE() {
+        if (w == null) {
+            return null;
+        }
         return w.getBlockTileEntity(x, y, z);
     }
 
