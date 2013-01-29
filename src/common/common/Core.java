@@ -45,7 +45,7 @@ public class Core {
     public static final String modId = "factorization";
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
-    public static final String version = "0.7.14"; //@VERSION@
+    public static final String version = "0.7.15"; //@VERSION@
     public static final boolean RichardG_touches_himself_while_reading_my_code = true;
     public Core() {
         registry = new Registry();
@@ -337,10 +337,10 @@ public class Core {
     }
     
     public static void notify(EntityPlayer player, Coord where, String format, String ...args) {
-        if (player.worldObj.isRemote) {
+        if (player != null && player.worldObj.isRemote) {
             FactorizationNotify.addMessage(where, format, args);
         } else {
-            proxy.addPacket(player, network.notifyPacket(where, format, args));
+            network.broadcastPacket(player, where, network.notifyPacket(where, format, args));
         }
     }
     
