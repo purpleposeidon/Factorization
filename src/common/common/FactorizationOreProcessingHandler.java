@@ -7,6 +7,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.oredict.OreDictionary;
@@ -15,11 +16,19 @@ import factorization.common.ItemOreProcessing.OreType;
 
 public class FactorizationOreProcessingHandler {
     private HashMap<String, ItemStack> bestIngots = new HashMap();
+    public static final float GRIND_MULTIPLY = 2F;
+    public static final float REDUCE_MULTIPLY = 2.5F;
+    public static final float CRYSTALLIZE_MULTIPLY = 3F;
+    
+    public static final float GRIND = GRIND_MULTIPLY;
+    public static final float WASH = 1F;
+    public static final float REDUCE = REDUCE_MULTIPLY/GRIND_MULTIPLY;
+    public static final float CRYSTALLIZE = CRYSTALLIZE_MULTIPLY/REDUCE_MULTIPLY;
     
     /** This adds an ore to the processing chain: Grinds the ore into gravel */
     void addProcessingFront(OreType oreType, ItemStack ore) {
         ItemStack dirty = Core.registry.ore_dirty_gravel.makeStack(oreType);
-        TileEntityGrinder.addRecipe(ore, dirty, 1.4F);
+        TileEntityGrinder.addRecipe(ore, dirty, GRIND);
     }
     
     /** This (maybe) adds an ore to the processing ends (converting anything to ingots). It only does this if the ingot is better. */
@@ -56,6 +65,7 @@ public class FactorizationOreProcessingHandler {
         }
         if (oreType != OreType.LEAD && oreType != OreType.SILVER) {
             TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.42857142857143F, ingot, 0.2F, Block.dirt);
+            //TODO: This should output reduced chunks instead!
         }
     }
     
@@ -81,14 +91,15 @@ public class FactorizationOreProcessingHandler {
             ItemStack crystal_silver = Core.registry.ore_crystal.makeStack(OreType.SILVER);
             ItemStack crystal_lead = Core.registry.ore_crystal.makeStack(OreType.LEAD);
             
-            TileEntitySlagFurnace.SlagRecipes.register(clean, 1.6F, reduced_lead, 1.1F, reduced_silver);
-            TileEntityCrystallizer.addRecipe(reduced_silver, crystal_silver, 1.5F, new ItemStack(Core.registry.acid), 0);
-            TileEntityCrystallizer.addRecipe(reduced_lead, crystal_lead, 1.5F, new ItemStack(Core.registry.acid), 0);
+            TileEntitySlagFurnace.SlagRecipes.register(clean, REDUCE, reduced_lead, REDUCE, reduced_silver);
+            TileEntityCrystallizer.addRecipe(reduced_silver, crystal_silver, CRYSTALLIZE, new ItemStack(Core.registry.acid), 0);
+            TileEntityCrystallizer.addRecipe(reduced_lead, crystal_lead, CRYSTALLIZE, new ItemStack(Core.registry.acid), 0);
         } else {
             //clean gravel -> reduced chunks
-            TileEntitySlagFurnace.SlagRecipes.register(clean, 1, reduced, 0.42857142857143F, reduced);
+            int r = MathHelper.truncateDoubleToInt(REDUCE);
+            TileEntitySlagFurnace.SlagRecipes.register(clean, r, reduced, REDUCE - r, reduced);
             //reduced chunks -> crystals
-            TileEntityCrystallizer.addRecipe(reduced, crystal, 1.5F, new ItemStack(Core.registry.acid), 0);
+            TileEntityCrystallizer.addRecipe(reduced, crystal, CRYSTALLIZE, new ItemStack(Core.registry.acid), 0);
         }
     }
     
