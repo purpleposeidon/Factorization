@@ -489,11 +489,12 @@ public class TileEntityBarrel extends TileEntityFactorization {
         changeItemCount(0);
     }
 
+    private static ItemStack emptyItemStack = new ItemStack(0, 0, 0);
     @Override
     public Packet getAuxillaryInfoPacket() {
         int ic = getItemCount();
         if (ic == 0) {
-            return getDescriptionPacketWith(MessageType.BarrelDescription, ic, upgrade, 0xDEAD);
+            return getDescriptionPacketWith(MessageType.BarrelDescription, ic, upgrade, emptyItemStack);
         }
         return getDescriptionPacketWith(MessageType.BarrelDescription, ic, upgrade, item);
     }
