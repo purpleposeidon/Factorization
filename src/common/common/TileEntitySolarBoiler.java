@@ -21,8 +21,8 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
         steam_stack = LiquidDictionary.getOrCreateLiquid("Steam", new LiquidStack(Core.registry.fz_steam, 0));
     }
     
-    LiquidTank waterTank = new LiquidTank(water_stack.copy(), 1000*16, this);
-    LiquidTank steamTank = new LiquidTank(steam_stack.copy(), 1000*16, this);
+    LiquidTank waterTank = new LiquidTank(water_stack.copy(), 1000*8, this);
+    LiquidTank steamTank = new LiquidTank(steam_stack.copy(), 1000*8, this);
     int reflector_count = 0;
     
     public TileEntitySolarBoiler() {
@@ -161,7 +161,9 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
             //pull water from below
             Coord below = here.add(0, -1, 0);
             ITankContainer tc = below.getTE(ITankContainer.class);
-            if ((below.is(Block.waterMoving) || below.is(Block.waterStill)) && Core.boilers_suck_water) {
+            boolean water_below = (below.is(Block.waterMoving) || below.is(Block.waterStill));
+            water_below &= !here.isPowered();
+            if (water_below && Core.boilers_suck_water) {
                 if (below.getMd() == 0) {
                     below.setId(0);
                     water.amount += 1000;

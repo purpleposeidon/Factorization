@@ -119,6 +119,10 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements ITankCon
         }
         shareFanSpeed();
         charge.update();
+        if (worldObj.isBlockGettingPowered(xCoord, yCoord, zCoord)) {
+            fan_speed = Math.max(0, fan_speed - 1);
+            return;
+        }
         LiquidStack steam = steamTank.getLiquid();
         if (steam == null) {
             steamTank.setLiquid(steam = LiquidDictionary.getLiquid("Steam", 0));
