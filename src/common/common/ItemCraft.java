@@ -6,6 +6,7 @@ import java.util.List;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -379,5 +380,11 @@ public class ItemCraft extends Item {
     @Override
     public boolean getShareTag() {
         return true;
+    }
+    
+    @Override
+    public void getSubItems(int id, CreativeTabs tab, List list) {
+        list.add(new ItemStack(Core.registry.item_craft));
+        list.add(Core.registry.diamond_shard_packet);
     }
 }
