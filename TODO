@@ -51,21 +51,17 @@ Kill Wrath (This will make the mod so much simpler...):
       - No more terrible particle effects
   - This will remove a use for diamond shards.
 
-Adjust ore yields to 2.4 prior to crystallization
 
 
 TOP LIST (that's become somewhat less tops. Oops.)
 --------
-pane recipe for turbine
+Reduce sludge output
 Look at what errors we get if the FZDS code isn't in
 either bats are spawning in the hammer dimension, or we're getting entity updates that we shouldn't be
-Test barrel's new ticklessness
 Exo-armor needs a look-through
 Make exo-armor not look terrible (Maybe use those armor slot symbols...). Also the on-player armor, needs some noise & sparklies. Also, is it too rigid?
 Wall jump only works when moving up? Make wall jump bouncing you off the wall at a 45° angle
-Change turbine to use up less water; a fully powered one causes too many block updates
 Grinder acting weird?
-dirty galena only gives silver
 RP heating
 Forestry liquid containers/vanilla water bottles working in the mixer
 fix middle clicking
@@ -89,6 +85,7 @@ Flying: Antigravity bits (Depends on inverium)
 Strong, but balanced, armor: Memory Plating/Conditioned Armor (More inverium)
 Good mining tools
 Placing/breaking wrath lamp in hammerspace seems to cause the client to crap its pants
+Don't keep non-weak references to worlds ("MapMaker.weakKeys().buildMap()") except in Entity/TileEntity
 
 back to ceramics?
 https://github.com/MinecraftForge/MinecraftForge/commit/34ebfcd9785c3c50c3ac743eb1e9cbf000df10dc
@@ -118,7 +115,6 @@ rotating barrels (We *still* don't have a rotation API, do we?)
 Fun fact: High-quality batteries can be made out of silver. Mmmm. But this can't really be used as an alternative... altho... maybe they could require greater charge to charge.
 implementing that generic block rotation API when it comes out if ever
 we miiight let you use capsules & shit in the mixer
-EBXL cracked sand + water = sand
 barrel lighting (normals.); it's a bit dark on dark mode.
 Test: slow stamper & packager & maker so as to not jam filters. also have stamper pulse for each item... (cakes)
 nikolite grinding! Once RedPower comes out...
@@ -127,7 +123,6 @@ do block breaking animations properly (after 1.3). Look at src/minecraft/net/min
 railgun, except for steve
 optimize these TEs. Prolly use whatever it is that Entity Models use?
   grinder
-http://3.bp.blogspot.com/_b5hcKABPlGI/SxB8DW-Xv-I/AAAAAAAAaxU/qmqqFtiwZ1A/s1600/6-509a.bmp . Discussion with Greys and Overminddl about solar towers.
 sideways barrels (and possibly upsidedown barrels)
 slowpoke discussion re. barrel balancing. Maybe an upgrade for automating barrel content access?
 ore processing for dark iron (and possibly wrath-burn other blocks besides iron)
