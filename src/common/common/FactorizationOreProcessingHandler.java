@@ -96,7 +96,7 @@ public class FactorizationOreProcessingHandler {
             TileEntityCrystallizer.addRecipe(reduced_lead, crystal_lead, CRYSTALLIZE, new ItemStack(Core.registry.acid), 0);
         } else {
             //clean gravel -> reduced chunks
-            int r = MathHelper.truncateDoubleToInt(REDUCE);
+            int r = (int)REDUCE;
             TileEntitySlagFurnace.SlagRecipes.register(clean, r, reduced, REDUCE - r, reduced);
             //reduced chunks -> crystals
             TileEntityCrystallizer.addRecipe(reduced, crystal, CRYSTALLIZE, new ItemStack(Core.registry.acid), 0);
