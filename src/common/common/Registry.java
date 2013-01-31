@@ -192,6 +192,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         OreDictionary.registerOre("oreSilver", silver_ore_item);
         OreDictionary.registerOre("ingotSilver", new ItemStack(silver_ingot));
         OreDictionary.registerOre("ingotLead", new ItemStack(lead_ingot));
+        OreDictionary.registerOre("blockSilver", silver_block_item);
+        OreDictionary.registerOre("blockLead", lead_block_item);
         addName(lead_ingot, "Lead Ingot");
         addName(silver_ingot, "Silver Ingot");
 
