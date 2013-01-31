@@ -1,3 +1,22 @@
+0.7.15
+  Insubstantial changes to the License.
+  Solar Turbines are being replaced with Solar Boilers and Steam Turbines.
+    - The solar boiler is setup the same way the old turbine was. Instead of sucking water up from the bottom, it can also be piped in using some other mod's fluid transport. The steam comes out of the top side.
+    - Solar boilers can also be stacked on top of eachother. Steam will be sent to the topmost boiler, and water will be shared. Steam will be sent to a Steam Turbine if it's placed ontop of the Boiler.
+    - Redstone signal on the boiler will prevent it from sucking up water; signal on the turbine will stop it
+    - This system is compatible with Railcraft steam. (And railcraft has a much better texture.)
+    - The old solar turbine is now deprecated: It can no longer be crafted, but they will still work. Craft it to get the motor back.
+  Redistributed ore processing yields. The yields, starting from 1 ore, are:
+    Grinder: 2x
+    Mixer: 2x (No increase here)
+    Slag furnace: 2.5x (The .5x gives a 50% chance for 1 extra reduced chunk)
+    Crystallizer: 3x
+  The charge meter does a global notify if the player is fake. (It works in deployers! Aim the deployer above the conductor.)
+  Grinders are now crafted upsidedown, instead of having two different unsatisfactory recipes.
+  Fixed crystallizer recipe bug
+  Sounds actually work again. Derp.
+
+
 0.7.14
   Solar turbine recipe uses glass panes instead of glass blocks
   Solar turbine uses less water; this prevents a fully powered one from causing block updates every half second.
