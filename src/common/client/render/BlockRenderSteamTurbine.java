@@ -16,6 +16,7 @@ import factorization.common.WireRenderingCube;
 
 public class BlockRenderSteamTurbine extends FactorizationBlockRender {
 
+    TileEntityWire fake_wire = new TileEntityWire();
     @Override
     void render(RenderBlocks rb) {
         int glass = Texture.lamp_iron + 10;
@@ -27,7 +28,6 @@ public class BlockRenderSteamTurbine extends FactorizationBlockRender {
         renderMotor(rb, 0);
         if (world_mode) {
             Coord me = getCoord();
-            TileEntityWire fake_wire = new TileEntityWire(); //NORELEASE: move outside of this function
             fake_wire.worldObj = me.w;
             fake_wire.xCoord = me.x;
             fake_wire.yCoord = me.y;
