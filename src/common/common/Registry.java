@@ -293,8 +293,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         pocket_table = new ItemPocketTable(itemID("pocketCraftingTable", 9002));
         addName(pocket_table, "Pocket Crafting Table");
         fz_steam = new Item(itemID("steam", 9049));
-        fz_steam.setTextureFile(Block.lavaStill.getTextureFile());
-        fz_steam.setIconIndex(Block.lavaStill.getBlockTextureFromSideAndMetadata(0, 0));
+        fz_steam.setTextureFile(Core.texture_file_block);
+        fz_steam.setIconIndex(3*16 + 4);
+        fz_steam.setItemName("steam");
+        addName(fz_steam, "Steam");
     }
 
     void recipe(ItemStack res, Object... params) {
