@@ -75,6 +75,9 @@ public class GuiRouter extends GuiContainer implements IClickable {
                 continue;
             }
             String invName = router.getIInventoryName((IInventory) ent);
+            if (invName == null) {
+                continue;
+            }
             Integer orig = names.get(invName);
             if (orig == null || invDistance < orig) {
                 names.put(invName, new Integer((int) invDistance));
