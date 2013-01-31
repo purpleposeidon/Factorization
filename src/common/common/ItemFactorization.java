@@ -100,7 +100,7 @@ public class ItemFactorization extends ItemBlock {
             }
         }
         if (FactorizationUtil.similar(is, Core.registry.solar_turbine_item)) {
-            infoList.add("Deprecated");
+            infoList.add("Deprecated for Solar Boilers & Steam Turbines");
         }
         Core.brand(infoList);
     }
