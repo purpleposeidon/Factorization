@@ -274,7 +274,7 @@ public class TileEntityRouter extends TileEntityFactorization {
      * If the router can possibly do anything
      */
     boolean shouldUpdate() {
-        if (worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord) || worldObj.isBlockGettingPowered(xCoord, yCoord, zCoord)) {
+        if (worldObj.isBlockGettingPowered(xCoord, yCoord, zCoord)) {
             return false;
         }
         if (is_input) {
