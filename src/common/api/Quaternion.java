@@ -1,12 +1,15 @@
 package factorization.api;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.ForgeDirection;
 
 public class Quaternion {
     public double w, x, y, z;
-    
     
     //Data functions
     public Quaternion() {
@@ -52,8 +55,41 @@ public class Quaternion {
         return new Quaternion(tag.getDouble(prefix+"w"), tag.getDouble(prefix+"x"), tag.getDouble(prefix+"y"), tag.getDouble(prefix+"z"));
     }
     
+    public void write(DataOutput out) throws IOException {
+        double[] d = toStaticArray();
+        for (int i = 0; i < d.length; i++) {
+            out.writeDouble(d[i]);
+        }
+    }
+    
+    public static Quaternion read(DataInput in) throws IOException {
+        double[] d = localStaticArray.get();
+        for (int i = 0; i < d.length; i++) {
+            d[i] = in.readDouble();
+        }
+        return new Quaternion(d);
+    }
+    
+    public double[] fillArray(double[] out) {
+        out[0] = w;
+        out[1] = x;
+        out[2] = y;
+        out[3] = z;
+        return out;
+    }
+    
     public double[] toArray() {
-        return new double[] { w, x, y, z };
+        return fillArray(new double[4]);
+    }
+    
+    private static ThreadLocal<double[]> localStaticArray = new ThreadLocal<double[]>() {
+        protected double[] initialValue() {
+            return new double[4];
+        };
+    };
+    
+    public double[] toStaticArray() {
+        return fillArray(localStaticArray.get());
     }
     
     public void update(double nw, double nx, double ny, double nz) {
@@ -93,10 +129,27 @@ public class Quaternion {
     }
     
     /**
+     * @param Vec3 that gets mutated to the axis of rotation
+     * @return the rotation
+     */
+    public double setVector(Vec3 axis) {
+        double halfAngle = Math.acos(w);
+        double sin = Math.sin(halfAngle);
+        axis.xCoord = x/sin;
+        axis.yCoord = y/sin;
+        axis.zCoord = z/sin;
+        return halfAngle*2;
+    }
+    
+    /**
      * Also called the norm
      */
     public double magnitude() {
         return Math.sqrt(w*w + x*x + y*y + z*z);
+    }
+    
+    public double magnitudeSquared() {
+        return w*w + x*x + y*y + z*z;
     }
     
     public double incrDistance(Quaternion other) {
