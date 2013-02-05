@@ -98,6 +98,7 @@ public class Core {
     public static boolean dev_environ = System.getProperty("user.dir", "").startsWith("/home/poseidon/Development/");
     public static boolean boilers_suck_water = true;
     public static double steam_output_adjust = 1.0;
+    public static boolean enable_sketchy_client_commands = true;
 
     // universal constant config
     public final static String texture_dir = "/factorization/texture/";
@@ -179,6 +180,7 @@ public class Core {
                 p.value = pocketActions;
                 p.comment = "3 keys for: removing (x), cycling (c), balancing (b)";
             }
+            enable_sketchy_client_commands = getBoolConfig("allowUnpureCommands", "client", enable_sketchy_client_commands, null);
         }
 
         gen_silver_ore = getBoolConfig("generateSilverOre", "general", gen_silver_ore, "This disables silver ore generation");

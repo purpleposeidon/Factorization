@@ -214,14 +214,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         
         logicMatrixProgrammer = new ItemMatrixProgrammer(itemID("logicMatrixProgrammer", 9043), "Logic Matrix Programmer", 1*16 + 6);
         DungeonHooks.addDungeonLoot(new ItemStack(logicMatrixProgrammer), 50); //XXX TODO: Temporary, put these on asteroids.
-        DungeonHooks.addDungeonMob("Creeper", 1);
-        String THATS_SOME_VERY_NICE_SOURCE_CODE_YOU_HAVE_THERE[] = {
-                "##  ##",
-                "##  ##",
-                "  ##  ",
-                " #### ",
-                " #  # "
-        };
         logicMatrix = new ItemCraftingComponent(itemID("logicMatrix", 9044), "Logic Matrix", 1*16 + 10);
         logicMatrixIdentifier = new ItemCraftingComponent(itemID("logicMatrixID", 9045), "Logic Matrix: Identifier", 1*16 + 11);
         heatHole = new ItemCraftingComponent(itemID("heatHole", 9046), "Heat Hole", 1*16 + 9);
