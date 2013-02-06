@@ -2,23 +2,23 @@ package factorization.fzds;
 
 import java.util.List;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
-
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import factorization.api.Quaternion;
 
 public class MetaAxisAlignedBB extends AxisAlignedBB {
     World shadowWorld;
     AxisAlignedBB shadowAABB;
     Vec3 offset;
+    Quaternion rotation;
     
-    public MetaAxisAlignedBB(World shadowWorld, AxisAlignedBB shadowAABB, Vec3 offset) {
+    public MetaAxisAlignedBB(World shadowWorld, AxisAlignedBB shadowAABB, Vec3 offset, Quaternion rotation) {
         super(0, 0, 0, 0, 0, 0);
         this.shadowWorld = shadowWorld;
         this.shadowAABB = shadowAABB; 
         this.offset = offset;
+        this.rotation = rotation;
     }
     
     public MetaAxisAlignedBB setUnderlying(AxisAlignedBB bb) {

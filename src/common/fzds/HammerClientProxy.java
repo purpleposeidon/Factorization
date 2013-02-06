@@ -342,27 +342,6 @@ public class HammerClientProxy extends HammerProxy {
     }
     
     
-    private EntityClientPlayerMP puppetMaster = null;
-    private EntityClientPlayerMP currentPuppet;
-    @Override
-    public void setPuppet(PuppetPlayer puppet) {
-        Minecraft mc = Minecraft.getMinecraft();
-        currentPuppet = new EntityClientPlayerMP(mc, mc.theWorld, mc.session, mc.thePlayer.sendQueue /* not sure about this one. */);
-        puppetMaster = mc.thePlayer;
-        mc.thePlayer = currentPuppet;
-        //mc.playerController.
-        /*
-        if (puppet == null) {
-            mc.renderViewEntity = puppetMaster;
-            puppetMaster = null;
-        } else {
-            mc.renderViewEntity = puppet;
-            puppetMaster = mc.thePlayer;
-        }
-        System.out.println("renderViewEntity: " + mc.renderViewEntity); //NORELEASE
-        currentPuppet = puppet;*/
-    }
-    
     //private static DimensionSliceEntity embedded;
     /*
     private static RenderGlobal realityRender; //used with renderWorld

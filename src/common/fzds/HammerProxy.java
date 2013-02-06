@@ -31,6 +31,4 @@ public class HammerProxy {
     public void checkForWorldChange() { }
     
     public void runShadowTick() { }
-
-    public void setPuppet(PuppetPlayer puppet) { }
 }

@@ -55,5 +55,10 @@ public class Packet220FzdsWrap extends Packet {
     public boolean isRealPacket() {
         return true;
     }
+    
+    @Override
+    public String toString() {
+        return super.toString() + " of " + wrapped;
+    }
 
 }

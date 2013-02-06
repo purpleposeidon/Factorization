@@ -1,19 +1,21 @@
 package factorization.api;
 
 import java.io.DataInput;
-import java.io.DataOutput;
+import java.io.DataInputStream;
 import java.io.IOException;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.ForgeDirection;
 
+import com.google.common.io.ByteArrayDataOutput;
+
 public class Quaternion {
     public double w, x, y, z;
     
     //Data functions
     public Quaternion() {
-        this(0, 0, 0, 0);
+        this(1, 0, 0, 0);
     }
     
     public Quaternion(double w, double x, double y, double z) {
@@ -39,6 +41,10 @@ public class Quaternion {
         this(w, v.xCoord, v.yCoord, v.zCoord);
     }
     
+    public boolean isEqual(Quaternion other) {
+        return w == other.w && x == other.x && y == other.y && z == other.z; 
+    }
+    
     @Override
     public String toString() {
         return "Quaternion(" + w + ", " + x + ", " + y + ", " + z + ")";
@@ -55,7 +61,7 @@ public class Quaternion {
         return new Quaternion(tag.getDouble(prefix+"w"), tag.getDouble(prefix+"x"), tag.getDouble(prefix+"y"), tag.getDouble(prefix+"z"));
     }
     
-    public void write(DataOutput out) throws IOException {
+    public void write(ByteArrayDataOutput out) {
         double[] d = toStaticArray();
         for (int i = 0; i < d.length; i++) {
             out.writeDouble(d[i]);
@@ -92,11 +98,19 @@ public class Quaternion {
         return fillArray(localStaticArray.get());
     }
     
+    public boolean isZero() {
+        return w == 0 && x == 0 && y == 0 && z == 0;
+    }
+    
     public void update(double nw, double nx, double ny, double nz) {
         w = nw;
         x = nx;
         y = ny;
         z = nz;
+    }
+    
+    public void update(Quaternion other) {
+        update(other.w, other.x, other.y, other.z);
     }
     
     public void updateVector(Vec3 v) {
@@ -110,6 +124,18 @@ public class Quaternion {
     }
     
     //Math functions
+    public void incrNormalize() {
+        double normSquared = magnitudeSquared();
+        if (normSquared == 1 || normSquared == 0) {
+            return;
+        }
+        double norm = Math.sqrt(normSquared);
+        w /= norm;
+        x /= norm;
+        y /= norm;
+        z /= norm;
+    }
+    
     public static Quaternion getRotationQuaternion(double angle, Vec3 axis) {
         double halfAngle = angle/2;
         double sin = Math.sin(halfAngle);
@@ -141,6 +167,44 @@ public class Quaternion {
         return halfAngle*2;
     }
     
+    public double dotProduct(Quaternion other) {
+        return w*other.w + x*other.x + y*other.y + z*other.z;
+    }
+    
+    private static final double DOT_THRESHOLD = 0.9995;
+    public Quaternion slerp(Quaternion other, double t) {
+        //From http://number-none.com/product/Understanding%20Slerp,%20Then%20Not%20Using%20It/index.html (encoding = Western; ISO-8859-1)
+        
+        
+        // v0 and v1 should be unit length or else
+        // something broken will happen.
+
+        // Compute the cosine of the angle between the two vectors.
+        double dot = dotProduct(other);
+
+        if (dot > DOT_THRESHOLD) {
+            // If the inputs are too close for comfort, linearly interpolate
+            // and normalize the result.
+            Quaternion result = new Quaternion(this);
+            Quaternion temp = other.add(this, -1);
+            temp.incrScale(t);
+            result.incrAdd(temp);
+            result.incrNormalize();
+            return result;
+        }
+        dot = Math.min(-1, Math.max(1, dot)); 	// Robustness: Stay within domain of acos()
+        double theta_0 = Math.acos(dot);  		// theta_0 = angle between input vectors
+        double theta = theta_0*t;    			// theta = angle between v0 and result 
+
+        Quaternion v2 = other.add(this, -dot);
+        v2.incrNormalize();              		// { v0, v2 } is now an orthonormal basis
+        
+        Quaternion ret = this.scale(Math.cos(theta));
+        v2.incrScale(Math.sin(theta));
+        ret.incrAdd(v2);
+        return ret;
+    }
+    
     /**
      * Also called the norm
      */
@@ -170,11 +234,11 @@ public class Quaternion {
         z += other.z;
     }
     
-    public void incrSubtract(Quaternion other) {
-        w -= other.w;
-        x -= other.x;
-        y -= other.y;
-        z -= other.z;
+    public void incrAdd(Quaternion other, double scale) {
+        w += other.w*scale;
+        x += other.x*scale;
+        y += other.y*scale;
+        z += other.z*scale;
     }
     
     public void incrMultiply(Quaternion other) {
@@ -208,6 +272,7 @@ public class Quaternion {
      * @param p
      */
     public void rotateIncr(Vec3 p) {
+        //TODO NORELEASE: This function is named wrong; "applyRotation"
         //return this * p * this^-1
         Quaternion point = new Quaternion(0, p);
         Quaternion trans = this.multiply(point).multiply(this.conjugate());
@@ -233,9 +298,9 @@ public class Quaternion {
         return ret;
     }
     
-    public Quaternion subtract(Quaternion other) {
+    public Quaternion add(Quaternion other, double scale) {
         Quaternion ret = new Quaternion(this);
-        ret.incrSubtract(other);
+        ret.incrAdd(other, scale);
         return ret;
     }
     

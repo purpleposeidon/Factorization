@@ -6,7 +6,6 @@ import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,6 +22,7 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.event.ForgeSubscribe;
@@ -31,11 +31,10 @@ import net.minecraftforge.event.world.WorldEvent;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
-import com.google.common.collect.Range;
-
 import cpw.mods.fml.common.IScheduledTickHandler;
 import cpw.mods.fml.common.TickType;
 import factorization.api.Coord;
+import factorization.api.Quaternion;
 import factorization.common.Core;
 
 
@@ -103,12 +102,12 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         int last_update_index = 0;
         int render_skips = 0;
         void update() {
-            render_skips++;
-            if (render_skips < update_frequency) {
-                render_skips = 0;
-            } else {
-                return;
-            }
+//			render_skips++;
+//			if (render_skips < update_frequency) {
+//				render_skips = 0;
+//			} else {
+//				return;
+//			}
             Core.profileStart("update");
             checkGLError("FZDS before WorldRender update");
             while (last_update_index < renderers.length) {
@@ -269,7 +268,20 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 float pdx = (float) ((dse.posX - dse.lastTickPosX)*partialTicks);
                 float pdy = (float) ((dse.posY - dse.lastTickPosY)*partialTicks);
                 float pdz = (float) ((dse.posZ - dse.lastTickPosZ)*partialTicks);
-                glTranslatef((float)(x - DimensionSliceEntity.offsetXZ), (float)(y - DimensionSliceEntity.offsetY), (float)(z - DimensionSliceEntity.offsetXZ));
+                glTranslatef((float)(x), (float)(y), (float)(z));
+                if (true /*!dse.rotation.isZero()*/) {
+                    //Quaternion quat = dse.rotation.slerp(dse.prevTickRotation, partialTicks);
+                    //Quaternion quat = dse.rotation;
+                    Quaternion quat = dse.rotation.add(dse.prevTickRotation);
+                    quat.incrScale(0.5);
+                    Vec3 vec = Vec3.createVectorHelper(quat.x, quat.y, quat.z);
+                    vec = vec.normalize();
+                    //GL11.glRotatef((float)Math.toDegrees(quat.w), (float)vec.xCoord, (float)vec.yCoord, (float)vec.zCoord);
+//					Vec3 vec = Vec3.createVectorHelper(0, 0, 0);
+                    double angle = quat.setVector(vec);
+                    GL11.glRotatef((float)Math.toDegrees(angle), (float)vec.xCoord, (float)vec.yCoord, (float)vec.zCoord);
+                }
+                glTranslatef((float)(-DimensionSliceEntity.offsetXZ), (float)(-DimensionSliceEntity.offsetY), (float)(-DimensionSliceEntity.offsetXZ));
                 renderInfo.renderTerrain();
                 checkGLError("FZDS terrain display list render");
                 glTranslatef((float)(dse.posX - x), (float)(dse.posY - y), (float)(dse.posZ - z));

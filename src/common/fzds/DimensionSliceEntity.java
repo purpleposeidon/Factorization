@@ -1,5 +1,6 @@
 package factorization.fzds;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,19 +10,19 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.ServerConfigurationManager;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 
+import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import factorization.api.Coord;
+import factorization.api.Quaternion;
 import factorization.common.Core;
 import factorization.fzds.api.IFzdsCustomTeleport;
 import factorization.fzds.api.IFzdsEntryControl;
@@ -31,8 +32,11 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     
     public Coord hammerCell;
     Object renderInfo = null;
-    AxisAlignedBB shadowArea = null, shadowCollisionArea = null, realArea = null, realCollisionArea = null;
+    AxisAlignedBB shadowArea = null, shadowCollisionArea = null, realArea = null, realCollisionArea = null, realDragArea = null;
     MetaAxisAlignedBB metaAABB = null;
+    public Quaternion rotation = new Quaternion(), rotationalVelocity = new Quaternion();
+    public Quaternion prevTickRotation = new Quaternion(); //used on the client
+    private Quaternion last_shared_rotation = new Quaternion(), last_shared_rotational_velocity = new Quaternion(); //used on the server
     
     PacketProxyingPlayer proxy = null;
     boolean needAreaUpdate = true;
@@ -40,6 +44,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     
     static final double offsetXZ = Hammer.cellWidth*16/2.0;
     static final double offsetY = 0; //TODO?
+    private double last_motion_hash = Double.NaN;
     
     public DimensionSliceEntity(World world) {
         super(world);
@@ -72,9 +77,15 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
         double diffX = shadowCoords.xCoord - hammerCell.x;
         double diffY = shadowCoords.yCoord - hammerCell.y;
         double diffZ = shadowCoords.zCoord - hammerCell.z;
-        buffer.xCoord = posX + diffX - offsetXZ;
-        buffer.yCoord = posY + diffY - offsetY;
-        buffer.zCoord = posZ + diffZ - offsetXZ;
+        buffer.xCoord = diffX - offsetXZ;
+        buffer.yCoord = diffY - offsetY;
+        buffer.zCoord = diffZ - offsetXZ;
+        
+        rotation.rotateIncr(buffer);
+        
+        buffer.xCoord += posX;
+        buffer.yCoord += posY;
+        buffer.zCoord += posZ;
         return buffer;
     }
     
@@ -100,11 +111,15 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     @Override
     protected void readEntityFromNBT(NBTTagCompound tag) {
         cell = tag.getInteger("cell");
+        rotation = Quaternion.loadFromTag(tag, "r");
+        rotationalVelocity = Quaternion.loadFromTag(tag, "w");
     }
 
     @Override
     protected void writeEntityToNBT(NBTTagCompound tag) {
         tag.setInteger("cell", cell);
+        rotation.writeToTag(tag, "r");
+        rotationalVelocity.writeToTag(tag, "w");
     }
     
     @Override
@@ -157,7 +172,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
                 }
             }
         }
-        metaAABB = new MetaAxisAlignedBB(hammerCell.w, shadowArea, Vec3.createVectorHelper(odx, ody, odz));
+        metaAABB = new MetaAxisAlignedBB(hammerCell.w, shadowArea, Vec3.createVectorHelper(odx, ody, odz), rotation);
         metaAABB.setUnderlying(realArea);
     }
     
@@ -229,21 +244,39 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
         needAreaUpdate = true;
     }
     
+    boolean updateHashMotion() {
+        double hash = motionX*10 + motionY*1010 + motionZ*101010;
+        if (hash == last_motion_hash) {
+            return false;
+        }
+        last_motion_hash = hash;
+        return true;
+    }
+    
     void updateMotion() {
-        if (motionX == 0 && motionY == 0 && motionZ == 0) {
+        if (motionX == 0 && motionY == 0 && motionZ == 0 && rotationalVelocity.isZero()) {
             return;
         }
         if (realArea == null || metaAABB == null) {
             return;
         }
+        if (realDragArea == null || updateHashMotion() || !rotationalVelocity.isZero()) {
+            realDragArea = realArea.addCoord(motionX, motionY, motionZ);
+        }
         prevPosX = posX;
         prevPosY = posY;
         prevPosZ = posZ;
         
+        Quaternion rotation_copy = new Quaternion(rotation);
+        
         posX += motionX;
         posY += motionY;
         posZ += motionZ;
+        rotation.incrMultiply(rotationalVelocity);
+        last_shared_rotation.incrMultiply(last_shared_rotational_velocity);
+        
         boolean moved = true;
+        
         if (!noClip) {
             List<AxisAlignedBB> collisions = worldObj.getCollidingBoundingBoxes(this, realArea);
             AxisAlignedBB collision = null;
@@ -255,21 +288,55 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
                 }
             }
             if (collision != null) {
-                //XXX TODO: This collision is terrible
+                //XXX TODO: This collision is terribad
                 posX -= motionX;
                 posY -= motionY;
                 posZ -= motionZ;
                 moved = false;
                 setVelocity(0, 0, 0);
+                rotationalVelocity.update(0, 0, 0, 0);
+                rotation = rotation_copy;
             }
         }
         if (moved) {
+            double s = 5;
+            double dx = (posX - prevPosX)*s;
+            double dy = (posY - prevPosY)*s;
+            double dz = (posZ - prevPosZ)*s;
+            List ents = worldObj.getEntitiesWithinAABBExcludingEntity(this, realDragArea);
+            for (int i = 0; i < ents.size(); i++) {
+                Entity e = (Entity) ents.get(i);
+                e.posX += dx;
+                e.posY += dy;
+                e.posZ += dz;
+            }
             updateRealArea();
         }
     }
     
+    void shareRotationInfo() {
+        boolean d0 = !rotation.isEqual(last_shared_rotation), d1 = !rotationalVelocity.isEqual(last_shared_rotational_velocity);
+        Packet toSend = null;
+        if (d0 && d1) {
+            toSend = HammerNet.makePacket(HammerNet.HammerNetType.rotationBoth, entityId, rotation, rotationalVelocity);
+            last_shared_rotation.update(rotation);
+            last_shared_rotational_velocity.update(rotationalVelocity);
+        } else if (d0) {
+            toSend = HammerNet.makePacket(HammerNet.HammerNetType.rotation, entityId, rotation);
+            last_shared_rotation.update(rotation);
+        } else if (d1) {
+            toSend = HammerNet.makePacket(HammerNet.HammerNetType.rotationVelocity, entityId, rotationalVelocity);
+            last_shared_rotational_velocity.update(rotationalVelocity);
+        }
+        if (toSend != null) {
+            PacketDispatcher.sendPacketToAllAround(posX, posY, posZ, 64, this.dimension, toSend);
+        }
+    }
+    
+    
     void doUpdate() {
         if (worldObj.isRemote) {
+            prevTickRotation.update(rotation);
             if (hammerCell == null) {
                 init();
                 return;
@@ -281,6 +348,9 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
             return;
         }
         updateMotion();
+        if (!worldObj.isRemote) {
+            shareRotationInfo();
+        }
         if (needAreaUpdate) {
             Core.profileStart("updateArea");
             updateShadowArea();
@@ -375,7 +445,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
                 return;
             }
         }
-        System.out.println("DSE taking: " + ent); //NORELEASE
+        //System.out.println("DSE taking: " + ent); //NORELEASE
         World shadowWorld = Hammer.getServerShadowWorld();
         Vec3 newLocation = real2shadow(Hammer.ent2vec(ent));
         transferEntity(ent, shadowWorld, newLocation);
@@ -409,7 +479,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
             return;
         }
         if (ent instanceof EntityPlayerMP) {
-            HammerNet.transferPlayer((EntityPlayerMP) ent, this, newWorld, newPosition);
+            //HammerNet.transferPlayer((EntityPlayerMP) ent, this, newWorld, newPosition);
         } else {
             //Inspired by Entity.travelToDimension
             ent.worldObj.setEntityDead(ent);
@@ -480,11 +550,17 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     @Override
     public void writeSpawnData(ByteArrayDataOutput data) {
         data.writeInt(cell);
+        rotation.write(data);
+        rotationalVelocity.write(data);
     }
 
     @Override
     public void readSpawnData(ByteArrayDataInput data) {
         cell = data.readInt();
+        try {
+            rotation = Quaternion.read(data);
+            rotationalVelocity = Quaternion.read(data);
+        } catch (IOException e) { }
     }
     
     @Override
