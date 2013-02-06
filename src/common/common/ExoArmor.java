@@ -85,14 +85,21 @@ public class ExoArmor extends ItemArmor
         Item item = is.getItem();
         if (item instanceof IExoUpgrade) {
             IExoUpgrade upgrade = (IExoUpgrade) is.getItem();
-            return upgrade.canUpgradeArmor(theArmor, armorType);
+            return upgrade.canUpgradeArmor(theArmor, this.armorType);
         }
-        if (is.getItem() instanceof ItemArmor && !(is.getItem() instanceof ISpecialArmor)) {
-            if (((ItemArmor) is.getItem()).armorType == armorType) {
-                return true;
-            }
+        if (isStandardArmor(is)
+                && ((ItemArmor) is.getItem()).armorType == this.armorType) {
+            return true;
         }
         return false;
+    }
+    
+    public static boolean isStandardArmor(ItemStack is) {
+        if (is == null) {
+            return false;
+        }
+        Item it = is.getItem();
+        return it instanceof ItemArmor && !(it instanceof ISpecialArmor);
     }
 
     public void setExoStateType(ItemStack is, int slot, ExoStateType mst) {
@@ -128,6 +135,7 @@ public class ExoArmor extends ItemArmor
     }
 
     static void onTickPlayer(EntityPlayer player, ExoPlayerState mps) {
+        //TODO: Forge has added armor ticking (Would need to update)
         for (ItemStack armorStack : player.inventory.armorInventory) {
             if (armorStack == null) {
                 continue;
@@ -197,7 +205,7 @@ public class ExoArmor extends ItemArmor
             if (is == null) {
                 continue;
             }
-            if (is.getItem().getClass() == ItemArmor.class) {
+            if (isStandardArmor(is)) {
                 if (found_vanilla_armor) {
                     continue;
                 }
@@ -224,7 +232,7 @@ public class ExoArmor extends ItemArmor
             if (is == null) {
                 continue;
             }
-            if (is.getItem().getClass() == ItemArmor.class) {
+            if (isStandardArmor(is)) {
                 if (found_vanilla_armor) {
                     continue;
                 }
@@ -250,7 +258,7 @@ public class ExoArmor extends ItemArmor
             if (is == null) {
                 continue;
             }
-            if (is.getItem().getClass() == ItemArmor.class) {
+            if (isStandardArmor(is)) {
                 if (found_vanilla_armor) {
                     continue;
                 }
