@@ -273,9 +273,14 @@ public class Quaternion {
      */
     public void rotateIncr(Vec3 p) {
         //TODO NORELEASE: This function is named wrong; "applyRotation"
+        //also, rather inefficient
         //return this * p * this^-1
         Quaternion point = new Quaternion(0, p);
         Quaternion trans = this.multiply(point).multiply(this.conjugate());
+//		Quaternion trans = this.multiply(point);
+//		incrConjugate();
+//		trans.multiply(this);
+//		incrConjugate();
         p.xCoord = trans.x;
         p.yCoord = trans.y;
         p.zCoord = trans.z;

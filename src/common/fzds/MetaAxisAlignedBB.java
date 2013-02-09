@@ -38,8 +38,38 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
         return shadowWorld.getAllCollidingBoundingBoxes(aabb);
     }
     
-    AxisAlignedBB AabbReal2Shadow(AxisAlignedBB real) {
-        return real.getOffsetBoundingBox(-offset.xCoord, -offset.yCoord, -offset.zCoord);
+    private AxisAlignedBB biggerBox = AxisAlignedBB.getBoundingBox(0, 0, 0, 1, 1, 1); //could be thread-locale
+    
+    private AxisAlignedBB AabbReal2Shadow(AxisAlignedBB real) {
+        //return real.getOffsetBoundingBox(-offset.xCoord, -offset.yCoord, -offset.zCoord);
+        AxisAlignedBB o = real.getOffsetBoundingBox(-offset.xCoord, -offset.yCoord, -offset.zCoord);
+        return o;
+        /*
+        Vec3[] vecs = RotatedBB.getAabbVertices(o);
+        biggerBox.minX = biggerBox.maxX = vecs[0].xCoord;
+        biggerBox.minY = biggerBox.maxY = vecs[0].yCoord;
+        biggerBox.minZ = biggerBox.maxZ = vecs[0].zCoord;
+        float d = 1F/32F; //TODO: Dynamically adjust this based on angle or something
+        d = 0; //NORELEASE
+        for (int i = 0; i < vecs.length; i++) {
+            Vec3 v = vecs[i];
+            rotation.rotateIncr(v);
+            //TODO NORELEASE rotate silly!
+            biggerBox.minX = Math.min(biggerBox.minX, v.xCoord - d);
+            biggerBox.maxX = Math.max(biggerBox.maxX, v.xCoord + d);
+            biggerBox.minY = Math.min(biggerBox.minY, v.yCoord - d);
+            biggerBox.maxY = Math.max(biggerBox.maxY, v.yCoord + d);
+            biggerBox.minZ = Math.min(biggerBox.minZ, v.zCoord - d);
+            biggerBox.maxZ = Math.max(biggerBox.maxZ, v.zCoord + d);
+        }
+        //System.out.println((biggerBox.maxX - biggerBox.minX) + " " + (biggerBox.maxY - biggerBox.minY) + " " + (biggerBox.maxZ - biggerBox.minZ));
+        if (biggerBox.minX >= biggerBox.maxX || biggerBox.minY >= biggerBox.maxY || biggerBox.minZ >= biggerBox.maxZ) {
+            System.out.println("Error!"); //NORELEASE
+        }
+//		if (!biggerBox.toString().equals(o.toString())) { //NORELEASE
+//			System.out.println("achoo");
+//		}
+        return biggerBox;*/
     }
     
     

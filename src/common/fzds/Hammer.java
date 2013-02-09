@@ -1,10 +1,12 @@
 package factorization.fzds;
 
+import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -45,6 +47,7 @@ import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.common.Core;
+import factorization.common.WeakSet;
 
 @Mod(modid = Hammer.modId, name = Hammer.name, version = Core.version, dependencies = "required-after: " + Core.modId)
 @NetworkMod(clientSideRequired = true, tinyPacketHandler = HammerNet.class)
@@ -62,7 +65,7 @@ public class Hammer {
     public static World worldClient = null; //This is actually a WorldClient that is actually HammerClientProxy.HammerWorldClient
     public static double DSE_ChunkUpdateRangeSquared = Math.pow(16*8, 2); //This is actually set when the server starts
     
-    private static Set<DimensionSliceEntity> serverSlices = new HashSet(), clientSlices = new HashSet();
+    private static WeakSet<DimensionSliceEntity> serverSlices = new WeakSet(), clientSlices = new WeakSet();
     static Set<DimensionSliceEntity> getSlices(World w) {
         if (w == null) {
             if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
@@ -151,7 +154,7 @@ public class Hammer {
     private final static EnumSet<TickType> serverTicks = EnumSet.of(TickType.SERVER);
     final static HammerInfo hammerInfo = new HammerInfo();
     //each cell is a few chunks wide, with chunks of bedrock between.
-    static final int cellWidth = 3;
+    static final int cellWidth = 3; //TODO: Make this more generic; we don't want limitations on size.
     static final int cellHeight = cellWidth;
     static final int wallWidth = 16;
     static final int wallHeight = 16*8; //16*8 is the minimum or something. (For the Chunk constructor that we're using.) I'd rather go with 16*4. Meh.

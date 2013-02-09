@@ -165,6 +165,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
             for (int dx = -width/2; dx < width/2; dx += 16) {
                 for (int dy = 0; dy < height; dy += 16) {
                     for (int dz = -width/2; dz < width/2; dz += 16) {
+                        //could theoretically re-use a single DseCollider for each chunk. Theoretically.
                         Entity e = new DseCollider(this, Vec3.createVectorHelper(dx, dy, dz));
                         e.onEntityUpdate();
                         worldObj.spawnEntityInWorld(e);
