@@ -133,8 +133,14 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             if (Minecraft.getMinecraft().isAmbientOcclusionEnabled() && Core.dimension_slice_allow_smooth) {
                 GL11.glShadeModel(GL11.GL_SMOOTH);
             }
-            
+            GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT);
             for (int pass = 0; pass < 2; pass++) {
+                if (pass == 1) {
+                    //setup transparency
+                    GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                    GL11.glEnable(GL11.GL_BLEND);
+                    //GL11.glDisable(GL11.GL_CULL_FACE);
+                }
                 for (int i = 0; i < renderers.length; i++) {
                     WorldRenderer wr = renderers[i];
                     wr.isInFrustum = true; //XXX might not be necessary
@@ -145,6 +151,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                     }
                 }
             }
+            GL11.glPopAttrib();
         }
         
         void renderEntities(float partialTicks) {
