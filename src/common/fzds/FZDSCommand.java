@@ -40,9 +40,10 @@ public class FZDSCommand extends CommandBase {
         }
         if (args.length == 0) {
             //TODO: Non-shitty command interface
-            sender.sendChatToPlayer("Player: spawn (show #) grass (go [#=0]) (goc [#=0]) leave");
-            sender.sendChatToPlayer("Selected: selection + - remove (s|r|v|w +|= x y z [w]) (rs|rw angle° direction)");
-            sender.sendChatToPlayer("removeall force_cell_allocation_count rot?");
+            sender.sendChatToPlayer("Need player: spawn (show [#=0]) grass (go [#=0]) (goc [#=0]) leave");
+            sender.sendChatToPlayer("Need selection: selection + - remove (s|r|v|w +|= x y z [w]) (rs|rw angle° direction) rot?");
+            sender.sendChatToPlayer("removeall force_cell_allocation_count");
+            sender.sendChatToPlayer("The important commands: goc leave show + rs rw");
             return;
         }
         String cmd = args[0];
@@ -308,7 +309,7 @@ public class FZDSCommand extends CommandBase {
                     sender.sendChatToPlayer("Not a command?");
                 }
             } else if (args[1].equals("=")) {
-                if (type == 'd') {
+                if (type == 'd' || type == 's') {
                     currentWE.setPosition(x, y, z);
                 } else if (type == 'v') {
                     currentWE.motionX = 0;
