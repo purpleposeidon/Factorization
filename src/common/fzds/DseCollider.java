@@ -17,6 +17,8 @@ public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdd
     DimensionSliceEntity parent;
     Vec3 offset;
     
+    int parent_id;
+    
     public DseCollider(World world) {
         super(world);
     }
@@ -31,6 +33,14 @@ public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdd
     @Override
     public void onEntityUpdate() {
         //TODO: Take transformations into account
+        if (worldObj.isRemote && parent == null) {
+            Entity e = worldObj.getEntityByID(parent_id);
+            if (e instanceof DimensionSliceEntity) {
+                parent = (DimensionSliceEntity) e;
+            } else {
+                return;
+            }
+        }
         if (parent.isDead && !worldObj.isRemote) {
             setDead();
             return;
@@ -80,14 +90,7 @@ public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdd
 
     @Override
     public void readSpawnData(ByteArrayDataInput data) {
-        int parent_id = data.readInt();
+        parent_id = data.readInt();
         offset = Vec3.createVectorHelper(data.readDouble(), data.readDouble(), data.readDouble());
-        Entity e = worldObj.getEntityByID(parent_id);
-        if (e instanceof DimensionSliceEntity) {
-            parent = (DimensionSliceEntity) e;
-        } else {
-            Core.logFine("DseCollider's parent didn't exist. (Could be out of range)");
-            setDead();
-        }
     }
 }
