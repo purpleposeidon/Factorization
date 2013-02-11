@@ -506,7 +506,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderMixer();
         new BlockRenderCrystallizer();
         new BlockRenderGreenware().setup();
-        for (FactoryType ft : new FactoryType[] { FactoryType.ROUTER, FactoryType.MAKER, FactoryType.STAMPER, FactoryType.BARREL, FactoryType.PACKAGER, FactoryType.SLAGFURNACE }) {
+        for (FactoryType ft : new FactoryType[] { FactoryType.ROUTER, FactoryType.MAKER, FactoryType.STAMPER, FactoryType.BARREL, FactoryType.PACKAGER, FactoryType.SLAGFURNACE, FactoryType.SOLARBOILER }) {
             FactorizationBlockRender.setDefaultRender(ft);
         }
 
