@@ -63,7 +63,7 @@ public class MiscClientProxy extends MiscProxy {
             mc.thePlayer.addChatMessage(Calendar.getInstance().getTime().toString());
         } else if (n.equalsIgnoreCase("about") || n.equalsIgnoreCase("?") || n.equalsIgnoreCase("help")) {
             mc.thePlayer.addChatMessage("Misc client-side commands; from Factorization by neptunepink");
-        } else if (n.equalsIgnoreCase("clear")) {
+        } else if (n.equalsIgnoreCase("clear") || n.equalsIgnoreCase("cl")) {
             List cp = new ArrayList();
             cp.addAll(mc.ingameGUI.getChatGUI().getSentMessages());
             mc.ingameGUI.getChatGUI().func_73761_a(); //above printChatMessage; clears chatLines and sentMessages 
