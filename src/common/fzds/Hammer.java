@@ -65,7 +65,7 @@ public class Hammer {
     public static World worldClient = null; //This is actually a WorldClient that is actually HammerClientProxy.HammerWorldClient
     public static double DSE_ChunkUpdateRangeSquared = Math.pow(16*8, 2); //This is actually set when the server starts
     
-    private static WeakSet<DimensionSliceEntity> serverSlices = new WeakSet(), clientSlices = new WeakSet();
+    private static Set<DimensionSliceEntity> serverSlices = new WeakSet(), clientSlices = new WeakSet();
     static Set<DimensionSliceEntity> getSlices(World w) {
         if (w == null) {
             if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
