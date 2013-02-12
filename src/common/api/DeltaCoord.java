@@ -1,5 +1,6 @@
 package factorization.api;
 
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.ForgeDirection;
 
 public class DeltaCoord {
@@ -130,5 +131,15 @@ public class DeltaCoord {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+    
+    public void writeToTag(String prefix, NBTTagCompound tag) {
+        tag.setInteger(prefix + "dx", x);
+        tag.setInteger(prefix + "dy", y);
+        tag.setInteger(prefix + "dz", z);
+    }
+    
+    public static DeltaCoord readFromTag(String prefix, NBTTagCompound tag) {
+        return new DeltaCoord(tag.getInteger(prefix + "dx"), tag.getInteger(prefix + "dy"), tag.getInteger(prefix + "dz"));
     }
 }

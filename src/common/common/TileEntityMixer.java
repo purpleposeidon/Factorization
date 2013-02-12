@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Charge;
@@ -140,7 +141,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
 
     int getRemainingProgress() {
-        return 300 - progress;
+        return 150 - progress;
     }
 
     float rotation = 0;
@@ -274,7 +275,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
 
     boolean extractEnergy() {
-        return charge.tryTake(1) > 0;
+        return charge.tryTake(3) > 0;
     }
 
     @Override

@@ -92,14 +92,14 @@ public class FactorizationOreProcessingHandler {
             ItemStack crystal_lead = Core.registry.ore_crystal.makeStack(OreType.LEAD);
             
             TileEntitySlagFurnace.SlagRecipes.register(clean, REDUCE, reduced_lead, REDUCE, reduced_silver);
-            TileEntityCrystallizer.addRecipe(reduced_silver, crystal_silver, CRYSTALLIZE, new ItemStack(Core.registry.acid), 0);
-            TileEntityCrystallizer.addRecipe(reduced_lead, crystal_lead, CRYSTALLIZE, new ItemStack(Core.registry.acid), 0);
+            TileEntityCrystallizer.addRecipe(reduced_silver, crystal_silver, CRYSTALLIZE, Core.registry.aqua_regia, 0);
+            TileEntityCrystallizer.addRecipe(reduced_lead, crystal_lead, CRYSTALLIZE, Core.registry.aqua_regia, 0);
         } else {
             //clean gravel -> reduced chunks
             int r = (int)REDUCE;
             TileEntitySlagFurnace.SlagRecipes.register(clean, r, reduced, REDUCE - r, reduced);
             //reduced chunks -> crystals
-            TileEntityCrystallizer.addRecipe(reduced, crystal, CRYSTALLIZE, new ItemStack(Core.registry.acid), 0);
+            TileEntityCrystallizer.addRecipe(reduced, crystal, CRYSTALLIZE, Core.registry.aqua_regia, 0);
         }
     }
     

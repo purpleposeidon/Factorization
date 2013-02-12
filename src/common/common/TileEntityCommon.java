@@ -60,7 +60,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     void sendFullDescription(EntityPlayer player) {
     }
 
-    boolean canPlaceAgainst(Coord c, int side) {
+    boolean canPlaceAgainst(EntityPlayer player, Coord c, int side) {
         return true;
     }
 

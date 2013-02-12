@@ -344,6 +344,24 @@ public class Core {
         }
     }
     
+    public static void notify(EntityPlayer player, Coord where, NotifyStyle style, String format, String ...args) {
+        if (style == NotifyStyle.FORCE || style == NotifyStyle.FORCELONG) {
+            format = "\b" + format;
+        }
+        if (style == NotifyStyle.LONG || style == NotifyStyle.FORCELONG) {
+            format = "\t" + format;
+        }
+        if (player != null && player.worldObj.isRemote) {
+            FactorizationNotify.addMessage(where, format, args);
+        } else {
+            network.broadcastPacket(player, where, network.notifyPacket(where, format, args));
+        }
+    }
+    
+    public static enum NotifyStyle {
+        FORCE, LONG, FORCELONG
+    }
+    
     enum TabType {
         REDSTONE(CreativeTabs.tabRedstone), TOOLS(CreativeTabs.tabTools), MISC(CreativeTabs.tabMisc), MATERIALS(CreativeTabs.tabMaterials);
         CreativeTabs type;

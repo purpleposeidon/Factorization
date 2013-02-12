@@ -417,6 +417,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
             if (tickEnd) {
                 return;
             }
+            if (kb.keyCode == 0) {
+                return;
+            }
             GuiScreen gui = Minecraft.getMinecraft().currentScreen;
             if (gui != null) {
                 return;
@@ -428,6 +431,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
         public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd) {
             GuiScreen gui = Minecraft.getMinecraft().currentScreen;
             if (gui != null) {
+                return;
+            }
+            if (kb.keyCode == 0) {
                 return;
             }
             Command.exoKeyOff.call(getClientPlayer(), exoIDmap.get(kb));

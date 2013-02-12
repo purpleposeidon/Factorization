@@ -291,6 +291,10 @@ public class BlockFactorization extends BlockContainer {
 
         itemList.add(reg.greenware_item);
         
+        if (reg.rocket_engine != null) {
+            itemList.add(new ItemStack(reg.rocket_engine));
+        }
+        
         //itemList.add(core.cutter_item);
         //itemList.add(core.queue_item);
     }

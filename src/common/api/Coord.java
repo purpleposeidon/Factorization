@@ -542,6 +542,13 @@ public class Coord {
         ent.posZ = z + 0.5;
     }
     
+    public void setAsTileEntityLocation(TileEntity te) {
+        te.worldObj = w;
+        te.xCoord = x;
+        te.yCoord = y;
+        te.zCoord = z;
+    }
+    
     public void moveToTopBlock() {
         for (int dx = -1; dx <= 1; dx++) {
             for (int dz = -1; dz <= 1; dz++) {

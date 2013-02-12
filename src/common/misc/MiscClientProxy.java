@@ -153,7 +153,7 @@ public class MiscClientProxy extends MiscProxy {
         KeyBindingRegistry.registerKeyBinding(new KeyHandler(new KeyBinding[] {sprint}, new boolean[] {true}) {
             @Override
             public String getLabel() {
-                return "FZ sprint (vanilla)";
+                return "FZ Sprint (vanilla)";
             }
             
             @Override
@@ -174,6 +174,9 @@ public class MiscClientProxy extends MiscProxy {
             void sprint(boolean state) {
                 Minecraft mc = Minecraft.getMinecraft();
                 if (mc.thePlayer == null) {
+                    return;
+                }
+                if (sprint.keyCode == 0) {
                     return;
                 }
                 mc.thePlayer.setSprinting(state);

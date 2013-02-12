@@ -30,9 +30,13 @@ public class FactorizationNotify {
         long creationTime;
         
         Message set(Coord locus, String msg) {
+            creationTime = System.currentTimeMillis();
+            if (msg.startsWith("\t")) {
+                msg = msg.substring(1);
+                creationTime += 1000*5;
+            }
             this.locus = locus;
             this.msg = msg;
-            creationTime = System.currentTimeMillis();
             return this;
         }
     }
@@ -50,6 +54,14 @@ public class FactorizationNotify {
             if (player != null) {
                 player.addChatMessage(msg);
             }
+            return;
+        }
+        if (msg.length() == 0) {
+            return;
+        }
+        if (msg.charAt(0) == '\b') {
+            String rest = msg.substring(1);
+            messages.add(new Message().set(locus, rest));
             return;
         }
         if (messages.size() > 2) {

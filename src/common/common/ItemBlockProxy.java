@@ -108,4 +108,9 @@ public class ItemBlockProxy extends Item {
     public boolean getShareTag() {
         return true;
     }
+    
+    @Override
+    public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
+        Core.brand(infoList);
+    }
 }

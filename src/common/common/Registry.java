@@ -26,6 +26,10 @@ import net.minecraftforge.common.DungeonHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.liquids.LiquidContainerData;
+import net.minecraftforge.liquids.LiquidContainerRegistry;
+import net.minecraftforge.liquids.LiquidDictionary;
+import net.minecraftforge.liquids.LiquidStack;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
@@ -55,7 +59,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             slagfurnace_item, battery_item_hidden, heater_item, steamturbine_item, solarboiler_item,
             mirror_item_hidden,
             leadwire_item, grinder_item, mixer_item, crystallizer_item,
-            greenware_item;
+            greenware_item,
+            rocket_engine_item_hidden;
     @Deprecated
     public ItemStack solar_turbine_item;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
@@ -83,6 +88,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemMachineUpgrade barrel_enlarge;
     public ItemStack fake_is;
     public ItemCraftingComponent acid, magnet, insulated_coil, motor, fan, diamond_cutting_head;
+    public ItemStack sulfuric_acid, aqua_regia;
     public ItemChargeMeter charge_meter;
     public ItemMirror mirror;
     public ItemBattery battery;
@@ -93,6 +99,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemAngularSaw angular_saw;
     public ItemCraftingComponent heatHole, logicMatrix, logicMatrixIdentifier, logicMatrixProgrammer;
     public Item fz_steam;
+    public ItemCraftingComponent nether_powder, rocket_fuel, rocket_fuel_liquid_entry;
+    public ItemBlockProxy rocket_engine;
+    public LiquidStack liquidStackRocketFuel;
+    public ItemCraftingComponent bucket_rocket_fuel;
 
     public Material materialMachine = new Material(MapColor.ironColor);
 
@@ -181,6 +191,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         mixer_item = FactoryType.MIXER.itemStack("Mixer");
         crystallizer_item = FactoryType.CRYSTALLIZER.itemStack("Crystallizer");
         greenware_item = FactoryType.GREENWARE.itemStack("Clay Sculpture");
+        rocket_engine_item_hidden = FactoryType.ROCKETENGINE.itemStack("Rocket Engine");
 
         //BlockResource stuff
         silver_ore_item = ResourceType.SILVERORE.itemStack("Silver Ore");
@@ -232,7 +243,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
         //Electricity
         acid = new ItemAcidBottle(itemID("acid", 9024), "Sulfuric Acid", 16 * 3 + 5);
-        OreDictionary.registerOre("sulfuricAcid", acid);
+        sulfuric_acid = new ItemStack(acid, 1);
+        aqua_regia = new ItemStack(acid, 1, 1);
+        addName(acid.getItemNameIS(aqua_regia), "Aqua Regia");
+        OreDictionary.registerOre("sulfuricAcid", sulfuric_acid);
+        OreDictionary.registerOre("aquaRegia", aqua_regia);
         magnet = new ItemCraftingComponent(itemID("magnet", 9025), "Magnet", 16 * 3 + 6);
         insulated_coil = new ItemCraftingComponent(itemID("coil", 9026), "Insulated Coil", 16 * 3 + 7);
         motor = new ItemCraftingComponent(itemID("motor", 9027), "Motor", 16 * 3 + 8);
@@ -291,6 +306,16 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         fz_steam.setIconIndex(3*16 + 4);
         fz_steam.setItemName("steam");
         addName(fz_steam, "Steam");
+        
+        //Rocketry
+        nether_powder = new ItemCraftingComponent(itemID("netherPowder", 9050), "Nether Powder", 9 + 16*2);
+        rocket_fuel = new ItemCraftingComponent(itemID("heldRocketFuel", 9051), "Rocket Fuel", 10 + 16*2);
+        rocket_fuel_liquid_entry = new ItemCraftingComponent(itemID("liquidRocketFuel", 9052), "Rocket Fuel", 4 + 16*2);
+        rocket_fuel_liquid_entry.setTextureFile(Core.texture_file_block);
+        rocket_engine = (ItemBlockProxy)(new ItemBlockProxy(itemID("rocketEngine", 9053), rocket_engine_item_hidden).setTextureFile(Core.texture_file_item).setIconCoord(0, 7).setItemName("rocketEngine"));
+        bucket_rocket_fuel = new ItemCraftingComponent(itemID("bucketRocketFuel", 9054), "Bucket of Rocket Fuel", 11 + 16*2);
+        bucket_rocket_fuel.setMaxStackSize(1);
+        bucket_rocket_fuel.setContainerItem(Item.bucketEmpty);
     }
 
     void recipe(ItemStack res, Object... params) {
@@ -668,8 +693,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //Electricity
 
         
-        shapelessRecipe(new ItemStack(acid), Item.gunpowder, Item.gunpowder, Item.coal, Item.potion);
-        shapelessOreRecipe(new ItemStack(acid), "dustSulfur", Item.coal, Item.potion);
+        shapelessRecipe(sulfuric_acid, Item.gunpowder, Item.gunpowder, Item.coal, Item.potion);
+        shapelessOreRecipe(sulfuric_acid, "dustSulfur", Item.coal, Item.potion);
+        shapelessRecipe(aqua_regia, sulfuric_acid, nether_powder, Item.fireballCharge);
         recipe(new ItemStack(fan),
                 "I I",
                 " I ",
@@ -812,6 +838,22 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'U', Item.cauldron);
         ItemStack lime = new ItemStack(Item.dyePowder, 1, 10);
         TileEntityCrystallizer.addRecipe(lime, new ItemStack(Item.slimeBall), 1, new ItemStack(Item.bucketMilk), 0);
+        
+        //Rocketry
+        TileEntityGrinder.addRecipe(new ItemStack(Block.netherrack), new ItemStack(nether_powder), 0);
+        shapelessRecipe(new ItemStack(rocket_fuel, 3), nether_powder, nether_powder, nether_powder, Item.fireballCharge);
+        liquidStackRocketFuel = new LiquidStack(rocket_fuel_liquid_entry, 0);
+        LiquidDictionary.getOrCreateLiquid("Factorization$powderRocketFuel", liquidStackRocketFuel);
+        recipe(new ItemStack(rocket_engine),
+                "#F#",
+                "#I#",
+                "I I",
+                '#', Block.blockSteel,
+                'F', rocket_fuel,
+                'I', Item.ingotIron);
+        shapelessRecipe(new ItemStack(bucket_rocket_fuel), Item.bucketEmpty, rocket_fuel, rocket_fuel);
+        LiquidContainerRegistry.registerLiquid(new LiquidContainerData(new LiquidStack(rocket_fuel_liquid_entry, LiquidContainerRegistry.BUCKET_VOLUME/2), new ItemStack(rocket_fuel, 1), new ItemStack(Item.bucketEmpty, 1)));
+        LiquidContainerRegistry.registerLiquid(new LiquidContainerData(new LiquidStack(rocket_fuel_liquid_entry, LiquidContainerRegistry.BUCKET_VOLUME), new ItemStack(bucket_rocket_fuel, 1), LiquidContainerRegistry.EMPTY_BUCKET));
     }
 
     public void setToolEffectiveness() {

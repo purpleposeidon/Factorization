@@ -34,7 +34,7 @@ public class ItemFactorization extends ItemBlock {
         }
         TileEntity te = f.makeTileEntity();
         if (te instanceof TileEntityCommon) {
-            boolean good = ((TileEntityCommon) te).canPlaceAgainst(here.copy().towardSide(CubeFace.oppositeSide(side)), side);
+            boolean good = ((TileEntityCommon) te).canPlaceAgainst(player, here.copy().towardSide(CubeFace.oppositeSide(side)), side);
             if (!good) {
                 return false;
             }

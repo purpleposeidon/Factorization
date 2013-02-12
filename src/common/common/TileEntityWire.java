@@ -76,7 +76,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
             return false;
         }
         for (byte side = 0; side < 6; side++) {
-            if (canPlaceAgainst(getCoord().towardSide(side), side)) {
+            if (canPlaceAgainst(null, getCoord().towardSide(side), side)) {
                 supporting_side = side;
                 shareInfo();
                 return true;
@@ -114,7 +114,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     }
 
     @Override
-    boolean canPlaceAgainst(Coord supporter, int side) {
+    boolean canPlaceAgainst(EntityPlayer player, Coord supporter, int side) {
         if (supporter.isSolidOnSide(side)) {
             return true;
         }

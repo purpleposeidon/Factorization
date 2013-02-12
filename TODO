@@ -205,6 +205,39 @@ Wand of Cooling:
   Due to the durability & simplicity of its components, the Wand of Cooling lasts for a fairly long time.
   Used to make a refrigerator? Carnot engines?
 
+Shapeless Recipes & the Mixer
+=============================
+I'd like to change the mixer into a machine that crafts shapeless recipes. But there's a few items that makes this weird.
+
+New mixer recipe:
+  IXI Iron, X=fan, Redstone, Motor, Lead, Cauldron
+  RMR
+  LCL
+
+And stop rendering with water in it
+
+Crafting limitations:
+  books, vanilla has "3 paper + 1 leather". Change to:
+    PPP
+     L
+
+  Writable book, vanilla has "1 book, 1 feather, 1 inksack". Change to
+     F
+    BI
+
+  single-items (sugar, bonemeal; use a stamper)
+  Probably only vanilla ShapelessRecipe and forge ShapelessOreRecipe
+  Maybe aks someone if doing this is cool?
+  Would definitely need a config option for this
+
+Crafting extensions:
+  May want an API! Simple... if irecipe.getClass() in someClassList, composed of:
+    RecipesArmorDyes.class
+    RecipeFireworks.class
+
+Note: Can't simply run it in a 2x2 crafting grid; might have a recipe requiring "2 foo, 1 bar", but vanilla-style'd have it crafted like "FBF"; we need to be able to craft it even if they're not separated out
+
+
 WRATH
 =====
 
