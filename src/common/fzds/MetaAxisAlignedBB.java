@@ -2,14 +2,11 @@ package factorization.fzds;
 
 import java.util.List;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
 import factorization.api.Quaternion;
+import factorization.common.FactorizationUtil;
 
 public class MetaAxisAlignedBB extends AxisAlignedBB {
     World shadowWorld;
@@ -32,42 +29,8 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
         return this;
     }
     
-    static boolean intersect(double la, double ha, double lb, double hb) {
-        //If we don't intersect, then we're overlapping.
-        //If we're not overlapping, then one is to the right of the other.
-        //<--  (la ha) -- (lb hb) -->
-        //<--- (lb hb) -- (la ha) -->
-        return !(ha < lb || hb < la);
-    }
-    
     List<AxisAlignedBB> getUnderlying(AxisAlignedBB aabb) {
         return shadowWorld.getAllCollidingBoundingBoxes(aabb);
-    }
-    
-    private AxisAlignedBB biggerBox = AxisAlignedBB.getBoundingBox(0, 0, 0, 1, 1, 1); //could be thread-locale NORELEASE still used?
-    
-    private Vec3 getMin(AxisAlignedBB aabb) {
-        return Vec3.createVectorHelper(aabb.minX, aabb.minY, aabb.minZ);
-    }
-    
-    private void setMin(AxisAlignedBB aabb, Vec3 v) {
-        aabb.minX = v.xCoord;
-        aabb.minY = v.yCoord;
-        aabb.minZ = v.zCoord;
-    }
-    
-    private Vec3 getMax(AxisAlignedBB aabb) {
-        return Vec3.createVectorHelper(aabb.maxX, aabb.maxY, aabb.maxZ);
-    }
-    
-    private void setMax(AxisAlignedBB aabb, Vec3 v) {
-        aabb.maxX = v.xCoord;
-        aabb.maxY = v.yCoord;
-        aabb.maxZ = v.zCoord;
-    }
-    
-    private Vec3 averageVec(Vec3 a, Vec3 b) {
-        return Vec3.createVectorHelper((a.xCoord + b.xCoord)/2, (a.yCoord + b.yCoord)/2, (a.zCoord + b.zCoord)/2);
     }
     
     private void shadow2rotation(Vec3 v) {
@@ -84,16 +47,6 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
         v.zCoord += shadow2rotationOrigin.zCoord;
     }
     
-    private void markVector(Vec3 v, double r, double g, double b) { //NORELEASE
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
-            //System.out.println("--> " + v);
-            EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-            player.worldObj.spawnParticle("reddust", v.xCoord, v.yCoord, v.zCoord, r - 1, g, b);
-        }
-    }
-    
-    
-    
     private AxisAlignedBB AabbReal2Shadow(AxisAlignedBB real) {
         //return real.getOffsetBoundingBox(-offset.xCoord, -offset.yCoord, -offset.zCoord);
         /*
@@ -102,9 +55,9 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
          * Real space -> hammer space -> rotation space; rotate -> un-rotation space == hammer space
          */
         AxisAlignedBB shadow = real.getOffsetBoundingBox(-offset.xCoord, -offset.yCoord, -offset.zCoord);
-        Vec3 shadowMax = getMax(shadow);
-        Vec3 shadowMin = getMin(shadow);
-        Vec3 centerInShadowSpace = averageVec(shadowMax, shadowMin);
+        Vec3 shadowMax = FactorizationUtil.getMax(shadow);
+        Vec3 shadowMin = FactorizationUtil.getMin(shadow);
+        Vec3 centerInShadowSpace = FactorizationUtil.averageVec(shadowMax, shadowMin);
         Vec3 center = centerInShadowSpace.addVector(0, 0, 0);
         shadow2rotation(center);
         rotation.rotateIncr(center);

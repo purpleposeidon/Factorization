@@ -17,7 +17,9 @@ import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.ISidedInventory;
@@ -27,6 +29,8 @@ import net.minecraftforge.liquids.LiquidTank;
 import factorization.api.Coord;
 
 public class FactorizationUtil {
+    //ItemStack handling
+    
     public static boolean identical(ItemStack a, ItemStack b) {
         //Checks NBT data
         //return ItemStack.areItemStacksEqual(a, b);
@@ -84,6 +88,8 @@ public class FactorizationUtil {
         int max = Math.min(is.getMaxStackSize(), stackLimit);
         return Math.max(0, max - is.stackSize);
     }
+    
+    //Slot transfering
 
     /**
      * Use transferSlotToSlots
@@ -216,7 +222,69 @@ public class FactorizationUtil {
 
         return chest;
     }
+    
+    public static class ISidedWrapper implements IInventory {
+        ISidedInventory isi;
+        ForgeDirection side;
+        public ISidedWrapper(ISidedInventory isi, ForgeDirection side) {
+            this.isi = isi;
+            this.side = side;
+        }
+        
+        @Override
+        public int getSizeInventory() {
+            return isi.getSizeInventorySide(side);
+        }
+        
+        private int getSlot(int slotIndex) {
+            return isi.getStartInventorySide(side) + slotIndex;
+        }
 
+        @Override
+        public ItemStack getStackInSlot(int slotIndex) {
+            return isi.getStackInSlot(getSlot(slotIndex));
+        }
+
+        @Override
+        public ItemStack decrStackSize(int slotIndex, int amount) {
+            return isi.decrStackSize(getSlot(slotIndex), amount);
+        }
+
+        @Override
+        public void setInventorySlotContents(int slotIndex, ItemStack stack) {
+            isi.setInventorySlotContents(getSlot(slotIndex), stack);
+        }
+
+        @Override
+        public String getInvName() {
+            return isi.getInvName();
+        }
+
+        @Override
+        public int getInventoryStackLimit() {
+            return isi.getInventoryStackLimit();
+        }
+
+        @Override
+        public void onInventoryChanged() {
+            isi.onInventoryChanged();
+        }
+
+        @Override
+        public ItemStack getStackInSlotOnClosing(int var1) { return null; }
+        
+        @Override
+        public boolean isUseableByPlayer(EntityPlayer var1) { return true; }
+
+        @Override
+        public void openChest() {}
+
+        @Override
+        public void closeChest() {}
+        
+    }
+    
+    //Recipe creation
     public static IRecipe createShapedRecipe(ItemStack result, Object... args) {
         String var3 = "";
         int var4 = 0;
@@ -345,66 +413,8 @@ public class FactorizationUtil {
         return values[next];
     }
     
-    public static class ISidedWrapper implements IInventory {
-        ISidedInventory isi;
-        ForgeDirection side;
-        public ISidedWrapper(ISidedInventory isi, ForgeDirection side) {
-            this.isi = isi;
-            this.side = side;
-        }
-        
-        @Override
-        public int getSizeInventory() {
-            return isi.getSizeInventorySide(side);
-        }
-        
-        private int getSlot(int slotIndex) {
-            return isi.getStartInventorySide(side) + slotIndex;
-        }
-
-        @Override
-        public ItemStack getStackInSlot(int slotIndex) {
-            return isi.getStackInSlot(getSlot(slotIndex));
-        }
-
-        @Override
-        public ItemStack decrStackSize(int slotIndex, int amount) {
-            return isi.decrStackSize(getSlot(slotIndex), amount);
-        }
-
-        @Override
-        public void setInventorySlotContents(int slotIndex, ItemStack stack) {
-            isi.setInventorySlotContents(getSlot(slotIndex), stack);
-        }
-
-        @Override
-        public String getInvName() {
-            return isi.getInvName();
-        }
-
-        @Override
-        public int getInventoryStackLimit() {
-            return isi.getInventoryStackLimit();
-        }
-
-        @Override
-        public void onInventoryChanged() {
-            isi.onInventoryChanged();
-        }
-
-        @Override
-        public ItemStack getStackInSlotOnClosing(int var1) { return null; }
-        
-        @Override
-        public boolean isUseableByPlayer(EntityPlayer var1) { return true; }
-
-        @Override
-        public void openChest() {}
-
-        @Override
-        public void closeChest() {}
-        
-    }
+    
+    //Liquid tank handling
     
     public static void writeTank(NBTTagCompound tag, LiquidTank tank, String name) {
         LiquidStack ls = tank.getLiquid();
@@ -427,5 +437,38 @@ public class FactorizationUtil {
             return;
         }
         LiquidEvent.fireEvent(new LiquidEvent.LiquidSpilledEvent(what, where.w, where.x, where.y, where.z));
+    }
+    
+    //AxisAlignedBB & Vec3 stuff
+    public static Vec3 getMin(AxisAlignedBB aabb) {
+        return Vec3.createVectorHelper(aabb.minX, aabb.minY, aabb.minZ);
+    }
+    
+    public static void setMin(AxisAlignedBB aabb, Vec3 v) {
+        aabb.minX = v.xCoord;
+        aabb.minY = v.yCoord;
+        aabb.minZ = v.zCoord;
+    }
+    
+    public static Vec3 getMax(AxisAlignedBB aabb) {
+        return Vec3.createVectorHelper(aabb.maxX, aabb.maxY, aabb.maxZ);
+    }
+    
+    public static void setMax(AxisAlignedBB aabb, Vec3 v) {
+        aabb.maxX = v.xCoord;
+        aabb.maxY = v.yCoord;
+        aabb.maxZ = v.zCoord;
+    }
+    
+    public static Vec3 averageVec(Vec3 a, Vec3 b) {
+        return Vec3.createVectorHelper((a.xCoord + b.xCoord)/2, (a.yCoord + b.yCoord)/2, (a.zCoord + b.zCoord)/2);
+    }
+    
+    public static boolean intersect(double la, double ha, double lb, double hb) {
+        //If we don't intersect, then we're overlapping.
+        //If we're not overlapping, then one is to the right of the other.
+        //<--  (la ha) -- (lb hb) -->
+        //<--- (lb hb) -- (la ha) -->
+        return !(ha < lb || hb < la);
     }
 }

@@ -36,6 +36,7 @@ import cpw.mods.fml.common.TickType;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.common.Core;
+import factorization.common.FactorizationUtil;
 
 
 public class RenderDimensionSliceEntity extends Render implements IScheduledTickHandler {
@@ -214,14 +215,6 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         }
     }
     
-    static boolean intersect(int la, int ha, int lb, int hb) {
-        //If we don't intersect, then we're overlapping.
-        //If we're not overlapping, then one is to the right of the other.
-        //<--- (la ha) -- (lb hb) -->
-        //<--- (lb hb) -- (la ha) -->
-        return !(ha < lb || hb < la);
-    }
-    
     static void markBlocksForUpdate(DimensionSliceEntity dse, int lx, int ly, int lz, int hx, int hy, int hz) {
         if (dse.renderInfo == null) {
             dse.renderInfo = instance.new DSRenderInfo(dse, dse.hammerCell);
@@ -229,9 +222,9 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         DSRenderInfo renderInfo = (DSRenderInfo) dse.renderInfo;
         for (int i = 0; i < renderInfo.renderers.length; i++) {
             WorldRenderer wr = renderInfo.renderers[i];
-            if (intersect(lx, lx, wr.posX, wr.posX + 16) &&
-                    intersect(ly, ly, wr.posY, wr.posY + 16) && 
-                    intersect(lz, lz, wr.posZ, wr.posZ + 16)) {
+            if (FactorizationUtil.intersect(lx, lx, wr.posX, wr.posX + 16) &&
+                    FactorizationUtil.intersect(ly, ly, wr.posY, wr.posY + 16) && 
+                    FactorizationUtil.intersect(lz, lz, wr.posZ, wr.posZ + 16)) {
                 wr.markDirty();
             }
         }
