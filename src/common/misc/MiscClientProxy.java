@@ -2,10 +2,22 @@ package factorization.misc;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.EnumSet;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.settings.GameSettings;
+import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.stats.AchievementList;
+import net.minecraft.stats.StatFileWriter;
+import cpw.mods.fml.client.registry.KeyBindingRegistry;
+import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
+import cpw.mods.fml.common.IScheduledTickHandler;
+import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.common.registry.TickRegistry;
+import cpw.mods.fml.relauncher.Side;
 import factorization.common.Core;
 
 public class MiscClientProxy extends MiscProxy {
@@ -72,5 +84,101 @@ public class MiscClientProxy extends MiscProxy {
             EntityClientPlayerMP player = mc.thePlayer;
             player.sendChatMessage("/me is at " + ((int) player.posX) + ", " + ((int) player.posY) + ", " + ((int) player.posZ));
         }
+    }
+    
+    @Override
+    void fixAchievements() {
+        //give the first achievement, because it is stupid and nobody cares.
+        //If you're using this mod, you've probably opened your inventory before anyways.
+        StatFileWriter sfw = Minecraft.getMinecraft().statFileWriter;
+        if (sfw != null && !sfw.hasAchievementUnlocked(AchievementList.openInventory) && !Core.add_branding) {
+            sfw.readStat(AchievementList.openInventory, 1);
+            Core.logInfo("Achievement Get! You've opened your inventory hundreds of times already! Yes! You're welcome!");
+        }
+        Minecraft.memoryReserve = new byte[0]; //Consider it an experiment. Would this break anything? I've *never* seen the out of memory screen.
+    }
+    
+    @Override
+    void registerLoadAlert() {
+        IScheduledTickHandler th = new IScheduledTickHandler() {
+            boolean hit = false;
+            int count = 0;
+            @Override
+            public EnumSet<TickType> ticks() {
+                if (hit) {
+                    return EnumSet.noneOf(TickType.class);
+                }
+                return EnumSet.of(TickType.CLIENT);
+            }
+            
+            @Override
+            public void tickStart(EnumSet<TickType> type, Object... tickData) {
+                if (type.contains(TickType.CLIENT)) {
+                    Minecraft mc = Minecraft.getMinecraft();
+                    if (count == 40) {
+                        //playing any earlier doesn't seem to work (sound is probably loaded in a separate thread?)
+                        if (mc.currentScreen instanceof GuiMainMenu) {
+                            mc.sndManager.playSoundFX("random.click", 1.0F, 1.0F);
+                            Core.logInfo("Click!");
+                        }
+                        hit = true;
+                    }
+                    count++;
+                }
+            }
+            
+            @Override
+            public void tickEnd(EnumSet<TickType> type, Object... tickData) { }
+
+            @Override
+            public int nextTickSpacing() {
+                if (hit) {
+                    return 100000;
+                }
+                return 1;
+            }
+            
+            @Override
+            public String getLabel() {
+                return "FZMisc waiting for Main Menu";
+            }
+        };
+        TickRegistry.registerScheduledTickHandler(th, Side.CLIENT);
+    }
+    
+    
+    KeyBinding sprint = new KeyBinding("FZ vanilla sprint", 0);
+    @Override
+    void registerSprintKey() {
+        KeyBindingRegistry.registerKeyBinding(new KeyHandler(new KeyBinding[] {sprint}, new boolean[] {true}) {
+            @Override
+            public String getLabel() {
+                return "FZ sprint (vanilla)";
+            }
+            
+            @Override
+            public EnumSet<TickType> ticks() {
+                return EnumSet.of(TickType.CLIENT);
+            }
+            
+            @Override
+            public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd) {
+                sprint(false);
+            }
+            
+            @Override
+            public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd, boolean isRepeat) {
+                sprint(true);
+            }
+            
+            void sprint(boolean state) {
+                Minecraft mc = Minecraft.getMinecraft();
+                if (mc.thePlayer == null) {
+                    return;
+                }
+                mc.thePlayer.setSprinting(state);
+                mc.gameSettings.keyBindForward.pressed = state;
+            }
+        });
     }
 }

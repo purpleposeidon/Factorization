@@ -8,19 +8,28 @@ import java.util.List;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.stats.AchievementList;
 import net.minecraftforge.common.DungeonHooks;
+import cpw.mods.fml.common.ICraftingHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Init;
+import cpw.mods.fml.common.Mod.PostInit;
 import cpw.mods.fml.common.Mod.PreInit;
 import cpw.mods.fml.common.Mod.ServerStarting;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.PacketDispatcher;
+import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.common.Core;
 
 @Mod(modid = MiscellaneousNonsense.modId, name = MiscellaneousNonsense.name, version = Core.version, dependencies = "required-after: " + Core.modId)
@@ -33,6 +42,8 @@ public class MiscellaneousNonsense {
     public static MiscProxy proxy;
     public static MiscellaneousNonsense instance;
     
+    public static final String RichardG_touches_himself_while_reading_my_code = "Confirmed to be true; there have been multiple sightings by respected authorities";
+    
     public MiscellaneousNonsense() {
         MiscellaneousNonsense.instance = this;
     }
@@ -40,7 +51,12 @@ public class MiscellaneousNonsense {
     @PreInit
     public void setParent(FMLPreInitializationEvent event) {
         event.getModMetadata().parent = Core.modId;
-        DungeonHooks.addDungeonMob("Creeper", 1);
+    }
+    
+    @PostInit
+    public void modsLoaded(FMLPostInitializationEvent event) {
+        //Fixes lack of creeper dungeons
+        DungeonHooks.addDungeonMob("Creeper", 1); //Etho, of all people, found one. It'd be nice if they were just a bit rarer.
         String THATS_SOME_VERY_NICE_SOURCE_CODE_YOU_HAVE_THERE[] = {
                 "##  ##",
                 "##  ##",
@@ -48,12 +64,29 @@ public class MiscellaneousNonsense {
                 " #### ",
                 " #  # "
         };
-        //TODO: Play click sound when MC starts up
-        //TODO: move in achievements fixes
-        //TODO: Running key
-        //TODO: Middle-click
-        //TODO: Netherstar sandwich ;D
-        //Chocolate bars, chocolate blocks, cheese blocks
+        
+        //Fixes achievements
+        proxy.fixAchievements();
+        GameRegistry.registerCraftingHandler(new ICraftingHandler() {
+            @Override public void onSmelting(EntityPlayer player, ItemStack item) { }
+            
+            @Override
+            public void onCrafting(EntityPlayer player, ItemStack stack, IInventory craftMatrix) {
+                if (player == null) {
+                    return;
+                }
+                Item item = stack.getItem();
+                if (item == Item.hoeStone || item == Item.hoeSteel) {
+                    player.addStat(AchievementList.buildHoe, 1);
+                }
+                if (item == Item.swordStone || item == Item.swordSteel) {
+                    player.addStat(AchievementList.buildSword, 1);
+                }
+            }
+        });
+        proxy.registerLoadAlert();
+        proxy.registerSprintKey();
+        //TODO: Make middle-clicking nicer
     }
     
     @ServerStarting

@@ -162,8 +162,6 @@ public abstract class FactorizationProxy implements IGuiHandler {
         return false;
     }
 
-    public void fixAchievements() { }
-
     public String getExoKeyBrief(int keyindex) {
         return "ExoKey" + keyindex;
     }

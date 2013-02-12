@@ -942,16 +942,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
     @Override
     public void onCrafting(EntityPlayer player, ItemStack stack, IInventory craftMatrix) {
-        //fixes for shitty MC achievements
-        if (player != null) {
-            Item item = stack.getItem();
-            if (item == Item.hoeStone || item == Item.hoeSteel) {
-                player.addStat(AchievementList.buildHoe, 1);
-            }
-            if (item == Item.swordStone || item == Item.swordSteel) {
-                player.addStat(AchievementList.buildSword, 1);
-            }
-        }
         //our regular programming
         for (int i = 0; i < craftMatrix.getSizeInventory(); i++) {
             ItemStack here = craftMatrix.getStackInSlot(i);

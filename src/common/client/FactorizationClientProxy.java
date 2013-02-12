@@ -519,19 +519,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
     }
     
     @Override
-    public void fixAchievements() {
-        //give the first achievement, because it is stupid and nobody cares.
-        //If you're using this mod, you've probably opened your inventory before anyways.
-        StatFileWriter sfw = Minecraft.getMinecraft().statFileWriter;
-        if (sfw != null && !sfw.hasAchievementUnlocked(AchievementList.openInventory) && !Core.add_branding) {
-            sfw.readStat(AchievementList.openInventory, 1);
-            Core.logInfo("Achievement Get! You've opened your inventory hundreds of times already! Yes! You're welcome!");
-        }
-        Minecraft.memoryReserve = new byte[0]; //Consider it an experiment. Would this break anything? I've *never* seen the out of memory screen.
-        System.gc();
-    }
-    
-    @Override
     public String getExoKeyBrief(int keyindex) {
         int key = ((FactorizationClientProxy) Core.proxy).exoKeys[keyindex - 1].keyCode;
         return GameSettings.getKeyDisplayString(key);

@@ -46,7 +46,6 @@ public class Core {
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
     public static final String version = "0.7.17"; //@VERSION@
-    public static final boolean RichardG_touches_himself_while_reading_my_code = true;
     public Core() {
         registry = new Registry();
         exoCore = new ExoCore();
@@ -242,7 +241,6 @@ public class Core {
         TileEntityWrathFire.setupBurning();
         TileEntitySolarBoiler.setupSteam();
         foph.addDictOres();
-        proxy.fixAchievements();
     }
     
     @ServerStarting
