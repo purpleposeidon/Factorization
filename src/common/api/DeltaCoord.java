@@ -1,5 +1,9 @@
 package factorization.api;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.ForgeDirection;
 
@@ -141,5 +145,15 @@ public class DeltaCoord {
     
     public static DeltaCoord readFromTag(String prefix, NBTTagCompound tag) {
         return new DeltaCoord(tag.getInteger(prefix + "dx"), tag.getInteger(prefix + "dy"), tag.getInteger(prefix + "dz"));
+    }
+    
+    public static DeltaCoord read(DataInput di) throws IOException {
+        return new DeltaCoord(di.readInt(), di.readInt(), di.readInt());
+    }
+    
+    public void write(DataOutput out) throws IOException {
+        for (int i = 0; i < 3; i++) {
+            out.writeInt(get(i));
+        }
     }
 }

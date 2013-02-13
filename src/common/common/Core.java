@@ -351,10 +351,13 @@ public class Core {
         if (style == NotifyStyle.LONG || style == NotifyStyle.FORCELONG) {
             format = "\t" + format;
         }
-        if (player != null && player.worldObj.isRemote) {
-            FactorizationNotify.addMessage(where, format, args);
-        } else {
-            network.broadcastPacket(player, where, network.notifyPacket(where, format, args));
+        notify(player, where, format, args);
+    }
+    
+    public static void clearNotifications(EntityPlayer player) {
+        if (player != null) {
+            //We aren't willing to do global clears
+            notify(player, new Coord(player), "!clear");
         }
     }
     

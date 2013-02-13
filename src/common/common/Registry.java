@@ -131,6 +131,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
     void registerSimpleTileEntities() {
         FactoryType.registerTileEntities();
+        GameRegistry.registerTileEntity(TileEntityFzNull.class, "fz.null");
         //TileEntity renderers are registered in the client proxy
 
         EntityRegistry.registerGlobalEntityID(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", Core.entity_relight_task_id);
@@ -308,11 +309,12 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         addName(fz_steam, "Steam");
         
         //Rocketry
-        nether_powder = new ItemCraftingComponent(itemID("netherPowder", 9050), "Nether Powder", 9 + 16*2);
+        nether_powder = new ItemCraftingComponent(itemID("netherPowder", 9050), "Netherrack Powder", 9 + 16*2);
         rocket_fuel = new ItemCraftingComponent(itemID("heldRocketFuel", 9051), "Rocket Fuel", 10 + 16*2);
         rocket_fuel_liquid_entry = new ItemCraftingComponent(itemID("liquidRocketFuel", 9052), "Rocket Fuel", 4 + 16*2);
         rocket_fuel_liquid_entry.setTextureFile(Core.texture_file_block);
-        rocket_engine = (ItemBlockProxy)(new ItemBlockProxy(itemID("rocketEngine", 9053), rocket_engine_item_hidden).setTextureFile(Core.texture_file_item).setIconCoord(0, 7).setItemName("rocketEngine"));
+        rocket_engine = (ItemBlockProxy)(new ItemBlockProxy(itemID("rocketEngine", 9053), rocket_engine_item_hidden).setTextureFile(Core.texture_file_item).setIconCoord(7, 0).setItemName("rocketEngine")).setMaxStackSize(1);
+        addName(rocket_engine, "Rocket Engine");
         bucket_rocket_fuel = new ItemCraftingComponent(itemID("bucketRocketFuel", 9054), "Bucket of Rocket Fuel", 11 + 16*2);
         bucket_rocket_fuel.setMaxStackSize(1);
         bucket_rocket_fuel.setContainerItem(Item.bucketEmpty);
@@ -840,7 +842,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         TileEntityCrystallizer.addRecipe(lime, new ItemStack(Item.slimeBall), 1, new ItemStack(Item.bucketMilk), 0);
         
         //Rocketry
-        TileEntityGrinder.addRecipe(new ItemStack(Block.netherrack), new ItemStack(nether_powder), 0);
+        TileEntityGrinder.addRecipe(new ItemStack(Block.netherrack), new ItemStack(nether_powder, 1), 1);
         shapelessRecipe(new ItemStack(rocket_fuel, 3), nether_powder, nether_powder, nether_powder, Item.fireballCharge);
         liquidStackRocketFuel = new LiquidStack(rocket_fuel_liquid_entry, 0);
         LiquidDictionary.getOrCreateLiquid("Factorization$powderRocketFuel", liquidStackRocketFuel);
@@ -852,8 +854,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'F', rocket_fuel,
                 'I', Item.ingotIron);
         shapelessRecipe(new ItemStack(bucket_rocket_fuel), Item.bucketEmpty, rocket_fuel, rocket_fuel);
-        LiquidContainerRegistry.registerLiquid(new LiquidContainerData(new LiquidStack(rocket_fuel_liquid_entry, LiquidContainerRegistry.BUCKET_VOLUME/2), new ItemStack(rocket_fuel, 1), new ItemStack(Item.bucketEmpty, 1)));
-        LiquidContainerRegistry.registerLiquid(new LiquidContainerData(new LiquidStack(rocket_fuel_liquid_entry, LiquidContainerRegistry.BUCKET_VOLUME), new ItemStack(bucket_rocket_fuel, 1), LiquidContainerRegistry.EMPTY_BUCKET));
+        ItemStack air = new ItemStack(Item.bucketEmpty, 0);
+        ItemStack emptyBucket = new ItemStack(Item.bucketEmpty, 1);
+        LiquidContainerRegistry.registerLiquid(new LiquidContainerData(new LiquidStack(rocket_fuel_liquid_entry, LiquidContainerRegistry.BUCKET_VOLUME/2), new ItemStack(rocket_fuel, 1), air));
+        LiquidContainerRegistry.registerLiquid(new LiquidContainerData(new LiquidStack(rocket_fuel_liquid_entry, LiquidContainerRegistry.BUCKET_VOLUME), new ItemStack(bucket_rocket_fuel, 1), emptyBucket));
     }
 
     public void setToolEffectiveness() {

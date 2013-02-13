@@ -40,7 +40,7 @@ public class BlockFactorization extends BlockContainer {
         //This is because portalgun relies on this to make a TE that won't drop anything when it's moving it.
         //But when this returned null, it wouldn't remove the real TE. So, the tile entity was both having its block broken, and being moved.
         //Returning a generic TE won't be an issue for us as we always use coord.getTE, and never assume, right?
-        return new TileEntity(); //XXX TODO: have a FZ-specific null TE to help with issues
+        return new TileEntityFzNull(); //XXX TODO: have a FZ-specific null TE to help with issues
     }
 
     @Override
@@ -50,6 +50,13 @@ public class BlockFactorization extends BlockContainer {
             return null;
         }
         FactoryType ft = tec.getFactoryType();
+        if (ft == FactoryType.EXTENDED) {
+            TileEntityCommon parent = ((TileEntityExtension)tec).getParent();
+            if (parent != null) {
+                tec = parent;
+                ft = parent.getFactoryType();
+            }
+        }
         if (ft == FactoryType.MIRROR) {
             return new ItemStack(Core.registry.mirror);
         }
@@ -64,6 +71,9 @@ public class BlockFactorization extends BlockContainer {
         }
         if (ft == FactoryType.GREENWARE) {
             return ((TileEntityGreenware) tec).getItem();
+        }
+        if (ft == FactoryType.ROCKETENGINE) {
+            return new ItemStack(Core.registry.rocket_engine);
         }
         return new ItemStack(Core.registry.item_factorization, 1, tec.getFactoryType().md);
     }
@@ -198,14 +208,14 @@ public class BlockFactorization extends BlockContainer {
         return 1;
     }
 
-    TileEntityCommon destroyedTE;
+    TileEntityCommon destroyedTE; //NOTE: Threading, and World Unloading! Should only be used in the server thread; should be set to null when done using
 
     @Override
     public void breakBlock(World w, int x, int y, int z, int id, int md) {
         TileEntityCommon te = new Coord(w, x, y, z).getTE(TileEntityCommon.class);
         if (te != null) {
-            destroyedTE = te;
             te.onRemove();
+            destroyedTE = te;
         }
         super.breakBlock(w, x, y, z, id, md);
     }
@@ -218,22 +228,31 @@ public class BlockFactorization extends BlockContainer {
         IFactoryType f = here.getTE(IFactoryType.class);
         if (f == null) {
             if (destroyedTE == null) {
-                System.out.println("No IFactoryType TE behind block that was destroyed, and nothing saved!");
+                Core.logWarning("No IFactoryType TE behind block that was destroyed, and nothing saved!");
+                destroyedTE = null;
                 return ret;
             }
             Coord destr = destroyedTE.getCoord();
             if (!destr.equals(here)) {
-                System.out.println("Last saved destroyed TE wasn't for this location");
+                Core.logWarning("Last saved destroyed TE wasn't for this location");
+                destroyedTE = null;
                 return ret;
             }
             if (!(destroyedTE instanceof IFactoryType)) {
-                System.out.println("TileEntity isn't an IFT! It's " + here.getTE());
+                Core.logWarning("TileEntity isn't an IFT! It's " + here.getTE());
+                destroyedTE = null;
                 return ret;
             }
             f = (IFactoryType) destroyedTE;
             destroyedTE = null;
         }
         ItemStack is = new ItemStack(Core.registry.item_factorization, 1, f.getFactoryType().md);
+        if (f.getFactoryType() == FactoryType.EXTENDED) {
+            TileEntityCommon parent = ((TileEntityExtension) f).getParent();
+            if (parent != null) {
+                f = parent;
+            }
+        }
         if (f.getFactoryType() == FactoryType.MIRROR) {
             is = new ItemStack(Core.registry.mirror);
         }
@@ -247,6 +266,9 @@ public class BlockFactorization extends BlockContainer {
         }
         if (f.getFactoryType() == FactoryType.GREENWARE) {
             is = ((TileEntityGreenware) f).getItem();
+        }
+        if (f.getFactoryType() == FactoryType.ROCKETENGINE) {
+            is = new ItemStack(Core.registry.rocket_engine);
         }
         ret.add(is);
         return ret;
@@ -382,6 +404,21 @@ public class BlockFactorization extends BlockContainer {
         }
         return tec.getCollisionBoundingBoxFromPool();
     }
+    
+    @Override
+    public AxisAlignedBB getSelectedBoundingBoxFromPool(World w, int x, int y, int z) {
+        TileEntity te = w.getBlockTileEntity(x, y, z);
+        if (te instanceof TileEntityCommon) {
+            TileEntityCommon tec = (TileEntityCommon) te;
+            if (tec.getFactoryType() == FactoryType.EXTENDED) {
+                AxisAlignedBB ret = tec.getCollisionBoundingBoxFromPool();
+                if (ret != null) {
+                    return ret;
+                }
+            }
+        }
+        return super.getSelectedBoundingBoxFromPool(w, x, y, z);
+    }
 
     @Override
     public void setBlockBoundsBasedOnState(IBlockAccess w, int x, int y, int z) {
@@ -460,5 +497,15 @@ public class BlockFactorization extends BlockContainer {
     @Override
     public boolean isAirBlock(World world, int x, int y, int z) {
         return false;
+    }
+    
+    public static int sideDisable = 0;
+    
+    @Override
+    public boolean shouldSideBeRendered(IBlockAccess iworld, int x, int y, int z, int side) {
+        if (sideDisable != 0) {
+            return (sideDisable & (1 << side)) == 0; 
+        }
+        return super.shouldSideBeRendered(iworld, x, y, z, side);
     }
 }

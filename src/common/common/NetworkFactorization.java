@@ -6,7 +6,6 @@ import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.IllegalFormatException;
 
@@ -26,6 +25,7 @@ import cpw.mods.fml.common.network.ITinyPacketHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
+import factorization.api.DeltaCoord;
 import factorization.api.VectorUV;
 
 public class NetworkFactorization implements ITinyPacketHandler {
@@ -71,8 +71,11 @@ public class NetworkFactorization implements ITinyPacketHandler {
                     output.writeFloat(v.x);
                     output.writeFloat(v.y);
                     output.writeFloat(v.z);
+                } else if (item instanceof DeltaCoord) {
+                    DeltaCoord dc = (DeltaCoord) item;
+                    dc.write(output);
                 } else {
-                    throw new RuntimeException("Argument is not Integer/Byte/String/Boolean/Float/ItemStack/RenderingCube.Vector: " + item);
+                    throw new RuntimeException("Argument is not Integer/Byte/String/Boolean/Float/ItemStack/DeltaCoord/RenderingCube.Vector: " + item);
                 }
             }
             output.flush();
@@ -426,8 +429,9 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 //
                 SculptDescription = 130, SculptSelect = 131, SculptNew = 132, SculptMove = 133, SculptRemove = 134, SculptState = 135, SculptWater = 136,
                 //
-                FurnaceBurnTime = 140
-                ;
+                FurnaceBurnTime = 140,
+                //
+                ExtensionInfo = 150;
     }
 
 }

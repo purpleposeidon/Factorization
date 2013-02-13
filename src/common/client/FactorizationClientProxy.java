@@ -47,12 +47,14 @@ import factorization.client.render.BatteryItemRender;
 import factorization.client.render.BlockRenderBattery;
 import factorization.client.render.BlockRenderCrystallizer;
 import factorization.client.render.BlockRenderDefault;
+import factorization.client.render.BlockRenderEmpty;
 import factorization.client.render.BlockRenderGreenware;
 import factorization.client.render.BlockRenderGrinder;
 import factorization.client.render.BlockRenderHeater;
 import factorization.client.render.BlockRenderLamp;
 import factorization.client.render.BlockRenderMirrorStand;
 import factorization.client.render.BlockRenderMixer;
+import factorization.client.render.BlockRenderRocketEngine;
 import factorization.client.render.BlockRenderSolarTurbine;
 import factorization.client.render.BlockRenderSteamTurbine;
 import factorization.client.render.BlockRenderWire;
@@ -512,9 +514,11 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderMixer();
         new BlockRenderCrystallizer();
         new BlockRenderGreenware().setup();
+        new BlockRenderRocketEngine();
         for (FactoryType ft : new FactoryType[] { FactoryType.ROUTER, FactoryType.MAKER, FactoryType.STAMPER, FactoryType.BARREL, FactoryType.PACKAGER, FactoryType.SLAGFURNACE, FactoryType.SOLARBOILER }) {
             FactorizationBlockRender.setDefaultRender(ft);
         }
+        new BlockRenderEmpty(FactoryType.EXTENDED);
 
         MinecraftForgeClient.registerItemRenderer(Core.registry.battery.shiftedIndex, new BatteryItemRender(renderBattery));
         MinecraftForge.EVENT_BUS.register(new FactorizationNotify());

@@ -28,15 +28,16 @@ public class FactorizationNotify {
         Coord locus;
         String msg;
         long creationTime;
+        boolean position_important;
         
-        Message set(Coord locus, String msg) {
+        Message set(Coord locus, String msg, boolean long_lasting, boolean position_important) {
             creationTime = System.currentTimeMillis();
-            if (msg.startsWith("\t")) {
-                msg = msg.substring(1);
+            if (long_lasting) {
                 creationTime += 1000*5;
-            }
+            } 
             this.locus = locus;
             this.msg = msg;
+            this.position_important = position_important;
             return this;
         }
     }
@@ -44,11 +45,27 @@ public class FactorizationNotify {
     static ArrayList<Message> messages = new ArrayList();
     
     public static void addMessage(Coord locus, String format, String ...args) {
+        if (format.equals("!clear")) {
+            messages.clear();
+            return;
+        }
         for (int i = 0; i < args.length; i++) {
             String translated = StatCollector.translateToLocal(args[i]);
             args[i] = translated;
         }
         String msg = String.format(format, (Object[]) args);
+        
+        boolean force_position = msg.startsWith("\b");
+        if (force_position) {
+            msg = msg.substring(1);
+        }
+        boolean long_lasting = msg.startsWith("\t");
+        if (long_lasting) {
+            msg = msg.substring(1);
+        }
+        if (msg.length() == 0) {
+            return;
+        }
         if (Core.notify_in_chat) {
             EntityPlayer player = Minecraft.getMinecraft().thePlayer;
             if (player != null) {
@@ -56,26 +73,18 @@ public class FactorizationNotify {
             }
             return;
         }
-        if (msg.length() == 0) {
-            return;
-        }
-        if (msg.charAt(0) == '\b') {
-            String rest = msg.substring(1);
-            messages.add(new Message().set(locus, rest));
-            return;
-        }
-        if (messages.size() > 2) {
+        if (messages.size() > 2 && !force_position) {
             messages.remove(0);
         }
         for (Message m : messages) {
             if (m.locus.equals(locus)) {
-                m.set(locus, msg);
+                m.set(locus, msg, long_lasting, force_position);
                 return;
-            } else if (m.locus.distanceManhatten(locus) == 1) {
+            } else if (m.locus.distanceManhatten(locus) == 1 && !force_position) {
                 m.creationTime = 0;
             }
         }
-        messages.add(new Message().set(locus, msg));
+        messages.add(new Message().set(locus, msg, long_lasting, force_position));
     }
 
     @ForgeSubscribe
@@ -131,9 +140,10 @@ public class FactorizationNotify {
         float scaling = 1.6F/60F;
         scaling *= 2F/3F;
         GL11.glPushMatrix();
-        AxisAlignedBB bb = m.locus.getCollisionBoundingBoxFromPool();
+        
         float y = m.locus.y;
-        if (bb != null) {
+        AxisAlignedBB bb = m.locus.getCollisionBoundingBoxFromPool();
+        if (bb != null && !m.position_important) {
             y += bb.maxY - bb.minY;
         } else {
             y += 0.5F;

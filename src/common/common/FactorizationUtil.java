@@ -27,6 +27,7 @@ import net.minecraftforge.liquids.LiquidEvent;
 import net.minecraftforge.liquids.LiquidStack;
 import net.minecraftforge.liquids.LiquidTank;
 import factorization.api.Coord;
+import factorization.api.DeltaCoord;
 
 public class FactorizationUtil {
     //ItemStack handling
@@ -400,6 +401,13 @@ public class FactorizationUtil {
         //stolen from BlockPistonBase.determineOrientation. It was reversed, & we handle the y-axis differently
         int var7 = MathHelper.floor_double((double) ((180 + player.rotationYaw) * 4.0F / 360.0F) + 0.5D) & 3;
         return var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0)));
+    }
+    
+    public static DeltaCoord getFlatDiagonalFacing(EntityPlayer player) {
+        double angle = Math.toRadians(90 + player.rotationYaw);
+        int dx = Math.cos(angle) > 0 ? 1 : -1;
+        int dz = Math.sin(angle) > 0 ? 1 : -1;
+        return new DeltaCoord(dx, 0, dz);
     }
     
     public static <E extends Enum> E shiftEnum(E current, E values[], int delta) {
