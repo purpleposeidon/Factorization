@@ -8,9 +8,6 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.NetClientHandler;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.entity.Entity;
@@ -20,17 +17,11 @@ import net.minecraft.network.packet.NetHandler;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet1Login;
 import net.minecraft.profiler.Profiler;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ForgeSubscribe;
-
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
@@ -41,7 +32,6 @@ import factorization.common.Core;
 
 public class HammerClientProxy extends HammerProxy {
     public HammerClientProxy() {
-        MinecraftForge.EVENT_BUS.register(this);
         RenderingRegistry.registerEntityRenderingHandler(DseCollider.class, new EmptyRender());
         RenderDimensionSliceEntity rwe = new RenderDimensionSliceEntity();
         RenderingRegistry.registerEntityRenderingHandler(DimensionSliceEntity.class, rwe);
@@ -260,12 +250,12 @@ public class HammerClientProxy extends HammerProxy {
     private void setWorldAndPlayer(WorldClient wc, EntityClientPlayerMP player) {
         Minecraft mc = Minecraft.getMinecraft();
         if (wc == null) {
-            System.out.println("Uh-oh"); //NORELEASE (well...)
+            Core.logSevere("Client-side hammer world is null. Remember: Crashing is fun!");
         }
         //For logic
         mc.theWorld = wc;
         mc.thePlayer = player;
-        mc.thePlayer.worldObj = wc; //XXX Oh boy. Maybe I should make a new EntityPlayer instead?
+        mc.thePlayer.worldObj = wc;
         setSendQueueWorld(wc);
         
         //For rendering
@@ -341,56 +331,4 @@ public class HammerClientProxy extends HammerProxy {
         Packet.addIdClassMapping(220, true /* client side */, false /* server side */, Packet220FzdsWrap.class);
     }
     
-    
-    //private static DimensionSliceEntity embedded;
-    /*
-    private static RenderGlobal realityRender; //used with renderWorld
-    @Override
-    public void setPlayerIsEmbedded(DimensionSliceEntity dse) {
-        embedded = dse;
-        if (embedded == null) {
-            realityRender = null;
-        } else {
-            Minecraft mc = Minecraft.getMinecraft();
-            realityRender = mc.renderGlobal;
-            Minecraft.getMinecraft().renderGlobal = new RenderGlobal(mc, mc.renderEngine);
-            reverse_shadow_world = (WorldClient) getClientRealWorld();
-        }
-    }*/
-    
-    boolean rendering = false;
-    @ForgeSubscribe
-    public void renderReality(RenderWorldLastEvent event) {
-//		if (realityRender == null) {
-//			return;
-//		}
-//		if (rendering) {
-//			return;
-//		}
-//		rendering = true;
-//		try {
-//			ICamera customCamera = new ICamera() {
-//				@Override
-//				public void setPosition(double var1, double var3, double var5) { }
-//				
-//				@Override
-//				public boolean isBoundingBoxInFrustum(AxisAlignedBB var1) {
-//					// TODO
-//					return true;
-//				}
-//			};
-//			RenderGlobal rg = realityRender;
-//			//rg = Minecraft.getMinecraft().renderGlobal;
-//			Vec3 pos = Minecraft.getMinecraft().renderViewEntity.getPosition(event.partialTicks);
-//			GL11.glPushMatrix();
-//			float s = 0.01F;
-//			GL11.glScalef(s, s, s);
-//			EntityRenderer er = Minecraft.getMinecraft().entityRenderer;
-//			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-//			rg.sortAndRender(player, 0 /* render pass */, event.partialTicks /* partial ticks */);
-//			GL11.glPopMatrix();
-//		} finally {
-//			rendering = false;
-//		}
-    }
 }

@@ -149,7 +149,6 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
                 if (description == null) {
                     continue;
                 }
-                System.out.println("Description: " + description); //NORELEASE
                 net.sendPacketToPlayer(new Packet220FzdsWrap(description));
             }
         }
