@@ -272,6 +272,7 @@ public class Quaternion {
      * @param p
      */
     public void applyRotation(Vec3 p) {
+        //TODO: Optimize!
         //also, rather inefficient
         //return this * p * this^-1
         Quaternion point = new Quaternion(0, p);
