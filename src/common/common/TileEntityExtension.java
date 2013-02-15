@@ -46,11 +46,6 @@ public class TileEntityExtension extends TileEntityCommon {
         return false;
     }
     
-    @Override
-    public Packet getDescriptionPacket() {
-        return super.getDescriptionPacket(); //NORELEASE remove
-    }
-    
     public TileEntityCommon getParent() {
         if (_parent == null && pc != null) {
             _parent = getCoord().add(pc).getTE(TileEntityCommon.class);
