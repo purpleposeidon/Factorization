@@ -845,7 +845,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         TileEntityGrinder.addRecipe(new ItemStack(Block.netherrack), new ItemStack(nether_powder, 1), 1);
         shapelessRecipe(new ItemStack(rocket_fuel, 3), nether_powder, nether_powder, nether_powder, Item.fireballCharge);
         liquidStackRocketFuel = new LiquidStack(rocket_fuel_liquid_entry, 0);
-        LiquidDictionary.getOrCreateLiquid("Factorization$powderRocketFuel", liquidStackRocketFuel);
+        LiquidDictionary.getOrCreateLiquid("powderRocketFuel", liquidStackRocketFuel);
         recipe(new ItemStack(rocket_engine),
                 "#F#",
                 "#I#",
@@ -856,7 +856,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         shapelessRecipe(new ItemStack(bucket_rocket_fuel), Item.bucketEmpty, rocket_fuel, rocket_fuel);
         ItemStack air = new ItemStack(Item.bucketEmpty, 0);
         ItemStack emptyBucket = new ItemStack(Item.bucketEmpty, 1);
-        LiquidContainerRegistry.registerLiquid(new LiquidContainerData(new LiquidStack(rocket_fuel_liquid_entry, LiquidContainerRegistry.BUCKET_VOLUME/2), new ItemStack(rocket_fuel, 1), air));
+        //LiquidContainerRegistry.registerLiquid(new LiquidContainerData(new LiquidStack(rocket_fuel_liquid_entry, LiquidContainerRegistry.BUCKET_VOLUME/2), new ItemStack(rocket_fuel, 1), air)); //TODO: Would be nice if this worked. Forge would need something for it tho.
         LiquidContainerRegistry.registerLiquid(new LiquidContainerData(new LiquidStack(rocket_fuel_liquid_entry, LiquidContainerRegistry.BUCKET_VOLUME), new ItemStack(bucket_rocket_fuel, 1), emptyBucket));
     }
 
