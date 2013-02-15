@@ -13,7 +13,7 @@ public class TileEntityMixerRenderer extends TileEntitySolarTurbineRender {
         TileEntityMixer mixer = (TileEntityMixer) te;
         GL11.glPushMatrix();
         GL11.glTranslatef((float) x, (float) y + 1.0F, (float) z + 1.0F);
-        renderWithRotation(mixer.getRotation()*1.4F);
+        renderWithRotation(mixer.getRotation()*0.4F);
         GL11.glPopMatrix();
     }
 

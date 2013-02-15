@@ -2,25 +2,21 @@ package factorization.nei;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.api.API;
 import codechicken.nei.api.IConfigureNEI;
-import codechicken.nei.recipe.FurnaceRecipeHandler;
-import codechicken.nei.recipe.GuiRecipe;
 import codechicken.nei.recipe.TemplateRecipeHandler;
-import codechicken.nei.recipe.TemplateRecipeHandler.RecipeTransferRect;
 import factorization.client.gui.GuiMixer;
-import factorization.client.gui.GuiSlag;
 import factorization.common.Core;
+import factorization.common.FactorizationUtil;
 import factorization.common.TileEntityMixer;
-import factorization.common.TileEntityMixer.MixRecipe;
-import factorization.common.TileEntitySlagFurnace;
-import factorization.common.TileEntitySlagFurnace.SlagRecipes;
-import factorization.common.TileEntitySlagFurnace.SmeltingResult;
+import factorization.common.TileEntityMixer.RecipeMatchInfo;
 
 public class NEI_MixerRecipeConfig extends TemplateRecipeHandler implements IConfigureNEI {
     @Override
@@ -42,18 +38,25 @@ public class NEI_MixerRecipeConfig extends TemplateRecipeHandler implements ICon
     @Override
     public void loadCraftingRecipes(ItemStack result) {
         //XXX NOTE: This is probably a lame implementation of this function.
-        outerloop: for (MixRecipe mr : TileEntityMixer.recipes) {
+        for (RecipeMatchInfo mr : getCache()) {
             if (result == null) {
                 arecipes.add(new CachedMixerRecipe(mr));
-                continue outerloop;
+                continue;
             }
-            for (ItemStack is : mr.outputs) {
-                if (result.isItemEqual(is)) {
-                    arecipes.add(new CachedMixerRecipe(mr));
-                    continue outerloop;
-                }
+            if (result.isItemEqual(mr.output)) {
+                arecipes.add(new CachedMixerRecipe(mr));
+                continue;
             }
         }
+    }
+    
+    private ArrayList<TileEntityMixer.RecipeMatchInfo> cache;
+    
+    ArrayList<TileEntityMixer.RecipeMatchInfo> getCache() {
+        if (cache == null) {
+            cache = TileEntityMixer.getRecipes();
+        }
+        return cache;
     }
     
     @Override
@@ -68,25 +71,36 @@ public class NEI_MixerRecipeConfig extends TemplateRecipeHandler implements ICon
     @Override
     public void loadUsageRecipes(ItemStack ingredient) {
         //XXX NOTE: This is probably a lame implementation of this function.
-        outerloop: for (MixRecipe mr : TileEntityMixer.recipes) {
+        List<ItemStack> items = new ArrayList();
+        outerloop: for (RecipeMatchInfo mr : getCache()) {
             if (ingredient == null) {
                 arecipes.add(new CachedMixerRecipe(mr));
                 continue outerloop;
             }
-            for (ItemStack is : mr.inputs) {
-                if (ingredient.isItemEqual(is)) {
-                    arecipes.add(new CachedMixerRecipe(mr));
-                    continue outerloop;
+            for (Object o : mr.inputs) {
+                items.clear();
+                if (o instanceof ItemStack) {
+                    items.add((ItemStack) o);
+                } else if (o instanceof String) {
+                    items.addAll(OreDictionary.getOres((String) o));
+                } else if (o instanceof List) {
+                    items.addAll((Collection<? extends ItemStack>) o);
+                }
+                for (ItemStack item : items) {
+                    if (ingredient.isItemEqual(item)) {
+                        arecipes.add(new CachedMixerRecipe(mr));
+                        continue outerloop;
+                    }
                 }
             }
         }
     }
 
     class CachedMixerRecipe extends CachedRecipe {
-        MixRecipe mr;
+        RecipeMatchInfo recipe;
 
-        public CachedMixerRecipe(MixRecipe mr) {
-            this.mr = mr;
+        public CachedMixerRecipe(RecipeMatchInfo recipe) {
+            this.recipe = recipe;
         }
 
         @Override
@@ -104,28 +118,43 @@ public class NEI_MixerRecipeConfig extends TemplateRecipeHandler implements ICon
             ArrayList<PositionedStack> ret = new ArrayList();
             int h = 14;
             int w = 33;
-            switch (mr.inputs.length) {
+            switch (recipe.inputs.size()) {
             case 4:
-                ret.add(new PositionedStack(mr.inputs[3], w + 18, h + 18));
+                ret.add(new PositionedStack(recipe.inputs.get(3), w + 18, h + 18));
             case 3:
-                ret.add(new PositionedStack(mr.inputs[2], w, h + 18));
+                ret.add(new PositionedStack(recipe.inputs.get(2), w, h + 18));
             case 2:
-                ret.add(new PositionedStack(mr.inputs[1], w, h));
+                ret.add(new PositionedStack(recipe.inputs.get(1), w, h));
             case 1:
-                ret.add(new PositionedStack(mr.inputs[0], w + 18, h));
+                ret.add(new PositionedStack(recipe.inputs.get(0), w + 18, h));
             default:
             } //Huh, ti mi cnino
             w = 107;
-            switch (mr.outputs.length) {
-            case 4:
-                ret.add(new PositionedStack(mr.outputs[3], w + 18, h + 18));
-            case 3:
-                ret.add(new PositionedStack(mr.outputs[2], w, h + 18));
-            case 2:
-                ret.add(new PositionedStack(mr.outputs[1], w, h));
-            case 1:
-                ret.add(new PositionedStack(mr.outputs[0], w + 18, h));
+            
+            ArrayList<ItemStack> output = new ArrayList();
+            output.add(recipe.output);
+            for (Object o : recipe.inputs) {
+                if (o instanceof ItemStack) {
+                    ItemStack is = (ItemStack) o;
+                    if (is.getItem().hasContainerItem()) {
+                        ItemStack cnt = FactorizationUtil.normalize(is.getItem().getContainerItemStack(is));
+                        if (cnt != null) {
+                            output.add(cnt);
+                        }
+                    }
+                }
+            }
+            switch (output.size()) {
             default:
+            case 4:
+                ret.add(new PositionedStack(output.get(3), w + 18, h + 18));
+            case 3:
+                ret.add(new PositionedStack(output.get(2), w, h + 18));
+            case 2:
+                ret.add(new PositionedStack(output.get(1), w + 18, h));
+            case 1:
+                ret.add(new PositionedStack(output.get(0), w, h));
+            case 0:
             }
             return ret;
         }

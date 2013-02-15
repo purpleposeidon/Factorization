@@ -2,12 +2,15 @@ package factorization.common;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.InventoryLargeChest;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
@@ -18,6 +21,7 @@ import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -26,26 +30,71 @@ import net.minecraftforge.common.ISidedInventory;
 import net.minecraftforge.liquids.LiquidEvent;
 import net.minecraftforge.liquids.LiquidStack;
 import net.minecraftforge.liquids.LiquidTank;
+import net.minecraftforge.oredict.OreDictionary;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 
 public class FactorizationUtil {
     //ItemStack handling
     
+    /**
+     * Compare includes NBT and damage value; ignores stack size
+     */
     public static boolean identical(ItemStack a, ItemStack b) {
-        //Checks NBT data
-        //return ItemStack.areItemStacksEqual(a, b);
+        if (a == null || b == null) {
+            return a == b;
+        }
         return a.isItemEqual(b) && ItemStack.areItemStackTagsEqual(a, b);
+        //return ItemStack.areItemStacksEqual(a, b);
     }
     
+    /**
+     * Compare includes damage value; ignores stack size and NBT
+     */
     public static boolean similar(ItemStack a, ItemStack b) {
         if (a == null || b == null) {
-            if (a == null && b == null) {
-                return true;
-            }
-            return false;
+            return a == b;
         }
         return a.isItemEqual(b);
+    }
+    
+    /**
+     * Compare only itemIDs and damage value, taking into account that a damage value of -1 matches any
+     */
+    public static boolean wildcardSimilar(ItemStack template, ItemStack stranger) {
+        if (template == null || stranger == null) {
+            return template == stranger;
+        }
+        if (template.getItemDamage() == -1) {
+            return template.itemID == stranger.itemID;
+        }
+        return similar(template, stranger);
+    }
+    
+    public static boolean oreDictionarySimilar(Object template, ItemStack stranger) {
+        if (template instanceof String) {
+            ArrayList<ItemStack> ores = OreDictionary.getOres((String) template);
+            for (int i = 0; i < ores.size(); i++) {
+                if (wildcardSimilar(ores.get(i), stranger)) {
+                    return true;
+                }
+            }
+            return false;
+        } else if (template instanceof List) {
+            for (Object o : (List)template) {
+                if (oreDictionarySimilar(o, stranger)) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return wildcardSimilar((ItemStack) template, stranger);
+        }
+    }
+    
+    public static ItemStack normalDecr(ItemStack is) {
+        is.stackSize--;
+        return is.stackSize <= 0 ? null : is;
     }
     
     public static NBTTagCompound getTag(ItemStack is) {
@@ -478,5 +527,40 @@ public class FactorizationUtil {
         //<--  (la ha) -- (lb hb) -->
         //<--- (lb hb) -- (la ha) -->
         return !(ha < lb || hb < la);
+    }
+    
+    public static InventoryCrafting makeCraftingGrid() {
+        return new InventoryCrafting(new Container() {
+            @Override
+            public boolean canInteractWith(EntityPlayer entityplayer) {
+                return false;
+            }
+
+            @Override
+            public void onCraftMatrixChanged(IInventory iinventory) {
+            }
+        }, 3, 3);
+    }
+    
+    public static EntityPlayer makePlayer(final Coord where, String use) {
+        EntityPlayer fakePlayer = new EntityPlayer(where.w) {
+            @Override public void sendChatToPlayer(String var1) {}
+            @Override
+            public boolean canCommandSenderUseCommand(int var1, String var2) { return false; }
+            @Override
+            public ChunkCoordinates getPlayerCoordinates() { return new ChunkCoordinates(where.x, where.y, where.z); }
+        };
+        fakePlayer.username = "[FZ " + use +  "]";
+        where.setAsEntityLocation(fakePlayer);
+        return fakePlayer;
+    }
+    
+    public static void addInventoryToArray(IInventory inv, ArrayList<ItemStack> ret) {
+        for (int i = 0; i < inv.getSizeInventory(); i++) {
+            ItemStack is = FactorizationUtil.normalize(inv.getStackInSlot(i));
+            if (is != null) {
+                ret.add(is);
+            }
+        }
     }
 }

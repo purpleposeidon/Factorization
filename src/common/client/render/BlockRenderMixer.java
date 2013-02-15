@@ -14,13 +14,14 @@ public class BlockRenderMixer extends FactorizationBlockRender {
         int metal = 14, lead = 16 * 2 + 2,hollow = 10 + 16;
         float width = 2F / 16F;
         renderCauldron(rb, metal, hollow);
-        if (!world_mode) {
-            renderPart(rb, 7, width, width * 0.5F, width, 15F / 16F, 1 - width, 1 - width);
-        }
+//		if (!world_mode) {
+//			renderPart(rb, 7, width, width * 0.5F, width, 15F / 16F, 1 - width, 1 - width);
+//		}
     }
 
     @Override
     void renderSecondPass(RenderBlocks rb) {
+        /*
         int water = 7;
         int color = Block.waterStill.colorMultiplier(w, x, y, z);
         float r = (float)(color >> 16 & 255) / 255.0F;
@@ -28,6 +29,7 @@ public class BlockRenderMixer extends FactorizationBlockRender {
         float b = (float)(color & 255) / 255.0F;
         Tessellator.instance.setColorOpaque_F(r, g, b);
         rb.renderTopFace(Core.registry.factory_rendering_block, x, y - 1F / 16F, z, water);
+        */
     }
 
     @Override

@@ -5,12 +5,14 @@ import java.util.List;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
+import factorization.api.IActOnCraft;
 import factorization.common.Core.TabType;
 
-public class ItemOreProcessing extends Item {
+public class ItemOreProcessing extends Item implements IActOnCraft {
     public static ArrayList<String> OD_ores = new ArrayList(), OD_ingots = new ArrayList();
     public static enum OreType {
         IRON(0, 0xD8D8D8, "Iron", "oreIron", "ingotIron"),
@@ -127,5 +129,40 @@ public class ItemOreProcessing extends Item {
     
     public ItemStack makeStack(OreType ot) {
         return new ItemStack(this, 1, ot.ID);
+    }
+
+    @Override
+    public void onCraft(ItemStack is, IInventory craftMatrix, int craftSlot, ItemStack result, EntityPlayer player) {
+        if (result.getItem() != Core.registry.ore_clean_gravel) {
+            return;
+        }
+        if (is.getItem() != Core.registry.ore_dirty_gravel) {
+            return;
+        }
+        if (player != null && player.worldObj != null) {
+            if (player.worldObj.isRemote) {
+                return;
+            }
+        }
+        if (Math.random() > 0.25) {
+            return;
+        }
+        for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
+            ItemStack pi = player.inventory.getStackInSlot(i);
+            if (pi != null && pi.getItem() == Core.registry.sludge) {
+                if (pi.stackSize < pi.getMaxStackSize()) {
+                    pi.stackSize++;
+                    return;
+                }
+            }
+        }
+        for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
+            ItemStack pi = player.inventory.getStackInSlot(i);
+            if (pi == null) {
+                player.inventory.setInventorySlotContents(i, new ItemStack(Core.registry.sludge, 1));
+                return;
+            }
+        }
+        player.dropPlayerItem(new ItemStack(Core.registry.sludge, 1));
     }
 }

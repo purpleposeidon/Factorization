@@ -2,27 +2,27 @@ package factorization.common;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.inventory.Container;
-import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
+import factorization.api.Coord;
 import factorization.common.Core.TabType;
 
 public class ItemCraft extends Item {
@@ -129,19 +129,8 @@ public class ItemCraft extends Item {
         return true;
     }
 
-    class DummyContainer extends Container {
-        @Override
-        public boolean canInteractWith(EntityPlayer entityplayer) {
-            return false;
-        }
-
-        @Override
-        public void onCraftMatrixChanged(IInventory iinventory) {
-        }
-    }
-
     InventoryCrafting getCrafter(ItemStack is) {
-        InventoryCrafting craft = new InventoryCrafting(new DummyContainer(), 3, 3);
+        InventoryCrafting craft = FactorizationUtil.makeCraftingGrid();
         for (int i = 0; i < slot_length; i++) {
             craft.setInventorySlotContents(i, getSlot(is, i));
         }
@@ -198,22 +187,13 @@ public class ItemCraft extends Item {
                 ret.add(result);
                 return ret;
             }
-            EntityPlayer fakePlayer = new EntityPlayer(where.worldObj) {
-                @Override public void sendChatToPlayer(String var1) {}
-                @Override
-                public boolean canCommandSenderUseCommand(int var1, String var2) { return false; }
-                @Override
-                public ChunkCoordinates getPlayerCoordinates() { return new ChunkCoordinates(0, 0, 0); }
-                @Override
-                public EntityItem dropPlayerItem(ItemStack par1ItemStack) {
-                    ret.add(par1ItemStack);
-                    EntityItem ret = super.dropPlayerItem(new ItemStack(0, 0, 0)); //ahh... this probably won't be used anyways.
-                    ret.posY = -99999;
-                    ret.setDead();
-                    return ret;
-                }
-            };
-            fakePlayer.username = "[Factorization CraftPacket]";
+            Coord pos = null;
+            if (where == null) {
+                //pos = new Coord(DimensionManager.getWorld(0), 0, -20, 0); //ugh. Lame... 
+            } else {
+                pos = new Coord(where);
+            }
+            EntityPlayer fakePlayer = FactorizationUtil.makePlayer(pos, "CraftPacket");
             if (where != null) {
                 if (Core.registry.diamond_shard_recipe.matches(craft, where.worldObj)) {
                     Sound.shardMake.playAt(where);
@@ -229,124 +209,11 @@ public class ItemCraft extends Item {
             SlotCrafting slot = new SlotCrafting(fakePlayer, craft, craftResult, 0, 0, 0);
             slot.onPickupFromSlot(fakePlayer, result);
             ret.add(result);
-            addInventoryToArray(craft, ret);
-            addInventoryToArray(fakePlayer.inventory, ret);
+            FactorizationUtil.addInventoryToArray(craft, ret);
+            FactorizationUtil.addInventoryToArray(fakePlayer.inventory, ret);
         }
 
         return ret;
-    }
-    
-    private void addInventoryToArray(IInventory inv, ArrayList<ItemStack> ret) {
-        for (int i = 0; i < inv.getSizeInventory(); i++) {
-            ItemStack is = FactorizationUtil.normalize(inv.getStackInSlot(i));
-            if (is != null) {
-                ret.add(is);
-            }
-        }
-    }
-    
-    public ArrayList<ItemStack> OldcraftAt(ItemStack is, boolean fake, TileEntity where) {
-        // Return the crafting result, and any leftover ingredients (buckets)
-        // If the crafting recipe fails, return our contents.
-        if (!(is.getItem() instanceof ItemCraft)) {
-            return null;
-        }
-        if (is.getItemDamage() == Core.registry.diamond_shard_packet.getItemDamage()) {
-            ItemStack cp = Core.registry.diamond_shard_packet.copy();
-            cp.setItemDamage(0);
-            return craftAt(cp, fake, where);
-        }
-
-        ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
-        InventoryCrafting craft = getCrafter(is);
-
-        ItemStack result;
-
-        if (where == null || where.worldObj == null) {
-            result = findMatchingRecipe(craft, null);
-        } else {
-            result = findMatchingRecipe(craft, where.worldObj);
-        }
-        if (result == null) {
-            is.setItemDamage(0);
-        }
-        else if (is.getItemDamage() == 0) {
-            is.setItemDamage(1);
-        }
-        if (result == null) {
-            // crafting failed, dump everything
-            for (int i = 0; i < slot_length; i++) {
-                ItemStack here = getSlot(is, i);
-                if (here != null) {
-                    ret.add(here);
-                }
-            }
-        } else {
-            ret.add(result);
-            EntityPlayer fakePlayer = null;
-            if (!fake && where != null) {
-                if (Core.registry.diamond_shard_recipe.matches(craft, where.worldObj)) {
-                    Sound.shardMake.playAt(where);
-                }
-                fakePlayer = new EntityPlayer(where.worldObj) {
-                    @Override public void sendChatToPlayer(String var1) {}
-                    @Override
-                    public boolean canCommandSenderUseCommand(int var1, String var2) { return false; }
-                    @Override
-                    public ChunkCoordinates getPlayerCoordinates() { return new ChunkCoordinates(0, 0, 0); }
-                };
-                fakePlayer.username = "fakeCraftingPlayer";
-                fakePlayer.posX = where.xCoord;
-                fakePlayer.posY = where.yCoord;
-                fakePlayer.posZ = where.zCoord;
-                GameRegistry.onItemCrafted(fakePlayer, result, craft);
-                result.onCrafting(where.worldObj, fakePlayer, 1);
-            }
-
-            for (int i = 0; i < craft.getSizeInventory(); i++) {
-                ItemStack here = craft.getStackInSlot(i);
-                if (here == null) {
-                    continue;
-                }
-                if (fake) {
-                    // maybe there's some crazy mod that tracks items?
-                    here = here.copy();
-                }
-                here.stackSize -= 1;
-                if (here.getItem().hasContainerItem()) {
-                    ItemStack cis = here.getItem().getContainerItemStack(here);
-                    if (cis.isItemDamaged() && cis.getItemDamage() >= cis.getMaxDamage() && fakePlayer != null) {
-                        MinecraftForge.EVENT_BUS.post(new PlayerDestroyItemEvent(fakePlayer, cis));
-                        cis = null;
-                    }
-                    if (cis != null && cis.stackSize > 0) {
-                        ret.add(cis);
-                    }
-                    
-                } else if (here.stackSize > 0) {
-                    ret.add(here);
-                }
-            }
-        }
-
-        return ret;
-    }
-
-    public boolean dumpToTable(ItemStack is, InventoryCrafting craft) {
-        if (craft.getSizeInventory() < 9) {
-            return false;
-        }
-
-        for (int i = 0; i < craft.getSizeInventory(); i++) {
-            ItemStack here = craft.getStackInSlot(i);
-            if (here.getItem() == this) {
-                continue;
-            }
-            if (here != null && getSlot(is, i) != null) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override

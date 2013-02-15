@@ -3,14 +3,28 @@ package factorization.common;
 import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Arrays;
+import java.util.List;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryCraftResult;
+import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.inventory.SlotCrafting;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.ShapelessRecipes;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.oredict.ShapelessOreRecipe;
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.api.Charge;
+import factorization.api.Coord;
 import factorization.api.IChargeConductor;
 import factorization.common.NetworkFactorization.MessageType;
 
@@ -18,6 +32,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         IChargeConductor {
     //inventory: 4 input slots, 4 output slots
     ItemStack input[] = new ItemStack[4], output[] = new ItemStack[4];
+    ArrayList<ItemStack> outputBuffer = new ArrayList();
     int progress = 0;
     int speed = 0;
     Charge charge = new Charge(this);
@@ -29,6 +44,14 @@ public class TileEntityMixer extends TileEntityFactorization implements
         tag.setInteger("progress", progress);
         tag.setInteger("speed", speed);
         writeSlotsToNBT(tag);
+        NBTTagList buffer = new NBTTagList();
+        for (ItemStack is : outputBuffer) {
+            NBTTagCompound itag = new NBTTagCompound(); 
+            is.writeToNBT(itag);
+            buffer.appendTag(itag);
+        }
+        
+        tag.setTag("outBuffer", buffer);
     }
 
     @Override
@@ -38,7 +61,37 @@ public class TileEntityMixer extends TileEntityFactorization implements
         progress = tag.getInteger("progress");
         speed = tag.getInteger("speed");
         readSlotsFromNBT(tag);
+        NBTTagList outBuffer = tag.getTagList("outBuffer");
+        if (outBuffer != null) {
+            for (int i = 0; i < outBuffer.tagCount(); i++) {
+                NBTBase base = outBuffer.tagAt(i);
+                if (!(base instanceof NBTTagCompound)) {
+                    continue;
+                }
+                ItemStack is = ItemStack.loadItemStackFromNBT((NBTTagCompound)base);
+                outputBuffer.add(is);
+            }
+        }
+        
+        setDirty();
+    }
+    
+    void setDirty() {
+        if (worldObj != null && worldObj.isRemote) {
+            return;
+        }
         dirty = true;
+        cache = null;
+    }
+    
+    @Override
+    public void dropContents() {
+        super.dropContents();
+        Coord here = getCoord();
+        for (ItemStack is : outputBuffer) {
+            FactorizationUtil.spawnItemStack(here, is);
+        }
+        setDirty();
     }
 
     @Override
@@ -48,7 +101,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
 
     @Override
     public ItemStack getStackInSlot(int slot) {
-        dirty = true;
+        //setDirty();
         if (slot >= 0 && slot < 4) {
             return input[slot];
         }
@@ -61,7 +114,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
 
     @Override
     public void setInventorySlotContents(int slot, ItemStack is) {
-        dirty = true;
+        setDirty();
         if (slot >= 0 && slot < 4) {
             input[slot] = is;
             return;
@@ -141,7 +194,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
 
     int getRemainingProgress() {
-        return 150 - progress;
+        return 250 - progress;
     }
 
     float rotation = 0;
@@ -149,57 +202,169 @@ public class TileEntityMixer extends TileEntityFactorization implements
     public float getRotation() {
         return rotation;
     }
-
-    public static ArrayList<MixRecipe> recipes = new ArrayList();
-    static boolean sorted = false;
-
-    public static class MixRecipe {
-        final public ItemStack inputs[], outputs[];
-
-        public MixRecipe(ItemStack inputs[], ItemStack outputs[]) {
-            this.inputs = inputs;
-            this.outputs = outputs;
+    
+    public static class RecipeMatchInfo {
+        public ArrayList inputs = new ArrayList();
+        public ItemStack output;
+        public IRecipe theRecipe;
+        
+        public RecipeMatchInfo(List<ItemStack> recipeInput, ItemStack recipeOutput, IRecipe theRecipe) {
+            for (Object o : recipeInput) {
+                if (o instanceof ItemStack) {
+                    this.inputs.add(((ItemStack)o).copy());
+                } else {
+                    this.inputs.add(o);
+                }
+            }
+            this.output = recipeOutput.copy();
+            this.theRecipe = theRecipe;
         }
-
-        public boolean matches(ItemStack mixer_inv[]) {
-            for (ItemStack is : inputs) {
-                boolean found = false;
-                for (ItemStack inp : mixer_inv) {
-                    if (inp != null && FactorizationUtil.identical(is, inp)) {
-                        found = true;
-                        break;
+    }
+    
+    boolean removeMatching(ItemStack[] hay, ItemStack needle) {
+        for (int i = 0; i < hay.length; i++) {
+            if (FactorizationUtil.wildcardSimilar(needle, hay[i])) {
+                hay[i] = FactorizationUtil.normalDecr(hay[i]);
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    boolean recipeMatches(List<ItemStack> recipeItems) {
+        ItemStack[] in = new ItemStack[input.length];
+        for (int i = 0; i < input.length; i++) {
+            if (input[i] != null) {
+                in[i] = input[i].copy();
+            }
+        }
+        for (int i = 0; i < recipeItems.size(); i++) {
+            Object o = recipeItems.get(i);
+            List<ItemStack> all;
+            if (o instanceof ItemStack) {
+                all = Arrays.asList((ItemStack)o);
+            } else {
+                all = (List<ItemStack>) o;
+            }
+            boolean found = false;
+            for (int R = 0; R < all.size(); R++) {
+                ItemStack recipeItem = all.get(R);
+                if (removeMatching(in, recipeItem)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    private static ArrayList<RecipeMatchInfo> recipe_cache = null;
+    public static ArrayList<RecipeMatchInfo> getRecipes() {
+        ArrayList<RecipeMatchInfo> cache = new ArrayList<TileEntityMixer.RecipeMatchInfo>();
+        outer: for (Object o: CraftingManager.getInstance().getRecipeList()) {
+            IRecipe recipe = (IRecipe) o;
+            List<ItemStack> inputList = null;
+            ItemStack output = null;
+            if (recipe.getClass() == ShapelessRecipes.class) {
+                ShapelessRecipes sr = (ShapelessRecipes) recipe;
+                inputList = sr.recipeItems;
+                output = sr.getRecipeOutput();
+            }
+            if (recipe.getClass() == ShapelessOreRecipe.class) {
+                ShapelessOreRecipe sr = (ShapelessOreRecipe) recipe;
+                inputList = ReflectionHelper.getPrivateValue(ShapelessOreRecipe.class, sr, "input");
+                output = sr.getRecipeOutput();
+            }
+            if (inputList == null) {
+                continue;
+            }
+            int s = inputList.size();
+            if (s <= 1 || s > 4) {
+                continue;
+            }
+            for (int i = 0; i < inputList.size(); i++) {
+                Object p = inputList.get(i);
+                if (p instanceof String) {
+                    p = OreDictionary.getOres((String) p);
+                }
+                if (p instanceof List) {
+                    for (ItemStack is : (List<ItemStack>)p) {
+                        if (!isOkayRecipeItem(is)) {
+                            continue outer;
+                        }
                     }
                 }
-                if (!found) {
-                    return false;
+                if (p instanceof ItemStack) {
+                    if (!isOkayRecipeItem((ItemStack) p)) {
+                        continue outer;
+                    }
+                }
+                
+            }
+            cache.add(new RecipeMatchInfo(inputList, output, recipe));
+        }
+        return cache;
+    }
+    
+    private static boolean isOkayRecipeItem(ItemStack is) {
+        Item item = is.getItem();
+        if (item == Item.paper || item == Item.book) {
+            return false;
+        }
+        if (is.getItemDamage() > 0xFF) {
+            return false;
+        }
+        if (item.hasContainerItem()) {
+            //We're going to filter out items like:
+            //  Logic matrix programmers
+            //  Diamond drawplates
+            ItemStack container = FactorizationUtil.normalize(item.getContainerItemStack(is));
+            if (container == null) {
+                return true;
+            }
+            if (container.getItem() != item) {
+                //Like water bucket -> empty bucket; OK
+                return true;
+            }
+            if (container.isItemStackDamageable() || container.isItemDamaged()) {
+                //Like a drawplate
+                return false;
+            }
+            if (container.isItemEqual(is)) {
+                //Like a logic matrix programmer
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    RecipeMatchInfo getRecipe() {
+        boolean empty = true;
+        for (int i = 0; i < input.length; i++) {
+            if (input[i] != null) {
+                empty = false;
+                break;
+            }
+        }
+        if (empty) {
+            return null;
+        }
+        if (recipe_cache == null) {
+            recipe_cache = getRecipes();
+        }
+        RecipeMatchInfo longest = null;
+        for (int i = 0; i < recipe_cache.size(); i++) {
+            RecipeMatchInfo result = recipe_cache.get(i);
+            if (recipeMatches(result.inputs)) {
+                if (longest == null || longest.inputs.size() < result.inputs.size()) {
+                    longest = result;
                 }
             }
-            return true;
         }
-    }
-
-    static void addRecipe(ItemStack inputs[], ItemStack outputs[]) {
-        recipes.add(new MixRecipe(inputs, outputs));
-        sorted = false;
-    }
-
-    MixRecipe getRecipe() {
-        if (!sorted) {
-            //this is pointless.
-            Collections.sort(recipes, new Comparator<MixRecipe>() {
-                @Override
-                public int compare(MixRecipe a, MixRecipe b) {
-                    return a.inputs.length - b.inputs.length;
-                }
-            });
-            sorted = true;
-        }
-        for (MixRecipe recipe : recipes) {
-            if (recipe.matches(input)) {
-                return recipe;
-            }
-        }
-        return null;
+        return longest;
     }
 
     static ItemStack[] copyArray(ItemStack src[]) {
@@ -249,15 +414,15 @@ public class TileEntityMixer extends TileEntityFactorization implements
         normalize(src);
         return true;
     }
-
-    boolean hasFreeSpace(MixRecipe mr) {
-        return addItems(copyArray(output), copyArray(mr.outputs));
+    
+    boolean hasFreeSpace(RecipeMatchInfo mr) {
+        return addItems(copyArray(output), new ItemStack[] { mr.output.copy() });
     }
 
-    MixRecipe cache = null;
+    RecipeMatchInfo cache = null;
     boolean dirty = true;
 
-    MixRecipe getCachedRecipe() {
+    RecipeMatchInfo getCachedRecipe() {
         if (!dirty) {
             return cache;
         }
@@ -275,13 +440,64 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
 
     boolean extractEnergy() {
-        return charge.tryTake(3) > 0;
+        int i = Math.max(2, speed);
+        return charge.tryTake(i) > 0;
+    }
+    
+    void craftRecipe(RecipeMatchInfo mr) {
+        InventoryCrafting craft = FactorizationUtil.makeCraftingGrid();
+        outer: for (int count = 0; count < mr.inputs.size(); count++) {
+            Object o = mr.inputs.get(count);
+            for (int i = 0; i < input.length; i++) {
+                if (o instanceof ItemStack) {
+                    o = ((ItemStack) o).copy();
+                    ((ItemStack) o).stackSize = 1;
+                }
+                if (FactorizationUtil.oreDictionarySimilar(o, input[i])) {
+                    craft.setInventorySlotContents(count, input[i].splitStack(1));
+                    continue outer;
+                }
+            }
+        }
+        EntityPlayer fakePlayer = FactorizationUtil.makePlayer(getCoord(), "Mixer");
+        IInventory craftResult = new InventoryCraftResult();
+        ItemStack out = mr.output.copy();
+        if (out.stackSize < 1) {
+            out.stackSize = 1;
+        }
+        craftResult.setInventorySlotContents(0, out);
+        SlotCrafting slot = new SlotCrafting(fakePlayer, craft, craftResult, 0, 0, 0);
+        slot.onPickupFromSlot(fakePlayer, out);
+        outputBuffer.add(out);
+        FactorizationUtil.addInventoryToArray(craft, outputBuffer);
+        FactorizationUtil.addInventoryToArray(fakePlayer.inventory, outputBuffer);
+        setDirty();
     }
 
     @Override
     void doLogic() {
         needLogic();
-        MixRecipe mr = getCachedRecipe();
+        if (outputBuffer.size() > 0) {
+            ItemStack toAdd = outputBuffer.get(0);
+            for (int i = 0; i < output.length; i++) {
+                if (output[i] == null) {
+                    output[i] = outputBuffer.remove(0);
+                    return;
+                }
+                int free = output[i].getMaxStackSize() - output[i].stackSize;
+                if (FactorizationUtil.similar(output[i], toAdd) && free > 0) {
+                    int toTake = Math.min(free, toAdd.stackSize);
+                    toAdd.stackSize -= toTake;
+                    output[i].stackSize += toTake;
+                    if (toAdd.stackSize <= 0) {
+                        outputBuffer.remove(0);
+                        return;
+                    }
+                }
+            }
+            return;
+        }
+        RecipeMatchInfo mr = getCachedRecipe();
         if (mr == null) {
             slow();
             return;
@@ -290,35 +506,20 @@ public class TileEntityMixer extends TileEntityFactorization implements
             slow();
             return;
         }
-        if (!extractEnergy() && speed > 0) {
-            speed--;
-        }
         if (speed < 5 && extractEnergy()) {
             speed++;
+        } else if (!extractEnergy() && speed > 0) {
+            int ns = Math.min(speed - 1, (int)(speed*0.8));
+            ns = Math.max(ns, 0);
+            System.out.println("Slowing: " + speed + " to " + ns);
+            speed = ns;
         }
         progress += speed;
         if (getRemainingProgress() <= 0 || Core.cheat) {
             progress = 0;
-            addItems(output, copyArray(mr.outputs));
-            dirty = true;
-            for (ItemStack rec : copyArray(mr.inputs)) {
-                for (int i = 0; i < input.length; i++) {
-                    if (input[i] == null) {
-                        continue;
-                    }
-                    if (FactorizationUtil.identical(rec, input[i])) {
-                        int d = Math.min(input[i].stackSize, rec.stackSize);
-                        input[i].stackSize -= d;
-                        rec.stackSize -= d;
-                        input[i] = FactorizationUtil.normalize(input[i]);
-                        rec = FactorizationUtil.normalize(rec);
-                    }
-                    if (rec == null) {
-                        break;
-                    }
-                }
-            }
+            craftRecipe(mr);
             normalize(input);
+            speed = Math.min(50, speed + 1);
         }
     }
 

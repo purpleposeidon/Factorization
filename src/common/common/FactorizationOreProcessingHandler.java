@@ -82,9 +82,7 @@ public class FactorizationOreProcessingHandler {
         ItemStack crystal = Core.registry.ore_crystal.makeStack(oreType);
         
         //dirty gravel -> clean gravel
-        TileEntityMixer.addRecipe(
-                new ItemStack[] { dirty, new ItemStack(Item.bucketWater) },
-                new ItemStack[] { clean, new ItemStack(Item.bucketEmpty), new ItemStack(Core.registry.sludge) });
+        Core.registry.shapelessRecipe(clean, new ItemStack(Item.bucketWater), dirty);
         if (oreType == OreType.GALENA) {
             ItemStack reduced_silver = Core.registry.ore_reduced.makeStack(OreType.SILVER);
             ItemStack reduced_lead = Core.registry.ore_reduced.makeStack(OreType.LEAD);
@@ -134,12 +132,6 @@ public class FactorizationOreProcessingHandler {
 
     @ForgeSubscribe
     public void registerOre(OreRegisterEvent evt) {
-        if (evt.Name.equals("sandCracked")) {
-            TileEntityMixer.addRecipe(
-                    new ItemStack[] { evt.Ore.copy(), new ItemStack(Item.bucketWater) },
-                    new ItemStack[] { new ItemStack(Block.sand), new ItemStack(Item.bucketEmpty) }
-            );
-        }
         handleNewOre(evt.Name, evt.Ore);
     }
     
