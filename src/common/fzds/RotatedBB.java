@@ -106,7 +106,7 @@ public class RotatedBB extends AxisAlignedBB {
         Vec3 verts[] = getAabbVertices(this);
         for (int i = 0; i < verts.length; i++) {
             Vec3 v = verts[i];
-            rotation.rotateIncr(v);
+            rotation.applyRotation(v);
             range.include(v, dir);
         }
         return range;
@@ -118,7 +118,7 @@ public class RotatedBB extends AxisAlignedBB {
         rotation.incrConjugate();
         for (int i = 0; i < verts.length; i++) {
             Vec3 v = verts[i];
-            rotation.rotateIncr(v);
+            rotation.applyRotation(v);
             range.include(v, dir);
         }
         rotation.incrConjugate();

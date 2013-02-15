@@ -60,7 +60,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
         Vec3 centerInShadowSpace = FactorizationUtil.averageVec(shadowMax, shadowMin);
         Vec3 center = centerInShadowSpace.addVector(0, 0, 0);
         shadow2rotation(center);
-        rotation.rotateIncr(center);
+        rotation.applyRotation(center);
         rotation2shadow(center);
         Vec3 diff = centerInShadowSpace.subtract(center);
         AxisAlignedBB moved = shadow.getOffsetBoundingBox(diff.xCoord, diff.yCoord, diff.zCoord);

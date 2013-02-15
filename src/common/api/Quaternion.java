@@ -271,8 +271,7 @@ public class Quaternion {
      * Note: This assumes that this quaternion is normal (magnitude = 1).
      * @param p
      */
-    public void rotateIncr(Vec3 p) {
-        //TODO NORELEASE: This function is named wrong; "applyRotation"
+    public void applyRotation(Vec3 p) {
         //also, rather inefficient
         //return this * p * this^-1
         Quaternion point = new Quaternion(0, p);

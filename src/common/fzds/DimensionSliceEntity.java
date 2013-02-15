@@ -85,7 +85,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
         buffer.yCoord = diffY - offsetY;
         buffer.zCoord = diffZ - offsetXZ;
         
-        rotation.rotateIncr(buffer);
+        rotation.applyRotation(buffer);
         
         buffer.xCoord += posX;
         buffer.yCoord += posY;
@@ -450,7 +450,6 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
                 return;
             }
         }
-        //System.out.println("DSE taking: " + ent); //NORELEASE
         World shadowWorld = Hammer.getServerShadowWorld();
         Vec3 newLocation = real2shadow(Hammer.ent2vec(ent));
         transferEntity(ent, shadowWorld, newLocation);
