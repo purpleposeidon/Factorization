@@ -49,14 +49,6 @@ public class FZDSCommand extends CommandBase {
         String cmd = args[0];
         if (sender instanceof EntityPlayerMP) {
             final EntityPlayerMP player = (EntityPlayerMP) sender;
-            /*if (cmd.equalsIgnoreCase("puppet")) {
-                MinecraftServer ms = MinecraftServer.getServer();
-                World w = player.worldObj;
-                ItemInWorldManager iiwm = new ItemInWorldManager(w);
-                PuppetPlayer puppet = new PuppetPlayer(ms, w, "neptunepink", iiwm);
-                HammerNet.puppetPlayer(player, puppet);
-                return;
-            }*/
             if (cmd.equalsIgnoreCase("spawn")) {
                 currentWE = Hammer.allocateSlice(player.worldObj);
                 currentWE.setPosition((int)player.posX, (int)player.posY, (int)player.posZ);
@@ -138,16 +130,6 @@ public class FZDSCommand extends CommandBase {
                 currentWE.posZ = (int) currentWE.posZ;
                 return;
             }
-            /*if (cmd.equals("kill_everything_except_me")) { //NORELEASE
-                World w = player.worldObj;
-                for (Entity e : (Iterable<Entity>)w.loadedEntityList) {
-                    if (e == player) {
-                        continue;
-                    }
-                    e.setDead();
-                }
-                return;
-            }*/
         }
         if (cmd.equals("removeall")) {
             int i = 0;
@@ -235,20 +217,6 @@ public class FZDSCommand extends CommandBase {
             Hammer.instance.hammerInfo.setAllocationCount(newCount);
             return;
         }
-        /*if (cmd.equals("kill_most_entities")) { //NORELEASE
-            for (World w : MinecraftServer.getServer().worldServers) {
-                for (Entity e : (Iterable<Entity>)w.loadedEntityList) {
-                    if (e instanceof EntityPlayer && !(e instanceof PuppetPlayer)) {
-                        continue;
-                    }
-                    if (e instanceof DimensionSliceEntity || e instanceof IFzdsEntryControl) {
-                        continue;
-                    }
-                    e.setDead();
-                }
-            }
-            return;
-        }*/
         if (cmd.equals("rs") || cmd.equals("rw")) {
             if (args.length != 3) {
                 sender.sendChatToPlayer("Usage: /fzds rs angle direction");
@@ -279,10 +247,9 @@ public class FZDSCommand extends CommandBase {
         }
         if (cmd.equals("s") || cmd.equals("d") || cmd.equals("r") || cmd.equals("v") || cmd.equals("w")) {
             if (args.length != 5 && args.length != 6) {
-                sender.sendChatToPlayer("Usage: /fzds s(displacement)|r(otation)|v(elocity)|w(r.velocity) =|+ [W=1; rotations] X Y Z");
+                sender.sendChatToPlayer("Usage: /fzds s(displacement)|r(otation)|v(elocity)|w(r.velocity) =|+ [W=1 (r/w only)] X Y Z");
                 return;
             }
-            //TODO NORELEASE: put w at the front. For insanity-prevention.
             int i = 0;
             double w = 1;
             if (args.length == 6) {
