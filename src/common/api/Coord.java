@@ -405,6 +405,9 @@ public class Coord {
         if (b == null) {
             return true;
         }
+        if (b.blockMaterial.isReplaceable()) {
+            return true;
+        }
         return b.isBlockReplaceable(w, x, y, z);
     }
 
