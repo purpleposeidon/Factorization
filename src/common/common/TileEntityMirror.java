@@ -148,7 +148,7 @@ public class TileEntityMirror extends TileEntityCommon {
     boolean gotten_info_packet = false;
     
     void setNextCheck() {
-        next_check = 20 +  rand.nextInt(20);
+        next_check = 80 + rand.nextInt(20);
     }
     
     @Override
