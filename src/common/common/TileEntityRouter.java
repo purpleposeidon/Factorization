@@ -8,6 +8,8 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 import java.util.regex.Matcher;
 
@@ -42,8 +44,8 @@ public class TileEntityRouter extends TileEntityFactorization {
     Coord lastSeenAt; // where we put an item in last
 
     // Runtime
-    private HashSet<TileEntity> visited; // All of the cells that we've found in the current run
-    private ArrayList<TileEntity> frontier; // Cells that we haven't visited yet. (subset of visited). NOTE: We really do want this to be ordered
+    private HashSet<TileEntity> visited = new HashSet(); // All of the cells that we've found in the current run
+    private LinkedList<TileEntity> frontier = new LinkedList<TileEntity>(); // Cells that we haven't visited yet. (subset of visited). NOTE: We really do want this to be ordered
     private static Random random = new Random();
     int delayDistance; // wait some ticks when moving between far locations
 
@@ -55,9 +57,6 @@ public class TileEntityRouter extends TileEntityFactorization {
         is_input = true;
         buffer = null;
         match = new String("");
-
-        visited = new HashSet();
-        frontier = new ArrayList();
     }
 
     void resetGraph() {
@@ -224,7 +223,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 
     TileEntity popFrontier() {
         if (upgradeSpeed) {
-            return frontier.remove(0);
+            return frontier.remove();
         }
         int closestDistance = Integer.MAX_VALUE;
         int closestIndex = 0;
@@ -250,7 +249,7 @@ public class TileEntityRouter extends TileEntityFactorization {
 
         if (tryInsert(here) && upgradeThorough) {
             resetGraph();
-            frontier.add(0, here);
+            frontier.add(here);
             return;
         }
 
