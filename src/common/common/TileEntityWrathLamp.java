@@ -6,6 +6,7 @@ import java.util.PriorityQueue;
 
 import net.minecraft.block.Block;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.nbt.NBTTagCompound;
@@ -90,11 +91,10 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         toVisit.clear();
         for (int dcx : deltas) {
             for (int dcz : deltas) {
-                Chunk chunk = world.getChunkFromBlockCoords(x + dcx, z + dcz);
-                if (chunk == null) {
+                if (!world.blockExists(x + dcx, y, z + dcz)) {
                     continue;
                 }
-                toVisit.add(chunk);
+                toVisit.add(world.getChunkFromBlockCoords(x + dcx, z + dcz));
             }
         }
         for (Chunk chunk : toVisit) {
