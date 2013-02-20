@@ -57,6 +57,9 @@ public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdd
     
     @Override
     public AxisAlignedBB getBoundingBox() {
+        if (parent == null) {
+            return null;
+        }
         return parent.metaAABB;
         //return boundingBox;
     }
