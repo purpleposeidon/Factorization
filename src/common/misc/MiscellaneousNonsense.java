@@ -111,7 +111,7 @@ public class MiscellaneousNonsense {
         }
         
         static List<String> fogCommands = Arrays.asList("far", "0", "normal", "1", "short", "2", "tiny", "3", "micro", "4", "microfog", "5", "other");
-        static List<String> otherCommands = Arrays.asList("pauserender", "gc", "now", "about", "clear", "saycoords");
+        static List<String> otherCommands = Arrays.asList("pauserender", "gc", "now", "about", "clear", "saycoords", "saveoptions");
         
         @Override
         public List addTabCompletionOptions(ICommandSender sender, String[] args) {

@@ -83,6 +83,8 @@ public class MiscClientProxy extends MiscProxy {
         } else if (n.equalsIgnoreCase("saycoords") && Core.enable_sketchy_client_commands) {
             EntityClientPlayerMP player = mc.thePlayer;
             player.sendChatMessage("/me is at " + ((int) player.posX) + ", " + ((int) player.posY) + ", " + ((int) player.posZ));
+        } else if (n.equalsIgnoreCase("saveoptions") || n.equalsIgnoreCase("savesettings") || n.equalsIgnoreCase("so") || n.equalsIgnoreCase("ss")) {
+            mc.gameSettings.saveOptions();
         }
     }
     
@@ -173,6 +175,9 @@ public class MiscClientProxy extends MiscProxy {
             
             void sprint(boolean state) {
                 Minecraft mc = Minecraft.getMinecraft();
+                if (mc.currentScreen != null) {
+                    return;
+                }
                 if (mc.thePlayer == null) {
                     return;
                 }
