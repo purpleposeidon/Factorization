@@ -4,6 +4,8 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.Random;
 
+import org.bouncycastle.util.Arrays;
+
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -148,6 +150,9 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         tag.setString("ver", Core.version);
         getBlockClass().enforceQuiet(getCoord()); //NOTE: This won't actually work for the quiting save; but a second save'll take care of that.
     }
+    
+    @Override
+    public void readFromNBT(NBTTagCompound tag) { super.readFromNBT(tag); }
 
     public boolean handleMessageFromServer(int messageType, DataInput input) throws IOException {
         return false;
@@ -161,7 +166,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     void broadcastMessage(EntityPlayer who, int messageType, Object... msg) {
         Core.network.broadcastMessage(who, getCoord(), messageType, msg);
     }
-
+    
     void broadcastMessage(EntityPlayer who, Packet toSend) {
         Core.network.broadcastPacket(who, getCoord(), toSend);
     }
