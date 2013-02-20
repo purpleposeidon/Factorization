@@ -3,6 +3,7 @@ package factorization.common;
 import java.io.DataInput;
 import java.io.IOException;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.util.AxisAlignedBB;
@@ -119,6 +120,23 @@ public class TileEntityExtension extends TileEntityCommon {
             return true;
         }
         return false;
+    }
+    
+    @Override
+    public boolean activate(EntityPlayer entityplayer) {
+        TileEntityCommon p = getParent();
+        if (p != null) {
+            return p.activate(entityplayer);
+        }
+        return false;
+    }
+    
+    @Override
+    public void neighborChanged() {
+        TileEntityCommon p = getParent();
+        if (p != null) {
+            p.neighborChanged();
+        }
     }
 }
 

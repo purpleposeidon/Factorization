@@ -431,7 +431,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 //
                 FurnaceBurnTime = 140,
                 //
-                ExtensionInfo = 150;
+                ExtensionInfo = 150, RocketState = 151;
     }
 
 }

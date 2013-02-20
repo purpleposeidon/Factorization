@@ -1,9 +1,11 @@
 package factorization.client.render;
 
 import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.world.WorldManager;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.common.BlockFactorization;
 import factorization.common.FactoryType;
+import factorization.common.TileEntityRocketEngine;
 
 public class BlockRenderRocketEngine extends FactorizationBlockRender {
 
@@ -12,6 +14,12 @@ public class BlockRenderRocketEngine extends FactorizationBlockRender {
         boolean oldAo = rb.enableAO;
         rb.enableAO = false;
         int body = 16*2 + 5, nozzle = 16*2 + 6, top = 14, bottom = 16*2 + 7;
+        if (world_mode) {
+            TileEntityRocketEngine rocket = getCoord().getTE(TileEntityRocketEngine.class);
+            if (rocket != null && rocket.lastValidationStatus) {
+                body += 3;
+            }
+        }
         float d = 2F/16F;
         float height = 6F/16F;
         float b = height*3 - 3F/16F;

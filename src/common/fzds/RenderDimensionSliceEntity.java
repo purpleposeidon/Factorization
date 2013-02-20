@@ -237,6 +237,9 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         if (ent.isDead) {
             return;
         }
+        if (ent.ticksExisted < 5) {
+            return;
+        }
         DimensionSliceEntity dse = (DimensionSliceEntity) ent;
         DSRenderInfo renderInfo = (DSRenderInfo) dse.renderInfo;
         if (nest == 0) {
@@ -269,7 +272,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 float pdy = (float) ((dse.posY - dse.lastTickPosY)*partialTicks);
                 float pdz = (float) ((dse.posZ - dse.lastTickPosZ)*partialTicks);
                 glTranslatef((float)(x), (float)(y), (float)(z));
-                if (true /*!dse.rotation.isZero()*/) {
+                if (!dse.rotation.isZero()) {
                     //Quaternion quat = dse.rotation.slerp(dse.prevTickRotation, partialTicks);
                     //Quaternion quat = dse.rotation;
                     Quaternion quat = dse.rotation.add(dse.prevTickRotation);
@@ -278,8 +281,8 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                     vec = vec.normalize();
                     //GL11.glRotatef((float)Math.toDegrees(quat.w), (float)vec.xCoord, (float)vec.yCoord, (float)vec.zCoord);
 //					Vec3 vec = Vec3.createVectorHelper(0, 0, 0);
-                    double angle = quat.setVector(vec);
-                    GL11.glRotatef((float)Math.toDegrees(angle), (float)vec.xCoord, (float)vec.yCoord, (float)vec.zCoord);
+                    double angle = Math.toDegrees(quat.setVector(vec));
+                    GL11.glRotatef((float)angle, (float)vec.xCoord, (float)vec.yCoord, (float)vec.zCoord);
                 }
                 glTranslatef((float)(-DimensionSliceEntity.offsetXZ), (float)(-DimensionSliceEntity.offsetY), (float)(-DimensionSliceEntity.offsetXZ));
                 renderInfo.renderTerrain();

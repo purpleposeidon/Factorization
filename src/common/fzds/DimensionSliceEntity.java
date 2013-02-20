@@ -64,6 +64,11 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
         this.hammerCell = Hammer.getCellCorner(world, cell);
     }
     
+    @Override
+    public String toString() {
+        return super.toString() + " ID = %" + cell;
+    }
+    
     private static Vec3 buffer = Vec3.createVectorHelper(0, 0, 0);
     
     public Vec3 real2shadow(Vec3 realCoords) {
@@ -597,6 +602,17 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     public boolean can(Caps cap) {
         return cap.in(capabilities);
     }
+    
+    public DimensionSliceEntity permit(Caps cap) {
+        capabilities |= cap.bit;
+        return this;
+    }
+    
+    public DimensionSliceEntity forbid(Caps cap) {
+        capabilities &= ~cap.bit;
+        return this;
+    }
+    
     
     public static enum Caps {
         COLLIDE, MOVE, ROTATE, DRAG, TAKE_INTERIOR_ENTITIES, REMOVE_EXTERIOR_ENTITIES, TRANSFER_PLAYERS; //Do not re-order this list, only append.

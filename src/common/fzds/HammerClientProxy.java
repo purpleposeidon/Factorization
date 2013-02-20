@@ -259,8 +259,12 @@ public class HammerClientProxy extends HammerProxy {
         setSendQueueWorld(wc);
         
         //For rendering
-        TileEntityRenderer.instance.worldObj = wc;
-        RenderManager.instance.worldObj = wc;
+        if (TileEntityRenderer.instance.worldObj != null) {
+            TileEntityRenderer.instance.worldObj = wc;
+        }
+        if (RenderManager.instance.worldObj != null) {
+            RenderManager.instance.worldObj = wc;
+        }
     }
     
     EntityClientPlayerMP real_player = null;
@@ -282,6 +286,7 @@ public class HammerClientProxy extends HammerProxy {
         }
         real_player.worldObj = w;
         if (fake_player == null || real_world != fake_player.worldObj) {
+            //TODO NORELEASE: Cache
             fake_player = new EntityClientPlayerMP(mc, mc.theWorld, mc.session, real_player.sendQueue /* not sure about this one. */);
         }
         setWorldAndPlayer((WorldClient) w, fake_player);

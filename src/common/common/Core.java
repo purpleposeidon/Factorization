@@ -98,6 +98,8 @@ public class Core {
     public static boolean boilers_suck_water = true;
     public static double steam_output_adjust = 1.0;
     public static boolean enable_sketchy_client_commands = true;
+    public static int max_rocket_base_size = 20*20;
+    public static int max_rocket_height = 64;
 
     // universal constant config
     public final static String texture_dir = "/factorization/texture/";

@@ -3,6 +3,9 @@ package factorization.api;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Iterator;
+
+import com.google.common.base.Splitter;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.ForgeDirection;
@@ -22,6 +25,10 @@ public class DeltaCoord {
 
     public DeltaCoord add(DeltaCoord o) {
         return new DeltaCoord(x + o.x, y + o.y, z + o.z);
+    }
+    
+    public DeltaCoord scale(double d) {
+        return new DeltaCoord((int)(x*d), (int)(y*d), (int)(z*d));
     }
 
     public boolean isZero() {
@@ -44,6 +51,12 @@ public class DeltaCoord {
             d(0, +1, 0),
             d(0, 0, -1),
             d(0, 0, +1) };
+    
+    public static DeltaCoord planeNeighbors[] = {
+        d(+1, 0, 0),
+        d(-1, 0, 0),
+        d(0, 0, -1),
+        d(0, 0, +1) };
 
     public double getAngleHorizontal() {
         return Math.atan2(z, -x);
@@ -155,5 +168,17 @@ public class DeltaCoord {
         for (int i = 0; i < 3; i++) {
             out.writeInt(get(i));
         }
+    }
+    
+    
+    private static Splitter COMMA_SPLITTER = Splitter.on(',');
+    public static DeltaCoord parse(String input) {
+        DeltaCoord ret = new DeltaCoord();
+        int i = 0;
+        for (String s : COMMA_SPLITTER.split(input)) {
+            ret.set(i, Integer.parseInt(s));
+            i++;
+        }
+        return ret;
     }
 }

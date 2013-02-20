@@ -55,6 +55,8 @@ Kill Wrath (This will make the mod so much simpler...):
 
 TOP LIST (that's become somewhat less tops. Oops.)
 --------
+FZDS breaks Pistons and Frames somehow
+Bug report of wire-breaking not actually disconnecting?
 Reduce sludge output
 Look at what errors we get if the FZDS code isn't in
 either bats are spawning in the hammer dimension, or we're getting entity updates that we shouldn't be
