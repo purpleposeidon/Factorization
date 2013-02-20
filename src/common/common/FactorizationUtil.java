@@ -44,8 +44,16 @@ public class FactorizationUtil {
         if (a == null || b == null) {
             return a == b;
         }
-        return a.isItemEqual(b) && ItemStack.areItemStackTagsEqual(a, b);
-        //return ItemStack.areItemStacksEqual(a, b);
+        return a.itemID == b.itemID && a.getItemDamage() == b.getItemDamage() && sameItemTags(a, b);
+    }
+    
+    public static boolean sameItemTags(ItemStack a, ItemStack b) {
+        if (a.stackTagCompound == null || b.stackTagCompound == null) {
+            return a.stackTagCompound == b.stackTagCompound;
+        }
+        a.stackTagCompound.setName("tag"); //Notch.
+        b.stackTagCompound.setName("tag"); //Notch.
+        return a.stackTagCompound.equals(b.stackTagCompound);
     }
     
     /**
@@ -55,7 +63,7 @@ public class FactorizationUtil {
         if (a == null || b == null) {
             return a == b;
         }
-        return a.isItemEqual(b);
+        return a.itemID == b.itemID && a.getItemDamage() == b.getItemDamage();
     }
     
     /**

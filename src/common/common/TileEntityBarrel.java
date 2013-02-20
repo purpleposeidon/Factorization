@@ -169,7 +169,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
             return false;
         }
         item.stackSize = is.stackSize;
-        return ItemStack.areItemStacksEqual(item, is);
+        return FactorizationUtil.identical(item, is);
     }
 
     @Override
