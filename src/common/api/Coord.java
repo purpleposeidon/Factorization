@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
@@ -13,11 +12,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.ForgeDirection;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class Coord {
     public World w;
@@ -65,7 +63,9 @@ public class Coord {
 
     public String toString() {
         String ret = "(" + x + ", " + y + ", " + z + ")";
-        if (w != null) {
+        if (!blockExists()) {
+            ret += " not loaded";
+        } else if (w != null) {
             ret += " a " + getBlock();
             TileEntity te = getTE();
             if (te != null) {
@@ -84,6 +84,14 @@ public class Coord {
     
     public void set(ChunkCoordinates cc) {
         set(w, cc.posX, cc.posY, cc.posZ);
+    }
+    
+    public void set(Coord c) {
+        set(c.w, c.x, c.y, c.z);
+    }
+    
+    public void set(Vec3 v) {
+        set(w, (int)v.xCoord, (int)v.yCoord, (int)v.zCoord);
     }
 
     @Override
@@ -315,6 +323,12 @@ public class Coord {
         return this;
     }
     
+    public void adjust(DeltaCoord dc) {
+        x += dc.x;
+        y += dc.y;
+        z += dc.z;
+    }
+    
     //Methods on the world
     
     public void markBlockForUpdate() {
@@ -383,7 +397,15 @@ public class Coord {
         if (b == null) {
             return false;
         }
-        return getBlock().isBlockNormalCube(w, x, y, z);
+        return b.isBlockNormalCube(w, x, y, z);
+    }
+    
+    public float getHardness() {
+        Block b = getBlock();
+        if (b == null) {
+            return 0;
+        }
+        return b.getBlockHardness(w, x, y, z);
     }
 
     /** Let's try to use Orientation */
@@ -394,6 +416,14 @@ public class Coord {
     
     public boolean isSolidOnSide(ForgeDirection side) {
         return w.isBlockSolidOnSide(x, y, z, side);
+    }
+    
+    public boolean isBlockBurning() {
+        Block b = getBlock();
+        if (b == null) {
+            return false;
+        }
+        return b == Block.fire || b.isBlockBurning(w, x, y, z);
     }
 
     public boolean blockExists() {
@@ -550,6 +580,12 @@ public class Coord {
         te.xCoord = x;
         te.yCoord = y;
         te.zCoord = z;
+    }
+    
+    public void setAsVector(Vec3 vec) {
+        vec.xCoord = x;
+        vec.yCoord = y;
+        vec.zCoord = z;
     }
     
     public void moveToTopBlock() {
