@@ -48,6 +48,7 @@ public class TileEntityRouter extends TileEntityFactorization {
     private LinkedList<TileEntity> frontier = new LinkedList<TileEntity>(); // Cells that we haven't visited yet. (subset of visited). NOTE: We really do want this to be ordered
     private static Random random = new Random();
     int delayDistance; // wait some ticks when moving between far locations
+    private int ticksSinceLastSpam = 9999;
 
     public TileEntityRouter() {
         super();
@@ -193,6 +194,7 @@ public class TileEntityRouter extends TileEntityFactorization {
     void doLogic() {
         Core.profileStart("router");
         needLogic();
+        ticksSinceLastSpam++;
         if (lastSeenAt == null) {
             lastSeenAt = getCoord();
         }
@@ -792,7 +794,10 @@ public class TileEntityRouter extends TileEntityFactorization {
         //Otherwise it'd spawn particles when the GUI's opened
         if (messageType == MessageType.RouterLastSeen) {
             if (lastSeenAt != null) {
-                broadcastMessage(who, MessageType.RouterLastSeen, lastSeenAt.x, lastSeenAt.y, lastSeenAt.z);
+                if (ticksSinceLastSpam > 10) {
+                    broadcastMessage(who, MessageType.RouterLastSeen, lastSeenAt.x, lastSeenAt.y, lastSeenAt.z);
+                    ticksSinceLastSpam = 0;
+                }
             }
         }
     }
