@@ -119,13 +119,20 @@ public class NEI_CrystallizerRecipeConfig extends TemplateRecipeHandler implemen
                 currenttip.add((int)prob + "%");
             }
         }
+        if (stack.isItemEqual(cr.solution)) {
+            currenttip.add("Does not get used up");
+        }
+        if (stack.isItemEqual(cr.input)) {
+            currenttip.add("Extra copies of this can be added");
+            currenttip.add("to the other slots to increase yield");
+        }
         return currenttip;
     }
 
     @Override
     public void loadTransferRects() {
         // XXX TODO (if this is even actually necessary? What's it do?) (It might give you places to click on to bring up the recipes list.)
-        transferRects.add(new RecipeTransferRect(new Rectangle(35, 78, 95, 16), "crystallizing"));
+        transferRects.add(new RecipeTransferRect(new Rectangle(35 + 63, 78, 95 - 63, 16), "crystallizing"));
     }
 
     @Override
