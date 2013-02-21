@@ -25,7 +25,7 @@ class DSTeleporter extends Teleporter {
             return;
         }
         destination.x--;
-        destination.moveToTopBlock();
+        //destination.moveToTopBlock();
         if (player.worldObj == DimensionManager.getWorld(Core.dimension_slice_dimid)) {
             destination.y = Math.min(Hammer.wallHeight, destination.y);
         }

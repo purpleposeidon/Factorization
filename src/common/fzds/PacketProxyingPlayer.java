@@ -35,7 +35,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
         super(MinecraftServer.getServer(), dimensionSlice.hammerCell.w, "[" + getPrefix() + dimensionSlice.cell + "]", new ItemInWorldManager(dimensionSlice.hammerCell.w));
         this.dimensionSlice = dimensionSlice;
         this.playerNetServerHandler = new NetServerHandler(MinecraftServer.getServer(), this, this);
-        Coord c = Hammer.getCellCenter(worldObj, dimensionSlice.cell);
+        Coord c = dimensionSlice.getCenter();
         c.y = -8; //lurk in the void; we should catch most mod's packets.
         c.setAsEntityLocation(this);
         WorldServer ws = (WorldServer) dimensionSlice.worldObj;
@@ -124,7 +124,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
         //Inspired by EntityPlayerMP.onUpdate. Shame we can't just add chunks... but there'd be no wrapper for the packets.
         ArrayList<Chunk> chunks = new ArrayList();
         ArrayList<TileEntity> tileEntities = new ArrayList();
-        Coord corner = Hammer.getCellCorner(target.worldObj, dimensionSlice.cell);
+        Coord corner = dimensionSlice.getCorner();
         World world = Hammer.getServerShadowWorld();
         for (int dx = 0; dx < Hammer.cellWidth; dx++) {
             for (int dz = 0; dz < Hammer.cellWidth; dz++) {

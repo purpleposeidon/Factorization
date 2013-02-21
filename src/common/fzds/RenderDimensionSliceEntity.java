@@ -37,6 +37,7 @@ import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
+import factorization.fzds.DimensionSliceEntity.Caps;
 
 
 public class RenderDimensionSliceEntity extends Render implements IScheduledTickHandler {
@@ -169,7 +170,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                             List<Entity> ents = here.entityLists[i1];
                             for (int i2 = 0; i2 < ents.size(); i2++) {
                                 Entity e = ents.get(i2);
-                                if (nest >= 3 && e instanceof DimensionSliceEntity) {
+                                if (nest == 3 && e instanceof DimensionSliceEntity) {
                                     continue;
                                 }
                                 //if e is a proxying player, don't render it?
@@ -238,6 +239,10 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             return;
         }
         if (ent.ticksExisted < 5) {
+            //TODO: Sometimes it fails to draw (Probably because the chunk data isn't loaded as it draws, it draws, does not dirty properly)
+            return;
+        }
+        if (nest > 3) {
             return;
         }
         DimensionSliceEntity dse = (DimensionSliceEntity) ent;
@@ -246,8 +251,11 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             Core.profileStart("fzds");
             checkGLError("FZDS before render -- somebody left a mess!");
             if (dse.renderInfo == null) {
-                //we.renderInfo = new DSRenderInfo(new Coord(Minecraft.getMinecraft().theWorld, 0, 0, 0)); //The real world
-                dse.renderInfo = renderInfo = new DSRenderInfo(dse, Hammer.getCellCorner(dse.worldObj, dse.cell)); //The shadow world
+                if (dse.can(Caps.ORACLE)) {
+                    dse.renderInfo = renderInfo = new DSRenderInfo(dse, dse.getCorner()); //The shadow world
+                } else {
+                    dse.renderInfo = new DSRenderInfo(dse, new Coord(dse)); //The real world
+                }
             }
             renderInfo.lastRenderInMegaticks = megatickCount;
         } else if (nest == 1) {
@@ -284,7 +292,10 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                     double angle = Math.toDegrees(quat.setVector(vec));
                     GL11.glRotatef((float)angle, (float)vec.xCoord, (float)vec.yCoord, (float)vec.zCoord);
                 }
-                glTranslatef((float)(-DimensionSliceEntity.offsetXZ), (float)(-DimensionSliceEntity.offsetY), (float)(-DimensionSliceEntity.offsetXZ));
+                glTranslatef((float)(-dse.centerOffset.xCoord),
+                        (float)(-dse.centerOffset.yCoord),
+                        (float)(-dse.centerOffset.zCoord)
+                        );
                 renderInfo.renderTerrain();
                 checkGLError("FZDS terrain display list render");
                 glTranslatef((float)(dse.posX - x), (float)(dse.posY - y), (float)(dse.posZ - z));

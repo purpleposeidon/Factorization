@@ -103,24 +103,9 @@ public class Hammer {
         return realWorld.isRemote ? getClientShadowWorld() : getServerShadowWorld();
     }
     
-    public static Coord getCellLookout(World realWorld, int cellId) {
-        int cellSize = (cellWidth + wallWidth)*16;
-        return new Coord(getWorld(realWorld), cellSize*cellId - 2, 0 /*wallHeight*/, (1 + cellWidth)*16/2);
-    }
-    
-    public static Coord getCellCorner(World realWorld, int cellId) {
-        //return new Coord(getWorld(), 0, 0, 0);
-        //return getCellLookout(cellId);
+    static Coord getCornerForId(World realWorld, int cellId) {
         int cellSize = (cellWidth + wallWidth)*16;
         return new Coord(getWorld(realWorld), cellSize*cellId, 0, 0);
-    }
-    
-    public static Coord getCellCenter(World realWorld, int cellId) {
-        return getCellCorner(realWorld, cellId).add(cellWidth*16/2, wallHeight/2, cellWidth*16/2);
-    }
-    
-    public static Coord getCellOppositeCorner(World realWorld, int cellId) {
-        return getCellCorner(realWorld, cellId).add(cellWidth*16, wallHeight, cellWidth*16);
     }
     
     public static int getIdFromCoord(Coord c) {
@@ -132,8 +117,9 @@ public class Hammer {
         return c.x / depth_per_cell;
     }
     
-    public static Chunk[] getChunks(World realWorld, int cellId) {
-        Coord corner = getCellCorner(realWorld, cellId);
+    @Deprecated
+    public static Chunk[] getChunks(DimensionSliceEntity dse) {
+        Coord corner = dse.getCorner();
         int i = 0;
         for (int dx = 0; dx < cellWidth; dx++) {
             for (int dz = 0; dz < cellWidth; dz++) {
@@ -386,5 +372,33 @@ public class Hammer {
         } else {
             Core.logFine("World.MAX_ENTITY_RADIUS was already set to %f, which is large enough for our purposes (%f)", World.MAX_ENTITY_RADIUS, desired_radius);
         }
+    }
+    
+    public static interface AreaMap {
+        void fillDse(DseDestination destination);
+    }
+    
+    public static interface DseDestination {
+        void include(Coord c);
+    }
+    
+    private static Coord orig = new Coord(null, 0, 0, 0);
+    
+    public static DimensionSliceEntity makeSlice(final Coord min, final Coord max, AreaMap mapper) {
+        final DimensionSliceEntity dse = Hammer.allocateSlice(min.w);
+        Vec3 vrm = min.centerVec(max);
+        dse.posX = vrm.xCoord;
+        dse.posY = vrm.yCoord;
+        dse.posZ = vrm.zCoord;
+        mapper.fillDse(new DseDestination() {public void include(Coord c) {
+            orig.set(c);
+            dse.real2shadow(c);
+            TransferLib.move(orig, c);
+        }});
+        mapper.fillDse(new DseDestination() {public void include(Coord c) {
+            dse.real2shadow(c);
+            c.markBlockForUpdate();
+        }});
+        return dse;
     }
 }

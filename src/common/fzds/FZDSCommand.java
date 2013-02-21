@@ -33,6 +33,8 @@ import factorization.api.Quaternion;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
 import factorization.fzds.DimensionSliceEntity.Caps;
+import factorization.fzds.Hammer.AreaMap;
+import factorization.fzds.Hammer.DseDestination;
 
 public class FZDSCommand extends CommandBase {
     //private static DimensionSliceEntity currentWE = null;
@@ -100,11 +102,45 @@ public class FZDSCommand extends CommandBase {
         }
         
         boolean appropriate() {
-            return true;
+            return (!needOp || op) && (!needCreative || creative);
         }
         
         String details() {
             return null;
+        }
+        
+        final String getHelp() {
+            String msg = "";
+            boolean first = true;
+            for (String m : help) {
+                if (first) {
+                    first = false;
+                } else {
+                    msg += " ";
+                }
+                msg += m;
+            }
+            return msg;
+        }
+        
+        final String getNeeds() {
+            if (reqs.length == 0) {
+                return "";
+            }
+            String ret = "[Need:";
+            for (Requires r : reqs) {
+                ret += " " + r;
+            }
+            return ret + "]";
+        }
+        
+        void inform() {
+            String msg = getHelp();
+            String d = details();
+            if (d != null) {
+                msg += ": " + d;
+            }
+            sender.sendChatToPlayer(msg);
         }
     }
     
@@ -280,30 +316,79 @@ public class FZDSCommand extends CommandBase {
         return ret;
     }
     
+    private static String pick(String ...bits) {
+        for (int i = 0; i < bits.length; i += 2) {
+            if (bits[i].equalsIgnoreCase(bits[i + 1])) {
+                return bits[i + 1];
+            }
+        }
+        return bits[bits.length - 1];
+    }
+    
     static {
-        help = add(new SubCommand("help") {
+        help = add(new SubCommand("help", "[subcmd]+") {
+            @Override
+            String details() { return "Gives a list of all subcommands, or information about the given subcommands"; }
             @Override
             void call(String[] args) {
-                sender.sendChatToPlayer(join(subCommands));
+                boolean any = false;
+                outer: for (String s : args) {
+                    any = true;
+                    for (SubCommand sc : subCommands) {
+                        for (String alt : sc.altNames) {
+                            if (alt.equalsIgnoreCase(s)) {
+                                sc.arg0 = s;
+                                sc.sender = sender;
+                                sc.inform();
+                                if (sc != this) {
+                                    sc.reset();
+                                }
+                                break outer;
+                            }
+                        }
+                    }
+                }
+                if (any) {
+                    return;
+                }
+                ArrayList<SubCommand> good = new ArrayList<FZDSCommand.SubCommand>();
+                for (SubCommand sc : subCommands) {
+                    sc.sender = sender;
+                    if (sc.appropriate()) {
+                        good.add(sc);
+                    }
+                    if (sc != this) {
+                        sc.reset();
+                    }
+                }
+                sender.sendChatToPlayer(join(good));
                 sender.sendChatToPlayer("The commands need a Coord, DSE, or player.");
                 sender.sendChatToPlayer("If these are not implicitly available, you can provide them using:");
                 sender.sendChatToPlayer(" #worldId,x,y,z %CellId @PlayerName");
                 sender.sendChatToPlayer("Best commands: grab goc leave drop");
             }});
-        add(new SubCommand ("go|goc", "[id=0]") {
+        add(new SubCommand ("go|gob|got") {
+            @Override
+            String details() {
+                String target = "";
+                if (arg0.equalsIgnoreCase("gob")) {
+                    target = "bottom";
+                } else if(arg0.equalsIgnoreCase("got")) {
+                    target = "top";
+                } else {
+                    target = "center";
+                }
+                return "Teleports player to the " + pick("gob", "bottom", "got", "top", "center") + " of the selection, in Hammerspace. Be ready to fly.";
+            }
             @Override
             public void call(String[] args) {
-                int destinationCell = 0;
-                if (args.length > 0) {
-                    destinationCell = Integer.parseInt(args[0]);
-                } else if (selected != null) {
-                    destinationCell = selected.cell;
-                }
                 DSTeleporter tp = getTp();
-                if (arg0.equalsIgnoreCase("goc")) {
-                    tp.destination = Hammer.getCellCenter(player.worldObj, destinationCell);
+                if (arg0.equalsIgnoreCase("gob")) {
+                    tp.destination = selected.getCorner();
+                } else if (arg0.equalsIgnoreCase("got")) {
+                    tp.destination = selected.getFarCorner();
                 } else {
-                    tp.destination = Hammer.getCellLookout(player.worldObj, destinationCell);
+                    tp.destination = selected.getCenter();
                 }
                 if (DimensionManager.getWorld(Core.dimension_slice_dimid) != player.worldObj) {
                     manager.transferPlayerToDimension(player, Core.dimension_slice_dimid, tp);
@@ -312,12 +397,13 @@ public class FZDSCommand extends CommandBase {
                     tp.destination.moveToTopBlock();
                     player.setPositionAndUpdate(tp.destination.x + 0.5, tp.destination.y, tp.destination.z + 0.5);
                 }
-            }}, Requires.PLAYER, Requires.CREATIVE);
+            }}, Requires.PLAYER, Requires.CREATIVE, Requires.SELECTION);
         add(new SubCommand("leave") {
+            @Override
+            String details() { return "Teleports the player to the overworld"; }
             @Override
             void call(String[] args) {
                 DSTeleporter tp = getTp();
-                
                 World w = DimensionManager.getWorld(0);
                 if (w == player.worldObj) {
                     return;
@@ -326,14 +412,23 @@ public class FZDSCommand extends CommandBase {
                 if (target == null) {
                     target = w.getSpawnPoint(); 
                 }
-                Vec3 v = Vec3.createVectorHelper(target.posX, target.posY + 1, target.posZ);
-                //HammerNet.transferPlayer(player, (DimensionSliceEntity)null, w, v);
                 if (target != null) {
                     tp.destination.set(target);
                 }
                 manager.transferPlayerToDimension(player, 0, tp);
             }}, Requires.PLAYER, Requires.CREATIVE);
+        add(new SubCommand("jump") {
+            @Override
+            String details() { return "Warps player to the selection"; }
+            @Override
+            void call(String[] args) {
+                DSTeleporter tp = getTp();
+                tp.destination = new Coord(selected);
+                manager.transferPlayerToDimension(player, selected.dimension, tp);
+            }}, Requires.PLAYER, Requires.CREATIVE, Requires.SELECTION);
         add(new SubCommand("tome") {
+            @Override
+            String details() { return "Warps selection to player"; }
             @Override
             void call(String[] args) {
                 selected.posX = user.x;
@@ -342,6 +437,8 @@ public class FZDSCommand extends CommandBase {
             }}, Requires.COORD, Requires.SELECTION);
         add(new SubCommand("grab|rgrab", "x,y,z", "x,y,z") {
             @Override
+            String details() { return "Creates a Slice from the range given" + pick("rgrab", ", relative to user's position", ""); }
+            @Override
             void call(String[] args) {
                 Coord base;
                 if (arg0.equalsIgnoreCase("rgrab")) {
@@ -349,96 +446,43 @@ public class FZDSCommand extends CommandBase {
                 } else {
                     base = new Coord(user.w, 0, 0, 0);
                 }
-                Coord a = base.add(DeltaCoord.parse(args[0]));
-                Coord b = base.add(DeltaCoord.parse(args[1]));
-                Coord lower, upper;
-                if (a.isSubmissiveTo(b)) {
-                    lower = a;
-                    upper = b;
-                } else {
-                    upper = b;
-                    lower = a;
-                }
+                final Coord lower = base.add(DeltaCoord.parse(args[0]));
+                final Coord upper = base.add(DeltaCoord.parse(args[1]));
+                Coord.sort(lower, upper);
+                
                 DimensionSliceEntity dse = Hammer.allocateSlice(user.w).permit(Caps.ROTATE);
                 Coord middle = lower.add(upper.difference(lower).scale(0.5));
                 middle.setAsEntityLocation(dse);
                 dse.posX += 0.5;
                 dse.posZ += 0.5;
                 
-                
-                Coord corner = Hammer.getCellCorner(user.w, dse.cell);
-                Coord far = Hammer.getCellOppositeCorner(user.w, dse.cell);
-                Coord c = new Coord(Hammer.getServerShadowWorld(), 0, 0, 0);
-                Coord r = new Coord(user.w, 0, 0, 0);
-                for (int x = lower.x; x <= upper.x; x++) {
-                    for (int y = lower.y; y <= upper.y; y++) {
-                        for (int z = lower.z; z <= upper.z; z++) {
-                            Vec3 real = Vec3.createVectorHelper(x, y, z);
-                            r.set(real);
-                            Vec3 shadow = dse.real2shadow(real);
-                            c.set(shadow);
-                            TransferLib.move(r, c);
+                Hammer.makeSlice(lower, upper, new AreaMap() {
+                    @Override
+                    public void fillDse(DseDestination destination) {
+                        Coord here = user.copy();
+                        for (int x = lower.x; x <= upper.x; x++) {
+                            for (int y = lower.y; y <= upper.y; y++) {
+                                for (int z = lower.z; z <= upper.z; z++) {
+                                    here.set(here.w, x, y, z);
+                                    destination.include(here);
+                                }
+                            }
                         }
-                    }
-                }
-                for (int x = lower.x; x <= upper.x; x++) {
-                    for (int y = lower.y; y <= upper.y; y++) {
-                        for (int z = lower.z; z <= upper.z; z++) {
-                            Vec3 real = Vec3.createVectorHelper(x, y, z);
-                            r.set(real);
-                            Vec3 shadow = dse.real2shadow(real);
-                            c.set(shadow);
-                            c.markBlockForUpdate();
-                        }
-                    }
-                }
+                    }});
                 dse.worldObj.spawnEntityInWorld(dse);
                 setSelection(dse);
             }}, Requires.COORD);
-        add(new SubCommand("drop") {			
+        add(new SubCommand("drop") {
+            @Override
+            String details() { return "Returns a Slice's blocks to the world, destroying the Slice"; }
             @Override
             void call(String[] args) {
-                Coord a = new Coord(Hammer.getServerShadowWorld(), 0, 0, 0);
-                Coord b = a.copy();
-                Vec3 vShadowMin = FactorizationUtil.getMin(selected.shadowArea);
-                Vec3 vShadowMax = FactorizationUtil.getMax(selected.shadowArea);
-                a.set(vShadowMin);
-                b.set(vShadowMax);
-                Vec3 shadow = Vec3.createVectorHelper(0, 0, 0);
-                DeltaCoord dc = b.difference(a);
-                Coord dest = new Coord(selected);
-                
-                for (int x = a.x; x < b.x; x++) {
-                    for (int y = a.y; y < b.y; y++) {
-                        for (int z = a.z; z < b.z; z++) {
-                            Coord c = new Coord(a.w, x, y, z);
-                            c.setAsVector(shadow);
-                            Vec3 real = selected.shadow2real(shadow);
-                            dest.set(real);
-                            TransferLib.move(c, dest);
-                        }
-                    }
-                }
-                for (int x = a.x; x < b.x; x++) {
-                    for (int y = a.y; y < b.y; y++) {
-                        for (int z = a.z; z < b.z; z++) {
-                            Coord c = new Coord(a.w, x, y, z);
-                            c.setAsVector(shadow);
-                            Vec3 real = selected.shadow2real(shadow);
-                            dest.set(real);
-                            dest.markBlockForUpdate();
-                        }
-                    }
-                }
-                /*Coord realMin = new Coord(selected);
-                Coord realMax = realMin.copy();
-                realMin.set(selected.shadow2real(vShadowMin));
-                realMax.set(selected.shadow2real(vShadowMax));
-                selected.worldObj.markBlockRangeForRenderUpdate(realMin.x, realMin.y, realMin.z, realMax.x, realMax.y, realMax.z);*/
-                selected.setDead();
+                selected.dropContents();
                 setSelection(null);
             }}, Requires.SELECTION);
         add(new SubCommand("spawn") {
+            @Override
+            String details() { return "Allocates an empty Slice"; }
             @Override
             void call(String[] args) {
                 DimensionSliceEntity currentWE = Hammer.allocateSlice(user.w);
@@ -447,7 +491,9 @@ public class FZDSCommand extends CommandBase {
                 ((EntityPlayerMP) sender).addChatMessage("Created FZDS " + currentWE.cell);
                 setSelection(currentWE);
             }}, Requires.COORD);
-        add(new SubCommand("show") {
+        add(new SubCommand("show", "[%CELL=0]") {
+            @Override
+            String details() { return "Creates a Slice with %cell"; }
             @Override
             void call(String[] args) {
                 int cell = 0;
@@ -460,12 +506,16 @@ public class FZDSCommand extends CommandBase {
                 ((EntityPlayerMP) sender).addChatMessage("Showing FZDS " + currentWE.cell);
                 setSelection(currentWE);
             }}, Requires.COORD);
-        add(new SubCommand("grass") {			
+        add(new SubCommand("grass") {
+            @Override
+            String details() { return "Places a grass block at the user's feet"; }
             @Override
             void call(String[] args) {
                 user.add(0, -1, 0).setId(Block.grass);
             }}, Requires.COORD, Requires.CREATIVE);
         add(new SubCommand("snap") {
+            @Override
+            String details() { return "Rounds the Slice's position down to integers"; }
             @Override
             void call(String[] args) {
                 selected.posX = (int) selected.posX;
@@ -473,6 +523,8 @@ public class FZDSCommand extends CommandBase {
                 selected.posZ = (int) selected.posZ;
             }}, Requires.SELECTION);
         add(new SubCommand("removeall") {
+            @Override
+            String details() { return "Removes all Slices"; }
             @Override
             void call(String[] args) {
                 int i = 0;
@@ -488,11 +540,15 @@ public class FZDSCommand extends CommandBase {
             }}, Requires.OP);
         add(new SubCommand("selection") {
             @Override
+            String details() { return "Shows the selection (and makes SELECTION the default selection)"; }
+            @Override
             void call(String[] args) {
                 sender.sendChatToPlayer("> " + selected);
                 setSelection(selected);
             }}, Requires.SELECTION);
         add(new SubCommand("rot?") {
+            @Override
+            String details() { return "Gives the rotation & angular velocity of the selection"; }
             @Override
             void call(String[] args) {
                 sender.sendChatToPlayer("r = " + selected.rotation);
@@ -502,6 +558,8 @@ public class FZDSCommand extends CommandBase {
                 }
             }}, Requires.SELECTION);
         add(new SubCommand("+|-") {
+            @Override
+            String details() { return "Changes which (loaded) Slice is selected"; }
             @Override
             void call(String[] args) {
                 boolean add = arg0.equals("+");
@@ -549,12 +607,16 @@ public class FZDSCommand extends CommandBase {
             }} /* needs nothing */);
         add(new SubCommand("remove") {
             @Override
+            String details() { return "Destroys the selection"; }
+            @Override
             void call(String[] args) {
                 selected.setDead();
                 setSelection(null);
                 sender.sendChatToPlayer("Made dead");
             }}, Requires.SELECTION);
         add(new SubCommand("force_cell_allocation_count", "newCount") {
+            @Override
+            String details() { return "[Debug command; sets how many %CELLS have been used]"; }
             @Override
             void call(String[] args) {
                 if (args.length != 1) {
@@ -563,10 +625,12 @@ public class FZDSCommand extends CommandBase {
                 int newCount = Integer.parseInt(args[0]);
                 Hammer.instance.hammerInfo.setAllocationCount(newCount);
             }}, Requires.OP);
-        add(new SubCommand("sr|sw", "angle°", "direction") {
+        add(new SubCommand("sr|sw", "angle°", "[direction=UP]") {
+            @Override
+            String details() { return "Sets the Slice's rotation"; }
             @Override
             void call(String[] args) {
-                if (args.length != 2) {
+                if (args.length != 2 && args.length != 1) {
                     throw new SyntaxErrorException();
                 }
                 if (!selected.can(Caps.ROTATE)) {
@@ -576,7 +640,11 @@ public class FZDSCommand extends CommandBase {
                 double theta = Math.toRadians(Double.parseDouble(args[0]));
                 ForgeDirection dir;
                 try {
-                    dir = ForgeDirection.valueOf(args[1].toUpperCase());
+                    if (args.length == 2) {
+                        dir = ForgeDirection.valueOf(args[1].toUpperCase());
+                    } else {
+                        dir = ForgeDirection.UP;
+                    }
                 } catch (IllegalArgumentException e) {
                     String msg = "Direction must be:";
                     for (ForgeDirection d : ForgeDirection.values()) {
@@ -600,6 +668,8 @@ public class FZDSCommand extends CommandBase {
                 toMod.update(Quaternion.getRotationQuaternion(theta, dir));
             }}, Requires.SELECTION);
         add(new SubCommand("d|v|r|w", "+|=", "[W=1]", "X", "Y", "Z") {
+            @Override
+            String details() { return "Changes or sets displacement/velocity/rotation/angular_velocity"; }
             @Override
             void call(String[] args) {
                 char type = arg0.charAt(0);
@@ -661,11 +731,51 @@ public class FZDSCommand extends CommandBase {
             }}, Requires.SELECTION);
         add(new SubCommand("dirty") {
             @Override
+            String details() { return "[Moves the selection back and forth]"; }
+            @Override
             void call(String[] args) {
                 selected.rotationalVelocity.w *= -1;
                 selected.rotation.w *= -1;
                 selected.rotation.w += 0.1;
             }}, Requires.SELECTION);
+        add(new SubCommand("caps") {
+            @Override
+            String details() { return "Lists the available Caps"; }
+            @Override
+            void call(String[] args) {
+                String r = "";
+                for (Caps cap : DimensionSliceEntity.Caps.values()) {
+                    r += " " + cap;
+                }
+                sender.sendChatToPlayer(r);
+            }});
+        add(new SubCommand("cap?") {
+            @Override
+            String details() { return "Lists the Caps enabled on the selection"; }
+            @Override
+            void call(String[] args) {
+                String r = "";
+                for (Caps cap : DimensionSliceEntity.Caps.values()) {
+                    if (selected.can(cap)) {
+                        r += " " + cap;
+                    }
+                }
+                sender.sendChatToPlayer(r);
+            }}, Requires.SELECTION);
+        add(new SubCommand("cap+|cap-", "CAP+") {
+            @Override
+            String details() { return "Gives or takes away Caps. May cause client desyncing."; }
+            @Override
+            void call(String[] args) {
+                for (String a : args) {
+                    Caps cap = Caps.valueOf(a);
+                    if (arg0.equalsIgnoreCase("cap+")) {
+                        selected.permit(cap);
+                    } else {
+                        selected.forbid(cap);
+                    }
+                }
+            }}, Requires.SELECTION, Requires.OP);
     }
 
 }

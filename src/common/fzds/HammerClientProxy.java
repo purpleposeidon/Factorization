@@ -23,6 +23,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.client.registry.RenderingRegistry;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
@@ -228,9 +229,11 @@ public class HammerClientProxy extends HammerProxy {
     @Override
     public void clientLogout(INetworkManager manager) {
         //TODO: what else we can do here to cleanup?
-        Hammer.worldClient = null;
-        send_queue = null;
-        fake_player = null;
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+            Hammer.worldClient = null;
+            send_queue = null;
+            fake_player = null;
+        }
     }
     
     private static NetClientHandler send_queue;

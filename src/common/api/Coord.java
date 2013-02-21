@@ -1,5 +1,6 @@
 package factorization.api;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -16,6 +17,9 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.ForgeDirection;
+
+import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteArrayDataOutput;
 
 public class Coord {
     public World w;
@@ -128,6 +132,10 @@ public class Coord {
         case 2: z = value; return;
         default: throw new RuntimeException("Invalid argument");
         }
+    }
+    
+    public Vec3 createVector() {
+        return Vec3.createVectorHelper(x, y, z);
     }
 
     /** @return boolean for a checkerboard pattern */
@@ -293,6 +301,14 @@ public class Coord {
 
     public Coord add(int x, int y, int z) {
         return new Coord(w, this.x + x, this.y + y, this.z + z);
+    }
+    
+    public Coord center(Coord o) {
+        return new Coord(w, (x + o.x)/2, (y + o.y)/2, (z + o.z)/2);
+    }
+    
+    public Vec3 centerVec(Coord o) {
+        return Vec3.createVectorHelper((x + o.x)/2.0, (y + o.y)/2.0, (z + o.z)/2.0);
     }
     
     /**
@@ -535,6 +551,18 @@ public class Coord {
         y = tag.getInteger(prefix + "y");
         z = tag.getInteger(prefix + "z");
     }
+    
+    public void writeToStream(ByteArrayDataOutput dos) {
+        dos.writeInt(x);
+        dos.writeInt(y);
+        dos.writeInt(z);
+    }
+    
+    public void readFromStream(ByteArrayDataInput dis) {
+        x = dis.readInt();
+        y = dis.readInt();
+        z = dis.readInt();
+    }
 
     public void mark() {
         World use_world = w;
@@ -586,6 +614,17 @@ public class Coord {
         vec.xCoord = x;
         vec.yCoord = y;
         vec.zCoord = z;
+    }
+    
+    public static void sort(Coord lower, Coord upper) {
+        Coord a = lower.copy();
+        Coord b = upper.copy();
+        lower.x = Math.min(a.x, b.x);
+        lower.y = Math.min(a.y, b.y);
+        lower.z = Math.min(a.z, b.z);
+        upper.x = Math.max(a.x, b.x);
+        upper.y = Math.max(a.y, b.y);
+        upper.z = Math.max(a.z, b.z);
     }
     
     public void moveToTopBlock() {
