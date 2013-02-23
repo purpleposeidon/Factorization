@@ -21,6 +21,8 @@ import net.minecraftforge.common.ForgeDirection;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 
+import factorization.common.FactorizationUtil;
+
 public class Coord {
     public World w;
     public int x, y, z;
@@ -285,6 +287,14 @@ public class Coord {
     
     public boolean isCompletelySubmissiveTo(Coord o) {
         return x < o.x && y < o.y && z < o.z;
+    }
+    
+    public boolean inside(Coord lower, Coord upper) {
+        return lower.lesserOrEqual(this) && lesserOrEqual(upper);
+    }
+    
+    public boolean lesserOrEqual(Coord o) {
+        return x <= o.x && y <= o.y && z <= o.z;
     }
 
     public void setWorld(World newWorld) {

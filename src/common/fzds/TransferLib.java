@@ -28,6 +28,9 @@ public class TransferLib {
         Core.notify(null, src, NotifyStyle.FORCE, "-");
         int id = src.getId();
         int md = src.getMd();
+        if (id != 0) {
+            System.out.println("Moving " + src + " to " + dest);
+        }
         TileEntity te = src.getTE();
         NBTTagCompound teData = null;
         if (te != null) {

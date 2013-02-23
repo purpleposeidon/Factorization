@@ -231,6 +231,13 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         }
     }
     
+    DSRenderInfo getRenderInfo(DimensionSliceEntity dse) {
+        if (dse.renderInfo == null) {
+            dse.renderInfo = new DSRenderInfo(dse, dse.getCorner());
+        }
+        return (DSRenderInfo) dse.renderInfo;
+    }
+    
     public static int nest = 0; //is 0 usually. Gets incremented right before we start actually rendering.
     @Override
     public void doRender(Entity ent, double x, double y, double z, float yaw, float partialTicks) {
@@ -243,18 +250,19 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             return;
         }
         if (nest > 3) {
-            return;
+            return; //This will never happen, except with outside help.
         }
         DimensionSliceEntity dse = (DimensionSliceEntity) ent;
-        DSRenderInfo renderInfo = (DSRenderInfo) dse.renderInfo;
+        DSRenderInfo renderInfo = getRenderInfo(dse);
         if (nest == 0) {
             Core.profileStart("fzds");
             checkGLError("FZDS before render -- somebody left a mess!");
             if (dse.renderInfo == null) {
                 if (dse.can(Caps.ORACLE)) {
-                    dse.renderInfo = renderInfo = new DSRenderInfo(dse, dse.getCorner()); //The shadow world
-                } else {
                     dse.renderInfo = new DSRenderInfo(dse, new Coord(dse)); //The real world
+                    //Honestly, we should be re-using vanilla's display lists for oracles.
+                } else {
+                    dse.renderInfo = renderInfo = new DSRenderInfo(dse, dse.getCorner()); //The shadow world
                 }
             }
             renderInfo.lastRenderInMegaticks = megatickCount;
@@ -266,29 +274,25 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         try {
             if (nest == 1) {
                 Core.profileStart("build");
-                Hammer.proxy.setClientWorld(Hammer.getClientShadowWorld());
+                Hammer.proxy.setShadowWorld();
                 try {
                     renderInfo.update();
                 } finally {
-                    Hammer.proxy.restoreClientWorld();
+                    Hammer.proxy.restoreRealWorld();
                     Core.profileEnd();
                 }
             }
             glPushMatrix();
             try {
                 float pdx = (float) ((dse.posX - dse.lastTickPosX)*partialTicks);
-                float pdy = (float) ((dse.posY - dse.lastTickPosY)*partialTicks);
+                float pdy = (float) ((dse.posY - dse.lastTickPosY)*partialTicks); //err, not used? XXX
                 float pdz = (float) ((dse.posZ - dse.lastTickPosZ)*partialTicks);
                 glTranslatef((float)(x), (float)(y), (float)(z));
                 if (!dse.rotation.isZero()) {
-                    //Quaternion quat = dse.rotation.slerp(dse.prevTickRotation, partialTicks);
-                    //Quaternion quat = dse.rotation;
                     Quaternion quat = dse.rotation.add(dse.prevTickRotation);
                     quat.incrScale(0.5);
                     Vec3 vec = Vec3.createVectorHelper(quat.x, quat.y, quat.z);
                     vec = vec.normalize();
-                    //GL11.glRotatef((float)Math.toDegrees(quat.w), (float)vec.xCoord, (float)vec.yCoord, (float)vec.zCoord);
-//					Vec3 vec = Vec3.createVectorHelper(0, 0, 0);
                     double angle = Math.toDegrees(quat.setVector(vec));
                     GL11.glRotatef((float)angle, (float)vec.xCoord, (float)vec.yCoord, (float)vec.zCoord);
                 }
@@ -299,11 +303,11 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 renderInfo.renderTerrain();
                 checkGLError("FZDS terrain display list render");
                 glTranslatef((float)(dse.posX - x), (float)(dse.posY - y), (float)(dse.posZ - z));
-                Hammer.proxy.setClientWorld(Hammer.getClientShadowWorld());
+                Hammer.proxy.setShadowWorld();
                 try {
                     renderInfo.renderEntities(partialTicks);
                 } finally {
-                    Hammer.proxy.restoreClientWorld();
+                    Hammer.proxy.restoreRealWorld();
                 }
                 checkGLError("FZDS entity render");
             } finally {

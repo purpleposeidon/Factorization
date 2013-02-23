@@ -12,15 +12,12 @@ public class HammerProxy {
     
     public World getClientRealWorld() { return null; }
     
-    //If embedded in a DSE, return the world the slice is in. Else return the shadow world.
-    public World getOppositeWorld() { return null; }
-
-    public void setClientWorld(World w) {
-        throw new RuntimeException("Tried to setClientWorld on server");
+    public void setShadowWorld() {
+        throw new RuntimeException("Tried to setShadowWorld on server");
     }
 
-    public void restoreClientWorld() {
-        throw new RuntimeException("Tried to restoreClientWorld on server");
+    public void restoreRealWorld() {
+        throw new RuntimeException("Tried to restoreRealWorld on server");
     }
 
     public boolean isInShadowWorld() { return false; }

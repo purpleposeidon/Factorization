@@ -108,7 +108,7 @@ public class Hammer {
         return new Coord(getWorld(realWorld), cellSize*cellId, 0, 0);
     }
     
-    public static int getIdFromCoord(Coord c) {
+    static int getIdFromCoord(Coord c) {
         //You're not allowed to write getIdFromXCoordinate
         if (c.x < 0 || c.z < 0 || c.z > cellWidth*16) {
             return -1;
@@ -382,7 +382,7 @@ public class Hammer {
         void include(Coord c);
     }
     
-    private static Coord orig = new Coord(null, 0, 0, 0);
+    private static Coord shadow = new Coord(null, 0, 0, 0);
     
     public static DimensionSliceEntity makeSlice(final Coord min, final Coord max, AreaMap mapper) {
         final DimensionSliceEntity dse = Hammer.allocateSlice(min.w);
@@ -390,14 +390,15 @@ public class Hammer {
         dse.posX = vrm.xCoord;
         dse.posY = vrm.yCoord;
         dse.posZ = vrm.zCoord;
-        mapper.fillDse(new DseDestination() {public void include(Coord c) {
-            orig.set(c);
-            dse.real2shadow(c);
-            TransferLib.move(orig, c);
+        mapper.fillDse(new DseDestination() {public void include(Coord real) {
+            shadow.set(real);
+            dse.real2shadow(shadow);
+            TransferLib.move(real, shadow);
         }});
-        mapper.fillDse(new DseDestination() {public void include(Coord c) {
-            dse.real2shadow(c);
-            c.markBlockForUpdate();
+        mapper.fillDse(new DseDestination() {public void include(Coord real) {
+            shadow.set(real);
+            dse.real2shadow(shadow);
+            shadow.markBlockForUpdate();
         }});
         return dse;
     }

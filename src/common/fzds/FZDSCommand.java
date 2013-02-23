@@ -95,6 +95,26 @@ public class FZDSCommand extends CommandBase {
             selected = null;
         }
         
+        private void setup(ICommandSender sender) {
+            this.sender = sender;
+            if (sender instanceof EntityPlayerMP) {
+                player = (EntityPlayerMP) sender;
+            }
+            if (sender instanceof TileEntity) {
+                user = new Coord((TileEntity) sender);
+            }
+            selected = currentSelection.get();
+            if (sender.canCommandSenderUseCommand(4, "stop")) {
+                op = true;
+            }
+            if (sender instanceof TileEntityCommandBlock) {
+                op = true;
+            }
+            if (op) {
+                creative = true;
+            }
+        }
+        
         DSTeleporter getTp() {
             DSTeleporter tp = new DSTeleporter((WorldServer) player.worldObj);
             tp.destination = new Coord(player.worldObj, 0, 0, 0);
@@ -102,7 +122,13 @@ public class FZDSCommand extends CommandBase {
         }
         
         boolean appropriate() {
-            return (!needOp || op) && (!needCreative || creative);
+            if (needOp && !op) {
+                return false;
+            }
+            if (needCreative && !creative) {
+                return false;
+            }
+            return true;
         }
         
         String details() {
@@ -206,23 +232,7 @@ public class FZDSCommand extends CommandBase {
     private static Splitter comma = Splitter.on(",");
     void runCommand(SubCommand cmd, ICommandSender sender, String[] args) {
         cmd.reset();
-        cmd.sender = sender;
-        if (sender instanceof EntityPlayerMP) {
-            cmd.player = (EntityPlayerMP) sender;
-        }
-        if (sender instanceof TileEntity) {
-            cmd.user = new Coord((TileEntity) sender);
-        }
-        cmd.selected = currentSelection.get();
-        if (sender.canCommandSenderUseCommand(4, "stop")) {
-            cmd.op = true;
-        }
-        if (sender instanceof TileEntityCommandBlock) {
-            cmd.op = true;
-        }
-        if (cmd.op) {
-            cmd.creative = true;
-        }
+        cmd.setup(sender);
         ArrayList<String> cleanedArgs = new ArrayList();
         for (String a : args) {
             if (Strings.isNullOrEmpty(a)) {
@@ -270,25 +280,17 @@ public class FZDSCommand extends CommandBase {
         if (cmd.user != null) {
             cmd.world = cmd.user.w;
         }
-        if (cmd.needPlayer) {
-            if (cmd.player == null) {
-                throw new CommandException("No player specified");
-            }
+        if (cmd.needPlayer && cmd.player == null) {
+            throw new CommandException("No player specified");
         }
-        if (cmd.needCoord) {
-            if (cmd.user == null) {
-                throw new CommandException("No coordinate specified");
-            }
+        if (cmd.needCoord && cmd.user == null) {
+            throw new CommandException("No coordinate specified");
         }
-        if (cmd.needOp) {
-            if (cmd.op == false) {
-                throw new CommandException("Insufficient permissions");
-            }
+        if (cmd.needOp && cmd.op == false) {
+            throw new CommandException("Insufficient permissions");
         }
-        if (cmd.needSelection) {
-            if (cmd.selected == null) {
-                throw new CommandException("No DSE selected");
-            }
+        if (cmd.needSelection && cmd.selected == null) {
+            throw new CommandException("No DSE selected");
         }
         cmd.arg0 = cleanedArgs.remove(0);
         try {
@@ -353,7 +355,9 @@ public class FZDSCommand extends CommandBase {
                 }
                 ArrayList<SubCommand> good = new ArrayList<FZDSCommand.SubCommand>();
                 for (SubCommand sc : subCommands) {
-                    sc.sender = sender;
+                    if (sc != this) {
+                        sc.setup(sender);
+                    }
                     if (sc.appropriate()) {
                         good.add(sc);
                     }
@@ -398,6 +402,18 @@ public class FZDSCommand extends CommandBase {
                     player.setPositionAndUpdate(tp.destination.x + 0.5, tp.destination.y, tp.destination.z + 0.5);
                 }
             }}, Requires.PLAYER, Requires.CREATIVE, Requires.SELECTION);
+        add(new SubCommand("enterhammer") {
+            @Override
+            String details() { return "Teleports the player into hammerspace"; }
+            @Override
+            void call(String[] args) {
+                if (player.dimension == Hammer.dimensionID) {
+                    return;
+                }
+                DSTeleporter tp = getTp();
+                tp.destination.set(Hammer.getServerShadowWorld(), 0, 64, 0);
+                manager.transferPlayerToDimension(player, Hammer.dimensionID, tp);
+            }}, Requires.PLAYER, Requires.CREATIVE);
         add(new SubCommand("leave") {
             @Override
             String details() { return "Teleports the player to the overworld"; }
@@ -446,15 +462,15 @@ public class FZDSCommand extends CommandBase {
                 } else {
                     base = new Coord(user.w, 0, 0, 0);
                 }
-                final Coord lower = base.add(DeltaCoord.parse(args[0]));
-                final Coord upper = base.add(DeltaCoord.parse(args[1]));
-                Coord.sort(lower, upper);
+                Coord low = base.add(DeltaCoord.parse(args[0]));
+                Coord up = base.add(DeltaCoord.parse(args[1]));
+                Coord.sort(low, up);
+                final Coord lower = low.copy();
+                final Coord upper = up.copy();
                 
                 DimensionSliceEntity dse = Hammer.allocateSlice(user.w).permit(Caps.ROTATE);
                 Coord middle = lower.add(upper.difference(lower).scale(0.5));
                 middle.setAsEntityLocation(dse);
-                dse.posX += 0.5;
-                dse.posZ += 0.5;
                 
                 Hammer.makeSlice(lower, upper, new AreaMap() {
                     @Override

@@ -37,11 +37,11 @@ public class Packet220FzdsWrap extends Packet {
 
     @Override
     public void processPacket(NetHandler netHandler) {
-        Hammer.proxy.setClientWorld(Hammer.proxy.getOppositeWorld());
+        Hammer.proxy.setShadowWorld();
         try {
             wrapped.processPacket(netHandler);
         } finally {
-            Hammer.proxy.restoreClientWorld();
+            Hammer.proxy.restoreRealWorld();
         }
     }
 

@@ -25,7 +25,7 @@ public enum FactoryType {
     HEATER(15, false, TileEntityHeater.class, "factory_heater"), //work furnaces without fuel
     MIRROR(16, false, TileEntityMirror.class, "factory_mirror"), //reflect sunlight onto IReflectionTargets
     GRINDER(17, true, TileEntityGrinder.class, "factory_grinder"), //grind
-    MIXER(18, true, TileEntityMixer.class, "factory_mixer"), //mix
+    MIXER(18, true, TileEntityMixer.class, "factory_mixer"), //crafts its input as shapeless recipes of 2-4 ingredients
     CRYSTALLIZER(19, true, TileEntityCrystallizer.class, "factory_crystal"), //grow metallic crystals
     GREENWARE(20, false, TileEntityGreenware.class, "factory_greenware"), //clay sculpture
     STEAMTURBINE(21, false, TileEntitySteamTurbine.class, "factory_steamturbine"), //A generic steam turbine; works with other mods' steam

@@ -70,10 +70,8 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
         return super.toString() + " ID = %" + cell;
     }
     
-    private static Vec3 buffer = Vec3.createVectorHelper(0, 0, 0);
-    
     public Vec3 real2shadow(Vec3 realCoords) {
-        //TODO NOTE: This ignores transformations! Need to fix!
+        Vec3 buffer = Vec3.createVectorHelper(0, 0, 0);
         double diffX = realCoords.xCoord + centerOffset.xCoord - posX;
         double diffY = realCoords.yCoord + centerOffset.yCoord - posY;
         double diffZ = realCoords.zCoord + centerOffset.zCoord - posZ;
@@ -85,6 +83,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     }
     
     public Vec3 shadow2real(Vec3 shadowCoords) {
+        Vec3 buffer = Vec3.createVectorHelper(0, 0, 0);
         double diffX = shadowCoords.xCoord - hammerCell.x;
         double diffY = shadowCoords.yCoord - hammerCell.y;
         double diffZ = shadowCoords.zCoord - hammerCell.z;
@@ -112,10 +111,12 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     
     public void shadow2real(Coord c) {
         c.set(shadow2real(c.createVector()));
+        c.w = worldObj;
     }
     
     public void real2shadow(Coord c) {
         c.set(real2shadow(c.createVector()));
+        c.w = Hammer.getWorld(worldObj);
     }
     
     public Coord getCorner() {
@@ -261,7 +262,9 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
             if (worldObj.isRemote) {
                 return;
             }
-            setDead();
+            /*if (!can(Caps.EMPTY)) { NORELEASE
+                setDead();
+            }*/
             shadowArea = makeAABB();
             shadowCollisionArea = makeAABB();
             realArea = makeAABB();
@@ -563,6 +566,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     public void setDead() {
         super.setDead();
         Hammer.getSlices(worldObj).remove(this);
+        System.out.println("DSE.setDead"); //NORELEASE
     }
     
     @Override
@@ -606,7 +610,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
             centerOffset.xCoord = data.readFloat();
             centerOffset.yCoord = data.readFloat();
             centerOffset.zCoord = data.readFloat();
-            hammerCell.w = worldObj;
+            hammerCell = new Coord(worldObj, 0, 0, 0);
             hammerCell.readFromStream(data);
         } catch (IOException e) {
             //Not expected to happen ever
@@ -677,7 +681,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     
     
     public static enum Caps {
-        COLLIDE, MOVE, ROTATE, DRAG, TAKE_INTERIOR_ENTITIES, REMOVE_EXTERIOR_ENTITIES, TRANSFER_PLAYERS, ORACLE; //Do not re-order this list, only append.
+        COLLIDE, MOVE, ROTATE, DRAG, TAKE_INTERIOR_ENTITIES, REMOVE_EXTERIOR_ENTITIES, TRANSFER_PLAYERS, ORACLE, EMPTY; //Do not re-order this list, only append.
         public int bit;
         
         Caps() {

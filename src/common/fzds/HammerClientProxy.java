@@ -69,21 +69,14 @@ public class HammerClientProxy extends HammerProxy {
         return real_world;
     }
     
-    @Override
-    public World getOppositeWorld() {
-        if (reverse_shadow_world != null) {
-            return reverse_shadow_world;
-        }
-        return Hammer.getClientShadowWorld();
-    }
-    
     /***
      * Inspired, obviously, by RenderGlobal.
-     * The World has a list of IWorldAccess, which it passes various events to. This one  
+     * The World has a list of IWorldAccess, which it passes various events to. This one
+     * TODO: Separate file  
      */
-    static class HammerRenderGlobal implements IWorldAccess {
+    static class ShadowRenderGlobal implements IWorldAccess {
         private World realWorld;
-        public HammerRenderGlobal(World realWorld) {
+        public ShadowRenderGlobal(World realWorld) {
             this.realWorld = realWorld;
         }
         //The coord arguments are always in shadowspace.
@@ -106,22 +99,19 @@ public class HammerClientProxy extends HammerProxy {
         
         Coord center = new Coord(Hammer.getClientShadowWorld(), 0, 0, 0);
         void markBlocksForUpdate(int lx, int ly, int lz, int hx, int hy, int hz) {
-            //Sorry, it could probably be a bit more efficient.
+            //Could this be more efficient?
+            Coord lower = new Coord(null, lx, ly, lz);
+            Coord upper = new Coord(null, hx, hy, hz);
             World realClientWorld = Hammer.getClientRealWorld();
-            World shadow = Hammer.getWorld(realClientWorld);
-            center.set(shadow, (lx + hx)/2, (ly + hy)/2, (lz + hz)/2);
-            int cellId = Hammer.getIdFromCoord(center);
-            if (cellId < 0) {
-                return;
-            }
             Iterator<DimensionSliceEntity> it = Hammer.getSlices(realClientWorld).iterator();
             while (it.hasNext()) {
                 DimensionSliceEntity dse = it.next();
                 if (dse.isDead) {
-                    it.remove(); //should be handled now. Keeping it anyways.
+                    it.remove(); //shouldn't happen. Keeping it anyways.
                     continue;
                 }
-                if (dse.cell == cellId && dse.worldObj == realClientWorld) {
+                
+                if (dse.getCorner().inside(lower, upper) || dse.getFarCorner().inside(lower, upper)) {
                     RenderDimensionSliceEntity.markBlocksForUpdate(dse, lx, ly, lz, hx, hy, hz);
                     dse.blocksChanged(lx, ly, lz);
                     dse.blocksChanged(hx, hy, hz);
@@ -206,13 +196,13 @@ public class HammerClientProxy extends HammerProxy {
                 return;
             }
             ((HammerWorldClient)Hammer.worldClient).clearAccesses();
-            Hammer.worldClient.addWorldAccess(new HammerRenderGlobal(currentWorld));
+            Hammer.worldClient.addWorldAccess(new ShadowRenderGlobal(currentWorld));
         }
     }
     
     @Override
     public void clientLogin(NetHandler clientHandler, INetworkManager manager, Packet1Login login) {
-        if (Core.enable_dimension_slice) {
+        if (Core.enable_dimension_slice && FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
             NetClientHandler nch = (NetClientHandler) clientHandler;
             Hammer.worldClient = new HammerWorldClient(nch,
                     new WorldSettings(0L, login.gameType, false, login.hardcoreMode, login.terrainType),
@@ -230,6 +220,9 @@ public class HammerClientProxy extends HammerProxy {
     public void clientLogout(INetworkManager manager) {
         //TODO: what else we can do here to cleanup?
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+            if (Hammer.worldClient != null) {
+                ((HammerWorldClient)Hammer.worldClient).clearAccesses();
+            }
             Hammer.worldClient = null;
             send_queue = null;
             fake_player = null;
@@ -253,7 +246,7 @@ public class HammerClientProxy extends HammerProxy {
     private void setWorldAndPlayer(WorldClient wc, EntityClientPlayerMP player) {
         Minecraft mc = Minecraft.getMinecraft();
         if (wc == null) {
-            Core.logSevere("Client-side hammer world is null. Remember: Crashing is fun!");
+            Core.logSevere("Setting client world to null. Remember: Crashing is fun!");
         }
         //For logic
         mc.theWorld = wc;
@@ -270,35 +263,43 @@ public class HammerClientProxy extends HammerProxy {
         }
     }
     
-    EntityClientPlayerMP real_player = null;
-    WorldClient real_world = null;
-    EntityClientPlayerMP fake_player = null;
-    
-    WorldClient reverse_shadow_world = null; //the world that the DSE is in when the client player is embedded in the DSE
+    private EntityClientPlayerMP real_player = null;
+    private WorldClient real_world = null;
+    private EntityClientPlayerMP fake_player = null;
     
     @Override
-    public void setClientWorld(World w) {
+    public void setShadowWorld() {
         //System.out.println("Setting world");
         Minecraft mc = Minecraft.getMinecraft();
+        WorldClient w = (WorldClient) Hammer.getClientShadowWorld();
         assert w != null;
+        if (real_player != null || real_world != null) {
+            Core.logSevere("Tried to switch to Shadow world, but we're already in the shadow world");
+            return;
+        }
         if (real_player == null) {
             real_player = mc.thePlayer;
+            if (real_player == null) {
+                Core.logSevere("Swapping out to hammer world, but thePlayer is null");
+            }
         }
         if (real_world == null) {
             real_world = mc.theWorld;
+            if (real_world == null) {
+                Core.logSevere("Swapping out to hammer world, but theWorld is null");
+            }
         }
         real_player.worldObj = w;
         if (fake_player == null || real_world != fake_player.worldObj) {
             //TODO NORELEASE: Cache
-            fake_player = new EntityClientPlayerMP(mc, mc.theWorld, mc.session, real_player.sendQueue /* not sure about this one. */);
+            fake_player = new EntityClientPlayerMP(mc, mc.theWorld /* XXX why is this real world? */, mc.session, real_player.sendQueue /* not sure about this one. */);
         }
         setWorldAndPlayer((WorldClient) w, fake_player);
     }
     
     @Override
-    public void restoreClientWorld() {
+    public void restoreRealWorld() {
         //System.out.println("Restoring world");
-        real_player.worldObj = real_world;
         setWorldAndPlayer(real_world, real_player);
         real_world = null;
         real_player = null;
@@ -311,17 +312,14 @@ public class HammerClientProxy extends HammerProxy {
     
     @Override
     public void runShadowTick() {
+        if (Minecraft.getMinecraft().isGamePaused) {
+            return;
+        }
         WorldClient w = (WorldClient) Hammer.getClientShadowWorld();
         if (w == null) {
             return;
         }
-        if (isInShadowWorld()) {
-            return;
-        }
-        if (Minecraft.getMinecraft().isGamePaused) {
-            return;
-        }
-        setClientWorld(w);
+        setShadowWorld();
         Core.profileStart("FZ.DStick");
         try {
             //Inspired by Minecraft.runTick()
@@ -329,7 +327,7 @@ public class HammerClientProxy extends HammerProxy {
             w.func_73029_E(32, 7, 32);
         } finally {
             Core.profileEnd();
-            restoreClientWorld();
+            restoreRealWorld();
         }
         
     }
