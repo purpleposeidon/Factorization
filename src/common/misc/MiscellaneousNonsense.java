@@ -92,6 +92,7 @@ public class MiscellaneousNonsense {
     @ServerStarting
     public void addCommands(FMLServerStartingEvent event) {
         event.registerServerCommand(new FogCommand());
+        //NORELEASE TODO: 'f' variant
     }
     
     static class FogCommand extends CommandBase {
