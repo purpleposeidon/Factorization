@@ -512,7 +512,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
 
     @Override
     public void updateEntity() {
-        super.updateEntity();
+        //super.updateEntity();
         updateStacks();
         if (lastCount != getItemCount()) {
             broadcastItemCount();
