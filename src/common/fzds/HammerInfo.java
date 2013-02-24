@@ -11,11 +11,15 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.world.WorldEvent;
+import factorization.api.Coord;
+import factorization.api.DeltaCoord;
 import factorization.common.Core;
 
 public class HammerInfo {
     private int allocated_cells = 0;
     private int unsaved_allocations = 0;
+    
+    //TODO NORELEASE: Let's use a config file in the save directory!
     
     @ForgeSubscribe
     public void handleWorldLoad(WorldEvent.Load event) {
@@ -23,16 +27,37 @@ public class HammerInfo {
             loadCellAllocations();
         }
     }
-
-    int takeCellId() {
-        //save the first time, and every 30 seconds (if there's been a change...)
+    
+    public int makeChannelFor(Object modInstance, String description, int padding) {
+        Core.logFine("Allocating Hammer channel for %s %s", modInstance, description); //NORELEASE
+        return 0;
+    }
+    
+    public int getPaddingForChannel(int channel) {
+        if (channel != 0) {
+            throw new IllegalArgumentException("Non-zero channels not yet implemented");
+        }
+        return 16*8;
+    }
+    
+    Coord takeCell(int channel, DeltaCoord size) {
+        if (channel != 0) {
+            throw new IllegalArgumentException("Non-zero channels not yet implemented");
+        }
+        int x = allocated_cells;
+        int add = size.x + getPaddingForChannel(channel);
+        Coord ret = new Coord(Hammer.getServerShadowWorld(), x, 64, channel*Hammer.channelWidth);
+        allocated_cells += add;
         if (unsaved_allocations++ == 0) {
             saveCellAllocations();
         }
-        return allocated_cells++;
+        return ret;
     }
     
-    void setAllocationCount(int count) {
+    void setAllocationCount(int channel, int count) {
+        if (channel != 0) {
+            throw new IllegalArgumentException("Non-zero channels not yet implemented");
+        }
         allocated_cells = count;
         saveCellAllocations();
     }

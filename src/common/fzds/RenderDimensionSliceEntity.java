@@ -66,29 +66,47 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
     }
     
     class DSRenderInfo {
-        final int width = Hammer.cellWidth;
-        final int height = 4;
-        final int cubicChunkCount = width*width*height;
-        final int wr_display_list_size = 3; //how many display lists a WorldRenderer uses
+        //final int width = Hammer.cellWidth;
+        //final int height = 4;
+        //final int cubicChunkCount = width*width*height;
+        private final int wr_display_list_size = 3; //how many display lists a WorldRenderer uses
+        final int entity_buffer = 8;
         
         int renderCounts = 0;
         long lastRenderInMegaticks = megatickCount;
         boolean dirty = false;
         private int renderList = -1;
-        private WorldRenderer renderers[] = new WorldRenderer[cubicChunkCount];
-        Coord corner;
+        private WorldRenderer renderers[] = null;
+        Coord corner, far;
         DimensionSliceEntity dse;
         
-        public DSRenderInfo(DimensionSliceEntity dse, Coord corner) {
+        int xSize, ySize, zSize;
+        int xSizeChunk, ySizeChunk, zSizeChunk;
+        int cubicChunkCount;
+        
+        public DSRenderInfo(DimensionSliceEntity dse) {
             this.dse = dse;
-            this.corner = corner;
+            this.corner = dse.getCorner();
+            this.far = dse.getFarCorner();
             
-            int xzSize = width*width;
+            xSize = (far.x - corner.x);
+            ySize = (far.y - corner.y);
+            zSize = (far.z - corner.z);
+            
+            xSizeChunk = xSize/16;
+            ySizeChunk = ySize/16;
+            zSizeChunk = zSize/16;
+            
+            
+            int xzSizeChunk = xSizeChunk*zSizeChunk;
+            cubicChunkCount = (1 + xSizeChunk)*(1 + ySizeChunk)*(1 + zSizeChunk);
+            
+            renderers = new WorldRenderer[cubicChunkCount];
             int i = 0;
             checkGLError("FZDS before render");
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    for (int z = 0; z < width; z++) {
+            for (int y = 0; y <= ySizeChunk; y++) {
+                for (int x = 0; x <= xSizeChunk; x++) {
+                    for (int z = 0; z <= zSizeChunk; z++) {
                         //We could allocate lists per WR instead?
                         renderers[i] = new WorldRenderer(corner.w, corner.w.loadedTileEntityList, corner.x + x*16, corner.y + y*16, corner.z + z*16, getRenderList() + i*wr_display_list_size);
                         renderers[i].posXClip = x*16;
@@ -166,13 +184,23 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             double sy = TileEntityRenderer.instance.playerY;
             double sz = TileEntityRenderer.instance.playerZ;
             try {
-                for (int cdx = 0; cdx < width; cdx++) {
-                    for (int cdz = 0; cdz < width; cdz++) {
+                int xwidth = far.x - corner.x;
+                int height = far.y - corner.y;
+                int zwidth = far.z - corner.z;
+                
+                for (int cdx = 0; cdx < xwidth; cdx++) {
+                    for (int cdz = 0; cdz < zwidth; cdz++) {
                         Chunk here = corner.w.getChunkFromBlockCoords(corner.x + cdx*16, corner.z + cdz*16);
                         for (int i1 = 0; i1 < here.entityLists.length; i1++) {
                             List<Entity> ents = here.entityLists[i1];
                             for (int i2 = 0; i2 < ents.size(); i2++) {
                                 Entity e = ents.get(i2);
+                                if (e.posY < corner.y - entity_buffer) {
+                                    continue;
+                                }
+                                if (e.posY > far.y + entity_buffer) {
+                                    continue;
+                                }
                                 if (nest == 3 && e instanceof DimensionSliceEntity) {
                                     continue;
                                 }
@@ -221,7 +249,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
     
     static void markBlocksForUpdate(DimensionSliceEntity dse, int lx, int ly, int lz, int hx, int hy, int hz) {
         if (dse.renderInfo == null) {
-            dse.renderInfo = instance.new DSRenderInfo(dse, dse.hammerCell);
+            dse.renderInfo = instance.new DSRenderInfo(dse);
         }
         DSRenderInfo renderInfo = (DSRenderInfo) dse.renderInfo;
         for (int i = 0; i < renderInfo.renderers.length; i++) {
@@ -236,7 +264,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
     
     DSRenderInfo getRenderInfo(DimensionSliceEntity dse) {
         if (dse.renderInfo == null) {
-            dse.renderInfo = new DSRenderInfo(dse, dse.getCorner());
+            dse.renderInfo = new DSRenderInfo(dse);
         }
         return (DSRenderInfo) dse.renderInfo;
     }
@@ -256,17 +284,13 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             return; //This will never happen, except with outside help.
         }
         DimensionSliceEntity dse = (DimensionSliceEntity) ent;
+        dse.getCorner().setId(Block.oreDiamond);
         DSRenderInfo renderInfo = getRenderInfo(dse);
         if (nest == 0) {
             Core.profileStart("fzds");
             checkGLError("FZDS before render -- somebody left a mess!");
             if (dse.renderInfo == null) {
-                if (dse.can(Caps.ORACLE)) {
-                    dse.renderInfo = new DSRenderInfo(dse, new Coord(dse)); //The real world
-                    //Honestly, we should be re-using vanilla's display lists for oracles. Oh well.
-                } else {
-                    dse.renderInfo = renderInfo = new DSRenderInfo(dse, dse.getCorner()); //The shadow world
-                }
+                dse.renderInfo = new DSRenderInfo(dse);
             }
             renderInfo.lastRenderInMegaticks = megatickCount;
         } else if (nest == 1) {

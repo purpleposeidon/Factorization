@@ -31,8 +31,8 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
     
     private HashSet<EntityPlayerMP> trackedPlayers = new HashSet();
     
-    public PacketProxyingPlayer(DimensionSliceEntity dimensionSlice) {
-        super(MinecraftServer.getServer(), dimensionSlice.hammerCell.w, "[" + getPrefix() + dimensionSlice.cell + "]", new ItemInWorldManager(dimensionSlice.hammerCell.w));
+    public PacketProxyingPlayer(DimensionSliceEntity dimensionSlice, World shadowWorld) {
+        super(MinecraftServer.getServer(), shadowWorld, "[" + getPrefix() + "]", new ItemInWorldManager(shadowWorld));
         this.dimensionSlice = dimensionSlice;
         this.playerNetServerHandler = new NetServerHandler(MinecraftServer.getServer(), this, this);
         Coord c = dimensionSlice.getCenter();
@@ -126,9 +126,11 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
         ArrayList<TileEntity> tileEntities = new ArrayList();
         Coord corner = dimensionSlice.getCorner();
         World world = Hammer.getServerShadowWorld();
-        for (int dx = 0; dx < Hammer.cellWidth; dx++) {
-            for (int dz = 0; dz < Hammer.cellWidth; dz++) {
-                int x = corner.x + 16*dx, z = corner.z + 16*dz;
+        
+        Coord low = dimensionSlice.getCorner();
+        Coord far = dimensionSlice.getFarCorner();
+        for (int x = low.x; x <= far.x; x += 16) {
+            for (int z = low.z; z <= far.z; z += 16) {
                 if (!world.blockExists(x+1, 0, z+1)) {
                     continue;
                 }
@@ -137,6 +139,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
                 tileEntities.addAll(chunk.chunkTileEntityMap.values());
             }
         }
+        
         //NOTE: This has the potential to go badly if there's a large amount of data in the chunks.
         NetServerHandler net = target.playerNetServerHandler;
         if (!chunks.isEmpty()) {

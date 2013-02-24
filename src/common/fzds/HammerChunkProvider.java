@@ -28,35 +28,7 @@ public class HammerChunkProvider implements IChunkProvider {
 
     @Override
     public Chunk provideChunk(int chunkX, int chunkZ) {
-        if (chunkZ < -1  || chunkZ > Hammer.cellWidth || chunkX < -1) {
-            return new Chunk(world, chunkX, chunkZ);
-        }
-        int totalWidth = Hammer.cellWidth + Hammer.wallWidth;
-        int x = chunkX % totalWidth;
-        int z = chunkZ % totalWidth;
-        if (x < 0) x += totalWidth;
-        if (z < 0) z += totalWidth;
-        Chunk ret;
-        if (x >= Hammer.cellWidth || z >= Hammer.cellWidth) {
-            //this is a wall chunk
-//			byte bedrock[] = new byte[16*16*16*8]; //8 seems to be the minimum # of cubic chunks
-//			Arrays.fill(bedrock, 0, 16*16*Hammer.wallHeight, (byte)Block.bedrock.blockID);
-            byte bedrock[] = new byte[16*16*Hammer.wallHeight];
-            Arrays.fill(bedrock, (byte)Block.bedrock.blockID);
-            ret = new Chunk(world, bedrock, chunkX, chunkZ);
-        } else if (chunkX < 0 || chunkZ < 0 || chunkZ > Hammer.cellWidth) {
-            //This is an outside chunk
-            ret = new Chunk(world, chunkX, chunkZ);
-        } else {
-            //this is a cell chunk
-            ret = new Chunk(world, chunkX, chunkZ);
-//			for (int i = 0; i < 16; i++) {
-//				for (int j = 0; j < 16; j++) {
-//					ret.setBlockID(i, 5, j, 1);
-//				}
-//			}
-        }
-        return ret;
+        return new Chunk(world, chunkX, chunkZ);
     }
 
     @Override
@@ -86,7 +58,7 @@ public class HammerChunkProvider implements IChunkProvider {
 
     @Override
     public String makeString() {
-        return "FZHammarChunkSource";
+        return "FzdsHammerChunkProvider";
     }
 
     @Override

@@ -335,7 +335,7 @@ for x in range(0, len(d[0])):
         DeltaCoord size = max.difference(min);
         DeltaCoord half = size.scale(0.5);
         Coord center = min.add(half);
-        DimensionSliceEntity dse = Hammer.allocateSlice(worldObj);
+        DimensionSliceEntity dse = Hammer.allocateSlice(worldObj, -1, new DeltaCoord(0, 0, 0));
         center.setAsEntityLocation(dse);
         dse.posX += 0.5;
         dse.posY -= 5;

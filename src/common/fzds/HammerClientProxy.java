@@ -97,7 +97,6 @@ public class HammerClientProxy extends HammerProxy {
             markBlocksForUpdate(var1 - 1, var2 - 1, var3 - 1, var4 + 1, var5 + 1, var6 + 1);
         }
         
-        Coord center = new Coord(Hammer.getClientShadowWorld(), 0, 0, 0);
         void markBlocksForUpdate(int lx, int ly, int lz, int hx, int hy, int hz) {
             //Could this be more efficient?
             Coord lower = new Coord(null, lx, ly, lz);

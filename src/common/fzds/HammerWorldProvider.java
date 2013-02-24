@@ -49,8 +49,7 @@ public class HammerWorldProvider extends WorldProvider {
     @Override
     public ChunkCoordinates getEntrancePortalLocation() {
         //err, this probably never gets called...
-        int cellCenter = Hammer.cellWidth*16/2;
-        return new ChunkCoordinates(cellCenter, 64, cellCenter);
+        return new ChunkCoordinates(0, 128, 00);
     }
     
     @Override

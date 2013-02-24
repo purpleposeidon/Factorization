@@ -1,14 +1,9 @@
 package factorization.fzds;
 
-import java.lang.ref.WeakReference;
-import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.WeakHashMap;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetworkManager;
@@ -18,7 +13,6 @@ import net.minecraft.network.packet.Packet1Login;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerManager;
 import net.minecraft.util.Vec3;
-import net.minecraft.util.Vec3Pool;
 import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -46,6 +40,7 @@ import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
+import factorization.api.DeltaCoord;
 import factorization.common.Core;
 import factorization.common.WeakSet;
 
@@ -64,6 +59,7 @@ public class Hammer {
     public static int dimensionID;
     public static World worldClient = null; //This is actually a WorldClient that is actually HammerClientProxy.HammerWorldClient
     public static double DSE_ChunkUpdateRangeSquared = Math.pow(16*8, 2); //This is actually set when the server starts
+    public static int fzds_command_channel = 0;
     
     private static Set<DimensionSliceEntity> serverSlices = new WeakSet(), clientSlices = new WeakSet();
     static Set<DimensionSliceEntity> getSlices(World w) {
@@ -103,49 +99,14 @@ public class Hammer {
         return realWorld.isRemote ? getClientShadowWorld() : getServerShadowWorld();
     }
     
-    static Coord getCornerForId(World realWorld, int cellId) {
-        int cellSize = (cellWidth + wallWidth)*16;
-        return new Coord(getWorld(realWorld), cellSize*cellId, 0, 0);
-    }
-    
-    static int getIdFromCoord(Coord c) {
-        //You're not allowed to write getIdFromXCoordinate
-        if (c.x < 0 || c.z < 0 || c.z > cellWidth*16) {
-            return -1;
-        }
-        int depth_per_cell = (cellWidth + wallWidth)*16;
-        return c.x / depth_per_cell;
-    }
-    
-    @Deprecated
-    public static Chunk[] getChunks(DimensionSliceEntity dse) {
-        Coord corner = dse.getCorner();
-        int i = 0;
-        for (int dx = 0; dx < cellWidth; dx++) {
-            for (int dz = 0; dz < cellWidth; dz++) {
-                hChunks[i++] = corner.w.getChunkFromBlockCoords(corner.x + 16*dx, corner.z + 16*dz);
-            }
-        }
-        return hChunks;
-    }
-    
-    public static DimensionSliceEntity allocateSlice(World spawnWorld) {
-        return spawnSlice(spawnWorld, hammerInfo.takeCellId());
-    }
-    
-    public static DimensionSliceEntity spawnSlice(World spawnWorld, int cellId) {
-        return new DimensionSliceEntity(spawnWorld, cellId);
+    public static DimensionSliceEntity allocateSlice(World spawnWorld, int channel, DeltaCoord size) {
+        Coord base = hammerInfo.takeCell(channel, size);
+        return new DimensionSliceEntity(spawnWorld, base, base.add(size));
     }
     
     private final static EnumSet<TickType> serverTicks = EnumSet.of(TickType.SERVER);
     final static HammerInfo hammerInfo = new HammerInfo();
-    //each cell is a few chunks wide, with chunks of bedrock between.
-    static final int cellWidth = 3; //TODO: Make this more generic; we don't want limitations on size.
-    static final int cellHeight = cellWidth;
-    static final int wallWidth = 16;
-    static final int wallHeight = 16*8; //16*8 is the minimum or something. (For the Chunk constructor that we're using.) I'd rather go with 16*4. Meh.
-    
-    private static Chunk[] hChunks = new Chunk[cellWidth*cellWidth];
+    static final int channelWidth = 16*50;
     
     @PreInit
     public void setup(FMLPreInitializationEvent event) {
@@ -250,6 +211,7 @@ public class Hammer {
         assert DimensionManager.shouldLoadSpawn(dimensionID);
         World hammerWorld = DimensionManager.getWorld(dimensionID);
         hammerWorld.addWorldAccess(new IWorldAccess() {
+            //TODO: Move to file; mix with Client Proxy's version
             //Should lets DSEs know that they need to update their area when a block is changed 
             @Override public void spawnParticle(String var1, double var2, double var4, double var6, double var8, double var10, double var12) { }
             @Override public void releaseEntitySkin(Entity var1) { }
@@ -276,20 +238,17 @@ public class Hammer {
             Coord center = new Coord(Hammer.getClientShadowWorld(), 0, 0, 0);
             void markBlocksForUpdate(int lx, int ly, int lz, int hx, int hy, int hz) {
                 //Sorry, it could probably be a bit more efficient.
-                World shadow = Hammer.getServerShadowWorld();
-                center.set(shadow, (lx + hx)/2, (ly + hy)/2, (lz + hz)/2);
-                int cellId = Hammer.getIdFromCoord(center);
-                if (cellId < 0) {
-                    return;
-                }
-                Iterator<DimensionSliceEntity> it = Hammer.getSlices(shadow).iterator();
+                Coord lower = new Coord(null, lx, ly, lz);
+                Coord upper = new Coord(null, hx, hy, hz);
+                World realClientWorld = Hammer.getClientRealWorld();
+                Iterator<DimensionSliceEntity> it = Hammer.getSlices(realClientWorld).iterator();
                 while (it.hasNext()) {
                     DimensionSliceEntity dse = it.next();
                     if (dse.isDead) {
-                        it.remove(); //should be handled now. Keeping it anyways.
+                        it.remove(); //shouldn't happen. Keeping it anyways.
                         continue;
                     }
-                    if (dse.cell == cellId && dse.worldObj == shadow) {
+                    if (dse.getCorner().inside(lower, upper) || dse.getFarCorner().inside(lower, upper)) {
                         dse.blocksChanged(lx, ly, lz);
                         dse.blocksChanged(hx, hy, hz);
                     }
@@ -303,7 +262,7 @@ public class Hammer {
         int view_distance = MinecraftServer.getServer().getConfigurationManager().getViewDistance();
         //the undeobfed method comes after "isPlayerWatchingChunk", also in uses of ServerConfigurationManager.getViewDistance()
         //It returns how many blocks are visible.
-        DSE_ChunkUpdateRangeSquared = Math.pow(PlayerManager.func_72686_a(view_distance) + 16*cellWidth, 2);
+        DSE_ChunkUpdateRangeSquared = Math.pow(PlayerManager.func_72686_a(view_distance) + 16*2, 2);
     }
     
     @ServerStopping
@@ -313,7 +272,7 @@ public class Hammer {
         clientSlices.clear();
     }
     
-    public static DimensionSliceEntity findClosest(Entity target, int cellId) {
+    public static DimensionSliceEntity findClosest(Entity target, Coord pos) {
         if (target == null) {
             return null;
         }
@@ -322,7 +281,7 @@ public class Hammer {
         World real_world = getClientRealWorld();
         
         for (DimensionSliceEntity here : Hammer.getSlices(target.worldObj)) {
-            if (here.worldObj != real_world && here.cell != cellId) {
+            if (here.worldObj != real_world && !pos.inside(here.getCorner(), here.getFarCorner())) {
                 continue;
             }
             if (closest == null) {
@@ -342,8 +301,7 @@ public class Hammer {
     
     public static Vec3 shadow2nearestReal(Entity player, double x, double y, double z) {
         //The JVM sometimes segfaults in this function.
-        int correct_cell_id = Hammer.getIdFromCoord(Coord.of(x, y, z));
-        DimensionSliceEntity closest = Hammer.findClosest(player, correct_cell_id);
+        DimensionSliceEntity closest = Hammer.findClosest(player, new Coord(player.worldObj, x, y, z));
         if (closest == null) {
             return null;
         }
@@ -384,8 +342,9 @@ public class Hammer {
     
     private static Coord shadow = new Coord(null, 0, 0, 0);
     
-    public static DimensionSliceEntity makeSlice(final Coord min, final Coord max, AreaMap mapper) {
-        final DimensionSliceEntity dse = Hammer.allocateSlice(min.w);
+    public static DimensionSliceEntity makeSlice(int channel, final Coord min, final Coord max, AreaMap mapper) {
+        DeltaCoord size = max.difference(min);
+        final DimensionSliceEntity dse = Hammer.allocateSlice(min.w, channel, size);
         Vec3 vrm = min.centerVec(max);
         dse.posX = vrm.xCoord;
         dse.posY = vrm.yCoord;

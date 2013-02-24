@@ -38,7 +38,7 @@ public class TransferLib {
         int id = src.getId();
         int md = src.getMd();
         if (id != 0) {
-            System.out.println("Moving " + src + " to " + dest);
+            System.out.println("Moving " + src + " to " + dest); //NORELEASE
         }
         TileEntity te = src.getTE();
         NBTTagCompound teData = null;

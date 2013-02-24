@@ -55,18 +55,17 @@ Kill Wrath (This will make the mod so much simpler...):
 
 TOP LIST (that's become somewhat less tops. Oops.)
 --------
-FZDS breaks Pistons and Frames somehow
+CovertJaguar_proper_packet_sending
+Tossing barrels (Or, well, anything) through mystcraft portals with the gravity gun
 Bug report of wire-breaking not actually disconnecting?
-Reduce sludge output
 Look at what errors we get if the FZDS code isn't in
 either bats are spawning in the hammer dimension, or we're getting entity updates that we shouldn't be
 Exo-armor needs a look-through
-Make exo-armor not look terrible (Maybe use those armor slot symbols...). Also the on-player armor, needs some noise & sparklies. Also, is it too rigid?
+Make exo-armor not look terrible (Maybe use those armor slot symbols...). Also the on-player armor texture needs some noise & sparklies. Also, is it too rigid?
 Wall jump only works when moving up? Make wall jump bouncing you off the wall at a 45° angle
 Grinder acting weird?
-RP heating
 Forestry liquid containers/vanilla water bottles working in the mixer
-fix middle clicking
+fix vanilla's middle clicking
 Modularize FZ/astro so that astro has no deps & can be removed for public release
 regularize fluid volumes for mixer/crystallizer; how can we make buckets of aqua regia?
 either figure out how to get mystcraft (?) loading TEs properly, or have the client automatically request the proper TE
@@ -88,13 +87,12 @@ Strong, but balanced, armor: Memory Plating/Conditioned Armor (More inverium)
 Good mining tools
 Placing/breaking wrath lamp in hammerspace seems to cause the client to crap its pants
 Don't keep non-weak references to worlds ("MapMaker.weakKeys().buildMap()") except in Entity/TileEntity
+RP heating
 
 back to ceramics?
 https://github.com/MinecraftForge/MinecraftForge/commit/34ebfcd9785c3c50c3ac743eb1e9cbf000df10dc
 
 [Reported bugs]
-FTB, ore genned silver doesn't work?
-Igneous Extruders (from Thermal Expansion) don't want to work with the router.
 exo in creative list twice when searching
 
 [Features]

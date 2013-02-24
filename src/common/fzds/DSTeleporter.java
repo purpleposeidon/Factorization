@@ -24,21 +24,6 @@ class DSTeleporter extends Teleporter {
             player.posZ = preciseDestination.zCoord;
             return;
         }
-        destination.x--;
-        //destination.moveToTopBlock();
-        if (player.worldObj == DimensionManager.getWorld(Core.dimension_slice_dimid)) {
-            destination.y = Math.min(Hammer.wallHeight, destination.y);
-        }
         destination.setAsEntityLocation(player);
-        /*Coord below = new Coord(player);
-        below = below.add(0, -3, 0);
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dz = -1; dz <= 1; dz++) {
-                Coord platform = below.add(dx, 0, dz);
-                if (platform.isAir()) {
-                    platform.setId(Block.stone);
-                }
-            }
-        }*/
     }
 }

@@ -35,39 +35,53 @@ import factorization.fzds.api.IFzdsCustomTeleport;
 import factorization.fzds.api.IFzdsEntryControl;
 
 public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, IEntityAdditionalSpawnData {
-    int cell;
+    //Dang, this is a lot of fields
+    
+    private Coord hammerCell, farCorner;
+    public Vec3 centerOffset;
+    
     private int capabilities = Caps.of(Caps.MOVE, Caps.COLLIDE, Caps.DRAG);
     
-    public Coord hammerCell;
-    Object renderInfo = null;
     AxisAlignedBB shadowArea = null, shadowCollisionArea = null, realArea = null, realCollisionArea = null, realDragArea = null;
     MetaAxisAlignedBB metaAABB = null;
+    boolean needAreaUpdate = true;
+    ArrayList<DseCollider> children = null; //null so that we can check if we need to init them easily
+    private double last_motion_hash = Double.NaN;
+    
     public Quaternion rotation = new Quaternion(), rotationalVelocity = new Quaternion();
-    public Quaternion prevTickRotation = new Quaternion(); //used on the client
     private Quaternion last_shared_rotation = new Quaternion(), last_shared_rotational_velocity = new Quaternion(); //used on the server
-    public Vec3 centerOffset = Vec3.createVectorHelper(Hammer.cellWidth*16/2, Hammer.wallHeight/2, Hammer.cellWidth*16/2);
+    public Quaternion prevTickRotation = new Quaternion(); //Client-side
+    
+    Object renderInfo = null; //Client-side
     
     PacketProxyingPlayer proxy = null;
-    boolean needAreaUpdate = true;
-    ArrayList<DseCollider> children = null; //we don't init here so that it's easy to see if we need to init it
-    
-    private double last_motion_hash = Double.NaN;
     
     public DimensionSliceEntity(World world) {
         super(world);
+        if (world == Hammer.getWorld(world)) {
+            setDead();
+        }
         ignoreFrustumCheck = true; //kinda lame; we should give ourselves a proper bounding box?
         boundingBox.setBounds(0, 0, 0, 0, 0, 0);
     }
     
-    public DimensionSliceEntity(World world, int cell) {
+    public DimensionSliceEntity(World world, Coord lowerCorner, Coord upperCorner) {
         this(world);
-        this.cell = cell;
-        this.hammerCell = Hammer.getCornerForId(world, cell);
+        setCorners(lowerCorner, upperCorner);
+    }
+    
+    private void setCorners(Coord lowerCorner, Coord upperCorner) {
+        this.hammerCell = lowerCorner;
+        this.farCorner = upperCorner;
+        centerOffset = Vec3.createVectorHelper(
+                (lowerCorner.x + upperCorner.x)/2,
+                (lowerCorner.y + upperCorner.y)/2,
+                (lowerCorner.z + upperCorner.z)/2);
     }
     
     @Override
     public String toString() {
-        return super.toString() + " ID = %" + cell;
+        return super.toString() + " - " + hammerCell + "  to  " + farCorner;
     }
     
     public Vec3 real2shadow(Vec3 realCoords) {
@@ -130,9 +144,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     }
     
     public Coord getFarCorner() {
-        return hammerCell.add((int)centerOffset.xCoord*2,
-                (int)centerOffset.yCoord*2,
-                (int)centerOffset.zCoord*2);
+        return farCorner;
     }
     
     @Override
@@ -150,27 +162,31 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
 
     @Override
     protected void readEntityFromNBT(NBTTagCompound tag) {
-        cell = tag.getInteger("cell");
+        hammerCell = new Coord(Hammer.getWorld(worldObj), 0, 0, 0);
+        farCorner = hammerCell.copy();
+        
+        
         capabilities = tag.getInteger("cap");
         rotation = Quaternion.loadFromTag(tag, "r");
         rotationalVelocity = Quaternion.loadFromTag(tag, "w");
-        centerOffset.xCoord = tag.getFloat("coX");
-        centerOffset.yCoord = tag.getFloat("coY");
-        centerOffset.zCoord = tag.getFloat("coZ");
-        hammerCell = new Coord(Hammer.getWorld(worldObj), 0, 0, 0);
+        centerOffset = Vec3.createVectorHelper(0, 0, 0);
+        centerOffset.xCoord = tag.getFloat("cox");
+        centerOffset.yCoord = tag.getFloat("coy");
+        centerOffset.zCoord = tag.getFloat("coz");
         hammerCell.readFromNBT("min", tag);
+        farCorner.readFromNBT("max", tag);
     }
 
     @Override
     protected void writeEntityToNBT(NBTTagCompound tag) {
-        tag.setInteger("cell", cell);
         tag.setInteger("cap", capabilities);
         rotation.writeToTag(tag, "r");
         rotationalVelocity.writeToTag(tag, "w");
-        tag.setFloat("coX", (float) centerOffset.xCoord);
-        tag.setFloat("coY", (float) centerOffset.yCoord);
-        tag.setFloat("coZ", (float) centerOffset.zCoord);
+        tag.setFloat("cox", (float) centerOffset.xCoord);
+        tag.setFloat("coy", (float) centerOffset.yCoord);
+        tag.setFloat("coz", (float) centerOffset.zCoord);
         hammerCell.writeToNBT("min", tag);
+        farCorner.writeToNBT("max", tag);
     }
     
     @Override
@@ -209,15 +225,14 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
         needAreaUpdate = false;
         //this.boundingBox.setBB(realArea);
         if (children == null && worldObj.isRemote) {
-            children = new ArrayList((int) Math.pow(Hammer.cellWidth, 3));
+            children = new ArrayList();
             //The array will be filled as the server sends us children
         } else if (children == null && !worldObj.isRemote) {
-            children = new ArrayList((int) Math.pow(Hammer.cellWidth, 3));
-            int width = Hammer.cellWidth*16;
-            int height = Hammer.cellHeight*16;
-            for (int dx = -width/2; dx < width/2; dx += 16) {
-                for (int dy = 0; dy < height; dy += 16) {
-                    for (int dz = -width/2; dz < width/2; dz += 16) {
+            children = new ArrayList();
+            
+            for (int dx = hammerCell.x; dx <= farCorner.x; dx += 16) {
+                for (int dy = hammerCell.y; dy <= farCorner.y; dy += 16) {
+                    for (int dz = hammerCell.z; dz <= farCorner.z; dz += 16) {
                         //could theoretically re-use a single DseCollider for each chunk. Theoretically.
                         Entity e = new DseCollider(this, Vec3.createVectorHelper(dx, dy, dz));
                         e.onEntityUpdate();
@@ -276,13 +291,6 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
         shadowArea = cloneAABB(start);
         shadowCollisionArea = shadowArea.expand(2, 2, 2);
         updateRealArea();
-    }
-    
-    void init() {
-        if (hammerCell == null) {
-            this.hammerCell = Hammer.getCornerForId(worldObj, cell);
-        }
-        Hammer.getSlices(worldObj).add(this);
     }
     
     public void blocksChanged(int x, int y, int z) {
@@ -394,8 +402,8 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
         if (worldObj.isRemote) {
             prevTickRotation.update(rotation);
         } else if (proxy == null && !isDead) {
-            init();
-            proxy = new PacketProxyingPlayer(this);
+            Hammer.getSlices(worldObj).add(this);
+            proxy = new PacketProxyingPlayer(this, Hammer.getServerShadowWorld());
             proxy.worldObj.spawnEntityInWorld(proxy);
             return;
         }
@@ -456,25 +464,33 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
         }
     }
     
+    
+    
     private void removeExteriorEntities() {
         //Move entities outside the bounds in the shadow world into the real world
-        Chunk[] mychunks = Hammer.getChunks(this);
-        for (int i = 0; i < mychunks.length; i++) {
-            Chunk chunk = mychunks[i];
-            for (int j = 0; j < chunk.entityLists.length; j++) {
-                List<Entity> l = chunk.entityLists[j];
-                for (int k = 0; k < l.size(); k++) {
-                    Entity ent = l.get(k); //This is probably an ArrayList.
-                    if (ent.posY < 0 || ent.posY > Hammer.wallHeight || ent == this /* oh god what */) {
-                        continue;
-                    }
-                    AxisAlignedBB bb = ent.boundingBox;
-                    if (bb != null && !shadowArea.intersectsWith(bb)) {
-                        ejectEntity(ent);
+        for (int x = hammerCell.x; x <= farCorner.x; x += 16) {
+            for (int z = hammerCell.z; z <= farCorner.z; z += 16) {
+                if (!worldObj.blockExists(x, 64, z)) {
+                    continue;
+                }
+                Chunk chunk = worldObj.getChunkFromBlockCoords(x, z);
+                for (int j = 0; j < chunk.entityLists.length; j++) {
+                    List<Entity> l = chunk.entityLists[j];
+                    for (int k = 0; k < l.size(); k++) {
+                        Entity ent = l.get(k); //This is probably an ArrayList.
+                        if (ent.posY < 0 || ent.posY > worldObj.getActualHeight() || ent == this /* oh god what */) {
+                            continue;
+                        }
+                        AxisAlignedBB bb = ent.boundingBox;
+                        if (bb != null && !shadowArea.intersectsWith(bb)) {
+                            ejectEntity(ent);
+                        }
                     }
                 }
+                
             }
         }
+        
     }
     
     boolean forbidEntityTransfer(Entity ent) {
@@ -591,7 +607,6 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     
     @Override
     public void writeSpawnData(ByteArrayDataOutput data) {
-        data.writeInt(cell);
         data.writeInt(capabilities);
         rotation.write(data);
         rotationalVelocity.write(data);
@@ -599,24 +614,24 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
         data.writeFloat((float) centerOffset.yCoord);
         data.writeFloat((float) centerOffset.zCoord);
         hammerCell.writeToStream(data);
+        farCorner.writeToStream(data);
     }
 
     @Override
     public void readSpawnData(ByteArrayDataInput data) {
-        cell = data.readInt();
-        capabilities = data.readInt();
         try {
+            capabilities = data.readInt();
             rotation = Quaternion.read(data);
             rotationalVelocity = Quaternion.read(data);
-            centerOffset.xCoord = data.readFloat();
-            centerOffset.yCoord = data.readFloat();
-            centerOffset.zCoord = data.readFloat();
+            centerOffset = Vec3.createVectorHelper(data.readFloat(), data.readFloat(), data.readFloat());
             if (can(Caps.ORACLE)) {
                 hammerCell = new Coord(worldObj, 0, 0, 0);
             } else {
                 hammerCell = new Coord(Hammer.getClientShadowWorld(), 0, 0, 0);
             }
             hammerCell.readFromStream(data);
+            farCorner = hammerCell.copy();
+            farCorner.readFromStream(data);
         } catch (IOException e) {
             //Not expected to happen ever
             e.printStackTrace();

@@ -256,20 +256,6 @@ public class FZDSCommand extends CommandBase {
                 }
                 World w = DimensionManager.getWorld(parts.get(0));
                 cmd.user = new Coord(w, parts.get(1), parts.get(2), parts.get(3));
-            } else if (a.startsWith("%")) {
-                World w = null;
-                int id = Integer.parseInt(a.substring(1));
-                boolean found = false;
-                for (DimensionSliceEntity dse : Hammer.getSlices(null /* not specifying world is LAME here */)) {
-                    if (dse.cell == id) {
-                        cmd.selected = dse;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    throw new CommandException("Did not find that DSE");
-                }
             } else {
                 cleanedArgs.add(a);
             }
@@ -368,7 +354,7 @@ public class FZDSCommand extends CommandBase {
                 sender.sendChatToPlayer(join(good));
                 sender.sendChatToPlayer("The commands need a Coord, DSE, or player.");
                 sender.sendChatToPlayer("If these are not implicitly available, you can provide them using:");
-                sender.sendChatToPlayer(" #worldId,x,y,z %CellId @PlayerName");
+                sender.sendChatToPlayer(" #worldId,x,y,z @PlayerName");
                 sender.sendChatToPlayer("Best commands: grab goc leave drop");
             }});
         add(new SubCommand ("go|gob|got") {
@@ -468,7 +454,7 @@ public class FZDSCommand extends CommandBase {
                 final Coord lower = low.copy();
                 final Coord upper = up.copy();
                 
-                DimensionSliceEntity dse = Hammer.makeSlice(lower, upper, new AreaMap() {
+                DimensionSliceEntity dse = Hammer.makeSlice(Hammer.fzds_command_channel, lower, upper, new AreaMap() {
                     @Override
                     public void fillDse(DseDestination destination) {
                         Coord here = user.copy();
@@ -493,33 +479,6 @@ public class FZDSCommand extends CommandBase {
                 selected.dropContents();
                 setSelection(null);
             }}, Requires.SELECTION);
-        add(new SubCommand("spawn") {
-            @Override
-            String details() { return "Allocates an empty Slice"; }
-            @Override
-            void call(String[] args) {
-                DimensionSliceEntity currentWE = Hammer.allocateSlice(user.w);
-                user.setAsEntityLocation(currentWE);
-                currentWE.permit(Caps.EMPTY);
-                currentWE.worldObj.spawnEntityInWorld(currentWE);
-                ((EntityPlayerMP) sender).addChatMessage("Created FZDS " + currentWE.cell);
-                setSelection(currentWE);
-            }}, Requires.COORD);
-        add(new SubCommand("show", "[%CELL=0]") {
-            @Override
-            String details() { return "Creates a Slice with %cell"; }
-            @Override
-            void call(String[] args) {
-                int cell = 0;
-                if (args.length > 0) {
-                    cell = Integer.valueOf(args[0]);
-                }
-                DimensionSliceEntity currentWE = Hammer.spawnSlice(user.w, cell);
-                user.setAsEntityLocation(currentWE);
-                currentWE.worldObj.spawnEntityInWorld(currentWE);
-                ((EntityPlayerMP) sender).addChatMessage("Showing FZDS " + currentWE.cell);
-                setSelection(currentWE);
-            }}, Requires.COORD);
         add(new SubCommand("grass") {
             @Override
             String details() { return "Places a grass block at the user's feet"; }
@@ -554,7 +513,7 @@ public class FZDSCommand extends CommandBase {
             }}, Requires.OP);
         add(new SubCommand("selection") {
             @Override
-            String details() { return "Shows the selection (and makes SELECTION the default selection)"; }
+            String details() { return "Prints the selection"; }
             @Override
             void call(String[] args) {
                 sender.sendChatToPlayer("> " + selected);
@@ -637,7 +596,7 @@ public class FZDSCommand extends CommandBase {
                     throw new SyntaxErrorException();
                 }
                 int newCount = Integer.parseInt(args[0]);
-                Hammer.instance.hammerInfo.setAllocationCount(newCount);
+                Hammer.instance.hammerInfo.setAllocationCount(Hammer.fzds_command_channel, newCount);
             }}, Requires.OP);
         add(new SubCommand("sr|sw", "angle°", "[direction=UP]") {
             @Override
