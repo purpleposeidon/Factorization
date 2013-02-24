@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.RenderHelper;
@@ -21,6 +22,7 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.ChunkPosition;
@@ -113,8 +115,9 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             Core.profileStart("update");
             checkGLError("FZDS before WorldRender update");
             while (last_update_index < renderers.length) {
-                if (renderers[last_update_index].needsUpdate) {
-                    renderers[last_update_index].updateRenderer();
+                WorldRenderer wr = renderers[last_update_index];
+                if (wr.needsUpdate) {
+                    wr.updateRenderer();
                     last_update_index++;
                     break;
                 }
@@ -260,7 +263,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             if (dse.renderInfo == null) {
                 if (dse.can(Caps.ORACLE)) {
                     dse.renderInfo = new DSRenderInfo(dse, new Coord(dse)); //The real world
-                    //Honestly, we should be re-using vanilla's display lists for oracles.
+                    //Honestly, we should be re-using vanilla's display lists for oracles. Oh well.
                 } else {
                     dse.renderInfo = renderInfo = new DSRenderInfo(dse, dse.getCorner()); //The shadow world
                 }
@@ -303,11 +306,15 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 renderInfo.renderTerrain();
                 checkGLError("FZDS terrain display list render");
                 glTranslatef((float)(dse.posX - x), (float)(dse.posY - y), (float)(dse.posZ - z));
-                Hammer.proxy.setShadowWorld();
-                try {
+                if (nest == 1) {
+                    Hammer.proxy.setShadowWorld();
+                    try {
+                        renderInfo.renderEntities(partialTicks);
+                    } finally {
+                        Hammer.proxy.restoreRealWorld();
+                    }
+                } else {
                     renderInfo.renderEntities(partialTicks);
-                } finally {
-                    Hammer.proxy.restoreRealWorld();
                 }
                 checkGLError("FZDS entity render");
             } finally {

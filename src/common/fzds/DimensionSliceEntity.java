@@ -157,7 +157,8 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
         centerOffset.xCoord = tag.getFloat("coX");
         centerOffset.yCoord = tag.getFloat("coY");
         centerOffset.zCoord = tag.getFloat("coZ");
-        hammerCell.writeToNBT("min", tag);
+        hammerCell = new Coord(Hammer.getWorld(worldObj), 0, 0, 0);
+        hammerCell.readFromNBT("min", tag);
     }
 
     @Override
@@ -169,7 +170,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
         tag.setFloat("coX", (float) centerOffset.xCoord);
         tag.setFloat("coY", (float) centerOffset.yCoord);
         tag.setFloat("coZ", (float) centerOffset.zCoord);
-        hammerCell.readFromNBT("min", tag);
+        hammerCell.writeToNBT("min", tag);
     }
     
     @Override
@@ -610,7 +611,11 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
             centerOffset.xCoord = data.readFloat();
             centerOffset.yCoord = data.readFloat();
             centerOffset.zCoord = data.readFloat();
-            hammerCell = new Coord(worldObj, 0, 0, 0);
+            if (can(Caps.ORACLE)) {
+                hammerCell = new Coord(worldObj, 0, 0, 0);
+            } else {
+                hammerCell = new Coord(Hammer.getClientShadowWorld(), 0, 0, 0);
+            }
             hammerCell.readFromStream(data);
         } catch (IOException e) {
             //Not expected to happen ever
@@ -671,6 +676,13 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     
     public DimensionSliceEntity permit(Caps cap) {
         capabilities |= cap.bit;
+        if (cap == Caps.ORACLE) {
+            forbid(Caps.COLLIDE);
+            forbid(Caps.DRAG);
+            forbid(Caps.TAKE_INTERIOR_ENTITIES);
+            forbid(Caps.REMOVE_EXTERIOR_ENTITIES);
+            forbid(Caps.TRANSFER_PLAYERS);
+        }
         return this;
     }
     
