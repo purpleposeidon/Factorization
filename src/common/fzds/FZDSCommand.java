@@ -319,7 +319,7 @@ public class FZDSCommand extends CommandBase {
     }
     
     private static String pick(String ...bits) {
-        for (int i = 0; i < bits.length; i += 2) {
+        for (int i = 0; i < bits.length - 1; i += 2) {
             if (bits[i].equalsIgnoreCase(bits[i + 1])) {
                 return bits[i + 1];
             }
@@ -468,11 +468,7 @@ public class FZDSCommand extends CommandBase {
                 final Coord lower = low.copy();
                 final Coord upper = up.copy();
                 
-                DimensionSliceEntity dse = Hammer.allocateSlice(user.w).permit(Caps.ROTATE);
-                Coord middle = lower.add(upper.difference(lower).scale(0.5));
-                middle.setAsEntityLocation(dse);
-                
-                Hammer.makeSlice(lower, upper, new AreaMap() {
+                DimensionSliceEntity dse = Hammer.makeSlice(lower, upper, new AreaMap() {
                     @Override
                     public void fillDse(DseDestination destination) {
                         Coord here = user.copy();
@@ -485,6 +481,7 @@ public class FZDSCommand extends CommandBase {
                             }
                         }
                     }});
+                dse.permit(Caps.ROTATE);
                 dse.worldObj.spawnEntityInWorld(dse);
                 setSelection(dse);
             }}, Requires.COORD);
@@ -503,6 +500,7 @@ public class FZDSCommand extends CommandBase {
             void call(String[] args) {
                 DimensionSliceEntity currentWE = Hammer.allocateSlice(user.w);
                 user.setAsEntityLocation(currentWE);
+                currentWE.permit(Caps.EMPTY);
                 currentWE.worldObj.spawnEntityInWorld(currentWE);
                 ((EntityPlayerMP) sender).addChatMessage("Created FZDS " + currentWE.cell);
                 setSelection(currentWE);
