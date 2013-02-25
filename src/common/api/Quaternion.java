@@ -99,7 +99,7 @@ public class Quaternion {
     }
     
     public boolean isZero() {
-        return w == 0 && x == 0 && y == 0 && z == 0;
+        return x == 0 && y == 0 && z == 0;
     }
     
     public void update(double nw, double nx, double ny, double nz) {

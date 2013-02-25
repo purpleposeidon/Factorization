@@ -71,12 +71,16 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     }
     
     private void setCorners(Coord lowerCorner, Coord upperCorner) {
+        if (lowerCorner.w != Hammer.getWorld(worldObj)) {
+            throw new IllegalArgumentException("My corners are not shadow!");
+        }
         this.hammerCell = lowerCorner;
         this.farCorner = upperCorner;
+        DeltaCoord dc = upperCorner.difference(lowerCorner);
         centerOffset = Vec3.createVectorHelper(
-                (lowerCorner.x + upperCorner.x)/2,
-                (lowerCorner.y + upperCorner.y)/2,
-                (lowerCorner.z + upperCorner.z)/2);
+                dc.x/2,
+                dc.y/2,
+                dc.z/2);
     }
     
     @Override
@@ -85,6 +89,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     }
     
     public Vec3 real2shadow(Vec3 realCoords) {
+        //TODO: Apply transformations!
         Vec3 buffer = Vec3.createVectorHelper(0, 0, 0);
         double diffX = realCoords.xCoord + centerOffset.xCoord - posX;
         double diffY = realCoords.yCoord + centerOffset.yCoord - posY;
@@ -138,9 +143,10 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     }
     
     public Coord getCenter() {
-        return hammerCell.add((int)centerOffset.xCoord,
+        return hammerCell.center(farCorner);
+        /*return hammerCell.add((int)centerOffset.xCoord,
                 (int)centerOffset.yCoord,
-                (int)centerOffset.zCoord);
+                (int)centerOffset.zCoord);*/
     }
     
     public Coord getFarCorner() {
@@ -229,12 +235,13 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
             //The array will be filled as the server sends us children
         } else if (children == null && !worldObj.isRemote) {
             children = new ArrayList();
-            
-            for (int dx = hammerCell.x; dx <= farCorner.x; dx += 16) {
-                for (int dy = hammerCell.y; dy <= farCorner.y; dy += 16) {
-                    for (int dz = hammerCell.z; dz <= farCorner.z; dz += 16) {
-                        //could theoretically re-use a single DseCollider for each chunk. Theoretically.
-                        Entity e = new DseCollider(this, Vec3.createVectorHelper(dx, dy, dz));
+            DeltaCoord size = getFarCorner().difference(getCorner());
+            DeltaCoord half = size.scale(0.5);
+            for (int dx = 0; dx <= size.x; dx += 16) {
+                for (int dy = 0; dy <= size.y; dy += 16) {
+                    for (int dz = 0; dz <= size.z; dz += 16) {
+                        //could theoretically re-use a single DseCollider for all chunks. Theoretically.
+                        DseCollider e = new DseCollider(this, Vec3.createVectorHelper(dx - half.x, dy - half.y, dz - half.z));
                         e.onEntityUpdate();
                         worldObj.spawnEntityInWorld(e);
                     }
@@ -248,11 +255,10 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     public void updateShadowArea() {
         Coord c = getCorner();
         Coord d = getFarCorner();
-        
         AxisAlignedBB start = null;
-        for (int x = c.x; x < d.x; x++) {
-            for (int y = c.y; y < d.y; y++) {
-                for (int z = c.z; z < d.z; z++) {
+        for (int x = c.x; x <= d.x; x++) {
+            for (int y = c.y; y <= d.y; y++) {
+                for (int z = c.z; z <= d.z; z++) {
                     Block block = Block.blocksList[c.w.getBlockId(x, y, z)];
                     if (block == null) {
                         continue;
@@ -346,7 +352,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
             AxisAlignedBB collision = null;
             for (int i = 0; i < collisions.size(); i++) {
                 AxisAlignedBB solid = collisions.get(i);
-                if (metaAABB.intersectsWith(solid) && solid != metaAABB) {
+                if (solid != metaAABB && metaAABB.intersectsWith(solid)) {
                     collision = solid;
                     break;
                 }
@@ -423,7 +429,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
                 updateShadowArea();
             }
             if (shadowArea == null) {
-                if (hammerCell.blockExists()) {
+                if (hammerCell.blockExists() && !can(Caps.EMPTY)) {
                     setDead();
                     Core.logFine("%s dying due to empty area", this.toString());
                 } else {
@@ -583,7 +589,6 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     public void setDead() {
         super.setDead();
         Hammer.getSlices(worldObj).remove(this);
-        System.out.println("DSE.setDead"); //NORELEASE
     }
     
     @Override

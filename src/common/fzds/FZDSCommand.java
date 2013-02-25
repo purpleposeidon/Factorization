@@ -360,14 +360,6 @@ public class FZDSCommand extends CommandBase {
         add(new SubCommand ("go|gob|got") {
             @Override
             String details() {
-                String target = "";
-                if (arg0.equalsIgnoreCase("gob")) {
-                    target = "bottom";
-                } else if(arg0.equalsIgnoreCase("got")) {
-                    target = "top";
-                } else {
-                    target = "center";
-                }
                 return "Teleports player to the " + pick("gob", "bottom", "got", "top", "center") + " of the selection, in Hammerspace. Be ready to fly.";
             }
             @Override

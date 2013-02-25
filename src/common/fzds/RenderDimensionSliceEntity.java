@@ -284,14 +284,10 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             return; //This will never happen, except with outside help.
         }
         DimensionSliceEntity dse = (DimensionSliceEntity) ent;
-        dse.getCorner().setId(Block.oreDiamond);
         DSRenderInfo renderInfo = getRenderInfo(dse);
         if (nest == 0) {
             Core.profileStart("fzds");
             checkGLError("FZDS before render -- somebody left a mess!");
-            if (dse.renderInfo == null) {
-                dse.renderInfo = new DSRenderInfo(dse);
-            }
             renderInfo.lastRenderInMegaticks = megatickCount;
         } else if (nest == 1) {
             Core.profileStart("recursion");
