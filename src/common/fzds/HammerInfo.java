@@ -46,7 +46,7 @@ public class HammerInfo {
         }
         int x = allocated_cells;
         int add = size.x + getPaddingForChannel(channel);
-        Coord ret = new Coord(Hammer.getServerShadowWorld(), x, 64, channel*Hammer.channelWidth);
+        Coord ret = new Coord(DeltaChunk.getServerShadowWorld(), x, 64, channel*Hammer.channelWidth);
         allocated_cells += add;
         if (unsaved_allocations++ == 0) {
             saveCellAllocations();

@@ -11,6 +11,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import factorization.common.Core;
+import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsEntryControl;
 
 public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdditionalSpawnData {

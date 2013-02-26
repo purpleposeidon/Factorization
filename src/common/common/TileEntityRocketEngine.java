@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -26,9 +25,9 @@ import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.common.Core.NotifyStyle;
 import factorization.common.NetworkFactorization.MessageType;
-import factorization.fzds.DimensionSliceEntity;
-import factorization.fzds.Hammer;
+import factorization.fzds.DeltaChunk;
 import factorization.fzds.TransferLib;
+import factorization.fzds.api.IDeltaChunk;
 
 public class TileEntityRocketEngine extends TileEntityCommon {
     boolean inSlice = false;
@@ -335,14 +334,15 @@ for x in range(0, len(d[0])):
         DeltaCoord size = max.difference(min);
         DeltaCoord half = size.scale(0.5);
         Coord center = min.add(half);
-        DimensionSliceEntity dse = Hammer.allocateSlice(worldObj, -1, new DeltaCoord(0, 0, 0));
+        IDeltaChunk dse = DeltaChunk.allocateSlice(worldObj, -1, new DeltaCoord(0, 0, 0));
         center.setAsEntityLocation(dse);
         dse.posX += 0.5;
         dse.posY -= 5;
         dse.posZ += 0.5;
+        //TODO NORELEASE Use the functional method for doing this
         
         Vec3 real = Vec3.createVectorHelper(0, 0, 0);
-        Coord dest = new Coord(Hammer.getServerShadowWorld(), 0, 0, 0);
+        Coord dest = new Coord(DeltaChunk.getServerShadowWorld(), 0, 0, 0);
         for (TileEntityRocketEngine engine : solver.engines) {
             Coord c = engine.getCoord();
             solver.entireRocket.remove(c);

@@ -310,8 +310,9 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 float pdy = (float) ((dse.posY - dse.lastTickPosY)*partialTicks); //err, not used? XXX
                 float pdz = (float) ((dse.posZ - dse.lastTickPosZ)*partialTicks);
                 glTranslatef((float)(x), (float)(y), (float)(z));
-                if (!dse.rotation.isZero()) {
-                    Quaternion quat = dse.rotation.add(dse.prevTickRotation);
+                Quaternion rotation = dse.getRotation();
+                if (!rotation.isZero()) {
+                    Quaternion quat = rotation.add(dse.prevTickRotation);
                     quat.incrScale(0.5);
                     Vec3 vec = Vec3.createVectorHelper(quat.x, quat.y, quat.z);
                     vec = vec.normalize();

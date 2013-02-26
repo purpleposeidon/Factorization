@@ -1,7 +1,7 @@
-package factorization.fzds;
+package factorization.fzds.api;
 
 public enum Caps {
-    COLLIDE, MOVE, ROTATE, DRAG, TAKE_INTERIOR_ENTITIES, REMOVE_EXTERIOR_ENTITIES, TRANSFER_PLAYERS, ORACLE, EMPTY; //Do not re-order this list, only append.
+    COLLIDE, MOVE, ROTATE, DRAG, TAKE_INTERIOR_ENTITIES, REMOVE_EXTERIOR_ENTITIES, TRANSFER_PLAYERS, ORACLE, EMPTY, SCALE, TRANSPARENT; //Do not re-order this list, only append.
     public int bit;
     
     Caps() {

@@ -1,6 +1,5 @@
 package factorization.fzds.api;
 
-import factorization.fzds.IDeltaChunk;
 
 public interface IFzdsEntryControl {
     boolean canEnter(IDeltaChunk dse);

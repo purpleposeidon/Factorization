@@ -30,6 +30,7 @@ import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.client.render.EmptyRender;
 import factorization.common.Core;
+import factorization.fzds.api.IDeltaChunk;
 
 public class HammerClientProxy extends HammerProxy {
     public HammerClientProxy() {
@@ -101,17 +102,17 @@ public class HammerClientProxy extends HammerProxy {
             //Could this be more efficient?
             Coord lower = new Coord(null, lx, ly, lz);
             Coord upper = new Coord(null, hx, hy, hz);
-            World realClientWorld = Hammer.getClientRealWorld();
-            Iterator<DimensionSliceEntity> it = Hammer.getSlices(realClientWorld).iterator();
+            World realClientWorld = DeltaChunk.getClientRealWorld();
+            Iterator<IDeltaChunk> it = DeltaChunk.getSlices(realClientWorld).iterator();
             while (it.hasNext()) {
-                DimensionSliceEntity dse = it.next();
+                IDeltaChunk dse = it.next();
                 if (dse.isDead) {
                     it.remove(); //shouldn't happen. Keeping it anyways.
                     continue;
                 }
                 
                 if (dse.getCorner().inside(lower, upper) || dse.getFarCorner().inside(lower, upper)) {
-                    RenderDimensionSliceEntity.markBlocksForUpdate(dse, lx, ly, lz, hx, hy, hz);
+                    RenderDimensionSliceEntity.markBlocksForUpdate((DimensionSliceEntity) dse, lx, ly, lz, hx, hy, hz);
                     dse.blocksChanged(lx, ly, lz);
                     dse.blocksChanged(hx, hy, hz);
                 }
@@ -120,7 +121,7 @@ public class HammerClientProxy extends HammerProxy {
 
         @Override
         public void playSound(String sound, double x, double y, double z, float volume, float pitch) {
-            Vec3 realCoords = Hammer.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, x, y, z);
+            Vec3 realCoords = DeltaChunk.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, x, y, z);
             if (realCoords == null) {
                 return;
             }
@@ -136,7 +137,7 @@ public class HammerClientProxy extends HammerProxy {
 
         @Override
         public void spawnParticle(String particle, double x, double y, double z, double vx, double vy, double vz) {
-            Vec3 realCoords = Hammer.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, x, y, z);
+            Vec3 realCoords = DeltaChunk.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, x, y, z);
             if (realCoords == null) {
                 return;
             }
@@ -155,7 +156,7 @@ public class HammerClientProxy extends HammerProxy {
 
         @Override
         public void playRecord(String recordName, int x, int y, int z) {
-            Vec3 realCoords = Hammer.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, x, y, z);
+            Vec3 realCoords = DeltaChunk.shadow2nearestReal(Minecraft.getMinecraft().thePlayer, x, y, z);
             if (realCoords == null) {
                 return;
             }
@@ -270,7 +271,7 @@ public class HammerClientProxy extends HammerProxy {
     public void setShadowWorld() {
         //System.out.println("Setting world");
         Minecraft mc = Minecraft.getMinecraft();
-        WorldClient w = (WorldClient) Hammer.getClientShadowWorld();
+        WorldClient w = (WorldClient) DeltaChunk.getClientShadowWorld();
         assert w != null;
         if (real_player != null || real_world != null) {
             Core.logSevere("Tried to switch to Shadow world, but we're already in the shadow world");
@@ -314,7 +315,7 @@ public class HammerClientProxy extends HammerProxy {
         if (Minecraft.getMinecraft().isGamePaused) {
             return;
         }
-        WorldClient w = (WorldClient) Hammer.getClientShadowWorld();
+        WorldClient w = (WorldClient) DeltaChunk.getClientShadowWorld();
         if (w == null) {
             return;
         }

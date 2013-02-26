@@ -13,12 +13,6 @@ import factorization.common.Core;
 import factorization.common.Core.NotifyStyle;
 
 public class TransferLib {
-    private final String[] Lore = new String[] {
-            "At twilight's end, the shadow's crossed, a new world birthed, the elder lost.",
-            "Yet on the morn we wake to find that mem'ry left so far behind. To deafened ears we ask, unseen,",
-            "“Which is life and which the dream?”"
-    };
-    
     static void setRaw(Coord c, int id, int md) {
         //c.setIdMd(id, md);
         Chunk chunk = c.w.getChunkFromBlockCoords(c.x, c.z);

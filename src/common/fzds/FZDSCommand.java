@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -18,7 +17,6 @@ import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityCommandBlock;
 import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
@@ -31,9 +29,10 @@ import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.Quaternion;
 import factorization.common.Core;
-import factorization.common.FactorizationUtil;
-import factorization.fzds.Hammer.AreaMap;
-import factorization.fzds.Hammer.DseDestination;
+import factorization.fzds.DeltaChunk.AreaMap;
+import factorization.fzds.DeltaChunk.DseDestination;
+import factorization.fzds.api.Caps;
+import factorization.fzds.api.IDeltaChunk;
 
 public class FZDSCommand extends CommandBase {
     //private static DimensionSliceEntity currentWE = null;
@@ -80,7 +79,7 @@ public class FZDSCommand extends CommandBase {
         Coord user;
         boolean op;
         boolean creative;
-        DimensionSliceEntity selected;
+        IDeltaChunk selected;
         
         abstract void call(String[] args);
         
@@ -222,9 +221,9 @@ public class FZDSCommand extends CommandBase {
         sender.sendChatToPlayer("Not a command");
     }
     
-    private static WeakReference<DimensionSliceEntity> currentSelection = new WeakReference(null);
+    private static WeakReference<IDeltaChunk> currentSelection = new WeakReference(null);
     
-    public static void setSelection(DimensionSliceEntity dse) {
+    public static void setSelection(IDeltaChunk dse) {
         currentSelection = new WeakReference(dse);
     }
     
@@ -388,7 +387,7 @@ public class FZDSCommand extends CommandBase {
                     return;
                 }
                 DSTeleporter tp = getTp();
-                tp.destination.set(Hammer.getServerShadowWorld(), 0, 64, 0);
+                tp.destination.set(DeltaChunk.getServerShadowWorld(), 0, 64, 0);
                 manager.transferPlayerToDimension(player, Hammer.dimensionID, tp);
             }}, Requires.PLAYER, Requires.CREATIVE);
         add(new SubCommand("leave") {
@@ -445,7 +444,7 @@ public class FZDSCommand extends CommandBase {
                 final Coord lower = low.copy();
                 final Coord upper = up.copy();
                 
-                DimensionSliceEntity dse = Hammer.makeSlice(Hammer.fzds_command_channel, lower, upper, new AreaMap() {
+                IDeltaChunk dse = DeltaChunk.makeSlice(Hammer.fzds_command_channel, lower, upper, new AreaMap() {
                     @Override
                     public void fillDse(DseDestination destination) {
                         Coord here = user.copy();
@@ -515,8 +514,8 @@ public class FZDSCommand extends CommandBase {
             String details() { return "Gives the rotation & angular velocity of the selection"; }
             @Override
             void call(String[] args) {
-                sender.sendChatToPlayer("r = " + selected.rotation);
-                sender.sendChatToPlayer("ω = " + selected.rotationalVelocity);
+                sender.sendChatToPlayer("r = " + selected.getRotation());
+                sender.sendChatToPlayer("ω = " + selected.getRotationalVelocity());
                 if (!selected.can(Caps.ROTATE)) {
                     sender.sendChatToPlayer("(Does not have the ROTATE cap, so this is meaningless)");
                 }
@@ -527,11 +526,11 @@ public class FZDSCommand extends CommandBase {
             @Override
             void call(String[] args) {
                 boolean add = arg0.equals("+");
-                Iterator<DimensionSliceEntity> it = Hammer.getSlices(MinecraftServer.getServer().worldServerForDimension(0)).iterator();
-                DimensionSliceEntity first = null, prev = null, next = null, last = null;
+                Iterator<IDeltaChunk> it = DeltaChunk.getSlices(MinecraftServer.getServer().worldServerForDimension(0)).iterator();
+                IDeltaChunk first = null, prev = null, next = null, last = null;
                 boolean found_current = false;
                 while (it.hasNext()) {
-                    DimensionSliceEntity here = it.next();
+                    IDeltaChunk here = it.next();
                     if (here.isDead) {
                         Core.logWarning(here + " was not removed");
                         it.remove();
@@ -628,7 +627,7 @@ public class FZDSCommand extends CommandBase {
                 } else {
                     throw new SyntaxErrorException();
                 }
-                Quaternion toMod = derivative == 0 ? selected.rotation : selected.rotationalVelocity;
+                Quaternion toMod = derivative == 0 ? selected.getRotation() : selected.getRotationalVelocity();
                 toMod.update(Quaternion.getRotationQuaternion(theta, dir));
             }}, Requires.SELECTION);
         add(new SubCommand("d|v|r|w", "+|=", "[W=1]", "X", "Y", "Z") {
@@ -665,9 +664,9 @@ public class FZDSCommand extends CommandBase {
                     } else if (type == 'v') {
                         selected.addVelocity(x/20, y/20, z/20);
                     } else if (type == 'r') {
-                        selected.rotation.incrAdd(new Quaternion(w, x, y, z));
+                        selected.getRotation().incrAdd(new Quaternion(w, x, y, z));
                     } else if (type == 'w') {
-                        selected.rotationalVelocity.incrAdd(new Quaternion(w, x, y, z));
+                        selected.getRotationalVelocity().incrAdd(new Quaternion(w, x, y, z));
                     } else {
                         sender.sendChatToPlayer("Not a command?");
                     }
@@ -680,15 +679,15 @@ public class FZDSCommand extends CommandBase {
                         selected.motionZ = 0;
                         selected.addVelocity(x/20, y/20, z/20);
                     } else if (type == 'r') {
-                        selected.rotation = (new Quaternion(w, x, y, z));
+                        selected.setRotation((new Quaternion(w, x, y, z)));
                     } else if (type == 'w') {
                         Quaternion omega = (new Quaternion(w, x, y, z));
-                        selected.rotationalVelocity = omega;
+                        selected.setRotationalVelocity(omega);
                     } else {
                         sender.sendChatToPlayer("Not a command?");
                     }
-                    selected.rotation.incrNormalize();
-                    selected.rotationalVelocity.incrNormalize();
+                    selected.getRotation().incrNormalize();
+                    selected.getRotationalVelocity().incrNormalize();
                 } else {
                     sender.sendChatToPlayer("+ or =?");
                 }
@@ -698,9 +697,9 @@ public class FZDSCommand extends CommandBase {
             String details() { return "[Moves the selection back and forth]"; }
             @Override
             void call(String[] args) {
-                selected.rotationalVelocity.w *= -1;
-                selected.rotation.w *= -1;
-                selected.rotation.w += 0.1;
+                selected.getRotationalVelocity().w *= -1;
+                selected.getRotation().w *= -1;
+                selected.getRotation().w += 0.1;
             }}, Requires.SELECTION);
         add(new SubCommand("caps") {
             @Override

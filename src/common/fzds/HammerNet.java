@@ -63,14 +63,14 @@ public class HammerNet implements ITinyPacketHandler {
     void setRotation(DataInputStream dis, DimensionSliceEntity dse) throws IOException {
         Quaternion q = Quaternion.read(dis);
         if (dse != null) {
-            dse.rotation = q;
+            dse.setRotation(q);
         }
     }
     
     void setRotationalVelocity(DataInputStream dis, DimensionSliceEntity dse) throws IOException {
         Quaternion q = Quaternion.read(dis);
         if (dse != null) {
-            dse.rotationalVelocity = q;
+            dse.setRotationalVelocity(q);
         }
     }
     

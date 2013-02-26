@@ -31,10 +31,12 @@ import factorization.api.DeltaCoord;
 import factorization.api.Quaternion;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
+import factorization.fzds.api.Caps;
+import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsCustomTeleport;
 import factorization.fzds.api.IFzdsEntryControl;
 
-class DimensionSliceEntity extends Entity implements IFzdsEntryControl, IEntityAdditionalSpawnData, IDeltaChunk {
+class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryControl, IEntityAdditionalSpawnData {
     //Dang, this is a lot of fields
     
     private Coord hammerCell, farCorner;
@@ -52,7 +54,7 @@ class DimensionSliceEntity extends Entity implements IFzdsEntryControl, IEntityA
     
     private Quaternion rotation = new Quaternion(), rotationalVelocity = new Quaternion();
     private Quaternion last_shared_rotation = new Quaternion(), last_shared_rotational_velocity = new Quaternion(); //used on the server
-    private Quaternion prevTickRotation = new Quaternion(); //Client-side
+    Quaternion prevTickRotation = new Quaternion(); //Client-side
     
     Object renderInfo = null; //Client-side
     
@@ -60,7 +62,7 @@ class DimensionSliceEntity extends Entity implements IFzdsEntryControl, IEntityA
     
     public DimensionSliceEntity(World world) {
         super(world);
-        if (world == Hammer.getWorld(world)) {
+        if (world == DeltaChunk.getWorld(world)) {
             setDead();
         }
         ignoreFrustumCheck = true; //kinda lame; we should give ourselves a proper bounding box?
@@ -73,7 +75,7 @@ class DimensionSliceEntity extends Entity implements IFzdsEntryControl, IEntityA
     }
     
     private void setCorners(Coord lowerCorner, Coord upperCorner) {
-        if (lowerCorner.w != Hammer.getWorld(worldObj)) {
+        if (lowerCorner.w != DeltaChunk.getWorld(worldObj)) {
             throw new IllegalArgumentException("My corners are not shadow!");
         }
         this.hammerCell = lowerCorner;
@@ -127,7 +129,7 @@ class DimensionSliceEntity extends Entity implements IFzdsEntryControl, IEntityA
     
     public void real2shadow(Coord c) {
         c.set(real2shadow(c.createVector()));
-        c.w = Hammer.getWorld(worldObj);
+        c.w = DeltaChunk.getWorld(worldObj);
     }
     
     public Coord getCorner() {
@@ -160,7 +162,7 @@ class DimensionSliceEntity extends Entity implements IFzdsEntryControl, IEntityA
 
     @Override
     protected void readEntityFromNBT(NBTTagCompound tag) {
-        hammerCell = new Coord(Hammer.getWorld(worldObj), 0, 0, 0);
+        hammerCell = new Coord(DeltaChunk.getWorld(worldObj), 0, 0, 0);
         farCorner = hammerCell.copy();
         
         
@@ -400,8 +402,8 @@ class DimensionSliceEntity extends Entity implements IFzdsEntryControl, IEntityA
         if (worldObj.isRemote) {
             prevTickRotation.update(rotation);
         } else if (proxy == null && !isDead) {
-            Hammer.getSlices(worldObj).add(this);
-            proxy = new PacketProxyingPlayer(this, Hammer.getServerShadowWorld());
+            DeltaChunk.getSlices(worldObj).add(this);
+            proxy = new PacketProxyingPlayer(this, DeltaChunk.getServerShadowWorld());
             proxy.worldObj.spawnEntityInWorld(proxy);
             return;
         }
@@ -513,7 +515,7 @@ class DimensionSliceEntity extends Entity implements IFzdsEntryControl, IEntityA
                 return;
             }
         }
-        World shadowWorld = Hammer.getServerShadowWorld();
+        World shadowWorld = DeltaChunk.getServerShadowWorld();
         Vec3 newLocation = real2shadow(Hammer.ent2vec(ent));
         transferEntity(ent, shadowWorld, newLocation);
         if (ifec != null) {
@@ -573,14 +575,14 @@ class DimensionSliceEntity extends Entity implements IFzdsEntryControl, IEntityA
     }
     
     void endSlice() {
-        Hammer.getSlices(worldObj).remove(this);
-        //TODO: teleport entities/blocks into the real world
+        DeltaChunk.getSlices(worldObj).remove(this);
+        //TODO: teleport entities/blocks into the real world?
     }
     
     @Override
     public void setDead() {
         super.setDead();
-        Hammer.getSlices(worldObj).remove(this);
+        endSlice();
     }
     
     @Override
@@ -624,7 +626,7 @@ class DimensionSliceEntity extends Entity implements IFzdsEntryControl, IEntityA
             if (can(Caps.ORACLE)) {
                 hammerCell = new Coord(worldObj, 0, 0, 0);
             } else {
-                hammerCell = new Coord(Hammer.getClientShadowWorld(), 0, 0, 0);
+                hammerCell = new Coord(DeltaChunk.getClientShadowWorld(), 0, 0, 0);
             }
             hammerCell.readFromStream(data);
             farCorner = hammerCell.copy();
@@ -650,7 +652,7 @@ class DimensionSliceEntity extends Entity implements IFzdsEntryControl, IEntityA
     }
     
     public void dropContents() {
-        Coord a = new Coord(Hammer.getServerShadowWorld(), 0, 0, 0);
+        Coord a = new Coord(DeltaChunk.getServerShadowWorld(), 0, 0, 0);
         Coord b = a.copy();
         Vec3 vShadowMin = FactorizationUtil.getMin(shadowArea);
         Vec3 vShadowMax = FactorizationUtil.getMax(shadowArea);
@@ -701,5 +703,25 @@ class DimensionSliceEntity extends Entity implements IFzdsEntryControl, IEntityA
     public DimensionSliceEntity forbid(Caps cap) {
         capabilities &= ~cap.bit;
         return this;
+    }
+
+    @Override
+    public Quaternion getRotation() {
+        return rotation;
+    }
+
+    @Override
+    public Quaternion getRotationalVelocity() {
+        return rotationalVelocity;
+    }
+
+    @Override
+    public void setRotation(Quaternion r) {
+        rotation = r;
+    }
+
+    @Override
+    public void setRotationalVelocity(Quaternion w) {
+        rotationalVelocity = w;
     }
 }

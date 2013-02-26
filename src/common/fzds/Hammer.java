@@ -43,11 +43,19 @@ import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.common.Core;
 import factorization.common.WeakSet;
+import factorization.fzds.api.IDeltaChunk;
 
 @Mod(modid = Hammer.modId, name = Hammer.name, version = Core.version, dependencies = "required-after: " + Core.modId)
 @NetworkMod(clientSideRequired = true, tinyPacketHandler = HammerNet.class)
 public class Hammer {
-    static final String lore = "Anvil's Hammer";
+    final String[] Lore = new String[] {
+            "At twilight's end, the shadow's crossed,",
+            "A new world birthed, the elder lost.",
+            "Yet on the morn we wake to find",
+            "That mem'ry left so far behind.",
+            "To deafened ears we ask, unseen,",
+            "“Which is life and which the dream?”"
+    };
     
     
     public static final String modId = Core.modId + ".dimensionalSlice";
@@ -61,47 +69,10 @@ public class Hammer {
     public static double DSE_ChunkUpdateRangeSquared = Math.pow(16*8, 2); //This is actually set when the server starts
     public static int fzds_command_channel = 0;
     
-    private static Set<DimensionSliceEntity> serverSlices = new WeakSet(), clientSlices = new WeakSet();
-    static Set<DimensionSliceEntity> getSlices(World w) {
-        if (w == null) {
-            if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
-                return clientSlices;
-            } else {
-                return serverSlices;
-            }
-        }
-        return w.isRemote ? clientSlices : serverSlices;
-    }
+    static Set<IDeltaChunk> serverSlices = new WeakSet(), clientSlices = new WeakSet();
     
     public Hammer() {
         Hammer.instance = this;
-    }
-    
-    public static World getClientShadowWorld() {
-        return worldClient;
-    }
-    
-    public static World getServerShadowWorld() {
-        return DimensionManager.getWorld(dimensionID);
-    }
-    
-    public static World getClientRealWorld() {
-        return proxy.getClientRealWorld();
-    }
-    
-    /***
-     * @return the thread-appropriate shadow world
-     */
-    public static World getWorld(World realWorld) {
-        if (realWorld == null) {
-            return FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT ? getClientShadowWorld() : getServerShadowWorld();
-        }
-        return realWorld.isRemote ? getClientShadowWorld() : getServerShadowWorld();
-    }
-    
-    public static DimensionSliceEntity allocateSlice(World spawnWorld, int channel, DeltaCoord size) {
-        Coord base = hammerInfo.takeCell(channel, size);
-        return new DimensionSliceEntity(spawnWorld, base, base.add(size));
     }
     
     private final static EnumSet<TickType> serverTicks = EnumSet.of(TickType.SERVER);
@@ -235,15 +206,15 @@ public class Hammer {
                 markBlocksForUpdate(x, y, z, x, y, z);
             }
             
-            Coord center = new Coord(Hammer.getClientShadowWorld(), 0, 0, 0);
+            Coord center = new Coord(DeltaChunk.getClientShadowWorld(), 0, 0, 0);
             void markBlocksForUpdate(int lx, int ly, int lz, int hx, int hy, int hz) {
                 //Sorry, it could probably be a bit more efficient.
                 Coord lower = new Coord(null, lx, ly, lz);
                 Coord upper = new Coord(null, hx, hy, hz);
-                World realClientWorld = Hammer.getClientRealWorld();
-                Iterator<DimensionSliceEntity> it = Hammer.getSlices(realClientWorld).iterator();
+                World realClientWorld = DeltaChunk.getClientRealWorld();
+                Iterator<IDeltaChunk> it = DeltaChunk.getSlices(realClientWorld).iterator();
                 while (it.hasNext()) {
-                    DimensionSliceEntity dse = it.next();
+                    IDeltaChunk dse = it.next();
                     if (dse.isDead) {
                         it.remove(); //shouldn't happen. Keeping it anyways.
                         continue;
@@ -272,46 +243,6 @@ public class Hammer {
         clientSlices.clear();
     }
     
-    public static DimensionSliceEntity findClosest(Entity target, Coord pos) {
-        if (target == null) {
-            return null;
-        }
-        DimensionSliceEntity closest = null;
-        double dist = Double.POSITIVE_INFINITY;
-        World real_world = getClientRealWorld();
-        
-        for (DimensionSliceEntity here : Hammer.getSlices(target.worldObj)) {
-            if (here.worldObj != real_world && !pos.inside(here.getCorner(), here.getFarCorner())) {
-                continue;
-            }
-            if (closest == null) {
-                closest = here;
-                continue;
-            }
-            double here_dist = target.getDistanceSqToEntity(here);
-            if (here_dist < dist) {
-                dist = here_dist;
-                closest = here;
-            }
-        }
-        return closest;
-    }
-    
-    private static Vec3 buffer = Vec3.createVectorHelper(0, 0, 0);
-    
-    public static Vec3 shadow2nearestReal(Entity player, double x, double y, double z) {
-        //The JVM sometimes segfaults in this function.
-        DimensionSliceEntity closest = Hammer.findClosest(player, new Coord(player.worldObj, x, y, z));
-        if (closest == null) {
-            return null;
-        }
-        buffer.xCoord = x;
-        buffer.yCoord = y;
-        buffer.zCoord = z;
-        Vec3 ret = closest.shadow2real(buffer);
-        return ret;
-    }
-    
     public static Vec3 ent2vec(Entity ent) {
         return ent.worldObj.getWorldVec3Pool().getVecFromPool(ent.posX, ent.posY, ent.posZ);
     }
@@ -330,35 +261,5 @@ public class Hammer {
         } else {
             Core.logFine("World.MAX_ENTITY_RADIUS was already set to %f, which is large enough for our purposes (%f)", World.MAX_ENTITY_RADIUS, desired_radius);
         }
-    }
-    
-    public static interface AreaMap {
-        void fillDse(DseDestination destination);
-    }
-    
-    public static interface DseDestination {
-        void include(Coord c);
-    }
-    
-    private static Coord shadow = new Coord(null, 0, 0, 0);
-    
-    public static DimensionSliceEntity makeSlice(int channel, final Coord min, final Coord max, AreaMap mapper) {
-        DeltaCoord size = max.difference(min);
-        final DimensionSliceEntity dse = Hammer.allocateSlice(min.w, channel, size);
-        Vec3 vrm = min.centerVec(max);
-        dse.posX = vrm.xCoord;
-        dse.posY = vrm.yCoord;
-        dse.posZ = vrm.zCoord;
-        mapper.fillDse(new DseDestination() {public void include(Coord real) {
-            shadow.set(real);
-            dse.real2shadow(shadow);
-            TransferLib.move(real, shadow);
-        }});
-        mapper.fillDse(new DseDestination() {public void include(Coord real) {
-            shadow.set(real);
-            dse.real2shadow(shadow);
-            shadow.markBlockForUpdate();
-        }});
-        return dse;
     }
 }

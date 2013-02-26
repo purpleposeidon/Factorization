@@ -23,6 +23,7 @@ import net.minecraft.world.chunk.Chunk;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.api.Coord;
+import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsEntryControl;
 
 public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryControl, INetworkManager {
@@ -125,7 +126,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
         ArrayList<Chunk> chunks = new ArrayList();
         ArrayList<TileEntity> tileEntities = new ArrayList();
         Coord corner = dimensionSlice.getCorner();
-        World world = Hammer.getServerShadowWorld();
+        World world = DeltaChunk.getServerShadowWorld();
         
         Coord low = dimensionSlice.getCorner();
         Coord far = dimensionSlice.getFarCorner();
