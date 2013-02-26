@@ -1,5 +1,6 @@
 package factorization.fzds;
 
+import java.io.File;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -15,7 +16,6 @@ import net.minecraft.server.management.PlayerManager;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -40,7 +40,6 @@ import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
-import factorization.api.DeltaCoord;
 import factorization.common.Core;
 import factorization.common.WeakSet;
 import factorization.fzds.api.IDeltaChunk;
@@ -94,6 +93,9 @@ public class Hammer {
         dimensionID = Core.dimension_slice_dimid;
         DimensionManager.registerProviderType(dimensionID, HammerWorldProvider.class, true);
         DimensionManager.registerDimension(dimensionID, dimensionID);
+        File base = event.getSuggestedConfigurationFile().getParentFile();
+        hammerInfo.setConfigFile(new File(base, "hammerChannels.cfg"));
+        fzds_command_channel = hammerInfo.makeChannelFor(this, "cmd", fzds_command_channel, -1, "This channel is used for Slices created using the /fzds command");
         
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             //When the client logs in or out, we need to do something to the shadow world

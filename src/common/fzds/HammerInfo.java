@@ -1,124 +1,162 @@
 package factorization.fzds;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.ConfigCategory;
+import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.Property;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.world.WorldEvent;
+import cpw.mods.fml.common.Mod;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.common.Core;
 
 public class HammerInfo {
-    private int allocated_cells = 0;
+    File worldConfigFile = null;
+    Configuration channelConfig;
+    Configuration worldState;
+    
     private int unsaved_allocations = 0;
+    private boolean channel_config_dirty = false;
+    boolean world_loaded = false;
+    HashMap<Integer, ConfigCategory> channel2category = new HashMap();
     
-    //TODO NORELEASE: Let's use a config file in the save directory!
+    private static final int defaultPadding = 16*8;
     
-    @ForgeSubscribe
-    public void handleWorldLoad(WorldEvent.Load event) {
-        if (DimensionManager.getWorld(Hammer.dimensionID) == event.world) {
-            loadCellAllocations();
-        }
+    void setConfigFile(File f) {
+        channelConfig = new Configuration(f);
     }
     
-    public int makeChannelFor(Object modInstance, String description, int padding) {
-        Core.logFine("Allocating Hammer channel for %s %s", modInstance, description); //NORELEASE
-        return 0;
+    void loadGlobalConfig() {
+        if (worldState != null) {
+            return;
+        }
+        WorldServer world = DimensionManager.getWorld(Hammer.dimensionID);
+        world_loaded = true;
+        File saveDir = world.getChunkSaveLocation();
+        saveDir = saveDir.getAbsoluteFile();
+        worldConfigFile = new File(saveDir, "hammer.state");
+        worldState = new Configuration(worldConfigFile);
+        saveChannelConfig();
+    }
+    
+    private static final String channelsCategory = "channels";
+    
+    public int makeChannelFor(Object modInstance, String channelId, int default_channel, int padding, String comment) {
+        if (padding < 0) {
+            padding = defaultPadding;
+        }
+        if (channelConfig == null) {
+            throw new IllegalArgumentException("Tried to register channel too early");
+        }
+        Core.logFine("Allocating Hammer channel for %s: %s", modInstance, comment);
+        
+        
+        Class c = modInstance.getClass();
+        Annotation a = c.getAnnotation(Mod.class);
+        if (a == null) {
+            throw new IllegalArgumentException("modInstance is not a mod");
+        }
+        Mod info = (Mod) c.getAnnotation(Mod.class);
+        String modCategory = (info.modid() + "." + channelId).toLowerCase();
+        
+        int max = default_channel;
+        boolean collision = false;
+        
+        for (Entry<String, ConfigCategory> entry : channelConfig.categories.entrySet()) {
+            if (entry.getKey().equals(modCategory)) {
+                continue;
+            }
+            ConfigCategory cat = entry.getValue();
+            if (!cat.containsKey("channel")) {
+                continue;
+            }
+            int here_chan = channelConfig.get(entry.getKey(), "channel", -1).getInt();
+            max = Math.max(max, here_chan);
+            if (here_chan == default_channel) {
+                collision = true;
+            }
+        }
+        if (collision) {
+            int newDefault = max + 1;
+            Core.logFine("Default channel ID for %s (%s) was already taken, using %s", modCategory, default_channel, newDefault);
+            default_channel = newDefault;
+        }
+        
+        channelConfig.addCustomCategoryComment(modCategory, comment);
+        int channelRet = channelConfig.get(modCategory, "channel", default_channel).getInt();
+        padding = channelConfig.get(modCategory, "padding", padding).getInt();
+        
+        if (world_loaded) {
+            saveChannelConfig();
+        } else {
+            channel_config_dirty = true;
+        }
+        channel2category.put(channelRet, channelConfig.getCategory(modCategory));
+        return channelRet;
     }
     
     public int getPaddingForChannel(int channel) {
-        if (channel != 0) {
-            throw new IllegalArgumentException("Non-zero channels not yet implemented");
-        }
-        return 16*8;
-    }
-    
-    Coord takeCell(int channel, DeltaCoord size) {
-        if (channel != 0) {
-            throw new IllegalArgumentException("Non-zero channels not yet implemented");
-        }
-        int x = allocated_cells;
-        int add = size.x + getPaddingForChannel(channel);
-        Coord ret = new Coord(DeltaChunk.getServerShadowWorld(), x, 64, channel*Hammer.channelWidth);
-        allocated_cells += add;
-        if (unsaved_allocations++ == 0) {
-            saveCellAllocations();
-        }
+        ConfigCategory cat = channel2category.get(channel);
+        Property prop = cat.get("padding");
+        int ret = prop.getInt(defaultPadding);
         return ret;
     }
     
-    void setAllocationCount(int channel, int count) {
+    Coord takeCell(int channel, DeltaCoord size) {
+        loadGlobalConfig();
+        Property chanAllocs = worldState.get("allocations", "channel" + channel, 0);
+        int start = chanAllocs.getInt(0);
+        int add = size.x + getPaddingForChannel(channel);
+        chanAllocs.value = Integer.toString(start + add);
+        Coord ret = new Coord(DeltaChunk.getServerShadowWorld(), start, 16, channel*Hammer.channelWidth);
+        dirtyCellAllocations();
+        return ret;
+    }
+    
+    public void setAllocationCount(int channel, int count) {
         if (channel != 0) {
             throw new IllegalArgumentException("Non-zero channels not yet implemented");
         }
-        allocated_cells = count;
+        ConfigCategory cat = channel2category.get(channel);
+        cat.get("allocated").value = Integer.toString(count);
         saveCellAllocations();
     }
     
-    private File getInfoFile() {
-        WorldServer baseWorld = DimensionManager.getWorld(0);
-        File saveDir = baseWorld.getChunkSaveLocation();
-        saveDir = saveDir.getAbsoluteFile();
-        return new File(saveDir, "fzds");
+    File getWorldSaveFile() {
+        World hammerWorld = DeltaChunk.getServerShadowWorld();
+        File base = new File(hammerWorld.getSaveHandler().getSaveDirectoryName());
+        return new File(base, "deltaChunk.cfg");
     }
     
-    public void loadCellAllocations() {
-        File infoFile = getInfoFile();
-        if (!infoFile.exists()) {
-            Core.logInfo("No FZDS info file");
-            return;
+    public void dirtyCellAllocations() {
+        if (unsaved_allocations == 0) {
+            saveCellAllocations();
         }
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(infoFile);
-            DataInputStream ios = new DataInputStream(fis);
-            allocated_cells = ios.readInt();
-            unsaved_allocations = 0;
-        } catch (Exception e) {
-            Core.logWarning("Unable to load FZDS info");
-            e.printStackTrace();
-        } finally {
-            try {
-                fis.close();
-            } catch (IOException e) {
-                e.printStackTrace(); //lern2raii
-            }
-        }
+        unsaved_allocations++;
     }
     
     public void saveCellAllocations() {
-        FileOutputStream fos = null;
-        try {
-            File infoFile = getInfoFile();
-            if (!infoFile.exists()) {
-                infoFile.createNewFile();
-            }
-            fos = new FileOutputStream(infoFile);
-            
-            DataOutputStream dos = new DataOutputStream(fos);
-            dos.writeInt(allocated_cells);
-            dos.flush();
-            unsaved_allocations = 0;
-        } catch (Exception e) {
-            Core.logWarning("Unable to save FZDS info (cell allocation count = " + allocated_cells + ". Might need to restore this with /fzds force_cell_allocation_count)");
-            e.printStackTrace();
-        } finally {
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace(); //lern2raii
-                }
-            }
+        if (channel_config_dirty) {
+            channelConfig.save();
+            channel_config_dirty = false;
         }
-        
+        if (worldState == null) {
+            return;
+        }
+        worldState.save();
+        unsaved_allocations = 0;
+    }
+    
+    public void saveChannelConfig() {
+        channelConfig.save();
     }
     
 }
