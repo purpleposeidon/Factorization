@@ -36,7 +36,7 @@ import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsCustomTeleport;
 import factorization.fzds.api.IFzdsEntryControl;
 
-class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryControl, IEntityAdditionalSpawnData {
+public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryControl, IEntityAdditionalSpawnData {
     //Dang, this is a lot of fields
     
     private Coord hammerCell, farCorner;
