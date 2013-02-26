@@ -1,10 +1,10 @@
 package factorization.fzds.api;
 
-import factorization.fzds.DimensionSliceEntity;
+import factorization.fzds.IDeltaChunk;
 
 public interface IFzdsEntryControl {
-    boolean canEnter(DimensionSliceEntity dse);
-    boolean canExit(DimensionSliceEntity dse);
-    void onEnter(DimensionSliceEntity dse);
-    void onExit(DimensionSliceEntity dse);
+    boolean canEnter(IDeltaChunk dse);
+    boolean canExit(IDeltaChunk dse);
+    void onEnter(IDeltaChunk dse);
+    void onExit(IDeltaChunk dse);
 }

@@ -32,7 +32,6 @@ import factorization.api.DeltaCoord;
 import factorization.api.Quaternion;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
-import factorization.fzds.DimensionSliceEntity.Caps;
 import factorization.fzds.Hammer.AreaMap;
 import factorization.fzds.Hammer.DseDestination;
 
@@ -709,7 +708,7 @@ public class FZDSCommand extends CommandBase {
             @Override
             void call(String[] args) {
                 String r = "";
-                for (Caps cap : DimensionSliceEntity.Caps.values()) {
+                for (Caps cap : Caps.values()) {
                     r += " " + cap;
                 }
                 sender.sendChatToPlayer(r);
@@ -720,7 +719,7 @@ public class FZDSCommand extends CommandBase {
             @Override
             void call(String[] args) {
                 String r = "";
-                for (Caps cap : DimensionSliceEntity.Caps.values()) {
+                for (Caps cap : Caps.values()) {
                     if (selected.can(cap)) {
                         r += " " + cap;
                     }

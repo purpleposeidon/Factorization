@@ -39,7 +39,6 @@ import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
-import factorization.fzds.DimensionSliceEntity.Caps;
 
 
 public class RenderDimensionSliceEntity extends Render implements IScheduledTickHandler {

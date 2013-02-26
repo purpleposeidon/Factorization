@@ -233,14 +233,14 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
     //IFzdsEntryControl implementation
     
     @Override
-    public boolean canEnter(DimensionSliceEntity dse) { return false; } //PPP must stay in the shadow (It stays out of range anyways.)
+    public boolean canEnter(IDeltaChunk dse) { return false; } //PPP must stay in the shadow (It stays out of range anyways.)
     
     @Override
-    public boolean canExit(DimensionSliceEntity dse) { return false; }
+    public boolean canExit(IDeltaChunk dse) { return false; }
     
     @Override
-    public void onEnter(DimensionSliceEntity dse) { }
+    public void onEnter(IDeltaChunk dse) { }
     
     @Override
-    public void onExit(DimensionSliceEntity dse) { }
+    public void onExit(IDeltaChunk dse) { }
 }

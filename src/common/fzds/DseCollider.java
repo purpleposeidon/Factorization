@@ -78,10 +78,10 @@ public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdd
     @Override protected void entityInit() { }
     @Override protected void readEntityFromNBT(NBTTagCompound var1) { }
     @Override protected void writeEntityToNBT(NBTTagCompound var1) { }
-    @Override public boolean canEnter(DimensionSliceEntity dse) { return false; }
-    @Override public boolean canExit(DimensionSliceEntity dse) { return false; }
-    @Override public void onEnter(DimensionSliceEntity dse) { }
-    @Override public void onExit(DimensionSliceEntity dse) { }
+    @Override public boolean canEnter(IDeltaChunk dse) { return false; }
+    @Override public boolean canExit(IDeltaChunk dse) { return false; }
+    @Override public void onEnter(IDeltaChunk dse) { }
+    @Override public void onExit(IDeltaChunk dse) { }
 
     @Override
     public void writeSpawnData(ByteArrayDataOutput data) {

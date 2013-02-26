@@ -34,23 +34,25 @@ import factorization.common.FactorizationUtil;
 import factorization.fzds.api.IFzdsCustomTeleport;
 import factorization.fzds.api.IFzdsEntryControl;
 
-public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, IEntityAdditionalSpawnData {
+class DimensionSliceEntity extends Entity implements IFzdsEntryControl, IEntityAdditionalSpawnData, IDeltaChunk {
     //Dang, this is a lot of fields
     
     private Coord hammerCell, farCorner;
-    public Vec3 centerOffset;
+    Vec3 centerOffset;
     
     private int capabilities = Caps.of(Caps.MOVE, Caps.COLLIDE, Caps.DRAG);
     
-    AxisAlignedBB shadowArea = null, shadowCollisionArea = null, realArea = null, realCollisionArea = null, realDragArea = null;
+    AxisAlignedBB realArea = null;
     MetaAxisAlignedBB metaAABB = null;
-    boolean needAreaUpdate = true;
+    
+    private AxisAlignedBB shadowArea = null, shadowCollisionArea = null, realCollisionArea = null, realDragArea = null;
+    private boolean needAreaUpdate = true;
     ArrayList<DseCollider> children = null; //null so that we can check if we need to init them easily
     private double last_motion_hash = Double.NaN;
     
-    public Quaternion rotation = new Quaternion(), rotationalVelocity = new Quaternion();
+    private Quaternion rotation = new Quaternion(), rotationalVelocity = new Quaternion();
     private Quaternion last_shared_rotation = new Quaternion(), last_shared_rotational_velocity = new Quaternion(); //used on the server
-    public Quaternion prevTickRotation = new Quaternion(); //Client-side
+    private Quaternion prevTickRotation = new Quaternion(); //Client-side
     
     Object renderInfo = null; //Client-side
     
@@ -116,16 +118,6 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
         buffer.yCoord += posY;
         buffer.zCoord += posZ;
         return buffer;
-    }
-    
-    public void swapCoordSpace(Coord c) {
-        if (c.w == worldObj) {
-            real2shadow(c);
-        } else if (c.w == Hammer.getWorld(worldObj)) {
-            shadow2real(c);
-        } else {
-            throw new IllegalArgumentException("Coord is neither our dimension, or the Hammer dimension");
-        }
     }
     
     public void shadow2real(Coord c) {
@@ -221,7 +213,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
                 orig.maxX + dx, orig.maxY + dy, orig.maxZ + dz);
     }
     
-    public void updateRealArea() {
+    private void updateRealArea() {
         Coord c = hammerCell;
         double odx = posX - c.x - centerOffset.xCoord;
         double ody = posY - c.y - centerOffset.yCoord;
@@ -252,7 +244,7 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
         metaAABB.setUnderlying(realArea);
     }
     
-    public void updateShadowArea() {
+    private void updateShadowArea() {
         Coord c = getCorner();
         Coord d = getFarCorner();
         AxisAlignedBB start = null;
@@ -599,16 +591,16 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     }
     
     @Override
-    public boolean canEnter(DimensionSliceEntity dse) { return false; }
+    public boolean canEnter(IDeltaChunk dse) { return false; }
     
     @Override
-    public boolean canExit(DimensionSliceEntity dse) { return true; }
+    public boolean canExit(IDeltaChunk dse) { return true; }
     
     @Override
-    public void onEnter(DimensionSliceEntity dse) { }
+    public void onEnter(IDeltaChunk dse) { }
     
     @Override
-    public void onExit(DimensionSliceEntity dse) { }
+    public void onExit(IDeltaChunk dse) { }
     
     @Override
     public void writeSpawnData(ByteArrayDataOutput data) {
@@ -709,27 +701,5 @@ public class DimensionSliceEntity extends Entity implements IFzdsEntryControl, I
     public DimensionSliceEntity forbid(Caps cap) {
         capabilities &= ~cap.bit;
         return this;
-    }
-    
-    
-    public static enum Caps {
-        COLLIDE, MOVE, ROTATE, DRAG, TAKE_INTERIOR_ENTITIES, REMOVE_EXTERIOR_ENTITIES, TRANSFER_PLAYERS, ORACLE, EMPTY; //Do not re-order this list, only append.
-        public int bit;
-        
-        Caps() {
-            this.bit = 1 << ordinal();
-        }
-        
-        public boolean in(int field) {
-            return (field & this.bit) != 0;
-        }
-        
-        public static int of(Caps ...args) {
-            int ret = 0;
-            for (int i = 0; i < args.length; i++) {
-                ret |= args[i].bit;
-            }
-            return ret;
-        }
     }
 }
