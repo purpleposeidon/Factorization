@@ -37,17 +37,17 @@ public class Packet220FzdsWrap extends Packet {
 
     @Override
     public void processPacket(NetHandler netHandler) {
-        Hammer.proxy.setShadowWorld();
+        Hammer.proxy.setShadowWorld(); //behold my power of voodoo
         try {
-            wrapped.processPacket(netHandler);
+            wrapped.processPacket(netHandler); //who doo?
         } finally {
-            Hammer.proxy.restoreRealWorld();
+            Hammer.proxy.restoreRealWorld(); //You do.
         }
     }
 
     @Override
     public int getPacketSize() {
-        //We need to exclude our own header, but include the wrapped packet's header
+        //This function excludes the header byte. We need to exclude our own header, but include the wrapped packet's header.
         return 1 + wrapped.getPacketSize();
     }
     
