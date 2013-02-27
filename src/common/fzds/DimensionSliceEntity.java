@@ -401,6 +401,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     void doUpdate() {
         if (worldObj.isRemote) {
             prevTickRotation.update(rotation);
+            rayOutOfDate = true;
         } else if (proxy == null && !isDead) {
             DeltaChunk.getSlices(worldObj).add(this);
             proxy = new PacketProxyingPlayer(this, DeltaChunk.getServerShadowWorld());
@@ -723,5 +724,30 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     @Override
     public void setRotationalVelocity(Quaternion w) {
         rotationalVelocity = w;
+    }
+    
+    @Override
+    public float getCollisionBorderSize() {
+        return 0;
+    }
+    
+    private DseRayTarget rayTarget = null;
+    private Entity[] raypart = null;
+    private boolean rayOutOfDate = true;
+    
+    @Override
+    public Entity[] getParts() {
+        if (!worldObj.isRemote) {
+            return null;
+        }
+        if (rayOutOfDate) {
+            if (raypart == null) {
+                raypart = new Entity[1];
+                raypart[0] = rayTarget = new DseRayTarget(this);
+            }
+            rayOutOfDate = false;
+            Hammer.proxy.updateRayPosition(rayTarget);
+        }
+        return raypart;
     }
 }

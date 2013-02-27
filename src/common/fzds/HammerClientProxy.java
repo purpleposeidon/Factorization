@@ -8,20 +8,27 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.NetClientHandler;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.renderer.EntityRenderer;
+import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.NetHandler;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet1Login;
 import net.minecraft.profiler.Profiler;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.event.DrawBlockHighlightEvent;
+import net.minecraftforge.event.ForgeSubscribe;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.registry.TickRegistry;
@@ -30,6 +37,7 @@ import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.client.render.EmptyRender;
 import factorization.common.Core;
+import factorization.common.FactorizationUtil;
 import factorization.fzds.api.IDeltaChunk;
 
 public class HammerClientProxy extends HammerProxy {
@@ -255,6 +263,7 @@ public class HammerClientProxy extends HammerProxy {
         setSendQueueWorld(wc);
         
         //For rendering
+        mc.renderViewEntity = player; //TODO NOTE: This make mess up in third person!
         if (TileEntityRenderer.instance.worldObj != null) {
             TileEntityRenderer.instance.worldObj = wc;
         }
@@ -337,4 +346,82 @@ public class HammerClientProxy extends HammerProxy {
         Packet.addIdClassMapping(220, true /* client side */, false /* server side */, Packet220FzdsWrap.class);
     }
     
+    MovingObjectPosition shadowSelected = null;
+    
+    @ForgeSubscribe
+    public void renderSelection(DrawBlockHighlightEvent event) {
+        //System.out.println(event.target.hitVec);
+        if (!(event.target.entityHit instanceof DseRayTarget)) {
+            return;
+        }
+        if (shadowSelected == null) {
+            return;
+        }
+        if (event.isCanceled()) {
+            return;
+        }
+        EntityPlayer player = event.player;
+        RenderGlobal rg = event.context;
+        ItemStack is = event.currentItem;
+        float partialTicks = event.partialTicks;
+        if (ForgeHooksClient.onDrawBlockHighlight(rg, player, shadowSelected, shadowSelected.subHit, is, partialTicks)) {
+            event.context.drawBlockBreaking(player, shadowSelected, 0, is, partialTicks);
+            event.context.drawSelectionBox(player, shadowSelected, 0, is, partialTicks);
+        }
+        
+        shadowSelected = null;
+    }
+    
+    void updateRayPosition(DseRayTarget ray) {
+        if (ray.parent.centerOffset == null) {
+            return;
+        }
+        //mc.renderViewEntity.rayTrace(reachDistance, partialTicks) Just this function would work if we didn't care about entities.
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityPlayer player = mc.thePlayer;
+        double origX = player.posX;
+        double origY = player.posY;
+        double origZ = player.posZ;
+        Vec3 shadowPos = ray.parent.real2shadow(Vec3.createVectorHelper(origX, origY, origZ));
+        MovingObjectPosition origMouseOver = mc.objectMouseOver;
+        final int pointedEntity_field_index = 6;
+        Entity origPointed = ReflectionHelper.getPrivateValue(EntityRenderer.class, mc.entityRenderer, pointedEntity_field_index);
+        //It's private! It's used in one function! Why is this even a field?
+        
+        try {
+            Hammer.proxy.setShadowWorld();
+            mc.thePlayer.posX = shadowPos.xCoord;
+            mc.thePlayer.posY = shadowPos.yCoord;
+            mc.thePlayer.posZ = shadowPos.zCoord;
+            //TODO: Need to rotate the player if the DSE has rotated
+            mc.thePlayer.rotationPitch = player.rotationPitch;
+            mc.thePlayer.rotationYaw = player.rotationYaw;
+            
+            mc.entityRenderer.getMouseOver(1F);
+            shadowSelected = mc.objectMouseOver;
+            if (shadowSelected == null) {
+                return;
+            }
+            AxisAlignedBB bb;
+            switch (mc.objectMouseOver.typeOfHit) {
+            case ENTITY:
+                bb = shadowSelected.entityHit.boundingBox;
+                break;
+            case TILE:
+                Coord hit = new Coord(DeltaChunk.getClientShadowWorld(), shadowSelected.blockX, shadowSelected.blockY, shadowSelected.blockZ);
+                bb = hit.getCollisionBoundingBoxFromPool();
+                break;
+            default: return;
+            }
+            //TODO: Rotations!
+            Vec3 min = ray.parent.shadow2real(FactorizationUtil.getMin(bb));
+            Vec3 max = ray.parent.shadow2real(FactorizationUtil.getMax(bb));
+            FactorizationUtil.setMin(ray.boundingBox, min);
+            FactorizationUtil.setMax(ray.boundingBox, max);
+        } finally {
+            Hammer.proxy.restoreRealWorld();
+            mc.objectMouseOver = origMouseOver;
+            ReflectionHelper.setPrivateValue(EntityRenderer.class, mc.entityRenderer, origPointed, pointedEntity_field_index);
+        }
+    }
 }

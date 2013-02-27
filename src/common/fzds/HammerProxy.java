@@ -28,4 +28,8 @@ public class HammerProxy {
     public void checkForWorldChange() { }
     
     public void runShadowTick() { }
+    
+    void registerStuff() { }
+    
+    void updateRayPosition(DseRayTarget ray) { }
 }

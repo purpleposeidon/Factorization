@@ -172,6 +172,7 @@ public class Hammer {
             }
         }, Side.SERVER);
         MinecraftForge.EVENT_BUS.register(hammerInfo);
+        MinecraftForge.EVENT_BUS.register(proxy);
     }
     
     @ServerStarting
