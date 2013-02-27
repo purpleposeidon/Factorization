@@ -326,6 +326,8 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 renderInfo.renderTerrain();
                 checkGLError("FZDS terrain display list render");
                 glTranslatef((float)(dse.posX - x), (float)(dse.posY - y), (float)(dse.posZ - z));
+                Coord c = dse.getCorner();
+                glTranslatef(-c.x, -c.y, -c.z);
                 if (nest == 1) {
                     Hammer.proxy.setShadowWorld();
                     try {
