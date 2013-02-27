@@ -347,6 +347,7 @@ public class HammerClientProxy extends HammerProxy {
     }
     
     MovingObjectPosition shadowSelected = null;
+    DseRayTarget rayTarget = null;
     
     @ForgeSubscribe
     public void renderSelection(DrawBlockHighlightEvent event) {
@@ -400,6 +401,7 @@ public class HammerClientProxy extends HammerProxy {
             mc.entityRenderer.getMouseOver(1F);
             shadowSelected = mc.objectMouseOver;
             if (shadowSelected == null) {
+                rayTarget = null;
                 return;
             }
             AxisAlignedBB bb;
@@ -418,6 +420,7 @@ public class HammerClientProxy extends HammerProxy {
             Vec3 max = ray.parent.shadow2real(FactorizationUtil.getMax(bb));
             FactorizationUtil.setMin(ray.boundingBox, min);
             FactorizationUtil.setMax(ray.boundingBox, max);
+            rayTarget = ray;
         } finally {
             Hammer.proxy.restoreRealWorld();
             mc.objectMouseOver = origMouseOver;
