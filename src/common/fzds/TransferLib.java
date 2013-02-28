@@ -13,8 +13,12 @@ import factorization.common.Core;
 import factorization.common.Core.NotifyStyle;
 
 public class TransferLib {
-    static void setRaw(Coord c, int id, int md) {
-        //c.setIdMd(id, md);
+    public static void setRaw(Coord c, int id, int md) {
+        boolean rem = c.w.isRemote;
+        c.w.isRemote = true;
+        c.setIdMd(id, md);
+        c.w.isRemote = rem;
+        /*
         Chunk chunk = c.w.getChunkFromBlockCoords(c.x, c.z);
         Block origBlock = Block.blocksList[id];
         try {
@@ -22,15 +26,17 @@ public class TransferLib {
             chunk.setBlockIDWithMetadata(c.x & 15, c.y, c.z & 15, id, md);
         } finally {
             Block.blocksList[id] = origBlock;
-        }
+        }*/
     }
     
     private static TileEntity wiper = new TileEntity();
     
-    public static TileEntity move(Coord src, Coord dest) {
-        Core.notify(null, src, NotifyStyle.FORCE, "-");
+    public static TileEntity move(Coord src, Coord dest, boolean wipeSrc, boolean overwriteDestination) {
         int id = src.getId();
         int md = src.getMd();
+        if (id == 0 && !overwriteDestination) {
+            return null;
+        }
         if (id != 0) {
             System.out.println("Moving " + src + " to " + dest); //NORELEASE
         }
@@ -39,12 +45,16 @@ public class TransferLib {
         if (te != null) {
             teData = new NBTTagCompound();
             te.writeToNBT(teData);
-            wiper.validate();
-            src.setTE(wiper);
-            Chunk chunk = src.w.getChunkFromBlockCoords(src.x, src.z);
-            chunk.chunkTileEntityMap.remove(new ChunkPosition(src.x & 15, src.y, src.z & 15));
+            if (wipeSrc) {
+                wiper.validate();
+                src.setTE(wiper);
+                Chunk chunk = src.w.getChunkFromBlockCoords(src.x, src.z);
+                chunk.chunkTileEntityMap.remove(new ChunkPosition(src.x & 15, src.y, src.z & 15));
+            }
         }
-        setRaw(src, 0, 0);
+        if (wipeSrc) {
+            setRaw(src, 0, 0);
+        }
         wiper.worldObj = null; //Don't hold onto a reference
         setRaw(dest, id, md);
         if (teData != null) {

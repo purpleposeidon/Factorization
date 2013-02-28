@@ -33,7 +33,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
     private HashSet<EntityPlayerMP> trackedPlayers = new HashSet();
     
     public PacketProxyingPlayer(DimensionSliceEntity dimensionSlice, World shadowWorld) {
-        super(MinecraftServer.getServer(), shadowWorld, "[" + getPrefix() + "]", new ItemInWorldManager(shadowWorld));
+        super(MinecraftServer.getServer(), shadowWorld, "FZDS Packet Proxy", new ItemInWorldManager(shadowWorld));
         this.dimensionSlice = dimensionSlice;
         this.playerNetServerHandler = new NetServerHandler(MinecraftServer.getServer(), this, this);
         Coord c = dimensionSlice.getCenter();
@@ -54,10 +54,6 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
         ticks_since_last_update = (int) (Math.random()*20);
         //TODO: I think the chunks are unloading despite the PPP's presence.
         //Either figure out how to get this to act like an actual player, or make chunk loaders happen as well
-    }
-    
-    static String getPrefix() {
-        return "FZDS";
     }
     
     private final int PlayerManager_playerViewRadius_field = 4;
@@ -130,8 +126,8 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements IFzdsEntryCo
         
         Coord low = dimensionSlice.getCorner();
         Coord far = dimensionSlice.getFarCorner();
-        for (int x = low.x; x <= far.x; x += 16) {
-            for (int z = low.z; z <= far.z; z += 16) {
+        for (int x = low.x - 16; x <= far.x + 16; x += 16) {
+            for (int z = low.z - 16; z <= far.z + 16; z += 16) {
                 if (!world.blockExists(x+1, 0, z+1)) {
                     continue;
                 }

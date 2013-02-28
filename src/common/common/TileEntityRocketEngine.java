@@ -348,12 +348,12 @@ for x in range(0, len(d[0])):
             solver.entireRocket.remove(c);
             c.setAsVector(real);
             dest.set(dse.real2shadow(real));
-            TransferLib.move(c, dest);
+            TransferLib.move(c, dest, true, true);
         }
         for (Coord c : solver.entireRocket) {
             c.setAsVector(real);
             dest.set(dse.real2shadow(real));
-            TransferLib.move(c, dest);
+            TransferLib.move(c, dest, true, true);
         }
         worldObj.spawnEntityInWorld(dse);
     }

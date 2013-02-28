@@ -101,24 +101,74 @@ public class DeltaChunk {
     
     private static Coord shadow = new Coord(null, 0, 0, 0);
     
-    public static IDeltaChunk makeSlice(int channel, final Coord min, final Coord max, AreaMap mapper) {
+    public static IDeltaChunk makeSlice(int channel, final Coord min, final Coord max, AreaMap mapper, boolean wipeSrc) {
         DeltaCoord size = max.difference(min);
         final IDeltaChunk dse = allocateSlice(min.w, channel, size);
         Vec3 vrm = min.centerVec(max);
-        dse.posX = vrm.xCoord;
-        dse.posY = vrm.yCoord;
-        dse.posZ = vrm.zCoord;
+        dse.posX = (int)vrm.xCoord;
+        dse.posY = (int)vrm.yCoord;
+        dse.posZ = (int)vrm.zCoord;
         mapper.fillDse(new DseDestination() {public void include(Coord real) {
             shadow.set(real);
             dse.real2shadow(shadow);
-            TransferLib.move(real, shadow);
+            TransferLib.move(real, shadow, false, true);
         }});
-        mapper.fillDse(new DseDestination() {public void include(Coord real) {
-            shadow.set(real);
-            dse.real2shadow(shadow);
-            shadow.markBlockForUpdate();
-        }});
+        if (wipeSrc) {
+            mapper.fillDse(new DseDestination() {public void include(Coord real) {
+                shadow.set(real);
+                dse.real2shadow(shadow);
+                TransferLib.setRaw(shadow, 1, 0);
+                shadow.setId(0);
+            }});
+        }
         return dse;
+    }
+    
+    public static void paste(IDeltaChunk selected, boolean overwriteDestination) {
+        Coord a = new Coord(DeltaChunk.getServerShadowWorld(), 0, 0, 0);
+        Coord b = a.copy();
+        Vec3 vShadowMin = Vec3.createVectorHelper(0, 0, 0);
+        Vec3 vShadowMax = Vec3.createVectorHelper(0, 0, 0);
+        selected.getCorner().setAsVector(vShadowMin);
+        selected.getFarCorner().setAsVector(vShadowMax);
+        a.set(vShadowMin);
+        b.set(vShadowMax);
+        DeltaCoord dc = b.difference(a);
+        Coord dest = new Coord(selected);
+        Coord c = new Coord(a.w, 0, 0, 0);
+        
+        for (int x = a.x; x < b.x; x++) {
+            for (int y = a.y; y < b.y; y++) {
+                for (int z = a.z; z < b.z; z++) {
+                    c.set(a.w, x, y, z);
+                    dest.set(c);
+                    selected.shadow2real(dest);
+                    TransferLib.move(c, dest, false, overwriteDestination);
+                }
+            }
+        }
+    }
+    
+    public static void clear(IDeltaChunk selected) {
+        Coord a = new Coord(DeltaChunk.getServerShadowWorld(), 0, 0, 0);
+        Coord b = a.copy();
+        Vec3 vShadowMin = Vec3.createVectorHelper(0, 0, 0);
+        Vec3 vShadowMax = Vec3.createVectorHelper(0, 0, 0);
+        selected.getCorner().setAsVector(vShadowMin);
+        selected.getFarCorner().setAsVector(vShadowMax);
+        a.set(vShadowMin);
+        b.set(vShadowMax);
+        
+        Coord c = new Coord(a.w, 0, 0, 0);
+        for (int x = a.x; x < b.x; x++) {
+            for (int y = a.y; y < b.y; y++) {
+                for (int z = a.z; z < b.z; z++) {
+                    c.set(a.w, x, y, z);
+                    selected.shadow2real(c);
+                    c.markBlockForUpdate();
+                }
+            }
+        }
     }
     
 }

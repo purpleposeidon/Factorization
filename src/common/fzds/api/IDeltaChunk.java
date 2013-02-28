@@ -19,8 +19,6 @@ public abstract class IDeltaChunk extends Entity {
     
     public abstract void blocksChanged(int x, int y, int z);
     
-    public abstract void dropContents();
-    
     public abstract boolean can(Caps cap);
     public abstract IDeltaChunk permit(Caps cap);
     public abstract IDeltaChunk forbid(Caps cap);

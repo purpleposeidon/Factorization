@@ -323,6 +323,12 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                         (float)(-dse.centerOffset.yCoord),
                         (float)(-dse.centerOffset.zCoord)
                         );
+                if (dse.scale != 1) {
+                    GL11.glScalef(dse.scale, dse.scale, dse.scale);
+                }
+                if (dse.opacity != 1) {
+                    GL11.glColor4f(1, 1, 1, dse.opacity);
+                }
                 renderInfo.renderTerrain();
                 checkGLError("FZDS terrain display list render");
                 glTranslatef((float)(dse.posX - x), (float)(dse.posY - y), (float)(dse.posZ - z));
@@ -340,6 +346,9 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 }
                 checkGLError("FZDS entity render");
             } finally {
+                if (dse.opacity != 1) {
+                    GL11.glColor4f(1, 1, 1, 1);
+                }
                 glPopMatrix();
             }
         } catch (Exception e) {
