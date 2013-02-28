@@ -12,7 +12,7 @@ import factorization.api.Coord;
 import factorization.api.IActOnCraft;
 import factorization.common.Core.TabType;
 
-public class ItemWrathIgniter extends Item implements IActOnCraft {
+public class ItemWrathIgniter extends Item {
     public ItemWrathIgniter(int par1) {
         super(par1);
         setMaxStackSize(1);
@@ -69,21 +69,24 @@ public class ItemWrathIgniter extends Item implements IActOnCraft {
         TileEntityWrathFire.ignite(baseBlock, fireBlock, player);
         return true;
     }
-
+    
     @Override
-    public void onCraft(ItemStack is, IInventory craftMatrix, int craftSlot, ItemStack result,
-            EntityPlayer player) {
-        if (result.isItemEqual(Core.registry.lamp_item) /* no NBT okay */) {
-            if (player != null) {
-                is.damageItem(1, player);
-            }
-            else {
-                is.setItemDamage(is.getItemDamage() - 1);
-            }
-            if (is.getItemDamage() <= is.getMaxDamage()) {
-                is.stackSize += 1;
-            }
+    public boolean hasContainerItem() {
+        return true;
+    }
+    
+    @Override
+    public ItemStack getContainerItemStack(ItemStack is) {
+        is.setItemDamage(is.getItemDamage() + 1);
+        if (is.getItemDamage() > getMaxDamage()) {
+            is.stackSize = 0;
         }
+        return is;
+    }
+    
+    @Override
+    public boolean doesContainerItemLeaveCraftingGrid(ItemStack par1ItemStack) {
+        return false;
     }
 
     @Override
