@@ -1,8 +1,11 @@
 package factorization.fzds;
 
+import static org.lwjgl.opengl.GL11.glTranslatef;
+
 import java.lang.reflect.Field;
 import java.util.Iterator;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
@@ -21,6 +24,7 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet1Login;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.EnumMovingObjectType;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IWorldAccess;
@@ -29,12 +33,16 @@ import net.minecraft.world.WorldSettings;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.event.ForgeSubscribe;
+
+import org.lwjgl.opengl.GL11;
+
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
+import factorization.api.DeltaCoord;
 import factorization.client.render.EmptyRender;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
@@ -270,6 +278,7 @@ public class HammerClientProxy extends HammerProxy {
         if (RenderManager.instance.worldObj != null) {
             RenderManager.instance.worldObj = wc;
         }
+        mc.renderGlobal.theWorld = wc;
     }
     
     private EntityClientPlayerMP real_player = null;
@@ -347,6 +356,8 @@ public class HammerClientProxy extends HammerProxy {
     }
     
     MovingObjectPosition shadowSelected = null;
+    DseRayTarget rayTarget = null;
+    AxisAlignedBB selectionBlockBounds = null;
     
     @ForgeSubscribe
     public void renderSelection(DrawBlockHighlightEvent event) {
@@ -364,12 +375,38 @@ public class HammerClientProxy extends HammerProxy {
         RenderGlobal rg = event.context;
         ItemStack is = event.currentItem;
         float partialTicks = event.partialTicks;
-        if (ForgeHooksClient.onDrawBlockHighlight(rg, player, shadowSelected, shadowSelected.subHit, is, partialTicks)) {
-            event.context.drawBlockBreaking(player, shadowSelected, 0, is, partialTicks);
-            event.context.drawSelectionBox(player, shadowSelected, 0, is, partialTicks);
+        DimensionSliceEntity dse = rayTarget.parent;
+        Coord here = null;
+        if (selectionBlockBounds != null && shadowSelected.typeOfHit == EnumMovingObjectType.TILE) {
+            here = new Coord(DeltaChunk.getClientShadowWorld(), shadowSelected.blockX, shadowSelected.blockY, shadowSelected.blockZ);
+            here.getBlock().setBlockBounds(
+                    (float)(selectionBlockBounds.minX - here.x), (float)(selectionBlockBounds.minY - here.y), (float)(selectionBlockBounds.minZ - here.z),
+                    (float)(selectionBlockBounds.maxX - here.x), (float)(selectionBlockBounds.maxY - here.y), (float)(selectionBlockBounds.maxZ - here.z)
+                );
         }
-        
-        shadowSelected = null;
+        //GL11.glDisable(GL11.GL_ALPHA_TEST);
+        GL11.glPushMatrix();
+        setShadowWorld();
+        try {
+            //TODO: Rotation transform
+            Coord corner = dse.getCorner();
+            GL11.glTranslatef(-corner.x, -corner.y, -corner.z);
+            GL11.glTranslatef((float)(+dse.posX), (float)(+dse.posY), (float)(+dse.posZ));
+            GL11.glTranslatef(-2, -2, -2); //Hello, weird 2s
+            
+            //TODO: glPushAttr for the mask.
+            GL11.glColorMask(true, true, false, true);
+            if (!ForgeHooksClient.onDrawBlockHighlight(rg, player, shadowSelected, shadowSelected.subHit, is, partialTicks)) {
+                event.context.drawBlockBreaking(player, shadowSelected, 0, is, partialTicks);
+                event.context.drawSelectionBox(player, shadowSelected, 0, is, partialTicks);
+            }
+        } finally {
+            GL11.glColorMask(true, true, true, true);
+            restoreRealWorld();
+            GL11.glPopMatrix();
+            //GL11.glEnable(GL11.GL_ALPHA_TEST);
+        }
+        //shadowSelected = null;
     }
     
     void updateRayPosition(DseRayTarget ray) {
@@ -389,37 +426,48 @@ public class HammerClientProxy extends HammerProxy {
         //It's private! It's used in one function! Why is this even a field?
         
         try {
-            Hammer.proxy.setShadowWorld();
-            mc.thePlayer.posX = shadowPos.xCoord;
-            mc.thePlayer.posY = shadowPos.yCoord;
-            mc.thePlayer.posZ = shadowPos.zCoord;
-            //TODO: Need to rotate the player if the DSE has rotated
-            mc.thePlayer.rotationPitch = player.rotationPitch;
-            mc.thePlayer.rotationYaw = player.rotationYaw;
-            
-            mc.entityRenderer.getMouseOver(1F);
-            shadowSelected = mc.objectMouseOver;
-            if (shadowSelected == null) {
-                return;
-            }
             AxisAlignedBB bb;
-            switch (mc.objectMouseOver.typeOfHit) {
-            case ENTITY:
-                bb = shadowSelected.entityHit.boundingBox;
-                break;
-            case TILE:
-                Coord hit = new Coord(DeltaChunk.getClientShadowWorld(), shadowSelected.blockX, shadowSelected.blockY, shadowSelected.blockZ);
-                bb = hit.getCollisionBoundingBoxFromPool();
-                break;
-            default: return;
+            Hammer.proxy.setShadowWorld();
+            try {
+                mc.thePlayer.posX = shadowPos.xCoord;
+                mc.thePlayer.posY = shadowPos.yCoord;
+                mc.thePlayer.posZ = shadowPos.zCoord;
+                //TODO: Need to rotate the player if the DSE has rotated
+                mc.thePlayer.rotationPitch = player.rotationPitch;
+                mc.thePlayer.rotationYaw = player.rotationYaw;
+                
+                mc.entityRenderer.getMouseOver(1F);
+                shadowSelected = mc.objectMouseOver;
+                if (shadowSelected == null) {
+                    rayTarget = null;
+                    return;
+                }
+                switch (shadowSelected.typeOfHit) {
+                case ENTITY:
+                    bb = shadowSelected.entityHit.boundingBox;
+                    selectionBlockBounds = null;
+                    break;
+                case TILE:
+                    Coord hit = new Coord(DeltaChunk.getClientShadowWorld(), shadowSelected.blockX, shadowSelected.blockY, shadowSelected.blockZ);
+                    Block block = hit.getBlock();
+                    bb = block.getSelectedBoundingBoxFromPool(hit.w, hit.x, hit.y, hit.z);
+                    selectionBlockBounds = bb;
+                    break;
+                default: return;
+                }
+            } finally {
+                Hammer.proxy.restoreRealWorld();
             }
             //TODO: Rotations!
+            if (bb == null) {
+                System.out.println("NORELEASE?");
+            }
             Vec3 min = ray.parent.shadow2real(FactorizationUtil.getMin(bb));
             Vec3 max = ray.parent.shadow2real(FactorizationUtil.getMax(bb));
             FactorizationUtil.setMin(ray.boundingBox, min);
             FactorizationUtil.setMax(ray.boundingBox, max);
+            rayTarget = ray;
         } finally {
-            Hammer.proxy.restoreRealWorld();
             mc.objectMouseOver = origMouseOver;
             ReflectionHelper.setPrivateValue(EntityRenderer.class, mc.entityRenderer, origPointed, pointedEntity_field_index);
         }
