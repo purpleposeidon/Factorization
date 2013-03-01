@@ -37,9 +37,21 @@ public class BlockLightAir extends Block {
     }
 
     @Override
-    public void breakBlock(World par1World, int par2, int par3, int par4, int par5, int par6) {
-        super.breakBlock(par1World, par2, par3, par4, par5, par6);
-        par1World.removeBlockTileEntity(par2, par3, par4);
+    public void breakBlock(World w, int x, int y, int z, int id, int md) {
+        //Don't need super calls because we don't carry TEs
+        if (w.isRemote) {
+            return;
+        }
+        if (md == air_md) {
+            if (TileEntityWrathLamp.isUpdating) {
+                return;
+            }
+            TileEntityWrathLamp.doAirCheck(w, x, y, z);
+            int below = w.getBlockId(x, y - 1, z);
+            if (below == blockID) {
+                w.scheduleBlockUpdate(x, y - 1, z, blockID, 1);
+            }
+        }
     }
 
     @Override
