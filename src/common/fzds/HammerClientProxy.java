@@ -472,4 +472,9 @@ public class HammerClientProxy extends HammerProxy {
             ReflectionHelper.setPrivateValue(EntityRenderer.class, mc.entityRenderer, origPointed, pointedEntity_field_index);
         }
     }
+    
+    @Override
+    MovingObjectPosition getShadowHit() {
+        return shadowSelected;
+    }
 }

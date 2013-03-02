@@ -173,6 +173,9 @@ public class Hammer {
         }, Side.SERVER);
         MinecraftForge.EVENT_BUS.register(hammerInfo);
         MinecraftForge.EVENT_BUS.register(proxy);
+        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+            MinecraftForge.EVENT_BUS.register(new DseRayTarget.ClickHandler());
+        }
     }
     
     @ServerStarting
