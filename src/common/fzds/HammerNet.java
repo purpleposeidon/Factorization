@@ -105,6 +105,7 @@ public class HammerNet implements ITinyPacketHandler {
             float zOffset = dis.readFloat();
             
             if (packetType == HammerNetType.leftClickBlock) {
+                ipp.theItemInWorldManager.onBlockClicked(hitX, hitY, hitZ, sideHit);
             } else if (packetType == HammerNetType.rightClickBlock) {
                 ItemStack is = player.getHeldItem();
                 ipp.theItemInWorldManager.activateBlockOrUseItem(ipp, shadow, is, hitX, hitY, hitZ, sideHit, xOffset, yOffset, zOffset);
