@@ -5,14 +5,14 @@ import java.util.HashSet;
 import java.util.PriorityQueue;
 
 import net.minecraft.block.Block;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.profiler.Profiler;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.Icon;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.common.ForgeDirection;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class TileEntityWrathLamp extends TileEntityCommon {
     static final int radius = 6;
@@ -54,6 +54,8 @@ public class TileEntityWrathLamp extends TileEntityCommon {
             airToUpdate.remove().check();
         }
     }
+    
+    static final int NOTIFY_NEIGHBORS = factorization.api.Coord.NOTIFY_NEIGHBORS;
 
     static void doAirCheck(World w, int x, int y, int z) {
         if (w.isRemote) {
@@ -66,7 +68,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         TileEntityWrathLamp lamp = TileEntityWrathLamp.findLightAirParent(w, x, y, z);
         if (lamp == null) {
             update_count += 1;
-            w.setBlockWithNotify(x, y, z, 0);
+            w.setBlockAndMetadataWithNotify(x, y, z, 0, 0, NOTIFY_NEIGHBORS);
         }
         else {
             lamp.activate(y);
@@ -151,7 +153,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
             for (int z = zCoord - radius; z <= zCoord + radius; z++) {
                 int id = worldObj.getBlockId(x, yCoord, z);
                 if (id == Core.registry.lightair_block.blockID) {
-                    worldObj.setBlockWithNotify(x, yCoord, z, 0);
+                    worldObj.setBlockAndMetadataWithNotify(x, yCoord, z, 0, 0, NOTIFY_NEIGHBORS);
                     //worldObj.setBlock(x, yCoord, z, 0);
                 }
             }
@@ -300,7 +302,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                         block = -1;
                     }
                     if (block == 0) {
-                        worldObj.setBlockWithNotify(x, height, z, Core.registry.lightair_block.blockID);
+                        worldObj.setBlockAndMetadataWithNotify(x, height, z, Core.registry.lightair_block.blockID, 0, NOTIFY_NEIGHBORS);
                     } else if (block == Core.registry.lightair_block.blockID) {
                     } else if (x == xCoord && height == yCoord && z == zCoord) {
                         //this is ourself. Hi, self.
@@ -398,6 +400,16 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     @Override
     public BlockClass getBlockClass() {
         return BlockClass.Lamp;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    FzIcon metal = tex("block/dark_iron_block");
+    @SideOnly(Side.CLIENT)
+    Icon glass = Block.glass.getBlockTextureFromSide(0);
+    
+    @Override
+    Icon getIcon(ForgeDirection dir) {
+        return BlockFactorization.error_icon;
     }
 
     @Override

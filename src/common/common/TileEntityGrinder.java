@@ -6,7 +6,10 @@ import java.util.ArrayList;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Charge;
 import factorization.api.IChargeConductor;
 import factorization.common.NetworkFactorization.MessageType;
@@ -97,6 +100,14 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.GRINDER;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    static FzIcon grinder_bottom = tex("machine/grinder_bottom"), grinder_bottom_top_edge = tex("machine/grinder_bottom_top_edge"), grinder_side = tex("grinder_side"), grinder_top = tex("grinder_top"); 
+    
+    @Override
+    Icon getIcon(ForgeDirection dir) {
+        return BlockFactorization.error_icon;
     }
 
     void slowDown() {

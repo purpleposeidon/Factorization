@@ -44,9 +44,9 @@ public class HammerChunkProvider implements IChunkProvider {
         //seems to be a callback for when the entire world is saved
         return true;
     }
-
+    
     @Override
-    public boolean unload100OldestChunks() {
+    public boolean unloadQueuedChunks() {
         // ??? Wtf is this?
         return false;
     }

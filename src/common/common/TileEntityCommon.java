@@ -4,18 +4,21 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.Random;
 
-import org.bouncycastle.util.Arrays;
-
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.Icon;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeDirection;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
 import factorization.api.ICoord;
@@ -26,6 +29,8 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     static Random rand = new Random();
 
     public abstract BlockClass getBlockClass();
+    @SideOnly(Side.CLIENT)
+    abstract Icon getIcon(ForgeDirection dir);
 
     @Override
     public Packet getDescriptionPacket() {
@@ -178,5 +183,10 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
             me.getCharge().invalidate();
         }
         super.invalidate();
+    }
+    
+    @SideOnly(Side.CLIENT)
+    protected static FzIcon tex(String name) {
+        return new FzIcon(name);
     }
 }

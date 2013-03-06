@@ -1,5 +1,7 @@
 package factorization.common;
 
+import javax.management.RuntimeErrorException;
+
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.item.ItemStack;
@@ -30,7 +32,7 @@ public enum FactoryType {
     GREENWARE(20, false, TileEntityGreenware.class, "factory_greenware"), //clay sculpture
     STEAMTURBINE(21, false, TileEntitySteamTurbine.class, "factory_steamturbine"), //A generic steam turbine; works with other mods' steam
     SOLARBOILER(22, false, TileEntitySolarBoiler.class, "factory_solarfurnace"), //Produces steam from sunlight
-    ROCKETENGINE(23, false, /*TileEntityRocketEngine.class*/ null, "factory_rocketengine"), //Is a rocket
+    ROCKETENGINE(23, false, TileEntityRocketEngine.class, "factory_rocketengine"), //Is a rocket
     EXTENDED(24, false, TileEntityExtension.class, "factory_ext"), //Used for multipiece blocks (like beds & rocket engines)
     
     
@@ -44,6 +46,7 @@ public enum FactoryType {
     final public boolean hasGui;
     final private Class clazz;
     final public String te_id;
+    final public TileEntityCommon representative;
 
     static class mapper {
         //bluh java
@@ -62,6 +65,15 @@ public enum FactoryType {
         mapper.mapping[md] = this;
         this.clazz = clazz;
         this.te_id = name;
+        TileEntityCommon rep = null;
+        if (TileEntityCommon.class.isAssignableFrom(clazz)) {
+            try {
+                rep = ((Class<? extends TileEntityCommon>)clazz).newInstance();
+            } catch (Throwable e) {
+                throw new IllegalArgumentException(e);
+            }
+        }
+        representative = rep;
     }
 
     FactoryType(int md, boolean use_gui, Class clazz, String name) {
@@ -104,7 +116,6 @@ public enum FactoryType {
 
     ItemStack itemStack(String name) {
         ItemStack ret = new ItemStack(Core.registry.item_factorization, 1, this.md);
-        Core.proxy.addName(ret, name);
         return ret;
     }
 

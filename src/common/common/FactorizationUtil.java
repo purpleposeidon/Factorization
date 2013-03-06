@@ -340,6 +340,16 @@ public class FactorizationUtil {
         @Override
         public void closeChest() {}
         
+        @Override
+        public boolean canStickItemInSlot(int i, ItemStack itemstack) {
+            return isi.canStickItemInSlot(i, itemstack);
+        }
+        
+        @Override
+        public boolean hasCustomName() {
+            return isi.hasCustomName();
+        }
+        
     }
     
     //Recipe creation

@@ -3,9 +3,13 @@ package factorization.common;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.Icon;
 import net.minecraftforge.common.ISidedInventory;
 import net.minecraftforge.common.ForgeDirection;
 import static net.minecraftforge.common.ForgeDirection.*;
@@ -20,6 +24,15 @@ public class TileEntityStamper extends TileEntityFactorization {
     @Override
     public BlockClass getBlockClass() {
         return BlockClass.Machine;
+    }
+    
+    
+    @SideOnly(Side.CLIENT)
+    static ActivatingMachineIcons icon = new ActivatingMachineIcons("craft/stamper");
+    
+    @Override
+    Icon getIcon(ForgeDirection dir) {
+        return icon.get(this, dir);
     }
 
     @Override

@@ -30,16 +30,7 @@ public class ItemWandOfCooling extends Item {
         Arrays.fill(changeArray, -1);
         remove(Block.fire);
         Core.tab(this, TabType.TOOLS);
-    }
-
-    @Override
-    public String getItemName() {
-        return "item.wandofcooling";
-    }
-
-    @Override
-    public String getItemNameIS(ItemStack is) {
-        return getItemName();
+        setItemName("factorization.tool.wand_of_cooling");
     }
 
     public void cool(Block src, Block dest) {
@@ -55,7 +46,7 @@ public class ItemWandOfCooling extends Item {
     }
 
     void setBlock(World world, int x, int y, int z, int id) {
-        world.setBlockWithNotify(x, y, z, id);
+        world.setBlockAndMetadataWithNotify(x, y, z, id, 0, Coord.NOTIFY_NEIGHBORS);
         soundCool(world, x, y, z);
     }
 
@@ -225,17 +216,6 @@ public class ItemWandOfCooling extends Item {
     public ItemStack onItemRightClick(ItemStack is, World world, EntityPlayer player) {
         tryPlaceIntoWorld(is, player, world, (int) player.posX, (int) player.posY, (int) player.posZ, 0, 0, 0, 0);
         return is;
-    }
-
-    @Override
-    public String getTextureFile() {
-        return Core.texture_file_item;
-    }
-
-    @Override
-    //-- can't override due to the stupidly typical reason.
-    public int getIconFromDamage(int par1) {
-        return (2 * 16) + 2;
     }
 
     @Override

@@ -3,13 +3,14 @@ package factorization.client.render;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.Icon;
 
 import org.lwjgl.opengl.GL11;
 
 import factorization.api.Coord;
 import factorization.common.Core;
 import factorization.common.FactoryType;
-import factorization.common.Texture;
+import factorization.common.TileEntitySteamTurbine;
 import factorization.common.TileEntityWire;
 import factorization.common.WireConnections;
 import factorization.common.WireRenderingCube;
@@ -19,11 +20,8 @@ public class BlockRenderSteamTurbine extends FactorizationBlockRender {
     TileEntityWire fake_wire = new TileEntityWire();
     @Override
     void render(RenderBlocks rb) {
-        int glass = Texture.lamp_iron + 10;
         float m = 0.0001F;
         renderNormalBlock(rb, getFactoryType().md);
-        
-        int out = 3*16 + 3;
         
         renderMotor(rb, 0);
         if (world_mode) {
@@ -45,25 +43,27 @@ public class BlockRenderSteamTurbine extends FactorizationBlockRender {
             Block b = Core.registry.factory_rendering_block;
             float f = 1F - (3F/16F);
             
+            Icon side = TileEntitySteamTurbine.turbine_side;
+            
             Tessellator.instance.zOffset += f;
-            rb.renderEastFace(b, x, y, z, out);
+            rb.renderEastFace(b, x, y, z, side);
             Tessellator.instance.zOffset -= f;
             Tessellator.instance.zOffset -= f;
-            rb.renderWestFace(b, x, y, z, out);
+            rb.renderWestFace(b, x, y, z, side);
             Tessellator.instance.zOffset += f;
             
             Tessellator.instance.xOffset += f;
-            rb.renderNorthFace(b, x, y, z, out);
+            rb.renderNorthFace(b, x, y, z, side);
             Tessellator.instance.xOffset -= f;
             Tessellator.instance.xOffset -= f;
-            rb.renderSouthFace(b, x, y, z, out);
+            rb.renderSouthFace(b, x, y, z, side);
             Tessellator.instance.xOffset += f;
             
             Tessellator.instance.yOffset += f;
-            rb.renderBottomFace(b, x, y, z, out - 1);
+            rb.renderBottomFace(b, x, y, z, TileEntitySteamTurbine.turbine_bottom);
             Tessellator.instance.yOffset -= f;
             Tessellator.instance.yOffset -= f;
-            rb.renderTopFace(b, x, y, z, 11);
+            rb.renderTopFace(b, x, y, z, TileEntitySteamTurbine.turbine_top);
             Tessellator.instance.yOffset += f;
         } else {
             //render fan
@@ -72,7 +72,7 @@ public class BlockRenderSteamTurbine extends FactorizationBlockRender {
             GL11.glScalef(s, s, s);
             GL11.glTranslatef(-0.5F, 0.1F, -0.5F);
             GL11.glRotatef(90, 1, 0, 0);
-            renderItemIn2D(10);
+            renderIcon(Core.registry.fan.getIconFromDamage(0));
             GL11.glPopMatrix();
         }
     }

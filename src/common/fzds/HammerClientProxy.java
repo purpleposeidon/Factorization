@@ -65,7 +65,7 @@ public class HammerClientProxy extends HammerProxy {
     
     public static class HammerWorldClient extends WorldClient {
         public HammerWorldClient(NetClientHandler par1NetClientHandler, WorldSettings par2WorldSettings, int par3, int par4, Profiler par5Profiler) {
-            super(par1NetClientHandler, par2WorldSettings, par3, par4, par5Profiler);
+            super(par1NetClientHandler, par2WorldSettings, par3, par4, par5Profiler, Minecraft.getMinecraft().getLogAgent());
         }
         
         @Override
@@ -143,13 +143,9 @@ public class HammerClientProxy extends HammerProxy {
             }
             realWorld.playSound(realCoords.xCoord, realCoords.yCoord, realCoords.zCoord, sound, volume, pitch, false);
         }
-
+        
         @Override
-        public void func_85102_a(EntityPlayer var1, String var2, double var3,
-                double var5, double var7, float var9, float var10) {
-            // TODO Auto-generated method stub
-            //This is another sound-placing method; appears to be murder-related.
-        }
+        public void playSoundToNearExcept(EntityPlayer entityplayer, String s, double d0, double d1, double d2, float f, float f1) { }
 
         @Override
         public void spawnParticle(String particle, double x, double y, double z, double vx, double vy, double vz) {
@@ -159,15 +155,15 @@ public class HammerClientProxy extends HammerProxy {
             }
             realWorld.spawnParticle(particle, realCoords.xCoord, realCoords.yCoord, realCoords.zCoord, vx, vy, vz);
         }
-
+        
         @Override
-        public void obtainEntitySkin(Entity var1) {
-            Minecraft.getMinecraft().renderGlobal.obtainEntitySkin(var1);
+        public void onEntityCreate(Entity entity) {
+            Minecraft.getMinecraft().renderGlobal.onEntityCreate(entity);
         }
-
+        
         @Override
-        public void releaseEntitySkin(Entity var1) {
-            Minecraft.getMinecraft().renderGlobal.releaseEntitySkin(var1);
+        public void onEntityDestroy(Entity entity) {
+            Minecraft.getMinecraft().renderGlobal.onEntityDestroy(entity);
         }
 
         @Override
@@ -225,7 +221,7 @@ public class HammerClientProxy extends HammerProxy {
                     Hammer.dimensionID,
                     login.difficultySetting,
                     Core.proxy.getProfiler());
-            send_queue = Minecraft.getMinecraft().getSendQueue();
+            send_queue = Minecraft.getMinecraft().thePlayer.sendQueue;
             NCH_class = (Class<NetClientHandler>)send_queue.getClass();
             NCH_worldClient_field = ReflectionHelper.findField(NCH_class, "worldClient", "i");
             Minecraft mc = Minecraft.getMinecraft();

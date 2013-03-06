@@ -1,19 +1,20 @@
 package factorization.common;
 
+import static net.minecraftforge.common.ForgeDirection.DOWN;
+import static net.minecraftforge.common.ForgeDirection.UP;
+
 import java.io.DataInput;
 import java.io.IOException;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
-import net.minecraftforge.common.ISidedInventory;
+import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
-import static net.minecraftforge.common.ForgeDirection.*;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
 
@@ -46,7 +47,19 @@ public class TileEntityBarrel extends TileEntityFactorization {
     public BlockClass getBlockClass() {
         return BlockClass.Barrel;
     }
-
+    
+    @SideOnly(Side.CLIENT)
+    static SimpleMachineIcons wood = new SimpleMachineIcons("storage/barrel"), extra_dimensional = new SimpleMachineIcons("storage/ed_barrel");
+    
+    @Override
+    Icon getIcon(ForgeDirection dir) {
+        ForgeDirection face = ForgeDirection.getOrientation(facing_direction);
+        if (upgrade > 0) {
+            return extra_dimensional.get(face, dir);
+        }
+        return wood.get(face, dir);
+    }
+    
     //These are some core barrel item-count manipulating functions.
 
     /**

@@ -19,8 +19,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.Icon;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.ForgeDirection;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.common.Core.NotifyStyle;
@@ -42,6 +45,14 @@ public class TileEntityRocketEngine extends TileEntityCommon {
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.ROCKETENGINE;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public static FzIcon valid = tex("rocket/rocket_engine_valid"), invalid = tex("rocket/rocket_engine_invalid"), nozzle = tex("rocket/rocket_engine_nozzle"), bottom_hole = tex("rocket/rocket_engine_bottom_hole"), top = tex("rocket/rocket_engine_top");
+    
+    @Override
+    Icon getIcon(ForgeDirection dir) {
+        return lastValidationStatus ? valid : invalid;
     }
 
     @Override

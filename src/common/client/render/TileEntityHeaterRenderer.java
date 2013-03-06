@@ -9,7 +9,6 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import org.lwjgl.opengl.GL11;
 
 import factorization.common.Core;
-import factorization.common.Texture;
 import factorization.common.TileEntityHeater;
 
 public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {

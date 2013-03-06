@@ -23,9 +23,7 @@ public class ItemAngularSaw extends Item {
     public ItemAngularSaw(int itemID) {
         super(itemID);
         setMaxDamage(0); //used to be 64
-        setIconCoord(5, 1);
-        setItemName("angularSaw");
-        setTextureFile(Core.texture_file_item);
+        setItemName("angular_saw");
         Core.tab(this, TabType.TOOLS);
         setMaxStackSize(1);
         setFull3D();

@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Icon;
+import net.minecraftforge.common.ForgeDirection;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class TileEntityPackager extends TileEntityStamper {
     @Override
@@ -14,6 +18,14 @@ public class TileEntityPackager extends TileEntityStamper {
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.PACKAGER;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    ActivatingMachineIcons icon = new ActivatingMachineIcons("craft/packager");
+    
+    @Override
+    Icon getIcon(ForgeDirection dir) {
+        return icon.get(this, dir);
     }
 
     @Override

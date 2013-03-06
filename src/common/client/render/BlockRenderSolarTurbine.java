@@ -6,11 +6,11 @@ import factorization.api.Coord;
 import factorization.common.Core;
 import factorization.common.FactoryType;
 import factorization.common.RenderingCube;
-import factorization.common.Texture;
 import factorization.common.TileEntitySolarTurbine;
 import factorization.common.TileEntityWire;
 import factorization.common.WireConnections;
 import factorization.common.WireRenderingCube;
+import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraftforge.client.MinecraftForgeClient;
 
@@ -45,22 +45,21 @@ public class BlockRenderSolarTurbine extends FactorizationBlockRender {
         int water_height = st.water_level;
         //Tessellator.instance.setColorOpaque_F(0.5F, 0.5F, 0.5F);
         //Tessellator.instance.setColorOpaque(255, 0, 255);
-        renderPart(rb, 7, d, 0.001F, d, 1 - d, (0.95F + water_height / (TileEntitySolarTurbine.max_water / 4)) / 16F, 1 - d);
+        renderPart(rb, Block.waterStill.getBlockTextureFromSide(0), d, 0.001F, d, 1 - d, (0.95F + water_height / (TileEntitySolarTurbine.max_water / 4)) / 16F, 1 - d);
         //			renderPart(rb, glass, 1 - d, 1 - d, 1 - d, d, 0.02F, d);
         return;
     }
     
     private TileEntityWire fake_wire = new TileEntityWire();
     void renderSolarTurbine(RenderBlocks rb, int water_height, Coord me) {
-        int glass = Texture.lamp_iron + 10;
         int water = 7;
         float m = 0.0001F;
-        renderPart(rb, glass, 0 + m, 0 + m, 0 + m, 1 - m, 1 - m, 1 - m);
+        renderPart(rb, Block.glass.getBlockTextureFromSide(0), 0 + m, 0 + m, 0 + m, 1 - m, 1 - m, 1 - m);
         if (!world_mode) {
             GL11.glPushMatrix();
             GL11.glTranslatef(-0.5F, 0.1F, -0.5F);
             GL11.glRotatef(90, 1, 0, 0);
-            renderItemIn2D(10);
+            FactorizationBlockRender.renderIcon(Core.registry.fan.getIconFromDamage(0));
             GL11.glPopMatrix();
         }
         renderMotor(rb, 0);

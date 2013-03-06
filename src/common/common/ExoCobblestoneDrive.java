@@ -18,11 +18,9 @@ public class ExoCobblestoneDrive extends Item implements IExoUpgrade {
 
     protected ExoCobblestoneDrive(int par1) {
         super(par1);
-        setItemName("exo.cobbledrive");
-        setIconIndex(16 * 10 + 1);
+        setItemName("factorization.exo.cobbledrive");
         Core.tab(this, TabType.MISC);
         setMaxStackSize(1);
-        setTextureFile(Core.texture_file_item);
     }
     
     @Override

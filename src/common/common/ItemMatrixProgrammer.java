@@ -7,8 +7,8 @@ import net.minecraft.item.ItemStack;
 import factorization.api.IActOnCraft;
 
 public class ItemMatrixProgrammer extends ItemCraftingComponent {
-    public ItemMatrixProgrammer(int id, String itemName, int icon) {
-        super(id, itemName, icon);
+    public ItemMatrixProgrammer(int id, String itemName) {
+        super(id, itemName);
         setMaxStackSize(1);
         setContainerItem(this);
     }

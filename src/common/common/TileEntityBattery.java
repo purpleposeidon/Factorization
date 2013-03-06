@@ -3,9 +3,15 @@ package factorization.common;
 import java.io.DataInput;
 import java.io.IOException;
 
+import cpw.mods.fml.relauncher.Side;
+
+import cpw.mods.fml.relauncher.SideOnly;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.Icon;
+import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Charge;
 import factorization.api.IChargeConductor;
 import factorization.common.NetworkFactorization.MessageType;
@@ -23,6 +29,18 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     @Override
     public Charge getCharge() {
         return charge;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    FzIcon top = tex("charge/battery_top"), bottom = tex("charge/battery_bottom"), side = tex("charge/battery_side"), meter = tex("charge/battery_meter");
+    
+    @Override
+    Icon getIcon(ForgeDirection dir) {
+        switch (dir) {
+        case UP: return top;
+        case DOWN: return bottom;
+        default: return side;
+        }
     }
 
     @Override

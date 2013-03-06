@@ -15,23 +15,15 @@ public class ItemMachineUpgrade extends Item {
     public int upgradeId;
     String name, type;
 
-    protected ItemMachineUpgrade(int id, String name, String type, FactoryType machineType,
-            int upgradeId) {
+    protected ItemMachineUpgrade(int id, String name, String type, FactoryType machineType, int upgradeId) {
         super(id);
         this.machineType = machineType;
         this.upgradeId = upgradeId;
         this.name = name;
         this.type = type;
         setItemName(this.name);
-        setIconIndex(9 * 16 + upgradeId);
         setMaxStackSize(16);
-        Core.proxy.addName(this, this.name);
         Core.tab(this, TabType.MISC);
-    }
-
-    @Override
-    public String getTextureFile() {
-        return Core.texture_file_item;
     }
     
     @Override

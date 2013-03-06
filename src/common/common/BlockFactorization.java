@@ -4,19 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.Icon;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
 import factorization.common.NetworkFactorization.MessageType;
@@ -164,39 +167,51 @@ public class BlockFactorization extends BlockContainer {
             ((TileEntityFactorization) t).click(entityplayer);
         }
     }
+    
+    @SideOnly(Side.CLIENT)
+    public static FzIcon tex(String name) { return new FzIcon(name); }
+    
+    @SideOnly(Side.CLIENT)
+    public static FzIcon default_icon = tex("block/default"), error_icon = tex("block/error"), transparent = tex("block/transparent"); 
+    @SideOnly(Side.CLIENT)
+    public static FzIcon motor_metal = tex("charge/motor_texture"), wire_texture = tex("charge/wire");
+    @SideOnly(Side.CLIENT)
+    public static FzIcon cauldron_top = tex("machine/cauldron_top"), cauldron_side = tex("machine/cauldron_side");
+    @SideOnly(Side.CLIENT)
+    public static FzIcon wood = tex("block/wood"), generic_metal = tex("machine/generic_metal");
+    
+    @Override
+    public void registerIcon(IconRegister reg) {
+        FactoryType.values(); //We want all these classes to have loaded so that the icons'll be defined
+        FzIcon.registerNew(reg);
+        //FzIcon.lock();
+    }
+    
+    @SideOnly(Side.CLIENT)
+    static public Icon force_texture = null;
 
     @Override
-    public int getBlockTexture(IBlockAccess w, int x, int y, int z, int side) {
+    public Icon getBlockTexture(IBlockAccess w, int x, int y, int z, int side) {
         // Used for in-world rendering. Takes 'active' into consideration.
-        if (Texture.force_texture != -1) {
-            return Texture.force_texture;
+        if (force_texture != null) {
+            return force_texture;
         }
         TileEntity t = w.getBlockTileEntity(x, y, z);
-        boolean active = false;
-        int facing_direction = 0;
-        if (t instanceof TileEntityFactorization) {
-            TileEntityFactorization f = (TileEntityFactorization) t;
-            active = (((f).draw_active + 1) / 2) % 3 == 1;
-            facing_direction = f.facing_direction;
+        if (t instanceof TileEntityCommon) {
+            return ((TileEntityCommon) t).getIcon(ForgeDirection.getOrientation(side));
         }
-        if (t instanceof TileEntityBarrel) {
-            //whee, hack
-            active = ((TileEntityBarrel) t).upgrade != 0;
-        }
-
-        if (t instanceof IFactoryType) {
-            int md = ((IFactoryType) t).getFactoryType().md;
-            return Texture.pick(md, side, active, facing_direction);
-        }
-
-        return 0;
+        return error_icon;
     }
 
     @Override
-    public int getBlockTextureFromSideAndMetadata(int side, int md) {
+    public Icon getBlockTextureFromSideAndMetadata(int side, int md) {
         // This shouldn't be called when rendering in the world.
         // Is used for inventory!
-        return Texture.pick(md, side, false, 3);
+        FactoryType ft = FactoryType.fromMd(md);
+        if (ft == null) {
+            return error_icon;
+        }
+        return ft.representative.getIcon(ForgeDirection.getOrientation(side));
     }
     
     @Override
@@ -461,20 +476,22 @@ public class BlockFactorization extends BlockContainer {
         new Coord(w, x, y, z).notifyBlockChange();
     }
     
+    
+    //Maybe we should only give weak power?
     @Override
-    public boolean isProvidingStrongPower(IBlockAccess w, int x, int y, int z, int side) {
+    public int isProvidingStrongPower(IBlockAccess w, int x, int y, int z, int side) {
         if (side < 2) {
-            return false;
+            return 0;
         }
         TileEntity te = w.getBlockTileEntity(x, y, z);
         if (te instanceof TileEntityCommon) {
-            return ((TileEntityCommon) te).power();
+            return ((TileEntityCommon) te).power() ? 15 : 0;
         }
-        return false;
+        return 0;
     }
     
     @Override
-    public boolean isProvidingWeakPower(IBlockAccess w, int x, int y, int z, int side) {
+    public int isProvidingWeakPower(IBlockAccess w, int x, int y, int z, int side) {
         return isProvidingStrongPower(w, x, y, z, side);
     }
 

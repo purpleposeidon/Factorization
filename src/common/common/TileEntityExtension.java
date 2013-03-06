@@ -7,6 +7,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.Icon;
+import net.minecraftforge.common.ForgeDirection;
 import factorization.api.DeltaCoord;
 import factorization.common.NetworkFactorization.MessageType;
 
@@ -22,6 +24,11 @@ public class TileEntityExtension extends TileEntityCommon {
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.EXTENDED;
+    }
+    
+    @Override
+    Icon getIcon(ForgeDirection dir) {
+        return BlockFactorization.error_icon;
     }
 
     @Override

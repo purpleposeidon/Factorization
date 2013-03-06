@@ -11,6 +11,7 @@ import factorization.common.NetworkFactorization.MessageType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 
 public class TileEntityCrystallizer extends TileEntityFactorization {
@@ -20,6 +21,14 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     public ItemStack growing_crystal, solution;
     public int heat, progress;
     public final static int topHeat = 300;
+    
+    @Override
+    Icon getIcon(ForgeDirection dir) {
+        switch (dir) {
+        case UP: return BlockFactorization.cauldron_top;
+        default: return BlockFactorization.cauldron_side;
+        }
+    }
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {

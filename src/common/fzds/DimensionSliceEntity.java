@@ -563,7 +563,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             manager.transferPlayerToDimension(player, newWorld.getWorldInfo().getDimension(), tp);
         } else {
             //Inspired by Entity.travelToDimension
-            ent.worldObj.setEntityDead(ent);
+            ent.worldObj.removeEntity(ent); //setEntityDead
             ent.isDead = false;
             
             Entity phoenix = EntityList.createEntityByName(EntityList.getEntityString(ent), newWorld); //Like a phoenix rising from the ashes!

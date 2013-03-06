@@ -62,9 +62,9 @@ public class GuiRouter extends GuiContainer implements IClickable {
         for (int cdx = -3; cdx <= 3; cdx++) {
             for (int cdz = -3; cdz <= 3; cdz++) {
                 Chunk chunk = router.worldObj.getChunkFromBlockCoords(router.xCoord + cdx*16, router.zCoord + cdz*16);
-                for (TileEntity te : chunk.chunkTileEntityMap.values()) {
+                for (Object te : chunk.chunkTileEntityMap.values()) {
                     if (te instanceof IInventory) {
-                        entities.add(te);
+                        entities.add((TileEntity) te);
                     }
                 }
             }
@@ -254,9 +254,8 @@ public class GuiRouter extends GuiContainer implements IClickable {
     }
 
     protected void drawGuiContainerBackgroundLayer(float f, int i, int j) {
-        int k = mc.renderEngine.getTexture(Core.texture_dir + "routergui.png");
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.renderEngine.bindTexture(k);
+        mc.renderEngine.bindTextureFile(Core.texture_dir + "routergui.png");
         int l = (width - xSize) / 2;
         int i1 = (height - ySize) / 2;
         drawTexturedModalRect(l, i1, 0, 0, xSize, ySize);

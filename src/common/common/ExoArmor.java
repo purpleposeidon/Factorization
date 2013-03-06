@@ -3,7 +3,7 @@ package factorization.common;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.util.DamageSource;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumArmorMaterial;
@@ -11,11 +11,15 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.Icon;
 import net.minecraftforge.common.IArmorTextureProvider;
 import net.minecraftforge.common.ISpecialArmor;
-import factorization.api.IExoUpgrade;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.ExoStateShader;
 import factorization.api.ExoStateType;
+import factorization.api.IExoUpgrade;
 import factorization.common.ExoCore.ExoPlayerState;
 
 public class ExoArmor extends ItemArmor
@@ -279,15 +283,22 @@ public class ExoArmor extends ItemArmor
         }
     }
 
+    @SideOnly(Side.CLIENT)
+    FzIcon[] parts = new FzIcon[] {
+        new FzIcon("exo/helmet.png"),
+        new FzIcon("exo/chest.png"),
+        new FzIcon("exo/pants.png"),
+        new FzIcon("exo/boot.png")
+    };
+    
     @Override
-    public String getTextureFile() {
-        return Core.texture_file_item;
+    public Icon getIconFromDamage(int par1) {
+        return parts[armorType];
     }
-
+    
     @Override
-    //seeerveerr
-    public int getIconFromDamage(int par1) {
-        return (4 + armorType) * 16;
+    public void registerIcon(IconRegister reg) {
+        FzIcon.registerNew(reg);
     }
 
     @Override

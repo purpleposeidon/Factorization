@@ -3,12 +3,16 @@ package factorization.common;
 import java.io.DataInput;
 import java.io.IOException;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.Icon;
 import net.minecraftforge.common.ISidedInventory;
 import net.minecraftforge.common.ForgeDirection;
 import static net.minecraftforge.common.ForgeDirection.*;
@@ -35,6 +39,14 @@ public class TileEntityMaker extends TileEntityFactorization implements
     @Override
     public BlockClass getBlockClass() {
         return BlockClass.Machine;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    ActivatingMachineIcons icon = new ActivatingMachineIcons("craft/maker");
+    
+    @Override
+    Icon getIcon(ForgeDirection dir) {
+        return icon.get(this, dir);
     }
 
     @Override

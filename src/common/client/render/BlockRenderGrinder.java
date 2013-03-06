@@ -1,26 +1,28 @@
 package factorization.client.render;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.RenderEngine;
-import net.minecraft.client.model.TexturedQuad;
+import net.minecraft.util.Icon;
+
+import org.lwjgl.opengl.GL11;
+
+import factorization.common.BlockFactorization;
 import factorization.common.Core;
 import factorization.common.FactoryType;
-import factorization.common.Texture;
 
 public class BlockRenderGrinder extends FactorizationBlockRender {
     @Override
     void render(RenderBlocks rb) {
+        //TODO: Optimize this!
         if (!world_mode) {
             RenderEngine re = Minecraft.getMinecraft().renderEngine;
-            re.bindTexture(re.getTexture(Core.texture_file_block));
+            re.bindTextureFile(Core.texture_file_block);
         }
         renderMotor(rb, 8F/16F);
         float p = 1F/16F;
         float p2 = 2*p, p3 = 3*p;
-        int dark_iron = 3+16*2, metal = 14, lead = 2+16*2;;
+        Icon metal = BlockFactorization.generic_metal, lead = BlockFactorization.motor_metal;
         //bottom plate
         //renderPart(rb, metal, 2*p, 0, 2*p, 1-2*p, 2*p, 1-2*p);
         renderPart(rb, metal, 0, 0, 0, 1, 2*p, 1);

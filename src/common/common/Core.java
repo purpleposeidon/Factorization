@@ -9,10 +9,12 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Icon;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
@@ -33,6 +35,7 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.client.gui.FactorizationNotify;
 
@@ -235,7 +238,6 @@ public class Core {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             isMainClientThread.set(true);
         }
-        proxy.addNameDirect("itemGroup.factorizationTab", "Factorization");
     }
 
     @PostInit
@@ -446,5 +448,17 @@ public class Core {
             return "<null item; bug?>";
         }
         return i.getItemName() + ".name";
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public static Icon texture(IconRegister reg, String name) {
+        name = name.replace('.', '/');
+        final String fz = "factorization/";
+        if (name.startsWith(fz)) {
+            name = name.substring(fz.length());
+        } else {
+            throw new IllegalArgumentException("Name doesn't start with 'factorization.' or 'factorization/'");
+        }
+        return reg.getIcon(texture_dir + name + ".png");
     }
 }

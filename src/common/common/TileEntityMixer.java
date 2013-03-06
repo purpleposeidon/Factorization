@@ -19,6 +19,7 @@ import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
@@ -36,6 +37,14 @@ public class TileEntityMixer extends TileEntityFactorization implements
     int progress = 0;
     int speed = 0;
     Charge charge = new Charge(this);
+    
+    @Override
+    Icon getIcon(ForgeDirection dir) {
+        switch (dir) {
+        case UP: return BlockFactorization.cauldron_top;
+        default: return BlockFactorization.cauldron_side;
+        }
+    }
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {

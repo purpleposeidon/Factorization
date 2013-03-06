@@ -2,34 +2,50 @@ package factorization.common;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.block.material.Material;
+import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import factorization.api.Coord;
 
 public class BlockResource extends Block {
+    @SideOnly(Side.CLIENT)
+    public Icon[] icons = new Icon[ResourceType.values().length];
+    @SideOnly(Side.CLIENT)
+    Icon exoBottom, exoTop;
     protected BlockResource(int id) {
         super(id, Material.rock);
         setHardness(2.0F);
         setBlockName("factorizationResourceBlock");
     }
+    
+    @Override
+    public void registerIcon(IconRegister reg) {
+        exoBottom = Core.texture(reg, "exo/modder_bottom");
+        exoTop = Core.texture(reg, "exo/modder_top");
+        for (ResourceType rt : ResourceType.values()) {
+            icons[rt.md] = Core.texture(reg, "");
+        }
+    }
 
     @Override
-    public int getBlockTextureFromSideAndMetadata(int side, int md) {
+    public Icon getBlockTextureFromSideAndMetadata(int side, int md) {
         if (ResourceType.EXOMODDER.is(md)) {
             if (side == 0) {
-                return Texture.exo_bottom;
+                return exoBottom;
             }
             if (side == 1) {
-                return Texture.exo_config;
+                return exoTop;
             }
-            return Texture.exo_side;
         }
-        return (16 * 2) + md;
+        return icons[md];
     }
 
     @Override

@@ -37,7 +37,7 @@ public class BlockRenderBattery extends FactorizationBlockRender {
             GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
         }
         RenderEngine re = Minecraft.getMinecraft().renderEngine;
-        re.bindTexture(re.getTexture(Core.texture_file_block));
+        re.bindTextureFile(Core.texture_file_block);
         renderBatteryDisplay(rb, item_fullness);
         Tessellator.instance.draw();
         GL11.glPopMatrix();

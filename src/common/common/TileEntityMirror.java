@@ -5,9 +5,12 @@ import java.io.IOException;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.util.Icon;
+import net.minecraftforge.common.ForgeDirection;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.IReflectionTarget;
@@ -25,6 +28,14 @@ public class TileEntityMirror extends TileEntityCommon {
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.MIRROR;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    static FzIcon front = tex("charge/mirror_front"), back = tex("charge/mirror_back");
+    
+    @Override
+    Icon getIcon(ForgeDirection dir) {
+        return front;
     }
 
     @Override

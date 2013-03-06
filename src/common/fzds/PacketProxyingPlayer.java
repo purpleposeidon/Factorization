@@ -156,7 +156,7 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements IFzdsEnt
     public void endProxy() {
         //From playerNetServerHandler.mcServer.getConfigurationManager().playerLoggedOut(this);
         WorldServer var2 = getServerForPlayer();
-        var2.setEntityDead(this);
+        var2.removeEntity(this); //setEntityDead
         var2.getPlayerManager().removePlayer(this); //No comod?
         var2.getMinecraftServer().getConfigurationManager().playerEntityList.remove(playerNetServerHandler);
         //The stuff above might not be necessary.

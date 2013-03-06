@@ -172,10 +172,11 @@ public class FactorizationClientProxy extends FactorizationProxy {
     }
 
     //CLIENT
+    /*
     @Override
     public void addNameDirect(String localId, String translation) {
         LanguageRegistry.instance().addStringLocalization(localId, "en_US", translation);
-    }
+    }*/
 
     @Override
     public String translateItemStack(ItemStack is) {
@@ -218,7 +219,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
                     EntityWrathFlameFX flame = new EntityWrathFlameFX(w,
                             X, y + 0.2 + rand.nextFloat() * 0.1, Z,
                             0.001 - rand.nextFloat() * 0.002, 0.01, 0.001 - rand.nextFloat() * 0.002);
-                    Minecraft.getMinecraft().effectRenderer.addEffect(flame, flame);
+                    Minecraft.getMinecraft().effectRenderer.addEffect(flame);
                 }
             }
             if (ft == FactoryType.SLAGFURNACE) {
@@ -266,7 +267,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
                     Z += rand.nextFloat() * 2 / 16;
                     double Y = y + (0.99F + sol.water_level / (TileEntitySolarTurbine.max_water / 4)) / 16F;
                     EntitySteamFX steam = new EntitySteamFX(w, X, Y, Z);
-                    Minecraft.getMinecraft().effectRenderer.addEffect(steam, null);
+                    Minecraft.getMinecraft().effectRenderer.addEffect(steam);
                 }
             }
         }
@@ -318,7 +319,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
                     if (big) {
                         flame.setScale(4);
                     }
-                    Minecraft.getMinecraft().effectRenderer.addEffect(flame, flame);
+                    Minecraft.getMinecraft().effectRenderer.addEffect(flame);
                 }
             }
         }

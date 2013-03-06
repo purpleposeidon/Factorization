@@ -13,12 +13,16 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.regex.Matcher;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.ISidedInventory;
@@ -69,6 +73,33 @@ public class TileEntityRouter extends TileEntityFactorization {
     @Override
     public BlockClass getBlockClass() {
         return BlockClass.DarkIron;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    static FzIcon top = tex("router/"), bottom = tex("router/bottom");
+    @SideOnly(Side.CLIENT)
+    static FzIcon[] sidesOn = new FzIcon[4], sidesOff = new FzIcon[4];
+    static {
+        try {
+            Class.forName("FzIcon");
+            String dirs[] = new String[] {"north", "south", "west", "east"}; //same order as ForgeDirection
+            for (int i = 0; i < dirs.length; i++) {
+                sidesOn[i] = tex("router/" + dirs[i] + "_on");
+                sidesOff[i] = tex("router/" + dirs[i] + "_off");
+            }
+        } catch (ClassNotFoundException e) { /* om nom nom */ }
+    }
+    
+    @Override
+    Icon getIcon(ForgeDirection dir) {
+        if (dir == ForgeDirection.UP) {
+            return top;
+        }
+        if (dir == ForgeDirection.DOWN) {
+            return bottom;
+        }
+        int index = dir.ordinal() - 2;
+        return (draw_active > 0 ? sidesOn : sidesOff)[index];
     }
 
     void putParticles(World world) {
@@ -275,7 +306,7 @@ public class TileEntityRouter extends TileEntityFactorization {
      * If the router can possibly do anything
      */
     boolean shouldUpdate() {
-        if (worldObj.isBlockGettingPowered(xCoord, yCoord, zCoord)) {
+        if (worldObj.getBlockPower(xCoord, yCoord, zCoord) > 0) {
             return false;
         }
         if (is_input) {

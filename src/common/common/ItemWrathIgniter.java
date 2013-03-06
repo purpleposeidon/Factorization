@@ -19,34 +19,13 @@ public class ItemWrathIgniter extends Item {
         setMaxDamage((6 * 2) - 1);
         setNoRepair();
         Core.tab(this, TabType.TOOLS);
+        setItemName("factorization.tool.wrath_igniter");
     }
 
     @Override
     public boolean isDamageable() {
         return true;
     }
-
-    @Override
-    public String getTextureFile() {
-        return Core.texture_file_item;
-    }
-
-    @Override
-    public String getItemName() {
-        return "item.wrathigniter";
-    }
-
-    @Override
-    public String getItemNameIS(ItemStack par1ItemStack) {
-        return getItemName();
-    }
-
-    @Override
-    //hello, server.
-    public int getIconFromDamage(int par1) {
-        return (16 * 3) + 1;
-    }
-
     
     @Override
     public boolean onItemUse(ItemStack par1ItemStack,

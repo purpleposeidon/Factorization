@@ -27,6 +27,7 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
         super(id);
         setMaxStackSize(1);
         Core.tab(this, TabType.TOOLS);
+        setItemName("factorization.tool.bag_of_holding");
     }
 
     final String pearlcount = "pearlcount";
@@ -266,14 +267,9 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
         return true;
     }
 
-    @Override
-    public String getTextureFile() {
-        return Core.texture_file_item;
-    }
-
-    public int getIconFromDamage(int damage) {
-        return 16 + ((int) (System.currentTimeMillis() / 50000) % 5);
-    }
+//	public int getIconFromDamage(int damage) {
+//		return 16 + ((int) (System.currentTimeMillis() / 50000) % 5);
+//	}
 
     @Override
     // ...

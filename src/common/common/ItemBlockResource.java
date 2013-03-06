@@ -9,13 +9,8 @@ import net.minecraft.item.ItemStack;
 public class ItemBlockResource extends ItemBlock {
     public ItemBlockResource(int id) {
         super(id);
-        //Y'know, that -256 is really retarded.
         setMaxDamage(0);
         setHasSubtypes(true);
-    }
-
-    public int getIconFromDamage(int damage) {
-        return Core.registry.resource_block.getBlockTextureFromSideAndMetadata(0, damage);
     }
 
     public int getMetadata(int i) {

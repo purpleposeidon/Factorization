@@ -2,8 +2,8 @@ package factorization.common;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -16,12 +16,10 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.Icon;
 import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
-import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.Core.TabType;
 
@@ -226,22 +224,24 @@ public class ItemCraft extends Item {
         return "Craftpacket";
     }
 
-    @Override
-    public String getTextureFile() {
-        return Core.texture_file_item;
-    }
-
     public boolean isValidCraft(ItemStack is) {
         return is.getItemDamage() != 0;
     }
 
+    @SideOnly(Side.CLIENT)
+    FzIcon complete = new FzIcon("craft/packet_complete"), incomplete = new FzIcon("craft/packet_incomplete");
+    
     @Override
-    // -- XXX NOTE: Can't override due to server
-    public int getIconFromDamage(int damage) {
+    public void registerIcon(IconRegister reg) {
+        FzIcon.registerNew(reg);
+    }
+    
+    @Override
+    public Icon getIconFromDamage(int damage) {
         if (damage == 0) {
-            return 2;
+            return incomplete;
         }
-        return 3;
+        return complete;
     }
 
     @Override

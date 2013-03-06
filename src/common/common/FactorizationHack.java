@@ -26,7 +26,7 @@ public class FactorizationHack {
         }
         
         @Override
-        public String getDeathMessage(EntityPlayer player) {
+        public String getDeathMessage(EntityLiving player) {
             return player.getEntityName() + " drank acid";
             // TODO translation
             // return super.getDeathMessage(par1EntityPlayer);

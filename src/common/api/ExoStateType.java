@@ -35,7 +35,7 @@ public enum ExoStateType {
     }
 
     private static void en(String local, String en) {
-        Core.proxy.addName(local, en);
+        //Core.proxy.addName(local, en);
     }
 
     static {

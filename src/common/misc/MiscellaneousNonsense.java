@@ -99,7 +99,7 @@ public class MiscellaneousNonsense {
 
         @Override
         public String getCommandName() {
-            return "fog";
+            return "f";
         }
 
         @Override
@@ -111,15 +111,13 @@ public class MiscellaneousNonsense {
             player.playerNetServerHandler.sendPacketToPlayer(instance.makePacket(args));
         }
         
-        static List<String> fogCommands = Arrays.asList("far", "0", "normal", "1", "short", "2", "tiny", "3", "micro", "4", "microfog", "5", "other");
-        static List<String> otherCommands = Arrays.asList("pauserender", "gc", "now", "about", "clear", "saycoords", "saveoptions");
+        static List<String> fogCommands = Arrays.asList("far", "0", "normal", "1", "short", "2", "tiny", "3", "micro", "4", "microfog", "5", "pauserender", "gc", "now", "about", "clear", "saycoords", "saveoptions");
         
         @Override
         public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+            //TODO: Non-lame
             if (args.length == 1) {
                 return fogCommands;
-            } else if (args.length == 2 && args[0].equalsIgnoreCase("other")) {
-                return otherCommands;
             }
             return super.addTabCompletionOptions(sender, args);
         }

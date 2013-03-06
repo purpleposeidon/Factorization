@@ -1,20 +1,41 @@
 package factorization.client.render;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_LIGHTING;
+import static org.lwjgl.opengl.GL11.GL_LINES;
+import static org.lwjgl.opengl.GL11.GL_ONE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_COLOR;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glLineWidth;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glScalef;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+import static org.lwjgl.opengl.GL11.glVertex3f;
+import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.RenderEngine;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.RenderBlaze;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Icon;
 
 import org.lwjgl.opengl.GL11;
 
 import factorization.common.Core;
 import factorization.common.TileEntityCrystallizer;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.client.renderer.RenderEngine;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 
 public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
 
@@ -50,14 +71,14 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             glScalef(s, s, s);
             glTranslatef(-0.5F, 0, 1F / 32F);
             RenderEngine re = Minecraft.getMinecraft().renderEngine;
-            re.bindTexture(re.getTexture(crys.growing_crystal.getItem().getTextureFile()));
+            re.bindTextureFile("/terrain.png");
 
             int var18 = crys.growing_crystal.getItem().getColorFromItemStack(crys.growing_crystal, 0);
             float r = (float) (var18 >> 16 & 255) / 255.0F;
             float g = (float) (var18 >> 8 & 255) / 255.0F;
             float b = (float) (var18 & 255) / 255.0F;
             GL11.glColor4f(r, g, b, 1.0F);
-            FactorizationBlockRender.renderItemIn2D(crys.growing_crystal.getIconIndex());
+            FactorizationBlockRender.renderIcon(crys.growing_crystal.getIconIndex());
             glPopMatrix();
         }
 
@@ -66,7 +87,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             glEnable(GL_BLEND);
             ItemStack sol = crys.solution;
             Tessellator tess = Tessellator.instance;
-            int tex = Block.waterMoving.getBlockTextureFromSide(1);
+            Icon tex = Block.waterMoving.getBlockTextureFromSide(1);
             String texture_file = Block.waterMoving.getTextureFile();
             if (sol.getItem() == Core.registry.acid) {
                 glColor4f(1F, 1F, 1F, 0.5F);
@@ -78,15 +99,16 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
                 //glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_ALPHA);
                 glBlendFunc(GL_SRC_COLOR, GL_SRC_ALPHA);
                 texture_file = Core.texture_file_block;
-                tex = 16 + 9;
+                //tex = 16 + 9; //Bluh!
             } else {
                 glColor4f(1F, 1F, 1F, 1);
                 glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_ALPHA);
             }
             RenderEngine re = Minecraft.getMinecraft().renderEngine;
-            re.bindTexture(re.getTexture(texture_file));
-            float u = ((tex & 15) << 4) / 256.0F;
-            float v = (tex & 240) / 256.0F;
+            //XXX TODO NORELEASE: fix renderer
+            re.bindTextureFile(texture_file);
+            float u = ((/*tex*/ 0 & 15) << 4) / 256.0F;
+            float v = (/*tex*/ 0 & 240) / 256.0F;
             float w = 1F / 16F;
             tess.startDrawingQuads();
             tess.yOffset = 9F / 16F;

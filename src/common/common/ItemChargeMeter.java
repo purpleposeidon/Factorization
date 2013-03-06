@@ -19,10 +19,7 @@ public class ItemChargeMeter extends Item {
 
     protected ItemChargeMeter(int par1) {
         super(par1);
-        setItemName("factorization.chargemeter");
-        Core.proxy.addName(this, "Charge Meter");
-        setIconIndex(6);
-        setTextureFile(Core.texture_file_item);
+        setItemName("factorization.tool.charge_meter");
         Core.tab(this, TabType.REDSTONE);
     }
     

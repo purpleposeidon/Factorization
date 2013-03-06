@@ -507,27 +507,22 @@ public class Coord {
     public boolean is(Block b, int md) {
         return getId() == b.blockID && getMd() == md;
     }
+    
+    public static final int NOTIFY_NEIGHBORS = 1, UPDATE = 2, ONLY_UPDATE_SERVERSIDE = 4; //TODO, this'll end up in Forge probably
 
     public boolean setId(int id, boolean notify) {
-        if (notify) {
-            return w.setBlockWithNotify(x, y, z, id);
-        }
-        return w.setBlock(x, y, z, id);
+        int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
+        return w.setBlockAndMetadataWithNotify(x, y, z, id, 0, notifyFlag);
     }
 
     public boolean setMd(int md, boolean notify) {
-        if (notify) {
-            w.setBlockMetadataWithNotify(x, y, z, md);
-            return true;
-        }
-        return w.setBlockMetadata(x, y, z, md);
+        int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
+        return w.setBlockMetadataWithNotify(x, y, z, md, notifyFlag);
     }
 
     public boolean setIdMd(int id, int md, boolean notify) {
-        if (notify) {
-            return w.setBlockAndMetadataWithNotify(x, y, z, id, md);
-        }
-        return w.setBlockAndMetadata(x, y, z, id, md);
+        int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
+        return w.setBlockAndMetadataWithNotify(x, y, z, id, md, notifyFlag);
     }
 
     public boolean setId(int id) {
@@ -650,6 +645,6 @@ public class Coord {
     }
     
     public boolean isPowered() {
-        return w.isBlockGettingPowered(x, y, z);
+        return w.getBlockPower(x, y, z) > 0;
     }
 }

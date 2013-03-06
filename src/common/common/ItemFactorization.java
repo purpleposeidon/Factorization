@@ -2,14 +2,13 @@ package factorization.common;
 
 import java.util.List;
 
-import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.network.packet.Packet;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.common.TileEntityGreenware.ClayState;
@@ -56,7 +55,8 @@ public class ItemFactorization extends ItemBlock {
         return false;
     }
 
-    public int getIconFromDamage(int damage) {
+    @Override
+    public Icon getIconFromDamage(int damage) {
         return Core.registry.factory_block.getBlockTextureFromSideAndMetadata(0, damage);
     }
 

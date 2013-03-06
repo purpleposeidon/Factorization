@@ -50,7 +50,7 @@ public class BatteryItemRender implements IItemRenderer {
             
         }
         RenderEngine re = Minecraft.getMinecraft().renderEngine;
-        re.bindTexture(re.getTexture(Core.texture_file_block));
+        re.bindTextureFile(Core.texture_file_block);
         NBTTagCompound tag = FactorizationUtil.getTag(is);
         render_battery.item_fullness = TileEntityBattery.getFullness(Core.registry.battery.getStorage(is));
         render_battery.renderInInventory();

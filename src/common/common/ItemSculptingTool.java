@@ -2,14 +2,17 @@ package factorization.common;
 
 import java.util.List;
 
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
-import factorization.api.VectorUV;
 import factorization.common.Core.TabType;
 import factorization.common.NetworkFactorization.MessageType;
 import factorization.common.TileEntityGreenware.ClayState;
@@ -19,8 +22,6 @@ public class ItemSculptingTool extends Item {
 
     protected ItemSculptingTool(int id) {
         super(id);
-        setTextureFile(Core.texture_file_item);
-        setIconIndex(6 + 16*4);
         setNoRepair();
         setMaxDamage(0);
         setMaxStackSize(1);
@@ -45,20 +46,28 @@ public class ItemSculptingTool extends Item {
             Core.registry.shapelessRecipe(fromMode(mode[j]), fromMode(mode[i]));
         }
     }
+    
+    @Override
+    public void registerIcon(IconRegister reg) {
+        //This function'll get called more than it needs to. This is not actually a problem.
+        FzIcon.registerNew(reg);
+    }
 
     static enum ToolMode {
-        SELECTOR("Select", true),
-        MOVER("Move", true),
-        STRETCHER("Stretch", false),
-        REMOVER("Remove", true),
-        ROTATOR("Rotate", true),
-        RESETTER("Unrotate", false);
+        SELECTOR("select", true),
+        MOVER("move", true),
+        STRETCHER("stretch", false),
+        REMOVER("delete", true),
+        ROTATOR("rotate", true),
+        RESETTER("reset", false);
         
-        String english;
+        String name;
         boolean craftable;
         ToolMode next;
+        @SideOnly(Side.CLIENT)
+        FzIcon icon = new FzIcon("ceramics/tool/" + name);
         private ToolMode(String english, boolean craftable) {
-            this.english = english;
+            this.name = english;
             this.craftable = craftable;
             this.next = this;
         }
@@ -92,16 +101,16 @@ public class ItemSculptingTool extends Item {
     }
     
     @Override
-    public int getIconFromDamage(int damage) {
-        return iconIndex + getMode(damage).ordinal();
+    public Icon getIconFromDamage(int damage) {
+        return getMode(damage).icon;
     }
     
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         ToolMode mode = getMode(is.getItemDamage());
-        list.add(mode.english);
+        list.add(mode.name);
         for (ToolMode nextMode = mode.next; nextMode != mode; nextMode = nextMode.next) {
-            list.add("(" + nextMode.english + ")");
+            list.add("(" + nextMode.name + ")");
         }
         Core.brand(list);
     }

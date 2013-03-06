@@ -18,11 +18,9 @@ import factorization.common.Core.TabType;
 public class ExoMountedPiston extends Item implements IExoUpgrade {
     protected ExoMountedPiston(int par1) {
         super(par1);
-        setItemName("exo.mountedpiston");
-        setIconIndex(16 * 10 + 2);
+        setItemName("factorization.exo.mountedpiston");
         Core.tab(this, TabType.MISC);
         setMaxStackSize(1);
-        setTextureFile(Core.texture_file_item);
     }
     
     @Override

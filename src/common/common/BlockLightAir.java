@@ -5,10 +5,14 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialTransparent;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.Icon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 
 public class BlockLightAir extends Block {
@@ -53,6 +57,15 @@ public class BlockLightAir extends Block {
             }
         }
     }
+    
+    @SideOnly(Side.CLIENT)
+    Icon transparent, glowstone;
+    
+    @Override
+    public void registerIcon(IconRegister reg) {
+        transparent = Core.texture(reg, "transparent");
+        glowstone = Block.glowStone.getBlockTextureFromSide(0);
+    }
 
     @Override
     public String getTextureFile() {
@@ -61,13 +74,13 @@ public class BlockLightAir extends Block {
         }
         return Core.texture_file_block;
     }
-
+    
     @Override
-    public int getBlockTextureFromSide(int par1) {
+    public Icon getBlockTextureFromSideAndMetadata(int side, int md) {
         if (Core.debug_light_air) {
-            return Block.glowStone.getBlockTextureFromSide(par1);
+            return glowstone;
         }
-        return 15; //transparent space at end of the row
+        return transparent;
     }
 
     static Random rand = new Random();
@@ -94,7 +107,7 @@ public class BlockLightAir extends Block {
         }
         if (md == fire_md) {
             if (w.isAirBlock(x - 1, y, z) && w.isAirBlock(x + 1, y, z) && w.isAirBlock(x, y - 1, z) && w.isAirBlock(x, y + 1, z) && w.isAirBlock(x, y, z - 1) && w.isAirBlock(x, y, z + 1)) {
-                w.setBlockWithNotify(x, y, z, 0);
+                w.setBlockAndMetadataWithNotify(x, y, z, 0, 0, Coord.UPDATE);
             }
         }
     }

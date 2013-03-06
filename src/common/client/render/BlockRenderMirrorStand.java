@@ -1,12 +1,12 @@
 package factorization.client.render;
 
+import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.util.Icon;
 import factorization.api.VectorUV;
 import factorization.common.Core;
 import factorization.common.FactoryType;
 import factorization.common.RenderingCube;
-import factorization.common.Texture;
 import factorization.common.TileEntityMirror;
-import net.minecraft.client.renderer.RenderBlocks;
 
 public class BlockRenderMirrorStand extends FactorizationBlockRender {
     RenderingCube mirror = new RenderingCube(Texture.mirrorStart, new VectorUV(6, 0.5F, 6));
@@ -20,10 +20,11 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
         float height = 7.25F / 16F;
         float radius = 1F / 16F;
         float c = 0.5F;
-        renderPart(rb, Texture.silver, c - radius, 0, c - radius, c + radius, height, c + radius);
+        Icon silver = Core.registry.silver_block_item.getIconIndex();
+        renderPart(rb, silver, c - radius, 0, c - radius, c + radius, height, c + radius);
         float trim = 3F / 16F;
         float trim_height = 2F / 16F;
-        renderPart(rb, Texture.silver, trim, 0, trim, 1 - trim, trim_height, 1 - trim);
+        renderPart(rb, silver, trim, 0, trim, 1 - trim, trim_height, 1 - trim);
         
         mirror.trans.reset();
         if (world_mode) {

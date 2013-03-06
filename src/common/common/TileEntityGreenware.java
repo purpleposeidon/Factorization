@@ -17,7 +17,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagDouble;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.util.Icon;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
+import net.minecraftforge.common.ForgeDirection;
 import factorization.api.MatrixTransform;
 import factorization.api.VectorUV;
 import factorization.common.NetworkFactorization.MessageType;
@@ -43,6 +45,12 @@ public class TileEntityGreenware extends TileEntityCommon {
             this.id = id;
         }
     }
+    
+    @Override
+    Icon getIcon(ForgeDirection dir) {
+        return null;
+    }
+    
     //server-side
     static HashMap<String, SelectionInfo> selections = new HashMap();
     //client-side

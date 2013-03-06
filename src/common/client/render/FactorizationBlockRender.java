@@ -1,14 +1,23 @@
 package factorization.client.render;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
+import static net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED;
+import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Icon;
+import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.IItemRenderer;
+import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.common.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
-import cpw.mods.fml.client.registry.RenderingRegistry;
+import org.lwjgl.opengl.GL12;
 
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
@@ -18,21 +27,7 @@ import factorization.common.BlockFactorization;
 import factorization.common.Core;
 import factorization.common.FactoryType;
 import factorization.common.RenderingCube;
-import factorization.common.Texture;
 import factorization.common.WireRenderingCube;
-import net.minecraft.client.Minecraft;
-import net.minecraft.block.Block;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.IWorldAccess;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
-import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.MinecraftForgeClient;
-import net.minecraftforge.common.ForgeDirection;
-import static net.minecraftforge.common.ForgeDirection.*;
 
 abstract public class FactorizationBlockRender implements ICoord {
     static Block metal = Block.obsidian;
@@ -149,7 +144,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         }
     }
     
-    protected void renderCauldron(RenderBlocks rb, int metal, int lid) {
+    protected void renderCauldron(RenderBlocks rb, Icon metal, Icon lid) {
         BlockFactorization block = Core.registry.factory_rendering_block;
         Tessellator tessellator = Tessellator.instance;
         //render the outside
@@ -161,7 +156,7 @@ abstract public class FactorizationBlockRender implements ICoord {
             GL11.glPushAttrib(GL11.GL_POLYGON_BIT);
             GL11.glDisable(GL11.GL_CULL_FACE);
             RenderBlocks renderblocks = rb;
-            int texture = metal;
+            Icon texture = metal;
             GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
             tessellator.startDrawingQuads();
             tessellator.setNormal(0.0F, -1F, 0.0F);
@@ -199,15 +194,14 @@ abstract public class FactorizationBlockRender implements ICoord {
         }
     }
     
-    protected void renderPart(RenderBlocks rb, int texture, float b1, float b2, float b3,
-            float b4, float b5, float b6) {
+    protected void renderPart(RenderBlocks rb, Icon texture, float b1, float b2, float b3, float b4, float b5, float b6) {
         BlockFactorization block = Core.registry.factory_rendering_block;
         rb.setRenderMinMax(b1, b2, b3, b4, b5, b6);
         block.setBlockBounds(b1, b2, b3, b4, b5, b6);
         if (world_mode) {
-            Texture.force_texture = texture;
+            BlockFactorization.force_texture = texture;
             rb.renderStandardBlock(block, x, y, z);
-            Texture.force_texture = -1;
+            BlockFactorization.force_texture = null;
         }
         else {
             renderPartInvTexture(rb, block, texture);
@@ -217,7 +211,7 @@ abstract public class FactorizationBlockRender implements ICoord {
     }
 
     private void renderPartInvTexture(RenderBlocks renderblocks,
-            Block block, int texture) {
+            Block block, Icon texture) {
         // This originally copied from RenderBlocks.renderBlockAsItem
         Tessellator tessellator = Tessellator.instance;
 
@@ -385,7 +379,7 @@ abstract public class FactorizationBlockRender implements ICoord {
     protected void renderCube(RenderingCube rc, int facesToDraw[]) {
         if (!world_mode) {
             Tessellator.instance.startDrawingQuads();
-            ForgeHooksClient.bindTexture(cubeTexture, 0);
+            //ForgeHooksClient.bindTexture(cubeTexture, 0);
             GL11.glDisable(GL11.GL_LIGHTING);
         }
         force_inv = false;
@@ -455,7 +449,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         }
         if (!world_mode) {
             Tessellator.instance.draw();
-            ForgeHooksClient.unbindTexture();
+            //ForgeHooksClient.unbindTexture();
             GL11.glEnable(GL11.GL_LIGHTING);
         }
     }
@@ -463,7 +457,7 @@ abstract public class FactorizationBlockRender implements ICoord {
     protected void renderCube(WireRenderingCube rc) {
         if (!world_mode) {
             Tessellator.instance.startDrawingQuads();
-            ForgeHooksClient.bindTexture(cubeTexture, 0);
+            //ForgeHooksClient.bindTexture(cubeTexture, 0);
             GL11.glDisable(GL11.GL_LIGHTING);
         }
         
@@ -484,7 +478,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         }
         if (!world_mode) {
             Tessellator.instance.draw();
-            ForgeHooksClient.unbindTexture();
+            //ForgeHooksClient.unbindTexture();
             GL11.glEnable(GL11.GL_LIGHTING);
         }
     }
@@ -522,104 +516,34 @@ abstract public class FactorizationBlockRender implements ICoord {
                 rc.ul + u / 256F, rc.vl + v / 256F);
     }
     
-    public static void renderItemIn2D(int icon_index) {
-        //NOTE: This is *not* suited for world_mode!
-        float var6 = ((float) (icon_index % 16 * 16) + 0.0F) / 256.0F;
-        float var7 = ((float) (icon_index % 16 * 16) + 15.9999F) / 256.0F;
-        float var8 = ((float) (icon_index / 16 * 16) + 0.0F) / 256.0F;
-        float var9 = ((float) (icon_index / 16 * 16) + 15.9999F) / 256.0F;
+    public static void renderIcon(Icon icon) {
+        //Extracted from ItemRenderer.renderItem
+        if (icon == null) {
+            return;
+        }
 
-        renderItemIn2D_DO(Tessellator.instance, var7, var8, var6, var9);
+        Minecraft.getMinecraft().renderEngine.bindTextureFile("/gui/items.png");
+
+        Tessellator tessellator = Tessellator.instance;
+        float f = icon.func_94209_e();
+        float f1 = icon.func_94212_f();
+        float f2 = icon.func_94206_g();
+        float f3 = icon.func_94210_h();
+        float f4 = 0.0F;
+        float f5 = 0.3F;
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GL11.glTranslatef(-f4, -f5, 0.0F);
+        float f6 = 1.5F;
+        GL11.glScalef(f6, f6, f6);
+        GL11.glRotatef(50.0F, 0.0F, 1.0F, 0.0F);
+        GL11.glRotatef(335.0F, 0.0F, 0.0F, 1.0F);
+        GL11.glTranslatef(-0.9375F, -0.0625F, 0.0F);
+        ItemRenderer.renderItemIn2D(tessellator, f1, f2, f, f3, icon.func_94213_j(), icon.func_94208_k(), 0.0625F);
     }
-
-    //copied from ItemRenderer.renderItemIn2D()
-    static void renderItemIn2D_DO(Tessellator par1Tessellator, float par2, float par3, float par4, float par5) {
-        float var6 = 1.0F;
-        float var7 = 0.0625F;
-        par1Tessellator.startDrawingQuads();
-        par1Tessellator.setNormal(0.0F, 0.0F, 1.0F);
-        par1Tessellator.addVertexWithUV(0.0D, 0.0D, 0.0D, (double) par2, (double) par5);
-        par1Tessellator.addVertexWithUV((double) var6, 0.0D, 0.0D, (double) par4, (double) par5);
-        par1Tessellator.addVertexWithUV((double) var6, 1.0D, 0.0D, (double) par4, (double) par3);
-        par1Tessellator.addVertexWithUV(0.0D, 1.0D, 0.0D, (double) par2, (double) par3);
-        par1Tessellator.draw();
-        par1Tessellator.startDrawingQuads();
-        par1Tessellator.setNormal(0.0F, 0.0F, -1.0F);
-        par1Tessellator.addVertexWithUV(0.0D, 1.0D, (double) (0.0F - var7), (double) par2, (double) par3);
-        par1Tessellator.addVertexWithUV((double) var6, 1.0D, (double) (0.0F - var7), (double) par4, (double) par3);
-        par1Tessellator.addVertexWithUV((double) var6, 0.0D, (double) (0.0F - var7), (double) par4, (double) par5);
-        par1Tessellator.addVertexWithUV(0.0D, 0.0D, (double) (0.0F - var7), (double) par2, (double) par5);
-        par1Tessellator.draw();
-        par1Tessellator.startDrawingQuads();
-        par1Tessellator.setNormal(-1.0F, 0.0F, 0.0F);
-        int var8;
-        float var9;
-        float var10;
-        float var11;
-
-        for (var8 = 0; var8 < 16; ++var8)
-        {
-            var9 = (float) var8 / 16.0F;
-            var10 = par2 + (par4 - par2) * var9 - 0.001953125F;
-            var11 = var6 * var9;
-            par1Tessellator.addVertexWithUV((double) var11, 0.0D, (double) (0.0F - var7), (double) var10, (double) par5);
-            par1Tessellator.addVertexWithUV((double) var11, 0.0D, 0.0D, (double) var10, (double) par5);
-            par1Tessellator.addVertexWithUV((double) var11, 1.0D, 0.0D, (double) var10, (double) par3);
-            par1Tessellator.addVertexWithUV((double) var11, 1.0D, (double) (0.0F - var7), (double) var10, (double) par3);
-        }
-
-        par1Tessellator.draw();
-        par1Tessellator.startDrawingQuads();
-        par1Tessellator.setNormal(1.0F, 0.0F, 0.0F);
-
-        for (var8 = 0; var8 < 16; ++var8)
-        {
-            var9 = (float) var8 / 16.0F;
-            var10 = par2 + (par4 - par2) * var9 - 0.001953125F;
-            var11 = var6 * var9 + 0.0625F;
-            par1Tessellator.addVertexWithUV((double) var11, 1.0D, (double) (0.0F - var7), (double) var10, (double) par3);
-            par1Tessellator.addVertexWithUV((double) var11, 1.0D, 0.0D, (double) var10, (double) par3);
-            par1Tessellator.addVertexWithUV((double) var11, 0.0D, 0.0D, (double) var10, (double) par5);
-            par1Tessellator.addVertexWithUV((double) var11, 0.0D, (double) (0.0F - var7), (double) var10, (double) par5);
-        }
-
-        par1Tessellator.draw();
-        par1Tessellator.startDrawingQuads();
-        par1Tessellator.setNormal(0.0F, 1.0F, 0.0F);
-
-        for (var8 = 0; var8 < 16; ++var8)
-        {
-            var9 = (float) var8 / 16.0F;
-            var10 = par5 + (par3 - par5) * var9 - 0.001953125F;
-            var11 = var6 * var9 + 0.0625F;
-            par1Tessellator.addVertexWithUV(0.0D, (double) var11, 0.0D, (double) par2, (double) var10);
-            par1Tessellator.addVertexWithUV((double) var6, (double) var11, 0.0D, (double) par4, (double) var10);
-            par1Tessellator.addVertexWithUV((double) var6, (double) var11, (double) (0.0F - var7), (double) par4, (double) var10);
-            par1Tessellator.addVertexWithUV(0.0D, (double) var11, (double) (0.0F - var7), (double) par2, (double) var10);
-        }
-
-        par1Tessellator.draw();
-        par1Tessellator.startDrawingQuads();
-        par1Tessellator.setNormal(0.0F, -1.0F, 0.0F);
-
-        for (var8 = 0; var8 < 16; ++var8)
-        {
-            var9 = (float) var8 / 16.0F;
-            var10 = par5 + (par3 - par5) * var9 - 0.001953125F;
-            var11 = var6 * var9;
-            par1Tessellator.addVertexWithUV((double) var6, (double) var11, 0.0D, (double) par4, (double) var10);
-            par1Tessellator.addVertexWithUV(0.0D, (double) var11, 0.0D, (double) par2, (double) var10);
-            par1Tessellator.addVertexWithUV(0.0D, (double) var11, (double) (0.0F - var7), (double) par2, (double) var10);
-            par1Tessellator.addVertexWithUV((double) var6, (double) var11, (double) (0.0F - var7), (double) par4, (double) var10);
-        }
-
-        par1Tessellator.draw();
-    }
-    
 
     void renderMotor(RenderBlocks rb, float yoffset) {
-        int metal = Core.registry.lead_block_item.getIconIndex();
-        metal = 11;
+        Icon metal = Core.registry.lead_block_item.getIconIndex();
+        //metal = 11;
         float d = 4.0F / 16.0F;
         float yd = -d + 0.003F;
         renderPart(rb, metal, d, d + yd + yoffset, d, 1 - d, 1 - (d + 0F/16F) + yd + yoffset, 1 - d);

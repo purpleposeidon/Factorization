@@ -18,15 +18,7 @@ public class ItemPocketTable extends Item {
         setMaxStackSize(1);
         Core.tab(this, TabType.TOOLS);
         setFull3D();
-    }
-
-    @Override
-    public String getTextureFile() {
-        return Core.texture_file_item;
-    }
-
-    public int getIconFromDamage(int damage) {
-        return 4;
+        setItemName("factorization.tool.pocket_crafting_table");
     }
 
     //

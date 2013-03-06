@@ -1,23 +1,13 @@
 package factorization.client.render;
 
-import static org.lwjgl.opengl.GL11.*;
-import static java.lang.Math.abs;
-
-import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.client.SpriteHelper;
-import cpw.mods.fml.client.registry.RenderingRegistry;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraftforge.client.ForgeHooksClient;
-import factorization.api.Coord;
 import factorization.api.VectorUV;
 import factorization.common.Core;
 import factorization.common.FactoryType;
 import factorization.common.RenderingCube;
-import factorization.common.TileEntityGreenware.ClayState;
 import factorization.common.TileEntityGreenware;
+import factorization.common.TileEntityGreenware.ClayState;
 
 public class BlockRenderGreenware extends FactorizationBlockRender {
     static BlockRenderGreenware instance;

@@ -4,12 +4,17 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.lang.reflect.Field;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import net.minecraft.block.BlockFurnace;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.util.Icon;
+import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
@@ -23,6 +28,14 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.HEATER;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public static FzIcon heater_spiral = tex("machine/heater_spiral"), heater_heat = tex("machine/heater_heat");
+    
+    @Override
+    Icon getIcon(ForgeDirection dir) {
+        return heater_spiral;
     }
 
     @Override

@@ -1,7 +1,10 @@
 package factorization.common;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.liquids.ILiquidTank;
 import net.minecraftforge.liquids.ITankContainer;
@@ -33,6 +36,17 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.SOLARBOILER;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    static FzIcon boiler_top = tex("charge/boiler_top"), boiler_side = tex("charge/boiler_side");
+    
+    @Override
+    Icon getIcon(ForgeDirection dir) {
+        switch (dir) {
+        case UP: return boiler_top;
+        default: return boiler_side;
+        }
     }
 
     @Override

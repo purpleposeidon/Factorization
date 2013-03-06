@@ -4,12 +4,16 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.util.Icon;
 import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
 import net.minecraftforge.common.ForgeDirection;
@@ -26,6 +30,20 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     @Override
     public int getSizeInventory() {
         return 4;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    static SimpleMachineIcons icon = new SimpleMachineIcons("machine/slag");
+    @SideOnly(Side.CLIENT)
+    static FzIcon face_on = tex("machine/slag_face_on");
+    
+    @Override
+    Icon getIcon(ForgeDirection dir) {
+        ForgeDirection face = ForgeDirection.getOrientation(facing_direction);
+        if (face == dir && isBurning()) {
+            return face_on;
+        }
+        return icon.get(face, dir);
     }
 
     @Override

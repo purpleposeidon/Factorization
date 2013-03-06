@@ -26,7 +26,7 @@ public class Packet220FzdsWrap extends Packet {
     private static Socket fakeSocket = new Socket();
     @Override
     public void readPacketData(DataInputStream dis) throws IOException {
-        wrapped = Packet.readPacket(dis, false, fakeSocket);
+        wrapped = Packet.readPacket(field_98193_m /* our ILogAgent */, dis, false, fakeSocket);
     }
 
     @Override

@@ -1,19 +1,18 @@
 package factorization.client.render;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import net.minecraft.client.particle.EntityBreakingFX;
+import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ForgeHooksClient;
 import factorization.api.Coord;
 import factorization.common.Core;
 
-public class EntityWrathFlameFX extends EntityBreakingFX {
+public class EntityWrathFlameFX extends EntityFX {
     double defaultY = 0;
 
     public EntityWrathFlameFX(World par1World, double x, double y, double z,
             double vx, double vy, double vz) {
-        super(par1World, x, y, z, vx, vy, vz, Core.registry.pocket_table);
+        super(par1World, x, y, z, vx, vy, vz);
         this.particleTextureJitterX = 0;
         this.particleTextureJitterY = 0;
         this.particleScale = 2;
@@ -132,6 +131,9 @@ public class EntityWrathFlameFX extends EntityBreakingFX {
     public void renderParticle(Tessellator par1Tessellator, float par2, float par3, float par4,
             float par5, float par6, float par7)
     {
+        super.renderParticle(par1Tessellator, par2, par3, par4, par5, par6, par7);
+        //I guess we don't need this anymore? (Dude, could have just wrapped the super call in the bind...)
+        /*
         ForgeHooksClient.bindTexture(Core.texture_file_item, 0);
         float var8 = (float) (0 % 16) / 16.0F;
         float var9 = var8 + 0.0624375F;
@@ -149,6 +151,7 @@ public class EntityWrathFlameFX extends EntityBreakingFX {
         par1Tessellator.addVertexWithUV((double) (var13 + par3 * var12 + par6 * var12), (double) (var14 + par4 * var12), (double) (var15 + par5 * var12 + par7 * var12), (double) var8, (double) var10);
         par1Tessellator.addVertexWithUV((double) (var13 + par3 * var12 - par6 * var12), (double) (var14 - par4 * var12), (double) (var15 + par5 * var12 - par7 * var12), (double) var8, (double) var11);
         ForgeHooksClient.unbindTexture();
+        */
     }
 
     public void setScale(int scale) {

@@ -74,12 +74,10 @@ public class ItemOreProcessing extends Item implements IActOnCraft {
 
     protected ItemOreProcessing(int itemID, int icon, String stateName) {
         super(itemID);
-        setTextureFile(Core.texture_file_item);
         setHasSubtypes(true);
-        setIconIndex(icon);
         this.stateName = stateName;
         Core.tab(this, TabType.MATERIALS);
-        setItemName("itemOreProcessing" + stateName);
+        setItemName("factorization.machine.ore." + stateName);
     }
 
     @Override
@@ -93,13 +91,7 @@ public class ItemOreProcessing extends Item implements IActOnCraft {
 
     @Override
     public String getItemNameIS(ItemStack is) {
-        return "item.oreProcessing" + stateName + is.getItemDamage();
-    }
-
-    void addEnglishNames(String prefix, String postfix) {
-        for (OreType oreType : OreType.values()) {
-            Core.proxy.addName("item.oreProcessing" + stateName + oreType.ID, prefix + oreType.en_name + postfix);
-        }
+        return "item.oreProcessing." + stateName + "." + OreType.values()[is.getItemDamage()];
     }
 
     @Override

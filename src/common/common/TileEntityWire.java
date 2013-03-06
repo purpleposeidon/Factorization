@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.IOException;
 
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.Icon;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -30,6 +31,11 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     @Override
     public BlockClass getBlockClass() {
         return BlockClass.Wire;
+    }
+    
+    @Override
+    Icon getIcon(ForgeDirection dir) {
+        return BlockFactorization.error_icon;
     }
 
     @Override

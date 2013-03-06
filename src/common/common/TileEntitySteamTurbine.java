@@ -3,7 +3,11 @@ package factorization.common;
 import java.io.DataInput;
 import java.io.IOException;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.liquids.ILiquidTank;
 import net.minecraftforge.liquids.ITankContainer;
@@ -24,6 +28,18 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements ITankCon
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.STEAMTURBINE;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public static FzIcon turbine_top = tex("charge/turbinee_top"), turbine_side = tex("charge/turbine_side"), turbine_bottom = tex("charge/turbine_bottom");
+    
+    @Override
+    Icon getIcon(ForgeDirection dir) {
+        switch (dir) {
+        case UP: return turbine_top;
+        case DOWN: return turbine_bottom;
+        default: return turbine_side;
+        }
     }
 
     @Override
@@ -119,7 +135,7 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements ITankCon
         }
         shareFanSpeed();
         charge.update();
-        if (worldObj.isBlockGettingPowered(xCoord, yCoord, zCoord)) {
+        if (worldObj.getBlockPower(xCoord, yCoord, zCoord) > 0) {
             fan_speed = Math.max(0, fan_speed - 1);
             return;
         }

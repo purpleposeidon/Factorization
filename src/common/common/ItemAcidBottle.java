@@ -2,22 +2,22 @@ package factorization.common;
 
 import java.util.List;
 
-import factorization.common.Core.TabType;
-
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Icon;
 import net.minecraft.world.World;
+import factorization.common.Core.TabType;
 
-public class ItemAcidBottle extends ItemCraftingComponent {
+public class ItemAcidBottle extends Item {
 
-    public ItemAcidBottle(int id, String itemName, int icon) {
-        super(id, itemName, icon);
+    public ItemAcidBottle(int id) {
+        super(id);
         Core.tab(this, TabType.MISC);
-        setTextureFile(Item.potion.getTextureFile());
         setMaxStackSize(16);
+        setItemName("factorization.item.acid");
     }
     
     @Override
@@ -26,7 +26,7 @@ public class ItemAcidBottle extends ItemCraftingComponent {
     }
     
     @Override
-    public int getIconFromDamageForRenderPass(int damage, int renderPass) {
+    public Icon getIconFromDamageForRenderPass(int damage, int renderPass) {
         return Item.potion.getIconFromDamageForRenderPass(damage, renderPass);
     }
     
@@ -45,7 +45,7 @@ public class ItemAcidBottle extends ItemCraftingComponent {
     public String getItemNameIS(ItemStack stack) {
         String name = super.getItemNameIS(stack);
         if (stack.getItemDamage() > 0) {
-            name += "regia";
+            name += ".regia";
         }
         return name;
     }
@@ -77,8 +77,7 @@ public class ItemAcidBottle extends ItemCraftingComponent {
 
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
-        super.addInformation(is, player, infoList, verbose);
-        //Core.brand(infoList); taken care of in super
+        Core.brand(infoList);
     }
     
     @Override

@@ -88,10 +88,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             router_thorough, router_throughput, router_eject;
     public ItemMachineUpgrade barrel_enlarge;
     public ItemStack fake_is;
-    public ItemCraftingComponent acid, magnet, insulated_coil, motor, fan, diamond_cutting_head;
+    public ItemAcidBottle acid;
+    public ItemCraftingComponent magnet, insulated_coil, motor, fan, diamond_cutting_head;
     public ItemStack sulfuric_acid, aqua_regia;
     public ItemChargeMeter charge_meter;
-    public ItemMirror mirror;
+    public ItemBlockProxy mirror;
     public ItemBattery battery;
     public ItemOreProcessing ore_dirty_gravel, ore_clean_gravel, ore_reduced, ore_crystal;
     public ItemCraftingComponent sludge;
@@ -100,7 +101,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemAngularSaw angular_saw;
     public ItemCraftingComponent heatHole, logicMatrix, logicMatrixIdentifier, logicMatrixProgrammer;
     public Item fz_steam;
-    public ItemCraftingComponent nether_powder, rocket_fuel, rocket_fuel_liquid_entry;
+    public ItemCraftingComponent nether_powder, rocket_fuel;
+    public Item rocket_fuel_liquid_entry;
     public ItemBlockProxy rocket_engine;
     public LiquidStack liquidStackRocketFuel;
     public ItemCraftingComponent bucket_rocket_fuel;
@@ -138,9 +140,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         EntityRegistry.registerGlobalEntityID(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", Core.entity_relight_task_id);
     }
 
-    private void addName(Object what, String name) {
+    /*private void addName(Object what, String name) {
         Core.proxy.addName(what, name);
-    }
+    }*/
 
     HashSet<Integer> added_ids = new HashSet();
 
@@ -158,16 +160,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     }
 
     void makeItems() {
-        ore_dirty_gravel = new ItemOreProcessing(itemID("oreDirtyGravel", 9034), 2 * 16 + 4, "dirtyGravel");
-        ore_clean_gravel = new ItemOreProcessing(itemID("oreCleanGravel", 9035), 2 * 16 + 5, "cleanGravel");
+        ore_dirty_gravel = new ItemOreProcessing(itemID("oreDirtyGravel", 9034), 2 * 16 + 4, "gravel");
+        ore_clean_gravel = new ItemOreProcessing(itemID("oreCleanGravel", 9035), 2 * 16 + 5, "clean");
         ore_reduced = new ItemOreProcessing(itemID("oreReduced", 9036), 2 * 16 + 6, "reduced");
         ore_crystal = new ItemOreProcessing(itemID("oreCrystal", 9037), 2 * 16 + 7, "crystal");
-        ore_dirty_gravel.addEnglishNames("Dirty ", " Gravel");
-        ore_clean_gravel.addEnglishNames("Clean ", " Chunks");
-        ore_reduced.addEnglishNames("Reduced ", " Chunks");
-        ore_crystal.addEnglishNames("Crystalline ", "");
-        sludge = new ItemCraftingComponent(itemID("sludge", 9039), "item.sludge", 2 * 16 + 8);
-        addName(sludge, "Sludge");
+        sludge = new ItemCraftingComponent(itemID("sludge", 9039), "sludge");
         OreDictionary.registerOre("FZ.sludge", sludge);
         //ItemBlocks
         item_factorization = (ItemFactorization) Item.itemsList[factory_block.blockID];
@@ -202,37 +199,30 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         dark_iron_block_item = ResourceType.DARKIRONBLOCK.itemStack("Block of Dark Iron");
         exoworkshop_item = ResourceType.EXOMODDER.itemStack("Exo-Modder");
 
-        lead_ingot = new ItemCraftingComponent(itemID("leadIngot", 9014), "Lead Ingot", 16 * 3 + 3);
-        silver_ingot = new ItemCraftingComponent(itemID("silverIngot", 9015), "Silver Ingot", 16 * 3 + 4);
+        lead_ingot = new ItemCraftingComponent(itemID("leadIngot", 9014), "lead_ingot");
+        silver_ingot = new ItemCraftingComponent(itemID("silverIngot", 9015), "silver_ingot");
         OreDictionary.registerOre("oreSilver", silver_ore_item);
         OreDictionary.registerOre("ingotSilver", new ItemStack(silver_ingot));
         OreDictionary.registerOre("ingotLead", new ItemStack(lead_ingot));
         OreDictionary.registerOre("blockSilver", silver_block_item);
         OreDictionary.registerOre("blockLead", lead_block_item);
-        addName(lead_ingot, "Lead Ingot");
-        addName(silver_ingot, "Silver Ingot");
 
         //Darkness & Evil
-        diamond_shard = new ItemCraftingComponent(itemID("diamondShard", 9006), "item.diamondshard", 3 * 16);
-        addName(diamond_shard, "Diamond Shard");
+        diamond_shard = new ItemCraftingComponent(itemID("diamondShard", 9006), "diamond_shard");
         OreDictionary.registerOre("FZ.diamondShard", diamond_shard);
         wrath_igniter = new ItemWrathIgniter(itemID("wrathIgniter", 9007));
-        addName(wrath_igniter, "Wrath Igniter");
-        dark_iron = new ItemCraftingComponent(itemID("darkIron", 9008), "item.darkiron", 3 * 16 + 2);
-        addName(dark_iron, "Dark Iron Ingot");
+        dark_iron = new ItemCraftingComponent(itemID("darkIron", 9008), "dark_iron_ingot");
         OreDictionary.registerOre("FZ.darkIron", dark_iron);
 
         bag_of_holding = new ItemBagOfHolding(itemID("bagOfHolding", 9001));
-        addName(bag_of_holding, "Bag of Holding");
         
-        logicMatrixProgrammer = new ItemMatrixProgrammer(itemID("logicMatrixProgrammer", 9043), "Logic Matrix Programmer", 1*16 + 6);
+        logicMatrixProgrammer = new ItemMatrixProgrammer(itemID("logicMatrixProgrammer", 9043), "factorization.tool.matrix_programmer");
         DungeonHooks.addDungeonLoot(new ItemStack(logicMatrixProgrammer), 50); //XXX TODO: Temporary, put these on asteroids.
-        logicMatrix = new ItemCraftingComponent(itemID("logicMatrix", 9044), "Logic Matrix", 1*16 + 10);
-        logicMatrixIdentifier = new ItemCraftingComponent(itemID("logicMatrixID", 9045), "Logic Matrix: Identifier", 1*16 + 11);
-        heatHole = new ItemCraftingComponent(itemID("heatHole", 9046), "Heat Hole", 1*16 + 9);
+        logicMatrix = new ItemCraftingComponent(itemID("logicMatrix", 9044), "logic_matrix");
+        logicMatrixIdentifier = new ItemCraftingComponent(itemID("logicMatrixID", 9045), "logic_matrix_identifier");
+        heatHole = new ItemCraftingComponent(itemID("heatHole", 9046), "heat_hole");
 
         wand_of_cooling = new ItemWandOfCooling(itemID("wandOfCooling", 9005));
-        addName(wand_of_cooling, "Wand of Cooling");
 
         router_item_filter = new ItemMachineUpgrade(itemID("routerItemFilter", 9016), "Item Filter", "Router Upgrade", FactoryType.ROUTER, 0);
         router_machine_filter = new ItemMachineUpgrade(itemID("routerMachineFilter", 9017), "Machine Filter", "Router Upgrade", FactoryType.ROUTER, 1);
@@ -244,27 +234,22 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         barrel_enlarge = new ItemMachineUpgrade(itemID("barrelEnlarge", 9032), "Extra-Dimensional Storage", "Barrel Upgrade", FactoryType.BARREL, 6);
 
         //Electricity
-        acid = new ItemAcidBottle(itemID("acid", 9024), "Sulfuric Acid", 16 * 3 + 5);
+        acid = new ItemAcidBottle(itemID("acid", 9024));
         sulfuric_acid = new ItemStack(acid, 1);
         aqua_regia = new ItemStack(acid, 1, 1);
-        addName(acid.getItemNameIS(aqua_regia), "Aqua Regia");
         OreDictionary.registerOre("sulfuricAcid", sulfuric_acid);
         OreDictionary.registerOre("aquaRegia", aqua_regia);
-        magnet = new ItemCraftingComponent(itemID("magnet", 9025), "Magnet", 16 * 3 + 6);
-        insulated_coil = new ItemCraftingComponent(itemID("coil", 9026), "Insulated Coil", 16 * 3 + 7);
-        motor = new ItemCraftingComponent(itemID("motor", 9027), "Motor", 16 * 3 + 8);
-        fan = new ItemCraftingComponent(itemID("fan", 9028), "Fan", 16 * 3 + 9);
-        diamond_cutting_head = new ItemCraftingComponent(itemID("diamondCuttingHead", 9038), "Diamond Cutting Head", 16 * 3 + 10);
+        magnet = new ItemCraftingComponent(itemID("magnet", 9025), "magnet");
+        insulated_coil = new ItemCraftingComponent(itemID("coil", 9026), "insulated_coil");
+        motor = new ItemCraftingComponent(itemID("motor", 9027), "motor");
+        fan = new ItemCraftingComponent(itemID("fan", 9028), "fan");
+        diamond_cutting_head = new ItemCraftingComponent(itemID("diamondCuttingHead", 9038), "diamond_cutting_head");
         charge_meter = new ItemChargeMeter(itemID("chargemeter", 9029));
-        addName(charge_meter, "Charge Meter");
-        mirror = new ItemMirror(itemID("mirror", 9030));
-        addName(mirror, "Reflective Mirror");
+        mirror = new ItemBlockProxy(itemID("mirror", 9030), mirror_item_hidden);
         battery = new ItemBattery(itemID("battery", 9033));
-        addName(battery, "Battery Block");
 
         //Industrial
         item_craft = new ItemCraft(itemID("itemCraftId", 9000));
-        addName(item_craft, "Craftpacket");
 
         //Exo-items
         exo_head = new ExoArmor(itemID("mechaHead", 9010), 0).setSlotCount(5);
@@ -272,52 +257,36 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         exo_leg = new ExoArmor(itemID("mechaLeg", 9012), 2).setSlotCount(6);
         exo_foot = new ExoArmor(itemID("mechaFoot", 9013), 3).setSlotCount(4);
 
-        exo_chasis = new ItemCraftingComponent(itemID("mechaChasis", 9009), "item.exochasis", 5);
-        addName(exo_chasis, "Exo-Chassis");
+        exo_chasis = new ItemCraftingComponent(itemID("mechaChasis", 9009), "exo_chasis");
         //Exo-armor uses up to Item ID 9013.
-        addName(exo_head, "Exo-Helmet");
-        addName(exo_chest, "Exo-Chestplate");
-        addName(exo_leg, "Exo-Leggings");
-        addName(exo_foot, "Exo-Boots");
         exo_buoyant_barrel = new ExoBuoyantBarrel(itemID("mechaBouyantBarrel", 9021));
         exo_cobble_drive = new ExoCobblestoneDrive(itemID("mechaCobbleDrive", 9022));
         exo_mounted_piston = new ExoMountedPiston(itemID("mechaMountedPiston", 9023));
         exo_wall_jump = new ExoWallJump(itemID("mechaSpring", 9047));
-        addName(exo_buoyant_barrel, "Buoyant Barrel");
-        addName(exo_cobble_drive, "Cobblestone Drive");
-        addName(exo_mounted_piston, "Shoulder-Mounted Piston");
-        addName(exo_wall_jump, "Wall Jumping Boots");
         angular_saw = new ItemAngularSaw(itemID("angularSaw", 9042));
-        addName(angular_saw, "Angular Saw");
         MinecraftForge.setToolClass(angular_saw, "pickaxe", 3);
         
         //ceramics
         sculpt_tool = new ItemSculptingTool(itemID("sculptTool", 9041));
-        addName(sculpt_tool, "Sculpting Tool");
         
         //inverium = new ItemInverium(itemID("inverium", 9040), "item.inverium", 12*16 + 0, 11);
-        inverium = new ItemInverium(itemID("inverium", 9040), "item.inverium", 12*16 + 0, 1);
-        addName(inverium, "Inverium Drop");
+        inverium = new ItemInverium(itemID("inverium", 9040), "factorization.rocket.inverium_drop");
         OreDictionary.registerOre("FZ.inverium", inverium);
 
         //Misc
         pocket_table = new ItemPocketTable(itemID("pocketCraftingTable", 9002));
-        addName(pocket_table, "Pocket Crafting Table");
         fz_steam = new Item(itemID("steam", 9049));
-        fz_steam.setTextureFile(Core.texture_file_block);
-        fz_steam.setIconIndex(3*16 + 4);
-        fz_steam.setItemName("steam");
-        addName(fz_steam, "Steam");
+        fz_steam.setItemName("factorization.charge.steam");
         
         //Rocketry
-        nether_powder = new ItemCraftingComponent(itemID("netherPowder", 9050), "Netherrack Powder", 9 + 16*2);
+        nether_powder = new ItemCraftingComponent(itemID("netherPowder", 9050), "nether_powder");
         if (Core.enable_dimension_slice) {
-            rocket_fuel = new ItemCraftingComponent(itemID("heldRocketFuel", 9051), "Rocket Fuel", 10 + 16*2);
-            rocket_fuel_liquid_entry = new ItemCraftingComponent(itemID("liquidRocketFuel", 9052), "Rocket Fuel", 4 + 16*2);
-            rocket_fuel_liquid_entry.setTextureFile(Core.texture_file_block);
-            rocket_engine = (ItemBlockProxy)(new ItemBlockProxy(itemID("rocketEngine", 9053), rocket_engine_item_hidden).setTextureFile(Core.texture_file_item).setIconCoord(7, 0).setItemName("rocketEngine")).setMaxStackSize(1);
-            addName(rocket_engine, "Rocket Engine");
-            bucket_rocket_fuel = new ItemCraftingComponent(itemID("bucketRocketFuel", 9054), "Bucket of Rocket Fuel", 11 + 16*2);
+            rocket_fuel = new ItemCraftingComponent(itemID("heldRocketFuel", 9051), "powder_rocket_fuel");
+            rocket_fuel_liquid_entry = new Item(itemID("liquidRocketFuel", 9052));
+            rocket_fuel.setItemName("factorization.rocket.powder_rocket_fuel");
+            rocket_engine = new ItemBlockProxy(itemID("rocketEngine", 9053), rocket_engine_item_hidden);
+            rocket_engine.setItemName("factorization.rocket.rocket_engine").setMaxStackSize(1);
+            bucket_rocket_fuel = new ItemCraftingComponent(itemID("bucketRocketFuel", 9054), "rocket_fuel_bucket");
             bucket_rocket_fuel.setMaxStackSize(1);
             bucket_rocket_fuel.setContainerItem(Item.bucketEmpty);
         }
@@ -671,7 +640,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "C C",
                 "CFC",
                 'C', Block.cobblestone,
-                'F', Block.stoneOvenIdle);
+                'F', Block.furnaceIdle);
         OreDictionary.registerOre("oreIron", new ItemStack(Block.oreIron));
         OreDictionary.registerOre("oreGold", new ItemStack(Block.oreGold));
         OreDictionary.registerOre("ingotIron", new ItemStack(Item.ingotIron));
@@ -940,7 +909,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public boolean onItemPickup(EntityItemPickupEvent event) {
         EntityPlayer player = event.entityPlayer;
         EntityItem item = event.item;
-        ItemStack is = item.func_92014_d();
+        ItemStack is = item.getEntityItem();
         if (item == null || is == null || is.stackSize == 0) {
             return true;
         }

@@ -77,7 +77,7 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
         RenderEngine re = Minecraft.getMinecraft().renderEngine;
         glDisable(GL_LIGHTING);
 
-        re.bindTexture(re.getTexture("/terrain.png"));
+        re.bindTextureFile("/terrain.png");
         //XXX TODO FIXME Move to somewhere more efficient
         //(Move the vector stuff out too...)
         RenderingCube frame = new RenderingCube(16 + 6, new VectorUV(5, 1, 5));

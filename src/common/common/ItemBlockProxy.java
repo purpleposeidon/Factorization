@@ -7,9 +7,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 
 public class ItemBlockProxy extends Item {
+    //TODO: Why doesn't this just extend ItemBlock?
     ItemStack proxy;
     int blockID;
 
@@ -20,10 +22,10 @@ public class ItemBlockProxy extends Item {
     }
 
     public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side,
-            float hitX, float hitY, float hitZ) {
+            float hitX, float hitY, float hitZ, int metadata) {
         proxy.stackSize = stack.stackSize;
         proxy.setTagCompound(stack.getTagCompound());
-        boolean ret = ((ItemBlock) proxy.getItem()).placeBlockAt(proxy, player, world, x, y, z, side, hitX, hitY, hitZ, 0);
+        boolean ret = ((ItemBlock) proxy.getItem()).placeBlockAt(proxy, player, world, x, y, z, side, hitX, hitY, hitZ, metadata);
         stack.stackSize = proxy.stackSize;
         return ret;
     }
@@ -85,13 +87,15 @@ public class ItemBlockProxy extends Item {
         {
             return false;
         }
-        else if (par3World.canPlaceEntityOnSide(this.blockID, par4, par5, par6, false, par7, null))
+        else if (par3World.canPlaceEntityOnSide(this.blockID, par4, par5, par6, false, par7, par2EntityPlayer, par1ItemStack))
         {
-            Block var12 = Block.blocksList[this.blockID];
+            Block block = Block.blocksList[this.blockID];
+            int j1 = this.getMetadata(par1ItemStack.getItemDamage());
+            int k1 = Block.blocksList[this.blockID].onBlockPlaced(par3World, par4, par5, par6, par7, par8, par9, par10, j1);
 
-            if (placeBlockAt(par1ItemStack, par2EntityPlayer, par3World, par4, par5, par6, par7, par8, par9, par10))
+            if (placeBlockAt(par1ItemStack, par2EntityPlayer, par3World, par4, par5, par6, par7, par8, par9, par10, k1))
             {
-                par3World.playSoundEffect((double)((float)par4 + 0.5F), (double)((float)par5 + 0.5F), (double)((float)par6 + 0.5F), var12.stepSound.getPlaceSound(), (var12.stepSound.getVolume() + 1.0F) / 2.0F, var12.stepSound.getPitch() * 0.8F);
+                par3World.playSoundEffect((double)((float)par4 + 0.5F), (double)((float)par5 + 0.5F), (double)((float)par6 + 0.5F), block.stepSound.getPlaceSound(), (block.stepSound.getVolume() + 1.0F) / 2.0F, block.stepSound.getPitch() * 0.8F);
                 --par1ItemStack.stackSize;
             }
 

@@ -7,22 +7,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
 public class ItemInverium extends ItemCraftingComponent {
-    int frame_count;
-    public ItemInverium(int id, String itemName, int icon, int frame_count) {
-        super(id, itemName, icon);
-        this.frame_count = frame_count;
+    public ItemInverium(int id, String itemName) {
+        super(id, itemName);
     }
 
     @Override
     public boolean hasEffect(ItemStack is) {
         return true;
-    }
-    
-    @Override
-    public int getIconFromDamage(int par1) {
-        long frame = (System.currentTimeMillis() / 300) % frame_count;
-        return icon + (int) frame;
-        //return icon + ((int) (System.currentTimeMillis() / 1000) % frame_count);
     }
     
     //getColorFromDamage (or maybe getColorForRenderPass)

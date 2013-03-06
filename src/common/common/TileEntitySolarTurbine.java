@@ -3,9 +3,13 @@ package factorization.common;
 import java.io.DataInput;
 import java.io.IOException;
 
+import cpw.mods.fml.relauncher.Side;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.Icon;
+import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
@@ -30,6 +34,11 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
     @Override
     public BlockClass getBlockClass() {
         return BlockClass.Machine;
+    }
+    
+    @Override
+    Icon getIcon(ForgeDirection dir) {
+        return Block.glass.getBlockTextureFromSide(0);
     }
 
     @Override

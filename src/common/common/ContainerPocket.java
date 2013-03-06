@@ -156,6 +156,16 @@ public class ContainerPocket extends ContainerWorkbench {
         public void closeChest() {
             src.closeChest();
         }
+        
+        @Override
+        public boolean hasCustomName() {
+            return false;
+        }
+        
+        @Override
+        public boolean canStickItemInSlot(int i, ItemStack itemstack) {
+            return true;
+        }
     }
 
     void addPlayerSlots(IInventory inventoryplayer) {

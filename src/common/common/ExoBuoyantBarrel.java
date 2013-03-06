@@ -19,11 +19,9 @@ class ExoBuoyantBarrel extends Item implements IExoUpgrade {
 
     protected ExoBuoyantBarrel(int par1) {
         super(par1);
-        setItemName("exo.buoyantbarrel");
-        setIconIndex(16 * 10);
+        setItemName("factorization.exo.buoyantbarrel");
         Core.tab(this, TabType.MISC);
         setMaxStackSize(1);
-        setTextureFile(Core.texture_file_item);
     }
     
     @Override

@@ -4,7 +4,11 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.Random;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -235,6 +239,16 @@ public abstract class TileEntityFactorization extends TileEntityCommon
 
     @Override
     public final void closeChest() {
+    }
+    
+    @Override
+    public boolean canStickItemInSlot(int i, ItemStack itemstack) {
+        return true;
+    }
+    
+    @Override
+    public boolean hasCustomName() {
+        return false;
     }
 
     @Override
