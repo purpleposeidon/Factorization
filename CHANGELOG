@@ -1,6 +1,16 @@
 0.7.18
   Added netherrack dust; made by grinding netherrack
   Crystallizing metals now requires a higher-tier acid
+  Routers do less netspam
+  /fzds got more powerful and flexible
+  Added an "/f" command. (Originally short for "/fog", but it's got other things now.) Has a few commands for running things client-side:
+    far, 0, normal, 1, short, 2, tiny, 3, micro, 4, microfog, +, -: Adjusts the fog
+    pauserender: Stops rendering; opening the inventory will resume it
+    now, date, time: shows the real-world time
+    clear, cl: Clears the chatlog
+    saycoords: Makes you say your coords in chat.
+    saveoptions, savesettings, so, ss: Saves Minecraft's options; it seems to have trouble doing this
+
 
 0.7.17
   Router takes only strong power now
@@ -23,7 +33,7 @@
     Mixer: 2x (No increase here)
     Slag furnace: 2.5x (The .5x gives a 50% chance for 1 extra reduced chunk)
     Crystallizer: 3x
-  The charge meter does a global notify if the player is fake. (It works in deployers! Aim the deployer above the conductor.)
+  The charge meter does a global notify if the player is fake. (It works in deployers! Aim the deployer *above* the conductor block.)
   Grinders are now crafted upsidedown, instead of having two different unsatisfactory recipes.
   Fixed crystallizer recipe bug
   Sounds actually work again. Derp.

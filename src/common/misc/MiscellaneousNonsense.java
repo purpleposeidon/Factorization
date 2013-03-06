@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.minecraft.command.CommandBase;
@@ -18,12 +19,10 @@ import net.minecraft.stats.AchievementList;
 import net.minecraftforge.common.DungeonHooks;
 import cpw.mods.fml.common.ICraftingHandler;
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.Init;
 import cpw.mods.fml.common.Mod.PostInit;
 import cpw.mods.fml.common.Mod.PreInit;
 import cpw.mods.fml.common.Mod.ServerStarting;
 import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
@@ -99,7 +98,7 @@ public class MiscellaneousNonsense {
 
         @Override
         public String getCommandName() {
-            return "fog";
+            return "f";
         }
 
         @Override
@@ -111,17 +110,23 @@ public class MiscellaneousNonsense {
             player.playerNetServerHandler.sendPacketToPlayer(instance.makePacket(args));
         }
         
-        static List<String> fogCommands = Arrays.asList("far", "0", "normal", "1", "short", "2", "tiny", "3", "micro", "4", "microfog", "5", "other");
-        static List<String> otherCommands = Arrays.asList("pauserender", "gc", "now", "about", "clear", "saycoords", "saveoptions");
+        static List<String> fogCommands = Arrays.asList("far", "0", "normal", "1", "short", "2", "tiny", "3", "micro", "4", "microfog", "5", "+", "-", "pauserender", "now", "about", "clear", "saycoords", "saveoptions");
         
         @Override
         public List addTabCompletionOptions(ICommandSender sender, String[] args) {
             if (args.length == 1) {
-                return fogCommands;
-            } else if (args.length == 2 && args[0].equalsIgnoreCase("other")) {
-                return otherCommands;
+                String arg0 = args[0];
+                List<String> ret = new LinkedList();
+                for (String cmd : fogCommands) {
+                    if (cmd.startsWith(arg0)) {
+                        ret.add(cmd);
+                    }
+                }
+                return ret;
+            } else if (args.length > 1) {
+                return new LinkedList();
             }
-            return super.addTabCompletionOptions(sender, args);
+            return fogCommands;
         }
         
         @Override
