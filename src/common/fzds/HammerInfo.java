@@ -70,15 +70,15 @@ public class HammerInfo {
         int max = default_channel;
         boolean collision = false;
         
-        for (Entry<String, ConfigCategory> entry : channelConfig.categories.entrySet()) {
-            if (entry.getKey().equals(modCategory)) {
+        for (String categoryName : channelConfig.getCategoryNames()) {
+            ConfigCategory cat = channelConfig.getCategory(categoryName);
+            if (cat.equals(modCategory)) {
                 continue;
             }
-            ConfigCategory cat = entry.getValue();
             if (!cat.containsKey("channel")) {
                 continue;
             }
-            int here_chan = channelConfig.get(entry.getKey(), "channel", -1).getInt();
+            int here_chan = channelConfig.get(categoryName, "channel", -1).getInt();
             max = Math.max(max, here_chan);
             if (here_chan == default_channel) {
                 collision = true;
@@ -115,7 +115,7 @@ public class HammerInfo {
         Property chanAllocs = worldState.get("allocations", "channel" + channel, 0);
         int start = chanAllocs.getInt(0);
         int add = size.x + getPaddingForChannel(channel);
-        chanAllocs.value = Integer.toString(start + add);
+        chanAllocs.set(Integer.toString(start + add));
         Coord ret = new Coord(DeltaChunk.getServerShadowWorld(), start, 16, channel*Hammer.channelWidth);
         dirtyCellAllocations();
         return ret;
@@ -126,7 +126,7 @@ public class HammerInfo {
             throw new IllegalArgumentException("Non-zero channels not yet implemented");
         }
         ConfigCategory cat = channel2category.get(channel);
-        cat.get("allocated").value = Integer.toString(count);
+        cat.get("allocated").set(count);
         saveCellAllocations();
     }
     

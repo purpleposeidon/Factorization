@@ -151,7 +151,7 @@ public class Core {
         if (comment != null && comment.length() != 0) {
             prop.comment = comment;
         }
-        return prop.value;
+        return prop.getString();
     }
     
     private void loadConfig(File configFile) {
@@ -181,7 +181,7 @@ public class Core {
                 pocketActions = attempt;
             } else {
                 Property p = config.get("pocketCraftingActionKeys", "client", pocketActions);
-                p.value = pocketActions;
+                p.set(pocketActions);
                 p.comment = "3 keys for: removing (x), cycling (c), balancing (b)";
             }
             enable_sketchy_client_commands = getBoolConfig("allowUnpureCommands", "client", enable_sketchy_client_commands, null);
@@ -208,7 +208,7 @@ public class Core {
         if (entity_relight_task_id == -1) {
             entity_relight_task_id = EntityRegistry.findGlobalUniqueEntityId();
             Property prop = config.get("general", "entityRelightTask", entity_relight_task_id);
-            prop.value = "" + entity_relight_task_id;
+            prop.set(entity_relight_task_id);
         }
         serverside_translate = getBoolConfig("serversideTranslate", "server", serverside_translate, "If false, notifications will be translated by the client");
         boilers_suck_water = getBoolConfig("boilersSuckWater", "server", boilers_suck_water, "If false, water must be piped in");
