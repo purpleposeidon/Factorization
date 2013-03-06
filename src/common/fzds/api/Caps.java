@@ -1,11 +1,18 @@
 package factorization.fzds.api;
 
 public enum Caps {
-    COLLIDE, MOVE, ROTATE, DRAG, TAKE_INTERIOR_ENTITIES, REMOVE_EXTERIOR_ENTITIES, TRANSFER_PLAYERS, ORACLE, EMPTY, SCALE, TRANSPARENT; //Do not re-order this list, only append.
+    //TODO: Implement SCALE, TRANSPARENT, and INTERACT
+    COLLIDE, MOVE, ROTATE, DRAG,
+    TAKE_INTERIOR_ENTITIES, REMOVE_EXTERIOR_ENTITIES, TRANSFER_PLAYERS,
+    ORACLE, EMPTY, SCALE, TRANSPARENT, INTERACT;
+    //Do not re-order this list, only append.
     public int bit;
     
     Caps() {
         this.bit = 1 << ordinal();
+        if (bit == 0) {
+            throw new IllegalArgumentException("Too many Caps");
+        }
     }
     
     public boolean in(int field) {

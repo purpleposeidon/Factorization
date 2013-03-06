@@ -17,6 +17,7 @@ import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityCommandBlock;
 import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
@@ -29,6 +30,7 @@ import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.Quaternion;
 import factorization.common.Core;
+import factorization.common.FactorizationUtil;
 import factorization.fzds.DeltaChunk.AreaMap;
 import factorization.fzds.DeltaChunk.DseDestination;
 import factorization.fzds.api.Caps;
@@ -353,7 +355,7 @@ public class FZDSCommand extends CommandBase {
                 sender.sendChatToPlayer("The commands need a Coord, DSE, or player.");
                 sender.sendChatToPlayer("If these are not implicitly available, you can provide them using:");
                 sender.sendChatToPlayer(" #worldId,x,y,z @PlayerName");
-                sender.sendChatToPlayer("Best commands: grab goc leave drop");
+                sender.sendChatToPlayer("Best commands: cut goc leave drop");
             }});
         add(new SubCommand ("go|gob|got") {
             @Override
@@ -427,22 +429,25 @@ public class FZDSCommand extends CommandBase {
                 selected.posY = user.y;
                 selected.posZ = user.z;
             }}, Requires.COORD, Requires.SELECTION);
-        add(new SubCommand("grab|rgrab", "x,y,z", "x,y,z") {
+        add(new SubCommand("cut|rcut|copy|rcopy", "x,y,z", "x,y,z") {
             @Override
-            String details() { return "Creates a Slice from the range given" + pick("rgrab", ", relative to user's position", ""); }
+            String details() { return "Creates a Slice from the range given" + pick("rcut", ", relative to user's position", ""); }
             @Override
             void call(String[] args) {
                 Coord base;
-                if (arg0.equalsIgnoreCase("rgrab")) {
+                if (arg0.equalsIgnoreCase("rcut")) {
                     base = user.copy();
                 } else {
                     base = new Coord(user.w, 0, 0, 0);
                 }
+                boolean copy = arg0.contains("copy");
                 Coord low = base.add(DeltaCoord.parse(args[0]));
                 Coord up = base.add(DeltaCoord.parse(args[1]));
                 Coord.sort(low, up);
                 final Coord lower = low.copy();
                 final Coord upper = up.copy();
+                Core.notify(null, lower, "Low");
+                Core.notify(null, upper, "High");
                 
                 IDeltaChunk dse = DeltaChunk.makeSlice(Hammer.fzds_command_channel, lower, upper, new AreaMap() {
                     @Override
@@ -456,8 +461,8 @@ public class FZDSCommand extends CommandBase {
                                 }
                             }
                         }
-                    }});
-                dse.permit(Caps.ROTATE);
+                    }}, !copy);
+                dse.permit(Caps.ROTATE).forbid(Caps.COLLIDE);
                 dse.worldObj.spawnEntityInWorld(dse);
                 setSelection(dse);
             }}, Requires.COORD);
@@ -466,9 +471,19 @@ public class FZDSCommand extends CommandBase {
             String details() { return "Returns a Slice's blocks to the world, destroying the Slice"; }
             @Override
             void call(String[] args) {
-                selected.dropContents();
+                DeltaChunk.paste(selected, true);
+                DeltaChunk.clear(selected);
+                selected.setDead();
                 setSelection(null);
             }}, Requires.SELECTION);
+        add(new SubCommand("paste") {
+            @Override
+            String details() { return "Clones a Slice's blocks into the world"; }
+            @Override
+            void call(String[] args) {
+                DeltaChunk.paste(selected, true);
+            }}, Requires.SELECTION, Requires.CREATIVE);
+        
         add(new SubCommand("grass") {
             @Override
             String details() { return "Places a grass block at the user's feet"; }
@@ -577,17 +592,6 @@ public class FZDSCommand extends CommandBase {
                 setSelection(null);
                 sender.sendChatToPlayer("Made dead");
             }}, Requires.SELECTION);
-        add(new SubCommand("force_cell_allocation_count", "newCount") {
-            @Override
-            String details() { return "[Debug command; sets how many %CELLS have been used]"; }
-            @Override
-            void call(String[] args) {
-                if (args.length != 1) {
-                    throw new SyntaxErrorException();
-                }
-                int newCount = Integer.parseInt(args[0]);
-                Hammer.instance.hammerInfo.setAllocationCount(Hammer.fzds_command_channel, newCount);
-            }}, Requires.OP);
         add(new SubCommand("sr|sw", "angle°", "[direction=UP]") {
             @Override
             String details() { return "Sets the Slice's rotation"; }
@@ -739,6 +743,24 @@ public class FZDSCommand extends CommandBase {
                     }
                 }
             }}, Requires.SELECTION, Requires.OP);
+        add(new SubCommand("scale", "newscale") {
+            @Override
+            void call(String[] args) {
+                if (!selected.can(Caps.SCALE)) {
+                    sender.sendChatToPlayer("Selection doesn't have the SCALE cap");
+                    return;
+                }
+                ((DimensionSliceEntity) selected).scale = Float.parseFloat(args[0]);
+            }}, Requires.SELECTION, Requires.CREATIVE);
+        add(new SubCommand("alpha", "newOpacity") {
+            @Override
+            void call(String[] args) {
+                if (!selected.can(Caps.TRANSPARENT)) {
+                    sender.sendChatToPlayer("Selection doesn't have the TRANSPARENT cap");
+                    return;
+                }
+                ((DimensionSliceEntity) selected).opacity = Float.parseFloat(args[0]);
+            }}, Requires.SELECTION, Requires.CREATIVE);
     }
 
 }

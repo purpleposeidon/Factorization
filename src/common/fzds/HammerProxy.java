@@ -3,6 +3,7 @@ package factorization.fzds;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.NetHandler;
 import net.minecraft.network.packet.Packet1Login;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
 public class HammerProxy {
@@ -32,4 +33,6 @@ public class HammerProxy {
     void registerStuff() { }
     
     void updateRayPosition(DseRayTarget ray) { }
+    
+    MovingObjectPosition getShadowHit() { return null; }
 }

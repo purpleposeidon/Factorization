@@ -21,6 +21,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     static final int maxDepth = 24; //XXX TODO
     private short beamDepths[] = new short[(diameter + 1) * (diameter + 1)];
     private Updater updater = new InitialBuild();
+    static boolean isUpdating = false;
 
     static int update_count;
     static final int update_limit = 64;
@@ -55,6 +56,9 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     }
 
     static void doAirCheck(World w, int x, int y, int z) {
+        if (w.isRemote) {
+            return;
+        }
         if (update_count > update_limit) {
             airToUpdate.add(new Coord(w, x, y, z));
             return;
@@ -133,7 +137,9 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     @Override
     public void updateEntity() {
         Core.profileStart("WrathLamp");
+        isUpdating = true;
         this.updater = this.updater.update();
+        isUpdating = false;
         Core.profileEnd();
     }
 
@@ -319,6 +325,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
             if (!(this.next_updater instanceof InitialBuild)) {
                 this.next_updater = new InitialBuild();
             }
+            start_height++;
             next_updater.start_height = Math.max(start_height, next_updater.start_height);
             return this;
         }
@@ -370,12 +377,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         public void onUpdate() {
             delay -= 1;
             if (delay == 0) {
-                factorization.api.Coord here = new factorization.api.Coord(this);
-                factorization.api.Coord a, b;
                 int r = radius + 15;
-                //				a = here.copy().add(-r, -r, -r);
-                //				b = here.copy().add(r, r, r);
-                //				worldObj.markBlocksDirty(a.x, a.y, a.z, b.x, b.y, b.z);
                 for (int x = (int) (posX - r); x <= posX + r; x++) {
                     for (int z = (int) (posZ - r); z <= posZ + r; z++) {
                         for (int y = (int) posY; y >= posY - maxDepth; y--) {

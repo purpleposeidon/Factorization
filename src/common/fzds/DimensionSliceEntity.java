@@ -56,6 +56,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     private Quaternion last_shared_rotation = new Quaternion(), last_shared_rotational_velocity = new Quaternion(); //used on the server
     Quaternion prevTickRotation = new Quaternion(); //Client-side
     
+    float scale = 1;
+    float opacity = 1;
+    
     Object renderInfo = null; //Client-side
     
     PacketProxyingPlayer proxy = null;
@@ -615,6 +618,12 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         data.writeFloat((float) centerOffset.zCoord);
         hammerCell.writeToStream(data);
         farCorner.writeToStream(data);
+        if (can(Caps.SCALE)) {
+            data.writeFloat(scale);
+        }
+        if (can(Caps.TRANSPARENT)) {
+            data.writeFloat(opacity);
+        }
     }
 
     @Override
@@ -632,6 +641,12 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             hammerCell.readFromStream(data);
             farCorner = hammerCell.copy();
             farCorner.readFromStream(data);
+            if (can(Caps.SCALE)) {
+                scale = data.readFloat();
+            }
+            if (can(Caps.TRANSPARENT)) {
+                opacity = data.readFloat();
+            }
         } catch (IOException e) {
             //Not expected to happen ever
             e.printStackTrace();
@@ -650,39 +665,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     public void addVelocity(double par1, double par3, double par5) {
         super.addVelocity(par1, par3, par5);
         isAirBorne = false; //If this is true, we get packet spam
-    }
-    
-    public void dropContents() {
-        Coord a = new Coord(DeltaChunk.getServerShadowWorld(), 0, 0, 0);
-        Coord b = a.copy();
-        Vec3 vShadowMin = FactorizationUtil.getMin(shadowArea);
-        Vec3 vShadowMax = FactorizationUtil.getMax(shadowArea);
-        a.set(vShadowMin);
-        b.set(vShadowMax);
-        DeltaCoord dc = b.difference(a);
-        Coord dest = new Coord(this);
-        Coord c = new Coord(a.w, 0, 0, 0);
-        
-        for (int x = a.x; x < b.x; x++) {
-            for (int y = a.y; y < b.y; y++) {
-                for (int z = a.z; z < b.z; z++) {
-                    c.set(a.w, x, y, z);
-                    dest.set(c);
-                    shadow2real(dest);
-                    TransferLib.move(c, dest);
-                }
-            }
-        }
-        for (int x = a.x; x < b.x; x++) {
-            for (int y = a.y; y < b.y; y++) {
-                for (int z = a.z; z < b.z; z++) {
-                    c.set(a.w, x, y, z);
-                    shadow2real(c);
-                    c.markBlockForUpdate();
-                }
-            }
-        }
-        setDead();
     }
     
     public boolean can(Caps cap) {

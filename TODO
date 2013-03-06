@@ -88,6 +88,7 @@ Good mining tools
 Placing/breaking wrath lamp in hammerspace seems to cause the client to crap its pants
 Don't keep non-weak references to worlds ("MapMaker.weakKeys().buildMap()") except in Entity/TileEntity
 RP heating
+register ore blocks
 
 back to ceramics?
 https://github.com/MinecraftForge/MinecraftForge/commit/34ebfcd9785c3c50c3ac743eb1e9cbf000df10dc
