@@ -208,7 +208,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         public ItemStack output;
         public IRecipe theRecipe;
         
-        public RecipeMatchInfo(List<ItemStack> recipeInput, ItemStack recipeOutput, IRecipe theRecipe) {
+        public RecipeMatchInfo(List recipeInput, ItemStack recipeOutput, IRecipe theRecipe) {
             for (Object o : recipeInput) {
                 if (o instanceof ItemStack) {
                     this.inputs.add(((ItemStack)o).copy());
