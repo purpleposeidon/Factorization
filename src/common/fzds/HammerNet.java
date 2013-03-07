@@ -112,7 +112,7 @@ public class HammerNet implements ITinyPacketHandler {
             }
             break;
         default:
-            ((NetServerHandler) handler).kickPlayerFromServer("DeltaChunk: bad click packet");
+            ((NetServerHandler) handler).kickPlayer("DeltaChunk: bad click packet");
             break;
         }
         

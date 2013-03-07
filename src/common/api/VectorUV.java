@@ -8,13 +8,13 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
 public class VectorUV {
-    public float x, y, z, u, v;
+    public double x, y, z, u, v;
     
     public VectorUV() {
         this(0, 0, 0);
     }
 
-    public VectorUV(float x, float y, float z) {
+    public VectorUV(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -22,7 +22,7 @@ public class VectorUV {
         this.v = 0;
     }
 
-    public VectorUV(float x, float y, float z, float u, float v) {
+    public VectorUV(double x, double y, double z, double u, double v) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -34,15 +34,15 @@ public class VectorUV {
         return this.x == other.x && this.y == other.y && this.z == other.z && this.u == other.u && this.v == other.v;
     }
 
-    public void rotate(float a, float b, float c, float argtheta) {
+    public void rotate(double a, double b, double c, double argtheta) {
         //Thanks to http://inside.mines.edu/~gmurray/ArbitraryAxisRotation/
         //Be sure to double-check the signs!
         double theta = Math.toRadians(argtheta);
-        float ox = this.x, oy = this.y, oz = this.z;
+        double ox = this.x, oy = this.y, oz = this.z;
 
-        float cos_theta = (float) Math.cos(theta);
-        float sin_theta = (float) Math.sin(theta);
-        float product = (a * ox + b * oy + c * oz) * (1 - cos_theta);
+        double cos_theta = (double) Math.cos(theta);
+        double sin_theta = (double) Math.sin(theta);
+        double product = (a * ox + b * oy + c * oz) * (1 - cos_theta);
         this.x = a * product + ox * cos_theta + (-c * oy + b * oz) * sin_theta;
         this.y = b * product + oy * cos_theta + (+c * ox - a * oz) * sin_theta;
         this.z = c * product + oz * cos_theta + (-b * ox + a * oy) * sin_theta;
@@ -60,7 +60,7 @@ public class VectorUV {
         return new VectorUV(x - o.x, y - o.y, z - o.z, u, v);
     }
 
-    public void scale(float d) {
+    public void scale(double d) {
         x *= d;
         y *= d;
         z *= d;
@@ -86,15 +86,15 @@ public class VectorUV {
     }
     
     public void writeToTag(NBTTagCompound tag, String prefix) {
-        tag.setFloat(prefix + "x", x);
-        tag.setFloat(prefix + "y", y);
-        tag.setFloat(prefix + "z", z);
+        tag.setFloat(prefix + "x", (float) x);
+        tag.setFloat(prefix + "y", (float) y);
+        tag.setFloat(prefix + "z", (float) z);
     }
     
     public static VectorUV readFromTag(NBTTagCompound tag, String prefix) {
-        float x = tag.getFloat(prefix+"x");
-        float y = tag.getFloat(prefix+"y");
-        float z = tag.getFloat(prefix+"z");
+        double x = tag.getFloat(prefix+"x");
+        double y = tag.getFloat(prefix+"y");
+        double z = tag.getFloat(prefix+"z");
         return new VectorUV(x, y, z);
     }
     
@@ -103,13 +103,13 @@ public class VectorUV {
     }
     
     public void addInfoToArray(ArrayList<Object> args) {
-        args.add(x);
-        args.add(y);
-        args.add(z);
+        args.add((float)x);
+        args.add((float)y);
+        args.add((float)z);
     }
     
 
-    public float get(int axis) {
+    public double get(int axis) {
         switch (axis) {
         case 0: return x;
         case 1: return y;

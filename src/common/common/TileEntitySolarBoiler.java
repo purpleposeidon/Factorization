@@ -20,8 +20,10 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     public static LiquidStack steam_stack = null;
     
     public static void setupSteam() {
-        water_stack = LiquidDictionary.getOrCreateLiquid("Water", new LiquidStack(Block.waterStill, 0));
-        steam_stack = LiquidDictionary.getOrCreateLiquid("Steam", new LiquidStack(Core.registry.fz_steam, 0));
+        if (water_stack == null) {
+            water_stack = LiquidDictionary.getOrCreateLiquid("Water", new LiquidStack(Block.waterStill, 0));
+            steam_stack = LiquidDictionary.getOrCreateLiquid("Steam", new LiquidStack(Core.registry.fz_steam, 0));
+        }
     }
     
     LiquidTank waterTank = new LiquidTank(water_stack.copy(), 1000*8, this);

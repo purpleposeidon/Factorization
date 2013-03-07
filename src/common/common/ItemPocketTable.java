@@ -18,7 +18,7 @@ public class ItemPocketTable extends Item {
         setMaxStackSize(1);
         Core.tab(this, TabType.TOOLS);
         setFull3D();
-        setItemName("factorization.tool.pocket_crafting_table");
+        setUnlocalizedName("factorization.tool.pocket_crafting_table");
     }
 
     //
@@ -58,17 +58,7 @@ public class ItemPocketTable extends Item {
         }
         return stack;
     }
-
-    @Override
-    public String getItemName() {
-        return "Pocket Crafting Table";
-    }
-
-    @Override
-    public String getItemNameIS(ItemStack par1ItemStack) {
-        return getItemName();
-    }
-
+    
     public ItemStack findPocket(EntityPlayer player) {
         InventoryPlayer inv = player.inventory;
         for (int i = 0; i < inv.getSizeInventory(); i++) {

@@ -52,7 +52,7 @@ public class ContainerFactorization extends Container {
             }
             if (allowed != null) {
                 for (int a : allowed) {
-                    if (itemstack.getItem().shiftedIndex == a) {
+                    if (itemstack.getItem().itemID == a) {
                         return true;
                     }
                 }
@@ -60,7 +60,7 @@ public class ContainerFactorization extends Container {
             }
             if (forbidden != null) {
                 for (int f : forbidden) {
-                    if (itemstack.getItem().shiftedIndex == f) {
+                    if (itemstack.getItem().itemID == f) {
                         return false;
                     }
                 }
@@ -99,11 +99,11 @@ public class ContainerFactorization extends Container {
             break;
         case MAKER:
             TileEntityMaker maker = (TileEntityMaker) ent;
-            int[] ic = { Core.registry.item_craft.shiftedIndex };
+            int[] ic = { Core.registry.item_craft.itemID };
             // input: No item_craft allowed!
             addSlotToContainer(new FactorySlot(maker, 0, 51, 19, null, ic));
-            int[] paper = { Item.paper.shiftedIndex };
-            int[] packet = { Core.registry.item_craft.shiftedIndex };
+            int[] paper = { Item.paper.itemID };
+            int[] packet = { Core.registry.item_craft.itemID };
             // paper: Must be paper
             addSlotToContainer(new FactorySlot(maker, 1, 42, 55, paper, null));
             // craft: Must be a craft packet

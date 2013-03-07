@@ -147,7 +147,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     HashSet<Integer> added_ids = new HashSet();
 
     public int itemID(String name, int default_id) {
-        int id = Integer.parseInt(Core.config.getItem("item", name, default_id).value);
+        int id = Core.config.getItem("item", name, default_id).getInt();
         if (added_ids.contains(default_id)) {
             throw new RuntimeException("Default ID already used: " + default_id);
         }
@@ -172,25 +172,25 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         Core.instance.tab(resource_block, TabType.MATERIALS);
 
         //BlockFactorization stuff
-        router_item = FactoryType.ROUTER.itemStack("Router");
-        barrel_item = FactoryType.BARREL.itemStack("Barrel");
-        maker_item = FactoryType.MAKER.itemStack("Craftpacket Maker");
-        stamper_item = FactoryType.STAMPER.itemStack("Craftpacket Stamper");
-        lamp_item = FactoryType.LAMP.itemStack("Wrathlamp");
-        packager_item = FactoryType.PACKAGER.itemStack("Packager");
-        slagfurnace_item = FactoryType.SLAGFURNACE.itemStack("Slag Furnace");
-        battery_item_hidden = FactoryType.BATTERY.itemStack("Battery Block");
-        solar_turbine_item = FactoryType.SOLARTURBINE.itemStack("Solar Turbine");
-        steamturbine_item = FactoryType.STEAMTURBINE.itemStack("Steam Turbine");
-        solarboiler_item = FactoryType.SOLARBOILER.itemStack("Solar Boiler");
-        heater_item = FactoryType.HEATER.itemStack("Furnace Heater");
-        mirror_item_hidden = FactoryType.MIRROR.itemStack("Reflective Mirror");
-        leadwire_item = FactoryType.LEADWIRE.itemStack("Lead Wire");
-        grinder_item = FactoryType.GRINDER.itemStack("Grinder");
-        mixer_item = FactoryType.MIXER.itemStack("Mixer");
-        crystallizer_item = FactoryType.CRYSTALLIZER.itemStack("Crystallizer");
-        greenware_item = FactoryType.GREENWARE.itemStack("Clay Sculpture");
-        rocket_engine_item_hidden = FactoryType.ROCKETENGINE.itemStack("Rocket Engine");
+        router_item = FactoryType.ROUTER.itemStack();
+        barrel_item = FactoryType.BARREL.itemStack();
+        maker_item = FactoryType.MAKER.itemStack();
+        stamper_item = FactoryType.STAMPER.itemStack();
+        lamp_item = FactoryType.LAMP.itemStack();
+        packager_item = FactoryType.PACKAGER.itemStack();
+        slagfurnace_item = FactoryType.SLAGFURNACE.itemStack();
+        battery_item_hidden = FactoryType.BATTERY.itemStack();
+        solar_turbine_item = FactoryType.SOLARTURBINE.itemStack();
+        steamturbine_item = FactoryType.STEAMTURBINE.itemStack();
+        solarboiler_item = FactoryType.SOLARBOILER.itemStack();
+        heater_item = FactoryType.HEATER.itemStack();
+        mirror_item_hidden = FactoryType.MIRROR.itemStack();
+        leadwire_item = FactoryType.LEADWIRE.itemStack();
+        grinder_item = FactoryType.GRINDER.itemStack();
+        mixer_item = FactoryType.MIXER.itemStack();
+        crystallizer_item = FactoryType.CRYSTALLIZER.itemStack();
+        greenware_item = FactoryType.GREENWARE.itemStack();
+        rocket_engine_item_hidden = FactoryType.ROCKETENGINE.itemStack();
 
         //BlockResource stuff
         silver_ore_item = ResourceType.SILVERORE.itemStack("Silver Ore");
@@ -276,16 +276,16 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //Misc
         pocket_table = new ItemPocketTable(itemID("pocketCraftingTable", 9002));
         fz_steam = new Item(itemID("steam", 9049));
-        fz_steam.setItemName("factorization.charge.steam");
+        fz_steam.setUnlocalizedName("factorization.charge.steam");
         
         //Rocketry
         nether_powder = new ItemCraftingComponent(itemID("netherPowder", 9050), "nether_powder");
         if (Core.enable_dimension_slice) {
             rocket_fuel = new ItemCraftingComponent(itemID("heldRocketFuel", 9051), "powder_rocket_fuel");
             rocket_fuel_liquid_entry = new Item(itemID("liquidRocketFuel", 9052));
-            rocket_fuel.setItemName("factorization.rocket.powder_rocket_fuel");
+            rocket_fuel.setUnlocalizedName("factorization.rocket.powder_rocket_fuel");
             rocket_engine = new ItemBlockProxy(itemID("rocketEngine", 9053), rocket_engine_item_hidden);
-            rocket_engine.setItemName("factorization.rocket.rocket_engine").setMaxStackSize(1);
+            rocket_engine.setUnlocalizedName("factorization.rocket.rocket_engine").setMaxStackSize(1);
             bucket_rocket_fuel = new ItemCraftingComponent(itemID("bucketRocketFuel", 9054), "rocket_fuel_bucket");
             bucket_rocket_fuel.setMaxStackSize(1);
             bucket_rocket_fuel.setContainerItem(Item.bucketEmpty);
@@ -409,7 +409,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         oreRecipe(silver_block_item, "###", "###", "###", '#', "ingotSilver");
         FurnaceRecipes.smelting().addSmelting(resource_block.blockID, 0 /* MD for silver */, new ItemStack(silver_ingot), 0.3F);
         
-        FurnaceRecipes.smelting().addSmelting(Item.bucketWater.shiftedIndex, new ItemStack(Item.bucketEmpty), 0);
+        FurnaceRecipes.smelting().addSmelting(Item.bucketWater.itemID, new ItemStack(Item.bucketEmpty), 0);
 
         //exo armor
         recipe(new ItemStack(exo_chasis),
@@ -796,7 +796,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'M', motor,
                 'L', "ingotLead",
                 'U', Item.cauldron);
-        FurnaceRecipes.smelting().addSmelting(sludge.shiftedIndex, 0, new ItemStack(Item.clay), 0.1F);
+        FurnaceRecipes.smelting().addSmelting(sludge.itemID, 0, new ItemStack(Item.clay), 0.1F);
 //		TileEntityMixer.addRecipe(
 //				new ItemStack[] { new ItemStack(sludge, 1), new ItemStack(Block.dirt), new ItemStack(Item.bucketWater) },
 //				new ItemStack[] { new ItemStack(Item.clay), new ItemStack(Item.bucketEmpty) });

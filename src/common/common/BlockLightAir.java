@@ -29,7 +29,7 @@ public class BlockLightAir extends Block {
         setLightValue(1F);
         setHardness(0.1F);
         setResistance(0.1F);
-        setBlockName("lightair");
+        setUnlocalizedName("lightair");
         if (Core.debug_light_air) {
             float r = 0.1F;
             float b = 0.5F;

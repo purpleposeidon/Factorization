@@ -30,7 +30,7 @@ public class ItemWandOfCooling extends Item {
         Arrays.fill(changeArray, -1);
         remove(Block.fire);
         Core.tab(this, TabType.TOOLS);
-        setItemName("factorization.tool.wand_of_cooling");
+        setUnlocalizedName("factorization.tool.wand_of_cooling");
     }
 
     public void cool(Block src, Block dest) {

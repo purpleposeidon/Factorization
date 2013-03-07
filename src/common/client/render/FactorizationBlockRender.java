@@ -132,7 +132,7 @@ abstract public class FactorizationBlockRender implements ICoord {
     protected void renderNormalBlock(RenderBlocks rb, int md) {
 //		renderPart(rb, Core.registry.factory_block.getBlockTextureFromSideAndMetadata(0, md), 0, 0, 0, 1, 1, 1);
         Block b = Core.registry.factory_rendering_block;
-        rb.setRenderMinMax(0, 0, 0, 1, 1, 1);
+        rb.setRenderBounds(0, 0, 0, 1, 1, 1);
         //b.setBlockBounds(0, 0, 0, 1, 1, 1);
         if (world_mode) {
             rb.renderStandardBlock(b, x, y, z);
@@ -148,7 +148,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         BlockFactorization block = Core.registry.factory_rendering_block;
         Tessellator tessellator = Tessellator.instance;
         //render the outside
-        rb.setRenderMinMax(0, 0, 0, 1, 1, 1);
+        rb.setRenderBounds(0, 0, 0, 1, 1, 1);
         block.setBlockBounds(0, 0, 0, 1, 1, 1);
         if (world_mode) {
             rb.renderStandardBlock(block, x, y, z);
@@ -180,7 +180,7 @@ abstract public class FactorizationBlockRender implements ICoord {
             //We don't need an inventory_mode because it draws both faces
             float d = 2F/16F;
             boolean origAO = rb.enableAO;
-            rb.setRenderMinMax(d, d, d, 1 - d, 1, 1 - d);
+            rb.setRenderBounds(d, d, d, 1 - d, 1, 1 - d);
             block.setBlockBounds(d, d, d, 1 - d, 1 - d, 1 - d);
             rb.enableAO = false;
             rb.renderNorthFace(block, x + 1 - 2*d, y, z, metal);
@@ -189,14 +189,14 @@ abstract public class FactorizationBlockRender implements ICoord {
             rb.renderWestFace(block, x, y, z - 1 + 2*d, metal);
             rb.renderTopFace(block, x, y - 1 + 1*d, z, metal);
             rb.enableAO = origAO;
-            rb.setRenderMinMax(0, 0, 0, 1, 1, 1);
+            rb.setRenderBounds(0, 0, 0, 1, 1, 1);
             block.setBlockBounds(0, 0, 0, 1, 1, 1);
         }
     }
     
     protected void renderPart(RenderBlocks rb, Icon texture, float b1, float b2, float b3, float b4, float b5, float b6) {
         BlockFactorization block = Core.registry.factory_rendering_block;
-        rb.setRenderMinMax(b1, b2, b3, b4, b5, b6);
+        rb.setRenderBounds(b1, b2, b3, b4, b5, b6);
         block.setBlockBounds(b1, b2, b3, b4, b5, b6);
         if (world_mode) {
             BlockFactorization.force_texture = texture;
@@ -206,7 +206,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         else {
             renderPartInvTexture(rb, block, texture);
         }
-        rb.setRenderMinMax(0, 0, 0, 1, 1, 1);
+        rb.setRenderBounds(0, 0, 0, 1, 1, 1);
         block.setBlockBounds(0, 0, 0, 1, 1, 1);
     }
 
@@ -525,10 +525,10 @@ abstract public class FactorizationBlockRender implements ICoord {
         Minecraft.getMinecraft().renderEngine.bindTextureFile("/gui/items.png");
 
         Tessellator tessellator = Tessellator.instance;
-        float f = icon.func_94209_e();
-        float f1 = icon.func_94212_f();
-        float f2 = icon.func_94206_g();
-        float f3 = icon.func_94210_h();
+        float f = icon.getU1();
+        float f1 = icon.getU2();
+        float f2 = icon.getV1();
+        float f3 = icon.getV2();
         float f4 = 0.0F;
         float f5 = 0.3F;
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
@@ -538,7 +538,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         GL11.glRotatef(50.0F, 0.0F, 1.0F, 0.0F);
         GL11.glRotatef(335.0F, 0.0F, 0.0F, 1.0F);
         GL11.glTranslatef(-0.9375F, -0.0625F, 0.0F);
-        ItemRenderer.renderItemIn2D(tessellator, f1, f2, f, f3, icon.func_94213_j(), icon.func_94208_k(), 0.0625F);
+        ItemRenderer.renderItemIn2D(tessellator, f1, f2, f, f3, icon.getWidth(), icon.getHeight(), 0.0625F);
     }
 
     void renderMotor(RenderBlocks rb, float yoffset) {

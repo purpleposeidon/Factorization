@@ -214,16 +214,6 @@ public class ItemCraft extends Item {
         return ret;
     }
 
-    @Override
-    public String getItemNameIS(ItemStack itemstack) {
-        return "Craftpacket";
-    }
-
-    @Override
-    public String getItemName() {
-        return "Craftpacket";
-    }
-
     public boolean isValidCraft(ItemStack is) {
         return is.getItemDamage() != 0;
     }

@@ -211,7 +211,7 @@ public class BlockFactorization extends BlockContainer {
         if (ft == null) {
             return error_icon;
         }
-        return ft.representative.getIcon(ForgeDirection.getOrientation(side));
+        return ft.getRepresentative().getIcon(ForgeDirection.getOrientation(side));
     }
     
     @Override

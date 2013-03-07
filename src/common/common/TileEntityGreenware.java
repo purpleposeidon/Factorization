@@ -238,8 +238,8 @@ public class TileEntityGreenware extends TileEntityCommon {
         if (held == null) {
             return false;
         }
-        int heldId = held.getItem().shiftedIndex;
-        if (heldId == Item.bucketWater.shiftedIndex && getState() == ClayState.DRY) {
+        int heldId = held.getItem().itemID;
+        if (heldId == Item.bucketWater.itemID && getState() == ClayState.DRY) {
             lastTouched = 0;
             if (player.capabilities.isCreativeMode) {
                 return true;
@@ -369,9 +369,9 @@ public class TileEntityGreenware extends TileEntityCommon {
             if (item == null) {
                 return true;
             }
-            int id = item.shiftedIndex;
+            int id = item.itemID;
             if (is.getItem() == Item.bucketWater && getState() == ClayState.DRY) {
-                is.itemID = Item.bucketWater.shiftedIndex;
+                is.itemID = Item.bucketWater.itemID;
                 lastTouched = 0;
             }
             if (id == Block.cloth.blockID) {

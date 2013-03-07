@@ -19,7 +19,7 @@ public class ItemChargeMeter extends Item {
 
     protected ItemChargeMeter(int par1) {
         super(par1);
-        setItemName("factorization.tool.charge_meter");
+        setUnlocalizedName("factorization.tool.charge_meter");
         Core.tab(this, TabType.REDSTONE);
     }
     

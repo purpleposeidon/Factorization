@@ -242,7 +242,7 @@ public class FZDSCommand extends CommandBase {
                 if (!cmd.op) {
                     throw new CommandException("You are not allowed to use arbitrary players");
                 }
-                cmd.player = MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(a.substring(1));
+                cmd.player = MinecraftServer.getServer().getConfigurationManager().getPlayerEntity(a.substring(1));
                 if (cmd.player == null) {
                     throw new CommandException("Player not found");
                 } 

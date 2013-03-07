@@ -1,17 +1,22 @@
 package factorization.client.render;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.client.renderer.entity.RenderBlaze;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 
 import org.lwjgl.opengl.GL11;
 
 import factorization.common.Core;
+import factorization.common.RenderingCube;
 import factorization.common.TileEntityHeater;
 
 public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
+    static RenderBlocks rb = new RenderBlocks();
     ModelElement element = new ModelElement();
 
     class ModelElement extends ModelBase {
@@ -31,7 +36,6 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
 
     @Override
     public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
-        Core.profileStartRender("heater");
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glPushMatrix();
         this.bindTextureByName(Core.texture_file_block);
@@ -49,7 +53,6 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
         GL11.glPopMatrix();
         GL11.glColor4f(1, 1, 1, 1);
         GL11.glEnable(GL11.GL_LIGHTING);
-        Core.profileEndRender();
     }
 
 }

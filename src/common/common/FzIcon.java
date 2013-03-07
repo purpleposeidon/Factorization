@@ -41,58 +41,58 @@ public class FzIcon implements Icon {
     }
 
     @Override
-    public int func_94211_a() {
-        return under.func_94211_a();
+    public int getOffsetX() {
+        return under.getOffsetX();
     }
 
     @Override
-    public int func_94216_b() {
-        return under.func_94216_b();
+    public int getOffsetY() {
+        return under.getOffsetY();
     }
 
     @Override
-    public float func_94209_e() {
-        return under.func_94209_e();
+    public float getU1() {
+        return under.getU1();
     }
 
     @Override
-    public float func_94212_f() {
-        return under.func_94212_f();
+    public float getU2() {
+        return under.getU2();
     }
 
     @Override
-    public float func_94214_a(double d0) {
-        return under.func_94214_a(d0);
+    public float interpolateU(double d0) {
+        return under.interpolateU(d0);
     }
 
     @Override
-    public float func_94206_g() {
-        return under.func_94206_g();
+    public float getV1() {
+        return under.getV1();
     }
 
     @Override
-    public float func_94210_h() {
-        return under.func_94210_h();
+    public float getV2() {
+        return under.getV2();
     }
 
     @Override
-    public float func_94207_b(double d0) {
-        return under.func_94207_b(d0);
+    public float interpolateV(double d0) {
+        return under.interpolateV(d0);
     }
 
     @Override
-    public String func_94215_i() {
-        return under.func_94215_i();
+    public String getName() {
+        return under.getName();
     }
 
     @Override
-    public int func_94213_j() {
-        return under.func_94213_j();
+    public int getWidth() {
+        return under.getWidth();
     }
 
     @Override
-    public int func_94208_k() {
-        return func_94208_k();
+    public int getHeight() {
+        return getHeight();
     }
     
     //java = teh best0rxxz!

@@ -13,8 +13,8 @@ public class ContainerSlagFurnace extends ContainerFactorization {
     }
 
     @Override
-    public void updateCraftingResults() {
-        super.updateCraftingResults();
+    public void detectAndSendChanges() {
+        super.detectAndSendChanges();
         //		System.out.println(crafters.size());
         for (ICrafting crafter : (Iterable<ICrafting>) crafters) {
             if (furnace.furnaceBurnTime != lastBurnTime) {

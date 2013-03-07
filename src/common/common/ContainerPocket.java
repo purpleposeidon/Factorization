@@ -59,7 +59,7 @@ public class ContainerPocket extends ContainerWorkbench {
         slotCrafting = new RedirectedSlotCrafting(player, this.craftMatrix, this.craftResult, 0,
                 205 + 3, 25 + 3);
         this.addSlotToContainer(slotCrafting);
-        updateCraftingResults();
+        detectAndSendChanges();
         updateCraft();
     }
 
@@ -163,7 +163,7 @@ public class ContainerPocket extends ContainerWorkbench {
         }
         
         @Override
-        public boolean canStickItemInSlot(int i, ItemStack itemstack) {
+        public boolean acceptsStackInSlot(int i, ItemStack itemstack) {
             return true;
         }
     }

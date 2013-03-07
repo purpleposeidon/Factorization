@@ -46,7 +46,18 @@ public enum FactoryType {
     final public boolean hasGui;
     final private Class clazz;
     final public String te_id;
-    final public TileEntityCommon representative;
+    private TileEntityCommon representative;
+
+    public TileEntityCommon getRepresentative() {
+        if (representative == null) {
+            try {
+                representative = ((Class<? extends TileEntityCommon>)clazz).newInstance();
+            } catch (Throwable e) {
+                throw new IllegalArgumentException(e);
+            }
+        }
+        return representative;
+    }
 
     static class mapper {
         //bluh java
@@ -66,13 +77,6 @@ public enum FactoryType {
         this.clazz = clazz;
         this.te_id = name;
         TileEntityCommon rep = null;
-        if (TileEntityCommon.class.isAssignableFrom(clazz)) {
-            try {
-                rep = ((Class<? extends TileEntityCommon>)clazz).newInstance();
-            } catch (Throwable e) {
-                throw new IllegalArgumentException(e);
-            }
-        }
         representative = rep;
     }
 
@@ -114,7 +118,7 @@ public enum FactoryType {
         return mapper.mapping[md];
     }
 
-    ItemStack itemStack(String name) {
+    ItemStack itemStack() {
         ItemStack ret = new ItemStack(Core.registry.item_factorization, 1, this.md);
         return ret;
     }

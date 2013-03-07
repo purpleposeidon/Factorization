@@ -17,7 +17,7 @@ public class ItemAcidBottle extends Item {
         super(id);
         Core.tab(this, TabType.MISC);
         setMaxStackSize(16);
-        setItemName("factorization.item.acid");
+        setUnlocalizedName("factorization.item.acid");
     }
     
     @Override
@@ -42,8 +42,8 @@ public class ItemAcidBottle extends Item {
     }
     
     @Override
-    public String getItemNameIS(ItemStack stack) {
-        String name = super.getItemNameIS(stack);
+    public String getUnlocalizedName(ItemStack stack) {
+        String name = super.getUnlocalizedName(stack);
         if (stack.getItemDamage() > 0) {
             name += ".regia";
         }

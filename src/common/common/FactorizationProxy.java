@@ -105,9 +105,9 @@ public abstract class FactorizationProxy implements IGuiHandler {
         if (is == null) {
             return "<null itemstack; bug?>";
         }
-        String n = is.getItem().getItemNameIS(is);
+        String n = is.getItem().getLocalizedName(is);
         if (n == null) {
-            n = is.getItem().getItemName();
+            n = is.getItem().getUnlocalizedName();
         }
         if (n == null) {
             n = is.getItemName();

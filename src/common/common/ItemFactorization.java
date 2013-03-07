@@ -64,18 +64,12 @@ public class ItemFactorization extends ItemBlock {
         return 15;
         //return i;
     }
-
+    
     @Override
-    public String getItemNameIS(ItemStack itemstack) {
-        //XXX I think this is actually supposed to return localization IDs like "factory.whatever"
-        // I don't think this actually gets called...
-        int md = itemstack.getItemDamage();
-        return "item.factoryBlock" + md;
-    }
-
-    @Override
-    public String getItemName() {
-        return "ItemFactorization";
+    public String getUnlocalizedName(ItemStack is) {
+        int md = is.getItemDamage();
+        FactoryType ft = FactoryType.fromMd(md);
+        return "factorization.factoryBlock." + ft;
     }
 
     @Override

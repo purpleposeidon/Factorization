@@ -16,16 +16,16 @@ public class ItemBlockResource extends ItemBlock {
     public int getMetadata(int i) {
         return i;
     }
-
+    
     @Override
-    public String getItemNameIS(ItemStack itemstack) {
+    public String getUnlocalizedName(ItemStack itemstack) {
         // I don't think this actually gets called...
         int md = itemstack.getItemDamage();
         if (md < ResourceType.values().length && md >= 0) {
             ResourceType rs = ResourceType.values()[md];
-            return getItemName() + "." + rs;
+            return getUnlocalizedName() + "." + rs;
         } 
-        return getItemName() + ".unknownMd" + md;
+        return getUnlocalizedName() + ".unknownMd" + md;
     }
     
     @Override

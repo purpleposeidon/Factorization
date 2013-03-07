@@ -26,7 +26,7 @@ public class ExoWallJump extends Item implements IExoUpgrade, ITickHandler {
 
     protected ExoWallJump(int par1) {
         super(par1);
-        setItemName("factorization.exo.wallJump");
+        setUnlocalizedName("factorization.exo.wallJump");
         Core.tab(this, TabType.MISC);
         setMaxStackSize(1);
         TickRegistry.registerTickHandler(this, Side.CLIENT);

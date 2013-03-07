@@ -341,8 +341,8 @@ public class FactorizationUtil {
         public void closeChest() {}
         
         @Override
-        public boolean canStickItemInSlot(int i, ItemStack itemstack) {
-            return isi.canStickItemInSlot(i, itemstack);
+        public boolean acceptsStackInSlot(int i, ItemStack itemstack) {
+            return isi.acceptsStackInSlot(i, itemstack);
         }
         
         @Override

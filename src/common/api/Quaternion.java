@@ -286,6 +286,17 @@ public class Quaternion {
         p.zCoord = trans.z;
     }
     
+    private static Vec3 uvCache = Vec3.createVectorHelper(0, 0, 0);
+    public void applyRotation(VectorUV vec) {
+        uvCache.xCoord = vec.x;
+        uvCache.yCoord = vec.y;
+        uvCache.zCoord = vec.z;
+        applyRotation(uvCache);
+        vec.x = uvCache.xCoord;
+        vec.y = uvCache.yCoord;
+        vec.z = uvCache.zCoord;
+    }
+    
     //Other math forms
     public double distance(Quaternion other) {
         return add(other).magnitude();

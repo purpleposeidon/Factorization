@@ -23,7 +23,7 @@ public class BlockResource extends Block {
     protected BlockResource(int id) {
         super(id, Material.rock);
         setHardness(2.0F);
-        setBlockName("factorizationResourceBlock");
+        setUnlocalizedName("factorizationResourceBlock");
     }
     
     @Override

@@ -19,7 +19,7 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     //3 States: Empty. Enough for 1 magnet. Enough for 2 magnets.
     public ItemBattery(int id) {
         super(id, Core.registry.battery_item_hidden);
-        setItemName("factorization_battery");
+        setUnlocalizedName("factorization_battery");
         setMaxStackSize(1);
         setMaxDamage(0); //'2' is not the number for this.
         setNoRepair();

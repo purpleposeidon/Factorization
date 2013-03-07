@@ -399,9 +399,9 @@ public class Core {
     }
     
     public static String getProperKey(ItemStack is) {
-        String n = is.getItem().getItemNameIS(is);
+        String n = is.getItem().getUnlocalizedName(is);
         if (n == null || n.length() == 0) {
-            n = is.getItem().getItemName();
+            n = is.getItem().getUnlocalizedName();
         }
         if (n == null || n.length() == 0) {
             n = is.getItemName();
@@ -447,7 +447,7 @@ public class Core {
         if (i == null) {
             return "<null item; bug?>";
         }
-        return i.getItemName() + ".name";
+        return i.getUnlocalizedName() + ".name";
     }
     
     @SideOnly(Side.CLIENT)
@@ -459,6 +459,6 @@ public class Core {
         } else {
             throw new IllegalArgumentException("Name doesn't start with 'factorization.' or 'factorization/'");
         }
-        return reg.getIcon(texture_dir + name + ".png");
+        return reg.makeIcon(texture_dir + name + ".png");
     }
 }

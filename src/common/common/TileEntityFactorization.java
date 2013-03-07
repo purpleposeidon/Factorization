@@ -242,7 +242,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }
     
     @Override
-    public boolean canStickItemInSlot(int i, ItemStack itemstack) {
+    public boolean acceptsStackInSlot(int i, ItemStack itemstack) {
         return true;
     }
     

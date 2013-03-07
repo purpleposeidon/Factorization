@@ -14,7 +14,7 @@ public class ItemCraftingComponent extends Item {
 
     public ItemCraftingComponent(int id, String name) {
         super(id);
-        setItemName("factorization.item." + name);
+        setUnlocalizedName("factorization.item." + name);
         Core.tab(this, TabType.MATERIALS);
         texture_name = "factroziation/texture/" + name;
     }

@@ -28,7 +28,7 @@ public class ExoArmor extends ItemArmor
     public ExoArmor(int par1, int armorType) {
         super(par1, EnumArmorMaterial.CHAIN, 0, armorType);
         setMaxDamage(0); //never break!
-        setItemName("item.exoArmor" + armorType);
+        setUnlocalizedName("item.exoArmor" + armorType);
     }
 
     //exo features

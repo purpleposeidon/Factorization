@@ -23,7 +23,7 @@ public class ItemAngularSaw extends Item {
     public ItemAngularSaw(int itemID) {
         super(itemID);
         setMaxDamage(0); //used to be 64
-        setItemName("angular_saw");
+        setUnlocalizedName("angular_saw");
         Core.tab(this, TabType.TOOLS);
         setMaxStackSize(1);
         setFull3D();

@@ -21,7 +21,7 @@ public class ItemMachineUpgrade extends Item {
         this.upgradeId = upgradeId;
         this.name = name;
         this.type = type;
-        setItemName(this.name);
+        setUnlocalizedName(this.name);
         setMaxStackSize(16);
         Core.tab(this, TabType.MISC);
     }

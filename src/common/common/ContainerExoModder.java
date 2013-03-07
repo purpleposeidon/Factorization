@@ -115,7 +115,7 @@ public class ContainerExoModder extends Container {
         }
 
         @Override
-        public boolean canStickItemInSlot(int i, ItemStack itemstack) {
+        public boolean acceptsStackInSlot(int i, ItemStack itemstack) {
             return true; //bluh. Whatever, we have slots.
         }
 

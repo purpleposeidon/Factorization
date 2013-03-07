@@ -27,7 +27,7 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
         super(id);
         setMaxStackSize(1);
         Core.tab(this, TabType.TOOLS);
-        setItemName("factorization.tool.bag_of_holding");
+        setUnlocalizedName("factorization.tool.bag_of_holding");
     }
 
     final String pearlcount = "pearlcount";
@@ -188,17 +188,6 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
             }
             writeRow(is, items, row);
         }
-    }
-
-    @Override
-    public String getItemName() {
-        //XXX Bluh localization plz2fix
-        return "Bag of Holding";
-    }
-
-    @Override
-    public String getItemNameIS(ItemStack par1ItemStack) {
-        return getItemName();
     }
 
     @Override

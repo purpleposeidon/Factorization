@@ -521,7 +521,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }
         new BlockRenderEmpty(FactoryType.EXTENDED);
 
-        MinecraftForgeClient.registerItemRenderer(Core.registry.battery.shiftedIndex, new BatteryItemRender(renderBattery));
+        MinecraftForgeClient.registerItemRenderer(Core.registry.battery.itemID, new BatteryItemRender(renderBattery));
         MinecraftForge.EVENT_BUS.register(new FactorizationNotify());
         
         if (Minecraft.getMinecraft().session.username.equals("neptunepink")) {
