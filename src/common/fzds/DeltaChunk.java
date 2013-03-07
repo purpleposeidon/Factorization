@@ -137,9 +137,9 @@ public class DeltaChunk {
         Coord dest = new Coord(selected);
         Coord c = new Coord(a.w, 0, 0, 0);
         
-        for (int x = a.x; x < b.x; x++) {
-            for (int y = a.y; y < b.y; y++) {
-                for (int z = a.z; z < b.z; z++) {
+        for (int x = a.x; x <= b.x; x++) {
+            for (int y = a.y; y <= b.y; y++) {
+                for (int z = a.z; z <= b.z; z++) {
                     c.set(a.w, x, y, z);
                     dest.set(c);
                     selected.shadow2real(dest);

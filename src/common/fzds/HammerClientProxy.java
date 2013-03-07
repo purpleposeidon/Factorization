@@ -352,7 +352,7 @@ public class HammerClientProxy extends HammerProxy {
     
     @Override
     public void clientInit() {
-        Packet.addIdClassMapping(220, true /* client side */, false /* server side */, Packet220FzdsWrap.class);
+        
     }
     
     MovingObjectPosition shadowSelected = null;
