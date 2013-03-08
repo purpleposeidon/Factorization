@@ -126,6 +126,10 @@ public class TileEntityMirror extends TileEntityCommon {
         if (reflection_target == null) {
             return;
         }
+        reflection_target.w = worldObj;
+        if (worldObj == null) {
+            return;
+        }
         IReflectionTarget target = reflection_target.getTE(IReflectionTarget.class);
         if (target == null) {
             return;
