@@ -8,7 +8,8 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.client.settings.GameSettings;
+import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatFileWriter;
@@ -17,6 +18,7 @@ import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
 import cpw.mods.fml.common.IScheduledTickHandler;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.registry.TickRegistry;
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import factorization.common.Core;
 
@@ -78,6 +80,27 @@ public class MiscClientProxy extends MiscProxy {
             player.sendChatMessage("/me is at " + ((int) player.posX) + ", " + ((int) player.posY) + ", " + ((int) player.posZ));
         } else if (n.equalsIgnoreCase("saveoptions") || n.equalsIgnoreCase("savesettings") || n.equalsIgnoreCase("so") || n.equalsIgnoreCase("ss")) {
             mc.gameSettings.saveOptions();
+        } else if (n.equalsIgnoreCase("render_above") || n.equalsIgnoreCase("render_everything_lagfest")) {
+            Object wr_list = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, 5);
+            if (!(wr_list instanceof WorldRenderer[])) {
+                mc.thePlayer.addChatMessage("Reflection failed");
+                return;
+            }
+            boolean lagfest = n.equalsIgnoreCase("render_everything_lagfest");
+            WorldRenderer[] lizt = (WorldRenderer[]) wr_list;
+            int did = 0;
+            int total = 0;
+            for (WorldRenderer wr : lizt) {
+                total++;
+                if (wr.needsUpdate) {
+                    if (wr.posY - 16*3 > mc.thePlayer.posY && wr.posY < mc.thePlayer.posY + 16*8 || lagfest) {
+                        wr.updateRenderer();
+                        wr.needsUpdate = false;
+                        did++;
+                    }
+                }
+            }
+            mc.thePlayer.addChatMessage("Rendered " + did + " chunks out of " + total);
         }
     }
     
