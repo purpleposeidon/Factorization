@@ -439,8 +439,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         oreRecipe(lead_block_item, "###", "###", "###", '#', "ingotLead");
         oreRecipe(silver_block_item, "###", "###", "###", '#', "ingotSilver");
         FurnaceRecipes.smelting().addSmelting(resource_block.blockID, 0 /* MD for silver */, new ItemStack(silver_ingot), 0.3F);
-        
-        FurnaceRecipes.smelting().addSmelting(Item.bucketWater.shiftedIndex, new ItemStack(Item.bucketEmpty), 0);
 
         //exo armor
         recipe(new ItemStack(exo_chasis),
