@@ -29,14 +29,6 @@ public class TileEntityMirror extends TileEntityCommon {
     public FactoryType getFactoryType() {
         return FactoryType.MIRROR;
     }
-    
-    @SideOnly(Side.CLIENT)
-    static FzIcon front = tex("charge/mirror_front"), back = tex("charge/mirror_back");
-    
-    @Override
-    Icon getIcon(ForgeDirection dir) {
-        return front;
-    }
 
     @Override
     public BlockClass getBlockClass() {

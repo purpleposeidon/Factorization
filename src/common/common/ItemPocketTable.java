@@ -4,6 +4,7 @@ import java.util.List;
 
 import factorization.common.Core.TabType;
 
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -19,6 +20,12 @@ public class ItemPocketTable extends Item {
         Core.tab(this, TabType.TOOLS);
         setFull3D();
         setUnlocalizedName("factorization.tool.pocket_crafting_table");
+    }
+    
+    @Override
+    public void registerIcon(IconRegister reg) {
+        super.registerIcon(reg);
+        FactorizationTextureLoader.register(reg, ItemIcons.class);
     }
 
     //

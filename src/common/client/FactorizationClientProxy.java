@@ -496,9 +496,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
             setTileEntityRenderer(TileEntitySteamTurbine.class, new TileEntitySteamTurbineRender());
             // End section that is azanor's fault
         }
-        
-        MinecraftForgeClient.preloadTexture(Core.texture_file_block);
-        MinecraftForgeClient.preloadTexture(Core.texture_file_item);
 
         RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
 

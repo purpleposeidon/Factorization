@@ -11,7 +11,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import factorization.api.Coord;
-import factorization.common.TileEntityGreenware.ClayState;
 
 public class ItemFactorization extends ItemBlock {
     public ItemFactorization(int id) {
@@ -89,8 +88,8 @@ public class ItemFactorization extends ItemBlock {
                     NBTTagList l = tag.getTagList("parts");
                     infoList.add(l.tagCount() + " parts");
                 }
-                ClayState state = TileEntityGreenware.getStateFromInfo(tag.getInteger("touch"), 0);
-                infoList.add(state.english);
+                //ClayState state = TileEntityGreenware.getStateFromInfo(tag.getInteger("touch"), 0);
+                //infoList.add(state.english);
             }
         }
         if (FactorizationUtil.similar(is, Core.registry.solar_turbine_item)) {

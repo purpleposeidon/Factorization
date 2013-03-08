@@ -30,15 +30,12 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements ITankCon
         return FactoryType.STEAMTURBINE;
     }
     
-    @SideOnly(Side.CLIENT)
-    public static FzIcon turbine_top = tex("charge/turbinee_top"), turbine_side = tex("charge/turbine_side"), turbine_bottom = tex("charge/turbine_bottom");
-    
     @Override
-    Icon getIcon(ForgeDirection dir) {
+    public Icon getIcon(ForgeDirection dir) {
         switch (dir) {
-        case UP: return turbine_top;
-        case DOWN: return turbine_bottom;
-        default: return turbine_side;
+        case UP: return BlockIcons.turbine_top;
+        case DOWN: return BlockIcons.turbine_bottom;
+        default: return BlockIcons.turbine_side;
         }
     }
 

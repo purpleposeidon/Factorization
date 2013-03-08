@@ -16,14 +16,18 @@ import factorization.api.VectorUV;
 
 public class BlockRenderHelper extends Block {
     //This class is used to make it easy (and very thread-safe) to render cubes of various sizes. It's a fake block.
+    public static BlockRenderHelper instance;
 
-    public BlockRenderHelper(int blockId, Material par2Material) {
-        super(blockId, par2Material);
-        blocksList[blockId] = null;
+    public BlockRenderHelper() {
+        super(0, Material.grass);
+        blocksList[blockID] = null;
         //These three shouldn't strictly be necessary
-        opaqueCubeLookup[blockId] = false;
-        lightOpacity[blockId] = 0;
-        canBlockGrass[blockId] = false;
+        opaqueCubeLookup[blockID] = false;
+        lightOpacity[blockID] = 0;
+        canBlockGrass[blockID] = false;
+        if (instance == null) {
+            instance = this;
+        }
     }
     
     public BlockRenderHelper setBlockBoundsOffset(float x, float y, float z) {
@@ -35,7 +39,16 @@ public class BlockRenderHelper extends Block {
     private Icon[] textures;
     
     @SideOnly(Side.CLIENT)
-    public BlockRenderHelper useTextures(Icon[] textures) {
+    public BlockRenderHelper useTexture(Icon texture) {
+        textures = new Icon[6];
+        for (int i = 0; i < textures.length; i++) {
+            textures[i] = texture;
+        }
+        return this;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public BlockRenderHelper useTextures(Icon ...textures) {
         this.textures = textures;
         return this;
     }
@@ -54,10 +67,10 @@ public class BlockRenderHelper extends Block {
             ret = textures[side];
         } catch (NullPointerException e) {
             textures = new Icon[6];
-            return textures[side] = BlockFactorization.error_icon;
+            return textures[side] = BlockIcons.error;
         }
         if (ret == null) {
-            return BlockFactorization.error_icon;
+            return BlockIcons.error;
         }
         return textures[side];
     }
@@ -150,7 +163,21 @@ public class BlockRenderHelper extends Block {
             VectorUV[] face = fullCache[f];
             for (int v = 0; v < face.length; v++) {
                 VectorUV vert = face[v];
-                tess.addVertexWithUV(vert.x, vert.y, vert.z, vert.u, vert.v);
+                tess.addVertexWithUV(vert.x + x, vert.y + y, vert.z + z, vert.u, vert.v);
+            }
+        }
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public void renderRotated(Tessellator tess, Coord c) {
+        if (c == null) {
+            renderRotated(tess, 0, 0, 0);
+        }
+        for (int f = 0; f < fullCache.length; f++) {
+            VectorUV[] face = fullCache[f];
+            for (int v = 0; v < face.length; v++) {
+                VectorUV vert = face[v];
+                tess.addVertexWithUV(vert.x + c.x, vert.y + c.y, vert.z + c.z, vert.u, vert.v);
             }
         }
     }

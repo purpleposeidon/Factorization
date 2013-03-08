@@ -20,12 +20,9 @@ public class TileEntityPackager extends TileEntityStamper {
         return FactoryType.PACKAGER;
     }
     
-    @SideOnly(Side.CLIENT)
-    ActivatingMachineIcons icon = new ActivatingMachineIcons("craft/packager");
-    
     @Override
-    Icon getIcon(ForgeDirection dir) {
-        return icon.get(this, dir);
+    public Icon getIcon(ForgeDirection dir) {
+        return BlockIcons.packager.get(this, dir);
     }
 
     @Override

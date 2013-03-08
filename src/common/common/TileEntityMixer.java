@@ -39,10 +39,10 @@ public class TileEntityMixer extends TileEntityFactorization implements
     Charge charge = new Charge(this);
     
     @Override
-    Icon getIcon(ForgeDirection dir) {
+    public Icon getIcon(ForgeDirection dir) {
         switch (dir) {
-        case UP: return BlockFactorization.cauldron_top;
-        default: return BlockFactorization.cauldron_side;
+        case UP: return BlockIcons.cauldron_top;
+        default: return BlockIcons.cauldron_side;
         }
     }
 

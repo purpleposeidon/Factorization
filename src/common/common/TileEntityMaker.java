@@ -41,12 +41,9 @@ public class TileEntityMaker extends TileEntityFactorization implements
         return BlockClass.Machine;
     }
     
-    @SideOnly(Side.CLIENT)
-    ActivatingMachineIcons icon = new ActivatingMachineIcons("craft/maker");
-    
     @Override
-    Icon getIcon(ForgeDirection dir) {
-        return icon.get(this, dir);
+    public Icon getIcon(ForgeDirection dir) {
+        return BlockIcons.maker.get(this, dir);
     }
 
     @Override

@@ -1,22 +1,14 @@
 package factorization.client.render;
 
-import static org.lwjgl.opengl.GL11.*;
-import factorization.common.Core;
-import factorization.common.FactoryType;
-import factorization.common.RenderingCube;
-import factorization.common.TileEntityGreenware;
-import factorization.common.TileEntityGreenware.ClayState;
-
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.tileentity.TileEntity;
 
 
 public class TileEntityGreenwareRender extends TileEntitySpecialRenderer {
 
     @Override
     public void renderTileEntityAt(TileEntity te, double viewx, double viewy, double viewz, float partial) {
+        /*
         TileEntityGreenware gw = (TileEntityGreenware) te;
         int dryTime = gw.dryTime;
         if (!gw.canEdit()) {
@@ -39,6 +31,7 @@ public class TileEntityGreenwareRender extends TileEntitySpecialRenderer {
         gw.renderedAsBlock = false;
         gw.dryTime = dryTime;
         Core.profileEndRender();
+        */
     }
 
 }

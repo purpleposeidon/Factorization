@@ -51,6 +51,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemFactorization item_factorization;
     public ItemBlockResource item_resource;
     public BlockFactorization factory_block, factory_rendering_block = null;
+    public BlockRenderHelper blockRender = null;
     public BlockLightAir lightair_block;
     public BlockResource resource_block;
 
@@ -114,6 +115,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     void makeBlocks() {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             //Theoretically, not necessary. I bet BUKKIT would flip its shit tho.
+            blockRender = new BlockRenderHelper();
             factory_rendering_block = new BlockFactorization(Core.factory_block_id);
             Block.blocksList[factory_rendering_block.blockID] = null;
         }
@@ -283,7 +285,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         if (Core.enable_dimension_slice) {
             rocket_fuel = new ItemCraftingComponent(itemID("heldRocketFuel", 9051), "powder_rocket_fuel");
             rocket_fuel_liquid_entry = new Item(itemID("liquidRocketFuel", 9052));
-            rocket_fuel.setUnlocalizedName("factorization.rocket.powder_rocket_fuel");
+            rocket_fuel_liquid_entry.setUnlocalizedName("factorization.rocket.powder_rocket_fuel");
             rocket_engine = new ItemBlockProxy(itemID("rocketEngine", 9053), rocket_engine_item_hidden);
             rocket_engine.setUnlocalizedName("factorization.rocket.rocket_engine").setMaxStackSize(1);
             bucket_rocket_fuel = new ItemCraftingComponent(itemID("bucketRocketFuel", 9054), "rocket_fuel_bucket");
@@ -409,7 +411,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         oreRecipe(silver_block_item, "###", "###", "###", '#', "ingotSilver");
         FurnaceRecipes.smelting().addSmelting(resource_block.blockID, 0 /* MD for silver */, new ItemStack(silver_ingot), 0.3F);
         
-        FurnaceRecipes.smelting().addSmelting(Item.bucketWater.itemID, new ItemStack(Item.bucketEmpty), 0);
+        //FurnaceRecipes.smelting().addSmelting(Item.bucketWater.itemID, new ItemStack(Item.bucketEmpty), 0); //Bah.
 
         //exo armor
         recipe(new ItemStack(exo_chasis),

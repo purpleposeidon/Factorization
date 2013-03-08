@@ -48,16 +48,12 @@ public class TileEntityBarrel extends TileEntityFactorization {
         return BlockClass.Barrel;
     }
     
-    @SideOnly(Side.CLIENT)
-    static SimpleMachineIcons wood = new SimpleMachineIcons("storage/barrel"), extra_dimensional = new SimpleMachineIcons("storage/ed_barrel");
-    
     @Override
-    Icon getIcon(ForgeDirection dir) {
-        ForgeDirection face = ForgeDirection.getOrientation(facing_direction);
+    public Icon getIcon(ForgeDirection dir) {
         if (upgrade > 0) {
-            return extra_dimensional.get(face, dir);
+            return BlockIcons.ed_barrel.get(this, dir);
         }
-        return wood.get(face, dir);
+        return BlockIcons.barrel.get(this, dir);
     }
     
     //These are some core barrel item-count manipulating functions.

@@ -13,9 +13,8 @@ pushd src/minecraft/factorization
   ln -s $BASE/src/common/* ./
 popd
 
-mkdir -p lib/factorization
-pushd lib/factorization
-  ln -s $BASE/texture/
+pushd lib/
+  ln -s $BASE/texture/mods/
 popd
 
 mkdir -p jars/saves

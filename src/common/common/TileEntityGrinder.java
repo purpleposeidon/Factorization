@@ -101,14 +101,6 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     public FactoryType getFactoryType() {
         return FactoryType.GRINDER;
     }
-    
-    @SideOnly(Side.CLIENT)
-    static FzIcon grinder_bottom = tex("machine/grinder_bottom"), grinder_bottom_top_edge = tex("machine/grinder_bottom_top_edge"), grinder_side = tex("grinder_side"), grinder_top = tex("grinder_top"); 
-    
-    @Override
-    Icon getIcon(ForgeDirection dir) {
-        return BlockFactorization.error_icon;
-    }
 
     void slowDown() {
         if (speed > 0) {

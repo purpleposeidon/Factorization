@@ -73,9 +73,9 @@ public class BlockFactorization extends BlockContainer {
             Core.registry.battery.normalizeDamage(is);
             return is;
         }
-        if (ft == FactoryType.GREENWARE) {
-            return ((TileEntityGreenware) tec).getItem();
-        }
+//		if (ft == FactoryType.GREENWARE) {
+//			return ((TileEntityGreenware) tec).getItem();
+//		}
         if (ft == FactoryType.ROCKETENGINE) {
             return new ItemStack(Core.registry.rocket_engine);
         }
@@ -168,23 +168,9 @@ public class BlockFactorization extends BlockContainer {
         }
     }
     
-    @SideOnly(Side.CLIENT)
-    public static FzIcon tex(String name) { return new FzIcon(name); }
-    
-    @SideOnly(Side.CLIENT)
-    public static FzIcon default_icon = tex("block/default"), error_icon = tex("block/error"), transparent = tex("block/transparent"); 
-    @SideOnly(Side.CLIENT)
-    public static FzIcon motor_metal = tex("charge/motor_texture"), wire_texture = tex("charge/wire");
-    @SideOnly(Side.CLIENT)
-    public static FzIcon cauldron_top = tex("machine/cauldron_top"), cauldron_side = tex("machine/cauldron_side");
-    @SideOnly(Side.CLIENT)
-    public static FzIcon wood = tex("block/wood"), generic_metal = tex("machine/generic_metal");
-    
     @Override
     public void registerIcon(IconRegister reg) {
-        FactoryType.values(); //We want all these classes to have loaded so that the icons'll be defined
-        FzIcon.registerNew(reg);
-        //FzIcon.lock();
+        FactorizationTextureLoader.register(reg, BlockIcons.class);
     }
     
     @SideOnly(Side.CLIENT)
@@ -200,7 +186,7 @@ public class BlockFactorization extends BlockContainer {
         if (t instanceof TileEntityCommon) {
             return ((TileEntityCommon) t).getIcon(ForgeDirection.getOrientation(side));
         }
-        return error_icon;
+        return BlockIcons.error;
     }
 
     @Override
@@ -209,7 +195,7 @@ public class BlockFactorization extends BlockContainer {
         // Is used for inventory!
         FactoryType ft = FactoryType.fromMd(md);
         if (ft == null) {
-            return error_icon;
+            return BlockIcons.error;
         }
         return ft.getRepresentative().getIcon(ForgeDirection.getOrientation(side));
     }
@@ -280,9 +266,9 @@ public class BlockFactorization extends BlockContainer {
             is.setTagCompound(tag);
             Core.registry.battery.normalizeDamage(is);
         }
-        if (f.getFactoryType() == FactoryType.GREENWARE) {
-            is = ((TileEntityGreenware) f).getItem();
-        }
+//		if (f.getFactoryType() == FactoryType.GREENWARE) {
+//			is = ((TileEntityGreenware) f).getItem();
+//		}
         if (f.getFactoryType() == FactoryType.ROCKETENGINE) {
             is = new ItemStack(Core.registry.rocket_engine);
         }

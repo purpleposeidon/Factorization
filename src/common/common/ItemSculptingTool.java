@@ -3,20 +3,13 @@ package factorization.common;
 import java.util.List;
 
 import net.minecraft.client.renderer.texture.IconRegister;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import factorization.api.Coord;
 import factorization.common.Core.TabType;
-import factorization.common.NetworkFactorization.MessageType;
-import factorization.common.TileEntityGreenware.ClayState;
-import factorization.common.TileEntityGreenware.SelectionInfo;
 
 public class ItemSculptingTool extends Item {
 
@@ -48,10 +41,7 @@ public class ItemSculptingTool extends Item {
     }
     
     @Override
-    public void registerIcon(IconRegister reg) {
-        //This function'll get called more than it needs to. This is not actually a problem.
-        FzIcon.registerNew(reg);
-    }
+    public void registerIcon(IconRegister reg) { }
 
     static enum ToolMode {
         SELECTOR("select", true),
@@ -64,8 +54,7 @@ public class ItemSculptingTool extends Item {
         String name;
         boolean craftable;
         ToolMode next;
-        @SideOnly(Side.CLIENT)
-        FzIcon icon = new FzIcon("ceramics/tool/" + name);
+        
         private ToolMode(String english, boolean craftable) {
             this.name = english;
             this.craftable = craftable;
@@ -102,7 +91,16 @@ public class ItemSculptingTool extends Item {
     
     @Override
     public Icon getIconFromDamage(int damage) {
-        return getMode(damage).icon;
+        //A bit lame. Lame.
+        switch (getMode(damage)) {
+        default:
+        case MOVER: return ItemIcons.move;
+        case REMOVER: return ItemIcons.delete;
+        case RESETTER: return ItemIcons.reset;
+        case ROTATOR: return ItemIcons.rotate;
+        case SELECTOR: return ItemIcons.select;
+        case STRETCHER: return ItemIcons.stretch;
+        }
     }
     
     @Override
@@ -120,6 +118,7 @@ public class ItemSculptingTool extends Item {
         is.setItemDamage(mode.next.ordinal());
     }
     
+    /*
     @Override
     public boolean onItemUse(ItemStack par1ItemStack,
             EntityPlayer par2EntityPlayer, World par3World, int par4, int par5,
@@ -295,4 +294,5 @@ public class ItemSculptingTool extends Item {
             break;
         }
     }
+    */
 }

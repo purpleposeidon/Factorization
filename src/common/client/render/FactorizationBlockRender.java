@@ -24,9 +24,9 @@ import factorization.api.DeltaCoord;
 import factorization.api.ICoord;
 import factorization.api.VectorUV;
 import factorization.common.BlockFactorization;
+import factorization.common.BlockRenderHelper;
 import factorization.common.Core;
 import factorization.common.FactoryType;
-import factorization.common.RenderingCube;
 import factorization.common.WireRenderingCube;
 
 abstract public class FactorizationBlockRender implements ICoord {
@@ -257,7 +257,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         VectorUV here = vecs[0].add(vecs[2]);
         here.scale(0.5F);
         here = here.add(center);
-        float x = Math.abs(here.x), y = Math.abs(here.y), z = Math.abs(here.z);
+        double x = Math.abs(here.x), y = Math.abs(here.y), z = Math.abs(here.z);
         if (x >= y && x >= z) {
             return here.x >= 0 ? ForgeDirection.WEST : ForgeDirection.EAST;
         }
@@ -284,39 +284,6 @@ abstract public class FactorizationBlockRender implements ICoord {
     
     
     DeltaCoord outward = new DeltaCoord(), corner = new DeltaCoord();
-    private void vectorAO(RenderingCube rc, VectorUV vec, ForgeDirection face) {
-        outward.init(face.offsetX, face.offsetY, face.offsetZ);
-        corner.init((int) vec.x, (int) vec.y, (int)vec.z);
-        Coord here = getCoord();
-        int normalAxis = -1;
-        for (int i = 0; i < 3; i++) {
-            int caxis = corner.get(i);
-            if (Math.abs(caxis) > 8) {
-                here.set(i, (int) (here.get(i) + Math.signum(caxis)));
-            }
-            if (Math.abs(outward.get(i)) == 1) {
-                corner.set(i, outward.get(i));
-                normalAxis = i;
-            } else {
-                float sig = Math.signum(caxis);
-                corner.set(i, (int) sig);
-            }
-        }
-        calculateAO(face, corner, here, normalAxis);
-        /*if (Math.abs(vec.x) > 8 || Math.abs(vec.y) > 8 || Math.abs(vec.z) > 8) {
-            calculateAO(face, corner, here.add(face.getOpposite()), normalAxis);
-        } else {
-            calculateAO(face, corner, here, normalAxis);
-        }*/
-        Tessellator.instance.setBrightness(vertexBrightnessResult);
-//		float firstColor = vertexColorResult;
-//		calculateAO(face, corner, here.add(face.getOpposite()), normalAxis);
-//		int slide = ((int)vec.get(normalAxis)) % 8;
-//		float scale = slide/16F;
-//		vertexColorResult = interpolate(vertexColorResult, firstColor, scale);
-        Tessellator.instance.setColorOpaque_F(vertexColorResult, vertexColorResult, vertexColorResult);
-        vertex(rc, vec);
-    }
 
     int mixedBrightness[] = new int[3];
     float aoLightValue[] = new float[3];
@@ -372,87 +339,6 @@ abstract public class FactorizationBlockRender implements ICoord {
     
     static boolean force_inv = true;
     static private int allFaces[] = { 0, 1, 2, 3, 4, 5 };
-    protected void renderCube(RenderingCube rc) {
-        renderCube(rc, allFaces);
-    }
-    
-    protected void renderCube(RenderingCube rc, int facesToDraw[]) {
-        if (!world_mode) {
-            Tessellator.instance.startDrawingQuads();
-            //ForgeHooksClient.bindTexture(cubeTexture, 0);
-            GL11.glDisable(GL11.GL_LIGHTING);
-        }
-        force_inv = false;
-        float delta = 1F/256F;
-        float zfight = rc.corner.x * delta; //TODO: Make this a field
-        //also: zfight should just depend on size.
-        //and we'll handle overlapping identically sized by shifting slightly based on the cube's origin. err. transformation matrix.
-        zfight *= rc.corner.y * (delta);
-        zfight *= rc.corner.z * (delta);
-        zfight = 1.0025F;
-        
-        VectorUV center = rc.trans.apply(new VectorUV(0, 0, 0));
-        
-        
-        if ((te != null || world_mode) && !force_inv) {
-            //<other stuff's supposed to go here>
-            //for each vertex:
-            //tess.setColorOpaque_F(color of that vertex)
-            //tess.setBrightness(brightness of that vertex)
-            //add vertex
-            Coord here = getCoord();
-            if (Minecraft.isAmbientOcclusionEnabled() && Core.renderAO) {
-                for (int face : facesToDraw) {
-//					if (face != 2) {
-//						continue;
-//					}
-                    VectorUV[] vecs = rc.faceVerts(face);
-                    faceColor = getNormalizedLighting(vecs, center);
-                    for (int i = 0; i < vecs.length; i++) {
-                        isDebugVertex = i == 1;
-                        vectorAO(rc, vecs[i], ForgeDirection.values()[face]);
-                    }
-                }
-            } else {
-                for (int face : facesToDraw) {
-                    VectorUV[] vecs = rc.faceVerts(face);
-                    float color = getNormalizedLighting(vecs, center);
-                    Tessellator.instance.setColorOpaque_F(color, color, color);
-                    int cx = here.x;
-                    int cy = here.y;
-                    int cz = here.z;
-                    cx += Math.signum((vecs[0].x + vecs[2].x)/2);
-                    cy += Math.signum((vecs[0].y + vecs[2].y)/2);
-                    cz += Math.signum((vecs[0].z + vecs[2].z)/2);
-                    //Not factory_rendering_block, the block at cx cy cz.
-                    int brightness = 0;
-                    Block block = Block.stone; //Block.blocksList[here.w.getBlockId(cx, cy, cz)];
-                    if (block != null) {
-                        brightness = block.getMixedBrightnessForBlock(here.w, cx, cy, cz);
-                    }
-                    Tessellator.instance.setBrightness(brightness);
-                    for (int i = 0; i < vecs.length; i++) {
-                        vertex(rc, vecs[i]);
-                    }
-                }
-            }
-        } else {
-            for (int face : facesToDraw) {
-                VectorUV[] vecs = rc.faceVerts(face);
-                float color = getNormalizedLighting(vecs, center);
-                Tessellator.instance.setColorOpaque_F(color, color, color);
-                
-                for (int i = 0; i < vecs.length; i++) {
-                    vertex(rc, vecs[i]);
-                }
-            }
-        }
-        if (!world_mode) {
-            Tessellator.instance.draw();
-            //ForgeHooksClient.unbindTexture();
-            GL11.glEnable(GL11.GL_LIGHTING);
-        }
-    }
     
     protected void renderCube(WireRenderingCube rc) {
         if (!world_mode) {
@@ -462,7 +348,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         }
         
         float delta = 1F/256F;
-        float zfight = rc.corner.x * delta;
+        double zfight = rc.corner.x * delta;
         zfight *= rc.corner.y * (delta);
         zfight *= rc.corner.z * (delta);
         zfight = 1.0025F;
@@ -473,7 +359,7 @@ abstract public class FactorizationBlockRender implements ICoord {
             Tessellator.instance.setColorOpaque_F(color, color, color);
             for (int i = 0; i < vecs.length; i++) {
                 VectorUV vec = vecs[i];
-                vertex(rc, vec.x*zfight, vec.y*zfight, vec.z*zfight, vec.u, vec.v);
+                vertex(rc, (float)(vec.x*zfight), (float)(vec.y*zfight), (float)(vec.z*zfight), (float)(vec.u), (float)(vec.v));
             }
         }
         if (!world_mode) {
@@ -482,28 +368,7 @@ abstract public class FactorizationBlockRender implements ICoord {
             GL11.glEnable(GL11.GL_LIGHTING);
         }
     }
-    
-    protected void vertex(RenderingCube rc, VectorUV vec) {
-        //all units are in texels; center of the cube is the origin. Or, like... not the center but the texel that's (8,8,8) away from the corner is.
-        //u & v are in texels
-        int u = (int) vec.u;
-        int v = (int) vec.v;
-        //this.x = this.y = this.z = 0;
-        if (use_vertex_offset) {
-            Tessellator.instance.addVertexWithUV(
-                    this.x + 0.5 + vec.x / 16F,
-                    this.y + 0.5 + vec.y / 16F,
-                    this.z + 0.5 + vec.z / 16F,
-                    rc.ul + u / 256F, rc.vl + v / 256F);
-        } else {
-            Tessellator.instance.addVertexWithUV(
-                    0.5 + vec.x / 16F,
-                    0.5 + vec.y / 16F,
-                    0.5 + vec.z / 16F,
-                    rc.ul + u / 256F, rc.vl + v / 256F);
-        }
-    }
-    
+
     protected void vertex(WireRenderingCube rc, float x, float y, float z, float u, float v) {
         //all units are in texels; center of the cube is the origin. Or, like... not the center but the texel that's (8,8,8) away from the corner is.
         //u & v are in texels
@@ -547,5 +412,16 @@ abstract public class FactorizationBlockRender implements ICoord {
         float d = 4.0F / 16.0F;
         float yd = -d + 0.003F;
         renderPart(rb, metal, d, d + yd + yoffset, d, 1 - d, 1 - (d + 0F/16F) + yd + yoffset, 1 - d);
+    }
+    
+    void renderRotatedHelper(BlockRenderHelper block) {
+        Tessellator tess = Tessellator.instance;
+        if (world_mode) {
+            block.renderRotated(tess, x, y, z);
+        } else {
+            tess.startDrawingQuads();
+            block.renderRotated(tess, 0, 0, 0);
+            tess.draw();
+        }
     }
 }

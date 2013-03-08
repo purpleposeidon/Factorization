@@ -55,6 +55,7 @@ Kill Wrath (This will make the mod so much simpler...):
 
 TOP LIST (that's become somewhat less tops. Oops.)
 --------
+The new IInventory has stuff for preventing things from being put into slots. All machines, and especially routers.
 CovertJaguar_proper_packet_sending
 Tossing barrels (Or, well, anything) through mystcraft portals with the gravity gun
 Bug report of wire-breaking not actually disconnecting?
@@ -111,6 +112,8 @@ make multiple copies of the metal texture for each ore processing machine
 http://www.minecraftforum.net/index.php?app=members&module=messaging&section=view&do=showConversation&topicID=1984385&st=0#msg3439990
 
 [Low-Priority Bugs]
+Redstone signal on furnace heaters
+Heater stacking; would increase speed?
 Get rid of as many getEffectiveSide() calls as we can; we often have a World hanging around somewhere we can use instead.
 rotating barrels (We *still* don't have a rotation API, do we?)
 Fun fact: High-quality batteries can be made out of silver. Mmmm. But this can't really be used as an alternative... altho... maybe they could require greater charge to charge.

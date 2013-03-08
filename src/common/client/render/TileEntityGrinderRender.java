@@ -20,8 +20,8 @@ import net.minecraft.util.Vec3;
 import org.lwjgl.opengl.GL11;
 
 import factorization.api.VectorUV;
+import factorization.common.BlockRenderHelper;
 import factorization.common.Core;
-import factorization.common.RenderingCube;
 import factorization.common.TileEntityGrinder;
 
 public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
@@ -80,19 +80,12 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
         re.bindTextureFile("/terrain.png");
         //XXX TODO FIXME Move to somewhere more efficient
         //(Move the vector stuff out too...)
-        RenderingCube frame = new RenderingCube(16 + 6, new VectorUV(5, 1, 5));
         Tessellator.instance.startDrawingQuads();
         Tessellator.instance.setColorOpaque_F(1, 1, 1);
         GL11.glTranslatef(0, 2F / 16F, 0);
-        for (int face = 0; face < 6; face++) {
-            for (VectorUV v : frame.faceVerts(face)) {
-                Tessellator.instance.addVertexWithUV(
-                        v.x / 16F,
-                        v.y / 16F,
-                        v.z / 16F,
-                        frame.ul + v.u / 256F, frame.vl + v.v / 256F);
-            }
-        }
+        BlockRenderHelper block = BlockRenderHelper.instance;
+        block.setBlockBoundsOffset(5F/8F, 1F/8F, 5F/8F);
+        block.render(0, 0, 0);
         Tessellator.instance.draw();
 
         for (int i = 0; i < 8; i++) {

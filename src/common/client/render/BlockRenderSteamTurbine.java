@@ -8,6 +8,7 @@ import net.minecraft.util.Icon;
 import org.lwjgl.opengl.GL11;
 
 import factorization.api.Coord;
+import factorization.common.BlockIcons;
 import factorization.common.Core;
 import factorization.common.FactoryType;
 import factorization.common.TileEntitySteamTurbine;
@@ -43,7 +44,7 @@ public class BlockRenderSteamTurbine extends FactorizationBlockRender {
             Block b = Core.registry.factory_rendering_block;
             float f = 1F - (3F/16F);
             
-            Icon side = TileEntitySteamTurbine.turbine_side;
+            Icon side = BlockIcons.turbine_side;
             
             Tessellator.instance.zOffset += f;
             rb.renderEastFace(b, x, y, z, side);
@@ -60,10 +61,10 @@ public class BlockRenderSteamTurbine extends FactorizationBlockRender {
             Tessellator.instance.xOffset += f;
             
             Tessellator.instance.yOffset += f;
-            rb.renderBottomFace(b, x, y, z, TileEntitySteamTurbine.turbine_bottom);
+            rb.renderBottomFace(b, x, y, z, BlockIcons.turbine_bottom);
             Tessellator.instance.yOffset -= f;
             Tessellator.instance.yOffset -= f;
-            rb.renderTopFace(b, x, y, z, TileEntitySteamTurbine.turbine_top);
+            rb.renderTopFace(b, x, y, z, BlockIcons.turbine_top);
             Tessellator.instance.yOffset += f;
         } else {
             //render fan

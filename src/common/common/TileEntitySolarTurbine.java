@@ -37,7 +37,7 @@ public class TileEntitySolarTurbine extends TileEntityCommon implements IChargeC
     }
     
     @Override
-    Icon getIcon(ForgeDirection dir) {
+    public Icon getIcon(ForgeDirection dir) {
         return Block.glass.getBlockTextureFromSide(0);
     }
 

@@ -222,7 +222,7 @@ public class WireConnections {
         min.scale(1F / 16F);
         max.scale(1F / 16F);
         float d = 0;
-        block.setBlockBounds(min.x + d, min.y + d, min.z + d, max.x + d, max.y + d, max.z + d);
+        block.setBlockBounds((float)(min.x + d), (float)(min.y + d), (float)(min.z + d), (float)(max.x + d), (float)(max.y + d), (float)(max.z + d));
     }
 
     public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z, Vec3 startVec,

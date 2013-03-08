@@ -401,16 +401,6 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     public BlockClass getBlockClass() {
         return BlockClass.Lamp;
     }
-    
-    @SideOnly(Side.CLIENT)
-    FzIcon metal = tex("block/dark_iron_block");
-    @SideOnly(Side.CLIENT)
-    Icon glass = Block.glass.getBlockTextureFromSide(0);
-    
-    @Override
-    Icon getIcon(ForgeDirection dir) {
-        return BlockFactorization.error_icon;
-    }
 
     @Override
     public boolean isBlockSolidOnSide(int side) {

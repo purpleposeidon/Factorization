@@ -4,9 +4,9 @@ import net.minecraft.client.renderer.RenderBlocks;
 
 import org.lwjgl.opengl.GL11;
 
+import factorization.common.BlockIcons;
 import factorization.common.Core;
 import factorization.common.FactoryType;
-import factorization.common.TileEntityHeater;
 
 public class BlockRenderHeater extends FactorizationBlockRender {
 
@@ -17,7 +17,7 @@ public class BlockRenderHeater extends FactorizationBlockRender {
             float c = 0.1F;
             GL11.glColor4f(c, c, c, 1F);
             //Tessellator.instance.setColorOpaque_F(c, c, c);
-            renderPart(rb, TileEntityHeater.heater_heat, d, d, d, 1 - d, 1 - d, 1 - d);
+            renderPart(rb, BlockIcons.heater_heat, d, d, d, 1 - d, 1 - d, 1 - d);
             GL11.glColor4f(1, 1, 1, 1);
         }
         renderNormalBlock(rb, getFactoryType().md);

@@ -40,14 +40,11 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
         return FactoryType.SOLARBOILER;
     }
     
-    @SideOnly(Side.CLIENT)
-    static FzIcon boiler_top = tex("charge/boiler_top"), boiler_side = tex("charge/boiler_side");
-    
     @Override
-    Icon getIcon(ForgeDirection dir) {
+    public Icon getIcon(ForgeDirection dir) {
         switch (dir) {
-        case UP: return boiler_top;
-        default: return boiler_side;
+        case UP: return BlockIcons.boiler_top;
+        default: return BlockIcons.boiler_side;
         }
     }
 

@@ -1,18 +1,17 @@
 package factorization.client.render;
 
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.RenderBlocks;
+
 import org.lwjgl.opengl.GL11;
 
 import factorization.api.Coord;
 import factorization.common.Core;
 import factorization.common.FactoryType;
-import factorization.common.RenderingCube;
 import factorization.common.TileEntitySolarTurbine;
 import factorization.common.TileEntityWire;
 import factorization.common.WireConnections;
 import factorization.common.WireRenderingCube;
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraftforge.client.MinecraftForgeClient;
 
 public class BlockRenderSolarTurbine extends FactorizationBlockRender {
 

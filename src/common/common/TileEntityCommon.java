@@ -29,8 +29,11 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     static Random rand = new Random();
 
     public abstract BlockClass getBlockClass();
+    
     @SideOnly(Side.CLIENT)
-    abstract Icon getIcon(ForgeDirection dir);
+    public Icon getIcon(ForgeDirection dir) {
+        return BlockIcons.error;
+    }
 
     @Override
     public Packet getDescriptionPacket() {
@@ -183,10 +186,5 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
             me.getCharge().invalidate();
         }
         super.invalidate();
-    }
-    
-    @SideOnly(Side.CLIENT)
-    protected static FzIcon tex(String name) {
-        return new FzIcon(name);
     }
 }

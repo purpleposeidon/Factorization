@@ -68,9 +68,9 @@ public class NetworkFactorization implements ITinyPacketHandler {
                     FactorizationHack.tagWrite(tag, output);
                 } else if (item instanceof VectorUV) {
                     VectorUV v = (VectorUV) item;
-                    output.writeFloat(v.x);
-                    output.writeFloat(v.y);
-                    output.writeFloat(v.z);
+                    output.writeFloat((float) v.x);
+                    output.writeFloat((float) v.y);
+                    output.writeFloat((float) v.z);
                 } else if (item instanceof DeltaCoord) {
                     DeltaCoord dc = (DeltaCoord) item;
                     dc.write(output);

@@ -31,19 +31,11 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     public int getSizeInventory() {
         return 4;
     }
-    
-    @SideOnly(Side.CLIENT)
-    static SimpleMachineIcons icon = new SimpleMachineIcons("machine/slag");
-    @SideOnly(Side.CLIENT)
-    static FzIcon face_on = tex("machine/slag_face_on");
-    
+
     @Override
-    Icon getIcon(ForgeDirection dir) {
-        ForgeDirection face = ForgeDirection.getOrientation(facing_direction);
-        if (face == dir && isBurning()) {
-            return face_on;
-        }
-        return icon.get(face, dir);
+    public Icon getIcon(ForgeDirection dir) {
+        draw_active = (byte) (furnaceBurnTime > 0 ? 1 : 0);
+        return BlockIcons.slag_furnace.get(this, dir);
     }
 
     @Override

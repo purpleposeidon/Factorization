@@ -75,31 +75,17 @@ public class TileEntityRouter extends TileEntityFactorization {
         return BlockClass.DarkIron;
     }
     
-    @SideOnly(Side.CLIENT)
-    static FzIcon top = tex("router/"), bottom = tex("router/bottom");
-    @SideOnly(Side.CLIENT)
-    static FzIcon[] sidesOn = new FzIcon[4], sidesOff = new FzIcon[4];
-    static {
-        try {
-            Class.forName("FzIcon");
-            String dirs[] = new String[] {"north", "south", "west", "east"}; //same order as ForgeDirection
-            for (int i = 0; i < dirs.length; i++) {
-                sidesOn[i] = tex("router/" + dirs[i] + "_on");
-                sidesOff[i] = tex("router/" + dirs[i] + "_off");
-            }
-        } catch (ClassNotFoundException e) { /* om nom nom */ }
-    }
-    
     @Override
-    Icon getIcon(ForgeDirection dir) {
-        if (dir == ForgeDirection.UP) {
-            return top;
+    public Icon getIcon(ForgeDirection dir) {
+        switch (dir) {
+        case UP: return BlockIcons.router$top;
+        case DOWN: return BlockIcons.router$bottom;
+        case NORTH: return BlockIcons.router$north.get(this);
+        case SOUTH: return BlockIcons.router$south.get(this);
+        case EAST: return BlockIcons.router$east.get(this);
+        case WEST: return BlockIcons.router$west.get(this);
+        default: return super.getIcon(dir);
         }
-        if (dir == ForgeDirection.DOWN) {
-            return bottom;
-        }
-        int index = dir.ordinal() - 2;
-        return (draw_active > 0 ? sidesOn : sidesOff)[index];
     }
 
     void putParticles(World world) {

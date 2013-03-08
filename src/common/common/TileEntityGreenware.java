@@ -25,7 +25,17 @@ import factorization.api.VectorUV;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityGreenware extends TileEntityCommon {
+    @Override
+    public FactoryType getFactoryType() {
+        return FactoryType.GREENWARE;
+    }
 
+    @Override
+    public BlockClass getBlockClass() {
+        return BlockClass.Ceramic;
+    }
+    
+/*
     public ArrayList<RenderingCube> parts = new ArrayList();
     public int lastTouched = 0;
     int totalHeat = 0;
@@ -44,11 +54,6 @@ public class TileEntityGreenware extends TileEntityCommon {
             this.gw = gw;
             this.id = id;
         }
-    }
-    
-    @Override
-    Icon getIcon(ForgeDirection dir) {
-        return null;
     }
     
     //server-side
@@ -123,16 +128,6 @@ public class TileEntityGreenware extends TileEntityCommon {
         parts.clear();
         parts.add(new RenderingCube(clayIconStart, new VectorUV(3, 5, 3)));
         touch();
-    }
-    
-    @Override
-    public FactoryType getFactoryType() {
-        return FactoryType.GREENWARE;
-    }
-
-    @Override
-    public BlockClass getBlockClass() {
-        return BlockClass.Ceramic;
     }
     
     void writeParts(NBTTagCompound tag) {
@@ -434,4 +429,5 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
         getCoord().redraw();
     }
+    */
 }

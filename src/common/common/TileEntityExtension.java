@@ -25,11 +25,6 @@ public class TileEntityExtension extends TileEntityCommon {
     public FactoryType getFactoryType() {
         return FactoryType.EXTENDED;
     }
-    
-    @Override
-    Icon getIcon(ForgeDirection dir) {
-        return BlockFactorization.error_icon;
-    }
 
     @Override
     public BlockClass getBlockClass() {

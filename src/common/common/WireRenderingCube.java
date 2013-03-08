@@ -104,8 +104,8 @@ public class WireRenderingCube {
         o = o.add(8, 8, 8);
         o.scale(1F / 16F);
         b.setBlockBounds(
-                o.x - c.x, o.y - c.y, o.z - c.z,
-                o.x + c.x, o.y + c.y, o.z + c.z);
+                (float)(o.x - c.x), (float)(o.y - c.y), (float)(o.z - c.z),
+                (float)(o.x + c.x), (float)(o.y + c.y), (float)(o.z + c.z));
     }
 
     public WireRenderingCube rotate(double ax, double ay, double az, int theta) {
@@ -211,7 +211,7 @@ public class WireRenderingCube {
                 break;
             }
             for (VectorUV main : ret) {
-                float udelta = 0, vdelta = 0;
+                double udelta = 0, vdelta = 0;
                 int nada = 0;
                 if (main.u > 16) {
                     udelta = main.u - 16;

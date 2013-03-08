@@ -8,6 +8,7 @@ import net.minecraft.util.Icon;
 import org.lwjgl.opengl.GL11;
 
 import factorization.common.BlockFactorization;
+import factorization.common.BlockIcons;
 import factorization.common.Core;
 import factorization.common.FactoryType;
 
@@ -22,7 +23,7 @@ public class BlockRenderGrinder extends FactorizationBlockRender {
         renderMotor(rb, 8F/16F);
         float p = 1F/16F;
         float p2 = 2*p, p3 = 3*p;
-        Icon metal = BlockFactorization.generic_metal, lead = BlockFactorization.motor_metal;
+        Icon metal = BlockIcons.generic_metal, lead = BlockIcons.motor_texture;
         //bottom plate
         //renderPart(rb, metal, 2*p, 0, 2*p, 1-2*p, 2*p, 1-2*p);
         renderPart(rb, metal, 0, 0, 0, 1, 2*p, 1);

@@ -63,7 +63,7 @@ public class BlockLightAir extends Block {
     
     @Override
     public void registerIcon(IconRegister reg) {
-        transparent = Core.texture(reg, "transparent");
+        transparent = Core.texture(reg, "block/transparent");
         glowstone = Block.glowStone.getBlockTextureFromSide(0);
     }
 

@@ -32,12 +32,6 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     public BlockClass getBlockClass() {
         return BlockClass.Wire;
     }
-    
-    @Override
-    Icon getIcon(ForgeDirection dir) {
-        return BlockFactorization.error_icon;
-    }
-
     @Override
     public boolean activate(EntityPlayer entityplayer) {
         return false;

@@ -282,23 +282,16 @@ public class ExoArmor extends ItemArmor
             }
         }
     }
-
-    @SideOnly(Side.CLIENT)
-    FzIcon[] parts = new FzIcon[] {
-        new FzIcon("exo/helmet.png"),
-        new FzIcon("exo/chest.png"),
-        new FzIcon("exo/pants.png"),
-        new FzIcon("exo/boot.png")
-    };
     
     @Override
     public Icon getIconFromDamage(int par1) {
-        return parts[armorType];
-    }
-    
-    @Override
-    public void registerIcon(IconRegister reg) {
-        FzIcon.registerNew(reg);
+        switch (par1) {
+        default:
+        case 0: return ItemIcons.exo$helmet;
+        case 1: return ItemIcons.exo$chest;
+        case 2: return ItemIcons.exo$pants;
+        case 3: return ItemIcons.exo$boot;
+        }
     }
 
     @Override

@@ -47,12 +47,9 @@ public class TileEntityRocketEngine extends TileEntityCommon {
         return FactoryType.ROCKETENGINE;
     }
     
-    @SideOnly(Side.CLIENT)
-    public static FzIcon valid = tex("rocket/rocket_engine_valid"), invalid = tex("rocket/rocket_engine_invalid"), nozzle = tex("rocket/rocket_engine_nozzle"), bottom_hole = tex("rocket/rocket_engine_bottom_hole"), top = tex("rocket/rocket_engine_top");
-    
     @Override
-    Icon getIcon(ForgeDirection dir) {
-        return lastValidationStatus ? valid : invalid;
+    public Icon getIcon(ForgeDirection dir) {
+        return lastValidationStatus ? BlockIcons.rocket_engine_valid : BlockIcons.rocket_engine_invalid;
     }
 
     @Override

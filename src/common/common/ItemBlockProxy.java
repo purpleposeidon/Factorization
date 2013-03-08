@@ -3,6 +3,7 @@ package factorization.common;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -19,6 +20,11 @@ public class ItemBlockProxy extends Item {
         super(par1);
         this.proxy = proxy.copy();
         this.blockID = ((ItemBlock) proxy.getItem()).getBlockID();
+    }
+    
+    @Override
+    public void registerIcon(IconRegister par1IconRegister) {
+        //Do nothing
     }
 
     public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side,

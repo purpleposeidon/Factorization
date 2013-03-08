@@ -26,13 +26,9 @@ public class TileEntityStamper extends TileEntityFactorization {
         return BlockClass.Machine;
     }
     
-    
-    @SideOnly(Side.CLIENT)
-    static ActivatingMachineIcons icon = new ActivatingMachineIcons("craft/stamper");
-    
     @Override
-    Icon getIcon(ForgeDirection dir) {
-        return icon.get(this, dir);
+    public Icon getIcon(ForgeDirection dir) {
+        return BlockIcons.stamper.get(this, dir);
     }
 
     @Override

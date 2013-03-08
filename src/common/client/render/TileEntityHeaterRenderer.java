@@ -1,38 +1,19 @@
 package factorization.client.render;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.client.renderer.entity.RenderBlaze;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.tileentity.TileEntity;
 
 import org.lwjgl.opengl.GL11;
 
+import factorization.common.BlockIcons;
+import factorization.common.BlockRenderHelper;
 import factorization.common.Core;
-import factorization.common.RenderingCube;
 import factorization.common.TileEntityHeater;
 
 public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
     static RenderBlocks rb = new RenderBlocks();
-    ModelElement element = new ModelElement();
-
-    class ModelElement extends ModelBase {
-        ModelSingleTexturedBox box;
-        ModelRenderer model;
-
-        public ModelElement() {
-            this.textureHeight = this.textureWidth = 16;
-            model = new ModelRenderer(this, 0, 0);
-            box = new ModelSingleTexturedBox(model, Texture.heater_element, 0, 0, 0, 0, 1, 1, 1, 1.0F);
-        }
-
-        public void renderAll() {
-            box.render(Tessellator.instance, 1F / 16F);
-        }
-    }
 
     @Override
     public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
@@ -49,7 +30,12 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
         float scale = 5F + 5 / 16F;
         scale -= 10F / 128F;
         GL11.glScalef(scale, scale, scale);
-        element.renderAll();
+        BlockRenderHelper block = BlockRenderHelper.instance;
+        block.setBlockBoundsOffset(1, 1, 1);
+        block.useTexture(BlockIcons.heater_heat);
+        Tessellator.instance.startDrawingQuads();
+        block.render(0, 0, 0);
+        Tessellator.instance.draw();
         GL11.glPopMatrix();
         GL11.glColor4f(1, 1, 1, 1);
         GL11.glEnable(GL11.GL_LIGHTING);

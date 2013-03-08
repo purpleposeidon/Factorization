@@ -1,9 +1,7 @@
 package factorization.client.render;
 
 import net.minecraft.client.renderer.RenderBlocks;
-import factorization.api.VectorUV;
 import factorization.common.FactoryType;
-import factorization.common.RenderingCube;
 
 public class BlockRenderEmpty extends FactorizationBlockRender {
     FactoryType for_type;

@@ -4,6 +4,7 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.common.BlockFactorization;
+import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.common.TileEntityRocketEngine;
 
@@ -13,13 +14,12 @@ public class BlockRenderRocketEngine extends FactorizationBlockRender {
     void render(RenderBlocks rb) {
         boolean oldAo = rb.enableAO;
         rb.enableAO = false;
-        //int body = 16*2 + 5, nozzle = 16*2 + 6, top = 14, bottom = 16*2 + 7;
-        Icon body = TileEntityRocketEngine.invalid;
-        Icon nozzle = TileEntityRocketEngine.nozzle, bottom = TileEntityRocketEngine.bottom_hole, top = TileEntityRocketEngine.top;
+        Icon body = BlockIcons.rocket_engine_invalid;
+        Icon nozzle = BlockIcons.rocket_engine_nozzle, bottom = BlockIcons.rocket_engine_bottom_hole, top = BlockIcons.rocket_engine_top;
         if (world_mode) { //Really, it should be...
             TileEntityRocketEngine rocket = getCoord().getTE(TileEntityRocketEngine.class);
             if (rocket != null && rocket.lastValidationStatus) {
-                body = TileEntityRocketEngine.valid;
+                body = BlockIcons.rocket_engine_valid;
             }
         }
         float d = 2F/16F;

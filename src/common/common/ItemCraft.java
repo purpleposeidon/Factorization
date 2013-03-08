@@ -217,21 +217,16 @@ public class ItemCraft extends Item {
     public boolean isValidCraft(ItemStack is) {
         return is.getItemDamage() != 0;
     }
-
-    @SideOnly(Side.CLIENT)
-    FzIcon complete = new FzIcon("craft/packet_complete"), incomplete = new FzIcon("craft/packet_incomplete");
     
     @Override
-    public void registerIcon(IconRegister reg) {
-        FzIcon.registerNew(reg);
-    }
+    public void registerIcon(IconRegister reg) { }
     
     @Override
     public Icon getIconFromDamage(int damage) {
         if (damage == 0) {
-            return incomplete;
+            return ItemIcons.packet_incomplete;
         }
-        return complete;
+        return ItemIcons.packet_complete;
     }
 
     @Override

@@ -31,15 +31,12 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
         return charge;
     }
     
-    @SideOnly(Side.CLIENT)
-    FzIcon top = tex("charge/battery_top"), bottom = tex("charge/battery_bottom"), side = tex("charge/battery_side"), meter = tex("charge/battery_meter");
-    
     @Override
-    Icon getIcon(ForgeDirection dir) {
+    public Icon getIcon(ForgeDirection dir) {
         switch (dir) {
-        case UP: return top;
-        case DOWN: return bottom;
-        default: return side;
+        case UP: return BlockIcons.battery_top;
+        case DOWN: return BlockIcons.battery_bottom;
+        default: return BlockIcons.battery_side;
         }
     }
 

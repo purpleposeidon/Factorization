@@ -30,12 +30,9 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
         return FactoryType.HEATER;
     }
     
-    @SideOnly(Side.CLIENT)
-    public static FzIcon heater_spiral = tex("machine/heater_spiral"), heater_heat = tex("machine/heater_heat");
-    
     @Override
-    Icon getIcon(ForgeDirection dir) {
-        return heater_spiral;
+    public Icon getIcon(ForgeDirection dir) {
+        return BlockIcons.heater_spiral;
     }
 
     @Override

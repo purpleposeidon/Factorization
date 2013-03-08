@@ -105,9 +105,9 @@ public class Core {
     public static int max_rocket_height = 64;
 
     // universal constant config
-    public final static String texture_dir = "/factorization/texture/";
-    public final static String texture_file_block = texture_dir + "blocks.png";
-    public final static String texture_file_item = texture_dir + "items.png";
+    public final static String texture_dir = "factorization:";
+    public final static String texture_file_block = "/terrain.png";
+    public final static String texture_file_item = texture_file_block; //"/gui/items.png";
 
     private int getBlockConfig(String name, int defaultId, String comment) {
         Property prop = null;
@@ -453,12 +453,6 @@ public class Core {
     @SideOnly(Side.CLIENT)
     public static Icon texture(IconRegister reg, String name) {
         name = name.replace('.', '/');
-        final String fz = "factorization/";
-        if (name.startsWith(fz)) {
-            name = name.substring(fz.length());
-        } else {
-            throw new IllegalArgumentException("Name doesn't start with 'factorization.' or 'factorization/'");
-        }
-        return reg.makeIcon(texture_dir + name + ".png");
+        return reg.makeIcon(texture_dir + name);
     }
 }
