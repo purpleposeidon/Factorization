@@ -269,7 +269,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //Exo-items
         exo_head = new ExoArmor(itemID("mechaHead", 9010), 0).setSlotCount(5);
         exo_chest = new ExoArmor(itemID("mechaChest", 9011), 1).setSlotCount(8);
-        exo_leg = new ExoArmor(itemID("mechaLeg", 9012), 2).setSlotCount(6);
+        exo_leg = new ExoArmor(itemID("mechaLeg", 9012), 2).setSlotCount(7);
         exo_foot = new ExoArmor(itemID("mechaFoot", 9013), 3).setSlotCount(4);
 
         exo_chasis = new ItemCraftingComponent(itemID("mechaChasis", 9009), "item.exochasis", 5);
