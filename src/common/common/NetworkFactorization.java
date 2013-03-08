@@ -37,6 +37,8 @@ public class NetworkFactorization implements ITinyPacketHandler {
     public NetworkFactorization() {
         Core.network = this;
     }
+    
+    int huge_tag_warnings = 0;
 
     public Packet TEmessagePacket(Coord src, int messageType, Object... items) {
         try {
@@ -63,9 +65,26 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 } else if (item instanceof Float) {
                     output.writeFloat((Float) item);
                 } else if (item instanceof ItemStack) {
+                    ItemStack is = (ItemStack) item;
                     NBTTagCompound tag = new NBTTagCompound();
-                    ((ItemStack) item).writeToNBT(tag);
-                    FactorizationHack.tagWrite(tag, output);
+                    is.writeToNBT(tag);
+                    tag.writeNamedTag(tag, output);
+                    if (outputStream.size() > 65536 && is.hasTagCompound()) {
+                        //Got an overflow! We'll blame the NBT tag.
+                        if (huge_tag_warnings++ < 10) {
+                            Core.logWarning("Item " + is + " probably has a huge NBT tag; it will be stripped from the packet; at " + src);
+                            if (huge_tag_warnings == 10) {
+                                Core.logWarning("(This will no longer be logged)");
+                            }
+                        }
+                        NBTTagCompound tag_copy = is.getTagCompound();
+                        is.setTagCompound(null);
+                        try {
+                            return TEmessagePacket(src, messageType, items);
+                        } finally {
+                            is.setTagCompound(tag_copy);
+                        }
+                    }
                 } else if (item instanceof VectorUV) {
                     VectorUV v = (VectorUV) item;
                     output.writeFloat(v.x);
