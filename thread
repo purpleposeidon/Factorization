@@ -202,29 +202,29 @@ The best place to put your Bag of Holding depends on how many columns it stores!
 Specifically, you'll want to place the bag such that the number of inventory columns it stores is a multiple of the number of columns to its right.
 [/spoiler]
 
-[u][b][size=4][anchor=MECHA]Mecha-Armor[/anchor][/size][/b][/u]
+[u][b][size=4][anchor=EXO]Exo-Armor[/anchor][/size][/b][/u]
 [spoiler]
-Mecha-Armor isn't ready yet!
+Exo-Armor isn't ready yet!
 
-[u]The [b]Mecha-Chasis[/b][/u]
-The Mecha-Chasis is a slightly expensive armor crafting component made by boxing a gold nugget inside 8 iron.
+[u]The [b]Exo-Chasis[/b][/u]
+The Exo-Chasis is a slightly expensive armor crafting component made by boxing a gold nugget inside 8 iron.
 [img]http://i.imgur.com/n3eSP.png[/img]
 
-[u][b]Mecha-Armor[/b][/u]
-Mecha-Armor is crafted as usual, with Mecha-Chasis.
+[u][b]Exo-Armor[/b][/u]
+Exo-Armor is crafted as usual, with Exo-Chasis.
 [img]http://i.imgur.com/dKwVp.png[/img]
 This armor will never break. It also will not protect you. Its strengths and powers come from the upgrades you give it.
 
-[u]The [b]Mecha-Modder[/b][/u]
-To add upgrades to the armor, you need to place it in a Mecha-Modder. It is crafted like so:
+[u]The [b]Exo-Modder[/b][/u]
+To add upgrades to the armor, you need to place it in a Exo-Modder. It is crafted like so:
 [img]http://i.imgur.com/Jzcfc.png[/img]
-Place the Mecha-Armor into the slot with the M. Many upgrades need to be triggered. The 'A' and 'K' buttons control when the upgrade is activated. The Mecha-Armors have differeing ammounts of slots for upgrades. The number of chasis it takes to make the armor is how many available slots there are.
+Place the Exo-Armor into the slot with the M. Many upgrades need to be triggered. The 'A' and 'K' buttons control when the upgrade is activated. The Exo-Armors have differeing ammounts of slots for upgrades. The number of chasis it takes to make the armor is how many available slots there are.
 [img]http://i.imgur.com/CC8u0.png[/img]
 
 There are a few types of upgrades. For most upgrades, you can place multiples in to get increased effects:
 
 [u]Vanilla Armor[/u]
-This is presently the only way of protectiong yourself with Mecha-Armor. The clothing type of the armors must match. Multiple armor upgrades will not stack; only one will be used until it wears out.
+This is presently the only way of protectiong yourself with Exo-Armor. The clothing type of the armors must match. Multiple armor upgrades will not stack; only one will be used until it wears out.
 
 [u]Buoyancy Barrel[/u]
 This makes you fly very quickly to the surface when you are in water.
@@ -241,8 +241,9 @@ Push blocks everywhere! Be the Enderman! This will push a block that's in front 
 
 [u]Other Stuff/Future Plans[/u]
 [spoiler]
-More Mecha-Armor upgrades
 ? ? ?
+More Exo-Armor upgrades
+Router replacement
 [/spoiler]
 
 Ceramics is a WIP, and there's no guarantee that sculptures won't be destroyed between versions.
@@ -268,14 +269,17 @@ This is a [url="http://files.minecraftforge.net/"]Minecraft Forge[/url] mod. It 
 
 
 [u][b][size=6][anchor=DOWNLOAD]Download[/anchor][/size][/b][/u]
-This Forge mod uses the same file for the client and the server.
+Factorization 0.7.21 (MC 1.4.6)
+[url="http://adf.ly/2137658/"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.7.21.jar"]adfly + DropBox[/url]
+Built on 2013-03-08 against Minecraft Forge 6.5.0.488
 
+Old versions [spoiler]
 Factorization 0.7.10 #2 (MC 1.4.6)
 [url="http://adf.ly/2137658/http://www.mediafire.com/?byo6ewp0vevpczu"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.7.10.jar"]adfly + DropBox[/url]
 Built on 2012-12-21 against Minecraft Forge 6.5.0.467
 
-Old versions [spoiler]
 Factorization 0.7.9 (MC 1.4.5)
 [url="http://adf.ly/2137658/http://www.mediafire.com/?bcdxvbyizdz0kdf"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.7.9.jar"]adfly + DropBox[/url]
