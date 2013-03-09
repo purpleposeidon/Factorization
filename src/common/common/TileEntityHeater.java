@@ -97,6 +97,10 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
         }
         updateClient();
         Coord here = getCoord();
+        if (here.isPowered()) {
+            charge.update();
+            return;
+        }
         long now = worldObj.getWorldTime() + here.seed();
         int rate = 4;
         if (now % rate == 0) {
