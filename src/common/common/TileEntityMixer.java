@@ -473,17 +473,17 @@ public class TileEntityMixer extends TileEntityFactorization implements
         FactorizationUtil.addInventoryToArray(fakePlayer.inventory, outputBuffer);
         setDirty();
     }
-
-    @Override
-    void doLogic() {
-        needLogic();
+    
+    boolean drainBuffer() {
         if (outputBuffer.size() > 0) {
             ItemStack toAdd = outputBuffer.get(0);
             for (int i = 0; i < output.length; i++) {
                 if (output[i] == null) {
                     output[i] = outputBuffer.remove(0);
-                    return;
+                    return true;
                 }
+            }
+            for (int i = 0; i < output.length; i++) {
                 int free = output[i].getMaxStackSize() - output[i].stackSize;
                 if (FactorizationUtil.similar(output[i], toAdd) && free > 0) {
                     int toTake = Math.min(free, toAdd.stackSize);
@@ -491,12 +491,22 @@ public class TileEntityMixer extends TileEntityFactorization implements
                     output[i].stackSize += toTake;
                     if (toAdd.stackSize <= 0) {
                         outputBuffer.remove(0);
-                        return;
+                        return true;
                     }
                 }
             }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    void doLogic() {
+        needLogic();
+        if (drainBuffer()) {
             return;
         }
+        
         RecipeMatchInfo mr = getCachedRecipe();
         if (mr == null) {
             slow();
@@ -519,6 +529,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
             progress = 0;
             craftRecipe(mr);
             normalize(input);
+            while (drainBuffer()) ;
             speed = Math.min(50, speed + 1);
         }
     }
