@@ -79,6 +79,8 @@ public class MiscClientProxy extends MiscProxy {
             player.sendChatMessage("/me is at " + ((int) player.posX) + ", " + ((int) player.posY) + ", " + ((int) player.posZ));
         } else if (n.equalsIgnoreCase("saveoptions") || n.equalsIgnoreCase("savesettings") || n.equalsIgnoreCase("so") || n.equalsIgnoreCase("ss")) {
             mc.gameSettings.saveOptions();
+        } else if (n.equalsIgnoreCase("lang")) {
+            Core.registry.loadLanguages();
         }
     }
     

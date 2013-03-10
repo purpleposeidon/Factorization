@@ -1,4 +1,4 @@
-package factorization.common;
+ package factorization.common;
 
 import java.util.List;
 

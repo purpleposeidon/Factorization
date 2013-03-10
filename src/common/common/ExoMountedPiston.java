@@ -18,7 +18,7 @@ import factorization.common.Core.TabType;
 public class ExoMountedPiston extends Item implements IExoUpgrade {
     protected ExoMountedPiston(int par1) {
         super(par1);
-        setUnlocalizedName("factorization.exo.mountedpiston");
+        setUnlocalizedName("factorization:exo/mountedpiston");
         Core.tab(this, TabType.MISC);
         setMaxStackSize(1);
     }

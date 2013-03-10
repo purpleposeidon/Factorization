@@ -34,7 +34,7 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
         block.setBlockBoundsOffset(1, 1, 1);
         block.useTexture(BlockIcons.heater_heat);
         Tessellator.instance.startDrawingQuads();
-        block.render(0, 0, 0);
+        block.renderForTileEntity();
         Tessellator.instance.draw();
         GL11.glPopMatrix();
         GL11.glColor4f(1, 1, 1, 1);

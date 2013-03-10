@@ -28,7 +28,7 @@ public class ExoArmor extends ItemArmor
     public ExoArmor(int par1, int armorType) {
         super(par1, EnumArmorMaterial.CHAIN, 0, armorType);
         setMaxDamage(0); //never break!
-        setUnlocalizedName("item.exoArmor" + armorType);
+        setUnlocalizedName("factorization:exo/armor" + armorType);
     }
 
     //exo features
@@ -185,12 +185,11 @@ public class ExoArmor extends ItemArmor
 
     public String getArmorTextureFile(ItemStack itemstack) {
         //presumably we'll have to change this depending on what type of armor we are
-        //XXX NOTE: LexManos needs to put IArmorTextureProvider in common
         //For now, the client uses render.ExoArmorTextured
         if (armorType == 2) {
-            return Core.texture_dir + "exo_armor_2.png";
+            return Core.real_texture_dir + "armor/exo_armor_2.png";
         }
-        return Core.texture_dir + "exo_armor_1.png";
+        return Core.real_texture_dir + "armor/exo_armor_1.png";
     }
 
     @Override
@@ -285,12 +284,12 @@ public class ExoArmor extends ItemArmor
     
     @Override
     public Icon getIconFromDamage(int par1) {
-        switch (par1) {
+        switch (armorType) {
         default:
-        case 0: return ItemIcons.exo$helmet;
-        case 1: return ItemIcons.exo$chest;
-        case 2: return ItemIcons.exo$pants;
-        case 3: return ItemIcons.exo$boot;
+        case 0: return ItemIcons.exo$armor0;
+        case 1: return ItemIcons.exo$armor1;
+        case 2: return ItemIcons.exo$armor2;
+        case 3: return ItemIcons.exo$armor3;
         }
     }
 

@@ -3,7 +3,7 @@ package factorization.common;
 import net.minecraft.item.ItemStack;
 
 public enum ResourceType {
-    SILVERORE(0, "block/galena_ore"), SILVERBLOCK(1, "block/block/silver_block"), LEADBLOCK(2, "block/lead_block"), DARKIRONBLOCK(3, "block/dark_iron_block"), EXOMODDER(4, "exo/modder_side");
+    SILVERORE(0, "resource/galena_ore"), SILVERBLOCK(1, "resource/silver_block"), LEADBLOCK(2, "resource/lead_block"), DARKIRONBLOCK(3, "resource/dark_iron_block"), EXOMODDER(4, "exo/modder_side");
 
     final public int md;
     final public String texture;

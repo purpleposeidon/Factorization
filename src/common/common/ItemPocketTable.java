@@ -19,7 +19,7 @@ public class ItemPocketTable extends Item {
         setMaxStackSize(1);
         Core.tab(this, TabType.TOOLS);
         setFull3D();
-        setUnlocalizedName("factorization.tool.pocket_crafting_table");
+        setUnlocalizedName("factorization:tool/pocket_crafting_table");
     }
     
     @Override

@@ -21,11 +21,6 @@ public class ItemBlockProxy extends Item {
         this.proxy = proxy.copy();
         this.blockID = ((ItemBlock) proxy.getItem()).getBlockID();
     }
-    
-    @Override
-    public void registerIcon(IconRegister par1IconRegister) {
-        //Do nothing
-    }
 
     public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side,
             float hitX, float hitY, float hitZ, int metadata) {

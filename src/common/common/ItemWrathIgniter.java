@@ -19,7 +19,7 @@ public class ItemWrathIgniter extends Item {
         setMaxDamage((6 * 2) - 1);
         setNoRepair();
         Core.tab(this, TabType.TOOLS);
-        setUnlocalizedName("factorization.tool.wrath_igniter");
+        setUnlocalizedName("factorization:tool/wrath_igniter");
     }
 
     @Override

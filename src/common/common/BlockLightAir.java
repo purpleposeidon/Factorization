@@ -58,19 +58,13 @@ public class BlockLightAir extends Block {
         }
     }
     
-    @SideOnly(Side.CLIENT)
-    Icon transparent, glowstone;
-    
     @Override
-    public void registerIcon(IconRegister reg) {
-        transparent = Core.texture(reg, "block/transparent");
-        glowstone = Block.glowStone.getBlockTextureFromSide(0);
-    }
+    public void registerIcon(IconRegister reg) { }
 
     @Override
     public String getTextureFile() {
         if (Core.debug_light_air) {
-            return "/terrain.png";
+            return Block.glowStone.getTextureFile();
         }
         return Core.texture_file_block;
     }
@@ -78,9 +72,9 @@ public class BlockLightAir extends Block {
     @Override
     public Icon getBlockTextureFromSideAndMetadata(int side, int md) {
         if (Core.debug_light_air) {
-            return glowstone;
+            return Block.glowStone.getBlockTextureFromSide(0);
         }
-        return transparent;
+        return BlockIcons.transparent;
     }
 
     static Random rand = new Random();

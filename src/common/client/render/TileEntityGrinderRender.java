@@ -8,6 +8,7 @@ import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glRotatef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PositionTextureVertex;
 import net.minecraft.client.renderer.RenderEngine;
@@ -84,8 +85,9 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
         Tessellator.instance.setColorOpaque_F(1, 1, 1);
         GL11.glTranslatef(0, 2F / 16F, 0);
         BlockRenderHelper block = BlockRenderHelper.instance;
+        block.useTexture(Block.blockSteel.getBlockTextureFromSide(0));
         block.setBlockBoundsOffset(5F/8F, 1F/8F, 5F/8F);
-        block.render(0, 0, 0);
+        block.renderForTileEntity();
         Tessellator.instance.draw();
 
         for (int i = 0; i < 8; i++) {
@@ -96,7 +98,6 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
             glRotatef(10, 0, 0, 1);
 
             diamondModel.render(Tessellator.instance, 1F);
-            //drawShard();
             glPopMatrix();
         }
 

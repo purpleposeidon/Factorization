@@ -1,0 +1,101 @@
+#en_US localizations
+factorization.factoryBlock.BARREL.name=Barrel
+factorization.factoryBlock.MAKER.name=Craftpacket Maker
+factorization.factoryBlock.STAMPER.name=Craftpacket Stamper
+factorization.factoryBlock.PACKAGER.name=Packager
+factorization.factoryBlock.SLAGFURNACE.name=Slag Furnace
+factorization.factoryBlock.ROUTER.name=Router
+factorization.factoryBlock.LAMP.name=Wrath Lamp
+item.factorization:charge_battery.name=Battery Block
+factorization.factoryBlock.SOLARTURBINE.name=Solar Turbine
+factorization.factoryBlock.SOLARBOILER.name=Solar Boiler
+factorization.factoryBlock.STEAMTURBINE.name=Steam Turbine
+item.factorization:mirror.name=Mirror
+factorization.factoryBlock.HEATER.name=Furnace Heater
+factorization.factoryBlock.LEADWIRE.name=Lead Wiring
+factorization.factoryBlock.GRINDER.name=Grinder
+factorization.factoryBlock.MIXER.name=Mixer
+factorization.factoryBlock.CRYSTALLIZER.name=Crystallizer
+factorization.factoryBlock.GREENWARE.name=Sculpture
+tile.factorization.ResourceBlock.SILVERORE.name=Silver Ore
+tile.factorization.ResourceBlock.SILVERBLOCK.name=Block of Silver
+tile.factorization.ResourceBlock.LEADBLOCK.name=Block of Lead
+tile.factorization.ResourceBlock.DARKIRONBLOCK.name=Block of Dark Iron
+tile.factorization.ResourceBlock.EXOMODDER.name=Exo-Modder
+
+item.factorization:craftpacket.name=Craftpacket
+item.factorization:craftpacket_complete.name=Craftpacket
+item.factorization:tool/bag_of_holding.name=Bag of Holding
+item.factorization:tool/pocket_crafting_table.name=Pocket Crafting Table
+item.factorization:tool/wand_of_cooling.name=Wand of Cooling
+item.factorization:diamond_shard.name=Diamond Shard
+item.factorization:tool/wrath_igniter.name=Wrath Igniter
+item.factorization:dark_iron_ingot.name=Dark Iron Ingot
+item.factorization:exo_chasis.name=Exo-Chasis
+item.factorization:lead_ingot.name=Lead Ingot
+item.factorization:silver_ingot.name=Silver Ingot
+item.factorization:router/item_filter.name=Item Filter
+item.factorization:router/machine_filter.name=Machine Filter
+item.factorization:router/speed.name=Speed Boost
+item.factorization:router/thorough.name=Thoroughness
+item.factorization:router/bandwidth.name=Bandwidth
+item.factorization:exo/buoyant_barrel.name=Buoyant Barrel
+item.factorization:exo/cobbledrive.name=Cobblestone Drive
+item.factorization:exo/mountedpiston.name=Shoulder-Mounted Piston
+item.factorization:exo/wall_jump_boots.name=Wall Jumping Boots
+item.factorization:acid.name=Sulfuric Acid
+item.factorization:acid_regia.name=Aqua Regia
+item.factorization:magnet.name=Magnet
+item.factorization:insulated_coil.name=Insulated Coil
+item.factorization:motor.name=Motor
+item.factorization:fan.name=Fan
+item.factorization:tool/charge_meter.name=Charge Meter
+item.factorization:router/eject.name=Auto-Ejector
+item.factorization:barrel_upgrade.name=Extra-Dimensional Storage
+item.factorization:diamond_cutting_head.name=Diamond Cutting Head
+item.factorization:sludge.name=Sludge
+item.factorization:sculptTool.name=Sculpting Tool
+item.factorization:tool/angular_saw.name=Cube Saw
+item.factorization:tool/matrix_programmer.name=Logic Matrix Repository
+item.factorization:logic_matrix.name=Blank Logic Matrix
+item.factorization:logic_matrix_identifier.name=Logic Matrix: Identifier
+item.factorization:heat_hole.name=Heat Hole
+item.factorization:nether_powder.name=Netherrack Powder
+item.factorization:rocket/rocket_engine.name=Rocket Engine
+item.factorization:rocket/powder_rocket_fuel.name=Powdered Rocket Fuel
+item.factorization:rocket/rocket_fuel_bucket.name=Bucket of Powdered Rocket Fuel
+item.factorization:rocket/inverium_drop=Inverium
+item.factorization:exo/armor0=Exo-Helmet
+item.factorization:exo/armor1=Exo-Chestplate
+item.factorization:exo/armor2=Exo-Leggings
+item.factorization:exo/armor3=Exo-Boots
+
+itemGroup.factorizationTab=Factorization
+
+#Ores
+item.factorization:ore/gravel/IRON.name=Dirty Iron Gravel
+item.factorization:ore/gravel/GOLD.name=Dirty Gold Gravel
+item.factorization:ore/gravel/TIN.name=Dirty Tin Gravel
+item.factorization:ore/gravel/COPPER.name=Dirty Copper Gravel
+item.factorization:ore/gravel/GALENA.name=Dirty Silver Gravel
+
+item.factorization:ore/clean/IRON.name=Clean Iron Gravel
+item.factorization:ore/clean/GOLD.name=Clean Gold Gravel
+item.factorization:ore/clean/TIN.name=Clean Tin Gravel
+item.factorization:ore/clean/COPPER.name=Clean Copper Gravel
+item.factorization:ore/clean/GALENA.name=Clean Silver Gravel
+
+item.factorization:ore/reduced/IRON.name=Reduced Iron Chunks
+item.factorization:ore/reduced/GOLD.name=Reduced Gold Chunks
+item.factorization:ore/reduced/TIN.name=Reduced Tin Chunks
+item.factorization:ore/reduced/COPPER.name=Reduced Copper Chunks
+item.factorization:ore/reduced/SILVER.name=Reduced Silver Chunks
+item.factorization:ore/reduced/LEAD.name=Reduced Lead Chunks
+
+item.factorization:ore/crystal/IRON.name=Crystalline Iron
+item.factorization:ore/crystal/GOLD.name=Crystalline Gold
+item.factorization:ore/crystal/TIN.name=Crystalline Tin
+item.factorization:ore/crystal/COPPER.name=Crystalline Copper
+item.factorization:ore/crystal/SILVER.name=Crystalline Silver
+item.factorization:ore/crystal/LEAD.name=Crystalline Lead
+

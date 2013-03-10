@@ -18,7 +18,7 @@ public class ItemSculptingTool extends Item {
         setNoRepair();
         setMaxDamage(0);
         setMaxStackSize(1);
-        setUnlocalizedName("item.sculptTool");
+        setUnlocalizedName("factorization:sculptTool");
         Core.tab(this, TabType.TOOLS);
         setFull3D();
     }

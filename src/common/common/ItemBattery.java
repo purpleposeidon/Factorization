@@ -3,6 +3,7 @@ package factorization.common;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -19,10 +20,15 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     //3 States: Empty. Enough for 1 magnet. Enough for 2 magnets.
     public ItemBattery(int id) {
         super(id, Core.registry.battery_item_hidden);
-        setUnlocalizedName("factorization_battery");
+        setUnlocalizedName("factorization:charge_battery");
         setMaxStackSize(1);
         setMaxDamage(0); //'2' is not the number for this.
         setNoRepair();
+    }
+    
+    @Override
+    public void registerIcon(IconRegister par1IconRegister) {
+        // Nada
     }
 
     public int getStorage(ItemStack is) {

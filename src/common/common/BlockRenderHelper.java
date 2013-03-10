@@ -38,9 +38,11 @@ public class BlockRenderHelper extends Block {
     @SideOnly(Side.CLIENT)
     private Icon[] textures;
     
+    private Icon[] repetitionCache = new Icon[6];
+    
     @SideOnly(Side.CLIENT)
     public BlockRenderHelper useTexture(Icon texture) {
-        textures = new Icon[6];
+        textures = repetitionCache;
         for (int i = 0; i < textures.length; i++) {
             textures[i] = texture;
         }
@@ -77,6 +79,12 @@ public class BlockRenderHelper extends Block {
     
     @SideOnly(Side.CLIENT)
     RenderBlocks rb = new RenderBlocks();
+    
+    @SideOnly(Side.CLIENT)
+    public void renderForTileEntity() {
+        begin();
+        renderRotated(Tessellator.instance, 0, 0, 0);
+    }
     
     @SideOnly(Side.CLIENT)
     public void render(int x, int y, int z) {

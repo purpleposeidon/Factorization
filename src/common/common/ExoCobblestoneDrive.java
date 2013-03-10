@@ -18,7 +18,7 @@ public class ExoCobblestoneDrive extends Item implements IExoUpgrade {
 
     protected ExoCobblestoneDrive(int par1) {
         super(par1);
-        setUnlocalizedName("factorization.exo.cobbledrive");
+        setUnlocalizedName("factorization:exo/cobbledrive");
         Core.tab(this, TabType.MISC);
         setMaxStackSize(1);
     }

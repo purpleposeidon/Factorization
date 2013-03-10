@@ -103,11 +103,14 @@ public class Core {
     public static boolean enable_sketchy_client_commands = true;
     public static int max_rocket_base_size = 20*20;
     public static int max_rocket_height = 64;
+    public static String language_file = "/mods/factorization/en_US.lang";
 
     // universal constant config
     public final static String texture_dir = "factorization:";
+    public final static String real_texture_dir = "/mods/factorization/textures/";
+    public final static String gui_dir = "/mods/factorization/textures/gui/";
     public final static String texture_file_block = "/terrain.png";
-    public final static String texture_file_item = texture_file_block; //"/gui/items.png";
+    public final static String texture_file_item = "/gui/items.png";
 
     private int getBlockConfig(String name, int defaultId, String comment) {
         Property prop = null;
@@ -191,6 +194,7 @@ public class Core {
         int config_silver_size = getIntConfig("silverOreNodeSize", "general", silver_ore_node_size, "The size of silver ore nodes. Between 5 & 35. Default is 25");
         silver_ore_node_size = Math.max(5, Math.min(config_silver_size, 35));
         add_branding = getBoolConfig("addBranding", "general", add_branding, null); //For our Tekkit friends
+        language_file = getStringConfig("languageFile", "general", language_file, "Filename on the Java classpath with the localizations");
         
         enable_dimension_slice = dev_environ;
         enable_dimension_slice = getBoolConfig("enableDimensionSlices", "dimensionSlices", enable_dimension_slice, "work in progress; may be unstable");
@@ -233,7 +237,7 @@ public class Core {
         registry.setToolEffectiveness();
         proxy.registerKeys();
         proxy.registerRenderers();
-
+        
         config.save();
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             isMainClientThread.set(true);
@@ -242,6 +246,7 @@ public class Core {
 
     @PostInit
     public void modsLoaded(FMLPostInitializationEvent event) {
+        registry.loadLanguages();
         TileEntityWrathFire.setupBurning();
         TileEntitySolarBoiler.setupSteam();
         foph.addDictOres();

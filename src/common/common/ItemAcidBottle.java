@@ -2,6 +2,7 @@ package factorization.common;
 
 import java.util.List;
 
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
@@ -17,12 +18,17 @@ public class ItemAcidBottle extends Item {
         super(id);
         Core.tab(this, TabType.MISC);
         setMaxStackSize(16);
-        setUnlocalizedName("factorization.item.acid");
+        setUnlocalizedName("factorization:acid");
     }
     
     @Override
     public boolean requiresMultipleRenderPasses() {
         return true;
+    }
+    
+    @Override
+    public void registerIcon(IconRegister par1IconRegister) {
+        // Nada
     }
     
     @Override
@@ -45,7 +51,7 @@ public class ItemAcidBottle extends Item {
     public String getUnlocalizedName(ItemStack stack) {
         String name = super.getUnlocalizedName(stack);
         if (stack.getItemDamage() > 0) {
-            name += ".regia";
+            name += "_regia";
         }
         return name;
     }
@@ -64,7 +70,7 @@ public class ItemAcidBottle extends Item {
     }
 
     @Override
-    public ItemStack onFoodEaten(ItemStack is, World w, EntityPlayer player) {
+    public ItemStack onEaten(ItemStack is, World w, EntityPlayer player) {
         is.stackSize--;
         Sound.acidBurn.playAt(player);
         if (w.isRemote) {

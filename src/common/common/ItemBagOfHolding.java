@@ -27,7 +27,7 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
         super(id);
         setMaxStackSize(1);
         Core.tab(this, TabType.TOOLS);
-        setUnlocalizedName("factorization.tool.bag_of_holding");
+        setUnlocalizedName("factorization:tool/bag_of_holding");
     }
 
     final String pearlcount = "pearlcount";

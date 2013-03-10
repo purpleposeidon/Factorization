@@ -19,7 +19,7 @@ class ExoBuoyantBarrel extends Item implements IExoUpgrade {
 
     protected ExoBuoyantBarrel(int par1) {
         super(par1);
-        setUnlocalizedName("factorization.exo.buoyantbarrel");
+        setUnlocalizedName("factorization:exo/buoyant_barrel");
         Core.tab(this, TabType.MISC);
         setMaxStackSize(1);
     }

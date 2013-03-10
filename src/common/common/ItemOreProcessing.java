@@ -77,7 +77,7 @@ public class ItemOreProcessing extends Item implements IActOnCraft {
         setHasSubtypes(true);
         this.stateName = stateName;
         Core.tab(this, TabType.MATERIALS);
-        setUnlocalizedName("factorization.machine.ore." + stateName);
+        setUnlocalizedName("factorization:ore/" + stateName);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class ItemOreProcessing extends Item implements IActOnCraft {
     
     @Override
     public String getUnlocalizedName(ItemStack is) {
-        return "item.oreProcessing." + stateName + "." + OreType.values()[is.getItemDamage()];
+        return "item.factorization:ore/" + stateName + "/" + OreType.values()[is.getItemDamage()];
     }
 
     @Override

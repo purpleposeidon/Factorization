@@ -136,6 +136,11 @@ public class FactorizationOreProcessingHandler {
     }
     
     void addDictOres() {
+        handleNewOre("ingotIron", new ItemStack(Item.ingotIron, 1));
+        handleNewOre("oreIron", new ItemStack(Block.oreIron, 1));
+        handleNewOre("ingotGold", new ItemStack(Item.ingotGold, 1));
+        handleNewOre("oreGold", new ItemStack(Block.oreGold, 1));
+        
         for (String oreClass : ItemOreProcessing.OD_ores) {
             ItemStack bestIngot = null;
             Iterable<ItemStack> oreList = OreDictionary.getOres(oreClass);

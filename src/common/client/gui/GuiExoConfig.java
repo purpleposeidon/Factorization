@@ -125,7 +125,7 @@ public class GuiExoConfig extends GuiContainer {
     @Override
     protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.renderEngine.bindTextureFile(Core.texture_dir + "exomodder.png");
+        mc.renderEngine.bindTextureFile(Core.gui_dir + "exomodder.png");
         int l = (width - xSize) / 2;
         int i1 = (height - ySize) / 2;
         drawTexturedModalRect(l, i1, 0, 0, xSize, ySize);

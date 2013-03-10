@@ -23,7 +23,7 @@ public class BlockResource extends Block {
     protected BlockResource(int id) {
         super(id, Material.rock);
         setHardness(2.0F);
-        setUnlocalizedName("factorizationResourceBlock");
+        setUnlocalizedName("factorization.ResourceBlock");
     }
     
     @Override
@@ -31,7 +31,7 @@ public class BlockResource extends Block {
         exoBottom = Core.texture(reg, "exo/modder_bottom");
         exoTop = Core.texture(reg, "exo/modder_top");
         for (ResourceType rt : ResourceType.values()) {
-            icons[rt.md] = Core.texture(reg, "");
+            icons[rt.md] = Core.texture(reg, rt.texture);
         }
     }
 

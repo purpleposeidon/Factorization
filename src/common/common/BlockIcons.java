@@ -28,7 +28,7 @@ public class BlockIcons {
     public static Icon
         motor_texture,
         wire,
-        battery_bottom, battery_top, battery_side, batery_meter,
+        battery_bottom, battery_top, battery_side, battery_meter,
         boiler_side, boiler_top,
         mirror_front, mirror_back, mirror_side,
         turbine_top, turbine_bottom, turbine_side;

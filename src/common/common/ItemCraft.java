@@ -32,6 +32,7 @@ public class ItemCraft extends Item {
         maxStackSize = 1;
         setHasSubtypes(true);
         Core.tab(this, TabType.MISC);
+        setUnlocalizedName("factorization:craftpacket");
     }
 
     public static void addStamperRecipe(IRecipe recipe) {
@@ -227,6 +228,14 @@ public class ItemCraft extends Item {
             return ItemIcons.packet_incomplete;
         }
         return ItemIcons.packet_complete;
+    }
+    
+    @Override
+    public String getUnlocalizedName(ItemStack is) {
+        if (is.getItemDamage() > 0) {
+            return super.getUnlocalizedName(is) + "_complete";
+        }
+        return super.getUnlocalizedName(is);
     }
 
     @Override

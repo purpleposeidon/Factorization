@@ -1,8 +1,14 @@
 package factorization.common;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Random;
 
 import net.minecraft.block.Block;
@@ -18,12 +24,13 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.stats.AchievementList;
+import net.minecraft.util.StringTranslate;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraftforge.common.DungeonHooks;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.Property;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.liquids.LiquidContainerData;
@@ -40,10 +47,10 @@ import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
 import factorization.common.Core.TabType;
-import factorization.fzds.FZDSCommand;
 
 public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler {
     static public final int ExoKeyCount = 3;
@@ -218,7 +225,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
         bag_of_holding = new ItemBagOfHolding(itemID("bagOfHolding", 9001));
         
-        logicMatrixProgrammer = new ItemMatrixProgrammer(itemID("logicMatrixProgrammer", 9043), "factorization.tool.matrix_programmer");
+        logicMatrixProgrammer = new ItemMatrixProgrammer(itemID("logicMatrixProgrammer", 9043), "tool.matrix_programmer");
         DungeonHooks.addDungeonLoot(new ItemStack(logicMatrixProgrammer), 50); //XXX TODO: Temporary, put these on asteroids.
         logicMatrix = new ItemCraftingComponent(itemID("logicMatrix", 9044), "logic_matrix");
         logicMatrixIdentifier = new ItemCraftingComponent(itemID("logicMatrixID", 9045), "logic_matrix_identifier");
@@ -226,14 +233,14 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
         wand_of_cooling = new ItemWandOfCooling(itemID("wandOfCooling", 9005));
 
-        router_item_filter = new ItemMachineUpgrade(itemID("routerItemFilter", 9016), "Item Filter", "Router Upgrade", FactoryType.ROUTER, 0);
-        router_machine_filter = new ItemMachineUpgrade(itemID("routerMachineFilter", 9017), "Machine Filter", "Router Upgrade", FactoryType.ROUTER, 1);
-        router_speed = new ItemMachineUpgrade(itemID("routerSpeed", 9018), "Speed Boost", "Router Upgrade", FactoryType.ROUTER, 2);
-        router_thorough = new ItemMachineUpgrade(itemID("routerThorough", 9019), "Thoroughness", "Router Upgrade", FactoryType.ROUTER, 3);
-        router_throughput = new ItemMachineUpgrade(itemID("routerThroughput", 9020), "Bandwidth", "Router Upgrade", FactoryType.ROUTER, 4);
-        router_eject = new ItemMachineUpgrade(itemID("routerEject", 9031), "Ejector", "Router Upgrade", FactoryType.ROUTER, 5);
+        router_item_filter = new ItemMachineUpgrade(itemID("routerItemFilter", 9016), "router/item_filter", "Router Upgrade", FactoryType.ROUTER, 0);
+        router_machine_filter = new ItemMachineUpgrade(itemID("routerMachineFilter", 9017), "router/machine_filter", "Router Upgrade", FactoryType.ROUTER, 1);
+        router_speed = new ItemMachineUpgrade(itemID("routerSpeed", 9018), "router/speed", "Router Upgrade", FactoryType.ROUTER, 2);
+        router_thorough = new ItemMachineUpgrade(itemID("routerThorough", 9019), "router/thorough", "Router Upgrade", FactoryType.ROUTER, 3);
+        router_throughput = new ItemMachineUpgrade(itemID("routerThroughput", 9020), "router/bandwidth", "Router Upgrade", FactoryType.ROUTER, 4);
+        router_eject = new ItemMachineUpgrade(itemID("routerEject", 9031), "router/eject", "Router Upgrade", FactoryType.ROUTER, 5);
 
-        barrel_enlarge = new ItemMachineUpgrade(itemID("barrelEnlarge", 9032), "Extra-Dimensional Storage", "Barrel Upgrade", FactoryType.BARREL, 6);
+        barrel_enlarge = new ItemMachineUpgrade(itemID("barrelEnlarge", 9032), "barrel_upgrade", "Barrel Upgrade", FactoryType.BARREL, 6);
 
         //Electricity
         acid = new ItemAcidBottle(itemID("acid", 9024));
@@ -248,6 +255,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         diamond_cutting_head = new ItemCraftingComponent(itemID("diamondCuttingHead", 9038), "diamond_cutting_head");
         charge_meter = new ItemChargeMeter(itemID("chargemeter", 9029));
         mirror = new ItemBlockProxy(itemID("mirror", 9030), mirror_item_hidden);
+        mirror.setUnlocalizedName("factorization:mirror");
         battery = new ItemBattery(itemID("battery", 9033));
 
         //Industrial
@@ -272,23 +280,23 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         sculpt_tool = new ItemSculptingTool(itemID("sculptTool", 9041));
         
         //inverium = new ItemInverium(itemID("inverium", 9040), "item.inverium", 12*16 + 0, 11);
-        inverium = new ItemInverium(itemID("inverium", 9040), "factorization.rocket.inverium_drop");
+        inverium = new ItemInverium(itemID("inverium", 9040), "rocket/inverium_drop");
         OreDictionary.registerOre("FZ.inverium", inverium);
 
         //Misc
         pocket_table = new ItemPocketTable(itemID("pocketCraftingTable", 9002));
         fz_steam = new Item(itemID("steam", 9049));
-        fz_steam.setUnlocalizedName("factorization.charge.steam");
+        fz_steam.setUnlocalizedName("factorization:charge/steam");
         
         //Rocketry
         nether_powder = new ItemCraftingComponent(itemID("netherPowder", 9050), "nether_powder");
         if (Core.enable_dimension_slice) {
-            rocket_fuel = new ItemCraftingComponent(itemID("heldRocketFuel", 9051), "powder_rocket_fuel");
+            rocket_fuel = new ItemCraftingComponent(itemID("heldRocketFuel", 9051), "rocket/powder_rocket_fuel");
             rocket_fuel_liquid_entry = new Item(itemID("liquidRocketFuel", 9052));
-            rocket_fuel_liquid_entry.setUnlocalizedName("factorization.rocket.powder_rocket_fuel");
+            rocket_fuel_liquid_entry.setUnlocalizedName("factorization:rocket/powder_rocket_fuel");
             rocket_engine = new ItemBlockProxy(itemID("rocketEngine", 9053), rocket_engine_item_hidden);
-            rocket_engine.setUnlocalizedName("factorization.rocket.rocket_engine").setMaxStackSize(1);
-            bucket_rocket_fuel = new ItemCraftingComponent(itemID("bucketRocketFuel", 9054), "rocket_fuel_bucket");
+            rocket_engine.setUnlocalizedName("factorization:rocket/rocket_engine").setMaxStackSize(1);
+            bucket_rocket_fuel = new ItemCraftingComponent(itemID("bucketRocketFuel", 9054), "rocket/rocket_fuel_bucket");
             bucket_rocket_fuel.setMaxStackSize(1);
             bucket_rocket_fuel.setContainerItem(Item.bucketEmpty);
         }
@@ -1005,6 +1013,29 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     @Override
     public String getLabel() {
         return "FZ_registry";
+    }
+    
+    public void loadLanguages() {
+        URL url = this.getClass().getResource(Core.language_file);
+        if (url == null) {
+            Core.logSevere("Language file %s was not found", url);
+            return;
+        }
+        try {
+            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
+            String line;
+            while ((line = in.readLine()) != null) {
+                line = line.trim();
+                if (line.startsWith("#") || !line.contains("=")) {
+                    continue;
+                }
+                String parts[] = line.split("=");
+                String key = parts[0], value = parts[1];
+                LanguageRegistry.instance().addStringLocalization(key, value);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
