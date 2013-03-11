@@ -87,6 +87,12 @@ public class BlockRenderHelper extends Block {
     }
     
     @SideOnly(Side.CLIENT)
+    public void renderForInventory() {
+        begin();
+        renderRotated(Tessellator.instance, 0, 0, 0);
+    }
+    
+    @SideOnly(Side.CLIENT)
     public void render(int x, int y, int z) {
         rb.renderStandardBlock(this, x, y, z);
     }

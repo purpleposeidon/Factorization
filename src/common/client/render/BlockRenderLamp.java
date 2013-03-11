@@ -6,6 +6,7 @@ import net.minecraft.util.Icon;
 import factorization.common.BlockFactorization;
 import factorization.common.Core;
 import factorization.common.FactoryType;
+import factorization.common.ResourceType;
 
 public class BlockRenderLamp extends FactorizationBlockRender {
 
@@ -19,7 +20,7 @@ public class BlockRenderLamp extends FactorizationBlockRender {
         float glass_ver = trim_in; //trim_in + 1F / 128F;
         float panel = trim_out + s; //trim_in + s * 0;
         BlockFactorization block = Core.registry.factory_block;
-        Icon metal = Core.registry.dark_iron_block_item.getIconIndex();
+        Icon metal = Core.registry.resource_block.getBlockTextureFromSideAndMetadata(0, ResourceType.DARKIRONBLOCK.md);
         Icon glass = Block.glass.getBlockTextureFromSide(0);
         //glass
         renderPart(rb, glass, glass_mid, glass_ver, glass_mid, 1 - glass_mid, 1 - glass_ver, 1 - glass_mid);

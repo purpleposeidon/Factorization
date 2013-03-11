@@ -103,14 +103,11 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
         tess.startDrawingQuads();
         tess.setColorOpaque_F(1, 1, 1);
         
-        //NORELEASE
-                Icon diamond = diamondModel.diamond;
-                tess.addVertexWithUV(0, 4, 0, 0, 0);
-                tess.addVertexWithUV(0, 4, 10, 0, 1);
-                tess.addVertexWithUV(10, 4, 10, 1, 1);
-                tess.addVertexWithUV(10, 4, 0, 1, 0);
-                
-                
+        //If you find yourself needing to look at an atlas... (just don't forget our favorite TAG)
+//		tess.addVertexWithUV(0, 4, 0, 0, 0);
+//		tess.addVertexWithUV(0, 4, 10, 0, 1);
+//		tess.addVertexWithUV(10, 4, 10, 1, 1);
+//		tess.addVertexWithUV(10, 4, 0, 1, 0);
         
         
         GL11.glTranslatef(0, 2F / 16F, 0);
@@ -121,16 +118,6 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
         block.begin();
         block.translate(-0.5F, -0.5F, -0.5F);
         block.renderForTileEntity();
-        
-        //NORELEASE
-        /*
-        diamond = Block.blockSteel.getBlockTextureFromSide(0);
-        tess.addVertexWithUV(0, 8, 0, diamond.getU1(), diamond.getV1());
-        tess.addVertexWithUV(0, 8, 10, diamond.getU1(), diamond.getV2());
-        tess.addVertexWithUV(10, 8, 10, diamond.getU2(), diamond.getV2());
-        tess.addVertexWithUV(10, 8, 0, diamond.getU2(), diamond.getV1());
-        */
-        
         
         Tessellator.instance.draw();
 

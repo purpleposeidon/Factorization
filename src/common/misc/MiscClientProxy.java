@@ -117,7 +117,6 @@ public class MiscClientProxy extends MiscProxy {
                         //playing any earlier doesn't seem to work (sound is probably loaded in a separate thread?)
                         if (mc.currentScreen instanceof GuiMainMenu) {
                             mc.sndManager.playSoundFX("random.click", 1.0F, 1.0F);
-                            Core.logInfo("Click!");
                         }
                         hit = true;
                     }
