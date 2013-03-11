@@ -52,6 +52,9 @@ public class BlockRenderBattery extends FactorizationBlockRender {
         Tessellator tes = Tessellator.instance;
 
         float pixels = Math.round(fullness * 11);
+        if (pixels < 1) {
+            return;
+        }
         float h = 1F / 16F + pixels / 16F;
         final double d = 1.0 / 128.0;
         int brightness;
