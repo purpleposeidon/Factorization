@@ -171,6 +171,7 @@ public class BlockFactorization extends BlockContainer {
     @Override
     public void registerIcon(IconRegister reg) {
         FactorizationTextureLoader.register(reg, BlockIcons.class);
+        Core.proxy.texturepackChanged();
     }
     
     @SideOnly(Side.CLIENT)
@@ -489,7 +490,8 @@ public class BlockFactorization extends BlockContainer {
 
     @Override
     public boolean canRenderInPass(int pass) {
-        return pass == 0 || pass == 1;
+        return pass == 0;
+        //return pass == 0 || pass == 1;
     }
 
     @Override

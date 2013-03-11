@@ -531,4 +531,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
         int key = ((FactorizationClientProxy) Core.proxy).exoKeys[keyindex - 1].keyCode;
         return GameSettings.getKeyDisplayString(key);
     }
+    
+    @Override
+    public void texturepackChanged() {
+        TileEntityGrinderRender.remakeModel();
+    }
 }

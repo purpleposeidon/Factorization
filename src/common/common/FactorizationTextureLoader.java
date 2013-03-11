@@ -34,7 +34,8 @@ public class FactorizationTextureLoader {
     
     public static void register(IconRegister reg, Class base, Object instance, String base_prefix) {
         try {
-            for (Field f : base.getFields()) {
+            Field[] fields = base.getFields();
+            for (Field f : fields) {
                 String prefix = base_prefix;
                 
                 Directory dir = f.getAnnotation(Directory.class);
@@ -46,9 +47,9 @@ public class FactorizationTextureLoader {
                     IconGroup ig = (IconGroup) f.get(instance);
                     if (ig == null) {
                         ig = (IconGroup) f.getType().newInstance();
-                        ig.prefix(f.getName());
-                        f.set(instance, ig);
                     }
+                    ig.prefix(f.getName());
+                    f.set(instance, ig);
                     register(reg, f.getType(), ig, prefix + ig.group_prefix);
                 }
                 if (Icon.class.isAssignableFrom(f.getType())) {

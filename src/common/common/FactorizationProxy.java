@@ -166,4 +166,6 @@ public abstract class FactorizationProxy implements IGuiHandler {
     public String getExoKeyBrief(int keyindex) {
         return "ExoKey" + keyindex;
     }
+    
+    public void texturepackChanged() {}
 }

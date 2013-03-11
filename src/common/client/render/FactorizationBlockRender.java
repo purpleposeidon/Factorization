@@ -24,6 +24,7 @@ import factorization.api.DeltaCoord;
 import factorization.api.ICoord;
 import factorization.api.VectorUV;
 import factorization.common.BlockFactorization;
+import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
 import factorization.common.Core;
 import factorization.common.FactoryType;
@@ -407,7 +408,7 @@ abstract public class FactorizationBlockRender implements ICoord {
     }
 
     void renderMotor(RenderBlocks rb, float yoffset) {
-        Icon metal = Core.registry.lead_block_item.getIconIndex();
+        Icon metal = BlockIcons.motor_texture;
         //metal = 11;
         float d = 4.0F / 16.0F;
         float yd = -d + 0.003F;

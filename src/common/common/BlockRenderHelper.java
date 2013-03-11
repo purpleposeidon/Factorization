@@ -38,6 +38,7 @@ public class BlockRenderHelper extends Block {
     @SideOnly(Side.CLIENT)
     private Icon[] textures;
     
+    @SideOnly(Side.CLIENT)
     private Icon[] repetitionCache = new Icon[6];
     
     @SideOnly(Side.CLIENT)
@@ -82,7 +83,6 @@ public class BlockRenderHelper extends Block {
     
     @SideOnly(Side.CLIENT)
     public void renderForTileEntity() {
-        begin();
         renderRotated(Tessellator.instance, 0, 0, 0);
     }
     
@@ -132,8 +132,9 @@ public class BlockRenderHelper extends Block {
             Icon faceIcon = textures[i];
             for (int f = 0; f < cache.length; f++) {
                 VectorUV vert = cache[f];
-                vert.u = faceIcon.interpolateU(vert.u);
-                vert.v = faceIcon.interpolateU(vert.v);
+                //System.out.println(vert.u + ", " + vert.v);
+                vert.u = faceIcon.interpolateU(vert.u*16);
+                vert.v = faceIcon.interpolateV(vert.v*16);
             }
         }
         return this;
@@ -169,8 +170,8 @@ public class BlockRenderHelper extends Block {
     public void renderRotated(Tessellator tess, int x, int y, int z) {
         for (int f = 0; f < fullCache.length; f++) {
             VectorUV[] face = fullCache[f];
-            for (int v = 0; v < face.length; v++) {
-                VectorUV vert = face[v];
+            for (int i = 0; i < face.length; i++) {
+                VectorUV vert = face[i];
                 tess.addVertexWithUV(vert.x + x, vert.y + y, vert.z + z, vert.u, vert.v);
             }
         }

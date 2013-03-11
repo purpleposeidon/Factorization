@@ -81,7 +81,7 @@ public class BlockIcons {
     }
     
     public static class SimpleMachine extends IconGroup {
-        Icon face, side, top, bottom;
+        public Icon face, side, top, bottom;
         
         public Icon get(TileEntityFactorization tef, ForgeDirection dir) {
             switch (dir) {

@@ -32,7 +32,7 @@ public class FactorizationRender implements ISimpleBlockRenderingHandler {
         Core.profileStart("fz");
         try {
             int md = world.getBlockMetadata(x, y, z);
-            int renderPass = 1; //MinecraftForgeClient.getRenderPass(); Bluh
+            int renderPass = 0; //MinecraftForgeClient.getRenderPass(); Bluh
             TileEntity te = world.getBlockTileEntity(x, y, z);
             if (te instanceof TileEntityCommon) {
                 TileEntityCommon tec = (TileEntityCommon) te;
