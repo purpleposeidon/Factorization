@@ -1,9 +1,13 @@
 package factorization.common;
 
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.item.Item;
 import net.minecraft.util.Icon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.ForgeDirection;
@@ -78,8 +82,6 @@ public class BlockRenderHelper extends Block {
         return textures[side];
     }
     
-    @SideOnly(Side.CLIENT)
-    RenderBlocks rb = new RenderBlocks();
     
     @SideOnly(Side.CLIENT)
     public void renderForTileEntity() {
@@ -87,35 +89,59 @@ public class BlockRenderHelper extends Block {
     }
     
     @SideOnly(Side.CLIENT)
-    public void renderForInventory() {
+    public void renderForInventory(RenderBlocks renderblocks) {
+        // This originally copied from RenderBlocks.renderBlockAsItem
+        Tessellator tessellator = Tessellator.instance;
+        Icon texture;
+        int i = 0;
+        
+        GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
+        renderblocks.setRenderBoundsFromBlock(this);
+        tessellator.startDrawingQuads();
+        if ((texture = textures[i++]) != null) {
+            tessellator.setNormal(0.0F, -1F, 0.0F);
+            renderblocks.renderBottomFace(this, 0.0D, 0.0D, 0.0D, texture);
+        }
+        if ((texture = textures[i++]) != null) {
+            tessellator.setNormal(0.0F, 1.0F, 0.0F);
+            renderblocks.renderTopFace(this, 0.0D, 0.0D, 0.0D, texture);
+        }
+        if ((texture = textures[i++]) != null) {
+            tessellator.setNormal(0.0F, 0.0F, -1F);
+            renderblocks.renderEastFace(this, 0.0D, 0.0D, 0.0D, texture);
+        }
+        if ((texture = textures[i++]) != null) {
+            tessellator.setNormal(0.0F, 0.0F, 1.0F);
+            renderblocks.renderWestFace(this, 0.0D, 0.0D, 0.0D, texture);
+        }
+        if ((texture = textures[i++]) != null) {
+            tessellator.setNormal(-1F, 0.0F, 0.0F);
+            renderblocks.renderNorthFace(this, 0.0D, 0.0D, 0.0D, texture);
+        }
+        if ((texture = textures[i++]) != null) {
+            tessellator.setNormal(1.0F, 0.0F, 0.0F);
+            renderblocks.renderSouthFace(this, 0.0D, 0.0D, 0.0D, texture);
+        }
+        tessellator.draw();
+        GL11.glTranslatef(0.5F, 0.5F, 0.5F);
+        /*RenderHelper.enableGUIStandardItemLighting();
+        rb.renderBlockAsItem(this, 0, 0);*/
+        /*Tessellator.instance.startDrawingQuads();
         begin();
         renderRotated(Tessellator.instance, 0, 0, 0);
+        Tessellator.instance.draw();*/
     }
     
     @SideOnly(Side.CLIENT)
-    public void render(int x, int y, int z) {
+    public void render(RenderBlocks rb, int x, int y, int z) {
+        rb.setRenderBounds(minX, minY, minZ, maxX, maxY, maxZ);
         rb.renderStandardBlock(this, x, y, z);
     }
     
     @SideOnly(Side.CLIENT)
-    public void render(Tessellator tess, int x, int y, int z) {
-        Tessellator orig = Tessellator.instance;
-        Tessellator.instance = tess;
-        rb.renderStandardBlock(this, x, y, z);
-        Tessellator.instance = orig;
-    }
-    
-    @SideOnly(Side.CLIENT)
-    public void render(Coord c) {
+    public void render(RenderBlocks rb, Coord c) {
+        rb.setRenderBounds(minX, minY, minZ, maxX, maxY, maxZ);
         rb.renderStandardBlock(this, c.x, c.y, c.z);
-    }
-    
-    @SideOnly(Side.CLIENT)
-    public void render(Tessellator tess, Coord c) {
-        Tessellator orig = Tessellator.instance;
-        Tessellator.instance = tess;
-        rb.renderStandardBlock(this, c.x, c.y, c.z);
-        Tessellator.instance = orig;
     }
     
     //We could add stuff for simple 90 degree rotations
@@ -133,9 +159,12 @@ public class BlockRenderHelper extends Block {
     @SideOnly(Side.CLIENT)
     public BlockRenderHelper begin() {
         for (int i = 0; i < 6; i++) {
+            Icon faceIcon = textures[i];
+            if (faceIcon == null) {
+                continue;
+            }
             cache = fullCache[i];
             faceVerts(i);
-            Icon faceIcon = textures[i];
             for (int f = 0; f < cache.length; f++) {
                 VectorUV vert = cache[f];
                 //System.out.println(vert.u + ", " + vert.v);
@@ -150,6 +179,9 @@ public class BlockRenderHelper extends Block {
     public BlockRenderHelper rotate(Quaternion q) {
         //Apply the Quaternion to the vertices
         for (int f = 0; f < fullCache.length; f++) {
+            if (textures[f] == null) {
+                continue;
+            }
             VectorUV[] face = fullCache[f];
             for (int v = 0; v < face.length; v++) {
                 q.applyRotation(face[v]);
@@ -162,6 +194,9 @@ public class BlockRenderHelper extends Block {
     public BlockRenderHelper translate(float dx, float dy, float dz) {
         //Move the vertices
         for (int f = 0; f < fullCache.length; f++) {
+            if (textures[f] == null) {
+                continue;
+            }
             VectorUV[] face = fullCache[f];
             for (int v = 0; v < face.length; v++) {
                 face[v].x += dx;
@@ -175,6 +210,9 @@ public class BlockRenderHelper extends Block {
     @SideOnly(Side.CLIENT)
     public void renderRotated(Tessellator tess, int x, int y, int z) {
         for (int f = 0; f < fullCache.length; f++) {
+            if (textures[f] == null) {
+                continue;
+            }
             VectorUV[] face = fullCache[f];
             for (int i = 0; i < face.length; i++) {
                 VectorUV vert = face[i];
@@ -189,6 +227,9 @@ public class BlockRenderHelper extends Block {
             renderRotated(tess, 0, 0, 0);
         }
         for (int f = 0; f < fullCache.length; f++) {
+            if (textures[f] == null) {
+                continue;
+            }
             VectorUV[] face = fullCache[f];
             for (int v = 0; v < face.length; v++) {
                 VectorUV vert = face[v];
@@ -198,8 +239,8 @@ public class BlockRenderHelper extends Block {
     }
     
     
-    VectorUV[] cache = new VectorUV[4];
-    VectorUV[][] fullCache = new VectorUV[8][4];
+    VectorUV[] cache;
+    VectorUV[][] fullCache = new VectorUV[6][4];
     {
         for (int i = 0; i < fullCache.length; i++) {
             cache = fullCache[i];
@@ -237,10 +278,10 @@ public class BlockRenderHelper extends Block {
             set(3, 1, 0, 1);
             break;
         case 4: //-x
-            set(0, 0, 1, 1);
-            set(1, 0, 1, 0);
-            set(2, 0, 0, 0);
-            set(3, 0, 0, 1);
+            set(0, 0, 0, 1);
+            set(1, 0, 1, 1);
+            set(2, 0, 1, 0);
+            set(3, 0, 0, 0);
             break;
         case 5: //+x
             set(0, 1, 1, 1);
@@ -277,50 +318,26 @@ public class BlockRenderHelper extends Block {
         case 4: //-x
             for (int i = 0; i < cache.length; i++) {
                 VectorUV vert = cache[i];
-                vert.u = 1 - vert.y;
-                vert.v = vert.z;
+                vert.u = vert.z;
+                vert.v = 1 - vert.y;
             }
             break;
         case 5: //+x
             for (int i = 0; i < cache.length; i++) {
                 VectorUV vert = cache[i];
-                vert.u = 1 - vert.y;
-                vert.v = 1 - vert.z;
+                vert.u = 1 - vert.z;
+                vert.v = 1 - vert.y;
             }
             break;
         default:
             throw new RuntimeException("Invalid face number");
         }
         //This is for clipping UVs that go over the edge I think?
-        /*
         for (int i = 0; i < cache.length; i++) {
-            VectorUV main = cache[i];
-            float udelta = 0, vdelta = 0;
-            int nada = 0;
-            if (main.u > 16) {
-                udelta = main.u - 16;
-            } else if (main.u < 0) {
-                udelta = main.u;
-            } else {
-                nada++;
-            }
-            if (main.v > 16) {
-                vdelta = main.v - 16;
-            } else if (main.v < 0) {
-                vdelta = main.v;
-            } else {
-                nada++;
-            }
-            if (nada == 2) {
-                continue;
-            }
-            for (int J = 0; J < cache.length; J++) {
-                VectorUV other = cache[J];
-                other.u -= udelta;
-                other.v -= vdelta;
-            }
+            VectorUV vec = cache[i];
+            vec.u = Math.max(0, Math.min(1, vec.u));
+            vec.v = Math.max(0, Math.min(1, vec.v));
         }
-        */
     }
     
     private void set(int i, int X, int Y, int Z) {

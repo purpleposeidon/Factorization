@@ -10,6 +10,7 @@ import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
 import factorization.common.Core;
 import factorization.common.FactoryType;
+import factorization.common.ResourceType;
 import factorization.common.TileEntityMirror;
 
 public class BlockRenderMirrorStand extends FactorizationBlockRender {
@@ -24,7 +25,7 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
         float height = 7.25F / 16F;
         float radius = 1F / 16F;
         float c = 0.5F;
-        Icon silver = Core.registry.silver_block_item.getIconIndex();
+        Icon silver = Core.registry.resource_block.getBlockTextureFromSideAndMetadata(0, ResourceType.SILVERBLOCK.md);
         renderPart(rb, silver, c - radius, 0, c - radius, c + radius, height, c + radius);
         float trim = 3F / 16F;
         float trim_height = 2F / 16F;
@@ -32,9 +33,12 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
         
         
         BlockRenderHelper block = BlockRenderHelper.instance;
-        block.setBlockBoundsOffset(6F/8F, 0.5F, 6F/8F);
+        block.setBlockBoundsOffset(2F/16F, 7.25F/16F, 2F/16F);
+        //block.setBlockBoundsOffset(0, 0, 0);
+        //block.setBlockBounds(0, 0, 0, 1, 1F/16F, 1);
         Icon side = BlockIcons.mirror_side;
-        block.useTextures(BlockIcons.mirror_back, BlockIcons.mirror_front, side, side, side, side);
+        Icon face = BlockIcons.mirror_front;
+        block.useTextures(face, face, side, side, side, side);
         
         block.begin();
         Coord here = getCoord();
@@ -42,9 +46,11 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
         if (world_mode) {
             TileEntityMirror tem = here.getTE(TileEntityMirror.class);
             if (tem != null && tem.target_rotation >= 0) {
-                Quaternion trans = Quaternion.getRotationQuaternion(Math.toRadians(tem.target_rotation + 90), ForgeDirection.UP);
+                block.translate(-0.5F, 0F, 0F);
+                Quaternion trans = Quaternion.getRotationQuaternion(Math.toRadians(tem.target_rotation - 90), ForgeDirection.UP);
                 trans.incrMultiply(mirrorTilt);
                 block.rotate(trans);
+                block.translate(0.5F, -0.20F, 0.5F);
             }
         }
         if (!world_mode) {

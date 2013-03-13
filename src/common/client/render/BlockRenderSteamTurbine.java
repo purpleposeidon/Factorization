@@ -64,7 +64,7 @@ public class BlockRenderSteamTurbine extends FactorizationBlockRender {
             rb.renderBottomFace(b, x, y, z, BlockIcons.turbine_bottom);
             Tessellator.instance.yOffset -= f;
             Tessellator.instance.yOffset -= f;
-            rb.renderTopFace(b, x, y, z, BlockIcons.turbine_top);
+            rb.renderTopFace(b, x, y, z, BlockIcons.turbine_bottom);
             Tessellator.instance.yOffset += f;
         } else {
             //render fan

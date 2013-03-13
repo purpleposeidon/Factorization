@@ -1,44 +1,22 @@
 package factorization.client.render;
 
-import java.util.Random;
-
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Icon;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import factorization.common.BlockIcons;
+import factorization.common.BlockRenderHelper;
 import factorization.common.Core;
+import factorization.common.ItemIcons;
 import factorization.common.TileEntitySolarTurbine;
 
 public class TileEntitySolarTurbineRender extends TileEntitySpecialRenderer {
-    class Spinner extends ModelBase
-    {
-        public ModelRenderer driveshaft;
-
-        public Spinner() {
-            int h = 4;
-            this.textureHeight = 64;
-            this.textureWidth = 64;
-            driveshaft = new ModelRenderer(this, 32, 0);
-            driveshaft.addBox(-0.5F, -h, -0.5F,
-                    1, h, 1,
-                    0.25F);
-            driveshaft.rotationPointX = 0;
-            driveshaft.rotationPointY = 1F;
-            driveshaft.rotationPointZ = 0;
-        }
-
-        public void renderAll() {
-            this.driveshaft.render(0.0625F);
-        }
-    }
-
-    Spinner axle = new Spinner();
-    static Random rand = new Random();
-
+    
     @Override
     public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
         TileEntitySolarTurbine turbine = (TileEntitySolarTurbine) te;
@@ -48,23 +26,36 @@ public class TileEntitySolarTurbineRender extends TileEntitySpecialRenderer {
         GL11.glPopMatrix();
     }
 
-    void renderWithRotation(float rotation) {
-        this.bindTextureByName(Core.texture_file_item);
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GL11.glScalef(1.0F, -1.0F, -1.0F);
-        GL11.glTranslatef(0.5F, 0.5F, 0.5F);
+    static void renderWithRotation(float rotation) {
+        //GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        //GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glTranslatef(0.5F, -0.5F/8F, -0.5F);
         GL11.glRotatef(rotation, 0, 1, 0);
-        axle.renderAll();
 
         float s = 0.60f;
         GL11.glScalef(s, s, s);
+        GL11.glPushMatrix();
         GL11.glRotatef(90, 1, 0, 0);
-        GL11.glTranslatef(-0.5F, -0.5F, 0.4F);
+        GL11.glTranslatef(-0.5F, -0.5F, 0.45F);
         drawProp();
+        GL11.glPopMatrix();
+        
+        Tessellator tess = Tessellator.instance;
+        tess.startDrawingQuads();
+        tess.setColorOpaque_F(1, 1, 1);
+        BlockRenderHelper block = BlockRenderHelper.instance;
+        Icon crank = ItemIcons.charge$crankshaft;
+        block.useTextures(null, null, crank, crank, crank, crank);
+        float d = 3F/8F;
+        block.setBlockBoundsOffset(d, 2.5F/8F, d);
+        block.begin();
+        block.renderForTileEntity();
+        //GL11.glTranslatef(-1, 0, 0);
+        GL11.glTranslatef(-0.5F, -1.1F, -0.5F);
+        Tessellator.instance.draw();
     }
 
-    void drawProp() {
+    static void drawProp() {
         FactorizationBlockRender.renderIcon(Core.registry.fan.getIconFromDamage(0));
     }
 

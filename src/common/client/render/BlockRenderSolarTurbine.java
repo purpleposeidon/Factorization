@@ -54,13 +54,6 @@ public class BlockRenderSolarTurbine extends FactorizationBlockRender {
         int water = 7;
         float m = 0.0001F;
         renderPart(rb, Block.glass.getBlockTextureFromSide(0), 0 + m, 0 + m, 0 + m, 1 - m, 1 - m, 1 - m);
-        if (!world_mode) {
-            GL11.glPushMatrix();
-            GL11.glTranslatef(-0.5F, 0.1F, -0.5F);
-            GL11.glRotatef(90, 1, 0, 0);
-            FactorizationBlockRender.renderIcon(Core.registry.fan.getIconFromDamage(0));
-            GL11.glPopMatrix();
-        }
         renderMotor(rb, 0);
         if (world_mode) {
             fake_wire.worldObj = me.w;
@@ -73,6 +66,12 @@ public class BlockRenderSolarTurbine extends FactorizationBlockRender {
             for (WireRenderingCube rc : con.getParts()) {
                 renderCube(rc);
             }
+        } else {
+            GL11.glPushMatrix();
+            GL11.glTranslatef(-0.5F, 0.1F, -0.5F);
+            GL11.glRotatef(90, 1, 0, 0);
+            FactorizationBlockRender.renderIcon(Core.registry.fan.getIconFromDamage(0));
+            GL11.glPopMatrix();
         }
     }
     

@@ -3,13 +3,13 @@ package factorization.common;
 import java.util.ArrayList;
 
 import net.minecraft.block.Block;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.Icon;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.VectorUV;
 
 public class WireRenderingCube {
-    int icon;
+    Icon icon;
     public VectorUV corner, origin, axis;
     public double ul, vl;
     public float theta;
@@ -18,7 +18,7 @@ public class WireRenderingCube {
      * Creates a lovely cube used to render with. The vectors are in texels with the center of the tile as the origin. The rotations will also be done around
      * the center of the tile.
      */
-    public WireRenderingCube(int icon, VectorUV corner, VectorUV origin) {
+    public WireRenderingCube(Icon icon, VectorUV corner, VectorUV origin) {
         if (origin == null) {
             origin = new VectorUV(0, 0, 0, 0, 0);
         }
@@ -30,46 +30,8 @@ public class WireRenderingCube {
         setIcon(icon);
     }
     
-    void writeToNBT(NBTTagCompound tag) {
-        tag.setInteger("icon", icon);
-        corner.writeToTag(tag, "c");
-        origin.writeToTag(tag, "o");
-        axis.writeToTag(tag, "a");
-        tag.setFloat("theta", theta);
-    }
-    
-    static WireRenderingCube loadFromNBT(NBTTagCompound tag) {
-        int icon = tag.getInteger("icon");
-        VectorUV c = VectorUV.readFromTag(tag, "c");
-        VectorUV o = VectorUV.readFromTag(tag, "o");
-        VectorUV a = VectorUV.readFromTag(tag, "a");
-        WireRenderingCube rc = new WireRenderingCube(icon, c, o);
-        rc.axis = a;
-        rc.theta = tag.getFloat("theta");
-        return rc;
-    }
-    
-    void writeToArray(ArrayList<Object> args) {
-        args.add(icon);
-        corner.addInfoToArray(args);
-        origin.addInfoToArray(args);
-        axis.addInfoToArray(args);
-        args.add(theta);
-    }
-    
     static float takeFloat(ArrayList<Object> args) {
         return (Float) args.remove(0);
-    }
-    
-    static WireRenderingCube readFromArray(ArrayList<Object> args) {
-        int icon = (Integer) args.remove(0);
-        VectorUV c = new VectorUV(takeFloat(args), takeFloat(args), takeFloat(args));
-        VectorUV o = new VectorUV(takeFloat(args), takeFloat(args), takeFloat(args));
-        VectorUV a = new VectorUV(takeFloat(args), takeFloat(args), takeFloat(args));
-        WireRenderingCube rc = new WireRenderingCube(icon, c, o);
-        rc.axis = a;
-        rc.theta = takeFloat(args);
-        return rc;
     }
     
     public boolean equals(WireRenderingCube other) {
@@ -123,11 +85,10 @@ public class WireRenderingCube {
         return this;
     }
     
-    public void setIcon(int newIcon) {
+    public void setIcon(Icon newIcon) {
         icon = newIcon;
-        //XXX TODO NOTE: This might not work properly with large texture packs?
-        ul = ((icon & 0xf) << 4) / 256.0;
-        vl = (icon & 0xf0) / 256.0;
+        ul = newIcon.getU1();
+        vl = newIcon.getV1();
     }
 
     public VectorUV[] faceVerts(int face) {

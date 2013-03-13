@@ -129,8 +129,7 @@ public class WireConnections {
     }
 
     static WireRenderingCube cube(VectorUV corner, VectorUV origin) {
-        final int icon = 11; //34... was old. 11 is right, but... what?
-        return new WireRenderingCube(icon, corner, origin);
+        return new WireRenderingCube(BlockIcons.wire, corner, origin);
     }
 
     static final float h = 2, w = 4; //these are half of the actual size.

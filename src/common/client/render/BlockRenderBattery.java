@@ -34,15 +34,11 @@ public class BlockRenderBattery extends FactorizationBlockRender {
     void renderInventoryMode(RenderBlocks rb, ItemRenderType type) {
         renderNormalBlock(rb, FactoryType.BATTERY.md);
         GL11.glPushMatrix();
-        Tessellator.instance.startDrawingQuads();
+        //TODO: Need to render with the correct positioning for the hand
         //if (type == EQUIPPED || type == ENTITY) {
-        if (true) {
-            GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
-        }
         RenderEngine re = Minecraft.getMinecraft().renderEngine;
         re.bindTextureFile(Core.texture_file_block);
         renderBatteryDisplay(rb, item_fullness);
-        Tessellator.instance.draw();
         GL11.glPopMatrix();
     }
 
@@ -56,7 +52,7 @@ public class BlockRenderBattery extends FactorizationBlockRender {
             return;
         }
         float h = 1F / 16F + pixels / 16F;
-        final double d = 1.0 / 128.0;
+        final float d = 1.0F / 128.0F;
         int brightness;
         if (world_mode) {
             brightness = Core.registry.factory_block.getMixedBrightnessForBlock(getCoord().w, x, y, z);
@@ -68,13 +64,14 @@ public class BlockRenderBattery extends FactorizationBlockRender {
         tes.setColorOpaque_F(color, fullness, fullness);
         
         BlockRenderHelper block = BlockRenderHelper.instance;
+        //Icon meter = BlockIcons.battery_meter;
         Icon meter = BlockIcons.battery_meter;
         block.useTextures(null, null, meter, meter, meter, meter);
-        block.setBlockBounds(0, 0, 0, 1, h, 1);
+        block.setBlockBounds(0 - d, 0, 0 - d, 1 + d, h, 1 + d);
         if (world_mode) {
-            block.render(x, y, z);
+            block.render(rb, x, y, z);
         } else {
-            block.renderForTileEntity();
+            block.renderForInventory(rb);
         }
     }
 

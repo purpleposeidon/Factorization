@@ -1,6 +1,7 @@
 package factorization.client.render;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
@@ -27,6 +28,9 @@ public class BatteryItemRender implements IItemRenderer {
 
     @Override
     public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper) {
+        if (type == ItemRenderType.EQUIPPED) {
+            return false;
+        }
         return item.getItem() instanceof ItemBattery;
     }
 
@@ -40,11 +44,12 @@ public class BatteryItemRender implements IItemRenderer {
             GL11.glScalef(0.5F, 0.5F, 0.5F);
         }
         if (type == ItemRenderType.EQUIPPED) {
+            /*
             GL11.glTranslatef(0, 1, 1);
-            //GL11.glRotatef(45, 1, 1, 0);
+            GL11.glRotatef(45, 1, 1, 0);
             
             GL11.glRotatef(50.0F, 0.0F, 1.0F, 0.0F);
-            GL11.glRotatef(335.0F, 0.0F, 0.0F, 1.0F);
+            GL11.glRotatef(335.0F, 0.0F, 0.0F, 1.0F);*/
         }
         if (type == ItemRenderType.INVENTORY) {
             

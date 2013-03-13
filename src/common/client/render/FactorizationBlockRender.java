@@ -145,40 +145,13 @@ abstract public class FactorizationBlockRender implements ICoord {
         }
     }
     
-    protected void renderCauldron(RenderBlocks rb, Icon metal, Icon lid) {
-        BlockFactorization block = Core.registry.factory_rendering_block;
+    protected void renderCauldron(RenderBlocks rb, Icon lid, Icon metal) {
         Tessellator tessellator = Tessellator.instance;
-        //render the outside
-        rb.setRenderBounds(0, 0, 0, 1, 1, 1);
-        block.setBlockBounds(0, 0, 0, 1, 1, 1);
+        BlockRenderHelper block = BlockRenderHelper.instance;
+        block.setBlockBoundsOffset(0, 0, 0);
+        block.useTextures(metal, lid, metal, metal, metal, metal);
         if (world_mode) {
-            rb.renderStandardBlock(block, x, y, z);
-        } else {
-            GL11.glPushAttrib(GL11.GL_POLYGON_BIT);
-            GL11.glDisable(GL11.GL_CULL_FACE);
-            RenderBlocks renderblocks = rb;
-            Icon texture = metal;
-            GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
-            tessellator.startDrawingQuads();
-            tessellator.setNormal(0.0F, -1F, 0.0F);
-            renderblocks.renderBottomFace(block, 0.0D, 0.0D, 0.0D, texture);
-            tessellator.setNormal(0.0F, 1.0F, 0.0F);
-            renderblocks.renderTopFace(block, 0.0D, 0.0D, 0.0D, lid);
-            tessellator.setNormal(0.0F, 0.0F, -1F);
-            renderblocks.renderEastFace(block, 0.0D, 0.0D, 0.0D, texture);
-            tessellator.setNormal(0.0F, 0.0F, 1.0F);
-            renderblocks.renderWestFace(block, 0.0D, 0.0D, 0.0D, texture);
-            tessellator.setNormal(-1F, 0.0F, 0.0F);
-            renderblocks.renderNorthFace(block, 0.0D, 0.0D, 0.0D, texture);
-            tessellator.setNormal(1.0F, 0.0F, 0.0F);
-            renderblocks.renderSouthFace(block, 0.0D, 0.0D, 0.0D, texture);
-            tessellator.draw();
-            GL11.glTranslatef(0.5F, 0.5F, 0.5F);
-            GL11.glPopAttrib();
-        }
-        if (world_mode) {
-            //render the inside
-            //We don't need an inventory_mode because it draws both faces
+            block.render(rb, getCoord());
             float d = 2F/16F;
             boolean origAO = rb.enableAO;
             rb.setRenderBounds(d, d, d, 1 - d, 1, 1 - d);
@@ -190,8 +163,13 @@ abstract public class FactorizationBlockRender implements ICoord {
             rb.renderWestFace(block, x, y, z - 1 + 2*d, metal);
             rb.renderTopFace(block, x, y - 1 + 1*d, z, metal);
             rb.enableAO = origAO;
-            rb.setRenderBounds(0, 0, 0, 1, 1, 1);
-            block.setBlockBounds(0, 0, 0, 1, 1, 1);
+        } else {
+            GL11.glDisable(GL11.GL_CULL_FACE);
+            //GL11.glDisable(GL11.GL_LIGHTING);
+            block.renderForInventory(rb);
+            //GL11.glEnable(GL11.GL_LIGHTING);
+            GL11.glTranslatef(0.5F, 0.5F, 0.5F);
+            GL11.glEnable(GL11.GL_CULL_FACE);
         }
     }
     
@@ -373,13 +351,12 @@ abstract public class FactorizationBlockRender implements ICoord {
     protected void vertex(WireRenderingCube rc, float x, float y, float z, float u, float v) {
         //all units are in texels; center of the cube is the origin. Or, like... not the center but the texel that's (8,8,8) away from the corner is.
         //u & v are in texels
-        u = (int) u;
-        v = (int) v;
+        Icon wire = BlockIcons.wire;
         Tessellator.instance.addVertexWithUV(
                 this.x + 0.5 + x / 16F,
                 this.y + 0.5 + y / 16F,
                 this.z + 0.5 + z / 16F,
-                rc.ul + u / 256F, rc.vl + v / 256F);
+                wire.interpolateU(u), wire.interpolateV(v));
     }
     
     public static void renderIcon(Icon icon) {
@@ -398,12 +375,12 @@ abstract public class FactorizationBlockRender implements ICoord {
         float f4 = 0.0F;
         float f5 = 0.3F;
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glTranslatef(-f4, -f5, 0.0F);
+        //GL11.glTranslatef(-f4, -f5, 0.0F);
         float f6 = 1.5F;
-        GL11.glScalef(f6, f6, f6);
-        GL11.glRotatef(50.0F, 0.0F, 1.0F, 0.0F);
-        GL11.glRotatef(335.0F, 0.0F, 0.0F, 1.0F);
-        GL11.glTranslatef(-0.9375F, -0.0625F, 0.0F);
+        //GL11.glScalef(f6, f6, f6);
+        //GL11.glRotatef(50.0F, 0.0F, 1.0F, 0.0F);
+        //GL11.glRotatef(335.0F, 0.0F, 0.0F, 1.0F);
+        //GL11.glTranslatef(-0.9375F, -0.0625F, 0.0F);
         ItemRenderer.renderItemIn2D(tessellator, f1, f2, f, f3, icon.getWidth(), icon.getHeight(), 0.0625F);
     }
 
