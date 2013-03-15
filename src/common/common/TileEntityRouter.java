@@ -1,9 +1,5 @@
 package factorization.common;
 
-/*
- * XXX TODO Mysterious Bugs:
- *   - infinite buckets. May be caused by heavy loads? May have fixed, but not sure
- */
 import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,6 +14,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -25,7 +22,7 @@ import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
-import net.minecraftforge.common.ISidedInventory;
+import net.minecraftforge.common.DEPRECATED_ISidedInventory;
 import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
 
@@ -137,6 +134,8 @@ public class TileEntityRouter extends TileEntityFactorization {
             IInventory chest = FactorizationUtil.openDoubleChest((TileEntityChest) ent);
             // null means it's a lower chest, but would keep it from
             // continuing, so return a convenient Router.
+            // But, will this mess things up if we've got a MachineFilter using "Chest|Router"?
+            // It shouldn't, since we skip over ourselves.
             return (chest == null) ? this : chest;
         }
         if (ent instanceof IInventory) {
@@ -193,9 +192,17 @@ public class TileEntityRouter extends TileEntityFactorization {
         int start = 0, end = inv.getSizeInventory();
         if (inv instanceof ISidedInventory) {
             ISidedInventory isi = (ISidedInventory) inv;
-            ForgeDirection access_side = ForgeDirection.getOrientation(CubeFace.oppositeSide(eject_direction));
+            int access_side = ForgeDirection.getOrientation(eject_direction).getOpposite().ordinal();
             start = isi.getStartInventorySide(access_side);
             end = start + isi.getSizeInventorySide(access_side);
+            if (start == end) {
+                return;
+            }
+        } else if (inv instanceof DEPRECATED_ISidedInventory) { //TODO NORELEASE: Switch to vanilla ISI. Also respect IInventory.canAccept...
+            DEPRECATED_ISidedInventory isi = (DEPRECATED_ISidedInventory) inv;
+            ForgeDirection access_side = ForgeDirection.getOrientation(CubeFace.oppositeSide(eject_direction));
+            start = isi.DEPRECATED_getStartInventorySide(access_side);
+            end = start + isi.DEPRECATED_getSizeInventorySide(access_side);
             if (start == end) {
                 return;
             }
@@ -313,6 +320,9 @@ public class TileEntityRouter extends TileEntityFactorization {
         if (srcStack == null || srcStack.stackSize <= 0) {
             return false;
         }
+        if (!dest.acceptsStackInSlot(dest_slot, srcStack)) {
+            return false;
+        }
         if (destStack == null) {
             if (upgradeThroughput) {
                 // Ha! Easy swap!
@@ -371,7 +381,6 @@ public class TileEntityRouter extends TileEntityFactorization {
     }
 
     public String getIInventoryName(IInventory t) {
-        //NOTE: This seems to have troubles with IC TEs? Maybe just on SMP?
         String invName = t.getInvName();
         if (invName == null || invName.length() == 0) {
             String className = t.getClass().getSimpleName();
@@ -423,7 +432,17 @@ public class TileEntityRouter extends TileEntityFactorization {
             ISidedInventory inv = (ISidedInventory) t;
             for (ForgeDirection side : ForgeDirection.values()) {
                 // check each side
-                if (inv.getSizeInventorySide(side) != 0) {
+                if (inv.getSizeInventorySide(side.ordinal()) != 0) {
+                    free_count++;
+                }
+            }
+            return free_count == 0;
+        } else if (t instanceof DEPRECATED_ISidedInventory) {
+            int free_count = 0;
+            DEPRECATED_ISidedInventory inv = (DEPRECATED_ISidedInventory) t;
+            for (ForgeDirection side : ForgeDirection.values()) {
+                // check each side
+                if (inv.DEPRECATED_getSizeInventorySide(side) != 0) {
                     free_count++;
                 }
             }
@@ -433,16 +452,29 @@ public class TileEntityRouter extends TileEntityFactorization {
     }
 
     boolean legalSlot(IInventory t, int slot) {
-        if (!(t instanceof ISidedInventory)) {
-            return true;
-        }
-        ISidedInventory s = (ISidedInventory) t;
-        for (ForgeDirection side : ForgeDirection.values()) {
-            int low = s.getStartInventorySide(side);
-            int high = low + s.getSizeInventorySide(side);
-            if (low <= slot && slot < high) {
-                return true;
+        if (t instanceof ISidedInventory) {
+            ISidedInventory s = (ISidedInventory) t;
+            for (ForgeDirection side : ForgeDirection.values()) {
+                if (side == ForgeDirection.UNKNOWN) {
+                    continue;
+                }
+                int low = s.getStartInventorySide(side.ordinal());
+                int high = low + s.getSizeInventorySide(side.ordinal());
+                if (low <= slot && slot < high) {
+                    return true;
+                }
             }
+        } else if (t instanceof DEPRECATED_ISidedInventory) {
+            DEPRECATED_ISidedInventory s = (DEPRECATED_ISidedInventory) t;
+            for (ForgeDirection side : ForgeDirection.values()) {
+                int low = s.DEPRECATED_getStartInventorySide(side);
+                int high = low + s.DEPRECATED_getSizeInventorySide(side);
+                if (low <= slot && slot < high) {
+                    return true;
+                }
+            }
+        } else {
+            return true;
         }
         return false;
     }
@@ -514,8 +546,15 @@ public class TileEntityRouter extends TileEntityFactorization {
             return false;
         }
         int start, end;
-        if (t instanceof ISidedInventory && target_side < 6 && target_side >= 0 && target_slot < 0) {
-            t = new FactorizationUtil.ISidedWrapper((ISidedInventory) t, ForgeDirection.getOrientation(target_side));
+        if (target_side < 6 && target_side >= 0 && target_slot < 0) {
+            if (t instanceof ISidedInventory) {
+                ISidedInventory isi = (ISidedInventory) t;
+                t = new FactorizationUtil.InventorySlice(t, isi.getStartInventorySide(target_side), isi.getSizeInventorySide(target_side));
+            } else if (t instanceof DEPRECATED_ISidedInventory) {
+                DEPRECATED_ISidedInventory isi = (DEPRECATED_ISidedInventory) t;
+                ForgeDirection side = ForgeDirection.getOrientation(target_side);
+                t = new FactorizationUtil.InventorySlice(t, isi.DEPRECATED_getStartInventorySide(side), isi.DEPRECATED_getSizeInventorySide(side));
+            }
         }
         if (target_slot < 0) {
             start = 0;
@@ -926,12 +965,17 @@ public class TileEntityRouter extends TileEntityFactorization {
     }
 
     @Override
-    public int getStartInventorySide(ForgeDirection side) {
+    public int getStartInventorySide(int s) {
         return 0;
     }
 
     @Override
-    public int getSizeInventorySide(ForgeDirection side) {
+    public int getSizeInventorySide(int s) {
         return 1;
+    }
+    
+    @Override
+    public boolean acceptsStackInSlot(int s, ItemStack itemstack) {
+        return s == 0;
     }
 }

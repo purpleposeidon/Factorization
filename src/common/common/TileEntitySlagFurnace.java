@@ -54,7 +54,8 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     }
 
     @Override
-    public int getStartInventorySide(ForgeDirection side) {
+    public int getStartInventorySide(int s) {
+        ForgeDirection side = ForgeDirection.getOrientation(s);
         switch (side) {
         case DOWN:
             return fuel; //bottom: fuel
@@ -66,11 +67,18 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     }
 
     @Override
-    public int getSizeInventorySide(ForgeDirection side) {
+    public int getSizeInventorySide(int s) {
+        ForgeDirection side = ForgeDirection.getOrientation(s);
         if (side == DOWN || side == UP) {
             return 1; //bottom/top: fuel/input
         }
         return 2;
+    }
+    
+    @Override
+    public boolean acceptsStackInSlot(int s, ItemStack itemstack) {
+        ForgeDirection side = ForgeDirection.getOrientation(s);
+        return side == DOWN || side == UP;
     }
 
     @Override

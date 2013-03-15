@@ -74,7 +74,8 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     }
 
     @Override
-    public int getStartInventorySide(ForgeDirection side) {
+    public int getStartInventorySide(int s) {
+        ForgeDirection side = ForgeDirection.getOrientation(s);
         if (side == ForgeDirection.UP) {
             return 0;
         }
@@ -82,8 +83,14 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     }
 
     @Override
-    public int getSizeInventorySide(ForgeDirection side) {
+    public int getSizeInventorySide(int s) {
         return 1;
+    }
+    
+    @Override
+    public boolean acceptsStackInSlot(int s, ItemStack itemstack) {
+        ForgeDirection side = ForgeDirection.getOrientation(s);
+        return side == ForgeDirection.UP;
     }
 
     @Override

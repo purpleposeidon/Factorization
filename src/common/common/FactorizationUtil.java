@@ -26,7 +26,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
-import net.minecraftforge.common.ISidedInventory;
+import net.minecraftforge.common.DEPRECATED_ISidedInventory;
 import net.minecraftforge.liquids.LiquidEvent;
 import net.minecraftforge.liquids.LiquidStack;
 import net.minecraftforge.liquids.LiquidTank;
@@ -73,7 +73,7 @@ public class FactorizationUtil {
         if (template == null || stranger == null) {
             return template == stranger;
         }
-        if (template.getItemDamage() == -1) {
+        if (template.getItemDamage() == Short.MAX_VALUE) {
             return template.itemID == stranger.itemID;
         }
         return similar(template, stranger);
@@ -281,75 +281,81 @@ public class FactorizationUtil {
         return chest;
     }
     
-    public static class ISidedWrapper implements IInventory {
-        ISidedInventory isi;
-        ForgeDirection side;
-        public ISidedWrapper(ISidedInventory isi, ForgeDirection side) {
-            this.isi = isi;
-            this.side = side;
+    public static class InventorySlice implements IInventory {
+        IInventory inv;
+        int start;
+        int length;
+        
+        public InventorySlice(IInventory inv, int start, int length) {
+            this.inv = inv;
+            this.start = start;
+            this.length = length;
         }
         
         @Override
         public int getSizeInventory() {
-            return isi.getSizeInventorySide(side);
-        }
-        
-        private int getSlot(int slotIndex) {
-            return isi.getStartInventorySide(side) + slotIndex;
+            return length;
         }
 
         @Override
-        public ItemStack getStackInSlot(int slotIndex) {
-            return isi.getStackInSlot(getSlot(slotIndex));
+        public ItemStack getStackInSlot(int i) {
+            return inv.getStackInSlot(this.start + i);
         }
 
         @Override
-        public ItemStack decrStackSize(int slotIndex, int amount) {
-            return isi.decrStackSize(getSlot(slotIndex), amount);
+        public ItemStack decrStackSize(int i, int amount) {
+            return inv.decrStackSize(this.start + i, amount);
         }
 
         @Override
-        public void setInventorySlotContents(int slotIndex, ItemStack stack) {
-            isi.setInventorySlotContents(getSlot(slotIndex), stack);
+        public ItemStack getStackInSlotOnClosing(int i) {
+            return inv.getStackInSlotOnClosing(this.start + i);
+        }
+
+        @Override
+        public void setInventorySlotContents(int i, ItemStack itemstack) {
+            inv.setInventorySlotContents(start + i, itemstack);
         }
 
         @Override
         public String getInvName() {
-            return isi.getInvName();
+            return inv.getInvName();
+        }
+
+        @Override
+        public boolean hasCustomName() {
+            return inv.hasCustomName();
         }
 
         @Override
         public int getInventoryStackLimit() {
-            return isi.getInventoryStackLimit();
+            return inv.getInventoryStackLimit();
         }
 
         @Override
         public void onInventoryChanged() {
-            isi.onInventoryChanged();
+            inv.onInventoryChanged();
         }
 
         @Override
-        public ItemStack getStackInSlotOnClosing(int var1) { return null; }
-        
-        @Override
-        public boolean isUseableByPlayer(EntityPlayer var1) { return true; }
+        public boolean isUseableByPlayer(EntityPlayer entityplayer) {
+            return inv.isUseableByPlayer(entityplayer);
+        }
 
         @Override
-        public void openChest() {}
+        public void openChest() {
+            inv.openChest();
+        }
 
         @Override
-        public void closeChest() {}
-        
-        @Override
-        public boolean acceptsStackInSlot(int i, ItemStack itemstack) {
-            return isi.acceptsStackInSlot(i, itemstack);
+        public void closeChest() {
+            inv.closeChest();
         }
-        
+
         @Override
-        public boolean hasCustomName() {
-            return isi.hasCustomName();
+        public boolean acceptsStackInSlot(int s, ItemStack itemstack) {
+            return inv.acceptsStackInSlot(start + s, itemstack);
         }
-        
     }
     
     //Recipe creation

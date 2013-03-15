@@ -191,8 +191,8 @@ public class TileEntityBarrel extends TileEntityFactorization {
             return null;
         }
         ItemStack ret = is.splitStack(amount);
-        updateStacks();
-        broadcastItemCount();
+        //updateStacks();
+        //broadcastItemCount();
         return ret;
     }
 
@@ -223,10 +223,10 @@ public class TileEntityBarrel extends TileEntityFactorization {
     public String getInvName() {
         return "Barrel";
     }
-
+    
     @Override
-    public int getStartInventorySide(ForgeDirection side) {
-        switch (side) {
+    public int getStartInventorySide(int side) {
+        switch (ForgeDirection.getOrientation(side)) {
         case DOWN:
             return 0; // -Y
         case UP:
@@ -237,11 +237,24 @@ public class TileEntityBarrel extends TileEntityFactorization {
     }
 
     @Override
-    public int getSizeInventorySide(ForgeDirection side) {
+    public int getSizeInventorySide(int s) {
+        ForgeDirection side = ForgeDirection.getOrientation(s);
         if (side == UP || side == DOWN) {
             return 1;
         }
         return 0;
+    }
+    
+    @Override
+    public boolean acceptsStackInSlot(int s, ItemStack itemstack) {
+        ForgeDirection side = ForgeDirection.getOrientation(s);
+        if (side == ForgeDirection.UP) {
+            if (item == null) {
+                return true;
+            }
+            return itemMatch(itemstack);
+        }
+        return false;
     }
 
     void info(EntityPlayer entityplayer) {

@@ -386,7 +386,7 @@ public class Coord {
         return w.getBlockTileEntity(x, y, z);
     }
 
-    public <T> T getTE(Class<T> clazz) {
+    public <T extends TileEntity> T getTE(Class<T> clazz) {
         TileEntity te = getTE();
         if (clazz.isInstance(te)) {
             return (T) te;

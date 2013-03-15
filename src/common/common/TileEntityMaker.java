@@ -13,14 +13,13 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Icon;
-import net.minecraftforge.common.ISidedInventory;
+import net.minecraftforge.common.DEPRECATED_ISidedInventory;
 import net.minecraftforge.common.ForgeDirection;
 import static net.minecraftforge.common.ForgeDirection.*;
 import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
 
-public class TileEntityMaker extends TileEntityFactorization implements
-        ISidedInventory {
+public class TileEntityMaker extends TileEntityFactorization {
     // Save these guys
     public boolean targets[] = new boolean[9]; // slots that should be filled
     ItemStack input;
@@ -228,7 +227,8 @@ public class TileEntityMaker extends TileEntityFactorization implements
     }
 
     @Override
-    public int getStartInventorySide(ForgeDirection side) {
+    public int getStartInventorySide(int s) {
+        ForgeDirection side = ForgeDirection.getOrientation(s);
         switch (side) {
         case DOWN:
             return paper_slot;
@@ -240,8 +240,14 @@ public class TileEntityMaker extends TileEntityFactorization implements
     }
 
     @Override
-    public int getSizeInventorySide(ForgeDirection side) {
+    public int getSizeInventorySide(int s) {
         return 1;
+    }
+    
+    @Override
+    public boolean acceptsStackInSlot(int s, ItemStack itemstack) {
+        ForgeDirection side = ForgeDirection.getOrientation(s);
+        return side == UP || side == DOWN;
     }
 
     @Override

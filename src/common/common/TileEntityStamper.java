@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.Icon;
-import net.minecraftforge.common.ISidedInventory;
+import net.minecraftforge.common.DEPRECATED_ISidedInventory;
 import net.minecraftforge.common.ForgeDirection;
 import static net.minecraftforge.common.ForgeDirection.*;
 
@@ -37,7 +37,8 @@ public class TileEntityStamper extends TileEntityFactorization {
     }
 
     @Override
-    public int getStartInventorySide(ForgeDirection side) {
+    public int getStartInventorySide(int s) {
+        ForgeDirection side = ForgeDirection.getOrientation(s);
         switch (side) {
         case UP:
         case DOWN:
@@ -48,8 +49,14 @@ public class TileEntityStamper extends TileEntityFactorization {
     }
 
     @Override
-    public int getSizeInventorySide(ForgeDirection side) {
+    public int getSizeInventorySide(int s) {
         return 1;
+    }
+    
+    @Override
+    public boolean acceptsStackInSlot(int s, ItemStack itemstack) {
+        ForgeDirection side = ForgeDirection.getOrientation(s);
+        return side == UP || side == DOWN;
     }
 
     @Override

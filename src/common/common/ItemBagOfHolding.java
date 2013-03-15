@@ -18,7 +18,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ISidedInventory;
+import net.minecraftforge.common.DEPRECATED_ISidedInventory;
 import net.minecraftforge.common.ForgeDirection;
 
 public class ItemBagOfHolding extends Item implements IActOnCraft {
@@ -218,11 +218,11 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
         IInventory inv = (IInventory) te;
         int inv_start = 0;
         int inv_end = inv.getSizeInventory();
-        if (inv instanceof ISidedInventory) {
-            ISidedInventory sinv = (ISidedInventory) inv;
+        if (inv instanceof DEPRECATED_ISidedInventory) {
+            DEPRECATED_ISidedInventory sinv = (DEPRECATED_ISidedInventory) inv;
             ForgeDirection orient = ForgeDirection.getOrientation(side);
-            inv_start = sinv.getStartInventorySide(orient);
-            inv_end = inv_start = sinv.getSizeInventorySide(orient);
+            inv_start = sinv.DEPRECATED_getStartInventorySide(orient);
+            inv_end = inv_start = sinv.DEPRECATED_getSizeInventorySide(orient);
         }
         // NOTE: We *could* consider double chests properly. But it maybe it's
         // more useful this way?

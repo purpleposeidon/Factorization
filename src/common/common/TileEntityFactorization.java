@@ -4,23 +4,16 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.Random;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.ISidedInventory;
-import factorization.api.Charge;
 import factorization.api.Coord;
-import factorization.api.IChargeConductor;
 import factorization.api.ICoord;
 import factorization.api.IFactoryType;
 import factorization.common.NetworkFactorization.MessageType;
@@ -241,10 +234,10 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     public final void closeChest() {
     }
     
-    @Override
+    /*@Override
     public boolean acceptsStackInSlot(int i, ItemStack itemstack) {
         return true;
-    }
+    }*/
     
     @Override
     public boolean hasCustomName() {

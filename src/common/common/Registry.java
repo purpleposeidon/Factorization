@@ -115,6 +115,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public Material materialMachine = new Material(MapColor.ironColor);
 
     WorldGenMinable silverGen;
+    
+    final int WILDCARD = Short.MAX_VALUE;
 
     void makeBlocks() {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
@@ -655,7 +657,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'I', dark_iron,
                 'S', "ingotSilver",
                 'G', Block.thinGlass,
-                'W', new ItemStack(wrath_igniter, 1, -1));
+                'W', new ItemStack(wrath_igniter, 1, WILDCARD));
 
         //Slag furnace
         recipe(slagfurnace_item,
