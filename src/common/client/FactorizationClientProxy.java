@@ -71,6 +71,7 @@ import factorization.client.render.TileEntityHeaterRenderer;
 import factorization.client.render.TileEntityMixerRenderer;
 import factorization.client.render.TileEntitySolarTurbineRender;
 import factorization.client.render.TileEntitySteamTurbineRender;
+import factorization.common.BlockRenderHelper;
 import factorization.common.Command;
 import factorization.common.ContainerCrystallizer;
 import factorization.common.ContainerExoModder;
@@ -535,5 +536,18 @@ public class FactorizationClientProxy extends FactorizationProxy {
     @Override
     public void texturepackChanged() {
         TileEntityGrinderRender.remakeModel();
+    }
+    
+    @Override
+    public boolean BlockRenderHelper_has_texture(BlockRenderHelper block, int f) {
+        if (block.textures == null) {
+            return true;
+        }
+        return block.textures[f] != null;
+    }
+    
+    @Override
+    public void BlockRenderHelper_clear_texture(BlockRenderHelper block) {
+        block.textures = null;
     }
 }

@@ -340,3 +340,25 @@ Boats. Of course, you'll need a splash potion-like to set them afloat. This will
 
 
 Fa²ct²o²ri²zn
+
+More storage:
+  Armor stands
+    H   Upper Armor Stand
+   -C-  leather Helmet, stick, leather vest
+    -
+
+   -L-  Lower Armor Stand
+    -   stick, leather leggings, leather boots
+    B
+
+    Shows off armor. Sneak- double-right click to swap your armor with it; implements IInventory
+  
+  Mini Chest
+    bbb
+    b b Wooden button
+    bbb
+    Stores a single stack of up to 64; probably slightly microblockish, could place up to 3x3 next to eachother? Maybe 2x2, less primes
+
+  Rainbow chest (Described elsewhere...)
+  Being Able To Place Barrels On Their Sides
+

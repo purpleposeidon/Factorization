@@ -8,9 +8,11 @@ public class ItemIcons {
     
     public static Icon charge$crankshaft;
     
+    public static Icon wrath_particle;
+    
     @Directory("craft")
     public static Icon packet_complete, packet_incomplete;
     
     @Directory("ceramics")
-    public static Icon delete, move, reset, rotate, rotate2, select, stretch;
+    public static Icon delete, move, reset, rotate, rotate2, stretch;
 }

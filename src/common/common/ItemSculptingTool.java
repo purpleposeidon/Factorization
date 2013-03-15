@@ -3,13 +3,20 @@ package factorization.common;
 import java.util.List;
 
 import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeDirection;
+import factorization.api.Coord;
+import factorization.api.Quaternion;
 import factorization.common.Core.TabType;
+import factorization.common.TileEntityGreenware.ClayLump;
+import factorization.common.TileEntityGreenware.ClayState;
 
 public class ItemSculptingTool extends Item {
 
@@ -44,7 +51,6 @@ public class ItemSculptingTool extends Item {
     public void registerIcon(IconRegister reg) { }
 
     static enum ToolMode {
-        SELECTOR("select", true),
         MOVER("move", true),
         STRETCHER("stretch", false),
         REMOVER("delete", true),
@@ -77,10 +83,10 @@ public class ItemSculptingTool extends Item {
     
     ToolMode getMode(int damage) {
         if (damage < 0) {
-            return ToolMode.SELECTOR;
+            return ToolMode.MOVER;
         }
         if (damage >= ToolMode.values().length) {
-            return ToolMode.SELECTOR;
+            return ToolMode.MOVER;
         }
         return ToolMode.values()[damage];
     }
@@ -98,7 +104,6 @@ public class ItemSculptingTool extends Item {
         case REMOVER: return ItemIcons.delete;
         case RESETTER: return ItemIcons.reset;
         case ROTATOR: return ItemIcons.rotate;
-        case SELECTOR: return ItemIcons.select;
         case STRETCHER: return ItemIcons.stretch;
         }
     }
@@ -118,7 +123,6 @@ public class ItemSculptingTool extends Item {
         is.setItemDamage(mode.next.ordinal());
     }
     
-    /*
     @Override
     public boolean onItemUse(ItemStack par1ItemStack,
             EntityPlayer par2EntityPlayer, World par3World, int par4, int par5,
@@ -164,63 +168,58 @@ public class ItemSculptingTool extends Item {
             return false;
         }
         if (w.isRemote) {
-            if (mode == ToolMode.SELECTOR) {
-                if (gw.parts.size() == 0) {
-                    return true;
-                }
-                int id = gw.parts.indexOf(gw.selected);
-                if (player.isSneaking()) {
-                    id--;
-                    if (id <= -1) {
-                        id = gw.parts.size() - 1;
-                    }
-                } else {
-                    id++;
-                    if (id == gw.parts.size()) {
-                        id = 0;
-                    }
-                }
-                gw.selected = gw.parts.get(id);
-                gw.broadcastMessage(null, MessageType.SculptSelect, id);
+            return true;
+        }
+        BlockRenderHelper hit = Core.registry.serverTraceHelper;
+        
+        //See EntityLiving.rayTrace
+        Vec3 playerPosition = player.getPosition(0);
+        Vec3 look = player.getLook(0);
+        double reach_distance = 6; //TODO: Get player's actual reach distance
+        Vec3 reach = playerPosition.addVector(look.xCoord * reach_distance, look.yCoord * reach_distance, look.zCoord * reach_distance);
+        
+        MovingObjectPosition hitPart = null;
+        int i = -1;
+        for (ClayLump lump : gw.parts) {
+            i++;
+            lump.toBlockBounds(hit);
+            hit.beginNoIcons();
+            hit.rotate(lump.quat);
+            hit.setBlockBoundsBasedOnRotation();
+            MovingObjectPosition mop = hit.collisionRayTrace(w, x, y, z, playerPosition, reach);
+            if (mop != null) {
+                //TODO: Need to use the closest one
+                hitPart = mop;
+                hitPart.subHit = i;
+                break;
             }
-            return true;
         }
-        if (mode == ToolMode.SELECTOR) {
-            return true;
-        }
-        SelectionInfo sel = TileEntityGreenware.selections.get(player.username);
-        if (sel == null) {
+        
+        if (hitPart == null) {
             return false;
         }
-        if (sel.gw != gw) {
-            return false;
-        }
-        if (sel.id < 0 || sel.id >= gw.parts.size()) {
-            return false;
-        }
-        RenderingCube selection = gw.parts.get(sel.id);
-        RenderingCube test;
+        
+        ClayLump selection = gw.parts.get(hitPart.subHit);
+        ClayLump test = selection.copy();
         switch (mode) {
         case MOVER:
-            test = selection.copy();
             move(test, player.isSneaking(), side);
             if (TileEntityGreenware.isValidLump(test)) {
                 move(selection, player.isSneaking(), side);
-                gw.shareLump(sel.id, selection);
+                gw.shareLump(hitPart.subHit, selection);
             }
             break;
         case STRETCHER:
             //move the nearest face of selected cube towards (of away from) the player
-            test = selection.copy();
             stretch(test, player.isSneaking(), side);
             if (TileEntityGreenware.isValidLump(test)) {
                 stretch(selection, player.isSneaking(), side);
-                gw.shareLump(sel.id, selection);
+                gw.shareLump(hitPart.subHit, selection);
             }
             break;
         case REMOVER:
             //delete selected
-            gw.removeLump(sel.id);
+            gw.removeLump(hitPart.subHit);
             EntityItem drop;
             if (gw.parts.size() == 0) {
                 here.setId(0);
@@ -231,68 +230,60 @@ public class ItemSculptingTool extends Item {
             w.spawnEntityInWorld(drop);
             break;
         case ROTATOR:
-            test = selection.copy();
             rotate(test, player.isSneaking(), side);
             if (TileEntityGreenware.isValidLump(test)) {
                 rotate(selection, player.isSneaking(), side);
-                gw.shareLump(sel.id, selection);
+                gw.shareLump(hitPart.subHit, selection);
             }
             break;
         case RESETTER:
-            selection.trans.reset();
-            gw.shareLump(sel.id, selection);
+            selection.quat = new Quaternion();
+            gw.shareLump(hitPart.subHit, selection);
             break;
         }
         
         return true;
     }
     
-    void rotate(RenderingCube cube, boolean reverse, int side) {
+    void rotate(ClayLump cube, boolean reverse, int side) {
         float delta = (float) Math.toRadians(360F/32F);
         if (reverse) {
             delta *= -1;
         }
         ForgeDirection direction = ForgeDirection.getOrientation(side);
-        cube.trans.rotate(direction.offsetX, direction.offsetY, direction.offsetZ, delta);
+        cube.quat.multiply(Quaternion.getRotationQuaternion(delta, direction.offsetX, direction.offsetY, direction.offsetZ));
     }
     
-    void move(RenderingCube cube, boolean reverse, int side) {
+    void move(ClayLump cube, boolean reverse, int side) {
         //shift origin 0.5, and corner by 0.5.
         ForgeDirection dir = ForgeDirection.getOrientation(side);
         stretch(cube, reverse, dir.ordinal());
         stretch(cube, !reverse, dir.getOpposite().ordinal());
     }
     
-    void stretch(RenderingCube cube, boolean reverse, int side) {
+    void stretch(ClayLump cube, boolean reverse, int side) {
         //shift origin 0.5, and corner by 0.5.
         ForgeDirection dir = ForgeDirection.getOrientation(side);
         float delta = reverse ? -0.5F : 0.5F;
         switch (dir) {
         case SOUTH:
-            cube.corner.z += delta;
-            cube.trans.translate(0, 0, delta);
+            cube.maxZ += delta;
             break;
         case NORTH:
-            cube.corner.z += delta;
-            cube.trans.translate(0, 0, -delta);
+            cube.minZ += delta;
             break;
         case EAST:
-            cube.corner.x += delta;
-            cube.trans.translate(delta, 0, 0);
+            cube.maxX += delta;
             break;
         case WEST:
-            cube.corner.x += delta;
-            cube.trans.translate(-delta, 0, 0);
+            cube.minX += delta;
             break;
         case UP:
-            cube.corner.y += delta;
-            cube.trans.translate(0, delta, 0);
+            cube.maxY += delta;
             break;
         case DOWN:
-            cube.corner.y += delta;
-            cube.trans.translate(0, -delta, 0);
+            cube.minY += delta;
             break;
         }
     }
-    */
 }

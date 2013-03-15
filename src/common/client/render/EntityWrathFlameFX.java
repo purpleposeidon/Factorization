@@ -1,11 +1,11 @@
 package factorization.client.render;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.World;
-import net.minecraftforge.client.ForgeHooksClient;
 import factorization.api.Coord;
-import factorization.common.Core;
+import factorization.common.ItemIcons;
 
 public class EntityWrathFlameFX extends EntityFX {
     double defaultY = 0;
@@ -16,7 +16,8 @@ public class EntityWrathFlameFX extends EntityFX {
         this.particleTextureJitterX = 0;
         this.particleTextureJitterY = 0;
         this.particleScale = 2;
-        setParticleTextureIndex(0);
+        func_94052_a(Minecraft.getMinecraft().renderEngine, ItemIcons.wrath_particle);
+        //setParticleTextureIndex(0);
         this.particleGravity = 0;
 
         this.motionX = vx;
@@ -27,6 +28,11 @@ public class EntityWrathFlameFX extends EntityFX {
         this.particleGreen = (20 + rand.nextInt(100)) / 255;
         this.particleBlue = 0.05F;
         this.particleMaxAge = (int) (50 * (1 + 0.1 * rand.nextFloat()));
+    }
+    
+    @Override
+    public int getFXLayer() {
+        return 2;
     }
 
     static final float colorDelta = 32F / 255F;
@@ -120,7 +126,6 @@ public class EntityWrathFlameFX extends EntityFX {
             if (particleBlue < gray)
                 particleBlue = gray;
         }
-        setParticleTextureIndex(0);
     }
 
 //	@Override

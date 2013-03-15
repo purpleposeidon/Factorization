@@ -47,11 +47,6 @@ public class BlockResource extends Block {
         }
         return icons[md];
     }
-
-    @Override
-    public String getTextureFile() {
-        return Core.texture_file_block;
-    }
     
     public void addCreativeItems(List itemList) {
         itemList.add(Core.registry.silver_ore_item);

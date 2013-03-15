@@ -1,33 +1,36 @@
 package factorization.common;
 
-import static java.lang.Math.abs;
 import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.block.Block;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagDouble;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.util.Icon;
-import net.minecraft.client.multiplayer.PlayerControllerMP;
-import net.minecraftforge.common.ForgeDirection;
-import factorization.api.MatrixTransform;
-import factorization.api.VectorUV;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
+
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
+
+import factorization.api.Quaternion;
 import factorization.common.NetworkFactorization.MessageType;
+import factorization.common.TileEntityGreenware.ClayLump;
 
 public class TileEntityGreenware extends TileEntityCommon {
     @Override
     public FactoryType getFactoryType() {
-        return FactoryType.GREENWARE;
+        return FactoryType.CERAMIC;
     }
 
     @Override
@@ -35,8 +38,117 @@ public class TileEntityGreenware extends TileEntityCommon {
         return BlockClass.Ceramic;
     }
     
-/*
-    public ArrayList<RenderingCube> parts = new ArrayList();
+    public static class ClayLump {
+        public byte minX, minY, minZ;
+        public byte maxX, maxY, maxZ;
+        
+        public short icon_id; //Only blocks
+        public byte icon_md;
+        
+        public Quaternion quat;
+        
+        void write(ByteArrayDataOutput out) {
+            out.writeByte(minX);
+            out.writeByte(minY);
+            out.writeByte(minZ);
+            out.writeByte(maxX);
+            out.writeByte(maxY);
+            out.writeByte(maxZ);
+            out.writeShort(icon_id);
+            out.writeByte(icon_md);
+            quat.write(out);
+        }
+        
+        void write(NBTTagCompound tag) {
+            tag.setByte("lx", minX);
+            tag.setByte("ly", minY);
+            tag.setByte("lz", minZ);
+            tag.setByte("hx", maxX);
+            tag.setByte("hy", maxY);
+            tag.setByte("hz", maxZ);
+            tag.setShort("icon_id", icon_id);
+            tag.setByte("icon_md", icon_md);
+            quat.writeToTag(tag, "r");
+        }
+        
+        void write(ArrayList<Object> out) {
+            out.add(minX);
+            out.add(minY);
+            out.add(minZ);
+            out.add(maxX);
+            out.add(maxY);
+            out.add(maxZ);
+            out.add(icon_id);
+            out.add(icon_md);
+            out.add(quat);
+        }
+        
+        ClayLump read(DataInput in) throws IOException {
+            minX = in.readByte();
+            minY = in.readByte();
+            minZ = in.readByte();
+            maxX = in.readByte();
+            maxY = in.readByte();
+            maxZ = in.readByte();
+            icon_id = in.readShort();
+            icon_md = in.readByte();
+            quat = Quaternion.read(in);
+            return this;
+        }
+        
+        ClayLump read(NBTTagCompound tag) {
+            minX = tag.getByte("lx");
+            minY = tag.getByte("ly");
+            minZ = tag.getByte("lz");
+            maxX = tag.getByte("hx");
+            maxY = tag.getByte("hy");
+            maxZ = tag.getByte("hz");
+            icon_id = tag.getShort("icon_id");
+            icon_md = tag.getByte("icon_md");
+            quat = Quaternion.loadFromTag(tag, "r");
+            return this;
+        }
+        
+        void offset(int dx, int dy, int dz) {
+            minX += dx;
+            maxX += dx;
+            minY += dy;
+            maxY += dy;
+            minZ += dz;
+            maxZ += dz;
+        }
+        
+        ClayLump asDefault() {
+            minX = minY = minZ = 0;
+            maxX = maxZ = 3;
+            maxY = 5;
+            offset(16, 16, 16);
+            icon_id = (short) Core.resource_id;
+            icon_md = (byte) ResourceType.BISQUE.md;
+            quat = new Quaternion();
+            return this;
+        }
+        
+        void toBlockBounds(Block b) {
+            b.setBlockBounds(minX, minY, minZ, maxX, maxY, maxZ);
+        }
+
+        public ClayLump copy() {
+            ClayLump ret = new ClayLump();
+            ret.minX = minX;
+            ret.minY = minY;
+            ret.minZ = minZ;
+            ret.maxX = maxX;
+            ret.maxY = maxY;
+            ret.maxZ = maxZ;
+            ret.icon_id = icon_id;
+            ret.icon_md = icon_md;
+            ret.quat = new Quaternion(quat);
+            return ret;
+        }
+    }
+    
+    public ArrayList<ClayLump> parts = new ArrayList();
     public int lastTouched = 0;
     int totalHeat = 0;
     
@@ -46,20 +158,6 @@ public class TileEntityGreenware extends TileEntityCommon {
     public static int dryTime = 20*60*2; //2 minutes
     public static int bisqueHeat = 1000, glazeHeat = bisqueHeat*20;
     public static final int clayIconStart = 12*16;
-    
-    static class SelectionInfo {
-        TileEntityGreenware gw;
-        int id;
-        SelectionInfo(TileEntityGreenware gw, int id) {
-            this.gw = gw;
-            this.id = id;
-        }
-    }
-    
-    //server-side
-    static HashMap<String, SelectionInfo> selections = new HashMap();
-    //client-side
-    public static RenderingCube selected;
     
     public static enum ClayState {
         WET("Wet Greenware"), DRY("Bone-Dry Greenware"), BISQUED("Bisqued"), GLAZED("High-Fire Glazed");
@@ -89,25 +187,19 @@ public class TileEntityGreenware extends TileEntityCommon {
         return getStateFromInfo(lastTouched, totalHeat);
     }
     
-    public int getIcon(RenderingCube rc) {
-        int icon = 0;
+    public Icon getIcon(ClayLump lump) {
         switch (getState()) {
-        case WET:
-            icon = 0;
-            if (isSelected(rc)) {
-                icon = 1;
-            }
-            break;
-        case DRY:
-            icon = 3;
-            break;
-        case BISQUED:
-            icon = 5;
-            break;
+        case WET: return BlockIcons.ceramics$wet;
+        case DRY: return BlockIcons.ceramics$dry;
+        case BISQUED: return BlockIcons.ceramics$bisque;
         case GLAZED:
-            return rc.icon;
+            Item it = Item.itemsList[lump.icon_id];
+            if (it == null) {
+                return BlockIcons.error;
+            }
+            return it.getIconFromDamage(lump.icon_md);
+        default: return BlockIcons.error;
         }
-        return clayIconStart + icon;
     }
     
     public void touch() {
@@ -126,15 +218,15 @@ public class TileEntityGreenware extends TileEntityCommon {
     
     void initialize() {
         parts.clear();
-        parts.add(new RenderingCube(clayIconStart, new VectorUV(3, 5, 3)));
+        parts.add(new ClayLump().asDefault());
         touch();
     }
     
     void writeParts(NBTTagCompound tag) {
         NBTTagList l = new NBTTagList();
-        for (RenderingCube rc : parts) {
+        for (ClayLump lump : parts) {
             NBTTagCompound rc_tag = new NBTTagCompound();
-            rc.writeToNBT(rc_tag);
+            lump.write(rc_tag);
             l.appendTag(rc_tag);
         }
         tag.setTag("parts", l);
@@ -160,7 +252,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         parts.clear();
         for (int i = 0; i < partList.tagCount(); i++) {
             NBTTagCompound rc_tag = (NBTTagCompound) partList.tagAt(i);
-            parts.add(RenderingCube.loadFromNBT(rc_tag));
+            parts.add(new ClayLump().read(rc_tag));
         }
         lastTouched = tag.getInteger("touch");
     }
@@ -173,11 +265,12 @@ public class TileEntityGreenware extends TileEntityCommon {
     
     @Override
     public Packet getAuxillaryInfoPacket() {
-        ArrayList<Object> args = new ArrayList(2 + parts.size()*7);
+        ArrayList<Object> args = new ArrayList(2 + parts.size()*9);
         args.add(MessageType.SculptDescription);
         args.add(getState().ordinal());
-        for (RenderingCube rc : parts) {
-            rc.writeToArray(args);
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        for (ClayLump lump : parts) {
+            lump.write(args);
         }
         return getDescriptionPacketWith(args.toArray());
     }
@@ -220,10 +313,6 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
     }
     
-    public boolean isSelected(RenderingCube rc) {
-        return rc == selected;
-    }
-
     @Override
     public boolean activate(EntityPlayer player) {
         if (getState() == ClayState.WET) {
@@ -265,14 +354,10 @@ public class TileEntityGreenware extends TileEntityCommon {
     }
     
     void addLump(String creator) {
-        parts.add(new RenderingCube(clayIconStart, new VectorUV(4, 4, 4)));
+        parts.add(new ClayLump().asDefault());
         if (!worldObj.isRemote) {
             broadcastMessage(null, MessageType.SculptNew, creator);
-            selections.put(creator, new SelectionInfo(this, parts.size() - 1));
             touch();
-        } else if (creator.equals(Minecraft.getMinecraft().thePlayer.username)) {
-            //I added it, so select it
-            selected = parts.get(parts.size() - 1);
         }
     }
     
@@ -287,7 +372,9 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
     }
     
-    public static boolean isValidLump(RenderingCube rc) {
+    public static boolean isValidLump(ClayLump lump) {
+        return true; //TODO: Implement
+        /*
         float edge = 8*3; //a cube and a half
         for (int i = 0; i < 6; i++) {
             for (VectorUV vertex : rc.faceVerts(i)) {
@@ -311,30 +398,28 @@ public class TileEntityGreenware extends TileEntityCommon {
         if (rc.corner.x > max || rc.corner.y > max || rc.corner.z > max) {
             return false;
         }
-        return true;
+        return true;*/
     }
     
-    void updateLump(int id, RenderingCube newCube) {
+    void updateLump(int id, ClayLump lump) {
         if (id < 0 || id >= parts.size()) {
             return;
         }
-        RenderingCube old = parts.get(id);
-        if (old.equals(newCube)) {
+        ClayLump old = parts.get(id);
+        if (old.equals(lump)) {
             return;
         }
-        old.icon = newCube.icon;
-        old.corner = newCube.corner;
-        old.trans = newCube.trans;
+        parts.set(id, lump);
         touch();
         if (worldObj.isRemote) {
             return;
         }
     }
     
-    void shareLump(int id, RenderingCube selection) {
+    void shareLump(int id, ClayLump selection) {
         ArrayList<Object> toSend = new ArrayList();
         toSend.add(id);
-        selection.writeToArray(toSend);
+        selection.write(toSend);
         broadcastMessage(null, MessageType.SculptMove, toSend.toArray());
     }
     
@@ -348,10 +433,6 @@ public class TileEntityGreenware extends TileEntityCommon {
     public boolean handleMessageFromClient(int messageType, DataInput input)
             throws IOException {
         if (super.handleMessageFromClient(messageType, input)) {
-            return true;
-        }
-        if (messageType == MessageType.SculptSelect) {
-            selections.put(Core.network.getCurrentPlayer().username, new SelectionInfo(this, input.readInt()));
             return true;
         }
         if (messageType == MessageType.SculptWater) {
@@ -389,14 +470,14 @@ public class TileEntityGreenware extends TileEntityCommon {
             ArrayList<Object> args = new ArrayList();
             while (true) {
                 try {
-                    parts.add(RenderingCube.readFromDataInput(input));
+                    parts.add(new ClayLump().read(input));
                 } catch (IOException e) {
                     break;
                 }
             }
             break;
         case MessageType.SculptMove:
-            updateLump(input.readInt(), RenderingCube.readFromDataInput(input));
+            updateLump(input.readInt(), new ClayLump().read(input));
             break;
         case MessageType.SculptNew:
             addLump(input.readUTF());
@@ -429,5 +510,25 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
         getCoord().redraw();
     }
-    */
+    
+    @Override
+    public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z, Vec3 startVec, Vec3 endVec) {
+        BlockRenderHelper block;
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+            block = Core.registry.clientTraceHelper;
+        } else {
+            block = Core.registry.serverTraceHelper;
+        }
+        for (ClayLump lump : parts) {
+            block.setBlockBounds(lump.minX/16, lump.minY/16, lump.minZ/16, lump.maxX/16, lump.maxY/16, lump.maxZ/16);
+            block.beginNoIcons();
+            block.rotate(lump.quat);
+            block.setBlockBoundsBasedOnRotation();
+            MovingObjectPosition mop = block.collisionRayTrace(w, x, y, z, startVec, endVec);
+            if (mop != null) {
+                return mop;
+            }
+        }
+        return null;
+    }
 }

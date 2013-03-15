@@ -23,7 +23,7 @@ public class BlockRenderHelper extends Block {
     public static BlockRenderHelper instance;
 
     public BlockRenderHelper() {
-        super(0, Material.grass);
+        super(Core.factory_block_id, Material.grass);
         blocksList[blockID] = null;
         //These three shouldn't strictly be necessary
         opaqueCubeLookup[blockID] = false;
@@ -39,8 +39,29 @@ public class BlockRenderHelper extends Block {
         return this;
     }
     
+    public BlockRenderHelper setBlockBoundsBasedOnRotation() {
+        double minX, minY, minZ;
+        double maxX, maxY, maxZ;
+        
+        minX = maxX = cache[0].x;
+        minY = maxY = cache[0].y;
+        minZ = maxZ = cache[0].z;
+        
+        for (int i = 1; i < cache.length; i++) {
+            VectorUV vec = cache[i];
+            minX = Math.min(minX, cache[i].x);
+            minY = Math.min(minY, cache[i].y);
+            minZ = Math.min(minZ, cache[i].z);
+            maxX = Math.min(maxX, cache[i].x);
+            maxY = Math.min(maxY, cache[i].y);
+            maxZ = Math.min(maxZ, cache[i].z);
+        }
+        setBlockBounds((float)minX, (float)minY, (float)minZ, (float)maxX, (float)maxY, (float)maxZ);
+        return this;
+    }
+    
     @SideOnly(Side.CLIENT)
-    private Icon[] textures;
+    public Icon[] textures;
     
     @SideOnly(Side.CLIENT)
     private Icon[] repetitionCache = new Icon[6];
@@ -154,8 +175,6 @@ public class BlockRenderHelper extends Block {
     @SideOnly(Side.CLIENT)
     private static ForgeDirection[] dirs = ForgeDirection.values();
     
-    //NOTE: This code assumes that every side has an Icon.
-    
     @SideOnly(Side.CLIENT)
     public BlockRenderHelper begin() {
         for (int i = 0; i < 6; i++) {
@@ -175,11 +194,24 @@ public class BlockRenderHelper extends Block {
         return this;
     }
     
-    @SideOnly(Side.CLIENT)
+    public BlockRenderHelper beginNoIcons() {
+        for (int i = 0; i < 6; i++) {
+            cache = fullCache[i]; //fullCache isn't static; we'll have two instances for server thread & client thread
+            faceVerts(i);
+        }
+        return this;
+    }
+
+    
+    boolean hasTexture(int f) {
+        //Efficiency
+        return Core.proxy.BlockRenderHelper_has_texture(this, f);
+    }
+    
     public BlockRenderHelper rotate(Quaternion q) {
         //Apply the Quaternion to the vertices
         for (int f = 0; f < fullCache.length; f++) {
-            if (textures[f] == null) {
+            if (!hasTexture(f)) {
                 continue;
             }
             VectorUV[] face = fullCache[f];
@@ -190,11 +222,10 @@ public class BlockRenderHelper extends Block {
         return this;
     }
     
-    @SideOnly(Side.CLIENT)
     public BlockRenderHelper translate(float dx, float dy, float dz) {
         //Move the vertices
         for (int f = 0; f < fullCache.length; f++) {
-            if (textures[f] == null) {
+            if (!hasTexture(f)) {
                 continue;
             }
             VectorUV[] face = fullCache[f];

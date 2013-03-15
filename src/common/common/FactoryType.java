@@ -29,17 +29,22 @@ public enum FactoryType {
     GRINDER(17, true, TileEntityGrinder.class, "factory_grinder"), //grind
     MIXER(18, true, TileEntityMixer.class, "factory_mixer"), //crafts its input as shapeless recipes of 2-4 ingredients
     CRYSTALLIZER(19, true, TileEntityCrystallizer.class, "factory_crystal"), //grow metallic crystals
-    GREENWARE(20, false, TileEntityGreenware.class, "factory_greenware"), //clay sculpture
+    //20 -- Used to be GREENWARE
     STEAMTURBINE(21, false, TileEntitySteamTurbine.class, "factory_steamturbine"), //A generic steam turbine; works with other mods' steam
     SOLARBOILER(22, false, TileEntitySolarBoiler.class, "factory_solarfurnace"), //Produces steam from sunlight
     ROCKETENGINE(23, false, TileEntityRocketEngine.class, "factory_rocketengine"), //Is a rocket
     EXTENDED(24, false, TileEntityExtension.class, "factory_ext"), //Used for multipiece blocks (like beds & rocket engines)
+    CERAMIC(25, false, TileEntityGreenware.class, "factory_ceramic"), //clay sculpture (Not really implemented)
     
     
 
     POCKETCRAFTGUI(101, true),
     EXOTABLEGUICONFIG(102, true), //Exo-armor editor
     ;
+    
+    static {
+        CERAMIC.disable();
+    }
 
     final public int md;
     final public int gui;
@@ -47,9 +52,20 @@ public enum FactoryType {
     final private Class clazz;
     final public String te_id;
     private TileEntityCommon representative;
+    private boolean can_represent = true;
+    private boolean disabled = false;
 
     public TileEntityCommon getRepresentative() {
+        if (!can_represent) {
+            return null;
+        }
         if (representative == null) {
+            if (can_represent) {
+                can_represent = TileEntityCommon.class.isAssignableFrom(clazz);
+                if (!can_represent) {
+                    return null;
+                }
+            }
             try {
                 representative = ((Class<? extends TileEntityCommon>)clazz).newInstance();
             } catch (Throwable e) {
@@ -87,6 +103,10 @@ public enum FactoryType {
     FactoryType(int md, boolean use_gui) {
         this(md, use_gui, md, null, null);
     }
+    
+    void disable() {
+        disabled = true;
+    }
 
     TileEntityCommon makeTileEntity() {
         if (clazz == null) {
@@ -119,6 +139,9 @@ public enum FactoryType {
     }
 
     ItemStack itemStack() {
+        if (disabled) {
+            return null;
+        }
         ItemStack ret = new ItemStack(Core.registry.item_factorization, 1, this.md);
         return ret;
     }

@@ -73,7 +73,7 @@ public class ItemFactorization extends ItemBlock {
 
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
-        if (is.isItemEqual(Core.registry.greenware_item) /* required to not compare NBT here */) {
+        if (Core.registry.greenware_item != null && is.isItemEqual(Core.registry.greenware_item) /* required to not compare NBT here */) {
             NBTTagCompound tag = is.getTagCompound();
             if (tag != null) {
                 if (tag.hasKey("sculptureName")) {

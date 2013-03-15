@@ -1,7 +1,7 @@
 package factorization.api;
 
 import java.io.DataInput;
-import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 import net.minecraft.nbt.NBTTagCompound;
@@ -62,6 +62,13 @@ public class Quaternion {
     }
     
     public void write(ByteArrayDataOutput out) {
+        double[] d = toStaticArray();
+        for (int i = 0; i < d.length; i++) {
+            out.writeDouble(d[i]);
+        }
+    }
+    
+    public void write(DataOutputStream out) throws IOException {
         double[] d = toStaticArray();
         for (int i = 0; i < d.length; i++) {
             out.writeDouble(d[i]);

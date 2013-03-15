@@ -2,13 +2,11 @@ package factorization.common;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Random;
 
 import net.minecraft.block.Block;
@@ -24,13 +22,12 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.StringTranslate;
+import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.feature.WorldGenMinable;
-import net.minecraftforge.common.DungeonHooks;
+import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.Property;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.liquids.LiquidContainerData;
@@ -58,7 +55,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemFactorization item_factorization;
     public ItemBlockResource item_resource;
     public BlockFactorization factory_block, factory_rendering_block = null;
-    public BlockRenderHelper blockRender = null;
+    public BlockRenderHelper blockRender = null, serverTraceHelper = null, clientTraceHelper = null;
     public BlockLightAir lightair_block;
     public BlockResource resource_block;
 
@@ -126,6 +123,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             factory_rendering_block = new BlockFactorization(Core.factory_block_id);
             Block.blocksList[factory_rendering_block.blockID] = null;
         }
+        serverTraceHelper = new BlockRenderHelper();
+        clientTraceHelper = new BlockRenderHelper();
         factory_block = new BlockFactorization(Core.factory_block_id);
         lightair_block = new BlockLightAir(Core.lightair_id);
         resource_block = new BlockResource(Core.resource_id);
@@ -198,7 +197,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         grinder_item = FactoryType.GRINDER.itemStack();
         mixer_item = FactoryType.MIXER.itemStack();
         crystallizer_item = FactoryType.CRYSTALLIZER.itemStack();
-        greenware_item = FactoryType.GREENWARE.itemStack();
+        greenware_item = FactoryType.CERAMIC.itemStack();
         rocket_engine_item_hidden = FactoryType.ROCKETENGINE.itemStack();
 
         //BlockResource stuff
@@ -226,7 +225,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         bag_of_holding = new ItemBagOfHolding(itemID("bagOfHolding", 9001));
         
         logicMatrixProgrammer = new ItemMatrixProgrammer(itemID("logicMatrixProgrammer", 9043), "tool.matrix_programmer");
-        DungeonHooks.addDungeonLoot(new ItemStack(logicMatrixProgrammer), 50); //XXX TODO: Temporary, put these on asteroids.
+        ChestGenHooks dungeon = ChestGenHooks.getInfo(ChestGenHooks.DUNGEON_CHEST);
+        dungeon.addItem(new WeightedRandomChestContent(new ItemStack(logicMatrixProgrammer), 1, 1, 25)); //XXX TODO: Temporary, put these on asteroids.
         logicMatrix = new ItemCraftingComponent(itemID("logicMatrix", 9044), "logic_matrix");
         logicMatrixIdentifier = new ItemCraftingComponent(itemID("logicMatrixID", 9045), "logic_matrix_identifier");
         heatHole = new ItemCraftingComponent(itemID("heatHole", 9046), "heat_hole");
@@ -307,15 +307,24 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     }
 
     void shapelessRecipe(ItemStack res, Object... params) {
+        if (res == null) {
+            return;
+        }
         GameRegistry.addShapelessRecipe(res, params);
     }
 
     void oreRecipe(ItemStack res, Object... params) {
+        if (res == null) {
+            return;
+        }
         IRecipe rec = new ShapedOreRecipe(res, params);
         CraftingManager.getInstance().getRecipeList().add(rec);
     }
 
     void shapelessOreRecipe(ItemStack res, Object... params) {
+        if (res == null) {
+            return;
+        }
         IRecipe rec = new ShapelessOreRecipe(res, params);
         CraftingManager.getInstance().getRecipeList().add(rec);
     }

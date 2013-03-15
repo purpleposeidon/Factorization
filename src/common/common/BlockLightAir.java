@@ -60,14 +60,6 @@ public class BlockLightAir extends Block {
     
     @Override
     public void registerIcon(IconRegister reg) { }
-
-    @Override
-    public String getTextureFile() {
-        if (Core.debug_light_air) {
-            return Block.glowStone.getTextureFile();
-        }
-        return Core.texture_file_block;
-    }
     
     @Override
     public Icon getBlockTextureFromSideAndMetadata(int side, int md) {

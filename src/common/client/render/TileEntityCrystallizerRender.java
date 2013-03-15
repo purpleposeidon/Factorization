@@ -88,7 +88,6 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             ItemStack sol = crys.solution;
             Tessellator tess = Tessellator.instance;
             Icon tex = Block.waterMoving.getBlockTextureFromSide(1);
-            String texture_file = Block.waterMoving.getTextureFile();
             if (sol.getItem() == Core.registry.acid) {
                 glColor4f(1F, 1F, 1F, 0.5F);
                 glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -98,7 +97,6 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
                 //glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_ALPHA);
                 //glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_ALPHA);
                 glBlendFunc(GL_SRC_COLOR, GL_SRC_ALPHA);
-                texture_file = Core.texture_file_block;
                 //tex = 16 + 9; //Bluh!
             } else {
                 glColor4f(1F, 1F, 1F, 1);
@@ -106,7 +104,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             }
             RenderEngine re = Minecraft.getMinecraft().renderEngine;
             //XXX TODO NORELEASE: fix renderer
-            re.bindTextureFile(texture_file);
+            re.bindTextureFile(Core.texture_file_block);
             float u = ((/*tex*/ 0 & 15) << 4) / 256.0F;
             float v = (/*tex*/ 0 & 240) / 256.0F;
             float w = 1F / 16F;

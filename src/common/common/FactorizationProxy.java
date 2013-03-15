@@ -168,4 +168,8 @@ public abstract class FactorizationProxy implements IGuiHandler {
     }
     
     public void texturepackChanged() {}
+    
+    public boolean BlockRenderHelper_has_texture(BlockRenderHelper block, int f) { return true; }
+    
+    public void BlockRenderHelper_clear_texture(BlockRenderHelper block) { }
 }

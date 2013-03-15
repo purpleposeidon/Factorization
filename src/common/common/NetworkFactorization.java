@@ -26,6 +26,7 @@ import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
+import factorization.api.Quaternion;
 import factorization.api.VectorUV;
 
 public class NetworkFactorization implements ITinyPacketHandler {
@@ -56,6 +57,8 @@ public class NetworkFactorization implements ITinyPacketHandler {
                     output.writeInt((Integer) item);
                 } else if (item instanceof Byte) {
                     output.writeByte((Byte) item);
+                } else if (item instanceof Short) {
+                    output.writeShort((Short) item);
                 } else if (item instanceof String) {
                     output.writeUTF((String) item);
                 } else if (item instanceof Boolean) {
@@ -74,8 +77,11 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 } else if (item instanceof DeltaCoord) {
                     DeltaCoord dc = (DeltaCoord) item;
                     dc.write(output);
+                } else if (item instanceof Quaternion) {
+                    Quaternion q = (Quaternion) item;
+                    q.write(output);
                 } else {
-                    throw new RuntimeException("Argument is not Integer/Byte/String/Boolean/Float/ItemStack/DeltaCoord/RenderingCube.Vector: " + item);
+                    throw new RuntimeException("Don't know how to serialize " + item.getClass() + " (" + item + ")");
                 }
             }
             output.flush();
@@ -427,7 +433,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 //
                 WireFace = 121,
                 //
-                SculptDescription = 130, SculptSelect = 131, SculptNew = 132, SculptMove = 133, SculptRemove = 134, SculptState = 135, SculptWater = 136,
+                SculptDescription = 130, SculptNew = 132, SculptMove = 133, SculptRemove = 134, SculptState = 135, SculptWater = 136,
                 //
                 FurnaceBurnTime = 140,
                 //

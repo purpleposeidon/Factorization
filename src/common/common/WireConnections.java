@@ -224,8 +224,7 @@ public class WireConnections {
         block.setBlockBounds((float)(min.x + d), (float)(min.y + d), (float)(min.z + d), (float)(max.x + d), (float)(max.y + d), (float)(max.z + d));
     }
 
-    public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z, Vec3 startVec,
-            Vec3 endVec) {
+    public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z, Vec3 startVec, Vec3 endVec) {
         for (WireRenderingCube part : getParts()) {
             part.toBlockBounds(Core.registry.resource_block);
             MovingObjectPosition ret = Core.registry.resource_block.collisionRayTrace(w, x, y, z, startVec, endVec);

@@ -255,7 +255,6 @@ public class Core {
     @ServerStarting
     public void registerServerCommands(FMLServerStartingEvent event) {
         isMainServerThread.set(true);
-        event.registerServerCommand(new NameClayCommand());
     }
 
     ItemStack getExternalItem(String className, String classField, String description) {
@@ -297,7 +296,9 @@ public class Core {
         ArrayList a = new ArrayList<Object>();
         block.addCreativeItems(a);
         for (Object o : a) {
-            tab.add(o);
+            if (o != null) {
+                tab.add(o);
+            }
         }
     }
     

@@ -32,7 +32,6 @@ public class BlockFactorization extends BlockContainer {
         setResistance(5);
         setLightOpacity(1);
         canBlockGrass[id] = true;
-        setTextureFile(Core.texture_file_block);
         setTickRandomly(false);
     }
 
@@ -198,7 +197,11 @@ public class BlockFactorization extends BlockContainer {
         if (ft == null) {
             return BlockIcons.error;
         }
-        return ft.getRepresentative().getIcon(ForgeDirection.getOrientation(side));
+        TileEntityCommon rep = ft.getRepresentative();
+        if (rep == null) {
+            return BlockIcons.error;
+        }
+        return rep.getIcon(ForgeDirection.getOrientation(side));
     }
     
     @Override
