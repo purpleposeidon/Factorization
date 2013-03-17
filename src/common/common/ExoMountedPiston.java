@@ -35,7 +35,17 @@ public class ExoMountedPiston extends Item implements IExoUpgrade {
         if (c.copy().towardSide(orientation).isAir()) {
             return false;
         }
-        Block.pistonBase.onBlockEventReceived(c.w, c.x, c.y, c.z, 0, orientation);
+        c.w.isRemote = true; //oh god why
+        try {
+            Block.pistonBase.onBlockEventReceived(c.w, c.x, c.y, c.z, 0, orientation);
+        } finally {
+            c.w.isRemote = false;
+            //Here's why: In 1.5, pistons started checking if they're powered.
+            //But they don't check if the world's remote.
+            //There's definitely a possibility that this could break something tho. v_v
+            //This code only gets called when !w.isRemote, so we're not making the client think it's a server.
+            //(Actually, there's only 4 lines I'd need to copy. But one of them is a call to a private method.)
+        }
         c.setId(0);
         Core.network.broadcastMessage(null, c, NetworkFactorization.MessageType.PistonPush, orientation);
         return true;
@@ -57,6 +67,7 @@ public class ExoMountedPiston extends Item implements IExoUpgrade {
 
         Coord head;
         Coord foot;
+        //TODO NORELEASE: Test this in each quadrant
         head = new Coord(player).add(0, 1, 0);
         foot = new Coord(player);
 

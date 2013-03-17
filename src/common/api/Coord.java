@@ -13,6 +13,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -41,11 +42,12 @@ public class Coord {
     }
 
     public Coord(Entity ent) {
-        this(ent.worldObj, ent.posX, ent.posY + ent.yOffset, ent.posZ);
+        this(ent.worldObj, Math.floor(ent.posX), ent.posY + ent.yOffset, Math.floor(ent.posZ));
     }
 
     public Coord(World w, double x, double y, double z) {
         this(w, (int) x, (int) y, (int) z);
+        //this(w, (int) Math.floor(x + 0.5), (int) Math.floor(y + 0.5), (int) Math.floor(z + 0.5));
     }
     
     public static Coord of(int x, int y, int z) {
@@ -386,7 +388,7 @@ public class Coord {
         return w.getBlockTileEntity(x, y, z);
     }
 
-    public <T extends TileEntity> T getTE(Class<T> clazz) {
+    public <T> T getTE(Class<T> clazz) {
         TileEntity te = getTE();
         if (clazz.isInstance(te)) {
             return (T) te;
