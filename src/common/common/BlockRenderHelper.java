@@ -43,18 +43,23 @@ public class BlockRenderHelper extends Block {
         double minX, minY, minZ;
         double maxX, maxY, maxZ;
         
-        minX = maxX = cache[0].x;
-        minY = maxY = cache[0].y;
-        minZ = maxZ = cache[0].z;
+        currentFace = faceCache[0];
         
-        for (int i = 1; i < cache.length; i++) {
-            VectorUV vec = cache[i];
-            minX = Math.min(minX, cache[i].x);
-            minY = Math.min(minY, cache[i].y);
-            minZ = Math.min(minZ, cache[i].z);
-            maxX = Math.min(maxX, cache[i].x);
-            maxY = Math.min(maxY, cache[i].y);
-            maxZ = Math.min(maxZ, cache[i].z);
+        minX = maxX = currentFace[0].x;
+        minY = maxY = currentFace[0].y;
+        minZ = maxZ = currentFace[0].z;
+        
+        for (int face = 0; face < faceCache.length; face++) {
+            currentFace = faceCache[face];
+            for (int i = 1; i < currentFace.length; i++) {
+                VectorUV vec = currentFace[i];
+                minX = Math.min(minX, vec.x);
+                minY = Math.min(minY, vec.y);
+                minZ = Math.min(minZ, vec.z);
+                maxX = Math.max(maxX, vec.x);
+                maxY = Math.max(maxY, vec.y);
+                maxZ = Math.max(maxZ, vec.z);
+            }
         }
         setBlockBounds((float)minX, (float)minY, (float)minZ, (float)maxX, (float)maxY, (float)maxZ);
         return this;
@@ -182,10 +187,10 @@ public class BlockRenderHelper extends Block {
             if (faceIcon == null) {
                 continue;
             }
-            cache = fullCache[i];
+            currentFace = faceCache[i];
             faceVerts(i);
-            for (int f = 0; f < cache.length; f++) {
-                VectorUV vert = cache[f];
+            for (int f = 0; f < currentFace.length; f++) {
+                VectorUV vert = currentFace[f];
                 //System.out.println(vert.u + ", " + vert.v);
                 vert.u = faceIcon.interpolateU(vert.u*16);
                 vert.v = faceIcon.interpolateV(vert.v*16);
@@ -196,7 +201,7 @@ public class BlockRenderHelper extends Block {
     
     public BlockRenderHelper beginNoIcons() {
         for (int i = 0; i < 6; i++) {
-            cache = fullCache[i]; //fullCache isn't static; we'll have two instances for server thread & client thread
+            currentFace = faceCache[i]; //fullCache isn't static; we'll have two instances for server thread & client thread
             faceVerts(i);
         }
         return this;
@@ -210,11 +215,11 @@ public class BlockRenderHelper extends Block {
     
     public BlockRenderHelper rotate(Quaternion q) {
         //Apply the Quaternion to the vertices
-        for (int f = 0; f < fullCache.length; f++) {
+        for (int f = 0; f < faceCache.length; f++) {
             if (!hasTexture(f)) {
                 continue;
             }
-            VectorUV[] face = fullCache[f];
+            VectorUV[] face = faceCache[f];
             for (int v = 0; v < face.length; v++) {
                 q.applyRotation(face[v]);
             }
@@ -224,11 +229,11 @@ public class BlockRenderHelper extends Block {
     
     public BlockRenderHelper translate(float dx, float dy, float dz) {
         //Move the vertices
-        for (int f = 0; f < fullCache.length; f++) {
+        for (int f = 0; f < faceCache.length; f++) {
             if (!hasTexture(f)) {
                 continue;
             }
-            VectorUV[] face = fullCache[f];
+            VectorUV[] face = faceCache[f];
             for (int v = 0; v < face.length; v++) {
                 face[v].x += dx;
                 face[v].y += dy;
@@ -240,11 +245,11 @@ public class BlockRenderHelper extends Block {
     
     @SideOnly(Side.CLIENT)
     public void renderRotated(Tessellator tess, int x, int y, int z) {
-        for (int f = 0; f < fullCache.length; f++) {
+        for (int f = 0; f < faceCache.length; f++) {
             if (textures[f] == null) {
                 continue;
             }
-            VectorUV[] face = fullCache[f];
+            VectorUV[] face = faceCache[f];
             for (int i = 0; i < face.length; i++) {
                 VectorUV vert = face[i];
                 tess.addVertexWithUV(vert.x + x, vert.y + y, vert.z + z, vert.u, vert.v);
@@ -257,11 +262,11 @@ public class BlockRenderHelper extends Block {
         if (c == null) {
             renderRotated(tess, 0, 0, 0);
         }
-        for (int f = 0; f < fullCache.length; f++) {
+        for (int f = 0; f < faceCache.length; f++) {
             if (textures[f] == null) {
                 continue;
             }
-            VectorUV[] face = fullCache[f];
+            VectorUV[] face = faceCache[f];
             for (int v = 0; v < face.length; v++) {
                 VectorUV vert = face[v];
                 tess.addVertexWithUV(vert.x + c.x, vert.y + c.y, vert.z + c.z, vert.u, vert.v);
@@ -270,13 +275,13 @@ public class BlockRenderHelper extends Block {
     }
     
     
-    VectorUV[] cache;
-    VectorUV[][] fullCache = new VectorUV[6][4];
+    VectorUV[] currentFace;
+    VectorUV[][] faceCache = new VectorUV[6][4];
     {
-        for (int i = 0; i < fullCache.length; i++) {
-            cache = fullCache[i];
-            for (int j = 0; j < cache.length; j++) {
-                cache[j] = new VectorUV();
+        for (int i = 0; i < faceCache.length; i++) {
+            currentFace = faceCache[i];
+            for (int j = 0; j < currentFace.length; j++) {
+                currentFace[j] = new VectorUV();
             }
         }
     }
@@ -326,36 +331,36 @@ public class BlockRenderHelper extends Block {
         case 0: //-y
         case 1: //+y
             //Mirror these like MC does.
-            for (int i = 0; i < cache.length; i++) {
-                VectorUV vert = cache[i];
+            for (int i = 0; i < currentFace.length; i++) {
+                VectorUV vert = currentFace[i];
                 vert.u = vert.x;
                 vert.v = vert.z;
             }
             break;
         case 2: //-z
-            for (int i = 0; i < cache.length; i++) {
-                VectorUV vert = cache[i];
+            for (int i = 0; i < currentFace.length; i++) {
+                VectorUV vert = currentFace[i];
                 vert.u = 1 - vert.x;
                 vert.v = 1 - vert.y;
             }
             break;
         case 3: //+z
-            for (int i = 0; i < cache.length; i++) {
-                VectorUV vert = cache[i];
+            for (int i = 0; i < currentFace.length; i++) {
+                VectorUV vert = currentFace[i];
                 vert.u = vert.x;
                 vert.v = 1 - vert.y;
             }
             break;
         case 4: //-x
-            for (int i = 0; i < cache.length; i++) {
-                VectorUV vert = cache[i];
+            for (int i = 0; i < currentFace.length; i++) {
+                VectorUV vert = currentFace[i];
                 vert.u = vert.z;
                 vert.v = 1 - vert.y;
             }
             break;
         case 5: //+x
-            for (int i = 0; i < cache.length; i++) {
-                VectorUV vert = cache[i];
+            for (int i = 0; i < currentFace.length; i++) {
+                VectorUV vert = currentFace[i];
                 vert.u = 1 - vert.z;
                 vert.v = 1 - vert.y;
             }
@@ -364,16 +369,16 @@ public class BlockRenderHelper extends Block {
             throw new RuntimeException("Invalid face number");
         }
         //This is for clipping UVs that go over the edge I think?
-        for (int i = 0; i < cache.length; i++) {
-            VectorUV vec = cache[i];
+        for (int i = 0; i < currentFace.length; i++) {
+            VectorUV vec = currentFace[i];
             vec.u = Math.max(0, Math.min(1, vec.u));
             vec.v = Math.max(0, Math.min(1, vec.v));
         }
     }
     
     private void set(int i, int X, int Y, int Z) {
-        cache[i].x = X == 0 ? minX : maxX;
-        cache[i].y = Y == 0 ? minY : maxY;
-        cache[i].z = Z == 0 ? minZ : maxZ;
+        currentFace[i].x = X == 0 ? minX : maxX;
+        currentFace[i].y = Y == 0 ? minY : maxY;
+        currentFace[i].z = Z == 0 ? minZ : maxZ;
     }
 }

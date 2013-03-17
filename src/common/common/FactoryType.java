@@ -43,7 +43,7 @@ public enum FactoryType {
     ;
     
     static {
-        CERAMIC.disable();
+        //CERAMIC.disable();
     }
 
     final public int md;

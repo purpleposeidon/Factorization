@@ -24,7 +24,7 @@ public class ItemSculptingTool extends Item {
         super(id);
         setNoRepair();
         setMaxDamage(0);
-        setMaxStackSize(1);
+        setMaxStackSize(4);
         setUnlocalizedName("factorization:sculptTool");
         Core.tab(this, TabType.TOOLS);
         setFull3D();
@@ -173,49 +173,26 @@ public class ItemSculptingTool extends Item {
         BlockRenderHelper hit = Core.registry.serverTraceHelper;
         
         //See EntityLiving.rayTrace
-        Vec3 playerPosition = player.getPosition(0);
-        Vec3 look = player.getLook(0);
-        double reach_distance = 6; //TODO: Get player's actual reach distance
-        Vec3 reach = playerPosition.addVector(look.xCoord * reach_distance, look.yCoord * reach_distance, look.zCoord * reach_distance);
-        
-        MovingObjectPosition hitPart = null;
-        int i = -1;
-        for (ClayLump lump : gw.parts) {
-            i++;
-            lump.toBlockBounds(hit);
-            hit.beginNoIcons();
-            hit.rotate(lump.quat);
-            hit.setBlockBoundsBasedOnRotation();
-            MovingObjectPosition mop = hit.collisionRayTrace(w, x, y, z, playerPosition, reach);
-            if (mop != null) {
-                //TODO: Need to use the closest one
-                hitPart = mop;
-                hitPart.subHit = i;
-                break;
-            }
-        }
+        MovingObjectPosition hitPart = getMovingObjectPositionFromPlayer(w, player, true);
         
         if (hitPart == null) {
             return false;
         }
+        if (hitPart.subHit == -1) {
+            return true;
+        }
+        int strength = Math.max(1, is.stackSize);
         
         ClayLump selection = gw.parts.get(hitPart.subHit);
         ClayLump test = selection.copy();
+        boolean sneaking = player.isSneaking();
         switch (mode) {
         case MOVER:
-            move(test, player.isSneaking(), side);
-            if (TileEntityGreenware.isValidLump(test)) {
-                move(selection, player.isSneaking(), side);
-                gw.shareLump(hitPart.subHit, selection);
-            }
+            move(test, sneaking, side, strength);
             break;
         case STRETCHER:
             //move the nearest face of selected cube towards (of away from) the player
-            stretch(test, player.isSneaking(), side);
-            if (TileEntityGreenware.isValidLump(test)) {
-                stretch(selection, player.isSneaking(), side);
-                gw.shareLump(hitPart.subHit, selection);
-            }
+            stretch(test, sneaking, side, strength);
             break;
         case REMOVER:
             //delete selected
@@ -228,61 +205,58 @@ public class ItemSculptingTool extends Item {
                 drop = new EntityItem(w, gw.xCoord, gw.yCoord, gw.zCoord, new ItemStack(Item.clay));
             }
             w.spawnEntityInWorld(drop);
-            break;
+            return true;
         case ROTATOR:
-            rotate(test, player.isSneaking(), side);
-            if (TileEntityGreenware.isValidLump(test)) {
-                rotate(selection, player.isSneaking(), side);
-                gw.shareLump(hitPart.subHit, selection);
-            }
+            rotate(test, sneaking, side, strength);
             break;
         case RESETTER:
-            selection.quat = new Quaternion();
-            gw.shareLump(hitPart.subHit, selection);
+            test.quat = new Quaternion();
             break;
         }
-        
+        if (gw.isValidLump(test)) {
+            gw.changeLump(hitPart.subHit, test);
+        }
         return true;
     }
     
-    void rotate(ClayLump cube, boolean reverse, int side) {
-        float delta = (float) Math.toRadians(360F/32F);
+    void rotate(ClayLump cube, boolean reverse, int side, int strength) {
+        float delta = (float) Math.toRadians(360F/32F*strength);
         if (reverse) {
             delta *= -1;
         }
         ForgeDirection direction = ForgeDirection.getOrientation(side);
-        cube.quat.multiply(Quaternion.getRotationQuaternion(delta, direction.offsetX, direction.offsetY, direction.offsetZ));
+        cube.quat.incrMultiply(Quaternion.getRotationQuaternion(delta, direction.offsetX, direction.offsetY, direction.offsetZ));
     }
     
-    void move(ClayLump cube, boolean reverse, int side) {
+    void move(ClayLump cube, boolean reverse, int side, int strength) {
         //shift origin 0.5, and corner by 0.5.
         ForgeDirection dir = ForgeDirection.getOrientation(side);
-        stretch(cube, reverse, dir.ordinal());
-        stretch(cube, !reverse, dir.getOpposite().ordinal());
+        stretch(cube, reverse, dir.ordinal(), strength);
+        stretch(cube, !reverse, dir.getOpposite().ordinal(), strength);
     }
     
-    void stretch(ClayLump cube, boolean reverse, int side) {
+    void stretch(ClayLump cube, boolean reverse, int side, int strength) {
         //shift origin 0.5, and corner by 0.5.
         ForgeDirection dir = ForgeDirection.getOrientation(side);
-        float delta = reverse ? -0.5F : 0.5F;
+        int delta = reverse ? -strength : strength;
         switch (dir) {
         case SOUTH:
             cube.maxZ += delta;
             break;
         case NORTH:
-            cube.minZ += delta;
+            cube.minZ -= delta;
             break;
         case EAST:
             cube.maxX += delta;
             break;
         case WEST:
-            cube.minX += delta;
+            cube.minX -= delta;
             break;
         case UP:
             cube.maxY += delta;
             break;
         case DOWN:
-            cube.minY += delta;
+            cube.minY -= delta;
             break;
         }
     }

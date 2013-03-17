@@ -70,10 +70,13 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
             if (state == ClayState.GLAZED) {
                 Item it = Item.itemsList[rc.icon_id];
                 if (it == null) {
+                    block.useTexture(BlockIcons.error);
                     continue; //boo
                 }
                 block.useTexture(it.getIconFromDamage(rc.icon_md));
             }
+            rc.toBlockBounds(block);
+            //block.setBlockBounds(0, 0, 0, 1, 1, 1);
             block.begin();
             block.rotate(rc.quat);
             block.renderRotated(Tessellator.instance, x, y, z);

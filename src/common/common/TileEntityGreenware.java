@@ -119,18 +119,19 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
         
         ClayLump asDefault() {
-            minX = minY = minZ = 0;
-            maxX = maxZ = 3;
-            maxY = 5;
-            offset(16, 16, 16);
+            minX = minZ = 4;
+            minY = 0;
+            maxX = maxZ = 16 - 4;
+            maxY = 10;
+            offset(16, 16+1, 16);
             icon_id = (short) Core.resource_id;
             icon_md = (byte) ResourceType.BISQUE.md;
             quat = new Quaternion();
             return this;
         }
         
-        void toBlockBounds(Block b) {
-            b.setBlockBounds(minX, minY, minZ, maxX, maxY, maxZ);
+        public void toBlockBounds(Block b) {
+            b.setBlockBounds((minX - 16)/16F, (minY - 16)/16F, (minZ - 16)/16F, (maxX - 16)/16F, (maxY - 16)/16F, (maxZ - 16)/16F);
         }
 
         public ClayLump copy() {
@@ -401,7 +402,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         return true;*/
     }
     
-    void updateLump(int id, ClayLump lump) {
+    private void updateLump(int id, ClayLump lump) {
         if (id < 0 || id >= parts.size()) {
             return;
         }
@@ -416,11 +417,16 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
     }
     
-    void shareLump(int id, ClayLump selection) {
+    private void shareLump(int id, ClayLump selection) {
         ArrayList<Object> toSend = new ArrayList();
         toSend.add(id);
         selection.write(toSend);
         broadcastMessage(null, MessageType.SculptMove, toSend.toArray());
+    }
+    
+    void changeLump(int id, ClayLump newValue) {
+        updateLump(id, newValue);
+        shareLump(id, newValue);
     }
     
     private float getFloat(DataInput input) throws IOException {
@@ -519,16 +525,19 @@ public class TileEntityGreenware extends TileEntityCommon {
         } else {
             block = Core.registry.serverTraceHelper;
         }
-        for (ClayLump lump : parts) {
-            block.setBlockBounds(lump.minX/16, lump.minY/16, lump.minZ/16, lump.maxX/16, lump.maxY/16, lump.maxZ/16);
+        for (int i = 0; i < parts.size(); i++) {
+            ClayLump lump = parts.get(i);
+            lump.toBlockBounds(block);
             block.beginNoIcons();
             block.rotate(lump.quat);
             block.setBlockBoundsBasedOnRotation();
             MovingObjectPosition mop = block.collisionRayTrace(w, x, y, z, startVec, endVec);
             if (mop != null) {
+                mop.subHit = i;
                 return mop;
             }
         }
         return null;
+        //return super.collisionRayTrace(w, x, y, z, startVec, endVec);
     }
 }
