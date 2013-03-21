@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.Item;
 import net.minecraft.util.Icon;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -227,6 +228,14 @@ public class BlockRenderHelper extends Block {
         return this;
     }
     
+    public BlockRenderHelper rotateMiddle(Quaternion q) {
+        Vec3 d = getBoundsMiddle();
+        translate((float)(-d.xCoord), (float)(-d.yCoord), (float)(-d.zCoord));
+        rotate(q);
+        translate((float)(d.xCoord), (float)(d.yCoord), (float)(d.zCoord));
+        return this;
+    }
+    
     public BlockRenderHelper translate(float dx, float dy, float dz) {
         //Move the vertices
         for (int f = 0; f < faceCache.length; f++) {
@@ -272,6 +281,14 @@ public class BlockRenderHelper extends Block {
                 tess.addVertexWithUV(vert.x + c.x, vert.y + c.y, vert.z + c.z, vert.u, vert.v);
             }
         }
+    }
+    
+    static Vec3 midCache = Vec3.createVectorHelper(0, 0, 0);
+    public Vec3 getBoundsMiddle() {
+        midCache.xCoord = (minX + maxX)/2;
+        midCache.yCoord = (minY + maxY)/2;
+        midCache.zCoord = (minZ + maxZ)/2;
+        return midCache;
     }
     
     

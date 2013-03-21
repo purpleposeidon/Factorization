@@ -355,7 +355,7 @@ public class FZDSCommand extends CommandBase {
                 sender.sendChatToPlayer("The commands need a Coord, DSE, or player.");
                 sender.sendChatToPlayer("If these are not implicitly available, you can provide them using:");
                 sender.sendChatToPlayer(" #worldId,x,y,z @PlayerName");
-                sender.sendChatToPlayer("Best commands: cut goc leave drop");
+                sender.sendChatToPlayer("Best commands: cut go leave drop");
             }});
         add(new SubCommand ("go|gob|got") {
             @Override
@@ -435,7 +435,7 @@ public class FZDSCommand extends CommandBase {
             @Override
             void call(String[] args) {
                 Coord base;
-                if (arg0.equalsIgnoreCase("rcut")) {
+                if (arg0.startsWith("r")) {
                     base = user.copy();
                 } else {
                     base = new Coord(user.w, 0, 0, 0);
@@ -444,6 +444,12 @@ public class FZDSCommand extends CommandBase {
                 Coord low = base.add(DeltaCoord.parse(args[0]));
                 Coord up = base.add(DeltaCoord.parse(args[1]));
                 Coord.sort(low, up);
+                DeltaCoord dimensions = up.difference(low);
+                int area = Math.abs(dimensions.x*dimensions.y*dimensions.z);
+                if (area > Hammer.max_fzds_grab_area) {
+                    sender.sendChatToPlayer("The area is too big: " + area);
+                    return;
+                }
                 final Coord lower = low.copy();
                 final Coord upper = up.copy();
                 Core.notify(null, lower, "Low");

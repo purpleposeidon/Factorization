@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.BlockContainer;
+import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -72,9 +73,9 @@ public class BlockFactorization extends BlockContainer {
             Core.registry.battery.normalizeDamage(is);
             return is;
         }
-//		if (ft == FactoryType.GREENWARE) {
-//			return ((TileEntityGreenware) tec).getItem();
-//		}
+        if (ft == FactoryType.CERAMIC) {
+            return ((TileEntityGreenware) tec).getItem();
+        }
         if (ft == FactoryType.ROCKETENGINE) {
             return new ItemStack(Core.registry.rocket_engine);
         }
@@ -225,6 +226,16 @@ public class BlockFactorization extends BlockContainer {
         }
         super.breakBlock(w, x, y, z, id, md);
     }
+    
+    @Override
+    public boolean removeBlockByPlayer(World world, EntityPlayer player, int x, int y, int z) {
+        TileEntityCommon tec = new Coord(world, x, y, z).getTE(TileEntityCommon.class);
+        if (tec == null) {
+            return super.removeBlockByPlayer(world, player, x, y, z);
+        }
+        return tec.removeBlockByPlayer(player);
+    }
+    
 
     @Override
     public ArrayList<ItemStack> getBlockDropped(World world, int X, int Y, int Z, int md,
@@ -398,7 +409,7 @@ public class BlockFactorization extends BlockContainer {
         if (tec == null) {
             return super.collisionRayTrace(w, x, y, z, startVec, endVec);
         }
-        return tec.collisionRayTrace(w, x, y, z, startVec, endVec);
+        return tec.collisionRayTrace(startVec, endVec);
     }
 
     @Override

@@ -433,7 +433,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 //
                 WireFace = 121,
                 //
-                SculptDescription = 130, SculptNew = 132, SculptMove = 133, SculptRemove = 134, SculptState = 135, SculptWater = 136,
+                SculptDescription = 130, SculptNew = 132, SculptMove = 133, SculptRemove = 134, SculptState = 135,
                 //
                 FurnaceBurnTime = 140,
                 //

@@ -208,9 +208,8 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     }
 
     @Override
-    public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z, Vec3 startVec,
-            Vec3 endVec) {
-        return new WireConnections(this).collisionRayTrace(w, x, y, z, startVec, endVec);
+    public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {
+        return new WireConnections(this).collisionRayTrace(worldObj, xCoord, yCoord, zCoord, startVec, endVec);
     }
 
     @Override

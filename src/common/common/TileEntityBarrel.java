@@ -12,9 +12,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.util.Icon;
+import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.event.ForgeSubscribe;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
 
@@ -374,6 +375,16 @@ public class TileEntityBarrel extends TileEntityFactorization {
         }
         return true;
     }
+    
+    
+    private static int last_hit_side = -1;
+    @ForgeSubscribe
+    public void clickEvent(PlayerInteractEvent event) {
+        if (event.entityPlayer.worldObj.isRemote) {
+            return;
+        }
+        last_hit_side = event.face;
+    }
 
     @Override
     public void click(EntityPlayer entityplayer) {
@@ -389,9 +400,11 @@ public class TileEntityBarrel extends TileEntityFactorization {
         if (entityplayer.isSneaking() && to_remove >= 1) {
             to_remove = 1;
         }
-        ejectItem(makeStack(to_remove), false, entityplayer);
+        ejectItem(makeStack(to_remove), false, entityplayer, last_hit_side);
+        last_hit_side = -1;
         changeItemCount(-to_remove);
         cleanBarrel();
+        last_hit_side = -1;
     }
 
     void addAllItems(EntityPlayer entityplayer) {
@@ -456,7 +469,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
             int to_drop;
             to_drop = Math.min(item.getMaxStackSize(), count);
             count -= to_drop;
-            ejectItem(makeStack(to_drop), getItemCount() > 64 * 16, null);
+            ejectItem(makeStack(to_drop), getItemCount() > 64 * 16, null, -1);
             if (count <= 0) {
                 break;
             }

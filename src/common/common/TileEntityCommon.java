@@ -76,6 +76,10 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
 
     void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
     }
+    
+    boolean removeBlockByPlayer(EntityPlayer player) {
+        return Core.registry.resource_block.removeBlockByPlayer(worldObj, player, xCoord, yCoord, zCoord);
+    }
 
     public void neighborChanged() {
     }
@@ -104,8 +108,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         return ret;
     }
 
-    public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z,
-            Vec3 startVec, Vec3 endVec) {
+    public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {
         return Block.stone.collisionRayTrace(worldObj, xCoord, yCoord, zCoord, startVec, endVec);
     }
 

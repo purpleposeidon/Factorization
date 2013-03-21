@@ -7,6 +7,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.item.ItemStack;
 import net.minecraft.src.ModLoader;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.MinecraftForge;
 
 public enum FactoryType {
     ROUTER(0, true, TileEntityRouter.class, "factory_router"), // Send/retrieve items from connected inventories
@@ -71,6 +72,7 @@ public enum FactoryType {
             } catch (Throwable e) {
                 throw new IllegalArgumentException(e);
             }
+            MinecraftForge.EVENT_BUS.register(representative);
         }
         return representative;
     }

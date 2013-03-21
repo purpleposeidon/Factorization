@@ -4,7 +4,11 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
@@ -12,10 +16,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Icon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
+import net.minecraft.util.Vec3Pool;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.DrawBlockHighlightEvent;
+import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.event.ForgeSubscribe;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
@@ -23,6 +32,7 @@ import com.google.common.io.ByteStreams;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 
+import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.common.NetworkFactorization.MessageType;
 import factorization.common.TileEntityGreenware.ClayLump;
@@ -42,7 +52,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         public byte minX, minY, minZ;
         public byte maxX, maxY, maxZ;
         
-        public short icon_id; //Only blocks
+        public short icon_id; //But only for blocks; no items
         public byte icon_md;
         
         public Quaternion quat;
@@ -131,6 +141,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
         
         public void toBlockBounds(Block b) {
+            //TODO NORELEASE: need to handle rotations (get the min/max of the vertices)
             b.setBlockBounds((minX - 16)/16F, (minY - 16)/16F, (minZ - 16)/16F, (maxX - 16)/16F, (maxY - 16)/16F, (maxZ - 16)/16F);
         }
 
@@ -154,7 +165,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     int totalHeat = 0;
     
     //Client-side only
-    public boolean renderedAsBlock = true; //keep rendering while waiting for the chunk to redraw
+    public boolean shouldRenderTesr = false;
     
     public static int dryTime = 20*60*2; //2 minutes
     public static int bisqueHeat = 1000, glazeHeat = bisqueHeat*20;
@@ -262,6 +273,9 @@ public class TileEntityGreenware extends TileEntityCommon {
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
         loadParts(tag);
+        if (parts.size() == 0) {
+            invalidate();
+        }
     }
     
     @Override
@@ -324,9 +338,10 @@ public class TileEntityGreenware extends TileEntityCommon {
             return false;
         }
         int heldId = held.getItem().itemID;
+        boolean creative = player.capabilities.isCreativeMode;
         if (heldId == Item.bucketWater.itemID && getState() == ClayState.DRY) {
             lastTouched = 0;
-            if (player.capabilities.isCreativeMode) {
+            if (creative) {
                 return true;
             }
             int ci = player.inventory.currentItem;
@@ -340,7 +355,9 @@ public class TileEntityGreenware extends TileEntityCommon {
         if (held.getItem() != Item.clay || held.stackSize == 0) {
             return false;
         }
-        held.stackSize--;
+        if (!creative) {
+            held.stackSize--;
+        }
         if (player.worldObj.isRemote) {
             //Let the server tell us the results
             return true;
@@ -350,16 +367,31 @@ public class TileEntityGreenware extends TileEntityCommon {
             held.stackSize++;
             return false;
         }
-        addLump(player.username);
+        addLump();
+        MovingObjectPosition hit = ItemSculptingTool.doRayTrace(player);
+        if (hit == null || hit.subHit == -1) {
+            player.addChatMessage("No selection"); //NORELEASE
+            return true;
+        }
+        ClayLump against = parts.get(hit.subHit);
+        ClayLump extrusion = extrudeLump(against, hit.sideHit);
+        if (isValidLump(extrusion)) {
+            changeLump(parts.size() - 1, extrusion);
+            player.addChatMessage("Extruded"); //NORELEASE
+        } else {
+            player.addChatMessage("Extrusion failed"); //NORELEASE
+        }
         return true;
     }
     
-    void addLump(String creator) {
-        parts.add(new ClayLump().asDefault());
+    ClayLump addLump() {
+        ClayLump ret = new ClayLump().asDefault();
+        parts.add(ret);
         if (!worldObj.isRemote) {
-            broadcastMessage(null, MessageType.SculptNew, creator);
+            broadcastMessage(null, MessageType.SculptNew);
             touch();
         }
+        return ret;
     }
     
     void removeLump(int id) {
@@ -373,33 +405,40 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
     }
     
+    ClayLump extrudeLump(ClayLump against, int side) {
+        ClayLump lump = against.copy();
+        ForgeDirection dir = ForgeDirection.getOrientation(side);
+        BlockRenderHelper b = Core.registry.serverTraceHelper;
+        against.toBlockBounds(b);
+        int wX = lump.maxX - lump.minX;
+        int wY = lump.maxY - lump.minY;
+        int wZ = lump.maxZ - lump.minZ;
+        lump.maxX += wX*dir.offsetX;
+        lump.maxY += wY*dir.offsetY;
+        lump.maxZ += wZ*dir.offsetZ;
+        lump.minX += wX*dir.offsetX;
+        lump.minY += wY*dir.offsetY;
+        lump.minZ += wZ*dir.offsetZ;
+        return lump;
+    }
+    
     public static boolean isValidLump(ClayLump lump) {
-        return true; //TODO: Implement
-        /*
-        float edge = 8*3; //a cube and a half
-        for (int i = 0; i < 6; i++) {
-            for (VectorUV vertex : rc.faceVerts(i)) {
-                if (abs(vertex.x) > edge) {
-                    return false;
-                }
-                if (abs(vertex.y) > edge) {
-                    return false;
-                }
-                if (abs(vertex.z) > edge) {
-                    return false;
-                }
-            }
-        }
-        //do not be skiny
-        if (rc.corner.x <= 0 || rc.corner.y <= 0 || rc.corner.z <= 0) {
+        int wX = lump.maxX - lump.minX;
+        int wY = lump.maxY - lump.minY;
+        int wZ = lump.maxZ - lump.minZ;
+        int area = wX*wY*wZ;
+        int max_area = 16*16*16/4;
+        if (area <= 0 || area > max_area) {
             return false;
         }
-        //do not be huge
-        float max = 8;
-        if (rc.corner.x > max || rc.corner.y > max || rc.corner.z > max) {
-            return false;
-        }
-        return true;*/
+        final int B = 16*3;
+        if (lump.minX < 0) return false;
+        if (lump.minY < 0) return false;
+        if (lump.minZ < 0) return false;
+        if (lump.maxX > B) return false;
+        if (lump.maxY > B) return false;
+        if (lump.maxZ > B) return false;
+        return true;
     }
     
     private void updateLump(int id, ClayLump lump) {
@@ -436,35 +475,6 @@ public class TileEntityGreenware extends TileEntityCommon {
     }
     
     @Override
-    public boolean handleMessageFromClient(int messageType, DataInput input)
-            throws IOException {
-        if (super.handleMessageFromClient(messageType, input)) {
-            return true;
-        }
-        if (messageType == MessageType.SculptWater) {
-            InventoryPlayer inv = Core.network.getCurrentPlayer().inventory;
-            ItemStack is = inv.mainInventory[inv.currentItem];
-            if (is == null) {
-                return true;
-            }
-            Item item = is.getItem();
-            if (item == null) {
-                return true;
-            }
-            int id = item.itemID;
-            if (is.getItem() == Item.bucketWater && getState() == ClayState.DRY) {
-                is.itemID = Item.bucketWater.itemID;
-                lastTouched = 0;
-            }
-            if (id == Block.cloth.blockID) {
-                lastTouched = dryTime;
-            }
-            return true;
-        }
-        return false;
-    }
-    
-    @Override
     public boolean handleMessageFromServer(int messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
@@ -481,12 +491,13 @@ public class TileEntityGreenware extends TileEntityCommon {
                     break;
                 }
             }
+            shouldRenderTesr = getState() == ClayState.WET;
             break;
         case MessageType.SculptMove:
             updateLump(input.readInt(), new ClayLump().read(input));
             break;
         case MessageType.SculptNew:
-            addLump(input.readUTF());
+            addLump();
             break;
         case MessageType.SculptRemove:
             removeLump(input.readInt());
@@ -495,6 +506,9 @@ public class TileEntityGreenware extends TileEntityCommon {
             readStateChange(input);
             break;
         default: return false;
+        }
+        if (renderEfficient()) {
+            getCoord().redraw();
         }
         return true;
     }
@@ -517,27 +531,165 @@ public class TileEntityGreenware extends TileEntityCommon {
         getCoord().redraw();
     }
     
+    private static final Vec3 zeroVec = Vec3.createVectorHelper(0, 0, 0); 
+    
     @Override
-    public MovingObjectPosition collisionRayTrace(World w, int x, int y, int z, Vec3 startVec, Vec3 endVec) {
+    boolean removeBlockByPlayer(EntityPlayer player) {
+        if (player.worldObj.isRemote) {
+            return false;
+        }
+        MovingObjectPosition hit = ItemSculptingTool.doRayTrace(player);
+        if (hit == null || hit.subHit == -1 || parts.size() < 2) {
+            return super.removeBlockByPlayer(player);
+        }
+        ClayState state = getState();
+        boolean solid = state == ClayState.BISQUED || state == ClayState.GLAZED;
+        //If it's solid, break it.
+        //If we're sneaking & creative, break it
+        if (player.capabilities.isCreativeMode) {
+            if (player.isSneaking()) {
+                return super.removeBlockByPlayer(player);
+            } else {
+                removeLump(hit.subHit);
+                return true;
+            }
+        } else if (solid) {
+            return super.removeBlockByPlayer(player);
+        }
+        removeLump(hit.subHit);
+        return true;
+    }
+    
+    @Override
+    public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {
         BlockRenderHelper block;
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
             block = Core.registry.clientTraceHelper;
         } else {
             block = Core.registry.serverTraceHelper;
         }
+        //It's possible for the startVec to be embedded in a lump (causing it to hit the opposite side), so we must move it farther away
+        double dx = startVec.xCoord - endVec.xCoord;
+        double dy = startVec.yCoord - endVec.yCoord;
+        double dz = startVec.zCoord - endVec.zCoord;
+        double scale = 5.2; //Diagonal of a 3³. (Was initially using scale = 2)
+        //This isn't quite right; the dVector would properly be normalized here & rescaled to the max diameter. But we can survive without it.
+        //Unnormalized length of dVector is 6m in surviavl mode IIRC. This'll be way longer than it needs to be.
+        //TODO NORELEASE: Check this against all 6 sides and at various distances
+        //Why is it + instead of -? Hmm.
+        startVec.xCoord += dx*scale;
+        startVec.yCoord += dy*scale;
+        startVec.zCoord += dz*scale;
+        MovingObjectPosition shortest = null;
+        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
         for (int i = 0; i < parts.size(); i++) {
             ClayLump lump = parts.get(i);
             lump.toBlockBounds(block);
             block.beginNoIcons();
-            block.rotate(lump.quat);
+            block.rotateMiddle(lump.quat);
             block.setBlockBoundsBasedOnRotation();
-            MovingObjectPosition mop = block.collisionRayTrace(w, x, y, z, startVec, endVec);
+            MovingObjectPosition mop = block.collisionRayTrace(worldObj, xCoord, yCoord, zCoord, startVec, endVec);
+            Vec3Pool vp = worldObj.getWorldVec3Pool();
             if (mop != null) {
                 mop.subHit = i;
-                return mop;
+                if (shortest == null) {
+                    shortest = mop;
+                } else {
+                    Vec3 s = shortest.hitVec;
+                    Vec3 m = mop.hitVec;
+                    s = vp.getVecFromPool(s.xCoord, s.yCoord, s.zCoord);
+                    m = vp.getVecFromPool(m.xCoord, m.yCoord, m.zCoord);
+                    offsetVector(player, s);
+                    offsetVector(player, m);
+                    if (m.lengthVector() < s.lengthVector()) {
+                        shortest = mop;
+                    }
+                }
             }
         }
-        return null;
+        return shortest;
         //return super.collisionRayTrace(w, x, y, z, startVec, endVec);
+    }
+    
+    private void offsetVector(EntityPlayer player, Vec3 v) {
+        v.xCoord -= player.posX;
+        v.yCoord -= player.posY;
+        v.zCoord -= player.posZ;
+    }
+    
+    @ForgeSubscribe
+    public void renderCeramicsSelection(DrawBlockHighlightEvent event) {
+        if (event.subID == -1) {
+            return;
+        }
+        Coord c = new Coord(event.player.worldObj, event.target.blockX, event.target.blockY, event.target.blockZ);
+        TileEntityGreenware clay = c.getTE(TileEntityGreenware.class);
+        if (clay == null) {
+            return;
+        }
+        event.setCanceled(true);
+        ClayLump lump = clay.parts.get(event.target.subHit);
+        BlockRenderHelper block = BlockRenderHelper.instance;
+        lump.toBlockBounds(block);
+        EntityPlayer player = event.player;
+        double partial = event.partialTicks;
+        double widen = 0.002;
+        double oX = player.lastTickPosX + (player.posX - player.lastTickPosX) * partial;
+        double oY = player.lastTickPosY + (player.posY - player.lastTickPosY) * partial;
+        double oZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partial;
+        AxisAlignedBB bb = block.getSelectedBoundingBoxFromPool(c.w, c.x, c.y, c.z).expand(widen, widen, widen).getOffsetBoundingBox(-oX, -oY, -oZ);
+        
+        
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glDepthMask(false);
+        float r = 0xFF;
+        GL11.glLineWidth(2.0F);
+        GL11.glColor4f(0, 0, 0, 0.4F);
+        //GL11.glColor4f(0x4D/r, 0x34/r, 0x7C/r, 0.8F); //#4D347C
+        drawOutlinedBoundingBox(bb);
+        GL11.glDepthMask(true);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glDisable(GL11.GL_BLEND);
+        
+        //TODO: If the rotation tool is selected, may draw the axis?
+        //Oooooh, we could also draw the offset position for *EVERY* tool...
+    }
+    
+    //Copied. Private in RenderGlobal.drawOutlinedBoundingBox. For some stupid pointless reason. Don't really feel like re-writing it to be public every update or submitting an AT. 
+    private static void drawOutlinedBoundingBox(AxisAlignedBB aabb) {
+        Tessellator tessellator = Tessellator.instance;
+        tessellator.startDrawing(3);
+        tessellator.addVertex(aabb.minX, aabb.minY, aabb.minZ);
+        tessellator.addVertex(aabb.maxX, aabb.minY, aabb.minZ);
+        tessellator.addVertex(aabb.maxX, aabb.minY, aabb.maxZ);
+        tessellator.addVertex(aabb.minX, aabb.minY, aabb.maxZ);
+        tessellator.addVertex(aabb.minX, aabb.minY, aabb.minZ);
+        tessellator.draw();
+        tessellator.startDrawing(3);
+        tessellator.addVertex(aabb.minX, aabb.maxY, aabb.minZ);
+        tessellator.addVertex(aabb.maxX, aabb.maxY, aabb.minZ);
+        tessellator.addVertex(aabb.maxX, aabb.maxY, aabb.maxZ);
+        tessellator.addVertex(aabb.minX, aabb.maxY, aabb.maxZ);
+        tessellator.addVertex(aabb.minX, aabb.maxY, aabb.minZ);
+        tessellator.draw();
+        tessellator.startDrawing(1);
+        tessellator.addVertex(aabb.minX, aabb.minY, aabb.minZ);
+        tessellator.addVertex(aabb.minX, aabb.maxY, aabb.minZ);
+        tessellator.addVertex(aabb.maxX, aabb.minY, aabb.minZ);
+        tessellator.addVertex(aabb.maxX, aabb.maxY, aabb.minZ);
+        tessellator.addVertex(aabb.maxX, aabb.minY, aabb.maxZ);
+        tessellator.addVertex(aabb.maxX, aabb.maxY, aabb.maxZ);
+        tessellator.addVertex(aabb.minX, aabb.minY, aabb.maxZ);
+        tessellator.addVertex(aabb.minX, aabb.maxY, aabb.maxZ);
+        tessellator.draw();
+    }
+    
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        return INFINITE_EXTENT_AABB;
+        //AxisAlignedBB bb = AxisAlignedBB.getAABBPool().getAABB(xCoord - 1, yCoord - 1, zCoord - 1, xCoord + 1, yCoord + 1, zCoord + 1);
+        //return bb;
     }
 }

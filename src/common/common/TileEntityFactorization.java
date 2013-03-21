@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.Random;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.Vec3;
+import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.ICoord;
 import factorization.api.IFactoryType;
@@ -151,37 +153,57 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         return Math.copySign(1, c);
     }
 
-    void ejectItem(ItemStack is, boolean violent, EntityPlayer player) {
+    void ejectItem(ItemStack is, boolean violent, EntityPlayer player, int to_side) {
+        if (worldObj.isRemote) {
+            return;
+        }
         if (is == null || is.stackSize == 0) {
             return;
         }
-        EntityItem ent = new EntityItem(worldObj, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, is);
+        if (player == null) {
+            to_side = -1;
+        }
         double mult = 0.02;
         if (violent) {
             mult = 0.2;
         }
-        if (player != null) {
+        Vec3 pos = worldObj.getWorldVec3Pool().getVecFromPool(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
+        Vec3 vel = worldObj.getWorldVec3Pool().getVecFromPool(0, 0, 0);
+        if (to_side != -1) {
+            ForgeDirection dir = ForgeDirection.getOrientation(to_side);
+            /*
+            ent.motionX = dir.offsetX;
+            ent.motionY = dir.offsetY;
+            ent.motionZ = dir.offsetZ;*/
+            double d = 0.75;
+            pos.xCoord += dir.offsetX*d;
+            pos.yCoord += dir.offsetY*d;
+            pos.zCoord += dir.offsetZ*d;
+            vel.xCoord = dir.offsetX;
+            vel.yCoord = dir.offsetY;
+            vel.zCoord = dir.offsetZ;
+        } else if (player != null) {
             // point velocity towards player
             Vec3 vec = Vec3.createVectorHelper(player.posX - xCoord, player.posY - yCoord,
                     player.posZ - zCoord);
             vec = vec.normalize();
-            ent.motionX = vec.xCoord;
-            ent.motionY = vec.yCoord;
-            ent.motionZ = vec.zCoord;
+            vel = vec;
             double d = 0.25;
             // move item to near the edge
-            ent.moveEntity(vec.xCoord * d, vec.yCoord * d, vec.zCoord * d);
-            ent.moveEntity(round(vec.xCoord), round(vec.yCoord), round(vec.zCoord));
+            pos.xCoord += vec.xCoord*d;
+            pos.yCoord += vec.yCoord*d;
+            pos.zCoord += vec.zCoord*d;
             //Minecraft.getMinecraft().theWorld.spawnParticle("reddust", ent.posX, ent.posY, ent.posZ, 0, 0, 0);
         } else {
             // random velocity
-            ent.motionX = rand.nextGaussian();
-            ent.motionY = rand.nextGaussian();
-            ent.motionZ = rand.nextGaussian();
+            vel.xCoord = rand.nextGaussian();
+            vel.yCoord = rand.nextGaussian();
+            vel.zCoord = rand.nextGaussian();
         }
-        ent.motionX *= mult;
-        ent.motionY *= mult;
-        ent.motionZ *= mult;
+        EntityItem ent = new EntityItem(worldObj, pos.xCoord, pos.yCoord, pos.zCoord, is);
+        ent.motionX = vel.xCoord*mult;
+        ent.motionY = vel.yCoord*mult;
+        ent.motionZ = vel.zCoord*mult;
         worldObj.spawnEntityInWorld(ent);
     }
 

@@ -4,7 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.Item;
-import factorization.api.VectorUV;
+import net.minecraft.util.Vec3;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
 import factorization.common.Core;
@@ -52,7 +52,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
         if (!gw.canEdit()) {
             renderStatic(gw);
         }
-        gw.renderedAsBlock = true;
+        gw.shouldRenderTesr = state == ClayState.WET;
     }
     
     void renderToTessellator(TileEntityGreenware greenware) {
@@ -76,9 +76,8 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
                 block.useTexture(it.getIconFromDamage(rc.icon_md));
             }
             rc.toBlockBounds(block);
-            //block.setBlockBounds(0, 0, 0, 1, 1, 1);
             block.begin();
-            block.rotate(rc.quat);
+            block.rotateMiddle(rc.quat);
             block.renderRotated(Tessellator.instance, x, y, z);
         }
     }

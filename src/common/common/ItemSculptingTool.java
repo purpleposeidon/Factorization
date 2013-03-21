@@ -54,7 +54,8 @@ public class ItemSculptingTool extends Item {
         MOVER("move", true),
         STRETCHER("stretch", false),
         REMOVER("delete", true),
-        ROTATOR("rotate", true),
+        ROTATE_GLOBAL("rotate_global", true),
+        ROTATE_LOCAL("rotate_local", false),
         RESETTER("reset", false);
         
         String name;
@@ -78,6 +79,7 @@ public class ItemSculptingTool extends Item {
         static {
             group(MOVER, STRETCHER);
             group(REMOVER, RESETTER);
+            group(ROTATE_GLOBAL, ROTATE_LOCAL);
         }
     }
     
@@ -103,7 +105,8 @@ public class ItemSculptingTool extends Item {
         case MOVER: return ItemIcons.move;
         case REMOVER: return ItemIcons.delete;
         case RESETTER: return ItemIcons.reset;
-        case ROTATOR: return ItemIcons.rotate;
+        case ROTATE_LOCAL: return ItemIcons.rotate_local;
+        case ROTATE_GLOBAL: return ItemIcons.rotate_global;
         case STRETCHER: return ItemIcons.stretch;
         }
     }
@@ -129,6 +132,10 @@ public class ItemSculptingTool extends Item {
             int par6, int par7, float par8, float par9, float par10) {
         return tryPlaceIntoWorld(par1ItemStack, par2EntityPlayer, par3World, par4, par5,
                 par6, par7, par8, par9, par10);
+    }
+    
+    public static MovingObjectPosition doRayTrace(EntityPlayer player) {
+        return Core.registry.sculpt_tool.getMovingObjectPositionFromPlayer(player.worldObj, player, true);
     }
     
     public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player,
@@ -206,8 +213,11 @@ public class ItemSculptingTool extends Item {
             }
             w.spawnEntityInWorld(drop);
             return true;
-        case ROTATOR:
-            rotate(test, sneaking, side, strength);
+        case ROTATE_LOCAL:
+            rotate_local(test, sneaking, side, strength);
+            break;
+        case ROTATE_GLOBAL:
+            rotate_global(test, sneaking, side, strength);
             break;
         case RESETTER:
             test.quat = new Quaternion();
@@ -219,13 +229,24 @@ public class ItemSculptingTool extends Item {
         return true;
     }
     
-    void rotate(ClayLump cube, boolean reverse, int side, int strength) {
-        float delta = (float) Math.toRadians(360F/32F*strength);
+    void rotate_local(ClayLump cube, boolean reverse, int side, int strength) {
+        float delta = (float) Math.toRadians(-360F/32F*strength);
         if (reverse) {
             delta *= -1;
         }
         ForgeDirection direction = ForgeDirection.getOrientation(side);
         cube.quat.incrMultiply(Quaternion.getRotationQuaternion(delta, direction.offsetX, direction.offsetY, direction.offsetZ));
+    }
+    
+    void rotate_global(ClayLump cube, boolean reverse, int side, int strength) {
+        float delta = (float) Math.toRadians(-360F/32F*strength);
+        if (reverse) {
+            delta *= -1;
+        }
+        ForgeDirection direction = ForgeDirection.getOrientation(side);
+        Quaternion global = Quaternion.getRotationQuaternion(delta, direction.offsetX, direction.offsetY, direction.offsetZ);
+        global.incrMultiply(cube.quat);
+        cube.quat = global;
     }
     
     void move(ClayLump cube, boolean reverse, int side, int strength) {

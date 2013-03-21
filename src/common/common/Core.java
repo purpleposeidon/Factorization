@@ -34,6 +34,7 @@ import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -97,7 +98,7 @@ public class Core {
     public static boolean dimension_slice_allow_smooth = true;
     public static boolean show_fine_logging = false;
     public static boolean serverside_translate = true;
-    public static boolean dev_environ = System.getProperty("user.dir", "").startsWith("/home/poseidon/Development/");
+    public static boolean dev_environ = (Boolean) ReflectionHelper.getPrivateValue(cpw.mods.fml.relauncher.RelaunchLibraryManager.class, null, "deobfuscatedEnvironment");
     public static boolean boilers_suck_water = true;
     public static double steam_output_adjust = 1.0;
     public static boolean enable_sketchy_client_commands = true;
