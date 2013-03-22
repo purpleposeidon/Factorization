@@ -344,6 +344,9 @@ public class BlockRenderHelper extends Block {
             break;
         }
         //Sets up UV data
+        if (face != 4) {
+            return;
+        }
         switch (face) {
         case 0: //-y
         case 1: //+y
@@ -385,12 +388,36 @@ public class BlockRenderHelper extends Block {
         default:
             throw new RuntimeException("Invalid face number");
         }
-        //This is for clipping UVs that go over the edge I think?
         for (int i = 0; i < currentFace.length; i++) {
             VectorUV vec = currentFace[i];
-            vec.u = Math.max(0, Math.min(1, vec.u));
-            vec.v = Math.max(0, Math.min(1, vec.v));
+            boolean any = false;
+            if (vec.u < 0 || vec.u > 1) {
+                double u = vec.u;
+                double delta = (vec.u < 0) ? -u : (1 - u);
+                for (int j = 0; j < currentFace.length; j++) {
+                    VectorUV vec2 = currentFace[j];
+                    vec2.u = clip(vec2.u + delta);
+                }
+                any = true;
+            }
+            if (vec.v < 0 || vec.v > 1) {
+                double v = vec.v;
+                double delta = (vec.v < 0) ? -v : (1 - v);
+                for (int j = 0; j < currentFace.length; j++) {
+                    VectorUV vec2 = currentFace[j];
+                    vec2.v = clip(vec2.v + delta);
+                }
+                any = true;
+            }
+            if (any) {
+                break;
+            }
         }
+        return;
+    }
+    
+    static double clip(double v) {
+        return Math.max(0, Math.min(1, v));
     }
     
     private void set(int i, int X, int Y, int Z) {

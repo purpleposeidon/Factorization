@@ -82,7 +82,7 @@ public class VectorUV {
 
     @Override
     public String toString() {
-        return "<" + x + ", " + y + ", " + z + ">";
+        return "<" + x + ", " + y + ", " + z + ": " + u + ", " + v + ">";
     }
     
     public void writeToTag(NBTTagCompound tag, String prefix) {

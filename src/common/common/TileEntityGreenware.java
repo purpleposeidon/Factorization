@@ -249,9 +249,12 @@ public class TileEntityGreenware extends TileEntityCommon {
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
         writeParts(tag);
+        if (parts.size() == 0) {
+            getCoord().setId(0);
+        }
     }
     
-    void loadParts(NBTTagCompound tag) {
+    public void loadParts(NBTTagCompound tag) {
         if (tag == null) {
             initialize();
             return;
@@ -273,9 +276,6 @@ public class TileEntityGreenware extends TileEntityCommon {
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
         loadParts(tag);
-        if (parts.size() == 0) {
-            invalidate();
-        }
     }
     
     @Override
@@ -330,7 +330,8 @@ public class TileEntityGreenware extends TileEntityCommon {
     
     @Override
     public boolean activate(EntityPlayer player) {
-        if (getState() == ClayState.WET) {
+        ClayState state = getState();
+        if (state == ClayState.WET) {
             touch();
         }
         ItemStack held = player.getCurrentEquippedItem();
@@ -339,7 +340,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
         int heldId = held.getItem().itemID;
         boolean creative = player.capabilities.isCreativeMode;
-        if (heldId == Item.bucketWater.itemID && getState() == ClayState.DRY) {
+        if (heldId == Item.bucketWater.itemID && state == ClayState.DRY) {
             lastTouched = 0;
             if (creative) {
                 return true;
@@ -353,6 +354,10 @@ public class TileEntityGreenware extends TileEntityCommon {
             return true;
         }
         if (held.getItem() != Item.clay || held.stackSize == 0) {
+            return false;
+        }
+        if (state != ClayState.WET) {
+            Core.notify(player, getCoord(), "Not wet");
             return false;
         }
         if (!creative) {

@@ -1,10 +1,12 @@
 package factorization.client.render;
 
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.Item;
-import net.minecraft.util.Vec3;
+import net.minecraft.item.ItemStack;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
 import factorization.common.Core;
@@ -28,14 +30,50 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
         }
     }
     
+    private static TileEntityGreenware loader = new TileEntityGreenware();
+    
     @Override
     void render(RenderBlocks rb) {
         if (!world_mode) {
-            Tessellator.instance.startDrawingQuads();
-            setupRenderGenericLump(); //TODO: Actually showing the model would be nice.
-            //But forge makes that stupidly difficult.
-            setupRenderStand();
-            Tessellator.instance.draw();
+            ItemStack is = ItemRenderCapture.getRenderingItem();
+            BlockRenderHelper block = BlockRenderHelper.instance;
+            boolean stand = true;
+            boolean rescale = false;
+            if (is.hasTagCompound()) {
+                loader.loadParts(is.getTagCompound());
+                int minX = 32, minY = 32, minZ = 32;
+                int maxX = 0, maxY = 32, maxZ = 32;
+                for (ClayLump cl : loader.parts) {
+                    minX = Math.min(minX, cl.minX);
+                    minY = Math.min(minY, cl.minY);
+                    minZ = Math.min(minZ, cl.minZ);
+                    maxX = Math.min(maxX, cl.maxX);
+                    maxY = Math.min(maxY, cl.maxY);
+                    maxZ = Math.min(maxZ, cl.maxZ);
+                    int min = Math.min(Math.min(minX, minY), minZ);
+                    int max = Math.max(Math.max(maxX, maxY), maxZ);
+                    if (min < 16 || max > 24) {
+                        rescale = true;
+                        break;
+                    }
+                }
+                if (rescale) {
+                    GL11.glPushMatrix();
+                    float scale = 1F/3F;
+                    GL11.glScalef(scale, scale, scale);
+                }
+                renderDynamic(loader);
+                ClayState cs = loader.getState();
+                stand = cs == ClayState.WET || cs == ClayState.DRY;
+            } else {
+                setupRenderGenericLump().renderForInventory(rb);
+            }
+            if (stand) {
+                setupRenderStand().renderForInventory(rb);
+            }
+            if (rescale) {
+                GL11.glPopMatrix();
+            }
             return;
         }
         TileEntityGreenware gw = getCoord().getTE(TileEntityGreenware.class);
@@ -48,6 +86,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
         ClayState state = gw.getState();
         if (state == ClayState.DRY || state == ClayState.WET) {
             BlockRenderHelper block = setupRenderStand();
+            block.render(rb, x, y, z);
         }
         if (!gw.canEdit()) {
             renderStatic(gw);
@@ -92,25 +131,17 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
         renderToTessellator(greenware);
     }
     
-    /*
-    static RenderingCube woodStand = new RenderingCube(16*12 + 2, new VectorUV(4, 1, 4));
-    static RenderingCube genericLump = new RenderingCube(16*12, new VectorUV(3, 5, 3));
-    static {
-        woodStand.trans.translate(0, -6, 0);
-    }
-    */
-    
     BlockRenderHelper setupRenderStand() {
         BlockRenderHelper block = BlockRenderHelper.instance;
         block.useTexture(BlockIcons.ceramics$stand);
-        block.setBlockBoundsOffset(4F/8F, 1F/8F, 4F/8F);
+        block.setBlockBounds(0, 0, 0, 1, 1F/8F, 1);
         return block;
     }
     
     BlockRenderHelper setupRenderGenericLump() {
         BlockRenderHelper block = BlockRenderHelper.instance;
         block.useTexture(Block.blockClay.getBlockTextureFromSide(0));
-        block.setBlockBoundsOffset(3F/8F, 5F/8F, 3F/8F);
+        block.setBlockBounds(3F/16F, 1F/8F, 3F/16F, 13F/16F, 7F/8F, 13F/16F);
         return block;
     }
 

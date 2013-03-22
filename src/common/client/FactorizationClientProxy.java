@@ -62,6 +62,7 @@ import factorization.client.render.EntitySteamFX;
 import factorization.client.render.EntityWrathFlameFX;
 import factorization.client.render.FactorizationBlockRender;
 import factorization.client.render.FactorizationRender;
+import factorization.client.render.ItemRenderCapture;
 import factorization.client.render.TileEntityBarrelRenderer;
 import factorization.client.render.TileEntityCrystallizerRender;
 import factorization.client.render.TileEntityGreenwareRender;
@@ -519,7 +520,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }
         new BlockRenderEmpty(FactoryType.EXTENDED);
 
+        ItemRenderCapture capture = new ItemRenderCapture();
         MinecraftForgeClient.registerItemRenderer(Core.registry.battery.itemID, new BatteryItemRender(renderBattery));
+        MinecraftForgeClient.registerItemRenderer(Core.registry.factory_block.blockID, capture);
         MinecraftForge.EVENT_BUS.register(new FactorizationNotify());
         
         if (Minecraft.getMinecraft().session.username.equals("neptunepink")) {
