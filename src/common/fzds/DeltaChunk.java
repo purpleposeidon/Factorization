@@ -101,7 +101,7 @@ public class DeltaChunk {
     
     private static Coord shadow = new Coord(null, 0, 0, 0);
     
-    public static IDeltaChunk makeSlice(int channel, final Coord min, final Coord max, AreaMap mapper, boolean wipeSrc) {
+    public static IDeltaChunk makeSlice(int channel, final Coord min, final Coord max, AreaMap mapper, final boolean wipeSrc) {
         DeltaCoord size = max.difference(min);
         final IDeltaChunk dse = allocateSlice(min.w, channel, size);
         Vec3 vrm = min.centerVec(max);
@@ -111,7 +111,7 @@ public class DeltaChunk {
         mapper.fillDse(new DseDestination() {public void include(Coord real) {
             shadow.set(real);
             dse.real2shadow(shadow);
-            TransferLib.move(real, shadow, false, true);
+            TransferLib.move(real, shadow, wipeSrc, true);
         }});
         if (wipeSrc) {
             mapper.fillDse(new DseDestination() {public void include(Coord real) {

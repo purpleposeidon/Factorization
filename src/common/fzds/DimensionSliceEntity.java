@@ -31,7 +31,7 @@ import factorization.api.DeltaCoord;
 import factorization.api.Quaternion;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
-import factorization.fzds.api.Caps;
+import factorization.fzds.api.DeltaCapability;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsCustomTeleport;
 import factorization.fzds.api.IFzdsEntryControl;
@@ -42,7 +42,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     private Coord hammerCell, farCorner;
     Vec3 centerOffset;
     
-    private int capabilities = Caps.of(Caps.MOVE, Caps.COLLIDE, Caps.DRAG);
+    private int capabilities = DeltaCapability.of(DeltaCapability.MOVE, DeltaCapability.COLLIDE, DeltaCapability.DRAG);
     
     AxisAlignedBB realArea = null;
     MetaAxisAlignedBB metaAABB = null;
@@ -95,12 +95,13 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         return super.toString() + " - " + hammerCell + "  to  " + farCorner;
     }
     
-    public Vec3 real2shadow(Vec3 realCoords) {
+    @Override
+    public Vec3 real2shadow(final Vec3 realVector) {
         //TODO: Apply transformations!
         Vec3 buffer = Vec3.createVectorHelper(0, 0, 0);
-        double diffX = realCoords.xCoord + centerOffset.xCoord - posX;
-        double diffY = realCoords.yCoord + centerOffset.yCoord - posY;
-        double diffZ = realCoords.zCoord + centerOffset.zCoord - posZ;
+        double diffX = realVector.xCoord + centerOffset.xCoord - posX;
+        double diffY = realVector.yCoord + centerOffset.yCoord - posY;
+        double diffZ = realVector.zCoord + centerOffset.zCoord - posZ;
 
         buffer.xCoord = hammerCell.x + diffX;
         buffer.yCoord = hammerCell.y + diffY;
@@ -108,11 +109,12 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         return buffer;
     }
     
-    public Vec3 shadow2real(Vec3 shadowCoords) {
+    @Override
+    public Vec3 shadow2real(final Vec3 shadowVector) {
         Vec3 buffer = Vec3.createVectorHelper(0, 0, 0);
-        double diffX = shadowCoords.xCoord - hammerCell.x;
-        double diffY = shadowCoords.yCoord - hammerCell.y;
-        double diffZ = shadowCoords.zCoord - hammerCell.z;
+        double diffX = shadowVector.xCoord - hammerCell.x;
+        double diffY = shadowVector.yCoord - hammerCell.y;
+        double diffZ = shadowVector.zCoord - hammerCell.z;
         buffer.xCoord = diffX - centerOffset.xCoord;
         buffer.yCoord = diffY - centerOffset.yCoord;
         buffer.zCoord = diffZ - centerOffset.zCoord;
@@ -125,20 +127,24 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         return buffer;
     }
     
+    @Override
     public void shadow2real(Coord c) {
         c.set(shadow2real(c.createVector()));
         c.w = worldObj;
     }
     
+    @Override
     public void real2shadow(Coord c) {
         c.set(real2shadow(c.createVector()));
         c.w = DeltaChunk.getWorld(worldObj);
     }
     
+    @Override
     public Coord getCorner() {
         return hammerCell;
     }
     
+    @Override
     public Coord getCenter() {
         return hammerCell.center(farCorner);
         /*return hammerCell.add((int)centerOffset.xCoord,
@@ -146,6 +152,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 (int)centerOffset.zCoord);*/
     }
     
+    @Override
     public Coord getFarCorner() {
         return farCorner;
     }
@@ -344,7 +351,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         
         boolean moved = true;
         
-        if (!noClip && can(Caps.COLLIDE)) {
+        if (!noClip && can(DeltaCapability.COLLIDE)) {
             List<AxisAlignedBB> collisions = worldObj.getCollidingBoundingBoxes(this, realArea);
             AxisAlignedBB collision = null;
             for (int i = 0; i < collisions.size(); i++) {
@@ -412,7 +419,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             return;
         }
         updateMotion();
-        if (!worldObj.isRemote && can(Caps.ROTATE)) {
+        if (!worldObj.isRemote && can(DeltaCapability.ROTATE)) {
             shareRotationInfo();
         }
         if (needAreaUpdate) {
@@ -427,17 +434,17 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 updateShadowArea();
             }
             if (shadowArea == null) {
-                if (hammerCell.blockExists() && !can(Caps.EMPTY)) {
+                if (hammerCell.blockExists() && !can(DeltaCapability.EMPTY)) {
                     setDead();
                     Core.logFine("%s dying due to empty area", this.toString());
                 } else {
                     needAreaUpdate = true; //Hopefully it will load up soon...
                 }
             } else {
-                if (can(Caps.TAKE_INTERIOR_ENTITIES)) {
+                if (can(DeltaCapability.TAKE_INTERIOR_ENTITIES)) {
                     takeInteriorEntities();
                 }
-                if (can(Caps.REMOVE_EXTERIOR_ENTITIES)) {
+                if (can(DeltaCapability.REMOVE_EXTERIOR_ENTITIES)) {
                     removeExteriorEntities();
                 }
             }
@@ -552,7 +559,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             return;
         }
         if (ent instanceof EntityPlayerMP) {
-            if (!can(Caps.TRANSFER_PLAYERS)) {
+            if (!can(DeltaCapability.TRANSFER_PLAYERS)) {
                 return;
             }
             EntityPlayerMP player = (EntityPlayerMP) ent;
@@ -618,10 +625,10 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         data.writeFloat((float) centerOffset.zCoord);
         hammerCell.writeToStream(data);
         farCorner.writeToStream(data);
-        if (can(Caps.SCALE)) {
+        if (can(DeltaCapability.SCALE)) {
             data.writeFloat(scale);
         }
-        if (can(Caps.TRANSPARENT)) {
+        if (can(DeltaCapability.TRANSPARENT)) {
             data.writeFloat(opacity);
         }
     }
@@ -633,7 +640,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             rotation = Quaternion.read(data);
             rotationalVelocity = Quaternion.read(data);
             centerOffset = Vec3.createVectorHelper(data.readFloat(), data.readFloat(), data.readFloat());
-            if (can(Caps.ORACLE)) {
+            if (can(DeltaCapability.ORACLE)) {
                 hammerCell = new Coord(worldObj, 0, 0, 0);
             } else {
                 hammerCell = new Coord(DeltaChunk.getClientShadowWorld(), 0, 0, 0);
@@ -641,10 +648,10 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             hammerCell.readFromStream(data);
             farCorner = hammerCell.copy();
             farCorner.readFromStream(data);
-            if (can(Caps.SCALE)) {
+            if (can(DeltaCapability.SCALE)) {
                 scale = data.readFloat();
             }
-            if (can(Caps.TRANSPARENT)) {
+            if (can(DeltaCapability.TRANSPARENT)) {
                 opacity = data.readFloat();
             }
         } catch (IOException e) {
@@ -667,23 +674,27 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         isAirBorne = false; //If this is true, we get packet spam
     }
     
-    public boolean can(Caps cap) {
+    public boolean can(DeltaCapability cap) {
         return cap.in(capabilities);
     }
     
-    public DimensionSliceEntity permit(Caps cap) {
+    public DimensionSliceEntity permit(DeltaCapability cap) {
         capabilities |= cap.bit;
-        if (cap == Caps.ORACLE) {
-            forbid(Caps.COLLIDE);
-            forbid(Caps.DRAG);
-            forbid(Caps.TAKE_INTERIOR_ENTITIES);
-            forbid(Caps.REMOVE_EXTERIOR_ENTITIES);
-            forbid(Caps.TRANSFER_PLAYERS);
+        if (cap == DeltaCapability.ORACLE) {
+            forbid(DeltaCapability.COLLIDE);
+            forbid(DeltaCapability.DRAG);
+            forbid(DeltaCapability.TAKE_INTERIOR_ENTITIES);
+            forbid(DeltaCapability.REMOVE_EXTERIOR_ENTITIES);
+            forbid(DeltaCapability.TRANSFER_PLAYERS);
+            forbid(DeltaCapability.INTERACT);
+            
+            permit(DeltaCapability.SCALE);
+            permit(DeltaCapability.TRANSPARENT);
         }
         return this;
     }
     
-    public DimensionSliceEntity forbid(Caps cap) {
+    public DimensionSliceEntity forbid(DeltaCapability cap) {
         capabilities &= ~cap.bit;
         return this;
     }

@@ -33,7 +33,7 @@ import factorization.common.Core;
 import factorization.common.FactorizationUtil;
 import factorization.fzds.DeltaChunk.AreaMap;
 import factorization.fzds.DeltaChunk.DseDestination;
-import factorization.fzds.api.Caps;
+import factorization.fzds.api.DeltaCapability;
 import factorization.fzds.api.IDeltaChunk;
 
 public class FZDSCommand extends CommandBase {
@@ -352,10 +352,8 @@ public class FZDSCommand extends CommandBase {
                     }
                 }
                 sender.sendChatToPlayer(join(good));
-                sender.sendChatToPlayer("The commands need a Coord, DSE, or player.");
-                sender.sendChatToPlayer("If these are not implicitly available, you can provide them using:");
-                sender.sendChatToPlayer(" #worldId,x,y,z @PlayerName");
-                sender.sendChatToPlayer("Best commands: cut go leave drop");
+                sender.sendChatToPlayer("To specify a Coord or player: #worldId,x,y,z @PlayerName");
+                sender.sendChatToPlayer("Best commands: cut d drop");
             }});
         add(new SubCommand ("go|gob|got") {
             @Override
@@ -468,7 +466,7 @@ public class FZDSCommand extends CommandBase {
                             }
                         }
                     }}, !copy);
-                dse.permit(Caps.ROTATE).forbid(Caps.COLLIDE);
+                dse.permit(DeltaCapability.ROTATE).forbid(DeltaCapability.COLLIDE);
                 dse.worldObj.spawnEntityInWorld(dse);
                 setSelection(dse);
             }}, Requires.COORD);
@@ -489,6 +487,16 @@ public class FZDSCommand extends CommandBase {
             void call(String[] args) {
                 DeltaChunk.paste(selected, true);
             }}, Requires.SELECTION, Requires.CREATIVE);
+        add(new SubCommand("oracle") {
+            @Override
+            void call(String[] args) {
+                AreaMap do_nothing = new AreaMap() {
+                    @Override public void fillDse(DseDestination destination) { }
+                };
+                IDeltaChunk dse = DeltaChunk.makeSlice(Hammer.fzds_command_channel, user, user, do_nothing, false);
+                dse.permit(DeltaCapability.ORACLE);
+                dse.worldObj.spawnEntityInWorld(dse);
+            }}, Requires.OP);
         
         add(new SubCommand("grass") {
             @Override
@@ -537,7 +545,7 @@ public class FZDSCommand extends CommandBase {
             void call(String[] args) {
                 sender.sendChatToPlayer("r = " + selected.getRotation());
                 sender.sendChatToPlayer("ω = " + selected.getRotationalVelocity());
-                if (!selected.can(Caps.ROTATE)) {
+                if (!selected.can(DeltaCapability.ROTATE)) {
                     sender.sendChatToPlayer("(Does not have the ROTATE cap, so this is meaningless)");
                 }
             }}, Requires.SELECTION);
@@ -606,7 +614,7 @@ public class FZDSCommand extends CommandBase {
                 if (args.length != 2 && args.length != 1) {
                     throw new SyntaxErrorException();
                 }
-                if (!selected.can(Caps.ROTATE)) {
+                if (!selected.can(DeltaCapability.ROTATE)) {
                     sender.sendChatToPlayer("Selection does not have the rotation cap");
                     return;
                 }
@@ -664,7 +672,7 @@ public class FZDSCommand extends CommandBase {
                 double x = Double.parseDouble(args[1+i]);
                 double y = Double.parseDouble(args[2+i]);
                 double z = Double.parseDouble(args[3+i]);
-                if ((type == 'r' || type == 'w') && !selected.can(Caps.ROTATE)) {
+                if ((type == 'r' || type == 'w') && !selected.can(DeltaCapability.ROTATE)) {
                     sender.sendChatToPlayer("Selection does not have the ROTATE cap");
                     return;
                 }
@@ -717,7 +725,7 @@ public class FZDSCommand extends CommandBase {
             @Override
             void call(String[] args) {
                 String r = "";
-                for (Caps cap : Caps.values()) {
+                for (DeltaCapability cap : DeltaCapability.values()) {
                     r += " " + cap;
                 }
                 sender.sendChatToPlayer(r);
@@ -728,7 +736,7 @@ public class FZDSCommand extends CommandBase {
             @Override
             void call(String[] args) {
                 String r = "";
-                for (Caps cap : Caps.values()) {
+                for (DeltaCapability cap : DeltaCapability.values()) {
                     if (selected.can(cap)) {
                         r += " " + cap;
                     }
@@ -741,7 +749,7 @@ public class FZDSCommand extends CommandBase {
             @Override
             void call(String[] args) {
                 for (String a : args) {
-                    Caps cap = Caps.valueOf(a);
+                    DeltaCapability cap = DeltaCapability.valueOf(a);
                     if (arg0.equalsIgnoreCase("cap+")) {
                         selected.permit(cap);
                     } else {
@@ -752,7 +760,7 @@ public class FZDSCommand extends CommandBase {
         add(new SubCommand("scale", "newscale") {
             @Override
             void call(String[] args) {
-                if (!selected.can(Caps.SCALE)) {
+                if (!selected.can(DeltaCapability.SCALE)) {
                     sender.sendChatToPlayer("Selection doesn't have the SCALE cap");
                     return;
                 }
@@ -761,7 +769,7 @@ public class FZDSCommand extends CommandBase {
         add(new SubCommand("alpha", "newOpacity") {
             @Override
             void call(String[] args) {
-                if (!selected.can(Caps.TRANSPARENT)) {
+                if (!selected.can(DeltaCapability.TRANSPARENT)) {
                     sender.sendChatToPlayer("Selection doesn't have the TRANSPARENT cap");
                     return;
                 }

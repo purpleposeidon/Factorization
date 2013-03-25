@@ -121,7 +121,7 @@ public class HammerClientProxy extends HammerProxy {
             World realClientWorld = DeltaChunk.getClientRealWorld();
             Iterator<IDeltaChunk> it = DeltaChunk.getSlices(realClientWorld).iterator();
             while (it.hasNext()) {
-                IDeltaChunk dse = it.next();
+                DimensionSliceEntity dse = (DimensionSliceEntity) it.next();
                 if (dse.isDead) {
                     it.remove(); //shouldn't happen. Keeping it anyways.
                     continue;

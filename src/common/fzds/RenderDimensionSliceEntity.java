@@ -39,6 +39,7 @@ import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
+import factorization.fzds.api.DeltaCapability;
 
 
 public class RenderDimensionSliceEntity extends Render implements IScheduledTickHandler {
@@ -53,14 +54,10 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
     }
     
     static void checkGLError(String op) {
-        int var2 = glGetError();
-
-        if (var2 != 0)
-        {
-            String var3 = GLU.gluErrorString(var2);
-            System.out.println("########## GL ERROR ##########");
-            System.out.println("@ " + op);
-            System.out.println(var2 + ": " + var3);
+        int errSym = glGetError();
+        if (errSym != 0) {
+            Core.logSevere("GL Error @ " + op);
+            Core.logSevere(errSym + ": " + GLU.gluErrorString(errSym));
         }
     }
     
@@ -294,14 +291,19 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         
         nest++;
         try {
+            final boolean oracle = dse.can(DeltaCapability.ORACLE);
             if (nest == 1) {
                 Core.profileStart("build");
-                Hammer.proxy.setShadowWorld();
-                try {
+                if (oracle) {
                     renderInfo.update();
-                } finally {
-                    Hammer.proxy.restoreRealWorld();
-                    Core.profileEnd();
+                } else {
+                    Hammer.proxy.setShadowWorld();
+                    try {
+                        renderInfo.update();
+                    } finally {
+                        Hammer.proxy.restoreRealWorld();
+                        Core.profileEnd();
+                    }
                 }
             }
             glPushMatrix();
@@ -335,11 +337,15 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 Coord c = dse.getCorner();
                 glTranslatef(-c.x, -c.y, -c.z);
                 if (nest == 1) {
-                    Hammer.proxy.setShadowWorld();
-                    try {
+                    if (oracle) {
                         renderInfo.renderEntities(partialTicks);
-                    } finally {
-                        Hammer.proxy.restoreRealWorld();
+                    } else {
+                        Hammer.proxy.setShadowWorld();
+                        try {
+                            renderInfo.renderEntities(partialTicks);
+                        } finally {
+                            Hammer.proxy.restoreRealWorld();
+                        }
                     }
                 } else {
                     renderInfo.renderEntities(partialTicks);
@@ -352,7 +358,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 glPopMatrix();
             }
         } catch (Exception e) {
-            System.err.println("FZDS failed to render");
+            Core.logSevere("FZDS failed to render");
             e.printStackTrace(System.err);
         }
         finally {
