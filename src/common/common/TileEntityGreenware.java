@@ -3,39 +3,42 @@ package factorization.common;
 import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
-
-import org.lwjgl.opengl.GL11;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Icon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.util.Vec3Pool;
-import net.minecraft.world.World;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.event.ForgeSubscribe;
+
+import org.lwjgl.opengl.GL11;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
-
 import factorization.api.Coord;
+import factorization.api.DeltaCoord;
 import factorization.api.Quaternion;
 import factorization.common.NetworkFactorization.MessageType;
-import factorization.common.TileEntityGreenware.ClayLump;
 
 public class TileEntityGreenware extends TileEntityCommon {
     @Override
@@ -158,18 +161,40 @@ public class TileEntityGreenware extends TileEntityCommon {
             ret.quat = new Quaternion(quat);
             return ret;
         }
+        
+        private static HashSet<Coord> cache = new HashSet();
+        private static DeltaCoord m1 = new DeltaCoord(-1, -1, -1);
+        
+        public Collection<Coord> getOccupiedBlocks(Coord base) {
+            cache.clear();
+            DeltaCoord min = new DeltaCoord(minX/16, minY/16, minZ/16);
+            min = min.add(m1);
+            DeltaCoord max = new DeltaCoord(maxX/16, maxY/16, maxZ/16);
+            max = max.add(m1);
+            DeltaCoord d = new DeltaCoord(); //NORELEASE static
+            for (int dx = min.x; dx <= max.x; dx++) {
+                for (int dy = min.y; dy <= max.y; dy++) {
+                    for (int dz = min.z; dz <= max.z; dz++) {
+                        d.init(dx, dy, dz);;
+                        cache.add(base.add(d));
+                    }
+                }
+            }
+            return cache;
+        }
     }
     
     public ArrayList<ClayLump> parts = new ArrayList();
     public int lastTouched = 0;
     int totalHeat = 0;
-    
-    //Client-side only
-    public boolean shouldRenderTesr = false;
+    private boolean partsValidated = false;
     
     public static int dryTime = 20*60*2; //2 minutes
     public static int bisqueHeat = 1000, glazeHeat = bisqueHeat*20;
     public static final int clayIconStart = 12*16;
+    
+    //Client-side only
+    public boolean shouldRenderTesr = false;
     
     public static enum ClayState {
         WET("Wet Greenware"), DRY("Bone-Dry Greenware"), BISQUED("Bisqued"), GLAZED("High-Fire Glazed");
@@ -311,6 +336,21 @@ public class TileEntityGreenware extends TileEntityCommon {
         if (worldObj.isRemote) {
             return;
         }
+        if (!partsValidated) {
+            partsValidated = true;
+            Iterator<ClayLump> it = parts.iterator();
+            while (it.hasNext()) {
+                ClayLump lump = it.next();
+                if (!isValidLump(lump)) {
+                    if (parts.size() == 1) {
+                        lump.asDefault();
+                    } else {
+                        it.remove();
+                        FactorizationUtil.spawnItemStack(getCoord(), new ItemStack(Item.clay));
+                    }
+                }
+            }
+        }
         switch (getState()) {
         case WET:
             if (!worldObj.isRaining()) {
@@ -427,15 +467,20 @@ public class TileEntityGreenware extends TileEntityCommon {
         return lump;
     }
     
-    public static boolean isValidLump(ClayLump lump) {
-        int wX = lump.maxX - lump.minX;
-        int wY = lump.maxY - lump.minY;
-        int wZ = lump.maxZ - lump.minZ;
-        int area = wX*wY*wZ;
-        int max_area = 16*16*16/4;
-        if (area <= 0 || area > max_area) {
-            return false;
+    public boolean isValidLump(ClayLump lump) {
+        //check volume
+        if (!(Core.dev_environ || Core.cheat)) {
+            int wX = lump.maxX - lump.minX; 
+            int wY = lump.maxY - lump.minY;
+            int wZ = lump.maxZ - lump.minZ;
+            int area = wX*wY*wZ;
+            int max_area = 16*16*16/4;
+            if (area <= 0 || area > max_area) {
+                return false;
+            }
         }
+        
+        //check bounds
         final int B = 16*3;
         if (lump.minX < 0) return false;
         if (lump.minY < 0) return false;
@@ -443,7 +488,47 @@ public class TileEntityGreenware extends TileEntityCommon {
         if (lump.maxX > B) return false;
         if (lump.maxY > B) return false;
         if (lump.maxZ > B) return false;
+        
+        //check for free space (needs to be last, as it can mutate the world)
+        for (Coord c : lump.getOccupiedBlocks(getCoord())) {
+            //This block needs to be an Extension, or this
+            if (c.isAir() || c.isReplacable()) {
+                c.setId(Core.registry.factory_block);
+                TileEntityExtension tex = new TileEntityExtension(this);
+                c.setTE(tex);
+                tex.getBlockClass().enforce(c);
+                continue;
+            }
+            TileEntity te = c.getTE();
+            if (te == this) {
+                continue;
+            }
+            if (te instanceof TileEntityExtension) {
+                TileEntityExtension tex = (TileEntityExtension) te;
+                if (tex.getParent() == this) {
+                    continue;
+                }
+            }
+            return false;
+        }
+        
         return true;
+    }
+    
+    @Override
+    void onRemove() {
+        super.onRemove();
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                for (int z = -1; z <= 1; z++) {
+                    Coord c = getCoord().add(x, y, z);
+                    TileEntityExtension tex = c.getTE(TileEntityExtension.class);
+                    if (tex != null && tex.getParent() == this) {
+                        c.setId(0);
+                    }
+                }
+            }
+        }
     }
     
     private void updateLump(int id, ClayLump lump) {
@@ -693,8 +778,42 @@ public class TileEntityGreenware extends TileEntityCommon {
     
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
-        return INFINITE_EXTENT_AABB;
-        //AxisAlignedBB bb = AxisAlignedBB.getAABBPool().getAABB(xCoord - 1, yCoord - 1, zCoord - 1, xCoord + 1, yCoord + 1, zCoord + 1);
-        //return bb;
+        AxisAlignedBB bb = AxisAlignedBB.getAABBPool().getAABB(xCoord - 1, yCoord - 1, zCoord - 1, xCoord + 1, yCoord + 1, zCoord + 1);
+        return bb;
     }
+    
+    @Override
+    public void setBlockBounds(Block b) {
+        super.setBlockBounds(b);
+        //b.setBlockBounds(-1, -1, -1, 1, 1, 1);
+    }
+    
+    
+    @Override
+    public boolean addCollisionBoxesToList(Block block, AxisAlignedBB aabb, List list, Entity entity) {
+        block.setBlockBounds(0, 0, 0, 1, 1F/8F, 1);
+        AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
+        if (aabb.intersectsWith(a)) {
+            list.add(a);
+        }
+        for (ClayLump lump : parts) {
+            lump.toBlockBounds(block);
+            a = block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
+            if (aabb.intersectsWith(a)) {
+                list.add(a);
+            }
+        }
+        return true;
+    }
+    
+    @Override
+    public AxisAlignedBB getCollisionBoundingBoxFromPool() {
+        return null;
+    }
+    
+    @Override
+    public boolean isBlockSolidOnSide(int side) {
+        return false;
+    }
+    
 }

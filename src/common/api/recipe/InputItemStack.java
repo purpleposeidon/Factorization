@@ -15,7 +15,7 @@ public class InputItemStack implements IGenericRecipeInput {
         if (me.getItemDamage() == -1) {
             return is.getItem() == me.getItem();
         }
-        return FactorizationUtil.identical(me, is);
+        return FactorizationUtil.couldMerge(me, is);
     }
 
 }

@@ -460,6 +460,6 @@ public class Core {
     @SideOnly(Side.CLIENT)
     public static Icon texture(IconRegister reg, String name) {
         name = name.replace('.', '/');
-        return reg.makeIcon(texture_dir + name);
+        return reg.registerIcon(texture_dir + name);
     }
 }

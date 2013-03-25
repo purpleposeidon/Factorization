@@ -158,12 +158,12 @@ public class ContainerPocket extends ContainerWorkbench {
         }
         
         @Override
-        public boolean hasCustomName() {
+        public boolean isInvNameLocalized() {
             return false;
         }
         
         @Override
-        public boolean acceptsStackInSlot(int i, ItemStack itemstack) {
+        public boolean isStackValidForSlot(int i, ItemStack itemstack) {
             return true;
         }
     }
@@ -275,7 +275,7 @@ public class ContainerPocket extends ContainerWorkbench {
                 freeSpace += res.getMaxStackSize();
                 continue;
             }
-            if (FactorizationUtil.identical(is, res)) {
+            if (FactorizationUtil.couldMerge(is, res)) {
                 freeSpace += is.getMaxStackSize() - is.stackSize;
             }
         }
@@ -297,7 +297,7 @@ public class ContainerPocket extends ContainerWorkbench {
                     would_fit += res.getMaxStackSize();
                     continue;
                 }
-                if (FactorizationUtil.identical(is, res)) {
+                if (FactorizationUtil.couldMerge(is, res)) {
                     would_fit += is.getMaxStackSize() - is.stackSize;
                 }
             }

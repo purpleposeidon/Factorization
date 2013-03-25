@@ -4,15 +4,12 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import com.google.common.base.Preconditions;
-
-import factorization.common.NetworkFactorization.MessageType;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
+import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityCrystallizer extends TileEntityFactorization {
     ItemStack inputs[] = new ItemStack[6];
@@ -75,26 +72,19 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         return "Crystallizer";
     }
 
+    private static final int[] INPUTS_s = {0, 1, 2, 3, 4, 5}, OUTPUT_s = {6};
+    
     @Override
-    public int getStartInventorySide(int s) {
+    public int[] getSizeInventorySide(int s) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
         if (side == ForgeDirection.UP || side == ForgeDirection.DOWN) {
-            return inputs.length;
+            return OUTPUT_s;
         }
-        return 0;
-    }
-
-    @Override
-    public int getSizeInventorySide(int s) {
-        ForgeDirection side = ForgeDirection.getOrientation(s);
-        if (side == ForgeDirection.UP || side == ForgeDirection.DOWN) {
-            return 1;
-        }
-        return inputs.length;
+        return INPUTS_s;
     }
     
     @Override
-    public boolean acceptsStackInSlot(int s, ItemStack itemstack) {
+    public boolean isStackValidForSlot(int s, ItemStack itemstack) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
         return side != ForgeDirection.UP && side != ForgeDirection.DOWN;
     }
@@ -114,7 +104,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         slot = -1;
         max_size = -99;
         for (int i = 0; i < inputs.length; i++) {
-            if (must_match != null && inputs[i] != null && !FactorizationUtil.identical(must_match, inputs[i])) {
+            if (must_match != null && inputs[i] != null && !FactorizationUtil.couldMerge(must_match, inputs[i])) {
                 continue;
             }
             int here_size = FactorizationUtil.getStackSize(inputs[i]);
@@ -210,7 +200,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
                 continue;
             } else  if (toMatch.getItemDamage() == -1 && is.itemID == toMatch.itemID) {
                 count += is.stackSize;
-            } else  if (FactorizationUtil.identical(is, toMatch)) {
+            } else  if (FactorizationUtil.couldMerge(is, toMatch)) {
                 count += is.stackSize;
             }
         }
@@ -238,7 +228,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
                 return false;
             }
             if (crys.output != null) {
-                if (!FactorizationUtil.identical(crys.output, output)) {
+                if (!FactorizationUtil.couldMerge(crys.output, output)) {
                     return false;
                 }
                 if (crys.output.stackSize + output_count > crys.output.getMaxStackSize()) {
@@ -299,7 +289,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
             ItemStack inverium = new ItemStack(Core.registry.inverium, 0, -1);
             for (int i = 0; i < crys.inputs.length; i++) {
                 ItemStack is = crys.inputs[i];
-                if (is != null && FactorizationUtil.identical(input, is)) {
+                if (is != null && FactorizationUtil.couldMerge(input, is)) {
                     if (crys.countMaterial(inverium) >= inverium_count) {
                         applyTo(crys, i);
                     }
@@ -365,7 +355,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     }
     
     @Override
-    public double func_82115_m() {
+    public double getMaxRenderDistanceSquared() {
         return 576; //24²
     }
 }

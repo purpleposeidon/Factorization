@@ -15,11 +15,9 @@ public class ContainerSlagFurnace extends ContainerFactorization {
     @Override
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
-        //		System.out.println(crafters.size());
         for (ICrafting crafter : (Iterable<ICrafting>) crafters) {
             if (furnace.furnaceBurnTime != lastBurnTime) {
                 crafter.sendProgressBarUpdate(this, 0, furnace.furnaceBurnTime);
-                //				System.out.println(crafter + " burn time is now " + furnace.furnaceBurnTime);
             }
             if (furnace.furnaceCookTime != lastCookTime) {
                 crafter.sendProgressBarUpdate(this, 1, furnace.furnaceCookTime);
@@ -35,7 +33,6 @@ public class ContainerSlagFurnace extends ContainerFactorization {
 
     @Override // -- stupid server
     public void updateProgressBar(int index, int val) {
-        //		System.out.println("Updated progress bar! " + index + " to " + val);
         switch (index) {
         case 0:
             furnace.furnaceBurnTime = val;

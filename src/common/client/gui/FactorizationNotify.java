@@ -3,24 +3,22 @@ package factorization.client.gui;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.StatCollector;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.ForgeSubscribe;
 
+import org.lwjgl.opengl.GL11;
+
 import factorization.api.Coord;
-import factorization.api.DeltaCoord;
 import factorization.common.Core;
 
 public class FactorizationNotify {
@@ -29,6 +27,7 @@ public class FactorizationNotify {
         String msg;
         long creationTime;
         boolean position_important;
+        TileEntity orig_under;
         
         Message set(Coord locus, String msg, boolean long_lasting, boolean position_important) {
             creationTime = System.currentTimeMillis();
@@ -38,6 +37,7 @@ public class FactorizationNotify {
             this.locus = locus;
             this.msg = msg;
             this.position_important = position_important;
+            orig_under = locus.getTE();
             return this;
         }
     }
@@ -115,6 +115,10 @@ public class FactorizationNotify {
         while (it.hasNext()) {
             Message m = it.next();
             if (m.creationTime < deathTime || m.locus.w != w) {
+                it.remove();
+                continue;
+            }
+            if (m.orig_under != m.locus.getTE()) {
                 it.remove();
                 continue;
             }

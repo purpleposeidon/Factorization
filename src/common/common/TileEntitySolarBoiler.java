@@ -33,6 +33,8 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     public TileEntitySolarBoiler() {
         waterTank.setTankPressure(0);
         steamTank.setTankPressure(1);
+        waterTank.getLiquid().amount = 0;
+        steamTank.getLiquid().amount = 0;
     }
 
     @Override

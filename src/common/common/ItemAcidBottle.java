@@ -27,7 +27,7 @@ public class ItemAcidBottle extends Item {
     }
     
     @Override
-    public void registerIcon(IconRegister par1IconRegister) {
+    public void updateIcons(IconRegister par1IconRegister) {
         // Nada
     }
     

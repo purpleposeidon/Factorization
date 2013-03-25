@@ -34,10 +34,10 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
         float near = 2F / 32F, far = 5F / 32F, point = -10F / 32F;
         float u_edge = 0; //diamond.getWidth()/16;
         float v_edge = 0; //diamond.getHeight()/16;
-        float du1 = diamond.getU1() + u_edge;
-        float du2 = diamond.getU2() - u_edge;
-        float dv1 = diamond.getV1() + v_edge;
-        float dv2 = diamond.getV2() - v_edge;
+        float du1 = diamond.getMinU() + u_edge;
+        float du2 = diamond.getMaxU() - u_edge;
+        float dv1 = diamond.getMinV() + v_edge;
+        float dv2 = diamond.getMaxV() - v_edge;
         float dum = (du1 + du2)/2;
         float dvm = (dv1 + dv2)/2;
         
@@ -96,7 +96,7 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
         RenderEngine re = Minecraft.getMinecraft().renderEngine;
         glDisable(GL_LIGHTING);
 
-        re.bindTextureFile(Core.texture_file_block);
+        re.bindTexture(Core.texture_file_block);
         //XXX TODO FIXME Move to somewhere more efficient
         //(Move the vector stuff out too...)
         Tessellator tess = Tessellator.instance;
@@ -113,6 +113,7 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
         GL11.glTranslatef(0, 2F / 16F, 0);
         BlockRenderHelper block = BlockRenderHelper.instance;
         block.useTexture(Block.blockSteel.getBlockTextureFromSide(0));
+        //block.useTexture(Block.cloth.getBlockTextureFromSideAndMetadata(0, 4));
         block.setBlockBoundsOffset(1F/8F, 7F/16F, 1F/8F);
         //block.setBlockBoundsOffset(0, 0, 0);
         block.begin();

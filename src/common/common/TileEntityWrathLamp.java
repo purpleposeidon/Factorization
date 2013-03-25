@@ -68,7 +68,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         TileEntityWrathLamp lamp = TileEntityWrathLamp.findLightAirParent(w, x, y, z);
         if (lamp == null) {
             update_count += 1;
-            w.setBlockAndMetadataWithNotify(x, y, z, 0, 0, NOTIFY_NEIGHBORS);
+            w.setBlock(x, y, z, 0, 0, NOTIFY_NEIGHBORS);
         }
         else {
             lamp.activate(y);
@@ -153,7 +153,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
             for (int z = zCoord - radius; z <= zCoord + radius; z++) {
                 int id = worldObj.getBlockId(x, yCoord, z);
                 if (id == Core.registry.lightair_block.blockID) {
-                    worldObj.setBlockAndMetadataWithNotify(x, yCoord, z, 0, 0, NOTIFY_NEIGHBORS);
+                    worldObj.setBlock(x, yCoord, z, 0, 0, NOTIFY_NEIGHBORS);
                     //worldObj.setBlock(x, yCoord, z, 0);
                 }
             }
@@ -302,7 +302,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                         block = -1;
                     }
                     if (block == 0) {
-                        worldObj.setBlockAndMetadataWithNotify(x, height, z, Core.registry.lightair_block.blockID, 0, NOTIFY_NEIGHBORS);
+                        worldObj.setBlock(x, height, z, Core.registry.lightair_block.blockID, 0, NOTIFY_NEIGHBORS);
                     } else if (block == Core.registry.lightair_block.blockID) {
                     } else if (x == xCoord && height == yCoord && z == zCoord) {
                         //this is ourself. Hi, self.

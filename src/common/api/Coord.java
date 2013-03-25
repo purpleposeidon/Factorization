@@ -514,7 +514,7 @@ public class Coord {
 
     public boolean setId(int id, boolean notify) {
         int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
-        return w.setBlockAndMetadataWithNotify(x, y, z, id, 0, notifyFlag);
+        return w.setBlock(x, y, z, id, 0, notifyFlag);
     }
 
     public boolean setMd(int md, boolean notify) {
@@ -524,7 +524,7 @@ public class Coord {
 
     public boolean setIdMd(int id, int md, boolean notify) {
         int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
-        return w.setBlockAndMetadataWithNotify(x, y, z, id, md, notifyFlag);
+        return w.setBlock(x, y, z, id, md, notifyFlag);
     }
 
     public boolean setId(int id) {
@@ -647,6 +647,6 @@ public class Coord {
     }
     
     public boolean isPowered() {
-        return w.getBlockPower(x, y, z) > 0;
+        return w.getBlockPowerInput(x, y, z) > 0;
     }
 }

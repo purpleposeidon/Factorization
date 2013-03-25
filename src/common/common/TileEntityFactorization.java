@@ -262,7 +262,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }*/
     
     @Override
-    public boolean hasCustomName() {
+    public boolean isInvNameLocalized() {
         return false;
     }
 
@@ -324,6 +324,16 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     @Override
     public ItemStack getStackInSlotOnClosing(int slot) {
         return null;
+    }
+    
+    @Override
+    public boolean canInsertIntoSide(int i, ItemStack itemstack, int j) {
+        return isStackValidForSlot(i, itemstack);
+    }
+    
+    @Override
+    public boolean canExtractFromSide(int i, ItemStack itemstack, int j) {
+        return true;
     }
 
     public void drawActive(int add_time) {

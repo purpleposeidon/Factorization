@@ -87,8 +87,8 @@ public class WireRenderingCube {
     
     public void setIcon(Icon newIcon) {
         icon = newIcon;
-        ul = newIcon.getU1();
-        vl = newIcon.getV1();
+        ul = newIcon.getMinU();
+        vl = newIcon.getMinV();
     }
 
     public VectorUV[] faceVerts(int face) {

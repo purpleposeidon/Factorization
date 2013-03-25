@@ -18,7 +18,7 @@ public class BlockRenderGrinder extends FactorizationBlockRender {
         //TODO: Optimize this!
         if (!world_mode) {
             RenderEngine re = Minecraft.getMinecraft().renderEngine;
-            re.bindTextureFile(Core.texture_file_block);
+            re.bindTexture(Core.texture_file_block);
         }
         renderMotor(rb, 8F/16F);
         float p = 1F/16F;

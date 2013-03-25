@@ -35,6 +35,9 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     @Override
     public Icon getIcon(ForgeDirection dir) {
         draw_active = (byte) (furnaceBurnTime > 0 ? 1 : 0);
+        if (draw_active > 0 && facing_direction == dir.ordinal()) {
+            return BlockIcons.machine$slag_furnace_face_on;
+        }
         return BlockIcons.slag_furnace.get(this, dir);
     }
 
@@ -53,30 +56,20 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
         return "Slag Furnace";
     }
 
+    private static final int[] INPUT_s = {input, input + 1}, FUEL_s = {fuel}, OUTPUT_s = {output};
+    
     @Override
-    public int getStartInventorySide(int s) {
+    public int[] getSizeInventorySide(int s) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
         switch (side) {
-        case DOWN:
-            return fuel; //bottom: fuel
-        case UP:
-            return input; //top: input
-        default:
-            return output; //side: output
+        case DOWN: return FUEL_s;
+        case UP: return INPUT_s;
+        default: return OUTPUT_s;
         }
-    }
-
-    @Override
-    public int getSizeInventorySide(int s) {
-        ForgeDirection side = ForgeDirection.getOrientation(s);
-        if (side == DOWN || side == UP) {
-            return 1; //bottom/top: fuel/input
-        }
-        return 2;
     }
     
     @Override
-    public boolean acceptsStackInSlot(int s, ItemStack itemstack) {
+    public boolean isStackValidForSlot(int s, ItemStack itemstack) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
         return side == DOWN || side == UP;
     }
@@ -177,7 +170,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
         if (output == null) {
             return true;
         }
-        if (!FactorizationUtil.identical(output, res)) {
+        if (!FactorizationUtil.couldMerge(output, res)) {
             return false;
         }
         if (output.stackSize + resSize <= output.getMaxStackSize()) {
@@ -302,7 +295,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
 
         static SmeltingResult getSlaggingResult(ItemStack input) {
             for (SmeltingResult res : smeltingResults) {
-                if (FactorizationUtil.identical(input, res.input)) {
+                if (FactorizationUtil.couldMerge(input, res.input)) {
                     return res;
                 }
             }

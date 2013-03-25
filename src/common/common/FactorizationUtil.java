@@ -25,8 +25,8 @@ import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.common.FakePlayer;
 import net.minecraftforge.common.ForgeDirection;
-import net.minecraftforge.common.DEPRECATED_ISidedInventory;
 import net.minecraftforge.liquids.LiquidEvent;
 import net.minecraftforge.liquids.LiquidStack;
 import net.minecraftforge.liquids.LiquidTank;
@@ -40,7 +40,7 @@ public class FactorizationUtil {
     /**
      * Compare includes NBT and damage value; ignores stack size
      */
-    public static boolean identical(ItemStack a, ItemStack b) {
+    public static boolean couldMerge(ItemStack a, ItemStack b) {
         if (a == null || b == null) {
             return a == b;
         }
@@ -98,6 +98,10 @@ public class FactorizationUtil {
         } else {
             return wildcardSimilar((ItemStack) template, stranger);
         }
+    }
+    
+    public static int stackSize(ItemStack is) {
+        return (is == null) ? 0 : is.stackSize;
     }
     
     public static ItemStack normalDecr(ItemStack is) {
@@ -171,7 +175,7 @@ public class FactorizationUtil {
             if (target == null) {
                 continue;
             }
-            if (FactorizationUtil.identical(is, target)) {
+            if (FactorizationUtil.couldMerge(is, target)) {
                 int free_space = target.getMaxStackSize() - target.stackSize;
                 int incr = Math.min(free_space, is.stackSize);
                 if (incr <= 0) {
@@ -211,7 +215,7 @@ public class FactorizationUtil {
         //try to fill up partially filled slots
         for (Slot slot : destinations) {
             ItemStack is = normalize(slot.getStack());
-            if (is == null || !FactorizationUtil.identical(is, clickStack)) {
+            if (is == null || !FactorizationUtil.couldMerge(is, clickStack)) {
                 continue;
             }
             int freeSpace = Math.min(is.getMaxStackSize() - is.stackSize, slot.getSlotStackLimit() - is.stackSize);
@@ -251,7 +255,238 @@ public class FactorizationUtil {
         clickSlot.putStack(normalize(clickStack));
         return null;
     }
+    
+    public static abstract class FzInv {
+        abstract int size();
+        abstract int slotIndex(int i);
+        
+        boolean forceInsert = false;
+        
+        final IInventory under;
+        
+        public FzInv(IInventory inv) {
+            this.under = inv;
+        }
+        
+        void setInsertForce(boolean b) {
+            forceInsert = b;
+        }
+        
+        ItemStack get(int i) {
+            return under.getStackInSlot(slotIndex(i));
+        }
+        
+        void set(int i, ItemStack is) {
+            under.setInventorySlotContents(slotIndex(i), is);
+        }
+        
+        int getFreeSpace(int i) {
+            ItemStack dest = get(i);
+            if (dest == null) {
+                return under.getInventoryStackLimit();
+            }
+            int dest_free = dest.getMaxStackSize() - dest.stackSize;
+            return Math.min(dest_free, under.getInventoryStackLimit());
+        }
+        
+        ItemStack pushInto(int i, ItemStack is) {
+            int slotIndex = slotIndex(i);
+            if (!canInsert(i, is)) {
+                return is;
+            }
+            ItemStack dest = under.getStackInSlot(slotIndex);
+            if (dest == null) {
+                ItemStack toPut = is;
+                int stack_limit = under.getInventoryStackLimit();
+                if (toPut.stackSize > stack_limit) {
+                    toPut = is.splitStack(stack_limit);
+                } else {
+                    is = null;
+                }
+                under.setInventorySlotContents(slotIndex, toPut);
+                return is;
+            }
+            if (!FactorizationUtil.couldMerge(dest, is)) {
+                return is;
+            }
 
+            int dest_free = getFreeSpace(i);
+            if (dest_free < 1) {
+                return is;
+            }
+            int delta = Math.min(dest_free, is.stackSize);
+            dest.stackSize += delta;
+            is.stackSize -= delta;
+            under.setInventorySlotContents(slotIndex, dest);
+            under.onInventoryChanged();
+            return normalize(is);
+        }
+        
+        public boolean canExtract(int i, ItemStack is) {
+            return true;
+        }
+        
+        public boolean canInsert(int i, ItemStack is) {
+            if (forceInsert) {
+                return true;
+            }
+            return under.isStackValidForSlot(slotIndex(i), is);
+        }
+        
+        public boolean transfer(int i, FzInv dest_inv, int dest_i, int max_transfer) {
+            ItemStack src = normalize(get(i));
+            if (src == null) {
+                return false;
+            }
+            if (!canExtract(i, src)) {
+                return false;
+            }
+            ItemStack dest = dest_inv.get(dest_i);
+            if (dest == null) {
+                dest = src.copy();
+                dest.stackSize = 0;
+            } else if (!couldMerge(src, dest)) {
+                return false;
+            }
+            if (!dest_inv.canInsert(dest_i, src)) {
+                return false;
+            }
+            int dest_free = dest_inv.getFreeSpace(dest_i);
+            if (dest_free < 1) {
+                return false;
+            }
+            int delta = Math.min(dest_free, src.stackSize);
+            delta = Math.min(max_transfer, delta);
+            dest.stackSize += delta;
+            src.stackSize -= delta;
+            src = normalize(src);
+            dest_inv.set(dest_i, dest);
+            set(i, src);
+            dest_inv.under.onInventoryChanged();
+            under.onInventoryChanged();
+            return true;
+        }
+        
+        public ItemStack push(ItemStack is) {
+            is = normalize(is);
+            //First, fill up already existing stacks
+            for (int i = 0; i < size(); i++) {
+                if (is == null) {
+                    return null;
+                }
+                ItemStack dest = get(i);
+                if (dest != null) {
+                    is = normalize(pushInto(i, is));
+                }
+            }
+            //Second, add to null stacks
+            for (int i = 0; i < size(); i++) {
+                if (is == null) {
+                    return null;
+                }
+                ItemStack dest = get(i);
+                if (dest == null) {
+                    is = normalize(pushInto(i, is));
+                }
+            }
+            return is;
+        }
+    }
+
+    public static class PlainInvWrapper extends FzInv {
+        final int length;
+        public PlainInvWrapper(IInventory inv) {
+            super(inv);
+            length = inv.getSizeInventory();
+        }
+        
+        @Override
+        int slotIndex(int i) {
+            return i;
+        }
+        
+        @Override
+        int size() {
+            return length;
+        }
+    }
+    
+    public static FzInv openInventory(IInventory orig_inv, final int side) {
+        if (orig_inv instanceof TileEntityChest) {
+            orig_inv = openDoubleChest((TileEntityChest) orig_inv);
+        }
+        if (orig_inv instanceof net.minecraft.inventory.ISidedInventory) {
+            final net.minecraft.inventory.ISidedInventory inv = (net.minecraft.inventory.ISidedInventory) orig_inv;
+            final int[] slotMap = inv.getSizeInventorySide(side);
+            return new FzInv(inv) {
+                @Override
+                int slotIndex(int i) {
+                    return slotMap[i];
+                }
+                
+                @Override
+                int size() {
+                    return slotMap.length;
+                }
+                
+                @Override
+                public boolean canExtract(int i, ItemStack is) {
+                    return inv.canExtractFromSide(slotMap[i], is, side);
+                }
+                
+                @Override
+                public boolean canInsert(int i, ItemStack is) {
+                    return inv.canInsertIntoSide(slotMap[i], is, side);
+                }};
+        } else if (orig_inv instanceof net.minecraftforge.common.ISidedInventory) {
+            final net.minecraftforge.common.ISidedInventory inv = (net.minecraftforge.common.ISidedInventory) orig_inv;
+            final ForgeDirection fside = ForgeDirection.getOrientation(side);
+            final int start_slot = inv.getStartInventorySide(fside);
+            final int length = inv.getSizeInventorySide(fside);
+            return new FzInv(inv) {
+                @Override
+                int slotIndex(int i) {
+                    return start_slot + i;
+                }
+                
+                @Override
+                int size() {
+                    return length;
+                }};
+        } else {
+            return new PlainInvWrapper(orig_inv);
+        }
+    }
+
+    public static boolean canAccessSlot(IInventory inv, int slot) {
+        if (inv instanceof net.minecraft.inventory.ISidedInventory) {
+            net.minecraft.inventory.ISidedInventory isi = (net.minecraft.inventory.ISidedInventory) inv;
+            //O(n). Ugh.
+            for (int i = 0; i < 6; i++) {
+                int[] slots = isi.getSizeInventorySide(i);
+                for (int j = 0; j < slots.length; j++) {
+                    if (slots[j] == slot) {
+                        return true;
+                    }
+                }
+            }
+        } else if (inv instanceof net.minecraftforge.common.ISidedInventory) {
+            net.minecraftforge.common.ISidedInventory isi = (net.minecraftforge.common.ISidedInventory) inv;
+            //O(1). Just PEACHY.
+            for (int i = 0; i < 6; i++) {
+                ForgeDirection side = ForgeDirection.getOrientation(i);
+                int start = isi.getStartInventorySide(side);
+                int end = start + isi.getSizeInventorySide(side);
+                if (start <= slot && slot < end) {
+                    return true;
+                }
+            }
+        } else {
+            return true;
+        }
+        return false;
+    }
+    
     /**
      * If you are accessing multiple chests, and some might be adjacent you'll want to treat them as a double chest. Calling this function with a lower chest
      * will return 'null'; calling with an upper chest will return an InventoryLargeChest. If it's a single chest, it'll return that chest.
@@ -281,82 +516,7 @@ public class FactorizationUtil {
         return chest;
     }
     
-    public static class InventorySlice implements IInventory {
-        IInventory inv;
-        int start;
-        int length;
-        
-        public InventorySlice(IInventory inv, int start, int length) {
-            this.inv = inv;
-            this.start = start;
-            this.length = length;
-        }
-        
-        @Override
-        public int getSizeInventory() {
-            return length;
-        }
-
-        @Override
-        public ItemStack getStackInSlot(int i) {
-            return inv.getStackInSlot(this.start + i);
-        }
-
-        @Override
-        public ItemStack decrStackSize(int i, int amount) {
-            return inv.decrStackSize(this.start + i, amount);
-        }
-
-        @Override
-        public ItemStack getStackInSlotOnClosing(int i) {
-            return inv.getStackInSlotOnClosing(this.start + i);
-        }
-
-        @Override
-        public void setInventorySlotContents(int i, ItemStack itemstack) {
-            inv.setInventorySlotContents(start + i, itemstack);
-        }
-
-        @Override
-        public String getInvName() {
-            return inv.getInvName();
-        }
-
-        @Override
-        public boolean hasCustomName() {
-            return inv.hasCustomName();
-        }
-
-        @Override
-        public int getInventoryStackLimit() {
-            return inv.getInventoryStackLimit();
-        }
-
-        @Override
-        public void onInventoryChanged() {
-            inv.onInventoryChanged();
-        }
-
-        @Override
-        public boolean isUseableByPlayer(EntityPlayer entityplayer) {
-            return inv.isUseableByPlayer(entityplayer);
-        }
-
-        @Override
-        public void openChest() {
-            inv.openChest();
-        }
-
-        @Override
-        public void closeChest() {
-            inv.closeChest();
-        }
-
-        @Override
-        public boolean acceptsStackInSlot(int s, ItemStack itemstack) {
-            return inv.acceptsStackInSlot(start + s, itemstack);
-        }
-    }
+    
     
     //Recipe creation
     public static IRecipe createShapedRecipe(ItemStack result, Object... args) {
@@ -567,14 +727,10 @@ public class FactorizationUtil {
     }
     
     public static EntityPlayer makePlayer(final Coord where, String use) {
-        EntityPlayer fakePlayer = new EntityPlayer(where.w) {
-            @Override public void sendChatToPlayer(String var1) {}
-            @Override
-            public boolean canCommandSenderUseCommand(int var1, String var2) { return false; }
+        EntityPlayer fakePlayer = new FakePlayer(where.w, "[FZ " + use +  "]") {
             @Override
             public ChunkCoordinates getPlayerCoordinates() { return new ChunkCoordinates(where.x, where.y, where.z); }
         };
-        fakePlayer.username = "[FZ " + use +  "]";
         where.setAsEntityLocation(fakePlayer);
         return fakePlayer;
     }
@@ -587,4 +743,6 @@ public class FactorizationUtil {
             }
         }
     }
+    
+    
 }

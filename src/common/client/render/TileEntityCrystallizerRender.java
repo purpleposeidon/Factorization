@@ -71,7 +71,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             glScalef(s, s, s);
             glTranslatef(-0.5F, 0, 1F / 32F);
             RenderEngine re = Minecraft.getMinecraft().renderEngine;
-            re.bindTextureFile("/terrain.png");
+            re.bindTexture("/terrain.png");
 
             int var18 = crys.growing_crystal.getItem().getColorFromItemStack(crys.growing_crystal, 0);
             float r = (float) (var18 >> 16 & 255) / 255.0F;
@@ -104,7 +104,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             }
             RenderEngine re = Minecraft.getMinecraft().renderEngine;
             //XXX TODO NORELEASE: fix renderer
-            re.bindTextureFile(Core.texture_file_block);
+            re.bindTexture(Core.texture_file_block);
             float u = ((/*tex*/ 0 & 15) << 4) / 256.0F;
             float v = (/*tex*/ 0 & 240) / 256.0F;
             float w = 1F / 16F;

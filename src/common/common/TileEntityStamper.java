@@ -1,18 +1,16 @@
 package factorization.common;
 
+import static net.minecraftforge.common.ForgeDirection.DOWN;
+import static net.minecraftforge.common.ForgeDirection.UP;
+
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.Icon;
-import net.minecraftforge.common.DEPRECATED_ISidedInventory;
 import net.minecraftforge.common.ForgeDirection;
-import static net.minecraftforge.common.ForgeDirection.*;
 
 
 public class TileEntityStamper extends TileEntityFactorization {
@@ -36,25 +34,19 @@ public class TileEntityStamper extends TileEntityFactorization {
         return 2;
     }
 
+    static int[] VERT_sides = {0}, HORIZ_sides = {1};
     @Override
-    public int getStartInventorySide(int s) {
-        ForgeDirection side = ForgeDirection.getOrientation(s);
-        switch (side) {
+    public int[] getSizeInventorySide(int s) {
+        switch (ForgeDirection.getOrientation(s)) {
         case UP:
         case DOWN:
-            return 0;
-        default:
-            return 1;
+            return VERT_sides;
+        default: return HORIZ_sides;
         }
-    }
-
-    @Override
-    public int getSizeInventorySide(int s) {
-        return 1;
     }
     
     @Override
-    public boolean acceptsStackInSlot(int s, ItemStack itemstack) {
+    public boolean isStackValidForSlot(int s, ItemStack itemstack) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
         return side == UP || side == DOWN;
     }
@@ -137,7 +129,7 @@ public class TileEntityStamper extends TileEntityFactorization {
             if (item == null) {
                 continue;
             }
-            if (!FactorizationUtil.identical(output, item)) {
+            if (!FactorizationUtil.couldMerge(output, item)) {
                 return false;
             }
             if (output.stackSize + item.stackSize > output.getMaxStackSize()) {
@@ -200,7 +192,7 @@ public class TileEntityStamper extends TileEntityFactorization {
                     needLogic();
                     continue;
                 }
-                if (FactorizationUtil.identical(output, here)) {
+                if (FactorizationUtil.couldMerge(output, here)) {
                     needLogic();
                     int can_take = output.getMaxStackSize() - output.stackSize;
                     if (here.stackSize > can_take) {

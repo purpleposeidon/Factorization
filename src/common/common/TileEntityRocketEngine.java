@@ -20,6 +20,7 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Icon;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
@@ -413,6 +414,13 @@ for x in range(0, len(d[0])):
             Core.notify(entityplayer, getCoord(), "Rocket is valid");
         }
         return true;
+    }
+    
+    @Override
+    public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {
+        Block block = worldObj.isRemote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
+        block.setBlockBounds(0, 0, 0, 2, 3, 2);
+        return block.collisionRayTrace(worldObj, xCoord, yCoord, zCoord, startVec, endVec);
     }
     
     @Override

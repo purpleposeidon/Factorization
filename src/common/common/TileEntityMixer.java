@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -27,6 +28,7 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
+import factorization.common.FactorizationUtil.FzInv;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityMixer extends TileEntityFactorization implements
@@ -139,23 +141,20 @@ public class TileEntityMixer extends TileEntityFactorization implements
     public String getInvName() {
         return "Mixer";
     }
+    
+    private static final int[] IN_s = {0, 1, 2, 3}, OUT_s = {4, 5, 6, 7};
 
     @Override
-    public int getStartInventorySide(int s) {
+    public int[] getSizeInventorySide(int s) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
         if (side == ForgeDirection.UP) {
-            return 0;
+            return IN_s;
         }
-        return 4;
-    }
-
-    @Override
-    public int getSizeInventorySide(int s) {
-        return 4;
+        return OUT_s;
     }
     
     @Override
-    public boolean acceptsStackInSlot(int s, ItemStack itemstack) {
+    public boolean isStackValidForSlot(int s, ItemStack itemstack) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
         return side == ForgeDirection.UP;
     }
@@ -219,17 +218,28 @@ public class TileEntityMixer extends TileEntityFactorization implements
         return rotation;
     }
     
+    private static class WeirdRecipeException extends Throwable {}
+    
     public static class RecipeMatchInfo {
         public ArrayList inputs = new ArrayList();
         public ItemStack output;
         public IRecipe theRecipe;
         
-        public RecipeMatchInfo(List<ItemStack> recipeInput, ItemStack recipeOutput, IRecipe theRecipe) {
+        public RecipeMatchInfo(List<ItemStack> recipeInput, ItemStack recipeOutput, IRecipe theRecipe) throws WeirdRecipeException {
             for (Object o : recipeInput) {
                 if (o instanceof ItemStack) {
                     this.inputs.add(((ItemStack)o).copy());
+                } else if (o instanceof Collection) {
+                    ArrayList<ItemStack> parts = new ArrayList();
+                    for (Object p : (Collection)o) {
+                        if (p instanceof ItemStack) {
+                            parts.add(((ItemStack) p).copy());
+                        }
+                    }
+                    this.inputs.add(parts);
                 } else {
-                    this.inputs.add(o);
+                    Core.logSevere("Don't know how to use %s in a recipe", o);
+                    throw new WeirdRecipeException();
                 }
             }
             this.output = recipeOutput.copy();
@@ -291,7 +301,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
             }
             if (recipe.getClass() == ShapelessOreRecipe.class) {
                 ShapelessOreRecipe sr = (ShapelessOreRecipe) recipe;
-                inputList = ReflectionHelper.getPrivateValue(ShapelessOreRecipe.class, sr, "input");
+                inputList = ReflectionHelper.getPrivateValue(ShapelessOreRecipe.class, sr, "input"); //thanks
                 output = sr.getRecipeOutput();
             }
             if (inputList == null) {
@@ -320,7 +330,9 @@ public class TileEntityMixer extends TileEntityFactorization implements
                 }
                 
             }
-            cache.add(new RecipeMatchInfo(inputList, output, recipe));
+            try {
+                cache.add(new RecipeMatchInfo(inputList, output, recipe));
+            } catch (WeirdRecipeException e) { }
         }
         return cache;
     }
@@ -397,7 +409,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         for (ItemStack is : src) {
             //increase already-started stacks
             for (int i = 0; i < out.length; i++) {
-                if (out[i] != null && FactorizationUtil.identical(is, out[i])) {
+                if (out[i] != null && FactorizationUtil.couldMerge(is, out[i])) {
                     int free = out[i].getMaxStackSize() - out[i].stackSize;
                     int delta = Math.min(free, is.stackSize);
                     is.stackSize -= delta;
@@ -495,21 +507,10 @@ public class TileEntityMixer extends TileEntityFactorization implements
         needLogic();
         if (outputBuffer.size() > 0) {
             ItemStack toAdd = outputBuffer.get(0);
-            for (int i = 0; i < output.length; i++) {
-                if (output[i] == null) {
-                    output[i] = outputBuffer.remove(0);
-                    return;
-                }
-                int free = output[i].getMaxStackSize() - output[i].stackSize;
-                if (FactorizationUtil.similar(output[i], toAdd) && free > 0) {
-                    int toTake = Math.min(free, toAdd.stackSize);
-                    toAdd.stackSize -= toTake;
-                    output[i].stackSize += toTake;
-                    if (toAdd.stackSize <= 0) {
-                        outputBuffer.remove(0);
-                        return;
-                    }
-                }
+            FzInv out = FactorizationUtil.openInventory(this, ForgeDirection.EAST.ordinal());
+            toAdd = out.push(toAdd);
+            if (toAdd == null) {
+                outputBuffer.remove(0);
             }
             return;
         }
@@ -527,7 +528,6 @@ public class TileEntityMixer extends TileEntityFactorization implements
         } else if (!extractEnergy() && speed > 0) {
             int ns = Math.min(speed - 1, (int)(speed*0.8));
             ns = Math.max(ns, 0);
-            System.out.println("Slowing: " + speed + " to " + ns);
             speed = ns;
         }
         progress += speed;

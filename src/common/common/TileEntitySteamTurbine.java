@@ -132,7 +132,7 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements ITankCon
         }
         shareFanSpeed();
         charge.update();
-        if (worldObj.getBlockPower(xCoord, yCoord, zCoord) > 0) {
+        if (worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0) {
             fan_speed = Math.max(0, fan_speed - 1);
             return;
         }

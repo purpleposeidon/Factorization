@@ -1,25 +1,20 @@
 package factorization.common;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
-import factorization.api.IActOnCraft;
-import factorization.common.Core.TabType;
-
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import net.minecraftforge.common.DEPRECATED_ISidedInventory;
-import net.minecraftforge.common.ForgeDirection;
+import factorization.api.IActOnCraft;
+import factorization.common.Core.TabType;
+import factorization.common.FactorizationUtil.FzInv;
 
 public class ItemBagOfHolding extends Item implements IActOnCraft {
     //XXX: Sending NBT data of all the items might not be a good idea. We might force it to not be shared, and use the damage value for the pearl count.
@@ -215,42 +210,19 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
         if (!(te instanceof IInventory)) {
             return false;
         }
-        IInventory inv = (IInventory) te;
-        int inv_start = 0;
-        int inv_end = inv.getSizeInventory();
-        if (inv instanceof DEPRECATED_ISidedInventory) {
-            DEPRECATED_ISidedInventory sinv = (DEPRECATED_ISidedInventory) inv;
-            ForgeDirection orient = ForgeDirection.getOrientation(side);
-            inv_start = sinv.DEPRECATED_getStartInventorySide(orient);
-            inv_end = inv_start = sinv.DEPRECATED_getSizeInventorySide(orient);
-        }
-        // NOTE: We *could* consider double chests properly. But it maybe it's
-        // more useful this way?
-        boolean did_something = false;
-        int slot = inv_start;
+        FzInv inv = FactorizationUtil.openInventory((IInventory)te, side);
 
         for (int row = 0; row < 4; row++) {
             ArrayList<ItemStack> items = getRow(is, row);
-            boolean changed_row = false;
-            while (items.size() > 0) {
-                if (items.get(0) == null) {
-                    items.remove(0);
+            
+            for (int i = 0; i < items.size(); i++) {
+                ItemStack row_is = items.get(i);
+                if (row_is == null) {
                     continue;
                 }
-                if (slot == inv_end) {
-                    break;
-                }
-                if (inv.getStackInSlot(slot) == null) {
-                    inv.setInventorySlotContents(slot, items.get(0));
-                    items.remove(0);
-                    changed_row = true;
-                }
-                slot += 1;
+                items.set(i, inv.push(row_is));
             }
-            if (changed_row) {
-                writeRow(is, items, row);
-                did_something = true;
-            }
+            writeRow(is, items, row);
         }
 
         return true;
@@ -285,7 +257,7 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
                     here.stackSize = 0;
                     row.set(col, here);
                 }
-                if (here == null || !FactorizationUtil.identical(here, add)) {
+                if (here == null || !FactorizationUtil.couldMerge(here, add)) {
                     continue;
                 }
                 should_add = true;

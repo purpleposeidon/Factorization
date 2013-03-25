@@ -7,19 +7,30 @@ HAMMER
 ✓ Step 3 is "create pseudoplayer, have packets sent to the pseudoplayer be sent to the real players, and render part of the dimension"
 ✓     -    have packets go to all players near the DSE; single PacketProxyingPlayer per DSE
 ✓     -    send chunks to players
+      -    Actually update the terrain when it changes
+      -    Actually consistently render the terrain when spawned
 ✓ Step 4 is to make the DSE interact with the real world
 ✓     -    DSE persistence
 ✓     -    external entity collisions, using custom AABBs
-  Step 5 is to get the player moving in & out
-      -    player entry/leaving
-      -    rendering correctly with embedded player
-  Step 6 is to get rotations working
+X Step 5 is to get the player moving in & out
+X     -    player entry/leaving
+X     -    rendering correctly with embedded player
+  Step 5 is to get player interactions working
+      -    placing blocks
+      -    activating blocks
+      -    GUIs
+      -    breaking blocks
+✓ Step 6 is to get rotations working
+      -    Non-glitchy collision with external entities
   Step 7 is rockets & shit.
       -    Refactor DSE & its rendering for Oracles
-      -    Proper command system
+✓     -    Proper command system
   Step 8 is watch mod interaction burst into flames.
   Step 9 is "drop into the pending mods folder; run away giggling."
 
+
+(Uh-oh, why is TransferLib broken?)
+CovertJaguar_proper_packet_sending
 
 The hard rendering bit:
   On server:
@@ -57,7 +68,6 @@ TOP LIST (that's become somewhat less tops. Oops.)
 --------
 smooth sandstone double slab (Are there other variants?)
 The new IInventory has stuff for preventing things from being put into slots. All machines, and especially routers.
-CovertJaguar_proper_packet_sending
 Tossing barrels (Or, well, anything) through mystcraft portals with the gravity gun
 Bug report of wire-breaking not actually disconnecting?
 Look at what errors we get if the FZDS code isn't in
@@ -362,4 +372,5 @@ More storage:
 
   Rainbow chest (Described elsewhere...)
   Being Able To Place Barrels On Their Sides
-
+  Gloria Chests:
+    (Think zelda. Yes, zelda. And also Super-Hostile.)

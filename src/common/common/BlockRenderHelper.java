@@ -181,6 +181,8 @@ public class BlockRenderHelper extends Block {
     @SideOnly(Side.CLIENT)
     private static ForgeDirection[] dirs = ForgeDirection.values();
     
+    private static VectorUV center = new VectorUV();
+    
     @SideOnly(Side.CLIENT)
     public BlockRenderHelper begin() {
         for (int i = 0; i < 6; i++) {
@@ -193,10 +195,13 @@ public class BlockRenderHelper extends Block {
             for (int f = 0; f < currentFace.length; f++) {
                 VectorUV vert = currentFace[f];
                 //System.out.println(vert.u + ", " + vert.v);
-                vert.u = faceIcon.interpolateU(vert.u*16);
-                vert.v = faceIcon.interpolateV(vert.v*16);
+                vert.u = faceIcon.getInterpolatedU(vert.u*16);
+                vert.v = faceIcon.getInterpolatedV(vert.v*16);
             }
         }
+        center.x = (minX + maxX)/2;
+        center.y = (minY + maxY)/2;
+        center.z = (minZ + maxZ)/2;
         return this;
     }
     
@@ -225,6 +230,7 @@ public class BlockRenderHelper extends Block {
                 q.applyRotation(face[v]);
             }
         }
+        q.applyRotation(center);
         return this;
     }
     
@@ -249,6 +255,9 @@ public class BlockRenderHelper extends Block {
                 face[v].z += dz;
             }
         }
+        center.x += dx;
+        center.y += dy;
+        center.z += dz;
         return this;
     }
     
@@ -259,6 +268,8 @@ public class BlockRenderHelper extends Block {
                 continue;
             }
             VectorUV[] face = faceCache[f];
+            float lighting = getNormalizedLighting(face, center);
+            tess.setColorOpaque_F(lighting, lighting, lighting);
             for (int i = 0; i < face.length; i++) {
                 VectorUV vert = face[i];
                 tess.addVertexWithUV(vert.x + x, vert.y + y, vert.z + z, vert.u, vert.v);
@@ -276,6 +287,10 @@ public class BlockRenderHelper extends Block {
                 continue;
             }
             VectorUV[] face = faceCache[f];
+            float lighting = getNormalizedLighting(face, center);
+            tess.setColorOpaque_F(lighting, lighting, lighting);
+            int brightness = getMixedBrightnessForBlock(c.w, c.x, c.y, c.z);
+            tess.setBrightness(brightness);
             for (int v = 0; v < face.length; v++) {
                 VectorUV vert = face[v];
                 tess.addVertexWithUV(vert.x + c.x, vert.y + c.y, vert.z + c.z, vert.u, vert.v);
@@ -344,9 +359,6 @@ public class BlockRenderHelper extends Block {
             break;
         }
         //Sets up UV data
-        if (face != 4) {
-            return;
-        }
         switch (face) {
         case 0: //-y
         case 1: //+y
@@ -388,30 +400,39 @@ public class BlockRenderHelper extends Block {
         default:
             throw new RuntimeException("Invalid face number");
         }
+        VectorUV[] cache = currentFace;
+        int WIDTH = 1;
+        for (int i = 0; i < cache.length; i++) {
+            VectorUV main = cache[i];
+            double udelta = 0, vdelta = 0;
+            int nada = 0;
+            if (main.u > WIDTH) {
+                udelta = main.u - WIDTH;
+            } else if (main.u < 0) {
+                udelta = main.u;
+            } else {
+                nada++;
+            }
+            if (main.v > WIDTH) {
+                vdelta = main.v - WIDTH;
+            } else if (main.v < 0) {
+                vdelta = main.v;
+            } else {
+                nada++;
+            }
+            if (nada == 2) {
+                continue;
+            }
+            for (int J = 0; J < cache.length; J++) {
+                VectorUV other = cache[J];
+                other.u -= udelta;
+                other.v -= vdelta;
+            }
+        }
         for (int i = 0; i < currentFace.length; i++) {
             VectorUV vec = currentFace[i];
-            boolean any = false;
-            if (vec.u < 0 || vec.u > 1) {
-                double u = vec.u;
-                double delta = (vec.u < 0) ? -u : (1 - u);
-                for (int j = 0; j < currentFace.length; j++) {
-                    VectorUV vec2 = currentFace[j];
-                    vec2.u = clip(vec2.u + delta);
-                }
-                any = true;
-            }
-            if (vec.v < 0 || vec.v > 1) {
-                double v = vec.v;
-                double delta = (vec.v < 0) ? -v : (1 - v);
-                for (int j = 0; j < currentFace.length; j++) {
-                    VectorUV vec2 = currentFace[j];
-                    vec2.v = clip(vec2.v + delta);
-                }
-                any = true;
-            }
-            if (any) {
-                break;
-            }
+            vec.u = clip(vec.u);
+            vec.v = clip(vec.v);
         }
         return;
     }
@@ -425,4 +446,28 @@ public class BlockRenderHelper extends Block {
         currentFace[i].y = Y == 0 ? minY : maxY;
         currentFace[i].z = Z == 0 ? minZ : maxZ;
     }
+    
+    static private ForgeDirection getFaceDirection(VectorUV[] vecs, VectorUV center) {
+        VectorUV here = vecs[0].add(vecs[2]);
+        here.scale(0.5);
+        here = here.add(center);
+        double x = Math.abs(here.x), y = Math.abs(here.y), z = Math.abs(here.z);
+        if (x >= y && x >= z) {
+            return here.x >= 0 ? ForgeDirection.WEST : ForgeDirection.EAST;
+        }
+        if (y >= x && y >= z) {
+            return here.y >= 0 ? ForgeDirection.UP : ForgeDirection.DOWN;
+        }
+        if (z >= x && z >= y) {
+            return here.z >= 0 ? ForgeDirection.SOUTH : ForgeDirection.NORTH;
+        }
+        return ForgeDirection.UP;
+    }
+    
+    private static final float[] directionLighting = new float[] {0.5F, 1F, 0.8F, 0.8F, 0.6F, 0.6F};
+    static private float getNormalizedLighting(VectorUV[] vecs, VectorUV center) {
+        return directionLighting[getFaceDirection(vecs, center).ordinal()];
+    }
+
+
 }

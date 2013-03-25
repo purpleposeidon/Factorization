@@ -356,7 +356,7 @@ abstract public class FactorizationBlockRender implements ICoord {
                 this.x + 0.5 + x / 16F,
                 this.y + 0.5 + y / 16F,
                 this.z + 0.5 + z / 16F,
-                wire.interpolateU(u), wire.interpolateV(v));
+                wire.getInterpolatedU(u), wire.getInterpolatedV(v));
     }
     
     public static void renderIcon(Icon icon) {
@@ -365,13 +365,13 @@ abstract public class FactorizationBlockRender implements ICoord {
             return;
         }
 
-        Minecraft.getMinecraft().renderEngine.bindTextureFile("/gui/items.png");
+        Minecraft.getMinecraft().renderEngine.bindTexture("/gui/items.png");
 
         Tessellator tessellator = Tessellator.instance;
-        float f = icon.getU1();
-        float f1 = icon.getU2();
-        float f2 = icon.getV1();
-        float f3 = icon.getV2();
+        float f = icon.getMinU();
+        float f1 = icon.getMaxU();
+        float f2 = icon.getMinV();
+        float f3 = icon.getMaxV();
         float f4 = 0.0F;
         float f5 = 0.3F;
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
@@ -381,7 +381,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         //GL11.glRotatef(50.0F, 0.0F, 1.0F, 0.0F);
         //GL11.glRotatef(335.0F, 0.0F, 0.0F, 1.0F);
         //GL11.glTranslatef(-0.9375F, -0.0625F, 0.0F);
-        ItemRenderer.renderItemIn2D(tessellator, f1, f2, f, f3, icon.getIconWidth(), icon.getIconHeight(), 0.0625F);
+        ItemRenderer.renderItemIn2D(tessellator, f1, f2, f, f3, icon.getSheetWidth(), icon.getSheetHeight(), 0.0625F);
     }
 
     void renderMotor(RenderBlocks rb, float yoffset) {

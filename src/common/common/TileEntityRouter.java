@@ -5,12 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Random;
 import java.util.regex.Matcher;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -22,8 +18,8 @@ import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
-import net.minecraftforge.common.DEPRECATED_ISidedInventory;
 import factorization.api.Coord;
+import factorization.common.FactorizationUtil.FzInv;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityRouter extends TileEntityFactorization {
@@ -129,29 +125,13 @@ public class TileEntityRouter extends TileEntityFactorization {
         }
     }
 
-    private IInventory openInventory(TileEntity ent) {
-        if (ent instanceof TileEntityChest) {
-            IInventory chest = FactorizationUtil.openDoubleChest((TileEntityChest) ent);
-            // null means it's a lower chest, but would keep it from
-            // continuing, so return a convenient Router.
-            // But, will this mess things up if we've got a MachineFilter using "Chest|Router"?
-            // It shouldn't, since we skip over ourselves.
-            return (chest == null) ? this : chest;
-        }
-        if (ent instanceof IInventory) {
-            return (IInventory) ent;
-        }
-        return null;
-    }
-
     boolean tryInsert(TileEntity ent) {
         if (ent.isInvalid()) {
             //Should help with frames/unloading chunks
             return false; //This is correct. upgradeThorough would have it hang here.
         }
         if (ent instanceof IInventory) {
-            IInventory inv = openInventory(ent);
-            if (actOn(inv)) {
+            if (actOn((IInventory) ent)) {
                 // Netcode Optimization: lastSeenAt increments draw_active
                 // router.drawActive(1);
                 draw_active += 1;
@@ -185,33 +165,11 @@ public class TileEntityRouter extends TileEntityFactorization {
         }
         last_eject = 20;
         Coord target = getEjectCoord();
-        IInventory inv = target.getTE(IInventory.class);
-        if (inv == null) {
+        IInventory target_inv = target.getTE(IInventory.class);
+        if (target_inv == null) {
             return;
         }
-        int start = 0, end = inv.getSizeInventory();
-        if (inv instanceof ISidedInventory) {
-            ISidedInventory isi = (ISidedInventory) inv;
-            int access_side = ForgeDirection.getOrientation(eject_direction).getOpposite().ordinal();
-            start = isi.getStartInventorySide(access_side);
-            end = start + isi.getSizeInventorySide(access_side);
-            if (start == end) {
-                return;
-            }
-        } else if (inv instanceof DEPRECATED_ISidedInventory) { //TODO NORELEASE: Switch to vanilla ISI. Also respect IInventory.canAccept...
-            DEPRECATED_ISidedInventory isi = (DEPRECATED_ISidedInventory) inv;
-            ForgeDirection access_side = ForgeDirection.getOrientation(CubeFace.oppositeSide(eject_direction));
-            start = isi.DEPRECATED_getStartInventorySide(access_side);
-            end = start + isi.DEPRECATED_getSizeInventorySide(access_side);
-            if (start == end) {
-                return;
-            }
-        }
-        for (int slot = start; slot < end; slot++) {
-            if (moveStack(this, 0, target.getTE(IInventory.class), slot)) {
-                return;
-            }
-        }
+        buffer = FactorizationUtil.openInventory(target_inv, eject_direction).push(buffer);
     }
 
     @Override
@@ -299,7 +257,7 @@ public class TileEntityRouter extends TileEntityFactorization {
      * If the router can possibly do anything
      */
     boolean shouldUpdate() {
-        if (worldObj.getBlockPower(xCoord, yCoord, zCoord) > 0) {
+        if (worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0) {
             return false;
         }
         if (is_input) {
@@ -311,64 +269,6 @@ public class TileEntityRouter extends TileEntityFactorization {
 
             return buffer.stackSize < buffer.getMaxStackSize();
         }
-    }
-
-    boolean moveStack(IInventory src, int src_slot, IInventory dest, int dest_slot) {
-        // move as much as possible from src's slot to dest's slot
-        ItemStack srcStack = src.getStackInSlot(src_slot);
-        ItemStack destStack = dest.getStackInSlot(dest_slot);
-        if (srcStack == null || srcStack.stackSize <= 0) {
-            return false;
-        }
-        if (!dest.acceptsStackInSlot(dest_slot, srcStack)) {
-            return false;
-        }
-        if (destStack == null) {
-            if (upgradeThroughput) {
-                // Ha! Easy swap!
-                src.setInventorySlotContents(src_slot, null);
-                dest.setInventorySlotContents(dest_slot, srcStack);
-                return true;
-            } else {
-                // leave it as 0 for us to fill up
-                // The two returns below shouldn't be a problem, as it'll be equal, and there'll be room
-                destStack = srcStack.copy();
-                destStack.stackSize = 0;
-            }
-        }
-        if (!FactorizationUtil.identical(srcStack, destStack)) {
-            return false;
-        }
-        if (destStack.stackSize >= destStack.getMaxStackSize()) {
-            return false;
-        }
-
-        if (upgradeThroughput) {
-            int movable = destStack.getMaxStackSize() - destStack.stackSize;
-            if (movable > srcStack.stackSize) {
-                // dest takes an incomplete stack
-                destStack.stackSize += srcStack.stackSize;
-                src.setInventorySlotContents(src_slot, null);
-                dest.setInventorySlotContents(dest_slot, destStack);
-                return true;
-            }
-            // partial move
-            srcStack.splitStack(movable);
-            destStack.stackSize += movable;
-            if (srcStack.stackSize == 0) {
-                srcStack = null;
-            }
-            src.setInventorySlotContents(src_slot, srcStack);
-            dest.setInventorySlotContents(dest_slot, destStack);
-        } else {
-            srcStack.stackSize--;
-            srcStack = FactorizationUtil.normalize(srcStack);
-            destStack.stackSize++;
-            src.setInventorySlotContents(src_slot, srcStack);
-            dest.setInventorySlotContents(dest_slot, destStack);
-        }
-
-        return true;
     }
 
     boolean isIInventoryBanned(String name) {
@@ -425,61 +325,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         return false;
     }
 
-    boolean isLocked(IInventory t) {
-        // If we can't access anything via ISidedInventory means, don't allow it
-        if (t instanceof ISidedInventory) {
-            int free_count = 0;
-            ISidedInventory inv = (ISidedInventory) t;
-            for (ForgeDirection side : ForgeDirection.values()) {
-                // check each side
-                if (inv.getSizeInventorySide(side.ordinal()) != 0) {
-                    free_count++;
-                }
-            }
-            return free_count == 0;
-        } else if (t instanceof DEPRECATED_ISidedInventory) {
-            int free_count = 0;
-            DEPRECATED_ISidedInventory inv = (DEPRECATED_ISidedInventory) t;
-            for (ForgeDirection side : ForgeDirection.values()) {
-                // check each side
-                if (inv.DEPRECATED_getSizeInventorySide(side) != 0) {
-                    free_count++;
-                }
-            }
-            return free_count == 0;
-        }
-        return false;
-    }
-
-    boolean legalSlot(IInventory t, int slot) {
-        if (t instanceof ISidedInventory) {
-            ISidedInventory s = (ISidedInventory) t;
-            for (ForgeDirection side : ForgeDirection.values()) {
-                if (side == ForgeDirection.UNKNOWN) {
-                    continue;
-                }
-                int low = s.getStartInventorySide(side.ordinal());
-                int high = low + s.getSizeInventorySide(side.ordinal());
-                if (low <= slot && slot < high) {
-                    return true;
-                }
-            }
-        } else if (t instanceof DEPRECATED_ISidedInventory) {
-            DEPRECATED_ISidedInventory s = (DEPRECATED_ISidedInventory) t;
-            for (ForgeDirection side : ForgeDirection.values()) {
-                int low = s.DEPRECATED_getStartInventorySide(side);
-                int high = low + s.DEPRECATED_getSizeInventorySide(side);
-                if (low <= slot && slot < high) {
-                    return true;
-                }
-            }
-        } else {
-            return true;
-        }
-        return false;
-    }
-    
-    boolean itemPassesInsertFilter(IInventory inv, ItemStack is) {
+    boolean itemPassesInsertFilter(FzInv inv, ItemStack is) {
         if (!upgradeItemFilter) {
             return true;
         }
@@ -491,19 +337,19 @@ public class TileEntityRouter extends TileEntityFactorization {
                 continue;
             }
             empty_filter = false;
-            if (FactorizationUtil.identical(here, is)) {
+            if (FactorizationUtil.couldMerge(here, is)) {
                 matching_count += here.stackSize;
             }
         }
         if (empty_filter) {
             return true;
         }
-        for (int i = 0; i < inv.getSizeInventory(); i++) {
-            ItemStack here = inv.getStackInSlot(i);
+        for (int i = 0; i < inv.size(); i++) {
+            ItemStack here = inv.get(i);
             if (here == null) {
                 continue;
             }
-            if (FactorizationUtil.identical(here, is)) {
+            if (FactorizationUtil.couldMerge(here, is)) {
                 matching_count -= here.stackSize;
             }
         }
@@ -546,53 +392,37 @@ public class TileEntityRouter extends TileEntityFactorization {
             return false;
         }
         int start, end;
-        if (target_side < 6 && target_side >= 0 && target_slot < 0) {
-            if (t instanceof ISidedInventory) {
-                ISidedInventory isi = (ISidedInventory) t;
-                t = new FactorizationUtil.InventorySlice(t, isi.getStartInventorySide(target_side), isi.getSizeInventorySide(target_side));
-            } else if (t instanceof DEPRECATED_ISidedInventory) {
-                DEPRECATED_ISidedInventory isi = (DEPRECATED_ISidedInventory) t;
-                ForgeDirection side = ForgeDirection.getOrientation(target_side);
-                t = new FactorizationUtil.InventorySlice(t, isi.DEPRECATED_getStartInventorySide(side), isi.DEPRECATED_getSizeInventorySide(side));
+        FzInv inv;
+        if (target_slot >= 0) {
+            if (!FactorizationUtil.canAccessSlot(t, target_slot)) {
+                return false;
             }
-        }
-        if (target_slot < 0) {
-            start = 0;
-            end = t.getSizeInventory();
-        } else {
-            if (isLocked(t)) {
+            if (target_slot >= t.getSizeInventory()) {
                 return false;
             }
             start = target_slot;
             end = target_slot + 1;
-            if (start >= t.getSizeInventory()) {
-                return false;
-            }
+            inv = new FactorizationUtil.PlainInvWrapper(t);
+        } else {
+            inv = FactorizationUtil.openInventory(t, target_side);
+            start = 0;
+            end = inv.size();
         }
+        FzInv me = FactorizationUtil.openInventory(this, 0);
+        int toMove = upgradeThroughput ? buffer.stackSize : 1;
         for (int slot = start; slot < end; slot++) {
-            // XXX: Should onInventoryChanged() happen at moveStack for both inventories? Probably.
-            if (!legalSlot(t, slot)) {
-                continue;
-            }
-            //So, about that item filtering...
             if (is_input) {
-                if (!itemPassesInsertFilter(t, buffer)) {
-                    continue;
+                if (!itemPassesInsertFilter(inv, buffer)) {
+                    return false;
                 }
-                //Filtering the input doesn't sound useful.
-                //XXX TODO: Maybe do nothing if buffer doesn't match the filter? That might be useful for a very complicated auto-processor
-                if (moveStack(this, 0, t, slot)) {
-                    onInventoryChanged();
-                    t.onInventoryChanged();
+                if (me.transfer(0, inv, slot, toMove)) {
                     return true;
                 }
             } else {
-                if (!itemPassesExtractFilter(t.getStackInSlot(slot))) {
+                if (!itemPassesExtractFilter(inv.get(slot))) {
                     continue;
                 }
-                if (moveStack(t, slot, this, 0)) {
-                    onInventoryChanged();
-                    t.onInventoryChanged();
+                if (inv.transfer(slot, me, 0, toMove)) {
                     return true;
                 }
             }
@@ -667,6 +497,13 @@ public class TileEntityRouter extends TileEntityFactorization {
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
         target_side = tag.getInteger("target_side");
+        //Compat: We don't allow "extract from anywhere" anymore
+        if (target_side == 6) {
+            target_side = 1;
+        }
+        if (target_side == ~6) {
+            target_side = ~1;
+        }
         target_slot = tag.getInteger("use_slot");
         is_input = tag.getBoolean("is_input");
         if (tag.hasKey("buffer")) {
@@ -964,18 +801,15 @@ public class TileEntityRouter extends TileEntityFactorization {
         }
     }
 
-    @Override
-    public int getStartInventorySide(int s) {
-        return 0;
-    }
+    private static final int[] side_info = {0};
 
     @Override
-    public int getSizeInventorySide(int s) {
-        return 1;
+    public int[] getSizeInventorySide(int s) {
+        return side_info;
     }
     
     @Override
-    public boolean acceptsStackInSlot(int s, ItemStack itemstack) {
+    public boolean isStackValidForSlot(int s, ItemStack itemstack) {
         return s == 0;
     }
 }

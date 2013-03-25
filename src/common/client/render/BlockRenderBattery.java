@@ -37,7 +37,7 @@ public class BlockRenderBattery extends FactorizationBlockRender {
         //TODO: Need to render with the correct positioning for the hand
         //if (type == EQUIPPED || type == ENTITY) {
         RenderEngine re = Minecraft.getMinecraft().renderEngine;
-        re.bindTextureFile(Core.texture_file_block);
+        re.bindTexture(Core.texture_file_block);
         renderBatteryDisplay(rb, item_fullness);
         GL11.glPopMatrix();
     }

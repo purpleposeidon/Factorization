@@ -179,7 +179,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
             return false;
         }
         item.stackSize = is.stackSize;
-        return FactorizationUtil.identical(item, is);
+        return FactorizationUtil.couldMerge(item, is);
     }
 
     @Override
@@ -225,29 +225,19 @@ public class TileEntityBarrel extends TileEntityFactorization {
         return "Barrel";
     }
     
+    private static final int[] DOWN_s = {0}, UP_s = {1}, NO_s = {};
+    
     @Override
-    public int getStartInventorySide(int side) {
+    public int[] getSizeInventorySide(int side) {
         switch (ForgeDirection.getOrientation(side)) {
-        case DOWN:
-            return 0; // -Y
-        case UP:
-            return 1; // +y
-        default:
-            return -1;
+        case DOWN: return DOWN_s;
+        case UP: return UP_s;
+        default: return NO_s;
         }
-    }
-
-    @Override
-    public int getSizeInventorySide(int s) {
-        ForgeDirection side = ForgeDirection.getOrientation(s);
-        if (side == UP || side == DOWN) {
-            return 1;
-        }
-        return 0;
     }
     
     @Override
-    public boolean acceptsStackInSlot(int s, ItemStack itemstack) {
+    public boolean isStackValidForSlot(int s, ItemStack itemstack) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
         if (side == ForgeDirection.UP) {
             if (item == null) {
@@ -587,8 +577,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     }
 
     @Override
-    //getRenderDistanceSquared
-    public double func_82115_m() {
+    public double getMaxRenderDistanceSquared() {
         if (Core.render_barrel_close) {
             return 25; //5²
         }

@@ -868,7 +868,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         BlockClass.Barrel.harvest("axe", 1);
         BlockClass.Machine.harvest("pickaxe", 0);
         BlockClass.MachineLightable.harvest("pickaxe", 0);
-        BlockClass.Cage.harvest("pickaxe", 1);
         MinecraftForge.setBlockHarvestLevel(resource_block, "pickaxe", 2);
     }
 
@@ -952,7 +951,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 free_slots += 1;
                 continue;
             }
-            if (FactorizationUtil.identical(is, here)) {
+            if (FactorizationUtil.couldMerge(is, here)) {
                 int free = here.getMaxStackSize() - here.stackSize;
                 remaining_size -= free;
                 if (remaining_size <= 0) {

@@ -46,7 +46,7 @@ public enum Command {
     static void fromNetwork(EntityPlayer player, byte s, byte arg) {
         Command c = name.map.get(s);
         if (c == null) {
-            System.err.println("Received invalid command #" + s);
+            Core.logWarning("Received invalid command #" + s);
             return;
         }
         c.call(player, arg);
@@ -230,7 +230,7 @@ public enum Command {
             }
             
             boolean add(ItemStack ta, int slot) {
-                if (FactorizationUtil.identical(toMatch, ta)) {
+                if (FactorizationUtil.couldMerge(toMatch, ta)) {
                     stackCount += ta.stackSize;
                     ta.stackSize = 0;
                     matchingSlots.add(slot);

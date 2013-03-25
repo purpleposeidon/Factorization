@@ -220,7 +220,7 @@ public class ItemCraft extends Item {
     }
     
     @Override
-    public void registerIcon(IconRegister reg) { }
+    public void updateIcons(IconRegister reg) { }
     
     @Override
     public Icon getIconFromDamage(int damage) {

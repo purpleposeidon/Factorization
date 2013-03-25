@@ -236,7 +236,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
             Coord here = new Coord(world, x, y, z);
             
             if (Core.debug_network) {
-                System.out.println("FactorNet: " + messageType + "      " + here);
+                Core.logFine("FactorNet: " + messageType + "      " + here);
             }
 
             if (!here.blockExists() && world.isRemote) {
@@ -331,11 +331,11 @@ public class NetworkFactorization implements ITinyPacketHandler {
         try {
             getCurrentPlayer().addChatMessage(String.format(main, items.toArray()));
         } catch (IllegalFormatException e) {
-            System.out.print("Illegal format: \"" + main + '"');
+            System.err.print("Illegal format: \"" + main + '"');
             for (String i : items) {
-                System.out.print(" \"" + i + "\"");
+                System.err.print(" \"" + i + "\"");
             }
-            System.out.println();
+            System.err.println();
             e.printStackTrace();
         }
     }

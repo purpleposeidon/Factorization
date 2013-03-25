@@ -47,9 +47,8 @@ public class GuiRouter extends GuiContainer implements IClickable {
     ButtonSet current_set = allSets[0];
 
     String[] side_names = { "bottom sides", "top sides", "§asouth§r sides", "§3north§r sides", "§eeast§r sides",
-            "§5west§r sides", "anywhere" };
-    String[] ejection_side_names = { "eject to bottom", "eject to top", "eject to §asouth§r", "eject to §3north§r", "eject to §eeast§r",
-            "eject to §5west§r" };
+            "§5west§r sides" };
+    String[] ejection_side_names = { "eject down", "eject up", "eject §asouth§r", "eject §3north§r", "eject §eeast§r", "eject §5west§r" };
     static final String any_inv = "all machines in network";
 
     public GuiRouter(ContainerFactorization cont) {
@@ -255,7 +254,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
 
     protected void drawGuiContainerBackgroundLayer(float f, int i, int j) {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.renderEngine.bindTextureFile(Core.gui_dir + "routergui.png");
+        mc.renderEngine.bindTexture(Core.gui_dir + "routergui.png");
         int l = (width - xSize) / 2;
         int i1 = (height - ySize) / 2;
         drawTexturedModalRect(l, i1, 0, 0, xSize, ySize);
@@ -318,7 +317,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
             if (0 <= router.target_slot) {
                 router.target_slot = ~router.target_slot;
                 if (rightClick) {
-                    router.target_side = 6;
+                    router.target_side = 5;
                 } else {
                     router.target_side = 0;
                 }
@@ -330,7 +329,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
                 }
                 if (router.target_side < 0) {
                     router.target_slot = ~router.target_slot;
-                } else if (router.target_side >= 7) {
+                } else if (router.target_side >= 6) {
                     router.target_slot = ~router.target_slot;
                     router.target_side = 0;
                 }

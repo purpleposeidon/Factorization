@@ -27,7 +27,7 @@ public class BlockResource extends Block {
     }
     
     @Override
-    public void registerIcon(IconRegister reg) {
+    public void registerIcons(IconRegister reg) {
         exoBottom = Core.texture(reg, "exo/modder_bottom");
         exoTop = Core.texture(reg, "exo/modder_top");
         for (ResourceType rt : ResourceType.values()) {

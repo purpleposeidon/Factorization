@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
-import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -169,7 +170,7 @@ public class BlockFactorization extends BlockContainer {
     }
     
     @Override
-    public void registerIcon(IconRegister reg) {
+    public void registerIcons(IconRegister reg) {
         FactorizationTextureLoader.register(reg, BlockIcons.class);
         Core.proxy.texturepackChanged();
     }
@@ -420,6 +421,15 @@ public class BlockFactorization extends BlockContainer {
             return super.getCollisionBoundingBoxFromPool(w, x, y, z);
         }
         return tec.getCollisionBoundingBoxFromPool();
+    }
+    
+    @Override
+    public void addCollisionBoxesToList(World w, int x, int y, int z, AxisAlignedBB aabb, List list, Entity entity) {
+        TileEntityCommon tec = new Coord(w, x, y, z).getTE(TileEntityCommon.class);
+        Block test = w.isRemote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
+        if (tec == null || !tec.addCollisionBoxesToList(test, aabb, list, entity)) {
+            super.addCollisionBoxesToList(w, x, y, z, aabb, list, entity);
+        }
     }
     
     @Override

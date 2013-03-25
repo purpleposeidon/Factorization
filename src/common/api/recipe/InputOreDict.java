@@ -23,7 +23,7 @@ public class InputOreDict implements IGenericRecipeInput {
                     return true;
                 }
             }
-            if (FactorizationUtil.identical(is, ore)) {
+            if (FactorizationUtil.couldMerge(is, ore)) {
                 return true;
             }
         }

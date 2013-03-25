@@ -110,12 +110,12 @@ public class ContainerExoModder extends Container {
         }
 
         @Override
-        public boolean hasCustomName() {
+        public boolean isInvNameLocalized() {
             return false;
         }
 
         @Override
-        public boolean acceptsStackInSlot(int i, ItemStack itemstack) {
+        public boolean isStackValidForSlot(int i, ItemStack itemstack) {
             return true; //bluh. Whatever, we have slots.
         }
 

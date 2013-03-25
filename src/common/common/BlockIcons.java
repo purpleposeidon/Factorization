@@ -47,6 +47,7 @@ public class BlockIcons {
         heater_heat, heater_spiral;
     @Directory("machine")
     public static SimpleMachine slag_furnace;
+    public static Icon machine$slag_furnace_face_on;
     
     @Directory("rocket")
     public static Icon

@@ -59,7 +59,7 @@ public class BlockLightAir extends Block {
     }
     
     @Override
-    public void registerIcon(IconRegister reg) { }
+    public void registerIcons(IconRegister reg) { }
     
     @Override
     public Icon getBlockTextureFromSideAndMetadata(int side, int md) {
@@ -93,7 +93,7 @@ public class BlockLightAir extends Block {
         }
         if (md == fire_md) {
             if (w.isAirBlock(x - 1, y, z) && w.isAirBlock(x + 1, y, z) && w.isAirBlock(x, y - 1, z) && w.isAirBlock(x, y + 1, z) && w.isAirBlock(x, y, z - 1) && w.isAirBlock(x, y, z + 1)) {
-                w.setBlockAndMetadataWithNotify(x, y, z, 0, 0, Coord.UPDATE);
+                w.setBlock(x, y, z, 0, 0, Coord.UPDATE);
             }
         }
     }

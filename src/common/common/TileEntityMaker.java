@@ -1,22 +1,17 @@
 package factorization.common;
 
+import static net.minecraftforge.common.ForgeDirection.DOWN;
+import static net.minecraftforge.common.ForgeDirection.UP;
+
 import java.io.DataInput;
 import java.io.IOException;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
-import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Icon;
-import net.minecraftforge.common.DEPRECATED_ISidedInventory;
 import net.minecraftforge.common.ForgeDirection;
-import static net.minecraftforge.common.ForgeDirection.*;
-import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityMaker extends TileEntityFactorization {
@@ -28,7 +23,7 @@ public class TileEntityMaker extends TileEntityFactorization {
     ItemStack output;
 
     // settings
-    private final int input_slot = 0, paper_slot = 1, craft_slot = 2, output_slot = 3;
+    private static final int input_slot = 0, paper_slot = 1, craft_slot = 2, output_slot = 3;
 
     public TileEntityMaker() {
         super();
@@ -225,27 +220,21 @@ public class TileEntityMaker extends TileEntityFactorization {
         output = readItem("output", tag);
         paper = readItem("paper", tag);
     }
+    
+    private static final int[] DOWN_s = {paper_slot, craft_slot}, UP_s = {input_slot}, OUT_s = {output_slot};
 
     @Override
-    public int getStartInventorySide(int s) {
+    public int[] getSizeInventorySide(int s) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
         switch (side) {
-        case DOWN:
-            return paper_slot;
-        case UP:
-            return input_slot;
-        default:
-            return output_slot;
+        case DOWN: return DOWN_s;
+        case UP: return UP_s;
+        default: return OUT_s;
         }
-    }
-
-    @Override
-    public int getSizeInventorySide(int s) {
-        return 1;
     }
     
     @Override
-    public boolean acceptsStackInSlot(int s, ItemStack itemstack) {
+    public boolean isStackValidForSlot(int s, ItemStack itemstack) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
         return side == UP || side == DOWN;
     }

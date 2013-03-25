@@ -72,23 +72,20 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     public String getInvName() {
         return "Grinder";
     }
+    
+    final private static int[] UP_s = {0}, OUT_s = {1};
 
     @Override
-    public int getStartInventorySide(int s) {
+    public int[] getSizeInventorySide(int s) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
         if (side == ForgeDirection.UP) {
-            return 0;
+            return UP_s;
         }
-        return 1;
-    }
-
-    @Override
-    public int getSizeInventorySide(int s) {
-        return 1;
+        return OUT_s;
     }
     
     @Override
-    public boolean acceptsStackInSlot(int s, ItemStack itemstack) {
+    public boolean isStackValidForSlot(int s, ItemStack itemstack) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
         return side == ForgeDirection.UP;
     }
@@ -220,11 +217,11 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
             return false;
         }
         for (GrinderRecipe gr : recipes) {
-            if (FactorizationUtil.identical(gr.input, input)) {
+            if (FactorizationUtil.couldMerge(gr.input, input)) {
                 if (output == null) {
                     return true;
                 }
-                if (!FactorizationUtil.identical(output, gr.output)) {
+                if (!FactorizationUtil.couldMerge(output, gr.output)) {
                     return false;
                 }
                 if (output.stackSize + ((int) gr.probability + .99) > output.getMaxStackSize()) {
@@ -238,7 +235,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
 
     void grind() {
         for (GrinderRecipe gr : recipes) {
-            if (FactorizationUtil.identical(gr.input, input)) {
+            if (FactorizationUtil.couldMerge(gr.input, input)) {
                 if (output == null) {
                     output = gr.output.copy();
                     output.stackSize = 0;

@@ -46,7 +46,7 @@ public class ItemWandOfCooling extends Item {
     }
 
     void setBlock(World world, int x, int y, int z, int id) {
-        world.setBlockAndMetadataWithNotify(x, y, z, id, 0, Coord.NOTIFY_NEIGHBORS | Coord.UPDATE);
+        world.setBlock(x, y, z, id, 0, Coord.NOTIFY_NEIGHBORS | Coord.UPDATE);
         soundCool(world, x, y, z);
     }
 

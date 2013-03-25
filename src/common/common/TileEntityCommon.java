@@ -2,10 +2,12 @@ package factorization.common;
 
 import java.io.DataInput;
 import java.io.IOException;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -106,6 +108,10 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         AxisAlignedBB ret = Core.registry.resource_block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
         Core.registry.resource_block.setBlockBounds(0, 0, 0, 1, 1, 1);
         return ret;
+    }
+    
+    public boolean addCollisionBoxesToList(Block block, AxisAlignedBB aabb, List list, Entity entity) {
+        return false;
     }
 
     public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {

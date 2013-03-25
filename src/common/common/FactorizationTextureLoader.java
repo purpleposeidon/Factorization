@@ -54,7 +54,7 @@ public class FactorizationTextureLoader {
                 }
                 if (Icon.class.isAssignableFrom(f.getType())) {
                     String icon_file = prefix + f.getName();
-                    f.set(instance, reg.makeIcon(icon_file.replace('$', '/')));
+                    f.set(instance, reg.registerIcon(icon_file.replace('$', '/')));
                 }
             }
         } catch (IllegalAccessException e) {

@@ -2,12 +2,18 @@ package factorization.common;
 
 import java.io.DataInput;
 import java.io.IOException;
+import java.util.List;
 
+import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.EnumMovingObjectType;
 import net.minecraft.util.Icon;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.DeltaCoord;
 import factorization.common.NetworkFactorization.MessageType;
@@ -86,13 +92,19 @@ public class TileEntityExtension extends TileEntityCommon {
     @Override
     public AxisAlignedBB getCollisionBoundingBoxFromPool() {
         TileEntityCommon p = getParent();
-        if (p == null && pc != null) {
-            p = getCoord().add(pc).getTE(TileEntityCommon.class);
+        if (p == null) {
+            return super.getCollisionBoundingBoxFromPool();
         }
-        if (p != null) {
-            return p.getCollisionBoundingBoxFromPool();
+        return p.getCollisionBoundingBoxFromPool();
+    }
+    
+    @Override
+    public boolean addCollisionBoxesToList(Block block, AxisAlignedBB aabb, List list, Entity entity) {
+        TileEntityCommon p = getParent();
+        if (p == null) {
+            return super.addCollisionBoxesToList(block, aabb, list, entity);
         }
-        return super.getCollisionBoundingBoxFromPool();
+        return p.addCollisionBoxesToList(block, aabb, list, entity);
     }
     
     @Override
@@ -139,6 +151,24 @@ public class TileEntityExtension extends TileEntityCommon {
         if (p != null) {
             p.neighborChanged();
         }
+    }
+    
+    @Override
+    public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {
+        TileEntityCommon p = getParent();
+        if (p != null) {
+            MovingObjectPosition ret = p.collisionRayTrace(startVec, endVec);
+            if (!(p instanceof TileEntityGreenware)) {
+                //hax
+                if (ret != null && ret.typeOfHit == EnumMovingObjectType.TILE) {
+                    ret.blockX = xCoord;
+                    ret.blockY = yCoord;
+                    ret.blockZ = zCoord;
+                }
+            }
+            return ret;
+        }
+        return super.collisionRayTrace(startVec, endVec);
     }
 }
 
