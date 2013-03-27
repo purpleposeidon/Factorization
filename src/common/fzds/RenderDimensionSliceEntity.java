@@ -44,7 +44,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
     public static int update_frequency = 16;
     public static RenderDimensionSliceEntity instance;
     
-    private Set<DSRenderInfo> renderInfoTracker = new HashSet();
+    private Set<DSRenderInfo> renderInfoTracker = new HashSet<DSRenderInfo>();
     private static long megatickCount = 0;
     
     public RenderDimensionSliceEntity() {
@@ -187,7 +187,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                     for (int cdz = 0; cdz < zwidth; cdz++) {
                         Chunk here = corner.w.getChunkFromBlockCoords(corner.x + cdx*16, corner.z + cdz*16);
                         for (int i1 = 0; i1 < here.entityLists.length; i1++) {
-                            List<Entity> ents = here.entityLists[i1];
+                            List<Entity> ents = (List<Entity>)here.entityLists[i1];
                             for (int i2 = 0; i2 < ents.size(); i2++) {
                                 Entity e = ents.get(i2);
                                 if (e.posY < corner.y - entity_buffer) {

@@ -14,7 +14,7 @@ public enum Command {
     exoModRightClick(10);
 
     static class name {
-        static HashMap<Byte, Command> map = new HashMap();
+        static HashMap<Byte, Command> map = new HashMap<Byte, Command>();
     }
     
     static {
@@ -151,7 +151,7 @@ public enum Command {
         if (empty >= 2) {
             return false;
         }
-        ArrayList<ItemStack> buffer = new ArrayList(8);
+        ArrayList<ItemStack> buffer = new ArrayList<ItemStack>(8);
         for (int slot : slots) {
             ItemStack toAdd = inv.getStackInSlot(slot);
             buffer.add(buffer.size(), toAdd);
@@ -219,7 +219,7 @@ public enum Command {
         class Accumulator {
             ItemStack toMatch;
             int stackCount = 0;
-            ArrayList<Integer> matchingSlots = new ArrayList(9);
+            ArrayList<Integer> matchingSlots = new ArrayList<Integer>(9);
             public Accumulator(ItemStack toMatch, int slot) {
                 this.toMatch = toMatch;
                 stackCount = toMatch.stackSize;
@@ -239,7 +239,7 @@ public enum Command {
         }
         InventoryPlayer inv = player.inventory;
         int slots[] = {15, 16, 17, 24, 25, 26, 33, 34, 35};
-        ArrayList<Accumulator> list = new ArrayList(9);
+        ArrayList<Accumulator> list = new ArrayList<Accumulator>(9);
         for (int slot : slots) {
             ItemStack here = inv.getStackInSlot(slot);
             if (here == null || here.stackSize == 0) {

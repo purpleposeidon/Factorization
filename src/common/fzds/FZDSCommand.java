@@ -48,7 +48,7 @@ public class FZDSCommand extends CommandBase {
     
     public static abstract class SubCommand {
         String[] help;
-        ArrayList<String> altNames = new ArrayList();
+        ArrayList<String> altNames = new ArrayList<String>();
         private boolean needOp;
         private boolean needPlayer;
         private boolean needCoord;
@@ -182,7 +182,7 @@ public class FZDSCommand extends CommandBase {
         }
     }
     
-    private static ArrayList<SubCommand> subCommands = new ArrayList();
+    private static ArrayList<SubCommand> subCommands = new ArrayList<SubCommand>();
     public static SubCommand help;
     
     public static SubCommand add(SubCommand cmd, Requires... reqs) {
@@ -221,17 +221,17 @@ public class FZDSCommand extends CommandBase {
         sender.sendChatToPlayer("Not a command");
     }
     
-    private static WeakReference<IDeltaChunk> currentSelection = new WeakReference(null);
+    private static WeakReference<IDeltaChunk> currentSelection = new WeakReference<IDeltaChunk>(null);
     
     public static void setSelection(IDeltaChunk dse) {
-        currentSelection = new WeakReference(dse);
+        currentSelection = new WeakReference<IDeltaChunk>(dse);
     }
     
     private static Splitter comma = Splitter.on(",");
     void runCommand(SubCommand cmd, ICommandSender sender, String[] args) {
         cmd.reset();
         cmd.setup(sender);
-        ArrayList<String> cleanedArgs = new ArrayList();
+        ArrayList<String> cleanedArgs = new ArrayList<String>();
         for (String a : args) {
             if (Strings.isNullOrEmpty(a)) {
                 continue;
@@ -248,7 +248,7 @@ public class FZDSCommand extends CommandBase {
                 if (!cmd.op) {
                     throw new CommandException("You are not allowed to use arbitrary locations");
                 }
-                ArrayList<Integer> parts = new ArrayList();
+                ArrayList<Integer> parts = new ArrayList<Integer>();
                 for (String stupid : comma.split(a.substring(1))) {
                     parts.add(Integer.parseInt(stupid));
                 }

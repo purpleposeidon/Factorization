@@ -19,8 +19,8 @@ public class WeakSet<T> implements Set<T> {
     @Override
     public boolean addAll(Collection<? extends T> c) {
         boolean any = false;
-        for (Object e : c) {
-            any |= add((T) e);
+        for (T e : c) {
+            any |= add(e);
         }
         return any;
     }

@@ -22,7 +22,7 @@ public class HammerInfo {
     private int unsaved_allocations = 0;
     private boolean channel_config_dirty = false;
     boolean world_loaded = false;
-    HashMap<Integer, ConfigCategory> channel2category = new HashMap();
+    HashMap<Integer, ConfigCategory> channel2category = new HashMap<Integer, ConfigCategory>();
     
     private static final int defaultPadding = 16*8;
     
@@ -55,7 +55,7 @@ public class HammerInfo {
         Core.logFine("Allocating Hammer channel for %s: %s", modInstance, comment);
         
         
-        Class c = modInstance.getClass();
+        Class<? extends Object> c = modInstance.getClass();
         Annotation a = c.getAnnotation(Mod.class);
         if (a == null) {
             throw new IllegalArgumentException("modInstance is not a mod");

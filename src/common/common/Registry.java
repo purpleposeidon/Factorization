@@ -154,7 +154,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         Core.proxy.addName(what, name);
     }*/
 
-    HashSet<Integer> added_ids = new HashSet();
+    HashSet<Integer> added_ids = new HashSet<Integer>();
 
     public int itemID(String name, int default_id) {
         int id = Core.config.getItem("item", name, default_id).getInt();

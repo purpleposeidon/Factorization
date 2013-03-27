@@ -512,8 +512,8 @@ for x in range(0, len(d[0])):
      * The set has a maximize size set in Core.config; it will throw {@link RocketValidationException} if it gets too big.
      */
     static HashSet<Coord> fillPlane(Iterable<Coord> seeds, int planeNormal, Criteria<Coord> criteria) throws RocketValidationException {
-        HashSet<Coord> ret = new HashSet(9*9);
-        HashSet<Coord> frontier = new HashSet();
+        HashSet<Coord> ret = new HashSet<Coord>(9*9);
+        HashSet<Coord> frontier = new HashSet<Coord>();
         for (Coord seed : seeds) {
             if (criteria.fits(seed)) {
                 frontier.add(seed);
@@ -550,7 +550,7 @@ for x in range(0, len(d[0])):
     
     static int expandPlane(ArrayList<Coord> coordSet, ForgeDirection normal, Criteria<Coord> crit) {
         int ord = normal.ordinal();
-        HashSet<Coord> toAdd = new HashSet();
+        HashSet<Coord> toAdd = new HashSet<Coord>();
         for (Coord me : coordSet) {
             Coord[] neighbors = me.getNeighborsInPlane(ord);
             for (int i = 0; i < neighbors.length; i++) {
@@ -576,7 +576,7 @@ for x in range(0, len(d[0])):
     }
     
     static HashSet<Coord> cloneSet(Collection<Coord> src) {
-        HashSet<Coord> ret = new HashSet(src.size());
+        HashSet<Coord> ret = new HashSet<Coord>(src.size());
         for (Coord c : src) {
             ret.add(c.copy());
         }
@@ -584,7 +584,7 @@ for x in range(0, len(d[0])):
     }
     
     static ArrayList<Coord> cloneArray(Collection<Coord> src) {
-        ArrayList<Coord> ret = new ArrayList(src.size());
+        ArrayList<Coord> ret = new ArrayList<Coord>(src.size());
         for (Coord c : src) {
             ret.add(c.copy());
         }
@@ -593,9 +593,9 @@ for x in range(0, len(d[0])):
     
     static class ContiguitySolver {
         TileEntityRocketEngine seed;
-        HashSet<TileEntityRocketEngine> engines = new HashSet();
-        HashSet<Coord> entireRocket = new HashSet();
-        ArrayList<Coord> mountingPlane = new ArrayList();
+        HashSet<TileEntityRocketEngine> engines = new HashSet<TileEntityRocketEngine>();
+        HashSet<Coord> entireRocket = new HashSet<Coord>();
+        ArrayList<Coord> mountingPlane = new ArrayList<Coord>();
         int fuel = 0;
         
         public ContiguitySolver(TileEntityRocketEngine seed) {
@@ -613,7 +613,7 @@ for x in range(0, len(d[0])):
         
         public void solve() throws RocketValidationException {
             Coord mounting = seed.getCoord().add(0, 3, 0); //The blocks above the rocket engine
-            Criteria isSolid = new Criteria<Coord>() {
+            Criteria<Coord> isSolid = new Criteria<Coord>() {
                 @Override
                 public boolean fits(Coord coord) {
                     return coord.getHardness() > 0;
