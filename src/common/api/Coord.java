@@ -24,7 +24,7 @@ public class Coord {
     public World w;
     public int x, y, z;
     static private Random rand = new Random();
-    static private ThreadLocal<Coord> staticCoord = new ThreadLocal();
+    static private ThreadLocal<Coord> staticCoord = new ThreadLocal<Coord>();
 
     public Coord(World w, int x, int y, int z) {
         this.w = w;
@@ -173,7 +173,7 @@ public class Coord {
     }
 
     public ArrayList<Coord> getNeighborsAdjacent() {
-        ArrayList<Coord> ret = new ArrayList(6);
+        ArrayList<Coord> ret = new ArrayList<Coord>(6);
         for (DeltaCoord d : DeltaCoord.directNeighbors) {
             ret.add(this.add(d));
         }
@@ -181,7 +181,7 @@ public class Coord {
     }
     
     public <T> Iterable<T> getAdjacentTEs(Class<T> clazz) {
-        ArrayList<T> ret = new ArrayList(6);
+        ArrayList<T> ret = new ArrayList<T>(6);
         for (Coord n : getNeighborsAdjacent()) {
             T toAdd = n.getTE(clazz);
             if (toAdd != null) {
@@ -192,7 +192,7 @@ public class Coord {
     }
 
     public ArrayList<Coord> getNeighborsDiagonal() {
-        ArrayList<Coord> ret = new ArrayList(26);
+        ArrayList<Coord> ret = new ArrayList<Coord>(26);
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
                 for (int dz = -1; dz <= 1; dz++) {
@@ -384,6 +384,7 @@ public class Coord {
         return w.getBlockTileEntity(x, y, z);
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T getTE(Class<T> clazz) {
         TileEntity te = getTE();
         if (clazz.isInstance(te)) {
