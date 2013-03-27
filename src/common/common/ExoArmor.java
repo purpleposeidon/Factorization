@@ -3,7 +3,6 @@ package factorization.common;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumArmorMaterial;
@@ -15,8 +14,6 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.IArmorTextureProvider;
 import net.minecraftforge.common.ISpecialArmor;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.ExoStateShader;
 import factorization.api.ExoStateType;
 import factorization.api.IExoUpgrade;

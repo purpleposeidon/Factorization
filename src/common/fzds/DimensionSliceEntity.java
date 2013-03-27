@@ -2,7 +2,6 @@ package factorization.fzds;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 
 import net.minecraft.block.Block;
@@ -16,7 +15,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
-import net.minecraft.world.Teleporter;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
@@ -30,7 +28,6 @@ import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.Quaternion;
 import factorization.common.Core;
-import factorization.common.FactorizationUtil;
 import factorization.fzds.api.DeltaCapability;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsCustomTeleport;

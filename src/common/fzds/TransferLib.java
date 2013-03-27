@@ -1,16 +1,10 @@
 package factorization.fzds;
 
-import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.chunk.Chunk;
 import factorization.api.Coord;
-import factorization.api.DeltaCoord;
-import factorization.common.Core;
-import factorization.common.Core.NotifyStyle;
 
 public class TransferLib {
     public static void setRaw(Coord c, int id, int md) {

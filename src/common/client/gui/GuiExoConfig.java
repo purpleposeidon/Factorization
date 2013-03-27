@@ -9,7 +9,6 @@ import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 
 import org.lwjgl.opengl.GL11;

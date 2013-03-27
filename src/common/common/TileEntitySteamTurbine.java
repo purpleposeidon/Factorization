@@ -3,9 +3,6 @@ package factorization.common;
 import java.io.DataInput;
 import java.io.IOException;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
@@ -14,7 +11,6 @@ import net.minecraftforge.liquids.ITankContainer;
 import net.minecraftforge.liquids.LiquidDictionary;
 import net.minecraftforge.liquids.LiquidStack;
 import net.minecraftforge.liquids.LiquidTank;
-import net.minecraftforge.liquids.LiquidDictionary.LiquidRegisterEvent;
 import factorization.api.Charge;
 import factorization.api.IChargeConductor;
 import factorization.common.NetworkFactorization.MessageType;

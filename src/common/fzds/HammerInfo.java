@@ -3,16 +3,12 @@ package factorization.fzds;
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
-import java.util.Map.Entry;
-
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.ConfigCategory;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.Property;
-import net.minecraftforge.event.ForgeSubscribe;
-import net.minecraftforge.event.world.WorldEvent;
 import cpw.mods.fml.common.Mod;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;

@@ -3,8 +3,6 @@ package factorization.common;
 import java.io.DataInput;
 import java.io.IOException;
 
-import cpw.mods.fml.relauncher.Side;
-
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;

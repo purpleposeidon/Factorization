@@ -2,8 +2,6 @@ package factorization.common;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;

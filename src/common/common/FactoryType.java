@@ -1,12 +1,7 @@
 package factorization.common;
 
-import javax.management.RuntimeErrorException;
-
-import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.item.ItemStack;
-import net.minecraft.src.ModLoader;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.MinecraftForge;
 
 public enum FactoryType {

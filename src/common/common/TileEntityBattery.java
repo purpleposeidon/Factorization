@@ -3,10 +3,6 @@ package factorization.common;
 import java.io.DataInput;
 import java.io.IOException;
 
-import cpw.mods.fml.relauncher.Side;
-
-import cpw.mods.fml.relauncher.SideOnly;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;

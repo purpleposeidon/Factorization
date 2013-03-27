@@ -1,15 +1,11 @@
 package factorization.client.render;
 
-import net.minecraft.block.Block;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
-import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
 import factorization.common.Core;
 import factorization.common.ItemIcons;

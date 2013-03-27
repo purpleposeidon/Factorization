@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
 
 public class VectorUV {
     public double x, y, z, u, v;

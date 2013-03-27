@@ -7,7 +7,6 @@ import net.minecraft.block.Block;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.oredict.OreDictionary;

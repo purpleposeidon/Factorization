@@ -8,7 +8,6 @@ import factorization.common.ContainerFactorization;
 import factorization.common.ContainerGrinder;
 import factorization.common.Core;
 import factorization.common.TileEntityGrinder;
-import factorization.common.TileEntitySlagFurnace;
 
 public class GuiGrinder extends GuiContainer {
     ContainerGrinder factContainer;

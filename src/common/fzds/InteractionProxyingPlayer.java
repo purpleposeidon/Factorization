@@ -1,12 +1,9 @@
 package factorization.fzds;
 
-import java.util.Iterator;
-
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemInWorldManager;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.World;
 
 public class InteractionProxyingPlayer extends GenericProxyPlayer {
     EntityPlayerMP orig;

@@ -1,19 +1,6 @@
 package factorization.api;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
-import static net.minecraftforge.common.ForgeDirection.*;
-import factorization.common.Core;
-import factorization.common.TileEntityHeater;
 
 public class Charge {
     ConductorSet conductorSet = null;

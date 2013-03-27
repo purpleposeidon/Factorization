@@ -1,17 +1,13 @@
 package factorization.fzds;
 
-import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemInWorldManager;
-import net.minecraft.network.INetworkManager;
 import net.minecraft.network.NetServerHandler;
-import net.minecraft.network.packet.NetHandler;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet56MapChunks;
 import net.minecraft.server.MinecraftServer;

@@ -3,7 +3,6 @@ package factorization.common;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.util.DamageSource;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.EntityLiving;

@@ -2,7 +2,6 @@ package factorization.fzds;
 
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.WorldProvider;
 
 public class HammerWorldProvider extends WorldProvider {

@@ -1,8 +1,6 @@
 package factorization.fzds;
 
 import java.net.SocketAddress;
-import java.util.Iterator;
-
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemInWorldManager;
 import net.minecraft.network.INetworkManager;

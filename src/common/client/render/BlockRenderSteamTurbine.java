@@ -11,7 +11,6 @@ import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.common.Core;
 import factorization.common.FactoryType;
-import factorization.common.TileEntitySteamTurbine;
 import factorization.common.TileEntityWire;
 import factorization.common.WireConnections;
 import factorization.common.WireRenderingCube;

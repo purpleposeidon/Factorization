@@ -7,7 +7,6 @@ import net.minecraft.util.Icon;
 
 import org.lwjgl.opengl.GL11;
 
-import factorization.common.BlockFactorization;
 import factorization.common.BlockIcons;
 import factorization.common.Core;
 import factorization.common.FactoryType;

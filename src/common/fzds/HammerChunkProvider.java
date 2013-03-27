@@ -1,17 +1,14 @@
 package factorization.fzds;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import net.minecraft.block.Block;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.util.IProgressUpdate;
 import net.minecraft.world.World;
-import factorization.api.Coord;
 
 public class HammerChunkProvider implements IChunkProvider {
     

@@ -1,7 +1,5 @@
 package factorization.fzds;
 
-import static org.lwjgl.opengl.GL11.glTranslatef;
-
 import java.lang.reflect.Field;
 import java.util.Iterator;
 
@@ -42,7 +40,6 @@ import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
-import factorization.api.DeltaCoord;
 import factorization.client.render.EmptyRender;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;

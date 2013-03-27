@@ -10,9 +10,6 @@ import codechicken.nei.forge.IContainerInputHandler;
 import factorization.client.FactorizationClientProxy;
 import factorization.common.Command;
 import factorization.common.Core;
-import factorization.common.FactorizationProxy;
-import factorization.common.ItemPocketTable;
-import factorization.common.Registry;
 
 public class NEI_FactorizationInputConfig implements IConfigureNEI {
     public void loadConfig() {

@@ -4,9 +4,6 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.lang.reflect.Field;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
 import net.minecraft.block.BlockFurnace;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.ItemStack;

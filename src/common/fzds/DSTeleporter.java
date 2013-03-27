@@ -4,9 +4,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.DimensionManager;
 import factorization.api.Coord;
-import factorization.common.Core;
 
 class DSTeleporter extends Teleporter {
     Coord destination;

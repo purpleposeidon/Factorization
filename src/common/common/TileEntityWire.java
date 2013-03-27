@@ -4,14 +4,12 @@ import java.io.DataInput;
 import java.io.IOException;
 
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Icon;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Charge;
 import factorization.api.Coord;

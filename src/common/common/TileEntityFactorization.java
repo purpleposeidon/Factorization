@@ -4,7 +4,6 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.Random;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;

@@ -19,10 +19,7 @@ import net.minecraft.profiler.Profiler;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
-import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ForgeSubscribe;
-
 import org.lwjgl.input.Keyboard;
 
 import cpw.mods.fml.client.registry.ClientRegistry;
@@ -90,7 +87,6 @@ import factorization.common.TileEntityBarrel;
 import factorization.common.TileEntityCrystallizer;
 import factorization.common.TileEntityFactorization;
 import factorization.common.TileEntityGreenware;
-import factorization.common.TileEntityGreenware.ClayLump;
 import factorization.common.TileEntityGrinder;
 import factorization.common.TileEntityHeater;
 import factorization.common.TileEntityMixer;

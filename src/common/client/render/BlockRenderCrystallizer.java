@@ -2,10 +2,7 @@ package factorization.client.render;
 
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockCauldron;
 import net.minecraft.client.renderer.RenderBlocks;
-import factorization.common.BlockFactorization;
 import factorization.common.BlockIcons;
 import factorization.common.Core;
 import factorization.common.FactoryType;

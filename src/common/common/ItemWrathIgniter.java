@@ -2,14 +2,11 @@ package factorization.common;
 
 import java.util.List;
 
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import factorization.api.Coord;
-import factorization.api.IActOnCraft;
 import factorization.common.Core.TabType;
 
 public class ItemWrathIgniter extends Item {

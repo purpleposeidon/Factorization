@@ -7,7 +7,6 @@ import org.lwjgl.opengl.GL11;
 
 import factorization.common.Core;
 import factorization.common.TileEntityGreenware;
-import factorization.common.TileEntityGreenware.ClayState;
 
 
 public class TileEntityGreenwareRender extends TileEntitySpecialRenderer {

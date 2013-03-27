@@ -3,8 +3,6 @@ package factorization.api;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Iterator;
-
 import com.google.common.base.Splitter;
 
 import net.minecraft.nbt.NBTTagCompound;

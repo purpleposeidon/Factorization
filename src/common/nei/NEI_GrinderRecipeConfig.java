@@ -1,7 +1,6 @@
 package factorization.nei;
 
 import java.awt.Rectangle;
-import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -9,18 +8,12 @@ import net.minecraft.item.ItemStack;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.api.API;
 import codechicken.nei.api.IConfigureNEI;
-import codechicken.nei.recipe.FurnaceRecipeHandler;
 import codechicken.nei.recipe.GuiRecipe;
 import codechicken.nei.recipe.TemplateRecipeHandler;
-import codechicken.nei.recipe.TemplateRecipeHandler.RecipeTransferRect;
 import factorization.client.gui.GuiGrinder;
-import factorization.client.gui.GuiSlag;
 import factorization.common.Core;
 import factorization.common.TileEntityGrinder;
 import factorization.common.TileEntityGrinder.GrinderRecipe;
-import factorization.common.TileEntitySlagFurnace;
-import factorization.common.TileEntitySlagFurnace.SlagRecipes;
-import factorization.common.TileEntitySlagFurnace.SmeltingResult;
 
 public class NEI_GrinderRecipeConfig extends TemplateRecipeHandler implements IConfigureNEI {
     @Override

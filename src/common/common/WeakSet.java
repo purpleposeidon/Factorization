@@ -1,8 +1,6 @@
 package factorization.common;
 
-import java.lang.ref.WeakReference;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;

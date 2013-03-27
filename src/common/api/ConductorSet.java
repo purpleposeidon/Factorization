@@ -3,7 +3,6 @@ package factorization.api;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 class ConductorSet implements Comparable {

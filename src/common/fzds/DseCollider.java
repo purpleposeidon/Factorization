@@ -4,13 +4,11 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
-import net.minecraft.client.particle.EntityDiggingFX;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import factorization.common.Core;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsEntryControl;
 

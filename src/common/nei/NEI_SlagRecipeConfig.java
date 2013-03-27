@@ -12,11 +12,9 @@ import codechicken.nei.api.IConfigureNEI;
 import codechicken.nei.recipe.FurnaceRecipeHandler;
 import codechicken.nei.recipe.GuiRecipe;
 import codechicken.nei.recipe.TemplateRecipeHandler;
-import codechicken.nei.recipe.TemplateRecipeHandler.RecipeTransferRect;
 import factorization.client.gui.GuiSlag;
 import factorization.common.Core;
 import factorization.common.TileEntitySlagFurnace;
-import factorization.common.TileEntitySlagFurnace.SlagRecipes;
 import factorization.common.TileEntitySlagFurnace.SmeltingResult;
 
 public class NEI_SlagRecipeConfig extends TemplateRecipeHandler implements IConfigureNEI {
