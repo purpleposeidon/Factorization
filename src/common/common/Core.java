@@ -45,7 +45,7 @@ import factorization.client.gui.FactorizationNotify;
         clientSideRequired = true,
         tinyPacketHandler = NetworkFactorization.class
         )
-public class Core {
+public class Core { //NORELEASE merge bugfixes from master into this branch, then make this branch master (or something...)
     public static final String modId = "factorization";
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
@@ -105,6 +105,12 @@ public class Core {
     public static int max_rocket_base_size = 20*20;
     public static int max_rocket_height = 64;
     public static String language_file = "/mods/factorization/en_US.lang";
+    
+    static {
+        if (!dev_environ) {
+            cheat = false;
+        }
+    }
 
     // universal constant config
     public final static String texture_dir = "factorization:";
@@ -376,8 +382,8 @@ public class Core {
         FORCE, LONG, FORCELONG
     }
     
-    enum TabType {
-        REDSTONE(CreativeTabs.tabRedstone), TOOLS(CreativeTabs.tabTools), MISC(CreativeTabs.tabMisc), MATERIALS(CreativeTabs.tabMaterials);
+    static enum TabType {
+        REDSTONE(CreativeTabs.tabRedstone), TOOLS(CreativeTabs.tabTools), MISC(CreativeTabs.tabMisc), MATERIALS(CreativeTabs.tabMaterials), ART(CreativeTabs.tabMisc);
         CreativeTabs type;
         TabType(CreativeTabs type) {
             this.type = type;

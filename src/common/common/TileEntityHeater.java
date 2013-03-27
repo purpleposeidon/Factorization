@@ -228,6 +228,10 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
                 }
             }
         }
+        if (te instanceof TileEntityGreenware) {
+            TileEntityGreenware teg = (TileEntityGreenware) te;
+            
+        }
     }
 
     boolean TEF_canSmelt(TileEntityFurnace diss) {

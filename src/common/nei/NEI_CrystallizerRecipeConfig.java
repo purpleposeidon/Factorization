@@ -4,26 +4,21 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.ItemStack;
+
+import org.lwjgl.opengl.GL11;
+
 import codechicken.nei.PositionedStack;
 import codechicken.nei.api.API;
 import codechicken.nei.api.IConfigureNEI;
 import codechicken.nei.forge.GuiContainerManager;
-import codechicken.nei.recipe.FurnaceRecipeHandler;
 import codechicken.nei.recipe.GuiRecipe;
 import codechicken.nei.recipe.TemplateRecipeHandler;
-import codechicken.nei.recipe.TemplateRecipeHandler.RecipeTransferRect;
 import factorization.client.gui.GuiCrystallizer;
-import factorization.client.gui.GuiSlag;
 import factorization.common.Core;
 import factorization.common.TileEntityCrystallizer;
 import factorization.common.TileEntityCrystallizer.CrystalRecipe;
-import factorization.common.TileEntitySlagFurnace;
-import factorization.common.TileEntitySlagFurnace.SlagRecipes;
-import factorization.common.TileEntitySlagFurnace.SmeltingResult;
 
 public class NEI_CrystallizerRecipeConfig extends TemplateRecipeHandler implements IConfigureNEI {
     @Override
@@ -158,7 +153,7 @@ public class NEI_CrystallizerRecipeConfig extends TemplateRecipeHandler implemen
     public void drawBackground(GuiContainerManager gui, int recipe)
     {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        gui.bindTextureByName(getGuiTexture());
+        gui.bindTexture(getGuiTexture());
         gui.drawTexturedModalRect(0, 15, 5, 11, 166, 95);
     }
     

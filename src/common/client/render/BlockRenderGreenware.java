@@ -97,7 +97,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
     void renderToTessellator(TileEntityGreenware greenware) {
         BlockRenderHelper block = BlockRenderHelper.instance;
         ClayState state = greenware.getState();
-        if (state != ClayState.GLAZED) {
+        if (state != ClayState.HIGHFIRED) {
             switch (state) {
             case WET: block.useTexture(Block.blockClay.getBlockTextureFromSide(0)); break;
             case DRY: block.useTexture(BlockIcons.ceramics$dry); break;
@@ -106,7 +106,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
             }
         }
         for (ClayLump rc : greenware.parts) {
-            if (state == ClayState.GLAZED) {
+            if (state == ClayState.HIGHFIRED) {
                 Item it = Item.itemsList[rc.icon_id];
                 if (it == null) {
                     block.useTexture(BlockIcons.error);

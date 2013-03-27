@@ -49,6 +49,9 @@ public class NEI_FactorizationInputConfig implements IConfigureNEI {
             }
 
             public boolean keyTyped(GuiContainer gui, char keyChar, int keyCode) { return false; }
+
+            @Override
+            public void onMouseDragged(GuiContainer gui, int mousex, int mousey, int button, long heldTime) { }
         });
     }
 

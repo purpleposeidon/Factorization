@@ -483,6 +483,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
                 }
                 if (FactorizationUtil.oreDictionarySimilar(o, input[i])) {
                     craft.setInventorySlotContents(count, input[i].splitStack(1));
+                    input[i] = FactorizationUtil.normalize(input[i]);
                     continue outer;
                 }
             }
@@ -501,17 +502,26 @@ public class TileEntityMixer extends TileEntityFactorization implements
         FactorizationUtil.addInventoryToArray(fakePlayer.inventory, outputBuffer);
         setDirty();
     }
+    
+    boolean dumpBuffer() {
+        if (outputBuffer.size() > 0) {
+            ItemStack toAdd = outputBuffer.get(0);
+            FzInv out = FactorizationUtil.openInventory(this, ForgeDirection.EAST.ordinal());
+            out.setInsertForce(true);
+            toAdd = out.push(toAdd);
+            if (toAdd == null) {
+                outputBuffer.remove(0);
+                return outputBuffer.size() > 0;
+            }
+            return true;
+        }
+        return false;
+    }
 
     @Override
     void doLogic() {
         needLogic();
-        if (outputBuffer.size() > 0) {
-            ItemStack toAdd = outputBuffer.get(0);
-            FzInv out = FactorizationUtil.openInventory(this, ForgeDirection.EAST.ordinal());
-            toAdd = out.push(toAdd);
-            if (toAdd == null) {
-                outputBuffer.remove(0);
-            }
+        if (dumpBuffer()) {
             return;
         }
         RecipeMatchInfo mr = getCachedRecipe();
@@ -536,6 +546,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
             craftRecipe(mr);
             normalize(input);
             speed = Math.min(50, speed + 1);
+            dumpBuffer();
         }
     }
 

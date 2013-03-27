@@ -26,7 +26,7 @@ public class ItemSculptingTool extends Item {
         setMaxDamage(0);
         setMaxStackSize(4);
         setUnlocalizedName("factorization:sculptTool");
-        Core.tab(this, TabType.TOOLS);
+        Core.tab(this, TabType.ART);
         setFull3D();
     }
     
@@ -165,7 +165,7 @@ public class ItemSculptingTool extends Item {
                 Core.notify(player, gw.getCoord(), "The clay is dry\nUse a %s.", Core.getTranslationKey(Item.bucketWater));
                 break;
             case BISQUED:
-            case GLAZED:
+            case HIGHFIRED:
                 Core.notify(player, gw.getCoord(), "This clay has been fired and can not be reshaped.");
                 break;
             default:

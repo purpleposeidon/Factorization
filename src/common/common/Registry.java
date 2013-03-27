@@ -16,6 +16,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
@@ -103,6 +104,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemCraftingComponent sludge;
     public ItemCraftingComponent inverium;
     public ItemSculptingTool sculpt_tool;
+    public ItemGlazeBucket glaze_bucket;
     public ItemAngularSaw angular_saw;
     public ItemCraftingComponent heatHole, logicMatrix, logicMatrixIdentifier, logicMatrixProgrammer;
     public Item fz_steam;
@@ -280,6 +282,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         
         //ceramics
         sculpt_tool = new ItemSculptingTool(itemID("sculptTool", 9041));
+        glaze_bucket = new ItemGlazeBucket(itemID("glazeBucket", 9055));
         
         //inverium = new ItemInverium(itemID("inverium", 9040), "item.inverium", 12*16 + 0, 11);
         inverium = new ItemInverium(itemID("inverium", 9040), "rocket/inverium_drop");
@@ -524,6 +527,60 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'c', Item.clay,
                 '/', Item.stick);
         ItemSculptingTool.addModeChangeRecipes();
+        oreRecipe(new ItemStack(glaze_bucket),
+                "_ _",
+                "# #",
+                "#_#",
+                '_', "slabWood",
+                '#', "plankWood");
+        
+        ItemStack base_common = glaze_bucket.makeCraftingGlaze("base_common");
+        ItemStack base_matte = glaze_bucket.makeCraftingGlaze("base_matte");
+        ItemStack base_translucent = glaze_bucket.makeCraftingGlaze("base_translucent");
+        ItemStack base_shiny = glaze_bucket.makeCraftingGlaze("base_shiny");
+        ItemStack base_bright = glaze_bucket.makeCraftingGlaze("base_bright");
+        ItemStack base_unreal = glaze_bucket.makeCraftingGlaze("base_unreal");
+        ItemStack base_mimicry = glaze_bucket.makeCraftingGlaze("base_mimicry");
+        
+        ItemStack charcoal = new ItemStack(Item.coal, 1, 1);
+        ItemStack bonemeal = new ItemStack(Item.dyePowder, 1, 15);
+        ItemStack lapis = new ItemStack(Item.dyePowder, 1, 4);
+        ItemStack lead_chunks = new ItemStack(ore_reduced, 1, ItemOreProcessing.OreType.LEAD.ID);
+        Item netherquartz = Item.netherquartz; //= field_94583_ca
+        
+        shapelessOreRecipe(base_common, new ItemStack(glaze_bucket), Item.bucketWater, Block.sand, Item.clay);
+        shapelessOreRecipe(base_matte, base_common, Item.clay, Block.sand, charcoal);
+        shapelessOreRecipe(base_translucent, base_common, Block.sand, Block.sand, Block.sand);
+        shapelessOreRecipe(base_shiny, base_common, netherquartz, Block.sand, charcoal);
+        shapelessOreRecipe(base_bright, base_shiny, bonemeal, nether_powder, lead_chunks);
+        shapelessOreRecipe(base_unreal, base_bright, diamond_shard, Item.eyeOfEnder, dark_iron);
+        shapelessOreRecipe(base_mimicry, base_unreal, Item.redstone, Item.slimeBall, lapis);
+        
+        /*GameRegistry.addRecipe(new IRecipe() {			
+            @Override
+            public boolean matches(InventoryCrafting inventorycrafting, World world) {
+                // TODO Auto-generated method stub
+                return false;
+            }
+            
+            @Override
+            public int getRecipeSize() {
+                // TODO Auto-generated method stub
+                return 2;
+            }
+            
+            @Override
+            public ItemStack getRecipeOutput() {
+                // TODO Auto-generated method stub
+                return null;
+            }
+            
+            @Override
+            public ItemStack getCraftingResult(InventoryCrafting inventorycrafting) {
+                // TODO Auto-generated method stub
+                return null;
+            }
+        });*/
         
         //inverium
         oreRecipe(new ItemStack(inverium, 1, 1),

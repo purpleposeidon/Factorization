@@ -26,6 +26,8 @@ public class BlockResource extends Block {
         setUnlocalizedName("factorization.ResourceBlock");
     }
     
+    static final int glaze_md_start = 1000; 
+    
     @Override
     public void registerIcons(IconRegister reg) {
         exoBottom = Core.texture(reg, "exo/modder_bottom");
@@ -33,8 +35,13 @@ public class BlockResource extends Block {
         for (ResourceType rt : ResourceType.values()) {
             icons[rt.md] = Core.texture(reg, rt.texture);
         }
+        for (BasicGlazes glaze : BasicGlazes.values()) {
+            glaze.icon = Core.texture(reg, "ceramics/glaze/" + glaze.name());
+        }
     }
 
+    
+    boolean done_spam = false;
     @Override
     public Icon getBlockTextureFromSideAndMetadata(int side, int md) {
         if (ResourceType.EXOMODDER.is(md)) {
@@ -45,7 +52,23 @@ public class BlockResource extends Block {
                 return exoTop;
             }
         }
-        return icons[md];
+        if (md >= glaze_md_start) {
+            int off = md - glaze_md_start;
+            if (off < BasicGlazes.values.length) {
+                return BasicGlazes.values[off].icon;
+            }
+            return BlockIcons.error;
+        }
+        try {
+            return icons[md];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            if (!done_spam) {
+                Core.logWarning("Invalid BlockResource metadata value (further errors silenced)");
+                e.printStackTrace();
+                done_spam = true;
+            }
+            return BlockIcons.error;
+        }
     }
     
     public void addCreativeItems(List itemList) {

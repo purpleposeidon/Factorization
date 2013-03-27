@@ -55,6 +55,7 @@ item.factorization:barrel_upgrade.name=Extra-Dimensional Storage
 item.factorization:diamond_cutting_head.name=Diamond Cutting Head
 item.factorization:sludge.name=Sludge
 item.factorization:sculptTool.name=Sculpting Tool
+item.factorization:ceramics/glaze_bucket.name=Glaze Bucket
 item.factorization:tool/angular_saw.name=Cube Saw
 item.factorization:tool/matrix_programmer.name=Logic Matrix Repository
 item.factorization:logic_matrix.name=Blank Logic Matrix

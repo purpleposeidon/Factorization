@@ -436,6 +436,9 @@ public class FactorizationUtil {
                 
                 @Override
                 public boolean canInsert(int i, ItemStack is) {
+                    if (forceInsert) {
+                        return true;
+                    }
                     return inv.canInsertIntoSide(slotMap[i], is, side);
                 }};
         } else if (orig_inv instanceof net.minecraftforge.common.ISidedInventory) {

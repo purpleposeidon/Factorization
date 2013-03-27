@@ -33,7 +33,7 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
         
         
         BlockRenderHelper block = BlockRenderHelper.instance;
-        block.setBlockBoundsOffset(2F/16F, 7.25F/16F, 2F/16F);
+        block.setBlockBoundsOffset(1F/16F, 7.25F/16F, 1F/16F);
         //block.setBlockBoundsOffset(0, 0, 0);
         //block.setBlockBounds(0, 0, 0, 1, 1F/16F, 1);
         Icon side = BlockIcons.mirror_side;

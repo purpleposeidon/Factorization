@@ -190,14 +190,14 @@ public class TileEntityGreenware extends TileEntityCommon {
     private boolean partsValidated = false;
     
     public static int dryTime = 20*60*2; //2 minutes
-    public static int bisqueHeat = 1000, glazeHeat = bisqueHeat*20;
+    public static int bisqueHeat = 1000, rawGlazedHeat = bisqueHeat + 1, highfireHeat = bisqueHeat*20;
     public static final int clayIconStart = 12*16;
     
     //Client-side only
     public boolean shouldRenderTesr = false;
     
     public static enum ClayState {
-        WET("Wet Greenware"), DRY("Bone-Dry Greenware"), BISQUED("Bisqued"), GLAZED("High-Fire Glazed");
+        WET("Wet Clay"), DRY("Bone-Dry Greenware"), BISQUED("Bisqued"), UNFIRED_GLAZED("Glazed Bisqueware"), HIGHFIRED("Highfire Glazed");
         public String english;
         ClayState(String en) {
             this.english = en;
@@ -208,8 +208,11 @@ public class TileEntityGreenware extends TileEntityCommon {
     }
     
     public static ClayState getStateFromInfo(int touch, int heat) {
-        if (heat > glazeHeat) {
-            return ClayState.GLAZED;
+        if (heat > highfireHeat) {
+            return ClayState.HIGHFIRED;
+        }
+        if (heat == rawGlazedHeat) {
+            return ClayState.UNFIRED_GLAZED;
         }
         if (heat > bisqueHeat) {
             return ClayState.BISQUED;
@@ -229,7 +232,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         case WET: return BlockIcons.ceramics$wet;
         case DRY: return BlockIcons.ceramics$dry;
         case BISQUED: return BlockIcons.ceramics$bisque;
-        case GLAZED:
+        case HIGHFIRED:
             Item it = Item.itemsList[lump.icon_id];
             if (it == null) {
                 return BlockIcons.error;
@@ -614,8 +617,8 @@ public class TileEntityGreenware extends TileEntityCommon {
         case BISQUED:
             totalHeat = bisqueHeat + 1;
             break;
-        case GLAZED:
-            totalHeat = glazeHeat + 1;
+        case HIGHFIRED:
+            totalHeat = highfireHeat + 1;
             break;
         }
         getCoord().redraw();
@@ -633,7 +636,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             return super.removeBlockByPlayer(player);
         }
         ClayState state = getState();
-        boolean solid = state == ClayState.BISQUED || state == ClayState.GLAZED;
+        boolean solid = state == ClayState.BISQUED || state == ClayState.HIGHFIRED;
         //If it's solid, break it.
         //If we're sneaking & creative, break it
         if (player.capabilities.isCreativeMode) {
