@@ -181,7 +181,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //ItemBlocks
         item_factorization = (ItemFactorization) Item.itemsList[factory_block.blockID];
         item_resource = (ItemBlockResource) Item.itemsList[resource_block.blockID];
-        Core.instance.tab(resource_block, TabType.MATERIALS);
+        Core.tab(resource_block, TabType.MATERIALS);
 
         //BlockFactorization stuff
         router_item = FactoryType.ROUTER.itemStack();
@@ -322,16 +322,14 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         if (res == null) {
             return;
         }
-        IRecipe rec = new ShapedOreRecipe(res, params);
-        CraftingManager.getInstance().getRecipeList().add(rec);
+        GameRegistry.addRecipe(new ShapedOreRecipe(res, params));
     }
 
     void shapelessOreRecipe(ItemStack res, Object... params) {
         if (res == null) {
             return;
         }
-        IRecipe rec = new ShapelessOreRecipe(res, params);
-        CraftingManager.getInstance().getRecipeList().add(rec);
+        GameRegistry.addRecipe(new ShapelessOreRecipe(res, params));
     }
 
     void makeRecipes() {

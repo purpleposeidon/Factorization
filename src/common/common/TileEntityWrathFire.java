@@ -232,7 +232,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
         if (rand.nextInt(3) == 0) {
             return true;
         }
-        c.setIdMd(Core.registry.lightair_block.blockID, Core.registry.lightair_block.fire_md);
+        c.setIdMd(Core.registry.lightair_block.blockID, BlockLightAir.fire_md);
         TileEntityWrathFire fire = c.getTE(TileEntityWrathFire.class);
         if (fire != null) {
             fire.inherit(this);

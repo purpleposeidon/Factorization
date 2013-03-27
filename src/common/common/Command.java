@@ -93,7 +93,7 @@ public enum Command {
             break;
         case exoKeyOff:
         case exoKeyOn:
-            Core.exoCore.buttonPressed(player, arg, this == exoKeyOn);
+            ExoCore.buttonPressed(player, arg, this == exoKeyOn);
             break;
         case exoModLeftClick:
         case exoModRightClick:
@@ -137,7 +137,7 @@ public enum Command {
             return;
         }
         ContainerPocket pocket = (ContainerPocket) player.openContainer;
-        for (int i : pocket.craftArea) {
+        for (int i : ContainerPocket.craftArea) {
             //transferStackInSlot
             pocket.transferStackInSlot(player, i);
         }

@@ -149,7 +149,8 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         
         void renderTerrain() {
             RenderHelper.disableStandardItemLighting();
-            if (Minecraft.getMinecraft().isAmbientOcclusionEnabled() && Core.dimension_slice_allow_smooth) {
+            Minecraft.getMinecraft();
+            if (Minecraft.isAmbientOcclusionEnabled() && Core.dimension_slice_allow_smooth) {
                 GL11.glShadeModel(GL11.GL_SMOOTH);
             }
             GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT);

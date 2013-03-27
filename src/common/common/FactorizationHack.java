@@ -43,6 +43,6 @@ public class FactorizationHack {
     }
 
     static public void tagWrite(NBTTagCompound tag, DataOutputStream output) throws IOException {
-        tag.writeNamedTag(tag, output);
+        NBTBase.writeNamedTag(tag, output);
     }
 }

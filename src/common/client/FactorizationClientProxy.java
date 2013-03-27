@@ -72,6 +72,7 @@ import factorization.client.render.TileEntityHeaterRenderer;
 import factorization.client.render.TileEntityMixerRenderer;
 import factorization.client.render.TileEntitySolarTurbineRender;
 import factorization.client.render.TileEntitySteamTurbineRender;
+import factorization.common.BlockLightAir;
 import factorization.common.BlockRenderHelper;
 import factorization.common.Command;
 import factorization.common.ContainerCrystallizer;
@@ -275,7 +276,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             }
         }
         if (id == Core.registry.lightair_block.blockID) {
-            if (md == Core.registry.lightair_block.fire_md) {
+            if (md == BlockLightAir.fire_md) {
                 int to_spawn = 1;
                 EntityPlayer player = Core.proxy.getClientPlayer();
                 boolean force = false;
@@ -534,7 +535,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
     
     @Override
     public String getExoKeyBrief(int keyindex) {
-        int key = ((FactorizationClientProxy) Core.proxy).exoKeys[keyindex - 1].keyCode;
+        int key = FactorizationClientProxy.exoKeys[keyindex - 1].keyCode;
         return GameSettings.getKeyDisplayString(key);
     }
     

@@ -141,7 +141,7 @@ public class MiscellaneousNonsense {
                 output.writeUTF(i);
             }
             output.flush();
-            return PacketDispatcher.getPacket(net.channel, outputStream.toByteArray());
+            return PacketDispatcher.getPacket(MiscNet.channel, outputStream.toByteArray());
         } catch (IOException e) {
             e.printStackTrace();
             return null;

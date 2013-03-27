@@ -24,7 +24,7 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
         //GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         float color = 0.1F;
         TileEntityHeater heater = (TileEntityHeater) te;
-        color += (heater.heat / (float) heater.maxHeat) * (1 - color);
+        color += (heater.heat / (float) TileEntityHeater.maxHeat) * (1 - color);
         GL11.glColor4f(color, color, color, 1.0F);
         float d = 0;
         GL11.glTranslatef((float) x + d, (float) y + d, (float) z + d);

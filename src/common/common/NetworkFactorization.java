@@ -120,7 +120,8 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 output.writeUTF(a);
             }
             output.flush();
-            return new PacketDispatcher().getTinyPacket(Core.instance, factorizeNtfyChannel, outputStream.toByteArray());
+            new PacketDispatcher();
+            return PacketDispatcher.getTinyPacket(Core.instance, factorizeNtfyChannel, outputStream.toByteArray());
         } catch (IOException e) {
             e.printStackTrace();
             return null;

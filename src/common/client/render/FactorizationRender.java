@@ -7,6 +7,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.client.MinecraftForgeClient;
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
+import factorization.common.BlockLightAir;
 import factorization.common.Core;
 import factorization.common.TileEntityCommon;
 
@@ -48,7 +49,7 @@ public class FactorizationRender implements ISimpleBlockRenderingHandler {
                 return true;
             }
             if (block == Core.registry.lightair_block) {
-                if (md == Core.registry.lightair_block.air_md) {
+                if (md == BlockLightAir.air_md) {
                     return false;
                 }
                 return true;

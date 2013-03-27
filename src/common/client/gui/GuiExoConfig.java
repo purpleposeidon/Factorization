@@ -103,7 +103,7 @@ public class GuiExoConfig extends GuiContainer {
         String eventShader = "";
         String localKey = mst.when(mss) + ".name";
         if (mst.key > 0) {
-            int key = ((FactorizationClientProxy) Core.proxy).exoKeys[mst.key - 1].keyCode;
+            int key = FactorizationClientProxy.exoKeys[mst.key - 1].keyCode;
             String keyName = GameSettings.getKeyDisplayString(key);
             String localFormat = LanguageRegistry.instance().getStringLocalization(localKey);
             try {

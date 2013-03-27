@@ -253,7 +253,7 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
                 ItemStack here = row.get(col);
                 if (here == null && should_add) {
                     should_add = false;
-                    here = add.copyItemStack(add);
+                    here = ItemStack.copyItemStack(add);
                     here.stackSize = 0;
                     row.set(col, here);
                 }

@@ -36,7 +36,7 @@ public class GuiCrystallizer extends GuiContainer {
         int progress = (int) (crys.getProgress() * 90);
         this.drawTexturedModalRect(var5 + 43, var6 + 89, 0, 192, progress, 16);
 
-        float h = crys.heat / (float) crys.topHeat;
+        float h = crys.heat / (float) TileEntityCrystallizer.topHeat;
         int heat = (int) ((1 - h) * 13);
         for (int dx : new int[] { 54, 109 }) {
             this.drawTexturedModalRect(var5 + dx, var6 + 75 + heat, 176, 0 + heat, 14, 13 - heat);
