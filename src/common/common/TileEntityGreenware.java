@@ -187,10 +187,11 @@ public class TileEntityGreenware extends TileEntityCommon {
     public ArrayList<ClayLump> parts = new ArrayList();
     public int lastTouched = 0;
     int totalHeat = 0;
+    boolean glazesApplied = false;
     private boolean partsValidated = false;
     
     public static int dryTime = 20*60*2; //2 minutes
-    public static int bisqueHeat = 1000, rawGlazedHeat = bisqueHeat + 1, highfireHeat = bisqueHeat*20;
+    public static int bisqueHeat = 1000, highfireHeat = bisqueHeat*20;
     public static final int clayIconStart = 12*16;
     
     //Client-side only
@@ -207,31 +208,29 @@ public class TileEntityGreenware extends TileEntityCommon {
     public TileEntityGreenware() {
     }
     
-    public static ClayState getStateFromInfo(int touch, int heat) {
-        if (heat > highfireHeat) {
+    public ClayState getState() {
+        if (totalHeat > highfireHeat) {
             return ClayState.HIGHFIRED;
         }
-        if (heat == rawGlazedHeat) {
-            return ClayState.UNFIRED_GLAZED;
-        }
-        if (heat > bisqueHeat) {
+        if (totalHeat > bisqueHeat) {
+            if (glazesApplied) {
+                return ClayState.UNFIRED_GLAZED;
+            }
             return ClayState.BISQUED;
         }
-        if (touch > dryTime) {
+        if (lastTouched > dryTime) {
             return ClayState.DRY;
         }
         return ClayState.WET;
-    }
-    
-    public ClayState getState() {
-        return getStateFromInfo(lastTouched, totalHeat);
     }
     
     public Icon getIcon(ClayLump lump) {
         switch (getState()) {
         case WET: return BlockIcons.ceramics$wet;
         case DRY: return BlockIcons.ceramics$dry;
-        case BISQUED: return BlockIcons.ceramics$bisque;
+        case BISQUED:
+        case UNFIRED_GLAZED:
+            return BlockIcons.ceramics$bisque;
         case HIGHFIRED:
             Item it = Item.itemsList[lump.icon_id];
             if (it == null) {
@@ -271,6 +270,8 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
         tag.setTag("parts", l);
         tag.setInteger("touch", lastTouched);
+        tag.setInteger("heat", totalHeat);
+        tag.setBoolean("glazed", glazesApplied);
     }
     
     @Override
@@ -298,6 +299,8 @@ public class TileEntityGreenware extends TileEntityCommon {
             parts.add(new ClayLump().read(rc_tag));
         }
         lastTouched = tag.getInteger("touch");
+        totalHeat = tag.getInteger("heat");
+        glazesApplied = tag.getBoolean("glazed");
     }
     
     @Override
@@ -795,13 +798,16 @@ public class TileEntityGreenware extends TileEntityCommon {
     @Override
     public boolean addCollisionBoxesToList(Block block, AxisAlignedBB aabb, List list, Entity entity) {
         block.setBlockBounds(0, 0, 0, 1, 1F/8F, 1);
-        AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
-        if (aabb.intersectsWith(a)) {
-            list.add(a);
+        ClayState state = getState();
+        if (state == ClayState.WET || state == ClayState.DRY) {
+            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
+            if (aabb.intersectsWith(a)) {
+                list.add(a);
+            }
         }
         for (ClayLump lump : parts) {
             lump.toBlockBounds(block);
-            a = block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
+            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
             if (aabb.intersectsWith(a)) {
                 list.add(a);
             }

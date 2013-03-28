@@ -20,7 +20,7 @@ public enum BasicGlazes {
     CELEDON(TRANSLUCENT),
     IRON_BLUE(SHINY),
     STONEWARE_SLIP(COMMON),
-    TEMMOKU(COMMON),
+    TENMOKU(COMMON),
     PEKING_BLUE(BRIGHT),
     SHINO(MATTE);
     //oribe green, woo blue, mambo, hamada rust, copper red
@@ -34,5 +34,9 @@ public enum BasicGlazes {
     private BasicGlazes(GlazeTypes type) {
         this.type = type;
         this.metadata = BlockResource.glaze_md_start + ordinal();
+    }
+    
+    public void recipe(Object... params) {
+        Core.registry.shapelessOreRecipe(Core.registry.glaze_bucket.make(this), params);
     }
 }

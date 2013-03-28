@@ -107,12 +107,12 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
         }
         for (ClayLump rc : greenware.parts) {
             if (state == ClayState.HIGHFIRED) {
-                Item it = Item.itemsList[rc.icon_id];
+                Block it = Block.blocksList[rc.icon_id];
                 if (it == null) {
                     block.useTexture(BlockIcons.error);
                     continue; //boo
                 }
-                block.useTexture(it.getIconFromDamage(rc.icon_md));
+                block.useTexture(it.getBlockTextureFromSideAndMetadata(0, rc.icon_md));
             }
             rc.toBlockBounds(block);
             block.begin();

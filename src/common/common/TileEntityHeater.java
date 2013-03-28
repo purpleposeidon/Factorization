@@ -16,6 +16,7 @@ import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
 import factorization.common.NetworkFactorization.MessageType;
+import factorization.common.TileEntityGreenware.ClayState;
 
 public class TileEntityHeater extends TileEntityCommon implements IChargeConductor {
     Charge charge = new Charge(this);
@@ -175,6 +176,12 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
     }
     
     void sendHeat(TileEntity te) {
+        if (te instanceof TileEntityExtension) {
+            te = ((TileEntityExtension) te).getParent();
+            if (te == null) {
+                return;
+            }
+        }
         if (te instanceof TileEntityFurnace) {
             TileEntityFurnace furnace = (TileEntityFurnace) te;
             if (!TEF_canSmelt(furnace)) {
@@ -227,7 +234,15 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
         }
         if (te instanceof TileEntityGreenware) {
             TileEntityGreenware teg = (TileEntityGreenware) te;
-            
+            ClayState state = teg.getState();
+            if (state == ClayState.DRY || state == ClayState.UNFIRED_GLAZED) {
+                teg.totalHeat += 1;
+                heat -= 3;
+            }
+            if (state == ClayState.WET) {
+                teg.lastTouched += 1;
+                heat -= 6;
+            }
         }
     }
 

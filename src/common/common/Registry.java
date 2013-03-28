@@ -542,7 +542,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         ItemStack bonemeal = new ItemStack(Item.dyePowder, 1, 15);
         ItemStack lapis = new ItemStack(Item.dyePowder, 1, 4);
         ItemStack lead_chunks = new ItemStack(ore_reduced, 1, ItemOreProcessing.OreType.LEAD.ID);
-        Item netherquartz = Item.netherquartz; //= field_94583_ca
+        ItemStack iron_chunks = new ItemStack(ore_reduced, 1, ItemOreProcessing.OreType.IRON.ID);
+        Item netherquartz = Item.field_94583_ca; //= field_94583_ca = netherquartz
+        Item netherbrick = Item.field_94584_bZ;
         
         shapelessOreRecipe(base_common, new ItemStack(glaze_bucket), Item.bucketWater, Block.sand, Item.clay);
         shapelessOreRecipe(base_matte, base_common, Item.clay, Block.sand, charcoal);
@@ -551,6 +553,24 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         shapelessOreRecipe(base_bright, base_shiny, bonemeal, nether_powder, lead_chunks);
         shapelessOreRecipe(base_unreal, base_bright, diamond_shard, Item.eyeOfEnder, dark_iron);
         shapelessOreRecipe(base_mimicry, base_unreal, Item.redstone, Item.slimeBall, lapis);
+        
+        ItemStack blackWool = new ItemStack(Block.cloth, 1, 15);
+        BasicGlazes.ST_VECHS_BLACK.recipe(base_matte, blackWool);
+        BasicGlazes.TEMPLE_WHITE.recipe(base_common, bonemeal);
+        BasicGlazes.SALLYS_WHITE.recipe(base_shiny, netherquartz);
+        BasicGlazes.CLEAR.recipe(base_translucent, Block.sand);
+        BasicGlazes.REDSTONE_OXIDE.recipe(base_common, Item.redstone);
+        BasicGlazes.LAPIS_OXIDE.recipe(base_common, lapis);
+        BasicGlazes.PURPLE_OXIDE.recipe(base_common, Item.redstone, lapis);
+        BasicGlazes.LEAD_OXIDE.recipe(base_common, lead_chunks);
+        BasicGlazes.FIRE_ENGINE_RED.recipe(base_bright, Item.redstone);
+        BasicGlazes.CELEDON.recipe(base_translucent, Item.slimeBall);
+        BasicGlazes.IRON_BLUE.recipe(base_shiny, lapis, iron_chunks);
+        BasicGlazes.STONEWARE_SLIP.recipe(base_common, sludge);
+        BasicGlazes.TENMOKU.recipe(base_common, netherbrick);
+        BasicGlazes.PEKING_BLUE.recipe(base_bright, lapis);
+        BasicGlazes.SHINO.recipe(base_matte, Item.redstone, netherquartz);
+        Core.registry.glaze_bucket.doneMakingStandardGlazes();
         
         /*GameRegistry.addRecipe(new IRecipe() {			
             @Override

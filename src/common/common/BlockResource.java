@@ -25,7 +25,7 @@ public class BlockResource extends Block {
         setUnlocalizedName("factorization.ResourceBlock");
     }
     
-    static final int glaze_md_start = 1000; 
+    static final int glaze_md_start = 17; 
     
     @Override
     public void registerIcons(IconRegister reg) {

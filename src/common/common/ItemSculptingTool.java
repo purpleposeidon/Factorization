@@ -165,7 +165,7 @@ public class ItemSculptingTool extends Item {
                 break;
             case BISQUED:
             case HIGHFIRED:
-                Core.notify(player, gw.getCoord(), "This clay has been fired and can not be reshaped.");
+                Core.notify(player, gw.getCoord(), "This has been fired");
                 break;
             default:
                 Core.notify(player, gw.getCoord(), "This clay can not be reshaped.");

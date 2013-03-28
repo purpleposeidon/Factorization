@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderEngine;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -66,6 +67,7 @@ public class ItemRenderGlazeBucket implements IItemRenderer {
             GL11.glScalef(s, s, s);
         } else {
             if (type == ItemRenderType.INVENTORY) {
+                RenderHelper.enableGUIStandardItemLighting();
                 GuiContainer.itemRenderer.zLevel = 0.5F;
             } else {
                 GuiContainer.itemRenderer.zLevel = 0;
