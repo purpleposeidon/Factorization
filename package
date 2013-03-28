@@ -7,14 +7,15 @@ echo Packaging client
 #./build_core_mod
 
 FZ=`pwd`
+OUT=~/Dropbox/dev/Factorization-dev.jar
 
 pushd ../forge/mcp/reobf/minecraft  > /dev/zero
-  cp -R $FZ/texture/ factorization/texture/
-  rm -rf factorization/texture/ignore/
+  cp -R $FZ/texture/mods ./
   cp $FZ/*.info ./
   cp $FZ/CHANGELOG ./
-  jar -cf ~/Dropbox/dev/Factorization-dev.jar CHANGELOG *.info factorization/
-  #jar -cf ~/Dropbox/dev/Factorization-dev.jar *Factorization*.class *.info factorization/
+  rm $OUT
+  jar -cf $OUT CHANGELOG *.info factorization/ ./mods
+  #jar -cf ~/Dropbox/dev/$OUT *Factorization*.class *.info factorization/
 popd > /dev/zero
 #pushd ~/mc/
 #  ./install modded-1.3

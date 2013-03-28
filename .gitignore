@@ -10,3 +10,5 @@ cb.old
 Skin Guides/
 Skin Guides.zip
 texture/ignore
+*.blend1
+*.blend2
