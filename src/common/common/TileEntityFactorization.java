@@ -326,12 +326,12 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }
     
     @Override
-    public boolean canInsertIntoSide(int i, ItemStack itemstack, int j) {
+    public boolean func_102007_a(int i, ItemStack itemstack, int j) {
         return isStackValidForSlot(i, itemstack);
     }
     
     @Override
-    public boolean canExtractFromSide(int i, ItemStack itemstack, int j) {
+    public boolean func_102008_b(int i, ItemStack itemstack, int j) {
         return true;
     }
 

@@ -431,7 +431,7 @@ public class FactorizationUtil {
                 
                 @Override
                 public boolean canExtract(int i, ItemStack is) {
-                    return inv.canExtractFromSide(slotMap[i], is, side);
+                    return inv.func_102008_b(slotMap[i], is, side);
                 }
                 
                 @Override
@@ -439,7 +439,7 @@ public class FactorizationUtil {
                     if (forceInsert) {
                         return true;
                     }
-                    return inv.canInsertIntoSide(slotMap[i], is, side);
+                    return inv.func_102007_a(slotMap[i], is, side);
                 }};
         } else if (orig_inv instanceof net.minecraftforge.common.ISidedInventory) {
             final net.minecraftforge.common.ISidedInventory inv = (net.minecraftforge.common.ISidedInventory) orig_inv;
