@@ -1,0 +1,60 @@
+Glazes are made in the mixer. The recipes require:
+  sand
+  wooden bowl
+Each mixing will give you enough to glaze 32 prisms.
+
+
+Appearence                Name                      Material                              Class
+----------                ----                      --------                              -----
+Black                     St. Vechs Black           black wool                            Matte
+White                     Temple White              bonemeal                              Common
+White                     Sally's White             quartz                                Shiny
+Clay                      Clear                     sand                                  Translucent
+Iron Oxide                Redstone Oxide            redstone                              Common
+cobalt oxide              Lazulian Oxide            lapis                                 Common
+purple oxide              Purple Oxide              lapis + redstone                      Common
+black oxide               Lead Oxide                lead gravel                           Common
+Bright red                Fire engine red           redstone                              Bright
+light trans green         Celedon                   slimeball                             Translucent
+iron blue                 Iron Blue                 lapis + reduced iron chunks           Shiny
+gray                      Stoneware Slip            sludge                                Common
+temmoku                   Temmoku (Tenmoku?)        netherbrick/dirt                      Common
+shiny bright blue         Peking blue               Lapis                                 Bright
+white w/ orange blobs     Shino                     redstone + quartz                     Matte
+dark green                oribe green               mossy cobble
+woo blue
+mambo
+hamada rust
+copper red
+
+
+
+
+Glaze Bucket:
+- -  wooden single slab, wooden plank
+# #
+#-#
+
+
+Common glaze base:
+  Empty glaze bucket, water bucket, sand, clay ball
+
+Matte glaze base:
+  Common glaze base, clay ball, sand, charcoal
+
+Translucent glaze base:
+  Common glaze base, sand*3
+
+Shiny glaze base:
+  Common glaze base, nether quartz, sand, charcoal
+
+Bright glaze base:
+  Shiny glaze base, reduced lead chunks, bonemeal, netherrack powder
+
+Unreal glaze base:
+  Bright glaze base, diamond shard, eye of ender, dark iron ingot (or reduced dark iron chunks)
+
+Mimicry glaze base:
+  Unreal glaze base, redstone, lapis, slimeball
+
+
