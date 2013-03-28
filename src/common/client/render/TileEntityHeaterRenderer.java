@@ -1,6 +1,5 @@
 package factorization.client.render;
 
-import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
@@ -25,6 +24,8 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
         float color = 0.1F;
         TileEntityHeater heater = (TileEntityHeater) te;
         color += (heater.heat / (float) TileEntityHeater.maxHeat) * (1 - color);
+        color = Math.max(color, 0);
+        color = Math.min(1, color);
         GL11.glColor4f(color, color, color, 1.0F);
         float d = 0;
         GL11.glTranslatef((float) x + d, (float) y + d, (float) z + d);
@@ -33,8 +34,10 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
         block.setBlockBoundsOffset(m, m, m);
         block.useTexture(BlockIcons.heater_heat);
         block.begin();
+        int brightness = (int)(color*16) << 4;
         Tessellator.instance.startDrawingQuads();
-        Tessellator.instance.setBrightness(Block.glowStone.getMixedBrightnessForBlock(te.worldObj, te.xCoord, te.yCoord, te.zCoord));
+        Tessellator.instance.setBrightness(brightness);
+        Tessellator.instance.setColorOpaque_F(color, color, color);
         block.renderForTileEntity();
         Tessellator.instance.draw();
         GL11.glPopMatrix();
