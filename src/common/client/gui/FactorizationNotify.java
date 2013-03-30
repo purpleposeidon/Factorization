@@ -111,6 +111,11 @@ public class FactorizationNotify {
         GL11.glTranslated(-cx, -cy, -cz);
         GL11.glPushAttrib(GL11.GL_BLEND);
         
+        GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glDepthMask(false);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         
         while (it.hasNext()) {
             Message m = it.next();
@@ -124,6 +129,11 @@ public class FactorizationNotify {
             }
             renderMessage(m);
         }
+        GL11.glEnable(GL11.GL_LIGHTING);
+        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        
+        
         GL11.glPopMatrix();
         GL11.glPopAttrib();
         Core.profileEnd();
@@ -158,11 +168,7 @@ public class FactorizationNotify {
         GL11.glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
         GL11.glScalef(-scaling, -scaling, scaling);
         GL11.glTranslatef(0, -10*lines.length, 0);
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glDepthMask(false);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        
         Tessellator tess = Tessellator.instance;
         int var16 = (lines.length - 1)*10;
 
@@ -182,10 +188,6 @@ public class FactorizationNotify {
             i++;
         }
         
-        
-        GL11.glEnable(GL11.GL_LIGHTING);
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         GL11.glPopMatrix();
         
     }
