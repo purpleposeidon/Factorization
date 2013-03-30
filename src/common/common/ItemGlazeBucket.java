@@ -194,6 +194,10 @@ public class ItemGlazeBucket extends Item {
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         ItemStack hint = getSource(is);
+        NBTTagCompound tag = FactorizationUtil.getTag(is);
+        if (!tag.hasNoTags()) {
+            list.add("Ceramic Glaze");
+        }
         if (hint != null) {
             Item hi = hint.getItem();
             hi.addInformation(hint, player, list, verbose);
@@ -206,6 +210,9 @@ public class ItemGlazeBucket extends Item {
 
     @Override
     public ItemStack onItemRightClick(ItemStack is, World w, EntityPlayer player) {
+        if (w.isRemote) {
+            return is;
+        }
         MovingObjectPosition mop = getMovingObjectPositionFromPlayer(w, player, true);
         if (!isUsable(is)) {
             return is;

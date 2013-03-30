@@ -14,5 +14,5 @@ public class ItemIcons {
     public static Icon packet_complete, packet_incomplete;
     
     @Directory("ceramics")
-    public static Icon delete, move, reset, rotate_local, rotate_global, stretch;
+    public static Icon move, reset, rotate_local, rotate_global, stretch, mold;
 }

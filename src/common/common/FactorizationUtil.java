@@ -36,6 +36,8 @@ import factorization.api.DeltaCoord;
 
 public class FactorizationUtil {
     //ItemStack handling
+    public static final int WILDCARD_DAMAGE = Short.MAX_VALUE; //TODO, copy from Forge?
+    
     
     /**
      * Compare includes NBT and damage value; ignores stack size
@@ -73,7 +75,7 @@ public class FactorizationUtil {
         if (template == null || stranger == null) {
             return template == stranger;
         }
-        if (template.getItemDamage() == Short.MAX_VALUE) {
+        if (template.getItemDamage() == WILDCARD_DAMAGE) {
             return template.itemID == stranger.itemID;
         }
         return similar(template, stranger);
@@ -116,6 +118,13 @@ public class FactorizationUtil {
             is.setTagCompound(ret);
         }
         return ret;
+    }
+    
+    public static String getCustomItemName(ItemStack is) {
+        if (is.hasDisplayName()) {
+            return is.getDisplayName();
+        }
+        return null;
     }
 
     public static boolean itemCanFire(World w, ItemStack is, int tickDelay) {
@@ -390,6 +399,40 @@ public class FactorizationUtil {
                 }
             }
             return is;
+        }
+        
+        public ItemStack pull(int slot, int limit) {
+            return under.decrStackSize(slotIndex(slot), limit);
+        }
+        
+        public ItemStack pull(ItemStack toMatch, int limit, boolean strict) {
+            ItemStack ret = null;
+            for (int i = 0; i < size(); i++) {
+                ItemStack is = get(i);
+                if (strict) {
+                    if (!FactorizationUtil.couldMerge(toMatch, is)) {
+                        continue;
+                    }
+                } else {
+                    if (!FactorizationUtil.wildcardSimilar(toMatch, is)) {
+                        continue;
+                    }
+                }
+                ItemStack pulled = FactorizationUtil.normalize(pull(i, limit));
+                if (pulled == null) {
+                    continue;
+                }
+                limit -= pulled.stackSize;
+                if (ret == null) {
+                    ret = pulled;
+                } else {
+                    ret.stackSize += pulled.stackSize;
+                }
+                if (limit <= 0) {
+                    break;
+                }
+            }
+            return ret;
         }
     }
 

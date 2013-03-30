@@ -27,6 +27,7 @@ import factorization.common.NetworkFactorization.MessageType;
 
 public abstract class TileEntityCommon extends TileEntity implements ICoord, IFactoryType {
     static Random rand = new Random();
+    protected String customName = null;
 
     public abstract BlockClass getBlockClass();
     
@@ -75,6 +76,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     }
 
     void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
+        customName = FactorizationUtil.getCustomItemName(is);
     }
     
     boolean removeBlockByPlayer(EntityPlayer player) {
@@ -164,10 +166,18 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         super.writeToNBT(tag);
         tag.setString("ver", Core.version);
         getBlockClass().enforceQuiet(getCoord()); //NOTE: This won't actually work for the quiting save; but a second save'll take care of that.
+        if (customName != null) {
+            tag.setString("customName", customName);
+        }
     }
     
     @Override
-    public void readFromNBT(NBTTagCompound tag) { super.readFromNBT(tag); }
+    public void readFromNBT(NBTTagCompound tag) {
+        super.readFromNBT(tag);
+        if (tag.hasKey("customName")) {
+            customName = tag.getString("customName");
+        }
+    }
 
     public boolean handleMessageFromServer(int messageType, DataInput input) throws IOException {
         return false;

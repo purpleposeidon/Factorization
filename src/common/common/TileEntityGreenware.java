@@ -35,12 +35,15 @@ import com.google.common.io.ByteStreams;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.Quaternion;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityGreenware extends TileEntityCommon {
+    public static int MAX_PARTS = 32;
+    
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.CERAMIC;
@@ -256,7 +259,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     }
     
     void initialize() {
-        parts.clear();
+        parts = new ArrayList<ClayLump>();
         parts.add(new ClayLump().asDefault());
         touch();
     }
@@ -293,8 +296,9 @@ public class TileEntityGreenware extends TileEntityCommon {
             initialize();
             return;
         }
-        parts.clear();
-        for (int i = 0; i < partList.tagCount(); i++) {
+        int tagCount = partList.tagCount();
+        parts = new ArrayList<ClayLump>(tagCount);
+        for (int i = 0; i < tagCount; i++) {
             NBTTagCompound rc_tag = (NBTTagCompound) partList.tagAt(i);
             parts.add(new ClayLump().read(rc_tag));
         }
@@ -332,6 +336,9 @@ public class TileEntityGreenware extends TileEntityCommon {
         NBTTagCompound tag = new NBTTagCompound();
         writeParts(tag);
         ret.setTagCompound(tag);
+        if (customName != null) {
+            ret.setItemName(customName);
+        }
         return ret;
     }
     
@@ -413,24 +420,22 @@ public class TileEntityGreenware extends TileEntityCommon {
             //Let the server tell us the results
             return true;
         }
-        if (parts.size() >= 32) {
+        if (parts.size() >= MAX_PARTS) {
             Core.notify(player, getCoord(), "Too complex");
             held.stackSize++;
             return false;
         }
-        addLump();
+        ClayLump toAdd = addLump();
         MovingObjectPosition hit = ItemSculptingTool.doRayTrace(player);
         if (hit == null || hit.subHit == -1) {
-            player.addChatMessage("No selection"); //NORELEASE
             return true;
         }
         ClayLump against = parts.get(hit.subHit);
         ClayLump extrusion = extrudeLump(against, hit.sideHit);
         if (isValidLump(extrusion)) {
             changeLump(parts.size() - 1, extrusion);
-            player.addChatMessage("Extruded"); //NORELEASE
         } else {
-            player.addChatMessage("Extrusion failed"); //NORELEASE
+            //TODO: Sometimes it fails when it shouldn't.
         }
         return true;
     }
@@ -475,7 +480,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     
     public boolean isValidLump(ClayLump lump) {
         //check volume
-        if (!(Core.dev_environ || Core.cheat)) {
+        if (!(Core.cheat)) {
             int wX = lump.maxX - lump.minX; 
             int wY = lump.maxY - lump.minY;
             int wZ = lump.maxZ - lump.minZ;
@@ -635,25 +640,31 @@ public class TileEntityGreenware extends TileEntityCommon {
             return false;
         }
         MovingObjectPosition hit = ItemSculptingTool.doRayTrace(player);
-        if (hit == null || hit.subHit == -1 || parts.size() < 2) {
+        if (hit == null || hit.subHit == -1 || parts.size() < 1) {
             return super.removeBlockByPlayer(player);
         }
+        Coord here = getCoord();
         ClayState state = getState();
-        boolean solid = state == ClayState.BISQUED || state == ClayState.HIGHFIRED;
         //If it's solid, break it.
         //If we're sneaking & creative, break it
+        boolean shouldDestroy = player.isSneaking() || parts.size() == 1;
         if (player.capabilities.isCreativeMode) {
-            if (player.isSneaking()) {
+            if (shouldDestroy) {
                 return super.removeBlockByPlayer(player);
             } else {
                 removeLump(hit.subHit);
                 return true;
             }
-        } else if (solid) {
-            return super.removeBlockByPlayer(player);
         }
-        removeLump(hit.subHit);
-        return true;
+        shouldDestroy |= state != ClayState.WET;
+        if (shouldDestroy) {
+            FactorizationUtil.spawnItemStack(here, getItem());
+            here.setId(0);
+        } else {
+            removeLump(hit.subHit);
+            FactorizationUtil.spawnItemStack(here, new ItemStack(Item.clay));
+        }
+        return false;
     }
     
     @Override
@@ -825,4 +836,12 @@ public class TileEntityGreenware extends TileEntityCommon {
         return false;
     }
     
+    @Override
+    @SideOnly(Side.CLIENT)
+    public Icon getIcon(ForgeDirection dir) {
+        if (parts.size() == 0) {
+            return Block.blockClay.getBlockTextureFromSide(0);
+        }
+        return getIcon(parts.get(0));
+    }
 }

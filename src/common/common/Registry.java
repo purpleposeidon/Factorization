@@ -16,6 +16,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
@@ -47,6 +48,7 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
 import factorization.common.Core.TabType;
+import factorization.common.TileEntityGreenware.ClayState;
 
 public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler {
     static public final int ExoKeyCount = 3;
@@ -572,6 +574,80 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         BasicGlazes.SHINO.recipe(base_matte, Item.redstone, netherquartz);
         Core.registry.glaze_bucket.doneMakingStandardGlazes();
         
+        //Sculpture combiniation recipe
+        GameRegistry.addRecipe(new IRecipe() {
+            ArrayList<ItemStack> merge(InventoryCrafting inv) {
+                if (inv.stackList.length < 2) {
+                    return null;
+                }
+                ArrayList<ItemStack> match = new ArrayList<ItemStack>(2);
+                int part_count = 0;
+                for (int i = 0; i < inv.getSizeInventory(); i++) {
+                    ItemStack is = inv.getStackInSlot(i);
+                    if (is == null) {
+                        continue;
+                    }
+                    if (!is.hasTagCompound()) {
+                        return null;
+                    }
+                    Item item = is.getItem();
+                    if (FactorizationUtil.similar(Core.registry.greenware_item, is)) {
+                        match.add(is);
+                    } else {
+                        return null;
+                    }
+                }
+                if (match.size() < 2) {
+                    return null;
+                }
+                return match;
+            }
+            
+            @Override
+            public boolean matches(InventoryCrafting inventorycrafting, World world) {
+                ArrayList<ItemStack> matching = merge(inventorycrafting);
+                if (matching == null) {
+                    return false;
+                }
+                int partCount = 0;
+                TileEntityGreenware rep = (TileEntityGreenware) FactoryType.CERAMIC.getRepresentative();
+                for (ItemStack is : matching) {
+                    rep.loadParts(is.getTagCompound());
+                    if (rep.getState() != ClayState.WET) {
+                        return false;
+                    }
+                    partCount += rep.parts.size();
+                    if (partCount >= TileEntityGreenware.MAX_PARTS) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            
+            @Override
+            public int getRecipeSize() {
+                return 2;
+            }
+            
+            @Override
+            public ItemStack getRecipeOutput() {
+                return greenware_item.copy();
+            }
+            
+            @Override
+            public ItemStack getCraftingResult(InventoryCrafting inventorycrafting) {
+                ArrayList<ItemStack> matching = merge(inventorycrafting);
+                TileEntityGreenware target = new TileEntityGreenware();
+                for (ItemStack is : matching) {
+                    TileEntityGreenware rep = (TileEntityGreenware) FactoryType.CERAMIC.getRepresentative();
+                    rep.loadParts(is.getTagCompound());
+                    target.parts.addAll(rep.parts);
+                }
+                return target.getItem();
+            }
+        });
+        
+        //Mimicry glaze recipe
         /*GameRegistry.addRecipe(new IRecipe() {			
             @Override
             public boolean matches(InventoryCrafting inventorycrafting, World world) {

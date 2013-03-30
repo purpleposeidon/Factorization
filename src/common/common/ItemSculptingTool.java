@@ -2,8 +2,8 @@ package factorization.common;
 
 import java.util.List;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IconRegister;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -14,6 +14,7 @@ import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.common.Core.TabType;
+import factorization.common.FactorizationUtil.FzInv;
 import factorization.common.TileEntityGreenware.ClayLump;
 import factorization.common.TileEntityGreenware.ClayState;
 
@@ -52,10 +53,10 @@ public class ItemSculptingTool extends Item {
     static enum ToolMode {
         MOVER("move", true),
         STRETCHER("stretch", false),
-        REMOVER("delete", true),
         ROTATE_GLOBAL("rotate_global", true),
         ROTATE_LOCAL("rotate_local", false),
-        RESETTER("reset", false);
+        RESETTER("reset", true),
+        MOLD("mold", true);
         
         String name;
         boolean craftable;
@@ -77,8 +78,9 @@ public class ItemSculptingTool extends Item {
         
         static {
             group(MOVER, STRETCHER);
-            group(REMOVER, RESETTER);
+            group(RESETTER);
             group(ROTATE_GLOBAL, ROTATE_LOCAL);
+            group(MOLD);
         }
     }
     
@@ -102,11 +104,11 @@ public class ItemSculptingTool extends Item {
         switch (getMode(damage)) {
         default:
         case MOVER: return ItemIcons.move;
-        case REMOVER: return ItemIcons.delete;
         case RESETTER: return ItemIcons.reset;
         case ROTATE_LOCAL: return ItemIcons.rotate_local;
         case ROTATE_GLOBAL: return ItemIcons.rotate_global;
         case STRETCHER: return ItemIcons.stretch;
+        case MOLD: return ItemIcons.mold;
         }
     }
     
@@ -140,6 +142,9 @@ public class ItemSculptingTool extends Item {
     public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player,
             World w, int x, int y, int z, int side,
             float vx, float vy, float vz) {
+        if (w.isRemote) {
+            return true;
+        }
         Coord here = new Coord(w, x, y, z);
         TileEntityGreenware gw = here.getTE(TileEntityGreenware.class);
         if (gw == null) {
@@ -155,6 +160,51 @@ public class ItemSculptingTool extends Item {
         }
         ClayState state = gw.getState();
         ToolMode mode = getMode(is.getItemDamage());
+        if (mode == ToolMode.MOLD) {
+            int is_fired = state.compareTo(ClayState.BISQUED);
+            if (is_fired < 0) {
+                Core.notify(player, here, "Not fired");
+                return true;
+            }
+            FzInv inv = FactorizationUtil.openInventory(player.inventory, 0);
+            if (!player.capabilities.isCreativeMode) {
+                boolean hasSlab = false;
+                int materialCount = 0;
+                int neededClay = gw.parts.size();
+                for (int i = 0; i < inv.size(); i++) {
+                    ItemStack it = inv.get(i);
+                    if (it == null) {
+                        continue;
+                    }
+                    if (it.getItem() == Item.clay) {
+                        materialCount += it.stackSize;
+                    }
+                    if (it.itemID == Block.woodSingleSlab.blockID) {
+                        hasSlab = true;
+                    }
+                }
+                if (!hasSlab || materialCount < neededClay) {
+                    Core.notify(player, here, "Need wood slab\nAnd %s clay", "" + neededClay);
+                    return false;
+                }
+                inv.pull(new ItemStack(Block.woodSingleSlab, 1, FactorizationUtil.WILDCARD_DAMAGE), 1, false);
+                inv.pull(new ItemStack(Item.clay), gw.parts.size(), false);
+            }
+            TileEntityGreenware rep = (TileEntityGreenware) FactoryType.CERAMIC.getRepresentative();
+            rep.loadParts(gw.getItem().getTagCompound());
+            rep.totalHeat = 0;
+            rep.glazesApplied = false;
+            rep.lastTouched = 0;
+            ItemStack toDrop = rep.getItem();
+            if (gw.customName != null) {
+                toDrop.setItemName(gw.customName);
+            }
+            if (inv.push(toDrop) != null) {
+                player.dropPlayerItem(toDrop);
+            }
+            Core.proxy.updatePlayerInventory(player);
+            return true;
+        }
         if (state != ClayState.WET) {
             if (w.isRemote) {
                 return false;
@@ -200,18 +250,6 @@ public class ItemSculptingTool extends Item {
             //move the nearest face of selected cube towards (of away from) the player
             stretch(test, sneaking, side, strength);
             break;
-        case REMOVER:
-            //delete selected
-            gw.removeLump(hitPart.subHit);
-            EntityItem drop;
-            if (gw.parts.size() == 0) {
-                here.setId(0);
-                drop = new EntityItem(w, gw.xCoord, gw.yCoord, gw.zCoord, Core.registry.greenware_item.copy());
-            } else {
-                drop = new EntityItem(w, gw.xCoord, gw.yCoord, gw.zCoord, new ItemStack(Item.clay));
-            }
-            w.spawnEntityInWorld(drop);
-            return true;
         case ROTATE_LOCAL:
             rotate_local(test, sneaking, side, strength);
             break;
@@ -219,8 +257,17 @@ public class ItemSculptingTool extends Item {
             rotate_global(test, sneaking, side, strength);
             break;
         case RESETTER:
-            test.quat = new Quaternion();
+            if (sneaking) {
+                Quaternion orig = test.quat;
+                test.asDefault();
+                test.quat = orig;
+            } else {
+                test.quat = new Quaternion();
+            }
             break;
+        case MOLD:
+            Core.notify(player, here, "Not fired");
+            return true;
         }
         if (gw.isValidLump(test)) {
             gw.changeLump(hitPart.subHit, test);

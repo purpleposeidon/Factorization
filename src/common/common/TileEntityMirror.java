@@ -3,10 +3,15 @@ package factorization.common;
 import java.io.DataInput;
 import java.io.IOException;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.util.Icon;
+import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.IReflectionTarget;
@@ -289,5 +294,11 @@ public class TileEntityMirror extends TileEntityCommon {
     @Override
     public boolean isBlockSolidOnSide(int side) {
         return false;
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public Icon getIcon(ForgeDirection dir) {
+        return BlockIcons.mirror_front;
     }
 }

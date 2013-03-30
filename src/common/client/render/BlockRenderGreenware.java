@@ -1,12 +1,12 @@
 package factorization.client.render;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+
+import org.lwjgl.opengl.GL11;
+
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
 import factorization.common.Core;
@@ -36,6 +36,9 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
     void render(RenderBlocks rb) {
         if (!world_mode) {
             ItemStack is = ItemRenderCapture.getRenderingItem();
+            if (is == null) {
+                return;
+            }
             BlockRenderHelper block = BlockRenderHelper.instance;
             boolean stand = true;
             boolean rescale = false;
@@ -47,12 +50,12 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
                     minX = Math.min(minX, cl.minX);
                     minY = Math.min(minY, cl.minY);
                     minZ = Math.min(minZ, cl.minZ);
-                    maxX = Math.min(maxX, cl.maxX);
-                    maxY = Math.min(maxY, cl.maxY);
-                    maxZ = Math.min(maxZ, cl.maxZ);
+                    maxX = Math.max(maxX, cl.maxX);
+                    maxY = Math.max(maxY, cl.maxY);
+                    maxZ = Math.max(maxZ, cl.maxZ);
                     int min = Math.min(Math.min(minX, minY), minZ);
                     int max = Math.max(Math.max(maxX, maxY), maxZ);
-                    if (min < 16 || max > 24) {
+                    if (min < 16 || max > 32) {
                         rescale = true;
                         break;
                     }

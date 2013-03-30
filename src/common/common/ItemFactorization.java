@@ -6,11 +6,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import factorization.api.Coord;
+import factorization.common.TileEntityGreenware.ClayState;
 
 public class ItemFactorization extends ItemBlock {
     public ItemFactorization(int id) {
@@ -76,20 +76,11 @@ public class ItemFactorization extends ItemBlock {
         if (Core.registry.greenware_item != null && is.isItemEqual(Core.registry.greenware_item) /* required to not compare NBT here */) {
             NBTTagCompound tag = is.getTagCompound();
             if (tag != null) {
-                if (tag.hasKey("sculptureName")) {
-                    String name = tag.getString("sculptureName");
-                    if (name != null && name.length() > 0) {
-                        infoList.add(name);
-                    }
-                } else if (tag.hasKey("parts")) {
-                    infoList.add("Use /nameclay to name this");
-                }
-                if (tag.hasKey("parts")) {
-                    NBTTagList l = tag.getTagList("parts");
-                    infoList.add(l.tagCount() + " parts");
-                }
-                //ClayState state = TileEntityGreenware.getStateFromInfo(tag.getInteger("touch"), 0);
-                //infoList.add(state.english);
+                TileEntityGreenware teg = (TileEntityGreenware) FactoryType.CERAMIC.getRepresentative();
+                teg.readFromNBT(tag);
+                ClayState state = teg.getState();
+                infoList.add(teg.parts.size() + " parts");
+                infoList.add(state.toString());
             }
         }
         if (FactorizationUtil.similar(is, Core.registry.solar_turbine_item)) {

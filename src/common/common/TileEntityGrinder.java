@@ -4,8 +4,12 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Charge;
 import factorization.api.IChargeConductor;
@@ -260,5 +264,11 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
             this.output = output;
             this.probability = probability;
         }
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public Icon getIcon(ForgeDirection dir) {
+        return BlockIcons.grinder_top;
     }
 }

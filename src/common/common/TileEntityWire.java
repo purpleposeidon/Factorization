@@ -3,7 +3,11 @@ package factorization.common;
 import java.io.DataInput;
 import java.io.IOException;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.Icon;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -235,5 +239,11 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
             return true;
         }
         return false;
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public Icon getIcon(ForgeDirection dir) {
+        return BlockIcons.wire;
     }
 }

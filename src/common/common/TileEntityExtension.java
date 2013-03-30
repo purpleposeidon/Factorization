@@ -4,6 +4,9 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.List;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,8 +14,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumMovingObjectType;
+import net.minecraft.util.Icon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
+import net.minecraftforge.common.ForgeDirection;
 import factorization.api.DeltaCoord;
 import factorization.common.NetworkFactorization.MessageType;
 
@@ -54,6 +59,11 @@ public class TileEntityExtension extends TileEntityCommon {
     }
     
     public TileEntityCommon getParent() {
+        if (_parent != null && _parent.isInvalid()) {
+            setParent(null);
+            _parent = null;
+            getCoord().setId(0);
+        }
         if (_parent == null && pc != null) {
             _parent = getCoord().add(pc).getTE(TileEntityCommon.class);
             if (_parent == null || _parent.getClass() == TileEntityExtension.class) {
@@ -167,6 +177,16 @@ public class TileEntityExtension extends TileEntityCommon {
             return ret;
         }
         return super.collisionRayTrace(startVec, endVec);
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public Icon getIcon(ForgeDirection dir) {
+        TileEntityCommon p = getParent();
+        if (p == null) {
+            return super.getIcon(dir);
+        }
+        return p.getIcon(dir);
     }
 }
 

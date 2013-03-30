@@ -6,6 +6,9 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.EffectRenderer;
+import net.minecraft.client.particle.EntityDiggingFX;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
@@ -191,8 +194,15 @@ public class BlockFactorization extends BlockContainer {
         return BlockIcons.error;
     }
 
+    private Icon tempParticleIcon = null;
+    
     @Override
     public Icon getBlockTextureFromSideAndMetadata(int side, int md) {
+        if (tempParticleIcon != null) {
+            Icon ret = tempParticleIcon;
+            tempParticleIcon = null;
+            return ret;
+        }
         // This shouldn't be called when rendering in the world.
         // Is used for inventory!
         FactoryType ft = FactoryType.fromMd(md);
@@ -537,5 +547,48 @@ public class BlockFactorization extends BlockContainer {
             return (sideDisable & (1 << side)) == 0; 
         }
         return super.shouldSideBeRendered(iworld, x, y, z, side);
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean addBlockHitEffects(World worldObj, MovingObjectPosition target, EffectRenderer effectRenderer) {
+        Coord here = new Coord(worldObj, target.blockX, target.blockY, target.blockZ);
+        TileEntityCommon tec = here.getTE(TileEntityCommon.class);
+        tempParticleIcon = (tec == null) ? BlockIcons.default_icon : tec.getIcon(ForgeDirection.getOrientation(target.sideHit));
+        return false;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    static final Random rand = new Random();
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean addBlockDestroyEffects(World world, int x, int y, int z, int meta, EffectRenderer effectRenderer) {
+        Coord here = new Coord(world, x, y, z);
+        TileEntityCommon tec = here.getTE(TileEntityCommon.class);
+        Icon theIcon = (tec == null) ? BlockIcons.default_icon : tec.getIcon(ForgeDirection.DOWN);
+        
+        //copied & modified from EffectRenderer.addBlockDestroyEffects
+        
+        byte b0 = 4;
+        Minecraft mc = Minecraft.getMinecraft();
+        for (int j1 = 0; j1 < b0; ++j1)
+        {
+            for (int k1 = 0; k1 < b0; ++k1)
+            {
+                for (int l1 = 0; l1 < b0; ++l1)
+                {
+                    double d0 = (double)x + ((double)j1 + 0.5D) / (double)b0;
+                    double d1 = (double)y + ((double)k1 + 0.5D) / (double)b0;
+                    double d2 = (double)z + ((double)l1 + 0.5D) / (double)b0;
+                    int i2 = rand.nextInt(6);
+                    EntityDiggingFX fx = (new EntityDiggingFX(world, d0, d1, d2, d0 - (double)x - 0.5D, d1 - (double)y - 0.5D, d2 - (double)z - 0.5D, Block.stone, i2, 0, mc.renderEngine)).func_70596_a(x, y, z);
+                    fx.setFxIcon(mc.renderEngine, theIcon);
+                    effectRenderer.addEffect(fx);
+                }
+            }
+        }
+        
+        return true;
     }
 }

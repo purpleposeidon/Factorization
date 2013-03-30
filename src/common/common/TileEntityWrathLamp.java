@@ -4,11 +4,16 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.common.ForgeDirection;
 
 public class TileEntityWrathLamp extends TileEntityCommon {
     static final int radius = 6;
@@ -401,5 +406,11 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     @Override
     public boolean isBlockSolidOnSide(int side) {
         return false;
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public Icon getIcon(ForgeDirection dir) {
+        return BlockIcons.dark_iron_block;
     }
 }

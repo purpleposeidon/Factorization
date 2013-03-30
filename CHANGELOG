@@ -1,3 +1,28 @@
+0.7.19
+  Ported to 1.5.1
+  Ceramics: Gotten far too much love
+    Previously made ceramics are now broke, as was fortold some months ago
+    Firing:
+        (Not new: DRY a sculpture using wool, or by leaving it alone for a while. Make it WET with a bucket of water)
+        A DRY sculpture can be BISQUED using a furnace heater.
+        A BISQUED sculpture can be GLAZED.
+        A GLAZED sculpture can be HIGHFIRED using a furnace heater. This takes much longer, you'll want to speed it up by wrapping it in multiple furnace heaters. Pieces that extend outside the 1m^3 have more surface area available for heaters.
+    Sculpt Tool Changes:
+        New mold tool; right click a fired piece w/ necessary materials in your inventory to get a wet copy of it
+        Rotation is much nicer
+        Selection tool is gone; it uses subblock selection
+        Removal tool is gone; use your fist. If the sculpture is wet, it'll break only the lump you're hitting.  (Sneak-break to break the entire sculpture.)
+        Rotation tool split into global rotation & local rotation
+        Reset tool will remove rotation (like before), or with shift-click reset position & size
+        The tools can now be stacked up to 4. Using a stacked tool may boost the effect.
+    Clicking on a clay lump with a ball of clay will create a new clay lump with the same size & rotation, placed on the side that you clicked on. (Unless it'd go out of bounds)
+    Wet sculptures can be crafted together to merge them into a single sculpture. (But there is a 32 claylump limit)
+    Sculptures now have (mostly) proper collision boxes
+    Glazing:
+        Glaze buckets have 32 uses; right click on a BISQUED lump to apply it.
+        Each glaze is made using one of the glaze bases.
+        The first glaze base is the common base; there is a heirarchy of more advanced bases
+
 0.7.18
   Added netherrack dust; made by grinding netherrack
   Crystallizing metals now requires a higher-tier acid
