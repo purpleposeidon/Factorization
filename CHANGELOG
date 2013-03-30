@@ -1,4 +1,4 @@
-0.7.19
+0.7.22
   Ported to 1.5.1
   Ceramics: Gotten far too much love
     Previously made ceramics are now broke, as was fortold some months ago
@@ -7,7 +7,7 @@
         A DRY sculpture can be BISQUED using a furnace heater.
         A BISQUED sculpture can be GLAZED.
         A GLAZED sculpture can be HIGHFIRED using a furnace heater. This takes much longer, you'll want to speed it up by wrapping it in multiple furnace heaters. Pieces that extend outside the 1m^3 have more surface area available for heaters.
-    Sculpt Tool Changes:
+    Sculpting Tool Changes:
         New mold tool; right click a fired piece w/ necessary materials in your inventory to get a wet copy of it
         Rotation is much nicer
         Selection tool is gone; it uses subblock selection
@@ -22,6 +22,7 @@
         Glaze buckets have 32 uses; right click on a BISQUED lump to apply it.
         Each glaze is made using one of the glaze bases.
         The first glaze base is the common base; there is a heirarchy of more advanced bases
+  I've saved the best for last, but be warned! If you have food or drink in your mouth, cover it with a sturdy napkin or hankerchief, as you may damage your computer; if you're standing in a subway car, sit down, or wait until you have reached your destination before continuing to read this, as you may faint; if you have high blood pressure, or your family has a history of heart disease, forgo reading the rest of this changelog entirely; if you need to remain stoic in the presence of friends or colleagues, continue only behind closed curtains and in the utmost of privacy: the block breaking particles are no longer derpy. Yes, you did read that right. The block breaking & digging particles are no longer derpy. The particles actually look, for most things, like the breaking block.
 
 0.7.18
   Added netherrack dust; made by grinding netherrack
