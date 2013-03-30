@@ -116,3 +116,12 @@ item.factorization:ceramics/glaze_bucket.STONEWARE_SLIP=Stoneware Slip
 item.factorization:ceramics/glaze_bucket.TENMOKU=Tenmoku
 item.factorization:ceramics/glaze_bucket.PEKING_BLUE=Peking Blue
 item.factorization:ceramics/glaze_bucket.SHINO=Malcolm's Shino
+
+#Glaze bases
+item.factorization:ceramics/glaze_bucket.base_common=Glaze Base: Common
+item.factorization:ceramics/glaze_bucket.base_matte=Glaze Base: Matte
+item.factorization:ceramics/glaze_bucket.base_translucent=Glaze Base: Translucent
+item.factorization:ceramics/glaze_bucket.base_shiny=Glaze Base: Shiny
+item.factorization:ceramics/glaze_bucket.base_bright=Glaze Base: Bright
+item.factorization:ceramics/glaze_bucket.base_unreal=Glaze Base: Unreal
+item.factorization:ceramics/glaze_bucket.base_mimicry=Glaze Base: Mimicing
