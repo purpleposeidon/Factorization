@@ -8,11 +8,8 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.GuiMainMenu;
-<<<<<<< HEAD
-=======
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.WorldRenderer;
->>>>>>> master
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatFileWriter;

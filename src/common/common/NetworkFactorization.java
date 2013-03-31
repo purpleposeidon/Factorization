@@ -71,7 +71,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                     ItemStack is = (ItemStack) item;
                     NBTTagCompound tag = new NBTTagCompound();
                     is.writeToNBT(tag);
-                    tag.writeNamedTag(tag, output);
+                    NBTTagCompound.writeNamedTag(tag, output);
                     if (outputStream.size() > 65536 && is.hasTagCompound()) {
                         //Got an overflow! We'll blame the NBT tag.
                         if (huge_tag_warnings++ < 10) {
