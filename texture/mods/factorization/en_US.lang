@@ -101,21 +101,21 @@ item.factorization:ore/crystal/SILVER.name=Crystalline Silver
 item.factorization:ore/crystal/LEAD.name=Crystalline Lead
 
 #Glazes
-item.factorization:ceramics/glaze_bucket.ST_VECHS_BLACK=St. Vech's Black
-item.factorization:ceramics/glaze_bucket.TEMPLE_WHITE=Temple White
-item.factorization:ceramics/glaze_bucket.SALLYS_WHITE=Sally's White
-item.factorization:ceramics/glaze_bucket.CLEAR=Clear
-item.factorization:ceramics/glaze_bucket.REDSTONE_OXIDE=Redstone Oxide
-item.factorization:ceramics/glaze_bucket.LAPIS_OXIDE=Lapis Oxide
-item.factorization:ceramics/glaze_bucket.PURPLE_OXIDE=Purple Oxide
-item.factorization:ceramics/glaze_bucket.LEAD_OXIDE=Lead Oxide
-item.factorization:ceramics/glaze_bucket.FIRE_ENGINE_RED=Fire Engine Read
-item.factorization:ceramics/glaze_bucket.CELEDON=Celedon
-item.factorization:ceramics/glaze_bucket.IRON_BLUE=Iron Blue
-item.factorization:ceramics/glaze_bucket.STONEWARE_SLIP=Stoneware Slip
-item.factorization:ceramics/glaze_bucket.TENMOKU=Tenmoku
-item.factorization:ceramics/glaze_bucket.PEKING_BLUE=Peking Blue
-item.factorization:ceramics/glaze_bucket.SHINO=Malcolm's Shino
+item.factorization:ceramics/glaze_bucket.ST_VECHS_BLACK.name=St. Vech's Black
+item.factorization:ceramics/glaze_bucket.TEMPLE_WHITE.name=Temple White
+item.factorization:ceramics/glaze_bucket.SALLYS_WHITE.name=Sally's White
+item.factorization:ceramics/glaze_bucket.CLEAR.name=Clear
+item.factorization:ceramics/glaze_bucket.REDSTONE_OXIDE.name=Redstone Oxide
+item.factorization:ceramics/glaze_bucket.LAPIS_OXIDE.name=Lapis Oxide
+item.factorization:ceramics/glaze_bucket.PURPLE_OXIDE.name=Purple Oxide
+item.factorization:ceramics/glaze_bucket.LEAD_OXIDE.name=Lead Oxide
+item.factorization:ceramics/glaze_bucket.FIRE_ENGINE_RED.name=Fire Engine Read
+item.factorization:ceramics/glaze_bucket.CELEDON.name=Celedon
+item.factorization:ceramics/glaze_bucket.IRON_BLUE.name=Iron Blue
+item.factorization:ceramics/glaze_bucket.STONEWARE_SLIP.name=Stoneware Slip
+item.factorization:ceramics/glaze_bucket.TENMOKU.name=Tenmoku
+item.factorization:ceramics/glaze_bucket.PEKING_BLUE.name=Peking Blue
+item.factorization:ceramics/glaze_bucket.SHINO.name=Malcolm's Shino
 
 #Glaze bases
 item.factorization:ceramics/glaze_bucket.base_common=Glaze Base: Common

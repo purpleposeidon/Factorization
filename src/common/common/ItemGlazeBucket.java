@@ -217,6 +217,9 @@ public class ItemGlazeBucket extends Item {
         if (!isUsable(is)) {
             return is;
         }
+        if (mop == null) {
+            return is;
+        }
         if (mop.typeOfHit != EnumMovingObjectType.TILE || mop.subHit == -1) {
             return is;
         }

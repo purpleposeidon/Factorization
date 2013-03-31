@@ -113,7 +113,7 @@ public class NEI_GrinderRecipeConfig extends TemplateRecipeHandler implements IC
 
     @Override
     public String getGuiTexture() {
-        return Core.texture_dir + "grinder.png";
+        return Core.gui_dir + "grinder.png";
     }
 
     @Override

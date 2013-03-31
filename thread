@@ -245,8 +245,6 @@ Push blocks everywhere! Be the Enderman! This will push a block that's in front 
 More Exo-Armor upgrades
 Router replacement
 [/spoiler]
-
-Ceramics is a WIP, and there's no guarantee that sculptures won't be destroyed between versions.
 [spoiler]
 The clay sculpting tool is crafted with a bit of clay on a stick. Different classes of tools can be gotten at by crafting the tool by itself. And there's a second layer of tools that you can get at by shift-right-clicking the ground with them. In most cases the opposite effect (rotating the other way, or stretching the other way) can be gotten by holding shift while using.
 Another lump can be added by clicking on the sculpture with a clay ball.
@@ -269,6 +267,11 @@ This is a [url="http://files.minecraftforge.net/"]Minecraft Forge[/url] mod. It 
 
 
 [u][b][size=6][anchor=DOWNLOAD]Download[/anchor][/size][/b][/u]
+Factorization 0.7.22 (MC 1.4.6)
+[url="http://adf.ly/2137658/http://www.mediafire.com/?akb41y9rtr0au96"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.7.22.jar"]adfly + DropBox[/url]
+Built on 2013-03-30 against Minecraft Forge 7.7.0.605
+
 Factorization 0.7.21 (MC 1.4.6)
 [url="http://adf.ly/2137658/http://www.mediafire.com/download.php?y73i8xhmyzsi1w7"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.7.21.jar"]adfly + DropBox[/url]

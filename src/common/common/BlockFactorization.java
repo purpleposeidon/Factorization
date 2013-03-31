@@ -583,7 +583,7 @@ public class BlockFactorization extends BlockContainer {
                     double d2 = (double)z + ((double)l1 + 0.5D) / (double)b0;
                     int i2 = rand.nextInt(6);
                     EntityDiggingFX fx = (new EntityDiggingFX(world, d0, d1, d2, d0 - (double)x - 0.5D, d1 - (double)y - 0.5D, d2 - (double)z - 0.5D, Block.stone, i2, 0, mc.renderEngine)).func_70596_a(x, y, z);
-                    fx.setFxIcon(mc.renderEngine, theIcon);
+                    fx.func_94052_a(mc.renderEngine, theIcon); //func_94052_a, setParticleIcon
                     effectRenderer.addEffect(fx);
                 }
             }

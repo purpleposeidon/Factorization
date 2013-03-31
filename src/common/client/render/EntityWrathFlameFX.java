@@ -16,7 +16,7 @@ public class EntityWrathFlameFX extends EntityFX {
         this.particleTextureJitterX = 0;
         this.particleTextureJitterY = 0;
         this.particleScale = 2;
-        setFxIcon(Minecraft.getMinecraft().renderEngine, ItemIcons.wrath_particle);
+        func_94052_a(Minecraft.getMinecraft().renderEngine, ItemIcons.wrath_particle);
         //setParticleTextureIndex(0);
         this.particleGravity = 0;
 

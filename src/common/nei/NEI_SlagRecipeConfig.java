@@ -146,7 +146,7 @@ public class NEI_SlagRecipeConfig extends TemplateRecipeHandler implements IConf
 
     @Override
     public String getGuiTexture() {
-        return Core.texture_dir + "slagfurnacegui.png";
+        return Core.gui_dir + "slagfurnacegui.png";
     }
 
     @Override

@@ -178,7 +178,7 @@ public class NEI_MixerRecipeConfig extends TemplateRecipeHandler implements ICon
 
     @Override
     public String getGuiTexture() {
-        return Core.texture_dir + "mixer.png";
+        return Core.gui_dir + "mixer.png";
     }
 
     @Override

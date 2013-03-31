@@ -142,7 +142,7 @@ public class NEI_CrystallizerRecipeConfig extends TemplateRecipeHandler implemen
 
     @Override
     public String getGuiTexture() {
-        return Core.texture_dir + "crystal.png";
+        return Core.gui_dir + "crystal.png";
     }
 
     @Override
