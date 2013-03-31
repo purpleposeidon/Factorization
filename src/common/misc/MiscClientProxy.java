@@ -26,7 +26,7 @@ public class MiscClientProxy extends MiscProxy {
     @Override
     void runCommand(List<String> args) {
         Minecraft mc = Minecraft.getMinecraft();
-        String n = args.get(0);
+        String n;
         if (args.size() == 0) {
             n = "about";
         } else {

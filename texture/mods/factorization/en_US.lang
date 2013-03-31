@@ -118,10 +118,10 @@ item.factorization:ceramics/glaze_bucket.PEKING_BLUE.name=Peking Blue
 item.factorization:ceramics/glaze_bucket.SHINO.name=Malcolm's Shino
 
 #Glaze bases
-item.factorization:ceramics/glaze_bucket.base_common=Glaze Base: Common
-item.factorization:ceramics/glaze_bucket.base_matte=Glaze Base: Matte
-item.factorization:ceramics/glaze_bucket.base_translucent=Glaze Base: Translucent
-item.factorization:ceramics/glaze_bucket.base_shiny=Glaze Base: Shiny
-item.factorization:ceramics/glaze_bucket.base_bright=Glaze Base: Bright
-item.factorization:ceramics/glaze_bucket.base_unreal=Glaze Base: Unreal
-item.factorization:ceramics/glaze_bucket.base_mimicry=Glaze Base: Mimicing
+item.factorization:ceramics/glaze_bucket.base_common.name=Glaze Base: Common
+item.factorization:ceramics/glaze_bucket.base_matte.name=Glaze Base: Matte
+item.factorization:ceramics/glaze_bucket.base_translucent.name=Glaze Base: Translucent
+item.factorization:ceramics/glaze_bucket.base_shiny.name=Glaze Base: Shiny
+item.factorization:ceramics/glaze_bucket.base_bright.name=Glaze Base: Bright
+item.factorization:ceramics/glaze_bucket.base_unreal.name=Glaze Base: Unreal
+item.factorization:ceramics/glaze_bucket.base_mimicry.name=Glaze Base: Mimicing

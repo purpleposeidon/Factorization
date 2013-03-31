@@ -536,7 +536,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         ItemStack base_shiny = glaze_bucket.makeCraftingGlaze("base_shiny");
         ItemStack base_bright = glaze_bucket.makeCraftingGlaze("base_bright");
         ItemStack base_unreal = glaze_bucket.makeCraftingGlaze("base_unreal");
-        ItemStack base_mimicry = glaze_bucket.makeCraftingGlaze("base_mimicry");
+        final ItemStack base_mimicry = glaze_bucket.makeCraftingGlaze("base_mimicry");
+        
+        glaze_bucket.add(base_mimicry);
         
         ItemStack charcoal = new ItemStack(Item.coal, 1, 1);
         ItemStack bonemeal = new ItemStack(Item.dyePowder, 1, 15);
@@ -646,31 +648,81 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         });
         
         //Mimicry glaze recipe
-        /*GameRegistry.addRecipe(new IRecipe() {			
+        GameRegistry.addRecipe(new IRecipe() {			
             @Override
             public boolean matches(InventoryCrafting inventorycrafting, World world) {
-                // TODO Auto-generated method stub
-                return false;
+                int mimic_items = 0;
+                int other_items = 0;
+                for (int i = 0; i < inventorycrafting.getSizeInventory(); i++) {
+                    ItemStack is = inventorycrafting.getStackInSlot(i);
+                    if (is == null) {
+                        continue;
+                    }
+                    if (FactorizationUtil.couldMerge(base_mimicry, is)) {
+                        mimic_items++;
+                    } else {
+                        if (is.itemID >= Block.blocksList.length) {
+                            return false;
+                        }
+                        int d = is.getItemDamage();
+                        if (d < 0 || d > 16) {
+                            return false;
+                        }
+                        Block b = Block.blocksList[is.itemID];
+                        if (b == null) {
+                            return false;
+                        }
+                        other_items++;
+                    }
+                }
+                return mimic_items == 1 && other_items == 1;
             }
             
             @Override
             public int getRecipeSize() {
-                // TODO Auto-generated method stub
                 return 2;
             }
             
             @Override
             public ItemStack getRecipeOutput() {
-                // TODO Auto-generated method stub
-                return null;
+                return base_mimicry;
             }
             
             @Override
             public ItemStack getCraftingResult(InventoryCrafting inventorycrafting) {
-                // TODO Auto-generated method stub
+                int[] side_map = {
+                        1, 2, 1,
+                        4, 0, 5,
+                        0, 3, 0
+                };
+                for (int i = 0; i < inventorycrafting.getSizeInventory(); i++) {
+                    ItemStack is = inventorycrafting.getStackInSlot(i);
+                    if (is == null) {
+                        continue;
+                    }
+                    if (FactorizationUtil.couldMerge(base_mimicry, is)) {
+                        continue;
+                    }
+                    if (is.itemID >= Block.blocksList.length) {
+                        continue;
+                    }
+                    int d = is.getItemDamage();
+                    if (d < 0 || d > 16) {
+                        continue;
+                    }
+                    Block b = Block.blocksList[is.itemID];
+                    if (b == null) {
+                        continue;
+                    }
+                    int side = 0;
+                    try {
+                        side = side_map[i];
+                    } catch (ArrayIndexOutOfBoundsException e) {}
+                    return glaze_bucket.makeMimicingGlaze(is.itemID, is.getItemDamage(), side);
+                }
                 return null;
             }
-        });*/
+        });
         
         //inverium
         oreRecipe(new ItemStack(inverium, 1, 1),
