@@ -121,6 +121,7 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements IFzdsEnt
         
         Coord low = dimensionSlice.getCorner();
         Coord far = dimensionSlice.getFarCorner();
+        int byteCount = 0, chunkCount = 0, teCount = 0; //TODO NORELEASE: Won't need this...
         for (int x = low.x - 16; x <= far.x + 16; x += 16) {
             for (int z = low.z - 16; z <= far.z + 16; z += 16) {
                 if (!world.blockExists(x+1, 0, z+1)) {
@@ -129,24 +130,31 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements IFzdsEnt
                 Chunk chunk = world.getChunkFromBlockCoords(x, z);
                 chunks.add(chunk);
                 tileEntities.addAll(chunk.chunkTileEntityMap.values());
+                chunkCount++;
             }
         }
+        
         
         //NOTE: This has the potential to go badly if there's a large amount of data in the chunks.
         NetServerHandler net = target.playerNetServerHandler;
         if (!chunks.isEmpty()) {
             Packet toSend = new Packet220FzdsWrap(new Packet56MapChunks(chunks));
             net.sendPacketToPlayer(toSend);
+            byteCount += toSend.getPacketSize() + 1;
         }
+        teCount = tileEntities.size();
         if (!tileEntities.isEmpty()) {
             for (TileEntity te : tileEntities) {
                 Packet description = te.getDescriptionPacket();
                 if (description == null) {
                     continue;
                 }
-                net.sendPacketToPlayer(new Packet220FzdsWrap(description));
+                Packet toSend = new Packet220FzdsWrap(description);
+                net.sendPacketToPlayer(toSend);
+                byteCount += toSend.getPacketSize() + 1;
             }
         }
+        System.out.println("Sending data of " + chunkCount + " chunks with " + teCount + " tileEntities, totalling " + byteCount + " (reported) bytes");
     }
     
     public void endProxy() {

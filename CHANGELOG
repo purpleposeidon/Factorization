@@ -24,9 +24,25 @@
         The first glaze base is the common base; there is a heirarchy of more advanced bases
   I've saved the best for last, but be warned! If you have food or drink in your mouth, cover it with a sturdy napkin or hankerchief, as you may damage your computer; if you're standing in a subway car, sit down, or wait until you have reached your destination before continuing to read this, as you may faint; if you have high blood pressure, or your family has a history of heart disease, forgo reading the rest of this changelog entirely; if you need to remain stoic in the presence of friends or colleagues, continue only behind closed curtains and in the utmost of privacy: the block breaking particles are no longer derpy. Yes, you did read that right. The block breaking & digging particles are no longer derpy. The particles actually look, for most things, like the breaking block.
 
-0.7.18
+0.7.21
+  Furnace heaters can be deactivated with a redstone signal
+
+0.7.20
+  Fixed some dupe bugs
+
+0.7.19
   Added netherrack dust; made by grinding netherrack
   Crystallizing metals now requires a higher-tier acid
+  Routers do less netspam
+  /fzds got more powerful and flexible
+  Added an "/f" command. (Originally short for "/fog", but it's got other things now.) Has a few commands for running things client-side:
+    far, 0, normal, 1, short, 2, tiny, 3, micro, 4, microfog, +, -: Adjusts the fog
+    pauserender: Stops rendering; opening your inventory will resume it
+    now, date, time: shows the real-world time
+    clear, cl: Clears the chatlog
+    saycoords: Makes you say your coords in chat.
+    saveoptions, savesettings, so, ss: Saves Minecraft's options; it seems to have trouble doing this
+
 
 0.7.17
   Router takes only strong power now
@@ -49,7 +65,7 @@
     Mixer: 2x (No increase here)
     Slag furnace: 2.5x (The .5x gives a 50% chance for 1 extra reduced chunk)
     Crystallizer: 3x
-  The charge meter does a global notify if the player is fake. (It works in deployers! Aim the deployer above the conductor.)
+  The charge meter does a global notify if the player is fake. (It works in deployers! Aim the deployer *above* the conductor block.)
   Grinders are now crafted upsidedown, instead of having two different unsatisfactory recipes.
   Fixed crystallizer recipe bug
   Sounds actually work again. Derp.

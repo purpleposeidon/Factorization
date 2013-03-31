@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.minecraft.command.CommandBase;
@@ -90,7 +91,6 @@ public class MiscellaneousNonsense {
     @ServerStarting
     public void addCommands(FMLServerStartingEvent event) {
         event.registerServerCommand(new FogCommand());
-        //NORELEASE TODO: 'f' variant
     }
     
     static class FogCommand extends CommandBase {
@@ -109,15 +109,24 @@ public class MiscellaneousNonsense {
             player.playerNetServerHandler.sendPacketToPlayer(instance.makePacket(args));
         }
         
-        static List<String> fogCommands = Arrays.asList("far", "0", "normal", "1", "short", "2", "tiny", "3", "micro", "4", "microfog", "5", "pauserender", "gc", "now", "about", "clear", "saycoords", "saveoptions");
+        static List<String> fogCommands = Arrays.asList("far", "0", "normal", "1", "short", "2", "tiny", "3", "micro", "4", "microfog", "5", "+", "-", "pauserender", "now", "about", "clear", "saycoords", "saveoptions");
         
         @Override
         public List addTabCompletionOptions(ICommandSender sender, String[] args) {
             //TODO: Non-lame
             if (args.length == 1) {
-                return fogCommands;
+                String arg0 = args[0];
+                List<String> ret = new LinkedList();
+                for (String cmd : fogCommands) {
+                    if (cmd.startsWith(arg0)) {
+                        ret.add(cmd);
+                    }
+                }
+                return ret;
+            } else if (args.length > 1) {
+                return new LinkedList();
             }
-            return super.addTabCompletionOptions(sender, args);
+            return fogCommands;
         }
         
         @Override

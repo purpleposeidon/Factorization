@@ -127,6 +127,7 @@ http://www.minecraftforum.net/index.php?app=members&module=messaging&section=vie
 [Low-Priority Bugs]
 Redstone signal on furnace heaters
 Heater stacking; would increase speed?
+right-clicking a barrel with a tool could put stuff in as if you had right-clicked with an empty hand
 Get rid of as many getEffectiveSide() calls as we can; we often have a World hanging around somewhere we can use instead.
 rotating barrels (We *still* don't have a rotation API, do we?)
 Fun fact: High-quality batteries can be made out of silver. Mmmm. But this can't really be used as an alternative... altho... maybe they could require greater charge to charge.

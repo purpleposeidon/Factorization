@@ -524,6 +524,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         if (dumpBuffer()) {
             return;
         }
+        
         RecipeMatchInfo mr = getCachedRecipe();
         if (mr == null) {
             slow();
@@ -545,6 +546,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
             progress = 0;
             craftRecipe(mr);
             normalize(input);
+            while (drainBuffer()) ;
             speed = Math.min(50, speed + 1);
             dumpBuffer();
         }

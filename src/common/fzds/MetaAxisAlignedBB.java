@@ -62,7 +62,8 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
         shadow2rotation(center);
         rotation.applyRotation(center);
         rotation2shadow(center);
-        Vec3 diff = centerInShadowSpace.subtract(center);
+        //Vec3 diff = centerInShadowSpace.subtract(center); client-side only; praise be to notch
+        Vec3 diff = centerInShadowSpace.addVector(-center.xCoord, -center.yCoord, -center.zCoord);
         AxisAlignedBB moved = shadow.getOffsetBoundingBox(diff.xCoord, diff.yCoord, diff.zCoord);
         double d = 1.0/16.0;
         moved.minX -= d;

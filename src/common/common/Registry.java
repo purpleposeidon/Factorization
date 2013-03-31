@@ -268,7 +268,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //Exo-items
         exo_head = new ExoArmor(itemID("mechaHead", 9010), 0).setSlotCount(5);
         exo_chest = new ExoArmor(itemID("mechaChest", 9011), 1).setSlotCount(8);
-        exo_leg = new ExoArmor(itemID("mechaLeg", 9012), 2).setSlotCount(6);
+        exo_leg = new ExoArmor(itemID("mechaLeg", 9012), 2).setSlotCount(7);
         exo_foot = new ExoArmor(itemID("mechaFoot", 9013), 3).setSlotCount(4);
 
         exo_chasis = new ItemCraftingComponent(itemID("mechaChasis", 9009), "exo_chasis");
@@ -434,8 +434,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         oreRecipe(lead_block_item, "###", "###", "###", '#', "ingotLead");
         oreRecipe(silver_block_item, "###", "###", "###", '#', "ingotSilver");
         FurnaceRecipes.smelting().addSmelting(resource_block.blockID, 0 /* MD for silver */, new ItemStack(silver_ingot), 0.3F);
-        
-        //FurnaceRecipes.smelting().addSmelting(Item.bucketWater.itemID, new ItemStack(Item.bucketEmpty), 0); //Bah.
 
         //exo armor
         recipe(new ItemStack(exo_chasis),

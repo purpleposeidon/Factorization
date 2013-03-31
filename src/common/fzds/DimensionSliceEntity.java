@@ -374,12 +374,22 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             double dx = (posX - prevPosX)*s;
             double dy = (posY - prevPosY)*s;
             double dz = (posZ - prevPosZ)*s;
-            List ents = worldObj.getEntitiesWithinAABBExcludingEntity(this, realDragArea);
+            //List ents = worldObj.getEntitiesWithinAABBExcludingEntity(this, realDragArea);
+            List ents =  worldObj.getEntitiesWithinAABBExcludingEntity(this, metaAABB);
             for (int i = 0; i < ents.size(); i++) {
                 Entity e = (Entity) ents.get(i);
                 e.posX += dx;
                 e.posY += dy;
                 e.posZ += dz;
+                if (Math.abs(e.motionX) < motionX) {
+                    e.motionX = motionX;
+                }
+                if (Math.abs(e.motionY) < motionY) {
+                    e.motionY = motionY;
+                }
+                if (Math.abs(e.motionZ) < motionZ) {
+                    e.motionZ = motionZ;
+                }
             }
             updateRealArea();
         }
