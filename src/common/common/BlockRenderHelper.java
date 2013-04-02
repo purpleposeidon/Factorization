@@ -65,8 +65,6 @@ public class BlockRenderHelper extends Block {
     
     @SideOnly(Side.CLIENT)
     public Icon[] textures;
-    
-    @SideOnly(Side.CLIENT)
     private Icon[] repetitionCache = new Icon[6];
     
     @SideOnly(Side.CLIENT)

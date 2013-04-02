@@ -178,7 +178,6 @@ public class BlockFactorization extends BlockContainer {
         Core.proxy.texturepackChanged();
     }
     
-    @SideOnly(Side.CLIENT)
     static public Icon force_texture = null;
 
     @Override
@@ -558,7 +557,6 @@ public class BlockFactorization extends BlockContainer {
         return false;
     }
     
-    @SideOnly(Side.CLIENT)
     static final Random rand = new Random();
     
     @Override

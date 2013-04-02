@@ -15,7 +15,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 
 public class BlockResource extends Block {
-    @SideOnly(Side.CLIENT)
     public Icon[] icons = new Icon[ResourceType.values().length];
     @SideOnly(Side.CLIENT)
     Icon exoBottom, exoTop;
