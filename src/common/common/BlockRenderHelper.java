@@ -169,15 +169,8 @@ public class BlockRenderHelper extends Block {
     }
     
     //We could add stuff for simple 90 degree rotations
-    
-    @SideOnly(Side.CLIENT)
     private static final int X = 0, Y = 1, Z = 2, U = 3, V = 4;
-    @SideOnly(Side.CLIENT)
-    private static float[][][] verts = new float[8][4][5]; //sides, face vertices, vertex
-    
-    @SideOnly(Side.CLIENT)
     private static ForgeDirection[] dirs = ForgeDirection.values();
-    
     private static VectorUV center = new VectorUV();
     
     @SideOnly(Side.CLIENT)
@@ -191,7 +184,6 @@ public class BlockRenderHelper extends Block {
             faceVerts(i);
             for (int f = 0; f < currentFace.length; f++) {
                 VectorUV vert = currentFace[f];
-                //System.out.println(vert.u + ", " + vert.v);
                 vert.u = faceIcon.getInterpolatedU(vert.u*16);
                 vert.v = faceIcon.getInterpolatedV(vert.v*16);
             }

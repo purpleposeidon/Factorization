@@ -225,7 +225,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         public ItemStack output;
         public IRecipe theRecipe;
         
-        public RecipeMatchInfo(List<ItemStack> recipeInput, ItemStack recipeOutput, IRecipe theRecipe) throws WeirdRecipeException {
+        public RecipeMatchInfo(List<Object> recipeInput, ItemStack recipeOutput, IRecipe theRecipe) throws WeirdRecipeException {
             for (Object o : recipeInput) {
                 if (o instanceof ItemStack) {
                     this.inputs.add(((ItemStack)o).copy());
@@ -292,7 +292,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         ArrayList<RecipeMatchInfo> cache = new ArrayList<TileEntityMixer.RecipeMatchInfo>();
         outer: for (Object o: CraftingManager.getInstance().getRecipeList()) {
             IRecipe recipe = (IRecipe) o;
-            List<ItemStack> inputList = null;
+            List<Object> inputList = null;
             ItemStack output = null;
             if (recipe.getClass() == ShapelessRecipes.class) {
                 ShapelessRecipes sr = (ShapelessRecipes) recipe;

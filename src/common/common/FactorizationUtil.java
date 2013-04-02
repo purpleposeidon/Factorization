@@ -455,8 +455,15 @@ public class FactorizationUtil {
     }
     
     public static FzInv openInventory(IInventory orig_inv, final int side) {
+        return openInventory(orig_inv, side, true);
+    }
+    
+    public static FzInv openInventory(IInventory orig_inv, final int side, boolean openBothChests) {
         if (orig_inv instanceof TileEntityChest) {
-            orig_inv = openDoubleChest((TileEntityChest) orig_inv);
+            orig_inv = openDoubleChest((TileEntityChest) orig_inv, openBothChests);
+            if (orig_inv == null) {
+                return null;
+            }
         }
         if (orig_inv instanceof net.minecraft.inventory.ISidedInventory) {
             final net.minecraft.inventory.ISidedInventory inv = (net.minecraft.inventory.ISidedInventory) orig_inv;
@@ -540,7 +547,7 @@ public class FactorizationUtil {
      * @param chest
      * @return
      */
-    public static IInventory openDoubleChest(TileEntityChest chest) {
+    public static IInventory openDoubleChest(TileEntityChest chest, boolean openBothSides) {
         IInventory origChest = (TileEntityChest) chest;
         World world = chest.worldObj;
         int i = chest.xCoord, j = chest.yCoord, k = chest.zCoord;
@@ -553,16 +560,20 @@ public class FactorizationUtil {
         }
         // If we're the lower chest, skip ourselves
         if (world.getBlockId(i + 1, j, k) == chestBlock) {
+            if (openBothSides) {
+                return new InventoryLargeChest(origChest.getInvName(), origChest, (TileEntityChest) world.getBlockTileEntity(i + 1, j, k));
+            }
             return null;
         }
         if (world.getBlockId(i, j, k + 1) == chestBlock) {
+            if (openBothSides) {
+                return new InventoryLargeChest(origChest.getInvName(), origChest, (TileEntityChest) world.getBlockTileEntity(i, j, k + 1));
+            }
             return null;
         }
 
         return chest;
     }
-    
-    
     
     //Recipe creation
     public static IRecipe createShapedRecipe(ItemStack result, Object... args) {
@@ -752,8 +763,7 @@ public class FactorizationUtil {
     }
     
     public static boolean intersect(double la, double ha, double lb, double hb) {
-        //If we don't intersect, then we're overlapping.
-        //If we're not overlapping, then one is to the right of the other.
+        //If we're not intersecting, then one is to the right of the other.
         //<--  (la ha) -- (lb hb) -->
         //<--- (lb hb) -- (la ha) -->
         return !(ha < lb || hb < la);

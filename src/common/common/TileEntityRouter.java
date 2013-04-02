@@ -154,7 +154,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         if (!upgradeEject) {
             return null;
         }
-        return getCoord().add(new CubeFace(eject_direction).toVector());
+        return getCoord().add(ForgeDirection.getOrientation(eject_direction).getOpposite());
     }
 
     void eject() {
@@ -402,11 +402,14 @@ public class TileEntityRouter extends TileEntityFactorization {
             end = target_slot + 1;
             inv = new FactorizationUtil.PlainInvWrapper(t);
         } else {
-            inv = FactorizationUtil.openInventory(t, target_side);
+            inv = FactorizationUtil.openInventory(t, target_side, false);
+            if (inv == null) {
+                return false;
+            }
             start = 0;
             end = inv.size();
         }
-        FzInv me = FactorizationUtil.openInventory(this, 0);
+        FzInv me = FactorizationUtil.openInventory(this, 0, false);
         int toMove = upgradeThroughput ? buffer.stackSize : 1;
         for (int slot = start; slot < end; slot++) {
             if (is_input) {
