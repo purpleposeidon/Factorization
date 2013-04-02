@@ -112,8 +112,6 @@ public class HammerClientProxy extends HammerProxy {
         
         void markBlocksForUpdate(int lx, int ly, int lz, int hx, int hy, int hz) {
             //Could this be more efficient?
-            Coord lower = new Coord(null, lx, ly, lz);
-            Coord upper = new Coord(null, hx, hy, hz);
             World realClientWorld = DeltaChunk.getClientRealWorld();
             Iterator<IDeltaChunk> it = DeltaChunk.getSlices(realClientWorld).iterator();
             while (it.hasNext()) {
@@ -123,7 +121,10 @@ public class HammerClientProxy extends HammerProxy {
                     continue;
                 }
                 
-                if (dse.getCorner().inside(lower, upper) || dse.getFarCorner().inside(lower, upper)) {
+                Coord near = dse.getCorner(), far = dse.getFarCorner();
+                if (FactorizationUtil.intersect(near.x, far.x, lx, hx)
+                        && FactorizationUtil.intersect(near.y, far.y, ly, hy)
+                        && FactorizationUtil.intersect(near.z, far.z, lz, hz)) {
                     RenderDimensionSliceEntity.markBlocksForUpdate((DimensionSliceEntity) dse, lx, ly, lz, hx, hy, hz);
                     dse.blocksChanged(lx, ly, lz);
                     dse.blocksChanged(hx, hy, hz);
@@ -300,9 +301,9 @@ public class HammerClientProxy extends HammerProxy {
             }
         }
         real_player.worldObj = w;
-        if (fake_player == null || real_world != fake_player.worldObj) {
+        if (fake_player == null || w != fake_player.worldObj) {
             //TODO NORELEASE: Cache
-            fake_player = new EntityClientPlayerMP(mc, mc.theWorld /* XXX why is this real world? */, mc.session, real_player.sendQueue /* not sure about this one. */);
+            fake_player = new EntityClientPlayerMP(mc, mc.theWorld /* why is this real world? */, mc.session, real_player.sendQueue /* not sure about this one. */);
         }
         setWorldAndPlayer((WorldClient) w, fake_player);
     }
@@ -360,6 +361,9 @@ public class HammerClientProxy extends HammerProxy {
         if (shadowSelected == null) {
             return;
         }
+        if (shadowSelected.typeOfHit != EnumMovingObjectType.TILE) {
+            return;
+        }
         if (event.isCanceled()) {
             return;
         }
@@ -381,12 +385,11 @@ public class HammerClientProxy extends HammerProxy {
         setShadowWorld();
         try {
             //TODO: Rotation transform
-            Coord corner = dse.getCorner();
+            Coord corner = dse.getCenter();
             GL11.glTranslatef(-corner.x, -corner.y, -corner.z);
             GL11.glTranslatef((float)(+dse.posX), (float)(+dse.posY), (float)(+dse.posZ));
-            GL11.glTranslatef(-2, -2, -2); //Hello, weird 2s
             
-            //TODO: glPushAttr for the mask.
+            //Could glPushAttr for the mask. Nah.
             GL11.glColorMask(true, true, false, true);
             if (!ForgeHooksClient.onDrawBlockHighlight(rg, player, shadowSelected, shadowSelected.subHit, is, partialTicks)) {
                 event.context.drawBlockBreaking(player, shadowSelected, 0, is, partialTicks);

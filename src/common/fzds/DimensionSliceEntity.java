@@ -419,6 +419,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         if (worldObj.isRemote) {
             prevTickRotation.update(rotation);
             rayOutOfDate = true;
+            if (ticksExisted == 1) {
+                DeltaChunk.getSlices(worldObj).add(this);
+            }
         } else if (proxy == null && !isDead) {
             DeltaChunk.getSlices(worldObj).add(this);
             proxy = new PacketProxyingPlayer(this, DeltaChunk.getServerShadowWorld());

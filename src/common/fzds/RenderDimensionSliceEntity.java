@@ -36,7 +36,6 @@ import cpw.mods.fml.common.TickType;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.common.Core;
-import factorization.common.FactorizationUtil;
 import factorization.fzds.api.DeltaCapability;
 
 
@@ -68,7 +67,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         
         int renderCounts = 0;
         long lastRenderInMegaticks = megatickCount;
-        boolean dirty = false;
+        boolean anyRenderersDirty = true;
         private int renderList = -1;
         private WorldRenderer renderers[] = null;
         Coord corner, far;
@@ -117,32 +116,36 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         
         int last_update_index = 0;
         int render_skips = 0;
+        
         void update() {
-//			render_skips++;
-//			if (render_skips < update_frequency) {
-//				render_skips = 0;
-//			} else {
-//				return;
-//			}
-            Core.profileStart("update");
+            if (!anyRenderersDirty) {
+                //System.out.println("Not dirty");
+                last_update_index = 0;
+                return;
+            }
+            boolean start_from_begining = last_update_index == 0;
+            Core.profileStart("updateFzdsTerrain");
             checkGLError("FZDS before WorldRender update");
+            final int update_limit = 20; //NORELEASE?
+            int updates = 0;
             while (last_update_index < renderers.length) {
-                WorldRenderer wr = renderers[last_update_index];
+                WorldRenderer wr = renderers[last_update_index++];
                 if (wr.needsUpdate) {
                     wr.updateRenderer();
-                    last_update_index++;
-                    break;
+                    if (++updates == update_limit) {
+                        System.out.println("Update limit hit"); //NORELEASE: And the two others!
+                        break;
+                    }
                 }
-                last_update_index++;
             }
             if (last_update_index == renderers.length) {
                 last_update_index = 0;
             }
-//			for (int i = 0; i < renderers.length; i++) {
-//				renderers[i].updateRenderer();
-//				checkGLError("FZDS WorldRender update");
-//			}
+            if (start_from_begining) {
+                anyRenderersDirty = false;
+            }
             Core.profileEnd();
+            System.out.println("Everything updated");
         }
         
         void renderTerrain() {
@@ -243,17 +246,21 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
     }
     
     static void markBlocksForUpdate(DimensionSliceEntity dse, int lx, int ly, int lz, int hx, int hy, int hz) {
+        System.out.println("Dirtying"); //NORELEASE
         if (dse.renderInfo == null) {
             dse.renderInfo = instance.new DSRenderInfo(dse);
         }
         DSRenderInfo renderInfo = (DSRenderInfo) dse.renderInfo;
+        renderInfo.anyRenderersDirty = true;
         for (int i = 0; i < renderInfo.renderers.length; i++) {
             WorldRenderer wr = renderInfo.renderers[i];
-            if (FactorizationUtil.intersect(lx, lx, wr.posX, wr.posX + 16) &&
-                    FactorizationUtil.intersect(ly, ly, wr.posY, wr.posY + 16) && 
-                    FactorizationUtil.intersect(lz, lz, wr.posZ, wr.posZ + 16)) {
+            wr.markDirty();
+            //TODO NORELEASE IMPORTANT GAH
+            /*if (FactorizationUtil.intersect(lx, hx, wr.posX, wr.posX + 16) &&
+                    FactorizationUtil.intersect(ly, hy, wr.posY, wr.posY + 16) && 
+                    FactorizationUtil.intersect(lz, hz, wr.posZ, wr.posZ + 16)) {
                 wr.markDirty();
-            }
+            }*/
         }
     }
     
