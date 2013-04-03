@@ -206,7 +206,8 @@ public class BlockFactorization extends BlockContainer {
         // Is used for inventory!
         FactoryType ft = FactoryType.fromMd(md);
         if (ft == null) {
-            return BlockIcons.error;
+            return BlockIcons.default_icon;
+            //return BlockIcons.error;
         }
         TileEntityCommon rep = ft.getRepresentative();
         if (rep == null) {
