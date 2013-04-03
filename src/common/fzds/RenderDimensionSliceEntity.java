@@ -119,7 +119,6 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         
         void update() {
             if (!anyRenderersDirty) {
-                //System.out.println("Not dirty");
                 last_update_index = 0;
                 return;
             }
@@ -133,7 +132,6 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 if (wr.needsUpdate) {
                     wr.updateRenderer();
                     if (++updates == update_limit) {
-                        System.out.println("Update limit hit"); //NORELEASE: And the two others!
                         break;
                     }
                 }
@@ -145,7 +143,6 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 anyRenderersDirty = false;
             }
             Core.profileEnd();
-            System.out.println("Everything updated");
         }
         
         void renderTerrain() {
@@ -246,7 +243,6 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
     }
     
     static void markBlocksForUpdate(DimensionSliceEntity dse, int lx, int ly, int lz, int hx, int hy, int hz) {
-        System.out.println("Dirtying"); //NORELEASE
         if (dse.renderInfo == null) {
             dse.renderInfo = instance.new DSRenderInfo(dse);
         }
