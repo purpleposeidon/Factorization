@@ -122,7 +122,7 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements ITankCon
 
     @Override
     public void updateEntity() {
-        fan_rotation += Math.min(35, fan_speed);
+        fan_rotation += Math.min(35, fan_speed/5);
         if (worldObj.isRemote) {
             return;
         }
