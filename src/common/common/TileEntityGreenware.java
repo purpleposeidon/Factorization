@@ -688,7 +688,6 @@ public class TileEntityGreenware extends TileEntityCommon {
         startVec.yCoord += dy*scale;
         startVec.zCoord += dz*scale;
         MovingObjectPosition shortest = null;
-        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
         for (int i = 0; i < parts.size(); i++) {
             ClayLump lump = parts.get(i);
             lump.toBlockBounds(block);
@@ -706,8 +705,8 @@ public class TileEntityGreenware extends TileEntityCommon {
                     Vec3 m = mop.hitVec;
                     s = vp.getVecFromPool(s.xCoord, s.yCoord, s.zCoord);
                     m = vp.getVecFromPool(m.xCoord, m.yCoord, m.zCoord);
-                    offsetVector(player, s);
-                    offsetVector(player, m);
+                    offsetVector(startVec, s);
+                    offsetVector(startVec, m);
                     if (m.lengthVector() < s.lengthVector()) {
                         shortest = mop;
                     }
@@ -718,13 +717,14 @@ public class TileEntityGreenware extends TileEntityCommon {
         //return super.collisionRayTrace(w, x, y, z, startVec, endVec);
     }
     
-    private void offsetVector(EntityPlayer player, Vec3 v) {
-        v.xCoord -= player.posX;
-        v.yCoord -= player.posY;
-        v.zCoord -= player.posZ;
+    private void offsetVector(Vec3 player, Vec3 v) {
+        v.xCoord -= player.xCoord;
+        v.yCoord -= player.yCoord;
+        v.zCoord -= player.zCoord;
     }
     
     @ForgeSubscribe
+    @SideOnly(Side.CLIENT)
     public void renderCeramicsSelection(DrawBlockHighlightEvent event) {
         if (event.subID == -1) {
             return;
