@@ -25,7 +25,7 @@ import factorization.common.Core;
 public class HammerNet implements ITinyPacketHandler {
     public static class HammerNetType {
         public static final short rotation = 0, rotationVelocity = 1, rotationBoth = 2,
-                rightClickEntity = 3, leftClickEntity = 4, rightClickBlock = 5, leftClickBlock = 6;
+                rightClickEntity = 3, leftClickEntity = 4, rightClickBlock = 5, leftClickBlock = 6, leftClickEnd = 7;
     }
     
     @Override
