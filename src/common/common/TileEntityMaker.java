@@ -258,6 +258,7 @@ public class TileEntityMaker extends TileEntityFactorization {
             boolean state = input.readBoolean();
             if (!worldObj.isRemote) {
                 setTargets(target_id, state);
+                needLogic();
             } else {
                 // we might be receiving a message from someone else
                 // don't want to bounce it back to the server!
