@@ -27,7 +27,9 @@ public class WireRenderingCube {
         this.axis = new VectorUV(0, 0, 0);
         this.theta = 0;
 
-        setIcon(icon);
+        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+            setIcon(icon);
+        }
     }
     
     static float takeFloat(ArrayList<Object> args) {
