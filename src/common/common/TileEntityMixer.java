@@ -230,6 +230,9 @@ public class TileEntityMixer extends TileEntityFactorization implements
                 if (o instanceof ItemStack) {
                     this.inputs.add(((ItemStack)o).copy());
                 } else if (o instanceof Collection) {
+                    if (((Collection) o).size() == 0) {
+                        throw new WeirdRecipeException();
+                    }
                     ArrayList<ItemStack> parts = new ArrayList();
                     for (Object p : (Collection)o) {
                         if (p instanceof ItemStack) {
