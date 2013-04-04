@@ -24,7 +24,6 @@ import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
-import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
@@ -304,7 +303,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
             }
             if (recipe.getClass() == ShapelessOreRecipe.class) {
                 ShapelessOreRecipe sr = (ShapelessOreRecipe) recipe;
-                inputList = ReflectionHelper.getPrivateValue(ShapelessOreRecipe.class, sr, "input"); //thanks
+                inputList = sr.getInput();
                 output = sr.getRecipeOutput();
             }
             if (inputList == null) {
