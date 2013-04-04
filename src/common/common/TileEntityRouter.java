@@ -367,8 +367,7 @@ public class TileEntityRouter extends TileEntityFactorization {
                 continue;
             }
             hits++;
-            if (filter[i].isItemEqual(is) /* no NBT okay */) {
-                //NOTE: Ignores NBT data. I think this will be more useful.
+            if (FactorizationUtil.couldMerge(filter[i], is)) {
                 return true;
             } else if (filter[i].itemID == is.itemID && is.getItem().isDamageable() && filter[i].isItemDamaged() && is.isItemDamaged()) {
                 //a slightly damaged sword will match all other damaged swords. A new sword should not.
