@@ -962,7 +962,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "CCC",
                 'C', insulated_coil,
                 'L', "ingotLead");
-        oreRecipe(new ItemStack(insulated_coil),
+        oreRecipe(new ItemStack(insulated_coil, 4),
                 "LLL",
                 "LCL",
                 "LLL",
