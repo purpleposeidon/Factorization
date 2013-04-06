@@ -40,8 +40,9 @@ public class ItemGlazeBucket extends Item {
         int id = getBlockId(is);
         Block block = Block.blocksList[id];
         if (block == null) {
-            return BlockIcons.uv_test; //NORELEASE
-            //return BlockIcons.transparent;
+            return BlockIcons.uv_test;
+            //Or could return the error icon.
+            //But I think this'll look less terribly awful if a block goes away.
         }
         return block.getBlockTextureFromSideAndMetadata(getBlockSide(is), getBlockMd(is));
     }
