@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -150,6 +149,14 @@ public class TileEntityGreenware extends TileEntityCommon {
             //TODO NORELEASE: need to handle rotations (get the min/max of the vertices)
             b.setBlockBounds((minX - 16)/16F, (minY - 16)/16F, (minZ - 16)/16F, (maxX - 16)/16F, (maxY - 16)/16F, (maxZ - 16)/16F);
         }
+        
+        public void toRotatedBlockBounds(BlockRenderHelper b) {
+            toBlockBounds(b);
+            //TODO: This doesn't work! Lame!
+            /*b.beginNoIcons();
+            b.rotate(quat);
+            b.setBlockBoundsBasedOnRotation();*/
+        }
 
         public ClayLump copy() {
             ClayLump ret = new ClayLump();
@@ -167,6 +174,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         
         private static HashSet<Coord> cache = new HashSet();
         private static DeltaCoord m1 = new DeltaCoord(-1, -1, -1);
+        private static DeltaCoord d = new DeltaCoord();
         
         public Collection<Coord> getOccupiedBlocks(Coord base) {
             cache.clear();
@@ -174,7 +182,6 @@ public class TileEntityGreenware extends TileEntityCommon {
             min = min.add(m1);
             DeltaCoord max = new DeltaCoord(maxX/16, maxY/16, maxZ/16);
             max = max.add(m1);
-            DeltaCoord d = new DeltaCoord(); //NORELEASE static
             for (int dx = min.x; dx <= max.x; dx++) {
                 for (int dy = min.y; dy <= max.y; dy++) {
                     for (int dz = min.z; dz <= max.z; dz++) {
@@ -229,7 +236,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     
     public Icon getIcon(ClayLump lump) {
         switch (getState()) {
-        case WET: return BlockIcons.ceramics$wet;
+        case WET: return Block.blockClay.getBlockTextureFromSide(0);
         case DRY: return BlockIcons.ceramics$dry;
         case BISQUED:
         case UNFIRED_GLAZED:
@@ -690,7 +697,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         MovingObjectPosition shortest = null;
         for (int i = 0; i < parts.size(); i++) {
             ClayLump lump = parts.get(i);
-            lump.toBlockBounds(block);
+            lump.toRotatedBlockBounds(block);
             block.beginNoIcons();
             block.rotateMiddle(lump.quat);
             block.setBlockBoundsBasedOnRotation();
@@ -807,7 +814,8 @@ public class TileEntityGreenware extends TileEntityCommon {
     
     
     @Override
-    public boolean addCollisionBoxesToList(Block block, AxisAlignedBB aabb, List list, Entity entity) {
+    public boolean addCollisionBoxesToList(Block ignore, AxisAlignedBB aabb, List list, Entity entity) {
+        BlockRenderHelper block = entity.worldObj.isRemote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
         block.setBlockBounds(0, 0, 0, 1, 1F/8F, 1);
         ClayState state = getState();
         if (state == ClayState.WET || state == ClayState.DRY) {
@@ -817,7 +825,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             }
         }
         for (ClayLump lump : parts) {
-            lump.toBlockBounds(block);
+            lump.toRotatedBlockBounds(block);
             AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
             if (aabb.intersectsWith(a)) {
                 list.add(a);
