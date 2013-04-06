@@ -45,7 +45,7 @@ import factorization.client.gui.FactorizationNotify;
         clientSideRequired = true,
         tinyPacketHandler = NetworkFactorization.class
         )
-public class Core { //NORELEASE merge bugfixes from master into this branch, then make this branch master (or something...)
+public class Core {
     public static final String modId = "factorization";
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
