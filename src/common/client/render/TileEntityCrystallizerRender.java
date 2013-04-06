@@ -87,7 +87,12 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             Tessellator tess = Tessellator.instance;
             Icon tex = Block.waterMoving.getBlockTextureFromSide(1);
             if (sol.getItem() == Core.registry.acid) {
-                glColor4f(1F, 1F, 1F, 0.5F);
+                if (sol.getItemDamage() > 0) {
+                    tex = Block.lavaMoving.getBlockTextureFromSide(0);
+                    glColor4f(0.5F, 0.7F, 0F, 0.25F);
+                } else {
+                    glColor4f(1F, 0.7F, 0F, 0.5F);
+                }
                 glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
             } else if (sol.getItem() == Item.bucketMilk) {
                 float f = 0.9F;
@@ -103,15 +108,16 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             RenderEngine re = Minecraft.getMinecraft().renderEngine;
             //XXX TODO NORELEASE: fix renderer
             re.bindTexture(Core.texture_file_block);
-            float u = ((/*tex*/ 0 & 15) << 4) / 256.0F;
-            float v = (/*tex*/ 0 & 240) / 256.0F;
-            float w = 1F / 16F;
+            float u0 = tex.getMinU();
+            float v0 = tex.getMinV();
+            float u1 = tex.getMaxU();
+            float v1 = tex.getMaxV();
             tess.startDrawingQuads();
             tess.yOffset = 9F / 16F;
-            tess.addVertexWithUV(0, 0, 0, u, v);
-            tess.addVertexWithUV(0, 0, 1, u, v + w);
-            tess.addVertexWithUV(1, 0, 1, u + w, v + w);
-            tess.addVertexWithUV(1, 0, 0, u + w, v);
+            tess.addVertexWithUV(0, 0, 0, u0, v0);
+            tess.addVertexWithUV(0, 0, 1, u0, v1);
+            tess.addVertexWithUV(1, 0, 1, u1, v1);
+            tess.addVertexWithUV(1, 0, 0, u1, v0);
             tess.yOffset = 0;
             tess.draw();
             glDisable(GL_BLEND);
