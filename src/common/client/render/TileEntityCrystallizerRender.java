@@ -106,7 +106,6 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
                 glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_ALPHA);
             }
             RenderEngine re = Minecraft.getMinecraft().renderEngine;
-            //XXX TODO NORELEASE: fix renderer
             re.bindTexture(Core.texture_file_block);
             float u0 = tex.getMinU();
             float v0 = tex.getMinV();
