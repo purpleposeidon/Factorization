@@ -409,7 +409,7 @@ public class TileEntityRouter extends TileEntityFactorization {
             end = inv.size();
         }
         FzInv me = FactorizationUtil.openInventory(this, 0, false);
-        int toMove = upgradeThroughput ? buffer.stackSize : 1;
+        int toMove = upgradeThroughput ? 64 : 1;
         for (int slot = start; slot < end; slot++) {
             if (is_input) {
                 if (!itemPassesInsertFilter(inv, buffer)) {
@@ -810,6 +810,9 @@ public class TileEntityRouter extends TileEntityFactorization {
     
     @Override
     public boolean isStackValidForSlot(int s, ItemStack itemstack) {
+        if (upgradeItemFilter && is_input) {
+            return itemPassesExtractFilter(itemstack);
+        }
         return s == 0;
     }
 }

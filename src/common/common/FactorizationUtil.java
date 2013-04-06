@@ -458,6 +458,7 @@ public class FactorizationUtil {
         return openInventory(orig_inv, side, true);
     }
     
+    @SuppressWarnings("deprecation")
     public static FzInv openInventory(IInventory orig_inv, final int side, boolean openBothChests) {
         if (orig_inv instanceof TileEntityChest) {
             orig_inv = openDoubleChest((TileEntityChest) orig_inv, openBothChests);
@@ -511,6 +512,7 @@ public class FactorizationUtil {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean canAccessSlot(IInventory inv, int slot) {
         if (inv instanceof net.minecraft.inventory.ISidedInventory) {
             net.minecraft.inventory.ISidedInventory isi = (net.minecraft.inventory.ISidedInventory) inv;

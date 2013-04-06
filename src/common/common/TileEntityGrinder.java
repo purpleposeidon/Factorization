@@ -74,21 +74,20 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         return "Grinder";
     }
     
-    final private static int[] UP_s = {0}, OUT_s = {1};
+    final private static int[] INPUT_s = {0}, OUT_s = {1};
 
     @Override
     public int[] getSizeInventorySide(int s) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
         if (side == ForgeDirection.UP) {
-            return UP_s;
+            return INPUT_s;
         }
         return OUT_s;
     }
     
     @Override
-    public boolean isStackValidForSlot(int s, ItemStack itemstack) {
-        ForgeDirection side = ForgeDirection.getOrientation(s);
-        return side == ForgeDirection.UP;
+    public boolean isStackValidForSlot(int slotIndex, ItemStack itemstack) {
+        return slotIndex == 0;
     }
 
     @Override

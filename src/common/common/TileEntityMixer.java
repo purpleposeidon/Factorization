@@ -153,9 +153,8 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
     
     @Override
-    public boolean isStackValidForSlot(int s, ItemStack itemstack) {
-        ForgeDirection side = ForgeDirection.getOrientation(s);
-        return side == ForgeDirection.UP;
+    public boolean isStackValidForSlot(int slotIndex, ItemStack itemstack) {
+        return slotIndex == 0 || slotIndex == 1 || slotIndex == 2 || slotIndex == 3;
     }
 
     @Override

@@ -233,15 +233,17 @@ public class TileEntityBarrel extends TileEntityFactorization {
     }
     
     @Override
-    public boolean isStackValidForSlot(int s, ItemStack itemstack) {
-        ForgeDirection side = ForgeDirection.getOrientation(s);
-        if (side == ForgeDirection.UP) {
-            if (item == null) {
-                return true;
-            }
-            return itemMatch(itemstack);
+    public boolean isStackValidForSlot(int slotIndex, ItemStack itemstack) {
+        if (itemstack == null) {
+            return false;
         }
-        return false;
+        if (itemstack.isItemDamaged()) {
+            return false;
+        }
+        if (item == null) {
+            return slotIndex == ForgeDirection.UP.ordinal();
+        }
+        return itemMatch(itemstack);
     }
 
     void info(EntityPlayer entityplayer) {

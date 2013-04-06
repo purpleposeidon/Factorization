@@ -1,8 +1,5 @@
 package factorization.common;
 
-import static net.minecraftforge.common.ForgeDirection.DOWN;
-import static net.minecraftforge.common.ForgeDirection.UP;
-
 import java.io.DataInput;
 import java.io.IOException;
 
@@ -234,9 +231,8 @@ public class TileEntityMaker extends TileEntityFactorization {
     }
     
     @Override
-    public boolean isStackValidForSlot(int s, ItemStack itemstack) {
-        ForgeDirection side = ForgeDirection.getOrientation(s);
-        return side == UP || side == DOWN;
+    public boolean isStackValidForSlot(int slotIndex, ItemStack itemstack) {
+        return slotIndex == 0;
     }
 
     @Override

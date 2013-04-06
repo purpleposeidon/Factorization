@@ -11,10 +11,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.Icon;
+import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
-import net.minecraftforge.common.ForgeDirection;
-import static net.minecraftforge.common.ForgeDirection.*;
 
 public class TileEntitySlagFurnace extends TileEntityFactorization {
     ItemStack furnaceItemStacks[] = new ItemStack[4];
@@ -53,22 +52,27 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
         return "Slag Furnace";
     }
 
-    private static final int[] INPUT_s = {input, input + 1}, FUEL_s = {fuel}, OUTPUT_s = {output};
+    private static final int[] INPUT_s = {input, input + 1}, FUEL_s = {fuel}, OUTPUT_s = {output, output + 1};
     
     @Override
     public int[] getSizeInventorySide(int s) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
         switch (side) {
-        case DOWN: return FUEL_s;
+        case DOWN: return OUTPUT_s;
         case UP: return INPUT_s;
-        default: return OUTPUT_s;
+        default: return FUEL_s;
         }
     }
     
     @Override
-    public boolean isStackValidForSlot(int s, ItemStack itemstack) {
-        ForgeDirection side = ForgeDirection.getOrientation(s);
-        return side == DOWN || side == UP;
+    public boolean isStackValidForSlot(int slotIndex, ItemStack itemstack) {
+        if (slotIndex == 0) {
+            return true;
+        }
+        if (slotIndex == 1) {
+            return TileEntityFurnace.isItemFuel(itemstack);
+        }
+        return false;
     }
 
     @Override

@@ -1,8 +1,5 @@
 package factorization.common;
 
-import static net.minecraftforge.common.ForgeDirection.DOWN;
-import static net.minecraftforge.common.ForgeDirection.UP;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -34,21 +31,18 @@ public class TileEntityStamper extends TileEntityFactorization {
         return 2;
     }
 
-    static int[] VERT_sides = {0}, HORIZ_sides = {1};
+    static int[] OUTPUT_sides = {0}, INPUT_sides = {1};
     @Override
     public int[] getSizeInventorySide(int s) {
         switch (ForgeDirection.getOrientation(s)) {
-        case UP:
-        case DOWN:
-            return VERT_sides;
-        default: return HORIZ_sides;
+        case DOWN: return INPUT_sides;
+        default: return OUTPUT_sides;
         }
     }
     
     @Override
-    public boolean isStackValidForSlot(int s, ItemStack itemstack) {
-        ForgeDirection side = ForgeDirection.getOrientation(s);
-        return side == UP || side == DOWN;
+    public boolean isStackValidForSlot(int slotIndex, ItemStack itemstack) {
+        return slotIndex == 0;
     }
 
     @Override

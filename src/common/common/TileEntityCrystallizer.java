@@ -84,9 +84,8 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     }
     
     @Override
-    public boolean isStackValidForSlot(int s, ItemStack itemstack) {
-        ForgeDirection side = ForgeDirection.getOrientation(s);
-        return side != ForgeDirection.UP && side != ForgeDirection.DOWN;
+    public boolean isStackValidForSlot(int slotIndex, ItemStack itemstack) {
+        return slotIndex < inputs.length;
     }
 
     @Override
