@@ -65,7 +65,6 @@ public class ExoMountedPiston extends Item implements IExoUpgrade {
 
         Coord head;
         Coord foot;
-        //TODO NORELEASE: Test this in each quadrant
         head = new Coord(player).add(0, 1, 0);
         foot = new Coord(player);
 
