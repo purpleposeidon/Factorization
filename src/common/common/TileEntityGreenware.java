@@ -146,7 +146,6 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
         
         public void toBlockBounds(Block b) {
-            //TODO NORELEASE: need to handle rotations (get the min/max of the vertices)
             b.setBlockBounds((minX - 16)/16F, (minY - 16)/16F, (minZ - 16)/16F, (maxX - 16)/16F, (maxY - 16)/16F, (maxZ - 16)/16F);
         }
         
@@ -689,7 +688,6 @@ public class TileEntityGreenware extends TileEntityCommon {
         double scale = 5.2; //Diagonal of a 3³. (Was initially using scale = 2)
         //This isn't quite right; the dVector would properly be normalized here & rescaled to the max diameter. But we can survive without it.
         //Unnormalized length of dVector is 6m in surviavl mode IIRC. This'll be way longer than it needs to be.
-        //TODO NORELEASE: Check this against all 6 sides and at various distances
         //Why is it + instead of -? Hmm.
         startVec.xCoord += dx*scale;
         startVec.yCoord += dy*scale;
