@@ -1,5 +1,5 @@
 [u][b][size=6][anchor=ABOUT]Factorization[/anchor][/size][/b][/u]
-This mod adds many machines for processing ore and crafting. It also has a few other useful things. The latest update brings electric Charge.
+This mod adds many machines for processing ore and crafting. It also has a few other useful things.
 
 Direwolf20 has made a mod spotlight! (For 0.6.6)
 [youtube]http://www.youtube.com/watch?v=syVswXHTGBg[/youtube]
@@ -245,14 +245,6 @@ Push blocks everywhere! Be the Enderman! This will push a block that's in front 
 More Exo-Armor upgrades
 Router replacement
 [/spoiler]
-[spoiler]
-The clay sculpting tool is crafted with a bit of clay on a stick. Different classes of tools can be gotten at by crafting the tool by itself. And there's a second layer of tools that you can get at by shift-right-clicking the ground with them. In most cases the opposite effect (rotating the other way, or stretching the other way) can be gotten by holding shift while using.
-Another lump can be added by clicking on the sculpture with a clay ball.
-A single lump can't be larger than 1m³. They can be moved out of the sculpture's block, but must stay within the 3³ area.
-The purple tool selects a clay lump, and the currently selected lump is drawn slightly purple.
-Right click on the sculpture with wool to dry it up. Sculptures will also dry if they aren't handled.
-There is no firing or glazing at this time.
-[/spoiler]
 
 
 
@@ -267,10 +259,10 @@ This is a [url="http://files.minecraftforge.net/"]Minecraft Forge[/url] mod. It 
 
 
 [u][b][size=6][anchor=DOWNLOAD]Download[/anchor][/size][/b][/u]
-Factorization 0.7.26 (MC 1.5.1)
-[url="http://adf.ly/2137658/http://www.mediafire.com/?4v5l7km2syglyzd"]adfly + MediaFire[/url], or
-[url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.7.26.jar"]adfly + DropBox[/url]
-Built on 2013-04-03 against Minecraft Forge 7.7.0.605
+Factorization 0.7.27 (MC 1.5.1)
+[url="http://adf.ly/2137658/http://www.mediafire.com/?708dkp00bq9d833"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.7.27.jar"]adfly + DropBox[/url]
+Built on 2013-04-06 against Minecraft Forge 7.7.0.605
 
 Factorization 0.7.21 (MC 1.4.6)
 [url="http://adf.ly/2137658/http://www.mediafire.com/download.php?y73i8xhmyzsi1w7"]adfly + MediaFire[/url], or
@@ -278,6 +270,11 @@ Factorization 0.7.21 (MC 1.4.6)
 Built on 2013-03-08 against Minecraft Forge 6.5.0.488
 
 Old versions [spoiler]
+Factorization 0.7.26 (MC 1.5.1)
+[url="http://adf.ly/2137658/http://www.mediafire.com/?4v5l7km2syglyzd"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.7.26.jar"]adfly + DropBox[/url]
+Built on 2013-04-03 against Minecraft Forge 7.7.0.605
+
 Factorization 0.7.25 (MC 1.5.1)
 [url="http://adf.ly/2137658/http://www.mediafire.com/?libh6bnblrj9d3j"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.7.25.jar"]adfly + DropBox[/url]
