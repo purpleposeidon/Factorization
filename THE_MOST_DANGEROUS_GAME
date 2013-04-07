@@ -9,6 +9,7 @@ Take a SHOT each time he:
   - refers to a client-only class or method in a method that isn't
   - uses println without a NORELEASE
   - releases code that has NORELEASEs in it that aren't FZDS-related
+  - makes a shoddy git commit
 
 ANTISHOTS cancel out regular SHOTS. Take an ANTISHOT each time he:
   - fixes a bug in a released version
@@ -20,5 +21,6 @@ The SNACK is a peanut, or m&m, or similar. Eat N snacks when he:
   - uses a pre/post increment/decrement in a boolean test; N=2
   - tries to use code hotswaping, but it fails; N=3
   - undoes something in the SHOTS section; N between 1 and 6
+  - makes a git commit; N=1
 
 
