@@ -1,0 +1,24 @@
+The neptunepink mod-dev drinking game! The rules:
+Take a SHOT each time he:
+  - manually types a variant of "x, y, z" (including this one)
+  - uses the wrong cardinal direction
+  - adds a function to Coord.java
+  - writes TODO or XXX in a comment
+  - pulls a variable out of a function & makes it static
+  - spaces out for longer than 5 minutes
+  - refers to a client-only class or method in a method that isn't
+  - uses println without a NORELEASE
+  - releases code that has NORELEASEs in it that aren't FZDS-related
+
+ANTISHOTS cancel out regular SHOTS. Take an ANTISHOT each time he:
+  - fixes a bug in a released version
+  - uses a Coord function (max 1 anti-shot per function per session)
+  - makes an awesome or cool texture
+
+The SNACK is a peanut, or m&m, or similar. Eat N snacks when he:
+  - creates an internal class; N=8
+  - uses a pre/post increment/decrement in a boolean test; N=2
+  - tries to use code hotswaping, but it fails; N=3
+  - undoes something in the SHOTS section; N between 1 and 6
+
+
