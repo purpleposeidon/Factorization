@@ -57,16 +57,10 @@ public class BlockResource extends Block {
             }
             return BlockIcons.error;
         }
-        try {
+        if (md < icons.length) {
             return icons[md];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            if (!done_spam) {
-                Core.logWarning("Invalid BlockResource metadata value (further errors silenced)");
-                e.printStackTrace();
-                done_spam = true;
-            }
-            return BlockIcons.error;
         }
+        return null;
     }
     
     public void addCreativeItems(List itemList) {
