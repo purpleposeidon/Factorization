@@ -132,6 +132,12 @@ public enum FactoryType {
     }
 
     public static FactoryType fromMd(int md) {
+        if (md < 0) {
+            return null;
+        }
+        if (md >= mapper.mapping.length) {
+            return null;
+        }
         return mapper.mapping[md];
     }
 
