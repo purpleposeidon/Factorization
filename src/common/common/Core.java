@@ -49,7 +49,7 @@ public class Core {
     public static final String modId = "factorization";
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
-    public static final String version = "0.7.27"; //@VERSION@
+    public static final String version = "0.7.30"; //@VERSION@
     public Core() {
         registry = new Registry();
         exoCore = new ExoCore();
