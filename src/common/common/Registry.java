@@ -177,7 +177,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         ore_reduced = new ItemOreProcessing(itemID("oreReduced", 9036), 2 * 16 + 6, "reduced");
         ore_crystal = new ItemOreProcessing(itemID("oreCrystal", 9037), 2 * 16 + 7, "crystal");
         sludge = new ItemCraftingComponent(itemID("sludge", 9039), "sludge");
-        sludge.setHint("Byproduct of washing ore gravel");
         OreDictionary.registerOre("FZ.sludge", sludge);
         //ItemBlocks
         item_factorization = (ItemFactorization) Item.itemsList[factory_block.blockID];

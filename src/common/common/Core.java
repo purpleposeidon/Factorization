@@ -16,6 +16,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraft.util.StatCollector;
+import net.minecraft.util.StringTranslate;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
@@ -341,7 +342,21 @@ public class Core {
         profileEnd();
     }
 
-    public static void brand(List list) {
+    public static void brand(ItemStack is, List list) {
+        String hint_key = is.getItem().getUnlocalizedName(is) + ".hint";
+        /* func_94520_b = containsTranslateKey */
+        StringTranslate st = StringTranslate.getInstance();
+        if (st.func_94520_b(hint_key)) {
+            String hint = StringTranslate.getInstance().translateKey(hint_key);
+            if (hint != null) {
+                hint = hint.trim();
+                if (hint.length() > 0) {
+                    for (String s : hint.split("\\\\n") /* whee */) {
+                        list.add(s);
+                    }
+                }
+            }
+        }
         if (add_branding) {
             list.add("Factorization");
         }

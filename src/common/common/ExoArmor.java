@@ -308,6 +308,6 @@ public class ExoArmor extends ItemArmor
                 infoList.add(s);
             }
         }
-        Core.brand(infoList);
+        Core.brand(is, infoList);
     }
 }

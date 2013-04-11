@@ -101,6 +101,6 @@ public class ItemAngularSaw extends Item {
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List list, boolean detailed) {
         super.addInformation(is, player, list, detailed);
-        Core.brand(list);
+        Core.brand(is, list);
     }
 }

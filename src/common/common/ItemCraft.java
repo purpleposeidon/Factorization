@@ -79,7 +79,7 @@ public class ItemCraft extends Item {
             if (is.getItemDamage() == Core.registry.diamond_shard_packet.getItemDamage() && is != Core.registry.diamond_shard_packet) {
                 addInformation(Core.registry.diamond_shard_packet, player, list, verbose);
             } else {
-                Core.brand(list);
+                Core.brand(is, list);
                 return;
             }
         }
@@ -108,7 +108,7 @@ public class ItemCraft extends Item {
         } else {
             list.add("Empty");
         }
-        Core.brand(list);
+        Core.brand(is, list);
     }
 
     public boolean addItem(ItemStack is, int i, ItemStack what, TileEntity where) {

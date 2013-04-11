@@ -84,6 +84,6 @@ class ExoBuoyantBarrel extends Item implements IExoUpgrade {
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         list.add("Exo-Upgrade");
-        Core.brand(list);
+        Core.brand(is, list);
     }
 }

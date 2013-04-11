@@ -119,7 +119,7 @@ public class ItemSculptingTool extends Item {
         for (ToolMode nextMode = mode.next; nextMode != mode; nextMode = nextMode.next) {
             list.add("(" + nextMode.name + ")");
         }
-        Core.brand(list);
+        Core.brand(is, list);
     }
     
     void changeMode(ItemStack is) {

@@ -206,7 +206,7 @@ public class ItemGlazeBucket extends Item {
                 return; //No Core.brand
             }
         }
-        Core.brand(list);
+        Core.brand(is, list);
     }
 
     @Override

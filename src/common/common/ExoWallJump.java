@@ -166,6 +166,6 @@ public class ExoWallJump extends Item implements IExoUpgrade, ITickHandler {
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
         infoList.add("Exo-Upgrade");
-        Core.brand(infoList);
+        Core.brand(is, infoList);
     }
 }

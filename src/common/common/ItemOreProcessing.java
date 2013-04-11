@@ -116,7 +116,7 @@ public class ItemOreProcessing extends Item implements IActOnCraft {
 
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
-        Core.brand(infoList);
+        Core.brand(is, infoList);
     }
     
     public ItemStack makeStack(OreType ot) {

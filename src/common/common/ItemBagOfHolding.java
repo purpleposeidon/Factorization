@@ -191,12 +191,12 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
         // Bag of Holding
         // Stores 5 columns
         if (is.getTagCompound() == null) {
-            Core.brand(list);
+            Core.brand(is, list);
             return;
         }
         int n = getNumOfCols(is);
         list.add("Stores " + n + " columns");
-        Core.brand(list);
+        Core.brand(is, list);
     }
 
     @Override

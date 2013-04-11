@@ -67,6 +67,6 @@ public class ItemWrathIgniter extends Item {
 
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
-        Core.brand(infoList);
+        Core.brand(is, infoList);
     }
 }
