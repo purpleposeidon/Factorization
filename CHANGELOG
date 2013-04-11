@@ -1,3 +1,7 @@
+0.7.31
+  Normalized machine input/output sides to match vanilla's new style
+  Fire engines can't read.
+
 0.7.30
   attempted (?) fix for sculpture collision crash
 
