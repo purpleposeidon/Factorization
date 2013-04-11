@@ -79,10 +79,10 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     @Override
     public int[] getSizeInventorySide(int s) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
-        if (side == ForgeDirection.UP) {
-            return INPUT_s;
+        if (side == ForgeDirection.DOWN) {
+            return OUT_s;
         }
-        return OUT_s;
+        return INPUT_s;
     }
     
     @Override

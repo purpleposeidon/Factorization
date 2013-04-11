@@ -218,21 +218,24 @@ public class TileEntityMaker extends TileEntityFactorization {
         paper = readItem("paper", tag);
     }
     
-    private static final int[] DOWN_s = {paper_slot, craft_slot}, UP_s = {input_slot}, OUT_s = {output_slot};
+    private static final int[] PACKET_s = {paper_slot, craft_slot}, MATERIAL_s = {input_slot}, OUT_s = {output_slot};
 
     @Override
     public int[] getSizeInventorySide(int s) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
         switch (side) {
-        case DOWN: return DOWN_s;
-        case UP: return UP_s;
-        default: return OUT_s;
+        case DOWN: return OUT_s;
+        case UP: return MATERIAL_s;
+        default: return PACKET_s;
         }
     }
     
     @Override
     public boolean isStackValidForSlot(int slotIndex, ItemStack itemstack) {
-        return slotIndex == 0;
+        if (itemstack == null) {
+            return false;
+        }
+        return slotIndex == 0 || (slotIndex == 1 && itemstack.getItem() == Core.registry.item_craft || itemstack.getItem() == Item.paper);
     }
 
     @Override

@@ -146,10 +146,10 @@ public class TileEntityMixer extends TileEntityFactorization implements
     @Override
     public int[] getSizeInventorySide(int s) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
-        if (side == ForgeDirection.UP) {
-            return IN_s;
+        if (side == ForgeDirection.DOWN) {
+            return OUT_s;
         }
-        return OUT_s;
+        return IN_s;
     }
     
     @Override
