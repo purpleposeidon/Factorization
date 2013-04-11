@@ -48,7 +48,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
 
     String[] side_names = { "bottom sides", "top sides", "§asouth§r sides", "§3north§r sides", "§eeast§r sides",
             "§5west§r sides" };
-    String[] ejection_side_names = { "eject down", "eject up", "eject §asouth§r", "eject §3north§r", "eject §eeast§r", "eject §5west§r" };
+    String[] ejection_side_names = { "eject up", "eject down", "eject §asouth§r", "eject §3north§r", "eject §eeast§r", "eject §5west§r" };
     static final String any_inv = "all machines in network";
 
     public GuiRouter(ContainerFactorization cont) {
