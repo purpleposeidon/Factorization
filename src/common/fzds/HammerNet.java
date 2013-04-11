@@ -3,12 +3,14 @@ package factorization.fzds;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.net.Socket;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetServerHandler;
 import net.minecraft.network.packet.NetHandler;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet131MapData;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
@@ -25,7 +27,7 @@ import factorization.common.Core;
 public class HammerNet implements ITinyPacketHandler {
     public static class HammerNetType {
         public static final short rotation = 0, rotationVelocity = 1, rotationBoth = 2,
-                rightClickEntity = 3, leftClickEntity = 4, rightClickBlock = 5, leftClickBlock = 6, leftClickEnd = 7;
+                rightClickEntity = 3, leftClickEntity = 4, rightClickBlock = 5, digPacket = 6;
     }
     
     @Override
@@ -67,6 +69,7 @@ public class HammerNet implements ITinyPacketHandler {
         
     }
     
+    static Socket fakeSocket = new Socket();
     void handleDseClick(NetHandler handler, Packet131MapData mapData) throws IOException {
         World world = handler.getPlayer().worldObj;
         World shadow = DeltaChunk.getServerShadowWorld();
@@ -94,7 +97,6 @@ public class HammerNet implements ITinyPacketHandler {
                 ipp.attackTargetEntityWithCurrentItem(smacked);
             }
             break;
-        case HammerNetType.leftClickBlock:
         case HammerNetType.rightClickBlock:
             int hitX = dis.readInt();
             int hitY = dis.readInt();
@@ -104,15 +106,19 @@ public class HammerNet implements ITinyPacketHandler {
             float yOffset = dis.readFloat();
             float zOffset = dis.readFloat();
             
-            if (packetType == HammerNetType.leftClickBlock) {
-                ipp.theItemInWorldManager.onBlockClicked(hitX, hitY, hitZ, sideHit);
-            } else if (packetType == HammerNetType.rightClickBlock) {
-                ItemStack is = player.getHeldItem();
-                ipp.theItemInWorldManager.activateBlockOrUseItem(ipp, shadow, is, hitX, hitY, hitZ, sideHit, xOffset, yOffset, zOffset);
+            ItemStack is = player.getHeldItem();
+            ipp.theItemInWorldManager.activateBlockOrUseItem(ipp, shadow, is, hitX, hitY, hitZ, sideHit, xOffset, yOffset, zOffset);
+            break;
+        case HammerNetType.digPacket:
+            System.out.println("We've gotten a wrapped up dig packet"); //NORELEASE
+            Packet p = Packet.readPacket(server.getLogAgent(), dis, true /* meaning server-side */, fakeSocket);
+            System.out.println("Dig packet> " + p); //NORELEASE
+            if (p != null) {
+                p.processPacket(handler);
             }
             break;
         default:
-            ((NetServerHandler) handler).kickPlayerFromServer("DeltaChunk: bad click packet");
+            ((NetServerHandler) handler).kickPlayerFromServer("DeltaChunk: bad interaction packet");
             break;
         }
         

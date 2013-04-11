@@ -1,5 +1,8 @@
 package factorization.fzds;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Iterator;
 
@@ -8,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.NetClientHandler;
+import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -18,6 +22,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.NetHandler;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.Packet14BlockDig;
 import net.minecraft.network.packet.Packet1Login;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.AxisAlignedBB;
@@ -35,6 +41,7 @@ import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
@@ -471,5 +478,120 @@ public class HammerClientProxy extends HammerProxy {
     @Override
     MovingObjectPosition getShadowHit() {
         return shadowSelected;
+    }
+    
+    @Override
+    void mineBlock(final MovingObjectPosition mop) {
+        final Minecraft mc = Minecraft.getMinecraft();
+        final EntityClientPlayerMP player = mc.thePlayer;
+        final PlayerControllerMP origController = mc.playerController;
+        
+        mc.playerController = new PlayerControllerMP(mc, player.sendQueue) {
+            void pushWrapper() {
+                setShadowWorld();
+            }
+            
+            void popWrapper() {
+                restoreRealWorld();
+            }
+            
+            void sendDigPacket(Packet toWrap) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                DataOutputStream dos = new DataOutputStream(baos);
+                try {
+                    dos.write(toWrap.getPacketId());
+                    toWrap.writePacketData(dos);
+                } catch (IOException e) {
+                    e.printStackTrace(); //Isn't there some guava thing for this?
+                }
+                Packet toSend = PacketDispatcher.getTinyPacket(Hammer.instance, HammerNet.HammerNetType.digPacket, baos.toByteArray());
+                System.out.println("SEND: " + toWrap); //NORELEASE
+                PacketDispatcher.sendPacketToServer(toSend);
+                
+            }
+            
+            void resetController() {
+                mc.playerController = origController;
+                System.out.println("Resetting controller"); //NORELEASE
+            }
+            
+            //NOTE: Incomplete, because java sucks. Are there any other functions we'll need?
+            
+            @Override
+            public void resetBlockRemoving() {
+                System.out.println("HCP.PCMP.resetBlockRemoving"); //NORELEASE
+                sendDigPacket(new Packet14BlockDig(1, mop.blockX, mop.blockY, mop.blockZ, mop.sideHit));
+                resetController();
+            }
+            
+            @Override
+            public void clickBlock(int x, int y, int z, int side) {
+                System.out.println("HCP.PCMP.clickBlock"); //NORELEASE
+                //Unlike vanilla's, this should only be called during the mining. Not at the start. Not at the cancellation. Not when we switch to a different one. (HOPEFULLY)
+                pushWrapper();
+                try {
+                    clickBlock_implementation(x, y, z, side);
+                } finally {
+                    popWrapper();
+                }
+            }
+            
+            public void clickBlock_implementation(int x, int y, int z, int side) {
+                //Very terribly copied from clickBlock with this change: sendDigPacket instead of using addToSendQueue
+                //And also adding resetController call after the block gets broken
+                if (!this.currentGameType.isAdventure() || mc.thePlayer.canCurrentToolHarvestBlock(x, y, z))
+                {
+                    if (this.currentGameType.isCreative())
+                    {
+                        sendDigPacket(new Packet14BlockDig(0, x, y, z, side));
+                        clickBlockCreative(this.mc, this, x, y, z, side);
+                        this.blockHitDelay = 5;
+                    }
+                    else if (!this.isHittingBlock || !this.func_85182_a(x, y, z) /* sameToolAndBlock */)
+                    {
+                        if (this.isHittingBlock)
+                        {
+                            sendDigPacket(new Packet14BlockDig(1, this.currentBlockX, this.currentBlockY, this.currentblockZ, side));
+                        }
+
+                        sendDigPacket(new Packet14BlockDig(0, x, y, z, side));
+                        int i1 = this.mc.theWorld.getBlockId(x, y, z);
+
+                        if (i1 > 0 && this.curBlockDamageMP == 0.0F)
+                        {
+                            Block.blocksList[i1].onBlockClicked(this.mc.theWorld, x, y, z, this.mc.thePlayer);
+                        }
+
+                        if (i1 > 0 && Block.blocksList[i1].getPlayerRelativeBlockHardness(this.mc.thePlayer, this.mc.thePlayer.worldObj, x, y, z) >= 1.0F)
+                        {
+                            this.onPlayerDestroyBlock(x, y, z, side);
+                            resetController();
+                        }
+                        else
+                        {
+                            this.isHittingBlock = true;
+                            this.currentBlockX = x;
+                            this.currentBlockY = y;
+                            this.currentblockZ = z;
+                            this.field_85183_f = this.mc.thePlayer.getHeldItem();
+                            this.curBlockDamageMP = 0.0F;
+                            this.stepSoundTickCounter = 0.0F;
+                            this.mc.theWorld.destroyBlockInWorldPartially(this.mc.thePlayer.entityId, this.currentBlockX, this.currentBlockY, this.currentblockZ, (int)(this.curBlockDamageMP * 10.0F) - 1);
+                        }
+                    }
+                }
+            }
+            
+            
+            
+            @Override
+            public void attackEntity(EntityPlayer par1EntityPlayer, Entity par2Entity) {
+                //likely will need stuff in here
+                // TODO Auto-generated method stub
+                System.out.println("HCP.PCMP.attackEntity"); //NORELEASE
+                super.attackEntity(par1EntityPlayer, par2Entity);
+            }
+        };
+        mc.playerController.clickBlock(mop.blockX, mop.blockY, mop.blockZ, mop.sideHit);
     }
 }

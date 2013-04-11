@@ -49,7 +49,7 @@ public class DseRayTarget extends Entity {
             handle(event, event.target, true);
         }
         
-        void handle(PlayerEvent event, Entity target, boolean right) {
+        void handle(PlayerEvent event, Entity target, boolean rightClick) {
             if (target.getClass() != DseRayTarget.class) {
                 return;
             }
@@ -63,11 +63,16 @@ public class DseRayTarget extends Entity {
             Packet toSend = null;
             switch (hit.typeOfHit) {
             case ENTITY:
-                toSend = HammerNet.makePacket(right ? HammerNetType.rightClickEntity : HammerNetType.leftClickEntity, ray.parent.entityId);
+                toSend = HammerNet.makePacket(rightClick ? HammerNetType.rightClickEntity : HammerNetType.leftClickEntity, ray.parent.entityId);
                 break;
             case TILE:
-                toSend = HammerNet.makePacket(right ? HammerNetType.rightClickBlock : HammerNetType.leftClickBlock, hit.blockX, hit.blockY, hit.blockZ, hit.sideHit,
-                        (float) (hit.hitVec.xCoord - hit.blockX), (float) (hit.hitVec.yCoord - hit.blockY), (float) (hit.hitVec.zCoord - hit.blockZ));
+                if (rightClick) {
+                    toSend = HammerNet.makePacket(HammerNetType.rightClickBlock, hit.blockX, hit.blockY, hit.blockZ, hit.sideHit,
+                            (float) (hit.hitVec.xCoord - hit.blockX), (float) (hit.hitVec.yCoord - hit.blockY), (float) (hit.hitVec.zCoord - hit.blockZ));
+                } else {
+                    Hammer.proxy.mineBlock(hit);
+                    return;
+                }
                 break;
             default:
                 Core.logWarning("What did you just click? " + hit.typeOfHit + " " + hit);

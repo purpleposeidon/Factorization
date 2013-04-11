@@ -1,12 +1,12 @@
 package factorization.fzds.api;
 
 public enum DeltaCapability {
-    //TODO: Implement SCALE, TRANSPARENT, and INTERACT
+    //TODO: Implement SCALE, TRANSPARENT, and INTERACT, BUILD
     COLLIDE, MOVE, ROTATE, DRAG,
     TAKE_INTERIOR_ENTITIES, REMOVE_EXTERIOR_ENTITIES, TRANSFER_PLAYERS,
-    ORACLE, EMPTY, SCALE, TRANSPARENT, INTERACT;
+    ORACLE, EMPTY, SCALE, TRANSPARENT, INTERACT, BUILD;
     //Do not re-order this list, only append.
-    public final int bit;
+    public final int bit; //TODO NORELEASE: make this a long!
     
     DeltaCapability() {
         this.bit = 1 << ordinal();

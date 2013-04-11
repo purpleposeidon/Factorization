@@ -95,4 +95,9 @@ public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdd
         parent_id = data.readInt();
         offset = Vec3.createVectorHelper(data.readDouble(), data.readDouble(), data.readDouble());
     }
+    
+    @Override
+    public Entity[] getParts() {
+        return parent == null ? null : parent.getParts();
+    }
 }
