@@ -1,3 +1,6 @@
+0.7.30
+  attempted (?) fix for sculpture collision crash
+
 0.7.27
   The recipe for coils now gives you 4 instead of 1!
   Changed the sidedness of things so that they're hopper-friendly
