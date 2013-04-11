@@ -813,7 +813,8 @@ public class TileEntityGreenware extends TileEntityCommon {
     
     @Override
     public boolean addCollisionBoxesToList(Block ignore, AxisAlignedBB aabb, List list, Entity entity) {
-        BlockRenderHelper block = entity.worldObj.isRemote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
+        boolean remote = (entity != null && entity.worldObj != null) ? entity.worldObj.isRemote : FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT;
+        BlockRenderHelper block = remote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
         block.setBlockBounds(0, 0, 0, 1, 1F/8F, 1);
         ClayState state = getState();
         if (state == ClayState.WET || state == ClayState.DRY) {
