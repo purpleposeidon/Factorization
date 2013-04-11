@@ -370,7 +370,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         recipe(new ItemStack(logicMatrixIdentifier),
                 "MiX",
                 'M', logicMatrix,
-                'i', Item.spiderEye,
+                'i', Item.field_94583_ca /* netherquartz */,
                 'X', logicMatrixProgrammer);
         recipe(new ItemStack(logicMatrixProgrammer),
                 "MiX",

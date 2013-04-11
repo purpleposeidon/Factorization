@@ -1,3 +1,7 @@
+0.7.32
+  Added an item hint system! What items need hints?
+  The Logic Matrix Identifier uses netherquartz instead now
+
 0.7.31
   Normalized machine input/output sides to match vanilla's new style
   Fire engines can't read.
