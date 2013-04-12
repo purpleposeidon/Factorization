@@ -12,7 +12,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Icon;
-import net.minecraftforge.common.IArmorTextureProvider;
 import net.minecraftforge.common.ISpecialArmor;
 import factorization.api.ExoStateShader;
 import factorization.api.ExoStateType;
@@ -20,7 +19,7 @@ import factorization.api.IExoUpgrade;
 import factorization.common.ExoCore.ExoPlayerState;
 
 public class ExoArmor extends ItemArmor
-        implements ISpecialArmor, IArmorTextureProvider {
+        implements ISpecialArmor {
     public int slotCount = 2;
     public ExoArmor(int par1, int armorType) {
         super(par1, EnumArmorMaterial.CHAIN, 0, armorType);
