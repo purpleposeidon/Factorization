@@ -421,7 +421,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "D ",
                 " B",
                 'D', diamond_shard,
-                'B', Block.netherBrick);
+                'B', Item.field_94584_bZ /* netherbrick */);
         //recipe(new ItemStack(wrath_igniter), // ah hell naw
         //		"D ",
         //		" B",
@@ -928,7 +928,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "WSW",
                 "W/W",
                 "LIL",
-                'W', Block.planks,
+                'W', "plankWood",
                 'S', Item.sign,
                 '/', Item.stick,
                 'L', "ingotLead",
