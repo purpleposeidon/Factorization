@@ -91,7 +91,7 @@ public class NEI_CrystallizerRecipeConfig extends TemplateRecipeHandler implemen
             ArrayList<PositionedStack> ret = new ArrayList();
             ret.add(new PositionedStack(cr.input, 75, 2 + 15));
             if (cr.inverium_count > 0) {
-                ItemStack inverium = new ItemStack(Core.registry.inverium, cr.inverium_count, 1);
+                ItemStack inverium = new ItemStack(Core.registry.inverium, cr.inverium_count, 1 /* TODO: This'll need to be updated when it becomes fake */);
                 ret.add(new PositionedStack(inverium, 103, 44 + 15));
                 ret.add(new PositionedStack(cr.solution, 47, 44 + 15));
             } else {
