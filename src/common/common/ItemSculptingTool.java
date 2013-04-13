@@ -187,7 +187,7 @@ public class ItemSculptingTool extends Item {
                     Core.notify(player, here, "Need wood slab\nAnd %s clay", "" + neededClay);
                     return false;
                 }
-                inv.pull(new ItemStack(Block.woodSingleSlab, 1, FactorizationUtil.WILDCARD_DAMAGE), 1, false);
+                inv.pull(FactorizationUtil.makeWildcard(Block.woodSingleSlab), 1, false);
                 inv.pull(new ItemStack(Item.clay), gw.parts.size(), false);
             }
             TileEntityGreenware rep = (TileEntityGreenware) FactoryType.CERAMIC.getRepresentative();

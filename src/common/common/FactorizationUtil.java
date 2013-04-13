@@ -38,6 +38,13 @@ public class FactorizationUtil {
     //ItemStack handling
     public static final int WILDCARD_DAMAGE = Short.MAX_VALUE; //TODO, copy from Forge?
     
+    public static ItemStack makeWildcard(Item item) {
+        return new ItemStack(item, 1, WILDCARD_DAMAGE);
+    }
+    
+    public static ItemStack makeWildcard(Block item) {
+        return new ItemStack(item, 1, WILDCARD_DAMAGE);
+    }
     
     /**
      * Compare includes NBT and damage value; ignores stack size
