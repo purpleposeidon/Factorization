@@ -197,9 +197,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         for (ItemStack is : inputs) {
             if (is == null) {
                 continue;
-            } else  if (toMatch.getItemDamage() == FactorizationUtil.WILDCARD_DAMAGE && is.itemID == toMatch.itemID) {
-                count += is.stackSize;
-            } else  if (FactorizationUtil.couldMerge(is, toMatch)) {
+            } else if (FactorizationUtil.wildcardSimilar(toMatch, is)) {
                 count += is.stackSize;
             }
         }
@@ -223,7 +221,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         }
 
         boolean matches(TileEntityCrystallizer crys) {
-            if (crys.countMaterial(new ItemStack(Core.registry.inverium, 1, FactorizationUtil.WILDCARD_DAMAGE)) < inverium_count) {
+            if (crys.countMaterial(FactorizationUtil.makeWildcard(Core.registry.inverium)) < inverium_count) {
                 return false;
             }
             if (crys.output != null) {
@@ -285,7 +283,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         }
 
         void apply(TileEntityCrystallizer crys) {
-            ItemStack inverium = new ItemStack(Core.registry.inverium, 0, -1);
+            ItemStack inverium = FactorizationUtil.makeWildcard(Core.registry.inverium);
             for (int i = 0; i < crys.inputs.length; i++) {
                 ItemStack is = crys.inputs[i];
                 if (is != null && FactorizationUtil.couldMerge(input, is)) {
