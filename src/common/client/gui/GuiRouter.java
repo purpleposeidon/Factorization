@@ -73,6 +73,9 @@ public class GuiRouter extends GuiContainer implements IClickable {
             if (invDistance > max_dist) {
                 continue;
             }
+            if (!(ent instanceof IInventory)) {
+                continue;
+            }
             String invName = router.getIInventoryName((IInventory) ent);
             if (invName == null) {
                 continue;
