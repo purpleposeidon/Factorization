@@ -339,7 +339,13 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
     
     private static boolean isOkayRecipeItem(ItemStack is) {
+        if (is == null) {
+            return false;
+        }
         Item item = is.getItem();
+        if (item == null) {
+            return false;
+        }
         if (item == Item.paper || item == Item.book) {
             return false;
         }
@@ -507,7 +513,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     boolean dumpBuffer() {
         if (outputBuffer.size() > 0) {
             ItemStack toAdd = outputBuffer.get(0);
-            FzInv out = FactorizationUtil.openInventory(this, ForgeDirection.EAST.ordinal());
+            FzInv out = FactorizationUtil.openInventory(this, ForgeDirection.DOWN);
             out.setInsertForce(true);
             toAdd = out.push(toAdd);
             if (toAdd == null) {
