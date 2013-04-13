@@ -454,6 +454,14 @@ public class FactorizationUtil {
         }
     }
     
+    public static FzInv openInventory(IInventory orig_inv, ForgeDirection side) {
+        return openInventory(orig_inv, side.ordinal(), true);
+    }
+    
+    public static FzInv openInventory(IInventory orig_inv, ForgeDirection side, boolean openBothChests) {
+        return openInventory(orig_inv, side.ordinal(), openBothChests);
+    }
+    
     public static FzInv openInventory(IInventory orig_inv, final int side) {
         return openInventory(orig_inv, side, true);
     }
