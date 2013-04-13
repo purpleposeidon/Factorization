@@ -12,6 +12,7 @@ import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import factorization.common.Core;
 import factorization.fzds.HammerNet.HammerNetType;
+import factorization.fzds.api.DeltaCapability;
 
 public class DseRayTarget extends Entity {
     //This is used on the client side to give the player something to smack
@@ -58,8 +59,12 @@ public class DseRayTarget extends Entity {
             if (hit == null) {
                 return; //huh.
             }
-            event.setCanceled(true);
             DseRayTarget ray = (DseRayTarget) target;
+            DimensionSliceEntity parent = ray.parent;
+            if (!parent.can(DeltaCapability.INTERACT)) {
+                return;
+            }
+            event.setCanceled(true);
             Packet toSend = null;
             switch (hit.typeOfHit) {
             case ENTITY:
@@ -67,11 +72,20 @@ public class DseRayTarget extends Entity {
                 break;
             case TILE:
                 if (rightClick) {
+                    if (!parent.can(DeltaCapability.BLOCK_PLACE)) {
+                        return;
+                    }
                     toSend = HammerNet.makePacket(HammerNetType.rightClickBlock, hit.blockX, hit.blockY, hit.blockZ, hit.sideHit,
                             (float) (hit.hitVec.xCoord - hit.blockX), (float) (hit.hitVec.yCoord - hit.blockY), (float) (hit.hitVec.zCoord - hit.blockZ));
                 } else {
-                    Hammer.proxy.mineBlock(hit);
-                    return;
+                    if (!parent.can(DeltaCapability.BLOCK_MINE)) {
+                        return;
+                    }
+                    //TODO XXX FIXME: Implement proper digging
+                    toSend = HammerNet.makePacket(HammerNetType.leftClickBlock, hit.blockX, hit.blockY, hit.blockZ, hit.sideHit,
+                            (float) (hit.hitVec.xCoord - hit.blockX), (float) (hit.hitVec.yCoord - hit.blockY), (float) (hit.hitVec.zCoord - hit.blockZ));
+                    //Hammer.proxy.mineBlock(hit);
+                    //return;
                 }
                 break;
             default:

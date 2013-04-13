@@ -7,6 +7,7 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -39,7 +40,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     private Coord hammerCell, farCorner;
     Vec3 centerOffset;
     
-    private int capabilities = DeltaCapability.of(DeltaCapability.MOVE, DeltaCapability.COLLIDE, DeltaCapability.DRAG);
+    private long capabilities = DeltaCapability.of(DeltaCapability.MOVE, DeltaCapability.COLLIDE, DeltaCapability.DRAG, DeltaCapability.REMOVE_ITEM_ENTITIES);
     
     AxisAlignedBB realArea = null;
     MetaAxisAlignedBB metaAABB = null;
@@ -78,6 +79,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         if (lowerCorner.w != DeltaChunk.getWorld(worldObj)) {
             throw new IllegalArgumentException("My corners are not shadow!");
         }
+        Coord.sort(lowerCorner, upperCorner);
         this.hammerCell = lowerCorner;
         this.farCorner = upperCorner;
         DeltaCoord dc = upperCorner.difference(lowerCorner);
@@ -173,7 +175,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         farCorner = hammerCell.copy();
         
         
-        capabilities = tag.getInteger("cap");
+        capabilities = tag.getLong("cap");
         rotation = Quaternion.loadFromTag(tag, "r");
         rotationalVelocity = Quaternion.loadFromTag(tag, "w");
         centerOffset = Vec3.createVectorHelper(0, 0, 0);
@@ -186,7 +188,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
 
     @Override
     protected void writeEntityToNBT(NBTTagCompound tag) {
-        tag.setInteger("cap", capabilities);
+        tag.setLong("cap", capabilities);
         rotation.writeToTag(tag, "r");
         rotationalVelocity.writeToTag(tag, "w");
         tag.setFloat("cox", (float) centerOffset.xCoord);
@@ -457,6 +459,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 if (can(DeltaCapability.REMOVE_EXTERIOR_ENTITIES)) {
                     removeExteriorEntities();
                 }
+                if (can(DeltaCapability.REMOVE_ITEM_ENTITIES)) {
+                    removeItemEntities();
+                }
             }
             if (isDead) {
                 endSlice();
@@ -514,6 +519,32 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         
     }
     
+    private void removeItemEntities() {
+        //Move entities outside the bounds in the shadow world into the real world
+        for (int x = hammerCell.x; x <= farCorner.x; x += 16) {
+            for (int z = hammerCell.z; z <= farCorner.z; z += 16) {
+                if (!worldObj.blockExists(x, 64, z)) {
+                    continue;
+                }
+                Chunk chunk = worldObj.getChunkFromBlockCoords(x, z);
+                for (int j = 0; j < chunk.entityLists.length; j++) {
+                    List<Entity> l = chunk.entityLists[j];
+                    for (int k = 0; k < l.size(); k++) {
+                        Entity ent = l.get(k); //This is probably an ArrayList.
+                        if (ent.posY < 0 || ent.posY > worldObj.getActualHeight() || ent == this /* oh god what */) {
+                            continue;
+                        }
+                        if (ent instanceof EntityItem) {
+                            ejectEntity(ent);
+                        }
+                    }
+                }
+                
+            }
+        }
+        
+    }
+    
     boolean forbidEntityTransfer(Entity ent) {
 //		if (ent instanceof EntityPlayerMP) {
 //			EntityPlayerMP player = (EntityPlayerMP) ent;
@@ -545,7 +576,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     }
     
     void ejectEntity(Entity ent) {
-        //TODO: Take transformations into account
         if (forbidEntityTransfer(ent)) {
             return;
         }
@@ -627,7 +657,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     @Override
     public void writeSpawnData(ByteArrayDataOutput data) {
-        data.writeInt(capabilities);
+        data.writeLong(capabilities);
         rotation.write(data);
         rotationalVelocity.write(data);
         data.writeFloat((float) centerOffset.xCoord);
@@ -646,7 +676,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     @Override
     public void readSpawnData(ByteArrayDataInput data) {
         try {
-            capabilities = data.readInt();
+            capabilities = data.readLong();
             rotation = Quaternion.read(data);
             rotationalVelocity = Quaternion.read(data);
             centerOffset = Vec3.createVectorHelper(data.readFloat(), data.readFloat(), data.readFloat());
@@ -697,6 +727,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             forbid(DeltaCapability.REMOVE_EXTERIOR_ENTITIES);
             forbid(DeltaCapability.TRANSFER_PLAYERS);
             forbid(DeltaCapability.INTERACT);
+            forbid(DeltaCapability.BLOCK_PLACE);
+            forbid(DeltaCapability.BLOCK_MINE);
+            forbid(DeltaCapability.REMOVE_ITEM_ENTITIES);
             
             permit(DeltaCapability.SCALE);
             permit(DeltaCapability.TRANSPARENT);
@@ -741,6 +774,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     @Override
     public Entity[] getParts() {
         if (!worldObj.isRemote) {
+            return null;
+        }
+        if (!can(DeltaCapability.INTERACT)) {
             return null;
         }
         if (rayOutOfDate) {

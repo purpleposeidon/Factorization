@@ -1,6 +1,5 @@
 package factorization.fzds;
 
-import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.ChunkPosition;
@@ -9,12 +8,17 @@ import factorization.api.Coord;
 
 public class TransferLib {
     public static void setRaw(Coord c, int id, int md) {
+        c.setIdMd(id, md);
+        Chunk here = c.getChunk();
+        here.isModified = true;
+        System.out.println("  -> " + c);
         /*boolean rem = c.w.isRemote;
         c.w.isRemote = true;
         c.setIdMd(id, md);
         c.w.isRemote = rem;*/
         
         //System.out.print("" + c + " becomes ");
+        /*
         c.setId(Block.gravel);
         c.getId(); //Might be needed
         Chunk chunk = c.w.getChunkFromBlockCoords(c.x, c.z);
@@ -25,7 +29,7 @@ public class TransferLib {
         } finally {
             Block.blocksList[id] = origBlock;
         }
-        System.out.println(c);
+        System.out.println(c);*/
     }
     
     private static TileEntity wiper = new TileEntity();

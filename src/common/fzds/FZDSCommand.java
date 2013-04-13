@@ -468,6 +468,11 @@ public class FZDSCommand extends CommandBase {
                 dse.worldObj.spawnEntityInWorld(dse);
                 setSelection(dse);
             }}, Requires.COORD);
+        add(new SubCommand("include") { //TODO
+            @Override
+            void call(String[] args) {
+                //selected.get
+            }}, Requires.SELECTION);
         add(new SubCommand("drop") {
             @Override
             String details() { return "Returns a Slice's blocks to the world, destroying the Slice"; }

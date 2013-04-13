@@ -5,8 +5,10 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemInWorldManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetServerHandler;
 import net.minecraft.network.packet.NetHandler;
@@ -20,6 +22,7 @@ import com.google.common.io.ByteStreams;
 
 import cpw.mods.fml.common.network.ITinyPacketHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
+import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.common.Core;
 
@@ -27,7 +30,7 @@ import factorization.common.Core;
 public class HammerNet implements ITinyPacketHandler {
     public static class HammerNetType {
         public static final short rotation = 0, rotationVelocity = 1, rotationBoth = 2,
-                rightClickEntity = 3, leftClickEntity = 4, rightClickBlock = 5, digPacket = 6;
+                rightClickEntity = 3, leftClickEntity = 4, rightClickBlock = 5, leftClickBlock = 6, digPacket = 7;
     }
     
     @Override
@@ -76,7 +79,7 @@ public class HammerNet implements ITinyPacketHandler {
         MinecraftServer server = MinecraftServer.getServer();
         EntityPlayerMP player = (EntityPlayerMP) handler.getPlayer();
         
-        InteractionProxyingPlayer ipp = new InteractionProxyingPlayer(server, player, player.theItemInWorldManager);
+        InteractionProxyingPlayer ipp = new InteractionProxyingPlayer(server, player, new ItemInWorldManager(shadow));
         
         ByteArrayInputStream bais = new ByteArrayInputStream(mapData.itemData);
         DataInputStream dis = new DataInputStream(bais);
@@ -98,6 +101,7 @@ public class HammerNet implements ITinyPacketHandler {
             }
             break;
         case HammerNetType.rightClickBlock:
+        case HammerNetType.leftClickBlock:
             int hitX = dis.readInt();
             int hitY = dis.readInt();
             int hitZ = dis.readInt();
@@ -107,7 +111,19 @@ public class HammerNet implements ITinyPacketHandler {
             float zOffset = dis.readFloat();
             
             ItemStack is = player.getHeldItem();
-            ipp.theItemInWorldManager.activateBlockOrUseItem(ipp, shadow, is, hitX, hitY, hitZ, sideHit, xOffset, yOffset, zOffset);
+            if (packetType == HammerNetType.rightClickBlock) {
+                ipp.theItemInWorldManager.activateBlockOrUseItem(ipp, shadow, is, hitX, hitY, hitZ, sideHit, xOffset, yOffset, zOffset);
+            } else {
+                Coord here = new Coord(shadow, hitX, hitY, hitZ);
+                Block b = here.getBlock();
+                if (b == null) {
+                    break;
+                }
+                if (b.canHarvestBlock(player, here.getMd())) {
+                    //playerEntity.theItemInWorldManager.uncheckedTryHarvestBlock(i, j, k);
+                    ipp.theItemInWorldManager.tryHarvestBlock(hitX, hitY, hitZ);
+                }
+            }
             break;
         case HammerNetType.digPacket:
             System.out.println("We've gotten a wrapped up dig packet"); //NORELEASE

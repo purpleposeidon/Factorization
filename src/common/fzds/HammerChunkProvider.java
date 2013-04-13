@@ -25,7 +25,9 @@ public class HammerChunkProvider implements IChunkProvider {
 
     @Override
     public Chunk provideChunk(int chunkX, int chunkZ) {
-        return new Chunk(world, chunkX, chunkZ);
+        Chunk ret = new Chunk(world, chunkX, chunkZ);
+        System.out.println("provideChunk: " + chunkX + " " + chunkZ + "   " + ret); //NORLEASE
+        return ret;
     }
 
     @Override
