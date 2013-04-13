@@ -1,5 +1,6 @@
 package factorization.api;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -20,7 +21,10 @@ import net.minecraftforge.common.ForgeDirection;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 
-public class Coord {
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.IDataSerializable;
+
+public class Coord implements IDataSerializable {
     public World w;
     public int x, y, z;
     static private Random rand = new Random();
@@ -75,6 +79,8 @@ public class Coord {
             if (te != null) {
                 ret += " with TE " + te;
             }
+            Chunk chunk = getChunk();
+            ret += " " + chunk;
         }
         return ret;
     }
@@ -566,6 +572,14 @@ public class Coord {
         x = dis.readInt();
         y = dis.readInt();
         z = dis.readInt();
+    }
+    
+    @Override
+    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+        x = data.asSameShare(prefix + "x").putInt(x);
+        y = data.asSameShare(prefix + "y").putInt(y);
+        z = data.asSameShare(prefix + "z").putInt(z);
+        return this;
     }
 
     public void mark() {

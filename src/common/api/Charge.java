@@ -1,8 +1,13 @@
 package factorization.api;
 
-import net.minecraft.nbt.NBTTagCompound;
+import java.io.IOException;
 
-public class Charge {
+import net.minecraft.nbt.NBTTagCompound;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.IDataSerializable;
+import factorization.api.datahelpers.Share;
+
+public class Charge implements IDataSerializable {
     ConductorSet conductorSet = null;
     IChargeConductor conductor = null;
     boolean isConductorSetLeader = false;
@@ -169,6 +174,15 @@ public class Charge {
             return;
         }
         remove();
+    }
+    
+    @Override
+    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+        int new_val = data.as(Share.PRIVATE, prefix + "charge").putInt(getValue());
+        if (data.isReader()) {
+            setValue(new_val);
+        }
+        return this;
     }
 
 }

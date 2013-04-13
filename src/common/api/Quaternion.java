@@ -10,7 +10,10 @@ import net.minecraftforge.common.ForgeDirection;
 
 import com.google.common.io.ByteArrayDataOutput;
 
-public class Quaternion {
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.IDataSerializable;
+
+public class Quaternion implements IDataSerializable {
     public double w, x, y, z;
     
     //Data functions
@@ -81,6 +84,15 @@ public class Quaternion {
             d[i] = in.readDouble();
         }
         return new Quaternion(d);
+    }
+    
+    @Override
+    public IDataSerializable serialize(String name_prefix, DataHelper data) throws IOException {
+        w = data.asSameShare("w").putDouble(w);
+        x = data.asSameShare("x").putDouble(x);
+        y = data.asSameShare("y").putDouble(y);
+        z = data.asSameShare("z").putDouble(z);
+        return this;
     }
     
     public double[] fillArray(double[] out) {
