@@ -39,7 +39,7 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     @Override
     public String getInfo() {
         float f = storage * 100 / max_storage;
-        return "Storage: " + ((int) f) + "%%";
+        return "Storage: " + ((int) f) + "%";
     }
 
     @Override

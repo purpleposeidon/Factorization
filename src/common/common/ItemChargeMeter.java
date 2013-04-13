@@ -42,7 +42,7 @@ public class ItemChargeMeter extends Item {
             if (w.isRemote) {
                 return true;
             }
-            Core.notify(player, here, im.getInfo());
+            Core.notify(player, here, "%s", im.getInfo());
             return true;
         }
         if (w.isRemote) {
@@ -66,7 +66,7 @@ public class ItemChargeMeter extends Item {
         if (player.getClass() != EntityPlayerMP.class || player.username == null || player.username.length() == 0 || player.username.startsWith("[")) {
             toNotify = null;
         }
-        Core.notify(toNotify, here,
+        Core.notify(toNotify, here, "%s",
                 "Charge: " + ic.getCharge().getValue() + "/" + ret.totalCharge
                 + "\nConductors: " + ret.conductorCount
                 + inf

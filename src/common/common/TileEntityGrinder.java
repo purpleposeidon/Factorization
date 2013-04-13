@@ -98,7 +98,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     @Override
     public String getInfo() {
         float p = speed * 100 / 50F;
-        return "Speed: " + ((int) p) + "%%";
+        return "Speed: " + ((int) p) + "%";
     }
 
     @Override
