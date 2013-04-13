@@ -7,6 +7,7 @@ factorization.factoryBlock.SLAGFURNACE.name=Slag Furnace
 factorization.factoryBlock.ROUTER.name=Router
 factorization.factoryBlock.LAMP.name=Wrath Lamp
 item.factorization:charge_battery.name=Battery Block
+factorization.factoryBlock.LEYDENJAR.name=Leyden Jar
 factorization.factoryBlock.SOLARTURBINE.name=Solar Turbine
 factorization.factoryBlock.SOLARBOILER.name=Solar Boiler
 factorization.factoryBlock.STEAMTURBINE.name=Steam Turbine

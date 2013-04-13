@@ -437,7 +437,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 //
                 BarrelDescription = 40, BarrelItem = 41, BarrelCount = 42, BarrelLoss = 43,
                 //
-                BatteryLevel = 50,
+                BatteryLevel = 50, LeydenjarLevel = 51,
                 //
                 MirrorDescription = 60,
                 //

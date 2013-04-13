@@ -63,7 +63,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemStack router_item, maker_item, stamper_item, packager_item,
             barrel_item,
             lamp_item, air_item,
-            slagfurnace_item, battery_item_hidden, heater_item, steamturbine_item, solarboiler_item,
+            slagfurnace_item, battery_item_hidden, leydenjar_item, heater_item, steamturbine_item, solarboiler_item,
             mirror_item_hidden,
             leadwire_item, grinder_item, mixer_item, crystallizer_item,
             greenware_item,
@@ -192,6 +192,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         packager_item = FactoryType.PACKAGER.itemStack();
         slagfurnace_item = FactoryType.SLAGFURNACE.itemStack();
         battery_item_hidden = FactoryType.BATTERY.itemStack();
+        leydenjar_item = FactoryType.LEYDENJAR.itemStack();
         solar_turbine_item = FactoryType.SOLARTURBINE.itemStack();
         steamturbine_item = FactoryType.STEAMTURBINE.itemStack();
         solarboiler_item = FactoryType.SOLARBOILER.itemStack();
@@ -955,6 +956,13 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                     'W', leadwire_item,
                     'B', new ItemStack(battery, 1, damage));
         }
+        oreRecipe(leydenjar_item,
+                "#G#",
+                "#L#",
+                "L#L",
+                '#', Block.thinGlass,
+                'G', Block.glass,
+                'L', "ingotLead");
 
         oreRecipe(heater_item,
                 "CCC",

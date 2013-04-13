@@ -140,9 +140,13 @@ abstract public class FactorizationBlockRender implements ICoord {
     }
     
     protected void renderCauldron(RenderBlocks rb, Icon lid, Icon metal) {
+        renderCauldron(rb, lid, metal, 1);
+    }
+    
+    protected void renderCauldron(RenderBlocks rb, Icon lid, Icon metal, float height) {
         Tessellator tessellator = Tessellator.instance;
         BlockRenderHelper block = BlockRenderHelper.instance;
-        block.setBlockBoundsOffset(0, 0, 0);
+        block.setBlockBounds(0, 0, 0, 1, height, 1);
         block.useTextures(metal, lid, metal, metal, metal, metal);
         if (world_mode) {
             block.render(rb, getCoord());

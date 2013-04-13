@@ -66,6 +66,7 @@ import factorization.client.render.TileEntityCrystallizerRender;
 import factorization.client.render.TileEntityGreenwareRender;
 import factorization.client.render.TileEntityGrinderRender;
 import factorization.client.render.TileEntityHeaterRenderer;
+import factorization.client.render.TileEntityLeydenJarRender;
 import factorization.client.render.TileEntityMixerRenderer;
 import factorization.client.render.TileEntitySolarTurbineRender;
 import factorization.client.render.TileEntitySteamTurbineRender;
@@ -89,6 +90,7 @@ import factorization.common.TileEntityFactorization;
 import factorization.common.TileEntityGreenware;
 import factorization.common.TileEntityGrinder;
 import factorization.common.TileEntityHeater;
+import factorization.common.TileEntityLeydenJar;
 import factorization.common.TileEntityMixer;
 import factorization.common.TileEntitySlagFurnace;
 import factorization.common.TileEntitySolarTurbine;
@@ -494,6 +496,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             setTileEntityRenderer(TileEntityMixer.class, new TileEntityMixerRenderer());
             setTileEntityRenderer(TileEntityCrystallizer.class, new TileEntityCrystallizerRender());
             setTileEntityRenderer(TileEntitySteamTurbine.class, new TileEntitySteamTurbineRender());
+            setTileEntityRenderer(TileEntityLeydenJar.class, new TileEntityLeydenJarRender());
             // End section that is azanor's fault
         }
 

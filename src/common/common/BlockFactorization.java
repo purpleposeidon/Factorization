@@ -338,6 +338,7 @@ public class BlockFactorization extends BlockContainer {
         itemList.add(reg.grinder_item);
         itemList.add(reg.mixer_item);
         itemList.add(reg.crystallizer_item);
+        itemList.add(reg.leydenjar_item);
 
         itemList.add(reg.greenware_item);
         

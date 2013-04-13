@@ -31,7 +31,8 @@ public class BlockIcons {
         battery_bottom, battery_top, battery_side, battery_meter,
         boiler_side, boiler_top,
         mirror_front, mirror_back, mirror_side,
-        turbine_top, turbine_bottom, turbine_side;
+        turbine_top, turbine_bottom, turbine_side,
+        leyden_metal, leyden_rim;
     
     @Directory("craft")
     public static BlockIcons.ActivatingMachineIcon maker, stamper, packager;
