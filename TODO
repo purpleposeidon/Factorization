@@ -4,7 +4,7 @@ HAMMER
 ------
 ✓ Step 1 is "create a dimension"
 ✓ Step 2 is "give the client an extra world for that dimension"
-✓ Step 3 is "create pseudoplayer, have packets sent to the pseudoplayer be sent to the real players, and render part of the dimension"
+  Step 3 is "create pseudoplayer, have packets sent to the pseudoplayer be sent to the real players, and render part of the dimension"
 ✓     -    have packets go to all players near the DSE; single PacketProxyingPlayer per DSE
 ✓     -    send chunks to players
       -    Actually update the terrain when it changes
@@ -12,20 +12,21 @@ HAMMER
 ✓ Step 4 is to make the DSE interact with the real world
 ✓     -    DSE persistence
 ✓     -    external entity collisions, using custom AABBs
-X Step 5 is to get the player moving in & out
-X     -    player entry/leaving
-X     -    rendering correctly with embedded player
   Step 5 is to get player interactions working
-      -    placing blocks
-      -    activating blocks
+✓     -    placing blocks
+✓     -    activating blocks
       -    GUIs
       -    breaking blocks
+              - Server-side: Client will send packets similar to Packet14BlockDig; we'll bamboozle ItemInWorldManager (Or replace it with our own, possibly temporarily. This might be better, as it'd be very simple to replace it when we're done.)
+              - Client-side: Can we set fields in places to make it do the digging animation?
+              - Do that IWorldAccess partial block breaking rendering on the client; make sure the player packet proxy gets the packets
 ✓ Step 6 is to get rotations working
-      -    Non-glitchy collision with external entities
+      -    Get collisions working when rotated
   Step 7 is rockets & shit.
       -    Refactor DSE & its rendering for Oracles
 ✓     -    Proper command system
   Step 8 is watch mod interaction burst into flames.
+      -    Put in a whitelist for Blocks, Entities, and TileEntities. (Probably a Object.getClass() mapping)
   Step 9 is "drop into the pending mods folder; run away giggling."
 
 
