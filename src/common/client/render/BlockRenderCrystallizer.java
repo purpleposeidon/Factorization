@@ -19,14 +19,7 @@ public class BlockRenderCrystallizer extends FactorizationBlockRender {
 
         float start = 7F / 16F;
         float sheight = 1 - width;
-        if (!world_mode) {
-            GL11.glPushMatrix();
-            GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
-        }
         renderPart(rb, BlockIcons.wood, width, sheight, start, 1 - width, 1, start + width);
-        if (!world_mode) {
-            GL11.glPopMatrix();
-        }
         Core.profileEnd();
     }
 

@@ -16,11 +16,7 @@ public class BlockRenderMixer extends FactorizationBlockRender {
         renderCauldron(rb, BlockIcons.cauldron_top, BlockIcons.cauldron_side);
         if (!world_mode) {
             GL11.glPushMatrix();
-            //GL11.glTranslatef(-0.5F, 0.65F, 0.5F);
-            // + 
-            //GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
-            // == 
-            GL11.glTranslatef(-1F, 0.15F, 0F);
+            GL11.glTranslatef(-0.5F, 0.65F, 0.5F);
             TileEntitySolarTurbineRender.renderWithRotation(0);
             GL11.glPopMatrix();
         }

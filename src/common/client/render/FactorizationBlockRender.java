@@ -152,21 +152,20 @@ abstract public class FactorizationBlockRender implements ICoord {
             block.render(rb, getCoord());
             float d = 2F/16F;
             boolean origAO = rb.enableAO;
-            rb.setRenderBounds(d, d, d, 1 - d, 1, 1 - d);
+            rb.setRenderBounds(d, d, d, 1 - d, height, 1 - d);
             block.setBlockBounds(d, d, d, 1 - d, 1 - d, 1 - d);
             rb.enableAO = false;
             rb.renderNorthFace(block, x + 1 - 2*d, y, z, metal);
             rb.renderEastFace(block, x, y, z + 1 - 2*d, metal);
             rb.renderSouthFace(block, x - 1 + 2*d, y, z, metal);
             rb.renderWestFace(block, x, y, z - 1 + 2*d, metal);
-            rb.renderTopFace(block, x, y - 1 + 1*d, z, metal);
+            rb.renderTopFace(block, x, y - height + 1*d, z, metal);
             rb.enableAO = origAO;
         } else {
             GL11.glDisable(GL11.GL_CULL_FACE);
             //GL11.glDisable(GL11.GL_LIGHTING);
             block.renderForInventory(rb);
             //GL11.glEnable(GL11.GL_LIGHTING);
-            GL11.glTranslatef(0.5F, 0.5F, 0.5F);
             GL11.glEnable(GL11.GL_CULL_FACE);
         }
     }
