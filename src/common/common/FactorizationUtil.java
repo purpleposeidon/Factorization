@@ -294,6 +294,7 @@ public class FactorizationUtil {
         
         void set(int i, ItemStack is) {
             under.setInventorySlotContents(slotIndex(i), is);
+            under.onInventoryChanged();
         }
         
         int getFreeSpace(int i) {
@@ -320,6 +321,7 @@ public class FactorizationUtil {
                     is = null;
                 }
                 under.setInventorySlotContents(slotIndex, toPut);
+                under.onInventoryChanged();
                 return is;
             }
             if (!FactorizationUtil.couldMerge(dest, is)) {

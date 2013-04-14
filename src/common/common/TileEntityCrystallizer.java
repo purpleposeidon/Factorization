@@ -65,6 +65,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
             return;
         }
         inputs[slot] = is;
+        onInventoryChanged();
     }
 
     @Override

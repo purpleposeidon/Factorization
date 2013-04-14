@@ -590,6 +590,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         if (f >= 0 && f < filter.length) {
             filter[f] = itemstack;
         }
+        onInventoryChanged();
     }
 
     @Override

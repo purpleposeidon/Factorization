@@ -92,6 +92,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         }
         dirty = true;
         cache = null;
+        onInventoryChanged();
     }
     
     @Override
@@ -154,7 +155,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     
     @Override
     public boolean isStackValidForSlot(int slotIndex, ItemStack itemstack) {
-        return slotIndex == 0 || slotIndex == 1 || slotIndex == 2 || slotIndex == 3;
+        return slotIndex < input.length;
     }
 
     @Override
