@@ -84,7 +84,7 @@ public class ChargeSparks {
                 continue;
             }
             if (!any) {
-                //NORELEASE: Restore the attributes
+                GL11.glPushAttrib(GL11.GL_ENABLE_BIT | GL11.GL_COLOR_BUFFER_BIT);
                 GL11.glDisable(GL11.GL_LIGHTING);
                 GL11.glDisable(GL11.GL_TEXTURE_2D);
                 GL11.glEnable(GL11.GL_BLEND);
@@ -113,7 +113,8 @@ public class ChargeSparks {
             tess.draw();
         }
         if (any) {
-            GL11.glEnable(GL11.GL_TEXTURE_2D);
+            GL11.glPopAttrib();
+            GL11.glColor4f(1, 1, 1, 1);
         }
         Core.profileEnd();
     }

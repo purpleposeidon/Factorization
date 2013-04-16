@@ -13,7 +13,6 @@ public class TileEntityLeydenJarRender extends TileEntitySpecialRenderer {
         TileEntityLeydenJar jar = (TileEntityLeydenJar) te;
         GL11.glPushMatrix();
         GL11.glTranslatef((float) x, (float) y, (float) z);
-        GL11.glDisable(GL11.GL_LIGHTING);
         
         if (jar.sparks != null) {
             jar.sparks.render();

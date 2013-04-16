@@ -30,9 +30,7 @@ public class BlockRenderLeydenJar extends FactorizationBlockRender {
         block.useTexture(knob);
         float d = 5F/16F;
         block.setBlockBoundsOffset(d, 0, d);
-        //block.setBlockB
         block.setBlockBounds(knob_in, 0, knob_in, 1 - knob_in, knob_height, 1 - knob_in);
-        //block.setBlockBounds(knob_in, -z, knob_in, 1 - knob_in, knob_height, 1 - knob_in);
         y++;
         renderBlock(rb, block);
         y--;
