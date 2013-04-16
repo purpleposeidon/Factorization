@@ -2,7 +2,6 @@ package factorization.client.render;
 
 
 
-import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.Icon;
 import factorization.common.BlockIcons;
