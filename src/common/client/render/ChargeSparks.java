@@ -102,7 +102,7 @@ public class ChargeSparks {
             double r = (spark.color >> 16 & 255)/f;
             double g = (spark.color >> 8 & 255)/f;
             double b = (spark.color & 255)/f;
-            double alpha = 0.5;
+            double alpha = 0.8;
             double depth_end = (1 << spark.depth);
             double perc = end_segment/depth_end;
             GL11.glColor4d(interpolate(r, perc), interpolate(g, perc), interpolate(b, perc), alpha_interpolate(alpha, perc));

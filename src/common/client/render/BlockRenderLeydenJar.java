@@ -16,9 +16,10 @@ public class BlockRenderLeydenJar extends FactorizationBlockRender {
         Icon knob = BlockIcons.leyden_knob;
         BlockRenderHelper block = BlockRenderHelper.instance;
         float inset = 1F/16F;
-        float jarHeight = 13F/16F;
+        float jarHeight = 16F/16F; //13
         float metal_height = 5F/16F;
         float knob_in = 5F/16F;
+        float knob_height = 3F/16F;
         float post_in = 7F/16F;
         float z = 1F/64F;
         
@@ -27,8 +28,14 @@ public class BlockRenderLeydenJar extends FactorizationBlockRender {
         renderBlock(rb, block);
         
         block.useTexture(knob);
-        block.setBlockBounds(knob_in, jarHeight - z, knob_in, 1 - knob_in, 1, 1 - knob_in);
+        float d = 5F/16F;
+        block.setBlockBoundsOffset(d, 0, d);
+        //block.setBlockB
+        block.setBlockBounds(knob_in, 0, knob_in, 1 - knob_in, knob_height, 1 - knob_in);
+        //block.setBlockBounds(knob_in, -z, knob_in, 1 - knob_in, knob_height, 1 - knob_in);
+        y++;
         renderBlock(rb, block);
+        y--;
         
         
         Icon leyden_metal = BlockIcons.leyden_metal;
