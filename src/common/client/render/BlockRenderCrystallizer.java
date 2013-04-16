@@ -1,7 +1,5 @@
 package factorization.client.render;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.renderer.RenderBlocks;
 import factorization.common.BlockIcons;
 import factorization.common.Core;
