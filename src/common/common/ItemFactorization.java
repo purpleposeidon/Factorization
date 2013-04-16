@@ -83,6 +83,16 @@ public class ItemFactorization extends ItemBlock {
                 infoList.add(state.toString());
             }
         }
+        if (FactorizationUtil.similar(is, Core.registry.leydenjar_item)) {
+            if (is.hasTagCompound()) {
+                FactoryType ft = FactoryType.LEYDENJAR;
+                TileEntityLeydenJar jar = (TileEntityLeydenJar) ft.getRepresentative();
+                jar.onPlacedBy(player, is, 0);
+                infoList.add(((int)(jar.getLevel()*100) + "% charged"));
+            } else {
+                infoList.add("0% charged");
+            }
+        }
         if (FactorizationUtil.similar(is, Core.registry.solar_turbine_item)) {
             infoList.add("Deprecated for Solar Boilers & Steam Turbines");
         }

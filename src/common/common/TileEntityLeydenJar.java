@@ -4,7 +4,13 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.Random;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.Icon;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Charge;
@@ -18,7 +24,7 @@ import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityLeydenJar extends TileEntityCommon implements IChargeConductor {
     private Charge charge = new Charge(this);
-    private int storage = 0;
+    int storage = 0;
     private final double max_efficiency = 0.36, min_efficiency = 0.05;
     private final int charge_threshold = 150;
     private final int discharge_threshold = 100;
@@ -70,6 +76,17 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
         return i*0.4 + 0.5;
     }
     
+    public void updateSparks(ChargeSparks the_sparks) {
+        double level = getLevel();
+        if (level > rand.nextDouble()) {
+            Vec3 src = Vec3.createVectorHelper(0.5, randomizeDirection(0)/2 + 0.2, 0.5);
+            ForgeDirection fo = ForgeDirection.getOrientation(2 + rand.nextInt(4));
+            Vec3 dest = Vec3.createVectorHelper(randomizeDirection(fo.offsetX), randomizeDirection(fo.offsetY), randomizeDirection(fo.offsetZ));
+            the_sparks.spark(src, dest, 12, 1, 3, 2.0, 8.0, /*0xF0FF00*/ /*0xEEDB02*/ 0xEEE59D);
+        }
+        the_sparks.update();
+    }
+    
     @Override
     public void updateEntity() {
         charge.update();
@@ -77,14 +94,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
             if (sparks == null) {
                 sparks = new ChargeSparks(10);
             }
-            double level = getLevel();
-            if (level > rand.nextDouble()) {
-                Vec3 src = Vec3.createVectorHelper(0.5, randomizeDirection(0)/2 + 0.2, 0.5);
-                ForgeDirection fo = ForgeDirection.getOrientation(2 + rand.nextInt(4));
-                Vec3 dest = Vec3.createVectorHelper(randomizeDirection(fo.offsetX), randomizeDirection(fo.offsetY), randomizeDirection(fo.offsetZ));
-                sparks.spark(src, dest, 12, 1, 3, 2.0, 8.0, /*0xF0FF00*/ /*0xEEDB02*/ 0xEEE59D);
-            }
-            sparks.update();
+            updateSparks(sparks);
             return;
         }
         if (getCoord().isPowered()) {
@@ -157,6 +167,20 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
             handleData(new DataInNBT(tag));
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public Icon getIcon(ForgeDirection dir) {
+        return BlockIcons.leyden_metal;
+    }
+    
+    @Override
+    public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
+        if (is.hasTagCompound()) {
+            NBTTagCompound tag = FactorizationUtil.getTag(is);
+            storage = tag.getInteger("storage");
         }
     }
 }

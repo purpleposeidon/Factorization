@@ -5,9 +5,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.client.IItemRenderer.ItemRenderType;
 import net.minecraftforge.common.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
@@ -33,6 +35,8 @@ abstract public class FactorizationBlockRender implements ICoord {
     protected int x, y, z;
     protected int metadata;
     protected TileEntity te;
+    protected ItemStack is;
+    protected ItemRenderType renderType;
     
     private static FactorizationBlockRender renderMap[] = new FactorizationBlockRender[0xFF];
     private static FactorizationBlockRender defaultRender;
@@ -114,6 +118,8 @@ abstract public class FactorizationBlockRender implements ICoord {
         x = y = z = 0;
         use_vertex_offset = true;
         te = null;
+        is = ItemRenderCapture.getRenderingItem();
+        renderType = ItemRenderCapture.getRenderType();
     }
     
     public final void setTileEntity(TileEntity t) {

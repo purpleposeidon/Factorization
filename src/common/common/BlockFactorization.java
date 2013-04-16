@@ -77,6 +77,14 @@ public class BlockFactorization extends BlockContainer {
             Core.registry.battery.normalizeDamage(is);
             return is;
         }
+        if (ft == FactoryType.LEYDENJAR) {
+            //TODO: refactor, is lameness
+            ItemStack is = new ItemStack(Core.registry.item_factorization, 1, tec.getFactoryType().md);
+            NBTTagCompound tag = FactorizationUtil.getTag(is);
+            TileEntityLeydenJar jar = (TileEntityLeydenJar) tec;
+            tag.setInteger("storage", jar.storage);
+            return is;
+        }
         if (ft == FactoryType.CERAMIC) {
             return ((TileEntityGreenware) tec).getItem();
         }
@@ -291,6 +299,12 @@ public class BlockFactorization extends BlockContainer {
             tag.setInteger("storage", bat.storage);
             is.setTagCompound(tag);
             Core.registry.battery.normalizeDamage(is);
+        }
+        if (f.getFactoryType() == FactoryType.LEYDENJAR) {
+            //TODO: refactor, is lameness
+            NBTTagCompound tag = FactorizationUtil.getTag(is);
+            TileEntityLeydenJar jar = (TileEntityLeydenJar) f;
+            tag.setInteger("storage", jar.storage);
         }
 //		if (f.getFactoryType() == FactoryType.GREENWARE) {
 //			is = ((TileEntityGreenware) f).getItem();

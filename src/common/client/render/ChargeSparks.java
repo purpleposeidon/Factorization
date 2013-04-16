@@ -12,6 +12,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.common.Core;
 
 public class ChargeSparks {
+    public long last_update = -1; //haxx to prevent updating while paused
     public ChargeSparks(int count) {
         sparks = new SparkInfo[count];
         for (int i = 0; i < sparks.length; i++) {

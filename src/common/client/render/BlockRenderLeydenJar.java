@@ -2,11 +2,19 @@ package factorization.client.render;
 
 
 
+import java.util.WeakHashMap;
+
+import org.lwjgl.opengl.GL11;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
+import net.minecraftforge.client.IItemRenderer.ItemRenderType;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
 import factorization.common.FactoryType;
+import factorization.common.TileEntityLeydenJar;
 
 public class BlockRenderLeydenJar extends FactorizationBlockRender {
 
@@ -31,9 +39,15 @@ public class BlockRenderLeydenJar extends FactorizationBlockRender {
         float d = 5F/16F;
         block.setBlockBoundsOffset(d, 0, d);
         block.setBlockBounds(knob_in, 0, knob_in, 1 - knob_in, knob_height, 1 - knob_in);
-        y++;
-        renderBlock(rb, block);
-        y--;
+        if (!world_mode) {
+            GL11.glTranslatef(0, 1, 0);
+            renderBlock(rb, block);
+            GL11.glTranslatef(0, -1, 0);
+        } else {
+            y++;
+            renderBlock(rb, block);
+            y--;
+        }
         
         
         Icon leyden_metal = BlockIcons.leyden_metal;
@@ -41,7 +55,39 @@ public class BlockRenderLeydenJar extends FactorizationBlockRender {
         block.useTextures(null, null, leyden_metal, leyden_metal, leyden_metal, leyden_metal);
         block.setBlockBounds(post_in, 1F/16F, post_in, 1 - post_in, jarHeight, 1 - post_in);
         renderBlock(rb, block);
+        if (!world_mode && is != null && is.hasTagCompound()) {
+            TileEntityLeydenJar jar = (TileEntityLeydenJar) FactoryType.LEYDENJAR.getRepresentative();
+            jar.onPlacedBy(null, is, 0);
+            ChargeSparks sparks;
+            if (!sparkMap.containsKey(is)) {
+                sparks = new ChargeSparks(10);
+                sparkMap.put(is, sparks);
+            } else {
+                sparks = sparkMap.get(is);
+            }
+            Minecraft mc = Minecraft.getMinecraft();
+            if (mc.theWorld == null) {
+                jar.updateSparks(sparks);
+            } else {
+                long now = mc.theWorld.getTotalWorldTime();
+                if (now != sparks.last_update) {
+                    sparks.last_update = now;
+                    jar.updateSparks(sparks);
+                }
+            }
+            if (renderType == ItemRenderType.ENTITY || renderType == ItemRenderType.EQUIPPED) {
+                float t = -0.5F;
+                GL11.glTranslatef(t, t, t);
+                sparks.render();
+                t *= -1;
+                GL11.glTranslatef(t, t, t);
+            } else {
+                sparks.render();
+            }
+        }
     }
+    
+    private WeakHashMap<ItemStack, ChargeSparks> sparkMap = new WeakHashMap<ItemStack, ChargeSparks>();
 
     @Override
     FactoryType getFactoryType() {
