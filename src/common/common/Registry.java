@@ -63,7 +63,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemStack router_item, maker_item, stamper_item, packager_item,
             barrel_item,
             lamp_item, air_item,
-            slagfurnace_item, battery_item_hidden, leydenjar_item, heater_item, steamturbine_item, solarboiler_item,
+            slagfurnace_item, battery_item_hidden, leydenjar_item, leydenjar_item_full, heater_item, steamturbine_item, solarboiler_item,
             mirror_item_hidden,
             leadwire_item, grinder_item, mixer_item, crystallizer_item,
             greenware_item,
@@ -262,6 +262,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         mirror = new ItemBlockProxy(itemID("mirror", 9030), mirror_item_hidden);
         mirror.setUnlocalizedName("factorization:mirror");
         battery = new ItemBattery(itemID("battery", 9033));
+        leydenjar_item_full = ItemStack.copyItemStack(leydenjar_item);
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setInteger("storage", TileEntityLeydenJar.max_storage);
+        leydenjar_item_full.setTagCompound(tag);
 
         //Industrial
         item_craft = new ItemCraft(itemID("itemCraftId", 9000));

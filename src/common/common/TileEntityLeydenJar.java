@@ -10,6 +10,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.util.Icon;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.ForgeDirection;
@@ -25,12 +26,13 @@ import factorization.common.NetworkFactorization.MessageType;
 public class TileEntityLeydenJar extends TileEntityCommon implements IChargeConductor {
     private Charge charge = new Charge(this);
     int storage = 0;
-    private final double max_efficiency = 0.36, min_efficiency = 0.05;
-    private final int charge_threshold = 150;
-    private final int discharge_threshold = 100;
-    private final int max_storage = 6400*100;
-    private final int max_charge_per_tick = 200;
-    private final int max_discharge_per_tick = 80;
+    
+    static double max_efficiency = 0.36, min_efficiency = 0.05;
+    static int charge_threshold = 150;
+    static int discharge_threshold = 100;
+    static int max_storage = 6400*100;
+    static int max_charge_per_tick = 200;
+    static int max_discharge_per_tick = 80;
 
     public ChargeSparks sparks = null;
     
@@ -182,5 +184,10 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
             NBTTagCompound tag = FactorizationUtil.getTag(is);
             storage = tag.getInteger("storage");
         }
+    }
+    
+    @Override
+    public Packet getDescriptionPacket() {
+        return super.getDescriptionPacketWith(MessageType.LeydenjarLevel, storage);
     }
 }

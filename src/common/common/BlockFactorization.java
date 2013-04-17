@@ -353,6 +353,9 @@ public class BlockFactorization extends BlockContainer {
         itemList.add(reg.mixer_item);
         itemList.add(reg.crystallizer_item);
         itemList.add(reg.leydenjar_item);
+        if (reg.leydenjar_item_full != null) {
+            itemList.add(reg.leydenjar_item_full);
+        }
 
         itemList.add(reg.greenware_item);
         
