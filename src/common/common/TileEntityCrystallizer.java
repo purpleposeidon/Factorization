@@ -78,7 +78,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     @Override
     public int[] getSizeInventorySide(int s) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
-        if (side == ForgeDirection.UP || side == ForgeDirection.DOWN) {
+        if (side == ForgeDirection.DOWN) {
             return OUTPUT_s;
         }
         return INPUTS_s;
