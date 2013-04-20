@@ -392,6 +392,9 @@ public class TileEntityBarrel extends TileEntityFactorization {
         if (entityplayer.isSneaking() && to_remove >= 1) {
             to_remove = 1;
         }
+        if (to_remove > 1 && to_remove == getItemCount()) {
+            to_remove--;
+        }
         ejectItem(makeStack(to_remove), false, entityplayer, last_hit_side);
         last_hit_side = -1;
         changeItemCount(-to_remove);
