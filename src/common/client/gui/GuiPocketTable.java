@@ -49,6 +49,7 @@ public class GuiPocketTable extends GuiContainer {
             super.keyTyped(key, par2);
             return;
         }
+        char my_key = ("" + key).toLowerCase().charAt(0);
         // 'x' clears items out of the way. Fill inv, then bag (and make slurp
         // sound). [XXX TODO -- Doing this server-friendly'd require a packet or
         // something]
@@ -61,15 +62,15 @@ public class GuiPocketTable extends GuiContainer {
         // - A line along a side: spread to the other side, skipping the middle.
         // - Two touching: fill the circumerfence, alternating.
         // - middle of a side: spread across center
-        if (key == Core.pocketActions.charAt(0) /* x */) {
+        if (my_key == Core.pocketActions.charAt(0) /* x */) {
             Command.craftClear.call(mc.thePlayer);
             return;
         }
-        if (key == Core.pocketActions.charAt(1) /* c */) {
+        if (my_key == Core.pocketActions.charAt(1) /* c */) {
             Command.craftMove.call(mc.thePlayer);
             return;
         }
-        if (key == Core.pocketActions.charAt(2) /* z */) {
+        if (my_key == Core.pocketActions.charAt(2) /* z */) {
             Command.craftBalance.call(mc.thePlayer);
             return;
         }
