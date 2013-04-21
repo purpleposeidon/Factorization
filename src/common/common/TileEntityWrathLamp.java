@@ -9,6 +9,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
@@ -21,7 +23,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     static final int diameter = radius * 2;
     static final int maxDepth = 24; //XXX TODO
     private short beamDepths[] = new short[(diameter + 1) * (diameter + 1)];
-    private Updater updater = new InitialBuild();
+    private Updater updater = new Idler();
     static boolean isUpdating = false;
 
     static int update_count;
@@ -54,6 +56,12 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         while (update_count < update_limit && airToUpdate.size() > 0) {
             airToUpdate.remove().check();
         }
+    }
+    
+    @Override
+    void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
+        super.onPlacedBy(player, is, side);
+        updater = new InitialBuild();
     }
     
     static final int NOTIFY_NEIGHBORS = factorization.api.Coord.NOTIFY_NEIGHBORS;
