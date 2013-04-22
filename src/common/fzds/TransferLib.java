@@ -1,5 +1,6 @@
 package factorization.fzds;
 
+import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.ChunkPosition;
@@ -7,29 +8,33 @@ import net.minecraft.world.chunk.Chunk;
 import factorization.api.Coord;
 
 public class TransferLib {
+    public static int set_method = 0;
     public static void setRaw(Coord c, int id, int md) {
-        c.setIdMd(id, md);
-        Chunk here = c.getChunk();
-        here.isModified = true;
-        System.out.println("  -> " + c);
-        /*boolean rem = c.w.isRemote;
-        c.w.isRemote = true;
-        c.setIdMd(id, md);
-        c.w.isRemote = rem;*/
-        
-        //System.out.print("" + c + " becomes ");
-        /*
-        c.setId(Block.gravel);
-        c.getId(); //Might be needed
-        Chunk chunk = c.w.getChunkFromBlockCoords(c.x, c.z);
-        Block origBlock = Block.blocksList[id];
-        try {
+        switch (set_method) {
+        default:
+            Chunk chunk = c.w.getChunkFromBlockCoords(c.x, c.z);
+            Block origBlock = Block.blocksList[id];
             Block.blocksList[id] = Block.stone;
-            chunk.setBlockIDWithMetadata(c.x & 15, c.y, c.z & 15, id, md);
-        } finally {
-            Block.blocksList[id] = origBlock;
+            try {
+                chunk.setBlockIDWithMetadata(c.x & 15, c.y, c.z & 15, id, md);
+            } finally {
+                Block.blocksList[id] = origBlock;
+            }
+            c.markBlockForUpdate();
+            break;
+        case 1:
+            boolean rem = c.w.isRemote;
+            c.w.isRemote = true;
+            try {
+                c.setIdMd(id, md);
+            } finally {
+                c.w.isRemote = rem;
+            }
+            break;
+        case 2:
+            c.setIdMd(id, md);
+            break;
         }
-        System.out.println(c);*/
     }
     
     private static TileEntity wiper = new TileEntity();
@@ -39,9 +44,6 @@ public class TransferLib {
         int md = src.getMd();
         if (id == 0 && !overwriteDestination) {
             return null;
-        }
-        if (id != 0) {
-            System.out.println("Moving " + src + " to " + dest); //NORELEASE
         }
         TileEntity te = src.getTE();
         NBTTagCompound teData = null;
@@ -72,5 +74,12 @@ public class TransferLib {
         return null;
     }
     
+    public static void rawErase(Coord c) {
+        TileEntity te = c.getTE();
+        if (te != null) {
+            c.removeTE();
+        }
+        setRaw(c, 0, 0);
+    }
     
 }

@@ -3,11 +3,11 @@ package factorization.fzds;
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
+
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.ConfigCategory;
 import net.minecraftforge.common.Configuration;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.Property;
 import cpw.mods.fml.common.Mod;
 import factorization.api.Coord;
@@ -15,9 +15,9 @@ import factorization.api.DeltaCoord;
 import factorization.common.Core;
 
 public class HammerInfo {
-    File worldConfigFile = null;
-    Configuration channelConfig;
-    Configuration worldState;
+    static File worldConfigFile = null;
+    static Configuration channelConfig;
+    static Configuration worldState;
     
     private int unsaved_allocations = 0;
     private boolean channel_config_dirty = false;
@@ -34,7 +34,7 @@ public class HammerInfo {
         if (worldState != null) {
             return;
         }
-        WorldServer world = DimensionManager.getWorld(Hammer.dimensionID);
+        WorldServer world = (WorldServer) DeltaChunk.getServerShadowWorld();
         world_loaded = true;
         File saveDir = world.getChunkSaveLocation();
         saveDir = saveDir.getAbsoluteFile();
@@ -118,9 +118,7 @@ public class HammerInfo {
     }
     
     public void setAllocationCount(int channel, int count) {
-        if (channel != 0) {
-            throw new IllegalArgumentException("Non-zero channels not yet implemented");
-        }
+        loadGlobalConfig();
         ConfigCategory cat = channel2category.get(channel);
         cat.get("allocated").set(count);
         saveCellAllocations();

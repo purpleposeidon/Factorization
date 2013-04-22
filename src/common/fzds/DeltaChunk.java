@@ -40,10 +40,8 @@ public class DeltaChunk {
      * @return the thread-appropriate shadow world
      */
     public static World getWorld(World realWorld) {
-        if (realWorld == null) {
-            return FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT ? getClientShadowWorld() : getServerShadowWorld();
-        }
-        return realWorld.isRemote ? getClientShadowWorld() : getServerShadowWorld();
+        boolean remote = realWorld == null ? FMLCommonHandler.instance().getEffectiveSide().isClient() : realWorld.isRemote;
+        return remote ? getClientShadowWorld() : getServerShadowWorld();
     }
     
     public static IDeltaChunk allocateSlice(World spawnWorld, int channel, DeltaCoord size) {
@@ -111,16 +109,16 @@ public class DeltaChunk {
         mapper.fillDse(new DseDestination() {public void include(Coord real) {
             shadow.set(real);
             dse.real2shadow(shadow);
-            TransferLib.move(real, shadow, wipeSrc, true);
+            TransferLib.move(real, shadow, false, true);
         }});
-        if (wipeSrc) {
-            mapper.fillDse(new DseDestination() {public void include(Coord real) {
-                shadow.set(real);
-                dse.real2shadow(shadow);
-                TransferLib.setRaw(shadow, 1, 0);
-                shadow.setId(0);
-            }});
-        }
+        mapper.fillDse(new DseDestination() {public void include(Coord real) {
+            if (wipeSrc) {
+                TransferLib.rawErase(real);
+            }
+            shadow.set(real);
+            dse.real2shadow(shadow);
+            shadow.markBlockForUpdate();
+        }});
         return dse;
     }
     
@@ -137,6 +135,9 @@ public class DeltaChunk {
         Coord dest = new Coord(selected);
         Coord c = new Coord(a.w, 0, 0, 0);
         
+        int minX = 0, minY = 0, minZ = 0, maxX = 0, maxY = 0, maxZ = 0;
+        boolean first = true;
+        
         for (int x = a.x; x <= b.x; x++) {
             for (int y = a.y; y <= b.y; y++) {
                 for (int z = a.z; z <= b.z; z++) {
@@ -144,9 +145,23 @@ public class DeltaChunk {
                     dest.set(c);
                     selected.shadow2real(dest);
                     TransferLib.move(c, dest, false, overwriteDestination);
+                    if (first) {
+                        minX = maxX = x;
+                        minY = maxY = y;
+                        minZ = maxZ = z;
+                        first = false;
+                    } else {
+                        minX = Math.min(minX, x);
+                        minY = Math.min(minY, y);
+                        minZ = Math.min(minZ, z);
+                        maxX = Math.max(maxX, x);
+                        maxY = Math.max(maxY, y);
+                        maxZ = Math.max(maxZ, z);
+                    }
                 }
             }
         }
+        dest.w.markBlockRangeForRenderUpdate(minX, minY, minZ, maxX, maxY, maxZ);
     }
     
     public static void clear(IDeltaChunk selected) {

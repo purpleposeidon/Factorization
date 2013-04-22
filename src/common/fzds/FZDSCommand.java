@@ -436,7 +436,7 @@ public class FZDSCommand extends CommandBase {
                 } else {
                     base = new Coord(user.w, 0, 0, 0);
                 }
-                boolean copy = arg0.contains("copy");
+                final boolean copy = arg0.contains("copy");
                 Coord low = base.add(DeltaCoord.parse(args[0]));
                 Coord up = base.add(DeltaCoord.parse(args[1]));
                 Coord.sort(low, up);
@@ -531,6 +531,7 @@ public class FZDSCommand extends CommandBase {
                         }
                     }
                 }
+                DeltaChunk.getSlices(MinecraftServer.getServer().worldServerForDimension(0)).clear();
                 sender.sendChatToPlayer("Removed " + i);
             }}, Requires.OP);
         add(new SubCommand("selection") {
@@ -651,12 +652,13 @@ public class FZDSCommand extends CommandBase {
                 Quaternion toMod = derivative == 0 ? selected.getRotation() : selected.getRotationalVelocity();
                 toMod.update(Quaternion.getRotationQuaternion(theta, dir));
             }}, Requires.SELECTION);
-        add(new SubCommand("d|v|r|w", "+|=", "[W=1]", "X", "Y", "Z") {
+        add(new SubCommand("d|s|v|r|w", "+|=", "[W=1]", "X", "Y", "Z") {
             @Override
             String details() { return "Changes or sets displacement/velocity/rotation/angular_velocity"; }
             @Override
             void call(String[] args) {
                 char type = arg0.charAt(0);
+                type = type == 's' ? 'd' : type;
                 if (args.length != 4 && args.length != 5) {
                     if (type == 'd' || type == 'v') {
                         sender.sendChatToPlayer("Usage: /fzds d(isplacement)|v(elocity) +|= X Y Z");
@@ -760,7 +762,7 @@ public class FZDSCommand extends CommandBase {
                     }
                 }
             }}, Requires.SELECTION, Requires.OP);
-        add(new SubCommand("scale", "newscale") {
+        add(new SubCommand("scale", "newScale") {
             @Override
             void call(String[] args) {
                 if (!selected.can(DeltaCapability.SCALE)) {
@@ -778,6 +780,11 @@ public class FZDSCommand extends CommandBase {
                 }
                 ((DimensionSliceEntity) selected).opacity = Float.parseFloat(args[0]);
             }}, Requires.SELECTION, Requires.CREATIVE);
+        add(new SubCommand("setBlockMethod 0=intrusive_lowlevel;1=world.isRemote;2=world.setBlock") {
+            @Override
+            void call(String[] args) {
+                int mode = Integer.parseInt(args[0]);
+            }}, Requires.OP, Requires.CREATIVE);
     }
 
 }
