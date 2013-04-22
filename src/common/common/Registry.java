@@ -148,8 +148,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         FactoryType.registerTileEntities();
         GameRegistry.registerTileEntity(TileEntityFzNull.class, "fz.null");
         //TileEntity renderers are registered in the client proxy
-
-        EntityRegistry.registerGlobalEntityID(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", Core.entity_relight_task_id);
+        
+        EntityRegistry.registerModEntity(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", 0, Core.instance, 1, 10, false);
     }
 
     /*private void addName(Object what, String name) {
