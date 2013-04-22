@@ -6,7 +6,8 @@ public enum Share {
     MUTABLE(true, true, false),
     PRIVATE_TRANSIENT(false, false, true),
     VISIBLE_TRANSIENT(true, false, true),
-    MUTABLE_TRANSIENT(true, true, true);
+    MUTABLE_TRANSIENT(true, true, true),
+    DESCRIPTION_PACKET(true, false, true);
     
     final public boolean is_public, client_can_edit, is_transient;
     

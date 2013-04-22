@@ -3,6 +3,7 @@ package factorization.api.datahelpers;
 import java.io.IOException;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 
 public abstract class DataHelper {
     /***
@@ -13,6 +14,27 @@ public abstract class DataHelper {
      * If true, whatever is getting put needs to be saved/loaded. Set by {@link DataHelper.as}.
      */
     protected boolean valid;
+    
+    protected DataHelper current_child;
+    protected String current_child_name;
+    public final DataHelper makeChild() {
+        current_child_name = name;
+        if (valid) {
+            return current_child = makeChild_do();
+        } else {
+            return new DataIdentity(this);
+        }
+    }
+    
+    public final void finishChild() {
+        if (valid) {
+            finishChild_do();
+        }
+    }
+    
+    protected abstract DataHelper makeChild_do();
+    
+    protected abstract void finishChild_do();
     
     public DataHelper as(Share share, String set_name) {
         name = set_name;
@@ -29,6 +51,14 @@ public abstract class DataHelper {
     public abstract boolean isReader();
     public boolean isWriter() {
         return !isReader();
+    }
+    
+    public NBTTagCompound getTag() {
+        return null;
+    }
+    
+    public boolean isNBT() {
+        return false;
     }
     
     /**

@@ -17,6 +17,8 @@ import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
 import factorization.common.FactorizationUtil.FzInv;
 import factorization.common.NetworkFactorization.MessageType;
 
@@ -471,6 +473,35 @@ public class TileEntityRouter extends TileEntityFactorization {
         }
     }
 
+    @Override
+    void putData(DataHelper data) throws IOException {
+        if (data.isNBT() && data.isWriter()) {
+            verifyUpgrades();
+        }
+        target_side = data.as(Share.MUTABLE, "target_side").putInt(target_side);
+        target_slot = data.as(Share.MUTABLE, "use_slot").putInt(target_slot);
+        is_input = data.as(Share.MUTABLE, "is_input").putBoolean(is_input);
+        putSlots(data);
+        match = data.as(Share.MUTABLE, "match").putString(match);
+        match_to_visit = data.as(Share.MUTABLE, "match_to_visit").putBoolean(match_to_visit);
+        eject_direction = data.as(Share.MUTABLE, "eject_side").putInt(eject_direction);
+        
+        upgradeItemFilter = data.as(Share.VISIBLE, "upgrade_item_filter").putBoolean(upgradeItemFilter);
+        upgradeMachineFilter = data.as(Share.VISIBLE, "upgrade_machine_filter").putBoolean(upgradeMachineFilter);
+        upgradeSpeed = data.as(Share.VISIBLE, "upgrade_speed").putBoolean(upgradeSpeed);
+        upgradeThorough = data.as(Share.VISIBLE, "upgrade_thorough").putBoolean(upgradeThorough);
+        upgradeThroughput = data.as(Share.VISIBLE, "upgrade_throughput").putBoolean(upgradeThroughput);
+        upgradeEject = data.as(Share.VISIBLE, "upgrade_eject").putBoolean(upgradeEject);
+        
+        //Compat: We don't allow "extract from anywhere" anymore
+        if (target_side == 6) {
+            target_side = 1;
+        }
+        if (target_side == ~6) {
+            target_side = ~1;
+        }
+    }
+    
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);

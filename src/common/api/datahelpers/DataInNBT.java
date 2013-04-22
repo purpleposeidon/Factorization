@@ -3,12 +3,21 @@ package factorization.api.datahelpers;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class DataInNBT extends DataHelper {
-private final NBTTagCompound tag;
-    
+public class DataInNBT extends DataHelperNBT {	
     public DataInNBT(NBTTagCompound theTag) {
         tag = theTag;
     }
+    
+    @Override
+    public DataHelper makeChild_do() {
+        if (tag.hasKey(current_child_name)) {
+            return new DataInNBT(tag.getCompoundTag(current_child_name));
+        }
+        return new DataInNBT(new NBTTagCompound());
+    }
+    
+    @Override
+    protected void finishChild_do() {}
 
     @Override
     protected boolean shouldStore(Share share) {
@@ -79,7 +88,10 @@ private final NBTTagCompound tag;
     @Override
     public String putString(String value) {
         if (valid) {
-            return tag.getString(name);
+            if (tag.hasKey(name)) {
+                return tag.getString(name);
+            }
+            return null;
         }
         return value;
     }

@@ -16,6 +16,14 @@ public class DataOutPacket extends DataHelper {
         this.dos = dos;
         this.side = side;
     }
+    
+    @Override
+    public DataHelper makeChild_do() {
+        return this;
+    }
+    
+    @Override
+    protected void finishChild_do() {}
 
     @Override
     protected boolean shouldStore(Share share) {

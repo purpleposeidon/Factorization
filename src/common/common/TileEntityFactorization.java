@@ -17,6 +17,8 @@ import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.ICoord;
 import factorization.api.IFactoryType;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
 import factorization.common.NetworkFactorization.MessageType;
 
 public abstract class TileEntityFactorization extends TileEntityCommon
@@ -278,6 +280,16 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         draw_active = tag.getByte("draw_active_byte");
         facing_direction = tag.getByte("facing");
     }
+    
+    protected final void putSlots(DataHelper data) {
+        if (data.isNBT()) {
+            if (data.isReader()) {
+                readSlotsFromNBT(data.getTag());
+            } else {
+                writeSlotsToNBT(data.getTag());
+            }
+        }
+    }
 
     public final void readSlotsFromNBT(NBTTagCompound tag) {
         NBTTagList invlist = tag.getTagList("Items");
@@ -286,7 +298,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
             setInventorySlotContents(comp.getInteger("Slot"), ItemStack.loadItemStackFromNBT(comp));
         }
     }
-
+    
     public final void writeSlotsToNBT(NBTTagCompound tag) {
         NBTTagList invlist = new NBTTagList();
         for (int i = 0; i < getSizeInventory(); i++) {

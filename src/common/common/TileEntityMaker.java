@@ -9,6 +9,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.Share;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityMaker extends TileEntityFactorization {
@@ -192,6 +194,17 @@ public class TileEntityMaker extends TileEntityFactorization {
             }
         }
 
+    }
+    
+    @Override
+    void putData(DataHelper data) throws IOException {
+        for (int i = 0; i < 9; i++) {
+            targets[i] = data.as(Share.MUTABLE, "target" + i).putBoolean(targets[i]);
+        }
+        input = data.as(Share.PRIVATE, "input").putItemStack(input);
+        craft = data.as(Share.PRIVATE, "craft").putItemStack(craft);
+        output = data.as(Share.PRIVATE, "output").putItemStack(output);
+        paper = data.as(Share.PRIVATE, "paper").putItemStack(paper);
     }
 
     @Override
