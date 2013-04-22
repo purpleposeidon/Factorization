@@ -30,9 +30,9 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     static double max_efficiency = 0.36, min_efficiency = 0.05;
     static int charge_threshold = 150;
     static int discharge_threshold = 100;
-    static int max_storage = 6400*100;
+    static int max_storage = 6400*200;
     static int max_charge_per_tick = 200;
-    static int max_discharge_per_tick = 80;
+    static int max_discharge_per_tick = 20;
 
     public ChargeSparks sparks = null;
     
