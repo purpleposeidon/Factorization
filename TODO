@@ -29,6 +29,9 @@ HAMMER
       -    Put in a whitelist for Blocks, Entities, and TileEntities. (Probably a Object.getClass() mapping)
   Step 9 is "drop into the pending mods folder; run away giggling."
 
+[01:14:36] <OvermindDL1> neptunepink: Stacktrace: at cpw.mods.fml.relauncher.ReflectionHelper.findField(ReflectionHelper.java:87) at factorization.fzds.HammerClientProxy.clientLogin(HammerClientProxy.java:230) at factorization.fzds.Hammer$1.clientLoggedIn(Hammer.java:126)
+
+
 
 (Uh-oh, why is TransferLib broken?)
 CovertJaguar_proper_packet_sending

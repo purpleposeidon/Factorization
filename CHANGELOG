@@ -1,3 +1,16 @@
+0.7.37
+  Increased the leyden jar's capaciy
+  Corrected crystallizer ISidedInventory sides
+
+0.7.36
+  Introducing the Leyden Jar:
+    - Stores tons more charge than a battery
+    - Needs >150 charge to start storing energy. You can get sufficient power by stacking 3 boilers on top of eachother, providing as many mirrors as can fit (using a cone shape), and sticking a turbine on top of that.
+    - It's very cheap, and very inefficient
+    - Is able to charge the lower tier batteries
+    - a must-have for any scientist's lair
+
+
 0.7.35
   Fixed bugs in the crysatllizer & router
 
