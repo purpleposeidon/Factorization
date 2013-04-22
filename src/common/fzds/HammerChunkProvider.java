@@ -25,9 +25,9 @@ public class HammerChunkProvider implements IChunkProvider {
 
     @Override
     public Chunk provideChunk(int chunkX, int chunkZ) {
-        Chunk ret = new Chunk(world, chunkX, chunkZ);
-        System.out.println("provideChunk: " + chunkX + " " + chunkZ + "   " + ret); //NORLEASE
-        return ret;
+        Chunk chunk = new Chunk(world, chunkX, chunkZ);
+        chunk.generateSkylightMap();
+        return chunk;
     }
 
     @Override
@@ -46,7 +46,6 @@ public class HammerChunkProvider implements IChunkProvider {
     
     @Override
     public boolean unloadQueuedChunks() {
-        // ??? Wtf is this?
         return false;
     }
 
