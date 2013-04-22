@@ -1,6 +1,7 @@
 package factorization.common;
 
 import cpw.mods.fml.common.registry.GameRegistry;
+import factorization.common.servo.TileEntityServoRail;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -32,6 +33,7 @@ public enum FactoryType {
     EXTENDED(24, false, TileEntityExtension.class, "factory_ext"), //Used for multipiece blocks (like beds & rocket engines)
     CERAMIC(25, false, TileEntityGreenware.class, "factory_ceramic"), //clay sculpture (Not really implemented)
     LEYDENJAR(26, false, TileEntityLeydenJar.class, "factory_leyjar"), //inefficient bulk energy storage
+    SERVORAIL(27, false, TileEntityServoRail.class, "factory_rail"),
     
 
     POCKETCRAFTGUI(101, true),
