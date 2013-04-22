@@ -57,7 +57,7 @@ public class BlockResource extends Block {
             }
             return BlockIcons.error;
         }
-        if (md < icons.length) {
+        if (md < icons.length && md >= 0) {
             return icons[md];
         }
         return null;
