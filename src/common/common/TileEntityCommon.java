@@ -23,10 +23,6 @@ import factorization.api.Coord;
 import factorization.api.IChargeConductor;
 import factorization.api.ICoord;
 import factorization.api.IFactoryType;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.DataInNBT;
-import factorization.api.datahelpers.DataOutNBT;
-import factorization.api.datahelpers.Share;
 import factorization.common.NetworkFactorization.MessageType;
 
 public abstract class TileEntityCommon extends TileEntity implements ICoord, IFactoryType {
@@ -121,37 +117,11 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {
         return Block.stone.collisionRayTrace(worldObj, xCoord, yCoord, zCoord, startVec, endVec);
     }
-    
-    void putCommonData(DataHelper data) throws IOException {
-        //We can't give the FactoryType as that's handled elsewhere
-        useExtraInfo(data.as(Share.DESCRIPTION_PACKET, "ex").putByte(getExtraInfo()));
-        useExtraInfo2(data.as(Share.DESCRIPTION_PACKET, "ex2").putByte(getExtraInfo2()));
-        customName = data.as(Share.PRIVATE, "customName").putString(customName);
-        putData(data);
-    }
-    
-    abstract void putData(DataHelper data) throws IOException;
 
-    @Override
-    public void writeToNBT(NBTTagCompound tag) {
-        super.writeToNBT(tag);
-        try {
-            putCommonData(new DataOutNBT(tag));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void setBlockBounds(Block b) {
+        b.setBlockBounds(0, 0, 0, 1, 1, 1);
     }
-    
-    @Override
-    public void readFromNBT(NBTTagCompound tag) {
-        super.readFromNBT(tag);
-        try {
-            putCommonData(new DataInNBT(tag));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
+
     Packet getDescriptionPacketWith(Object... args) {
         Object[] suffix = new Object[args.length + 3];
         suffix[0] = getFactoryType().md;
@@ -163,10 +133,6 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         Packet p = Core.network.TEmessagePacket(getCoord(), MessageType.FactoryType, suffix);
         p.isChunkDataPacket = true;
         return p;
-    }
-    
-    public void setBlockBounds(Block b) {
-        b.setBlockBounds(0, 0, 0, 1, 1, 1);
     }
 
     @Override
@@ -193,6 +159,24 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     
     public boolean takeUpgrade(ItemStack is) {
         return false;
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound tag) {
+        super.writeToNBT(tag);
+        tag.setString("ver", Core.version);
+        getBlockClass().enforceQuiet(getCoord()); //NOTE: This won't actually work for the quiting save; but a second save'll take care of that.
+        if (customName != null) {
+            tag.setString("customName", customName);
+        }
+    }
+    
+    @Override
+    public void readFromNBT(NBTTagCompound tag) {
+        super.readFromNBT(tag);
+        if (tag.hasKey("customName")) {
+            customName = tag.getString("customName");
+        }
     }
 
     public boolean handleMessageFromServer(int messageType, DataInput input) throws IOException {
