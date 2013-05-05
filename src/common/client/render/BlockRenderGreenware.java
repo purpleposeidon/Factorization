@@ -33,6 +33,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
     private static TileEntityGreenware loader = new TileEntityGreenware();
     
     @Override
+    protected
     void render(RenderBlocks rb) {
         if (!world_mode) {
             ItemStack is = ItemRenderCapture.getRenderingItem();
@@ -115,7 +116,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
                     block.useTexture(BlockIcons.error);
                     continue; //boo
                 }
-                block.useTexture(it.getBlockTextureFromSideAndMetadata(0, rc.icon_md));
+                block.useTexture(it.getIcon(0, rc.icon_md));
             }
             rc.toBlockBounds(block);
             block.begin();
@@ -149,6 +150,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
     }
 
     @Override
+    protected
     FactoryType getFactoryType() {
         return FactoryType.CERAMIC;
     }

@@ -1,24 +1,18 @@
 package factorization.client.render;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.RenderEngine;
 import net.minecraft.util.Icon;
 
 import org.lwjgl.opengl.GL11;
 
 import factorization.common.BlockIcons;
-import factorization.common.Core;
 import factorization.common.FactoryType;
 
 public class BlockRenderGrinder extends FactorizationBlockRender {
     @Override
+    protected
     void render(RenderBlocks rb) {
         //TODO: Optimize this!
-        if (!world_mode) {
-            RenderEngine re = Minecraft.getMinecraft().renderEngine;
-            re.bindTexture(Core.texture_file_block);
-        }
         renderMotor(rb, 8F/16F);
         float p = 1F/16F;
         float p2 = 2*p, p3 = 3*p;
@@ -49,6 +43,7 @@ public class BlockRenderGrinder extends FactorizationBlockRender {
     }
 
     @Override
+    protected
     FactoryType getFactoryType() {
         return FactoryType.GRINDER;
     }

@@ -88,8 +88,8 @@ abstract public class FactorizationBlockRender implements ICoord {
         }
     }
     
-    abstract void render(RenderBlocks rb);
-    abstract FactoryType getFactoryType();
+    protected abstract void render(RenderBlocks rb);
+    protected abstract FactoryType getFactoryType();
     void renderSecondPass(RenderBlocks rb) {}
     
     @Override
@@ -387,7 +387,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         ItemRenderer.renderItemIn2D(tessellator, f1, f2, f, f3, icon.getSheetWidth(), icon.getSheetHeight(), 0.0625F);
     }
 
-    void renderMotor(RenderBlocks rb, float yoffset) {
+    protected void renderMotor(RenderBlocks rb, float yoffset) {
         Icon metal = BlockIcons.motor_texture;
         //metal = 11;
         float d = 4.0F / 16.0F;
@@ -395,7 +395,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         renderPart(rb, metal, d, d + yd + yoffset, d, 1 - d, 1 - (d + 0F/16F) + yd + yoffset, 1 - d);
     }
     
-    void renderRotatedHelper(BlockRenderHelper block) {
+    protected void renderRotatedHelper(BlockRenderHelper block) {
         Tessellator tess = Tessellator.instance;
         if (world_mode) {
             block.renderRotated(tess, x, y, z);
@@ -403,6 +403,14 @@ abstract public class FactorizationBlockRender implements ICoord {
             tess.startDrawingQuads();
             block.renderRotated(tess, 0, 0, 0);
             tess.draw();
+        }
+    }
+    
+    protected void renderBlock(RenderBlocks rb, BlockRenderHelper block) {
+        if (world_mode) {
+            block.render(rb, x, y, z);
+        } else {
+            block.renderForInventory(rb);
         }
     }
 }

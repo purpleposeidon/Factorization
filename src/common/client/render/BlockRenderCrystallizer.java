@@ -8,6 +8,7 @@ import factorization.common.FactoryType;
 public class BlockRenderCrystallizer extends FactorizationBlockRender {
 
     @Override
+    protected
     void render(RenderBlocks rb) {
         Core.profileStart("crystallizer");
         int metal = 14, wood = 8 + 16, hollow = 10 + 16;
@@ -22,6 +23,7 @@ public class BlockRenderCrystallizer extends FactorizationBlockRender {
     }
 
     @Override
+    protected
     FactoryType getFactoryType() {
         return FactoryType.CRYSTALLIZER;
     }

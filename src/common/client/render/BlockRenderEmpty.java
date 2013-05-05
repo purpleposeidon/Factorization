@@ -10,9 +10,11 @@ public class BlockRenderEmpty extends FactorizationBlockRender {
         this.for_type = for_type;
     }
     @Override
+    protected
     void render(RenderBlocks rb) { }
 
     @Override
+    protected
     FactoryType getFactoryType() {
         return for_type;
     }

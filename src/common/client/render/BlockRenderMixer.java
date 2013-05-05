@@ -9,6 +9,7 @@ import factorization.common.FactoryType;
 public class BlockRenderMixer extends FactorizationBlockRender {
 
     @Override
+    protected
     void render(RenderBlocks rb) {
         if (world_mode) {
             renderMotor(rb, 1F / 16F);
@@ -23,6 +24,7 @@ public class BlockRenderMixer extends FactorizationBlockRender {
     }
 
     @Override
+    protected
     FactoryType getFactoryType() {
         return FactoryType.MIXER;
     }

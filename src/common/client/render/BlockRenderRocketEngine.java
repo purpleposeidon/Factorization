@@ -11,6 +11,7 @@ import factorization.common.TileEntityRocketEngine;
 public class BlockRenderRocketEngine extends FactorizationBlockRender {
 
     @Override
+    protected
     void render(RenderBlocks rb) {
         boolean oldAo = rb.enableAO;
         rb.enableAO = false;
@@ -61,6 +62,7 @@ public class BlockRenderRocketEngine extends FactorizationBlockRender {
     }
 
     @Override
+    protected
     FactoryType getFactoryType() {
         return FactoryType.ROCKETENGINE;
     }

@@ -12,6 +12,7 @@ import factorization.common.WireRenderingCube;
 
 public class BlockRenderWire extends FactorizationBlockRender {
     @Override
+    protected
     void render(RenderBlocks rb) {
         if (world_mode) {
             Tessellator.instance.setBrightness(Core.registry.factory_block.getMixedBrightnessForBlock(w, x, y, z));
@@ -27,6 +28,7 @@ public class BlockRenderWire extends FactorizationBlockRender {
     }
 
     @Override
+    protected
     FactoryType getFactoryType() {
         return FactoryType.LEADWIRE;
     }

@@ -20,12 +20,13 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
     
     private static Quaternion mirrorTilt = Quaternion.getRotationQuaternion(Math.toRadians(-45), 1, 0, 0);
     @Override
+    protected
     void render(RenderBlocks rb) {
         Core.profileStart("mirror");
         float height = 7.25F / 16F;
         float radius = 1F / 16F;
         float c = 0.5F;
-        Icon silver = Core.registry.resource_block.getBlockTextureFromSideAndMetadata(0, ResourceType.SILVERBLOCK.md);
+        Icon silver = Core.registry.resource_block.getIcon(0, ResourceType.SILVERBLOCK.md);
         renderPart(rb, silver, c - radius, 0, c - radius, c + radius, height, c + radius);
         float trim = 3F / 16F;
         float trim_height = 2F / 16F;
@@ -64,6 +65,7 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
     }
     
     @Override
+    protected
     FactoryType getFactoryType() {
         return FactoryType.MIRROR;
     }

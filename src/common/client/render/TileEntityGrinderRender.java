@@ -111,7 +111,7 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
         
         GL11.glTranslatef(0, 2F / 16F, 0);
         BlockRenderHelper block = BlockRenderHelper.instance;
-        block.useTexture(Block.blockSteel.getBlockTextureFromSide(0));
+        block.useTexture(Block.blockIron.getBlockTextureFromSide(0));
         //block.useTexture(Block.cloth.getBlockTextureFromSideAndMetadata(0, 4));
         block.setBlockBoundsOffset(1F/8F, 7F/16F, 1F/8F);
         //block.setBlockBoundsOffset(0, 0, 0);

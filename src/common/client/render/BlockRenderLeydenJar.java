@@ -19,6 +19,7 @@ import factorization.common.TileEntityLeydenJar;
 public class BlockRenderLeydenJar extends FactorizationBlockRender {
 
     @Override
+    protected
     void render(RenderBlocks rb) {
         Icon glass = BlockIcons.leyden_glass_side;
         Icon knob = BlockIcons.leyden_knob;
@@ -90,16 +91,8 @@ public class BlockRenderLeydenJar extends FactorizationBlockRender {
     private WeakHashMap<ItemStack, ChargeSparks> sparkMap = new WeakHashMap<ItemStack, ChargeSparks>();
 
     @Override
-    FactoryType getFactoryType() {
+    protected FactoryType getFactoryType() {
         return FactoryType.LEYDENJAR;
-    }
-    
-    void renderBlock(RenderBlocks rb, BlockRenderHelper block) {
-        if (world_mode) {
-            block.render(rb, x, y, z);
-        } else {
-            block.renderForInventory(rb);
-        }
     }
 
 }

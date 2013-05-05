@@ -19,6 +19,7 @@ public class BlockRenderSteamTurbine extends FactorizationBlockRender {
 
     TileEntityWire fake_wire = new TileEntityWire();
     @Override
+    protected
     void render(RenderBlocks rb) {
         float m = 0.0001F;
         renderNormalBlock(rb, getFactoryType().md);
@@ -78,6 +79,7 @@ public class BlockRenderSteamTurbine extends FactorizationBlockRender {
     }
 
     @Override
+    protected
     FactoryType getFactoryType() {
         return FactoryType.STEAMTURBINE;
     }

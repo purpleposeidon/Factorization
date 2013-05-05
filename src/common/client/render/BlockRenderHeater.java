@@ -11,6 +11,7 @@ import factorization.common.FactoryType;
 public class BlockRenderHeater extends FactorizationBlockRender {
 
     @Override
+    protected
     void render(RenderBlocks rb) {
         float d = 0.5F / 32F;
         if (!world_mode || !Core.renderTEs) {
@@ -24,6 +25,7 @@ public class BlockRenderHeater extends FactorizationBlockRender {
     }
 
     @Override
+    protected
     FactoryType getFactoryType() {
         return FactoryType.HEATER;
     }

@@ -11,6 +11,7 @@ import factorization.common.ResourceType;
 public class BlockRenderLamp extends FactorizationBlockRender {
 
     @Override
+    protected
     void render(RenderBlocks rb) {
         float s = 1F / 16F;
         float p = 1F / 64F;
@@ -20,7 +21,7 @@ public class BlockRenderLamp extends FactorizationBlockRender {
         float glass_ver = trim_in; //trim_in + 1F / 128F;
         float panel = trim_out + s; //trim_in + s * 0;
         BlockFactorization block = Core.registry.factory_block;
-        Icon metal = Core.registry.resource_block.getBlockTextureFromSideAndMetadata(0, ResourceType.DARKIRONBLOCK.md);
+        Icon metal = Core.registry.resource_block.getIcon(0, ResourceType.DARKIRONBLOCK.md);
         Icon glass = Block.glass.getBlockTextureFromSide(0);
         //glass
         renderPart(rb, glass, glass_mid, glass_ver, glass_mid, 1 - glass_mid, 1 - glass_ver, 1 - glass_mid);
@@ -40,6 +41,7 @@ public class BlockRenderLamp extends FactorizationBlockRender {
     }
     
     @Override
+    protected
     FactoryType getFactoryType() {
         return FactoryType.LAMP;
     }

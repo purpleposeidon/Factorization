@@ -16,6 +16,7 @@ import factorization.common.WireRenderingCube;
 public class BlockRenderSolarTurbine extends FactorizationBlockRender {
 
     @Override
+    protected
     void render(RenderBlocks rb) {
         if (world_mode) {
             Coord me = getCoord();
@@ -76,6 +77,7 @@ public class BlockRenderSolarTurbine extends FactorizationBlockRender {
     }
     
     @Override
+    protected
     FactoryType getFactoryType() {
         return FactoryType.SOLARTURBINE;
     }

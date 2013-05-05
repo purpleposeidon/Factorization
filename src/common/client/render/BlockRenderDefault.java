@@ -7,6 +7,7 @@ import factorization.common.TileEntityCommon;
 public class BlockRenderDefault extends FactorizationBlockRender {
 
     @Override
+    protected
     void render(RenderBlocks rb) {
         if (world_mode) {
             TileEntityCommon c = getCoord().getTE(TileEntityCommon.class);
@@ -20,6 +21,7 @@ public class BlockRenderDefault extends FactorizationBlockRender {
     }
 
     @Override
+    protected
     FactoryType getFactoryType() {
         return null;
     }
