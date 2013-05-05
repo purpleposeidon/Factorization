@@ -44,7 +44,7 @@ public class NEI_GrinderRecipeConfig extends TemplateRecipeHandler implements IC
     
     @Override
     public void loadCraftingRecipes(String outputId, Object... results) {
-        if (outputId.equals("grinding")) {
+        if (outputId.equals("fz.grinding")) {
             loadCraftingRecipes(null);
             return;
         }
@@ -98,7 +98,7 @@ public class NEI_GrinderRecipeConfig extends TemplateRecipeHandler implements IC
 
     @Override
     public void loadTransferRects() {
-        transferRects.add(new RecipeTransferRect(new Rectangle(74, 23, 24, 18), "grinding"));
+        transferRects.add(new RecipeTransferRect(new Rectangle(74, 23, 24, 18), "fz.grinding"));
     }
 
     @Override
@@ -118,6 +118,6 @@ public class NEI_GrinderRecipeConfig extends TemplateRecipeHandler implements IC
 
     @Override
     public String getOverlayIdentifier() {
-        return "grinding";
+        return "fz.grinding";
     }
 }

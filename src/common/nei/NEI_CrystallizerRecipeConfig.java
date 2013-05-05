@@ -49,7 +49,7 @@ public class NEI_CrystallizerRecipeConfig extends TemplateRecipeHandler implemen
     
     @Override
     public void loadCraftingRecipes(String outputId, Object... results) {
-        if (outputId.equals("crystallizing")) {
+        if (outputId.equals("fz.crystallizing")) {
             loadCraftingRecipes(null);
             return;
         }
@@ -127,7 +127,7 @@ public class NEI_CrystallizerRecipeConfig extends TemplateRecipeHandler implemen
     @Override
     public void loadTransferRects() {
         // XXX TODO (if this is even actually necessary? What's it do?) (It might give you places to click on to bring up the recipes list.)
-        transferRects.add(new RecipeTransferRect(new Rectangle(35 + 63, 78, 95 - 63, 16), "crystallizing"));
+        transferRects.add(new RecipeTransferRect(new Rectangle(35 + 63, 78, 95 - 63, 16), "fz.crystallizing"));
     }
 
     @Override
@@ -147,7 +147,7 @@ public class NEI_CrystallizerRecipeConfig extends TemplateRecipeHandler implemen
 
     @Override
     public String getOverlayIdentifier() {
-        return "crystallizing";
+        return "fz.crystallizing";
     }
     
     public void drawBackground(GuiContainerManager gui, int recipe)

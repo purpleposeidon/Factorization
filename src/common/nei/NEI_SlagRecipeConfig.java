@@ -46,7 +46,7 @@ public class NEI_SlagRecipeConfig extends TemplateRecipeHandler implements IConf
     
     @Override
     public void loadCraftingRecipes(String outputId, Object... results) {
-        if (outputId.equals("slagging")) {
+        if (outputId.equals("fz.slagging")) {
             loadCraftingRecipes(null);
         } else {
             super.loadCraftingRecipes(outputId, results);
@@ -56,7 +56,7 @@ public class NEI_SlagRecipeConfig extends TemplateRecipeHandler implements IConf
     @Override
     public void loadUsageRecipes(String inputId, Object... ingredients) {
         ItemStack ingredient;
-        if (inputId.equals("slagging")) {
+        if (inputId.equals("fz.slagging")) {
             ingredient = null;
         } else if (inputId.equals("item")) {
             ingredient = (ItemStack) ingredients[0];
@@ -131,7 +131,7 @@ public class NEI_SlagRecipeConfig extends TemplateRecipeHandler implements IConf
 
     @Override
     public void loadTransferRects() {
-        transferRects.add(new RecipeTransferRect(new Rectangle(74, 23, 24, 18), "slagging"));
+        transferRects.add(new RecipeTransferRect(new Rectangle(74, 23, 24, 18), "fz.slagging"));
     }
 
     @Override
@@ -151,6 +151,6 @@ public class NEI_SlagRecipeConfig extends TemplateRecipeHandler implements IConf
 
     @Override
     public String getOverlayIdentifier() {
-        return "slagging";
+        return "fz.slagging";
     }
 }

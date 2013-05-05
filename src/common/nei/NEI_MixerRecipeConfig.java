@@ -61,7 +61,7 @@ public class NEI_MixerRecipeConfig extends TemplateRecipeHandler implements ICon
     
     @Override
     public void loadCraftingRecipes(String outputId, Object... results) {
-        if (outputId.equals("mixing")) {
+        if (outputId.equals("fz.mixing")) {
             loadCraftingRecipes(null);
             return;
         }
@@ -163,7 +163,7 @@ public class NEI_MixerRecipeConfig extends TemplateRecipeHandler implements ICon
 
     @Override
     public void loadTransferRects() {
-        transferRects.add(new RecipeTransferRect(new Rectangle(74, 23, 24, 18), "mixing"));
+        transferRects.add(new RecipeTransferRect(new Rectangle(74, 23, 24, 18), "fz.mixing"));
     }
 
     @Override
@@ -183,6 +183,6 @@ public class NEI_MixerRecipeConfig extends TemplateRecipeHandler implements ICon
 
     @Override
     public String getOverlayIdentifier() {
-        return "mixing";
+        return "fz.mixing";
     }
 }
