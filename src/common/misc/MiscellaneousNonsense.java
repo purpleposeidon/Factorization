@@ -75,10 +75,10 @@ public class MiscellaneousNonsense {
                     return;
                 }
                 Item item = stack.getItem();
-                if (item == Item.hoeStone || item == Item.hoeSteel) {
+                if (item == Item.hoeStone || item == Item.hoeIron) {
                     player.addStat(AchievementList.buildHoe, 1);
                 }
-                if (item == Item.swordStone || item == Item.swordSteel) {
+                if (item == Item.swordStone || item == Item.swordIron) {
                     player.addStat(AchievementList.buildSword, 1);
                 }
             }

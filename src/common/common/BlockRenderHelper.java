@@ -83,6 +83,12 @@ public class BlockRenderHelper extends Block {
     }
     
     @SideOnly(Side.CLIENT)
+    public BlockRenderHelper setTexture(int i, Icon texture) {
+        textures[i] = texture;
+        return this;
+    }
+    
+    @SideOnly(Side.CLIENT)
     @Override
     public boolean shouldSideBeRendered(IBlockAccess w, int x, int y, int z, int side) {
         return textures[side] != null;
@@ -90,7 +96,7 @@ public class BlockRenderHelper extends Block {
     
     @SideOnly(Side.CLIENT)
     @Override
-    public Icon getBlockTextureFromSideAndMetadata(int side, int md) {
+    public Icon getIcon(int side, int md) {
         Icon ret;
         try {
             ret = textures[side];
