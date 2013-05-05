@@ -1,6 +1,6 @@
 package factorization.api.datahelpers;
 
-import java.io.DataOutputStream;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import net.minecraft.item.ItemStack;
@@ -9,10 +9,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import cpw.mods.fml.relauncher.Side;
 
 public class DataOutPacket extends DataHelper {
-    private final DataOutputStream dos;
+    private final DataOutput dos;
     private final Side side;
     
-    public DataOutPacket(DataOutputStream dos, Side side) {
+    public DataOutPacket(DataOutput dos, Side side) {
         this.dos = dos;
         this.side = side;
     }

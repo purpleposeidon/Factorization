@@ -36,7 +36,7 @@ import factorization.api.DeltaCoord;
 
 public class FactorizationUtil {
     //ItemStack handling
-    public static final int WILDCARD_DAMAGE = Short.MAX_VALUE; //TODO, copy from Forge?
+    public static final int WILDCARD_DAMAGE = OreDictionary.WILDCARD_VALUE;
     
     public static ItemStack makeWildcard(Item item) {
         return new ItemStack(item, 1, WILDCARD_DAMAGE);

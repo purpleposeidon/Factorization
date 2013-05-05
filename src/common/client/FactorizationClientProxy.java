@@ -66,6 +66,7 @@ import factorization.common.TileEntitySlagFurnace;
 import factorization.common.TileEntitySolarTurbine;
 import factorization.common.TileEntitySteamTurbine;
 import factorization.common.TileEntityWrathLamp;
+import factorization.common.servo.BlockRenderServoRail;
 
 public class FactorizationClientProxy extends FactorizationProxy {
     @Override
@@ -487,6 +488,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderCrystallizer();
         new BlockRenderGreenware().setup();
         new BlockRenderRocketEngine();
+        new BlockRenderServoRail();
         for (FactoryType ft : new FactoryType[] { FactoryType.ROUTER, FactoryType.MAKER, FactoryType.STAMPER, FactoryType.BARREL, FactoryType.PACKAGER, FactoryType.SLAGFURNACE, FactoryType.SOLARBOILER }) {
             FactorizationBlockRender.setDefaultRender(ft);
         }

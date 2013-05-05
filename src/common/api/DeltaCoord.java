@@ -5,10 +5,13 @@ import java.io.DataOutput;
 import java.io.IOException;
 import com.google.common.base.Splitter;
 
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.IDataSerializable;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.ForgeDirection;
 
-public class DeltaCoord {
+public class DeltaCoord implements IDataSerializable {
     public int x, y, z;
 
     public DeltaCoord() {
@@ -178,5 +181,13 @@ public class DeltaCoord {
             i++;
         }
         return ret;
+    }
+    
+    @Override
+    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+        x = data.asSameShare(prefix + "dx").putInt(x);
+        y = data.asSameShare(prefix + "dy").putInt(y);
+        z = data.asSameShare(prefix + "dz").putInt(z);
+        return this;
     }
 }

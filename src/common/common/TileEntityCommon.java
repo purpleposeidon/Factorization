@@ -204,4 +204,22 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         }
         super.invalidate();
     }
+    
+    public boolean rotate(ForgeDirection axis) {
+        return false;
+    }
+    
+    static ForgeDirection[] empty_rotation_array = new ForgeDirection[0];
+    static ForgeDirection[] flat_rotation_array = new ForgeDirection[] { 
+        ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.WEST, ForgeDirection.EAST
+    };
+    static ForgeDirection[] full_rotation_array = new ForgeDirection[6];
+    static {
+        for (int i = 0; i < 6; i++) {
+            full_rotation_array[i] = ForgeDirection.getOrientation(i);
+        }
+    }
+    public ForgeDirection[] getValidRotations() {
+        return empty_rotation_array;
+    }
 }

@@ -27,7 +27,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     static boolean isUpdating = false;
 
     static int update_count;
-    static final int update_limit = 64;
+    static final int update_limit = 512;
     static PriorityQueue<Coord> airToUpdate = new PriorityQueue(1024);
 
     private static class Coord implements Comparable<Coord> {
@@ -65,12 +65,20 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     }
     
     static final int NOTIFY_NEIGHBORS = factorization.api.Coord.NOTIFY_NEIGHBORS;
+    static boolean spammed_console = false;
 
     static void doAirCheck(World w, int x, int y, int z) {
         if (w.isRemote) {
             return;
         }
         if (update_count > update_limit) {
+            if (airToUpdate.size() > 1024*8) {
+                if (!spammed_console) {
+                    Core.logSevere("TileEntityWrathLamp.airToUpdate has %i entries!", airToUpdate.size());
+                    spammed_console = true;
+                }
+                return;
+            }
             airToUpdate.add(new Coord(w, x, y, z));
             return;
         }

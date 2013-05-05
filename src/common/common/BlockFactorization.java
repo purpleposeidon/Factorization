@@ -331,6 +331,7 @@ public class BlockFactorization extends BlockContainer {
 
         //dark
         itemList.add(reg.router_item);
+        itemList.add(reg.servorail_item);
         itemList.add(reg.lamp_item);
         //itemList.add(reg.sentrydemon_item);
 

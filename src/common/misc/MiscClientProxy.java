@@ -11,8 +11,12 @@ import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.Entity;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatFileWriter;
+import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
+import cpw.mods.fml.client.GuiModList;
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
 import cpw.mods.fml.common.IScheduledTickHandler;
@@ -33,6 +37,7 @@ public class MiscClientProxy extends MiscProxy {
             n = args.get(0);
         }
         int i = mc.gameSettings.renderDistance;
+        boolean found_number = true;
         if (n.equalsIgnoreCase("far")) {
             i = 0;
         } else if (n.equalsIgnoreCase("normal")) {
@@ -52,31 +57,36 @@ public class MiscClientProxy extends MiscProxy {
         } else {
             try {
                 i = Integer.parseInt(n);
-            } catch (NumberFormatException e) { }
+            } catch (NumberFormatException e) {
+                found_number = false;
+            }
         }
         if (!mc.isSingleplayer() || !Core.enable_sketchy_client_commands) {
             if (i < 0) {
                 i = 0;
             }
-            if (i > 8) {
-                i = 8;
-            }
         }
-        mc.gameSettings.renderDistance = i;
+        if (i > 8) {
+            i = 8; //seems to have started crashing. Lame.
+        }
+        if (found_number) { 
+            mc.gameSettings.renderDistance = i;
+            return;
+        }
+        EntityClientPlayerMP player = mc.thePlayer;
         if (n.equalsIgnoreCase("pauserender")) {
             mc.skipRenderWorld = !mc.skipRenderWorld;
         } else if (n.equalsIgnoreCase("now") || n.equalsIgnoreCase("date") || n.equalsIgnoreCase("time")) {
-            mc.thePlayer.addChatMessage(Calendar.getInstance().getTime().toString());
+            player.addChatMessage(Calendar.getInstance().getTime().toString());
         } else if (n.equalsIgnoreCase("about") || n.equalsIgnoreCase("?") || n.equalsIgnoreCase("help")) {
-            mc.thePlayer.addChatMessage("Misc client-side commands; from Factorization by neptunepink");
-            mc.thePlayer.addChatMessage("Use tab to get the subcommands");
+            player.addChatMessage("Misc client-side commands; from Factorization by neptunepink");
+            player.addChatMessage("Use tab to get the subcommands");
         } else if (n.equalsIgnoreCase("clear") || n.equalsIgnoreCase("cl")) {
             List cp = new ArrayList();
             cp.addAll(mc.ingameGUI.getChatGUI().getSentMessages());
             mc.ingameGUI.getChatGUI().clearChatMessages(); 
             mc.ingameGUI.getChatGUI().getSentMessages().addAll(cp);
         } else if (n.equalsIgnoreCase("saycoords") && Core.enable_sketchy_client_commands) {
-            EntityClientPlayerMP player = mc.thePlayer;
             player.sendChatMessage("/me is at " + ((int) player.posX) + ", " + ((int) player.posY) + ", " + ((int) player.posZ));
         } else if (n.equalsIgnoreCase("saveoptions") || n.equalsIgnoreCase("savesettings") || n.equalsIgnoreCase("so") || n.equalsIgnoreCase("ss")) {
             mc.gameSettings.saveOptions();
@@ -102,7 +112,32 @@ public class MiscClientProxy extends MiscProxy {
                     }
                 }
             }
-            mc.thePlayer.addChatMessage("Rendered " + did + " chunks out of " + total);
+            player.addChatMessage("Rendered " + did + " chunks out of " + total);
+        } else if (n.equalsIgnoreCase("noclip") && Core.enable_cheat_commands && mc.isSingleplayer()) {
+            boolean next = !mc.gameSettings.noclip;
+            mc.gameSettings.noclip = next;
+            mc.thePlayer.noClip = next;
+            for (World w : DimensionManager.getWorlds()) {
+                for (Object o : w.playerEntities) {
+                    Entity e = (Entity) o;
+                    e.noClip = next;
+                }
+            }
+        } else if (n.equalsIgnoreCase("c") || n.equalsIgnoreCase("creative")) {
+            player.sendChatMessage("/gamemode " + (player.capabilities.isCreativeMode ? 0 : 1));
+        } else if (n.equalsIgnoreCase("n") || n.equalsIgnoreCase("nice") || n.equalsIgnoreCase("makenice")) {
+            if (player.worldObj.isRaining()) {
+                player.sendChatMessage("/toggledownfall");
+            }
+            double angle =player.worldObj.getCelestialAngle(0) % 360;
+            if (angle < 45 || angle > 90+45) {
+                player.sendChatMessage("/time set day");
+            }
+            player.sendChatMessage("/f cl");
+        } else if (n.equalsIgnoreCase("mods")) {
+            mc.displayGuiScreen(new GuiModList(null));
+        } else {
+            player.addChatMessage("Unknown command: " + n);
         }
     }
     

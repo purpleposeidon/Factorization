@@ -50,7 +50,7 @@ public class Core {
     public static final String modId = "factorization";
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
-    public static final String version = "0.7.37"; //@VERSION@
+    public static final String version = "0.7.38"; //@VERSION@
     public Core() {
         registry = new Registry();
         exoCore = new ExoCore();
@@ -102,7 +102,7 @@ public class Core {
     public static boolean dev_environ = (Boolean) ReflectionHelper.getPrivateValue(cpw.mods.fml.relauncher.RelaunchLibraryManager.class, null, "deobfuscatedEnvironment");
     public static boolean boilers_suck_water = true;
     public static double steam_output_adjust = 1.0;
-    public static boolean enable_sketchy_client_commands = true;
+    public static boolean enable_sketchy_client_commands = true, enable_cheat_commands = dev_environ;
     public static int max_rocket_base_size = 20*20;
     public static int max_rocket_height = 64;
     public static String language_file = "/mods/factorization/en_US.lang";

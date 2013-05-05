@@ -10,15 +10,18 @@ import java.util.ArrayList;
 import java.util.IllegalFormatException;
 
 import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.NetHandler;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet131MapData;
+import net.minecraft.server.management.PlayerInstance;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StringTranslate;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.ITinyPacketHandler;
@@ -26,6 +29,7 @@ import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
+import factorization.api.IEntityMessage;
 import factorization.api.Quaternion;
 import factorization.api.VectorUV;
 
@@ -34,6 +38,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
     protected final static short factorizeMsgChannel = 1; //used for sending translatable chat messages
     protected final static short factorizeCmdChannel = 2; //used for player keys
     protected final static short factorizeNtfyChannel = 3; //used to show messages in-world
+    protected final static short factorizeEntityChannel = 4; //used for entities
 
     public NetworkFactorization() {
         Core.network = this;
@@ -104,7 +109,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 }
             }
             output.flush();
-            return PacketDispatcher.getTinyPacket(Core.instance, (short) 0, outputStream.toByteArray());
+            return PacketDispatcher.getTinyPacket(Core.instance, factorizeTEChannel, outputStream.toByteArray());
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -141,6 +146,74 @@ public class NetworkFactorization implements ITinyPacketHandler {
             output.flush();
             new PacketDispatcher();
             return PacketDispatcher.getTinyPacket(Core.instance, factorizeNtfyChannel, outputStream.toByteArray());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    public Packet entityPacket(Entity to, short messageType, Object ...items) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            DataOutputStream output = new DataOutputStream(outputStream);
+
+            output.writeInt(to.entityId);
+            output.writeShort(messageType);
+
+            for (Object item : items) {
+                if (item == null) {
+                    throw new RuntimeException("Argument is null!");
+                }
+                if (item instanceof Integer) {
+                    output.writeInt((Integer) item);
+                } else if (item instanceof Byte) {
+                    output.writeByte((Byte) item);
+                } else if (item instanceof Short) {
+                    output.writeShort((Short) item);
+                } else if (item instanceof String) {
+                    output.writeUTF((String) item);
+                } else if (item instanceof Boolean) {
+                    output.writeBoolean((Boolean) item);
+                } else if (item instanceof Float) {
+                    output.writeFloat((Float) item);
+                } else if (item instanceof ItemStack) {
+                    ItemStack is = (ItemStack) item;
+                    NBTTagCompound tag = new NBTTagCompound();
+                    is.writeToNBT(tag);
+                    NBTTagCompound.writeNamedTag(tag, output);
+                    if (outputStream.size() > 65536 && is.hasTagCompound()) {
+                        //Got an overflow! We'll blame the NBT tag.
+                        if (huge_tag_warnings++ < 10) {
+                            Core.logWarning("Item " + is + " probably has a huge NBT tag; it will be stripped from the packet; packet for entity " + to);
+                            if (huge_tag_warnings == 10) {
+                                Core.logWarning("(This will no longer be logged)");
+                            }
+                        }
+                        NBTTagCompound tag_copy = is.getTagCompound();
+                        is.setTagCompound(null);
+                        try {
+                            return entityPacket(to, messageType, items);
+                        } finally {
+                            is.setTagCompound(tag_copy);
+                        }
+                    }
+                } else if (item instanceof VectorUV) {
+                    VectorUV v = (VectorUV) item;
+                    output.writeFloat((float) v.x);
+                    output.writeFloat((float) v.y);
+                    output.writeFloat((float) v.z);
+                } else if (item instanceof DeltaCoord) {
+                    DeltaCoord dc = (DeltaCoord) item;
+                    dc.write(output);
+                } else if (item instanceof Quaternion) {
+                    Quaternion q = (Quaternion) item;
+                    q.write(output);
+                } else {
+                    throw new RuntimeException("Don't know how to serialize " + item.getClass() + " (" + item + ")");
+                }
+            }
+            output.flush();
+            return PacketDispatcher.getTinyPacket(Core.instance, factorizeEntityChannel, outputStream.toByteArray());
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -215,6 +288,21 @@ public class NetworkFactorization implements ITinyPacketHandler {
             Core.proxy.addPacket(who, toSend);
         }
     }
+    
+    public void broadcastPacket(World world, int xCoord, int yCoord, int zCoord, Packet toSend) {
+        if (toSend == null) {
+            return;
+        }
+        if (world.isRemote) {
+            return;
+        }
+        WorldServer w = (WorldServer) world;
+        PlayerInstance pi = w.getPlayerManager().getOrCreateChunkWatcher(xCoord >> 4, zCoord >> 4, false);
+        if (pi == null) {
+            return;
+        }
+        pi.sendToAllPlayersWatchingChunk(toSend);
+    }
 
     static final private ThreadLocal<EntityPlayer> currentPlayer = new ThreadLocal<EntityPlayer>();
 
@@ -240,6 +328,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
         case factorizeMsgChannel: handleMsg(input); break;
         case factorizeCmdChannel: handleCmd(data); break;
         case factorizeNtfyChannel: handleNtfy(input); break;
+        case factorizeEntityChannel: handleEntity(input); break;
         default: Core.logWarning("Got packet with invalid channel %i with player = %s ", channel, me); break;
         }
 
@@ -418,6 +507,38 @@ public class NetworkFactorization implements ITinyPacketHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+    
+    void handleEntity(DataInputStream input) {
+        try {
+            World world = getCurrentPlayer().worldObj;
+            if (!world.isRemote) {
+                return;
+            }
+            int entityId = input.readInt();
+            short messageType = input.readShort();
+            Entity to = world.getEntityByID(entityId);
+            if (to == null) {
+                if (Core.dev_environ) {
+                    Core.logFine("Packet to unknown entity #%i: %i", entityId, messageType);
+                }
+                return;
+            }
+            
+            if (!(to instanceof IEntityMessage)) {
+                Core.logFine("Packet to inappropriate entity #%i: %i", entityId, messageType);
+            }
+            IEntityMessage iem = (IEntityMessage) to;
+            
+            if (Core.debug_network) {
+                Core.logFine("EntityNet: " + messageType + "      " + to);
+            }
+            
+            boolean handled;
+            iem.handleMessage(messageType, input);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
     

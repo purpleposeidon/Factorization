@@ -49,6 +49,8 @@ import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
 import factorization.common.Core.TabType;
 import factorization.common.TileEntityGreenware.ClayState;
+import factorization.common.servo.ItemServoMotor;
+import factorization.common.servo.ServoMotor;
 
 public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler {
     static public final int ExoKeyCount = 3;
@@ -60,7 +62,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public BlockLightAir lightair_block;
     public BlockResource resource_block;
 
-    public ItemStack router_item, maker_item, stamper_item, packager_item,
+    public ItemStack router_item, servorail_item;
+    
+    public ItemStack maker_item, stamper_item, packager_item,
             barrel_item,
             lamp_item, air_item,
             slagfurnace_item, battery_item_hidden, leydenjar_item, leydenjar_item_full, heater_item, steamturbine_item, solarboiler_item,
@@ -113,6 +117,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemBlockProxy rocket_engine;
     public LiquidStack liquidStackRocketFuel;
     public ItemCraftingComponent bucket_rocket_fuel;
+    public ItemServoMotor servo_motor_placer;
 
     public Material materialMachine = new Material(MapColor.ironColor);
 
@@ -150,6 +155,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //TileEntity renderers are registered in the client proxy
         
         EntityRegistry.registerModEntity(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", 0, Core.instance, 1, 10, false);
+        EntityRegistry.registerModEntity(ServoMotor.class, "factory_servo", 1, Core.instance, 100, 1, true);
     }
 
     /*private void addName(Object what, String name) {
@@ -185,6 +191,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
         //BlockFactorization stuff
         router_item = FactoryType.ROUTER.itemStack();
+        servorail_item = FactoryType.SERVORAIL.itemStack();
         barrel_item = FactoryType.BARREL.itemStack();
         maker_item = FactoryType.MAKER.itemStack();
         stamper_item = FactoryType.STAMPER.itemStack();
@@ -310,6 +317,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             bucket_rocket_fuel.setMaxStackSize(1);
             bucket_rocket_fuel.setContainerItem(Item.bucketEmpty);
         }
+        
+        //Servos
+        servo_motor_placer = new ItemServoMotor(itemID("servoMotorPlacer", 9056));
     }
 
     void recipe(ItemStack res, Object... params) {
@@ -375,7 +385,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         recipe(new ItemStack(logicMatrixIdentifier),
                 "MiX",
                 'M', logicMatrix,
-                'i', Item.field_94583_ca /* netherquartz */,
+                'i', Item.netherQuartz /* netherquartz */,
                 'X', logicMatrixProgrammer);
         recipe(new ItemStack(logicMatrixProgrammer),
                 "MiX",
@@ -426,7 +436,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "D ",
                 " B",
                 'D', diamond_shard,
-                'B', Item.field_94584_bZ /* netherbrick */);
+                'B', Item.netherrackBrick /* netherbrick */);
         //recipe(new ItemStack(wrath_igniter), // ah hell naw
         //		"D ",
         //		" B",
@@ -485,7 +495,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'O', Block.obsidian,
                 'P', Block.pistonBase,
                 'W', Item.bucketWater,
-                'T', Item.pickaxeSteel,
+                'T', Item.pickaxeIron,
                 'L', Item.bucketLava);
         recipe(is_cobble_drive,
                 "OPO",
@@ -494,7 +504,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'O', Block.obsidian,
                 'P', Block.pistonBase,
                 'W', Item.bucketWater,
-                'T', Item.pickaxeSteel,
+                'T', Item.pickaxeIron,
                 'L', Item.bucketLava);
         recipe(new ItemStack(exo_mounted_piston),
                 "CNC",
@@ -550,8 +560,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         ItemStack lapis = new ItemStack(Item.dyePowder, 1, 4);
         ItemStack lead_chunks = new ItemStack(ore_reduced, 1, ItemOreProcessing.OreType.LEAD.ID);
         ItemStack iron_chunks = new ItemStack(ore_reduced, 1, ItemOreProcessing.OreType.IRON.ID);
-        Item netherquartz = Item.field_94583_ca; //= field_94583_ca = netherquartz
-        Item netherbrick = Item.field_94584_bZ;
+        Item netherquartz = Item.netherQuartz;
+        Item netherbrick = Item.netherrackBrick;
         
         shapelessOreRecipe(base_common, new ItemStack(glaze_bucket), Item.bucketWater, Block.sand, Item.clay);
         shapelessOreRecipe(base_matte, base_common, Item.clay, Block.sand, charcoal);
@@ -1059,7 +1069,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                     "#F#",
                     "#I#",
                     "I I",
-                    '#', Block.blockSteel,
+                    '#', Block.blockIron,
                     'F', rocket_fuel,
                     'I', Item.ingotIron);
             shapelessRecipe(new ItemStack(bucket_rocket_fuel), Item.bucketEmpty, rocket_fuel, rocket_fuel);

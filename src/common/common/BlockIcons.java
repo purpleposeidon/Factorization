@@ -54,6 +54,8 @@ public class BlockIcons {
     public static Icon
         rocket_engine_top, rocket_engine_bottom_hole, rocket_engine_nozzle, rocket_engine_valid, rocket_engine_invalid;
     
+    public static Icon servo$rail;
+    
     public static Icon ceramics$bisque, ceramics$dry, ceramics$stand, ceramic$rawglaze;
     
     public static class RouterFace extends IconGroup {

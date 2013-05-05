@@ -589,4 +589,19 @@ public class TileEntityBarrel extends TileEntityFactorization {
         }
         return 1024; //32²
     }
+    
+    @Override
+    public boolean rotate(ForgeDirection axis) {
+        if (axis.offsetX != 0) {
+            return false;
+        }
+        facing_direction = (byte) axis.ordinal();
+        getCoord().markBlockForUpdate();
+        return true;
+    }
+    
+    @Override
+    public ForgeDirection[] getValidRotations() {
+        return flat_rotation_array;
+    }
 }

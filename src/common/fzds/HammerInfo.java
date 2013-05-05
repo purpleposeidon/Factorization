@@ -126,7 +126,7 @@ public class HammerInfo {
     
     File getWorldSaveFile() {
         World hammerWorld = DeltaChunk.getServerShadowWorld();
-        File base = new File(hammerWorld.getSaveHandler().getSaveDirectoryName());
+        File base = new File(hammerWorld.getSaveHandler().getWorldDirectoryName());
         return new File(base, "deltaChunk.cfg");
     }
     
