@@ -22,7 +22,7 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     }
     
     @Override
-    public void updateIcons(IconRegister par1IconRegister) {
+    public void registerIcons(IconRegister par1IconRegister) {
         // Nada
     }
 

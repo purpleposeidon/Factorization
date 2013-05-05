@@ -56,7 +56,7 @@ public class ItemFactorization extends ItemBlock {
 
     @Override
     public Icon getIconFromDamage(int damage) {
-        return Core.registry.factory_block.getBlockTextureFromSideAndMetadata(0, damage);
+        return Core.registry.factory_block.getIcon(0, damage);
     }
 
     public int getMetadata(int i) {

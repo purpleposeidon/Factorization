@@ -44,7 +44,7 @@ public class ItemGlazeBucket extends Item {
             //Or could return the error icon.
             //But I think this'll look less terribly awful if a block goes away.
         }
-        return block.getBlockTextureFromSideAndMetadata(getBlockSide(is), getBlockMd(is));
+        return block.getIcon(getBlockSide(is), getBlockMd(is));
     }
     
     @Override

@@ -22,8 +22,8 @@ public class ItemPocketTable extends Item {
     }
     
     @Override
-    public void updateIcons(IconRegister reg) {
-        super.updateIcons(reg);
+    public void registerIcons(IconRegister reg) {
+        super.registerIcons(reg);
         FactorizationTextureLoader.register(reg, ItemIcons.class);
     }
 

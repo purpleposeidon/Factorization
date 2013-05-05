@@ -48,7 +48,7 @@ public class ItemSculptingTool extends Item {
     }
     
     @Override
-    public void updateIcons(IconRegister reg) { }
+    public void registerIcons(IconRegister reg) { }
 
     static enum ToolMode {
         MOVER("move", true),
