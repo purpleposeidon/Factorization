@@ -30,7 +30,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
     }
     
     List<AxisAlignedBB> getUnderlying(AxisAlignedBB aabb) {
-        return shadowWorld.getAllCollidingBoundingBoxes(aabb);
+        return shadowWorld.getCollidingBlockBounds(aabb);
     }
     
     private void shadow2rotation(Vec3 v) {

@@ -60,7 +60,7 @@ public class BlockLightAir extends Block {
     public void registerIcons(IconRegister reg) { }
     
     @Override
-    public Icon getBlockTextureFromSideAndMetadata(int side, int md) {
+    public Icon getIcon(int side, int md) {
         if (Core.debug_light_air) {
             return Block.glowStone.getBlockTextureFromSide(0);
         }

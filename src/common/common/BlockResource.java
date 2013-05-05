@@ -41,7 +41,7 @@ public class BlockResource extends Block {
     
     boolean done_spam = false;
     @Override
-    public Icon getBlockTextureFromSideAndMetadata(int side, int md) {
+    public Icon getIcon(int side, int md) {
         if (ResourceType.EXOMODDER.is(md)) {
             if (side == 0) {
                 return exoBottom;

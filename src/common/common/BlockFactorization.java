@@ -204,7 +204,7 @@ public class BlockFactorization extends BlockContainer {
     private Icon tempParticleIcon = null;
     
     @Override
-    public Icon getBlockTextureFromSideAndMetadata(int side, int md) {
+    public Icon getIcon(int side, int md) {
         if (tempParticleIcon != null) {
             Icon ret = tempParticleIcon;
             tempParticleIcon = null;
@@ -586,26 +586,42 @@ public class BlockFactorization extends BlockContainer {
         Icon theIcon = (tec == null) ? BlockIcons.default_icon : tec.getIcon(ForgeDirection.DOWN);
         
         //copied & modified from EffectRenderer.addBlockDestroyEffects
-        
         byte b0 = 4;
         Minecraft mc = Minecraft.getMinecraft();
-        for (int j1 = 0; j1 < b0; ++j1)
-        {
-            for (int k1 = 0; k1 < b0; ++k1)
-            {
-                for (int l1 = 0; l1 < b0; ++l1)
-                {
-                    double d0 = (double)x + ((double)j1 + 0.5D) / (double)b0;
-                    double d1 = (double)y + ((double)k1 + 0.5D) / (double)b0;
-                    double d2 = (double)z + ((double)l1 + 0.5D) / (double)b0;
+        for (int j1 = 0; j1 < b0; ++j1) {
+            for (int k1 = 0; k1 < b0; ++k1) {
+                for (int l1 = 0; l1 < b0; ++l1) {
+                    double d0 = (double) x + ((double) j1 + 0.5D) / (double) b0;
+                    double d1 = (double) y + ((double) k1 + 0.5D) / (double) b0;
+                    double d2 = (double) z + ((double) l1 + 0.5D) / (double) b0;
                     int i2 = rand.nextInt(6);
-                    EntityDiggingFX fx = (new EntityDiggingFX(world, d0, d1, d2, d0 - (double)x - 0.5D, d1 - (double)y - 0.5D, d2 - (double)z - 0.5D, Block.stone, i2, 0, mc.renderEngine)).func_70596_a(x, y, z);
-                    fx.func_94052_a(mc.renderEngine, theIcon); //func_94052_a, setParticleIcon
+                    EntityDiggingFX fx = (new EntityDiggingFX(world, d0, d1, d2, d0 - (double) x - 0.5D, d1 - (double) y - 0.5D, d2 - (double) z - 0.5D,
+                            Block.stone, i2, 0, mc.renderEngine)).func_70596_a(x, y, z);
+                    fx.setParticleIcon(mc.renderEngine, theIcon); // func_94052_a,
+                                                                    // setParticleIcon
                     effectRenderer.addEffect(fx);
                 }
             }
         }
         
         return true;
+    }
+    
+    @Override
+    public boolean rotateBlock(World worldObj, int x, int y, int z, ForgeDirection axis) {
+        TileEntityCommon tec = new Coord(worldObj, x, y, z).getTE(TileEntityCommon.class);
+        if (tec == null) {
+            return false;
+        }
+        return false;
+    }
+    
+    @Override
+    public ForgeDirection[] getValidRotations(World worldObj, int x, int y, int z) {
+        TileEntityCommon tec = new Coord(worldObj, x, y, z).getTE(TileEntityCommon.class);
+        if (tec == null) {
+            return TileEntityCommon.empty_rotation_array;
+        }
+        return tec.getValidRotations();
     }
 }
