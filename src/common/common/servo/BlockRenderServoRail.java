@@ -27,14 +27,14 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
     }
     
     void restoreTextures(int a, int b) {
-        Icon icon = BlockIcons.dark_iron_block;
+        Icon icon = BlockIcons.uv_test;
         block.setTexture(a, icon);
         block.setTexture(b, icon);
     }
     
     @Override
     protected void render(RenderBlocks rb) {
-        Icon icon = BlockIcons.dark_iron_block;
+        Icon icon = BlockIcons.uv_test;
         block = BlockRenderHelper.instance;
         block.useTexture(icon);
         float f = TileEntityServoRail.width;
@@ -90,7 +90,7 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
             renderBlock(rb, block);
             restoreTextures(4, 5);
         }
-        if (count != 3) {
+        if (count == 0) {
             block.useTextures(central);
             block.setBlockBounds(f, f, f, 1 - f, 1 - f, 1 - f);
             renderBlock(rb, block);
