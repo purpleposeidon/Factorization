@@ -26,7 +26,7 @@ import factorization.common.TileEntityCommon;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsEntryControl;
 
-public class TileEntityServoRail extends TileEntityCommon implements IChargeConductor, IFzdsEntryControl {
+public class TileEntityServoRail extends TileEntityCommon implements IChargeConductor {
     public static final float width = 7F/16F;
     
     Charge charge = new Charge(this);
@@ -56,22 +56,6 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     public void updateEntity() {
         charge.update();
     }
-    
-    @Override
-    public boolean canEnter(IDeltaChunk dse) {
-        return false;
-    }
-    
-    @Override
-    public boolean canExit(IDeltaChunk dse) {
-        return false;
-    }
-
-    @Override
-    public void onEnter(IDeltaChunk dse) { }
-
-    @Override
-    public void onExit(IDeltaChunk dse) { }
     
     @Override
     public void writeToNBT(NBTTagCompound tag) {

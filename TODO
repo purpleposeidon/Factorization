@@ -70,6 +70,7 @@ Kill Wrath (This will make the mod so much simpler...):
 
 TOP LIST (that's become somewhat less tops. Oops.)
 --------
+Pocket crafting table hotbar transfer target deletion bug; see Container.java:402 slotClick "par3 == 2"
 onInventoryUpdate all the TEs
 smooth sandstone double slab (Are there other variants?)
 The new IInventory has stuff for preventing things from being put into slots. All machines, and especially routers.
@@ -109,6 +110,7 @@ register ore blocks
 Forge finally has Block hooks for custom particles! \o/
 
 back to ceramics?
+   - a new tool: export to obj tool. And if we have an export, maybe an import would be nice. Could export the sculpture, or export the chunk! Use a hacked up tessellator.
 https://github.com/MinecraftForge/MinecraftForge/commit/34ebfcd9785c3c50c3ac743eb1e9cbf000df10dc
 
 [Reported bugs]
