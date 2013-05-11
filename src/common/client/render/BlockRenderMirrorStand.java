@@ -18,7 +18,7 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
     private static final int backFace[] = {0};
     private static final int sideFace[] = {2, 3, 4, 5};
     
-    private static Quaternion mirrorTilt = Quaternion.getRotationQuaternion(Math.toRadians(-45), 1, 0, 0);
+    private static Quaternion mirrorTilt = Quaternion.getRotationQuaternionRadians(Math.toRadians(-45), 1, 0, 0);
     @Override
     protected
     void render(RenderBlocks rb) {
@@ -48,7 +48,7 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
             TileEntityMirror tem = here.getTE(TileEntityMirror.class);
             if (tem != null && tem.target_rotation >= 0) {
                 block.translate(-0.5F, 0F, 0F);
-                Quaternion trans = Quaternion.getRotationQuaternion(Math.toRadians(tem.target_rotation - 90), ForgeDirection.UP);
+                Quaternion trans = Quaternion.getRotationQuaternionRadians(Math.toRadians(tem.target_rotation - 90), ForgeDirection.UP);
                 trans.incrMultiply(mirrorTilt);
                 block.rotate(trans);
                 block.translate(0.5F, -0.20F, 0.5F);

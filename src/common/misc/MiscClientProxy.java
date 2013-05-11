@@ -236,7 +236,9 @@ public class MiscClientProxy extends MiscProxy {
                 if (sprint.keyCode == 0) {
                     return;
                 }
-                mc.thePlayer.setSprinting(state);
+                if (!mc.thePlayer.isSneaking() && mc.thePlayer.isSprinting() != state) {
+                    mc.thePlayer.setSprinting(state);
+                }
                 mc.gameSettings.keyBindForward.pressed = state;
             }
         });

@@ -5,6 +5,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
+import factorization.api.FzOrientation;
 import factorization.common.FactorizationUtil;
 import factorization.common.ItemCraftingComponent;
 
@@ -30,7 +31,14 @@ public class ItemServoMotor extends ItemCraftingComponent {
         motor.posZ = c.z;
         //c.setAsEntityLocation(motor);
         w.spawnEntityInWorld(motor);
-        motor.direction = ForgeDirection.getOrientation(FactorizationUtil.determineOrientation(player));
+        ForgeDirection face = ForgeDirection.getOrientation(FactorizationUtil.determineOrientation(player));
+        if (motor.validDirection(face)) {
+            motor.orientation = FzOrientation.fromDirection(face);
+            FzOrientation perfect = motor.orientation.pointTopTo(ForgeDirection.getOrientation(side));
+            if (perfect != FzOrientation.UNKNOWN) {
+                motor.orientation = perfect;
+            }
+        }
         return true;
     }
 }

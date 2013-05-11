@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -21,8 +22,9 @@ import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
-import factorization.api.ICoord;
+import factorization.api.FzOrientation;
 import factorization.api.IEntityMessage;
+import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataInPacket;
@@ -30,38 +32,36 @@ import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.Share;
 import factorization.common.Core;
+import factorization.common.FactorizationUtil;
 
-public class ServoMotor extends Entity implements IEntityAdditionalSpawnData,
-        ICoord, IEntityMessage {
+public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IEntityMessage {
     Controller controller = new Controller();
 
     boolean dampenVelocity;
 
     Coord pos;
-    ForgeDirection direction = ForgeDirection.UNKNOWN,
-            nextDirection = ForgeDirection.UNKNOWN;
-    double speed;
+    FzOrientation prevOrientation = FzOrientation.UNKNOWN, orientation = FzOrientation.UNKNOWN, nextOrientation = FzOrientation.UNKNOWN;
+    private byte speed_b;
+    private static final double max_speed_b = 127;
     double accumulated_motion;
     double percent_complete;
+    
+    boolean new_motor = true;
+    
+    //For client-side rendering
+    double gear_rotation = 0, prev_gear_rotation = 0;
+    double servo_reorient = 0, prev_servo_reorient = 0;
 
-    static final double maxSpeed = 0.1, slowedSpeed = maxSpeed / 20,
-            minSpeed = slowedSpeed / 10;
+    static final double maxSpeed = 0.05 /* NORELEASE: 0.1 */, slowedSpeed = maxSpeed / 20, minSpeed = slowedSpeed / 10;
 
     private static class MessageType {
-        static final short motor_speed = 100, motor_direction = 101,
-                motor_position = 102;
+        static final short motor_speed = 100, motor_direction = 101, motor_position = 102;
     }
 
     public ServoMotor(World world) {
         super(world);
         setSize(1, 1);
         double d = 0.5;
-        boundingBox.minX = -d;
-        boundingBox.minY = -d;
-        boundingBox.minZ = -d;
-        boundingBox.maxX = +d;
-        boundingBox.maxY = +d;
-        boundingBox.maxZ = +d;
         pos = new Coord(world, 0, 0, 0);
     }
 
@@ -106,15 +106,22 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData,
     }
 
     void putData(DataHelper data) throws IOException {
+        if (!worldObj.isRemote) {
+            initPosition();
+        }
         data.as(Share.VISIBLE, "controller");
         controller.putData(data);
-        byte d = (byte) direction.ordinal();
-        d = data.as(Share.VISIBLE, "direction").putByte(d);
-        direction = ForgeDirection.getOrientation(d);
-        speed = data.as(Share.VISIBLE, "speed").putDouble(speed);
-        accumulated_motion = data.as(Share.VISIBLE, "accumulated_motion").putDouble(accumulated_motion);
+        prevOrientation = data.as(Share.PRIVATE, "prevOrient").putFzOrientation(prevOrientation);
+        orientation = data.as(Share.VISIBLE, "Orient").putFzOrientation(orientation);
+        nextOrientation = data.as(Share.VISIBLE, "nextOrient").putFzOrientation(nextOrientation);
+        speed_b = data.as(Share.VISIBLE, "speedb").putByte(speed_b);
+        accumulated_motion = data.as(Share.PRIVATE, "accumulated_motion").putDouble(accumulated_motion);
         percent_complete = data.as(Share.VISIBLE, "percent_complete").putDouble(percent_complete);
         pos = data.as(Share.VISIBLE, "pos").put(pos);
+        if (data.isReader()) {
+            pos.w = worldObj;
+        }
+        new_motor = data.as(Share.PRIVATE, "new").putBoolean(new_motor);
     }
 
     boolean validPosition(Coord c) {
@@ -122,55 +129,65 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData,
     }
 
     boolean validDirection(ForgeDirection dir) {
-        if (dir.offsetX + dir.offsetY + dir.offsetZ == -1) {
-            return validPosition(getCoord());
-        } else {
-            return validPosition(getCoord().add(dir));
-        }
+        return validPosition(getCurrentPos().add(dir));
     }
 
     void checkDirection() {
-        if (validPosition(getCoord())) {
+        if (validDirection(orientation.facing)) {
             return;
         }
-        if (validDirection(direction)) {
+        if (validDirection(nextOrientation.facing)) {
+            swapOrientations();
             return;
         }
-        if (validDirection(nextDirection)) {
-            swapDirections();
-            return;
-        }
-        speed = 0;
-        direction = ForgeDirection.UNKNOWN;
+        speed_b = 0;
+        orientation = FzOrientation.UNKNOWN;
     }
 
-    void swapDirections() {
-        ForgeDirection shwahpah = direction;
-        direction = nextDirection;
-        nextDirection = shwahpah;
+    void swapOrientations() {
+        FzOrientation shwahpah = orientation;
+        orientation = nextOrientation;
+        nextOrientation = shwahpah;
+    }
+    
+    void initPosition() {
+        new_motor = false;
+        if (!worldObj.isRemote) {
+            pos = new Coord(this);
+        }
     }
 
+    private boolean need_description_packet = false;
+    private static Quaternion target_orientation = new Quaternion();
     @Override
     public void onEntityUpdate() {
+        if (new_motor) {
+            initPosition(); //TODO: Is that Coord field necessary?
+        }
         if (ticksExisted == 1) {
             checkDirection();
+            if (!worldObj.isRemote) {
+                pos.w = worldObj;
+                
+            }
         }
         super.onEntityUpdate();
         if (worldObj.isRemote) {
             doLogic();
         } else {
-            boolean first = ticksExisted == 1;
-            double old_speed = speed;
-            ForgeDirection old_dir = direction;
-            ForgeDirection old_next_dir = nextDirection;
-            boolean at_stop = old_speed == 0 || old_dir == ForgeDirection.UNKNOWN;
+            byte orig_speed = speed_b;
             doLogic();
-            if (old_speed != speed || first) {
-                speedChanged();
+            need_description_packet |= orig_speed != speed_b;
+            if (need_description_packet) {
+                need_description_packet  = false;
+                describe();
             }
-            if (old_dir != direction || old_next_dir != nextDirection || first) {
-                directionChanged();
-            }
+//			if (old_speed != speed_b || first) {
+//				speedChanged();
+//			}
+//			if (old_dir != direction || old_next_dir != nextDirection || first) {
+//				orientationChanged();
+//			}
             broadcast(MessageType.motor_position, (float) posX, (float) posY, (float) posZ); //NORELEASE
         }
         setPosition(posX, posY, posZ);
@@ -179,95 +196,122 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData,
     void doLogic() {
         double x = posX, y = posY, z = posZ;
         worldObj.spawnParticle("reddust", x, y, z, 0, 0, 0);
-
+        
+        if (orientation == FzOrientation.UNKNOWN) {
+            if (nextOrientation != FzOrientation.UNKNOWN) {
+                swapOrientations();
+            } else {
+                pickNextOrientation();
+            }
+        }
+        
         if (!worldObj.isRemote) {
+            final double speed = getSpeed();
             if (dampenVelocity || hasSignal(Signal.STOP_MOTOR) || hasSignal(Signal.SLOW_MOTOR)) {
-                speed = speed * 2 / 3;
+                speed_b = (byte) (speed_b * 2 / 3);
                 if (speed < slowedSpeed) {
                     dampenVelocity = false;
                     if (hasSignal(Signal.STOP_MOTOR)) {
                         if (speed < minSpeed) {
-                            speed = 0;
-                            if (direction != ForgeDirection.UNKNOWN) {
-                                nextDirection = direction;
-                                direction = ForgeDirection.UNKNOWN;
-                            }
+                            speed_b = 0;
                         }
                     }
                 }
-            } else if (direction != ForgeDirection.UNKNOWN && speed < maxSpeed) {
+            } else if (orientation != FzOrientation.UNKNOWN && speed < maxSpeed) {
                 accelerate(); // NORELEASE
-                /*
-                 * long now = worldObj.getTotalWorldTime(); if (now % 10 == 0) {
-                 * IChargeConductor conductor =
-                 * here.getTE(IChargeConductor.class); if (conductor != null) {
-                 * int drain = 4; if (conductor.getCharge().tryTake(drain) >=
-                 * drain) { accelerate(); } } }
-                 */
+//				long now = worldObj.getTotalWorldTime();
+//				if (now % 10 == 0) {
+//					IChargeConductor conductor = getCurrentPos().getTE(IChargeConductor.class);
+//					if (conductor != null) {
+//						int drain = 4;
+//						if (conductor.getCharge().tryTake(drain) >= drain) {
+//							accelerate();
+//						}
+//					}
+//				}
             }
         }
         if (controller != null) {
             controller.doUpdate(this);
         }
-        if (speed <= 0 || direction == ForgeDirection.UNKNOWN) {
+        final double speed = getSpeed();
+        if (speed <= 0 || orientation == FzOrientation.UNKNOWN) {
             return;
         }
         accumulated_motion += speed;
         moveMotor();
         if (percent_complete >= 1) {
             percent_complete = 0;
+            pos = pos.add(orientation.facing);
             onEnterNewBlock();
-            if (pickNextDirection()) {
+            if (pickNextOrientation()) {
                 // We're relying on the speed being < 1 here.
                 moveMotor();
             }
         }
     }
-
-    static ThreadLocal<ArrayList<ForgeDirection>> direction_cache = new ThreadLocal<ArrayList<ForgeDirection>>();
-
-    static ArrayList<ForgeDirection> getDirs() {
-        ArrayList<ForgeDirection> ret = direction_cache.get();
-        if (ret == null) {
-            ret = new ArrayList(6);
-            for (int i = 0; i < 6; i++) {
-                ret.add(ForgeDirection.getOrientation(i));
-            }
-            direction_cache.set(ret);
+    
+    public Random getRandom() {
+        //Synchronizing RNG state isn't worthwhile
+        //It's possible things could end up in loops like this.
+        //Could probably think of something else to throw in.
+        Random rand = FactorizationUtil.dirtyRandomCache();
+        long seed = entityId + getCurrentPos().seed() + orientation.ordinal() << 2 + nextOrientation.ordinal();
+        rand.setSeed(seed);
+        return rand;
+    }
+    
+    private boolean testDirection(ForgeDirection d) {
+        if (d == ForgeDirection.UNKNOWN) {
+            return false;
         }
-        return ret;
+        return validDirection(d);
     }
 
-    boolean pickNextDirection() {
+    boolean pickNextOrientation() {
+        final ForgeDirection direction = orientation.facing, nextDirection = nextOrientation.facing;
         ForgeDirection opposite = direction.getOpposite();
-        if (direction != ForgeDirection.UNKNOWN && validPosition(getCoord().add(direction))) {
+        if (testDirection(nextDirection)) {
+            swapOrientations();
             return true;
         }
-        if (nextDirection != ForgeDirection.UNKNOWN && validDirection(nextDirection)) {
-            swapDirections();
+        if (testDirection(direction)) {
             return true;
         }
-        ArrayList<ForgeDirection> dirs = getDirs();
-        Collections.shuffle(dirs);
+        final ForgeDirection top = orientation.top, nextTop = nextOrientation.top;
+        if (testDirection(top)) {
+            nextOrientation = FzOrientation.fromDirection(top).pointTopTo(direction);
+            swapOrientations();
+        }
+        if (testDirection(nextTop)) {
+            nextOrientation = FzOrientation.fromDirection(nextTop).pointTopTo(nextDirection);
+            swapOrientations();
+        }
+        need_description_packet = true;
+        ArrayList<ForgeDirection> dirs = FactorizationUtil.dirtyDirectionCache();
+        Collections.shuffle(dirs, getRandom());
         for (int i = 0; i < 6; i++) {
             ForgeDirection d = dirs.get(i);
-            if (d == opposite || d == direction || d == nextDirection) {
+            if (d == opposite || d == direction || d == nextDirection || d == top || d == nextTop) {
                 continue;
             }
             if (validDirection(d)) {
-                nextDirection = direction;
-                direction = d;
+                nextOrientation = FzOrientation.fromDirection(d);
+                FzOrientation perfect = nextOrientation.pointTopTo(orientation.top);
+                if (perfect != FzOrientation.UNKNOWN) {
+                    nextOrientation = perfect;
+                }
+                swapOrientations();
                 return true;
             }
         }
-        direction = nextDirection = ForgeDirection.UNKNOWN;
+        orientation = nextOrientation = FzOrientation.UNKNOWN;
         return false;
     }
 
     void accelerate() {
-        speed += maxSpeed / (20 * 6);
-        speed = Math.min(speed, maxSpeed);
-        speedChanged();
+        speed_b += 1;
+        speed_b = (byte) Math.min(speed_b, max_speed_b);
     }
 
     void broadcast(short message_type, Object... msg) {
@@ -275,18 +319,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData,
         Core.network.broadcastPacket(worldObj, (int) posX, (int) posY, (int) posZ, p);
     }
 
-    void speedChanged() {
-        if (worldObj.isRemote) {
-            return;
-        }
-        broadcast(MessageType.motor_speed, (float) speed);
-    }
-
-    void directionChanged() {
-        if (worldObj.isRemote) {
-            return;
-        }
-        broadcast(MessageType.motor_direction, (byte) direction.ordinal(), (byte) nextDirection.ordinal());
+    void describe() {
+        Coord c = getCurrentPos();
+        broadcast(MessageType.motor_speed, speed_b, (float) percent_complete, c.x, c.y, c.z /* not sure why... */, (byte) orientation.ordinal(), (byte) nextOrientation.ordinal());
     }
 
     double fraction(double v) {
@@ -298,19 +333,45 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData,
             return;
         }
         double move = Math.min(accumulated_motion, 1 - percent_complete);
-        posX = pos.x + direction.offsetX * move;
-        posY = pos.y + direction.offsetY * move;
-        posZ = pos.z + direction.offsetZ * move;
         accumulated_motion -= move;
         percent_complete += move;
-        if (percent_complete >= 1) {
-            pos = pos.add(direction);
+        posX = pos.x + orientation.facing.offsetX * percent_complete;
+        posY = pos.y + orientation.facing.offsetY * percent_complete;
+        posZ = pos.z + orientation.facing.offsetZ * percent_complete;
+        if (worldObj.isRemote) {
+            prev_gear_rotation = gear_rotation;
+            gear_rotation += move;
+            
+            prev_servo_reorient = servo_reorient;
+            servo_reorient = Math.min(1, servo_reorient + move);
+            /*if (direction != orientation.facing) {
+                prevOrientation = orientation;
+                FzOrientation default_orientation = FzOrientation.fromDirection(direction);
+                FzOrientation next = default_orientation.pointTopTo(prevOrientation.top);
+                if (next != FzOrientation.UNKNOWN) {
+                    //A turn that keeps the gears in the same plane
+                    orientation = next;
+                } else {
+                    //The gears are being tilted somehow
+                    orientation = default_orientation.pointTopTo(prevOrientation.facing);
+                    if (orientation == FzOrientation.UNKNOWN) {
+                        orientation = next;
+                    }
+                }
+            }*/
+            if (servo_reorient >= 1) {
+                servo_reorient = 0;
+                prevOrientation = orientation;
+            }
         }
     }
-
-    @Override
-    public Coord getCoord() {
-        return pos.copy();
+    
+    Coord getCurrentPos() {
+        return pos;
+    }
+    
+    Coord getNextPos() {
+        return pos.add(orientation.facing);
     }
 
     boolean hasSignal(Signal signal) {
@@ -348,7 +409,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData,
 
     @Override
     public String toString() {
-        return super.toString() + (worldObj.isRemote ? " client" : " server") + " " + speed;
+        return super.toString() + (worldObj.isRemote ? " client" : " server") + " " + getSpeed();
     }
 
     @Override
@@ -369,22 +430,26 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData,
     }
 
     @Override
-    public void setPositionAndRotation(double x, double y, double z, float yaw,
-            float pitch) {
+    public void setPositionAndRotation(double x, double y, double z, float yaw, float pitch) {
         super.setPositionAndRotation(x, y, z, yaw, pitch);
     }
 
     @Override
     public boolean handleMessage(short messageType, DataInputStream input)
             throws IOException {
-        System.out.println("MotorMessage: " + messageType); // NORELEASE
+//		System.out.println("MotorMessage: " + messageType); // NORELEASE
         switch (messageType) {
         case MessageType.motor_speed:
-            speed = input.readFloat();
-            return true;
+            speed_b = input.readByte();
+            percent_complete = input.readFloat();
+            Coord c = getCurrentPos();
+            c.x = input.readInt();
+            c.y = input.readInt();
+            c.z = input.readInt();
+            //$FALL-THROUGH$~~~~~!
         case MessageType.motor_direction:
-            direction = ForgeDirection.getOrientation(input.readByte());
-            nextDirection = ForgeDirection.getOrientation(input.readByte());
+            orientation = FzOrientation.getOrientation(input.readByte());
+            nextOrientation = FzOrientation.getOrientation(input.readByte());
             return true;
         case MessageType.motor_position:
             double x = posX, y = posY, z = posZ;
@@ -393,5 +458,14 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData,
             return true;
         }
         return false;
+    }
+
+    public double getSpeed() {
+        double perc = speed_b/(max_speed_b);
+        return maxSpeed*perc;
+    }
+
+    public void setSpeed(byte new_speed) {
+        speed_b = new_speed;
     }
 }

@@ -592,7 +592,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     
     @Override
     public boolean rotate(ForgeDirection axis) {
-        if (axis.offsetX != 0) {
+        if (axis.offsetY != 0) {
             return false;
         }
         facing_direction = (byte) axis.ordinal();

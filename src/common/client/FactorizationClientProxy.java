@@ -67,6 +67,8 @@ import factorization.common.TileEntitySolarTurbine;
 import factorization.common.TileEntitySteamTurbine;
 import factorization.common.TileEntityWrathLamp;
 import factorization.common.servo.BlockRenderServoRail;
+import factorization.common.servo.RenderServoMotor;
+import factorization.common.servo.ServoMotor;
 
 public class FactorizationClientProxy extends FactorizationProxy {
     @Override
@@ -472,6 +474,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }
 
         RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
+        RenderingRegistry.registerEntityRenderingHandler(ServoMotor.class, new RenderServoMotor());
 
         RenderingRegistry.registerBlockHandler(new FactorizationRender());
         BlockRenderBattery renderBattery = new BlockRenderBattery();
@@ -527,5 +530,10 @@ public class FactorizationClientProxy extends FactorizationProxy {
     @Override
     public void BlockRenderHelper_clear_texture(BlockRenderHelper block) {
         block.textures = null;
+    }
+    
+    @Override
+    public String getPocketCraftingTableKey() {
+        return GameSettings.getKeyDisplayString(pocket_key.keyCode);
     }
 }

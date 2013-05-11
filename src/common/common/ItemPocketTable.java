@@ -2,14 +2,15 @@ package factorization.common;
 
 import java.util.List;
 
-import factorization.common.Core.TabType;
-
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModContainer;
+import factorization.common.Core.TabType;
 
 public class ItemPocketTable extends Item {
 
@@ -27,35 +28,17 @@ public class ItemPocketTable extends Item {
         FactorizationTextureLoader.register(reg, ItemIcons.class);
     }
 
-    //
-    // @Override
-    // public boolean onItemUseFirst(ItemStack stack, EntityPlayer player,
-    // World world, int X, int Y, int Z, int side) {
-    // player.openGui(FactorizationCore.instance, FactoryType.POCKETCRAFT.gui,
-    // null, 0, 0, 0);
-    // return true;
-    // }
-    //
-    // @Override
-    // public boolean tryPlaceIntoWorld(ItemStack stack,
-    // EntityPlayer player, World world, int X, int Y,
-    // int Z, int side) {
-    // // TODO Auto-generated method stub
-    // return super.onItemUse(par1ItemStack, par2EntityPlayer, par3World, par4,
-    // par5,
-    // par6, par7);
-    // }
-
     @Override
     public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
+        return activateTable(stack, world, player);
+    }
+    
+    ItemStack activateTable(ItemStack stack, World world, EntityPlayer player) {
         ItemStack save = player.inventory.getItemStack();
         if (save != null) {
             player.inventory.setItemStack(null);
         }
-        //XXX TODO: Chests stay open. Man, how do I fix this?
-        //player.openGui(Core.instance, FactoryType.NULLGUI.gui, null, 0, 0, 0);
         if (!world.isRemote) {
-            //...this may be troublesome for stack saving! :O
             player.openGui(Core.instance, FactoryType.POCKETCRAFTGUI.gui, null, 0, 0, 0);
             if (save != null) {
                 player.inventory.setItemStack(save);
@@ -67,21 +50,38 @@ public class ItemPocketTable extends Item {
     
     public ItemStack findPocket(EntityPlayer player) {
         InventoryPlayer inv = player.inventory;
+        int need_to_move = -1;
+        int a_free_space = -1;
         for (int i = 0; i < inv.getSizeInventory(); i++) {
-            if (i % 9 >= (9 - 3) && i > 9) {
-                continue;
-            }
+            boolean in_crafting_area = i % 9 >= (9 - 3) && i > 9;
             ItemStack is = inv.getStackInSlot(i);
             if (is == null) {
+                if (!in_crafting_area) {
+                    if (a_free_space == -1 || a_free_space < 9) {
+                        //Silly condition because: If it's not set, we should set it. If it's < 9, it's in the hotbar, which is a poor choice.
+                        //If it is going to the hotbar, it'll end up in the last empty slot.
+                        a_free_space = i;
+                    }
+                }
                 continue;
             }
             if (is.getItem() == this) {
-                return is;
+                if (in_crafting_area) {
+                    need_to_move = i;
+                } else {
+                    return is;
+                }
             }
         }
         ItemStack mouse_item = player.inventory.getItemStack();
         if (mouse_item != null && mouse_item.getItem() == this && player.openContainer instanceof ContainerPocket) {
             return mouse_item;
+        }
+        if (need_to_move != -1 && a_free_space != -1) {
+            ItemStack pocket = inv.getStackInSlot(need_to_move);
+            inv.setInventorySlotContents(need_to_move, null);
+            inv.setInventorySlotContents(a_free_space, pocket);
+            return pocket;
         }
         return null;
     }
@@ -91,12 +91,24 @@ public class ItemPocketTable extends Item {
         if (is == null) {
             return false;
         }
-        this.onItemRightClick(is, player.worldObj, player);
+        activateTable(is, player.worldObj, player);
         return true;
     }
-
+    
+    public static int NEI_status = -1;
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
+        if (player.worldObj.isRemote) {
+            ClassLoader loader = getClass().getClassLoader();
+            String key = Core.proxy.getPocketCraftingTableKey();
+            if (key != null && key != "") {
+                String enabled_or_installed = NEI_status == 1 ? "enabled" : "installed";
+                infoList.add("Press " + key + " to activate.");
+                if (NEI_status != 0) {
+                    infoList.add("Opens anywhere with NEI " + enabled_or_installed);
+                }
+            }
+        }
         Core.brand(is, infoList);
     }
 }

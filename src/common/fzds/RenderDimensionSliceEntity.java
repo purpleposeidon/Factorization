@@ -318,10 +318,8 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 if (!rotation.isZero()) {
                     Quaternion quat = rotation.add(dse.prevTickRotation);
                     quat.incrScale(0.5);
-                    Vec3 vec = Vec3.createVectorHelper(quat.x, quat.y, quat.z);
-                    vec = vec.normalize();
-                    double angle = Math.toDegrees(quat.setVector(vec));
-                    GL11.glRotatef((float)angle, (float)vec.xCoord, (float)vec.yCoord, (float)vec.zCoord);
+                    Vec3 vec = Vec3.createVectorHelper(0, 0, 0);
+                    quat.glRotate();
                 }
                 glTranslatef((float)(-dse.centerOffset.xCoord),
                         (float)(-dse.centerOffset.yCoord),

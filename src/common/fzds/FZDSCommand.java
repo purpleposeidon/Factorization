@@ -650,7 +650,7 @@ public class FZDSCommand extends CommandBase {
                     throw new SyntaxErrorException();
                 }
                 Quaternion toMod = derivative == 0 ? selected.getRotation() : selected.getRotationalVelocity();
-                toMod.update(Quaternion.getRotationQuaternion(theta, dir));
+                toMod.update(Quaternion.getRotationQuaternionRadians(theta, dir));
             }}, Requires.SELECTION);
         add(new SubCommand("d|s|v|r|w", "+|=", "[W=1]", "X", "Y", "Z") {
             @Override

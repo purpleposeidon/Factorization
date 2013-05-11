@@ -23,8 +23,6 @@ import factorization.common.BlockRenderHelper;
 import factorization.common.Core;
 import factorization.common.FactoryType;
 import factorization.common.TileEntityCommon;
-import factorization.fzds.api.IDeltaChunk;
-import factorization.fzds.api.IFzdsEntryControl;
 
 public class TileEntityServoRail extends TileEntityCommon implements IChargeConductor {
     public static final float width = 7F/16F;
@@ -100,8 +98,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         return any;
     }
     
-    @Override
-    public boolean addCollisionBoxesToList(Block ignore, AxisAlignedBB aabb, List list, Entity entity) {
+    private boolean getCollisionBoxes(AxisAlignedBB aabb, List list, Entity entity) {
         boolean remote = (entity != null && entity.worldObj != null) ? entity.worldObj.isRemote : FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT;
         BlockRenderHelper block = remote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
         boolean[] sides = new boolean[6];
@@ -153,6 +150,11 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     }
     
     @Override
+    public boolean addCollisionBoxesToList(Block ignore, AxisAlignedBB aabb, List list, Entity entity) {
+        return false;
+    }
+    
+    @Override
     public AxisAlignedBB getCollisionBoundingBoxFromPool() {
         return null;
     }
@@ -160,7 +162,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     @Override
     public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {
         ArrayList<AxisAlignedBB> boxes = new ArrayList(4);
-        addCollisionBoxesToList(null, null, boxes, null);
+        getCollisionBoxes(null, boxes, null);
         Block b = FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER ? Core.registry.serverTraceHelper : Core.registry.clientTraceHelper;
         for (AxisAlignedBB ab : boxes) {
             ab = ab.getOffsetBoundingBox(-xCoord, -yCoord, -zCoord);

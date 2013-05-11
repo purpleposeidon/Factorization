@@ -820,4 +820,30 @@ public class FactorizationUtil {
     }
     
     
+    
+    
+    private static ThreadLocal<ArrayList<ForgeDirection>> direction_cache = new ThreadLocal<ArrayList<ForgeDirection>>();
+
+    public static ArrayList<ForgeDirection> dirtyDirectionCache() {
+        ArrayList<ForgeDirection> ret = direction_cache.get();
+        if (ret == null) {
+            ret = new ArrayList(6);
+            for (int i = 0; i < 6; i++) {
+                ret.add(ForgeDirection.getOrientation(i));
+            }
+            direction_cache.set(ret);
+        }
+        return ret;
+    }
+    
+    private static ThreadLocal<Random> random_cache = new ThreadLocal<Random>();
+
+    public static Random dirtyRandomCache() {
+        Random ret = random_cache.get();
+        if (ret == null) {
+            ret = new Random();
+            random_cache.set(ret);
+        }
+        return ret;
+    }
 }

@@ -70,7 +70,19 @@ Kill Wrath (This will make the mod so much simpler...):
 
 TOP LIST (that's become somewhat less tops. Oops.)
 --------
-Pocket crafting table hotbar transfer target deletion bug; see Container.java:402 slotClick "par3 == 2"
+****POCKET CRAFTING TABLE****
+  Pocket crafting table hotbar transfer target deletion bug; see Container.java:402 slotClick "par3 == 2"
+  Add 'f': fills the crafting grid with what the mouse hovering over
+  Tutorial text in the GUI
+
+  $C opens the Pocket Crafting Table; if NEI is $(installed|enabled), it'll open from any inventory.
+  Commands:
+    $X: Empties the crafting grid
+    $C: Slides items clockwise from the upper left corner, possibly alternating
+    $F: fills grid with item under the mouse
+    $B: balances items
+
+
 onInventoryUpdate all the TEs
 smooth sandstone double slab (Are there other variants?)
 The new IInventory has stuff for preventing things from being put into slots. All machines, and especially routers.
@@ -88,8 +100,10 @@ Modularize FZ/astro so that astro has no deps & can be removed for public releas
 regularize fluid volumes for mixer/crystallizer; how can we make buckets of aqua regia?
 either figure out how to get mystcraft (?) loading TEs properly, or have the client automatically request the proper TE
   (perhaps change that new TileEntity() in BlockFZ to new UnloadedFZTE()
+Config option for ore processing output
 remove failed packet spam for everyone who isn't me
 test with dedicated server (not from eclipse....)
+Kill exo-armor
 [Mecha-Features]
 add inverium-based mecha-upgrades
 These upgrades:

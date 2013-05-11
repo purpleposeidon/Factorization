@@ -4,12 +4,16 @@ import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.ForgeDirection;
 
 import com.google.common.io.ByteArrayDataOutput;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 
@@ -42,6 +46,10 @@ public class Quaternion implements IDataSerializable {
     
     public Quaternion(double w, Vec3 v) {
         this(w, v.xCoord, v.yCoord, v.zCoord);
+    }
+    
+    public Quaternion(double w, ForgeDirection dir) {
+        this(w, dir.offsetX, dir.offsetY, dir.offsetZ);
     }
     
     public boolean isEqual(Quaternion other) {
@@ -132,6 +140,10 @@ public class Quaternion implements IDataSerializable {
         update(other.w, other.x, other.y, other.z);
     }
     
+    public void update(ForgeDirection dir) {
+        update(w, dir.offsetX, dir.offsetY, dir.offsetZ);
+    }
+    
     public void updateVector(Vec3 v) {
         v.xCoord = x;
         v.yCoord = y;
@@ -155,22 +167,59 @@ public class Quaternion implements IDataSerializable {
         z /= norm;
     }
     
-    public static Quaternion getRotationQuaternion(double angle, Vec3 axis) {
+    public static Quaternion getRotationQuaternion(FzOrientation orient) {
+        if (orient.top == ForgeDirection.UP) {
+            
+        }
+        return getRotationQuaternionRadians(Math.toRadians(orient.getRotation()*90), orient.facing);
+    }
+    
+    public static Quaternion getRotationQuaternionRadians(double angle, Vec3 axis) {
         double halfAngle = angle/2;
         double sin = Math.sin(halfAngle);
         return new Quaternion(Math.cos(halfAngle), axis.xCoord*sin, axis.yCoord*sin, axis.zCoord*sin);
     }
     
-    public static Quaternion getRotationQuaternion(double angle, ForgeDirection axis) {
+    public static Quaternion getRotationQuaternionRadians(double angle, ForgeDirection axis) {
         double halfAngle = angle/2;
         double sin = Math.sin(halfAngle);
         return new Quaternion(Math.cos(halfAngle), axis.offsetX*sin, axis.offsetY*sin, axis.offsetZ*sin);
     }
     
-    public static Quaternion getRotationQuaternion(double angle, double ax, double ay, double az) {
+    public static Quaternion getRotationQuaternionRadians(double angle, double ax, double ay, double az) {
         double halfAngle = angle/2;
         double sin = Math.sin(halfAngle);
         return new Quaternion(Math.cos(halfAngle), ax*sin, ay*sin, az*sin);
+    }
+    
+    private static Quaternion[] quat_cache = new Quaternion[FzOrientation.values().length];
+    /***
+     * @param An {@link FzOrientation}
+     * @return A {@link Quaternion} that should not be mutated. It 
+     */
+    public static Quaternion fromOrientation(final FzOrientation orient) {
+        final int ord = orient.ordinal();
+        if (quat_cache[ord] != null) {
+            //return quat_cache[ord]; NORELEASE
+        }
+        if (orient == FzOrientation.UNKNOWN) {
+            return quat_cache[ord] = new Quaternion();
+        }
+        final Vec3 target = orient.getDiagonalVector();
+        final Quaternion q1;
+        final double quart = Math.toRadians(90);
+        switch (orient.facing) {
+        case UP: q1 = Quaternion.getRotationQuaternionRadians(0*quart, ForgeDirection.WEST); break;
+        case DOWN: q1 = Quaternion.getRotationQuaternionRadians(2*quart, ForgeDirection.WEST); break;
+        case NORTH: q1 = Quaternion.getRotationQuaternionRadians(1*quart, ForgeDirection.WEST); break;
+        case SOUTH: q1 = Quaternion.getRotationQuaternionRadians(-1*quart, ForgeDirection.WEST); break;
+        case EAST: q1 = Quaternion.getRotationQuaternionRadians(1*quart, ForgeDirection.NORTH); break;
+        case WEST: q1 = Quaternion.getRotationQuaternionRadians(-1*quart, ForgeDirection.NORTH); break;
+        default: return quat_cache[ord] = new Quaternion(); //Won't happen
+        }
+        final Quaternion q2 = Quaternion.getRotationQuaternionRadians(orient.getRotation()*quart, orient.facing);
+        q2.incrMultiply(q1);
+        return quat_cache[ord] = q1;
     }
     
     /**
@@ -186,8 +235,22 @@ public class Quaternion implements IDataSerializable {
         return halfAngle*2;
     }
     
+    @SideOnly(Side.CLIENT)
+    public void glRotate() {
+        double halfAngle = Math.acos(w);
+        double sin = Math.sin(halfAngle);
+        GL11.glRotatef((float) Math.toDegrees(halfAngle*2), (float) (x/sin), (float) (y/sin), (float) (z/sin));
+    }
+    
     public double dotProduct(Quaternion other) {
         return w*other.w + x*other.x + y*other.y + z*other.z;
+    }
+    
+    public void incrLerp(Quaternion other, double t) {
+        other.incrAdd(this, -1);
+        other.incrScale(t);
+        this.incrAdd(other);
+        this.incrNormalize();
     }
     
     private static final double DOT_THRESHOLD = 0.9995;

@@ -11,7 +11,7 @@ import factorization.api.ExoStateType;
 public enum Command {
     bagShuffle(1), craftClear(2), craftMove(3), craftBalance(4), craftOpen(5, true),
     bagShuffleReverse(6), exoKeyOn(7, true), exoKeyOff(8, true), exoModLeftClick(9),
-    exoModRightClick(10);
+    exoModRightClick(10), craftFill(11);
 
     static class name {
         static HashMap<Byte, Command> map = new HashMap<Byte, Command>();
@@ -85,6 +85,10 @@ public enum Command {
         case craftBalance:
             // move as many items as we can to fill in template in crafting area
             craftBalance(player);
+            break;
+        case craftFill:
+            // fill the empty area in the crafting grid with the slot under the cursor
+            craftFill(player, arg);
             break;
         case craftOpen:
             Core.registry.pocket_table.tryOpen(player);
@@ -281,5 +285,9 @@ public enum Command {
         if (player.openContainer instanceof ContainerPocket) {
             ((ContainerPocket) player.openContainer).updateMatrix();
         }
+    }
+    
+    void craftFill(EntityPlayer player, int slot) {
+        
     }
 }

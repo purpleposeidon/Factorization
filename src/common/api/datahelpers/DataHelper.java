@@ -2,6 +2,8 @@ package factorization.api.datahelpers;
 
 import java.io.IOException;
 
+import factorization.api.FzOrientation;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -89,4 +91,10 @@ public abstract class DataHelper {
     public abstract double putDouble(double value) throws IOException;
     public abstract String putString(String value) throws IOException;
     public abstract ItemStack putItemStack(ItemStack value) throws IOException;
+    
+    public FzOrientation putFzOrientation(FzOrientation value) throws IOException {
+        //In case it becomes ForgeOrientation
+        byte v = (byte) value.ordinal();
+        return FzOrientation.getOrientation(putByte(v));
+    }
 }

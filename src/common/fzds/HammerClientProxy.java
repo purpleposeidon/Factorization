@@ -227,7 +227,7 @@ public class HammerClientProxy extends HammerProxy {
                     Core.proxy.getProfiler());
             send_queue = Minecraft.getMinecraft().thePlayer.sendQueue;
             NCH_class = (Class<NetClientHandler>)send_queue.getClass();
-            NCH_worldClient_field = ReflectionHelper.findField(NCH_class, "worldClient", "i");
+            NCH_worldClient_field = ReflectionHelper.findField(NCH_class, "worldClient", "field_72564_i", "i");
             Minecraft mc = Minecraft.getMinecraft();
         }
     }

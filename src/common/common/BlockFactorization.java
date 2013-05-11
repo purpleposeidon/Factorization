@@ -238,7 +238,8 @@ public class BlockFactorization extends BlockContainer {
 
     @Override
     public void breakBlock(World w, int x, int y, int z, int id, int md) {
-        TileEntityCommon te = new Coord(w, x, y, z).getTE(TileEntityCommon.class);
+        Coord here = new Coord(w, x, y, z);
+        TileEntityCommon te = here.getTE(TileEntityCommon.class);
         if (te != null) {
             te.onRemove();
             destroyedTE = te;
@@ -248,8 +249,10 @@ public class BlockFactorization extends BlockContainer {
     
     @Override
     public boolean removeBlockByPlayer(World world, EntityPlayer player, int x, int y, int z) {
-        TileEntityCommon tec = new Coord(world, x, y, z).getTE(TileEntityCommon.class);
+        Coord here = new Coord(world, x, y, z);
+        TileEntityCommon tec = here.getTE(TileEntityCommon.class);
         if (tec == null) {
+            Core.notify(null, here, "No TileEntity!");
             return super.removeBlockByPlayer(world, player, x, y, z);
         }
         return tec.removeBlockByPlayer(player);
@@ -614,7 +617,7 @@ public class BlockFactorization extends BlockContainer {
         if (tec == null) {
             return false;
         }
-        return false;
+        return tec.rotate(axis);
     }
     
     @Override

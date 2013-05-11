@@ -115,6 +115,7 @@ public class Core {
 
     // universal constant config
     public final static String texture_dir = "factorization:";
+    public final static String model_dir = "/mods/factorization/models/";
     public final static String real_texture_dir = "/mods/factorization/textures/";
     public final static String gui_dir = "/mods/factorization/textures/gui/";
     public final static String texture_file_block = "/terrain.png";
@@ -344,10 +345,9 @@ public class Core {
 
     public static void brand(ItemStack is, List list) {
         String hint_key = is.getItem().getUnlocalizedName(is) + ".hint";
-        /* func_94520_b = containsTranslateKey */
         StringTranslate st = StringTranslate.getInstance();
-        if (st.func_94520_b(hint_key)) {
-            String hint = StringTranslate.getInstance().translateKey(hint_key);
+        if (st.func_94520_b(hint_key) /* func_94520_b = containsTranslateKey */ ) {
+            String hint = st.translateKey(hint_key);
             if (hint != null) {
                 hint = hint.trim();
                 if (hint.length() > 0) {

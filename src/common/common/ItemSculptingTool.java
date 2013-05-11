@@ -281,7 +281,7 @@ public class ItemSculptingTool extends Item {
             delta *= -1;
         }
         ForgeDirection direction = ForgeDirection.getOrientation(side);
-        cube.quat.incrMultiply(Quaternion.getRotationQuaternion(delta, direction.offsetX, direction.offsetY, direction.offsetZ));
+        cube.quat.incrMultiply(Quaternion.getRotationQuaternionRadians(delta, direction.offsetX, direction.offsetY, direction.offsetZ));
     }
     
     void rotate_global(ClayLump cube, boolean reverse, int side, int strength) {
@@ -290,7 +290,7 @@ public class ItemSculptingTool extends Item {
             delta *= -1;
         }
         ForgeDirection direction = ForgeDirection.getOrientation(side);
-        Quaternion global = Quaternion.getRotationQuaternion(delta, direction.offsetX, direction.offsetY, direction.offsetZ);
+        Quaternion global = Quaternion.getRotationQuaternionRadians(delta, direction.offsetX, direction.offsetY, direction.offsetZ);
         global.incrMultiply(cube.quat);
         cube.quat = global;
     }

@@ -74,13 +74,18 @@ public class Coord implements IDataSerializable {
         if (!blockExists()) {
             ret += " not loaded";
         } else if (w != null) {
-            ret += " a " + getBlock();
+            Block b = getBlock();
+            if (b != null) {
+                ret += " " + getBlock().getClass().getSimpleName();
+            } else {
+                ret += " air";
+            }
             TileEntity te = getTE();
             if (te != null) {
-                ret += " with TE " + te;
+                ret += " " + te.getClass().getSimpleName();
             }
-            Chunk chunk = getChunk();
-            ret += " " + chunk;
+            //Chunk chunk = getChunk();
+            //ret += " " + chunk;
         }
         return ret;
     }
