@@ -20,6 +20,7 @@ public class ItemChargeMeter extends Item {
         super(par1);
         setUnlocalizedName("factorization:tool/charge_meter");
         Core.tab(this, TabType.REDSTONE);
+        setMaxStackSize(1);
     }
     
     @Override
