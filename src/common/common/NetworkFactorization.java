@@ -521,7 +521,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
             Entity to = world.getEntityByID(entityId);
             if (to == null) {
                 if (Core.dev_environ) {
-                    Core.logFine("Packet to unknown entity #%i: %i", entityId, messageType);
+                    //Core.logFine("Packet to unknown entity #%s: %s", entityId, messageType);
                 }
                 return;
             }
