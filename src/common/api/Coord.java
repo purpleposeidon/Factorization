@@ -445,7 +445,6 @@ public class Coord implements IDataSerializable {
     }
 
     /** Let's try to use Orientation */
-    @Deprecated
     public boolean isSolidOnSide(int side) {
         return w.isBlockSolidOnSide(x, y, z, ForgeDirection.getOrientation(side));
     }
