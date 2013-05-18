@@ -3,6 +3,8 @@ package factorization.api;
 import java.io.IOException;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
@@ -90,7 +92,7 @@ public class Charge implements IDataSerializable {
             new ConductorSet(conductor);
             return;
         }
-        Iterable<IChargeConductor> neighbors = conductor.getCoord().getAdjacentTEs(IChargeConductor.class);
+        Iterable<IChargeConductor> neighbors = here.getAdjacentTEs(IChargeConductor.class);
         for (IChargeConductor neighbor : neighbors) {
             Charge n = neighbor.getCharge();
             if (n.conductorSet == null) {
@@ -111,19 +113,22 @@ public class Charge implements IDataSerializable {
      * Call this function every tick.
      */
     public void update() {
-        Coord here = conductor.getCoord();
-        if (here.w.isRemote) {
+        TileEntity te = (TileEntity) conductor;
+        World w = te.worldObj;
+        if (w.isRemote) {
             return;
         }
         createOrJoinConductorSet();
         if (isConductorSetLeader) {
             conductorSet.update();
         }
-        if (justCreated || (here.w.getWorldTime() + here.seed()) % 600 == 0) {
+        int seed = ((te.xCoord << 4 + te.zCoord) << 8) + te.yCoord;
+        if (justCreated || (w.getWorldTime() + seed) % 600 == 0) {
             justCreated = false;
             if (conductorSet.leader == null) {
                 conductorSet.leader = conductor;
             }
+            Coord here = conductor.getCoord();
             for (IChargeConductor neighbor : here.getAdjacentTEs(IChargeConductor.class)) {
                 justCreated |= conductorSet.addNeighbor(neighbor.getCharge().conductorSet);
             }
