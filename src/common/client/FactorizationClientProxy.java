@@ -20,6 +20,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
+
 import org.lwjgl.input.Keyboard;
 
 import cpw.mods.fml.client.registry.ClientRegistry;
@@ -29,43 +30,9 @@ import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.TickType;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
-import factorization.client.gui.FactorizationNotify;
-import factorization.client.gui.GuiCrystallizer;
-import factorization.client.gui.GuiExoConfig;
-import factorization.client.gui.GuiGrinder;
-import factorization.client.gui.GuiMaker;
-import factorization.client.gui.GuiMixer;
-import factorization.client.gui.GuiPocketTable;
-import factorization.client.gui.GuiRouter;
-import factorization.client.gui.GuiSlag;
-import factorization.client.gui.GuiStamper;
+import factorization.client.gui.*;
 import factorization.client.render.*;
-import factorization.common.BlockLightAir;
-import factorization.common.BlockRenderHelper;
-import factorization.common.Command;
-import factorization.common.ContainerCrystallizer;
-import factorization.common.ContainerExoModder;
-import factorization.common.ContainerFactorization;
-import factorization.common.ContainerGrinder;
-import factorization.common.ContainerMixer;
-import factorization.common.ContainerPocket;
-import factorization.common.ContainerSlagFurnace;
-import factorization.common.Core;
-import factorization.common.FactorizationProxy;
-import factorization.common.FactoryType;
-import factorization.common.Registry;
-import factorization.common.TileEntityBarrel;
-import factorization.common.TileEntityCrystallizer;
-import factorization.common.TileEntityFactorization;
-import factorization.common.TileEntityGreenware;
-import factorization.common.TileEntityGrinder;
-import factorization.common.TileEntityHeater;
-import factorization.common.TileEntityLeydenJar;
-import factorization.common.TileEntityMixer;
-import factorization.common.TileEntitySlagFurnace;
-import factorization.common.TileEntitySolarTurbine;
-import factorization.common.TileEntitySteamTurbine;
-import factorization.common.TileEntityWrathLamp;
+import factorization.common.*;
 import factorization.common.servo.BlockRenderServoRail;
 import factorization.common.servo.RenderServoMotor;
 import factorization.common.servo.ServoMotor;
@@ -226,24 +193,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
                     w.spawnParticle("flame", (double) (var7 + var11), (double) var8, (double) (var9 + var10), 0.0D, 0.0D, 0.0D);
                 }
 
-            }
-            if (ft == FactoryType.SOLARTURBINE) {
-                TileEntitySolarTurbine sol = (TileEntitySolarTurbine) te;
-                if (sol.getReflectors() > 0 && sol.water_level > 0) {
-                    double X = x + 2 / 16F;
-                    double Z = z + 2 / 16F;
-                    if (rand.nextBoolean()) {
-                        X += 0.5;
-                    }
-                    if (rand.nextBoolean()) {
-                        Z += 0.5;
-                    }
-                    X += rand.nextFloat() * 2 / 16;
-                    Z += rand.nextFloat() * 2 / 16;
-                    double Y = y + (0.99F + sol.water_level / (TileEntitySolarTurbine.max_water / 4)) / 16F;
-                    EntitySteamFX steam = new EntitySteamFX(w, X, Y, Z);
-                    Minecraft.getMinecraft().effectRenderer.addEffect(steam);
-                }
             }
         }
         if (id == Core.registry.lightair_block.blockID) {
@@ -462,7 +411,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         setTileEntityRenderer(TileEntityGreenware.class, new TileEntityGreenwareRender());
         if (Core.renderTEs) {
             // This is entirely Azanor's fault.
-            setTileEntityRenderer(TileEntitySolarTurbine.class, new TileEntitySolarTurbineRender());
             setTileEntityRenderer(TileEntityHeater.class, new TileEntityHeaterRenderer());
             //setTileEntityRenderer(TileEntityMirror.class, new TileEntityMirrorRenderer());
             setTileEntityRenderer(TileEntityGrinder.class, new TileEntityGrinderRender());
@@ -483,7 +431,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderHeater();
         new BlockRenderLamp();
         new BlockRenderMirrorStand();
-        new BlockRenderSolarTurbine();
         new BlockRenderSteamTurbine();
         new BlockRenderWire();
         new BlockRenderGrinder();

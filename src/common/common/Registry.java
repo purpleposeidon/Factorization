@@ -72,8 +72,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             leadwire_item, grinder_item, mixer_item, crystallizer_item,
             greenware_item,
             rocket_engine_item_hidden;
-    @Deprecated
-    public ItemStack solar_turbine_item;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item, exoworkshop_item;
     public ItemStack is_factory, is_lamp, is_lightair;
@@ -200,7 +198,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         slagfurnace_item = FactoryType.SLAGFURNACE.itemStack();
         battery_item_hidden = FactoryType.BATTERY.itemStack();
         leydenjar_item = FactoryType.LEYDENJAR.itemStack();
-        solar_turbine_item = FactoryType.SOLARTURBINE.itemStack();
         steamturbine_item = FactoryType.STEAMTURBINE.itemStack();
         solarboiler_item = FactoryType.SOLARBOILER.itemStack();
         heater_item = FactoryType.HEATER.itemStack();
@@ -914,14 +911,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 " I ",
                 "I I",
                 'I', Item.ingotIron);
-//		recipe(solar_turbine_item,
-//				"###",
-//				"#F#",
-//				"#M#",
-//				'#', Block.thinGlass,
-//				'F', fan,
-//				'M', motor);
-        shapelessRecipe(new ItemStack(motor), solar_turbine_item);
         recipe(solarboiler_item,
                 "I#I",
                 "I I",

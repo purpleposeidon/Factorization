@@ -19,7 +19,7 @@ public enum FactoryType {
     WRATHFIRE(10, false, TileEntityWrathFire.class, "factory_fire"), //burn things
     SLAGFURNACE(11, true, TileEntitySlagFurnace.class, "factory_slag"), //get extra ore output
     BATTERY(12, false, TileEntityBattery.class, "factory_battery"),
-    SOLARTURBINE(13, false, TileEntitySolarTurbine.class, "factory_solarturbine"), //sun-powered steam turbine
+    //13 -- This used to be SOLARTURBINE
     LEADWIRE(14, false, TileEntityWire.class, "factory_solder"),
     HEATER(15, false, TileEntityHeater.class, "factory_heater"), //work furnaces without fuel
     MIRROR(16, false, TileEntityMirror.class, "factory_mirror"), //reflect sunlight onto IReflectionTargets

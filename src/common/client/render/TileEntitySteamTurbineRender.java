@@ -12,7 +12,7 @@ public class TileEntitySteamTurbineRender extends TileEntitySpecialRenderer {
         TileEntitySteamTurbine turbine = (TileEntitySteamTurbine) te;
         GL11.glPushMatrix();
         GL11.glTranslatef((float) x, (float) y + 1.0F, (float) z + 1.0F);
-        TileEntitySolarTurbineRender.renderWithRotation(turbine.fan_rotation);
+        TileEntityMixerRenderer.renderWithRotation(turbine.fan_rotation);
         GL11.glPopMatrix();
     }
 }

@@ -1,5 +1,8 @@
 0.8.00
   Barrels should be wrench-rotatable
+  Made the pocket crafting table self-documenting
+  Added time dilation to Minecraft to make laggy servers look less laggy by slowing the client down to match. If you don't like it, there are config options to disable it both client & server-side
+  Removed deprecated solar turbines
 
 0.7.37
   Increased the leyden jar's capaciy

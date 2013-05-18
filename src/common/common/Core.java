@@ -50,7 +50,7 @@ public class Core {
     public static final String modId = "factorization";
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
-    public static final String version = "0.8.00"; //@VERSION@
+    public static final String version = "0.8.00.dev0"; //@VERSION@
     public Core() {
         registry = new Registry();
         exoCore = new ExoCore();
@@ -89,11 +89,11 @@ public class Core {
     public static boolean spread_wrathfire = true;
     public static boolean pocket_craft_anywhere = true;
     public static boolean bag_swap_anywhere = true;
-    public static String pocketActions = "xcb";
+    public static String pocketActions = "xcbf";
     public static boolean renderTEs = true;
     public static boolean renderAO = true;
     public static boolean add_branding = false;
-    public static boolean cheat = false;
+    public static boolean cheat = true;
     public static boolean debug_light_air = false;
     public static boolean debug_network = false;
     public static boolean dimension_slice_allow_smooth = true;
@@ -103,6 +103,8 @@ public class Core {
     public static boolean boilers_suck_water = true;
     public static double steam_output_adjust = 1.0;
     public static boolean enable_sketchy_client_commands = true, enable_cheat_commands = dev_environ;
+    public static int tps_reporting_interval = 20;
+    public static boolean use_tps_reports = true;
     public static int max_rocket_base_size = 20*20;
     public static int max_rocket_height = 64;
     public static String language_file = "/mods/factorization/en_US.lang";
@@ -189,14 +191,15 @@ public class Core {
             renderTEs = getBoolConfig("renderOtherTileEntities", "client", renderTEs, "If false, most TEs won't draw, making everything look broken but possibly improving FPS");
             renderAO = getBoolConfig("renderAmbientOcclusion", "client", renderAO, "If false, never use smooth lighting for drawing sculptures");
             String attempt = getStringConfig("pocketCraftingActionKeys", "client", pocketActions, "3 keys for: removing (x), cycling (c), balancing (b)");
-            if (attempt.length() == 3) {
+            if (attempt.length() == pocketActions.length()) {
                 pocketActions = attempt;
             } else {
                 Property p = config.get("pocketCraftingActionKeys", "client", pocketActions);
                 p.set(pocketActions);
-                p.comment = "3 keys for: removing (x), cycling (c), balancing (b)";
+                p.comment = pocketActions.length() + " keys for: removing (x), cycling (c), balancing (b), filling (f)";
             }
             enable_sketchy_client_commands = getBoolConfig("allowUnpureCommands", "client", enable_sketchy_client_commands, null);
+            use_tps_reports = getBoolConfig("useTpsReports", "client", use_tps_reports, "If this is enabled, the client will run as slowly as the server does. This avoids visual artifacts on laggy servers.");
         }
 
         gen_silver_ore = getBoolConfig("generateSilverOre", "general", gen_silver_ore, "This disables silver ore generation");
@@ -226,6 +229,7 @@ public class Core {
         serverside_translate = getBoolConfig("serversideTranslate", "server", serverside_translate, "If false, notifications will be translated by the client");
         boilers_suck_water = getBoolConfig("boilersSuckWater", "server", boilers_suck_water, "If false, water must be piped in");
         steam_output_adjust = getDoubleConfig("steamOutputAdjustment", "server", steam_output_adjust, "Scale how much steam is produced by the solar boiler");
+        tps_reporting_interval = getIntConfig("tpsReportInterval", "server", tps_reporting_interval, "How many ticks the server will wait before sending out TPS reports. 20 ticks = 1 second.");
 
         config.save();
     }
@@ -346,7 +350,7 @@ public class Core {
     public static void brand(ItemStack is, List list) {
         String hint_key = is.getItem().getUnlocalizedName(is) + ".hint";
         StringTranslate st = StringTranslate.getInstance();
-        if (st.func_94520_b(hint_key) /* func_94520_b = containsTranslateKey */ ) {
+        if (st.containsTranslateKey(hint_key) /* func_94520_b = containsTranslateKey */ ) {
             String hint = st.translateKey(hint_key);
             if (hint != null) {
                 hint = hint.trim();

@@ -18,7 +18,7 @@ public class BlockRenderMixer extends FactorizationBlockRender {
         if (!world_mode) {
             GL11.glPushMatrix();
             GL11.glTranslatef(-0.5F, 0.65F, 0.5F);
-            TileEntitySolarTurbineRender.renderWithRotation(0);
+            TileEntityMixerRenderer.renderWithRotation(0);
             GL11.glPopMatrix();
         }
     }

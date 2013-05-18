@@ -93,9 +93,6 @@ public class ItemFactorization extends ItemBlock {
                 infoList.add("0% charged");
             }
         }
-        if (FactorizationUtil.similar(is, Core.registry.solar_turbine_item)) {
-            infoList.add("Deprecated for Solar Boilers & Steam Turbines");
-        }
         Core.brand(is, infoList);
     }
     
