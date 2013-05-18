@@ -12,7 +12,8 @@ import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.Player;
 
 public class MiscNet implements IPacketHandler {
-    public static final String channel = "fz.bounce";
+    public static final String cmdChannel = "fzmsc.cmd";
+    public static final String tpsChannel = "fzmsc.tps";
     
     public MiscNet() {
         MiscellaneousNonsense.net = this;
@@ -24,17 +25,25 @@ public class MiscNet implements IPacketHandler {
         if (!player.worldObj.isRemote) {
             return;
         }
-        if (!channel.equals(packet.channel)) {
+        if (tpsChannel.equals(packet.channel)) {
+            try {
+                ByteArrayInputStream bais = new ByteArrayInputStream(packet.data);
+                DataInputStream input = new DataInputStream(bais);
+                MiscellaneousNonsense.proxy.handleTpsReport(input.readFloat());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+        if (!cmdChannel.equals(packet.channel)) {
             return;
         }
         ArrayList<String> text = new ArrayList();
         try {
-            if (packet.data != null && packet.data.length > 0) {
-                ByteArrayInputStream bais = new ByteArrayInputStream(packet.data);
-                DataInputStream input = new DataInputStream(bais);
-                while (input.available() > 0) {
-                    text.add(input.readUTF());
-                }
+            ByteArrayInputStream bais = new ByteArrayInputStream(packet.data);
+            DataInputStream input = new DataInputStream(bais);
+            while (input.available() > 0) {
+                text.add(input.readUTF());
             }
         } catch (IOException e) {
             e.printStackTrace();

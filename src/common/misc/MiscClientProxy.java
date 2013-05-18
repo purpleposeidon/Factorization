@@ -243,4 +243,14 @@ public class MiscClientProxy extends MiscProxy {
             }
         });
     }
+    
+    @Override
+    void handleTpsReport(float newTps) {
+        if (Float.isInfinite(newTps) || Float.isNaN(newTps)) {
+            return;
+        }
+        newTps = Math.min(1.5F, Math.max(0.01F, newTps));
+        Minecraft mc = Minecraft.getMinecraft();
+        mc.timer.timerSpeed = newTps;
+    }
 }
