@@ -128,27 +128,27 @@ public class BlockRenderHelper extends Block {
         tessellator.startDrawingQuads();
         if ((texture = textures[i++]) != null) {
             tessellator.setNormal(0.0F, -1F, 0.0F);
-            renderblocks.renderBottomFace(this, 0.0D, 0.0D, 0.0D, texture);
+            renderblocks.renderFaceYNeg(this, 0.0D, 0.0D, 0.0D, texture);
         }
         if ((texture = textures[i++]) != null) {
             tessellator.setNormal(0.0F, 1.0F, 0.0F);
-            renderblocks.renderTopFace(this, 0.0D, 0.0D, 0.0D, texture);
+            renderblocks.renderFaceYPos(this, 0.0D, 0.0D, 0.0D, texture);
         }
         if ((texture = textures[i++]) != null) {
             tessellator.setNormal(0.0F, 0.0F, -1F);
-            renderblocks.renderEastFace(this, 0.0D, 0.0D, 0.0D, texture);
+            renderblocks.renderFaceZNeg(this, 0.0D, 0.0D, 0.0D, texture);
         }
         if ((texture = textures[i++]) != null) {
             tessellator.setNormal(0.0F, 0.0F, 1.0F);
-            renderblocks.renderWestFace(this, 0.0D, 0.0D, 0.0D, texture);
+            renderblocks.renderFaceZPos(this, 0.0D, 0.0D, 0.0D, texture);
         }
         if ((texture = textures[i++]) != null) {
             tessellator.setNormal(-1F, 0.0F, 0.0F);
-            renderblocks.renderNorthFace(this, 0.0D, 0.0D, 0.0D, texture);
+            renderblocks.renderFaceXNeg(this, 0.0D, 0.0D, 0.0D, texture);
         }
         if ((texture = textures[i++]) != null) {
             tessellator.setNormal(1.0F, 0.0F, 0.0F);
-            renderblocks.renderSouthFace(this, 0.0D, 0.0D, 0.0D, texture);
+            renderblocks.renderFaceXPos(this, 0.0D, 0.0D, 0.0D, texture);
         }
         tessellator.draw();
         GL11.glTranslatef(0.5F, 0.5F, 0.5F);
