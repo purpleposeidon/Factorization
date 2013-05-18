@@ -4,8 +4,6 @@ import factorization.common.FactorizationTextureLoader.Directory;
 import net.minecraft.util.Icon;
 
 public class ItemIcons {
-    public static Icon exo$armor0, exo$armor1, exo$armor2, exo$armor3;
-    
     public static Icon charge$crankshaft;
     
     public static Icon wrath_particle;

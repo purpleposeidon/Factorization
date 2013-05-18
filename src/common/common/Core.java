@@ -53,17 +53,14 @@ public class Core {
     public static final String version = "0.8.00.dev0"; //@VERSION@
     public Core() {
         registry = new Registry();
-        exoCore = new ExoCore();
         foph = new FactorizationOreProcessingHandler(); //We don't register foph yet.
         MinecraftForge.EVENT_BUS.register(registry);
-        MinecraftForge.EVENT_BUS.register(exoCore);
     }
     
     // runtime storage
     @Instance("factorization")
     public static Core instance;
     public static Registry registry;
-    public static ExoCore exoCore;
     public static FactorizationOreProcessingHandler foph;
     @SidedProxy(clientSide = "factorization.client.FactorizationClientProxy", serverSide = "factorization.common.FactorizationServerProxy")
     public static FactorizationProxy proxy;

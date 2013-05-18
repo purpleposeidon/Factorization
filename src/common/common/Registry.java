@@ -53,8 +53,6 @@ import factorization.common.servo.ItemServoMotor;
 import factorization.common.servo.ServoMotor;
 
 public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler {
-    static public final int ExoKeyCount = 3;
-
     public ItemFactorization item_factorization;
     public ItemBlockResource item_resource;
     public BlockFactorization factory_block, factory_rendering_block = null;
@@ -73,7 +71,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             greenware_item,
             rocket_engine_item_hidden;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
-            dark_iron_block_item, exoworkshop_item;
+            dark_iron_block_item;
     public ItemStack is_factory, is_lamp, is_lightair;
     public ItemCraft item_craft;
     public ItemBagOfHolding bag_of_holding;
@@ -86,12 +84,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemWrathIgniter wrath_igniter;
     public ItemCraftingComponent silver_ingot, lead_ingot;
     public ItemCraftingComponent dark_iron;
-    public ItemCraftingComponent exo_chasis;
-    public ExoArmor exo_head, exo_chest, exo_leg, exo_foot;
-    public ExoBuoyantBarrel exo_buoyant_barrel;
-    public ExoCobblestoneDrive exo_cobble_drive;
-    public ExoMountedPiston exo_mounted_piston;
-    public ExoWallJump exo_wall_jump;
     public ItemMachineUpgrade router_item_filter, router_machine_filter, router_speed,
             router_thorough, router_throughput, router_eject;
     public ItemMachineUpgrade barrel_enlarge;
@@ -214,7 +206,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         silver_block_item = ResourceType.SILVERBLOCK.itemStack("Block of Silver");
         lead_block_item = ResourceType.LEADBLOCK.itemStack("Block of Lead");
         dark_iron_block_item = ResourceType.DARKIRONBLOCK.itemStack("Block of Dark Iron");
-        exoworkshop_item = ResourceType.EXOMODDER.itemStack("Exo-Modder");
 
         lead_ingot = new ItemCraftingComponent(itemID("leadIngot", 9014), "lead_ingot");
         silver_ingot = new ItemCraftingComponent(itemID("silverIngot", 9015), "silver_ingot");
@@ -273,19 +264,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
         //Industrial
         item_craft = new ItemCraft(itemID("itemCraftId", 9000));
-
-        //Exo-items
-        exo_head = new ExoArmor(itemID("mechaHead", 9010), 0).setSlotCount(5);
-        exo_chest = new ExoArmor(itemID("mechaChest", 9011), 1).setSlotCount(8);
-        exo_leg = new ExoArmor(itemID("mechaLeg", 9012), 2).setSlotCount(7);
-        exo_foot = new ExoArmor(itemID("mechaFoot", 9013), 3).setSlotCount(4);
-
-        exo_chasis = new ItemCraftingComponent(itemID("mechaChasis", 9009), "exo_chasis");
-        //Exo-armor uses up to Item ID 9013.
-        exo_buoyant_barrel = new ExoBuoyantBarrel(itemID("mechaBouyantBarrel", 9021));
-        exo_cobble_drive = new ExoCobblestoneDrive(itemID("mechaCobbleDrive", 9022));
-        exo_mounted_piston = new ExoMountedPiston(itemID("mechaMountedPiston", 9023));
-        exo_wall_jump = new ExoWallJump(itemID("mechaSpring", 9047));
+        
         angular_saw = new ItemAngularSaw(itemID("angularSaw", 9042));
         MinecraftForge.setToolClass(angular_saw, "pickaxe", 3);
         
@@ -447,87 +426,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         oreRecipe(silver_block_item, "###", "###", "###", '#', "ingotSilver");
         FurnaceRecipes.smelting().addSmelting(resource_block.blockID, 0 /* MD for silver */, new ItemStack(silver_ingot), 0.3F);
 
-        //exo armor
-        recipe(new ItemStack(exo_chasis),
-                "III",
-                "InI",
-                "III",
-                'I', Item.ingotIron,
-                'n', Item.goldNugget);
-        recipe(new ItemStack(exo_head),
-                "###",
-                "# #",
-                '#', exo_chasis);
-        recipe(new ItemStack(exo_chest),
-                "# #",
-                "###",
-                "###",
-                '#', exo_chasis);
-        recipe(new ItemStack(exo_leg),
-                "###",
-                "# #",
-                "# #",
-                '#', exo_chasis);
-        recipe(new ItemStack(exo_foot),
-                "# #",
-                "# #",
-                '#', exo_chasis);
-        //exo armor upgrades
-
-        oreRecipe(new ItemStack(exo_buoyant_barrel),
-                "W_W",
-                "PBP",
-                "WVW",
-                'W', "plankWood",
-                '_', Block.pressurePlatePlanks,
-                'P', Block.pistonBase,
-                'B', barrel_item,
-                'V', Item.boat);
-
-        ItemStack is_cobble_drive = new ItemStack(exo_cobble_drive);
-        recipe(is_cobble_drive,
-                "OPO",
-                "WTL",
-                "OOO",
-                'O', Block.obsidian,
-                'P', Block.pistonBase,
-                'W', Item.bucketWater,
-                'T', Item.pickaxeIron,
-                'L', Item.bucketLava);
-        recipe(is_cobble_drive,
-                "OPO",
-                "LTW",
-                "OOO",
-                'O', Block.obsidian,
-                'P', Block.pistonBase,
-                'W', Item.bucketWater,
-                'T', Item.pickaxeIron,
-                'L', Item.bucketLava);
-        recipe(new ItemStack(exo_mounted_piston),
-                "CNC",
-                "LSL",
-                "CCC",
-                'C', Block.cobblestone,
-                'S', Block.pistonStickyBase,
-                'N', Block.pistonBase,
-                'L', Block.lever);
-        oreRecipe(new ItemStack(angular_saw),
-                "O ",
-                "MY",
-                "! ",
-                'O', new ItemStack(diamond_cutting_head),
-                'M', new ItemStack(motor),
-                'Y', new ItemStack(Item.ingotIron),
-                '!', "ingotLead");
-        recipe(new ItemStack(exo_wall_jump),
-                "ILI",
-                "IBI",
-                "OOO",
-                'I', Item.ingotIron,
-                'L', Item.leather,
-                'B', Item.bootsLeather,
-                'O', Item.slimeBall);
-        
         //ceramics
         recipe(new ItemStack(sculpt_tool),
                 " c",
@@ -885,15 +783,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //most ores give 0.4F stone, but redstone is dense.
         //mining redstone normally gives 4 to 6 ore. 5.8F should get you a slightly better yield.
         TileEntitySlagFurnace.SlagRecipes.register(Block.oreRedstone, 5.8F, Item.redstone, 0.2F, Block.stone);
-
-        //exo-workshop
-        recipe(exoworkshop_item,
-                "MCM",
-                "i i",
-                "i i",
-                'C', Block.workbench,
-                'M', exo_chasis,
-                'i', Item.ingotIron);
+        
+        
         oreRecipe(greenware_item,
                 "c",
                 "-",

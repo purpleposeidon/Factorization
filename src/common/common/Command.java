@@ -2,16 +2,14 @@ package factorization.common;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
-import factorization.api.ExoStateShader;
-import factorization.api.ExoStateType;
 
 public enum Command {
     bagShuffle(1), craftClear(2), craftMove(3), craftBalance(4), craftOpen(5, true),
-    bagShuffleReverse(6), exoKeyOn(7, true), exoKeyOff(8, true), exoModLeftClick(9),
-    exoModRightClick(10), craftFill(11);
+    bagShuffleReverse(6), craftFill(11);
 
     static class name {
         static HashMap<Byte, Command> map = new HashMap<Byte, Command>();
@@ -19,7 +17,6 @@ public enum Command {
     
     static {
         bagShuffle.setReverse(bagShuffleReverse);
-        exoModLeftClick.setReverse(exoModRightClick);
     }
 
     public byte id;
@@ -92,42 +89,6 @@ public enum Command {
             break;
         case craftOpen:
             Core.registry.pocket_table.tryOpen(player);
-            break;
-        case exoKeyOff:
-        case exoKeyOn:
-            ExoCore.buttonPressed(player, arg, this == exoKeyOn);
-            break;
-        case exoModLeftClick:
-        case exoModRightClick:
-            if (player.openContainer instanceof ContainerExoModder) {
-                ContainerExoModder cont = (ContainerExoModder) player.openContainer;
-                ItemStack armor = cont.upgrader.armor;
-                ExoArmor m = (ExoArmor) armor.getItem();
-                int slot = arg / 2;
-                boolean changeExoType = 0 == (arg % 2);
-                int deltaDirection = this == exoModLeftClick ? 1 : -1;
-                ExoStateType mst = m.getExoStateType(armor, slot);
-                ExoStateShader mss = m.getExoStateShader(armor, slot);
-                if (changeExoType) {
-                    do {
-                        mst = FactorizationUtil.shiftEnum(mst, ExoStateType.values(), deltaDirection);
-                    } while (!mst.armorRestriction.canUse(m.armorType));
-                    m.setExoStateType(armor, slot, mst);
-                } else {
-                    //changeExoShader
-                    if (mst == ExoStateType.NEVER) {
-                        //Only use the first two, as the others don't make sense for a constant.
-                        if (mss != ExoStateShader.NORMAL) {
-                            mss = ExoStateShader.NORMAL;
-                        } else {
-                            mss = ExoStateShader.INVERSE;
-                        }
-                    } else {
-                        mss = FactorizationUtil.shiftEnum(mss, ExoStateShader.values(), deltaDirection);
-                    }
-                    m.setExoStateShader(armor, slot, mss);
-                }
-            }
             break;
         default:
             throw new RuntimeException("Command " + this + " is missing handler");

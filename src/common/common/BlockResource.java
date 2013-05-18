@@ -10,14 +10,10 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 
 public class BlockResource extends Block {
     public Icon[] icons = new Icon[ResourceType.values().length];
-    @SideOnly(Side.CLIENT)
-    Icon exoBottom, exoTop;
     protected BlockResource(int id) {
         super(id, Material.rock);
         setHardness(2.0F);
@@ -28,8 +24,6 @@ public class BlockResource extends Block {
     
     @Override
     public void registerIcons(IconRegister reg) {
-        exoBottom = Core.texture(reg, "exo/modder_bottom");
-        exoTop = Core.texture(reg, "exo/modder_top");
         for (ResourceType rt : ResourceType.values()) {
             icons[rt.md] = Core.texture(reg, rt.texture);
         }
@@ -42,14 +36,6 @@ public class BlockResource extends Block {
     boolean done_spam = false;
     @Override
     public Icon getIcon(int side, int md) {
-        if (ResourceType.EXOMODDER.is(md)) {
-            if (side == 0) {
-                return exoBottom;
-            }
-            if (side == 1) {
-                return exoTop;
-            }
-        }
         if (md >= glaze_md_start) {
             int off = md - glaze_md_start;
             if (off < BasicGlazes.values.length) {
@@ -68,7 +54,6 @@ public class BlockResource extends Block {
         itemList.add(Core.registry.silver_block_item);
         itemList.add(Core.registry.lead_block_item);
         itemList.add(Core.registry.dark_iron_block_item);
-        itemList.add(Core.registry.exoworkshop_item);
     }
     
     @Override
@@ -89,10 +74,6 @@ public class BlockResource extends Block {
             return false;
         }
         Coord here = new Coord(w, x, y, z);
-        if (ResourceType.EXOMODDER.is(here.getMd())) {
-            player.openGui(Core.instance, FactoryType.EXOTABLEGUICONFIG.gui, w, x, y, z);
-            return true;
-        }
         return false;
     }
 

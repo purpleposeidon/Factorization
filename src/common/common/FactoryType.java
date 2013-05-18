@@ -36,8 +36,7 @@ public enum FactoryType {
     SERVORAIL(27, false, TileEntityServoRail.class, "factory_rail"),
     
 
-    POCKETCRAFTGUI(101, true),
-    EXOTABLEGUICONFIG(102, true), //Exo-armor editor
+    POCKETCRAFTGUI(101, true)
     ;
     
     static {

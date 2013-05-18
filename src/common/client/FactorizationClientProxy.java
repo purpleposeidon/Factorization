@@ -20,9 +20,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
-
-import org.lwjgl.input.Keyboard;
-
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
@@ -30,7 +27,15 @@ import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.TickType;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
-import factorization.client.gui.*;
+import factorization.client.gui.FactorizationNotify;
+import factorization.client.gui.GuiCrystallizer;
+import factorization.client.gui.GuiGrinder;
+import factorization.client.gui.GuiMaker;
+import factorization.client.gui.GuiMixer;
+import factorization.client.gui.GuiPocketTable;
+import factorization.client.gui.GuiRouter;
+import factorization.client.gui.GuiSlag;
+import factorization.client.gui.GuiStamper;
 import factorization.client.render.*;
 import factorization.common.*;
 import factorization.common.servo.BlockRenderServoRail;
@@ -64,11 +69,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         if (ID == FactoryType.POCKETCRAFTGUI.gui) {
             return new GuiPocketTable(new ContainerPocket(player));
         }
-
-        if (ID == FactoryType.EXOTABLEGUICONFIG.gui) {
-            return new GuiExoConfig(new ContainerExoModder(player, new Coord(world, x, y, z)));
-        }
-
+        
         TileEntity te = world.getBlockTileEntity(x, y, z);
         if (!(te instanceof TileEntityFactorization)) {
             return null;
@@ -261,7 +262,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
     public static KeyBinding bag_swap_key = new KeyBinding("FZ Bag of Holding", org.lwjgl.input.Keyboard.KEY_GRAVE);
     public static KeyBinding pocket_key = new KeyBinding("FZ Pocket Crafting Table", org.lwjgl.input.Keyboard.KEY_C);
-    public static KeyBinding exoKeys[] = new KeyBinding[Registry.ExoKeyCount];
 
     private static class CommandKeySet extends KeyHandler {
         Map<KeyBinding, Command> map;
@@ -321,82 +321,11 @@ public class FactorizationClientProxy extends FactorizationProxy {
         public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd) {
         }
     }
-
-    private Map<KeyBinding, Byte> exoIDmap = new HashMap();
-
-    public class ExoKeySet extends KeyHandler {
-        public ExoKeySet(KeyBinding[] keyBindings, boolean[] repeatings) {
-            super(keyBindings, repeatings);
-        }
-
-        @Override
-        public EnumSet<TickType> ticks() {
-            return EnumSet.of(TickType.CLIENT);
-        }
-
-        @Override
-        public String getLabel() {
-            return "ExoKeys";
-        }
-
-        @Override
-        public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd, boolean isRepeat) {
-            if (tickEnd) {
-                return;
-            }
-            if (kb.keyCode == 0) {
-                return;
-            }
-            GuiScreen gui = Minecraft.getMinecraft().currentScreen;
-            if (gui != null) {
-                return;
-            }
-            Command.exoKeyOn.call(getClientPlayer(), exoIDmap.get(kb));
-        }
-
-        @Override
-        public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd) {
-            GuiScreen gui = Minecraft.getMinecraft().currentScreen;
-            if (gui != null) {
-                return;
-            }
-            if (kb.keyCode == 0) {
-                return;
-            }
-            Command.exoKeyOff.call(getClientPlayer(), exoIDmap.get(kb));
-        }
-
-    }
-
     @Override
     public void registerKeys() {
-        //we use numpad keys as our default, unless they're being used for movement (implying a left-handed user, using mouse w/ right hand)
-        //If that's the case, we use our original keybindings.
-        int defaults_main[] = new int[] { Keyboard.KEY_NUMPAD1, Keyboard.KEY_NUMPAD2, Keyboard.KEY_NUMPAD3 };
-        int defaults_alt[] = new int[] { Keyboard.KEY_R, Keyboard.KEY_F, Keyboard.KEY_V };
-        int defaults[] = defaults_main;
-        GameSettings gs = Minecraft.getMinecraft().gameSettings;
-        int conflict_check[] = new int[] { gs.keyBindForward.keyCode, gs.keyBindLeft.keyCode, gs.keyBindRight.keyCode, gs.keyBindBack.keyCode };
-        outer: for (int vanilla_kc : conflict_check) {
-            for (int default_kc : defaults_main) {
-                if (default_kc == vanilla_kc) {
-                    if (default_kc == vanilla_kc) {
-                        defaults = defaults_alt;
-                        break outer;
-                    }
-                }
-            }
-        }
-        
-        
-        for (byte i = 0; i < exoKeys.length; i++) {
-            exoKeys[i] = new KeyBinding("FZ Exo" + (i + 1), defaults[i]);
-            exoIDmap.put(exoKeys[i], i);
-        }
         KeyBindingRegistry.registerKeyBinding(CommandKeySet.create(
                 bag_swap_key, Command.bagShuffle,
                 pocket_key, Command.craftOpen));
-        KeyBindingRegistry.registerKeyBinding(new ExoKeySet(exoKeys, new boolean[exoKeys.length]));
     }
 
     private void setTileEntityRenderer(Class clazz, TileEntitySpecialRenderer r) {
@@ -453,12 +382,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         if (Minecraft.getMinecraft().session.username.equals("neptunepink")) {
             Core.FZLogger.setLevel(Level.FINE);
         }
-    }
-    
-    @Override
-    public String getExoKeyBrief(int keyindex) {
-        int key = FactorizationClientProxy.exoKeys[keyindex - 1].keyCode;
-        return GameSettings.getKeyDisplayString(key);
     }
     
     @Override

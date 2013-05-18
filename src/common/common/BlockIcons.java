@@ -37,9 +37,6 @@ public class BlockIcons {
     @Directory("craft")
     public static BlockIcons.ActivatingMachineIcon maker, stamper, packager;
     
-    @Directory("exo")
-    public static Icon modder_top, modder_bottom, modder_side;
-    
     @Directory("machine")
     public static Icon
         cauldron_side, cauldron_top,

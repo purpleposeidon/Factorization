@@ -37,10 +37,6 @@ public abstract class FactorizationProxy implements IGuiHandler {
             return new ContainerPocket(player);
         }
 
-        if (ID == FactoryType.EXOTABLEGUICONFIG.gui) {
-            return new ContainerExoModder(player, new Coord(world, x, y, z));
-        }
-
         TileEntity te = world.getBlockTileEntity(x, y, z);
         if (!(te instanceof TileEntityFactorization)) {
             return null;
@@ -153,10 +149,6 @@ public abstract class FactorizationProxy implements IGuiHandler {
 
     public boolean isPlayerAdmin(EntityPlayer player) {
         return false;
-    }
-
-    public String getExoKeyBrief(int keyindex) {
-        return "ExoKey" + keyindex;
     }
     
     public void texturepackChanged() {}
