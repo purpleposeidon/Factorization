@@ -33,9 +33,10 @@ import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.Share;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
+import factorization.common.servo.controllers.DummyController;
 
 public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IEntityMessage {
-    Controller controller = new Controller();
+    Controller controller = new DummyController();
 
     boolean dampenVelocity;
 
@@ -163,6 +164,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     public void onEntityUpdate() {
         if (new_motor) {
             initPosition(); //TODO: Is that Coord field necessary?
+            if (prevOrientation == FzOrientation.UNKNOWN && orientation != FzOrientation.UNKNOWN) {
+                prevOrientation = orientation;
+            }
         }
         if (ticksExisted == 1) {
             checkDirection();
@@ -266,6 +270,26 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             return false;
         }
         return validDirection(d);
+    }
+    
+    static int similarity(FzOrientation base, FzOrientation novel) {
+        int score = 0;
+        //if pointing in plane, we want them to face the same direction
+        
+        return score;
+    }
+    
+    int scorePotentialOrientation(FzOrientation o) {
+        int points = 0;
+        if (o == nextOrientation) {
+            points += 200;
+        } else if (o == orientation) {
+            points += 100;
+        } else {
+            
+        }
+        
+        return points;
     }
 
     boolean pickNextOrientation() {

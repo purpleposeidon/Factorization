@@ -2,8 +2,11 @@ package factorization.common.servo;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
@@ -14,34 +17,36 @@ import factorization.api.datahelpers.DataOutNBT;
 import factorization.common.Core;
 
 public abstract class ServoComponent {
-    private static HashMap<Integer, Class<? extends ServoComponent>> idMap = new HashMap<Integer, Class<? extends ServoComponent>>(50);
+    private static HashMap<String, Class<? extends ServoComponent>> componentMap = new HashMap<String, Class<? extends ServoComponent>>(50, 0.5F);
+    final private static String componentTagKey = "SCId";
     
-    public static void register(Class<? extends ServoComponent> decorClass) {
-        int id;
+    public static void register(Class<? extends ServoComponent> componentClass) {
+        String name;
         try {
-            ServoComponent decor = decorClass.newInstance();
-            id = decor.getUniqueId();
+            ServoComponent decor = componentClass.newInstance();
+            name = decor.getName();
         } catch (Throwable e) {
             throw new IllegalArgumentException(e);
         }
-        idMap.put(id, decorClass);
+        componentMap.put(name, componentClass);
     }
     
-    
-    final private static String id_index = "SCId";
+    public static Class<? extends ServoComponent> getComponent(String name) {
+        return componentMap.get(name);
+    }
     
     static ServoComponent load(NBTTagCompound tag) {
-        if (tag == null || !tag.hasKey(id_index)) {
+        if (tag == null || !tag.hasKey(componentTagKey)) {
             return null;
         }
-        int id = tag.getInteger(id_index);
-        Class<? extends ServoComponent> decorClass = idMap.get(id);
-        if (decorClass == null) {
-            Core.logWarning("Unknown servo component with ID %i", id);
+        String componentName = tag.getString(componentTagKey);
+        Class<? extends ServoComponent> componentClass = getComponent(componentName);
+        if (componentClass == null) {
+            Core.logWarning("Unknown servo component with ID %s", componentName);
             return null;
         }
         try {
-            ServoComponent decor = decorClass.newInstance();
+            ServoComponent decor = componentClass.newInstance();
             decor.putData(new DataInNBT(tag));
             return decor;
         } catch (Throwable e) {
@@ -50,28 +55,42 @@ public abstract class ServoComponent {
         }
     }
     
-    protected final NBTTagCompound save() {
-        NBTTagCompound tag = new NBTTagCompound();
-        tag.setInteger(id_index, getUniqueId());
+    protected final void save(NBTTagCompound tag) {
+        tag.setString(componentTagKey, getName());
         try {
             putData(new DataOutNBT(tag));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return tag;
     }
     
-    private static int range = 10000;
-    protected final static int ACTUATOR_BASE = 0*range, CONTROLLER_BASE = 1*range, DECORATOR_BASE = 2*range, INSTRUCTION_BASE = 3*range, OTHER_BASE = 4*range;
-    
+    /**
+     * @return a unique name, something like "modname.componentType.name"
+     */
     public abstract String getName();
-    public abstract int getUniqueId();
-    protected abstract void putData(DataHelper data) throws IOException;
-    abstract void onClick(EntityPlayer player, ForgeDirection side);
-    abstract void dropItems();
-    @SideOnly(Side.CLIENT)
-    abstract void renderDynamic();
-    @SideOnly(Side.CLIENT)
-    abstract void renderStatic();
     
+    /**
+     * This function is called to do all serialization
+     * @param data
+     * @throws IOException
+     */
+    protected abstract void putData(DataHelper data) throws IOException;
+    public abstract void onClick(EntityPlayer player, ForgeDirection side);
+    public abstract List<ItemStack> dropItems();
+    
+    /**
+     * Render to the Tessellator. This must be appropriate for a SimpleBlockRenderingHandler.
+     */
+    @SideOnly(Side.CLIENT)
+    public abstract void renderStatic();
+    
+    @SideOnly(Side.CLIENT)
+    public void renderDynamic() {
+        Tessellator tess = Tessellator.instance;
+        tess.startDrawingQuads();
+        renderStatic();
+        tess.draw();
+    }
+    
+    public abstract void configure(ServoStack stack);
 }

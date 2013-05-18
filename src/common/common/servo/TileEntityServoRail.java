@@ -59,10 +59,9 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
         if (decoration != null) {
-            NBTTagCompound decor = decoration.save();
-            if (decor != null) {
-                tag.setTag("decor", decor);
-            }
+            NBTTagCompound decor = new NBTTagCompound();
+            decoration.save(decor);
+            tag.setTag("decor", decor);
         }
     }
     
