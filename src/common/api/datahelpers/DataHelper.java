@@ -3,6 +3,7 @@ package factorization.api.datahelpers;
 import java.io.IOException;
 
 import factorization.api.FzOrientation;
+import factorization.common.Core;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -96,5 +97,30 @@ public abstract class DataHelper {
         //In case it becomes ForgeOrientation
         byte v = (byte) value.ordinal();
         return FzOrientation.getOrientation(putByte(v));
+    }
+    
+    public Object putObject(Object o) throws IOException {
+        if (o instanceof Boolean) {
+            return putBoolean((Boolean) o);
+        } else if (o instanceof Byte) {
+            return putByte((Byte) o);
+        } else if (o instanceof Short) {
+            return putShort((Short) o);
+        } else if (o instanceof Integer) {
+            return putInt((Integer) o);
+        } else if (o instanceof Float) {
+            return putFloat((Float) o);
+        } else if (o instanceof Double) {
+            return putDouble((Double) o);
+        } else if (o instanceof String) {
+            return putString((String) o);
+        } else if (o instanceof ItemStack) {
+            return putItemStack((ItemStack) o);
+        } else if (o instanceof IDataSerializable) {
+            return put((IDataSerializable)o);
+        } else {
+            Core.logWarning("Don't know how to serialize " + o);
+            return null;
+        }
     }
 }

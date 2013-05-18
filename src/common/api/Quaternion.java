@@ -96,10 +96,10 @@ public class Quaternion implements IDataSerializable {
     
     @Override
     public IDataSerializable serialize(String name_prefix, DataHelper data) throws IOException {
-        w = data.asSameShare("w").putDouble(w);
-        x = data.asSameShare("x").putDouble(x);
-        y = data.asSameShare("y").putDouble(y);
-        z = data.asSameShare("z").putDouble(z);
+        w = data.asSameShare(name_prefix + "w").putDouble(w);
+        x = data.asSameShare(name_prefix + "x").putDouble(x);
+        y = data.asSameShare(name_prefix + "y").putDouble(y);
+        z = data.asSameShare(name_prefix + "z").putDouble(z);
         return this;
     }
     
