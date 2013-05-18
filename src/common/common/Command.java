@@ -287,7 +287,22 @@ public enum Command {
         }
     }
     
-    void craftFill(EntityPlayer player, int slot) {
-        
+    void craftFill(EntityPlayer player, byte slot) {
+        final InventoryPlayer inv = player.inventory;
+        final ItemStack toMove = inv.getStackInSlot(slot);
+        if (toMove == null) {
+            return;
+        }
+        for (int i : ContainerPocket.playerCraftInvSlots) {
+            if (toMove.stackSize <= 0) {
+                break;
+            }
+            ItemStack is = inv.getStackInSlot(i);
+            if (is != null) {
+                continue;
+            }
+            inv.setInventorySlotContents(i, toMove.splitStack(1));
+        }
+        inv.setInventorySlotContents(slot, FactorizationUtil.normalize(toMove));
     }
 }

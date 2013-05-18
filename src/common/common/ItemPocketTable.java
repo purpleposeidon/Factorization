@@ -8,8 +8,6 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.ModContainer;
 import factorization.common.Core.TabType;
 
 public class ItemPocketTable extends Item {
@@ -52,14 +50,14 @@ public class ItemPocketTable extends Item {
         InventoryPlayer inv = player.inventory;
         int need_to_move = -1;
         int a_free_space = -1;
-        for (int i = 0; i < inv.getSizeInventory(); i++) {
+        for (int i = 0; i < inv.mainInventory.length; i++) {
             boolean in_crafting_area = i % 9 >= (9 - 3) && i > 9;
-            ItemStack is = inv.getStackInSlot(i);
+            ItemStack is = inv.mainInventory[i]; // A little bit gross; using it the proper causes us to check armor slots.
             if (is == null) {
                 if (!in_crafting_area) {
                     if (a_free_space == -1 || a_free_space < 9) {
-                        //Silly condition because: If it's not set, we should set it. If it's < 9, it's in the hotbar, which is a poor choice.
-                        //If it is going to the hotbar, it'll end up in the last empty slot.
+                        // Silly condition because: If it's not set, we should set it. If it's < 9, it's in the hotbar, which is a poor choice.
+                        // If it is going to the hotbar, it'll end up in the last empty slot.
                         a_free_space = i;
                     }
                 }
@@ -103,9 +101,10 @@ public class ItemPocketTable extends Item {
             String key = Core.proxy.getPocketCraftingTableKey();
             if (key != null && key != "") {
                 String enabled_or_installed = NEI_status == 1 ? "enabled" : "installed";
-                infoList.add("Press " + key + " to activate.");
-                if (NEI_status != 0) {
-                    infoList.add("Opens anywhere with NEI " + enabled_or_installed);
+                if (NEI_status != -1) {
+                    infoList.add("Press " + key + " to activate from anywhere.");
+                } else {
+                    infoList.add("Press " + key + " to activate.");
                 }
             }
         }

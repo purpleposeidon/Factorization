@@ -10,9 +10,11 @@ import codechicken.nei.forge.IContainerInputHandler;
 import factorization.client.FactorizationClientProxy;
 import factorization.common.Command;
 import factorization.common.Core;
+import factorization.common.ItemPocketTable;
 
 public class NEI_FactorizationInputConfig implements IConfigureNEI {
     public void loadConfig() {
+        ItemPocketTable.NEI_status = 1;
         GuiContainerManager.addInputHandler(new IContainerInputHandler() {
             @Override
             public void onMouseUp(GuiContainer gui, int mousex, int mousey, int button) { }
