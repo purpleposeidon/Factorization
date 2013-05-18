@@ -485,7 +485,7 @@ public class FactorizationUtil {
         }
         if (orig_inv instanceof net.minecraft.inventory.ISidedInventory) {
             final net.minecraft.inventory.ISidedInventory inv = (net.minecraft.inventory.ISidedInventory) orig_inv;
-            final int[] slotMap = inv.getSizeInventorySide(side);
+            final int[] slotMap = inv.getAccessibleSlotsFromSide(side);
             return new FzInv(inv) {
                 @Override
                 int slotIndex(int i) {
@@ -499,7 +499,7 @@ public class FactorizationUtil {
                 
                 @Override
                 public boolean canExtract(int i, ItemStack is) {
-                    return inv.func_102008_b(slotMap[i], is, side);
+                    return inv.canExtractItem(slotMap[i], is, side);
                 }
                 
                 @Override
@@ -507,7 +507,7 @@ public class FactorizationUtil {
                     if (forceInsert) {
                         return true;
                     }
-                    return inv.func_102007_a(slotMap[i], is, side);
+                    return inv.canInsertItem(slotMap[i], is, side);
                 }};
         } else if (orig_inv instanceof net.minecraftforge.common.ISidedInventory) {
             final net.minecraftforge.common.ISidedInventory inv = (net.minecraftforge.common.ISidedInventory) orig_inv;
@@ -535,7 +535,7 @@ public class FactorizationUtil {
             net.minecraft.inventory.ISidedInventory isi = (net.minecraft.inventory.ISidedInventory) inv;
             //O(n). Ugh.
             for (int i = 0; i < 6; i++) {
-                int[] slots = isi.getSizeInventorySide(i);
+                int[] slots = isi.getAccessibleSlotsFromSide(i);
                 for (int j = 0; j < slots.length; j++) {
                     if (slots[j] == slot) {
                         return true;

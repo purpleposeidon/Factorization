@@ -56,7 +56,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     private static final int[] INPUT_s = {input, input + 1}, FUEL_s = {fuel}, OUTPUT_s = {output, output + 1};
     
     @Override
-    public int[] getSizeInventorySide(int s) {
+    public int[] getAccessibleSlotsFromSide(int s) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
         switch (side) {
         case DOWN: return OUTPUT_s;

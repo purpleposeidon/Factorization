@@ -342,7 +342,7 @@ public class HammerClientProxy extends HammerProxy {
         try {
             //Inspired by Minecraft.runTick()
             w.updateEntities();
-            w.func_73029_E(32, 7, 32);
+            w.doVoidFogParticles(32, 7, 32);
         } finally {
             Core.profileEnd();
             restoreRealWorld();
@@ -547,7 +547,7 @@ public class HammerClientProxy extends HammerProxy {
                         clickBlockCreative(this.mc, this, x, y, z, side);
                         this.blockHitDelay = 5;
                     }
-                    else if (!this.isHittingBlock || !this.func_85182_a(x, y, z) /* sameToolAndBlock */)
+                    else if (!this.isHittingBlock || !this.sameToolAndBlock(x, y, z) /* func_85182_a sameToolAndBlock */)
                     {
                         if (this.isHittingBlock)
                         {

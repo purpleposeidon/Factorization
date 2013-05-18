@@ -145,7 +145,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     private static final int[] IN_s = {0, 1, 2, 3}, OUT_s = {4, 5, 6, 7};
 
     @Override
-    public int[] getSizeInventorySide(int s) {
+    public int[] getAccessibleSlotsFromSide(int s) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
         if (side == ForgeDirection.DOWN) {
             return OUT_s;

@@ -161,11 +161,11 @@ abstract public class FactorizationBlockRender implements ICoord {
             rb.setRenderBounds(d, d, d, 1 - d, height, 1 - d);
             block.setBlockBounds(d, d, d, 1 - d, 1 - d, 1 - d);
             rb.enableAO = false;
-            rb.renderNorthFace(block, x + 1 - 2*d, y, z, metal);
-            rb.renderEastFace(block, x, y, z + 1 - 2*d, metal);
-            rb.renderSouthFace(block, x - 1 + 2*d, y, z, metal);
-            rb.renderWestFace(block, x, y, z - 1 + 2*d, metal);
-            rb.renderTopFace(block, x, y - height + 1*d, z, metal);
+            rb.renderFaceXNeg(block, x + 1 - 2*d, y, z, metal);
+            rb.renderFaceZNeg(block, x, y, z + 1 - 2*d, metal);
+            rb.renderFaceXPos(block, x - 1 + 2*d, y, z, metal);
+            rb.renderFaceZPos(block, x, y, z - 1 + 2*d, metal);
+            rb.renderFaceYPos(block, x, y - height + 1*d, z, metal);
             rb.enableAO = origAO;
         } else {
             GL11.glDisable(GL11.GL_CULL_FACE);
@@ -201,17 +201,17 @@ abstract public class FactorizationBlockRender implements ICoord {
         GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
         tessellator.startDrawingQuads();
         tessellator.setNormal(0.0F, -1F, 0.0F);
-        renderblocks.renderBottomFace(block, 0.0D, 0.0D, 0.0D, texture);
+        renderblocks.renderFaceYNeg(block, 0.0D, 0.0D, 0.0D, texture);
         tessellator.setNormal(0.0F, 1.0F, 0.0F);
-        renderblocks.renderTopFace(block, 0.0D, 0.0D, 0.0D, texture);
+        renderblocks.renderFaceYPos(block, 0.0D, 0.0D, 0.0D, texture);
         tessellator.setNormal(0.0F, 0.0F, -1F);
-        renderblocks.renderEastFace(block, 0.0D, 0.0D, 0.0D, texture);
+        renderblocks.renderFaceZNeg(block, 0.0D, 0.0D, 0.0D, texture);
         tessellator.setNormal(0.0F, 0.0F, 1.0F);
-        renderblocks.renderWestFace(block, 0.0D, 0.0D, 0.0D, texture);
+        renderblocks.renderFaceZPos(block, 0.0D, 0.0D, 0.0D, texture);
         tessellator.setNormal(-1F, 0.0F, 0.0F);
-        renderblocks.renderNorthFace(block, 0.0D, 0.0D, 0.0D, texture);
+        renderblocks.renderFaceXNeg(block, 0.0D, 0.0D, 0.0D, texture);
         tessellator.setNormal(1.0F, 0.0F, 0.0F);
-        renderblocks.renderSouthFace(block, 0.0D, 0.0D, 0.0D, texture);
+        renderblocks.renderFaceXPos(block, 0.0D, 0.0D, 0.0D, texture);
         tessellator.draw();
         GL11.glTranslatef(0.5F, 0.5F, 0.5F);
     }

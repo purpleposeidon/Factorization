@@ -76,7 +76,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     private static final int[] INPUTS_s = {0, 1, 2, 3, 4, 5}, OUTPUT_s = {6};
     
     @Override
-    public int[] getSizeInventorySide(int s) {
+    public int[] getAccessibleSlotsFromSide(int s) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
         if (side == ForgeDirection.DOWN) {
             return OUTPUT_s;

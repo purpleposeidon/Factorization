@@ -214,7 +214,7 @@ public class ContainerExoModder extends Container {
     }
     
     //Direct copy from Vanilla SlotArmor because it is private for no reason at all.
-    static class SlotArmor extends Slot
+    class SlotArmor extends Slot
     {
         /**
          * The armor type that can be placed on that slot, it uses the same values of armorType field on ItemArmor.
@@ -248,7 +248,7 @@ public class ContainerExoModder extends Container {
         public boolean isItemValid(ItemStack par1ItemStack)
         {
             Item item = (par1ItemStack == null ? null : par1ItemStack.getItem());
-            return item != null && item.isValidArmor(par1ItemStack, armorType);
+            return item != null && item.isValidArmor(par1ItemStack, armorType, player);
         }
     
         @SideOnly(Side.CLIENT)

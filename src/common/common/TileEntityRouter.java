@@ -805,7 +805,7 @@ public class TileEntityRouter extends TileEntityFactorization {
     private static final int[] side_info = {0};
 
     @Override
-    public int[] getSizeInventorySide(int s) {
+    public int[] getAccessibleSlotsFromSide(int s) {
         return side_info;
     }
     

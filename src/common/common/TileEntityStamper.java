@@ -33,7 +33,7 @@ public class TileEntityStamper extends TileEntityFactorization {
 
     static int[] OUTPUT_sides = {0}, INPUT_sides = {1};
     @Override
-    public int[] getSizeInventorySide(int s) {
+    public int[] getAccessibleSlotsFromSide(int s) {
         switch (ForgeDirection.getOrientation(s)) {
         case DOWN: return INPUT_sides;
         default: return OUTPUT_sides;

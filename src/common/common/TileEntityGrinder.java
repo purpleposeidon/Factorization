@@ -78,7 +78,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     final private static int[] INPUT_s = {0}, OUT_s = {1};
 
     @Override
-    public int[] getSizeInventorySide(int s) {
+    public int[] getAccessibleSlotsFromSide(int s) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
         if (side == ForgeDirection.DOWN) {
             return OUT_s;
@@ -217,37 +217,50 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         if (input == null) {
             return false;
         }
-        for (GrinderRecipe gr : recipes) {
-            if (FactorizationUtil.couldMerge(gr.input, input)) {
-                if (output == null) {
-                    return true;
-                }
-                if (!FactorizationUtil.couldMerge(output, gr.output)) {
-                    return false;
-                }
-                if (output.stackSize + ((int) gr.probability + .99) > output.getMaxStackSize()) {
-                    return false;
-                }
+        GrinderRecipe gr = getRecipe();
+        if (gr == null) {
+            return false;
+        }
+        if (FactorizationUtil.couldMerge(gr.input, input)) {
+            if (output == null) {
                 return true;
             }
+            if (!FactorizationUtil.couldMerge(output, gr.output)) {
+                return false;
+            }
+            if (output.stackSize + Math.ceil(gr.probability) > output.getMaxStackSize()) {
+                return false;
+            }
+            return true;
         }
         return false;
     }
-
-    void grind() {
+    
+    GrinderRecipe getRecipe() {
         for (GrinderRecipe gr : recipes) {
             if (FactorizationUtil.couldMerge(gr.input, input)) {
-                if (output == null) {
-                    output = gr.output.copy();
-                    output.stackSize = 0;
-                }
-                int min = (int) gr.probability;
-                output.stackSize += min;
-                output.stackSize += rand.nextFloat() < (gr.probability - min) ? 1 : 0;
-                input.stackSize--;
-                input = FactorizationUtil.normalize(input);
-                return;
+                return gr;
             }
+        }
+        return null;
+    }
+
+    void grind() {
+        GrinderRecipe gr = getRecipe();
+        if (gr == null) {
+            return;
+        }
+        if (FactorizationUtil.couldMerge(gr.input, input)) {
+            if (output == null) {
+                output = gr.output.copy();
+                output.stackSize = 0;
+            }
+            int min = (int) gr.probability;
+            output.stackSize += min;
+            output.stackSize += rand.nextFloat() < (gr.probability - min) ? 1 : 0;
+            input.stackSize--;
+            input = FactorizationUtil.normalize(input);
+            return;
         }
     }
 

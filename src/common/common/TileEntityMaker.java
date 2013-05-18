@@ -221,7 +221,7 @@ public class TileEntityMaker extends TileEntityFactorization {
     private static final int[] PACKET_s = {paper_slot, craft_slot}, MATERIAL_s = {input_slot}, OUT_s = {output_slot};
 
     @Override
-    public int[] getSizeInventorySide(int s) {
+    public int[] getAccessibleSlotsFromSide(int s) {
         ForgeDirection side = ForgeDirection.getOrientation(s);
         switch (side) {
         case DOWN: return OUT_s;

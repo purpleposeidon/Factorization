@@ -227,7 +227,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     private static final int[] DOWN_s = {0}, UP_s = {1}, NO_s = {};
     
     @Override
-    public int[] getSizeInventorySide(int side) {
+    public int[] getAccessibleSlotsFromSide(int side) {
         switch (ForgeDirection.getOrientation(side)) {
         case DOWN: return DOWN_s;
         case UP: return UP_s;
