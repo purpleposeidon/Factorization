@@ -82,16 +82,14 @@ TOP LIST (that's become somewhat less tops. Oops.)
     $F: fills grid with item under the mouse
     $B: balances items
 
-
 onInventoryUpdate all the TEs
+determine what the real colors of all these raw glazes are
 smooth sandstone double slab (Are there other variants?)
 The new IInventory has stuff for preventing things from being put into slots. All machines, and especially routers.
 Tossing barrels (Or, well, anything) through mystcraft portals with the gravity gun
 Bug report of wire-breaking not actually disconnecting?
 Look at what errors we get if the FZDS code isn't in
 either bats are spawning in the hammer dimension, or we're getting entity updates that we shouldn't be
-Exo-armor needs a look-through
-Make exo-armor not look terrible (Maybe use those armor slot symbols...). Also the on-player armor texture needs some noise & sparklies. Also, is it too rigid?
 Wall jump only works when moving up? Make wall jump bouncing you off the wall at a 45° angle
 Grinder acting weird?
 Forestry liquid containers/vanilla water bottles working in the mixer
@@ -103,32 +101,16 @@ either figure out how to get mystcraft (?) loading TEs properly, or have the cli
 Config option for ore processing output
 remove failed packet spam for everyone who isn't me
 test with dedicated server (not from eclipse....)
-Kill exo-armor
-[Mecha-Features]
-add inverium-based mecha-upgrades
-These upgrades:
-  Lead boots
-  Damage Absorber (It has to be trained on a particular damage type.) Memory Plating/Conditioned Armor
-  Armor Remover (?)
-  Anti-gravity (uses inverium'd lead blocks): Velocity limiting, hovering, high jumping
-    Acceleration Dampener
-    Acceleration Stopper
-Some electricity related mecha-upgrades?
-Flying: Antigravity bits (Depends on inverium)
-Strong, but balanced, armor: Memory Plating/Conditioned Armor (More inverium)
-Good mining tools
 Placing/breaking wrath lamp in hammerspace seems to cause the client to crap its pants
 Don't keep non-weak references to worlds ("MapMaker.weakKeys().buildMap()") except in Entity/TileEntity
 RP heating
 register ore blocks
-Forge finally has Block hooks for custom particles! \o/
+To kill NEI's shift-? cheat: clear out RecipeInfo.overlayMap... or something.  Hmm....
+  Might want to just remove instances whose class = DefaultOverlayHandler or BrewingOverlayHandler.
 
 back to ceramics?
    - a new tool: export to obj tool. And if we have an export, maybe an import would be nice. Could export the sculpture, or export the chunk! Use a hacked up tessellator.
 https://github.com/MinecraftForge/MinecraftForge/commit/34ebfcd9785c3c50c3ac743eb1e9cbf000df10dc
-
-[Reported bugs]
-exo in creative list twice when searching
 
 [Features]
 https://github.com/pahimar/Equivalent-Exchange-3/commit/e1ed736955b9af238431358bad405e306833f36a
@@ -291,22 +273,6 @@ bag of holding
   possible TODO:
     shift-` to move items the other way?
     Right click the bag to open up its inventory. Or ctrl-`?
-
-
-Mecha-upgrades:
-  Free:
-    bouyancy barrel
-    internal piston
-    cobblestone drive
-  Electric:
-    charcoal filter
-    thermal environmental control
-    sugar water?
-  Inverium:
-    upgrades from slowing falling to slight hovering to flying amongst the birds
-    something to feed you
-    
-
 
 
 Clay
