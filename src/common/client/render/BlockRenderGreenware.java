@@ -5,7 +5,6 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.item.ItemStack;
 
 import org.lwjgl.opengl.GL11;
 
@@ -39,7 +38,6 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
     protected
     void render(RenderBlocks rb) {
         if (!world_mode) {
-            ItemStack is = ItemRenderCapture.getRenderingItem();
             if (is == null) {
                 return;
             }
@@ -130,6 +128,8 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
         return rc.raw_color;
     }
     
+    private boolean spammed = false;
+    
     void renderToTessellator(TileEntityGreenware greenware) {
         BlockRenderHelper block = BlockRenderHelper.instance;
         ClayState state = greenware.getState();
@@ -138,7 +138,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
             case WET: block.useTexture(Block.blockClay.getBlockTextureFromSide(0)); break;
             case DRY: block.useTexture(BlockIcons.ceramics$dry); break;
             case BISQUED: block.useTexture(BlockIcons.ceramics$bisque); break;
-            case UNFIRED_GLAZED: block.useTexture(BlockIcons.ceramics$stand); break;
+            case UNFIRED_GLAZED: block.useTexture(BlockIcons.ceramics$rawglaze); break;
             default: block.useTexture(BlockIcons.error); break;
             }
         }
@@ -153,7 +153,20 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
                     for (int i = 0; i < 6; i++) {
                         block.setTexture(i, it.getIcon(i, rc.icon_md));
                         //int color = it.getRenderColor(rc.icon_md);
-                        int color = it.colorMultiplier(greenware.worldObj, greenware.xCoord, greenware.yCoord, greenware.zCoord); //NORELEASE: try/catch w/ error message
+                        int color = 0xFFFFFF; 
+                        if (greenware.worldObj != null) {
+                            try {
+                                color = it.colorMultiplier(greenware.worldObj, greenware.xCoord, greenware.yCoord, greenware.zCoord); //NORELEASE: try/catch w/ error message
+                            } catch (Throwable t) {
+                                if (!spammed) {
+                                    spammed = true;
+                                    Core.logWarning("%s could not give a Block.colorMultiplier", it);
+                                    t.printStackTrace();
+                                }
+                            }
+                        } else {
+                            color = it.getRenderColor(i);
+                        }
                         if (color != 0xFFFFFF) {
                             colors_changed = true;
                             block.setColor(i, color);
