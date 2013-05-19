@@ -73,20 +73,20 @@ public class BlockLightAir extends Block {
     public void onNeighborBlockChange(World w, int x, int y, int z, int neighborID) {
         int md = w.getBlockMetadata(x, y, z);
         if (md == air_md) {
-            Coord here = new Coord(w, x, y, z);
+            int notifyFlag = Coord.NOTIFY_NEIGHBORS | Coord.UPDATE;
             if (neighborID == Block.cobblestoneWall.blockID) {
                 if (w.getBlockId(x, y - 1, z) == Block.cobblestoneWall.blockID) {
-                    here.setId(0);
+                    w.setBlock(x, y, z, 0, 0, notifyFlag);
+                    return;
                 }
             }
             TileEntityWrathLamp.doAirCheck(w, x, y, z);
-            Coord above = new Coord(w, x, y + 1, z);
-            Block b = above.getBlock();
-            if (b != null && !above.isAir()) {
+            Block b = Block.blocksList[w.getBlockId(x, y + 1, z)];
+            if (b != null && !b.isAirBlock(w, x, y + 1, z)) {
                 //a li'l hack for sand
-                here.setId(0, false);
+                w.setBlock(x, y, z, 0, 0, 0);
                 b.updateTick(w, x, y + 1, z, rand);
-                here.setIdMd(blockID, air_md, false);
+                w.setBlock(x, y, z, blockID, air_md, 0);
             }
         }
         if (md == fire_md) {

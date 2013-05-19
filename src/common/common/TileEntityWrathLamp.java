@@ -6,6 +6,7 @@ import java.util.PriorityQueue;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.fzds.TransferLib;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -65,6 +66,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     }
     
     static final int NOTIFY_NEIGHBORS = factorization.api.Coord.NOTIFY_NEIGHBORS;
+    static final int UPDATE_CLIENT = factorization.api.Coord.UPDATE;
     static boolean spammed_console = false;
 
     static void doAirCheck(World w, int x, int y, int z) {
@@ -85,7 +87,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         TileEntityWrathLamp lamp = TileEntityWrathLamp.findLightAirParent(w, x, y, z);
         if (lamp == null) {
             update_count += 1;
-            w.setBlock(x, y, z, 0, 0, NOTIFY_NEIGHBORS);
+            w.setBlock(x, y, z, 0, 0, NOTIFY_NEIGHBORS | UPDATE_CLIENT);
         }
         else {
             lamp.activate(y);
@@ -170,8 +172,11 @@ public class TileEntityWrathLamp extends TileEntityCommon {
             for (int z = zCoord - radius; z <= zCoord + radius; z++) {
                 int id = worldObj.getBlockId(x, yCoord, z);
                 if (id == Core.registry.lightair_block.blockID) {
-                    worldObj.setBlock(x, yCoord, z, 0, 0, NOTIFY_NEIGHBORS);
-                    //worldObj.setBlock(x, yCoord, z, 0);
+                    if (worldObj.isRemote) {
+                        worldObj.setBlock(x, yCoord, z, 0, 0, NOTIFY_NEIGHBORS);
+                    } else {
+                        worldObj.setBlock(x, yCoord, z, 0);
+                    }
                 }
             }
         }
@@ -319,7 +324,11 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                         block = -1;
                     }
                     if (block == 0) {
-                        worldObj.setBlock(x, height, z, Core.registry.lightair_block.blockID, 0, NOTIFY_NEIGHBORS);
+                        //Nice work, Mojang. If we didn't do this the hard way, the client will lag very badly near chunks that are unloaded.
+                        //XXX TODO FIXME: Seems a bit difficult. What's the right way to do this?
+                        Chunk chunk = worldObj.getChunkFromBlockCoords(x, z);
+                        chunk.setBlockIDWithMetadata(x & 15, height, z & 15, Core.registry.lightair_block.blockID, 0);
+                        worldObj.markBlockForRenderUpdate(x, height, z);
                     } else if (block == Core.registry.lightair_block.blockID) {
                     } else if (x == xCoord && height == yCoord && z == zCoord) {
                         //this is ourself. Hi, self.
@@ -380,7 +389,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
 
         @Override
         protected void entityInit() {
-            delay = 20 * 2;
+            delay = 20 * 4;
         }
 
         //No need to bother saving this.
