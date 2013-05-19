@@ -1164,7 +1164,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "factorization mixer recipes@fz.mixing",
                 "factorization slag furnace recipes@fz.slagging"
         }) {
-            FMLInterModComms.sendRuntimeMessage(Core.instance, "NEIPlugins", "register-crafting-handler", Core.modId + "@" + msg);
+            FMLInterModComms.sendRuntimeMessage(Core.instance, "NEIPlugins", "register-crafting-handler", Core.name + "@" + msg);
         }
     }
 }
