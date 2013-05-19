@@ -1,5 +1,7 @@
 package factorization.client.render;
 
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
@@ -7,6 +9,7 @@ import net.minecraft.item.ItemStack;
 
 import org.lwjgl.opengl.GL11;
 
+import factorization.common.BasicGlazes;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
 import factorization.common.Core;
@@ -98,6 +101,35 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
         gw.shouldRenderTesr = state == ClayState.WET;
     }
     
+    private static Random rawMimicRandom = new Random();
+    
+    int getColor(ClayLump rc) {
+        if (rc.raw_color == -1) {
+            //Get the raw color, possibly making something up
+            if (rc.icon_id == Core.registry.resource_block.blockID && rc.icon_md > 16) {
+                for (BasicGlazes bg : BasicGlazes.values()) {
+                    if (bg.metadata == rc.icon_md) {
+                        if (bg.raw_color == -1) {
+                            bg.raw_color = 0xFF00FF;
+                        }
+                        rc.raw_color = bg.raw_color;
+                        break;
+                    }
+                }
+            }
+            if (rc.raw_color == -1) {
+                rawMimicRandom.setSeed((rc.icon_id << 16) + rc.icon_md);
+                int c = 0;
+                for (int i = 0; i < 3; i++) {
+                    c += (rawMimicRandom.nextInt(0xE0) + 10);
+                    c <<= 16;
+                }
+                rc.raw_color = c;
+            }
+        }
+        return rc.raw_color;
+    }
+    
     void renderToTessellator(TileEntityGreenware greenware) {
         BlockRenderHelper block = BlockRenderHelper.instance;
         ClayState state = greenware.getState();
@@ -106,22 +138,40 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
             case WET: block.useTexture(Block.blockClay.getBlockTextureFromSide(0)); break;
             case DRY: block.useTexture(BlockIcons.ceramics$dry); break;
             case BISQUED: block.useTexture(BlockIcons.ceramics$bisque); break;
+            case UNFIRED_GLAZED: block.useTexture(BlockIcons.ceramics$stand); break;
             default: block.useTexture(BlockIcons.error); break;
             }
         }
+        boolean colors_changed = false;
         for (ClayLump rc : greenware.parts) {
             if (state == ClayState.HIGHFIRED) {
                 Block it = Block.blocksList[rc.icon_id];
                 if (it == null) {
                     block.useTexture(BlockIcons.error);
-                    continue; //boo
+                    //continue; //boo // err, huh?
+                } else {
+                    for (int i = 0; i < 6; i++) {
+                        block.setTexture(i, it.getIcon(i, rc.icon_md));
+                        //int color = it.getRenderColor(rc.icon_md);
+                        int color = it.colorMultiplier(greenware.worldObj, greenware.xCoord, greenware.yCoord, greenware.zCoord); //NORELEASE: try/catch w/ error message
+                        if (color != 0xFFFFFF) {
+                            colors_changed = true;
+                            block.setColor(i, color);
+                        }
+                    }
                 }
-                block.useTexture(it.getIcon(0, rc.icon_md));
+            }
+            if (state == ClayState.UNFIRED_GLAZED) {
+                block.setColor(getColor(rc));
+                colors_changed = true;
             }
             rc.toBlockBounds(block);
             block.begin();
             block.rotateMiddle(rc.quat);
             block.renderRotated(Tessellator.instance, x, y, z);
+        }
+        if (colors_changed) {
+            block.resetColors();
         }
     }
     

@@ -63,7 +63,6 @@ public class BlockRenderHelper extends Block {
         return this;
     }
     
-    @SideOnly(Side.CLIENT)
     public Icon[] textures;
     private Icon[] repetitionCache = new Icon[6];
     
@@ -84,6 +83,7 @@ public class BlockRenderHelper extends Block {
     
     @SideOnly(Side.CLIENT)
     public BlockRenderHelper setTexture(int i, Icon texture) {
+        textures = repetitionCache;
         textures[i] = texture;
         return this;
     }
@@ -254,6 +254,27 @@ public class BlockRenderHelper extends Block {
         return this;
     }
     
+    private int[] colors = new int[6];
+    {
+        resetColors();
+    }
+    
+    public void setColor(int index, int color) {
+        colors[index] = color;
+    }
+    
+    public void setColor(int color) {
+        for (int i = 0; i < colors.length; i++) {
+            colors[i] = color;
+        }
+    }
+    
+    public void resetColors() {
+        for (int i = 0; i < colors.length; i++) {
+            colors[i] = 0xFFFFFF;
+        }
+    }
+    
     @SideOnly(Side.CLIENT)
     public void renderRotated(Tessellator tess, int x, int y, int z) {
         for (int f = 0; f < faceCache.length; f++) {
@@ -262,7 +283,11 @@ public class BlockRenderHelper extends Block {
             }
             VectorUV[] face = faceCache[f];
             float lighting = getNormalizedLighting(face, center);
-            tess.setColorOpaque_F(lighting, lighting, lighting);
+            int color = colors[f];
+            float color_r = (color & 0xFF0000) >> 16;
+            float color_g = (color & 0x00FF00) >> 8;
+            float color_b = (color & 0x0000FF);
+            tess.setColorOpaque_F(lighting*color_r, lighting*color_g, lighting*color_b);
             for (int i = 0; i < face.length; i++) {
                 VectorUV vert = face[i];
                 tess.addVertexWithUV(vert.x + x, vert.y + y, vert.z + z, vert.u, vert.v);

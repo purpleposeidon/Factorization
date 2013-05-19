@@ -42,7 +42,7 @@ import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityGreenware extends TileEntityCommon {
     public static int MAX_PARTS = 32;
-    
+
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.CERAMIC;
@@ -52,16 +52,18 @@ public class TileEntityGreenware extends TileEntityCommon {
     public BlockClass getBlockClass() {
         return BlockClass.Ceramic;
     }
-    
+
     public static class ClayLump {
         public byte minX, minY, minZ;
         public byte maxX, maxY, maxZ;
-        
-        public short icon_id; //But only for blocks; no items
+
+        public short icon_id; // But only for blocks; no items
         public byte icon_md;
-        
+
         public Quaternion quat;
-        
+
+        public int raw_color = -1;
+
         void write(ByteArrayDataOutput out) {
             out.writeByte(minX);
             out.writeByte(minY);
@@ -73,7 +75,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             out.writeByte(icon_md);
             quat.write(out);
         }
-        
+
         void write(NBTTagCompound tag) {
             tag.setByte("lx", minX);
             tag.setByte("ly", minY);
@@ -85,7 +87,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             tag.setByte("icon_md", icon_md);
             quat.writeToTag(tag, "r");
         }
-        
+
         void write(ArrayList<Object> out) {
             out.add(minX);
             out.add(minY);
@@ -97,7 +99,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             out.add(icon_md);
             out.add(quat);
         }
-        
+
         ClayLump read(DataInput in) throws IOException {
             minX = in.readByte();
             minY = in.readByte();
@@ -110,7 +112,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             quat = Quaternion.read(in);
             return this;
         }
-        
+
         ClayLump read(NBTTagCompound tag) {
             minX = tag.getByte("lx");
             minY = tag.getByte("ly");
@@ -123,7 +125,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             quat = Quaternion.loadFromTag(tag, "r");
             return this;
         }
-        
+
         void offset(int dx, int dy, int dz) {
             minX += dx;
             maxX += dx;
@@ -132,29 +134,30 @@ public class TileEntityGreenware extends TileEntityCommon {
             minZ += dz;
             maxZ += dz;
         }
-        
+
         ClayLump asDefault() {
             minX = minZ = 4;
             minY = 0;
             maxX = maxZ = 16 - 4;
             maxY = 10;
-            offset(16, 16+1, 16);
+            offset(16, 16 + 1, 16);
             icon_id = (short) Core.resource_id;
             icon_md = (byte) ResourceType.BISQUE.md;
             quat = new Quaternion();
             return this;
         }
-        
+
         public void toBlockBounds(Block b) {
-            b.setBlockBounds((minX - 16)/16F, (minY - 16)/16F, (minZ - 16)/16F, (maxX - 16)/16F, (maxY - 16)/16F, (maxZ - 16)/16F);
+            b.setBlockBounds((minX - 16) / 16F, (minY - 16) / 16F, (minZ - 16) / 16F, (maxX - 16) / 16F, (maxY - 16) / 16F, (maxZ - 16) / 16F);
         }
-        
+
         public void toRotatedBlockBounds(BlockRenderHelper b) {
             toBlockBounds(b);
-            //TODO: This doesn't work! Lame!
-            /*b.beginNoIcons();
-            b.rotate(quat);
-            b.setBlockBoundsBasedOnRotation();*/
+            // TODO: This doesn't work! Lame!
+            /*
+             * b.beginNoIcons(); b.rotate(quat);
+             * b.setBlockBoundsBasedOnRotation();
+             */
         }
 
         public ClayLump copy() {
@@ -170,21 +173,22 @@ public class TileEntityGreenware extends TileEntityCommon {
             ret.quat = new Quaternion(quat);
             return ret;
         }
-        
+
         private static HashSet<Coord> cache = new HashSet();
         private static DeltaCoord m1 = new DeltaCoord(-1, -1, -1);
         private static DeltaCoord d = new DeltaCoord();
-        
+
         public Collection<Coord> getOccupiedBlocks(Coord base) {
             cache.clear();
-            DeltaCoord min = new DeltaCoord(minX/16, minY/16, minZ/16);
+            DeltaCoord min = new DeltaCoord(minX / 16, minY / 16, minZ / 16);
             min = min.add(m1);
-            DeltaCoord max = new DeltaCoord(maxX/16, maxY/16, maxZ/16);
+            DeltaCoord max = new DeltaCoord(maxX / 16, maxY / 16, maxZ / 16);
             max = max.add(m1);
             for (int dx = min.x; dx <= max.x; dx++) {
                 for (int dy = min.y; dy <= max.y; dy++) {
                     for (int dz = min.z; dz <= max.z; dz++) {
-                        d.init(dx, dy, dz);;
+                        d.init(dx, dy, dz);
+                        ;
                         cache.add(base.add(d));
                     }
                 }
@@ -192,31 +196,32 @@ public class TileEntityGreenware extends TileEntityCommon {
             return cache;
         }
     }
-    
+
     public ArrayList<ClayLump> parts = new ArrayList();
     public int lastTouched = 0;
     int totalHeat = 0;
     boolean glazesApplied = false;
     private boolean partsValidated = false;
-    
-    public static int dryTime = 20*60*2; //2 minutes
-    public static int bisqueHeat = 1000, highfireHeat = bisqueHeat*20;
-    public static final int clayIconStart = 12*16;
-    
-    //Client-side only
+
+    public static int dryTime = 20 * 60 * 2; // 2 minutes
+    public static int bisqueHeat = 1000, highfireHeat = bisqueHeat * 20;
+    public static final int clayIconStart = 12 * 16;
+
+    // Client-side only
     public boolean shouldRenderTesr = false;
-    
+
     public static enum ClayState {
         WET("Wet Clay"), DRY("Bone-Dry Greenware"), BISQUED("Bisqued"), UNFIRED_GLAZED("Glazed Bisqueware"), HIGHFIRED("Highfire Glazed");
         public String english;
+
         ClayState(String en) {
             this.english = en;
         }
     };
-    
+
     public TileEntityGreenware() {
     }
-    
+
     public ClayState getState() {
         if (totalHeat > highfireHeat) {
             return ClayState.HIGHFIRED;
@@ -232,44 +237,47 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
         return ClayState.WET;
     }
-    
-    public Icon getIcon(ClayLump lump) {
+
+    public Icon getIcon(ClayLump lump, int side) {
         switch (getState()) {
-        case WET: return Block.blockClay.getBlockTextureFromSide(0);
-        case DRY: return BlockIcons.ceramics$dry;
+        case WET:
+            return Block.blockClay.getBlockTextureFromSide(side);
+        case DRY:
+            return BlockIcons.ceramics$dry;
         case BISQUED:
         case UNFIRED_GLAZED:
-            return BlockIcons.ceramics$bisque;
+            return BlockIcons.error;
         case HIGHFIRED:
             Item it = Item.itemsList[lump.icon_id];
             if (it == null) {
                 return BlockIcons.error;
             }
             return it.getIconFromDamage(lump.icon_md);
-        default: return BlockIcons.error;
+        default:
+            return BlockIcons.error;
         }
     }
-    
+
     public void touch() {
         if (getState() == ClayState.WET) {
             lastTouched = 0;
         }
     }
-    
+
     public boolean renderEfficient() {
         return getState() != ClayState.WET;
     }
-    
+
     public boolean canEdit() {
         return getState() == ClayState.WET;
     }
-    
+
     void initialize() {
         parts = new ArrayList<ClayLump>();
         parts.add(new ClayLump().asDefault());
         touch();
     }
-    
+
     void writeParts(NBTTagCompound tag) {
         NBTTagList l = new NBTTagList();
         for (ClayLump lump : parts) {
@@ -282,7 +290,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         tag.setInteger("heat", totalHeat);
         tag.setBoolean("glazed", glazesApplied);
     }
-    
+
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
@@ -291,7 +299,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             getCoord().setId(0);
         }
     }
-    
+
     public void loadParts(NBTTagCompound tag) {
         if (tag == null) {
             initialize();
@@ -312,16 +320,16 @@ public class TileEntityGreenware extends TileEntityCommon {
         totalHeat = tag.getInteger("heat");
         glazesApplied = tag.getBoolean("glazed");
     }
-    
+
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
         loadParts(tag);
     }
-    
+
     @Override
     public Packet getAuxillaryInfoPacket() {
-        ArrayList<Object> args = new ArrayList(2 + parts.size()*9);
+        ArrayList<Object> args = new ArrayList(2 + parts.size() * 9);
         args.add(MessageType.SculptDescription);
         args.add(getState().ordinal());
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
@@ -330,7 +338,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
         return getDescriptionPacketWith(args.toArray());
     }
-    
+
     @Override
     void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
         super.onPlacedBy(player, is, side);
@@ -347,8 +355,9 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
         return ret;
     }
-    
+
     private ClayState lastState = null;
+
     @Override
     public void updateEntity() {
         super.updateEntity();
@@ -386,7 +395,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             broadcastMessage(null, MessageType.SculptState, lastState.ordinal());
         }
     }
-    
+
     @Override
     public boolean activate(EntityPlayer player) {
         ClayState state = getState();
@@ -423,7 +432,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             held.stackSize--;
         }
         if (player.worldObj.isRemote) {
-            //Let the server tell us the results
+            // Let the server tell us the results
             return true;
         }
         if (parts.size() >= MAX_PARTS) {
@@ -441,11 +450,11 @@ public class TileEntityGreenware extends TileEntityCommon {
         if (isValidLump(extrusion)) {
             changeLump(parts.size() - 1, extrusion);
         } else {
-            //TODO: Sometimes it fails when it shouldn't.
+            // TODO: Sometimes it fails when it shouldn't.
         }
         return true;
     }
-    
+
     ClayLump addLump() {
         ClayLump ret = new ClayLump().asDefault();
         parts.add(ret);
@@ -455,7 +464,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
         return ret;
     }
-    
+
     void removeLump(int id) {
         if (id < 0 || id >= parts.size()) {
             return;
@@ -466,7 +475,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             touch();
         }
     }
-    
+
     ClayLump extrudeLump(ClayLump against, int side) {
         ClayLump lump = against.copy();
         ForgeDirection dir = ForgeDirection.getOrientation(side);
@@ -475,40 +484,46 @@ public class TileEntityGreenware extends TileEntityCommon {
         int wX = lump.maxX - lump.minX;
         int wY = lump.maxY - lump.minY;
         int wZ = lump.maxZ - lump.minZ;
-        lump.maxX += wX*dir.offsetX;
-        lump.maxY += wY*dir.offsetY;
-        lump.maxZ += wZ*dir.offsetZ;
-        lump.minX += wX*dir.offsetX;
-        lump.minY += wY*dir.offsetY;
-        lump.minZ += wZ*dir.offsetZ;
+        lump.maxX += wX * dir.offsetX;
+        lump.maxY += wY * dir.offsetY;
+        lump.maxZ += wZ * dir.offsetZ;
+        lump.minX += wX * dir.offsetX;
+        lump.minY += wY * dir.offsetY;
+        lump.minZ += wZ * dir.offsetZ;
         return lump;
     }
-    
+
     public boolean isValidLump(ClayLump lump) {
-        //check volume
+        // check volume
         if (!(Core.cheat)) {
-            int wX = lump.maxX - lump.minX; 
+            int wX = lump.maxX - lump.minX;
             int wY = lump.maxY - lump.minY;
             int wZ = lump.maxZ - lump.minZ;
-            int area = wX*wY*wZ;
-            int max_area = 16*16*16/4;
+            int area = wX * wY * wZ;
+            int max_area = 16 * 16 * 16 / 4;
             if (area <= 0 || area > max_area) {
                 return false;
             }
         }
-        
-        //check bounds
-        final int B = 16*3;
-        if (lump.minX < 0) return false;
-        if (lump.minY < 0) return false;
-        if (lump.minZ < 0) return false;
-        if (lump.maxX > B) return false;
-        if (lump.maxY > B) return false;
-        if (lump.maxZ > B) return false;
-        
-        //check for free space (needs to be last, as it can mutate the world)
+
+        // check bounds
+        final int B = 16 * 3;
+        if (lump.minX < 0)
+            return false;
+        if (lump.minY < 0)
+            return false;
+        if (lump.minZ < 0)
+            return false;
+        if (lump.maxX > B)
+            return false;
+        if (lump.maxY > B)
+            return false;
+        if (lump.maxZ > B)
+            return false;
+
+        // check for free space (needs to be last, as it can mutate the world)
         for (Coord c : lump.getOccupiedBlocks(getCoord())) {
-            //This block needs to be an Extension, or this
+            // This block needs to be an Extension, or this
             if (c.isAir() || c.isReplacable()) {
                 c.setId(Core.registry.factory_block);
                 TileEntityExtension tex = new TileEntityExtension(this);
@@ -528,10 +543,10 @@ public class TileEntityGreenware extends TileEntityCommon {
             }
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Override
     void onRemove() {
         super.onRemove();
@@ -547,7 +562,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             }
         }
     }
-    
+
     private void updateLump(int id, ClayLump lump) {
         if (id < 0 || id >= parts.size()) {
             return;
@@ -562,25 +577,25 @@ public class TileEntityGreenware extends TileEntityCommon {
             return;
         }
     }
-    
+
     private void shareLump(int id, ClayLump selection) {
         ArrayList<Object> toSend = new ArrayList();
         toSend.add(id);
         selection.write(toSend);
         broadcastMessage(null, MessageType.SculptMove, toSend.toArray());
     }
-    
+
     void changeLump(int id, ClayLump newValue) {
         updateLump(id, newValue);
         shareLump(id, newValue);
     }
-    
+
     private float getFloat(DataInput input) throws IOException {
         int r = (int) (input.readFloat() * 2);
-        //XXX TODO: clip to within the 3x3 cube!
-        return r/2F;
+        // XXX TODO: clip to within the 3x3 cube!
+        return r / 2F;
     }
-    
+
     @Override
     public boolean handleMessageFromServer(int messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
@@ -612,14 +627,15 @@ public class TileEntityGreenware extends TileEntityCommon {
         case MessageType.SculptState:
             readStateChange(input);
             break;
-        default: return false;
+        default:
+            return false;
         }
         if (renderEfficient()) {
             getCoord().redraw();
         }
         return true;
     }
-    
+
     private void readStateChange(DataInput input) throws IOException {
         switch (ClayState.values()[input.readInt()]) {
         case WET:
@@ -631,15 +647,19 @@ public class TileEntityGreenware extends TileEntityCommon {
         case BISQUED:
             totalHeat = bisqueHeat + 1;
             break;
+        case UNFIRED_GLAZED:
+            totalHeat = bisqueHeat + 2;
+            glazesApplied = true;
+            break;
         case HIGHFIRED:
             totalHeat = highfireHeat + 1;
             break;
         }
         getCoord().redraw();
     }
-    
-    private static final Vec3 zeroVec = Vec3.createVectorHelper(0, 0, 0); 
-    
+
+    private static final Vec3 zeroVec = Vec3.createVectorHelper(0, 0, 0);
+
     @Override
     boolean removeBlockByPlayer(EntityPlayer player) {
         if (player.worldObj.isRemote) {
@@ -651,8 +671,8 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
         Coord here = getCoord();
         ClayState state = getState();
-        //If it's solid, break it.
-        //If we're sneaking & creative, break it
+        // If it's solid, break it.
+        // If we're sneaking & creative, break it
         boolean shouldDestroy = player.isSneaking() || parts.size() == 1;
         if (player.capabilities.isCreativeMode) {
             if (shouldDestroy) {
@@ -672,7 +692,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
         return false;
     }
-    
+
     @Override
     public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {
         BlockRenderHelper block;
@@ -681,17 +701,20 @@ public class TileEntityGreenware extends TileEntityCommon {
         } else {
             block = Core.registry.serverTraceHelper;
         }
-        //It's possible for the startVec to be embedded in a lump (causing it to hit the opposite side), so we must move it farther away
+        // It's possible for the startVec to be embedded in a lump (causing it
+        // to hit the opposite side), so we must move it farther away
         double dx = startVec.xCoord - endVec.xCoord;
         double dy = startVec.yCoord - endVec.yCoord;
         double dz = startVec.zCoord - endVec.zCoord;
-        double scale = 5.2; //Diagonal of a 3³. (Was initially using scale = 2)
-        //This isn't quite right; the dVector would properly be normalized here & rescaled to the max diameter. But we can survive without it.
-        //Unnormalized length of dVector is 6m in surviavl mode IIRC. This'll be way longer than it needs to be.
-        //Why is it + instead of -? Hmm.
-        startVec.xCoord += dx*scale;
-        startVec.yCoord += dy*scale;
-        startVec.zCoord += dz*scale;
+        double scale = 5.2; // Diagonal of a 3³. (Was initially using scale = 2)
+        // This isn't quite right; the dVector would properly be normalized here
+        // & rescaled to the max diameter. But we can survive without it.
+        // Unnormalized length of dVector is 6m in surviavl mode IIRC. This'll
+        // be way longer than it needs to be.
+        // Why is it + instead of -? Hmm.
+        startVec.xCoord += dx * scale;
+        startVec.yCoord += dy * scale;
+        startVec.zCoord += dz * scale;
         MovingObjectPosition shortest = null;
         for (int i = 0; i < parts.size(); i++) {
             ClayLump lump = parts.get(i);
@@ -719,15 +742,15 @@ public class TileEntityGreenware extends TileEntityCommon {
             }
         }
         return shortest;
-        //return super.collisionRayTrace(w, x, y, z, startVec, endVec);
+        // return super.collisionRayTrace(w, x, y, z, startVec, endVec);
     }
-    
+
     private void offsetVector(Vec3 player, Vec3 v) {
         v.xCoord -= player.xCoord;
         v.yCoord -= player.yCoord;
         v.zCoord -= player.zCoord;
     }
-    
+
     @ForgeSubscribe
     @SideOnly(Side.CLIENT)
     public void renderCeramicsSelection(DrawBlockHighlightEvent event) {
@@ -750,8 +773,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         double oY = player.lastTickPosY + (player.posY - player.lastTickPosY) * partial;
         double oZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partial;
         AxisAlignedBB bb = block.getSelectedBoundingBoxFromPool(c.w, c.x, c.y, c.z).expand(widen, widen, widen).getOffsetBoundingBox(-oX, -oY, -oZ);
-        
-        
+
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -759,17 +781,19 @@ public class TileEntityGreenware extends TileEntityCommon {
         float r = 0xFF;
         GL11.glLineWidth(2.0F);
         GL11.glColor4f(0, 0, 0, 0.4F);
-        //GL11.glColor4f(0x4D/r, 0x34/r, 0x7C/r, 0.8F); //#4D347C
+        // GL11.glColor4f(0x4D/r, 0x34/r, 0x7C/r, 0.8F); //#4D347C
         drawOutlinedBoundingBox(bb);
         GL11.glDepthMask(true);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glDisable(GL11.GL_BLEND);
-        
-        //TODO: If the rotation tool is selected, may draw the axis?
-        //Oooooh, we could also draw the offset position for *EVERY* tool...
+
+        // TODO: If the rotation tool is selected, may draw the axis?
+        // Oooooh, we could also draw the offset position for *EVERY* tool...
     }
-    
-    //Copied. Private in RenderGlobal.drawOutlinedBoundingBox. For some stupid pointless reason. Don't really feel like re-writing it to be public every update or submitting an AT. 
+
+    // Copied. Private in RenderGlobal.drawOutlinedBoundingBox. For some stupid
+    // pointless reason. Don't really feel like re-writing it to be public every
+    // update or submitting an AT.
     private static void drawOutlinedBoundingBox(AxisAlignedBB aabb) {
         Tessellator tessellator = Tessellator.instance;
         tessellator.startDrawing(3);
@@ -797,25 +821,24 @@ public class TileEntityGreenware extends TileEntityCommon {
         tessellator.addVertex(aabb.minX, aabb.maxY, aabb.maxZ);
         tessellator.draw();
     }
-    
+
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
         AxisAlignedBB bb = AxisAlignedBB.getAABBPool().getAABB(xCoord - 1, yCoord - 1, zCoord - 1, xCoord + 1, yCoord + 1, zCoord + 1);
         return bb;
     }
-    
+
     @Override
     public void setBlockBounds(Block b) {
         super.setBlockBounds(b);
-        //b.setBlockBounds(-1, -1, -1, 1, 1, 1);
+        // b.setBlockBounds(-1, -1, -1, 1, 1, 1);
     }
-    
-    
+
     @Override
     public boolean addCollisionBoxesToList(Block ignore, AxisAlignedBB aabb, List list, Entity entity) {
         boolean remote = (entity != null && entity.worldObj != null) ? entity.worldObj.isRemote : FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT;
         BlockRenderHelper block = remote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
-        block.setBlockBounds(0, 0, 0, 1, 1F/8F, 1);
+        block.setBlockBounds(0, 0, 0, 1, 1F / 8F, 1);
         ClayState state = getState();
         if (state == ClayState.WET || state == ClayState.DRY) {
             AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
@@ -832,23 +855,23 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
         return true;
     }
-    
+
     @Override
     public AxisAlignedBB getCollisionBoundingBoxFromPool() {
         return null;
     }
-    
+
     @Override
     public boolean isBlockSolidOnSide(int side) {
         return false;
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     public Icon getIcon(ForgeDirection dir) {
         if (parts.size() == 0) {
             return Block.blockClay.getBlockTextureFromSide(0);
         }
-        return getIcon(parts.get(0));
+        return getIcon(parts.get(0), dir.ordinal());
     }
 }

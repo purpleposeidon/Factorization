@@ -106,7 +106,8 @@ public class ItemGlazeBucket extends Item {
     }
     
     private byte getBlockSide(ItemStack is) {
-        return FactorizationUtil.getTag(is).getByte("bsd");
+        return 0;
+        //return FactorizationUtil.getTag(is).getByte("bsd");
     }
     
     private boolean isMimic(ItemStack is) {
@@ -140,11 +141,14 @@ public class ItemGlazeBucket extends Item {
         FactorizationUtil.getTag(is).setString("gid", unique_id);
     }
     
+    int md_for_nei = 0;
+    
     public ItemStack makeCraftingGlaze(String unique_id) {
         ItemStack is = new ItemStack(this);
         NBTTagCompound tag = FactorizationUtil.getTag(is);
         tag.setBoolean("fake", true);
         setGid(is, unique_id);
+        is.setItemDamage(md_for_nei++);
         //add(is);
         return is;
     }
@@ -169,6 +173,7 @@ public class ItemGlazeBucket extends Item {
     public ItemStack make(BasicGlazes glaze) {
         ItemStack is = makeGlazeWith(Core.registry.resource_block.blockID, glaze.metadata, 0);
         setGid(is, glaze.name());
+        is.setItemDamage(md_for_nei++);
         return is;
     }
     
@@ -238,8 +243,13 @@ public class ItemGlazeBucket extends Item {
             Core.notify(player, clay.getCoord(), "Already high-fired");
             return is;
         }
-        if (useCharge(is)) {
-            ClayLump part = clay.parts.get(mop.subHit);
+        ClayLump part = clay.parts.get(mop.subHit);
+        int id = getBlockId(is);
+        int md = getBlockMd(is);
+        if (part.icon_id == id && part.icon_md == md) {
+            return is;
+        }
+        if (useCharge(is) || player.capabilities.isCreativeMode) {
             part.icon_id = getBlockId(is);
             part.icon_md = getBlockMd(is);
             clay.changeLump(mop.subHit, part);
