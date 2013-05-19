@@ -90,7 +90,7 @@ public class Core {
     public static boolean renderTEs = true;
     public static boolean renderAO = true;
     public static boolean add_branding = false;
-    public static boolean cheat = true;
+    public static boolean cheat = false;
     public static boolean debug_light_air = false;
     public static boolean debug_network = false;
     public static boolean dimension_slice_allow_smooth = true;

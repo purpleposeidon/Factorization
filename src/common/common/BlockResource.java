@@ -25,6 +25,9 @@ public class BlockResource extends Block {
     @Override
     public void registerIcons(IconRegister reg) {
         for (ResourceType rt : ResourceType.values()) {
+            if (rt.texture == null) {
+                continue;
+            }
             icons[rt.md] = Core.texture(reg, rt.texture);
         }
         for (BasicGlazes glaze : BasicGlazes.values()) {

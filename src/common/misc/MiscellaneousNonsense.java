@@ -189,7 +189,6 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         //Yoink from GuiStatsComponent.updateStats
         MinecraftServer ms = MinecraftServer.getServer();
         double ticks_time_ms = MathHelper.average(ms.tickTimeArray)*1.0E-6D;
-        System.out.println(ticks_time_ms);
         return (float) Math.min(expected_tick_time_ms/ticks_time_ms, 1);
     }
     

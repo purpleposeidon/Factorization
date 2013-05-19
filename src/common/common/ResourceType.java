@@ -7,6 +7,7 @@ public enum ResourceType {
     SILVERBLOCK(1, "resource/silver_block"),
     LEADBLOCK(2, "resource/lead_block"),
     DARKIRONBLOCK(3, "resource/dark_iron_block"),
+    EMPTY4(4, null),
     DRY(5, "ceramics/dry"),
     BISQUE(6, "ceramics/bisque")
     ;
