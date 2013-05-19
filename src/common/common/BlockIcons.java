@@ -53,7 +53,7 @@ public class BlockIcons {
     
     public static Icon servo$rail;
     
-    public static Icon ceramics$bisque, ceramics$dry, ceramics$stand, ceramic$rawglaze;
+    public static Icon ceramics$bisque, ceramics$dry, ceramics$stand, ceramics$rawglaze;
     
     public static class RouterFace extends IconGroup {
         public Icon on, off;

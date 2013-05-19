@@ -42,6 +42,7 @@ import cpw.mods.fml.common.ICraftingHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
@@ -1153,4 +1154,17 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         }
     }
 
+    void sendIMC() {
+        
+        //Registers our recipe handlers to a list in NEIPlugins.
+        //Format: "Factorization@<Recipe Name>@<outputId that used to view all recipes>"
+        for (String msg : new String[] {
+                "factorization crystallizer recipes@fz.crystallizing",
+                "factorization grinder recipes@fz.grinding",
+                "factorization mixer recipes@fz.mixing",
+                "factorization slag furnace recipes@fz.slagging"
+        }) {
+            FMLInterModComms.sendRuntimeMessage(Core.instance, "NEIPlugins", "register-crafting-handler", "Factorization@" + msg);
+        }
+    }
 }

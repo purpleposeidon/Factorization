@@ -260,6 +260,7 @@ public class Core {
         TileEntityWrathFire.setupBurning();
         TileEntitySolarBoiler.setupSteam();
         foph.addDictOres();
+        registry.sendIMC();
     }
     
     @ServerStarting
