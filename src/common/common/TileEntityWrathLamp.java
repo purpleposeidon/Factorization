@@ -4,10 +4,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import factorization.fzds.TransferLib;
-
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,6 +13,8 @@ import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.ForgeDirection;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class TileEntityWrathLamp extends TileEntityCommon {
     static final int radius = 6;
