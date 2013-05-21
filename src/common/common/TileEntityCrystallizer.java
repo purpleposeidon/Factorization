@@ -1,6 +1,6 @@
 package factorization.common;
 
-import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -339,7 +339,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     }
 
     @Override
-    public boolean handleMessageFromServer(int messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

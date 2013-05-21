@@ -1,6 +1,6 @@
 package factorization.common;
 
-import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -106,7 +106,7 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     }
 
     @Override
-    public boolean handleMessageFromServer(int messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

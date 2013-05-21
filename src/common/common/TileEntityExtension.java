@@ -1,11 +1,8 @@
 package factorization.common;
 
-import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.List;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -18,6 +15,8 @@ import net.minecraft.util.Icon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.ForgeDirection;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.DeltaCoord;
 import factorization.common.NetworkFactorization.MessageType;
 
@@ -132,8 +131,7 @@ public class TileEntityExtension extends TileEntityCommon {
     }
     
     @Override
-    public boolean handleMessageFromServer(int messageType, DataInput input)
-            throws IOException {
+    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

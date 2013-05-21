@@ -2,7 +2,6 @@ package factorization.common;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -104,6 +103,9 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 } else if (item instanceof Quaternion) {
                     Quaternion q = (Quaternion) item;
                     q.write(output);
+                } else if (item instanceof byte[]) {
+                    //NOTE: The size must be known elsewhere
+                    output.write((byte[]) item);
                 } else {
                     throw new RuntimeException("Don't know how to serialize " + item.getClass() + " (" + item + ")");
                 }
@@ -449,8 +451,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
         }
     }
 
-    void handleForeignMessage(World world, int x, int y, int z, TileEntity ent, int messageType,
-            DataInput input) throws IOException {
+    void handleForeignMessage(World world, int x, int y, int z, TileEntity ent, int messageType, DataInputStream input) throws IOException {
         if (!world.isRemote) {
             //Nothing for the server to deal with
         } else {
@@ -578,7 +579,9 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 //
                 FurnaceBurnTime = 140,
                 //
-                ExtensionInfo = 150, RocketState = 151;
+                ExtensionInfo = 150, RocketState = 151,
+                //
+                ServoRailDecor = 161;
     }
 
 }

@@ -1,6 +1,6 @@
 package factorization.common;
 
-import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
@@ -122,7 +122,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         b.setBlockBounds(0, 0, 0, 1, 1, 1);
     }
 
-    Packet getDescriptionPacketWith(Object... args) {
+    protected Packet getDescriptionPacketWith(Object... args) {
         Object[] suffix = new Object[args.length + 3];
         suffix[0] = getFactoryType().md;
         suffix[1] = getExtraInfo();
@@ -179,11 +179,11 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         }
     }
 
-    public boolean handleMessageFromServer(int messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
         return false;
     }
 
-    public boolean handleMessageFromClient(int messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromClient(int messageType, DataInputStream input) throws IOException {
         // There are no base attributes a client can edit
         return false;
     }

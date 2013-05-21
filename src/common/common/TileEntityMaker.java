@@ -1,6 +1,7 @@
 package factorization.common;
 
 import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -269,7 +270,7 @@ public class TileEntityMaker extends TileEntityFactorization {
     }
 
     @Override
-    public boolean handleMessageFromServer(int messageType, DataInput input)
+    public boolean handleMessageFromServer(int messageType, DataInputStream input)
             throws IOException {
         // target target_slot_id state
         // fuel page_count
@@ -283,7 +284,7 @@ public class TileEntityMaker extends TileEntityFactorization {
     }
 
     @Override
-    public boolean handleMessageFromClient(int messageType, DataInput input)
+    public boolean handleMessageFromClient(int messageType, DataInputStream input)
             throws IOException {
         if (super.handleMessageFromClient(messageType, input)) {
             return true;

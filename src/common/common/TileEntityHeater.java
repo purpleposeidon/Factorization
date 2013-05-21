@@ -1,12 +1,12 @@
 package factorization.common;
 
-import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 
 import net.minecraft.block.BlockFurnace;
-import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
@@ -87,7 +87,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
     }
 
     @Override
-    public boolean handleMessageFromServer(int messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
