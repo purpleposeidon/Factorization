@@ -97,6 +97,7 @@ public class NEI_CrystallizerRecipeConfig extends TemplateRecipeHandler implemen
             } else {
                 ret.add(new PositionedStack(cr.solution, 75, 58 + 15));
             }
+            ret.add(new PositionedStack(Core.registry.heater_item, 0, 75));
             return ret;
         }
 
@@ -120,6 +121,9 @@ public class NEI_CrystallizerRecipeConfig extends TemplateRecipeHandler implemen
         if (stack.isItemEqual(cr.input)) {
             currenttip.add("Extra copies of this can be added");
             currenttip.add("to the other slots to increase yield");
+        }
+        if (stack.isItemEqual(Core.registry.heater_item)) {
+            currenttip.add("Use this to heat the crystallizer");
         }
         return currenttip;
     }
@@ -155,6 +159,19 @@ public class NEI_CrystallizerRecipeConfig extends TemplateRecipeHandler implemen
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         gui.bindTexture(getGuiTexture());
         gui.drawTexturedModalRect(0, 15, 5, 11, 166, 95);
+    }
+    
+    @Override
+    public void drawExtras(GuiContainerManager gui, int recipe) {
+        super.drawExtras(gui, recipe);
+        //drawProgressBar(gui, 43 - 5, 89 + 4, 0, 192, 90, 16, 20*60, 0);
+        
+        
+        //this.drawTexturedModalRect(var5 + 43, var6 + 89, 0, 192, progress, 16);
+        //for (int dx : new int[] { 54, 109 }) {
+        //	this.drawTexturedModalRect(var5 + dx, var6 + 75 + heat, 176, 0 + heat, 14, 13 - heat);
+        //}
+        //drawProgressBar(gui, x, y, tx, ty, w, h, completion, direction);
     }
     
     @Override
