@@ -99,6 +99,15 @@ public abstract class DataHelper {
         return FzOrientation.getOrientation(putByte(v));
     }
     
+    public <E extends Enum> E putEnum(E value) throws IOException {
+        int i = value.ordinal();
+        i = putInt(i);
+        if (isWriter()) {
+            return value;
+        }
+        return (E) value.getClass().getEnumConstants()[i];
+    }
+    
     public Object putObject(Object o) throws IOException {
         if (o instanceof Boolean) {
             return putBoolean((Boolean) o);
@@ -118,6 +127,8 @@ public abstract class DataHelper {
             return putItemStack((ItemStack) o);
         } else if (o instanceof IDataSerializable) {
             return put((IDataSerializable)o);
+        } else if (o instanceof Enum) {
+            return putEnum((Enum) o);
         } else {
             Core.logWarning("Don't know how to serialize " + o);
             return null;

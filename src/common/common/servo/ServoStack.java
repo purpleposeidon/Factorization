@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 
-public class ServoStack implements IDataSerializable {
+public class ServoStack implements IDataSerializable, Iterable {
     private LinkedList<Object> contents = new LinkedList<Object>();
     private int maxSize = 16;
     
@@ -26,6 +26,7 @@ public class ServoStack implements IDataSerializable {
         return contents.removeFirst();
     }
     
+    @Override
     public Iterator<Object> iterator() {
         return contents.iterator();
     }
@@ -36,6 +37,10 @@ public class ServoStack implements IDataSerializable {
     
     public void setMaxSize(int newSize) {
         maxSize = newSize;
+    }
+    
+    public int getFreeSpace() {
+        return Math.min(0, maxSize - contents.size());
     }
     
     @Override

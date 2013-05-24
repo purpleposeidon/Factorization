@@ -3,11 +3,10 @@ package factorization.common.servo.controllers;
 import java.io.IOException;
 import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.client.renderer.RenderBlocks;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.common.servo.Controller;
 import factorization.common.servo.ServoMotor;
@@ -27,18 +26,16 @@ public class DummyController extends Controller {
     protected void putData(DataHelper data) throws IOException { }
 
     @Override
-    public void onClick(EntityPlayer player, ForgeDirection side) { }
-
-    @Override
-    public List<ItemStack> dropItems() {
-        return null;
+    public boolean configure(ServoStack stack) {
+        return false;
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
-    public void renderStatic() { }
-    
-    @Override
-    public void configure(ServoStack stack) { }
+    public void deconfigure(List<Object> stack) { }
 
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void renderStatic(Coord where, RenderBlocks rb) { }
+
+    
 }

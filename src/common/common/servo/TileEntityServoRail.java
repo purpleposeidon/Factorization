@@ -1,11 +1,16 @@
 package factorization.common.servo;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Icon;
@@ -22,13 +27,14 @@ import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
 import factorization.common.Core;
 import factorization.common.FactoryType;
+import factorization.common.NetworkFactorization.MessageType;
 import factorization.common.TileEntityCommon;
 
 public class TileEntityServoRail extends TileEntityCommon implements IChargeConductor {
     public static final float width = 7F/16F;
     
     Charge charge = new Charge(this);
-    ServoComponent decoration = null;
+    Decorator decoration = null;
     
     @Override
     public FactoryType getFactoryType() {
@@ -55,23 +61,28 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         charge.update();
     }
     
+    private String decor_tag_key = "decor";
+    
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
         if (decoration != null) {
             NBTTagCompound decor = new NBTTagCompound();
             decoration.save(decor);
-            tag.setTag("decor", decor);
+            tag.setTag(decor_tag_key, decor);
         }
     }
     
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
-        NBTTagCompound dtag = tag.getCompoundTag("decor");
+        if (!tag.hasKey(decor_tag_key)) {
+            return;
+        }
+        NBTTagCompound dtag = tag.getCompoundTag(decor_tag_key);
         ServoComponent component = ServoComponent.load(dtag);
         if (component instanceof Decorator) {
-            decoration = component;
+            decoration = (Decorator) component;
         }
     }
     
@@ -186,5 +197,42 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     @SideOnly(Side.CLIENT)
     public Icon getIcon(ForgeDirection dir) {
         return BlockIcons.servo$rail;
+    }
+    
+    public void setDecoration(Decorator newDecor) {
+        decoration = newDecor;
+    }
+    
+    @Override
+    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
+        if (super.handleMessageFromServer(messageType, input)) {
+            return true;
+        }
+        if (messageType == MessageType.ServoRailDecor) {
+            DataInputStream dis = new DataInputStream(input);
+            ServoComponent sc = ServoComponent.readFromPacket(input);
+            if (!(sc instanceof Decorator)) {
+                return false;
+            }
+            decoration = (Decorator) sc;
+            return true;
+        }
+        return false;
+    }
+    
+    @Override
+    public Packet getDescriptionPacket() {
+        if (decoration == null) {
+            return super.getDescriptionPacket();
+        } else {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(baos);
+            try {
+                decoration.writeToPacket(dos);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return getDescriptionPacketWith(MessageType.ServoRailDecor, baos.toByteArray());
+        }
     }
 }

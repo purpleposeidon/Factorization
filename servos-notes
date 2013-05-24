@@ -55,9 +55,15 @@ Commands:
 
 
 Actuators:
-  Item Interaction:
+  <Name>
+    <Normal activation>/<Shift-click activation>
+    <Configuration options>
+  Item Interaction
     Insert/Extract
     Target slot (or -1); item count
+  Probe
+    Get space used in target slot
+    Target slot
   Block Grabber:
     Grab Block/Drop Block
   Mobile Lacerator

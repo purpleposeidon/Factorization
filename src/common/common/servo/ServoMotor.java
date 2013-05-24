@@ -4,10 +4,12 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.util.DamageSource;
@@ -41,7 +43,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     boolean dampenVelocity;
 
     Coord pos;
-    FzOrientation prevOrientation = FzOrientation.UNKNOWN, orientation = FzOrientation.UNKNOWN, nextOrientation = FzOrientation.UNKNOWN;
+    public FzOrientation prevOrientation = FzOrientation.UNKNOWN, orientation = FzOrientation.UNKNOWN, nextOrientation = FzOrientation.UNKNOWN;
     private byte speed_b;
     private static final double max_speed_b = 127;
     double accumulated_motion;
@@ -491,5 +493,13 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
 
     public void setSpeed(byte new_speed) {
         speed_b = new_speed;
+    }
+    
+    public void dropItemStacks(List<Object> toDrop) {
+        for (Object o : toDrop) {
+            if (o instanceof ItemStack) {
+                FactorizationUtil.spawnItemStack(this, (ItemStack) o);
+            }
+        }
     }
 }

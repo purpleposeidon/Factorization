@@ -6,15 +6,17 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
+import factorization.common.Core;
 import factorization.common.FactorizationUtil;
 import factorization.common.ItemCraftingComponent;
+import factorization.common.Core.TabType;
 
 public class ItemServoMotor extends ItemCraftingComponent {
 
     public ItemServoMotor(int par1) {
         super(par1, "factorization:servo/motor");
+        Core.tab(this, TabType.SERVOS);
     }
-    
     
     @Override
     public boolean onItemUse(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side, float vecX, float vecY, float vecZ) {
