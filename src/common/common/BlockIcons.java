@@ -1,5 +1,6 @@
 package factorization.common;
 
+import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.common.FactorizationTextureLoader.Directory;
@@ -70,6 +71,9 @@ public class BlockIcons {
     @Directory("storage")
     public static SimpleMachine barrel, ed_barrel;
     
+    @Directory("servo")
+    public static ArrowyBox arrow_direction;
+    
     
     public static class ActivatingMachineIcon extends IconGroup {
         public Icon top, bottom, side, side_on;
@@ -91,6 +95,31 @@ public class BlockIcons {
             case DOWN: return bottom;
             default: return tef.facing_direction == dir.ordinal() ? face : side;
             }
+        }
+    }
+    
+    public static class ArrowyBox extends IconGroup {
+        public Icon front, side, back;
+        public Icon get(ForgeDirection arrow_direction, ForgeDirection face) {
+            if (arrow_direction == face) {
+                return front;
+            }
+            if (arrow_direction.getOpposite() == face) {
+                return back;
+            }
+            return side;
+        }
+        public void setRotations(ForgeDirection arrow_direction, RenderBlocks rb) {
+            //rb.renderBlockLog
+            if (arrow_direction.offsetY != 0) {
+                rb.uvRotateEast = 1;
+                rb.uvRotateWest = 1;
+                rb.uvRotateNorth = 1;
+                rb.uvRotateSouth = 1;
+            }
+        }
+        public void unsetRotations(RenderBlocks rb) {
+            rb.uvRotateNorth = rb.uvRotateEast = rb.uvRotateSouth = rb.uvRotateWest = rb.uvRotateTop = rb.uvRotateBottom = 0;
         }
     }
 }
