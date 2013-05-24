@@ -83,6 +83,7 @@ TOP LIST (that's become somewhat less tops. Oops.)
     $B: balances items
 
 onInventoryUpdate all the TEs
+bag of holding width tooltip
 determine what the real colors of all these raw glazes are
 smooth sandstone double slab (Are there other variants?)
 The new IInventory has stuff for preventing things from being put into slots. All machines, and especially routers.

@@ -50,7 +50,7 @@ public class Core {
     public static final String modId = "factorization";
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
-    public static final String version = "0.8.00.dev0"; //@VERSION@
+    public static final String version = "0.8.00.dev1"; //@VERSION@
     public Core() {
         registry = new Registry();
         foph = new FactorizationOreProcessingHandler(); //We don't register foph yet.
@@ -110,6 +110,7 @@ public class Core {
         if (!dev_environ) {
             cheat = false;
         }
+        dev_environ = false;
     }
 
     // universal constant config
@@ -399,8 +400,8 @@ public class Core {
         FORCE, LONG, FORCELONG
     }
     
-    static enum TabType {
-        REDSTONE(CreativeTabs.tabRedstone), TOOLS(CreativeTabs.tabTools), MISC(CreativeTabs.tabMisc), MATERIALS(CreativeTabs.tabMaterials), ART(CreativeTabs.tabMisc);
+    public static enum TabType {
+        REDSTONE(CreativeTabs.tabRedstone), TOOLS(CreativeTabs.tabTools), MISC(CreativeTabs.tabMisc), MATERIALS(CreativeTabs.tabMaterials), ART(CreativeTabs.tabMisc), SERVOS(CreativeTabs.tabTools);
         CreativeTabs type;
         TabType(CreativeTabs type) {
             this.type = type;
