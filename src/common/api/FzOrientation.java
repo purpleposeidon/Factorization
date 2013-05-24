@@ -173,6 +173,10 @@ public enum FzOrientation {
         return valuesCache[dir.ordinal()*4];
     }
     
+    /**
+     * @param newTop
+     * @return {@link FzOrientation} with the same direction, but facing newTop. If the top can't be change to that direction because it is already facing that direction, it returns UNKNOWN.
+     */
     public FzOrientation pointTopTo(ForgeDirection newTop) {
         FzOrientation fzo = this;
         for (int i = 0; i < 4; i++) {
