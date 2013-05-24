@@ -118,17 +118,22 @@ public class NEI_MixerRecipeConfig extends TemplateRecipeHandler implements ICon
             ArrayList<PositionedStack> ret = new ArrayList();
             int h = 14;
             int w = 33;
-            switch (recipe.inputs.size()) {
-            case 4:
-                ret.add(new PositionedStack(recipe.inputs.get(3), w + 18, h + 18));
-            case 3:
-                ret.add(new PositionedStack(recipe.inputs.get(2), w, h + 18));
-            case 2:
-                ret.add(new PositionedStack(recipe.inputs.get(1), w, h));
-            case 1:
-                ret.add(new PositionedStack(recipe.inputs.get(0), w + 18, h));
-            default:
-            } //Huh, ti mi cnino
+            try {
+                switch (recipe.inputs.size()) {
+                default: //But it's incomplete!
+                case 4:
+                    ret.add(new PositionedStack(recipe.inputs.get(3), w + 18, h + 18));
+                case 3:
+                    ret.add(new PositionedStack(recipe.inputs.get(2), w, h + 18));
+                case 2:
+                    ret.add(new PositionedStack(recipe.inputs.get(1), w, h));
+                case 1:
+                    ret.add(new PositionedStack(recipe.inputs.get(0), w + 18, h));
+                case 0:
+                } //Huh, ti mi cnino
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             w = 107;
             
             ArrayList<ItemStack> output = new ArrayList();

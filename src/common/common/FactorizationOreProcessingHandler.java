@@ -9,11 +9,17 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
+import net.minecraftforge.liquids.LiquidContainerData;
+import net.minecraftforge.liquids.LiquidContainerRegistry;
+import net.minecraftforge.liquids.LiquidDictionary;
+import net.minecraftforge.liquids.LiquidStack;
+import net.minecraftforge.liquids.LiquidDictionary.LiquidRegisterEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.OreDictionary.OreRegisterEvent;
 import factorization.common.ItemOreProcessing.OreType;
 
 public class FactorizationOreProcessingHandler {
+    private static final String waterBucket = "fz.waterBucketLike";
     private HashMap<String, ItemStack> bestIngots = new HashMap();
     public static final float GRIND_MULTIPLY = 2F;
     public static final float REDUCE_MULTIPLY = 2.5F;
@@ -79,9 +85,12 @@ public class FactorizationOreProcessingHandler {
         ItemStack clean = Core.registry.ore_clean_gravel.makeStack(oreType);
         ItemStack reduced = Core.registry.ore_reduced.makeStack(oreType);
         ItemStack crystal = Core.registry.ore_crystal.makeStack(oreType);
+        ItemStack clean8 = clean.copy();
+        clean8.stackSize = 8;
         
         //dirty gravel -> clean gravel
-        Core.registry.shapelessRecipe(clean, new ItemStack(Item.bucketWater), dirty);
+        Core.registry.shapelessOreRecipe(clean, waterBucket, dirty);
+        Core.registry.shapelessOreRecipe(clean8, waterBucket, dirty, dirty, dirty, dirty, dirty, dirty, dirty, dirty);
         if (oreType == OreType.GALENA) {
             ItemStack reduced_silver = Core.registry.ore_reduced.makeStack(OreType.SILVER);
             ItemStack reduced_lead = Core.registry.ore_reduced.makeStack(OreType.LEAD);
@@ -134,7 +143,18 @@ public class FactorizationOreProcessingHandler {
         handleNewOre(evt.Name, evt.Ore);
     }
     
+    void loadWater() {
+        LiquidStack h20 = LiquidContainerRegistry.getLiquidForFilledItem(new ItemStack(Item.bucketWater));
+        for (LiquidContainerData container : LiquidContainerRegistry.getRegisteredLiquidContainerData()) {
+            LiquidStack liq = container.stillLiquid;
+            if (h20.isLiquidEqual(liq) && liq.amount == LiquidContainerRegistry.BUCKET_VOLUME) {
+                OreDictionary.registerOre(waterBucket, container.filled);
+            }
+        }
+    }
+    
     void addDictOres() {
+        loadWater();
         handleNewOre("ingotIron", new ItemStack(Item.ingotIron, 1));
         handleNewOre("oreIron", new ItemStack(Block.oreIron, 1));
         handleNewOre("ingotGold", new ItemStack(Item.ingotGold, 1));

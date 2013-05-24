@@ -33,7 +33,9 @@ import factorization.common.NetworkFactorization.MessageType;
 public class TileEntityMixer extends TileEntityFactorization implements
         IChargeConductor {
     //inventory: 4 input slots, 4 output slots
-    ItemStack input[] = new ItemStack[4], output[] = new ItemStack[4];
+    private static final int INPUT_SIZE = 4;
+    ItemStack input[] = new ItemStack[INPUT_SIZE], output[] = new ItemStack[4];
+    private static final int[] IN_s = {0, 1, 2, 3}, OUT_s = {4, 5, 6, 7};
     ArrayList<ItemStack> outputBuffer = new ArrayList();
     int progress = 0;
     int speed = 0;
@@ -107,17 +109,17 @@ public class TileEntityMixer extends TileEntityFactorization implements
 
     @Override
     public int getSizeInventory() {
-        return 8;
+        return input.length + output.length;
     }
 
     @Override
     public ItemStack getStackInSlot(int slot) {
         //setDirty();
-        if (slot >= 0 && slot < 4) {
+        if (slot >= 0 && slot < input.length) {
             return input[slot];
         }
-        slot -= 4;
-        if (slot >= 0 && slot < 4) {
+        slot -= input.length;
+        if (slot >= 0 && slot < output.length) {
             return output[slot];
         }
         return null;
@@ -126,12 +128,12 @@ public class TileEntityMixer extends TileEntityFactorization implements
     @Override
     public void setInventorySlotContents(int slot, ItemStack is) {
         setDirty();
-        if (slot >= 0 && slot < 4) {
+        if (slot >= 0 && slot < input.length) {
             input[slot] = is;
             return;
         }
-        slot -= 4;
-        if (slot >= 0 && slot < 4) {
+        slot -= input.length;
+        if (slot >= 0 && slot < output.length) {
             output[slot] = is;
             return;
         }
@@ -141,8 +143,6 @@ public class TileEntityMixer extends TileEntityFactorization implements
     public String getInvName() {
         return "Mixer";
     }
-    
-    private static final int[] IN_s = {0, 1, 2, 3}, OUT_s = {4, 5, 6, 7};
 
     @Override
     public int[] getAccessibleSlotsFromSide(int s) {
@@ -223,11 +223,37 @@ public class TileEntityMixer extends TileEntityFactorization implements
         public ArrayList inputs = new ArrayList();
         public ItemStack output;
         public IRecipe theRecipe;
+        public int size = 0;
+        
+        void add(Object o) {
+            if (o instanceof ItemStack) {
+                ItemStack it = (ItemStack) o;
+                o = it = it.copy();
+                int s = Math.min(1, it.stackSize);
+                it.stackSize = s;
+                for (int i = 0; i < inputs.size(); i++) {
+                    Object h = inputs.get(i);
+                    if (h instanceof ItemStack) {
+                        ItemStack here = (ItemStack) h;
+                        if (FactorizationUtil.couldMerge(here, it)) {
+                            here.stackSize += s;
+                            size += s;
+                            return;
+                        }
+                    }
+                }
+                inputs.add(it);
+                size += s;
+                return;
+            }
+            inputs.add(o);
+            size++;
+        }
         
         public RecipeMatchInfo(List<Object> recipeInput, ItemStack recipeOutput, IRecipe theRecipe) throws WeirdRecipeException {
             for (Object o : recipeInput) {
                 if (o instanceof ItemStack) {
-                    this.inputs.add(((ItemStack)o).copy());
+                    add(((ItemStack)o).copy());
                 } else if (o instanceof Collection) {
                     if (((Collection) o).size() == 0) {
                         throw new WeirdRecipeException();
@@ -235,10 +261,10 @@ public class TileEntityMixer extends TileEntityFactorization implements
                     ArrayList<ItemStack> parts = new ArrayList();
                     for (Object p : (Collection)o) {
                         if (p instanceof ItemStack) {
-                            parts.add(((ItemStack) p).copy());
+                            parts.add((ItemStack)p);
                         }
                     }
-                    this.inputs.add(parts);
+                    add(parts);
                 } else {
                     Core.logSevere("Don't know how to use %s in a recipe", o);
                     throw new WeirdRecipeException();
@@ -250,10 +276,16 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
     
     boolean removeMatching(ItemStack[] hay, ItemStack needle) {
+        needle = needle.copy();
         for (int i = 0; i < hay.length; i++) {
             if (FactorizationUtil.wildcardSimilar(needle, hay[i])) {
-                hay[i] = FactorizationUtil.normalDecr(hay[i]);
-                return true;
+                int delta = Math.min(hay[i].stackSize, needle.stackSize);
+                hay[i].stackSize -= delta;
+                needle.stackSize -= delta;
+                hay[i] = FactorizationUtil.normalize(hay[i]);
+                if (needle.stackSize <= 0) {
+                    return true;
+                }
             }
         }
         return false;
@@ -310,7 +342,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
                 continue;
             }
             int s = inputList.size();
-            if (s <= 1 || s > 4) {
+            if (s <= 1 || s > 9) {
                 continue;
             }
             for (int i = 0; i < inputList.size(); i++) {
@@ -350,9 +382,9 @@ public class TileEntityMixer extends TileEntityFactorization implements
         if (item == Item.paper || item == Item.book) {
             return false;
         }
-        if (is.getItemDamage() > 0xFF) {
+        /*if (is.getItemDamage() > 0xFF) {
             return false;
-        }
+        }*/ //??? What was this for?
         if (item.hasContainerItem()) {
             //We're going to filter out items like:
             //  Logic matrix programmers
@@ -393,10 +425,10 @@ public class TileEntityMixer extends TileEntityFactorization implements
         }
         RecipeMatchInfo longest = null;
         for (int i = 0; i < recipe_cache.size(); i++) {
-            RecipeMatchInfo result = recipe_cache.get(i);
-            if (recipeMatches(result.inputs)) {
-                if (longest == null || longest.inputs.size() < result.inputs.size()) {
-                    longest = result;
+            RecipeMatchInfo recipe = recipe_cache.get(i);
+            if (recipeMatches(recipe.inputs)) {
+                if (longest == null || longest.size < recipe.size) {
+                    longest = recipe;
                 }
             }
         }
@@ -482,15 +514,21 @@ public class TileEntityMixer extends TileEntityFactorization implements
     
     void craftRecipe(RecipeMatchInfo mr) {
         InventoryCrafting craft = FactorizationUtil.makeCraftingGrid();
+        int craft_slot = 0;
         outer: for (int count = 0; count < mr.inputs.size(); count++) {
             Object o = mr.inputs.get(count);
             for (int i = 0; i < input.length; i++) {
                 if (o instanceof ItemStack) {
                     o = ((ItemStack) o).copy();
-                    ((ItemStack) o).stackSize = 1;
                 }
                 if (FactorizationUtil.oreDictionarySimilar(o, input[i])) {
-                    craft.setInventorySlotContents(count, input[i].splitStack(1));
+                    int size = 1;
+                    if (o instanceof ItemStack) {
+                        size = ((ItemStack) o).stackSize;
+                    }
+                    for (int c = 0; c < size; c++) {
+                        craft.setInventorySlotContents(craft_slot++, input[i].splitStack(1));
+                    }
                     input[i] = FactorizationUtil.normalize(input[i]);
                     continue outer;
                 }
@@ -521,7 +559,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
                 outputBuffer.remove(0);
                 return outputBuffer.size() > 0;
             }
-            return true;
+            return false;
         }
         return false;
     }
@@ -554,7 +592,8 @@ public class TileEntityMixer extends TileEntityFactorization implements
             progress = 0;
             craftRecipe(mr);
             normalize(input);
-            while (dumpBuffer()) ;
+            int count = 8; //Was needed for about 20 seconds. Let's keep it anyways.
+            while (dumpBuffer() && count-- > 0) ;
             speed = Math.min(50, speed + 1);
             dumpBuffer();
         }

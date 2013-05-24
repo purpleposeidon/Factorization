@@ -136,25 +136,32 @@ public class ItemOreProcessing extends Item implements IActOnCraft {
                 return;
             }
         }
-        if (Math.random() > 0.25) {
-            return;
-        }
-        for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
-            ItemStack pi = player.inventory.getStackInSlot(i);
-            if (pi != null && pi.getItem() == Core.registry.sludge) {
-                if (pi.stackSize < pi.getMaxStackSize()) {
-                    pi.stackSize++;
+        boolean any = false;
+        for (int stack_index = 0; stack_index < is.stackSize; stack_index++) {
+            if (Math.random() > 0.25) {
+                continue;
+            }
+            any = true;
+            for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
+                ItemStack pi = player.inventory.getStackInSlot(i);
+                if (pi != null && pi.getItem() == Core.registry.sludge) {
+                    if (pi.stackSize < pi.getMaxStackSize()) {
+                        pi.stackSize++;
+                        return;
+                    }
+                }
+            }
+            for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
+                ItemStack pi = player.inventory.getStackInSlot(i);
+                if (pi == null) {
+                    player.inventory.setInventorySlotContents(i, new ItemStack(Core.registry.sludge, 1));
                     return;
                 }
             }
+            player.dropPlayerItem(new ItemStack(Core.registry.sludge, 1));
         }
-        for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
-            ItemStack pi = player.inventory.getStackInSlot(i);
-            if (pi == null) {
-                player.inventory.setInventorySlotContents(i, new ItemStack(Core.registry.sludge, 1));
-                return;
-            }
+        if (any) {
+            Core.proxy.updatePlayerInventory(player);
         }
-        player.dropPlayerItem(new ItemStack(Core.registry.sludge, 1));
     }
 }
