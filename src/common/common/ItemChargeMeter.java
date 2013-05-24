@@ -67,13 +67,17 @@ public class ItemChargeMeter extends Item {
         if (player.getClass() != EntityPlayerMP.class || player.username == null || player.username.length() == 0 || player.username.startsWith("[")) {
             toNotify = null;
         }
-        Core.notify(toNotify, here, "%s",
-                "Charge: " + ic.getCharge().getValue() + "/" + ret.totalCharge
+        String msg;
+        if (Core.dev_environ) { 
+            msg = "Charge: " + ic.getCharge().getValue() + "/" + ret.totalCharge
                 + "\nConductors: " + ret.conductorCount
-                + inf
+                + inf;
                 //+ "  C: " + ic.getCoord()
                 //+ "  Total: " + ret.totalCharge
-                );
+        } else {
+            msg = "Charge: " + ic.getCharge().getValue();
+        }
+        Core.notify(toNotify, here, "%s", msg);
         return true;
     }
 
