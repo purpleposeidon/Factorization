@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -31,6 +34,8 @@ import net.minecraftforge.liquids.LiquidEvent;
 import net.minecraftforge.liquids.LiquidStack;
 import net.minecraftforge.liquids.LiquidTank;
 import net.minecraftforge.oredict.OreDictionary;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 
@@ -683,7 +688,7 @@ public class FactorizationUtil {
 
     static Random rand = new Random();
 
-    static EntityItem spawnItemStack(Coord c, ItemStack item) {
+    public static EntityItem spawnItemStack(Coord c, ItemStack item) {
         if (item == null) {
             return null;
         }
@@ -696,6 +701,22 @@ public class FactorizationUtil {
         entityitem.motionX = rand.nextGaussian() * 0.02;
         entityitem.motionZ = rand.nextGaussian() * 0.02;
         c.w.spawnEntityInWorld(entityitem);
+        return entityitem;
+    }
+    
+    public static EntityItem spawnItemStack(Entity c, ItemStack item) {
+        if (item == null) {
+            return null;
+        }
+        double dx = rand.nextFloat() * 0.5 - 0.5;
+        double dy = rand.nextFloat() * 0.5 - 0.5;
+        double dz = rand.nextFloat() * 0.5 - 0.5;
+
+        EntityItem entityitem = new EntityItem(c.worldObj, c.posX + c.width/2, c.posY + c.height/2, c.posZ + c.width/2, item);
+        entityitem.motionY = 0.2 + rand.nextGaussian() * 0.02;
+        entityitem.motionX = rand.nextGaussian() * 0.02;
+        entityitem.motionZ = rand.nextGaussian() * 0.02;
+        c.worldObj.spawnEntityInWorld(entityitem);
         return entityitem;
     }
     
@@ -845,5 +866,10 @@ public class FactorizationUtil {
             random_cache.set(ret);
         }
         return ret;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public static RenderBlocks getRB() {
+        return Minecraft.getMinecraft().renderGlobal.globalRenderBlocks;
     }
 }
