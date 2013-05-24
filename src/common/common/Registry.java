@@ -50,6 +50,7 @@ import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
 import factorization.common.Core.TabType;
 import factorization.common.TileEntityGreenware.ClayState;
+import factorization.common.servo.ItemServoComponent;
 import factorization.common.servo.ItemServoMotor;
 import factorization.common.servo.ServoMotor;
 
@@ -109,6 +110,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public LiquidStack liquidStackRocketFuel;
     public ItemCraftingComponent bucket_rocket_fuel;
     public ItemServoMotor servo_motor_placer;
+    public ItemServoComponent servo_component;
 
     public Material materialMachine = new Material(MapColor.ironColor);
 
@@ -296,7 +298,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         }
         
         //Servos
-        servo_motor_placer = new ItemServoMotor(itemID("servoMotorPlacer", 9056));
+        if (Core.dev_environ) {
+            servo_motor_placer = new ItemServoMotor(itemID("servoMotorPlacer", 9056));
+            servo_component = new ItemServoComponent(itemID("servoMotorComponent", 9057));
+        }
     }
 
     void recipe(ItemStack res, Object... params) {
