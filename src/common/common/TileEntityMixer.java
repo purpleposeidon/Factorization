@@ -253,7 +253,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         public RecipeMatchInfo(List<Object> recipeInput, ItemStack recipeOutput, IRecipe theRecipe) throws WeirdRecipeException {
             for (Object o : recipeInput) {
                 if (o instanceof ItemStack) {
-                    add(((ItemStack)o).copy());
+                    add((ItemStack) o);
                 } else if (o instanceof Collection) {
                     if (((Collection) o).size() == 0) {
                         throw new WeirdRecipeException();
@@ -261,7 +261,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
                     ArrayList<ItemStack> parts = new ArrayList();
                     for (Object p : (Collection)o) {
                         if (p instanceof ItemStack) {
-                            parts.add((ItemStack)p);
+                            parts.add((ItemStack) p);
                         }
                     }
                     add(parts);
@@ -270,7 +270,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
                     throw new WeirdRecipeException();
                 }
             }
-            this.output = recipeOutput.copy();
+            this.output = recipeOutput;
             this.theRecipe = theRecipe;
         }
     }
@@ -341,6 +341,10 @@ public class TileEntityMixer extends TileEntityFactorization implements
             if (inputList == null) {
                 continue;
             }
+            if (output == null) {
+                continue;
+            }
+            output = output.copy();
             int s = inputList.size();
             if (s <= 1 || s > 9) {
                 continue;
@@ -348,7 +352,11 @@ public class TileEntityMixer extends TileEntityFactorization implements
             for (int i = 0; i < inputList.size(); i++) {
                 Object p = inputList.get(i);
                 if (p instanceof String) {
-                    p = OreDictionary.getOres((String) p);
+                    ArrayList<ItemStack> ores = OreDictionary.getOres((String) p);
+                    for (int X = 0; X < ores.size(); X++) {
+                        ores.set(X, ores.get(X).copy());
+                    }
+                    p = ores;
                 }
                 if (p instanceof List) {
                     for (ItemStack is : (List<ItemStack>)p) {
