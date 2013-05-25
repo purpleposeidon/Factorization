@@ -9,7 +9,8 @@ public enum StackType {
     ON_BLOCK_EXIT("Triggered when leaving a block"),
     ON_REDSTONE("Triggered when a signal is received"),
     ON_ITERATION("Called by the controller"),
-    IO_BUFFER("Used for reading & writing to track");
+    IO_BUFFER("Used for reading & writing to track"),
+    STATUS("Activated actuators put success/failure signals in here");
     
     String description;
     
