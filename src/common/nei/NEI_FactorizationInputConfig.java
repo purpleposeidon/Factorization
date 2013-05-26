@@ -56,11 +56,11 @@ public class NEI_FactorizationInputConfig implements IConfigureNEI {
 
     @Override
     public String getName() {
-        return "factorizationKeyHandler";
+        return "FZ Key Handler";
     }
 
     @Override
     public String getVersion() {
-        return "1";
+        return "v1";
     }
 }

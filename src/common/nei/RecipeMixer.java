@@ -9,8 +9,6 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 import codechicken.nei.PositionedStack;
-import codechicken.nei.api.API;
-import codechicken.nei.api.IConfigureNEI;
 import codechicken.nei.recipe.TemplateRecipeHandler;
 import factorization.client.gui.GuiMixer;
 import factorization.common.Core;
@@ -18,23 +16,7 @@ import factorization.common.FactorizationUtil;
 import factorization.common.TileEntityMixer;
 import factorization.common.TileEntityMixer.RecipeMatchInfo;
 
-public class NEI_MixerRecipeConfig extends TemplateRecipeHandler implements IConfigureNEI {
-    @Override
-    public void loadConfig() {
-        API.registerRecipeHandler(this);
-        API.registerUsageHandler(this);
-    }
-
-    @Override
-    public String getName() {
-        return "factorization mixer recipes";
-    }
-
-    @Override
-    public String getVersion() {
-        return "1";
-    }
-
+public class RecipeMixer extends TemplateRecipeHandler {
     @Override
     public void loadCraftingRecipes(ItemStack result) {
         //XXX NOTE: This is probably a lame implementation of this function.

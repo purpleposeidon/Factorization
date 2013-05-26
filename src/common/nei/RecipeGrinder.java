@@ -6,8 +6,6 @@ import java.util.List;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.ItemStack;
 import codechicken.nei.PositionedStack;
-import codechicken.nei.api.API;
-import codechicken.nei.api.IConfigureNEI;
 import codechicken.nei.recipe.GuiRecipe;
 import codechicken.nei.recipe.TemplateRecipeHandler;
 import factorization.client.gui.GuiGrinder;
@@ -15,23 +13,7 @@ import factorization.common.Core;
 import factorization.common.TileEntityGrinder;
 import factorization.common.TileEntityGrinder.GrinderRecipe;
 
-public class NEI_GrinderRecipeConfig extends TemplateRecipeHandler implements IConfigureNEI {
-    @Override
-    public void loadConfig() {
-        API.registerRecipeHandler(this);
-        API.registerUsageHandler(this);
-    }
-
-    @Override
-    public String getName() {
-        return "factorization grinder recipes";
-    }
-
-    @Override
-    public String getVersion() {
-        return "1";
-    }
-
+public class RecipeGrinder extends TemplateRecipeHandler {
     @Override
     public void loadCraftingRecipes(ItemStack result) {
         //XXX NOTE: This is probably a lame implementation of this function. 
