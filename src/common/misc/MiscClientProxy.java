@@ -249,7 +249,10 @@ public class MiscClientProxy extends MiscProxy {
         if (Float.isInfinite(newTps) || Float.isNaN(newTps)) {
             return;
         }
-        newTps = Math.min(1.5F, Math.max(0.01F, newTps));
+        if (!Core.use_tps_reports) {
+            return;
+        }
+        newTps = Math.min(1.5F, Math.max(Core.lowest_dilation, newTps));
         Minecraft mc = Minecraft.getMinecraft();
         mc.timer.timerSpeed = newTps;
     }
