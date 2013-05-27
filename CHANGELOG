@@ -1,8 +1,10 @@
 0.8.00
-  Barrels should be wrench-rotatable
-  Made the pocket crafting table self-documenting
-  Added time dilation to Minecraft to make laggy servers look less laggy by slowing the client down to match. If you don't like it, there are config options to disable it both client & server-side
+  Barrels are wrench-rotatable
+  Made the pocket crafting table self-documenting, and it will move itself out of the crafting area if possible
+  Added a "fill empty area in crafting grid with item under cursor" pocket crafting table command
+  Added time dilation to make laggy servers look less laggy by slowing the client down to match. If you don't like it, there are config options to change/disable it both client & server-side.
   Removed deprecated solar turbines
+  Removed the unloved exo armor; if you're a dev who cares: https://github.com/purpleposeidon/ExoArmor
 
 0.7.37
   Increased the leyden jar's capaciy
