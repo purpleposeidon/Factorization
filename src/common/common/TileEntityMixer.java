@@ -383,6 +383,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         if (is == null) {
             return false;
         }
+        is = is.copy();
         Item item = is.getItem();
         if (item == null) {
             return false;
