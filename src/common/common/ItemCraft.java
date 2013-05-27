@@ -65,7 +65,10 @@ public class ItemCraft extends Item {
         NBTTagCompound saved = new NBTTagCompound();
         what.writeToNBT(saved);
         tag.setTag("slot" + i, saved);
-        craftAt(is, true, where);
+        if (Core.finished_loading) {
+            //This is a nice hack to keep us from looking up recipes in @PreInit when creating the diamond shard packet
+            craftAt(is, true, where);
+        }
     }
 
     @Override

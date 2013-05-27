@@ -50,7 +50,7 @@ public class Core {
     public static final String modId = "factorization";
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
-    public static final String version = "0.8.00.dev2"; //@VERSION@
+    public static final String version = "0.8.00.dev3"; //@VERSION@
     public Core() {
         registry = new Registry();
         foph = new FactorizationOreProcessingHandler(); //We don't register foph yet.
@@ -66,6 +66,7 @@ public class Core {
     public static FactorizationProxy proxy;
     public static NetworkFactorization network;
     public static int factory_rendertype = -1;
+    public static boolean finished_loading = false;
 
     // Configuration
     public static Configuration config;
@@ -265,6 +266,7 @@ public class Core {
         TileEntitySolarBoiler.setupSteam();
         foph.addDictOres();
         registry.sendIMC();
+        finished_loading = true;
     }
     
     @ServerStarting
