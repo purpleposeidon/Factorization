@@ -26,4 +26,12 @@ public abstract class Actuator extends ServoComponent {
     public boolean pushItem(Entity user, ItemStack is) {
         return false;
     }
+    
+    /**
+     * 
+     * @return how much energy is needed to call onUse. If this much energy can't be extracted from the player/servo rail, then onUse won't be called.
+     */
+    public int energyRequired() {
+        return 0;
+    }
 }
