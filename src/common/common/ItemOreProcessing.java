@@ -125,6 +125,9 @@ public class ItemOreProcessing extends Item implements IActOnCraft {
 
     @Override
     public void onCraft(ItemStack is, IInventory craftMatrix, int craftSlot, ItemStack result, EntityPlayer player) {
+        if (result == null) {
+            return;
+        }
         if (result.getItem() != Core.registry.ore_clean_gravel) {
             return;
         }
