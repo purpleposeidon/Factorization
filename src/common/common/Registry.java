@@ -112,7 +112,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemServoMotor servo_motor_placer;
     public ItemServoComponent servo_component;
 
-    public Material materialMachine = new Material(MapColor.ironColor);
+    public Material materialMachine = Material.anvil; //new Material(MapColor.ironColor);
 
     WorldGenMinable silverGen;
     
