@@ -136,6 +136,11 @@ public class MiscClientProxy extends MiscProxy {
             player.sendChatMessage("/f cl");
         } else if (n.equalsIgnoreCase("mods")) {
             mc.displayGuiScreen(new GuiModList(null));
+        } else if ((n.equalsIgnoreCase("ninja") || n.equalsIgnoreCase("deninja")) && Core.enable_cheat_commands) {
+            if (mc.isSingleplayer()) {
+                float tps = n.equalsIgnoreCase("ninja") ? 0.5F : 1F;
+                mc.timer.timerSpeed = tps;
+            }
         } else {
             player.addChatMessage("Unknown command: " + n);
         }
