@@ -112,7 +112,6 @@ public class Core {
         if (!dev_environ) {
             cheat = false;
         }
-        dev_environ = false;
     }
 
     // universal constant config
