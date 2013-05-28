@@ -521,25 +521,37 @@ public class TileEntityMixer extends TileEntityFactorization implements
         return charge.tryTake(i) > 0;
     }
     
+    int add(InventoryCrafting craft, int craft_slot, ItemStack is) {
+        if (is == null) {
+            return craft_slot;
+        }
+        if (is.stackSize > is.getMaxStackSize() || is.stackSize < 1) {
+            Core.logWarning("%s: Trying to craft with %s, which has a stack size of %s", getCoord(), is, is.stackSize);
+            craft.setInventorySlotContents(craft_slot++, is);
+            return craft_slot;
+        }
+        while (is.stackSize > 0) {
+            craft.setInventorySlotContents(craft_slot++, is.splitStack(1));
+        }
+        return craft_slot;
+    }
+    
     void craftRecipe(RecipeMatchInfo mr) {
         InventoryCrafting craft = FactorizationUtil.makeCraftingGrid();
         int craft_slot = 0;
-        outer: for (int count = 0; count < mr.inputs.size(); count++) {
-            Object o = mr.inputs.get(count);
-            for (int i = 0; i < input.length; i++) {
-                if (o instanceof ItemStack) {
-                    o = ((ItemStack) o).copy();
-                }
-                if (FactorizationUtil.oreDictionarySimilar(o, input[i])) {
-                    int size = 1;
-                    if (o instanceof ItemStack) {
-                        size = ((ItemStack) o).stackSize;
+        FzInv inv = FactorizationUtil.openInventory(this, ForgeDirection.UP);
+        for (int i_input = 0; i_input < mr.inputs.size(); i_input++) {
+            Object o = mr.inputs.get(i_input);
+            if (o instanceof ItemStack) {
+                ItemStack is = (ItemStack) o;
+                craft_slot = add(craft, craft_slot, inv.pull(is, is.stackSize, false));
+            } else {
+                for (ItemStack is : (Iterable<ItemStack>) o) {
+                    ItemStack got = FactorizationUtil.normalize(inv.pull(is, 1, false));
+                    if (got != null) {
+                        craft_slot = add(craft, craft_slot, got);
+                        continue;
                     }
-                    for (int c = 0; c < size; c++) {
-                        craft.setInventorySlotContents(craft_slot++, input[i].splitStack(1));
-                    }
-                    input[i] = FactorizationUtil.normalize(input[i]);
-                    continue outer;
                 }
             }
         }
