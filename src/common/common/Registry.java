@@ -298,10 +298,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         }
         
         //Servos
-        if (Core.dev_environ) {
-            servo_motor_placer = new ItemServoMotor(itemID("servoMotorPlacer", 9056));
-            servo_component = new ItemServoComponent(itemID("servoMotorComponent", 9057));
-        }
+        servo_motor_placer = new ItemServoMotor(itemID("servoMotorPlacer", 9056));
+        servo_component = new ItemServoComponent(itemID("servoMotorComponent", 9057));
     }
 
     void recipe(ItemStack res, Object... params) {
