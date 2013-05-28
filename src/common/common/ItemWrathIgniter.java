@@ -53,6 +53,7 @@ public class ItemWrathIgniter extends Item {
     
     @Override
     public ItemStack getContainerItemStack(ItemStack is) {
+        is = is.copy();
         is.setItemDamage(is.getItemDamage() + 1);
         if (is.getItemDamage() > getMaxDamage()) {
             is.stackSize = 0;
