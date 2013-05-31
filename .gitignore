@@ -13,3 +13,4 @@ texture/ignore
 *.blend1
 *.blend2
 .*
+eclipse/
