@@ -664,4 +664,23 @@ public class Coord implements IDataSerializable {
     public boolean isPowered() {
         return w.getBlockPowerInput(x, y, z) > 0;
     }
+    
+    public static void iterateCube(Coord a, Coord b, ICoordFunction func) {
+        a = a.copy();
+        b = b.copy();
+        sort(a, b);
+        Coord here = a.copy();
+        for (int x = a.x; x <= b.x; x++) {
+            for (int y = a.y; y <= b.y; y++) {
+                for (int z = a.z; z <= b.z; z++) {
+                    here.set(here.w, x, y, z);
+                    func.handle(here);
+                }
+            }
+        }
+    }
+    
+    public boolean hasSimilarCoordinate(Coord other) {
+        return x == other.x || y == other.y || z == other.z;
+    }
 }
