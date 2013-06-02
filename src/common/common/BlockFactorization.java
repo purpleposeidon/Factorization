@@ -1,6 +1,8 @@
 package factorization.common;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -233,8 +235,8 @@ public class BlockFactorization extends BlockContainer {
     public int quantityDropped(int meta, int fortune, Random random) {
         return 1;
     }
-
-    TileEntityCommon destroyedTE; //NOTE: Threading, and World Unloading! Should only be used in the server thread; should be set to null when done using
+    
+    LinkedList<TileEntityCommon> destroyed_tes = new LinkedList<TileEntityCommon>();
 
     @Override
     public void breakBlock(World w, int x, int y, int z, int id, int md) {
@@ -242,9 +244,9 @@ public class BlockFactorization extends BlockContainer {
         TileEntityCommon te = here.getTE(TileEntityCommon.class);
         if (te != null) {
             te.onRemove();
-            destroyedTE = te;
+            destroyed_tes.add(te);
         }
-        super.breakBlock(w, x, y, z, id, md);
+        super.breakBlock(w, x, y, z, id, md); //Just removes the TE; does nothing else.
     }
     
     @Override
@@ -260,12 +262,21 @@ public class BlockFactorization extends BlockContainer {
     
 
     @Override
-    public ArrayList<ItemStack> getBlockDropped(World world, int X, int Y, int Z, int md,
-            int fortune) {
+    public ArrayList<ItemStack> getBlockDropped(World world, int X, int Y, int Z, int md, int fortune) {
         ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
         Coord here = new Coord(world, X, Y, Z);
         IFactoryType f = here.getTE(IFactoryType.class);
         if (f == null) {
+            Iterator<TileEntityCommon> it = destroyed_tes.iterator();
+            TileEntityCommon destroyedTE = null;
+            while (it.hasNext()) {
+                TileEntityCommon tec = it.next();
+                if (tec.getCoord().equals(here)) {
+                    destroyedTE  = tec;
+                    it.remove();
+                    break;
+                }
+            }
             if (destroyedTE == null) {
                 Core.logWarning("No IFactoryType TE behind block that was destroyed, and nothing saved!");
                 destroyedTE = null;
