@@ -74,7 +74,13 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 } else if (item instanceof ItemStack) {
                     ItemStack is = (ItemStack) item;
                     NBTTagCompound tag = new NBTTagCompound();
-                    is.writeToNBT(tag);
+                    if (is.getItem().getShareTag()) {
+                        is.writeToNBT(tag);
+                    } else {
+                        NBTTagCompound backup = is.getTagCompound();
+                        is.writeToNBT(tag);
+                        is.setTagCompound(backup);
+                    }
                     NBTTagCompound.writeNamedTag(tag, output);
                     if (outputStream.size() > 65536 && is.hasTagCompound()) {
                         //Got an overflow! We'll blame the NBT tag.
@@ -181,7 +187,13 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 } else if (item instanceof ItemStack) {
                     ItemStack is = (ItemStack) item;
                     NBTTagCompound tag = new NBTTagCompound();
-                    is.writeToNBT(tag);
+                    if (is.getItem().getShareTag()) {
+                        is.writeToNBT(tag);
+                    } else {
+                        NBTTagCompound backup = is.getTagCompound();
+                        is.writeToNBT(tag);
+                        is.setTagCompound(backup);
+                    }
                     NBTTagCompound.writeNamedTag(tag, output);
                     if (outputStream.size() > 65536 && is.hasTagCompound()) {
                         //Got an overflow! We'll blame the NBT tag.
