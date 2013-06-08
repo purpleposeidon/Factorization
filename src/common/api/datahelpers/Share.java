@@ -4,6 +4,7 @@ public enum Share {
     PRIVATE(false, false, false),
     VISIBLE(true, false, false),
     MUTABLE(true, true, false),
+    MUTABLE_INDIRECT(false, true, false),
     PRIVATE_TRANSIENT(false, false, true),
     VISIBLE_TRANSIENT(true, false, true),
     MUTABLE_TRANSIENT(true, true, true),

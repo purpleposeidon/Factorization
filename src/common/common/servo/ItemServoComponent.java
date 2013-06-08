@@ -81,8 +81,11 @@ public class ItemServoComponent extends Item {
             Decorator dec = (Decorator) sc;
             Coord here = new Coord(world, x, y, z);
             TileEntityServoRail rail = here.getTE(TileEntityServoRail.class);
-            if (rail.decoration == null) {
+            if (rail != null && rail.decoration == null) {
                 rail.setDecoration(dec);
+            }
+            if (world.isRemote){
+                here.redraw();
             }
         }
         return super.onItemUse(is, player, world, x, y, z, side, vx, vy, vz);

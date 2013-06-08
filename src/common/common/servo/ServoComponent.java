@@ -7,6 +7,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.minecraft.client.renderer.RenderBlocks;
@@ -23,15 +24,15 @@ import com.google.common.reflect.ClassPath;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
-import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataInPacket;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.DataOutPacket;
+import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
 
-public abstract class ServoComponent {
+public abstract class ServoComponent implements IDataSerializable {
     private static HashMap<String, Class<? extends ServoComponent>> componentMap = new HashMap<String, Class<? extends ServoComponent>>(50, 0.5F);
     final private static String componentTagKey = "SCId";
 
@@ -82,7 +83,7 @@ public abstract class ServoComponent {
         }
         try {
             ServoComponent decor = componentClass.newInstance();
-            decor.putData(new DataInNBT(tag));
+            (new DataInNBT(tag)).put(decor);
             return decor;
         } catch (Throwable e) {
             e.printStackTrace();
@@ -93,7 +94,7 @@ public abstract class ServoComponent {
     protected final void save(NBTTagCompound tag) {
         tag.setString(componentTagKey, getName());
         try {
-            putData(new DataOutNBT(tag));
+            (new DataOutNBT(tag)).put(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -102,8 +103,7 @@ public abstract class ServoComponent {
     void writeToPacket(DataOutputStream dos) throws IOException {
         short id = getPacketIdMap().inverse().get(getName());
         dos.writeInt(id);
-        DataHelper data = new DataOutPacket(dos, Side.SERVER);
-        putData(data);
+        (new DataOutPacket(dos, Side.SERVER)).put(this);
     }
     
     static ServoComponent readFromPacket(DataInputStream dis) throws IOException {
@@ -115,7 +115,7 @@ public abstract class ServoComponent {
         }
         try {
             ServoComponent decor = componentClass.newInstance();
-            decor.putData(new DataInPacket(dis, Side.CLIENT));
+            (new DataInPacket(dis, Side.CLIENT)).put(decor);
             return decor;
         } catch (IOException e) {
             throw e;
@@ -141,8 +141,8 @@ public abstract class ServoComponent {
     }
     
     //return True if the item should be consumed by a survival-mode player
-    abstract boolean onClick(EntityPlayer player, Coord block, ForgeDirection side);
-    abstract boolean onClick(EntityPlayer player, ServoMotor motor);
+    public abstract boolean onClick(EntityPlayer player, Coord block, ForgeDirection side);
+    public abstract boolean onClick(EntityPlayer player, ServoMotor motor);
     
     /**
      * @return a unique name, something like "modname.componentType.name"
@@ -150,18 +150,19 @@ public abstract class ServoComponent {
     public abstract String getName();
     
     /**
-     * This function is called to do all serialization
-     * 
-     * @param data
-     * @throws IOException
-     */
-    protected abstract void putData(DataHelper data) throws IOException;
-    
-    /**
      * Attempt to update the ServoComponent's configuration from stack. {@link deconfigure} will be called first.
      * @param stack
      */
-    public abstract boolean configure(ServoStack stack);
+    public final boolean configure(ServoStack stack) {
+        stack.setConfiguring(true);
+        stack.setReader(true);
+        try {
+            stack.put(this);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
     
     /**
      * Used to wipe everything clean, to emptiness. Important conditions:
@@ -172,11 +173,21 @@ public abstract class ServoComponent {
      * </ul>
      * @param list to add state to.
      */
-    public abstract void deconfigure(List<Object> stack);
+    public final void deconfigure(LinkedList<Object> stack) {
+        ServoStack out = new ServoStack();
+        out.setConfiguring(true);
+        out.setReader(false);
+        out.setContentsList(stack);
+        try {
+            out.put(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     
     /**
      * Render to the Tessellator. This must be appropriate for a SimpleBlockRenderingHandler.
-     * @param where to render it at in world. If null, render immediately at 0,0,0.
+     * @param where to render it at in world. If null, it is being rendered in an inventory (or so). Render to 0,0,0.
      * @param rb RenderBlocks
      */
     @SideOnly(Side.CLIENT)
@@ -191,7 +202,9 @@ public abstract class ServoComponent {
     }
     
     @SideOnly(Side.CLIENT)
-    public void addInformation(List info) { }
+    public void addInformation(List info) {
+        info.add("ServoComponent: " + getName());
+    }
     
     public static void registerRecursivelyFromPackage(String packageName) {
         ClassLoader loader = ServoComponent.class.getClassLoader();

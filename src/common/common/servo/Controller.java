@@ -1,6 +1,6 @@
 package factorization.common.servo;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.ForgeDirection;
@@ -11,17 +11,17 @@ public abstract class Controller extends ServoComponent {
     public abstract void doUpdate(ServoMotor motor);
     
     @Override
-    boolean onClick(EntityPlayer player, Coord block, ForgeDirection side) {
+    public boolean onClick(EntityPlayer player, Coord block, ForgeDirection side) {
         return false;
     }
     
     @Override
-    boolean onClick(EntityPlayer player, ServoMotor motor) {
+    public boolean onClick(EntityPlayer player, ServoMotor motor) {
         if (motor.controller == this) {
             return false;
         }
         if (motor.controller != null) {
-            ArrayList<Object> toDrop = new ArrayList();
+            LinkedList<Object> toDrop = new LinkedList();
             motor.controller.deconfigure(toDrop);
             motor.dropItemStacks(toDrop);
         }

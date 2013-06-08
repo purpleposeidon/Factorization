@@ -13,6 +13,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -48,6 +49,10 @@ public class Coord implements IDataSerializable {
     public Coord(World w, double x, double y, double z) {
         this(w, (int) x, (int) y, (int) z);
         //this(w, (int) Math.floor(x + 0.5), (int) Math.floor(y + 0.5), (int) Math.floor(z + 0.5));
+    }
+    
+    public Coord(World w, MovingObjectPosition mop) {
+        this(w, mop.blockX, mop.blockY, mop.blockZ);
     }
     
     public static Coord of(int x, int y, int z) {

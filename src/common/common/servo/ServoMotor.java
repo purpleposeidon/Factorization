@@ -39,6 +39,15 @@ import factorization.common.servo.controllers.DummyController;
 
 public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IEntityMessage {
     Controller controller = new DummyController();
+    private ServoStack[] stacks = new ServoStack[StackType.values().length];
+    {
+        for (int i = 0; i < stacks.length; i++) {
+            stacks[i] = new ServoStack();
+        }
+    }
+    public StackType stack_index = StackType.PRIMARY;
+    private Actuator actuator = null;
+    public boolean sneaking = false;
 
     boolean dampenVelocity;
 
@@ -113,7 +122,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             initPosition();
         }
         data.as(Share.VISIBLE, "controller");
-        controller.putData(data);
+        controller = data.as(Share.PRIVATE, "controller").put(controller);
         prevOrientation = data.as(Share.PRIVATE, "prevOrient").putFzOrientation(prevOrientation);
         orientation = data.as(Share.VISIBLE, "Orient").putFzOrientation(orientation);
         nextOrientation = data.as(Share.VISIBLE, "nextOrient").putFzOrientation(nextOrientation);
@@ -125,6 +134,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             pos.w = worldObj;
         }
         new_motor = data.as(Share.PRIVATE, "new").putBoolean(new_motor);
+        for (StackType st : StackType.values()) {
+            String name = st.toString();
+            data.as(Share.VISIBLE, name).put(getServoStack(st));
+        }
+        setActuator(data.as(Share.VISIBLE, "actuator").put(getActuator()));
     }
 
     boolean validPosition(Coord c) {
@@ -392,11 +406,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
     }
     
-    Coord getCurrentPos() {
+    public Coord getCurrentPos() {
         return pos;
     }
     
-    Coord getNextPos() {
+    public Coord getNextPos() {
         return pos.add(orientation.facing);
     }
 
@@ -405,6 +419,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     void onEnterNewBlock() {
+        TileEntityServoRail rail = getCurrentPos().getTE(TileEntityServoRail.class);
+        if (rail == null /* :| */ || rail.decoration == null) {
+            return;
+        }
+        rail.decoration.motorHit(this);
     }
 
     @Override
@@ -501,5 +520,21 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 FactorizationUtil.spawnItemStack(this, (ItemStack) o);
             }
         }
+    }
+    
+    public ServoStack getServoStack(StackType st) {
+        return stacks[st.ordinal()];
+    }
+    
+    public ServoStack getServoStack() {
+        return stacks[stack_index.ordinal()];
+    }
+
+    public Actuator getActuator() {
+        return actuator;
+    }
+
+    public void setActuator(Actuator actuator) {
+        this.actuator = actuator;
     }
 }

@@ -1,8 +1,6 @@
 package factorization.common.servo.instructions;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
 
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.Icon;
@@ -12,12 +10,11 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
-import factorization.common.FactorizationUtil;
 import factorization.common.servo.Instruction;
 import factorization.common.servo.ServoMotor;
-import factorization.common.servo.ServoStack;
 
 public class SetDirection extends Instruction {
     ForgeDirection dir = ForgeDirection.UP;
@@ -48,29 +45,11 @@ public class SetDirection extends Instruction {
     public String getName() {
         return "fz.instruction.setdirection";
     }
-
-    @Override
-    protected void putData(DataHelper data) throws IOException {
-        dir = data.as(Share.VISIBLE, "dir").putEnum(dir);
-    }
-
-    @Override
-    public boolean configure(ServoStack stack) {
-        Iterator<Object> it = stack.iterator();
-        while (it.hasNext()) {
-            Object o = it.next();
-            if (o instanceof ForgeDirection) {
-                it.remove();
-                dir = (ForgeDirection) o;
-                return true;
-            }
-        }
-        return false;
-    }
     
     @Override
-    public void deconfigure(List<Object> stack) {
-        stack.add(dir);
+    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+        dir = data.as(Share.MUTABLE_INDIRECT, "dir").putEnum(dir);
+        return this;
     }
 
     @Override

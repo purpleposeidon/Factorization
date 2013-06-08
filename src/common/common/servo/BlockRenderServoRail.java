@@ -34,19 +34,28 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
     
     @Override
     protected void render(RenderBlocks rb) {
+        TileEntityServoRail rail = null;
+        if (world_mode) {
+            TileEntity te = w.getBlockTileEntity(x, y, z);
+            if (te instanceof TileEntityServoRail) {
+                rail = (TileEntityServoRail) te;
+                Decorator dec = rail.decoration;
+                if (dec != null) {
+                    dec.renderStatic(rail.getCoord(), rb);
+                }
+            } else {
+                return;
+            }
+        }
+        
+        
         Icon icon = BlockIcons.uv_test;
         block = BlockRenderHelper.instance;
         block.useTexture(icon);
         float f = TileEntityServoRail.width;
         boolean any = false;
-        if (world_mode) {
-            TileEntity te = w.getBlockTileEntity(x, y, z);
-            if (te instanceof TileEntityServoRail) {
-                TileEntityServoRail rail = (TileEntityServoRail) te;
-                rail.fillSideInfo(sides);
-            } else {
-                return;
-            }
+        if (rail != null) {
+            rail.fillSideInfo(sides);
         } else {
             any = true;
             for (int i = 0; i < 6; i++) {

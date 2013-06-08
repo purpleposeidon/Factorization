@@ -278,7 +278,7 @@ public class FactorizationUtil {
     }
     
     public static abstract class FzInv {
-        abstract int size();
+        public abstract int size();
         abstract int slotIndex(int i);
         
         boolean forceInsert = false;
@@ -293,16 +293,16 @@ public class FactorizationUtil {
             forceInsert = b;
         }
         
-        ItemStack get(int i) {
+        public ItemStack get(int i) {
             return under.getStackInSlot(slotIndex(i));
         }
         
-        void set(int i, ItemStack is) {
+        public void set(int i, ItemStack is) {
             under.setInventorySlotContents(slotIndex(i), is);
             under.onInventoryChanged();
         }
         
-        int getFreeSpace(int i) {
+        public int getFreeSpace(int i) {
             ItemStack dest = get(i);
             if (dest == null) {
                 return under.getInventoryStackLimit();
@@ -311,7 +311,20 @@ public class FactorizationUtil {
             return Math.min(dest_free, under.getInventoryStackLimit());
         }
         
-        ItemStack pushInto(int i, ItemStack is) {
+        public boolean canPush(ItemStack is) {
+            for (int i = 0; i < size(); i++) {
+                ItemStack here = get(i);
+                if (get(i) == null) {
+                    return true;
+                }
+                if (couldMerge(here, is)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        public ItemStack pushInto(int i, ItemStack is) {
             int slotIndex = slotIndex(i);
             if (!canInsert(i, is)) {
                 return is;
@@ -353,7 +366,7 @@ public class FactorizationUtil {
             if (forceInsert) {
                 return true;
             }
-            return under.isStackValidForSlot(slotIndex(i), is);
+            return under.isStackValidForSlot(slotIndex(i), is) && couldMerge(get(i), is);
         }
         
         public boolean transfer(int i, FzInv dest_inv, int dest_i, int max_transfer) {
@@ -415,6 +428,40 @@ public class FactorizationUtil {
             return is;
         }
         
+        public ItemStack peek() {
+            for (int i = 0; i < size(); i++) {
+                ItemStack is = normalize(get(i));
+                if (is != null) {
+                    return is;
+                }
+            }
+            return null;
+        }
+        
+        public ItemStack pull() {
+            for (int i = 0; i < size(); i++) {
+                ItemStack ret = pull(i, 64);
+                if (ret != null) {
+                    return ret;
+                }
+            }
+            return null;
+        }
+        
+        public ItemStack pullFromSlot(int slot) {
+            return pull(slot, 64);
+        }
+        
+        public ItemStack pullWithLimit(int limit) {
+            for (int i = 0; i < size(); i++) {
+                ItemStack ret = pull(i, limit);
+                if (ret != null) {
+                    return ret;
+                }
+            }
+            return null;
+        }
+        
         public ItemStack pull(int slot, int limit) {
             return under.decrStackSize(slotIndex(slot), limit);
         }
@@ -463,9 +510,58 @@ public class FactorizationUtil {
         }
         
         @Override
-        int size() {
+        public int size() {
             return length;
         }
+    }
+    
+    public static class Container2IInventory implements IInventory {
+        Container cont;
+        public Container2IInventory(Container cont) {
+            this.cont = cont;
+        }
+        @Override
+        public int getSizeInventory() {
+            return cont.getInventory().size();
+        }
+        
+        @Override
+        public ItemStack getStackInSlot(int i) {
+            return cont.getSlot(i).getStack();
+        }
+        @Override
+        public ItemStack decrStackSize(int i, int j) {
+            return cont.getSlot(i).decrStackSize(j);
+        }
+        @Override
+        public ItemStack getStackInSlotOnClosing(int i) {
+            return null;
+        }
+        @Override
+        public void setInventorySlotContents(int i, ItemStack itemstack) {
+            cont.putStackInSlot(i, itemstack);
+        }
+        
+        @Override
+        public boolean isStackValidForSlot(int i, ItemStack itemstack) {
+            return cont.getSlot(i).isItemValid(itemstack);
+        }
+        
+        @Override
+        public String getInvName() { return "Container2IInventory wrapper"; }
+        
+        @Override
+        public boolean isInvNameLocalized() { return false; }
+        @Override
+        public int getInventoryStackLimit() { return 64; }
+        @Override
+        public void onInventoryChanged() { }
+        @Override
+        public boolean isUseableByPlayer(EntityPlayer entityplayer) { return false; }
+        @Override
+        public void openChest() { }
+        @Override
+        public void closeChest() { }
     }
     
     public static FzInv openInventory(IInventory orig_inv, ForgeDirection side) {
@@ -482,6 +578,9 @@ public class FactorizationUtil {
     
     @SuppressWarnings("deprecation")
     public static FzInv openInventory(IInventory orig_inv, final int side, boolean openBothChests) {
+        if (orig_inv == null) {
+            return null;
+        }
         if (orig_inv instanceof TileEntityChest) {
             orig_inv = openDoubleChest((TileEntityChest) orig_inv, openBothChests);
             if (orig_inv == null) {
@@ -498,7 +597,7 @@ public class FactorizationUtil {
                 }
                 
                 @Override
-                int size() {
+                public int size() {
                     return slotMap.length;
                 }
                 
@@ -526,12 +625,25 @@ public class FactorizationUtil {
                 }
                 
                 @Override
-                int size() {
+                public int size() {
                     return length;
                 }};
         } else {
             return new PlainInvWrapper(orig_inv);
         }
+    }
+    
+    public static FzInv openInventory(Entity ent, boolean access_players) {
+        if (ent instanceof EntityPlayer && !access_players) {
+            return null;
+        }
+        if (ent instanceof IInventory) {
+            return openInventory((IInventory) ent, ForgeDirection.UP);
+        }
+        if (ent instanceof EntityPlayer) {
+            return openInventory((IInventory) ((EntityPlayer)ent).inventory, ForgeDirection.UP);
+        }
+        return null;		
     }
 
     @SuppressWarnings("deprecation")

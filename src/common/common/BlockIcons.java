@@ -73,6 +73,7 @@ public class BlockIcons {
     
     @Directory("servo")
     public static ArrowyBox arrow_direction;
+    public static Icon servo$activate;
     
     
     public static class ActivatingMachineIcon extends IconGroup {

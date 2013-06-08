@@ -27,6 +27,7 @@ import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
 import factorization.common.Core;
 import factorization.common.FactoryType;
+import factorization.common.Core.NotifyStyle;
 import factorization.common.NetworkFactorization.MessageType;
 import factorization.common.TileEntityCommon;
 
@@ -43,7 +44,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
 
     @Override
     public BlockClass getBlockClass() {
-        return BlockClass.Ceramic;
+        return BlockClass.DarkIron;
     }
 
     @Override
@@ -229,8 +230,12 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             DataOutputStream dos = new DataOutputStream(baos);
             try {
                 decoration.writeToPacket(dos);
-            } catch (IOException e) {
+            } catch (Exception e) {
+                Core.logWarning("Component packet error at %s %s:", this, getCoord());
                 e.printStackTrace();
+                decoration = null;
+                Core.notify(null, getCoord(), NotifyStyle.FORCELONG, "Component packet error!\nSee console log.");
+                return super.getDescriptionPacket();
             }
             return getDescriptionPacketWith(MessageType.ServoRailDecor, baos.toByteArray());
         }
