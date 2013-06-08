@@ -26,7 +26,12 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import factorization.common.Core;
 
+import javax.imageio.ImageIO;
+
 public class MiscClientProxy extends MiscProxy {
+    static {
+        ImageIO.setUseCache(false);
+    }
     @Override
     void runCommand(List<String> args) {
         Minecraft mc = Minecraft.getMinecraft();
@@ -136,7 +141,7 @@ public class MiscClientProxy extends MiscProxy {
             player.sendChatMessage("/f cl");
         } else if (n.equalsIgnoreCase("mods")) {
             mc.displayGuiScreen(new GuiModList(null));
-        } else if ((n.equalsIgnoreCase("ninja") || n.equalsIgnoreCase("deninja")) && Core.enable_cheat_commands) {
+        } else if ((n.equalsIgnoreCase("ninja") || n.equalsIgnoreCase("deninja") || n.equalsIgnoreCase("neo") || n.equalsIgnoreCase("deneo")) && Core.enable_cheat_commands) {
             if (mc.isSingleplayer()) {
                 float tps = n.equalsIgnoreCase("ninja") ? 0.5F : 1F;
                 mc.timer.timerSpeed = tps;
