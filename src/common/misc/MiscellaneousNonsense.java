@@ -197,26 +197,31 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
     @Override
     public void tickStart(EnumSet<TickType> type, Object... tickData) {
         //lag();
-        MinecraftServer ms = MinecraftServer.getServer();
-        if (ms.getTickCounter() < ms.tickTimeArray.length) {
-            //Ignore startup
+        if (type.contains(TickType.SERVER)) {
+            MinecraftServer ms = MinecraftServer.getServer();
+            if (ms.getTickCounter() < ms.tickTimeArray.length) {
+                //Ignore startup
+                return;
+            }
+            if (measurements++ != Core.tps_reporting_interval) {
+                return;
+            }
+            measurements = 0;
+            float tps = getTpsRatio();
+            if (tps != last_tps) {
+                PacketDispatcher.sendPacketToAllPlayers(makeTpsReportPacket(getTpsRatio()));
+                last_tps = tps;
+            }
             return;
-        }
-        if (measurements++ != Core.tps_reporting_interval) {
-            return;
-        }
-        measurements = 0;
-        float tps = getTpsRatio();
-        if (tps != last_tps) {
-            PacketDispatcher.sendPacketToAllPlayers(makeTpsReportPacket(getTpsRatio()));
-            last_tps = tps;
+        } else {
+            LagssieWatchDog.ticks++;
         }
     }
     
     @Override
     public void tickEnd(EnumSet<TickType> type, Object... tickData) { }
     
-    private static EnumSet<TickType> serverTicks = EnumSet.of(TickType.SERVER);
+    private static EnumSet<TickType> serverTicks = EnumSet.of(TickType.SERVER, TickType.CLIENT, TickType.RENDER);
 
     @Override
     public EnumSet<TickType> ticks() {

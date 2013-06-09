@@ -50,7 +50,7 @@ public class Core {
     public static final String modId = "factorization";
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
-    public static final String version = "0.8.00.dev4"; //@VERSION@
+    public static final String version = "0.8.00.dev5"; //@VERSION@
     public Core() {
         registry = new Registry();
         foph = new FactorizationOreProcessingHandler(); //We don't register foph yet.
@@ -104,6 +104,8 @@ public class Core {
     public static int tps_reporting_interval = 20;
     public static boolean use_tps_reports = true;
     public static float lowest_dilation = 0.9F;
+    public static boolean lagssie_watcher = true;
+    public static double lagssie_interval = 0.25;
     public static int max_rocket_base_size = 20*20;
     public static int max_rocket_height = 64;
     public static String language_file = "/mods/factorization/en_US.lang";
@@ -201,6 +203,8 @@ public class Core {
             use_tps_reports = getBoolConfig("useTimeDilation", "client", use_tps_reports, "If this is enabled, the client will run as slowly as the server does. This avoids visual artifacts on laggy servers.");
             lowest_dilation = (float) getDoubleConfig("lowestTimeDilation", "client", lowest_dilation, "Sets a lower bound on time dilation. Between 0 and 1.");
             lowest_dilation = Math.max(1, Math.min(0, lowest_dilation));
+            lagssie_watcher = getBoolConfig("enableLagWatchDog", "client", lagssie_watcher, "If true, enables a thread that dumps a stack trace of Minecraft if it is paused for longer than lagWatchDogInterval");
+            lagssie_interval = getDoubleConfig("lagWatchDogInterval", "client", lagssie_interval, "If the game is stuck for longer than this amount of time (in seconds), dump a stacktrace of what it is doing.");
         }
 
         gen_silver_ore = getBoolConfig("generateSilverOre", "general", gen_silver_ore, "This disables silver ore generation");

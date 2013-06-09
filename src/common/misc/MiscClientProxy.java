@@ -146,6 +146,12 @@ public class MiscClientProxy extends MiscProxy {
                 float tps = n.equalsIgnoreCase("ninja") ? 0.5F : 1F;
                 mc.timer.timerSpeed = tps;
             }
+        } else if (n.equalsIgnoreCase("watchdog") && Core.lagssie_watcher) {
+            if (args.size() != 2) {
+                player.addChatMessage("Usage: /f watchdog <waitInterval>");
+                return;
+            }
+            watch_dog.sleep_time = Double.parseDouble(args.get(1));
         } else {
             player.addChatMessage("Unknown command: " + n);
         }
@@ -186,6 +192,7 @@ public class MiscClientProxy extends MiscProxy {
                             mc.sndManager.playSoundFX("random.click", 1.0F, 1.0F);
                         }
                         hit = true;
+                        startLagWatchDog();
                     }
                     count++;
                 }
@@ -265,5 +272,16 @@ public class MiscClientProxy extends MiscProxy {
         newTps = Math.min(1.5F, Math.max(Core.lowest_dilation, newTps));
         Minecraft mc = Minecraft.getMinecraft();
         mc.timer.timerSpeed = newTps;
+    }
+    
+    LagssieWatchDog watch_dog = null;
+    
+    void startLagWatchDog() {
+        if (Core.lagssie_watcher) {
+            watch_dog = new LagssieWatchDog(Thread.currentThread(), Core.lagssie_interval);
+            Thread dog = new Thread(watch_dog);
+            dog.setDaemon(true);
+            dog.start();
+        }
     }
 }
