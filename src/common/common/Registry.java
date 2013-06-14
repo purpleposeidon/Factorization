@@ -100,6 +100,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemCraftingComponent inverium;
     public ItemSculptingTool sculpt_tool;
     public ItemGlazeBucket glaze_bucket;
+    public ItemStack base_common, base_matte, base_translucent, base_shiny, base_bright, base_unreal, glaze_base_mimicry;
     public ItemAngularSaw angular_saw;
     public ItemCraftingComponent heatHole, logicMatrix, logicMatrixIdentifier, logicMatrixProgrammer;
     public Item fz_steam;
@@ -301,25 +302,25 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         servo_component = new ItemServoComponent(itemID("servoMotorComponent", 9057));
     }
 
-    void recipe(ItemStack res, Object... params) {
+    public void recipe(ItemStack res, Object... params) {
         GameRegistry.addRecipe(res, params);
     }
 
-    void shapelessRecipe(ItemStack res, Object... params) {
+    public void shapelessRecipe(ItemStack res, Object... params) {
         if (res == null) {
             return;
         }
         GameRegistry.addShapelessRecipe(res, params);
     }
 
-    void oreRecipe(ItemStack res, Object... params) {
+    public void oreRecipe(ItemStack res, Object... params) {
         if (res == null) {
             return;
         }
         GameRegistry.addRecipe(new ShapedOreRecipe(res, params));
     }
 
-    void shapelessOreRecipe(ItemStack res, Object... params) {
+    public void shapelessOreRecipe(ItemStack res, Object... params) {
         if (res == null) {
             return;
         }
@@ -443,15 +444,15 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 '_', "slabWood",
                 '#', "plankWood");
         
-        ItemStack base_common = glaze_bucket.makeCraftingGlaze("base_common");
-        ItemStack base_matte = glaze_bucket.makeCraftingGlaze("base_matte");
-        ItemStack base_translucent = glaze_bucket.makeCraftingGlaze("base_translucent");
-        ItemStack base_shiny = glaze_bucket.makeCraftingGlaze("base_shiny");
-        ItemStack base_bright = glaze_bucket.makeCraftingGlaze("base_bright");
-        ItemStack base_unreal = glaze_bucket.makeCraftingGlaze("base_unreal");
-        final ItemStack base_mimicry = glaze_bucket.makeCraftingGlaze("base_mimicry");
+        base_common = glaze_bucket.makeCraftingGlaze("base_common");
+        base_matte = glaze_bucket.makeCraftingGlaze("base_matte");
+        base_translucent = glaze_bucket.makeCraftingGlaze("base_translucent");
+        base_shiny = glaze_bucket.makeCraftingGlaze("base_shiny");
+        base_bright = glaze_bucket.makeCraftingGlaze("base_bright");
+        base_unreal = glaze_bucket.makeCraftingGlaze("base_unreal");
+        glaze_base_mimicry = glaze_bucket.makeCraftingGlaze("base_mimicry");
         
-        glaze_bucket.add(base_mimicry);
+        glaze_bucket.add(glaze_base_mimicry);
         
         ItemStack charcoal = new ItemStack(Item.coal, 1, 1);
         ItemStack bonemeal = new ItemStack(Item.dyePowder, 1, 15);
@@ -467,7 +468,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         shapelessOreRecipe(base_shiny, base_common, netherquartz, Block.sand, charcoal);
         shapelessOreRecipe(base_bright, base_shiny, bonemeal, nether_powder, lead_chunks);
         shapelessOreRecipe(base_unreal, base_bright, diamond_shard, Item.eyeOfEnder, dark_iron);
-        shapelessOreRecipe(base_mimicry, base_unreal, Item.redstone, Item.slimeBall, lapis);
+        shapelessOreRecipe(glaze_base_mimicry, base_unreal, Item.eyeOfEnder, Item.slimeBall, lapis);
         
         ItemStack blackWool = new ItemStack(Block.cloth, 1, 15);
         BasicGlazes.ST_VECHS_BLACK.recipe(base_matte, blackWool);
@@ -571,7 +572,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                     if (is == null) {
                         continue;
                     }
-                    if (FactorizationUtil.couldMerge(base_mimicry, is)) {
+                    if (FactorizationUtil.couldMerge(glaze_base_mimicry, is)) {
                         mimic_items++;
                     } else {
                         if (is.itemID >= Block.blocksList.length) {
@@ -598,7 +599,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             
             @Override
             public ItemStack getRecipeOutput() {
-                return base_mimicry;
+                return glaze_base_mimicry;
             }
             
             @Override
@@ -613,7 +614,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                     if (is == null) {
                         continue;
                     }
-                    if (FactorizationUtil.couldMerge(base_mimicry, is)) {
+                    if (FactorizationUtil.couldMerge(glaze_base_mimicry, is)) {
                         continue;
                     }
                     if (is.itemID >= Block.blocksList.length) {
