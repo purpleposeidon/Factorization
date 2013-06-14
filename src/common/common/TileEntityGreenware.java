@@ -501,7 +501,10 @@ public class TileEntityGreenware extends TileEntityCommon {
             int wY = lump.maxY - lump.minY;
             int wZ = lump.maxZ - lump.minZ;
             int area = wX * wY * wZ;
-            int max_area = 16 * 16 * 16 / 4;
+            int max_area = 16 * 16 * 16 /* / 4 */;
+            if (!Core.stretchy_clay) {
+                max_area /= 4;
+            }
             if (area <= 0 || area > max_area) {
                 return false;
             }
@@ -542,7 +545,8 @@ public class TileEntityGreenware extends TileEntityCommon {
                     continue;
                 }
             }
-            return false;
+            //return false; -- Actually, let's allow this.
+            Core.notify(null, c, "!");
         }
 
         return true;
