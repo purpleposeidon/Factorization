@@ -40,6 +40,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.client.gui.FactorizationNotify;
+import factorization.common.compat.CompatManager;
 
 @Mod(modid = Core.modId, name = Core.name, version = Core.version)
 @NetworkMod(
@@ -104,10 +105,11 @@ public class Core {
     public static int tps_reporting_interval = 20;
     public static boolean use_tps_reports = true;
     public static float lowest_dilation = 0.9F;
-    public static boolean lagssie_watcher = true;
+    public static boolean lagssie_watcher = false;
     public static double lagssie_interval = 0.25;
     public static int max_rocket_base_size = 20*20;
     public static int max_rocket_height = 64;
+    public static boolean stretchy_clay = true;
     public static String language_file = "/mods/factorization/en_US.lang";
     
     static {
@@ -234,6 +236,7 @@ public class Core {
         serverside_translate = getBoolConfig("serversideTranslate", "server", serverside_translate, "If false, notifications will be translated by the client");
         boilers_suck_water = getBoolConfig("boilersSuckWater", "server", boilers_suck_water, "If false, water must be piped in");
         steam_output_adjust = getDoubleConfig("steamOutputAdjustment", "server", steam_output_adjust, "Scale how much steam is produced by the solar boiler");
+        stretchy_clay = getBoolConfig("stretchyClay", "server", stretchy_clay, "If true, maximum clay lump volume is 1 m³ instead of (1 m³)/4");
         tps_reporting_interval = getIntConfig("tpsReportInterval", "server", tps_reporting_interval, "How many ticks the server will wait before sending out TPS reports. 20 ticks = 1 second.");
 
         config.save();
@@ -269,6 +272,7 @@ public class Core {
         TileEntitySolarBoiler.setupSteam();
         foph.addDictOres();
         registry.sendIMC();
+        (new CompatManager()).loadCompat();
         finished_loading = true;
     }
     
