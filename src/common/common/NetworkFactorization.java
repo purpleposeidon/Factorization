@@ -11,6 +11,7 @@ import java.util.IllegalFormatException;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.NetHandler;
@@ -74,7 +75,8 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 } else if (item instanceof ItemStack) {
                     ItemStack is = (ItemStack) item;
                     NBTTagCompound tag = new NBTTagCompound();
-                    if (is.getItem().getShareTag()) {
+                    final Item is_item = is.getItem();
+                    if (is_item == null || is_item.getShareTag()) {
                         is.writeToNBT(tag);
                     } else {
                         NBTTagCompound backup = is.getTagCompound();
