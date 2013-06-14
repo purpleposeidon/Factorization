@@ -123,10 +123,33 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
         if (heat <= 0) {
             return;
         }
+        int recurs = 0, action = 0;
         for (Coord c : here.getRandomNeighborsAdjacent()) {
-            sendHeat(c.getTE());
-            if (heat <= 0) {
-                return;
+            TileEntity te = c.getTE();
+            if (te == null) {
+                continue;
+            }
+            if (te instanceof TileEntityHeater) {
+                recurs++;
+                continue;
+            }
+            if (sendHeat(te, false)) {
+                action++;
+                if (heat <= 0) {
+                    return;
+                }
+            }
+        }
+        if (recurs > 0 && action == 0) {
+            for (Coord c : here.getRandomNeighborsAdjacent()) {
+                TileEntity te = c.getTE();
+                if (te == null) {
+                    continue;
+                }
+                if (te instanceof TileEntityHeater) {
+                    sendHeat(te, true);
+                    continue;
+                }
             }
         }
     }
@@ -179,39 +202,42 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
 //		}
     }
     
-    void sendHeat(TileEntity te) {
+    boolean sendHeat(TileEntity te, boolean canRecurse) {
         if (te instanceof TileEntityExtension) {
             te = ((TileEntityExtension) te).getParent();
             if (te == null) {
-                return;
+                return false;
             }
         }
         if (te instanceof TileEntityFurnace) {
             TileEntityFurnace furnace = (TileEntityFurnace) te;
             if (!TEF_canSmelt(furnace)) {
-                return;
+                return false;
             }
             ProxiedHeatingResult pf = new ProxiedHeatingResult(new Coord(te), furnace.furnaceBurnTime, furnace.furnaceCookTime);
             furnace.furnaceBurnTime = pf.burnTime;
             furnace.furnaceCookTime = Math.min(pf.cookTime, 200 - 1);
             BlockFurnace.updateFurnaceBlockState(furnace.furnaceCookTime > 0, worldObj, te.xCoord, te.yCoord, te.zCoord);
+            return true;
         }
         if (te instanceof TileEntitySlagFurnace) {
             TileEntitySlagFurnace furnace = (TileEntitySlagFurnace) te;
             if (!furnace.canSmelt()) {
-                return;
+                return false;
             }
             ProxiedHeatingResult pf = new ProxiedHeatingResult(new Coord(te), furnace.furnaceBurnTime, furnace.furnaceCookTime);
             furnace.furnaceBurnTime = pf.burnTime;
             furnace.furnaceCookTime = pf.cookTime;
+            return true;
         } 
         if (te instanceof TileEntityCrystallizer) {
             TileEntityCrystallizer crys = (TileEntityCrystallizer) te;
             if (!crys.needHeat()) {
-                return;
+                return false;
             }
             crys.heat++;
             heat--;
+            return true;
         } 
         if (rpAlloyFurnace != null && rpAlloyFurnace.isInstance(te)) {
             Exception err = null;
@@ -220,6 +246,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
                 //Field totalburnField = rpAlloyFurnace.getField("totalburn");
                 ProxiedHeatingResult pf = new ProxiedHeatingResult(new Coord(te), burntimeField.getInt(te), 0 /* Elo doesn't want speedy. :( */);
                 burntimeField.setInt(te, pf.burnTime);
+                return true;
             } catch (SecurityException e) {
                 err = e;
             } catch (NoSuchFieldException e) {
@@ -235,6 +262,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
                     err.printStackTrace();
                 }
             }
+            return false;
         }
         if (te instanceof TileEntityGreenware) {
             TileEntityGreenware teg = (TileEntityGreenware) te;
@@ -242,12 +270,34 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
             if (state == ClayState.DRY || state == ClayState.UNFIRED_GLAZED) {
                 teg.totalHeat += 1;
                 heat -= 3;
+                return true;
             }
             if (state == ClayState.WET) {
                 teg.lastTouched += 1;
                 heat -= 6;
+                return true;
             }
+            return false;
         }
+        if (canRecurse && te instanceof TileEntityHeater) {
+            int to_take = 2;
+            if (heat < to_take) {
+                return false;
+            }
+            TileEntityHeater heater = ((TileEntityHeater) te);
+            for (Coord c : heater.getCoord().getRandomNeighborsAdjacent()) {
+                TileEntity it = c.getTE();
+                if (it == this || it == null || it instanceof TileEntityHeater) {
+                    continue;
+                }
+                if (heater.sendHeat(it, false)) {
+                    heat -= to_take;
+                    return true;
+                }
+            }
+            return false;
+        }
+        return false;
     }
 
     boolean TEF_canSmelt(TileEntityFurnace diss) {
