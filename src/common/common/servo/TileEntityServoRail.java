@@ -44,7 +44,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
 
     @Override
     public BlockClass getBlockClass() {
-        return BlockClass.DarkIron;
+        return BlockClass.Wire;
     }
 
     @Override
@@ -162,6 +162,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     
     @Override
     public boolean addCollisionBoxesToList(Block ignore, AxisAlignedBB aabb, List list, Entity entity) {
+        //return getCollisionBoxes(aabb, list, entity);
         return false;
     }
     
@@ -239,5 +240,10 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             }
             return getDescriptionPacketWith(MessageType.ServoRailDecor, baos.toByteArray());
         }
+    }
+    
+    @Override
+    public boolean isBlockSolidOnSide(int side) {
+        return false;
     }
 }

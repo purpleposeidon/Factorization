@@ -46,7 +46,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
     }
     public StackType stack_index = StackType.PRIMARY;
-    private Actuator actuator = null;
+    private Actuator actuator = new EmptyActuator();
     public boolean sneaking = false;
 
     boolean dampenVelocity;
@@ -138,6 +138,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             String name = st.toString();
             data.as(Share.VISIBLE, name).put(getServoStack(st));
         }
+        //TODO FIXME NORELEASE ServoComponent.load(tag) This won't do. What's the way to serialize these things???
         setActuator(data.as(Share.VISIBLE, "actuator").put(getActuator()));
     }
 
