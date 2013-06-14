@@ -64,13 +64,15 @@ public class RenderServoMotor extends Render {
         }
         loadTexture(Core.model_dir + "gear/servo_uv.png");
         ServoMotor motor = (ServoMotor) ent;
+        final FzOrientation orientation = FzOrientation.FACE_DOWN_POINT_SOUTH; //motor.orientation;
+        final FzOrientation prevOrientation =  FzOrientation.FACE_DOWN_POINT_EAST;//motor.prevOrientation;
         
         //NORELEASE: debug facing
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glDisable(GL11.GL_TEXTURE_2D);
         GL11.glLineWidth(4);
         GL11.glBegin(GL11.GL_LINE_STRIP);
-        FzOrientation o = motor.orientation;
+        FzOrientation o = orientation;
         GL11.glColor3f(1, 0, 0);
         GL11.glVertex3d(0, 0, 0);
         GL11.glVertex3d(o.facing.offsetX, o.facing.offsetY, o.facing.offsetZ);
@@ -78,7 +80,7 @@ public class RenderServoMotor extends Render {
         GL11.glEnd();
         GL11.glLineWidth(2);
         GL11.glBegin(GL11.GL_LINE_STRIP);
-        o = motor.prevOrientation;
+        o = prevOrientation;
         GL11.glColor3f(0, 0, 1);
         GL11.glVertex3d(0, 0, 0);
         GL11.glVertex3d(o.facing.offsetX, o.facing.offsetY, o.facing.offsetZ);
@@ -90,11 +92,11 @@ public class RenderServoMotor extends Render {
         ro = (float) Math.min(1, ro*1.1);
         ro = (float) Math.cbrt(ro);
         Quaternion qt;
-        if (motor.prevOrientation == motor.orientation) {
-            qt = Quaternion.fromOrientation(motor.orientation);
+        if (prevOrientation == orientation) {
+            qt = Quaternion.fromOrientation(orientation);
         } else {
-            Quaternion q0 = new Quaternion(Quaternion.fromOrientation(motor.prevOrientation));
-            Quaternion q1 = new Quaternion(Quaternion.fromOrientation(motor.orientation));
+            Quaternion q0 = new Quaternion(Quaternion.fromOrientation(prevOrientation));
+            Quaternion q1 = new Quaternion(Quaternion.fromOrientation(orientation));
             q0.incrLerp(q1, ro);
             qt = q0;
         }
@@ -119,11 +121,14 @@ public class RenderServoMotor extends Render {
         
         //Gear rotation
         double rail_width = TileEntityServoRail.width;
-        double radius = 0.25 + 1.5/48.0;
+        double radius = 0.56 /* from gear center to the outer edge of the ring (excluding the teeth) */ + 0.06305 /* half the width of the teeth */; //0.25 + 1.5/48.0;
         double constant = Math.PI*2*(radius);
         double dr = motor.gear_rotation - motor.prev_gear_rotation;
         double partial_rotation = motor.prev_gear_rotation + dr*partial;
         double angle = constant*partial_rotation;
+        
+        radius = 0.25 + 1.5/48.0;
+        //radius /= 2;
         
         float rd = (float) (radius + rail_width);
         //Gear rendering

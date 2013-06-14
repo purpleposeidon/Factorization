@@ -115,6 +115,10 @@ public class Coord implements IDataSerializable {
     public void set(Vec3 v) {
         set(w, (int)v.xCoord, (int)v.yCoord, (int)v.zCoord);
     }
+    
+    public void set(DeltaCoord dc) {
+        set(w, dc.x, dc.y, dc.z);
+    }
 
     @Override
     public int hashCode() {
@@ -168,6 +172,10 @@ public class Coord implements IDataSerializable {
 
     public DeltaCoord difference(Coord b) {
         return new DeltaCoord(x - b.x, y - b.y, z - b.z);
+    }
+    
+    public DeltaCoord asDeltaCoord() {
+        return new DeltaCoord(x, y, z);
     }
 
     public double distance(Coord o) {

@@ -32,7 +32,8 @@ public class ItemServoMotor extends ItemCraftingComponent {
         motor.posY = c.y;
         motor.posZ = c.z;
         //c.setAsEntityLocation(motor);
-        w.spawnEntityInWorld(motor);
+        //w.spawnEntityInWorld(motor);
+        motor.spawnServoMotor();
         ForgeDirection face = ForgeDirection.getOrientation(FactorizationUtil.determineOrientation(player));
         if (motor.validDirection(face)) {
             motor.orientation = FzOrientation.fromDirection(face);

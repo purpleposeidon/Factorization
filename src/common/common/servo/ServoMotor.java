@@ -24,6 +24,7 @@ import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
+import factorization.api.DeltaCoord;
 import factorization.api.FzOrientation;
 import factorization.api.IEntityMessage;
 import factorization.api.Quaternion;
@@ -51,12 +52,15 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
 
     boolean dampenVelocity;
 
-    Coord pos;
-    public FzOrientation prevOrientation = FzOrientation.UNKNOWN, orientation = FzOrientation.UNKNOWN, nextOrientation = FzOrientation.UNKNOWN;
+    Coord pos_prev, pos_next;
+    float pos_progress;
+    
+    
+    public FzOrientation prevOrientation = FzOrientation.UNKNOWN, orientation = FzOrientation.UNKNOWN;
+    public ForgeDirection nextDirection = ForgeDirection.UNKNOWN;
     private byte speed_b;
     private static final double max_speed_b = 127;
     double accumulated_motion;
-    double percent_complete;
     
     boolean new_motor = true;
     
@@ -67,14 +71,26 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     static final double maxSpeed = 0.05 /* NORELEASE: 0.1 */, slowedSpeed = maxSpeed / 20, minSpeed = slowedSpeed / 10;
 
     private static class MessageType {
-        static final short motor_speed = 100, motor_direction = 101, motor_position = 102;
+        static final short motor_description = 100, motor_direction = 101, motor_speed = 102;
     }
 
     public ServoMotor(World world) {
         super(world);
         setSize(1, 1);
         double d = 0.5;
-        pos = new Coord(world, 0, 0, 0);
+        pos_prev = new Coord(world, 0, 0, 0);
+        pos_next = pos_prev.copy();
+    }
+    
+    /**
+     * You <b>must</b> call this method instead of using worldObj.spawnEntityInWorld!
+     */
+    public void spawnServoMotor() {
+        pos_prev = new Coord(this);
+        pos_next = pos_prev.copy();
+        pickNextOrientation();
+        interpolatePosition(0);
+        worldObj.spawnEntityInWorld(this);
     }
 
     @Override
@@ -118,21 +134,16 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     void putData(DataHelper data) throws IOException {
-        if (!worldObj.isRemote) {
-            initPosition();
-        }
         data.as(Share.VISIBLE, "controller");
         controller = data.as(Share.PRIVATE, "controller").put(controller);
         prevOrientation = data.as(Share.PRIVATE, "prevOrient").putFzOrientation(prevOrientation);
         orientation = data.as(Share.VISIBLE, "Orient").putFzOrientation(orientation);
-        nextOrientation = data.as(Share.VISIBLE, "nextOrient").putFzOrientation(nextOrientation);
+        nextDirection = data.as(Share.VISIBLE, "nextDir").putEnum(nextDirection);
         speed_b = data.as(Share.VISIBLE, "speedb").putByte(speed_b);
         accumulated_motion = data.as(Share.PRIVATE, "accumulated_motion").putDouble(accumulated_motion);
-        percent_complete = data.as(Share.VISIBLE, "percent_complete").putDouble(percent_complete);
-        pos = data.as(Share.VISIBLE, "pos").put(pos);
-        if (data.isReader()) {
-            pos.w = worldObj;
-        }
+        pos_next = data.as(Share.VISIBLE, "pos_next").put(pos_next);
+        pos_prev = data.as(Share.VISIBLE, "pos_prev").put(pos_prev);
+        pos_progress = data.as(Share.VISIBLE, "pos_progress").putFloat(pos_progress);
         new_motor = data.as(Share.PRIVATE, "new").putBoolean(new_motor);
         for (StackType st : StackType.values()) {
             String name = st.toString();
@@ -154,7 +165,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         if (validDirection(orientation.facing)) {
             return;
         }
-        if (validDirection(nextOrientation.facing)) {
+        if (validDirection(nextDirection)) {
             swapOrientations();
             return;
         }
@@ -163,16 +174,17 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     void swapOrientations() {
-        FzOrientation shwahpah = orientation;
-        orientation = nextOrientation;
-        nextOrientation = shwahpah;
-    }
-    
-    void initPosition() {
-        new_motor = false;
-        if (!worldObj.isRemote) {
-            pos = new Coord(this);
+        ForgeDirection orig_direction = orientation.facing;
+        FzOrientation start = FzOrientation.fromDirection(nextDirection);
+        FzOrientation perfect = start.pointTopTo(orientation.top);
+        if (perfect == FzOrientation.UNKNOWN) {
+            perfect = start.pointTopTo(orig_direction);
         }
+        if (perfect == FzOrientation.UNKNOWN) {
+            perfect = start;
+        }
+        orientation = perfect;
+        nextDirection = orig_direction;
     }
 
     private boolean need_description_packet = false;
@@ -180,17 +192,12 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     @Override
     public void onEntityUpdate() {
         if (new_motor) {
-            initPosition(); //TODO: Is that Coord field necessary?
             if (prevOrientation == FzOrientation.UNKNOWN && orientation != FzOrientation.UNKNOWN) {
                 prevOrientation = orientation;
             }
         }
         if (ticksExisted == 1) {
             checkDirection();
-            if (!worldObj.isRemote) {
-                pos.w = worldObj;
-                
-            }
         }
         super.onEntityUpdate();
         if (worldObj.isRemote) {
@@ -209,9 +216,19 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
 //			if (old_dir != direction || old_next_dir != nextDirection || first) {
 //				orientationChanged();
 //			}
-            broadcast(MessageType.motor_position, (float) posX, (float) posY, (float) posZ); //NORELEASE
         }
-        setPosition(posX, posY, posZ);
+        interpolatePosition(pos_progress);
+    }
+    
+    public void interpolatePosition(float interp) {
+        setPosition(
+                ip(pos_prev.x, pos_next.x, interp),
+                ip(pos_prev.y, pos_next.y, interp),
+                ip(pos_prev.z, pos_next.z, interp));
+    }
+    
+    static double ip(int a, int b, float interp) {
+        return a + (b - a)*interp;
     }
 
     void doLogic() {
@@ -219,15 +236,12 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         worldObj.spawnParticle("reddust", x, y, z, 0, 0, 0);
         
         if (orientation == FzOrientation.UNKNOWN) {
-            if (nextOrientation != FzOrientation.UNKNOWN) {
-                swapOrientations();
-            } else {
-                pickNextOrientation();
-            }
+            pickNextOrientation();
         }
         
         if (!worldObj.isRemote) {
-            final double speed = getSpeed();
+            //Core.notify(null, getCurrentPos(), "X");
+            final double speed = getProperSpeed();
             if (dampenVelocity || hasSignal(Signal.STOP_MOTOR) || hasSignal(Signal.SLOW_MOTOR)) {
                 speed_b = (byte) (speed_b * 2 / 3);
                 if (speed < slowedSpeed) {
@@ -255,20 +269,18 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         if (controller != null) {
             controller.doUpdate(this);
         }
-        final double speed = getSpeed();
+        final double speed = getProperSpeed();
         if (speed <= 0 || orientation == FzOrientation.UNKNOWN) {
             return;
         }
         accumulated_motion += speed;
         moveMotor();
-        if (percent_complete >= 1) {
-            percent_complete = 0;
-            pos = pos.add(orientation.facing);
+        if (pos_progress >= 1) {
+            pos_progress--;
+            accumulated_motion = Math.min(pos_progress, speed);
+            pos_prev = pos_next;
             onEnterNewBlock();
-            if (pickNextOrientation()) {
-                // We're relying on the speed being < 1 here.
-                moveMotor();
-            }
+            pickNextOrientation();
         }
     }
     
@@ -277,7 +289,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         //It's possible things could end up in loops like this.
         //Could probably think of something else to throw in.
         Random rand = FactorizationUtil.dirtyRandomCache();
-        long seed = entityId + getCurrentPos().seed() + orientation.ordinal() << 2 + nextOrientation.ordinal();
+        long seed = entityId + getCurrentPos().seed() << 5 + orientation.ordinal() << 2 + nextDirection.ordinal();
         rand.setSeed(seed);
         return rand;
     }
@@ -296,57 +308,55 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         return score;
     }
     
-    int scorePotentialOrientation(FzOrientation o) {
-        int points = 0;
-        if (o == nextOrientation) {
-            points += 200;
-        } else if (o == orientation) {
-            points += 100;
-        } else {
-            
-        }
-        
-        return points;
+    
+    boolean pickNextOrientation() {
+        boolean ret = pickNextOrientation_impl();
+        pos_next = pos_prev.add(orientation.facing);
+        return ret;
     }
 
-    boolean pickNextOrientation() {
-        final ForgeDirection direction = orientation.facing, nextDirection = nextOrientation.facing;
-        ForgeDirection opposite = direction.getOpposite();
+    boolean pickNextOrientation_impl() {
+        final ForgeDirection direction = orientation.facing;
         if (testDirection(nextDirection)) {
+            // We can go the way we were told to go next
             swapOrientations();
             return true;
         }
         if (testDirection(direction)) {
+            // Our course is fine.
             return true;
         }
-        final ForgeDirection top = orientation.top, nextTop = nextOrientation.top;
+        // We've hit a T intersection, and don't know where to go next.
+        final ForgeDirection top = orientation.top;
         if (testDirection(top)) {
-            nextOrientation = FzOrientation.fromDirection(top).pointTopTo(direction);
+            // We'll turn upwards
+            nextDirection = top;
             swapOrientations();
+            return true;
         }
-        if (testDirection(nextTop)) {
-            nextOrientation = FzOrientation.fromDirection(nextTop).pointTopTo(nextDirection);
-            swapOrientations();
-        }
-        need_description_packet = true;
+        // We'll pick a random direction. Going backwards is our last resort.
+        final ForgeDirection opposite = direction.getOpposite();
         ArrayList<ForgeDirection> dirs = FactorizationUtil.dirtyDirectionCache();
         Collections.shuffle(dirs, getRandom());
         for (int i = 0; i < 6; i++) {
             ForgeDirection d = dirs.get(i);
-            if (d == opposite || d == direction || d == nextDirection || d == top || d == nextTop) {
+            if (d == opposite || d == direction || d == nextDirection || d == top || d == nextDirection) {
                 continue;
             }
             if (validDirection(d)) {
-                nextOrientation = FzOrientation.fromDirection(d);
-                FzOrientation perfect = nextOrientation.pointTopTo(orientation.top);
-                if (perfect != FzOrientation.UNKNOWN) {
-                    nextOrientation = perfect;
-                }
+                nextDirection = d;
                 swapOrientations();
+                need_description_packet = true; //NORELEASE: Check this out: Does the client simulate the same as the server? (Probably not.) Use a particle marker.
                 return true;
             }
         }
-        orientation = nextOrientation = FzOrientation.UNKNOWN;
+        if (validDirection(opposite)) {
+            orientation = FzOrientation.fromDirection(opposite).pointTopTo(top);
+            if (orientation != FzOrientation.UNKNOWN) {
+                return true;
+            }
+        }
+        orientation = FzOrientation.UNKNOWN;
         return false;
     }
 
@@ -360,11 +370,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         Core.network.broadcastPacket(worldObj, (int) posX, (int) posY, (int) posZ, p);
     }
 
-    void describe() {
-        Coord c = getCurrentPos();
-        broadcast(MessageType.motor_speed, speed_b, (float) percent_complete, c.x, c.y, c.z /* not sure why... */, (byte) orientation.ordinal(), (byte) nextOrientation.ordinal());
-    }
-
     double fraction(double v) {
         return v - ((int) v);
     }
@@ -373,12 +378,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         if (accumulated_motion == 0) {
             return;
         }
-        double move = Math.min(accumulated_motion, 1 - percent_complete);
+        double move = Math.min(accumulated_motion, 1 - pos_progress);
         accumulated_motion -= move;
-        percent_complete += move;
-        posX = pos.x + orientation.facing.offsetX * percent_complete;
-        posY = pos.y + orientation.facing.offsetY * percent_complete;
-        posZ = pos.z + orientation.facing.offsetZ * percent_complete;
+        pos_progress += move;
         if (worldObj.isRemote) {
             prev_gear_rotation = gear_rotation;
             gear_rotation += move;
@@ -408,11 +410,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
     
     public Coord getCurrentPos() {
-        return pos;
+        return pos_prev;
     }
     
     public Coord getNextPos() {
-        return pos.add(orientation.facing);
+        return pos_next;
     }
 
     boolean hasSignal(Signal signal) {
@@ -455,7 +457,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
 
     @Override
     public String toString() {
-        return super.toString() + (worldObj.isRemote ? " client" : " server") + " " + getSpeed();
+        return super.toString() + (worldObj.isRemote ? " client" : " server") + " " + getProperSpeed();
     }
 
     @Override
@@ -466,7 +468,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
 
     @Override
     public void setPosition(double x, double y, double z) {
-        // super.setPosition(x, y, z); //... really. Great.
+        // super.setPosition(x, y, z); //Super does some stupid shit to the bounding box.
         this.posX = x;
         this.posY = y;
         this.posZ = z;
@@ -480,39 +482,38 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         super.setPositionAndRotation(x, y, z, yaw, pitch);
     }
 
+    void describe() {
+        broadcast(MessageType.motor_description,
+                speed_b,
+                pos_progress,
+                pos_prev.asDeltaCoord(),
+                pos_next.asDeltaCoord(),
+                (byte) orientation.ordinal(),
+                (byte) nextDirection.ordinal());
+    }
+    
     @Override
     public boolean handleMessage(short messageType, DataInputStream input)
             throws IOException {
-//		System.out.println("MotorMessage: " + messageType); // NORELEASE
         switch (messageType) {
-        case MessageType.motor_speed:
+        case MessageType.motor_description:
             speed_b = input.readByte();
-            percent_complete = input.readFloat();
-            Coord c = getCurrentPos();
-            c.x = input.readInt();
-            c.y = input.readInt();
-            c.z = input.readInt();
+            pos_progress = input.readFloat();
+            pos_prev.set(DeltaCoord.read(input));
+            pos_next.set(DeltaCoord.read(input));
+            interpolatePosition(pos_progress);
             //$FALL-THROUGH$~~~~~!
         case MessageType.motor_direction:
             orientation = FzOrientation.getOrientation(input.readByte());
-            nextOrientation = FzOrientation.getOrientation(input.readByte());
-            return true;
-        case MessageType.motor_position:
-            double x = posX, y = posY, z = posZ;
-            worldObj.spawnParticle("reddust", input.readFloat(), input.readFloat(), input.readFloat(), -1, 1, 0);
-            //setPosition(input.readFloat(), input.readFloat(), input.readFloat());
+            nextDirection = ForgeDirection.getOrientation(input.readByte());
             return true;
         }
         return false;
     }
 
-    public double getSpeed() {
+    public double getProperSpeed() {
         double perc = speed_b/(max_speed_b);
         return maxSpeed*perc;
-    }
-
-    public void setSpeed(byte new_speed) {
-        speed_b = new_speed;
     }
     
     public void dropItemStacks(List<Object> toDrop) {
