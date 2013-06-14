@@ -4,6 +4,8 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.minecraft.client.Minecraft;
+
 import cpw.mods.fml.common.FMLLog;
 
 public class LagssieWatchDog implements Runnable {
@@ -53,6 +55,9 @@ public class LagssieWatchDog implements Runnable {
                     had_good_tick = false;
                 } else {
                     log("");
+                }
+                if (!Minecraft.getMinecraft().running) {
+                    return;
                 }
                 for (StackTraceElement ste : watch_thread.getStackTrace()) {
                     log("   " + ste.toString());
