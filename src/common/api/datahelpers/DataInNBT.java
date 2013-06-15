@@ -21,7 +21,7 @@ public class DataInNBT extends DataHelperNBT {
 
     @Override
     protected boolean shouldStore(Share share) {
-        return !share.is_transient && tag.hasKey(name);
+        return !share.is_transient /*&& tag.hasKey(name)*/;
     }
     
     @Override
