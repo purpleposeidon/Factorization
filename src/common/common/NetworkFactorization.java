@@ -482,10 +482,9 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 TileEntityBarrel.spawnBreakParticles(here, input.readInt());
                 break;
             default:
-                if (world.blockExists(x, y, z)) {
+                if (here.blockExists() && here.getId() != 0) {
                     Core.logFine("Got unhandled message: " + messageType + " for " + here);
-                }
-                else {
+                } else {
                     //XXX: Need to figure out how to keep the server from sending these things!
                     Core.logFine("Got message to unloaded chunk: " + messageType + " for " + here);
                 }
