@@ -110,6 +110,7 @@ public class Core {
     public static int max_rocket_base_size = 20*20;
     public static int max_rocket_height = 64;
     public static boolean stretchy_clay = true;
+    public static boolean equal_opportunities_for_mobs = true;
     public static String language_file = "/mods/factorization/en_US.lang";
     
     static {
@@ -238,6 +239,7 @@ public class Core {
         steam_output_adjust = getDoubleConfig("steamOutputAdjustment", "server", steam_output_adjust, "Scale how much steam is produced by the solar boiler");
         stretchy_clay = getBoolConfig("stretchyClay", "server", stretchy_clay, "If true, maximum clay lump volume is 1 m³ instead of (1 m³)/4");
         tps_reporting_interval = getIntConfig("tpsReportInterval", "server", tps_reporting_interval, "How many ticks the server will wait before sending out TPS reports. 20 ticks = 1 second.");
+        equal_opportunities_for_mobs = getBoolConfig("equalOpportunitiesForMobs", "server", equal_opportunities_for_mobs, null);
 
         config.save();
     }
