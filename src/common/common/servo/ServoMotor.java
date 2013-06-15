@@ -160,7 +160,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     boolean validDirection(ForgeDirection dir) {
         return validPosition(getCurrentPos().add(dir));
     }
-
+    
     void checkDirection() {
         if (validDirection(orientation.facing)) {
             return;
@@ -171,20 +171,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
         speed_b = 0;
         orientation = FzOrientation.UNKNOWN;
-    }
-
-    void swapOrientations() {
-        ForgeDirection orig_direction = orientation.facing;
-        FzOrientation start = FzOrientation.fromDirection(nextDirection);
-        FzOrientation perfect = start.pointTopTo(orientation.top);
-        if (perfect == FzOrientation.UNKNOWN) {
-            perfect = start.pointTopTo(orig_direction);
-        }
-        if (perfect == FzOrientation.UNKNOWN) {
-            perfect = start;
-        }
-        orientation = perfect;
-        nextDirection = orig_direction;
     }
 
     private boolean need_description_packet = false;
@@ -313,6 +299,20 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         boolean ret = pickNextOrientation_impl();
         pos_next = pos_prev.add(orientation.facing);
         return ret;
+    }
+    
+    void swapOrientations() {
+        ForgeDirection orig_direction = orientation.facing;
+        FzOrientation start = FzOrientation.fromDirection(nextDirection);
+        FzOrientation perfect = start.pointTopTo(orientation.top);
+        if (perfect == FzOrientation.UNKNOWN) {
+            perfect = start.pointTopTo(orig_direction);
+        }
+        if (perfect == FzOrientation.UNKNOWN) {
+            perfect = start;
+        }
+        orientation = perfect;
+        nextDirection = orig_direction;
     }
 
     boolean pickNextOrientation_impl() {
