@@ -24,6 +24,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.DungeonHooks;
+import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.ICraftingHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Mod;
@@ -101,6 +102,9 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         TickRegistry.registerTickHandler(this, Side.SERVER);
         TickRegistry.registerTickHandler(this, Side.CLIENT);
         //TODO: Make middle-clicking nicer
+        if (Core.equal_opportunities_for_mobs) {
+            MinecraftForge.EVENT_BUS.register(new MobEqualizer());
+        }
     }
     
     @ServerStarting
