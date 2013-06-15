@@ -219,7 +219,7 @@ public class Quaternion implements IDataSerializable {
         }
         final Quaternion q2 = Quaternion.getRotationQuaternionRadians(orient.getRotation()*quart, orient.facing);
         q2.incrMultiply(q1);
-        return quat_cache[ord] = q1;
+        return quat_cache[ord] = q2;
     }
     
     /**
