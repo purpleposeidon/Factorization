@@ -1,3 +1,5 @@
+
+Recursion depth:
   at net.minecraft.world.World.setBlock(World.java:569)
   at factorization.common.TileEntityWrathLamp.doAirCheck(TileEntityWrathLamp.java:88)
   at factorization.common.BlockLightAir.onNeighborBlockChange(BlockLightAir.java:83)
@@ -98,20 +100,10 @@ Kill Wrath (This will make the mod so much simpler...):
 
 TOP LIST (that's become somewhat less tops. Oops.)
 --------
-****POCKET CRAFTING TABLE****
-  Pocket crafting table hotbar transfer target deletion bug; see Container.java:402 slotClick "par3 == 2"
-  Add 'f': fills the crafting grid with what the mouse hovering over
-  Tutorial text in the GUI
-
-  $C opens the Pocket Crafting Table; if NEI is $(installed|enabled), it'll open from any inventory.
-  Commands:
-    $X: Empties the crafting grid
-    $C: Slides items clockwise from the upper left corner, possibly alternating
-    $F: fills grid with item under the mouse
-    $B: balances items
-
 onInventoryUpdate all the TEs
 bag of holding width tooltip
+breaking lead wiring with fist doesn't drop
+maybe make dev builds public or so...
 determine what the real colors of all these raw glazes are
 smooth sandstone double slab (Are there other variants?)
 The new IInventory has stuff for preventing things from being put into slots. All machines, and especially routers.
@@ -122,7 +114,15 @@ either bats are spawning in the hammer dimension, or we're getting entity update
 Wall jump only works when moving up? Make wall jump bouncing you off the wall at a 45° angle
 Grinder acting weird?
 Forestry liquid containers/vanilla water bottles working in the mixer
-fix vanilla's middle clicking
+Misc Nonsense:
+  fix vanilla's middle clicking
+  add a watchdog thread; every tick update a variable. Watchdog sleeps for a bit, prints out stack traces when stuff is lagging.
+notification system upgrade:
+  IMC system for sending messages (should work server & client side)
+  be able to specify: an entity ID, a floating position, or a coordinate
+  be able to send an item along with the message. It'll serialize it & stuff. And then there'll be format messages that control how the item is shown: the item name, the item name + the extra information, render the item in-line with the text, or render the item to the side of the message
+  extra controls for clearing up other notifications: get rid of nearby messages (barrels), start fading the message away as soon as it shows up (energy measurements), remove any messages that have the same typename as this one, leave the message up for # seconds
+lassie the watchdog in misc nonsense
 Modularize FZ/astro so that astro has no deps & can be removed for public release
 regularize fluid volumes for mixer/crystallizer; how can we make buckets of aqua regia?
 either figure out how to get mystcraft (?) loading TEs properly, or have the client automatically request the proper TE

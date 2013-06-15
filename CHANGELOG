@@ -5,6 +5,8 @@
   Added time dilation to make laggy servers look less laggy by slowing the client down to match. If you don't like it, there are config options to change/disable it both client & server-side.
   Removed deprecated solar turbines
   Removed the unloved exo armor; if you're a dev who cares: https://github.com/purpleposeidon/ExoArmor
+  Bugfix: Breaking a machine with a wire attached would fail to drop the right items
+  Furnace heaters can heat through other furnace heaters
 
 0.7.37
   Increased the leyden jar's capaciy
