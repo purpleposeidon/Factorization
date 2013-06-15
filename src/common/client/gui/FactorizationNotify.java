@@ -104,19 +104,19 @@ public class FactorizationNotify {
         Iterator<Message> it = messages.iterator();
         long deathTime = System.currentTimeMillis() - 1000*6;
         EntityLiving camera = Minecraft.getMinecraft().renderViewEntity;
-        double cx = camera.lastTickPosX + (camera.posX - camera.lastTickPosX) * (double)event.partialTicks;
-        double cy = camera.lastTickPosY + (camera.posY - camera.lastTickPosY) * (double)event.partialTicks;
-        double cz = camera.lastTickPosZ + (camera.posZ - camera.lastTickPosZ) * (double)event.partialTicks;
+        double cx = camera.lastTickPosX + (camera.posX - camera.lastTickPosX) * (double) event.partialTicks;
+        double cy = camera.lastTickPosY + (camera.posY - camera.lastTickPosY) * (double) event.partialTicks;
+        double cz = camera.lastTickPosZ + (camera.posZ - camera.lastTickPosZ) * (double) event.partialTicks;
         GL11.glPushMatrix();
         GL11.glTranslated(-cx, -cy, -cz);
         GL11.glPushAttrib(GL11.GL_BLEND);
-        
+
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glDepthMask(false);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        
+
         while (it.hasNext()) {
             Message m = it.next();
             if (m.creationTime < deathTime || m.locus.w != w) {
