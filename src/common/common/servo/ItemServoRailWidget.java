@@ -9,6 +9,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -16,8 +17,8 @@ import factorization.common.Core;
 import factorization.common.FactorizationUtil;
 import factorization.common.Core.TabType;
 
-public class ItemServoComponent extends Item {
-    public ItemServoComponent(int itemId) {
+public class ItemServoRailWidget extends Item {
+    public ItemServoRailWidget(int itemId) {
         super(itemId);
         setUnlocalizedName("factorization:servo/component");
         Core.tab(this, TabType.SERVOS);
@@ -35,7 +36,7 @@ public class ItemServoComponent extends Item {
         String s = super.getItemDisplayName(is);
         if (s == null || s.length() == 0) {
             s = getUnlocalizedName(is);
-            System.out.println(s); //NORELEASE
+            //System.out.println(s); //NORELEASE
         }
         return s;
     };
@@ -61,13 +62,6 @@ public class ItemServoComponent extends Item {
         if (sc == null) {
             return is;
         }
-        if (sc instanceof Actuator) {
-            Actuator ac = (Actuator) sc;
-            ac.onUse(player, player.isSneaking());
-        } else {
-            return is;
-        }
-        update(is, sc);
         return is;
     }
     
@@ -129,8 +123,36 @@ public class ItemServoComponent extends Item {
         list.addAll(subItemsCache);
     }
     
+    public Icon getIcon(ItemStack stack, int renderPass, EntityPlayer player, ItemStack usingItem, int useRemaining) {
+        return getIcon(stack, renderPass);
+    }
+    
     @Override
     public Icon getIcon(ItemStack stack, int pass) {
-        return super.getIcon(stack, pass);
+        if (pass != 0) {
+            return null;
+        }
+        ServoComponent sc = get(stack);
+        if (sc instanceof Decorator) {
+            return ((Decorator) sc).getIcon(ForgeDirection.UNKNOWN);
+        }
+        return null;
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public int getSpriteNumber() {
+        return 0;
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean requiresMultipleRenderPasses() {
+        return true;
+    }
+    
+    @Override
+    public int getRenderPasses(int metadata) {
+        return 1;
     }
 }

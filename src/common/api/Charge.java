@@ -92,16 +92,24 @@ public class Charge implements IDataSerializable {
             new ConductorSet(conductor);
             return;
         }
-        Iterable<IChargeConductor> neighbors = here.getAdjacentTEs(IChargeConductor.class);
-        for (IChargeConductor neighbor : neighbors) {
-            Charge n = neighbor.getCharge();
-            if (n.conductorSet == null) {
+        Iterable<Coord> neighbors = here.getNeighborsAdjacent();
+        for (Coord n : neighbors) {
+            ChargeMetalBlockConductance.taintBlock(n);
+            IChargeConductor neighbor = n.getTE(IChargeConductor.class);
+            if (neighbor == null) {
                 continue;
             }
-            if (n.conductorSet.addConductor(this.conductor)) {
+            Charge neighbor_charge = neighbor.getCharge();
+            if (neighbor_charge.conductorSet == null) {
+                continue;
+            }
+            if (neighbor_charge.conductorSet.addConductor(this.conductor)) {
                 //we've got ourself added to a set. Inform the set of any adjacent sets.
-                for (IChargeConductor otherNeighbor : neighbors) {
-                    conductorSet.addNeighbor(otherNeighbor.getCharge().conductorSet);
+                for (Coord coord_otherNeighbor : neighbors) {
+                    IChargeConductor otherNeighbor = coord_otherNeighbor.getTE(IChargeConductor.class);
+                    if (otherNeighbor != null) {
+                        conductorSet.addNeighbor(otherNeighbor.getCharge().conductorSet);
+                    }
                 }
                 return;
             }

@@ -57,7 +57,7 @@ public class TileEntityMirror extends TileEntityCommon {
     }
     
     @Override
-    public boolean activate(EntityPlayer entityplayer) {
+    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
         neighborChanged();
         return false;
     }

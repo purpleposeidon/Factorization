@@ -1,3 +1,21 @@
+Servos Figurings:
+    Actuators are Items that implement an Interface
+    We'll have 16 servo stacks. (Corresponding to wool colors.)
+    We'll have a few pointers to stacks, used for various purposes: equipment/execution, next execution, argument, IO buffer, onEnterBlock. You can change which stack it points to.
+        This is still ugly.
+        What if we had a stack per instruction?
+          Too many stacks. 1 stack per class of instruction.
+          So you could quote an instruction to use as a reference to a stack...
+    Bootstrap Decorator:
+      Has an adjacent inventory & optional colored block
+      Servos passing into it from the bottom get de-equipped
+      Servos passing from the other sides get equiped
+    So, classes:
+      Actuator becomes an interface on Items
+      Controller goes away
+      We get a new class, "ServoRailWidget". Decorator and Instruction extend them.
+
+
 
 Recursion depth:
   at net.minecraft.world.World.setBlock(World.java:569)
@@ -108,27 +126,23 @@ determine what the real colors of all these raw glazes are
 smooth sandstone double slab (Are there other variants?)
 The new IInventory has stuff for preventing things from being put into slots. All machines, and especially routers.
 Tossing barrels (Or, well, anything) through mystcraft portals with the gravity gun
-Bug report of wire-breaking not actually disconnecting?
 Look at what errors we get if the FZDS code isn't in
 either bats are spawning in the hammer dimension, or we're getting entity updates that we shouldn't be
-Wall jump only works when moving up? Make wall jump bouncing you off the wall at a 45° angle
 Grinder acting weird?
 Forestry liquid containers/vanilla water bottles working in the mixer
 Misc Nonsense:
   fix vanilla's middle clicking
-  add a watchdog thread; every tick update a variable. Watchdog sleeps for a bit, prints out stack traces when stuff is lagging.
 notification system upgrade:
   IMC system for sending messages (should work server & client side)
   be able to specify: an entity ID, a floating position, or a coordinate
   be able to send an item along with the message. It'll serialize it & stuff. And then there'll be format messages that control how the item is shown: the item name, the item name + the extra information, render the item in-line with the text, or render the item to the side of the message
   extra controls for clearing up other notifications: get rid of nearby messages (barrels), start fading the message away as soon as it shows up (energy measurements), remove any messages that have the same typename as this one, leave the message up for # seconds
-lassie the watchdog in misc nonsense
 Modularize FZ/astro so that astro has no deps & can be removed for public release
 regularize fluid volumes for mixer/crystallizer; how can we make buckets of aqua regia?
 either figure out how to get mystcraft (?) loading TEs properly, or have the client automatically request the proper TE
   (perhaps change that new TileEntity() in BlockFZ to new UnloadedFZTE()
 Config option for ore processing output
-remove failed packet spam for everyone who isn't me
+configuration method for adding ores?
 test with dedicated server (not from eclipse....)
 Placing/breaking wrath lamp in hammerspace seems to cause the client to crap its pants
 Don't keep non-weak references to worlds ("MapMaker.weakKeys().buildMap()") except in Entity/TileEntity
@@ -144,10 +158,6 @@ https://github.com/MinecraftForge/MinecraftForge/commit/34ebfcd9785c3c50c3ac743e
 [Features]
 https://github.com/pahimar/Equivalent-Exchange-3/commit/e1ed736955b9af238431358bad405e306833f36a
 
-[High-priority Bugs]
-** two issues with buttons in mecha-modder: doesn't update when blank armor put in
-Re-write barrel to use replacement for ISidedInventory. (Assuming it *ever* gets released...)
-
 [High-rez texture bugs]
 wrath lamp particles
 GUIs ?????
@@ -157,16 +167,14 @@ http://www.minecraftforum.net/index.php?app=members&module=messaging&section=vie
 
 [Low-Priority Bugs]
 Redstone signal on furnace heaters
-Heater stacking; would increase speed?
 right-clicking a barrel with a tool could put stuff in as if you had right-clicked with an empty hand
 Get rid of as many getEffectiveSide() calls as we can; we often have a World hanging around somewhere we can use instead.
-rotating barrels (We *still* don't have a rotation API, do we?)
 Fun fact: High-quality batteries can be made out of silver. Mmmm. But this can't really be used as an alternative... altho... maybe they could require greater charge to charge.
 implementing that generic block rotation API when it comes out if ever
 we miiight let you use capsules & shit in the mixer
 barrel lighting (normals.); it's a bit dark on dark mode.
 Test: slow stamper & packager & maker so as to not jam filters. also have stamper pulse for each item... (cakes)
-nikolite grinding! Once RedPower comes out...
+nikolite grinding! Once RedPower comes out...  :(
 check normal fire interactions w/ our TEs; fire's invisible on certain blocks? (Slag furnace maybe.)
 do block breaking animations properly (after 1.3). Look at src/minecraft/net/minecraft/src/RenderGlobal.java +1569 renderWorld()
 railgun, except for steve
@@ -370,17 +378,6 @@ Boats. Of course, you'll need a splash potion-like to set them afloat. This will
 Fa²ct²o²ri²zn
 
 More storage:
-  Armor stands
-    H   Upper Armor Stand
-   -C-  leather Helmet, stick, leather vest
-    -
-
-   -L-  Lower Armor Stand
-    -   stick, leather leggings, leather boots
-    B
-
-    Shows off armor. Sneak- double-right click to swap your armor with it; implements IInventory
-  
   Mini Chest
     bbb
     b b Wooden button
@@ -391,3 +388,9 @@ More storage:
   Being Able To Place Barrels On Their Sides
   Gloria Chests:
     (Think zelda. Yes, zelda. And also Super-Hostile.)
+
+
+Moderator:
+  prevents you from using items based on their package? Probably voids them from your inventor as well.
+
+Invasive charge'd be nice (lets you transmit charge through metal blocks)

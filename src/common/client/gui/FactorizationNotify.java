@@ -149,12 +149,11 @@ public class FactorizationNotify {
             width = Math.max(width, fr.getStringWidth(line));
         }
         width += 2;
-        
-        
-        float scaling = 1.6F/60F;
-        scaling *= 2F/3F;
+
+        float scaling = 1.6F / 60F;
+        scaling *= 2F / 3F;
         GL11.glPushMatrix();
-        
+
         float y = m.locus.y;
         AxisAlignedBB bb = m.locus.getCollisionBoundingBoxFromPool();
         if (bb != null && !m.position_important) {
@@ -167,28 +166,28 @@ public class FactorizationNotify {
         GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
         GL11.glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
         GL11.glScalef(-scaling, -scaling, scaling);
-        GL11.glTranslatef(0, -10*lines.length, 0);
-        
+        GL11.glTranslatef(0, -10 * lines.length, 0);
+
         Tessellator tess = Tessellator.instance;
-        int var16 = (lines.length - 1)*10;
+        int var16 = (lines.length - 1) * 10;
 
         GL11.glDisable(GL11.GL_TEXTURE_2D);
         tess.startDrawingQuads();
         int var17 = width / 2;
         tess.setColorRGBA_F(0.0F, 0.0F, 0.0F, 0.5F);
-        tess.addVertex((double)(-var17 - 1), (double)(-1), 0.0D);
-        tess.addVertex((double)(-var17 - 1), (double)(8 + var16), 0.0D);
-        tess.addVertex((double)(var17 + 1), (double)(8 + var16), 0.0D);
-        tess.addVertex((double)(var17 + 1), (double)(-1), 0.0D);
+        tess.addVertex((double) (-var17 - 1), (double) (-1), 0.0D);
+        tess.addVertex((double) (-var17 - 1), (double) (8 + var16), 0.0D);
+        tess.addVertex((double) (var17 + 1), (double) (8 + var16), 0.0D);
+        tess.addVertex((double) (var17 + 1), (double) (-1), 0.0D);
         tess.draw();
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         int i = 0;
         for (String line : lines) {
-            fr.drawString(line, -fr.getStringWidth(line) / 2, 10*i, -1);
+            fr.drawString(line, -fr.getStringWidth(line) / 2, 10 * i, -1);
             i++;
         }
-        
+
         GL11.glPopMatrix();
-        
+
     }
 }

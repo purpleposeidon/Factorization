@@ -1,7 +1,7 @@
 # Blender v2.60 (sub 6) OBJ File: 'servo motor.blend'
 # www.blender.org
 mtllib servo_motor.mtl
-o Dark_Gear_Circle
+o Dark_Sprocket_Circle
 v -0.038863 0.036185 0.668057
 v 0.399648 0.036185 0.536742
 v 0.651159 0.036185 0.154279

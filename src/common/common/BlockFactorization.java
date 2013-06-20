@@ -136,17 +136,20 @@ public class BlockFactorization extends BlockContainer {
             int side, float vecx, float vecy, float vecz) {
         // right click
         Coord here = new Coord(world, x, y, z);
+        if (here.getTE() == null && world.isRemote) {
+            Core.network.broadcastMessage(null, here, MessageType.DescriptionRequest);
+        }
         if (entityplayer.isSneaking()) {
-            if (here.getTE() == null && world.isRemote) {
-                Core.network.broadcastMessage(null, here, MessageType.DescriptionRequest);
+            ItemStack cur = entityplayer.getCurrentEquippedItem();
+            if (cur == null || cur.getItem() != Core.registry.logicMatrixProgrammer) {
+                return false;
             }
-            return false;
         }
 
         TileEntityCommon t = here.getTE(TileEntityCommon.class);
 
         if (t != null) {
-            return t.activate(entityplayer);
+            return t.activate(entityplayer, ForgeDirection.getOrientation(side));
         } else {
             //info message
             if (world.isRemote) {

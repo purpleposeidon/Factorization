@@ -17,6 +17,7 @@ public enum BlockClass {
     Lamp(4, false, 0, 15, 6F),
     //LightAir(5, false, 0, 15, 0),
     //WrathFire(6, false, 0, 4, 0),
+    MachineDynamicLightable(6, true, 0, 0, 3.5F),
     Machine(7, true, 0, 0, 3.5F),
     MachineLightable(8, true, 0, 13, 3.5F),
     Wire(9, false, 0, 0, 0.25F),

@@ -1,7 +1,7 @@
 package factorization.common.servo;
 
 import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.AdvancedModelLoader;
@@ -14,20 +14,20 @@ import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.common.Core;
 
-public class RenderServoMotor extends Render {
-    static int gear_display_list = -1;
+public class RenderServoMotor extends RenderEntity {
+    static int sprocket_display_list = -1;
     boolean loaded_model = false;
     
-    void loadGearModel() {
-        IModelCustom gear = AdvancedModelLoader.loadModel(Core.model_dir + "gear/gear.obj");
-        gear_display_list = GLAllocation.generateDisplayLists(1);
-        GL11.glNewList(gear_display_list, GL11.GL_COMPILE);
-        gear.renderAll();
+    void loadSprocketModel() {
+        IModelCustom sprocket = AdvancedModelLoader.loadModel(Core.model_dir + "sprocket/sprocket.obj");
+        sprocket_display_list = GLAllocation.generateDisplayLists(1);
+        GL11.glNewList(sprocket_display_list, GL11.GL_COMPILE);
+        sprocket.renderAll();
         GL11.glEndList();
     }
     
-    void renderGear() {
-        GL11.glCallList(gear_display_list);
+    void renderSprocket() {
+        GL11.glCallList(sprocket_display_list);
     }
     
     ForgeDirection getPerpendicular(ForgeDirection a, ForgeDirection b) {
@@ -56,16 +56,20 @@ public class RenderServoMotor extends Render {
     
     @Override
     public void doRender(Entity ent, double x, double y, double z, float yaw, float partial) {
+        //super.doRender(ent, x, y, z, yaw, partial);
         GL11.glPushMatrix();
         GL11.glTranslated(x + 0.5, y + 0.5, z + 0.5);
         if (loaded_model == false) {
-            loadGearModel();
+            loadSprocketModel();
             loaded_model = true;
         }
-        loadTexture(Core.model_dir + "gear/servo_uv.png");
+        loadTexture(Core.model_dir + "sprocket/servo_uv.png");
         ServoMotor motor = (ServoMotor) ent;
-        final FzOrientation orientation = FzOrientation.FACE_DOWN_POINT_SOUTH; //motor.orientation;
-        final FzOrientation prevOrientation =  FzOrientation.FACE_DOWN_POINT_EAST;//motor.prevOrientation;
+        motor.interpolatePosition((float) Math.pow(motor.pos_progress, 2));
+        //final FzOrientation orientation = FzOrientation.FACE_WEST_POINT_SOUTH; //motor.orientation;
+        //final FzOrientation prevOrientation = orientation; //FzOrientation.FACE_DOWN_POINT_EAST;//motor.prevOrientation;
+        final FzOrientation orientation = motor.orientation;
+        final FzOrientation prevOrientation = motor.prevOrientation;
         
         //NORELEASE: debug facing
         GL11.glDisable(GL11.GL_LIGHTING);
@@ -119,24 +123,24 @@ public class RenderServoMotor extends Render {
         float s = 0.5F;
         GL11.glScalef(s, s, s);
         
-        //Gear rotation
+        //Sprocket rotation
         double rail_width = TileEntityServoRail.width;
-        double radius = 0.56 /* from gear center to the outer edge of the ring (excluding the teeth) */ + 0.06305 /* half the width of the teeth */; //0.25 + 1.5/48.0;
+        double radius = 0.56 /* from sprocket center to the outer edge of the ring (excluding the teeth) */ + 0.06305 /* half the width of the teeth */; //0.25 + 1.5/48.0;
         double constant = Math.PI*2*(radius);
-        double dr = motor.gear_rotation - motor.prev_gear_rotation;
-        double partial_rotation = motor.prev_gear_rotation + dr*partial;
+        double dr = motor.sprocket_rotation - motor.prev_sprocket_rotation;
+        double partial_rotation = motor.prev_sprocket_rotation + dr*partial;
         double angle = constant*partial_rotation;
         
         radius = 0.25 + 1.5/48.0;
         //radius /= 2;
         
         float rd = (float) (radius + rail_width);
-        //Gear rendering
+        //Sprocket rendering. (You wouldn't have been able to tell by reading the code.)
         {
             GL11.glPushMatrix();
             GL11.glTranslatef(0, 0, rd);
             GL11.glRotatef((float)Math.toDegrees(angle), 0, 1, 0);
-            renderGear();
+            renderSprocket();
             GL11.glPopMatrix();
         }
         {
@@ -144,10 +148,11 @@ public class RenderServoMotor extends Render {
             //GL11.glTranslatef(0, 0, (float)(2 - radius));
             //GL11.glTranslatef(0, 0, (float)(2 - radius));
             //GL11.glTranslatef(0, 0, 2*(float)(radius*2 + TileEntityServoRail.width/2));
-            GL11.glRotatef((float)Math.toDegrees(-angle), 0, 1, 0);
-            renderGear();
+            GL11.glRotatef((float)Math.toDegrees(-angle) + 360F/9F, 0, 1, 0);
+            renderSprocket();
         }
         GL11.glPopMatrix();
+        motor.interpolatePosition(motor.pos_progress);
     }
 
 }

@@ -30,7 +30,7 @@ import javax.imageio.ImageIO;
 
 public class MiscClientProxy extends MiscProxy {
     static {
-        ImageIO.setUseCache(false);
+        // ImageIO.setUseCache(false); NORELEASE?
     }
     @Override
     void runCommand(List<String> args) {

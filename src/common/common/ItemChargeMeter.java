@@ -6,6 +6,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import factorization.api.Charge;
 import factorization.api.Charge.ChargeDensityReading;
@@ -33,15 +34,16 @@ public class ItemChargeMeter extends Item {
 
     public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y,
             int z, int side, float vecx, float vecy, float vecz) {
+        if (w.isRemote) {
+            return true;
+        }
         Coord here = new Coord(w, x, y, z);
+        TileEntity te = here.getTE();
         IChargeConductor ic = here.getTE(IChargeConductor.class);
         if (ic == null) {
             IMeterInfo im = here.getTE(IMeterInfo.class);
             if (im == null) {
                 return false;
-            }
-            if (w.isRemote) {
-                return true;
             }
             Core.notify(player, here, "%s", im.getInfo());
             return true;

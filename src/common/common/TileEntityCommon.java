@@ -140,7 +140,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         return new Coord(this);
     }
 
-    public boolean activate(EntityPlayer entityplayer) {
+    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
         FactoryType type = getFactoryType();
 
         if (type.hasGui) {
@@ -188,11 +188,11 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         return false;
     }
 
-    void broadcastMessage(EntityPlayer who, int messageType, Object... msg) {
+    protected void broadcastMessage(EntityPlayer who, int messageType, Object... msg) {
         Core.network.broadcastMessage(who, getCoord(), messageType, msg);
     }
     
-    void broadcastMessage(EntityPlayer who, Packet toSend) {
+    protected void broadcastMessage(EntityPlayer who, Packet toSend) {
         Core.network.broadcastPacket(who, getCoord(), toSend);
     }
     

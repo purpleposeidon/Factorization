@@ -208,16 +208,42 @@ public class Quaternion implements IDataSerializable {
         final Vec3 target = orient.getDiagonalVector();
         final Quaternion q1;
         final double quart = Math.toRadians(90);
+        int rotation = orient.getRotation();
         switch (orient.facing) {
-        case UP: q1 = Quaternion.getRotationQuaternionRadians(0*quart, ForgeDirection.WEST); break;
-        case DOWN: q1 = Quaternion.getRotationQuaternionRadians(2*quart, ForgeDirection.WEST); break;
-        case NORTH: q1 = Quaternion.getRotationQuaternionRadians(1*quart, ForgeDirection.WEST); break;
-        case SOUTH: q1 = Quaternion.getRotationQuaternionRadians(-1*quart, ForgeDirection.WEST); break;
-        case EAST: q1 = Quaternion.getRotationQuaternionRadians(1*quart, ForgeDirection.NORTH); break;
-        case WEST: q1 = Quaternion.getRotationQuaternionRadians(-1*quart, ForgeDirection.NORTH); break;
+        case UP: {
+            q1 = Quaternion.getRotationQuaternionRadians(0*quart, ForgeDirection.WEST);
+            rotation = 5 - rotation;
+            break;
+        }
+        case DOWN: {
+            q1 = Quaternion.getRotationQuaternionRadians(2*quart, ForgeDirection.WEST);
+            rotation = 3 - rotation;
+            break;
+        }
+        case NORTH: {
+            q1 = Quaternion.getRotationQuaternionRadians(1*quart, ForgeDirection.WEST);
+            rotation = 5 - rotation;
+            break;
+        }
+        case SOUTH: {
+            q1 = Quaternion.getRotationQuaternionRadians(-1*quart, ForgeDirection.WEST);
+            rotation = 3 - rotation;
+            break;
+        }
+        case EAST: {
+            q1 = Quaternion.getRotationQuaternionRadians(1*quart, ForgeDirection.NORTH);
+            //rotation = 3 - rotation;
+            rotation += Math.abs(orient.top.offsetZ)*2;
+            break;
+        }
+        case WEST: {
+            q1 = Quaternion.getRotationQuaternionRadians(-1*quart, ForgeDirection.NORTH);
+            rotation += Math.abs(orient.top.offsetY)*2;
+            break;
+        }
         default: return quat_cache[ord] = new Quaternion(); //Won't happen
         }
-        final Quaternion q2 = Quaternion.getRotationQuaternionRadians(orient.getRotation()*quart, orient.facing);
+        final Quaternion q2 = Quaternion.getRotationQuaternionRadians(rotation*quart, orient.facing);
         q2.incrMultiply(q1);
         return quat_cache[ord] = q2;
     }

@@ -9,13 +9,16 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.server.management.PlayerInstance;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Icon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
@@ -26,8 +29,8 @@ import factorization.common.BlockClass;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
 import factorization.common.Core;
-import factorization.common.FactoryType;
 import factorization.common.Core.NotifyStyle;
+import factorization.common.FactoryType;
 import factorization.common.NetworkFactorization.MessageType;
 import factorization.common.TileEntityCommon;
 
@@ -205,12 +208,37 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         decoration = newDecor;
     }
     
+    public Decorator getDecoration() {
+        return decoration;
+    }
+    
+    @Override
+    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
+        if (decoration == null) {
+            return false;
+        }
+        boolean ret = decoration.onClick(entityplayer, getCoord(), side);
+        if (!worldObj.isRemote) {
+            WorldServer world = (WorldServer) worldObj;
+            PlayerInstance playerInstance = world.getPlayerManager().getOrCreateChunkWatcher(xCoord >> 4, zCoord >> 4, false);
+            if (playerInstance != null) {
+                playerInstance.sendToAllPlayersWatchingChunk(_getDescriptionPacket(true));
+            }
+
+        }
+        return ret;
+        //return super.activate(entityplayer);
+    }
+    
     @Override
     public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == MessageType.ServoRailDecor) {
+        if (messageType == MessageType.ServoRailDecor || messageType == MessageType.ServoRailDecorUpdate) {
+            if (messageType == MessageType.ServoRailDecorUpdate) {
+                getCoord().redraw();
+            }
             DataInputStream dis = new DataInputStream(input);
             ServoComponent sc = ServoComponent.readFromPacket(input);
             if (!(sc instanceof Decorator)) {
@@ -224,6 +252,10 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     
     @Override
     public Packet getDescriptionPacket() {
+        return _getDescriptionPacket(false);
+    }
+    
+    public Packet _getDescriptionPacket(boolean with_update) {
         if (decoration == null) {
             return super.getDescriptionPacket();
         } else {
@@ -238,7 +270,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
                 Core.notify(null, getCoord(), NotifyStyle.FORCELONG, "Component packet error!\nSee console log.");
                 return super.getDescriptionPacket();
             }
-            return getDescriptionPacketWith(MessageType.ServoRailDecor, baos.toByteArray());
+            return getDescriptionPacketWith(with_update ? MessageType.ServoRailDecorUpdate : MessageType.ServoRailDecor, baos.toByteArray());
         }
     }
     

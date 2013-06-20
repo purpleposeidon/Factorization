@@ -125,5 +125,14 @@ item.factorization:ceramics/glaze_bucket.base_mimicry.name=Glaze Base: Mimicing
 
 #Servos
 factorization:servo/component.name=Servo Component
-factorization:servo/motor.name=Servo Motor
-item.factorization:servo/component.fz.controller.dummyDefault=Default Controller
+item.factorization:servo/servo.name=Servo
+item.factorization:servo/actuator.item_manipulator.name=Inventory Manipulator
+item.factorization:servo/sprocket.name=Dark Iron Sprocket
+item.factorization:servo/servo_motor.name=Servo Motor
+item.factorization:servo/component.fz.decorator.equipmentBay.name=Equipment Bay
+item.factorization:servo/component.fz.decorator.equipmentBay.hint=Equips or de-equips servos from an inventory
+item.factorization:servo/component.fz.instruction.activateactuator.name=Activate Actuator
+item.factorization:servo/component.fz.instruction.boop.name=Boop
+item.factorization:servo/component.fz.instruction.setdirection.name=Set Direction
+
+

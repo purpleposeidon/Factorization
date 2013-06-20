@@ -143,10 +143,10 @@ public class TileEntityExtension extends TileEntityCommon {
     }
     
     @Override
-    public boolean activate(EntityPlayer entityplayer) {
+    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
         TileEntityCommon p = getParent();
         if (p != null) {
-            return p.activate(entityplayer);
+            return p.activate(entityplayer, side);
         }
         return false;
     }

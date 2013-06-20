@@ -398,7 +398,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     }
 
     @Override
-    public boolean activate(EntityPlayer player) {
+    public boolean activate(EntityPlayer player, ForgeDirection side) {
         ClayState state = getState();
         if (state == ClayState.WET) {
             touch();

@@ -26,6 +26,7 @@ public class FactorizationTextureLoader {
             this.group_prefix = prefix + "_";
             return this;
         }
+        public void afterRegister() { }
     }
     
     public static void register(IconRegister reg, Class base) {
@@ -51,6 +52,7 @@ public class FactorizationTextureLoader {
                     ig.prefix(f.getName());
                     f.set(instance, ig);
                     register(reg, f.getType(), ig, prefix + ig.group_prefix);
+                    ig.afterRegister();
                 }
                 if (Icon.class.isAssignableFrom(f.getType())) {
                     String icon_file = prefix + f.getName();

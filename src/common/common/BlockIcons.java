@@ -3,6 +3,8 @@ package factorization.common;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.common.FactorizationTextureLoader.Directory;
 import factorization.common.FactorizationTextureLoader.IconGroup;
 
@@ -73,7 +75,8 @@ public class BlockIcons {
     
     @Directory("servo")
     public static ArrowyBox arrow_direction;
-    public static Icon servo$activate;
+    public static Icon servo$activate, servo$activate_sneaky;
+    public static Icon servo$bay, servo$bay_bottom, servo$bay_top;
     
     
     public static class ActivatingMachineIcon extends IconGroup {
@@ -99,8 +102,102 @@ public class BlockIcons {
         }
     }
     
+    public static abstract class ExtendedIcon implements Icon {
+        protected Icon under;
+        
+        public ExtendedIcon(Icon under) {
+            this.under = under;
+        }
+        
+        @Override
+        @SideOnly(Side.CLIENT)
+        public int getSheetWidth() {
+            return under.getSheetWidth();
+        }
+        
+        @Override
+        @SideOnly(Side.CLIENT)
+        public int getSheetHeight() {
+            return under.getSheetHeight();
+        }
+        
+        @Override
+        @SideOnly(Side.CLIENT)
+        public int getOriginY() {
+            return under.getOriginY();
+        }
+        
+        @Override
+        @SideOnly(Side.CLIENT)
+        public int getOriginX() {
+            return under.getOriginX();
+        }
+        
+        @Override
+        @SideOnly(Side.CLIENT)
+        public float getMinV() {
+            return getInterpolatedV(0);
+        }
+        
+        @Override
+        @SideOnly(Side.CLIENT)
+        public float getMinU() {
+            return getInterpolatedU(0);
+        }
+        
+        @Override
+        @SideOnly(Side.CLIENT)
+        public float getMaxV() {
+            return getInterpolatedV(16);
+        }
+        
+        @Override
+        @SideOnly(Side.CLIENT)
+        public float getMaxU() {
+            return getInterpolatedU(16);
+        }
+        
+        @Override
+        @SideOnly(Side.CLIENT)
+        public String getIconName() {
+            return under.getIconName();
+        }
+    }
+    
     public static class ArrowyBox extends IconGroup {
-        public Icon front, side, back;
+        public Icon front, side_N, side_E, back;
+        public Icon side_S, side_W;
+
+        @Override
+        public void afterRegister() {
+            side_S = new ExtendedIcon(side_N) {
+                @Override
+                @SideOnly(Side.CLIENT)
+                public float getInterpolatedV(double d0) {
+                    return under.getInterpolatedV(16 - d0);
+                }
+                
+                @Override
+                @SideOnly(Side.CLIENT)
+                public float getInterpolatedU(double d0) {
+                    return under.getInterpolatedU(16 - d0);
+                }
+            };
+            side_W = new ExtendedIcon(side_E) {
+                @Override
+                @SideOnly(Side.CLIENT)
+                public float getInterpolatedV(double d0) {
+                    return under.getInterpolatedV(16 - d0);
+                }
+                
+                @Override
+                @SideOnly(Side.CLIENT)
+                public float getInterpolatedU(double d0) {
+                    return under.getInterpolatedU(16 - d0);
+                }
+            };
+        }
+        
         public Icon get(ForgeDirection arrow_direction, ForgeDirection face) {
             if (arrow_direction == face) {
                 return front;
@@ -108,16 +205,31 @@ public class BlockIcons {
             if (arrow_direction.getOpposite() == face) {
                 return back;
             }
-            return side;
-        }
-        public void setRotations(ForgeDirection arrow_direction, RenderBlocks rb) {
-            //rb.renderBlockLog
-            if (arrow_direction.offsetY != 0) {
-                rb.uvRotateEast = 1;
-                rb.uvRotateWest = 1;
-                rb.uvRotateNorth = 1;
-                rb.uvRotateSouth = 1;
+            if (arrow_direction == ForgeDirection.UP) {
+                return side_N;
             }
+            if (arrow_direction == ForgeDirection.DOWN) {
+                return side_S;
+            }
+            if (face.offsetY != 0) {
+                if (arrow_direction == ForgeDirection.WEST) return side_W;
+                if (arrow_direction == ForgeDirection.EAST) return side_E;
+                if (arrow_direction == ForgeDirection.NORTH) return side_N;
+                if (arrow_direction == ForgeDirection.SOUTH) return side_S;
+            }
+            if (face == ForgeDirection.WEST) {;
+                return arrow_direction.offsetZ == 1 ? side_E : side_W;
+            }
+            if (face == ForgeDirection.EAST) {;
+                return arrow_direction.offsetZ == -1 ? side_E : side_W;
+            }
+            if (face == ForgeDirection.NORTH) {
+                return arrow_direction.offsetX == -1 ? side_E : side_W;
+            }
+            if (face == ForgeDirection.SOUTH) {
+                return arrow_direction.offsetX == 1 ? side_E : side_W;
+            }
+            return uv_test;
         }
         public void unsetRotations(RenderBlocks rb) {
             rb.uvRotateNorth = rb.uvRotateEast = rb.uvRotateSouth = rb.uvRotateWest = rb.uvRotateTop = rb.uvRotateBottom = 0;

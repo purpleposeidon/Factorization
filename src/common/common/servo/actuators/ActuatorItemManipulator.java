@@ -1,8 +1,5 @@
 package factorization.common.servo.actuators;
 
-import java.io.IOException;
-
-import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -10,61 +7,35 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumMovingObjectType;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.ForgeDirection;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.IDataSerializable;
-import factorization.api.datahelpers.Share;
+import factorization.common.Core;
 import factorization.common.FactorizationUtil;
 import factorization.common.FactorizationUtil.FzInv;
-import factorization.common.servo.Actuator;
+import factorization.common.servo.ActuatorItem;
 import factorization.common.servo.ServoMotor;
 import factorization.common.servo.ServoStack;
 
-public class ItemManipulator extends Actuator {
-    ForgeDirection sneak_direction = ForgeDirection.UNKNOWN;
-    int slot = -1, quantity = -1;
-
-    @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        sneak_direction = data.as(Share.VISIBLE, "sneak_direction").putEnum(sneak_direction);
-        slot = data.as(Share.PRIVATE, "slot").putInt(slot);
-        quantity = data.as(Share.PRIVATE, "quantity").putInt(quantity);
-        return this;
-    }
-
-    @Override
-    public String getName() {
-        return "fz.actuator.item_manipulate";
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void renderStatic(Coord where, RenderBlocks rb) {
-        // TODO Auto-generated method stub
-
+public class ActuatorItemManipulator extends ActuatorItem {
+    public ActuatorItemManipulator(int itemId) {
+        super(itemId);
+        setUnlocalizedName("factorization:servo/actuator.item_manipulator");
     }
     
-    @Override
-    protected boolean use(Entity user, MovingObjectPosition mop) {
-        if (isSneaking(user)) {
-            return giveItem(user, mop);
-        } else {
-            return takeItem(user, mop);
-        }
-    }
+    private static int default_slot = -1, default_limit = 64;
 
-    boolean giveItem(Entity user, MovingObjectPosition mop) {
+    boolean giveItem(ItemStack actuator_is, Entity user, MovingObjectPosition mop) {
         FzInv target_inv = getInv(user, mop);
         if (target_inv == null) {
             return false;
         }
+        int slot = takeConfig(user, default_slot);
         int start = slot, end = slot;
         if (slot == -1) {
             start = 0;
             end = target_inv.size();
         }
+        int limit = takeConfig(user, default_limit);
+        
         //TODO: Implement slot accesses...
         ItemStack toPush = null;
         if (user instanceof EntityPlayer) {
@@ -74,11 +45,15 @@ public class ItemManipulator extends Actuator {
             ItemStack buffer = null;
             boolean any = false;
             for (int i = start; i < end; i++) {
+                ItemStack peak = FactorizationUtil.normalize(inv.get(i));
+                if (peak == actuator_is || peak == null) {
+                    continue;
+                }
                 if (target_inv.canInsert(i, toUse)) {
                     if (buffer == null) {
-                        buffer = inv.pull();
+                        buffer = inv.pull(i, limit);
                     }
-                    buffer = target_inv.pushInto(i, buffer);
+                    buffer = target_inv.push(buffer);
                     if (buffer == null) {
                         return true;
                     }
@@ -88,15 +63,26 @@ public class ItemManipulator extends Actuator {
             return any;
         } else if (user instanceof ServoMotor) {
             ServoMotor motor = (ServoMotor) user;
-            ServoStack ss = motor.getServoStack();
+            ServoStack ss = motor.getServoStack(ServoMotor.STACK_ARGUMENT);
             
-            ItemStack toUse = ss.findType(ItemStack.class);
+            ItemStack toUse = null;
+            int toUse_index = 0;
+            for (Object o : ss) {
+                if (o instanceof ItemStack && o != actuator_is) {
+                    toUse = (ItemStack) o;
+                    break;
+                }
+                toUse_index++;
+            }
+            if (toUse == null) {
+                return false;
+            }
             ItemStack buffer = null;
             boolean any = false;
             for (int i = start; i < end; i++) {
                 if (target_inv.canInsert(i, toUse)) {
                     if (buffer == null) {
-                        buffer = ss.popType(ItemStack.class);
+                        buffer = (ItemStack) ss.remove(toUse_index);
                     }
                     buffer = target_inv.pushInto(i, buffer);
                     if (buffer == null) {
@@ -110,19 +96,21 @@ public class ItemManipulator extends Actuator {
         return false;
     }
     
-    boolean takeItem(Entity user, MovingObjectPosition mop) {
+    boolean takeItem(ItemStack actuator_is, Entity user, MovingObjectPosition mop) {
         FzInv inv = getInv(user, mop);
         if (inv == null) {
             return false;
         }
+        int slot = takeConfig(user, default_slot);
         int start = slot, end = slot;
         if (slot == -1) {
             start = 0;
             end = inv.size();
         }
+        int limit = takeConfig(user, default_limit);
         
         for (int i = start; i < end; i++) {
-            ItemStack is = inv.pullFromSlot(i);
+            ItemStack is = inv.pull(i, limit);
             if (is == null) {
                 continue;
             }
@@ -141,6 +129,19 @@ public class ItemManipulator extends Actuator {
         } else {
             return null;
         }
+    }
+    @Override
+    public boolean use(ItemStack is, Entity user, MovingObjectPosition mop) {
+        if (isSneaking(user)) {
+            giveItem(is, user, mop);
+        } else {
+            takeItem(is, user, mop);
+        }
+        if (user instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) user;
+            Core.proxy.updatePlayerInventory(player);
+        }
+        return true;
     }
 
 }

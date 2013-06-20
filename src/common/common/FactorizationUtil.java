@@ -56,7 +56,7 @@ public class FactorizationUtil {
      */
     public static boolean couldMerge(ItemStack a, ItemStack b) {
         if (a == null || b == null) {
-            return a == b;
+            return true;
         }
         return a.itemID == b.itemID && a.getItemDamage() == b.getItemDamage() && sameItemTags(a, b);
     }

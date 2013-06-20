@@ -2,6 +2,8 @@ package factorization.common.servo.instructions;
 
 import java.io.IOException;
 
+import net.minecraft.block.Block;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.datahelpers.DataHelper;
@@ -30,4 +32,9 @@ public class Boop extends Instruction {
     
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException { return this; }
+    
+    @Override
+    protected ItemStack getRecipeItem() {
+        return new ItemStack(Block.music);
+    }
 }

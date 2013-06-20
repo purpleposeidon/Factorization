@@ -404,7 +404,7 @@ for x in range(0, len(d[0])):
     }
     
     @Override
-    public boolean activate(EntityPlayer entityplayer) {
+    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
         if (worldObj.isRemote) {
             return true;
         }

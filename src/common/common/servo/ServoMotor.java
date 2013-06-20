@@ -26,6 +26,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.FzOrientation;
+import factorization.api.IChargeConductor;
 import factorization.api.IEntityMessage;
 import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
@@ -36,19 +37,18 @@ import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.Share;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
-import factorization.common.servo.controllers.DummyController;
 
 public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IEntityMessage {
-    Controller controller = new DummyController();
-    private ServoStack[] stacks = new ServoStack[StackType.values().length];
+    public static final int STACKS = 16;
+    public static final int STACK_EQUIPMENT = 0, STACK_ARGUMENT = 1, STACK_IO = 2, STACK_CONFIG = 3, STACK_ERRNO = 4;
+    private ServoStack[] stacks = new ServoStack[STACKS];
     {
         for (int i = 0; i < stacks.length; i++) {
             stacks[i] = new ServoStack();
         }
     }
-    public StackType stack_index = StackType.PRIMARY;
-    private Actuator actuator = new EmptyActuator();
     public boolean sneaking = false;
+    public int next_stack = 0;
 
     boolean dampenVelocity;
 
@@ -65,7 +65,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     boolean new_motor = true;
     
     //For client-side rendering
-    double gear_rotation = 0, prev_gear_rotation = 0;
+    double sprocket_rotation = 0, prev_sprocket_rotation = 0;
     double servo_reorient = 0, prev_servo_reorient = 0;
 
     static final double maxSpeed = 0.05 /* NORELEASE: 0.1 */, slowedSpeed = maxSpeed / 20, minSpeed = slowedSpeed / 10;
@@ -88,6 +88,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     public void spawnServoMotor() {
         pos_prev = new Coord(this);
         pos_next = pos_prev.copy();
+        pickNextOrientation();
         pickNextOrientation();
         interpolatePosition(0);
         worldObj.spawnEntityInWorld(this);
@@ -135,7 +136,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
 
     void putData(DataHelper data) throws IOException {
         data.as(Share.VISIBLE, "controller");
-        controller = data.as(Share.PRIVATE, "controller").put(controller);
         prevOrientation = data.as(Share.PRIVATE, "prevOrient").putFzOrientation(prevOrientation);
         orientation = data.as(Share.VISIBLE, "Orient").putFzOrientation(orientation);
         nextDirection = data.as(Share.VISIBLE, "nextDir").putEnum(nextDirection);
@@ -145,12 +145,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         pos_prev = data.as(Share.VISIBLE, "pos_prev").put(pos_prev);
         pos_progress = data.as(Share.VISIBLE, "pos_progress").putFloat(pos_progress);
         new_motor = data.as(Share.PRIVATE, "new").putBoolean(new_motor);
-        for (StackType st : StackType.values()) {
-            String name = st.toString();
-            data.as(Share.VISIBLE, name).put(getServoStack(st));
+        for (int i = 0; i < STACKS; i++) {
+            String name = "stack_" + i;
+            stacks[i] = data.as(Share.VISIBLE, name).put(stacks[i]);
         }
-        //TODO FIXME NORELEASE ServoComponent.load(tag) This won't do. What's the way to serialize these things???
-        setActuator(data.as(Share.VISIBLE, "actuator").put(getActuator()));
+        next_stack = data.as(Share.VISIBLE, "next_stack").putInt(next_stack);
     }
 
     boolean validPosition(Coord c) {
@@ -196,12 +195,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 need_description_packet  = false;
                 describe();
             }
-//			if (old_speed != speed_b || first) {
-//				speedChanged();
-//			}
-//			if (old_dir != direction || old_next_dir != nextDirection || first) {
-//				orientationChanged();
-//			}
         }
         interpolatePosition(pos_progress);
     }
@@ -224,10 +217,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         if (orientation == FzOrientation.UNKNOWN) {
             pickNextOrientation();
         }
-        
+        final double speed = getProperSpeed() ;
+        boolean should_accelerate = speed < maxSpeed && orientation != FzOrientation.UNKNOWN;
         if (!worldObj.isRemote) {
             //Core.notify(null, getCurrentPos(), "X");
-            final double speed = getProperSpeed();
             if (dampenVelocity || hasSignal(Signal.STOP_MOTOR) || hasSignal(Signal.SLOW_MOTOR)) {
                 speed_b = (byte) (speed_b * 2 / 3);
                 if (speed < slowedSpeed) {
@@ -238,24 +231,26 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                         }
                     }
                 }
-            } else if (orientation != FzOrientation.UNKNOWN && speed < maxSpeed) {
-                accelerate(); // NORELEASE
-//				long now = worldObj.getTotalWorldTime();
-//				if (now % 10 == 0) {
-//					IChargeConductor conductor = getCurrentPos().getTE(IChargeConductor.class);
-//					if (conductor != null) {
-//						int drain = 4;
-//						if (conductor.getCharge().tryTake(drain) >= drain) {
-//							accelerate();
-//						}
-//					}
-//				}
+                should_accelerate = false;
             }
         }
-        if (controller != null) {
-            controller.doUpdate(this);
+        if (Core.cheat_servo_energy) {
+            if (should_accelerate) {
+                accelerate();
+            }
+        } else {
+            long now = worldObj.getTotalWorldTime();
+            if (now % 5 == 0) {
+                int to_drain = should_accelerate ? 2 : 1;
+                IChargeConductor conductor = getCurrentPos().getTE(IChargeConductor.class);
+                if (conductor != null) {
+                    if (conductor.getCharge().tryTake(to_drain) >= to_drain) {
+                        accelerate();
+                    }
+                }
+            }
         }
-        final double speed = getProperSpeed();
+        
         if (speed <= 0 || orientation == FzOrientation.UNKNOWN) {
             return;
         }
@@ -370,10 +365,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         Core.network.broadcastPacket(worldObj, (int) posX, (int) posY, (int) posZ, p);
     }
 
-    double fraction(double v) {
-        return v - ((int) v);
-    }
-
     void moveMotor() {
         if (accumulated_motion == 0) {
             return;
@@ -382,26 +373,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         accumulated_motion -= move;
         pos_progress += move;
         if (worldObj.isRemote) {
-            prev_gear_rotation = gear_rotation;
-            gear_rotation += move;
+            prev_sprocket_rotation = sprocket_rotation;
+            sprocket_rotation += move;
             
             prev_servo_reorient = servo_reorient;
             servo_reorient = Math.min(1, servo_reorient + move);
-            /*if (direction != orientation.facing) {
-                prevOrientation = orientation;
-                FzOrientation default_orientation = FzOrientation.fromDirection(direction);
-                FzOrientation next = default_orientation.pointTopTo(prevOrientation.top);
-                if (next != FzOrientation.UNKNOWN) {
-                    //A turn that keeps the gears in the same plane
-                    orientation = next;
-                } else {
-                    //The gears are being tilted somehow
-                    orientation = default_orientation.pointTopTo(prevOrientation.facing);
-                    if (orientation == FzOrientation.UNKNOWN) {
-                        orientation = next;
-                    }
-                }
-            }*/
             if (servo_reorient >= 1) {
                 servo_reorient = 0;
                 prevOrientation = orientation;
@@ -446,6 +422,20 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         EntityPlayer player = (EntityPlayer) src;
         if (!worldObj.isRemote) {
             setDead();
+            if (player.capabilities.isCreativeMode && !player.isSneaking()) {
+                return true;
+            }
+            ArrayList<Object> toDrop = new ArrayList(30);
+            toDrop.add(new ItemStack(Core.registry.servo_motor_placer));
+            for (ServoStack ss : stacks) {
+                while (ss.getSize() > 0) {
+                    Object o = ss.pop();
+                    if (o instanceof ItemStack) {
+                        toDrop.add(o);
+                    }
+                }
+            }
+            dropItemStacks(toDrop);
         }
         return true;
     }
@@ -472,9 +462,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         this.posX = x;
         this.posY = y;
         this.posZ = z;
-        double a = 0;
-        double b = 1;
-        this.boundingBox.setBounds(x - a, y - a, z - a, x + b, y + b, z + b);
+        double neg_size = 0;
+        double pos_size = 1;
+        double height = 8F/16F;
+        double dy = 0.5;
+        this.boundingBox.setBounds(x - neg_size, dy + y - height, z - neg_size, x + pos_size, dy + y + height, z + pos_size);
     }
 
     @Override
@@ -524,19 +516,21 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
     }
     
-    public ServoStack getServoStack(StackType st) {
-        return stacks[st.ordinal()];
+    public ServoStack getServoStack(int stackId) {
+        stackId = Math.max(0, stackId);
+        stackId = Math.min(stackId, STACKS);
+        return stacks[stackId];
     }
     
-    public ServoStack getServoStack() {
-        return stacks[stack_index.ordinal()];
+    public static boolean canClone(Object o) {
+        return !(o instanceof ItemStack);
     }
-
-    public Actuator getActuator() {
-        return actuator;
-    }
-
-    public void setActuator(Actuator actuator) {
-        this.actuator = actuator;
+    
+    public void putError(Object error) {
+        ServoStack ss = getServoStack(STACK_ERRNO);
+        if (ss.getFreeSpace() <= 0) {
+            ss.popEnd();
+        }
+        ss.push(error);
     }
 }

@@ -29,6 +29,7 @@ import factorization.api.datahelpers.DataInPacket;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.IDataSerializable;
+import factorization.api.datahelpers.Share;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
 
@@ -70,6 +71,15 @@ public abstract class ServoComponent implements IDataSerializable {
     public static Iterable<Class<? extends ServoComponent>> getComponents() {
         return getPacketIdMap().values();
     }
+    
+    public short getNetworkId() {
+        BiMap<Class<? extends ServoComponent>, Short> map = getPacketIdMap().inverse();
+        Short o = map.get(getClass());
+        if (o == null) {
+            throw new IllegalArgumentException(getClass() + " is not a registered ServoComponent");
+        }
+        return o;
+    }
 
     static ServoComponent load(NBTTagCompound tag) {
         if (tag == null || !tag.hasKey(componentTagKey)) {
@@ -83,7 +93,7 @@ public abstract class ServoComponent implements IDataSerializable {
         }
         try {
             ServoComponent decor = componentClass.newInstance();
-            (new DataInNBT(tag)).put(decor);
+            (new DataInNBT(tag)).as(Share.VISIBLE, "sc").put(decor);
             return decor;
         } catch (Throwable e) {
             e.printStackTrace();
@@ -94,20 +104,19 @@ public abstract class ServoComponent implements IDataSerializable {
     protected final void save(NBTTagCompound tag) {
         tag.setString(componentTagKey, getName());
         try {
-            (new DataOutNBT(tag)).put(this);
+            (new DataOutNBT(tag)).as(Share.VISIBLE, "sc").put(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
     
     void writeToPacket(DataOutputStream dos) throws IOException {
-        short id = getPacketIdMap().inverse().get(getName());
-        dos.writeInt(id);
-        (new DataOutPacket(dos, Side.SERVER)).put(this);
+        dos.writeShort(getNetworkId());
+        (new DataOutPacket(dos, Side.SERVER)).as(Share.VISIBLE, "sc").put(this);
     }
     
     static ServoComponent readFromPacket(DataInputStream dis) throws IOException {
-        int id = dis.readInt();
+        short id = dis.readShort();
         Class<? extends ServoComponent> componentClass = getPacketIdMap().get(id);
         if (componentClass == null) {
             Core.logWarning("Unknown servo component with #ID %s", id);
@@ -115,7 +124,7 @@ public abstract class ServoComponent implements IDataSerializable {
         }
         try {
             ServoComponent decor = componentClass.newInstance();
-            (new DataInPacket(dis, Side.CLIENT)).put(decor);
+            (new DataInPacket(dis, Side.CLIENT)).as(Share.VISIBLE, "sc").put(decor);
             return decor;
         } catch (IOException e) {
             throw e;
@@ -203,7 +212,7 @@ public abstract class ServoComponent implements IDataSerializable {
     
     @SideOnly(Side.CLIENT)
     public void addInformation(List info) {
-        info.add("ServoComponent: " + getName());
+        info.add("Servo Component");
     }
     
     public static void registerRecursivelyFromPackage(String packageName) {
@@ -236,4 +245,16 @@ public abstract class ServoComponent implements IDataSerializable {
     static {
         registerRecursivelyFromPackage("factorization.common.servo");
     }
+    
+    public static void setupRecipes() {
+        for (Class<? extends ServoComponent> klazz : componentMap.values()) {
+            try {
+                klazz.newInstance().addRecipes();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    protected void addRecipes() {}
 }

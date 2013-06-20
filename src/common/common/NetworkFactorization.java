@@ -113,7 +113,8 @@ public class NetworkFactorization implements ITinyPacketHandler {
                     q.write(output);
                 } else if (item instanceof byte[]) {
                     //NOTE: The size must be known elsewhere
-                    output.write((byte[]) item);
+                    byte[] b = (byte[]) item;
+                    output.write(b, 0, b.length);
                 } else {
                     throw new RuntimeException("Don't know how to serialize " + item.getClass() + " (" + item + ")");
                 }
@@ -594,7 +595,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 //
                 ExtensionInfo = 150, RocketState = 151,
                 //
-                ServoRailDecor = 161;
+                ServoRailDecor = 161, ServoRailDecorUpdate = 162;
     }
 
 }

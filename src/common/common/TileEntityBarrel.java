@@ -314,7 +314,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     //* Double:						Add all but 1 item
 
     @Override
-    public boolean activate(EntityPlayer entityplayer) {
+    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
         // right click: put an item in
         if (entityplayer.worldObj.isRemote) {
             return true;

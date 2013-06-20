@@ -27,7 +27,7 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
     }
     
     void restoreTextures(int a, int b) {
-        Icon icon = BlockIcons.uv_test;
+        Icon icon = BlockIcons.servo$rail;
         block.setTexture(a, icon);
         block.setTexture(b, icon);
     }
@@ -49,7 +49,7 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
         }
         
         
-        Icon icon = BlockIcons.uv_test;
+        Icon icon = BlockIcons.servo$rail;
         block = BlockRenderHelper.instance;
         block.useTexture(icon);
         float f = TileEntityServoRail.width;

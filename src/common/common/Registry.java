@@ -49,9 +49,11 @@ import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
 import factorization.common.Core.TabType;
 import factorization.common.TileEntityGreenware.ClayState;
-import factorization.common.servo.ItemServoComponent;
+import factorization.common.servo.ItemServoRailWidget;
 import factorization.common.servo.ItemServoMotor;
+import factorization.common.servo.ServoComponent;
 import factorization.common.servo.ServoMotor;
+import factorization.common.servo.actuators.ActuatorItemManipulator;
 
 public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler {
     public ItemFactorization item_factorization;
@@ -110,7 +112,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public LiquidStack liquidStackRocketFuel;
     public ItemCraftingComponent bucket_rocket_fuel;
     public ItemServoMotor servo_motor_placer;
-    public ItemServoComponent servo_component;
+    public ItemServoRailWidget servo_component;
+    public ActuatorItemManipulator actuator_item_manipulator;
+    public ItemStack dark_iron_sprocket, sprocket_motor;
 
     public Material materialMachine = Material.anvil; //new Material(MapColor.ironColor);
 
@@ -299,7 +303,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         
         //Servos
         servo_motor_placer = new ItemServoMotor(itemID("servoMotorPlacer", 9056));
-        servo_component = new ItemServoComponent(itemID("servoMotorComponent", 9057));
+        servo_component = new ItemServoRailWidget(itemID("servoMotorComponent", 9057));
+        actuator_item_manipulator = new ActuatorItemManipulator(itemID("actuatorItemManipulator", 9058));
+        dark_iron_sprocket = new ItemStack(new ItemCraftingComponent(itemID("darkIronSprocket", 9059), "servo/sprocket"));
+        sprocket_motor = new ItemStack(new ItemCraftingComponent(itemID("servoMotor", 9060), "servo/servo_motor"));
     }
 
     public void recipe(ItemStack res, Object... params) {
@@ -962,6 +969,36 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             LiquidContainerRegistry.registerLiquid(new LiquidContainerData(new LiquidStack(rocket_fuel_liquid_entry, LiquidContainerRegistry.BUCKET_VOLUME/2), new ItemStack(rocket_fuel, 1), air)); //TODO: Would be nice if this worked. Forge would need something for it tho.
             LiquidContainerRegistry.registerLiquid(new LiquidContainerData(new LiquidStack(rocket_fuel_liquid_entry, LiquidContainerRegistry.BUCKET_VOLUME), new ItemStack(bucket_rocket_fuel, 1), emptyBucket));
         }
+        
+        //Servos
+        ItemStack rails = servorail_item.copy();
+        rails.stackSize = 8;
+        oreRecipe(rails, "DLD",
+                'D', dark_iron,
+                'L', "ingotLead");
+        oreRecipe(dark_iron_sprocket,
+                " D ",
+                "DSD",
+                " D ",
+                'D', dark_iron,
+                'S', "ingotSilver");
+        recipe(sprocket_motor,
+                " S ",
+                "rMc",
+                'S', dark_iron_sprocket,
+                'r', Item.redstoneRepeater,
+                'M', motor,
+                'c', Item.comparator);
+        oreRecipe(new ItemStack(servo_motor_placer),
+                "MDL",
+                " #P",
+                "MDL",
+                'M', sprocket_motor,
+                'D', dark_iron,
+                'L', "ingotLead",
+                '#', logicMatrix,
+                'P', logicMatrixProgrammer);
+        ServoComponent.setupRecipes();
     }
 
     public void setToolEffectiveness() {

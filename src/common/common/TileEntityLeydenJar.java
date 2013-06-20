@@ -78,7 +78,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     }
     
     public void updateSparks(ChargeSparks the_sparks) {
-        double level = getLevel();
+        double level = getLevel()*4/5;
         if (level > rand.nextDouble()) {
             Vec3 src = Vec3.createVectorHelper(0.5, randomizeDirection(0)/2 + 0.2, 0.5);
             ForgeDirection fo = ForgeDirection.getOrientation(2 + rand.nextInt(4));

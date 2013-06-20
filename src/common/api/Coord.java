@@ -387,7 +387,9 @@ public class Coord implements IDataSerializable {
     }
 
     public void redraw() {
-        w.markBlockForRenderUpdate(x, y, z);
+        if (w.isRemote) {
+            w.markBlockForRenderUpdate(x, y, z);
+        }
     }
     
     public void notifyNeighbors() {

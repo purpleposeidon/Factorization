@@ -38,6 +38,7 @@ import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.ChargeMetalBlockConductance;
 import factorization.api.Coord;
 import factorization.client.gui.FactorizationNotify;
 import factorization.common.compat.CompatManager;
@@ -93,6 +94,7 @@ public class Core {
     public static boolean renderAO = true;
     public static boolean add_branding = false;
     public static boolean cheat = false;
+    public static boolean cheat_servo_energy = false;
     public static boolean debug_light_air = false;
     public static boolean debug_network = false;
     public static boolean dimension_slice_allow_smooth = true;
@@ -111,11 +113,13 @@ public class Core {
     public static int max_rocket_height = 64;
     public static boolean stretchy_clay = true;
     public static boolean equal_opportunities_for_mobs = true;
+    public static boolean invasiveCharge = false;
     public static String language_file = "/mods/factorization/en_US.lang";
     
     static {
         if (!dev_environ) {
             cheat = false;
+            cheat_servo_energy = false;
         }
     }
 
@@ -240,7 +244,7 @@ public class Core {
         stretchy_clay = getBoolConfig("stretchyClay", "server", stretchy_clay, "If true, maximum clay lump volume is 1 m³ instead of (1 m³)/4");
         tps_reporting_interval = getIntConfig("tpsReportInterval", "server", tps_reporting_interval, "How many ticks the server will wait before sending out TPS reports. 20 ticks = 1 second.");
         equal_opportunities_for_mobs = getBoolConfig("equalOpportunitiesForMobs", "server", equal_opportunities_for_mobs, null);
-
+        //invasiveCharge = getBoolConfig("invasiveCharge", "server", invasiveCharge, "Set to true to prevent charge from connecting over metal blocks.");
         config.save();
     }
 
@@ -275,6 +279,7 @@ public class Core {
         foph.addDictOres();
         registry.sendIMC();
         (new CompatManager()).loadCompat();
+        ChargeMetalBlockConductance.setup();
         finished_loading = true;
     }
     

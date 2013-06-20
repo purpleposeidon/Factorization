@@ -34,7 +34,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
         return BlockClass.Wire;
     }
     @Override
-    public boolean activate(EntityPlayer entityplayer) {
+    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
         return false;
     }
 
