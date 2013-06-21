@@ -124,7 +124,7 @@ public class TileEntityMirror extends TileEntityCommon {
     }
     
     @Override
-    void onRemove() {
+    protected void onRemove() {
         super.onRemove();
         if (reflection_target == null) {
             return;

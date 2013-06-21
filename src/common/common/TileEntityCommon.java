@@ -48,7 +48,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         return p;
     }
 
-    void onRemove() {
+    protected void onRemove() {
         if (this instanceof IChargeConductor) {
             ((IChargeConductor) this).getCharge().remove();
         }
@@ -221,5 +221,10 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     }
     public ForgeDirection[] getValidRotations() {
         return empty_rotation_array;
+    }
+    
+    //Requires the BlockClass to be MachineDynamicLightable
+    public int getDynamicLight() {
+        return 0;
     }
 }

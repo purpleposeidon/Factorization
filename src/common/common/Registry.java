@@ -998,6 +998,14 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'L', "ingotLead",
                 '#', logicMatrix,
                 'P', logicMatrixProgrammer);
+        oreRecipe(new ItemStack(actuator_item_manipulator),
+                "123",
+                "PVP",
+                'P', Block.pistonBase,
+                'V', Block.hopperBlock,
+                '1', Block.pressurePlatePlanks,
+                '2', Block.pressurePlateGold,
+                '3', Block.pressurePlateIron);
         ServoComponent.setupRecipes();
     }
 

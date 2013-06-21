@@ -1,26 +1,29 @@
 package factorization.common.servo;
 
+import java.io.IOException;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
+import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.Core;
-import factorization.common.FactorizationUtil;
 import factorization.common.Core.TabType;
+import factorization.common.FactorizationUtil;
+import factorization.common.ItemCraftingComponent;
 
-public abstract class ActuatorItem extends Item {
-    public ActuatorItem(int itemId) {
-        super(itemId);
+public abstract class ActuatorItem extends ItemCraftingComponent {
+    public ActuatorItem(int itemId, String name) {
+        super(itemId, name);
         Core.tab(this, TabType.SERVOS);
     }
 
-    public abstract boolean use(ItemStack is, Entity user, MovingObjectPosition mop);
+    public abstract boolean use(ItemStack is, Entity user, MovingObjectPosition mop) throws IOException;
     
     static class TraceHelper extends EntityLiving {
         public TraceHelper() {
@@ -36,36 +39,18 @@ public abstract class ActuatorItem extends Item {
         }
     }
     
-    static TraceHelper trace_helper = new TraceHelper();
-    
-    /*
     @Override
     public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
         if (world.isRemote) {
             return false;
         }
-        boolean sneak = player.isSneaking();
-        onUse(stack, player, sneak);
-        return true;
-    }*/
-    /*
-    @Override
-    public ItemStack onItemRightClick(ItemStack is, World world, EntityPlayer player) {
-        onUse(is, player, player.isSneaking());
-        return is;
-    }*/
-    
-    @Override
-    public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
-        if (world.isRemote) {
-            return false;
-        }
-        //return onUse(stack, player);
         MovingObjectPosition mop = new MovingObjectPosition(x, y, z, side, Vec3.createVectorHelper(hitX, hitY, hitZ));
-        use(stack, player, mop);
+        try {
+            use(stack, player, mop);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return true;
-        // TODO Auto-generated method stub
-        //return super.onItemUseFirst(stack, player, world, x, y, z, side, hitX, hitY, hitZ);
     }
     
     public boolean onUse(ItemStack is, Entity user) {
@@ -78,17 +63,16 @@ public abstract class ActuatorItem extends Item {
             Coord c = motor.getCurrentPos();
             ForgeDirection fd = motor.orientation.top;
             target = new MovingObjectPosition(c.x + fd.offsetX, c.y + fd.offsetY, c.z + fd.offsetZ, fd.getOpposite().ordinal(), Vec3.createVectorHelper(0, 0, 0));
-            /*trace_helper.posX = user.posX;
-            trace_helper.posY = user.posY;
-            trace_helper.posZ = user.posZ;
-            trace_helper.worldObj = user.worldObj;
-            trace_helper.look = motor.orientation.facing;
-            target = trace_helper.rayTrace(4.5, 1);*/
         }
         if (target == null) {
             return false;
         }
-        return use(is, user, target);
+        try {
+            return use(is, user, target);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
     
     public static ItemStack takeItem(Entity user) {
@@ -136,19 +120,18 @@ public abstract class ActuatorItem extends Item {
         }
     }
     
-    public static <T> T takeConfig(Entity user, T default_value) {
-        if (!(user instanceof ServoMotor)) {
-            return default_value;
-        }
-        ServoMotor motor = (ServoMotor) user;
-        ServoStack ss = motor.getServoStack(ServoMotor.STACK_CONFIG);
-        T ret = ss.popType((Class<? extends T>)default_value.getClass());
-        if (ret == null) {
-            return default_value;
-        }
-        if (ServoMotor.canClone(ret)) {
-            ss.append(ret);
-        }
-        return ret;
+    //final static public String actcfg = "actcfg";
+    
+    /*
+    public final DataHelper getConfigReader(ItemStack is) {
+        NBTTagCompound tag = FactorizationUtil.getTag(is);
+        return new DataInNBT(tag).as(Share.VISIBLE, "");
     }
+    
+    public final DataHelper getConfigWriter(ItemStack is) {
+        NBTTagCompound tag = FactorizationUtil.getTag(is);
+        return new DataOutNBT(tag).as(Share.VISIBLE, "");
+    }*/
+    
+    public abstract IDataSerializable getState();
 }

@@ -211,8 +211,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     void doLogic() {
-        double x = posX, y = posY, z = posZ;
-        worldObj.spawnParticle("reddust", x, y, z, 0, 0, 0);
         
         if (orientation == FzOrientation.UNKNOWN) {
             pickNextOrientation();
@@ -240,13 +238,20 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             }
         } else {
             long now = worldObj.getTotalWorldTime();
-            if (now % 5 == 0) {
-                int to_drain = should_accelerate ? 2 : 1;
-                IChargeConductor conductor = getCurrentPos().getTE(IChargeConductor.class);
-                if (conductor != null) {
-                    if (conductor.getCharge().tryTake(to_drain) >= to_drain) {
-                        accelerate();
+            IChargeConductor conductor = getCurrentPos().getTE(IChargeConductor.class);
+            if (conductor != null) {
+                int to_drain = 0;
+                if (should_accelerate) {
+                    if (now % 3 == 0) {
+                        to_drain = 2;
+                    } else {
+                        should_accelerate = false;
                     }
+                } else if (now % 60 == 0) {
+                    to_drain = 1;
+                }
+                if (to_drain > 0 && conductor.getCharge().tryTake(to_drain) >= to_drain && should_accelerate) {
+                    accelerate();
                 }
             }
         }
@@ -275,7 +280,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         return rand;
     }
     
-    private boolean testDirection(ForgeDirection d) {
+    public boolean testDirection(ForgeDirection d) {
         if (d == ForgeDirection.UNKNOWN) {
             return false;
         }
@@ -296,7 +301,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         return ret;
     }
     
-    void swapOrientations() {
+    public void swapOrientations() {
         ForgeDirection orig_direction = orientation.facing;
         FzOrientation start = FzOrientation.fromDirection(nextDirection);
         FzOrientation perfect = start.pointTopTo(orientation.top);
@@ -312,7 +317,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
 
     boolean pickNextOrientation_impl() {
         final ForgeDirection direction = orientation.facing;
-        if (testDirection(nextDirection)) {
+        if (nextDirection != direction.getOpposite() && testDirection(nextDirection)) {
             // We can go the way we were told to go next
             swapOrientations();
             return true;
@@ -527,6 +532,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
     
     public void putError(Object error) {
+        if (!worldObj.isRemote) {
+            Core.notify(null, getCurrentPos(), "" + error);
+        }
         ServoStack ss = getServoStack(STACK_ERRNO);
         if (ss.getFreeSpace() <= 0) {
             ss.popEnd();

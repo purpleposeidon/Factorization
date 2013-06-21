@@ -1,5 +1,7 @@
 package factorization.common.servo.actuators;
 
+import java.io.IOException;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -8,6 +10,10 @@ import net.minecraft.util.EnumMovingObjectType;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.DataInNBT;
+import factorization.api.datahelpers.IDataSerializable;
+import factorization.api.datahelpers.Share;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
 import factorization.common.FactorizationUtil.FzInv;
@@ -17,24 +23,30 @@ import factorization.common.servo.ServoStack;
 
 public class ActuatorItemManipulator extends ActuatorItem {
     public ActuatorItemManipulator(int itemId) {
-        super(itemId);
-        setUnlocalizedName("factorization:servo/actuator.item_manipulator");
+        super(itemId, "servo/actuator.item_manipulator");
     }
     
-    private static int default_slot = -1, default_limit = 64;
+    private static class State implements IDataSerializable {
+        int slot = -1, limit = 64;
 
-    boolean giveItem(ItemStack actuator_is, Entity user, MovingObjectPosition mop) {
+        @Override
+        public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+            slot = data.asSameShare(prefix + "slot").put(slot);
+            limit = data.asSameShare(prefix + "limit").put(limit);
+            return this;
+        }		
+    }
+
+    boolean giveItem(State state, ItemStack actuator_is, Entity user, MovingObjectPosition mop) throws IOException {
         FzInv target_inv = getInv(user, mop);
         if (target_inv == null) {
             return false;
         }
-        int slot = takeConfig(user, default_slot);
-        int start = slot, end = slot;
-        if (slot == -1) {
+        int start = state.slot, end = state.slot + 1;
+        if (state.slot == -1) {
             start = 0;
             end = target_inv.size();
         }
-        int limit = takeConfig(user, default_limit);
         
         //TODO: Implement slot accesses...
         ItemStack toPush = null;
@@ -51,7 +63,7 @@ public class ActuatorItemManipulator extends ActuatorItem {
                 }
                 if (target_inv.canInsert(i, toUse)) {
                     if (buffer == null) {
-                        buffer = inv.pull(i, limit);
+                        buffer = inv.pull(i, state.limit);
                     }
                     buffer = target_inv.push(buffer);
                     if (buffer == null) {
@@ -96,21 +108,19 @@ public class ActuatorItemManipulator extends ActuatorItem {
         return false;
     }
     
-    boolean takeItem(ItemStack actuator_is, Entity user, MovingObjectPosition mop) {
+    boolean takeItem(State state, ItemStack actuator_is, Entity user, MovingObjectPosition mop) throws IOException {
         FzInv inv = getInv(user, mop);
         if (inv == null) {
             return false;
         }
-        int slot = takeConfig(user, default_slot);
-        int start = slot, end = slot;
-        if (slot == -1) {
+        int start = state.slot, end = state.slot + 1;
+        if (state.slot == -1) {
             start = 0;
             end = inv.size();
         }
-        int limit = takeConfig(user, default_limit);
         
         for (int i = start; i < end; i++) {
-            ItemStack is = inv.pull(i, limit);
+            ItemStack is = inv.pull(i, state.limit);
             if (is == null) {
                 continue;
             }
@@ -131,11 +141,12 @@ public class ActuatorItemManipulator extends ActuatorItem {
         }
     }
     @Override
-    public boolean use(ItemStack is, Entity user, MovingObjectPosition mop) {
+    public boolean use(ItemStack is, Entity user, MovingObjectPosition mop) throws IOException {
+        State state = (new DataInNBT(FactorizationUtil.getTag(is))).as(Share.VISIBLE, "").put(new State());
         if (isSneaking(user)) {
-            giveItem(is, user, mop);
+            giveItem(state, is, user, mop);
         } else {
-            takeItem(is, user, mop);
+            takeItem(state, is, user, mop);
         }
         if (user instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) user;
@@ -143,5 +154,9 @@ public class ActuatorItemManipulator extends ActuatorItem {
         }
         return true;
     }
-
+    
+    @Override
+    public IDataSerializable getState() {
+        return new State();
+    }
 }

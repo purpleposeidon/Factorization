@@ -553,7 +553,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     }
 
     @Override
-    void onRemove() {
+    protected void onRemove() {
         super.onRemove();
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {

@@ -163,10 +163,8 @@ public abstract class ServoComponent implements IDataSerializable {
      * @param stack
      */
     public final boolean configure(ServoStack stack) {
-        stack.setConfiguring(true);
-        stack.setReader(true);
         try {
-            stack.put(this);
+            stack.getDataHelper(true).put(this);
             return true;
         } catch (IOException e) {
             return false;
@@ -184,11 +182,9 @@ public abstract class ServoComponent implements IDataSerializable {
      */
     public final void deconfigure(LinkedList<Object> stack) {
         ServoStack out = new ServoStack();
-        out.setConfiguring(true);
-        out.setReader(false);
         out.setContentsList(stack);
         try {
-            out.put(this);
+            out.getDataHelper(false).put(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -212,7 +208,7 @@ public abstract class ServoComponent implements IDataSerializable {
     
     @SideOnly(Side.CLIENT)
     public void addInformation(List info) {
-        info.add("Servo Component");
+        //info.add("Servo Component");
     }
     
     public static void registerRecursivelyFromPackage(String packageName) {

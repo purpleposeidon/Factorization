@@ -215,7 +215,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     }
     
     @Override
-    void onRemove() {
+    protected void onRemove() {
         super.onRemove();
         Coord here = getCoord();
         FactorizationUtil.spill(here, waterTank.getLiquid());

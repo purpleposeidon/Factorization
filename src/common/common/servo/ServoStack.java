@@ -7,12 +7,13 @@ import java.util.LinkedList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactorizationUtil;
 
-public class ServoStack extends DataHelper implements IDataSerializable, Iterable, IInventory {
+public class ServoStack implements IDataSerializable, Iterable, IInventory {
     private LinkedList<Object> contents = new LinkedList<Object>();
     private final int maxSize = 16;
 
@@ -125,20 +126,26 @@ public class ServoStack extends DataHelper implements IDataSerializable, Iterabl
 
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        // TODO FIXME NORELEASE: deserializing doesn't work over the wire
-        // because we don't know what things are
         int length = data.asSameShare(prefix + "size").putInt(contents.size());
-
+        if (length == 0) {
+            return this;
+        }
         prefix = prefix + "#";
         if (data.isWriter()) {
             int i = 0;
             for (Object o : contents) {
-                data.asSameShare(prefix + i++).putObject(o);
+                if (o instanceof ItemStack) {
+                    o = ((ItemStack) o).writeToNBT(new NBTTagCompound());
+                }
+                data.asSameShare(prefix + i++).putUntypedOject(o);
             }
         } else {
             contents.clear();
             for (int i = 0; i < length; i++) {
-                Object n = data.asSameShare(prefix + i).putObject(null);
+                Object n = data.asSameShare(prefix + i).putUntypedOject(null);
+                if (n instanceof NBTTagCompound) {
+                    n = ItemStack.loadItemStackFromNBT((NBTTagCompound) n);
+                }
                 if (n != null) {
                     contents.add(n);
                 }
@@ -146,124 +153,41 @@ public class ServoStack extends DataHelper implements IDataSerializable, Iterabl
         }
         return this;
     }
-
-    boolean reader;
-
-    void setReader(boolean reader) {
-        this.reader = reader;
-    }
-
-    boolean configuring;
-
-    void setConfiguring(boolean configuring) {
-        this.configuring = configuring;
-    }
-
-    @Override
-    protected DataHelper makeChild_do() {
-        return this;
-    }
-
-    @Override
-    protected void finishChild_do() {
-    }
-
-    @Override
-    protected boolean shouldStore(Share share) {
-        if (configuring) {
-            return share.client_can_edit;
-        } else {
-            return !share.is_transient;
+    
+    private class DataServoStack extends DataHelper {
+        final boolean reader;
+        public DataServoStack(boolean reader) {
+            this.reader = reader;
         }
-    }
 
-    @Override
-    public boolean isReader() {
-        return reader;
-    }
+        @Override
+        protected boolean shouldStore(Share share) {
+            return true;
+        }
 
-    private <E> E get(E value) throws IOException {
-        if (reader) {
-            E ret = (E) popType(value.getClass());
-            if (ret == null) {
-                throw new IOException();
+        @Override
+        public boolean isReader() {
+            return reader;
+        }
+
+        @Override
+        protected <E> Object putImplementation(E value) throws IOException {
+            if (reader) {
+                E ret = (E) popType(value.getClass());
+                if (ret == null) {
+                    throw new IOException();
+                }
+                return ret;
+            } else {
+                push(value);
+                return value;
             }
-            return ret;
         }
-        push(value);
-        return value;
+        
     }
-
-    @Override
-    public boolean putBoolean(boolean value) throws IOException {
-        if (valid) {
-            return get(value);
-        }
-        return value;
-    }
-
-    @Override
-    public byte putByte(byte value) throws IOException {
-        if (valid) {
-            return (Byte) get(value);
-        }
-        return value;
-    }
-
-    @Override
-    public short putShort(short value) throws IOException {
-        if (valid) {
-            return get(value);
-        }
-        return value;
-    }
-
-    @Override
-    public int putInt(int value) throws IOException {
-        if (valid) {
-            return get(value);
-        }
-        return value;
-    }
-
-    @Override
-    public long putLong(long value) throws IOException {
-        if (valid) {
-            return get(value);
-        }
-        return value;
-    }
-
-    @Override
-    public float putFloat(float value) throws IOException {
-        if (valid) {
-            return get(value);
-        }
-        return value;
-    }
-
-    @Override
-    public double putDouble(double value) throws IOException {
-        if (valid) {
-            return get(value);
-        }
-        return value;
-    }
-
-    @Override
-    public String putString(String value) throws IOException {
-        if (valid) {
-            return get(value);
-        }
-        return value;
-    }
-
-    @Override
-    public ItemStack putItemStack(ItemStack value) throws IOException {
-        if (valid) {
-            return get(value);
-        }
-        return value;
+    
+    public DataHelper getDataHelper(boolean reader) {
+        return new DataServoStack(reader);
     }
 
     @Override

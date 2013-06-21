@@ -44,7 +44,7 @@ public class TileEntityExtension extends TileEntityCommon {
     }
 
     @Override
-    void onRemove() {
+    protected void onRemove() {
         super.onRemove();
         TileEntityCommon p = getParent();
         if (p != null) {

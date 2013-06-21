@@ -21,12 +21,17 @@ public class ItemServoMotor extends ItemCraftingComponent {
     
     @Override
     public boolean onItemUse(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side, float vecX, float vecY, float vecZ) {
+        return false;
+    }
+    
+    @Override
+    public boolean onItemUseFirst(ItemStack is, EntityPlayer player, World w, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
         Coord c = new Coord(w, x, y, z);
         if (c.getTE(TileEntityServoRail.class) == null) {
             return false;
         }
         if (w.isRemote) {
-            return true;
+            return false;
         }
         ServoMotor motor = new ServoMotor(w);
         motor.posX = c.x;
@@ -43,6 +48,7 @@ public class ItemServoMotor extends ItemCraftingComponent {
                 motor.orientation = perfect;
             }
         }
+        is.stackSize--;
         return true;
     }
 }

@@ -13,6 +13,7 @@ import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
+import factorization.common.BlockIcons;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
 import factorization.common.Core.TabType;
@@ -22,6 +23,7 @@ public class ItemServoRailWidget extends Item {
         super(itemId);
         setUnlocalizedName("factorization:servo/component");
         Core.tab(this, TabType.SERVOS);
+        setMaxStackSize(1);
     }
     
     public String getUnlocalizedName(ItemStack is) {
@@ -81,6 +83,9 @@ public class ItemServoRailWidget extends Item {
             if (world.isRemote){
                 here.redraw();
             }
+            if (!dec.isFreeToPlace() && !player.capabilities.isCreativeMode) {
+                is.stackSize--;
+            }
         }
         return super.onItemUse(is, player, world, x, y, z, side, vx, vy, vz);
     }
@@ -89,11 +94,11 @@ public class ItemServoRailWidget extends Item {
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         super.addInformation(is, player, list, verbose);
+        Core.brand(is, list);
         ServoComponent sc = get(is);
         if (sc != null) {
             sc.addInformation(list);
         }
-        Core.brand(is, list);
     }
     
     
@@ -133,10 +138,14 @@ public class ItemServoRailWidget extends Item {
             return null;
         }
         ServoComponent sc = get(stack);
+        Icon ret = null;
         if (sc instanceof Decorator) {
-            return ((Decorator) sc).getIcon(ForgeDirection.UNKNOWN);
+            ret = ((Decorator) sc).getIcon(ForgeDirection.UNKNOWN);
         }
-        return null;
+        if (ret == null) {
+            ret = BlockIcons.uv_test;
+        }
+        return ret;
     }
     
     @Override

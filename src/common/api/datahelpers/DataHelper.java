@@ -2,11 +2,9 @@ package factorization.api.datahelpers;
 
 import java.io.IOException;
 
-import factorization.api.FzOrientation;
-import factorization.common.Core;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import factorization.api.FzOrientation;
 
 public abstract class DataHelper {
     /***
@@ -17,27 +15,6 @@ public abstract class DataHelper {
      * If true, whatever is getting put needs to be saved/loaded. Set by {@link DataHelper.as}.
      */
     protected boolean valid;
-    
-    protected DataHelper current_child;
-    protected String current_child_name;
-    public final DataHelper makeChild() {
-        current_child_name = name;
-        if (valid) {
-            return current_child = makeChild_do();
-        } else {
-            return new DataIdentity(this);
-        }
-    }
-    
-    public final void finishChild() {
-        if (valid) {
-            finishChild_do();
-        }
-    }
-    
-    protected abstract DataHelper makeChild_do();
-    
-    protected abstract void finishChild_do();
     
     public DataHelper as(Share share, String set_name) {
         name = set_name;
@@ -64,74 +41,117 @@ public abstract class DataHelper {
         return false;
     }
     
+    
     /**
-     * The put and put<Type> functions will save or load a value.
+     * The put function will save or load a value. 
      * First call {@link DataHelper.as} to set the name that should be used and how it should be Shared.
      * For the {@link IDataSerializable}, the name will be used as a prefix.
      * If writing, the original will be returned. If reading, the loaded value will be returned.
-     * 
-     * @arg ids An {@link IDataSerializable}
-     * @return If writing, returns the argument. If reading, returns the object that was read.
+     * Must be able to handle these types: Boolean, Byte, Short, Integer, Float, Double, String, ItemStack, IDataSerializable, Enum
+     * @param An object. It must never be null.
+     * @return o if isWriter(); else the read value
+     * @throws IOException
      */
-    public <T extends IDataSerializable> T put(T ids) throws IOException {
-        if (valid) {
-            if (name == null) {
-                name = "";
+    public final <E> E put(E o) throws IOException {
+        if (!valid) {
+            return o;
+        }
+        if (o instanceof IDataSerializable) {
+            return (E) ((IDataSerializable) o).serialize(name, this);
+        }
+        if (o instanceof Enum) {
+            Enum value = (Enum) o;
+            int i = value.ordinal();
+            i = put(i);
+            if (isWriter()) {
+                return (E) value;
             }
-            return (T) ids.serialize(name, this);
+            return (E) value.getClass().getEnumConstants()[i];
         }
-        return ids;
-    }
-    
-    public abstract boolean putBoolean(boolean value) throws IOException;
-    public abstract byte putByte(byte value) throws IOException;
-    public abstract short putShort(short value) throws IOException;
-    public abstract int putInt(int value) throws IOException;
-    public abstract long putLong(long value) throws IOException;
-    public abstract float putFloat(float value) throws IOException;
-    public abstract double putDouble(double value) throws IOException;
-    public abstract String putString(String value) throws IOException;
-    public abstract ItemStack putItemStack(ItemStack value) throws IOException;
-    
-    public FzOrientation putFzOrientation(FzOrientation value) throws IOException {
-        //In case it becomes ForgeOrientation
-        byte v = (byte) value.ordinal();
-        return FzOrientation.getOrientation(putByte(v));
-    }
-    
-    public <E extends Enum> E putEnum(E value) throws IOException {
-        int i = value.ordinal();
-        i = putInt(i);
-        if (isWriter()) {
-            return value;
+        if (o instanceof ItemStack) {
+            ItemStack value = (ItemStack) o;
+            NBTTagCompound writtenTag = value.writeToNBT(new NBTTagCompound());
+            if (isReader()) {
+                return (E) ItemStack.loadItemStackFromNBT(put(writtenTag));
+            } else {
+                put(writtenTag);
+                return o;
+            }
         }
-        return (E) value.getClass().getEnumConstants()[i];
+        return (E) putImplementation(o);
     }
     
-    public Object putObject(Object o) throws IOException {
+    /** Reads or writes a value, and returns what was read or written.
+     * Here is a template for all the types: <pre>
         if (o instanceof Boolean) {
-            return putBoolean((Boolean) o);
         } else if (o instanceof Byte) {
-            return putByte((Byte) o);
         } else if (o instanceof Short) {
-            return putShort((Short) o);
         } else if (o instanceof Integer) {
-            return putInt((Integer) o);
+        } else if (o instanceof Long) {
         } else if (o instanceof Float) {
-            return putFloat((Float) o);
-        } else if (o instanceof Double) {
-            return putDouble((Double) o);
+        } else if (o instanceof Double) {		
         } else if (o instanceof String) {
-            return putString((String) o);
-        } else if (o instanceof ItemStack) {
-            return putItemStack((ItemStack) o);
-        } else if (o instanceof IDataSerializable) {
-            return put((IDataSerializable)o);
-        } else if (o instanceof Enum) {
-            return putEnum((Enum) o);
+        } else if (o instanceof NBTTagCompound) {
+        }
+        </pre>
+        The actual list is: Boolean Byte Short Integer Long Float Double String
+     * @throws IOException
+     */
+    protected abstract <E> Object putImplementation(E o) throws IOException;
+    
+    /*
+     * For compatability with old code:
+     * 
+for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStack".split():
+    print("""public final _ put%(_ value) throws IOException { return (_)put(value); }""".replace('_', t.lower()).replace('%', t))
+     */
+    public final boolean putBoolean(boolean value) throws IOException { return (boolean)put(value); }
+    public final byte putByte(byte value) throws IOException { return (byte)put(value); }
+    public final short putShort(short value) throws IOException { return (short)put(value); }
+    public final int putInt(int value) throws IOException { return (int)put(value); }
+    public final long putLong(long value) throws IOException { return (long)put(value); }
+    public final float putFloat(float value) throws IOException { return (float)put(value); }
+    public final double putDouble(double value) throws IOException { return (double)put(value); }
+    
+    public final String putString(String value) throws IOException { return (String)put(value); }
+    public final FzOrientation putFzOrientation(FzOrientation value) throws IOException { return (FzOrientation)put(value); }
+    public final ItemStack putItemStack(ItemStack value) throws IOException { return (ItemStack)put(value); }
+
+    public final <E extends Enum> E putEnum(E value) throws IOException { return (E)put(value); }
+    
+    private static final Class[] validTypes = new Class[] {
+        Boolean.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, NBTTagCompound.class
+    };
+    public final Object putUntypedOject(Object value) throws IOException {
+        final String orig_name = name;
+        if (isReader()) {
+            int typeIndex = asSameShare(orig_name + "_type").put(-1);
+            asSameShare(orig_name);
+            if (typeIndex < 0 || typeIndex > validTypes.length) {
+                return value; //Fun times.
+            }
+            Class type = validTypes[typeIndex];
+            if (value != null && value.getClass() == type) {
+                return put(value);
+            }
+            //We don't have a good value. So, we'll have to create one.
+            try {
+                value = type.newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return put(value);
         } else {
-            Core.logWarning("Don't know how to serialize " + o);
-            return null;
+            for (int i = 0; i < validTypes.length; i++) {
+                Class type = validTypes[i];
+                if (value.getClass() == type) {
+                    asSameShare(orig_name + "_type").put(i);
+                    asSameShare(orig_name);
+                    put(value);
+                    return value;
+                }
+            }
+            return value; //Uh, yeah. We don't know what it is.
         }
     }
 }

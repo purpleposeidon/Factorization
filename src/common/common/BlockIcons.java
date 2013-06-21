@@ -73,11 +73,11 @@ public class BlockIcons {
     @Directory("storage")
     public static SimpleMachine barrel, ed_barrel;
     
-    @Directory("servo")
-    public static ArrowyBox arrow_direction;
+    public static ArrowyBox servo$set_direction, servo$set_facing;
     public static Icon servo$activate, servo$activate_sneaky;
     public static Icon servo$bay, servo$bay_bottom, servo$bay_top;
-    
+    public static Icon servo$one, servo$zero, servo$number, servo$sum, servo$product, servo$dup, servo$drop;
+    public static Icon servo$configure, servo$deconfigure;
     
     public static class ActivatingMachineIcon extends IconGroup {
         public Icon top, bottom, side, side_on;

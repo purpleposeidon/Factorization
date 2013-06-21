@@ -3,7 +3,6 @@ package factorization.api.datahelpers;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import cpw.mods.fml.relauncher.Side;
@@ -16,14 +15,6 @@ public class DataOutPacket extends DataHelper {
         this.dos = dos;
         this.side = side;
     }
-    
-    @Override
-    public DataHelper makeChild_do() {
-        return this;
-    }
-    
-    @Override
-    protected void finishChild_do() {}
 
     @Override
     protected boolean shouldStore(Share share) {
@@ -34,75 +25,27 @@ public class DataOutPacket extends DataHelper {
     public boolean isReader() {
         return false;
     }
-
+    
     @Override
-    public boolean putBoolean(boolean value) throws IOException {
-        if (valid) {
-            dos.writeBoolean(value);
-        }
-        return value;
-    }
-
-    @Override
-    public byte putByte(byte value) throws IOException {
-        if (valid) {
-            dos.writeByte(value);
-        }
-        return value;
-    }
-
-    @Override
-    public short putShort(short value) throws IOException {
-        if (valid) {
-            dos.write(value);
-        }
-        return value;
-    }
-
-    @Override
-    public int putInt(int value) throws IOException {
-        if (valid) {
-            dos.writeInt(value);
-        }
-        return value;
-    }
-
-    @Override
-    public long putLong(long value) throws IOException {
-        if (valid) {
-            dos.writeLong(value);
-        }
-        return value;
-    }
-
-    @Override
-    public float putFloat(float value) throws IOException {
-        if (valid) {
-            dos.writeFloat(value);
-        }
-        return value;
-    }
-
-    @Override
-    public double putDouble(double value) throws IOException {
-        if (valid) {
-            dos.writeDouble(value);
-        }
-        return value;
-    }
-
-    @Override
-    public String putString(String value) throws IOException {
-        if (valid) {
-            dos.writeUTF(value);
-        }
-        return value;
-    }
-
-    @Override
-    public ItemStack putItemStack(ItemStack value) throws IOException {
-        if (valid) {
-            NBTBase.writeNamedTag(value.writeToNBT(new NBTTagCompound()), dos);
+    protected <E> Object putImplementation(E value) throws IOException {
+        if (value instanceof Boolean) {
+            dos.writeBoolean((Boolean)value);
+        } else if (value instanceof Byte) {
+            dos.writeByte((Byte)value);
+        } else if (value instanceof Short) {
+            dos.writeShort((Short)value);
+        } else if (value instanceof Integer) {
+            dos.writeInt((Integer)value);
+        } else if (value instanceof Long) {
+            dos.writeLong((Long) value);
+        } else if (value instanceof Float) {
+            dos.writeFloat((Float) value);
+        } else if (value instanceof Double) {
+            dos.writeDouble((Double) value);
+        } else if (value instanceof String) {
+            dos.writeUTF((String)value);
+        } else if (value instanceof NBTTagCompound) {
+            NBTBase.writeNamedTag((NBTBase)value, dos);
         }
         return value;
     }

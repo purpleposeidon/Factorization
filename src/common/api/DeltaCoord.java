@@ -185,9 +185,9 @@ public class DeltaCoord implements IDataSerializable {
     
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        x = data.asSameShare(prefix + "dx").putInt(x);
-        y = data.asSameShare(prefix + "dy").putInt(y);
-        z = data.asSameShare(prefix + "dz").putInt(z);
+        x = data.asSameShare(prefix + "dx").put(x);
+        y = data.asSameShare(prefix + "dy").put(y);
+        z = data.asSameShare(prefix + "dz").put(z);
         return this;
     }
 }

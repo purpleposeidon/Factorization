@@ -5,7 +5,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.common.servo.Decorator;
-import factorization.common.servo.Instruction;
 import factorization.common.servo.TileEntityServoRail;
 
 public class ItemMatrixProgrammer extends ItemCraftingComponent {
@@ -39,6 +38,6 @@ public class ItemMatrixProgrammer extends ItemCraftingComponent {
         }
         rail.setDecoration(null);
         c.redraw();
-        return true;
+        return false;
     }
 }

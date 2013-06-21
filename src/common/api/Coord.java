@@ -15,6 +15,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.ForgeDirection;
@@ -400,6 +401,10 @@ public class Coord implements IDataSerializable {
     public void updateLight() {
         w.updateAllLightTypes(x, y, z);
     }
+    
+    public void updateBlockLight() {
+        w.updateLightByType(EnumSkyBlock.Block, x, y, z);
+    }
 
     public void setTE(TileEntity te) {
         w.setBlockTileEntity(x, y, z, te);
@@ -597,9 +602,9 @@ public class Coord implements IDataSerializable {
     
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        x = data.asSameShare(prefix + "x").putInt(x);
-        y = data.asSameShare(prefix + "y").putInt(y);
-        z = data.asSameShare(prefix + "z").putInt(z);
+        x = data.asSameShare(prefix + "x").put(x);
+        y = data.asSameShare(prefix + "y").put(y);
+        z = data.asSameShare(prefix + "z").put(z);
         return this;
     }
 

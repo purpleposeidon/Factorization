@@ -438,6 +438,12 @@ public class BlockFactorization extends BlockContainer {
                 return c.lightValue;
             }
         }
+        if (c == BlockClass.MachineDynamicLightable) {
+            TileEntity te = world.getBlockTileEntity(x, y, z);
+            if (te instanceof TileEntityCommon) {
+                return ((TileEntityCommon) te).getDynamicLight();
+            }
+        }
         return BlockClass.get(md).lightValue;
     }
 

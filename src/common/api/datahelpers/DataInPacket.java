@@ -3,7 +3,6 @@ package factorization.api.datahelpers;
 import java.io.DataInput;
 import java.io.IOException;
 
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import cpw.mods.fml.relauncher.Side;
@@ -16,14 +15,6 @@ public class DataInPacket extends DataHelper {
         this.dis = dis;
         this.side = side;
     }
-    
-    @Override
-    public DataHelper makeChild_do() {
-        return this;
-    }
-    
-    @Override
-    protected void finishChild_do() { }
 
     @Override
     protected boolean shouldStore(Share share) {
@@ -34,77 +25,29 @@ public class DataInPacket extends DataHelper {
     public boolean isReader() {
         return true;
     }
-
+    
     @Override
-    public boolean putBoolean(boolean value) throws IOException {
-        if (valid) {
+    protected <E> Object putImplementation(E o) throws IOException {
+        if (o instanceof Boolean) {
             return dis.readBoolean();
-        }
-        return value;
-    }
-
-    @Override
-    public byte putByte(byte value) throws IOException {
-        if (valid) {
+        } else if (o instanceof Byte) {
             return dis.readByte();
-        }
-        return value;
-    }
-
-    @Override
-    public short putShort(short value) throws IOException {
-        if (valid) {
+        } else if (o instanceof Short) {
             return dis.readShort();
-        }
-        return value;
-    }
-
-    @Override
-    public int putInt(int value) throws IOException {
-        if (valid) {
+        } else if (o instanceof Integer) {
             return dis.readInt();
-        }
-        return value;
-    }
-
-    @Override
-    public long putLong(long value) throws IOException {
-        if (valid) {
+        } else if (o instanceof Long) {
             return dis.readLong();
-        }
-        return value;
-    }
-
-    @Override
-    public float putFloat(float value) throws IOException {
-        if (valid) {
+        } else if (o instanceof Float) {
             return dis.readFloat();
-        }
-        return value;
-    }
-
-    @Override
-    public double putDouble(double value) throws IOException {
-        if (valid) {
+        } else if (o instanceof Double) {
             return dis.readDouble();
-        }
-        return value;
-    }
-
-    @Override
-    public String putString(String value) throws IOException {
-        if (valid) {
+        } else if (o instanceof String) {
             return dis.readUTF();
+        } else if (o instanceof NBTTagCompound) {
+            return (NBTTagCompound) NBTBase.readNamedTag(dis);
         }
-        return value;
-    }
-
-    @Override
-    public ItemStack putItemStack(ItemStack value) throws IOException {
-        if (valid) {
-            return ItemStack.loadItemStackFromNBT((NBTTagCompound) NBTBase.readNamedTag(dis));
-        }
-        return value;
+        return o;
     }
 
 }

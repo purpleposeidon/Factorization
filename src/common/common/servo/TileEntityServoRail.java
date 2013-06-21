@@ -75,11 +75,13 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             decoration.save(decor);
             tag.setTag(decor_tag_key, decor);
         }
+        charge.writeToNBT(tag);
     }
     
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
+        charge.readFromNBT(tag);
         if (!tag.hasKey(decor_tag_key)) {
             return;
         }
@@ -224,7 +226,10 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             if (playerInstance != null) {
                 playerInstance.sendToAllPlayersWatchingChunk(_getDescriptionPacket(true));
             }
-
+            String info = decoration.getInfo();
+            if (info != null) {
+                Core.notify(entityplayer, getCoord(), info);
+            }
         }
         return ret;
         //return super.activate(entityplayer);
@@ -277,5 +282,16 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     @Override
     public boolean isBlockSolidOnSide(int side) {
         return false;
+    }
+    
+    @Override
+    protected void onRemove() {
+        super.onRemove();
+        if (decoration == null) {
+            return;
+        }
+        if (!decoration.isFreeToPlace()) {
+            getCoord().spawnItem(decoration.toItem());
+        }
     }
 }

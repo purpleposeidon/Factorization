@@ -8,6 +8,7 @@ import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
+import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
@@ -105,6 +106,9 @@ public abstract class Decorator extends ServoComponent {
         for (int i = 0; i < 6; i++) {
             ForgeDirection face = ForgeDirection.getOrientation(i);
             Icon icon = getIcon(face);
+            if (icon == null) {
+                icon = BlockIcons.uv_test;
+            }
             if (stretchIcon()) {
                 stretcher[i].under = icon;
                 block.setTexture(i, stretcher[i]);
@@ -141,5 +145,9 @@ public abstract class Decorator extends ServoComponent {
     
     public boolean isFreeToPlace() {
         return false;
+    }
+    
+    public String getInfo() {
+        return null;
     }
 }

@@ -50,8 +50,19 @@ public class ActivateActuator extends Instruction {
     
     @Override
     public boolean onClick(EntityPlayer player, Coord block, ForgeDirection side) {
-        sneaky = !sneaky;
-        return true;
+        if (playerHasProgrammer(player)) {
+            sneaky = !sneaky;
+            return true;
+        }
+        return false;
+    }
+    
+    @Override
+    public String getInfo() {
+        if (sneaky) {
+            return "Sneaking";
+        }
+        return "Not sneaking";
     }
 
     @Override

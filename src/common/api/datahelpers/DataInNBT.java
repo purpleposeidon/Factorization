@@ -1,6 +1,7 @@
 package factorization.api.datahelpers;
 
-import net.minecraft.item.ItemStack;
+import java.io.IOException;
+
 import net.minecraft.nbt.NBTTagCompound;
 
 public class DataInNBT extends DataHelperNBT {	
@@ -8,17 +9,6 @@ public class DataInNBT extends DataHelperNBT {
         tag = theTag;
     }
     
-    @Override
-    public DataHelper makeChild_do() {
-        if (tag.hasKey(current_child_name)) {
-            return new DataInNBT(tag.getCompoundTag(current_child_name));
-        }
-        return new DataInNBT(new NBTTagCompound());
-    }
-    
-    @Override
-    protected void finishChild_do() {}
-
     @Override
     protected boolean shouldStore(Share share) {
         return !share.is_transient /*&& tag.hasKey(name)*/;
@@ -28,80 +18,32 @@ public class DataInNBT extends DataHelperNBT {
     public boolean isReader() {
         return true;
     }
-
+    
     @Override
-    public boolean putBoolean(boolean value) {
-        if (valid) {
+    protected <E> Object putImplementation(E o) throws IOException {
+        if (!tag.hasKey(name)) {
+            return o;
+        }
+        if (o instanceof Boolean) {
             return tag.getBoolean(name);
-        }
-        return value;
-    }
-
-    @Override
-    public byte putByte(byte value) {
-        if (valid) {
+        } else if (o instanceof Byte) {
             return tag.getByte(name);
-        }
-        return value;
-    }
-
-    @Override
-    public short putShort(short value) {
-        if (valid) {
+        } else if (o instanceof Short) {
             return tag.getShort(name);
-        }
-        return value;
-    }
-
-    @Override
-    public int putInt(int value) {
-        if (valid) {
+        } else if (o instanceof Integer) {
             return tag.getInteger(name);
-        }
-        return value;
-    }
-
-    @Override
-    public long putLong(long value) {
-        if (valid) {
+        } else if (o instanceof Long) {
             return tag.getLong(name);
-        }
-        return value;
-    }
-    
-    @Override
-    public float putFloat(float value) {
-        if (valid) {
+        } else if (o instanceof Float) {
             return tag.getFloat(name);
+        } else if (o instanceof Double) {
+            return tag.getDouble(name);			
+        } else if (o instanceof String) {
+            return tag.getString(name);
+        } else if (o instanceof NBTTagCompound) {
+            return tag.getCompoundTag(name);
         }
-        return value;
-    }
-    
-    @Override
-    public double putDouble(double value) {
-        if (valid) {
-            return tag.getDouble(name);
-        }
-        return value;
-    }
-
-    @Override
-    public String putString(String value) {
-        if (valid) {
-            if (tag.hasKey(name)) {
-                return tag.getString(name);
-            }
-            return null;
-        }
-        return value;
-    }
-
-    @Override
-    public ItemStack putItemStack(ItemStack value) {
-        if (valid) {
-            return ItemStack.loadItemStackFromNBT(tag.getCompoundTag(name));
-        }
-        return value;
+        return o;
     }
 
 }

@@ -207,7 +207,7 @@ public class TileEntityRocketEngine extends TileEntityCommon {
     }
     
     @Override
-    void onRemove() {
+    protected void onRemove() {
         Coord here = getCoord();
         for (int dx = -5; dx <= 5; dx++) {
             for (int dy = -5; dy <= 5; dy++) {

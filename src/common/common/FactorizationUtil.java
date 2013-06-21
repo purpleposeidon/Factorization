@@ -123,6 +123,7 @@ public class FactorizationUtil {
         return is.stackSize <= 0 ? null : is;
     }
     
+    /** Makes sure there is an NBT tag on the ItemStack, and then returns it. */
     public static NBTTagCompound getTag(ItemStack is) {
         NBTTagCompound ret = is.getTagCompound();
         if (ret == null) {

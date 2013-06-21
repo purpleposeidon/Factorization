@@ -14,6 +14,7 @@ import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Charge;
+import factorization.api.Coord;
 import factorization.api.IChargeConductor;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
@@ -35,6 +36,8 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
 
     public ChargeSparks sparks = null;
     
+    char last_light = (char) -1;
+    
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.LEYDENJAR;
@@ -42,7 +45,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
 
     @Override
     public BlockClass getBlockClass() {
-        return BlockClass.Machine;
+        return BlockClass.MachineDynamicLightable;
     }
     
     public double getLevel() {
@@ -91,14 +94,24 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     @Override
     public void updateEntity() {
         charge.update();
+        final Coord here = getCoord();
         if (worldObj.isRemote) {
             if (sparks == null) {
                 sparks = new ChargeSparks(10);
             }
             updateSparks(sparks);
+            char now_light = (char) getDynamicLight();
+            if (last_light == -1) {
+                last_light = now_light;
+            }
+            if (Math.abs(last_light - now_light) > 1) {
+                last_light = now_light;
+                here.updateBlockLight();
+                here.redraw();
+            }
             return;
         }
-        if (getCoord().isPowered()) {
+        if (here.isPowered()) {
             return;
         }
         boolean change = false;
@@ -188,5 +201,10 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     @Override
     public Packet getDescriptionPacket() {
         return super.getDescriptionPacketWith(MessageType.LeydenjarLevel, storage);
+    }
+    
+    @Override
+    public int getDynamicLight() {
+        return (int) (getLevel()*7);
     }
 }
