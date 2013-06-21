@@ -56,7 +56,7 @@ item.factorization:sludge.hint=Byproduct of washing ore gravel
 item.factorization:sculptTool.name=Sculpting Tool
 item.factorization:ceramics/glaze_bucket.name=Glaze Bucket
 item.factorization:tool/angular_saw.name=Cube Saw
-item.factorization:tool/matrix_programmer.name=Logic Matrix Repository
+item.factorization:tool/matrix_programmer.name=Logic Matrix Programmer
 item.factorization:tool/matrix_programmer.hint=Found in dungeons\nAncient code repository
 item.factorization:logic_matrix.name=Blank Logic Matrix
 item.factorization:logic_matrix_identifier.name=Logic Matrix: Identifier
@@ -126,6 +126,7 @@ item.factorization:ceramics/glaze_bucket.base_mimicry.name=Glaze Base: Mimicing
 #Servos
 factorization:servo/component.name=Servo Component
 item.factorization:servo/servo.name=Servo
+item.factorization:servo/servo.hint=See the changelog.\nPlease give feedback!
 item.factorization:servo/actuator.item_manipulator.name=Inventory Manipulator
 item.factorization:servo/sprocket.name=Dark Iron Sprocket
 item.factorization:servo/servo_motor.name=Servo Motor

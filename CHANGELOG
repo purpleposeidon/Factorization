@@ -7,6 +7,37 @@
   Removed the unloved exo armor; if you're a dev who cares: https://github.com/purpleposeidon/ExoArmor
   Bugfix: Breaking a machine with a wire attached would fail to drop the right items
   Furnace heaters can heat through other furnace heaters
+  Leyden jars now emit a bit of light. How did I miss this!?!?
+  Added Servos:
+    Servo Rail:
+      A block. Needs to be powered.
+    Servo:
+      An entity; is placed on the rails
+      Has a direction & an orientation
+      (The model is temporary, and the renderer has some interpolation issues)
+    Instructions:
+      Made using paper, a logic matrix programmer, and some other ingredient
+      They have infinite uses
+      They are configured using the programmer; shift-right clicking with it will clear the instruction
+      Clicking an instructino may give some information about its configuration
+    Programming:
+      The servo has 16 stacks of max size 16. The stacks can hold values of various types, and also ItemStacks.
+      (Right now you can't do much with them...)
+      usually when a value is taken off the stack, whatever's pulling the value off will ignore types that don't match what it's looking for
+      Some stacks are dedicated to a particular purpose: arguments, code, IO, equipment...
+    Actuators:
+      Usable by the servo and by players.
+      Right clicking does something; shift right clicking does something related.
+      They are configurable; there's an instruction for Configuring actuators.
+      There's only one actuator right now, Item Manipulator:
+        Configs: slot (Integer; -1, or >=0) limit (Integer, >0)
+    Decorators:
+      They go on servo rails like instructions do, but they aren't free.
+      Right now the only one is the Loading Bay:
+        When a servo motor passes through, it is equipped with an item from an inventory that it's facing.
+        When it passes from the top, nothing happens
+        When it passes from the bottom, an item is removed
+        
 
 0.7.37
   Increased the leyden jar's capaciy
