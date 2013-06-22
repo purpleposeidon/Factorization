@@ -89,21 +89,28 @@ public class ActuatorItemManipulator extends ActuatorItem {
             if (toUse == null) {
                 return false;
             }
-            ItemStack buffer = null;
-            boolean any = false;
+            int orig_size = toUse.stackSize;
+            
             for (int i = start; i < end; i++) {
-                if (target_inv.canInsert(i, toUse)) {
-                    if (buffer == null) {
-                        buffer = (ItemStack) ss.remove(toUse_index);
-                    }
-                    buffer = target_inv.pushInto(i, buffer);
-                    if (buffer == null) {
-                        return true;
-                    }
-                    any |= true;
+                if (target_inv.get(i) == null) {
+                    continue;
+                }
+                toUse = FactorizationUtil.normalize(target_inv.pushInto(i, toUse));
+                if (toUse == null) {
+                    ss.remove(toUse_index);
+                    return true;
                 }
             }
-            return any;
+            if (toUse != null) {
+                for (int i = start; i < end; i++) {
+                    toUse = FactorizationUtil.normalize(target_inv.pushInto(i, toUse));
+                    if (toUse == null) {
+                        ss.remove(toUse_index);
+                        return true;
+                    }
+                }
+            }
+            return orig_size != FactorizationUtil.getStackSize(toUse);
         }
         return false;
     }
