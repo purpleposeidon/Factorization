@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+#set -e
 
 BASE=$(dirname `pwd`/$0)/
 cd $BASE/../
@@ -11,6 +11,10 @@ cd forge/mcp
 mkdir -p src/minecraft/factorization/
 pushd src/minecraft/factorization
   ln -s $BASE/src/common/* ./
+popd
+
+pushd src/minecraft/
+  ln -s $BASE/APIS/* ./
 popd
 
 pushd lib/
