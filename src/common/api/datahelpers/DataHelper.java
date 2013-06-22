@@ -135,10 +135,22 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
                 return put(value);
             }
             //We don't have a good value. So, we'll have to create one.
-            try {
-                value = type.newInstance();
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (type == Boolean.class) {
+                value = false;
+            } else if (type == Short.class) {
+                value = (short) 0;
+            } else if (type == Integer.class) {
+                value = (int) 0;
+            } else if (value == Long.class) {
+                value = (long) 0;
+            } else if (value == Float.class) {
+                value = (float) 0;
+            } else if (value == Double.class) {
+                value = (double) 0;
+            } else if (value == NBTTagCompound.class) {
+                value = new NBTTagCompound();
+            } else {
+                return null;
             }
             return put(value);
         } else {
