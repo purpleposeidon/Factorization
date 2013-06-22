@@ -122,6 +122,8 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             putData(new DataInPacket(data, Side.CLIENT));
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace(); //Hrm! Why? (I mean, besides the obvious.)
         }
     }
 
@@ -131,6 +133,8 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             putData(new DataOutPacket(data, Side.SERVER));
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace(); //Hrm! Why? (I mean, besides the obvious.)
         }
     }
 
