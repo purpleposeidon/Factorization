@@ -82,6 +82,8 @@ public class ItemServoRailWidget extends Item {
             }
             if (world.isRemote){
                 here.redraw();
+            } else {
+                here.markBlockForUpdate();
             }
             if (!dec.isFreeToPlace() && !player.capabilities.isCreativeMode) {
                 is.stackSize--;
