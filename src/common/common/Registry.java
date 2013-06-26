@@ -49,8 +49,8 @@ import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
 import factorization.common.Core.TabType;
 import factorization.common.TileEntityGreenware.ClayState;
-import factorization.common.servo.ItemServoRailWidget;
 import factorization.common.servo.ItemServoMotor;
+import factorization.common.servo.ItemServoRailWidget;
 import factorization.common.servo.ServoComponent;
 import factorization.common.servo.ServoMotor;
 import factorization.common.servo.actuators.ActuatorItemManipulator;
@@ -144,6 +144,13 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         GameRegistry.registerWorldGenerator(this);
 
         Core.tab(factory_block, Core.TabType.MATERIALS);
+        
+        final Block vanillaDiamond = Block.blockDiamond;
+        final int diamondId = vanillaDiamond.blockID;
+        Block.blocksList[diamondId] = null;
+        BlockOreStorageShatterable newDiamond = new BlockOreStorageShatterable(diamondId, vanillaDiamond);
+        newDiamond.setHardness(5.0F).setResistance(10.0F).setStepSound(Block.soundMetalFootstep).setUnlocalizedName("blockDiamond");
+        //Block.blockDiamond = newDiamond;
     }
 
     void registerSimpleTileEntities() {

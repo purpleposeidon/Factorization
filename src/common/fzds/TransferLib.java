@@ -9,16 +9,35 @@ import factorization.api.Coord;
 
 public class TransferLib {
     public static int set_method = 0;
+    
     public static void setRaw(Coord c, int id, int md) {
-        switch (set_method) {
+        setRaw(c, id, md, set_method);
+    }
+    
+    /**
+     * 
+     * @param c
+     * @param id
+     * @param md
+     * @param use_method
+     * 	0: Sneaky and intrusive. Set value in chunk directly (and make the block be stone)
+     *  1: World.isRemote
+     *  2: Direct
+     */
+    public static void setRaw(Coord c, int id, int md, int use_method) {
+        switch (use_method) {
         default:
             Chunk chunk = c.w.getChunkFromBlockCoords(c.x, c.z);
-            Block origBlock = Block.blocksList[id];
+            int old_id = c.getId();
+            Block origOldBlock = Block.blocksList[old_id];
+            Block origNewBlock = Block.blocksList[id];
+            Block.blocksList[old_id] = Block.stone;
             Block.blocksList[id] = Block.stone;
             try {
                 chunk.setBlockIDWithMetadata(c.x & 15, c.y, c.z & 15, id, md);
             } finally {
-                Block.blocksList[id] = origBlock;
+                Block.blocksList[old_id] = origOldBlock;
+                Block.blocksList[id] = origNewBlock;
             }
             c.markBlockForUpdate();
             break;

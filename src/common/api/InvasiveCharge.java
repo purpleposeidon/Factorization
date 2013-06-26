@@ -2,6 +2,7 @@ package factorization.api;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
 
 public class InvasiveCharge extends TileEntity implements IChargeConductor {
     int id, md;
@@ -57,5 +58,10 @@ public class InvasiveCharge extends TileEntity implements IChargeConductor {
     public void invalidate() {
         super.invalidate();
         charge.invalidate();
+    }
+    
+    @Override
+    public boolean shouldRefresh(int oldID, int newID, int oldMeta, int newMeta, World world, int x, int y, int z) {
+        return false;
     }
 }

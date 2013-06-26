@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
+import factorization.fzds.TransferLib;
 
 public class ChargeMetalBlockConductance {
     //static HashMap<Integer, ArrayList<Integer>> validBlocks = new HashMap();
@@ -50,7 +51,9 @@ public class ChargeMetalBlockConductance {
                 put(b.blockID, metadata);
             }
         }
-        
+        for (Block block : new Block[] { Block.blockIron, Block.blockGold, Block.blockEmerald }) {
+            put(block.blockID, 0);
+        }
     }
     
     static void put(int id, int md) {
@@ -62,15 +65,19 @@ public class ChargeMetalBlockConductance {
     }
     
     public static void taintBlock(Coord c) {
-        /*int blockID = c.getId(), md = c.getMd();
+        int blockID = c.getId(), md = c.getMd();
         if (validBlocks[blockID] == null || !validBlocks[blockID][md]) {
             return;
         }
-        if (c.getTE() == null) {
-            InvasiveCharge te = new InvasiveCharge();
-            //te.validate();
-            te.initialize(blockID, md);
-            c.setTE(te);
-        }*/
+        if (c.getTE() != null) {
+            return;
+        }
+        InvasiveCharge te = new InvasiveCharge();
+        te.validate();
+        te.initialize(blockID, md);
+        int orig_id = c.getId(), orig_md = c.getMd();
+        TransferLib.setRaw(c, Core.registry.factory_block.blockID, 0);
+        c.setTE(te);
+        TransferLib.setRaw(c, orig_id, orig_md, 0);
     }
 }
