@@ -1,6 +1,7 @@
 package factorization.common.servo.actuators;
 
 import java.io.IOException;
+import java.util.List;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -90,5 +91,12 @@ public class ActuatorItemSyringe extends ActuatorItem {
     @Override
     public IDataSerializable getState() {
         return new State();
+    }
+    
+    @Override
+    public void addConfigurationInfo(ItemStack is, List infoList) throws IOException {
+        State state = (new DataInNBT(FactorizationUtil.getTag(is))).as(Share.VISIBLE, "").put(new State());
+        infoList.add("Slot: " + (state.slot == -1 ? "Any" : state.slot));
+        infoList.add("Size: " + state.limit);
     }
 }

@@ -1,6 +1,7 @@
 package factorization.common.servo;
 
 import java.io.IOException;
+import java.util.List;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -110,4 +111,14 @@ public abstract class ActuatorItem extends ItemCraftingComponent {
     }*/
     
     public abstract IDataSerializable getState();
+    
+    @Override
+    public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
+        super.addInformation(is, player, infoList, verbose);
+        try {
+            addConfigurationInfo(is, infoList);
+        } catch (IOException e) { }
+    }
+    
+    public abstract void addConfigurationInfo(ItemStack is, List infoList) throws IOException;
 }
