@@ -1,16 +1,19 @@
 package factorization.common.servo;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelZombie;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.entity.RenderBiped;
 import net.minecraft.client.renderer.entity.RenderEntity;
 import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
@@ -91,6 +94,7 @@ public class RenderServoMotor extends RenderEntity {
 
         GL11.glPushMatrix();
         GL11.glTranslated(x + 0.5, y + 0.5, z + 0.5);
+        GL11.glPushMatrix();
 
         motor.interpolatePosition((float) Math.pow(motor.pos_progress, 2));
 
@@ -133,8 +137,6 @@ public class RenderServoMotor extends RenderEntity {
             q0.incrLerp(q1, ro);
             qt = q0;
         }
-        // Minecraft.getMinecraft().thePlayer.addChatMessage(prevOrientation +
-        // "-->" + orientation + ": " + ro); Be sure to tag this.
         qt.glRotate();
         GL11.glRotatef(90, 0, 0, 1);
 
@@ -156,6 +158,7 @@ public class RenderServoMotor extends RenderEntity {
         GL11.glScalef(s, s, s);
 
         renderMainModel(motor, partial, ro);
+        boolean render_stacks = false;
         if (highlighted) {
             GL11.glDisable(GL11.GL_TEXTURE_2D);
             boolean dso = debug_servo_orientation;
@@ -174,6 +177,7 @@ public class RenderServoMotor extends RenderEntity {
                 final ItemStack helmet = player.getCurrentArmor(3);
                 if (is != null && is.getItem() == Core.registry.logicMatrixProgrammer || FactorizationUtil.oreDictionarySimilar("visionInducingEyewear", helmet)) {
                     renderInventory(motor, partial);
+                    render_stacks = true;
                 }
             }
         }
@@ -181,12 +185,15 @@ public class RenderServoMotor extends RenderEntity {
         renderItem(motor, motor.getActuator(), partial);
         motor.interpolatePosition(motor.pos_progress);
         GL11.glPopMatrix();
+        if (render_stacks) {
+            renderStacks(motor);
+        }
+        GL11.glPopMatrix();
     }
 
     RenderItem renderItem = new RenderItem();
 
     void renderInventory(ServoMotor motor, float partial) {
-        //float s = -1; ///16F;
         float s = 1/2F;
         ItemStack actuator = motor.getActuator();
         FzInv inv = motor.getInv();
@@ -220,11 +227,6 @@ public class RenderServoMotor extends RenderEntity {
                 e.printStackTrace();
                 inv.set(i, null);
             }
-            /*RenderEngine re = mc.renderEngine;
-            FontRenderer fr = mc.fontRenderer;
-            if (!ForgeHooksClient.renderInventoryItem(renderBlocks, re, is, true, 0, 0, 0)) {
-                renderItem.renderItemIntoGUI(fr, re, is, 0, 0);
-            }*/
             GL11.glPopMatrix();
         }
     }
@@ -232,7 +234,6 @@ public class RenderServoMotor extends RenderEntity {
     void renderMainModel(ServoMotor motor, float partial, double ro) {
         // TODO: Put our textures into ItemIcons
         GL11.glPushMatrix();
-        // super.doRender(ent, x, y, z, yaw, partial);
         if (loaded_model == false) {
             loadSprocketModel();
             loaded_model = true;
@@ -241,19 +242,14 @@ public class RenderServoMotor extends RenderEntity {
 
         // Sprocket rotation
         double rail_width = TileEntityServoRail.width;
-        double radius = 0.56 /*
-                             * from sprocket center to the outer edge of the
-                             * ring (excluding the teeth)
-                             */+ 0.06305 /* half the width of the teeth */; // 0.25
-                                                                            // +
-                                                                            // 1.5/48.0;
+        double radius = 0.56 /* from sprocket center to the outer edge of the ring (excluding the teeth) */
+                    + 0.06305 /* half the width of the teeth */;
         double constant = Math.PI * 2 * (radius);
         double dr = motor.sprocket_rotation - motor.prev_sprocket_rotation;
         double partial_rotation = motor.prev_sprocket_rotation + dr * partial;
         double angle = constant * partial_rotation;
 
         radius = 0.25 + 1.5 / 48.0;
-        // radius /= 2;
 
         float rd = (float) (radius + rail_width);
         if (motor.orientation != motor.prevOrientation) {
@@ -265,8 +261,7 @@ public class RenderServoMotor extends RenderEntity {
                 rd += stretch_interp / 8;
             }
         }
-        // Sprocket rendering. (You wouldn't have been able to tell by reading
-        // the code.)
+        // Sprocket rendering. (You wouldn't have been able to tell by reading the code.)
         {
             GL11.glPushMatrix();
             GL11.glTranslatef(0, 0, rd);
@@ -277,10 +272,6 @@ public class RenderServoMotor extends RenderEntity {
         {
             GL11.glPushMatrix();
             GL11.glTranslatef(0, 0, -rd);
-            // GL11.glTranslatef(0, 0, (float)(2 - radius));
-            // GL11.glTranslatef(0, 0, (float)(2 - radius));
-            // GL11.glTranslatef(0, 0, 2*(float)(radius*2 +
-            // TileEntityServoRail.width/2));
             GL11.glRotatef((float) Math.toDegrees(-angle) + 360F / 9F, 0, 1, 0);
             renderSprocket();
             GL11.glPopMatrix();
@@ -348,5 +339,47 @@ public class RenderServoMotor extends RenderEntity {
 
     protected void func_82422_c() {
         GL11.glTranslatef(0.0F, 0.1875F, 0.0F);
+    }
+    
+    void renderStacks(ServoMotor motor) {
+        GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glPushMatrix();
+        
+        float s = 1F/128F;
+        GL11.glScalef(s, s, s);
+        GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
+        GL11.glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
+        for (int i = 0; i < ServoMotor.STACKS; i++) {
+            GL11.glPushMatrix();
+            ServoStack ss = motor.getServoStack(i);
+            GL11.glRotatef(180/16*(8.5F + i), 0, 0, 1);
+            GL11.glTranslatef(0, -(0.9F)/s, 0);
+            if (renderStack(ss, ItemDye.dyeColors[15 - i])) {
+            }
+            GL11.glPopMatrix();
+        }
+        
+        GL11.glPopMatrix();
+        GL11.glEnable(GL11.GL_LIGHTING);
+    }
+    
+    boolean renderStack(ServoStack stack, int color) {
+        int i = 0;
+        Minecraft mc = Minecraft.getMinecraft();
+        FontRenderer fr = mc.fontRenderer;
+        fr.drawString("䷼", 0, 0, color, false); // All the cool kids use Yijing.
+        for (Object o : stack) {
+            if (i == 0) {
+                GL11.glPushMatrix();
+            }
+            String text = o.toString();
+            GL11.glTranslatef(0, -10, 0);;
+            fr.drawString(text, 0, 0, color, false);
+            i++;
+        }
+        if (i > 0) {
+            GL11.glPopMatrix();
+        }
+        return i > 0;
     }
 }
