@@ -163,6 +163,17 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     
     @Override
     public boolean addCollisionBoxesToList(Block ignore, AxisAlignedBB aabb, List list, Entity entity) {
+        if (decoration != null && !(decoration instanceof Instruction)) {
+            float f = decoration.getSize();
+            boolean remote = (entity != null && entity.worldObj != null) ? entity.worldObj.isRemote : FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT;
+            BlockRenderHelper block = remote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
+            block.setBlockBounds(f, f, f, 1 - f, 1 - f, 1 - f);
+            AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
+            if (aabb == null || aabb.intersectsWith(a)) {
+                list.add(a);
+                return true;
+            }
+        }
         //return getCollisionBoxes(aabb, list, entity);
         return false;
     }
