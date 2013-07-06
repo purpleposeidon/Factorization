@@ -458,6 +458,9 @@ public class FactorizationUtil {
                 if (is == null || is == exclude) {
                     continue;
                 }
+                if (!canExtract(i, is)) {
+                    continue;
+                }
                 if (is.stackSize <= max_transfer) {
                     int orig_size = is.stackSize;
                     is = dest_inv.push(is);

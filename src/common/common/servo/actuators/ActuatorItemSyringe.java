@@ -48,15 +48,15 @@ public class ActuatorItemSyringe extends ActuatorItem {
     }
     
     boolean takeItem(State state, ItemStack actuator_is, Entity user, MovingObjectPosition mop) throws IOException {
-        FzInv inv = getInv(user, mop);
-        if (inv == null) {
+        FzInv target_inv = getInv(user, mop);
+        if (target_inv == null) {
             return false;
         }
         if (state.slot != -1) {
-            inv = inv.slice(state.slot, state.slot + 1);
+            target_inv = target_inv.slice(state.slot, state.slot + 1);
         }
-        
-        return inv.transfer(FactorizationUtil.openInventory(user, true), state.limit, actuator_is);
+        FzInv user_inv = FactorizationUtil.openInventory(user, true);
+        return target_inv.transfer(user_inv, state.limit, actuator_is);
     }
     
     FzInv getInv(Entity user, MovingObjectPosition mop) {
