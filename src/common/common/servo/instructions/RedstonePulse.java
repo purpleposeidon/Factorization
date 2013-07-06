@@ -4,18 +4,18 @@ import java.io.IOException;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
-import factorization.common.Core;
 import factorization.common.TileEntityCommon;
-import factorization.common.servo.Decorator;
+import factorization.common.servo.Instruction;
 import factorization.common.servo.ServoMotor;
 
-public class RedstonePulse extends Decorator {
+public class RedstonePulse extends Instruction {
 
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
@@ -51,19 +51,11 @@ public class RedstonePulse extends Decorator {
 
     @Override
     public String getName() {
-        return "fz.decorator.pulse";
+        return "fz.instruction.pulse";
     }
 
     @Override
-    public float getSize() {
-        return 0F/16F;
-    }
-    
-    @Override
-    protected void addRecipes() {
-        Core.registry.recipe(toItem(),
-                "-_-",
-                '-', Core.registry.servorail_item,
-                '_', Block.pressurePlateStone);
+    protected ItemStack getRecipeItem() {
+        return new ItemStack(Block.pressurePlateStone);
     }
 }
