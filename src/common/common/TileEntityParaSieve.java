@@ -30,13 +30,17 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
+        putting_nbt = true;
         writeSlotsToNBT(tag);
+        putting_nbt = false;
     }
     
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
+        putting_nbt = true;
         readSlotsFromNBT(tag);
+        putting_nbt = false;
     }
     
     public ForgeDirection getFacing() {
@@ -65,10 +69,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     
     private boolean recursing = false;
     IInventory getTarget() {
-        if (recursing) {
-            return null;
-        }
-        if (worldObj.isRemote) {
+        if (recursing || putting_nbt || worldObj == null || worldObj.isRemote) {
             return null;
         }
         recursing = true;
