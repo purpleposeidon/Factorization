@@ -869,6 +869,13 @@ public class FactorizationUtil {
         return chest;
     }
     
+    public static IInventory openDoubleChest(IInventory inv, boolean openBothSides) {
+        if (inv instanceof TileEntityChest) {
+            return openDoubleChest((TileEntityChest) inv, openBothSides);
+        }
+        return inv;
+    }
+    
     //Recipe creation
     public static IRecipe createShapedRecipe(ItemStack result, Object... args) {
         String var3 = "";

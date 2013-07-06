@@ -83,7 +83,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
                 if (te instanceof TileEntityParaSieve) {
                     return null;
                 }
-                return (IInventory) te;
+                return FactorizationUtil.openDoubleChest((IInventory) te, true);
             }
             return null;
         } finally {
