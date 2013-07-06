@@ -135,7 +135,12 @@ public abstract class ServoComponent implements IDataSerializable {
     }
     
     public ItemStack toItem() {
-        ItemStack ret = new ItemStack(Core.registry.servo_component);
+        ItemStack ret;
+        if (this instanceof Instruction) {
+            ret = new ItemStack(Core.registry.servo_widget_instruction);
+        } else {
+            ret = new ItemStack(Core.registry.servo_widget_decor);
+        }
         NBTTagCompound tag = new NBTTagCompound();
         save(tag);
         ret.setTagCompound(tag);

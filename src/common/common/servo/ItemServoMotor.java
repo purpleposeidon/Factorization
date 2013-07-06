@@ -48,7 +48,9 @@ public class ItemServoMotor extends ItemCraftingComponent {
                 motor.orientation = perfect;
             }
         }
-        is.stackSize--;
+        if (!player.capabilities.isCreativeMode) {
+            is.stackSize--;
+        }
         return true;
     }
 }

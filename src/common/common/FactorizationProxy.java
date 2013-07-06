@@ -158,4 +158,6 @@ public abstract class FactorizationProxy implements IGuiHandler {
     public void BlockRenderHelper_clear_texture(BlockRenderHelper block) { }
     
     public String getPocketCraftingTableKey() { return null; }
+    
+    public boolean isClientHoldingShift() { return false; }
 }

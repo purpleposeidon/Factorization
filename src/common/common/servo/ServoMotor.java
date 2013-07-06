@@ -4,11 +4,11 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
@@ -36,9 +36,11 @@ import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.Share;
 import factorization.common.Core;
+import factorization.common.FactorizationHack;
 import factorization.common.FactorizationUtil;
+import factorization.common.FactorizationUtil.FzInv;
 
-public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IEntityMessage {
+public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IEntityMessage, IInventory {
     public static final int STACKS = 16;
     public static final int STACK_EQUIPMENT = 0, STACK_ARGUMENT = 1, STACK_IO = 2, STACK_CONFIG = 3, STACK_ERRNO = 4;
     private ServoStack[] stacks = new ServoStack[STACKS];
@@ -47,6 +49,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             stacks[i] = new ServoStack();
         }
     }
+    private ItemStack[] inv = new ItemStack[9], inv_last_sent = new ItemStack[inv.length];
     public boolean sneaking = false;
     public int next_stack = 0;
 
@@ -68,10 +71,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     double sprocket_rotation = 0, prev_sprocket_rotation = 0;
     double servo_reorient = 0, prev_servo_reorient = 0;
 
-    static final double maxSpeed = 0.05 /* NORELEASE: 0.1 */, slowedSpeed = maxSpeed / 20, minSpeed = slowedSpeed / 10;
+    static final double maxSpeed = 0.0875 /* NORELEASE: 0.1 */, slowedSpeed = maxSpeed / 20, minSpeed = slowedSpeed / 10;
 
     private static class MessageType {
-        static final short motor_description = 100, motor_direction = 101, motor_speed = 102;
+        static final short motor_description = 100, motor_direction = 101, motor_speed = 102, motor_inventory = 103;
     }
 
     public ServoMotor(World world) {
@@ -150,10 +153,19 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         pos_progress = data.as(Share.VISIBLE, "pos_progress").putFloat(pos_progress);
         new_motor = data.as(Share.PRIVATE, "new").putBoolean(new_motor);
         for (int i = 0; i < STACKS; i++) {
-            String name = "stack_" + i;
+            String name = "stack" + i;
             stacks[i] = data.as(Share.VISIBLE, name).put(stacks[i]);
         }
         next_stack = data.as(Share.VISIBLE, "next_stack").putInt(next_stack);
+        for (int i = 0; i < inv.length; i++) {
+            ItemStack is = inv[i] == null ? EMPTY_ITEM : inv[i];
+            is = data.as(Share.VISIBLE, "inv" + i).putItemStack(is);
+            if (is == null) {
+                inv[i] = is;
+            } else {
+                inv[i] = is.itemID == 0 ? null : is;
+            }
+        }
     }
 
     boolean validPosition(Coord c) {
@@ -181,7 +193,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     @Override
     public void onEntityUpdate() {
         if (new_motor) {
-            if (prevOrientation == FzOrientation.UNKNOWN && orientation != FzOrientation.UNKNOWN) {
+            if (prevOrientation == FzOrientation.UNKNOWN ) {
                 prevOrientation = orientation;
             }
         }
@@ -214,27 +226,20 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         return a + (b - a)*interp;
     }
 
-    void doLogic() {
-        
-        if (orientation == FzOrientation.UNKNOWN) {
-            pickNextOrientation();
-        }
+    void updateSpeed() {
         final double speed = getProperSpeed() ;
         boolean should_accelerate = speed < maxSpeed && orientation != FzOrientation.UNKNOWN;
-        if (!worldObj.isRemote) {
-            //Core.notify(null, getCurrentPos(), "X");
-            if (dampenVelocity || hasSignal(Signal.STOP_MOTOR) || hasSignal(Signal.SLOW_MOTOR)) {
-                speed_b = (byte) (speed_b * 2 / 3);
-                if (speed < slowedSpeed) {
-                    dampenVelocity = false;
-                    if (hasSignal(Signal.STOP_MOTOR)) {
-                        if (speed < minSpeed) {
-                            speed_b = 0;
-                        }
+        if (dampenVelocity || hasSignal(Signal.STOP_MOTOR) || hasSignal(Signal.SLOW_MOTOR)) {
+            speed_b = (byte) (speed_b * 2 / 3);
+            if (speed < slowedSpeed) {
+                dampenVelocity = false;
+                if (hasSignal(Signal.STOP_MOTOR)) {
+                    if (speed < minSpeed) {
+                        speed_b = 0;
                     }
                 }
-                should_accelerate = false;
             }
+            should_accelerate = false;
         }
         if (Core.cheat_servo_energy) {
             if (should_accelerate) {
@@ -243,6 +248,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         } else {
             long now = worldObj.getTotalWorldTime();
             IChargeConductor conductor = getCurrentPos().getTE(IChargeConductor.class);
+            boolean failure = true;
             if (conductor != null) {
                 int to_drain = 0;
                 if (should_accelerate) {
@@ -254,12 +260,27 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 } else if (now % 60 == 0) {
                     to_drain = 1;
                 }
-                if (to_drain > 0 && conductor.getCharge().tryTake(to_drain) >= to_drain && should_accelerate) {
+                if (to_drain > 0 && should_accelerate && conductor.getCharge().tryTake(to_drain) >= to_drain) {
                     accelerate();
+                    failure = false;
+                } else if (to_drain == 0) {
+                    failure = false;
                 }
             }
+            if (failure) {
+                speed_b = (byte) Math.max(speed_b - 1, 0);
+            }
         }
-        
+    }
+    
+    void doLogic() {
+        if (orientation == FzOrientation.UNKNOWN) {
+            pickNextOrientation();
+        }
+        if (!worldObj.isRemote) {
+            updateSpeed();
+        }
+        final double speed = getProperSpeed() ;
         if (speed <= 0 || orientation == FzOrientation.UNKNOWN) {
             return;
         }
@@ -307,13 +328,20 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     public void swapOrientations() {
         ForgeDirection orig_direction = orientation.facing;
+        ForgeDirection orig_top = orientation.top;
         FzOrientation start = FzOrientation.fromDirection(nextDirection);
-        FzOrientation perfect = start.pointTopTo(orientation.top);
+        FzOrientation perfect = start.pointTopTo(orig_top);
         if (perfect == FzOrientation.UNKNOWN) {
-            perfect = start.pointTopTo(orig_direction);
-        }
-        if (perfect == FzOrientation.UNKNOWN) {
-            perfect = start;
+            if (nextDirection == orig_top) {
+                //convex turn
+                perfect = start.pointTopTo(orig_direction.getOpposite());
+            } else if (nextDirection == orig_top.getOpposite()) {
+                //concave turn
+                perfect = start.pointTopTo(orig_direction);
+            }
+            if (perfect == FzOrientation.UNKNOWN) {
+                perfect = start; //Might be impossible?
+            }
         }
         orientation = perfect;
         nextDirection = orig_direction;
@@ -330,7 +358,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             // Our course is fine.
             return true;
         }
-        // We've hit a T intersection, and don't know where to go next.
+        // We've hit eg a T intersection, and we aren't pointing towards one of the branches
         final ForgeDirection top = orientation.top;
         if (testDirection(top)) {
             // We'll turn upwards
@@ -388,7 +416,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             prev_servo_reorient = servo_reorient;
             servo_reorient = Math.min(1, servo_reorient + move);
             if (servo_reorient >= 1) {
-                servo_reorient = 0;
+                prev_servo_reorient = servo_reorient = 0;
                 prevOrientation = orientation;
             }
         }
@@ -411,11 +439,26 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         if (rail == null /* :| */ || rail.decoration == null) {
             return;
         }
+        if (getCurrentPos().isPowered()) {
+            return;
+        }
         rail.decoration.motorHit(this);
     }
 
     @Override
     public boolean interact(EntityPlayer player) {
+        ItemStack is = FactorizationUtil.normalize(player.getHeldItem());
+        if (is == null) {
+            return false;
+        }
+        if (is.getItem() instanceof ActuatorItem) {
+            ItemStack toPush = is.splitStack(1);
+            if (FactorizationUtil.getStackSize(getInv().push(toPush)) == 0) {
+                return true;
+            }
+            is.stackSize++;
+            return false;
+        }
         return false;
     }
 
@@ -431,18 +474,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         EntityPlayer player = (EntityPlayer) src;
         if (!worldObj.isRemote) {
             setDead();
-            if (player.capabilities.isCreativeMode && !player.isSneaking()) {
-                return true;
-            }
-            ArrayList<Object> toDrop = new ArrayList(30);
+            ArrayList<ItemStack> toDrop = new ArrayList();
             toDrop.add(new ItemStack(Core.registry.servo_motor_placer));
-            for (ServoStack ss : stacks) {
-                while (ss.getSize() > 0) {
-                    Object o = ss.pop();
-                    if (o instanceof ItemStack) {
-                        toDrop.add(o);
-                    }
-                }
+            for (ItemStack is : inv) {
+                toDrop.add(is);
             }
             dropItemStacks(toDrop);
         }
@@ -491,12 +526,29 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 pos_next.asDeltaCoord(),
                 (byte) orientation.ordinal(),
                 (byte) nextDirection.ordinal());
+        /*for (int i = 0; i < inv_last_sent.length; i++) {
+            inv_last_sent[i] = EMPTY_ITEM; //makes sure everything gets updated properly.
+        }
+        onInventoryChanged();*/
     }
     
     @Override
     public boolean handleMessage(short messageType, DataInputStream input)
             throws IOException {
         switch (messageType) {
+        case MessageType.motor_inventory:
+            while (true) {
+                byte index = input.readByte();
+                if (index < 0) {
+                    break;
+                }
+                ItemStack is = FactorizationHack.loadItemStackFromDataInput(input);
+                if (is != null && is.itemID == 0) {
+                    is = null;
+                }
+                inv[index] = is;
+            }
+            return true;
         case MessageType.motor_description:
             speed_b = input.readByte();
             pos_progress = input.readFloat();
@@ -517,11 +569,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         return maxSpeed*perc;
     }
     
-    public void dropItemStacks(List<Object> toDrop) {
-        for (Object o : toDrop) {
-            if (o instanceof ItemStack) {
-                FactorizationUtil.spawnItemStack(this, (ItemStack) o);
-            }
+    public void dropItemStacks(Iterable<ItemStack> toDrop) {
+        for (ItemStack is : toDrop) {
+            FactorizationUtil.spawnItemStack(this, is);
         }
     }
     
@@ -529,10 +579,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         stackId = Math.max(0, stackId);
         stackId = Math.min(stackId, STACKS);
         return stacks[stackId];
-    }
-    
-    public static boolean canClone(Object o) {
-        return !(o instanceof ItemStack);
     }
     
     public void putError(Object error) {
@@ -544,5 +590,95 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             ss.popEnd();
         }
         ss.push(error);
+    }
+
+    @Override
+    public int getSizeInventory() {
+        return inv.length;
+    }
+
+    @Override
+    public ItemStack getStackInSlot(int i) {
+        return inv[i];
+    }
+
+    @Override
+    public ItemStack decrStackSize(int i, int j) {
+        ItemStack ret = inv[i].splitStack(j);
+        inv[i] = FactorizationUtil.normalize(inv[i]);
+        return ret;
+    }
+
+    @Override
+    public ItemStack getStackInSlotOnClosing(int i) {
+        return null;
+    }
+
+    @Override
+    public void setInventorySlotContents(int i, ItemStack itemstack) {
+        inv[i] = itemstack;
+    }
+
+    @Override
+    public String getInvName() {
+        return "Servo Motor Inventory";
+    }
+
+    @Override
+    public boolean isInvNameLocalized() {
+        return true;
+    }
+
+    @Override
+    public int getInventoryStackLimit() {
+        return 64;
+    }
+
+    private static final ItemStack EMPTY_ITEM = new ItemStack(0, 0, 0);
+    @Override
+    public void onInventoryChanged() {
+        updateInventory(inv.length);
+    }
+    
+    public void updateInventory(int slot_count) {
+        ArrayList<Object> toSend = new ArrayList(18);
+        for (byte i = 0; i < slot_count; i++) {
+            if (FactorizationUtil.identical(inv[i], inv_last_sent[i])) {
+                continue;
+            }
+            toSend.add(i);
+            if (inv[i] == null) {
+                toSend.add(EMPTY_ITEM);
+            } else {
+                toSend.add(inv[i]);
+            }
+            inv_last_sent[i] = inv[i];
+        }
+        if (toSend.isEmpty()) {
+            return;
+        }
+        toSend.add(-1);
+        broadcast(MessageType.motor_inventory, toSend.toArray());
+    }
+    
+    @Override
+    public boolean isUseableByPlayer(EntityPlayer entityplayer) {
+        return false;
+    }
+
+    @Override
+    public void openChest() { }
+
+    @Override
+    public void closeChest() { }
+
+    @Override
+    public boolean isStackValidForSlot(int i, ItemStack itemstack) {
+        return true;
+    }
+    
+    private FzInv my_fz_inv = FactorizationUtil.openInventory(this, 0);
+    public FzInv getInv() {
+        return my_fz_inv;
     }
 }

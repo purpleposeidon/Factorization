@@ -123,9 +123,12 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
         Boolean.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, NBTTagCompound.class
     };
     public final Object putUntypedOject(Object value) throws IOException {
+        if (!valid) {
+            return value;
+        }
         final String orig_name = name;
         if (isReader()) {
-            int typeIndex = asSameShare(orig_name + "_type").put(-1);
+            int typeIndex = asSameShare(orig_name + ".type").put(-1);
             asSameShare(orig_name);
             if (typeIndex < 0 || typeIndex > validTypes.length) {
                 return value; //Fun times.
@@ -141,13 +144,13 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
                 value = (short) 0;
             } else if (type == Integer.class) {
                 value = (int) 0;
-            } else if (value == Long.class) {
+            } else if (type == Long.class) {
                 value = (long) 0;
-            } else if (value == Float.class) {
+            } else if (type == Float.class) {
                 value = (float) 0;
-            } else if (value == Double.class) {
+            } else if (type == Double.class) {
                 value = (double) 0;
-            } else if (value == NBTTagCompound.class) {
+            } else if (type == NBTTagCompound.class) {
                 value = new NBTTagCompound();
             } else {
                 return null;
@@ -156,8 +159,8 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
         } else {
             for (int i = 0; i < validTypes.length; i++) {
                 Class type = validTypes[i];
-                if (value.getClass() == type) {
-                    asSameShare(orig_name + "_type").put(i);
+                if (value.getClass() == type) { //TODO NORELEASE: Pull getClass out
+                    asSameShare(orig_name + ".type").put(i);
                     asSameShare(orig_name);
                     put(value);
                     return value;

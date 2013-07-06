@@ -23,7 +23,6 @@ public class ItemServoRailWidget extends Item {
         super(itemId);
         setUnlocalizedName("factorization:servo/component");
         Core.tab(this, TabType.SERVOS);
-        setMaxStackSize(1);
     }
     
     public String getUnlocalizedName(ItemStack is) {
@@ -38,7 +37,6 @@ public class ItemServoRailWidget extends Item {
         String s = super.getItemDisplayName(is);
         if (s == null || s.length() == 0) {
             s = getUnlocalizedName(is);
-            //System.out.println(s); //NORELEASE
         }
         return s;
     };
@@ -115,7 +113,11 @@ public class ItemServoRailWidget extends Item {
         for (Class<? extends ServoComponent> scClass : ServoComponent.getComponents()) {
             try {
                 ServoComponent sc = scClass.newInstance();
-                subItemsCache.add(sc.toItem());
+                if (sc instanceof Instruction && this == Core.registry.servo_widget_instruction) {
+                    subItemsCache.add(sc.toItem());
+                } else if (this == Core.registry.servo_widget_decor && !(sc instanceof Instruction)) {
+                    subItemsCache.add(sc.toItem());
+                }
             } catch (Throwable e) {
                 e.printStackTrace();
                 continue;

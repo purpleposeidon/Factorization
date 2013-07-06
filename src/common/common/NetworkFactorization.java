@@ -190,7 +190,8 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 } else if (item instanceof ItemStack) {
                     ItemStack is = (ItemStack) item;
                     NBTTagCompound tag = new NBTTagCompound();
-                    if (is.getItem().getShareTag()) {
+                    final Item is_item = is.getItem();
+                    if (is_item == null || is_item.getShareTag()) {
                         is.writeToNBT(tag);
                     } else {
                         NBTTagCompound backup = is.getTagCompound();

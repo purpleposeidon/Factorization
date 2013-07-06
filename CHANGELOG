@@ -1,14 +1,25 @@
 0.8.00
+  Changed license
+  Limited Wrath Lamp RAM-eating
   Barrels are wrench-rotatable
-  Made the pocket crafting table self-documenting, and it will move itself out of the crafting area if possible
-  Added a "fill empty area in crafting grid with item under cursor" pocket crafting table command
-  Added time dilation to make laggy servers look less laggy by slowing the client down to match. If you don't like it, there are config options to change/disable it both client & server-side.
-  Removed deprecated solar turbines
-  Removed the unloved exo armor; if you're a dev who cares: https://github.com/purpleposeidon/ExoArmor
+  Diamond shards can now be made by blowing up diamond blocks
+  Pocket crafting table:
+    self documenting
+    will try to move itself out of the crafting area instead of closing, if possible
+    Added a "fill empty area in crafting grid with item under cursor" pocket crafting table command
+  REMOVED:
+    solar turbines
+    the unloved exo armor; if you're a dev who cares: https://github.com/purpleposeidon/ExoArmor (I should have waited until 1.6 to do this. Oops.)
+    (While we're talking about 1.6: I'm going to be consolidating Item IDs, so item IDs are going to change.)
   Bugfix: Breaking a machine with a wire attached would fail to drop the right items
-  Furnace heaters can heat through other furnace heaters
-  Leyden jars now emit a bit of light. How did I miss this!?!?
-  Added Servos:
+  Charge:
+    Furnace heaters can heat through other furnace heaters. Heating this way is less efficient.
+    Leyden jars now emit a bit of light. How did I miss this!?!? Also increased z-politeness of the knobby bit
+    Solar boilers require at least 4 mirrors to operate
+  MISC NONSENSE:
+    Added time dilation to make laggy servers look less laggy by slowing the client down to match. If you don't like it, there are config options to change/disable it both client & server-side.
+    Added some fun stuff
+  ADDED SERVOS
     Servo Rail:
       A block. Needs to be powered.
     Servo:
@@ -29,6 +40,7 @@
       Usable by the servo and by players.
       Right clicking does something; shift right clicking does something related.
       They are configurable; there's an instruction for Configuring actuators.
+      Click on a servo motor with one to equip it
       There's only one actuator right now, Item Manipulator:
         Configs: slot (Integer; -1, or >=0) limit (Integer, >0)
     Decorators:

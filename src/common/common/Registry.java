@@ -53,9 +53,10 @@ import factorization.common.servo.ItemServoMotor;
 import factorization.common.servo.ItemServoRailWidget;
 import factorization.common.servo.ServoComponent;
 import factorization.common.servo.ServoMotor;
-import factorization.common.servo.actuators.ActuatorItemManipulator;
+import factorization.common.servo.actuators.ActuatorItemSyringe;
 
 public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler {
+    //NORELEASE: Consolidate item IDs of crafting components in 1.6 release
     public ItemFactorization item_factorization;
     public ItemBlockResource item_resource;
     public BlockFactorization factory_block, factory_rendering_block = null;
@@ -72,7 +73,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             mirror_item_hidden,
             leadwire_item, grinder_item, mixer_item, crystallizer_item,
             greenware_item,
-            rocket_engine_item_hidden;
+            rocket_engine_item_hidden,
+            parasieve_item;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item;
     public ItemStack is_factory, is_lamp, is_lightair;
@@ -112,8 +114,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public LiquidStack liquidStackRocketFuel;
     public ItemCraftingComponent bucket_rocket_fuel;
     public ItemServoMotor servo_motor_placer;
-    public ItemServoRailWidget servo_component;
-    public ActuatorItemManipulator actuator_item_manipulator;
+    public ItemServoRailWidget servo_widget_instruction, servo_widget_decor;
+    public ActuatorItemSyringe actuator_item_manipulator;
     public ItemStack dark_iron_sprocket, sprocket_motor;
 
     public Material materialMachine = Material.anvil; //new Material(MapColor.ironColor);
@@ -150,7 +152,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         Block.blocksList[diamondId] = null;
         BlockOreStorageShatterable newDiamond = new BlockOreStorageShatterable(diamondId, vanillaDiamond);
         newDiamond.setHardness(5.0F).setResistance(10.0F).setStepSound(Block.soundMetalFootstep).setUnlocalizedName("blockDiamond");
-        //Block.blockDiamond = newDiamond;
+        //Block.blockDiamond /* field_72071_ax */ = newDiamond;
+//		ReflectionHelper.setPrivateValue(Block.class, null, newDiamond, "blockDiamond", "field_72071_ax"); TODO: Reflection-set blockDiamond.
     }
 
     void registerSimpleTileEntities() {
@@ -196,6 +199,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //BlockFactorization stuff
         router_item = FactoryType.ROUTER.itemStack();
         servorail_item = FactoryType.SERVORAIL.itemStack();
+        parasieve_item = FactoryType.PARASIEVE.itemStack();
         barrel_item = FactoryType.BARREL.itemStack();
         maker_item = FactoryType.MAKER.itemStack();
         stamper_item = FactoryType.STAMPER.itemStack();
@@ -310,8 +314,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         
         //Servos
         servo_motor_placer = new ItemServoMotor(itemID("servoMotorPlacer", 9056));
-        servo_component = new ItemServoRailWidget(itemID("servoMotorComponent", 9057));
-        actuator_item_manipulator = new ActuatorItemManipulator(itemID("actuatorItemManipulator", 9058));
+        servo_widget_decor = new ItemServoRailWidget(itemID("servoWidgetDecor", 9057));
+        servo_widget_instruction = new ItemServoRailWidget(itemID("servoWidgetInstruction", 9061));
+        servo_widget_decor.setMaxStackSize(16);
+        servo_widget_instruction.setMaxStackSize(1);
+        actuator_item_manipulator = new ActuatorItemSyringe(itemID("actuatorItemManipulator", 9058));
         dark_iron_sprocket = new ItemStack(new ItemCraftingComponent(itemID("darkIronSprocket", 9059), "servo/sprocket"));
         sprocket_motor = new ItemStack(new ItemCraftingComponent(itemID("servoMotor", 9060), "servo/servo_motor"));
     }
@@ -820,13 +827,15 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 " I ",
                 "I I",
                 'I', Item.ingotIron);
-        recipe(solarboiler_item,
-                "I#I",
-                "I I",
-                "III",
-                'I', Item.ingotIron,
-                '#', Block.fenceIron
-                );
+        if (Core.enable_solar_steam) {
+            recipe(solarboiler_item,
+                    "I#I",
+                    "I I",
+                    "III",
+                    'I', Item.ingotIron,
+                    '#', Block.fenceIron
+                    );
+        }
         oreRecipe(steamturbine_item,
                 "I#I",
                 "GXG",
@@ -896,12 +905,14 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'M', magnet,
                 'L', "ingotLead",
                 'I', Item.ingotIron);
-        oreRecipe(new ItemStack(mirror),
-                "SSS",
-                "S#S",
-                "SSS",
-                'S', "ingotSilver",
-                '#', Block.thinGlass);
+        if (Core.enable_solar_steam) { //NOTE: This'll probably cause a bug when we use mirrors for other things
+            oreRecipe(new ItemStack(mirror),
+                    "SSS",
+                    "S#S",
+                    "SSS",
+                    'S', "ingotSilver",
+                    '#', Block.thinGlass);
+        }
         ItemStack with_8 = leadwire_item.copy();
         with_8.stackSize = 8;
         oreRecipe(with_8,
@@ -1006,14 +1017,22 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 '#', logicMatrix,
                 'P', logicMatrixProgrammer);
         oreRecipe(new ItemStack(actuator_item_manipulator),
-                "123",
-                "PVP",
-                'P', Block.pistonBase,
-                'V', Block.hopperBlock,
-                '1', Block.pressurePlatePlanks,
-                '2', Block.pressurePlateGold,
-                '3', Block.pressurePlateIron);
+                "| |",
+                "|#|",
+                "|P|",
+                '#', Block.glass,
+                '|', Block.thinGlass,
+                '-', Block.pressurePlatePlanks,
+                'P', Block.pistonBase);
         ServoComponent.setupRecipes();
+        recipe(parasieve_item,
+                "IHI",
+                "ImI",
+                "DID",
+                'I', Item.ingotIron,
+                'D', dark_iron,
+                'H', Block.hopperBlock,
+                'm', logicMatrixIdentifier);
     }
 
     public void setToolEffectiveness() {

@@ -14,7 +14,6 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.Core;
 import factorization.common.Core.TabType;
-import factorization.common.FactorizationUtil;
 import factorization.common.ItemCraftingComponent;
 
 public abstract class ActuatorItem extends ItemCraftingComponent {
@@ -73,29 +72,6 @@ public abstract class ActuatorItem extends ItemCraftingComponent {
             e.printStackTrace();
             return false;
         }
-    }
-    
-    public static ItemStack takeItem(Entity user) {
-        if (user instanceof ServoMotor) {
-            ServoMotor motor = (ServoMotor) user;
-            return motor.getServoStack(ServoMotor.STACK_ARGUMENT).popType(ItemStack.class);
-        } else if (user instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) user;
-            return FactorizationUtil.openInventory(player.inventory, ForgeDirection.UP).pull();
-        }
-        return null;
-    }
-    
-    public static ItemStack pushItem(Entity user, ItemStack is) {
-        if (user instanceof ServoMotor) {
-            ServoMotor motor = (ServoMotor) user;
-            motor.getServoStack(ServoMotor.STACK_ARGUMENT).pushmergeItemStack(is);
-            return FactorizationUtil.normalize(is);
-        } else if (user instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) user;
-            return FactorizationUtil.openInventory(player.inventory, ForgeDirection.UP).push(is);
-        }
-        return is;
     }
     
     public static boolean extractEnergy(Entity user, int amount) {

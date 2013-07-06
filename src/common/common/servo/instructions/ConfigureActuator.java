@@ -15,6 +15,7 @@ import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
+import factorization.common.FactorizationUtil.FzInv;
 import factorization.common.servo.ActuatorItem;
 import factorization.common.servo.Instruction;
 import factorization.common.servo.ServoMotor;
@@ -35,15 +36,18 @@ public class ConfigureActuator extends Instruction {
 
     @Override
     public void motorHit(ServoMotor motor) {
-        ServoStack equipment = motor.getServoStack(ServoMotor.STACK_EQUIPMENT);
         ServoStack config = motor.getServoStack(ServoMotor.STACK_ARGUMENT);
-        ItemStack actuator = equipment.findType(ItemStack.class);
+        ItemStack actuator = null;
+        FzInv inv = motor.getInv();
+        for (int i = 0; i < inv.size(); i++) {
+            ItemStack is = inv.get(i);
+            if (is != null && is.getItem() instanceof ActuatorItem) {
+                actuator = is;
+                break;
+            }
+        }
         if (actuator == null) {
             motor.putError("No actuator to configure");
-            return;
-        }
-        if (!(actuator.getItem() instanceof ActuatorItem)) {
-            motor.putError("Item " + actuator.getItem() + " was not an actuator");
             return;
         }
         ActuatorItem actualator = (ActuatorItem) actuator.getItem();

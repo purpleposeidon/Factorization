@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
@@ -49,6 +50,15 @@ public class FactorizationUtil {
     
     public static ItemStack makeWildcard(Block item) {
         return new ItemStack(item, 1, WILDCARD_DAMAGE);
+    }
+    
+    public static boolean identical(ItemStack a, ItemStack b) {
+        if (a == null && b == null) {
+            return true;
+        } else if (a == null || b == null) {
+            return false;
+        }
+        return couldMerge(a, b) && a.stackSize == b.stackSize;
     }
     
     /**
@@ -111,6 +121,69 @@ public class FactorizationUtil {
             return false;
         } else {
             return wildcardSimilar((ItemStack) template, stranger);
+        }
+    }
+    
+    public static boolean itemInRange(ItemStack a, ItemStack b, ItemStack stranger) {
+        if (stranger == null) {
+            return false;
+        }
+        if (a == null || b == null) {
+            if (a != null) {
+                return couldMerge(a, stranger);
+            }
+            if (b != null) {
+                return couldMerge(b, stranger);
+            }
+            return false;
+        }
+        if (a.itemID != b.itemID) {
+            Class ca = a.getItem().getClass(), cb = b.getItem().getClass();
+            Class c_stranger = stranger.getItem().getClass();
+            /*if (ca == cb) {
+                if (ca == c_stranger) {
+                    return true;
+                }
+            }*/
+            //Broadest match: return true if the stranger starts with the common prefix
+            String na = ca.getName();
+            String nb = cb.getName();
+            String n_stranger = c_stranger.getName();
+            int end = Math.min(na.length(), nb.length());
+            for (int i = 0; i < end; i++) {
+                char x = na.charAt(i);
+                char y = nb.charAt(i);
+                if (x == y) {
+                    if (n_stranger.charAt(i) != x) {
+                        return false;
+                    }
+                } else {
+                    return true;
+                }
+            }
+            return true; //all 3 names were identical
+        }
+        if (a.itemID != stranger.itemID) {
+            return false; //It doesn't match! How could we have been so silly as to not notice?
+        }
+        int mda = a.getItemDamage(), mdb = b.getItemDamage(), md_stranger = stranger.getItemDamage();
+        //Only check tag compounds if both items have one.
+        if (a.hasTagCompound() == b.hasTagCompound()) {
+            if (a.hasTagCompound()) {
+                //We aren't going to go all the way with this; that'd be too difficult & expensive
+                if (!a.getTagCompound().equals(stranger.getTagCompound())) {
+                    return false;
+                }
+            } else if (stranger.hasTagCompound()) {
+                return false; //no a tag, no b tag, but stranger tag
+            }
+        }
+        if (mda < mdb) {
+            return mda <= md_stranger && md_stranger <= mdb;
+        } else if (mda > mdb) {
+            return mda >= md_stranger && md_stranger >= mdb;
+        } else {
+            return mda == md_stranger;
         }
     }
     
@@ -370,6 +443,45 @@ public class FactorizationUtil {
             return under.isStackValidForSlot(slotIndex(i), is) && couldMerge(get(i), is);
         }
         
+        public boolean isEmpty() {
+            for (int i = 0; i < size(); i++) {
+                if (get(i) != null) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        public boolean transfer(FzInv dest_inv, int max_transfer, ItemStack exclude) {
+            for (int i = 0; i < size(); i++) {
+                ItemStack is = normalize(get(i));
+                if (is == null || is == exclude) {
+                    continue;
+                }
+                if (is.stackSize <= max_transfer) {
+                    int orig_size = is.stackSize;
+                    is = dest_inv.push(is);
+                    if (orig_size != getStackSize(is)) {
+                        set(i, is);
+                        return true;
+                    }
+                } else {
+                    ItemStack to_push = is.copy();
+                    int orig_size = Math.min(to_push.stackSize, max_transfer);
+                    to_push.stackSize = orig_size;
+                    to_push = dest_inv.push(to_push);
+                    int taken = orig_size - getStackSize(to_push);
+                    if (taken > 0) {
+                        is.stackSize -= taken;
+                        is = normalize(is);
+                        set(i, is);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        
         public boolean transfer(int i, FzInv dest_inv, int dest_i, int max_transfer) {
             ItemStack src = normalize(get(i));
             if (src == null) {
@@ -496,6 +608,50 @@ public class FactorizationUtil {
             }
             return ret;
         }
+        
+        private int slice_index(int i) {
+            int size = size();
+            while (i < 0 && size > 0) {
+                i += size; //super inefficient!
+            }
+            return i;
+        }
+        
+        public FzInv slice(int start, int end) {
+            start = slice_index(start);
+            end = slice_index(end);
+            start = Math.max(start, 0);
+            end = Math.min(end, size());
+            if (end < start) {
+                end = start;
+            }
+            if (start > end) {
+                start = end;
+            }
+            return new SubsetInv(this, start, end);
+        }
+    }
+    
+    public static class SubsetInv extends FzInv {
+        final FzInv ui;
+        int start, end;
+        public SubsetInv(FzInv ui, int start, int end) {
+            super(ui.under);
+            this.ui = ui;
+            this.start = start;
+            this.end = end;
+        }
+        
+        @Override
+        public int size() {
+            return end - start;
+        }
+
+        @Override
+        int slotIndex(int i) {
+            return ui.slotIndex(start + i);
+        }
+        
     }
 
     public static class PlainInvWrapper extends FzInv {
@@ -642,7 +798,8 @@ public class FactorizationUtil {
             return openInventory((IInventory) ent, ForgeDirection.UP);
         }
         if (ent instanceof EntityPlayer) {
-            return openInventory((IInventory) ((EntityPlayer)ent).inventory, ForgeDirection.UP);
+            InventoryPlayer ip = ((EntityPlayer)ent).inventory;
+            return openInventory(ip, ForgeDirection.UP).slice(0, ip.mainInventory.length);
         }
         return null;		
     }

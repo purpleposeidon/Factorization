@@ -11,10 +11,10 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
+import factorization.common.FactorizationUtil.FzInv;
 import factorization.common.servo.ActuatorItem;
 import factorization.common.servo.Instruction;
 import factorization.common.servo.ServoMotor;
-import factorization.common.servo.ServoStack;
 
 public class ActivateActuator extends Instruction {
 
@@ -30,22 +30,23 @@ public class ActivateActuator extends Instruction {
 
     @Override
     public void motorHit(ServoMotor motor) {
-        ServoStack ss = motor.getServoStack(ServoMotor.STACK_EQUIPMENT);
-        ItemStack is = ss.popType(ItemStack.class);
-        if (is == null) {
-            return;
-        }
-        if (is.getItem() instanceof ActuatorItem) {
-            ActuatorItem actuator = (ActuatorItem) is.getItem();
-            if (actuator == null) {
-                return;
+        FzInv mi = motor.getInv();
+        for (int i = 0; i < mi.size(); i++) {
+            ItemStack is = mi.get(i);
+            if (is == null) {
+                continue;
             }
-            boolean last_sneak = motor.sneaking;
-            motor.sneaking = sneaky;
-            actuator.onUse(is, motor);
-            motor.sneaking = last_sneak;
+            if (is.getItem() instanceof ActuatorItem) {
+                ActuatorItem actuator = (ActuatorItem) is.getItem();
+                if (actuator == null) {
+                    return;
+                }
+                boolean last_sneak = motor.sneaking;
+                motor.sneaking = sneaky;
+                actuator.onUse(is, motor);
+                motor.sneaking = last_sneak;
+            }
         }
-        ss.forceAppend(is);
     }
     
     @Override

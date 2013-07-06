@@ -200,7 +200,7 @@ public class Quaternion implements IDataSerializable {
     public static Quaternion fromOrientation(final FzOrientation orient) {
         final int ord = orient.ordinal();
         if (quat_cache[ord] != null) {
-            //return quat_cache[ord]; NORELEASE
+            return quat_cache[ord];
         }
         if (orient == FzOrientation.UNKNOWN) {
             return quat_cache[ord] = new Quaternion();

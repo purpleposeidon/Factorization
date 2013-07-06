@@ -30,7 +30,7 @@ public class BlockRenderLeydenJar extends FactorizationBlockRender {
         float knob_in = 5F/16F;
         float knob_height = 3F/16F;
         float post_in = 7F/16F;
-        float z = 1F/64F;
+        float dz = 1F/64F;
         
         block.setBlockBounds(inset, 0, inset, 1 - inset, jarHeight, 1 - inset);
         block.useTextures(null, BlockIcons.leyden_glass, glass, glass, glass, glass);
@@ -38,15 +38,17 @@ public class BlockRenderLeydenJar extends FactorizationBlockRender {
         
         block.useTexture(knob);
         float d = 5F/16F;
-        block.setBlockBoundsOffset(d, 0, d);
-        block.setBlockBounds(knob_in, 0, knob_in, 1 - knob_in, knob_height, 1 - knob_in);
+        //block.setBlockBoundsOffset(d, 0, d);
+        block.setBlockBounds(knob_in, 0 + 1F/64F, knob_in, 1 - knob_in, knob_height, 1 - knob_in);
         if (!world_mode) {
             GL11.glTranslatef(0, 1, 0);
             renderBlock(rb, block);
             GL11.glTranslatef(0, -1, 0);
         } else {
             y++;
-            renderBlock(rb, block);
+            if (!w.isBlockOpaqueCube(x, y, z)) {
+                renderBlock(rb, block);
+            }
             y--;
         }
         

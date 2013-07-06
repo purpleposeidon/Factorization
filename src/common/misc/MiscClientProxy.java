@@ -26,8 +26,6 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import factorization.common.Core;
 
-import javax.imageio.ImageIO;
-
 public class MiscClientProxy extends MiscProxy {
     static {
         // ImageIO.setUseCache(false); NORELEASE?

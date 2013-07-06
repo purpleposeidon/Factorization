@@ -73,7 +73,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
                 return;
             }
             else if (player.rotationPitch >= 65F) {
-                facing_direction = -1; //+Y
+                facing_direction = 1; //+Y
                 return;
             }
         }
@@ -300,7 +300,6 @@ public abstract class TileEntityFactorization extends TileEntityCommon
             invlist.appendTag(comp);
         }
         tag.setTag("Items", invlist);
-        tag.setInteger("draw_active_int", draw_active);
     }
 
     static void saveItem(String name, NBTTagCompound tag, ItemStack is) {

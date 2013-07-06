@@ -153,9 +153,17 @@ public class ContainerFactorization extends Container {
             //central output
             addSlotToContainer(new SlotFurnace(player, crys, 6, 80, 40));
             break;
+        case PARASIEVE:
+            TileEntityParaSieve proto = (TileEntityParaSieve) ent;
+            for (int i = 0; i < proto.filters.length/2; i++) {
+                addSlotToContainer(new Slot(proto, i*2, 53 + i*18, 17));
+                addSlotToContainer(new Slot(proto, i*2 + 1, 53 + i*18, 35));
+            }
+            invdy -= 18;
+            break;
         default:
             //Fun Fact: progress is done by subclassing; see ContainerSlagFurnace
-            //Additional Fun Fact: Juse use SlotFurnace for output slots!
+            //Additional Fun Fact: use SlotFurnace for output slots!
             break;
         }
         addPlayerSlots(inventoryplayer);

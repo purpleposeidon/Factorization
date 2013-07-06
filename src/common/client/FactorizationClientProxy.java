@@ -24,18 +24,12 @@ import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
-import factorization.client.gui.FactorizationNotify;
-import factorization.client.gui.GuiCrystallizer;
-import factorization.client.gui.GuiGrinder;
-import factorization.client.gui.GuiMaker;
-import factorization.client.gui.GuiMixer;
-import factorization.client.gui.GuiPocketTable;
-import factorization.client.gui.GuiRouter;
-import factorization.client.gui.GuiSlag;
-import factorization.client.gui.GuiStamper;
+import factorization.client.gui.*;
 import factorization.client.render.*;
 import factorization.common.*;
 import factorization.common.servo.BlockRenderServoRail;
@@ -109,7 +103,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
         if (ID == FactoryType.CRYSTALLIZER.gui) {
             gui = new GuiCrystallizer(cont);
         }
-
+        if (ID == FactoryType.PARASIEVE.gui) {
+            gui = new GuiParasieve(cont);
+        }
         cont.addSlotsForGui(fac, player.inventory);
         return gui;
     }
@@ -368,7 +364,16 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderGreenware().setup();
         new BlockRenderRocketEngine();
         new BlockRenderServoRail();
-        for (FactoryType ft : new FactoryType[] { FactoryType.ROUTER, FactoryType.MAKER, FactoryType.STAMPER, FactoryType.BARREL, FactoryType.PACKAGER, FactoryType.SLAGFURNACE, FactoryType.SOLARBOILER }) {
+        for (FactoryType ft : new FactoryType[] {
+                FactoryType.ROUTER,
+                FactoryType.MAKER,
+                FactoryType.STAMPER,
+                FactoryType.BARREL,
+                FactoryType.PACKAGER,
+                FactoryType.SLAGFURNACE,
+                FactoryType.SOLARBOILER,
+                FactoryType.PARASIEVE
+                }) {
             FactorizationBlockRender.setDefaultRender(ft);
         }
         new BlockRenderEmpty(FactoryType.EXTENDED);
@@ -405,5 +410,15 @@ public class FactorizationClientProxy extends FactorizationProxy {
     @Override
     public String getPocketCraftingTableKey() {
         return GameSettings.getKeyDisplayString(pocket_key.keyCode);
+    }
+    
+    @Override
+    public boolean isClientHoldingShift() {
+        if (FMLCommonHandler.instance().getEffectiveSide() != Side.CLIENT) {
+            return false;
+        }
+        Minecraft mc = Minecraft.getMinecraft();
+        return org.lwjgl.input.Keyboard.isKeyDown(42 /* sneak */);
+        //return !mc.gameSettings.keyBindSneak.pressed;
     }
 }

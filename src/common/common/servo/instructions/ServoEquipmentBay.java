@@ -6,7 +6,6 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
@@ -18,7 +17,6 @@ import factorization.common.FactorizationUtil;
 import factorization.common.FactorizationUtil.FzInv;
 import factorization.common.servo.Decorator;
 import factorization.common.servo.ServoMotor;
-import factorization.common.servo.ServoStack;
 
 public class ServoEquipmentBay extends Decorator {
 
@@ -26,9 +24,14 @@ public class ServoEquipmentBay extends Decorator {
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
         return this;
     }
+    
+    String error = null;
 
     @Override
     public void motorHit(ServoMotor motor) {
+        if (motor.worldObj.isRemote) {
+            return;
+        }
         final Coord c = motor.getCurrentPos();
         final ForgeDirection facing = motor.orientation.facing;
         final ForgeDirection top = motor.orientation.top;
@@ -40,7 +43,10 @@ public class ServoEquipmentBay extends Decorator {
         } else if (try_(motor, c.add(facing), facing)) {
             return;
         }
-        if (facing == ForgeDirection.UP) {
+        if (error != null) {
+            motor.putError(error);
+            error = null;
+        } else if (facing == ForgeDirection.UP) {
             motor.putError("Unequip failed");
         } else {
             motor.putError("Equip failed");
@@ -51,39 +57,36 @@ public class ServoEquipmentBay extends Decorator {
         return equip(motor, FactorizationUtil.openInventory(inv.getTE(IInventory.class), dir));
     }
 
+    /**
+     * @return true if we should stop looking for inventories to use
+     */
     boolean equip(ServoMotor motor, FzInv inv) {
         if (inv == null) {
+            error = "Not facing an inventory";
             return false;
         }
         ForgeDirection direwolf20 = motor.orientation.facing;
-        ServoStack ss = motor.getServoStack(ServoMotor.STACK_EQUIPMENT);
         if (direwolf20 == ForgeDirection.UP) {
             // Unequip
-            if (ss.getSize() <= 0) {
-                motor.putError("Stack underflow");
-                return true;
+            if (!motor.getInv().transfer(inv, 1, null)) {
+                if (motor.getInv().isEmpty()) {
+                    motor.putError("Servo Inventory is empty");
+                } else {
+                    motor.putError("Transfer failed");
+                }
             }
-            ItemStack is = ss.popType(ItemStack.class);
-            if (is == null) {
-                motor.putError("Stack underflow");
-                return true;
-            }
-            if (inv.push(is) == null) {
-                return true;
-            }
+            return true;
         } else {
             // Equip
-            if (ss.getFreeSpace() <= 0) {
-                motor.putError("Stack overflow");
-                return true;
+            if (!inv.transfer(motor.getInv(), 1, null)) {
+                if (inv.isEmpty()) {
+                    motor.putError("Source inventory is empty");
+                } else {
+                    motor.putError("Transfer failed");
+                }
             }
-            ItemStack is = inv.pullWithLimit(1);
-            if (is == null) {
-                return false;
-            }
-            return ss.push(is);
+            return true;
         }
-        return false;
     }
 
     @Override

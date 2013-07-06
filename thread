@@ -147,7 +147,7 @@ A Wrath Forge needs to have a certain amount of netherbrick, or else the Wrath F
 [u][b]Dark Iron[/b][/u]
 Burning an iron block with Wrath Fire will leave behind a Dark Iron block. This block can be uncrafted into 4 Dark Iron ingots. This metal appears to be Ender-aligned, and has a few good uses.
 
-[u]The [b]Item Router[/b][/u]
+[u]The [b]Item Router[/b][/u] [small](is going to be replaced by Servos in the near future.)[/small]
 The Item Router is a very flexible, very powerful machine. Making it requires the 3rd material Nether Fortresses provide: blaze powder, which is necessary for an Eye of Ender.
 [img]http://i.imgur.com/Mw3si.png[/img]
 The Router is a block that creates an item delivery network out of blobs of machines that are all next to eachother. (What I mean by "machine" is a block that has a permanent inventory, such as a chest or furnace.) The router will visit each machine and either take or give a single item, depending on the mode set in the GUI. You can change what direction the machine is accessed from, or you can access a specific item slot.
@@ -202,48 +202,28 @@ The best place to put your Bag of Holding depends on how many columns it stores!
 Specifically, you'll want to place the bag such that the number of inventory columns it stores is a multiple of the number of columns to its right.
 [/spoiler]
 
-[u][b][size=4][anchor=EXO]Exo-Armor[/anchor][/size][/b][/u]
+[u][b][size=4][anchor=SERVO]Servos[/anchor][/size][/b][/u]
 [spoiler]
-Exo-Armor isn't ready yet!
+There are a few parts to this: There are Servos, Servo Rails, Instructions/Decorators, and Actuators.
 
-[u]The [b]Exo-Chasis[/b][/u]
-The Exo-Chasis is a slightly expensive armor crafting component made by boxing a gold nugget inside 8 iron.
-[img]http://i.imgur.com/n3eSP.png[/img]
+The Servo works similarly to a minecart, but it draws a tiny amount of power from the Servo Rails. It can hold up to 9 items.
 
-[u][b]Exo-Armor[/b][/u]
-Exo-Armor is crafted as usual, with Exo-Chasis.
-[img]http://i.imgur.com/dKwVp.png[/img]
-This armor will never break. It also will not protect you. Its strengths and powers come from the upgrades you give it.
+Servo Rails do not require support. They do not collide. They are charge conductors.
 
-[u]The [b]Exo-Modder[/b][/u]
-To add upgrades to the armor, you need to place it in a Exo-Modder. It is crafted like so:
-[img]http://i.imgur.com/Jzcfc.png[/img]
-Place the Exo-Armor into the slot with the M. Many upgrades need to be triggered. The 'A' and 'K' buttons control when the upgrade is activated. The Exo-Armors have differeing ammounts of slots for upgrades. The number of chasis it takes to make the armor is how many available slots there are.
-[img]http://i.imgur.com/CC8u0.png[/img]
+Instructions and Decorators are very similar. They are both placed onto Servo Rails, and do their thing when a Servo runs over them. The logic matrix programmer is their tool. Right clicking will cycle through their options, and shift-right clicking will remove them. A direct redstone signal will prevent them from operating. Instructions can be placed infinitely, unlike Decorators.
 
-There are a few types of upgrades. For most upgrades, you can place multiples in to get increased effects:
+An Actuator is an item that Servos and players can use. Click on a Servo with an Actuator to equip it. (They can also be equiped via the Equipment Bay decorator.) Actuators can be used by right-clicking or shift-right-clicking.
 
-[u]Vanilla Armor[/u]
-This is presently the only way of protectiong yourself with Exo-Armor. The clothing type of the armors must match. Multiple armor upgrades will not stack; only one will be used until it wears out.
 
-[u]Buoyancy Barrel[/u]
-This makes you fly very quickly to the surface when you are in water.
-[img]http://i.imgur.com/T3tml.png[/img]
+The Item Syringe is an actuator. Right-clicking an inventory will pull an item out of it into the user's inventory, and shift-right-clicking will push an item into it from the user's inventory.
 
-[u]The Cobblestone Drive[/u]
-This will generate cobblestone for you! Never run out of cobblestone again! The cobble will despawn after a few seconds.
-[img]http://i.imgur.com/SSOhm.png[/img]
-
-[u]Shoulder-Mounted Piston[/u]
-Push blocks everywhere! Be the Enderman! This will push a block that's in front of you, either the upper block, or the lower block. You must be standing in a clear space to use it. You can also push vertically by looking straight up or down.
-[img]http://i.imgur.com/kKFoQ.png[/img]
+(This area is not fully implemented)
+Servo Motors have 16 seperate stacks for things like integers, strings, and instructions. Each stack can hold up to 16 items. The math and configure instructions use a particular stack. The Item Syringe two configuration parts: the slot, and how much to pull. By default it pulls from slot -1 (meaning any slot), and a limit of 64.
 [/spoiler]
 
 [u]Other Stuff/Future Plans[/u]
 [spoiler]
 ? ? ?
-More Exo-Armor upgrades
-Router replacement
 [/spoiler]
 
 
@@ -367,5 +347,4 @@ Factorization 0.5.3 (MC 1.3.2)
 [u][b][size=6][anchor=LICENSE]License[/anchor][/size][/b][/u]
 This mod may be used in modpacks under the following conditions:
 1. There is a post in this thread that the mod is being used in a modpack. If it is a public modpack, then it must include the pack's name and the website or URL where the modpack can be found. If it is a private modpack, then mention this in your post. (I would like the post to contain also a description of the modpack and an estimate of the number of users, but this isn't necessary.)
-2. The modpack must include in it a text file listing for each public mod: the name of the mod, the mod's author, and the mod's forum thread or website.
-3. If the modpack is, or is derived from, the modpacks known as "tekkit" or "technic", or is kept in company with them, or uses their launcher or other programs, then the configuration file "factorization.cfg" must have "addBranding" set to "true", such that this is the default value for all users of the modpack. (Users of the modpack may change this value themselves if they wish.)
+2. The modpack must include in it a text file listing for each public mod: the name of the mod, the mod's author, and the mod's website or forum thread.

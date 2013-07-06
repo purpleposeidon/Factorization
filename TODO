@@ -150,6 +150,7 @@ RP heating
 register ore blocks
 To kill NEI's shift-? cheat: clear out RecipeInfo.overlayMap... or something.  Hmm....
   Might want to just remove instances whose class = DefaultOverlayHandler or BrewingOverlayHandler.
+http://jezek2.advel.cz/tmp/jstackalloc/javadoc/
 
 back to ceramics?
    - a new tool: export to obj tool. And if we have an export, maybe an import would be nice. Could export the sculpture, or export the chunk! Use a hacked up tessellator.

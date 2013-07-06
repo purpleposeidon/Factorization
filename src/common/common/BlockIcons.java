@@ -45,7 +45,8 @@ public class BlockIcons {
         cauldron_side, cauldron_top,
         generic_metal,
         grinder_bottom, grinder_top, grinder_side, grinder_bottom_top_edge,
-        heater_heat, heater_spiral;
+        heater_heat, heater_spiral,
+        parasieve_front, parasieve_side, parasieve_back;
     @Directory("machine")
     public static SimpleMachine slag_furnace;
     public static Icon machine$slag_furnace_face_on;
@@ -78,6 +79,8 @@ public class BlockIcons {
     public static Icon servo$bay, servo$bay_bottom, servo$bay_top;
     public static Icon servo$one, servo$zero, servo$number, servo$sum, servo$product, servo$dup, servo$drop;
     public static Icon servo$configure, servo$deconfigure;
+    public static Icon servo$pulse;
+    public static Icon servo$spin_cc, servo$spin_ccc;
     
     public static class ActivatingMachineIcon extends IconGroup {
         public Icon top, bottom, side, side_on;

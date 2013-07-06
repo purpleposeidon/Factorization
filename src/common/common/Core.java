@@ -52,7 +52,7 @@ public class Core {
     public static final String modId = "factorization";
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
-    public static final String version = "0.8.00.dev9"; //@VERSION@
+    public static final String version = "0.8.00.dev10"; //@VERSION@
     public Core() {
         registry = new Registry();
         foph = new FactorizationOreProcessingHandler(); //We don't register foph yet.
@@ -114,6 +114,7 @@ public class Core {
     public static boolean stretchy_clay = true;
     public static boolean equal_opportunities_for_mobs = true;
     public static boolean invasiveCharge = false;
+    public static boolean enable_solar_steam = true;
     public static String language_file = "/mods/factorization/en_US.lang";
     
     static {
@@ -246,6 +247,7 @@ public class Core {
         equal_opportunities_for_mobs = getBoolConfig("equalOpportunitiesForMobs", "server", equal_opportunities_for_mobs, null);
         //invasiveCharge = getBoolConfig("invasiveCharge", "server", invasiveCharge, "Set to true to prevent charge from connecting over metal blocks.");
         //Broken. Doesn't work.
+        enable_solar_steam = getBoolConfig("enableSolarSteam", "server", enable_solar_steam, "Set to false to disable the crafting recipe for solar2steam machines");
         config.save();
     }
 
@@ -365,9 +367,8 @@ public class Core {
         profileEnd();
         profileEnd();
     }
-
-    public static void brand(ItemStack is, List list) {
-        String hint_key = is.getItem().getUnlocalizedName(is) + ".hint";
+    
+    private static void addTranslationHints(String hint_key, List list) {
         StringTranslate st = StringTranslate.getInstance();
         if (st.containsTranslateKey(hint_key) /* func_94520_b = containsTranslateKey */ ) {
             String hint = st.translateKey(hint_key);
@@ -379,6 +380,14 @@ public class Core {
                     }
                 }
             }
+        }
+    }
+    
+    public static void brand(ItemStack is, List list) {
+        String name = is.getItem().getUnlocalizedName(is);
+        addTranslationHints(name + ".hint", list);
+        if (proxy.isClientHoldingShift()) {
+            addTranslationHints(name + ".shift", list);
         }
         if (add_branding) {
             list.add("Factorization");

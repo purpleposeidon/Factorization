@@ -129,7 +129,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     }
     
     int getHeat() {
-        return reflector_count;
+        return Math.max(reflector_count - 3, 0);
     }
     
     void sanitize() {

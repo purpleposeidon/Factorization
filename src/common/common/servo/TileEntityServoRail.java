@@ -92,16 +92,12 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         }
     }
     
-    TileEntityServoRail getAt(ForgeDirection dir) {
+    boolean has(ForgeDirection dir) {
         TileEntity te = worldObj.getBlockTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
         if (te instanceof TileEntityServoRail) {
-            return (TileEntityServoRail) te;
+            return true;
         }
-        return null;
-    }
-    
-    boolean has(ForgeDirection dir) {
-        return getAt(dir) != null;
+        return false;
     }
     
     public boolean fillSideInfo(boolean[] sides) {

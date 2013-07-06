@@ -34,6 +34,7 @@ public enum FactoryType {
     CERAMIC(25, false, TileEntityGreenware.class, "factory_ceramic"), //clay sculpture (Not really implemented)
     LEYDENJAR(26, false, TileEntityLeydenJar.class, "factory_leyjar"), //inefficient bulk energy storage
     SERVORAIL(27, false, TileEntityServoRail.class, "factory_rail"),
+    PARASIEVE(28, true, TileEntityParaSieve.class, "factory_sieve"),
     
 
     POCKETCRAFTGUI(101, true)

@@ -30,6 +30,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
 import factorization.common.NetworkFactorization.MessageType;
+import factorization.common.servo.Decorator;
+import factorization.common.servo.TileEntityServoRail;
 
 public class BlockFactorization extends BlockContainer {
     public boolean fake_normal_render = false;
@@ -93,7 +95,14 @@ public class BlockFactorization extends BlockContainer {
         if (ft == FactoryType.ROCKETENGINE) {
             return new ItemStack(Core.registry.rocket_engine);
         }
-        return new ItemStack(Core.registry.item_factorization, 1, tec.getFactoryType().md);
+        if (ft == FactoryType.SERVORAIL) {
+            TileEntityServoRail sr = (TileEntityServoRail) tec;
+            final Decorator decoration = sr.getDecoration();
+            if (decoration != null) {
+                return decoration.toItem();
+            }
+        }
+        return new ItemStack(Core.registry.item_factorization, 1, ft.md);
     }
 
     @Override
@@ -345,6 +354,7 @@ public class BlockFactorization extends BlockContainer {
         itemList.add(reg.stamper_item);
         itemList.add(reg.packager_item);
         itemList.add(reg.slagfurnace_item);
+        itemList.add(reg.parasieve_item);
 
         //dark
         itemList.add(reg.router_item);

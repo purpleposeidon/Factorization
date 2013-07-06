@@ -156,7 +156,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
                         int color = 0xFFFFFF; 
                         if (greenware.worldObj != null) {
                             try {
-                                color = it.colorMultiplier(greenware.worldObj, greenware.xCoord, greenware.yCoord, greenware.zCoord); //NORELEASE: try/catch w/ error message
+                                color = it.colorMultiplier(greenware.worldObj, greenware.xCoord, greenware.yCoord, greenware.zCoord);
                             } catch (Throwable t) {
                                 if (!spammed) {
                                     spammed = true;

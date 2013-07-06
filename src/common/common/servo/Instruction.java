@@ -6,13 +6,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.common.Core;
-import factorization.common.FactorizationUtil;
 
 
 public abstract class Instruction extends Decorator {
     @Override
     public boolean onClick(EntityPlayer player, Coord block, ForgeDirection side) {
-        TileEntityServoRail rail = block.getTE(TileEntityServoRail.class);
+        /*TileEntityServoRail rail = block.getTE(TileEntityServoRail.class);
         if (rail == null) {
             return false;
         }
@@ -20,7 +19,8 @@ public abstract class Instruction extends Decorator {
             FactorizationUtil.spawnItemStack(player, rail.decoration.toItem());
         }
         rail.setDecoration(this);
-        return true;
+        return true;*/
+        return false;
     }
     
     @Override
@@ -36,8 +36,8 @@ public abstract class Instruction extends Decorator {
     @Override
     protected void addRecipes() {
         Core.registry.recipe(toItem(),
-                "P<#",
-                'P', Item.paper,
+                "I<#",
+                'I', Core.registry.dark_iron,
                 '<', getRecipeItem(),
                 '#', Core.registry.logicMatrixProgrammer);
     }
