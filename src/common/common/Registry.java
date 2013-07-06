@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -118,7 +119,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ActuatorItemSyringe actuator_item_manipulator;
     public ItemStack dark_iron_sprocket, sprocket_motor;
 
-    public Material materialMachine = Material.anvil; //new Material(MapColor.ironColor);
+    public Material materialMachine = /*Material.anvil; */ new Material(MapColor.ironColor); //If we use vanilla's, TConstruct tools aren't stupid slow. If we use ours, blocks will drop when broken by hand.
 
     WorldGenMinable silverGen;
     
