@@ -71,6 +71,9 @@ public class ActuatorItemSyringe extends ActuatorItem {
     }
     @Override
     public boolean use(ItemStack is, Entity user, MovingObjectPosition mop) throws IOException {
+        if (user.worldObj.isRemote) {
+            return true;
+        }
         State state = (new DataInNBT(FactorizationUtil.getTag(is))).as(Share.VISIBLE, "").put(new State());
         if (isSneaking(user)) {
             giveItem(state, is, user, mop);

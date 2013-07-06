@@ -11,7 +11,6 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
-import factorization.common.FactorizationUtil.FzInv;
 import factorization.common.servo.ActuatorItem;
 import factorization.common.servo.Instruction;
 import factorization.common.servo.ServoMotor;
@@ -30,23 +29,15 @@ public class ActivateActuator extends Instruction {
 
     @Override
     public void motorHit(ServoMotor motor) {
-        FzInv mi = motor.getInv();
-        for (int i = 0; i < mi.size(); i++) {
-            ItemStack is = mi.get(i);
-            if (is == null) {
-                continue;
-            }
-            if (is.getItem() instanceof ActuatorItem) {
-                ActuatorItem actuator = (ActuatorItem) is.getItem();
-                if (actuator == null) {
-                    return;
-                }
-                boolean last_sneak = motor.sneaking;
-                motor.sneaking = sneaky;
-                actuator.onUse(is, motor);
-                motor.sneaking = last_sneak;
-            }
+        ItemStack is = motor.getActuator();
+        if (is == null) {
+            return;
         }
+        ActuatorItem actuator = (ActuatorItem) is.getItem();
+        boolean last_sneak = motor.sneaking;
+        motor.sneaking = sneaky;
+        actuator.onUse(is, motor);
+        motor.sneaking = last_sneak;
     }
     
     @Override

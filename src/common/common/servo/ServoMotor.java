@@ -36,7 +36,6 @@ import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.Share;
 import factorization.common.Core;
-import factorization.common.FactorizationHack;
 import factorization.common.FactorizationUtil;
 import factorization.common.FactorizationUtil.FzInv;
 
@@ -542,9 +541,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 if (index < 0) {
                     break;
                 }
-                ItemStack is = FactorizationHack.loadItemStackFromDataInput(input);
-                if (is != null && is.itemID == 0) {
-                    is = null;
+                int id = input.readInt(), damage = input.readInt();
+                ItemStack is = null;
+                if (id != 0) {
+                    is = new ItemStack(id, 1, damage);
                 }
                 inv[index] = is;
             }
@@ -648,9 +648,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             }
             toSend.add(i);
             if (inv[i] == null) {
-                toSend.add(EMPTY_ITEM);
+                toSend.add(0);
+                toSend.add(0);
             } else {
-                toSend.add(inv[i]);
+                toSend.add((int)inv[i].itemID);
+                toSend.add((int)inv[i].getItemDamage() /* ugh, why isn't that field public */);
             }
             inv_last_sent[i] = inv[i];
         }
@@ -680,5 +682,23 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     private FzInv my_fz_inv = FactorizationUtil.openInventory(this, 0);
     public FzInv getInv() {
         return my_fz_inv;
+    }
+    
+    public ItemStack getActuator() {
+        FzInv mi = getInv();
+        for (int i = 0; i < mi.size(); i++) {
+            ItemStack is = mi.get(i);
+            if (is == null) {
+                continue;
+            }
+            if (is.getItem() instanceof ActuatorItem) {
+                ActuatorItem actuator = (ActuatorItem) is.getItem();
+                if (actuator == null) {
+                    continue;
+                }
+                return is;
+            }
+        }
+        return null;
     }
 }
