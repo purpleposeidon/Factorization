@@ -651,8 +651,12 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 toSend.add(0);
                 toSend.add(0);
             } else {
-                toSend.add((int)inv[i].itemID);
-                toSend.add((int)inv[i].getItemDamage() /* ugh, why isn't that field public */);
+                int id = (int)inv[i].itemID;
+                toSend.add(id);
+                inv[i].itemID = 1;
+                int damage = inv[i].getItemDamage(); /* field is private for some reason; we'll trust that stone does the right thing. */
+                inv[i].itemID = id;
+                toSend.add(damage);
             }
             inv_last_sent[i] = inv[i];
         }
