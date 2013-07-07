@@ -1026,9 +1026,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'P', Block.pistonBase);
         ServoComponent.setupRecipes();
         recipe(parasieve_item,
+                "I#I",
+                "DmD",
                 "IHI",
-                "ImI",
-                "DID",
+                '#', Block.fenceIron,
                 'I', Item.ingotIron,
                 'D', dark_iron,
                 'H', Block.hopperBlock,
