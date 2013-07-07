@@ -25,9 +25,11 @@ import org.lwjgl.opengl.GL11;
 
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
+import factorization.common.BlockRenderHelper;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
 import factorization.common.FactorizationUtil.FzInv;
+import factorization.common.ItemIcons;
 
 public class RenderServoMotor extends RenderEntity {
     static int sprocket_display_list = -1;
@@ -157,7 +159,7 @@ public class RenderServoMotor extends RenderEntity {
         float s = 0.5F;
         GL11.glScalef(s, s, s);
 
-        renderMainModel(motor, partial, ro);
+        renderMainModel(motor, partial, ro, false);
         boolean render_stacks = false;
         if (highlighted) {
             GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -166,7 +168,7 @@ public class RenderServoMotor extends RenderEntity {
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.25F);
             GL11.glEnable(GL11.GL_BLEND);
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            renderMainModel(motor, partial, ro);
+            renderMainModel(motor, partial, ro, true);
             debug_servo_orientation = dso;
             GL11.glEnable(GL11.GL_TEXTURE_2D);
             GL11.glColor4f(1, 1, 1, 1);
@@ -217,7 +219,7 @@ public class RenderServoMotor extends RenderEntity {
             GL11.glPushMatrix();
             float theta = 360/count*c + 360*now;
             GL11.glRotatef(theta, 0, 1, 0);
-            GL11.glTranslatef(0.75F + (float)Math.cos(Math.toRadians(theta*short_count))/16, 0.5F, 0);
+            GL11.glTranslatef(0.75F + (float)Math.cos(Math.toRadians(theta*short_count))/16, 0.75F, 0);
             GL11.glScalef(s, s, s);
             
             try {
@@ -231,7 +233,7 @@ public class RenderServoMotor extends RenderEntity {
         }
     }
 
-    void renderMainModel(ServoMotor motor, float partial, double ro) {
+    void renderMainModel(ServoMotor motor, float partial, double ro, boolean hilighting) {
         // TODO: Put our textures into ItemIcons
         GL11.glPushMatrix();
         if (loaded_model == false) {
@@ -247,7 +249,7 @@ public class RenderServoMotor extends RenderEntity {
         double constant = Math.PI * 2 * (radius);
         double dr = motor.sprocket_rotation - motor.prev_sprocket_rotation;
         double partial_rotation = motor.prev_sprocket_rotation + dr * partial;
-        double angle = constant * partial_rotation;
+        final double angle = constant * partial_rotation;
 
         radius = 0.25 + 1.5 / 48.0;
 
@@ -276,6 +278,28 @@ public class RenderServoMotor extends RenderEntity {
             renderSprocket();
             GL11.glPopMatrix();
         }
+
+        //Axles
+        GL11.glPopMatrix();
+        if (!hilighting) {
+            loadTexture(Core.texture_file_item);
+        }
+        renderServoPlate();
+    }
+    
+    void renderServoPlate() {
+        GL11.glPushMatrix();
+        GL11.glTranslatef(0.6F, 2.5F/16F, 0F);
+        float sh = 2F, sv = 1.5F;
+        GL11.glScalef(sh, sv, sh);
+        BlockRenderHelper block = Core.registry.blockRender;
+        float height = 7F/16F;
+        block.setBlockBounds(0, 8F/16F, 0, 10F/16F, 10F/16F, 1);
+        block.useTextures(ItemIcons.servo$plate, ItemIcons.servo$plate,
+                ItemIcons.servo$plate_side_left, ItemIcons.servo$plate_side_right,
+                ItemIcons.servo$plate_side_red, ItemIcons.servo$plate_side_silver);
+        Minecraft mc = Minecraft.getMinecraft();
+        block.renderForInventory(mc.renderGlobal.globalRenderBlocks);
         GL11.glPopMatrix();
     }
 

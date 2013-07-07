@@ -23,7 +23,7 @@ public class BlockRenderHelper extends Block {
     public BlockRenderHelper() {
         super(Core.factory_block_id, Material.grass);
         blocksList[blockID] = null;
-        //These three shouldn't strictly be necessary
+        // These three shouldn't strictly be necessary
         opaqueCubeLookup[blockID] = false;
         lightOpacity[blockID] = 0;
         canBlockGrass[blockID] = false;
@@ -31,7 +31,7 @@ public class BlockRenderHelper extends Block {
             instance = this;
         }
     }
-    
+
     public BlockRenderHelper setBlockBoundsOffset(float x, float y, float z) {
         setBlockBounds(x, y, z, 1 - x, 1 -y , 1 - z);
         return this;

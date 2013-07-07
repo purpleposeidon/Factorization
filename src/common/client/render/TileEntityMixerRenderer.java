@@ -23,7 +23,7 @@ public class TileEntityMixerRenderer extends TileEntitySpecialRenderer {
     }
     
     
-    static void renderWithRotation(float rotation) {
+    public static void renderWithRotation(float rotation) {
         //GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         //GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         GL11.glTranslatef(0.5F, -0.5F/8F, -0.5F);
@@ -37,18 +37,23 @@ public class TileEntityMixerRenderer extends TileEntitySpecialRenderer {
         drawProp();
         GL11.glPopMatrix();
         
+        GL11.glTranslatef(-0.5F, -1.1F, -0.5F);
+        renderAxle(false);
+    }
+    
+    public static void renderAxle(boolean render_top) {
         Tessellator tess = Tessellator.instance;
         tess.startDrawingQuads();
         tess.setColorOpaque_F(1, 1, 1);
         BlockRenderHelper block = BlockRenderHelper.instance;
         Icon crank = ItemIcons.charge$crankshaft;
-        block.useTextures(null, null, crank, crank, crank, crank);
+        Icon top = render_top ? crank : null;
+        block.useTextures(top, null, crank, crank, crank, crank);
         float d = 3F/8F;
         block.setBlockBoundsOffset(d, 2.5F/8F, d);
         block.begin();
         block.renderForTileEntity();
         //GL11.glTranslatef(-1, 0, 0);
-        GL11.glTranslatef(-0.5F, -1.1F, -0.5F);
         Tessellator.instance.draw();
     }
 

@@ -1009,12 +1009,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'M', motor,
                 'c', Item.comparator);
         oreRecipe(new ItemStack(servo_motor_placer),
-                "MDL",
+                "MS ",
                 " #P",
-                "MDL",
+                "MS ",
                 'M', sprocket_motor,
-                'D', dark_iron,
-                'L', "ingotLead",
+                'S', "ingotSilver",
                 '#', logicMatrix,
                 'P', logicMatrixProgrammer);
         oreRecipe(new ItemStack(actuator_item_manipulator),

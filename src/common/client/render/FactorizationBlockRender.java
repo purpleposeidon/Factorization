@@ -387,7 +387,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         ItemRenderer.renderItemIn2D(tessellator, f1, f2, f, f3, icon.getSheetWidth(), icon.getSheetHeight(), 0.0625F);
     }
 
-    protected void renderMotor(RenderBlocks rb, float yoffset) {
+    public void renderMotor(RenderBlocks rb, float yoffset) {
         Icon metal = BlockIcons.motor_texture;
         //metal = 11;
         float d = 4.0F / 16.0F;
