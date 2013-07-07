@@ -90,6 +90,7 @@ public class RenderServoMotor extends RenderEntity {
     private static boolean debug_servo_orientation = false;
 
     public void doRender(Entity ent, double x, double y, double z, float yaw, float partial) {
+        Core.profileStartRender("servo");
         MovingObjectPosition mop = Minecraft.getMinecraft().objectMouseOver;
         boolean highlighted = mop != null && mop.entityHit == ent;
         ServoMotor motor = (ServoMotor) ent;
@@ -191,6 +192,7 @@ public class RenderServoMotor extends RenderEntity {
             renderStacks(motor);
         }
         GL11.glPopMatrix();
+        Core.profileEndRender();
     }
 
     RenderItem renderItem = new RenderItem();
