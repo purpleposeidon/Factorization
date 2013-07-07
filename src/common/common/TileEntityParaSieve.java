@@ -53,18 +53,16 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     }
     
     boolean itemPassesFilter(ItemStack stranger) {
-        boolean no_filter = true;
         for (int i = 0; i < filters.length/2; i++) {
             ItemStack a = filters[i*2], b = filters[i*2 + 1];
             if (a == b && b == null) {
                 continue;
             }
-            no_filter = false;
             if (FactorizationUtil.itemInRange(a, b, stranger)) {
                 return true;
             }
         }
-        return no_filter;
+        return false;
     }
     
     private boolean recursing = false;
