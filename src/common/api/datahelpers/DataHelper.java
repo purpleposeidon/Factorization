@@ -157,9 +157,10 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
             }
             return put(value);
         } else {
+            Class value_type = value.getClass();
             for (int i = 0; i < validTypes.length; i++) {
                 Class type = validTypes[i];
-                if (value.getClass() == type) { //TODO NORELEASE: Pull getClass out
+                if (value_type == type) {
                     asSameShare(orig_name + ".type").put(i);
                     asSameShare(orig_name);
                     put(value);
