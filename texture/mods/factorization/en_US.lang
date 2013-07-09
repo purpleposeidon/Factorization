@@ -5,7 +5,7 @@ factorization.factoryBlock.STAMPER.name=Craftpacket Stamper
 factorization.factoryBlock.PACKAGER.name=Packager
 factorization.factoryBlock.SLAGFURNACE.name=Slag Furnace
 factorization.factoryBlock.ROUTER.name=Router
-factorization.factoryBlock.ROUTER.hint=Also try Servos!
+#factorization.factoryBlock.ROUTER.hint=Also try Servos!
 factorization.factoryBlock.LAMP.name=Wrath Lamp
 item.factorization:charge_battery.name=Battery Block
 item.factorization:charge_battery.hint=Charge bounds: 20-30
@@ -132,7 +132,7 @@ item.factorization:ceramics/glaze_bucket.base_mimicry.name=Glaze Base: Mimicing
 #Servos
 factorization:servo/component.name=Servo Component
 item.factorization:servo/servo.name=Servo
-item.factorization:servo/servo.hint=See the changelog.\nPlease give feedback!
+#item.factorization:servo/servo.hint=See the changelog.\nPlease give feedback!
 item.factorization:servo/sprocket.name=Dark Iron Sprocket
 item.factorization:servo/servo_motor.name=Servo Motor
 item.factorization:servo/component.fz.decorator.equipmentBay.name=Loading Bay

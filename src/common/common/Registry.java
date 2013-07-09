@@ -990,6 +990,12 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         }
         
         //Servos
+        if (Core.servos_enabled) {
+            makeServoRecipes();
+        }
+    }
+    
+    private void makeServoRecipes() {
         ItemStack rails = servorail_item.copy();
         rails.stackSize = 8;
         oreRecipe(rails, "DLD",
