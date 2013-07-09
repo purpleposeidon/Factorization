@@ -218,7 +218,7 @@ An Actuator is an item that Servos and players can use. Click on a Servo with an
 The Item Syringe is an actuator. Right-clicking an inventory will pull an item out of it into the user's inventory, and shift-right-clicking will push an item into it from the user's inventory.
 
 (This area is not fully implemented)
-Servo Motors have 16 seperate stacks for things like integers, strings, and instructions. Each stack can hold up to 16 items. The math and configure instructions use a particular stack. The Item Syringe two configuration parts: the slot, and how much to pull. By default it pulls from slot -1 (meaning any slot), and a limit of 64.
+Servo Motors have 16 seperate stacks for things like integers, strings, and instructions. Each stack can hold up to 16 items. The math and configure instructions use a particular stack. The Item Syringe has two configuration parts: the slot, and how much to pull. By default it pulls from slot -1 (meaning any slot), and a limit of 64.
 [/spoiler]
 
 [u]Other Stuff/Future Plans[/u]
@@ -239,7 +239,7 @@ This is a [url="http://files.minecraftforge.net/"]Minecraft Forge[/url] mod. It 
 
 
 [u][b][size=6][anchor=DOWNLOAD]Download[/anchor][/size][/b][/u]
-Factorization 0.8.01 (MC 1.5.1)
+Factorization 0.8.01 (MC 1.5.2)
 [url="http://adf.ly/2137658/http://www.mediafire.com/?0x3gc3kcl4rp4x2"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.8.01.jar"]adfly + DropBox[/url]
 Built on 2013-07-08 against Minecraft Forge 7.8.0.696
