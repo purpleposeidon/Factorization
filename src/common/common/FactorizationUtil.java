@@ -150,11 +150,12 @@ public class FactorizationUtil {
             String nb = cb.getName();
             String n_stranger = c_stranger.getName();
             int end = Math.min(na.length(), nb.length());
+            int end_stranger = n_stranger.length();
             for (int i = 0; i < end; i++) {
                 char x = na.charAt(i);
                 char y = nb.charAt(i);
                 if (x == y) {
-                    if (n_stranger.charAt(i) != x) {
+                    if (end_stranger <= i || n_stranger.charAt(i) != x) {
                         return false;
                     }
                 } else {
