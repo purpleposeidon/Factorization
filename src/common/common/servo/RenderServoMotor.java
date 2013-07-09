@@ -166,7 +166,7 @@ public class RenderServoMotor extends RenderEntity {
             GL11.glDisable(GL11.GL_TEXTURE_2D);
             boolean dso = debug_servo_orientation;
             debug_servo_orientation = false;
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.25F);
+            GL11.glColor4f(0.0F, 0.75F, 0.75F, 0.11F);
             GL11.glEnable(GL11.GL_BLEND);
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             renderMainModel(motor, partial, ro, true);
@@ -179,7 +179,6 @@ public class RenderServoMotor extends RenderEntity {
                 ItemStack is = player.getHeldItem();
                 final ItemStack helmet = player.getCurrentArmor(3);
                 if (is != null && is.getItem() == Core.registry.logicMatrixProgrammer || FactorizationUtil.oreDictionarySimilar("visionInducingEyewear", helmet)) {
-                    renderInventory(motor, partial);
                     render_stacks = true;
                 }
             }
@@ -189,6 +188,9 @@ public class RenderServoMotor extends RenderEntity {
         motor.interpolatePosition(motor.pos_progress);
         GL11.glPopMatrix();
         if (render_stacks) {
+            GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
+            GL11.glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
+            renderInventory(motor, partial);
             renderStacks(motor);
         }
         GL11.glPopMatrix();
@@ -198,7 +200,9 @@ public class RenderServoMotor extends RenderEntity {
     RenderItem renderItem = new RenderItem();
 
     void renderInventory(ServoMotor motor, float partial) {
-        float s = 1/2F;
+        GL11.glPushMatrix();
+        GL11.glRotatef(90, 1, 0, 0);
+        float s = 1/4F;
         ItemStack actuator = motor.getActuator();
         FzInv inv = motor.getInv();
         final Minecraft mc = Minecraft.getMinecraft();
@@ -210,7 +214,6 @@ public class RenderServoMotor extends RenderEntity {
         for (int i = 0; i < inv.size(); i++) {
             count += inv.get(i) == null ? 0 : 1;
         }
-        short short_count = (short) Math.min(count, 6); //7, 8, and 9 have awkward harmonics
         int c = 0;
         for (int i = 0; i < inv.size(); i++) {
             ItemStack is = inv.get(i);
@@ -219,11 +222,12 @@ public class RenderServoMotor extends RenderEntity {
             }
             c++;
             GL11.glPushMatrix();
-            float theta = 360/count*c + 360*now;
+            float theta = 360/count*c;
             GL11.glRotatef(theta, 0, 1, 0);
-            GL11.glTranslatef(0.75F + (float)Math.cos(Math.toRadians(theta*short_count))/16, 0.75F, 0);
+            GL11.glTranslatef(0.65F, -0.25F, 0);
             GL11.glScalef(s, s, s);
-            
+            GL11.glRotatef(90, 1, 0, 0);
+            GL11.glRotatef(-90, 0, 0, 1);
             try {
                 renderItem(motor, is, partial);
             } catch (Exception e) {
@@ -233,6 +237,7 @@ public class RenderServoMotor extends RenderEntity {
             }
             GL11.glPopMatrix();
         }
+        GL11.glPopMatrix();
     }
 
     void renderMainModel(ServoMotor motor, float partial, double ro, boolean hilighting) {
@@ -253,7 +258,7 @@ public class RenderServoMotor extends RenderEntity {
         double partial_rotation = motor.prev_sprocket_rotation + dr * partial;
         final double angle = constant * partial_rotation;
 
-        radius = 0.25 + 1.5 / 48.0;
+        radius = 0.25 - 1.0 / 48.0;
 
         float rd = (float) (radius + rail_width);
         if (motor.orientation != motor.prevOrientation) {
@@ -266,16 +271,18 @@ public class RenderServoMotor extends RenderEntity {
             }
         }
         // Sprocket rendering. (You wouldn't have been able to tell by reading the code.)
+        float height_d = -1.5F/64F;
+        GL11.glRotatef(180, 1, 0, 0);
         {
             GL11.glPushMatrix();
-            GL11.glTranslatef(0, 0, rd);
+            GL11.glTranslatef(0, height_d, rd);
             GL11.glRotatef((float) Math.toDegrees(angle), 0, 1, 0);
             renderSprocket();
             GL11.glPopMatrix();
         }
         {
             GL11.glPushMatrix();
-            GL11.glTranslatef(0, 0, -rd);
+            GL11.glTranslatef(0, height_d, -rd);
             GL11.glRotatef((float) Math.toDegrees(-angle) + 360F / 9F, 0, 1, 0);
             renderSprocket();
             GL11.glPopMatrix();
@@ -296,7 +303,7 @@ public class RenderServoMotor extends RenderEntity {
         GL11.glScalef(sh, sv, sh);
         BlockRenderHelper block = Core.registry.blockRender;
         float height = 7F/16F;
-        block.setBlockBounds(0, 8F/16F, 0, 10F/16F, 10F/16F, 1);
+        block.setBlockBounds(0, 8F/16F, 0, 10F/16F, 9F/16F, 1);
         block.useTextures(ItemIcons.servo$plate, ItemIcons.servo$plate,
                 ItemIcons.servo$plate_side_left, ItemIcons.servo$plate_side_right,
                 ItemIcons.servo$plate_side_red, ItemIcons.servo$plate_side_silver);
@@ -373,8 +380,6 @@ public class RenderServoMotor extends RenderEntity {
         
         float s = 1F/128F;
         GL11.glScalef(s, s, s);
-        GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
-        GL11.glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
         for (int i = 0; i < ServoMotor.STACKS; i++) {
             GL11.glPushMatrix();
             ServoStack ss = motor.getServoStack(i);
