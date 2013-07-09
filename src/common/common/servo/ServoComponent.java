@@ -144,6 +144,9 @@ public abstract class ServoComponent implements IDataSerializable {
         NBTTagCompound tag = new NBTTagCompound();
         save(tag);
         ret.setTagCompound(tag);
+        String name = getName();
+        int dmg = Math.abs(name.hashCode()) % (Short.MAX_VALUE);
+        ret.setItemDamage(dmg);
         return ret;
     }
     
