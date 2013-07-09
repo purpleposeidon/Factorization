@@ -70,7 +70,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     double sprocket_rotation = 0, prev_sprocket_rotation = 0;
     double servo_reorient = 0, prev_servo_reorient = 0;
 
-    static final double maxSpeed = 0.0875 /* NORELEASE: 0.1 */, slowedSpeed = maxSpeed / 20, minSpeed = slowedSpeed / 10;
+    static final double maxSpeed = 0.0875 /* NORELEASE: 0.0875 */, slowedSpeed = maxSpeed / 20, minSpeed = slowedSpeed / 10;
 
     private static class MessageType {
         static final short motor_description = 100, motor_direction = 101, motor_speed = 102, motor_inventory = 103;
@@ -452,8 +452,8 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
         if (is.getItem() instanceof ActuatorItem) {
             ItemStack toPush = is.splitStack(1);
-            if (FactorizationUtil.getStackSize(getInv().push(toPush)) == 0) {
-                return true;
+            if (FactorizationUtil.getStackSize(getInv().push(toPush)) <= 0) {
+                return false;
             }
             is.stackSize++;
             return false;
