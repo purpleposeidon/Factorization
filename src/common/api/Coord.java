@@ -707,4 +707,12 @@ public class Coord implements IDataSerializable {
     public boolean hasSimilarCoordinate(Coord other) {
         return x == other.x || y == other.y || z == other.z;
     }
+    
+    public int getComparatorOverride(ForgeDirection side) {
+        Block b = getBlock();
+        if (b == null || !b.hasComparatorInputOverride()) {
+            return 0;
+        }
+        return b.getComparatorInputOverride(w, x, y, z, side.ordinal());
+    }
 }

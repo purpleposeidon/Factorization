@@ -657,4 +657,18 @@ public class BlockFactorization extends BlockContainer {
         }
         return tec.getValidRotations();
     }
+    
+    @Override
+    public boolean hasComparatorInputOverride() {
+        return true;
+    }
+    
+    @Override
+    public int getComparatorInputOverride(World world, int x, int y, int z, int side) {
+        TileEntityCommon tec = new Coord(world, x, y, z).getTE(TileEntityCommon.class);
+        if (tec == null) {
+            return 0;
+        }
+        return tec.getComparatorValue(ForgeDirection.getOrientation(side));
+    }
 }

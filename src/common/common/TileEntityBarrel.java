@@ -604,4 +604,19 @@ public class TileEntityBarrel extends TileEntityFactorization {
     public ForgeDirection[] getValidRotations() {
         return flat_rotation_array;
     }
+    
+    @Override
+    public int getComparatorValue(ForgeDirection side) {
+        int count = getItemCount();
+        if (count == 0) {
+            return 0;
+        }
+        int max = getMaxSize();
+        if (count == max) {
+            return 15;
+        }
+        float v = count/(float)max;
+        return (int) Math.max(1, v*14);
+        //return super.getComparatorValue(side);
+    }
 }

@@ -1,10 +1,5 @@
 package factorization.common;
 
-import org.bouncycastle.util.Arrays;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -12,6 +7,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
+
+import org.bouncycastle.util.Arrays;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class TileEntityParaSieve extends TileEntityFactorization implements ISidedInventory {
     ItemStack[] filters = new ItemStack[8];
@@ -65,13 +65,28 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         return false;
     }
     
-    private boolean recursing = false;
-    IInventory getTarget() {
-        if (recursing || putting_nbt || worldObj == null || worldObj.isRemote) {
-            return null;
+    private boolean is_recursing = false;
+    private static ThreadLocal<Integer> recursion_count = new ThreadLocal<Integer>() { protected Integer initialValue() {return 0;};};
+    
+    protected boolean beginRecursion() {
+        recursion_count.set(recursion_count.get() + 1);
+        if (is_recursing || recursion_count.get() > 6) {
+            return true;
         }
-        recursing = true;
+        is_recursing = true;
+        return false;
+    }
+    
+    protected void endRecursion() {
+        is_recursing = false;
+        recursion_count.set(Math.min(0, recursion_count.get() - 1));
+    }
+    
+    IInventory getTarget() {
         try {
+            if (beginRecursion() || putting_nbt || worldObj == null || worldObj.isRemote) {
+                return null;
+            }
             ForgeDirection facing = getFacing();
             if (facing == ForgeDirection.UNKNOWN) {
                 return null;
@@ -86,7 +101,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             }
             return null;
         } finally {
-            recursing = false;
+            endRecursion();
         }
     }
     
@@ -216,5 +231,18 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         } else {
             return BlockIcons.parasieve_side;
         }
+    }
+    
+    @Override
+    public int getComparatorValue(ForgeDirection side) {
+        try {
+            if (beginRecursion()) {
+                return 11;
+            }
+            return getCoord().add(getFacing()).getComparatorOverride(getFacing().getOpposite());
+        } finally {
+            endRecursion();
+        }
+        
     }
 }

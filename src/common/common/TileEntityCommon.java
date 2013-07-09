@@ -8,6 +8,8 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
@@ -225,6 +227,13 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     
     //Requires the BlockClass to be MachineDynamicLightable
     public int getDynamicLight() {
+        return 0;
+    }
+    
+    public int getComparatorValue(ForgeDirection side) {
+        if (this instanceof IInventory) {
+            return Container.calcRedstoneFromInventory((IInventory)this);
+        }
         return 0;
     }
 }
