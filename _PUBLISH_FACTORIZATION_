@@ -28,6 +28,8 @@ oldfile = exp("~/Dropbox/Public/old/" + filename)
 mfurl = exp("~/tmp/factorization_mediafire_url")
 run("rm " + mfurl)
 
+#Check for baddies
+run("ack-grep NORELEASE src/")
 
 #Factorization
 run("./make")
