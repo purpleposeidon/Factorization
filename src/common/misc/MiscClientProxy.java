@@ -27,9 +27,6 @@ import cpw.mods.fml.relauncher.Side;
 import factorization.common.Core;
 
 public class MiscClientProxy extends MiscProxy {
-    static {
-        // ImageIO.setUseCache(false); NORELEASE?
-    }
     @Override
     void runCommand(List<String> args) {
         if (args == null) {
