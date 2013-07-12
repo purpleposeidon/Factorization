@@ -11,6 +11,7 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.common.FakePlayer;
 import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
@@ -135,7 +136,7 @@ public abstract class FactorizationProxy implements IGuiHandler {
     }
 
     public void updatePlayerInventory(EntityPlayer player) {
-        if (player instanceof EntityPlayerMP) {
+        if (player instanceof EntityPlayerMP && !(player instanceof FakePlayer)) {
             EntityPlayerMP emp = (EntityPlayerMP) player;
             emp.sendContainerToPlayer(emp.inventoryContainer);
             // updates entire inventory. Inefficient, I know, but... XXX
