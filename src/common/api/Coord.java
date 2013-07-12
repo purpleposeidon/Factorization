@@ -160,6 +160,10 @@ public class Coord implements IDataSerializable {
     public Vec3 createVector() {
         return Vec3.createVectorHelper(x, y, z);
     }
+    
+    public MovingObjectPosition createMop(ForgeDirection side, Vec3 hitVec) {
+        return new MovingObjectPosition(x, y, z, side.ordinal(), hitVec);
+    }
 
     /** @return boolean for a checkerboard pattern */
     public boolean parity() {
@@ -378,6 +382,12 @@ public class Coord implements IDataSerializable {
         x += dc.x;
         y += dc.y;
         z += dc.z;
+    }
+    
+    public void adjust(ForgeDirection dc) {
+        x += dc.offsetX;
+        y += dc.offsetY;
+        z += dc.offsetZ;
     }
     
     //Methods on the world
