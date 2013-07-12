@@ -48,7 +48,11 @@ public class MiscNet implements IPacketHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        MiscellaneousNonsense.proxy.runCommand(text);
+        try {
+            MiscellaneousNonsense.proxy.runCommand(text);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

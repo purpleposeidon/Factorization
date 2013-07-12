@@ -153,6 +153,11 @@ public class MiscClientProxy extends MiscProxy {
                 return;
             }
             watch_dog.sleep_time = Double.parseDouble(args.get(1));
+        } else if (n.equalsIgnoreCase("timedilation") || n.equalsIgnoreCase("td")) {
+            float dilation = Float.parseFloat(args.get(1));
+            dilation = Math.max(0.1F, dilation);
+            dilation = Math.min(1F, dilation);
+            Core.lowest_dilation = dilation;
         } else {
             player.addChatMessage("Unknown command: " + n);
         }
