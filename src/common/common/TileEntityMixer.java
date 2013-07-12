@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -575,14 +576,14 @@ public class TileEntityMixer extends TileEntityFactorization implements
             ItemStack toAdd = outputBuffer.get(0);
             FzInv out = FactorizationUtil.openInventory(this, ForgeDirection.DOWN);
             out.setInsertForce(true);
-            toAdd = out.push(toAdd);
-            if (toAdd == null) {
-                outputBuffer.remove(0);
-                return outputBuffer.size() > 0;
+            Iterator<ItemStack> it = outputBuffer.iterator();
+            while (it.hasNext()) {
+                if (out.push(it.next()) == null) {
+                    it.remove();
+                }
             }
-            return false;
         }
-        return false;
+        return outputBuffer.size() > 0;
     }
 
     @Override
@@ -613,8 +614,6 @@ public class TileEntityMixer extends TileEntityFactorization implements
             progress = 0;
             craftRecipe(mr);
             normalize(input);
-            int count = 8; //Was needed for about 20 seconds. Let's keep it anyways.
-            while (dumpBuffer() && count-- > 0) ;
             speed = Math.min(50, speed + 1);
             dumpBuffer();
         }
