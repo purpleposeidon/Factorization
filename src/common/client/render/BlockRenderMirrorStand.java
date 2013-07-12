@@ -27,13 +27,20 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
         float radius = 1F / 16F;
         float c = 0.5F;
         Icon silver = Core.registry.resource_block.getIcon(0, ResourceType.SILVERBLOCK.md);
-        renderPart(rb, silver, c - radius, 0, c - radius, c + radius, height, c + radius);
+        
+        //Pole
+        BlockRenderHelper block = Core.registry.blockRender;
+        block.useTexture(silver);
+        block.setTexture(0, null);
+        block.setBlockBounds(c - radius, 0, c - radius, c + radius, height, c + radius);
+        block.render(rb, x, y, z);
+        
+        //Base
         float trim = 3F / 16F;
         float trim_height = 2F / 16F;
         renderPart(rb, silver, trim, 0, trim, 1 - trim, trim_height, 1 - trim);
         
-        
-        BlockRenderHelper block = BlockRenderHelper.instance;
+        //Mirror
         block.setBlockBoundsOffset(2F/16F, 7.5F/16F, 2F/16F);
         //block.setBlockBoundsOffset(0, 0, 0);
         //block.setBlockBounds(0, 0, 0, 1, 1F/16F, 1);
