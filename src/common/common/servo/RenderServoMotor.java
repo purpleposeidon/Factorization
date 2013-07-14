@@ -82,12 +82,13 @@ public class RenderServoMotor extends RenderEntity {
         double v;
         // h(x,k) = (sin(x∙pi∙4.5)^2)∙x
         // v = Math.pow(Math.sin(r*Math.PI*4.5), 2)*r;
+        
         v = Math.min(1, r * r * 4);
         return (float) v;
     }
 
     private Quaternion q0 = new Quaternion(), q1 = new Quaternion();
-    private static boolean debug_servo_orientation = false;
+    private static boolean debug_servo_orientation = Core.dev_environ;
 
     public void doRender(Entity ent, double x, double y, double z, float yaw, float partial) {
         Core.profileStartRender("servo");
@@ -127,7 +128,6 @@ public class RenderServoMotor extends RenderEntity {
 
         // Servo facing
         float ro = interp(motor.servo_reorient, motor.prev_servo_reorient, partial);
-        // ro = (float) Math.min(1, ro*ro*4);
         Quaternion qt;
         if (prevOrientation == orientation) {
             qt = Quaternion.fromOrientation(orientation);
@@ -184,8 +184,13 @@ public class RenderServoMotor extends RenderEntity {
             }
         }
         GL11.glScalef(1 / s, 1 / s, 1 / s);
-        renderItem(motor, motor.getActuator(), partial);
-        motor.interpolatePosition(motor.pos_progress);
+        GL11.glPushMatrix();
+        ItemStack held = motor.getHeldItem();
+        if (held != null && held.getItem().isFull3D()) {
+            GL11.glTranslatef(0, 0.5F, 0);
+        }
+        renderItem(motor, held, partial);
+        GL11.glPopMatrix();
         GL11.glPopMatrix();
         if (render_stacks) {
             GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
@@ -195,6 +200,7 @@ public class RenderServoMotor extends RenderEntity {
         }
         GL11.glPopMatrix();
         Core.profileEndRender();
+        motor.interpolatePosition(motor.pos_progress);
     }
 
     RenderItem renderItem = new RenderItem();
@@ -203,7 +209,6 @@ public class RenderServoMotor extends RenderEntity {
         GL11.glPushMatrix();
         GL11.glRotatef(90, 1, 0, 0);
         float s = 1/4F;
-        ItemStack actuator = motor.getActuator();
         FzInv inv = motor.getInv();
         final Minecraft mc = Minecraft.getMinecraft();
         long range = 9*20;

@@ -52,7 +52,7 @@ public class Core {
     public static final String modId = "factorization";
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
-    public static final String version = "0.8.01"; //@VERSION@
+    public static final String version = "0.8.02dev0"; //@VERSION@
     public Core() {
         registry = new Registry();
         foph = new FactorizationOreProcessingHandler(); //We don't register foph yet.
@@ -115,7 +115,7 @@ public class Core {
     public static boolean equal_opportunities_for_mobs = true;
     public static boolean invasiveCharge = false;
     public static boolean enable_solar_steam = true;
-    public static boolean servos_enabled = false;
+    public static boolean servos_enabled = version.contains("dev");
     public static String language_file = "/mods/factorization/en_US.lang";
     
     static {

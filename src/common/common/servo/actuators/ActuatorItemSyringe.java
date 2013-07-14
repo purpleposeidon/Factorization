@@ -19,6 +19,7 @@ import factorization.common.Core;
 import factorization.common.FactorizationUtil;
 import factorization.common.FactorizationUtil.FzInv;
 import factorization.common.servo.ActuatorItem;
+import factorization.common.servo.ServoMotor;
 
 public class ActuatorItemSyringe extends ActuatorItem {
     public ActuatorItemSyringe(int itemId) {
@@ -71,20 +72,17 @@ public class ActuatorItemSyringe extends ActuatorItem {
         }
     }
     @Override
-    public boolean use(ItemStack is, Entity user, MovingObjectPosition mop) throws IOException {
+    public boolean use(ItemStack is, EntityPlayer user, ServoMotor motor, MovingObjectPosition mop) throws IOException {
         if (user.worldObj.isRemote) {
             return true;
         }
         State state = (new DataInNBT(FactorizationUtil.getTag(is))).as(Share.VISIBLE, "").put(new State());
-        if (isSneaking(user)) {
+        if (user.isSneaking()) {
             giveItem(state, is, user, mop);
         } else {
             takeItem(state, is, user, mop);
         }
-        if (user instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) user;
-            Core.proxy.updatePlayerInventory(player);
-        }
+        Core.proxy.updatePlayerInventory(user);
         return true;
     }
     

@@ -1,3 +1,8 @@
+0.8.01
+  Everything now supports comparators
+  Fixed smooth turning in servos
+  Servos can now right click with any item; now the only thing that makes actuators special is that the servo can configure them.
+
 0.8.00
   Changed license
   Limited Wrath Lamp RAM-eating

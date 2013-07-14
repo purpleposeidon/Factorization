@@ -15,6 +15,7 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.world.World;
+import net.minecraftforge.common.FakePlayer;
 import net.minecraftforge.common.ForgeDirection;
 
 import com.google.common.io.ByteArrayDataInput;
@@ -49,7 +50,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
     }
     private ItemStack[] inv = new ItemStack[9], inv_last_sent = new ItemStack[inv.length];
-    public boolean sneaking = false;
     public int next_stack = 0;
 
     boolean dampenVelocity;
@@ -75,6 +75,8 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     private static class MessageType {
         static final short motor_description = 100, motor_direction = 101, motor_speed = 102, motor_inventory = 103;
     }
+    
+    private EntityPlayer fakePlayer;
 
     public ServoMotor(World world) {
         super(world);
@@ -82,6 +84,42 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         double d = 0.5;
         pos_prev = new Coord(world, 0, 0, 0);
         pos_next = pos_prev.copy();
+        fakePlayer = new FakePlayer(world, "[Servo]");
+        fakePlayer.inventory.mainInventory = inv;
+    }
+    
+    public EntityPlayer getPlayer() {
+        ForgeDirection fd = orientation.facing;
+        interpolatePosition(0.5F);
+        //fakePlayer.setPosition(Math.floor(posX), posY, Math.floor(posZ));
+        double x = Math.floor(posX) + fd.offsetX*1;
+        double y = posY;
+        double z = Math.floor(posZ) + fd.offsetY*1;
+        if (fd == ForgeDirection.NORTH) { //Don't ask me why.
+            x++; //Why?
+            //Dude. I said not to ask.
+        }
+        fakePlayer.setPosition(x, y, z);
+        fakePlayer.rotationYaw = (float)Math.atan2(fd.offsetX, fd.offsetZ);
+        fakePlayer.rotationPitch = fd.offsetY*90;
+        //setPosition(posX, posY - 1024, posZ);
+        interpolatePosition(pos_progress);
+        return fakePlayer;
+    }
+    
+    public void finishUsingPlayer() {
+        //setPosition(posX, posY + 1024, posZ);
+        for (int i = 0; i < fakePlayer.inventory.armorInventory.length; i++) {
+            ItemStack is = fakePlayer.inventory.armorInventory[i];
+            if (is == null) {
+                continue;
+            }
+            ItemStack toToss = getInv().push(is);
+            if (toToss != null) {
+                getCurrentPos().spawnItem(toToss);
+            }
+            fakePlayer.inventory.armorInventory[i] = null;
+        }
     }
     
     /**
@@ -413,10 +451,14 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             sprocket_rotation += move;
             
             prev_servo_reorient = servo_reorient;
-            servo_reorient = Math.min(1, servo_reorient + move);
-            if (servo_reorient >= 1) {
-                prev_servo_reorient = servo_reorient = 0;
-                prevOrientation = orientation;
+            if (orientation != prevOrientation) {
+                servo_reorient = Math.min(1, servo_reorient + move);
+                if (servo_reorient >= 1) {
+                    prev_servo_reorient = servo_reorient = 0;
+                    prevOrientation = orientation;
+                }
+            } else {
+                servo_reorient = 0;
             }
         }
     }
@@ -688,18 +730,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         return my_fz_inv;
     }
     
-    public ItemStack getActuator() {
-        FzInv mi = getInv();
-        for (int i = 0; i < mi.size(); i++) {
-            ItemStack is = mi.get(i);
-            if (is == null) {
-                continue;
-            }
-            if (is.getItem() instanceof ActuatorItem) {
-                ActuatorItem actuator = (ActuatorItem) is.getItem();
-                if (actuator == null) {
-                    continue;
-                }
+    public ItemStack getHeldItem() {
+        for (int i = 0; i < inv.length; i++) {
+            ItemStack is = inv[i];
+            if (is != null) {
                 return is;
             }
         }

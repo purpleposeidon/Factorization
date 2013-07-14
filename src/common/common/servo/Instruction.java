@@ -42,4 +42,9 @@ public abstract class Instruction extends Decorator {
     }
     
     protected abstract ItemStack getRecipeItem();
+    
+    /** @return true if calling this instruction should stop execution for the tick. Things that might cause world-interaction should do this. */
+    public boolean interrupts() {
+        return false;
+    }
 }

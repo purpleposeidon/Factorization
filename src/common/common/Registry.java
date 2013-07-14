@@ -299,6 +299,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         pocket_table = new ItemPocketTable(itemID("pocketCraftingTable", 9002));
         fz_steam = new Item(itemID("steam", 9049));
         fz_steam.setUnlocalizedName("factorization:charge/steam");
+        if (Core.dev_environ) {
+            new ItemAnnoyanceRemover(itemID("creativeMode_annoyanceRemover", 9062), "annoyanceRemover");
+        }
         
         //Rocketry
         nether_powder = new ItemCraftingComponent(itemID("netherPowder", 9050), "nether_powder");
