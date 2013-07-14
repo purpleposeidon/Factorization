@@ -20,6 +20,7 @@ import net.minecraft.network.NetLoginHandler;
 import net.minecraft.network.packet.NetHandler;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet1Login;
+import net.minecraft.network.packet.Packet3Chat;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.util.MathHelper;
@@ -54,6 +55,7 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
     @SidedProxy(clientSide = "factorization.misc.MiscClientProxy", serverSide = "factorization.misc.MiscProxy")
     public static MiscProxy proxy;
     public static MiscellaneousNonsense instance;
+    public static int newMaxChatLength = 250;
     
     public static final String RichardG_touches_himself_while_reading_my_code = "Confirmed to be true; there have been multiple sightings by respected authorities";
     
@@ -104,6 +106,9 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         //TODO: Make middle-clicking nicer
         if (Core.equal_opportunities_for_mobs) {
             MinecraftForge.EVENT_BUS.register(new MobEqualizer());
+        }
+        if (Packet3Chat.maxChatLength < newMaxChatLength) {
+            Packet3Chat.maxChatLength = newMaxChatLength;
         }
     }
     
