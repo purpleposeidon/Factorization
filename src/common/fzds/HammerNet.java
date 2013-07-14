@@ -7,6 +7,7 @@ import java.net.Socket;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemInWorldManager;
 import net.minecraft.item.ItemStack;
@@ -35,6 +36,10 @@ public class HammerNet implements ITinyPacketHandler {
     
     @Override
     public void handle(NetHandler handler, Packet131MapData mapData) {
+        EntityPlayer player = handler.getPlayer();
+        if (player == null || player.worldObj == null) {
+            return; //Blah, what...
+        }
         if (!handler.getPlayer().worldObj.isRemote) {
             try {
                 handleDseClick(handler, mapData);
