@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
@@ -362,13 +363,15 @@ abstract public class FactorizationBlockRender implements ICoord {
                 wire.getInterpolatedU(u), wire.getInterpolatedV(v));
     }
     
-    public static void renderIcon(Icon icon) {
+    public static void renderItemIcon(Icon icon) {
         //Extracted from ItemRenderer.renderItem
         if (icon == null) {
             return;
         }
 
-        Minecraft.getMinecraft().renderEngine.bindTexture("/gui/items.png");
+        
+        final TextureManager tex = Minecraft.getMinecraft().renderEngine;
+        tex.bindResourceTexture(tex.getResourceLocationForSpriteNumber__func_130087_a(1 /* 1 = item icons */));
 
         Tessellator tessellator = Tessellator.instance;
         float f = icon.getMinU();

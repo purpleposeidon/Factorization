@@ -1,7 +1,7 @@
 package factorization.fzds;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -22,12 +22,12 @@ public class Packet220FzdsWrap extends Packet {
     
     private static Socket fakeSocket = new Socket();
     @Override
-    public void readPacketData(DataInputStream dis) throws IOException {
+    public void readPacketData(DataInput dis) throws IOException {
         wrapped = Packet.readPacket(field_98193_m /* our ILogAgent */, dis, false, fakeSocket);
     }
 
     @Override
-    public void writePacketData(DataOutputStream dos) throws IOException {
+    public void writePacketData(DataOutput dos) throws IOException {
         dos.write(wrapped.getPacketId());
         wrapped.writePacketData(dos);
     }

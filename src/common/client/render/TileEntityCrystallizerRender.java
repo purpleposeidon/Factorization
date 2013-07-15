@@ -76,7 +76,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             float g = (float) (var18 >> 8 & 255) / 255.0F;
             float b = (float) (var18 & 255) / 255.0F;
             GL11.glColor4f(r, g, b, 1.0F);
-            FactorizationBlockRender.renderIcon(crys.growing_crystal.getIconIndex());
+            FactorizationBlockRender.renderItemIcon(crys.growing_crystal.getIconIndex());
             glPopMatrix();
         }
 

@@ -8,7 +8,6 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.particle.EntityDiggingFX;
 import net.minecraft.client.renderer.texture.IconRegister;
@@ -620,19 +619,16 @@ public class BlockFactorization extends BlockContainer {
         
         //copied & modified from EffectRenderer.addBlockDestroyEffects
         byte b0 = 4;
-        Minecraft mc = Minecraft.getMinecraft();
-        for (int j1 = 0; j1 < b0; ++j1) {
-            for (int k1 = 0; k1 < b0; ++k1) {
-                for (int l1 = 0; l1 < b0; ++l1) {
-                    double d0 = (double) x + ((double) j1 + 0.5D) / (double) b0;
-                    double d1 = (double) y + ((double) k1 + 0.5D) / (double) b0;
-                    double d2 = (double) z + ((double) l1 + 0.5D) / (double) b0;
-                    int i2 = rand.nextInt(6);
-                    EntityDiggingFX fx = (new EntityDiggingFX(world, d0, d1, d2, d0 - (double) x - 0.5D, d1 - (double) y - 0.5D, d2 - (double) z - 0.5D,
-                            Block.stone, i2, 0, mc.renderEngine)).func_70596_a(x, y, z);
-                    fx.setParticleIcon(mc.renderEngine, theIcon); // func_94052_a,
-                                                                    // setParticleIcon
-                    effectRenderer.addEffect(fx);
+        for (int j1 = 0; j1 < b0; ++j1)
+        {
+            for (int k1 = 0; k1 < b0; ++k1)
+            {
+                for (int l1 = 0; l1 < b0; ++l1)
+                {
+                    double d0 = (double)x + ((double)j1 + 0.5D) / (double)b0;
+                    double d1 = (double)y + ((double)k1 + 0.5D) / (double)b0;
+                    double d2 = (double)z + ((double)l1 + 0.5D) / (double)b0;
+                    effectRenderer.addEffect((new EntityDiggingFX(world, d0, d1, d2, d0 - (double)x - 0.5D, d1 - (double)y - 0.5D, d2 - (double)z - 0.5D, this, meta)).applyColourMultiplier(x, y, z));
                 }
             }
         }

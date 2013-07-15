@@ -73,7 +73,7 @@ public class BlockRenderSteamTurbine extends FactorizationBlockRender {
             GL11.glScalef(s, s, s);
             GL11.glTranslatef(-0.5F, 0.1F, -0.5F);
             GL11.glRotatef(90, 1, 0, 0);
-            renderIcon(Core.registry.fan.getIconFromDamage(0));
+            renderItemIcon(Core.registry.fan.getIconFromDamage(0));
             GL11.glPopMatrix();
         }
     }

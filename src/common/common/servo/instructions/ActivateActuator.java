@@ -67,7 +67,7 @@ public class ActivateActuator extends Instruction {
                     return;
                 }
                 if (mop.entityHit instanceof EntityLiving) {
-                    is.interactWith((EntityLiving)mop.entityHit);
+                    is.interactWith(player, (EntityLiving)mop.entityHit);
                 }
             }
         } catch (IOException e) { } finally {

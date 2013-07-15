@@ -31,9 +31,9 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.FakePlayer;
 import net.minecraftforge.common.ForgeDirection;
-import net.minecraftforge.liquids.LiquidEvent;
-import net.minecraftforge.liquids.LiquidStack;
-import net.minecraftforge.liquids.LiquidTank;
+import net.minecraftforge.fluids.FluidEvent;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.oredict.OreDictionary;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -737,7 +737,6 @@ public class FactorizationUtil {
         return openInventory(orig_inv, side, true);
     }
     
-    @SuppressWarnings("deprecation")
     public static FzInv openInventory(IInventory orig_inv, final int side, boolean openBothChests) {
         if (orig_inv == null) {
             return null;
@@ -774,21 +773,6 @@ public class FactorizationUtil {
                     }
                     return inv.canInsertItem(slotMap[i], is, side);
                 }};
-        } else if (orig_inv instanceof net.minecraftforge.common.ISidedInventory) {
-            final net.minecraftforge.common.ISidedInventory inv = (net.minecraftforge.common.ISidedInventory) orig_inv;
-            final ForgeDirection fside = ForgeDirection.getOrientation(side);
-            final int start_slot = inv.getStartInventorySide(fside);
-            final int length = inv.getSizeInventorySide(fside);
-            return new FzInv(inv) {
-                @Override
-                int slotIndex(int i) {
-                    return start_slot + i;
-                }
-                
-                @Override
-                public int size() {
-                    return length;
-                }};
         } else {
             return new PlainInvWrapper(orig_inv);
         }
@@ -808,7 +792,6 @@ public class FactorizationUtil {
         return null;		
     }
 
-    @SuppressWarnings("deprecation")
     public static boolean canAccessSlot(IInventory inv, int slot) {
         if (inv instanceof net.minecraft.inventory.ISidedInventory) {
             net.minecraft.inventory.ISidedInventory isi = (net.minecraft.inventory.ISidedInventory) inv;
@@ -819,17 +802,6 @@ public class FactorizationUtil {
                     if (slots[j] == slot) {
                         return true;
                     }
-                }
-            }
-        } else if (inv instanceof net.minecraftforge.common.ISidedInventory) {
-            net.minecraftforge.common.ISidedInventory isi = (net.minecraftforge.common.ISidedInventory) inv;
-            //O(1). Just PEACHY.
-            for (int i = 0; i < 6; i++) {
-                ForgeDirection side = ForgeDirection.getOrientation(i);
-                int start = isi.getStartInventorySide(side);
-                int end = start + isi.getSizeInventorySide(side);
-                if (start <= slot && slot < end) {
-                    return true;
                 }
             }
         } else {
@@ -1035,8 +1007,8 @@ public class FactorizationUtil {
     
     //Liquid tank handling
     
-    public static void writeTank(NBTTagCompound tag, LiquidTank tank, String name) {
-        LiquidStack ls = tank.getLiquid();
+    public static void writeTank(NBTTagCompound tag, FluidTank tank, String name) {
+        FluidStack ls = tank.getFluid();
         if (ls == null) {
             return;
         }
@@ -1045,17 +1017,18 @@ public class FactorizationUtil {
         tag.setTag(name, liquid_tag);
     }
     
-    public static void readTank(NBTTagCompound tag, LiquidTank tank, String name) {
+    public static void readTank(NBTTagCompound tag, FluidTank tank, String name) {
         NBTTagCompound liquid_tag = tag.getCompoundTag(name);
-        LiquidStack ls = LiquidStack.loadLiquidStackFromNBT(liquid_tag);
-        tank.setLiquid(ls);
+        FluidStack ls = FluidStack.loadFluidStackFromNBT(liquid_tag);
+        tank.setFluid(ls);
     }
     
-    public static void spill(Coord where, LiquidStack what) {
+    public static void spill(Coord where, FluidStack what) {
+        //TODO: Should be in Coord, no?
         if (what == null || what.amount < 0) {
             return;
         }
-        LiquidEvent.fireEvent(new LiquidEvent.LiquidSpilledEvent(what, where.w, where.x, where.y, where.z));
+        FluidEvent.fireEvent(new FluidEvent.FluidSpilledEvent(what, where.w, where.x, where.y, where.z));
     }
     
     //AxisAlignedBB & Vec3 stuff

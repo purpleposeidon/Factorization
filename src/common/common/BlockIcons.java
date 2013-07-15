@@ -126,18 +126,6 @@ public class BlockIcons {
         
         @Override
         @SideOnly(Side.CLIENT)
-        public int getOriginY() {
-            return under.getOriginY();
-        }
-        
-        @Override
-        @SideOnly(Side.CLIENT)
-        public int getOriginX() {
-            return under.getOriginX();
-        }
-        
-        @Override
-        @SideOnly(Side.CLIENT)
         public float getMinV() {
             return getInterpolatedV(0);
         }

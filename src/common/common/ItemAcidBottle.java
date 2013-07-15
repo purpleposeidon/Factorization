@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import factorization.common.Core.TabType;
@@ -69,6 +70,16 @@ public class ItemAcidBottle extends Item {
         return is;
     }
 
+    static public DamageSource acidDrinker = new AcidDamage();
+    
+    static class AcidDamage extends DamageSource {
+
+        protected AcidDamage() {
+            super("acidDrinker");
+            setDamageBypassesArmor();
+        }
+    }
+    
     @Override
     public ItemStack onEaten(ItemStack is, World w, EntityPlayer player) {
         is.stackSize--;
@@ -76,7 +87,7 @@ public class ItemAcidBottle extends Item {
         if (w.isRemote) {
             return is;
         }
-        FactorizationHack.damageEntity(player, FactorizationHack.acidBurn, is.getItemDamage() > 0 ? 15 : 10);
+        player.attackEntityFrom(acidDrinker, is.getItemDamage() > 0 ? 15 : 10);
         player.getFoodStats().addStats(-20, 0);
         return is;
     }

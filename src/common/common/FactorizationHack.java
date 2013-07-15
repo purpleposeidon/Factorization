@@ -13,28 +13,6 @@ import net.minecraft.nbt.NBTTagCompound;
 
 public class FactorizationHack {
     //TODO: All this can be moved elsewhere
-    static public DamageSource acidBurn = new AcidDamage("acidburn");
-    
-    static class AcidDamage extends DamageSource {
-
-        protected AcidDamage(String par1Str) {
-            super(par1Str);
-            setDamageBypassesArmor();
-        }
-        
-        @Override
-        public String getDeathMessage(EntityLiving player) {
-            return player.getEntityName() + " drank acid";
-            // TODO translation
-            // return super.getDeathMessage(par1EntityPlayer);
-        }
-        
-    }
-
-    static public void damageEntity(EntityLiving ent, DamageSource source, int i) {
-        ent.attackEntityFrom(source, i);
-    }
-
     static public ItemStack loadItemStackFromDataInput(DataInput input) throws IOException {
         return ItemStack.loadItemStackFromNBT((NBTTagCompound) NBTBase.readNamedTag(input));
     }

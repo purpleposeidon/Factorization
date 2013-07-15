@@ -9,12 +9,16 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import net.minecraft.util.StringTranslate;
 import net.minecraftforge.common.Configuration;
@@ -100,7 +104,7 @@ public class Core {
     public static boolean dimension_slice_allow_smooth = true;
     public static boolean show_fine_logging = false;
     public static boolean serverside_translate = true;
-    public static boolean dev_environ = (Boolean) ReflectionHelper.getPrivateValue(cpw.mods.fml.relauncher.RelaunchLibraryManager.class, null, "deobfuscatedEnvironment");
+    public static boolean dev_environ = (Boolean) ReflectionHelper.getPrivateValue(cpw.mods.fml.relauncher.CoreModManager.class, null, "deobfuscatedEnvironment");
     public static boolean boilers_suck_water = true;
     public static double steam_output_adjust = 1.0;
     public static boolean enable_sketchy_client_commands = true, enable_cheat_commands = dev_environ;
@@ -125,13 +129,6 @@ public class Core {
         }
     }
 
-    // universal constant config
-    public final static String texture_dir = "factorization:";
-    public final static String model_dir = "/mods/factorization/models/";
-    public final static String real_texture_dir = "/mods/factorization/textures/";
-    public final static String gui_dir = "/mods/factorization/textures/gui/";
-    public final static String texture_file_block = "/terrain.png";
-    public final static String texture_file_item = "/gui/items.png";
 
     private int getBlockConfig(String name, int defaultId, String comment) {
         Property prop = null;
@@ -514,9 +511,35 @@ public class Core {
         return i.getUnlocalizedName() + ".name";
     }
     
+    public static void sendChatMessage(boolean raw, ICommandSender sender, String msg) {
+        sender.sendChatToPlayer(chatmessagecomponent);
+    }
+    
+    public static void sendChatMessage(boolean raw, ICommandSender sender, String format, Object... params) {
+        sender.sendChatToPlayer(chatmessagecomponent);
+    }
+    
     @SideOnly(Side.CLIENT)
     public static Icon texture(IconRegister reg, String name) {
         name = name.replace('.', '/');
         return reg.registerIcon(texture_dir + name);
+    }
+    
+    public final static String texture_dir = "factorization:";
+    public final static String model_dir = "/mods/factorization/models/";
+    public final static String real_texture_dir = "/mods/factorization/textures/";
+    public final static String gui_dir = "/mods/factorization/textures/gui/";
+    public final static String texture_file_block = "/terrain.png";
+    public final static String texture_file_item = "/gui/items.png";
+    
+    public static ResourceLocation getResource(String name) {
+        return new ResourceLocation("factorization", name);
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public static void bindGuiTexture(String name) {
+        //bad design; should have a GuiFz. meh.
+        TextureManager tex = Minecraft.getMinecraft().renderEngine;
+        tex.bindResourceTexture(getResource("gui/" + name + ".png"));
     }
 }

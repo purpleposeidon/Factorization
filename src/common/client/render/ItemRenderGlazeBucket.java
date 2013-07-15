@@ -44,6 +44,7 @@ public class ItemRenderGlazeBucket implements IItemRenderer {
         return false;
     }
 
+    private static RenderItem itemRenderer = new RenderItem();
     @Override
     public void renderItem(ItemRenderType type, ItemStack is, Object... data) {
         Minecraft mc = Minecraft.getMinecraft();
@@ -68,11 +69,11 @@ public class ItemRenderGlazeBucket implements IItemRenderer {
         } else {
             if (type == ItemRenderType.INVENTORY) {
                 RenderHelper.enableGUIStandardItemLighting();
-                GuiContainer.itemRenderer.zLevel = 0.5F;
+                itemRenderer.zLevel = 0.5F;
             } else {
-                GuiContainer.itemRenderer.zLevel = 0;
+                itemRenderer.zLevel = 0;
             }
-            GuiContainer.itemRenderer.renderItemIntoGUI(mc.fontRenderer, re, is, 0, 0);
+            itemRenderer.renderItemIntoGUI(mc.fontRenderer, re, is, 0, 0);
         }
         Icon glaze = bucket.getIcon(is, 1, null, null, 0);
         if (glaze == null) {

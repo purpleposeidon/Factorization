@@ -502,9 +502,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
         return false;
     }
-
+    
     @Override
-    public boolean attackEntityFrom(DamageSource damageSource, int damage) {
+    public boolean attackEntityFrom(DamageSource damageSource, float damage) {
         if (damageSource instanceof EntityDamageSourceIndirect) {
             return false;
         }

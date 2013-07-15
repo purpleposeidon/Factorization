@@ -1,6 +1,5 @@
 package factorization.client.render;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.World;
@@ -16,8 +15,7 @@ public class EntityWrathFlameFX extends EntityFX {
         this.particleTextureJitterX = 0;
         this.particleTextureJitterY = 0;
         this.particleScale = 2;
-        setParticleIcon(Minecraft.getMinecraft().renderEngine, ItemIcons.wrath_particle); /* func_94052_a */
-        //setParticleTextureIndex(0);
+        particleIcon = ItemIcons.wrath_particle;
         this.particleGravity = 0;
 
         this.motionX = vx;

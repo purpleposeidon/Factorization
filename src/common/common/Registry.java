@@ -30,10 +30,6 @@ import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
-import net.minecraftforge.liquids.LiquidContainerData;
-import net.minecraftforge.liquids.LiquidContainerRegistry;
-import net.minecraftforge.liquids.LiquidDictionary;
-import net.minecraftforge.liquids.LiquidStack;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
@@ -110,9 +106,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemCraftingComponent heatHole, logicMatrix, logicMatrixIdentifier, logicMatrixProgrammer;
     public Item fz_steam;
     public ItemCraftingComponent nether_powder, rocket_fuel;
-    public Item rocket_fuel_liquid_entry;
     public ItemBlockProxy rocket_engine;
-    public LiquidStack liquidStackRocketFuel;
     public ItemCraftingComponent bucket_rocket_fuel;
     public ItemServoMotor servo_motor_placer;
     public ItemServoRailWidget servo_widget_instruction, servo_widget_decor;
@@ -307,8 +301,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         nether_powder = new ItemCraftingComponent(itemID("netherPowder", 9050), "nether_powder");
         if (Core.enable_dimension_slice) {
             rocket_fuel = new ItemCraftingComponent(itemID("heldRocketFuel", 9051), "rocket/powder_rocket_fuel");
-            rocket_fuel_liquid_entry = new Item(itemID("liquidRocketFuel", 9052));
-            rocket_fuel_liquid_entry.setUnlocalizedName("factorization:rocket/powder_rocket_fuel");
             rocket_engine = new ItemBlockProxy(itemID("rocketEngine", 9053), rocket_engine_item_hidden);
             rocket_engine.setUnlocalizedName("factorization:rocket/rocket_engine").setMaxStackSize(1);
             bucket_rocket_fuel = new ItemCraftingComponent(itemID("bucketRocketFuel", 9054), "rocket/rocket_fuel_bucket");
@@ -516,7 +508,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //Sculpture combiniation recipe
         GameRegistry.addRecipe(new IRecipe() {
             ArrayList<ItemStack> merge(InventoryCrafting inv) {
-                if (inv.stackList.length < 2) {
+                if (inv.stackList.length < 2) { //TODO NORELEASE: Do this the less cheaty way?
                     return null;
                 }
                 ArrayList<ItemStack> match = new ArrayList<ItemStack>(2);
@@ -976,8 +968,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         TileEntityGrinder.addRecipe(new ItemStack(Block.netherrack), new ItemStack(nether_powder, 1), 1);
         if (Core.enable_dimension_slice) {
             shapelessRecipe(new ItemStack(rocket_fuel, 3), nether_powder, nether_powder, nether_powder, Item.fireballCharge);
-            liquidStackRocketFuel = new LiquidStack(rocket_fuel_liquid_entry, 0);
-            LiquidDictionary.getOrCreateLiquid("powderRocketFuel", liquidStackRocketFuel);
             recipe(new ItemStack(rocket_engine),
                     "#F#",
                     "#I#",
@@ -988,8 +978,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             shapelessRecipe(new ItemStack(bucket_rocket_fuel), Item.bucketEmpty, rocket_fuel, rocket_fuel);
             ItemStack air = new ItemStack(Item.bucketEmpty, 0);
             ItemStack emptyBucket = new ItemStack(Item.bucketEmpty, 1);
-            LiquidContainerRegistry.registerLiquid(new LiquidContainerData(new LiquidStack(rocket_fuel_liquid_entry, LiquidContainerRegistry.BUCKET_VOLUME/2), new ItemStack(rocket_fuel, 1), air)); //TODO: Would be nice if this worked. Forge would need something for it tho.
-            LiquidContainerRegistry.registerLiquid(new LiquidContainerData(new LiquidStack(rocket_fuel_liquid_entry, LiquidContainerRegistry.BUCKET_VOLUME), new ItemStack(bucket_rocket_fuel, 1), emptyBucket));
         }
         
         //Servos

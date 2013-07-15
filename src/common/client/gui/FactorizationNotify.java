@@ -7,7 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
@@ -103,7 +103,7 @@ public class FactorizationNotify {
         Core.profileStart("factorizationNotify");
         Iterator<Message> it = messages.iterator();
         long deathTime = System.currentTimeMillis() - 1000*6;
-        EntityLiving camera = Minecraft.getMinecraft().renderViewEntity;
+        EntityLivingBase camera = Minecraft.getMinecraft().renderViewEntity;
         double cx = camera.lastTickPosX + (camera.posX - camera.lastTickPosX) * (double) event.partialTicks;
         double cy = camera.lastTickPosY + (camera.posY - camera.lastTickPosY) * (double) event.partialTicks;
         double cz = camera.lastTickPosZ + (camera.posZ - camera.lastTickPosZ) * (double) event.partialTicks;

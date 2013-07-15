@@ -22,14 +22,14 @@ public abstract class Decorator extends ServoComponent {
 
         @Override
         @SideOnly(Side.CLIENT)
-        public int getOriginX() {
-            return under.getOriginX();
+        public int getSheetWidth() {
+            return under.getSheetWidth();
         }
 
         @Override
         @SideOnly(Side.CLIENT)
-        public int getOriginY() {
-            return under.getOriginY();
+        public int getSheetHeight() {
+            return under.getSheetHeight();
         }
 
         @Override
@@ -73,19 +73,6 @@ public abstract class Decorator extends ServoComponent {
         public String getIconName() {
             return under.getIconName();
         }
-
-        @Override
-        @SideOnly(Side.CLIENT)
-        public int getSheetWidth() {
-            return under.getSheetWidth();
-        }
-
-        @Override
-        @SideOnly(Side.CLIENT)
-        public int getSheetHeight() {
-            return under.getSheetHeight();
-        }
-        
     }
     
     @SideOnly(Side.CLIENT)

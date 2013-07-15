@@ -3,13 +3,13 @@ package factorization.common;
 import java.util.Arrays;
 import java.util.List;
 
-import net.minecraft.inventory.ContainerWorkbench;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.ItemStack;
+import net.minecraft.inventory.ContainerWorkbench;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.inventory.SlotCrafting;
+import net.minecraft.item.ItemStack;
 
 public class ContainerPocket extends ContainerWorkbench {
 
@@ -227,7 +227,7 @@ public class ContainerPocket extends ContainerWorkbench {
     }
 
     @Override
-    public void onCraftGuiClosed(EntityPlayer par1EntityPlayer) {
+    public void onContainerClosed(EntityPlayer par1EntityPlayer) {
         //NOTE: This is super.super.onCraftGuiClosed(par1EntityPlayer)
         InventoryPlayer var2 = par1EntityPlayer.inventory;
 

@@ -1,12 +1,12 @@
 package factorization.client.render;
 
-import org.lwjgl.opengl.GL11;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.RenderEngine;
 import net.minecraftforge.client.IItemRenderer;
+
+import org.lwjgl.opengl.GL11;
+
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
 import factorization.common.ItemBattery;
@@ -50,8 +50,8 @@ public class BatteryItemRender implements IItemRenderer {
         if (type == ItemRenderType.INVENTORY) {
             
         }
-        RenderEngine re = Minecraft.getMinecraft().renderEngine;
-        re.bindTexture(Core.texture_file_block);
+        //RenderEngine re = Minecraft.getMinecraft().renderEngine;
+        //re.bindTexture(Core.texture_file_block);
         NBTTagCompound tag = FactorizationUtil.getTag(is);
         render_battery.item_fullness = TileEntityBattery.getFullness(Core.registry.battery.getStorage(is));
         render_battery.renderInInventory();

@@ -649,7 +649,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             ServerConfigurationManager manager = ms.getConfigurationManager();
             DSTeleporter tp = new DSTeleporter((WorldServer) newWorld);
             tp.preciseDestination = newPosition;
-            manager.transferPlayerToDimension(player, newWorld.getWorldInfo().getDimension(), tp);
+            manager.transferPlayerToDimension(player, newWorld.provider.dimensionId, tp);
         } else {
             //Inspired by Entity.travelToDimension
             ent.worldObj.removeEntity(ent); //setEntityDead

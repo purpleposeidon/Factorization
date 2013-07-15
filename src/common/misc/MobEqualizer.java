@@ -3,6 +3,7 @@ package factorization.misc;
 import java.util.ArrayList;
 
 import net.minecraft.entity.IRangedAttackMob;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
@@ -42,7 +43,8 @@ public class MobEqualizer {
             }
         }
         ArrayList<ItemStack> weapons = new ArrayList();
-        if (!(event.entity instanceof IRangedAttackMob) || event.world.rand.nextBoolean()) {
+        if (!(ent instanceof IRangedAttackMob) || event.world.rand.nextBoolean()) {
+            float orig_damage = (float)ent.getAttributeInstanceForAttributeType__func_110148_a(SharedMonsterAttributes.attackDamage__field_111264_e).getDamage__func_111126_e();
             for (int i = 0; i < 9; i++) {
                 ItemStack is = template.inventory.getStackInSlot(i);
                 if (is == null) {
@@ -51,11 +53,16 @@ public class MobEqualizer {
                 if (is.stackSize != 1 || is.getMaxStackSize() != 1) {
                     continue;
                 }
+                is = is.copy();
                 EnumAction act = is.getItemUseAction();
                 if (act != EnumAction.block && act != EnumAction.none && act != EnumAction.bow) {
                     continue;
                 }
-                if (is.getDamageVsEntity(ent) <= 1) {
+                ItemStack orig_weapon = ent.getCurrentItemOrArmor(0);
+                ent.setCurrentItemOrArmor(0, is);
+                float f = (float)ent.getAttributeInstanceForAttributeType__func_110148_a(SharedMonsterAttributes.attackDamage__field_111264_e).getDamage__func_111126_e();
+                ent.setCurrentItemOrArmor(0, orig_weapon);
+                if (f <= orig_damage) { //TODO NORELEASE: This might be too low?
                     continue;
                 }
                 weapons.add(is);
@@ -70,7 +77,7 @@ public class MobEqualizer {
         }
         
         event.setCanceled(true);
-        ent.initCreature(); // We need to cancel the event so that we can call this before the below happens
+        ent.initCreature__func_110161_a(null); // We need to cancel the event so that we can call this before the below happens
         if (!ent.canPickUpLoot()) {
             return;
         }

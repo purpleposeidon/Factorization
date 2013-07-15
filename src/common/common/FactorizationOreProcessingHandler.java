@@ -9,9 +9,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
-import net.minecraftforge.liquids.LiquidContainerData;
-import net.minecraftforge.liquids.LiquidContainerRegistry;
-import net.minecraftforge.liquids.LiquidStack;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidContainerRegistry.FluidContainerData;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.OreDictionary.OreRegisterEvent;
 import factorization.common.ItemOreProcessing.OreType;
@@ -142,11 +142,11 @@ public class FactorizationOreProcessingHandler {
     }
     
     void loadWater() {
-        LiquidStack h20 = LiquidContainerRegistry.getLiquidForFilledItem(new ItemStack(Item.bucketWater));
-        for (LiquidContainerData container : LiquidContainerRegistry.getRegisteredLiquidContainerData()) {
-            LiquidStack liq = container.stillLiquid;
-            if (h20.isLiquidEqual(liq) && liq.amount == LiquidContainerRegistry.BUCKET_VOLUME) {
-                OreDictionary.registerOre(waterBucket, container.filled);
+        FluidStack h20 = FluidContainerRegistry.getFluidForFilledItem(new ItemStack(Item.bucketWater));
+        for (FluidContainerData container : FluidContainerRegistry.getRegisteredFluidContainerData()) {
+            FluidStack liq = container.fluid;
+            if (h20.isFluidEqual(liq) && liq.amount == FluidContainerRegistry.BUCKET_VOLUME) {
+                OreDictionary.registerOre(waterBucket, container.filledContainer);
             }
         }
     }

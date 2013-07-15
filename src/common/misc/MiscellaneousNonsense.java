@@ -107,9 +107,6 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         if (Core.equal_opportunities_for_mobs) {
             MinecraftForge.EVENT_BUS.register(new MobEqualizer());
         }
-        if (Packet3Chat.maxChatLength < newMaxChatLength) {
-            Packet3Chat.maxChatLength = newMaxChatLength;
-        }
     }
     
     @ServerStarting

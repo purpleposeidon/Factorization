@@ -164,7 +164,11 @@ public class FZDSCommand extends CommandBase {
             if (d != null) {
                 msg += ": " + d;
             }
-            sender.sendChatToPlayer(msg);
+            sendChat(msg);
+        }
+        
+        void sendChat(String msg) {
+            sendChat(msg);
         }
     }
     
@@ -195,13 +199,19 @@ public class FZDSCommand extends CommandBase {
     }
     
     @Override
+    public String getCommandUsage(ICommandSender icommandsender) { //NORELEASE: Check what this actually does
+        processCommand(icommandsender, new String[0]);
+        return "";
+    }
+    
+    @Override
     public void processCommand(ICommandSender sender, String[] args) {
         if (sender instanceof EntityPlayerMP) {
             EntityPlayerMP player = (EntityPlayerMP) sender;
             boolean op = MinecraftServer.getServer().getConfigurationManager().areCommandsAllowed(player.username);
             boolean cr = player.capabilities.isCreativeMode;
             if (!(op || cr)) {
-                sender.sendChatToPlayer("You must be op or in creative mode to use these commands");
+                Core.sendChatMessage(true, sender, "You must be op or in creative mode to use these commands");
                 return;
             }
         }
@@ -218,7 +228,7 @@ public class FZDSCommand extends CommandBase {
                 }
             }
         }
-        sender.sendChatToPlayer("Not a command");
+        Core.sendChatMessage(true, sender, "Not a command");
     }
     
     private static WeakReference<IDeltaChunk> currentSelection = new WeakReference<IDeltaChunk>(null);
@@ -349,9 +359,9 @@ public class FZDSCommand extends CommandBase {
                         sc.reset();
                     }
                 }
-                sender.sendChatToPlayer(join(good));
-                sender.sendChatToPlayer("To specify a Coord or player: #worldId,x,y,z @PlayerName");
-                sender.sendChatToPlayer("Best commands: cut d drop");
+                sendChat(join(good));
+                sendChat("To specify a Coord or player: #worldId,x,y,z @PlayerName");
+                sendChat("Best commands: cut d drop");
             }});
         add(new SubCommand ("go|gob|got") {
             @Override
@@ -388,17 +398,18 @@ public class FZDSCommand extends CommandBase {
                 tp.destination.set(DeltaChunk.getServerShadowWorld(), 0, 64, 0);
                 manager.transferPlayerToDimension(player, Hammer.dimensionID, tp);
             }}, Requires.PLAYER, Requires.CREATIVE);
-        add(new SubCommand("leave") {
+        add(new SubCommand("leave", "[dest=0]") {
             @Override
             String details() { return "Teleports the player to the overworld"; }
             @Override
             void call(String[] args) {
                 DSTeleporter tp = getTp();
-                World w = DimensionManager.getWorld(0);
-                if (w == player.worldObj) {
-                    return;
+                int targetDimId = 0;
+                if (args.length == 1) {
+                    targetDimId = Integer.parseInt(args[0]);
                 }
-                ChunkCoordinates target = player.getBedLocation();
+                World w = DimensionManager.getWorld(targetDimId);
+                ChunkCoordinates target = player.getBedLocation(targetDimId);
                 if (target == null) {
                     target = w.getSpawnPoint(); 
                 }
@@ -443,7 +454,7 @@ public class FZDSCommand extends CommandBase {
                 DeltaCoord dimensions = up.difference(low);
                 int area = Math.abs(dimensions.x*dimensions.y*dimensions.z);
                 if (area > Hammer.max_fzds_grab_area) {
-                    sender.sendChatToPlayer("The area is too big: " + area);
+                    sendChat("The area is too big: " + area);
                     return;
                 }
                 final Coord lower = low.copy();
@@ -532,14 +543,14 @@ public class FZDSCommand extends CommandBase {
                     }
                 }
                 DeltaChunk.getSlices(MinecraftServer.getServer().worldServerForDimension(0)).clear();
-                sender.sendChatToPlayer("Removed " + i);
+                sendChat("Removed " + i);
             }}, Requires.OP);
         add(new SubCommand("selection") {
             @Override
             String details() { return "Prints the selection"; }
             @Override
             void call(String[] args) {
-                sender.sendChatToPlayer("> " + selected);
+                sendChat("> " + selected);
                 setSelection(selected);
             }}, Requires.SELECTION);
         add(new SubCommand("rot?") {
@@ -547,10 +558,10 @@ public class FZDSCommand extends CommandBase {
             String details() { return "Gives the rotation & angular velocity of the selection"; }
             @Override
             void call(String[] args) {
-                sender.sendChatToPlayer("r = " + selected.getRotation());
-                sender.sendChatToPlayer("ω = " + selected.getRotationalVelocity());
+                sendChat("r = " + selected.getRotation());
+                sendChat("ω = " + selected.getRotationalVelocity());
                 if (!selected.can(DeltaCapability.ROTATE)) {
-                    sender.sendChatToPlayer("(Does not have the ROTATE cap, so this is meaningless)");
+                    sendChat("(Does not have the ROTATE cap, so this is meaningless)");
                 }
             }}, Requires.SELECTION);
         add(new SubCommand("+|-") {
@@ -584,7 +595,7 @@ public class FZDSCommand extends CommandBase {
                     }
                 }
                 if (first == null) {
-                    sender.sendChatToPlayer("There are no DSEs loaded");
+                    sendChat("There are no DSEs loaded");
                     setSelection(null);
                     return;
                 }
@@ -598,7 +609,7 @@ public class FZDSCommand extends CommandBase {
                 } else {
                     selected = add ? next : prev;
                 }
-                sender.sendChatToPlayer("> " + selected);
+                sendChat("> " + selected);
                 setSelection(selected);
             }} /* needs nothing */);
         add(new SubCommand("remove") {
@@ -608,7 +619,7 @@ public class FZDSCommand extends CommandBase {
             void call(String[] args) {
                 selected.setDead();
                 setSelection(null);
-                sender.sendChatToPlayer("Made dead");
+                sendChat("Made dead");
             }}, Requires.SELECTION);
         add(new SubCommand("sr|sw", "angle°", "[direction=UP]") {
             @Override
@@ -619,7 +630,7 @@ public class FZDSCommand extends CommandBase {
                     throw new SyntaxErrorException();
                 }
                 if (!selected.can(DeltaCapability.ROTATE)) {
-                    sender.sendChatToPlayer("Selection does not have the rotation cap");
+                    sendChat("Selection does not have the rotation cap");
                     return;
                 }
                 double theta = Math.toRadians(Double.parseDouble(args[0]));
@@ -638,7 +649,7 @@ public class FZDSCommand extends CommandBase {
                         }
                         msg += " " + d;
                     }
-                    sender.sendChatToPlayer(msg);
+                    sendChat(msg);
                     return;
                 }
                 int derivative = -1;
@@ -661,10 +672,10 @@ public class FZDSCommand extends CommandBase {
                 type = type == 's' ? 'd' : type;
                 if (args.length != 4 && args.length != 5) {
                     if (type == 'd' || type == 'v') {
-                        sender.sendChatToPlayer("Usage: /fzds d(isplacement)|v(elocity) +|= X Y Z");
+                        sendChat("Usage: /fzds d(isplacement)|v(elocity) +|= X Y Z");
                     }
                     if (type == 'r' || type == 'w') {
-                        sender.sendChatToPlayer("Usage: /fzds r(otation)|w(rotational velocity) +|= [W=1] X Y Z (a quaternion; cmds sr & sw are simpler)");
+                        sendChat("Usage: /fzds r(otation)|w(rotational velocity) +|= [W=1] X Y Z (a quaternion; cmds sr & sw are simpler)");
                     }
                     return;
                 }
@@ -678,7 +689,7 @@ public class FZDSCommand extends CommandBase {
                 double y = Double.parseDouble(args[2+i]);
                 double z = Double.parseDouble(args[3+i]);
                 if ((type == 'r' || type == 'w') && !selected.can(DeltaCapability.ROTATE)) {
-                    sender.sendChatToPlayer("Selection does not have the ROTATE cap");
+                    sendChat("Selection does not have the ROTATE cap");
                     return;
                 }
                 if (args[0].equals("+")) {
@@ -691,7 +702,7 @@ public class FZDSCommand extends CommandBase {
                     } else if (type == 'w') {
                         selected.getRotationalVelocity().incrAdd(new Quaternion(w, x, y, z));
                     } else {
-                        sender.sendChatToPlayer("Not a command?");
+                        sendChat("Not a command?");
                     }
                 } else if (args[0].equals("=")) {
                     if (type == 'd' || type == 's') {
@@ -707,12 +718,12 @@ public class FZDSCommand extends CommandBase {
                         Quaternion omega = (new Quaternion(w, x, y, z));
                         selected.setRotationalVelocity(omega);
                     } else {
-                        sender.sendChatToPlayer("Not a command?");
+                        sendChat("Not a command?");
                     }
                     selected.getRotation().incrNormalize();
                     selected.getRotationalVelocity().incrNormalize();
                 } else {
-                    sender.sendChatToPlayer("+ or =?");
+                    sendChat("+ or =?");
                 }
             }}, Requires.SELECTION);
         add(new SubCommand("dirty") {
@@ -733,7 +744,7 @@ public class FZDSCommand extends CommandBase {
                 for (DeltaCapability cap : DeltaCapability.values()) {
                     r += " " + cap;
                 }
-                sender.sendChatToPlayer(r);
+                sendChat(r);
             }});
         add(new SubCommand("cap?") {
             @Override
@@ -746,7 +757,7 @@ public class FZDSCommand extends CommandBase {
                         r += " " + cap;
                     }
                 }
-                sender.sendChatToPlayer(r);
+                sendChat(r);
             }}, Requires.SELECTION);
         add(new SubCommand("cap+|cap-", "CAP+") {
             @Override
@@ -766,7 +777,7 @@ public class FZDSCommand extends CommandBase {
             @Override
             void call(String[] args) {
                 if (!selected.can(DeltaCapability.SCALE)) {
-                    sender.sendChatToPlayer("Selection doesn't have the SCALE cap");
+                    sendChat("Selection doesn't have the SCALE cap");
                     return;
                 }
                 ((DimensionSliceEntity) selected).scale = Float.parseFloat(args[0]);
@@ -775,7 +786,7 @@ public class FZDSCommand extends CommandBase {
             @Override
             void call(String[] args) {
                 if (!selected.can(DeltaCapability.TRANSPARENT)) {
-                    sender.sendChatToPlayer("Selection doesn't have the TRANSPARENT cap");
+                    sendChat("Selection doesn't have the TRANSPARENT cap");
                     return;
                 }
                 ((DimensionSliceEntity) selected).opacity = Float.parseFloat(args[0]);
@@ -786,5 +797,4 @@ public class FZDSCommand extends CommandBase {
                 int mode = Integer.parseInt(args[0]);
             }}, Requires.OP, Requires.CREATIVE);
     }
-
 }

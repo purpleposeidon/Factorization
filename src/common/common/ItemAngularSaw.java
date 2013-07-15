@@ -2,15 +2,14 @@ package factorization.common;
 
 import java.util.List;
 
-import factorization.api.Coord;
-import factorization.common.Core.TabType;
 import net.minecraft.block.Block;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import factorization.api.Coord;
+import factorization.common.Core.TabType;
 
-public class ItemAngularSaw extends Item {
+public class ItemAngularSaw extends Item { //NORELEASE: Should we lose this thing? I think the recipe's gone already for some reason... 
     static Block[] cuttableBlocks = {Block.oreDiamond, Block.oreRedstone, Block.oreLapis, Block.oreCoal, Block.oreEmerald,
         Block.stone, Block.glass, Block.glowStone };
     public ItemAngularSaw(int itemID) {
@@ -40,12 +39,6 @@ public class ItemAngularSaw extends Item {
         return super.getStrVsBlock(itemstack, block, metadata);
     }
     
-    @Override
-    public boolean hitEntity(ItemStack par1ItemStack,
-            EntityLiving par2EntityLiving, EntityLiving par3EntityLiving) {
-        // TODO Auto-generated method stub
-        return super.hitEntity(par1ItemStack, par2EntityLiving, par3EntityLiving);
-    }
     
     @Override
     public boolean onBlockStartBreak(ItemStack itemstack, int X, int Y, int Z,

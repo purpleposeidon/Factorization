@@ -29,8 +29,6 @@ public abstract class ActuatorItem extends ItemCraftingComponent {
         }
 
         public ForgeDirection look = ForgeDirection.UP;
-        @Override
-        public int getMaxHealth() { return 0; }
         
         public Vec3 getLook() {
             return Vec3.createVectorHelper(look.offsetX, look.offsetY, look.offsetZ);

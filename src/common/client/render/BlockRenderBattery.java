@@ -2,7 +2,6 @@ package factorization.client.render;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.RenderEngine;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.Icon;
 import net.minecraftforge.client.IItemRenderer.ItemRenderType;
@@ -37,8 +36,7 @@ public class BlockRenderBattery extends FactorizationBlockRender {
         GL11.glPushMatrix();
         //TODO: Need to render with the correct positioning for the hand
         //if (type == EQUIPPED || type == ENTITY) {
-        RenderEngine re = Minecraft.getMinecraft().renderEngine;
-        re.bindTexture(Core.texture_file_block);
+        //TextureUtil.bindTexture(Core.texture_file_block);
         renderBatteryDisplay(rb, item_fullness);
         GL11.glPopMatrix();
     }

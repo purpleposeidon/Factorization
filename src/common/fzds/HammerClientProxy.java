@@ -400,7 +400,7 @@ public class HammerClientProxy extends HammerProxy {
             GL11.glColorMask(true, true, false, true);
             if (!ForgeHooksClient.onDrawBlockHighlight(rg, player, shadowSelected, shadowSelected.subHit, is, partialTicks)) {
                 event.context.drawBlockBreaking(player, shadowSelected, 0, is, partialTicks);
-                event.context.drawSelectionBox(player, shadowSelected, 0, is, partialTicks);
+                event.context.drawSelectionBox(player, shadowSelected, 0, partialTicks);
             }
         } finally {
             GL11.glColorMask(true, true, true, true);
