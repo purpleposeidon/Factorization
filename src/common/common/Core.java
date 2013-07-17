@@ -60,7 +60,6 @@ public class Core {
         registry = new Registry();
         foph = new FactorizationOreProcessingHandler(); //We don't register foph yet.
         MinecraftForge.EVENT_BUS.register(registry);
-        MinecraftForge.EVENT_BUS.register(proxy);
     }
     
     // runtime storage

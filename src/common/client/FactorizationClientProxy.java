@@ -39,6 +39,10 @@ import factorization.common.servo.RenderServoMotor;
 import factorization.common.servo.ServoMotor;
 
 public class FactorizationClientProxy extends FactorizationProxy {
+    public FactorizationClientProxy() {
+        MinecraftForge.EVENT_BUS.register(this);
+    }
+    
     @Override
     public void broadcastTranslate(EntityPlayer who, String... msg) {
         String format = msg[0];
