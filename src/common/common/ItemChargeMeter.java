@@ -72,13 +72,13 @@ public class ItemChargeMeter extends Item {
         String msg;
         if (Core.dev_environ) { 
             msg = "Charge: " + ic.getCharge().getValue() + "/" + ret.totalCharge
-                + "\nConductors: " + ret.conductorCount
-                + inf;
+                + "\nConductors: " + ret.conductorCount;
                 //+ "  C: " + ic.getCoord()
                 //+ "  Total: " + ret.totalCharge
         } else {
             msg = "Charge: " + ic.getCharge().getValue();
         }
+        msg += inf;
         Core.notify(toNotify, here, "%s", msg);
         return true;
     }

@@ -22,6 +22,7 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.chunk.Chunk;
@@ -58,6 +59,9 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         }
     }
     
+    @Override
+    protected ResourceLocation getResourceLocationToBind(Entity entity) { return null; }
+
     class DSRenderInfo {
         //final int width = Hammer.cellWidth;
         //final int height = 4;
@@ -164,7 +168,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                     wr.isInFrustum = true; //XXX might not be necessary
                     int displayList = wr.getGLCallListForPass(pass);
                     if (displayList >= 0) {
-                        loadTexture("/terrain.png");
+                        bindResourceLocationTexture(Core.blockAtlas);
                         glCallList(displayList);
                     }
                 }

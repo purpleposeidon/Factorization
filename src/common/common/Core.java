@@ -17,6 +17,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ChatMessageComponent;
 import net.minecraft.util.Icon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
@@ -27,10 +28,8 @@ import net.minecraftforge.common.Property;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.Mod.PostInit;
-import cpw.mods.fml.common.Mod.PreInit;
-import cpw.mods.fml.common.Mod.ServerStarting;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -61,6 +60,7 @@ public class Core {
         registry = new Registry();
         foph = new FactorizationOreProcessingHandler(); //We don't register foph yet.
         MinecraftForge.EVENT_BUS.register(registry);
+        MinecraftForge.EVENT_BUS.register(proxy);
     }
     
     // runtime storage
@@ -249,7 +249,7 @@ public class Core {
         config.save();
     }
 
-    @PreInit
+    @EventHandler
     public void load(FMLPreInitializationEvent event) {
         loadConfig(event.getSuggestedConfigurationFile());
         registry.makeBlocks();
@@ -272,7 +272,7 @@ public class Core {
         }
     }
 
-    @PostInit
+    @EventHandler
     public void modsLoaded(FMLPostInitializationEvent event) {
         registry.loadLanguages();
         TileEntityWrathFire.setupBurning();
@@ -284,7 +284,7 @@ public class Core {
         finished_loading = true;
     }
     
-    @ServerStarting
+    @EventHandler
     public void registerServerCommands(FMLServerStartingEvent event) {
         isMainServerThread.set(true);
     }
@@ -512,11 +512,11 @@ public class Core {
     }
     
     public static void sendChatMessage(boolean raw, ICommandSender sender, String msg) {
-        sender.sendChatToPlayer(chatmessagecomponent);
+        sender.sendChatToPlayer(raw ? ChatMessageComponent.createFromText(msg) : ChatMessageComponent.createFromTranslationKey(msg));
     }
     
-    public static void sendChatMessage(boolean raw, ICommandSender sender, String format, Object... params) {
-        sender.sendChatToPlayer(chatmessagecomponent);
+    public static void sendUnlocalizedChatMessage(ICommandSender sender, String format, Object... params) {
+        sender.sendChatToPlayer(ChatMessageComponent.createFromTranslationWithSubstitutions(format, params));
     }
     
     @SideOnly(Side.CLIENT)
@@ -529,8 +529,12 @@ public class Core {
     public final static String model_dir = "/mods/factorization/models/";
     public final static String real_texture_dir = "/mods/factorization/textures/";
     public final static String gui_dir = "/mods/factorization/textures/gui/";
-    public final static String texture_file_block = "/terrain.png";
-    public final static String texture_file_item = "/gui/items.png";
+//	public final static String texture_file_block = "/terrain.png";
+//	public final static String texture_file_item = "/gui/items.png";
+    
+    public static final ResourceLocation blockAtlas = new ResourceLocation("textures/atlas/blocks.png");
+    public static final ResourceLocation itemAtlas = new ResourceLocation("textures/atlas/items.png");
+    public static Icon blockMissingIcon, itemMissingIcon;
     
     public static ResourceLocation getResource(String name) {
         return new ResourceLocation("factorization", name);

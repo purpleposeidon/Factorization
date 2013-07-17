@@ -20,7 +20,6 @@ import net.minecraft.network.NetLoginHandler;
 import net.minecraft.network.packet.NetHandler;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet1Login;
-import net.minecraft.network.packet.Packet3Chat;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.util.MathHelper;
@@ -29,9 +28,7 @@ import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.ICraftingHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.PostInit;
-import cpw.mods.fml.common.Mod.PreInit;
-import cpw.mods.fml.common.Mod.ServerStarting;
+import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -63,12 +60,12 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         MiscellaneousNonsense.instance = this;
     }
     
-    @PreInit
+    @EventHandler
     public void setParent(FMLPreInitializationEvent event) {
         event.getModMetadata().parent = Core.modId;
     }
     
-    @PostInit
+    @EventHandler
     public void modsLoaded(FMLPostInitializationEvent event) {
         //Fixes lack of creeper dungeons
         DungeonHooks.addDungeonMob("Creeper", 1); //Etho, of all people, found one. It'd be nice if they were just a bit rarer.
@@ -109,7 +106,7 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         }
     }
     
-    @ServerStarting
+    @EventHandler
     public void addCommands(FMLServerStartingEvent event) {
         event.registerServerCommand(new FogCommand());
     }
@@ -131,6 +128,15 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         }
         
         static List<String> fogCommands = Arrays.asList("far", "0", "normal", "1", "short", "2", "tiny", "3", "micro", "4", "microfog", "5", "+", "-", "pauserender", "now", "about", "clear", "saycoords", "saveoptions");
+        
+        @Override
+        public String getCommandUsage(ICommandSender icommandsender) {
+            String ret = "";
+            for (String s : fogCommands) {
+                ret += s + " ";
+            }
+            return ret.trim();
+        }
         
         @Override
         public List addTabCompletionOptions(ICommandSender sender, String[] args) {

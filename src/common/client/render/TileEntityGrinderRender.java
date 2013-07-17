@@ -12,8 +12,8 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PositionTextureVertex;
 import net.minecraft.client.model.TexturedQuad;
-import net.minecraft.client.renderer.RenderEngine;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
@@ -92,10 +92,10 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
             diamondModel = new DiamondModel();
         }
         
-        RenderEngine re = Minecraft.getMinecraft().renderEngine;
+        TextureManager re = Minecraft.getMinecraft().renderEngine;
         glDisable(GL_LIGHTING);
 
-        re.bindTexture(Core.texture_file_block);
+        re.bindResourceTexture(Core.blockAtlas);
         //XXX TODO FIXME Move to somewhere more efficient
         //(Move the vector stuff out too...)
         Tessellator tess = Tessellator.instance;

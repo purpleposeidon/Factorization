@@ -16,6 +16,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.minecraftforge.client.model.IModelCustom;
@@ -244,15 +245,22 @@ public class RenderServoMotor extends RenderEntity {
         }
         GL11.glPopMatrix();
     }
-
+    
+    ResourceLocation servo_uv = Core.getResource("/models/sprocket/servo_uv.png");
+    
+    @Override
+    protected ResourceLocation getResourceLocationToBind(Entity par1Entity) {
+        return servo_uv;
+    }
+    
     void renderMainModel(ServoMotor motor, float partial, double ro, boolean hilighting) {
         // TODO: Put our textures into ItemIcons
         GL11.glPushMatrix();
+        bindResourceLocationTexture(servo_uv);
         if (loaded_model == false) {
             loadSprocketModel();
             loaded_model = true;
         }
-        loadTexture(Core.model_dir + "sprocket/servo_uv.png");
 
         // Sprocket rotation
         double rail_width = TileEntityServoRail.width;
@@ -296,7 +304,7 @@ public class RenderServoMotor extends RenderEntity {
         //Axles
         GL11.glPopMatrix();
         if (!hilighting) {
-            loadTexture(Core.texture_file_item);
+            bindResourceLocationTexture(Core.itemAtlas);
         }
         renderServoPlate();
     }
@@ -320,11 +328,6 @@ public class RenderServoMotor extends RenderEntity {
     static ItemStack equiped_item = null;
 
     static EntityLiving item_holder = new EntityLiving(null) {
-        @Override
-        public int getMaxHealth() {
-            return 0;
-        }
-
         public ItemStack getHeldItem() {
             return equiped_item;
         }

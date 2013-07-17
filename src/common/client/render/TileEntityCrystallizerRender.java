@@ -1,29 +1,10 @@
 package factorization.client.render;
 
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_LIGHTING;
-import static org.lwjgl.opengl.GL11.GL_LINES;
-import static org.lwjgl.opengl.GL11.GL_ONE;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_SRC_COLOR;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glColor4f;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glLineWidth;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-import static org.lwjgl.opengl.GL11.glVertex3f;
+import static org.lwjgl.opengl.GL11.*;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderEngine;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -57,6 +38,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
         
         glDisable(GL_LIGHTING);
         //render the item, growing as it nears completion
+        TextureManager re = Minecraft.getMinecraft().renderEngine;
         if (crys.growing_crystal != null && crys.progress > 0) {
             glPushMatrix();
             float s = crys.getProgress();
@@ -68,8 +50,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             glTranslatef(0.5F, 3F / 16F, 0.5F);
             glScalef(s, s, s);
             glTranslatef(-0.5F, 0, 1F / 32F);
-            RenderEngine re = Minecraft.getMinecraft().renderEngine;
-            re.bindTexture("/terrain.png");
+            re.bindResourceTexture(Core.blockAtlas);
 
             int var18 = crys.growing_crystal.getItem().getColorFromItemStack(crys.growing_crystal, 0);
             float r = (float) (var18 >> 16 & 255) / 255.0F;
@@ -105,8 +86,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
                 glColor4f(1F, 1F, 1F, 1);
                 glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_ALPHA);
             }
-            RenderEngine re = Minecraft.getMinecraft().renderEngine;
-            re.bindTexture(Core.texture_file_block);
+            re.bindResourceTexture(Core.blockAtlas);
             float u0 = tex.getMinU();
             float v0 = tex.getMinV();
             float u1 = tex.getMaxU();

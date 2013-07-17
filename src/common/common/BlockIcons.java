@@ -226,4 +226,14 @@ public class BlockIcons {
             rb.uvRotateNorth = rb.uvRotateEast = rb.uvRotateSouth = rb.uvRotateWest = rb.uvRotateTop = rb.uvRotateBottom = 0;
         }
     }
+    
+    SteamIcon steam;
+    
+    public static class SteamIcon extends IconGroup {
+        Icon texture;
+        @Override
+        public void afterRegister() {
+            Core.registry.steamFluid.setIcons(texture);
+        }
+    }
 }

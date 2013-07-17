@@ -399,7 +399,6 @@ public class HammerClientProxy extends HammerProxy {
             //Could glPushAttr for the mask. Nah.
             GL11.glColorMask(true, true, false, true);
             if (!ForgeHooksClient.onDrawBlockHighlight(rg, player, shadowSelected, shadowSelected.subHit, is, partialTicks)) {
-                event.context.drawBlockBreaking(player, shadowSelected, 0, is, partialTicks);
                 event.context.drawSelectionBox(player, shadowSelected, 0, partialTicks);
             }
         } finally {
@@ -539,7 +538,7 @@ public class HammerClientProxy extends HammerProxy {
             public void clickBlock_implementation(int x, int y, int z, int side) {
                 //Very terribly copied from clickBlock with this change: sendDigPacket instead of using addToSendQueue
                 //And also adding resetController call after the block gets broken
-                if (!this.currentGameType.isAdventure() || mc.thePlayer.canCurrentToolHarvestBlock(x, y, z))
+                if (!this.currentGameType.isAdventure() || mc.thePlayer.isCurrentToolAdventureModeExempt(x, y, z))
                 {
                     if (this.currentGameType.isCreative())
                     {

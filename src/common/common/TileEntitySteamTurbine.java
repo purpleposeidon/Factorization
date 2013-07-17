@@ -6,17 +6,18 @@ import java.io.IOException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
-import net.minecraftforge.liquids.ILiquidTank;
-import net.minecraftforge.liquids.ITankContainer;
-import net.minecraftforge.liquids.LiquidDictionary;
-import net.minecraftforge.liquids.LiquidStack;
-import net.minecraftforge.liquids.LiquidTank;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidHandler;
 import factorization.api.Charge;
 import factorization.api.IChargeConductor;
 import factorization.common.NetworkFactorization.MessageType;
 
-public class TileEntitySteamTurbine extends TileEntityCommon implements ITankContainer, IChargeConductor {
-    LiquidTank steamTank = new LiquidTank(TileEntitySolarBoiler.steam_stack.copy(), 1000*16, this);
+public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHandler, IChargeConductor {
+    FluidTank steamTank = new FluidTank(TileEntitySolarBoiler.steam_stack.copy(), 1000*16, this);
     Charge charge = new Charge(this);
     int fan_speed = 0;
     public int fan_rotation = 0;
@@ -57,39 +58,36 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements ITankCon
     }
 
     @Override
-    public int fill(ForgeDirection from, LiquidStack resource, boolean doFill) {
+    public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
         return steamTank.fill(resource, doFill);
     }
-
+    
     @Override
-    public int fill(int tankIndex, LiquidStack resource, boolean doFill) {
-        return steamTank.fill(resource, doFill);
+    public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+        return null;
     }
-
+    
     @Override
-    public LiquidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+    public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
         return steamTank.drain(maxDrain, doDrain);
     }
-
+    
     @Override
-    public LiquidStack drain(int tankIndex, int maxDrain, boolean doDrain) {
-        return steamTank.drain(maxDrain, doDrain);
-    }
-
-    @Override
-    public ILiquidTank[] getTanks(ForgeDirection direction) {
-        if (direction == ForgeDirection.UP) {
-            return new ILiquidTank[] {};
+    public boolean canFill(ForgeDirection from, Fluid fluid) {
+        if (from == ForgeDirection.UP) {
+            return false;
         }
-        return new ILiquidTank[] {steamTank};
+        return fluid == null || fluid.getID() == TileEntitySolarBoiler.steam.getID();
     }
-
+    
     @Override
-    public ILiquidTank getTank(ForgeDirection direction, LiquidStack type) {
-        if (direction == ForgeDirection.UP) {
-            return null;
-        }
-        return steamTank;
+    public boolean canDrain(ForgeDirection from, Fluid fluid) {
+        return false;
+    }
+    
+    @Override
+    public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+        return new FluidTankInfo[] {steamTank.getInfo()};
     }
 
     @Override
@@ -99,7 +97,7 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements ITankCon
 
     @Override
     public String getInfo() {
-        float s = steamTank.getLiquid().amount*16/(float)steamTank.getCapacity();
+        float s = steamTank.getFluid().amount*16/(float)steamTank.getCapacity();
         return "Steam: " + String.format("%.1f", s)
                 + "\nFan: " + fan_speed;
     }
@@ -132,9 +130,9 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements ITankCon
             fan_speed = Math.max(0, fan_speed - 1);
             return;
         }
-        LiquidStack steam = steamTank.getLiquid();
+        FluidStack steam = steamTank.getFluid();
         if (steam == null) {
-            steamTank.setLiquid(steam = LiquidDictionary.getLiquid("Steam", 0));
+            steamTank.setFluid(steam = FluidRegistry.getFluidStack("Steam", 0));
         }
         long seed = getCoord().seed() + worldObj.getWorldTime();
         if (seed % 5 == 0) {

@@ -19,7 +19,9 @@ import net.minecraft.profiler.Profiler;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.ForgeSubscribe;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
@@ -420,5 +422,15 @@ public class FactorizationClientProxy extends FactorizationProxy {
         Minecraft mc = Minecraft.getMinecraft();
         return org.lwjgl.input.Keyboard.isKeyDown(42 /* sneak */);
         //return !mc.gameSettings.keyBindSneak.pressed;
+    }
+    
+    @ForgeSubscribe
+    public void onStitch(TextureStitchEvent.Post event) {
+        int t = event.map.textureType;
+        if (t == 0 /* terrain */) {
+            Core.blockMissingIcon = event.map.func_110572_b("this code for getting the missing Icon brought to you by LexManos");
+        } else if (t == 1 /* items */) {
+            Core.itemMissingIcon = event.map.func_110572_b("this code for getting the missing Icon brought to you by Tahg");
+        }
     }
 }

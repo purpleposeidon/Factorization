@@ -57,8 +57,6 @@ abstract public class FactorizationBlockRender implements ICoord {
         return ret;
     }
     
-    protected String cubeTexture = Core.texture_file_block;
-    
     public FactorizationBlockRender() {
         if (getFactoryType() != null) {
             int md = getFactoryType().md;

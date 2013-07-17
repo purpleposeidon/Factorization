@@ -30,6 +30,8 @@ import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
@@ -104,7 +106,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemStack base_common, base_matte, base_translucent, base_shiny, base_bright, base_unreal, glaze_base_mimicry;
     public ItemAngularSaw angular_saw;
     public ItemCraftingComponent heatHole, logicMatrix, logicMatrixIdentifier, logicMatrixProgrammer;
-    public Item fz_steam;
+    public Fluid steamFluid;
     public ItemCraftingComponent nether_powder, rocket_fuel;
     public ItemBlockProxy rocket_engine;
     public ItemCraftingComponent bucket_rocket_fuel;
@@ -291,8 +293,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
         //Misc
         pocket_table = new ItemPocketTable(itemID("pocketCraftingTable", 9002));
-        fz_steam = new Item(itemID("steam", 9049));
-        fz_steam.setUnlocalizedName("factorization:charge/steam");
+        steamFluid = new Fluid("steam").setDensity(-500).setGaseous(true).setViscosity(100).setUnlocalizedName("factorization:fluid/steam");
+        FluidRegistry.registerFluid(steamFluid);
         if (Core.dev_environ) {
             new ItemAnnoyanceRemover(itemID("creativeMode_annoyanceRemover", 9062), "annoyanceRemover");
         }

@@ -4,8 +4,6 @@ import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import net.minecraft.util.DamageSource;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;

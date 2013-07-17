@@ -23,10 +23,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.IScheduledTickHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.PostInit;
-import cpw.mods.fml.common.Mod.PreInit;
-import cpw.mods.fml.common.Mod.ServerStarting;
-import cpw.mods.fml.common.Mod.ServerStopping;
+import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -80,7 +77,7 @@ public class Hammer {
     final static HammerInfo hammerInfo = new HammerInfo();
     static final int channelWidth = 16*50;
     
-    @PreInit
+    @EventHandler
     public void setup(FMLPreInitializationEvent event) {
         event.getModMetadata().parent = Core.modId;
         enabled = Core.enable_dimension_slice;
@@ -181,7 +178,7 @@ public class Hammer {
         }
     }
     
-    @ServerStarting
+    @EventHandler
     public void setMainServerThread(FMLServerStartingEvent event) {
         if (!enabled) {
             return;
@@ -247,7 +244,7 @@ public class Hammer {
         DSE_ChunkUpdateRangeSquared = Math.pow(PlayerManager.getFurthestViewableBlock(view_distance) + 16*2, 2);
     }
     
-    @ServerStopping
+    @EventHandler
     public void saveInfo(FMLServerStoppingEvent event) {
         hammerInfo.saveCellAllocations();
         serverSlices.clear();
@@ -258,7 +255,7 @@ public class Hammer {
         return ent.worldObj.getWorldVec3Pool().getVecFromPool(ent.posX, ent.posY, ent.posZ);
     }
     
-    @PostInit
+    @EventHandler
     public void modsLoaded(FMLPostInitializationEvent event) {
         double desired_radius = 16/2;
         if (Core.force_max_entity_radius >= 0 && Core.force_max_entity_radius < desired_radius) {

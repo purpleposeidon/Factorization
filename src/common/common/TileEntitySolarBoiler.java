@@ -4,35 +4,36 @@ import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
-import net.minecraftforge.liquids.ILiquidTank;
-import net.minecraftforge.liquids.ITankContainer;
-import net.minecraftforge.liquids.LiquidDictionary;
-import net.minecraftforge.liquids.LiquidStack;
-import net.minecraftforge.liquids.LiquidTank;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidHandler;
 import factorization.api.Coord;
 import factorization.api.IMeterInfo;
 import factorization.api.IReflectionTarget;
 
-public class TileEntitySolarBoiler extends TileEntityCommon implements IReflectionTarget, ITankContainer, IMeterInfo {
-    public static LiquidStack water_stack = null;
-    public static LiquidStack steam_stack = null;
+public class TileEntitySolarBoiler extends TileEntityCommon implements IReflectionTarget, IFluidHandler, IMeterInfo {
+    public static Fluid steam;
+    public static FluidStack water_stack = null;
+    public static FluidStack steam_stack = null;
     
     public static void setupSteam() {
         if (water_stack == null) {
-            water_stack = LiquidDictionary.getOrCreateLiquid("Water", new LiquidStack(Block.waterStill, 0));
-            steam_stack = LiquidDictionary.getOrCreateLiquid("Steam", new LiquidStack(Core.registry.fz_steam, 0));
+            water_stack = new FluidStack(FluidRegistry.WATER, 0);
+            steam_stack = FluidRegistry.getFluidStack("steam", 0);
+            steam = steam_stack.getFluid();
         }
     }
     
-    LiquidTank waterTank = new LiquidTank(water_stack.copy(), 1000*8, this);
-    LiquidTank steamTank = new LiquidTank(steam_stack.copy(), 1000*8, this);
+    FluidTank waterTank = new FluidTank(water_stack.copy(), 1000*8, this);
+    FluidTank steamTank = new FluidTank(steam_stack.copy(), 1000*8, this);
     int reflector_count = 0;
     
     public TileEntitySolarBoiler() {
-        waterTank.setTankPressure(0);
-        steamTank.setTankPressure(1);
-        waterTank.getLiquid().amount = 0;
-        steamTank.getLiquid().amount = 0;
+        waterTank.getFluid().amount = 0;
+        steamTank.getFluid().amount = 0;
     }
 
     @Override
@@ -68,50 +69,48 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
         sanitize();
     }
     
-    private LiquidTank getTank(ForgeDirection from) {
+    private FluidTank getTank(ForgeDirection from) {
         if (from == ForgeDirection.UP) {
             return steamTank;
         }
         return waterTank;
     }
-
+    
     @Override
-    public int fill(ForgeDirection from, LiquidStack resource, boolean doFill) {
-        return getTank(from, resource).fill(resource, doFill);
+    public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+        return getTank(from).fill(resource, doFill);
     }
 
     @Override
-    public int fill(int tankIndex, LiquidStack resource, boolean doFill) {
-        return waterTank.fill(resource, doFill);
-    }
-
-    @Override
-    public LiquidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+    public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
         return getTank(from).drain(maxDrain, doDrain);
     }
-
+    
     @Override
-    public LiquidStack drain(int tankIndex, int maxDrain, boolean doDrain) {
-        return steamTank.drain(maxDrain, doDrain);
+    public boolean canDrain(ForgeDirection from, Fluid fluid) {
+        return false;
     }
-
+    
     @Override
-    public ILiquidTank[] getTanks(ForgeDirection direction) {
-        return new ILiquidTank[] { getTank(direction) };
+    public boolean canFill(ForgeDirection from, Fluid fluid) {
+        if (from == ForgeDirection.UP) {
+            return false;
+        }
+        return fluid == null || fluid.getID() == water_stack.fluidID;
     }
-
+    
     @Override
-    public ILiquidTank getTank(ForgeDirection direction, LiquidStack type) {
-        if (direction == ForgeDirection.UP) {
-            return steamTank;
+    public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+        FluidTank tank = getTank(from);
+        if (resource == null || from == ForgeDirection.UP || tank.getFluid().fluidID != resource.fluidID) {
+            return null;
         }
-        if (water_stack.isLiquidEqual(type)) {
-            return waterTank;
-        }
-        if (steam_stack.isLiquidEqual(type)) {
-            return steamTank;
-        }
-        return getTank(direction);
+        return tank.drain(tank.getCapacity(), doDrain);
+    }
+    
+    @Override
+    public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+        return new FluidTankInfo[] {getTank(from).getInfo()};
     }
 
     //MAIN LOGIC
@@ -121,32 +120,18 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     }
     
     int getWater() {
-        return waterTank.getLiquid().amount;
+        return waterTank.getFluid().amount;
     }
     
     int getSteam() {
-        return steamTank.getLiquid().amount;
+        return steamTank.getFluid().amount;
     }
     
     int getHeat() {
         return Math.max(reflector_count - 3, 0);
     }
     
-    void sanitize() {
-        LiquidStack water = waterTank.getLiquid();
-        LiquidStack steam = steamTank.getLiquid();
-        if (water == null) {
-            water = LiquidDictionary.getLiquid("Water", 0);
-            waterTank.setLiquid(water);
-        }
-        if (steam == null) {
-            steam = LiquidDictionary.getLiquid("Steam", 0);
-            steamTank.setLiquid(steam);
-        }
-        if (water == null || steam == null) {
-            throw new RuntimeException("Steam/Water not defined");
-        }
-    }
+    void sanitize() { /* hopefully not actually needed. */ }
     
     @Override
     public void updateEntity() {
@@ -154,16 +139,16 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
             return;
         }
         sanitize();
-        LiquidStack water = waterTank.getLiquid();
-        LiquidStack steam = steamTank.getLiquid();
+        FluidStack water = waterTank.getFluid();
+        FluidStack steam = steamTank.getFluid();
         Coord here = getCoord();
         long seed = here.seed() + worldObj.getWorldTime();
         if (steam.amount > 0 && seed % 5 == 0) {
             //Send steam upwards
             Coord above = here.add(0, 1, 0);
-            ITankContainer tc = above.getTE(ITankContainer.class);
+            IFluidHandler tc = above.getTE(IFluidHandler.class);
             if (tc != null) {
-                LiquidStack sending_steam = steam.copy();
+                FluidStack sending_steam = steam.copy();
                 sending_steam.amount = Math.min(sending_steam.amount, Math.max(1, getHeat()/10));
                 steam.amount -= tc.fill(ForgeDirection.DOWN, steam.copy(), true);
                 steam.amount = Math.max(0, steam.amount);
@@ -173,7 +158,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
         if (water.amount <= 0 || (random && water.amount < waterTank.getCapacity())) {
             //pull water from below
             Coord below = here.add(0, -1, 0);
-            ITankContainer tc = below.getTE(ITankContainer.class);
+            IFluidHandler tc = below.getTE(IFluidHandler.class);
             boolean water_below = (below.is(Block.waterMoving) || below.is(Block.waterStill));
             water_below &= !here.isPowered();
             if (water_below && Core.boilers_suck_water) {
@@ -188,8 +173,8 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
                 }
                 int free = Math.max(0, waterTank.getCapacity() - water.amount);
                 free = Math.min(1000/10, free);
-                LiquidStack avail = tc.drain(dir, free, false);
-                if (avail != null && avail.isLiquidEqual(water_stack)) {
+                FluidStack avail = tc.drain(dir, free, false);
+                if (avail != null && avail.isFluidEqual(water_stack)) {
                     water.amount += tc.drain(dir, free, true).amount;
                 }
             }
@@ -218,15 +203,15 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     protected void onRemove() {
         super.onRemove();
         Coord here = getCoord();
-        FactorizationUtil.spill(here, waterTank.getLiquid());
-        FactorizationUtil.spill(here, steamTank.getLiquid());
+        FactorizationUtil.spill(here, waterTank.getFluid());
+        FactorizationUtil.spill(here, steamTank.getFluid());
     }
     
     @Override
     public String getInfo() {
         sanitize();
-        float w = waterTank.getLiquid().amount*16/(float)waterTank.getCapacity();
-        float s = steamTank.getLiquid().amount*16/(float)steamTank.getCapacity();
+        float w = waterTank.getFluid().amount*16/(float)waterTank.getCapacity();
+        float s = steamTank.getFluid().amount*16/(float)steamTank.getCapacity();
         return "Power: " + reflector_count
                 + "\nSteam: " + String.format("%.1f", s)
                 + "\nWater: " + String.format("%.1f", w);

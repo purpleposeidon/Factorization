@@ -1,19 +1,19 @@
 package factorization.client.render;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.RenderEngine;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraftforge.client.IItemRenderer;
 
 import org.lwjgl.opengl.GL11;
 
+import factorization.common.Core;
 import factorization.common.ItemGlazeBucket;
 
 
@@ -49,7 +49,7 @@ public class ItemRenderGlazeBucket implements IItemRenderer {
     public void renderItem(ItemRenderType type, ItemStack is, Object... data) {
         Minecraft mc = Minecraft.getMinecraft();
         Tessellator tess = Tessellator.instance;
-        RenderEngine re = mc.renderEngine;
+        TextureManager re = mc.renderEngine;
         ItemGlazeBucket bucket = (ItemGlazeBucket) is.getItem();
         if (type == ItemRenderType.ENTITY) {
             float s = 1F/16F;
@@ -77,9 +77,10 @@ public class ItemRenderGlazeBucket implements IItemRenderer {
         }
         Icon glaze = bucket.getIcon(is, 1, null, null, 0);
         if (glaze == null) {
-            glaze = re.getMissingIcon(0);
+            glaze = Core.blockMissingIcon;
         }
-        re.bindTexture("/terrain.png");
+        re.bindResourceTexture(Core.blockAtlas);
+        
         double lx = 4, ly = 5;
         double hx = 12, hy = 13;
         double height = hy - ly;

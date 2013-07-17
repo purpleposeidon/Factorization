@@ -3,20 +3,21 @@ package factorization.client.render;
 import java.util.Random;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.RenderEngine;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ForgeHooksClient;
 
 import org.lwjgl.opengl.GL11;
+
 import factorization.common.Core;
 import factorization.common.TileEntityBarrel;
 
@@ -183,7 +184,7 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
             //Original call:
             //renderItem.renderItemIntoGUI(getFontRenderer(), Minecraft.getMinecraft().renderEngine, is, 0, 0);
             //However, this draws the sparkly effect, which causes problems.
-            RenderEngine re = Minecraft.getMinecraft().renderEngine;
+            TextureManager re = Minecraft.getMinecraft().renderEngine;
             FontRenderer fr = getFontRenderer();
             if (!ForgeHooksClient.renderInventoryItem(renderBlocks, re, is, true, 0, 0, 0)) {
                 //renderItem.func_82406_b(fr, re, is, 0, 0);
