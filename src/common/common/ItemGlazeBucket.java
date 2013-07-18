@@ -20,12 +20,11 @@ import factorization.common.Core.TabType;
 import factorization.common.TileEntityGreenware.ClayLump;
 import factorization.common.TileEntityGreenware.ClayState;
 
-public class ItemGlazeBucket extends Item {
+public class ItemGlazeBucket extends ItemFactorization {
     public static final int MAX_CHARGES = 32;
     
     public ItemGlazeBucket(int itemId) {
-        super(itemId);
-        setUnlocalizedName("factorization:ceramics/glaze_bucket");
+        super(itemId, "ceramics/glaze_bucket", TabType.ART);
         setMaxStackSize(1);
         setMaxDamage(0);
         setNoRepair();
@@ -198,7 +197,7 @@ public class ItemGlazeBucket extends Item {
     }
     
     @Override
-    public void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
+    protected void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         ItemStack hint = getSource(is);
         NBTTagCompound tag = FactorizationUtil.getTag(is);
         if (!tag.hasNoTags()) {
@@ -211,7 +210,6 @@ public class ItemGlazeBucket extends Item {
                 return; //No Core.brand
             }
         }
-        Core.brand(is, list);
     }
 
     @Override

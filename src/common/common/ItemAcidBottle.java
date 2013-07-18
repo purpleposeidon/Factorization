@@ -2,6 +2,8 @@ package factorization.common;
 
 import java.util.List;
 
+import factorization.common.Core.TabType;
+
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,15 +13,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
-import factorization.common.Core.TabType;
 
-public class ItemAcidBottle extends Item {
+public class ItemAcidBottle extends ItemFactorization {
 
     public ItemAcidBottle(int id) {
-        super(id);
-        Core.tab(this, TabType.MISC);
+        super(id, "acid", TabType.MISC);
         setMaxStackSize(16);
-        setUnlocalizedName("factorization:acid");
     }
     
     @Override
@@ -90,11 +89,6 @@ public class ItemAcidBottle extends Item {
         player.attackEntityFrom(acidDrinker, is.getItemDamage() > 0 ? 15 : 10);
         player.getFoodStats().addStats(-20, 0);
         return is;
-    }
-
-    @Override
-    public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
-        Core.brand(is, infoList);
     }
     
     @Override

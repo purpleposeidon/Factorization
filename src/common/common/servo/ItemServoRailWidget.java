@@ -5,7 +5,6 @@ import java.util.List;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
@@ -15,14 +14,13 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.common.Core;
-import factorization.common.FactorizationUtil;
 import factorization.common.Core.TabType;
+import factorization.common.FactorizationUtil;
+import factorization.common.ItemFactorization;
 
-public class ItemServoRailWidget extends Item {
+public class ItemServoRailWidget extends ItemFactorization {
     public ItemServoRailWidget(int itemId) {
-        super(itemId);
-        setUnlocalizedName("factorization:servo/component");
-        Core.tab(this, TabType.SERVOS);
+        super(itemId, "servo/component", TabType.SERVOS);
     }
     
     public String getUnlocalizedName(ItemStack is) {
@@ -92,9 +90,7 @@ public class ItemServoRailWidget extends Item {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
-        super.addInformation(is, player, list, verbose);
-        Core.brand(is, list);
+    public void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         ServoComponent sc = get(is);
         if (sc != null) {
             sc.addInformation(list);

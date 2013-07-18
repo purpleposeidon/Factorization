@@ -3,26 +3,23 @@ package factorization.common;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.common.Core.TabType;
 
-public class ItemMachineUpgrade extends Item {
+public class ItemMachineUpgrade extends ItemFactorization {
     FactoryType machineType;
     public int upgradeId;
     String name, type;
 
     protected ItemMachineUpgrade(int id, String name, String type, FactoryType machineType, int upgradeId) {
-        super(id);
+        super(id, name, TabType.MISC);
         this.machineType = machineType;
         this.upgradeId = upgradeId;
         this.name = name;
         this.type = type;
-        setUnlocalizedName("factorization:" + this.name);
         setMaxStackSize(16);
-        Core.tab(this, TabType.MISC);
     }
     
     @Override
@@ -46,10 +43,9 @@ public class ItemMachineUpgrade extends Item {
         }
         return false;
     }
-
+    
     @Override
-    public void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
+    protected void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         list.add(type);
-        Core.brand(is, list);
     }
 }

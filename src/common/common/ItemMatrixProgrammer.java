@@ -4,12 +4,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import factorization.api.Coord;
+import factorization.common.Core.TabType;
 import factorization.common.servo.Decorator;
 import factorization.common.servo.TileEntityServoRail;
 
-public class ItemMatrixProgrammer extends ItemCraftingComponent {
-    public ItemMatrixProgrammer(int id, String itemName) {
-        super(id, itemName);
+public class ItemMatrixProgrammer extends ItemFactorization {
+    public ItemMatrixProgrammer(int id) {
+        super(id, "tool.matrix_programmer", TabType.TOOLS);
         setMaxStackSize(1);
         setContainerItem(this);
     }

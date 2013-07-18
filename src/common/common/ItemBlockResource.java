@@ -30,6 +30,6 @@ public class ItemBlockResource extends ItemBlock {
     
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
-        Core.brand(is, list);
+        Core.brand(is, player, list, verbose);
     }
 }

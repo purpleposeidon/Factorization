@@ -380,11 +380,15 @@ public class Core {
         }
     }
     
-    public static void brand(ItemStack is, List list) {
-        String name = is.getItem().getUnlocalizedName(is);
+    public static void brand(ItemStack is, EntityPlayer player, List list, boolean verbose) { //NORELEASE: Formatting.
+        final Item it = is.getItem();
+        String name = it.getUnlocalizedName(is);
         addTranslationHints(name + ".hint", list);
         if (proxy.isClientHoldingShift()) {
             addTranslationHints(name + ".shift", list);
+        }
+        if (it instanceof ItemFactorization) {
+            ((ItemFactorization) it).addExtraInformation(is, player, list, verbose);
         }
         if (add_branding) {
             list.add("Factorization");

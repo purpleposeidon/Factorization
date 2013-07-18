@@ -210,21 +210,15 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     public static class CrystalRecipe {
         public ItemStack input, output, solution;
         public float output_count;
-        public int inverium_count;
 
-        public CrystalRecipe(ItemStack input, ItemStack output, float output_count,
-                ItemStack solution, int inverium_count) {
+        public CrystalRecipe(ItemStack input, ItemStack output, float output_count, ItemStack solution) {
             this.input = input;
             this.output = output;
             this.output_count = output_count;
             this.solution = solution;
-            this.inverium_count = inverium_count;
         }
 
         boolean matches(TileEntityCrystallizer crys) {
-            if (crys.countMaterial(FactorizationUtil.makeWildcard(Core.registry.inverium)) < inverium_count) {
-                return false;
-            }
             if (crys.output != null) {
                 if (!FactorizationUtil.couldMerge(crys.output, output)) {
                     return false;
@@ -265,39 +259,19 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
                 crys.output.stackSize = 0;
             }
             crys.output.stackSize += delta;
-            int dead_inverium = inverium_count;
-            for (int inverium_slot = 0; inverium_slot < crys.inputs.length; inverium_slot++) {
-                if (dead_inverium == 0) {
-                    break;
-                }
-                ItemStack inverium = crys.inputs[inverium_slot];
-                if (inverium == null || inverium.getItem() != Core.registry.inverium) {
-                    continue;
-                }
-                int toRemove = Math.min(dead_inverium, inverium.stackSize);
-                inverium.stackSize -= toRemove;
-                dead_inverium -= toRemove;
-                if (inverium.stackSize <= 0) {
-                    crys.inputs[inverium_slot] = null;
-                }
-            }
         }
 
         void apply(TileEntityCrystallizer crys) {
-            ItemStack inverium = FactorizationUtil.makeWildcard(Core.registry.inverium);
             for (int i = 0; i < crys.inputs.length; i++) {
                 ItemStack is = crys.inputs[i];
                 if (is != null && FactorizationUtil.couldMerge(input, is)) {
-                    if (crys.countMaterial(inverium) >= inverium_count) {
-                        applyTo(crys, i);
-                    }
+                    applyTo(crys, i);
                 }
             }
         }
     }
 
-    public static void addRecipe(ItemStack input, ItemStack output, float output_count, ItemStack solution,
-            int inverium_count) {
+    public static void addRecipe(ItemStack input, ItemStack output, float output_count, ItemStack solution) {
         if (output.stackSize != 1) {
             throw new RuntimeException("Stacksize should be 1");
         }
@@ -306,7 +280,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         }
         output = output.copy();
         output.stackSize = 0;
-        recipes.add(new CrystalRecipe(input, output, output_count, solution, inverium_count));
+        recipes.add(new CrystalRecipe(input, output, output_count, solution));
     }
 
     CrystalRecipe getMatchingRecipe() {

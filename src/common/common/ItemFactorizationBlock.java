@@ -15,7 +15,6 @@ import factorization.common.TileEntityGreenware.ClayState;
 public class ItemFactorizationBlock extends ItemBlock {
     public ItemFactorizationBlock(int id) {
         super(id);
-        //Y'know, that -256 is really retarded.
         setMaxDamage(0);
         setHasSubtypes(true);
     }
@@ -93,7 +92,7 @@ public class ItemFactorizationBlock extends ItemBlock {
                 infoList.add("0% charged");
             }
         }
-        Core.brand(is, infoList);
+        Core.brand(is, player, infoList, verbose);
     }
     
     @Override

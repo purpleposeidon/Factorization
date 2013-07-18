@@ -114,6 +114,6 @@ public class ItemBlockProxy extends Item {
     
     @Override
     public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
-        Core.brand(is, infoList);
+        Core.brand(is, player, infoList, verbose);
     }
 }

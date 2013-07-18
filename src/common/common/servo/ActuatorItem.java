@@ -59,10 +59,9 @@ public abstract class ActuatorItem extends ItemCraftingComponent {
     public abstract IDataSerializable getState();
     
     @Override
-    public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
-        super.addInformation(is, player, infoList, verbose);
+    protected void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         try {
-            addConfigurationInfo(is, infoList);
+            addConfigurationInfo(is, list);
         } catch (IOException e) { }
     }
     

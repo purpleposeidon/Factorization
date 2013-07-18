@@ -64,7 +64,7 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
                 break;
             }
         }
-        Core.brand(is, list);
+        Core.brand(is, player, list, verbose);
     }
 
     @Override

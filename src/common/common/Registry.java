@@ -80,7 +80,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemCraft item_craft;
     public ItemBagOfHolding bag_of_holding;
     public ItemPocketTable pocket_table;
-    public ItemWandOfCooling wand_of_cooling;
     public ItemCraftingComponent diamond_shard;
     public IRecipe diamond_shard_recipe;
     public ItemStack diamond_shard_packet;
@@ -100,12 +99,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemBattery battery;
     public ItemOreProcessing ore_dirty_gravel, ore_clean_gravel, ore_reduced, ore_crystal;
     public ItemCraftingComponent sludge;
-    public ItemCraftingComponent inverium;
     public ItemSculptingTool sculpt_tool;
     public ItemGlazeBucket glaze_bucket;
     public ItemStack base_common, base_matte, base_translucent, base_shiny, base_bright, base_unreal, glaze_base_mimicry;
-    public ItemAngularSaw angular_saw;
-    public ItemCraftingComponent heatHole, logicMatrix, logicMatrixIdentifier, logicMatrixProgrammer;
+    public ItemCraftingComponent logicMatrix, logicMatrixIdentifier;
+    public ItemMatrixProgrammer logicMatrixProgrammer;
     public Fluid steamFluid;
     public ItemCraftingComponent nether_powder, rocket_fuel;
     public ItemBlockProxy rocket_engine;
@@ -250,14 +248,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
         bag_of_holding = new ItemBagOfHolding(itemID("bagOfHolding", 9001));
         
-        logicMatrixProgrammer = new ItemMatrixProgrammer(itemID("logicMatrixProgrammer", 9043), "tool.matrix_programmer");
+        logicMatrixProgrammer = new ItemMatrixProgrammer(itemID("logicMatrixProgrammer", 9043));
         ChestGenHooks dungeon = ChestGenHooks.getInfo(ChestGenHooks.DUNGEON_CHEST);
         dungeon.addItem(new WeightedRandomChestContent(new ItemStack(logicMatrixProgrammer), 1, 1, 25)); //XXX TODO: Temporary, put these on asteroids.
         logicMatrix = new ItemCraftingComponent(itemID("logicMatrix", 9044), "logic_matrix");
         logicMatrixIdentifier = new ItemCraftingComponent(itemID("logicMatrixID", 9045), "logic_matrix_identifier");
-        heatHole = new ItemCraftingComponent(itemID("heatHole", 9046), "heat_hole");
-
-        wand_of_cooling = new ItemWandOfCooling(itemID("wandOfCooling", 9005));
 
         router_item_filter = new ItemMachineUpgrade(itemID("routerItemFilter", 9016), "router/item_filter", "Router Upgrade", FactoryType.ROUTER, 0);
         router_machine_filter = new ItemMachineUpgrade(itemID("routerMachineFilter", 9017), "router/machine_filter", "Router Upgrade", FactoryType.ROUTER, 1);
@@ -291,24 +286,14 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //Industrial
         item_craft = new ItemCraft(itemID("itemCraftId", 9000));
         
-        angular_saw = new ItemAngularSaw(itemID("angularSaw", 9042));
-        MinecraftForge.setToolClass(angular_saw, "pickaxe", 3);
-        
         //ceramics
         sculpt_tool = new ItemSculptingTool(itemID("sculptTool", 9041));
         glaze_bucket = new ItemGlazeBucket(itemID("glazeBucket", 9055));
-        
-        //inverium = new ItemInverium(itemID("inverium", 9040), "item.inverium", 12*16 + 0, 11);
-        inverium = new ItemInverium(itemID("inverium", 9040), "rocket/inverium_drop");
-        OreDictionary.registerOre("FZ.inverium", inverium);
 
         //Misc
         pocket_table = new ItemPocketTable(itemID("pocketCraftingTable", 9002));
         steamFluid = new Fluid("steam").setDensity(-500).setGaseous(true).setViscosity(100).setUnlocalizedName("factorization:fluid/steam");
         FluidRegistry.registerFluid(steamFluid);
-        if (Core.dev_environ) {
-            new ItemAnnoyanceRemover(itemID("creativeMode_annoyanceRemover", 9062), "annoyanceRemover");
-        }
         
         //Rocketry
         nether_powder = new ItemCraftingComponent(itemID("netherPowder", 9050), "nether_powder");
@@ -405,16 +390,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'i', dark_iron,
                 'X', logicMatrixProgrammer);
         
-        TileEntityCrystallizer.addRecipe(new ItemStack(Block.stone), new ItemStack(logicMatrix), 1, new ItemStack(Item.potion), 1);
-        // wand of cooling
-        TileEntityCrystallizer.addRecipe(new ItemStack(Item.magmaCream), new ItemStack(heatHole), 1, new ItemStack(Item.potion), 1);
-        recipe(new ItemStack(wand_of_cooling),
-                " OD",
-                " IO",
-                "I  ",
-                'O', Block.obsidian,
-                'D', heatHole,
-                'I', Item.ingotIron);
+        TileEntityCrystallizer.addRecipe(new ItemStack(Block.blockRedstone), new ItemStack(logicMatrix), 1, Core.registry.aqua_regia);
 
         // diamond shard
         //How do we feel about 12 shards for 9 diamonds?
@@ -669,15 +645,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 return null;
             }
         });
-        
-        //inverium
-        oreRecipe(new ItemStack(inverium, 1, 1),
-                "LGL",
-                "GDG",
-                "LGL",
-                'L', "ingotLead",
-                'G', Item.ingotGold,
-                'D', Item.diamond);
 
         // BlockFactorization recipes
         // router
@@ -977,7 +944,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'S', Item.silk,
                 'U', Item.cauldron);
         ItemStack lime = new ItemStack(Item.dyePowder, 1, 10);
-        TileEntityCrystallizer.addRecipe(lime, new ItemStack(Item.slimeBall), 1, new ItemStack(Item.bucketMilk), 0);
+        TileEntityCrystallizer.addRecipe(lime, new ItemStack(Item.slimeBall), 1, new ItemStack(Item.bucketMilk));
         
         //Rocketry
         TileEntityGrinder.addRecipe(new ItemStack(Block.netherrack), new ItemStack(nether_powder, 1), 1);

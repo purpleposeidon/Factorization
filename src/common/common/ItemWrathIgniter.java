@@ -1,22 +1,17 @@
 package factorization.common;
 
-import java.util.List;
-
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.common.Core.TabType;
 
-public class ItemWrathIgniter extends Item {
+public class ItemWrathIgniter extends ItemFactorization {
     public ItemWrathIgniter(int par1) {
-        super(par1);
+        super(par1, "tool/wrath_igniter", TabType.TOOLS);
         setMaxStackSize(1);
         setMaxDamage((6 * 2) - 1);
         setNoRepair();
-        Core.tab(this, TabType.TOOLS);
-        setUnlocalizedName("factorization:tool/wrath_igniter");
     }
 
     @Override
@@ -64,10 +59,5 @@ public class ItemWrathIgniter extends Item {
     @Override
     public boolean doesContainerItemLeaveCraftingGrid(ItemStack par1ItemStack) {
         return false;
-    }
-
-    @Override
-    public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
-        Core.brand(is, infoList);
     }
 }

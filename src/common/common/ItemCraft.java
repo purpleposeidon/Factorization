@@ -10,7 +10,6 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.SlotCrafting;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
@@ -21,16 +20,14 @@ import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.common.Core.TabType;
 
-public class ItemCraft extends Item {
+public class ItemCraft extends ItemFactorization {
     private final int slot_length = 9;
     static List<IRecipe> recipes = new ArrayList();
 
     public ItemCraft(int i) {
-        super(i);
+        super(i, "craftpacket", TabType.MISC);
         maxStackSize = 1;
         setHasSubtypes(true);
-        Core.tab(this, TabType.MISC);
-        setUnlocalizedName("factorization:craftpacket");
     }
 
     public static void addStamperRecipe(IRecipe recipe) {
@@ -72,17 +69,15 @@ public class ItemCraft extends Item {
     }
 
     @Override
-    // -- XXX NOTE Can't override due to server
-    public void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
+    protected void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         // super.addInformation(is, list); // XXX NOTE Can't call due to server
         String line = "";
         ArrayList<String> toAdd = new ArrayList<String>();
         int count = 0;
         if (is.getItemDamage() > 1) {
             if (is.getItemDamage() == Core.registry.diamond_shard_packet.getItemDamage() && is != Core.registry.diamond_shard_packet) {
-                addInformation(Core.registry.diamond_shard_packet, player, list, verbose);
+                addExtraInformation(Core.registry.diamond_shard_packet, player, list, verbose);
             } else {
-                Core.brand(is, list);
                 return;
             }
         }
@@ -111,8 +106,8 @@ public class ItemCraft extends Item {
         } else {
             list.add("Empty");
         }
-        Core.brand(is, list);
     }
+    
 
     public boolean addItem(ItemStack is, int i, ItemStack what, TileEntity where) {
         if (i < 0 || 8 < i) {

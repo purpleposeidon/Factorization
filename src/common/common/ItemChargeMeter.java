@@ -1,10 +1,7 @@
 package factorization.common;
 
-import java.util.List;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -15,12 +12,10 @@ import factorization.api.IChargeConductor;
 import factorization.api.IMeterInfo;
 import factorization.common.Core.TabType;
 
-public class ItemChargeMeter extends Item {
+public class ItemChargeMeter extends ItemFactorization {
 
     protected ItemChargeMeter(int par1) {
-        super(par1);
-        setUnlocalizedName("factorization:tool/charge_meter");
-        Core.tab(this, TabType.REDSTONE);
+        super(par1, "tool/charge_meter", TabType.TOOLS);
         setMaxStackSize(1);
     }
     
@@ -81,10 +76,5 @@ public class ItemChargeMeter extends Item {
         msg += inf;
         Core.notify(toNotify, here, "%s", msg);
         return true;
-    }
-
-    @Override
-    public void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
-        Core.brand(is, list);
     }
 }

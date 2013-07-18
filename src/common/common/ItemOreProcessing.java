@@ -6,13 +6,12 @@ import java.util.List;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 import factorization.api.IActOnCraft;
 import factorization.common.Core.TabType;
 
-public class ItemOreProcessing extends Item implements IActOnCraft {
+public class ItemOreProcessing extends ItemFactorization implements IActOnCraft {
     public static ArrayList<String> OD_ores = new ArrayList(), OD_ingots = new ArrayList();
     public static enum OreType {
         IRON(0, 0xD8D8D8, "Iron", "oreIron", "ingotIron"),
@@ -73,11 +72,9 @@ public class ItemOreProcessing extends Item implements IActOnCraft {
     String stateName;
 
     protected ItemOreProcessing(int itemID, int icon, String stateName) {
-        super(itemID);
+        super(itemID, "ore/" + stateName, TabType.MATERIALS);
         setHasSubtypes(true);
         this.stateName = stateName;
-        Core.tab(this, TabType.MATERIALS);
-        setUnlocalizedName("factorization:ore/" + stateName);
     }
 
     @Override
@@ -112,11 +109,6 @@ public class ItemOreProcessing extends Item implements IActOnCraft {
                 }
             }
         }
-    }
-
-    @Override
-    public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
-        Core.brand(is, infoList);
     }
     
     public ItemStack makeStack(OreType ot) {

@@ -5,19 +5,16 @@ import java.util.List;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import factorization.common.Core.TabType;
 
-public class ItemPocketTable extends Item {
+public class ItemPocketTable extends ItemFactorization {
 
     public ItemPocketTable(int id) {
-        super(id);
+        super(id, "tool/pocket_crafting_table", TabType.TOOLS);
         setMaxStackSize(1);
-        Core.tab(this, TabType.TOOLS);
         setFull3D();
-        setUnlocalizedName("factorization:tool/pocket_crafting_table");
     }
     
     @Override
@@ -94,8 +91,9 @@ public class ItemPocketTable extends Item {
     }
     
     public static int NEI_status = -1;
+    
     @Override
-    public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
+    public void addExtraInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
         if (player.worldObj.isRemote) {
             ClassLoader loader = getClass().getClassLoader();
             String key = Core.proxy.getPocketCraftingTableKey();
@@ -108,6 +106,5 @@ public class ItemPocketTable extends Item {
                 }
             }
         }
-        Core.brand(is, infoList);
     }
 }

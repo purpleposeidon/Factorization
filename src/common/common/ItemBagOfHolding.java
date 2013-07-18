@@ -16,13 +16,11 @@ import factorization.api.IActOnCraft;
 import factorization.common.Core.TabType;
 import factorization.common.FactorizationUtil.FzInv;
 
-public class ItemBagOfHolding extends Item implements IActOnCraft {
+public class ItemBagOfHolding extends ItemFactorization implements IActOnCraft {
     //XXX: Sending NBT data of all the items might not be a good idea. We might force it to not be shared, and use the damage value for the pearl count.
     public ItemBagOfHolding(int id) {
-        super(id);
+        super(id, "tool/bag_of_holding", TabType.TOOLS);
         setMaxStackSize(1);
-        Core.tab(this, TabType.TOOLS);
-        setUnlocalizedName("factorization:tool/bag_of_holding");
     }
 
     final String pearlcount = "pearlcount";
@@ -186,18 +184,10 @@ public class ItemBagOfHolding extends Item implements IActOnCraft {
     }
 
     @Override
-    // XXX NOTE: Can't override due to... the *fucking* server. >:|
-    public void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
-        // Bag of Holding
-        // Stores 5 columns
-        if (is.getTagCompound() == null) {
-            Core.brand(is, list);
-            return;
-        }
+    protected void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         int n = getNumOfCols(is);
         list.add("Stores " + n + " columns");
-        Core.brand(is, list);
-    }
+    };
 
     @Override
     public boolean onItemUseFirst(ItemStack is, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {

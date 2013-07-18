@@ -18,15 +18,13 @@ import factorization.common.FactorizationUtil.FzInv;
 import factorization.common.TileEntityGreenware.ClayLump;
 import factorization.common.TileEntityGreenware.ClayState;
 
-public class ItemSculptingTool extends Item {
+public class ItemSculptingTool extends ItemFactorization {
 
     protected ItemSculptingTool(int id) {
-        super(id);
+        super(id, "sculptTool", TabType.ART);
         setNoRepair();
         setMaxDamage(0);
         setMaxStackSize(4);
-        setUnlocalizedName("factorization:sculptTool");
-        Core.tab(this, TabType.ART);
         setFull3D();
     }
     
@@ -113,13 +111,12 @@ public class ItemSculptingTool extends Item {
     }
     
     @Override
-    public void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
+    public void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         ToolMode mode = getMode(is.getItemDamage());
         list.add(mode.name);
         for (ToolMode nextMode = mode.next; nextMode != mode; nextMode = nextMode.next) {
             list.add("(" + nextMode.name + ")");
         }
-        Core.brand(is, list);
     }
     
     void changeMode(ItemStack is) {
