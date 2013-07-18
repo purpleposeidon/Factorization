@@ -168,7 +168,7 @@ public class FZDSCommand extends CommandBase {
         }
         
         void sendChat(String msg) {
-            sendChat(msg);
+            Core.sendChatMessage(true, sender, msg);
         }
     }
     
@@ -199,9 +199,9 @@ public class FZDSCommand extends CommandBase {
     }
     
     @Override
-    public String getCommandUsage(ICommandSender icommandsender) { //NORELEASE: Check what this actually does
-        processCommand(icommandsender, new String[0]);
-        return "";
+    public String getCommandUsage(ICommandSender icommandsender) {
+        //processCommand(icommandsender, new String[0]);
+        return "/fzds subcommand";
     }
     
     @Override

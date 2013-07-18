@@ -18,7 +18,7 @@ pushd src/minecraft/
 popd
 
 pushd lib/
-  ln -s $BASE/texture/mods/
+  ln -s $BASE/resources/mods/
 popd
 
 mkdir -p jars/saves

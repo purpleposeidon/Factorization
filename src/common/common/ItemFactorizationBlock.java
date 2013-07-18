@@ -12,8 +12,8 @@ import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.common.TileEntityGreenware.ClayState;
 
-public class ItemFactorization extends ItemBlock {
-    public ItemFactorization(int id) {
+public class ItemFactorizationBlock extends ItemBlock {
+    public ItemFactorizationBlock(int id) {
         super(id);
         //Y'know, that -256 is really retarded.
         setMaxDamage(0);

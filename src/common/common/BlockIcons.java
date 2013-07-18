@@ -157,7 +157,7 @@ public class BlockIcons {
     
     public static class ArrowyBox extends IconGroup {
         public Icon front, side_N, side_E, back;
-        public Icon side_S, side_W;
+        public Icon side_S, side_W; //NORELEASE: @Ignore annotation on these
 
         @Override
         public void afterRegister() {

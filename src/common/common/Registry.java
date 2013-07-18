@@ -56,7 +56,7 @@ import factorization.common.servo.actuators.ActuatorItemSyringe;
 
 public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler {
     //NORELEASE: Consolidate item IDs of crafting components in 1.6 release
-    public ItemFactorization item_factorization;
+    public ItemFactorizationBlock item_factorization;
     public ItemBlockResource item_resource;
     public BlockFactorization factory_block, factory_rendering_block = null;
     public BlockRenderHelper blockRender = null, serverTraceHelper = null, clientTraceHelper = null;
@@ -136,7 +136,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         is_factory = new ItemStack(factory_block);
         is_lightair = new ItemStack(lightair_block);
 
-        GameRegistry.registerBlock(factory_block, ItemFactorization.class, "FZ factory");
+        GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FZ factory");
         GameRegistry.registerBlock(lightair_block, "FZ Lightair");
         GameRegistry.registerBlock(resource_block, ItemBlockResource.class, "FZ resource");
         GameRegistry.registerCraftingHandler(this);
@@ -180,6 +180,17 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         added_ids.add(default_id);
         return id;
     }
+    
+    void postMakeItems() {
+        //NORELEASE: Okay, ItemFactorization is overdue now. Get rid of this function.
+        for (int id : added_ids) {
+            Item it = Item.itemsList[id + 256];
+            if (it == null) {
+                continue; //This is weird.
+            }
+            it.setTextureName(it.getUnlocalizedName());
+        }
+    }
 
     void makeItems() {
         ore_dirty_gravel = new ItemOreProcessing(itemID("oreDirtyGravel", 9034), 2 * 16 + 4, "gravel");
@@ -189,7 +200,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         sludge = new ItemCraftingComponent(itemID("sludge", 9039), "sludge");
         OreDictionary.registerOre("FZ.sludge", sludge);
         //ItemBlocks
-        item_factorization = (ItemFactorization) Item.itemsList[factory_block.blockID];
+        item_factorization = (ItemFactorizationBlock) Item.itemsList[factory_block.blockID];
         item_resource = (ItemBlockResource) Item.itemsList[resource_block.blockID];
         Core.tab(resource_block, TabType.MATERIALS);
 
@@ -319,6 +330,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         actuator_item_manipulator = new ActuatorItemSyringe(itemID("actuatorItemManipulator", 9058));
         dark_iron_sprocket = new ItemStack(new ItemCraftingComponent(itemID("darkIronSprocket", 9059), "servo/sprocket"));
         sprocket_motor = new ItemStack(new ItemCraftingComponent(itemID("servoMotor", 9060), "servo/servo_motor"));
+        
+        postMakeItems();
     }
 
     public void recipe(ItemStack res, Object... params) {
