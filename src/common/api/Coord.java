@@ -654,6 +654,7 @@ public class Coord implements IDataSerializable {
     }
     
     public void setAsEntityLocation(Entity ent) {
+        ent.worldObj = w;
         ent.posX = x + 0.5;
         ent.posY = y;
         ent.posZ = z + 0.5;

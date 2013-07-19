@@ -1,7 +1,7 @@
 package factorization.common;
 
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
@@ -29,55 +29,37 @@ public class TileEntityPackager extends TileEntityStamper {
         boolean need_pulse = false;
         boolean can_add = output == null || output.stackSize < output.getMaxStackSize();
         if (outputBuffer == null && can_add && input != null && input.stackSize > 0) {
-            ItemStack toCraft = null;
+            ItemStack[] matrix = new ItemStack[9];
+            List<ItemStack> testOutput = null;
             int to_remove = 0;
-
-            ItemCraft ic = Core.registry.item_craft;
-            ItemStack craftInput = ItemStack.copyItemStack(input);
             if (input.stackSize >= 9) {
-                toCraft = new ItemStack(ic);
                 for (int i = 0; i < 9; i++) {
-                    ic.addItem(toCraft, i, craftInput, this);
+                    matrix[i] = input;
                 }
-                ic.craftAt(toCraft, true, this);
-                if (!ic.isValidCraft(toCraft)) {
-                    toCraft = null;
-                }
-                else {
-                    to_remove = 9;
-                }
+                to_remove = 9;
+                testOutput = FactorizationUtil.craft3x3(this, true, matrix);
+            } else if (input.stackSize >= 4) {
+                matrix[0] = input;
+                matrix[1] = input;
+                matrix[3] = input;
+                matrix[4] = input;
+                to_remove = 4;
+                testOutput = FactorizationUtil.craft3x3(this, true, matrix);
             }
-            if (input.stackSize >= 4 && toCraft == null) {
-                toCraft = new ItemStack(ic);
-                ic.addItem(toCraft, 0, craftInput, this);
-                ic.addItem(toCraft, 1, craftInput, this);
-                ic.addItem(toCraft, 3, craftInput, this);
-                ic.addItem(toCraft, 4, craftInput, this);
-                ic.craftAt(toCraft, true, this);
-                if (!ic.isValidCraft(toCraft)) {
-                    toCraft = null;
-                }
-                else {
-                    to_remove = 4;
-                }
-            }
-
-            if (toCraft == null) {
+            
+            if (testOutput == null || testOutput.isEmpty()) {
                 return;
             }
 
-            ArrayList<ItemStack> fakeResult = Core.registry.item_craft
-                    .craftAt(toCraft, true, this);
-
-            if (canMerge(fakeResult)) {
-                //really craft
-                ArrayList<ItemStack> craftResult = Core.registry.item_craft.craftAt(toCraft, false, this);
-                outputBuffer = craftResult;
-                needLogic();
-                drawActive(3);
-                input.stackSize -= to_remove;
-                need_pulse = true;
+            if (!canMerge(testOutput)) {
+                return;
             }
+            //really craft
+            outputBuffer.addAll(FactorizationUtil.craft3x3(this, false, matrix));
+            needLogic();
+            drawActive(3);
+            input.stackSize -= to_remove;
+            need_pulse = true;
         }
 
         if (input != null && input.stackSize <= 0) {

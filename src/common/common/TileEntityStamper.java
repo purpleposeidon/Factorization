@@ -2,6 +2,7 @@ package factorization.common;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -112,7 +113,7 @@ public class TileEntityStamper extends TileEntityFactorization {
         }
     }
 
-    boolean canMerge(ArrayList<ItemStack> items) {
+    boolean canMerge(List<ItemStack> items) {
         if (items == null) {
             return true;
         }
@@ -138,30 +139,13 @@ public class TileEntityStamper extends TileEntityFactorization {
         int input_count = (input == null) ? 0 : input.stackSize;
         boolean can_add = output == null
                 || output.stackSize < output.getMaxStackSize();
-        if (outputBuffer == null && can_add && input != null
-                && input.stackSize > 0) {
-            ItemStack toCraft;
-
-            if (input.getItem() instanceof ItemCraft) {
-                toCraft = input;
-                ItemCraft ic = (ItemCraft) input.getItem();
-            } else {
-                // try to craft a single item
-                // Center's the best place for it
-                ItemCraft ic = Core.registry.item_craft;
-                toCraft = new ItemStack(ic);
-                ItemStack craftInput = input.copy();
-                craftInput.stackSize = 1;
-                ic.addItem(toCraft, 4, craftInput, this);
-            }
-
-            ArrayList<ItemStack> fakeResult = Core.registry.item_craft.craftAt(toCraft, true, this);
-
+        if (outputBuffer == null && can_add && input != null && input.stackSize > 0) {
+            List<ItemStack> fakeResult = FactorizationUtil.craft1x1(this, true, input);
             if (canMerge(fakeResult)) {
                 //really craft
-                ArrayList<ItemStack> craftResult = Core.registry.item_craft.craftAt(toCraft, false, this);
+                List<ItemStack> craftResult = FactorizationUtil.craft1x1(this, false, input);
                 input.stackSize--;
-                outputBuffer = craftResult;
+                outputBuffer.addAll(craftResult);
                 needLogic();
                 drawActive(3);
             }

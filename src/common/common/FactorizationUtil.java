@@ -1,6 +1,7 @@
 package factorization.common;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -14,15 +15,19 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.InventoryLargeChest;
 import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChunkCoordinates;
@@ -1125,5 +1130,93 @@ public class FactorizationUtil {
     @SideOnly(Side.CLIENT)
     public static RenderBlocks getRB() {
         return Minecraft.getMinecraft().renderGlobal.globalRenderBlocks;
+    }
+    
+    static InventoryCrafting getCrafter(ItemStack...slots) {
+        InventoryCrafting craft = FactorizationUtil.makeCraftingGrid();
+        for (int i = 0; i < 9; i++) {
+            craft.setInventorySlotContents(i, slots[i]);
+        }
+        return craft;
+    }
+    
+    static ItemStack findMatchingRecipe(InventoryCrafting craft, World world) {
+        return CraftingManager.getInstance().findMatchingRecipe(craft, world);
+    }
+    
+    private static final ItemStack[] slots3x3 = new ItemStack[9];
+    
+    static boolean wantSize(int size, TileEntity where, ItemStack...slots) {
+        if (slots.length != size) {
+            System.out.println("Tried to craft with items.length != " + size);
+            if (where != null) {
+                System.out.println("At " + new Coord(where));
+            }
+            Thread.dumpStack();
+            return true;
+        }
+        return false;
+    }
+    
+    public static List<ItemStack> craft1x1(TileEntity where, boolean fake, ItemStack what) {
+        for (int i = 0; i < slots3x3.length; i++) {
+            slots3x3[i] = null;
+        }
+        slots3x3[4] = what;
+        return craft3x3(where, fake, slots3x3);
+    }
+    
+    public static List<ItemStack> craft2x2(TileEntity where, boolean fake, ItemStack...slots) {
+        if (wantSize(4, where, slots)) {
+            return Arrays.asList(slots);
+        }
+        for (int i = 0; i < slots3x3.length; i++) {
+            slots3x3[i] = null;
+        }
+        slots3x3[0] = slots[0];
+        slots3x3[1] = slots[1];
+        slots3x3[3] = slots[2];
+        slots3x3[4] = slots[3];
+        return craft3x3(where, fake, slots3x3);
+    }
+    
+    public static List<ItemStack> craft3x3(TileEntity where, boolean fake, ItemStack... slots) {
+        // Return the crafting result, and any leftover ingredients (buckets)
+        // If the crafting recipe fails, return our contents.
+        if (wantSize(9, where, slots)) {
+            return Arrays.asList(slots);
+        }
+
+        InventoryCrafting craft = getCrafter(slots);
+
+        ItemStack result = CraftingManager.getInstance().findMatchingRecipe(craft, where == null ? null : where.worldObj);
+        
+        if (result == null) {
+            // crafting failed, dump everything
+            return Arrays.asList(slots);
+        }
+        final ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
+        if (fake) {
+            ret.add(result);
+            return ret;
+        }
+        Coord pos = null;
+        if (where != null) {
+            pos = new Coord(where); 
+        }
+        EntityPlayer fakePlayer = FactorizationUtil.makePlayer(pos, "Crafting");
+        if (pos != null) {
+            pos.setAsEntityLocation(fakePlayer);
+        }
+
+        IInventory craftResult = new InventoryCraftResult();
+        craftResult.setInventorySlotContents(0, result);
+        SlotCrafting slot = new SlotCrafting(fakePlayer, craft, craftResult, 0, 0, 0);
+        slot.onPickupFromSlot(fakePlayer, result);
+        ret.add(result);
+        FactorizationUtil.addInventoryToArray(craft, ret);
+        FactorizationUtil.addInventoryToArray(fakePlayer.inventory, ret);
+
+        return ret;
     }
 }
