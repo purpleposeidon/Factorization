@@ -77,7 +77,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item;
     public ItemStack is_factory, is_lamp, is_lightair;
-    public ItemCraft item_craft;
     public ItemBagOfHolding bag_of_holding;
     public ItemPocketTable pocket_table;
     public ItemCraftingComponent diamond_shard;
@@ -207,7 +206,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         servorail_item = FactoryType.SERVORAIL.itemStack();
         parasieve_item = FactoryType.PARASIEVE.itemStack();
         barrel_item = FactoryType.BARREL.itemStack();
-        maker_item = FactoryType.MAKER.itemStack();
         stamper_item = FactoryType.STAMPER.itemStack();
         lamp_item = FactoryType.LAMP.itemStack();
         packager_item = FactoryType.PACKAGER.itemStack();
@@ -282,9 +280,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         NBTTagCompound tag = new NBTTagCompound();
         tag.setInteger("storage", TileEntityLeydenJar.max_storage);
         leydenjar_item_full.setTagCompound(tag);
-
-        //Industrial
-        item_craft = new ItemCraft(itemID("itemCraftId", 9000));
         
         //ceramics
         sculpt_tool = new ItemSculptingTool(itemID("sculptTool", 9041));
@@ -391,33 +386,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'X', logicMatrixProgrammer);
         
         TileEntityCrystallizer.addRecipe(new ItemStack(Block.blockRedstone), new ItemStack(logicMatrix), 1, Core.registry.aqua_regia);
-
-        // diamond shard
-        //How do we feel about 12 shards for 9 diamonds?
-        diamond_shard_recipe = FactorizationUtil.createShapedRecipe(new ItemStack(diamond_shard, 18),
-                "OTO",
-                "TDT",
-                "OTO",
-                'O', Block.obsidian,
-                'T', Block.tnt,
-                'D', Block.blockDiamond);
-        ItemCraft.addStamperRecipe(diamond_shard_recipe);
-        diamond_shard_packet = new ItemStack(item_craft);
-        diamond_shard_packet.setItemDamage(0xFF);
-        for (int i : new int[] { 0, 2, 6, 8 }) {
-            item_craft.addItem(diamond_shard_packet, i, new ItemStack(Block.obsidian), null);
-        }
-        for (int i : new int[] { 1, 3, 5, 7 }) {
-            item_craft.addItem(diamond_shard_packet, i, new ItemStack(Block.tnt), null);
-        }
-        item_craft.addItem(diamond_shard_packet, 4, new ItemStack(Block.blockDiamond), null);
-        recipe(diamond_shard_packet,
-                "OTO",
-                "TDT",
-                "OTO",
-                'O', Block.obsidian,
-                'T', Block.tnt,
-                'D', Block.blockDiamond);
 
         //wrathfire igniter
         recipe(new ItemStack(wrath_igniter),
@@ -1152,11 +1120,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             if (item instanceof IActOnCraft) {
                 ((IActOnCraft) item).onCraft(here, craftMatrix, i, stack, player);
             }
-        }
-
-        if (stack.getItem() == item_craft && stack.getItemDamage() == diamond_shard_packet.getItemDamage()) {
-            stack.setTagCompound((NBTTagCompound) diamond_shard_packet.getTagCompound().copy());
-            stack.setItemDamage(1);
         }
     }
 

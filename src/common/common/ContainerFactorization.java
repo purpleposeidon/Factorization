@@ -3,14 +3,13 @@ package factorization.common;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import net.minecraft.inventory.Container;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.inventory.SlotFurnace;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityFurnace;
 
 public class ContainerFactorization extends Container {
@@ -95,20 +94,6 @@ public class ContainerFactorization extends Container {
             for (int i = 0; i < 9; i++) {
                 addSlotToContainer(new StackLimitedSlot(64, router, 1 + i, 8 + i * 18, 44 - 0xFFFFFF));
             }
-            break;
-        case MAKER:
-            TileEntityMaker maker = (TileEntityMaker) ent;
-            int[] ic = { Core.registry.item_craft.itemID };
-            // input: No item_craft allowed!
-            addSlotToContainer(new FactorySlot(maker, 0, 51, 19, null, ic));
-            int[] paper = { Item.paper.itemID };
-            int[] packet = { Core.registry.item_craft.itemID };
-            // paper: Must be paper
-            addSlotToContainer(new FactorySlot(maker, 1, 42, 55, paper, null));
-            // craft: Must be a craft packet
-            addSlotToContainer(new FactorySlot(maker, 2, 60, 55, packet, null));
-            // output: Nothing goes in
-            addSlotToContainer(new FactorySlot(maker, 3, 152, 37, null, null));
             break;
         case STAMPER:
         case PACKAGER:
@@ -214,18 +199,6 @@ public class ContainerFactorization extends Container {
                 } else {
                     return FactorizationUtil.transferSlotToSlots(slot, Arrays.asList((Slot) inventorySlots.get(0)));
                 }
-            }
-            break;
-        case MAKER:
-            if (i >= 4) {
-                Item item = itemstack.getItem();
-                if (item == Item.paper) {
-                    return FactorizationUtil.transferSlotToSlots(slot, Arrays.asList((Slot) inventorySlots.get(1), (Slot) inventorySlots.get(0)));
-                }
-                if (item == Core.registry.item_craft) {
-                    return FactorizationUtil.transferSlotToSlots(slot, Arrays.asList((Slot) inventorySlots.get(2)));
-                }
-                return FactorizationUtil.transferSlotToSlots(slot, Arrays.asList((Slot) inventorySlots.get(0)));
             }
             break;
         case STAMPER:

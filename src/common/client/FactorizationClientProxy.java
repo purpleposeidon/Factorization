@@ -31,7 +31,15 @@ import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
-import factorization.client.gui.*;
+import factorization.client.gui.FactorizationNotify;
+import factorization.client.gui.GuiCrystallizer;
+import factorization.client.gui.GuiGrinder;
+import factorization.client.gui.GuiMixer;
+import factorization.client.gui.GuiParasieve;
+import factorization.client.gui.GuiPocketTable;
+import factorization.client.gui.GuiRouter;
+import factorization.client.gui.GuiSlag;
+import factorization.client.gui.GuiStamper;
 import factorization.client.render.*;
 import factorization.common.*;
 import factorization.common.servo.BlockRenderServoRail;
@@ -90,9 +98,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         GuiScreen gui = null;
         if (ID == FactoryType.ROUTER.gui) {
             gui = new GuiRouter(cont);
-        }
-        if (ID == FactoryType.MAKER.gui) {
-            gui = new GuiMaker(cont);
         }
         if (ID == FactoryType.STAMPER.gui) {
             gui = new GuiStamper(cont);
@@ -372,7 +377,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderServoRail();
         for (FactoryType ft : new FactoryType[] {
                 FactoryType.ROUTER,
-                FactoryType.MAKER,
                 FactoryType.STAMPER,
                 FactoryType.BARREL,
                 FactoryType.PACKAGER,

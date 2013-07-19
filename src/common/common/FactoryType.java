@@ -8,7 +8,7 @@ import net.minecraftforge.common.MinecraftForge;
 public enum FactoryType {
     ROUTER(0, true, TileEntityRouter.class, "factory_router"), // Send/retrieve items from connected inventories
     //1 -- This used to be CUTTER
-    MAKER(2, true, TileEntityMaker.class, "factory_maker"), // Create Craft Packets and put items into them.
+    //2 -- This used to be MAKER
     STAMPER(3, true, TileEntityStamper.class, "factory_stamper"), // Crafts craft packets, and outputs results
     //4 -- This used to be QUEUE
     BARREL(5, false, TileEntityBarrel.class, "factory_barrel"), // Store huge quantities of identical items
@@ -161,6 +161,6 @@ public enum FactoryType {
     }
 
     public boolean connectRedstone() {
-        return this == ROUTER || this == MAKER || this == STAMPER || this == PACKAGER;
+        return this == ROUTER || this == STAMPER || this == PACKAGER;
     }
 }
