@@ -21,7 +21,7 @@ public class BlockRenderHelper extends Block {
     public static BlockRenderHelper instance;
 
     public BlockRenderHelper() {
-        super(Core.factory_block_id, Material.grass);
+        super(FzConfig.factory_block_id, Material.grass);
         blocksList[blockID] = null;
         // These three shouldn't strictly be necessary
         opaqueCubeLookup[blockID] = false;

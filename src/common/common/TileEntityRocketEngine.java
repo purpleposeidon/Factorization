@@ -190,13 +190,13 @@ public class TileEntityRocketEngine extends TileEntityCommon {
         if (!here.equals(myDestination)) {
             here.removeTE();
             base = new TileEntityRocketEngine();
-            myDestination.setId(Core.factory_block_id);
+            myDestination.setId(FzConfig.factory_block_id);
             myDestination.setTE(base);
         }
         
         for (Coord spot : area) {
             if (!spot.equals(myDestination)) {
-                spot.setId(Core.factory_block_id);
+                spot.setId(FzConfig.factory_block_id);
                 TileEntityExtension tex = new TileEntityExtension(base);
                 spot.setTE(tex);
                 tex.getBlockClass().enforce(spot);
@@ -520,7 +520,7 @@ for x in range(0, len(d[0])):
             }
         }
         while (frontier.size() > 0) {
-            if (ret.size() == Core.max_rocket_base_size) {
+            if (ret.size() == FzConfig.max_rocket_base_size) {
                 throw new RocketValidationException("Rocket is too wide");
             }
             Coord me = choose(frontier);
@@ -641,7 +641,7 @@ for x in range(0, len(d[0])):
             entireRocket.addAll(cloneArray(mountingPlane));
             while (true) {
                 y++;
-                if (y > Core.max_rocket_height) {
+                if (y > FzConfig.max_rocket_height) {
                     throw new RocketValidationException("Rocket is too tall");
                 }
                 movePlane(heightScan, upwards);
@@ -650,7 +650,7 @@ for x in range(0, len(d[0])):
                 while (true) {
                     expandPlane(heightScan, ForgeDirection.UP, isSolid);
                     int new_size = heightScan.size();
-                    if (new_size >= Core.max_rocket_base_size) {
+                    if (new_size >= FzConfig.max_rocket_base_size) {
                         throw new RocketValidationException("Rocket is too wide");
                     }
                     if (new_size == last_size) {
@@ -658,7 +658,7 @@ for x in range(0, len(d[0])):
                     }
                     last_size = new_size;
                 }
-                if (heightScan.size() >= Core.max_rocket_base_size) {
+                if (heightScan.size() >= FzConfig.max_rocket_base_size) {
                     throw new RocketValidationException("Rocket is too wide");
                 }
                 if (heightScan.size() == 0) {

@@ -29,6 +29,7 @@ import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.Quaternion;
 import factorization.common.Core;
+import factorization.common.FzConfig;
 import factorization.fzds.DeltaChunk.AreaMap;
 import factorization.fzds.DeltaChunk.DseDestination;
 import factorization.fzds.api.DeltaCapability;
@@ -378,8 +379,8 @@ public class FZDSCommand extends CommandBase {
                 } else {
                     tp.destination = selected.getCenter();
                 }
-                if (DimensionManager.getWorld(Core.dimension_slice_dimid) != player.worldObj) {
-                    manager.transferPlayerToDimension(player, Core.dimension_slice_dimid, tp);
+                if (DimensionManager.getWorld(FzConfig.dimension_slice_dimid) != player.worldObj) {
+                    manager.transferPlayerToDimension(player, FzConfig.dimension_slice_dimid, tp);
                 } else {
                     tp.destination.x--;
                     tp.destination.moveToTopBlock();

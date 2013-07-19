@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL11;
 import factorization.common.Command;
 import factorization.common.ContainerPocket;
 import factorization.common.Core;
+import factorization.common.FzConfig;
 
 public class GuiPocketTable extends GuiContainer {
     public ContainerPocket containerPocket;
@@ -40,8 +41,8 @@ public class GuiPocketTable extends GuiContainer {
         // this.fontRenderer.drawString("Crafting", 178, 10, 4210752);
         this.fontRenderer.drawString("PcktCrftng", 178, 10, 4210752);
         int color = 0xa0a0a0;
-        for (int i = 0; i < Core.pocketActions.length(); i++) {
-            char key = Core.pocketActions.charAt(i);
+        for (int i = 0; i < FzConfig.pocketActions.length(); i++) {
+            char key = FzConfig.pocketActions.charAt(i);
             String msg = null;
             switch (i) {
             case 0: msg = "Empty the crafting grid"; break;
@@ -53,7 +54,7 @@ public class GuiPocketTable extends GuiContainer {
                 continue;
             }
             int d = 10;
-            int y = -d*Core.pocketActions.length() + d*i;
+            int y = -d*FzConfig.pocketActions.length() + d*i;
             this.fontRenderer.drawString(key + ": " + msg, 8, y, color);
         }
         // this.fontRenderer.drawString("123456789", 178, 10, 4210752);
@@ -80,19 +81,19 @@ public class GuiPocketTable extends GuiContainer {
         // - A line along a side: spread to the other side, skipping the middle.
         // - Two touching: fill the circumerfence, alternating.
         // - middle of a side: spread across center
-        if (my_key == Core.pocketActions.charAt(0) /* x */) {
+        if (my_key == FzConfig.pocketActions.charAt(0) /* x */) {
             Command.craftClear.call(mc.thePlayer);
             return;
         }
-        if (my_key == Core.pocketActions.charAt(1) /* c */) {
+        if (my_key == FzConfig.pocketActions.charAt(1) /* c */) {
             Command.craftMove.call(mc.thePlayer);
             return;
         }
-        if (my_key == Core.pocketActions.charAt(2) /* b */) {
+        if (my_key == FzConfig.pocketActions.charAt(2) /* b */) {
             Command.craftBalance.call(mc.thePlayer);
             return;
         }
-        if (my_key == Core.pocketActions.charAt(3) /* f */) {
+        if (my_key == FzConfig.pocketActions.charAt(3) /* f */) {
             int mouseX = Mouse.getEventX() * this.width / this.mc.displayWidth;
             int mouseY = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
             Slot slot = getSlotAtPosition(mouseX, mouseY);

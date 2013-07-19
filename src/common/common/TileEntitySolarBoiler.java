@@ -161,7 +161,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
             IFluidHandler tc = below.getTE(IFluidHandler.class);
             boolean water_below = (below.is(Block.waterMoving) || below.is(Block.waterStill));
             water_below &= !here.isPowered();
-            if (water_below && Core.boilers_suck_water) {
+            if (water_below && FzConfig.boilers_suck_water) {
                 if (below.getMd() == 0) {
                     below.setId(0);
                     water.amount += 1000;
@@ -196,7 +196,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
         toBoil = Math.min(steamTank.getCapacity() - steam.amount, toBoil);
         int water_to_steam = 160; /* CovertJaguar gives 1:160 as the water:steam ratio */;
         water.amount -= Math.max(toBoil/water_to_steam, 1);
-        steam.amount += (int)(toBoil*Core.steam_output_adjust);
+        steam.amount += (int)(toBoil*FzConfig.steam_output_adjust);
     }
     
     @Override

@@ -28,7 +28,7 @@ public class BlockLightAir extends Block {
         setHardness(0.1F);
         setResistance(0.1F);
         setUnlocalizedName("lightair");
-        if (Core.debug_light_air) {
+        if (FzConfig.debug_light_air) {
             float r = 0.1F;
             float b = 0.5F;
             setBlockBounds(b - r, b - r, b - r, b + r, b + r, b + r);
@@ -61,7 +61,7 @@ public class BlockLightAir extends Block {
     
     @Override
     public Icon getIcon(int side, int md) {
-        if (Core.debug_light_air) {
+        if (FzConfig.debug_light_air) {
             return Block.glowStone.getBlockTextureFromSide(0);
         }
         return BlockIcons.transparent;
@@ -150,7 +150,7 @@ public class BlockLightAir extends Block {
 
     @Override
     public int getRenderType() {
-        return Core.debug_light_air ? 0 : -1;
+        return FzConfig.debug_light_air ? 0 : -1;
     }
 
     @Override

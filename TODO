@@ -121,6 +121,7 @@ TOP LIST (that's become somewhat less tops. Oops.)
 pocket crafting table seems to have issues under... either netlag or server lag. Change the action keys to be done client-side? Hmm. Are we running them both sides, but the server doesn't keep up? That really doesn't make sense tho. This is pretty important.
 offset silver ore gen by the seed
 somehow the wrong item is dropping? Like, that one list is being weird?
+wrenching parasieves
 make mirrors less of a PITA to break
 make chat line limit less suck
 support abyssal ores by adding oreDiamond, oreLapis, and oreEmerald (Well, there's the other oreFoos I guess too.)

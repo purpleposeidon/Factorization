@@ -37,6 +37,7 @@ import cpw.mods.fml.common.TickType;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.common.Core;
+import factorization.common.FzConfig;
 import factorization.fzds.api.DeltaCapability;
 
 
@@ -152,7 +153,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         void renderTerrain() {
             RenderHelper.disableStandardItemLighting();
             Minecraft.getMinecraft();
-            if (Minecraft.isAmbientOcclusionEnabled() && Core.dimension_slice_allow_smooth) {
+            if (Minecraft.isAmbientOcclusionEnabled() && FzConfig.dimension_slice_allow_smooth) {
                 GL11.glShadeModel(GL11.GL_SMOOTH);
             }
             GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT);

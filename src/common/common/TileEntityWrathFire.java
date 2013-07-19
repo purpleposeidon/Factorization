@@ -212,7 +212,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
     }
 
     boolean trySpawn(Coord c) {
-        if (!Core.spread_wrathfire) {
+        if (!FzConfig.spread_wrathfire) {
             return false;
         }
         if (generation > max_generation) {

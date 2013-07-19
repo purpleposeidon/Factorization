@@ -122,14 +122,14 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             //Theoretically, not necessary. I bet BUKKIT would flip its shit tho.
             blockRender = new BlockRenderHelper();
-            factory_rendering_block = new BlockFactorization(Core.factory_block_id);
+            factory_rendering_block = new BlockFactorization(FzConfig.factory_block_id);
             Block.blocksList[factory_rendering_block.blockID] = null;
         }
         serverTraceHelper = new BlockRenderHelper();
         clientTraceHelper = new BlockRenderHelper();
-        factory_block = new BlockFactorization(Core.factory_block_id);
-        lightair_block = new BlockLightAir(Core.lightair_id);
-        resource_block = new BlockResource(Core.resource_id);
+        factory_block = new BlockFactorization(FzConfig.factory_block_id);
+        lightair_block = new BlockLightAir(FzConfig.lightair_id);
+        resource_block = new BlockResource(FzConfig.resource_id);
         is_factory = new ItemStack(factory_block);
         is_lightair = new ItemStack(lightair_block);
 
@@ -166,7 +166,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     HashSet<Integer> added_ids = new HashSet<Integer>();
 
     public int itemID(String name, int default_id) {
-        int id = Core.config.getItem("item", name, default_id).getInt();
+        int id = FzConfig.config.getItem("item", name, default_id).getInt();
         if (added_ids.contains(default_id)) {
             throw new RuntimeException("Default ID already used: " + default_id);
         }
@@ -292,7 +292,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         
         //Rocketry
         nether_powder = new ItemCraftingComponent(itemID("netherPowder", 9050), "nether_powder");
-        if (Core.enable_dimension_slice) {
+        if (FzConfig.enable_dimension_slice) {
             rocket_fuel = new ItemCraftingComponent(itemID("heldRocketFuel", 9051), "rocket/powder_rocket_fuel");
             rocket_engine = new ItemBlockProxy(itemID("rocketEngine", 9053), rocket_engine_item_hidden);
             rocket_engine.setUnlocalizedName("factorization:rocket/rocket_engine").setMaxStackSize(1);
@@ -773,7 +773,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 " I ",
                 "I I",
                 'I', Item.ingotIron);
-        if (Core.enable_solar_steam) {
+        if (FzConfig.enable_solar_steam) {
             recipe(solarboiler_item,
                     "I#I",
                     "I I",
@@ -851,7 +851,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'M', magnet,
                 'L', "ingotLead",
                 'I', Item.ingotIron);
-        if (Core.enable_solar_steam) { //NOTE: This'll probably cause a bug when we use mirrors for other things
+        if (FzConfig.enable_solar_steam) { //NOTE: This'll probably cause a bug when we use mirrors for other things
             oreRecipe(new ItemStack(mirror),
                     "SSS",
                     "S#S",
@@ -916,7 +916,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         
         //Rocketry
         TileEntityGrinder.addRecipe(new ItemStack(Block.netherrack), new ItemStack(nether_powder, 1), 1);
-        if (Core.enable_dimension_slice) {
+        if (FzConfig.enable_dimension_slice) {
             shapelessRecipe(new ItemStack(rocket_fuel, 3), nether_powder, nether_powder, nether_powder, Item.fireballCharge);
             recipe(new ItemStack(rocket_engine),
                     "#F#",
@@ -996,13 +996,13 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     }
 
     public void makeOther() { 
-        silverGen = new WorldGenMinable(resource_block.blockID, Core.silver_ore_node_size);
+        silverGen = new WorldGenMinable(resource_block.blockID, FzConfig.silver_ore_node_size);
     }
     
     @Override
     public void generate(Random rand, int chunkX, int chunkZ, World world,
             IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
-        if (!Core.gen_silver_ore) {
+        if (!FzConfig.gen_silver_ore) {
             return;
         }
         if ((chunkZ + 3*chunkX) % 5 != 0) {
@@ -1149,7 +1149,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     }
     
     public void loadLanguages() {
-        URL url = this.getClass().getResource(Core.language_file);
+        URL url = this.getClass().getResource(FzConfig.language_file);
         if (url == null) {
             Core.logSevere("Language file %s was not found", url);
             return;

@@ -42,6 +42,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.common.Core;
+import factorization.common.FzConfig;
 
 @Mod(modid = MiscellaneousNonsense.modId, name = MiscellaneousNonsense.name, version = Core.version, dependencies = "required-after: " + Core.modId)
 @NetworkMod(clientSideRequired = true, packetHandler = MiscNet.class, channels = {MiscNet.cmdChannel, MiscNet.tpsChannel}, connectionHandler = MiscellaneousNonsense.class)
@@ -101,7 +102,7 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         TickRegistry.registerTickHandler(this, Side.SERVER);
         TickRegistry.registerTickHandler(this, Side.CLIENT);
         //TODO: Make middle-clicking nicer
-        if (Core.equal_opportunities_for_mobs) {
+        if (FzConfig.equal_opportunities_for_mobs) {
             MinecraftForge.EVENT_BUS.register(new MobEqualizer());
         }
     }
@@ -215,7 +216,7 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
                 //Ignore startup
                 return;
             }
-            if (measurements++ != Core.tps_reporting_interval) {
+            if (measurements++ != FzConfig.tps_reporting_interval) {
                 return;
             }
             measurements = 0;

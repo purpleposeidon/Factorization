@@ -245,4 +245,20 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         }
         
     }
+    
+    @Override
+    public ForgeDirection[] getValidRotations() {
+        return full_rotation_array;
+    }
+    
+    @Override
+    public boolean rotate(ForgeDirection axis) {
+        byte ao = (byte) axis.ordinal();
+        if (ao == facing_direction) {
+            return false;
+        }
+        facing_direction = ao;
+        getCoord().markBlockForUpdate();
+        return true;
+    }
 }

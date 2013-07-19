@@ -142,7 +142,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             maxX = maxZ = 16 - 4;
             maxY = 10;
             offset(16, 16 + 1, 16);
-            icon_id = (short) Core.resource_id;
+            icon_id = (short) FzConfig.resource_id;
             icon_md = (byte) ResourceType.BISQUE.md;
             quat = new Quaternion();
             return this;
@@ -502,7 +502,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             int wZ = lump.maxZ - lump.minZ;
             int area = wX * wY * wZ;
             int max_area = 16 * 16 * 16 /* / 4 */;
-            if (!Core.stretchy_clay) {
+            if (!FzConfig.stretchy_clay) {
                 max_area /= 4;
             }
             if (area <= 0 || area > max_area) {

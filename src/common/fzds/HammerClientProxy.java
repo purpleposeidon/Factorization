@@ -49,6 +49,7 @@ import factorization.api.Coord;
 import factorization.client.render.EmptyRender;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
+import factorization.common.FzConfig;
 import factorization.fzds.api.IDeltaChunk;
 
 public class HammerClientProxy extends HammerProxy {
@@ -218,7 +219,7 @@ public class HammerClientProxy extends HammerProxy {
     
     @Override
     public void clientLogin(NetHandler clientHandler, INetworkManager manager, Packet1Login login) {
-        if (Core.enable_dimension_slice && FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+        if (FzConfig.enable_dimension_slice && FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
             NetClientHandler nch = (NetClientHandler) clientHandler;
             Hammer.worldClient = new HammerWorldClient(nch,
                     new WorldSettings(0L, login.gameType, false, login.hardcoreMode, login.terrainType),

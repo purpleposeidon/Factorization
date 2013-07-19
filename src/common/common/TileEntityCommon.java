@@ -207,6 +207,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         super.invalidate();
     }
     
+    /** Looks like we're doing "face towards this axis" */
     public boolean rotate(ForgeDirection axis) {
         return false;
     }

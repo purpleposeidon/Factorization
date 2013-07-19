@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
+import factorization.common.FzConfig;
 import factorization.fzds.TransferLib;
 
 public class ChargeMetalBlockConductance {
@@ -18,7 +19,7 @@ public class ChargeMetalBlockConductance {
     public static ArrayList<ItemStack> excludeOres = new ArrayList<ItemStack>();
     
     public static void setup() {
-        if (!Core.invasiveCharge) {
+        if (!FzConfig.invasiveCharge) {
             return;
         }
         GameRegistry.registerTileEntity(InvasiveCharge.class, "factorization.invasiveCharge");

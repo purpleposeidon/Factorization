@@ -584,7 +584,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
 
     @Override
     public double getMaxRenderDistanceSquared() {
-        if (Core.render_barrel_close) {
+        if (FzConfig.render_barrel_close) {
             return 25; //5²
         }
         return 1024; //32²

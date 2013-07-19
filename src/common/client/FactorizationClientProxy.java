@@ -341,11 +341,11 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
     @Override
     public void registerRenderers() {
-        if (Core.render_barrel_item || Core.render_barrel_text) {
-            setTileEntityRenderer(TileEntityBarrel.class, new TileEntityBarrelRenderer(Core.render_barrel_item, Core.render_barrel_text));
+        if (FzConfig.render_barrel_item || FzConfig.render_barrel_text) {
+            setTileEntityRenderer(TileEntityBarrel.class, new TileEntityBarrelRenderer(FzConfig.render_barrel_item, FzConfig.render_barrel_text));
         }
         setTileEntityRenderer(TileEntityGreenware.class, new TileEntityGreenwareRender());
-        if (Core.renderTEs) {
+        if (FzConfig.renderTEs) {
             // This is entirely Azanor's fault.
             setTileEntityRenderer(TileEntityHeater.class, new TileEntityHeaterRenderer());
             //setTileEntityRenderer(TileEntityMirror.class, new TileEntityMirrorRenderer());

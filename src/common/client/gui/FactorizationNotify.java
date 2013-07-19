@@ -20,6 +20,7 @@ import org.lwjgl.opengl.GL11;
 
 import factorization.api.Coord;
 import factorization.common.Core;
+import factorization.common.FzConfig;
 
 public class FactorizationNotify {
     static class Message {
@@ -66,7 +67,7 @@ public class FactorizationNotify {
         if (msg.length() == 0) {
             return;
         }
-        if (Core.notify_in_chat) {
+        if (FzConfig.notify_in_chat) {
             EntityPlayer player = Minecraft.getMinecraft().thePlayer;
             if (player != null) {
                 player.addChatMessage(msg);

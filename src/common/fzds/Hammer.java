@@ -39,6 +39,7 @@ import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.common.Core;
+import factorization.common.FzConfig;
 import factorization.common.WeakSet;
 import factorization.fzds.api.IDeltaChunk;
 
@@ -80,7 +81,7 @@ public class Hammer {
     @EventHandler
     public void setup(FMLPreInitializationEvent event) {
         event.getModMetadata().parent = Core.modId;
-        enabled = Core.enable_dimension_slice;
+        enabled = FzConfig.enable_dimension_slice;
         if (!enabled) {
             return;
         }
@@ -89,7 +90,7 @@ public class Hammer {
         EntityRegistry.registerModEntity(DseCollider.class, "fzdsC", 2, this, 64, 80000, false);
         
         //Create the hammer dimension
-        dimensionID = Core.dimension_slice_dimid;
+        dimensionID = FzConfig.dimension_slice_dimid;
         DimensionManager.registerProviderType(dimensionID, HammerWorldProvider.class, true);
         DimensionManager.registerDimension(dimensionID, dimensionID);
         File base = event.getSuggestedConfigurationFile().getParentFile();
@@ -258,8 +259,8 @@ public class Hammer {
     @EventHandler
     public void modsLoaded(FMLPostInitializationEvent event) {
         double desired_radius = 16/2;
-        if (Core.force_max_entity_radius >= 0 && Core.force_max_entity_radius < desired_radius) {
-            desired_radius = Core.force_max_entity_radius;
+        if (FzConfig.force_max_entity_radius >= 0 && FzConfig.force_max_entity_radius < desired_radius) {
+            desired_radius = FzConfig.force_max_entity_radius;
             Core.logFine("Using %f as FZDS's maximum entity radius; this could cause failure to collide with FZDS entities");
         }
         if (World.MAX_ENTITY_RADIUS < desired_radius) {

@@ -271,11 +271,11 @@ public class TileEntityRouter extends TileEntityFactorization {
     }
 
     boolean isIInventoryBanned(String name) {
-        if (Core.routerBan == null) {
+        if (FzConfig.routerBan == null) {
             //xu do mi tavla fo la .rAUterban.
             return false;
         }
-        Matcher m = Core.routerBan.matcher(name);
+        Matcher m = FzConfig.routerBan.matcher(name);
         return m.matches();
     }
 

@@ -25,6 +25,7 @@ import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import factorization.common.Core;
+import factorization.common.FzConfig;
 
 public class MiscClientProxy extends MiscProxy {
     @Override
@@ -64,7 +65,7 @@ public class MiscClientProxy extends MiscProxy {
                 found_number = false;
             }
         }
-        if (!mc.isSingleplayer() || !Core.enable_sketchy_client_commands) {
+        if (!mc.isSingleplayer() || !FzConfig.enable_sketchy_client_commands) {
             if (i < 0) {
                 i = 0;
             }
@@ -89,7 +90,7 @@ public class MiscClientProxy extends MiscProxy {
             cp.addAll(mc.ingameGUI.getChatGUI().getSentMessages());
             mc.ingameGUI.getChatGUI().clearChatMessages(); 
             mc.ingameGUI.getChatGUI().getSentMessages().addAll(cp);
-        } else if (n.equalsIgnoreCase("saycoords") && Core.enable_sketchy_client_commands) {
+        } else if (n.equalsIgnoreCase("saycoords") && FzConfig.enable_sketchy_client_commands) {
             player.sendChatMessage("/me is at " + ((int) player.posX) + ", " + ((int) player.posY) + ", " + ((int) player.posZ));
         } else if (n.equalsIgnoreCase("saveoptions") || n.equalsIgnoreCase("savesettings") || n.equalsIgnoreCase("so") || n.equalsIgnoreCase("ss")) {
             mc.gameSettings.saveOptions();
@@ -116,7 +117,7 @@ public class MiscClientProxy extends MiscProxy {
                 }
             }
             player.addChatMessage("Rendered " + did + " chunks out of " + total);
-        } else if (n.equalsIgnoreCase("noclip") && Core.enable_cheat_commands && mc.isSingleplayer()) {
+        } else if (n.equalsIgnoreCase("noclip") && FzConfig.enable_cheat_commands && mc.isSingleplayer()) {
             boolean next = !mc.gameSettings.noclip;
             mc.gameSettings.noclip = next;
             mc.thePlayer.noClip = next;
@@ -139,12 +140,12 @@ public class MiscClientProxy extends MiscProxy {
             player.sendChatMessage("/f cl");
         } else if (n.equalsIgnoreCase("mods")) {
             mc.displayGuiScreen(new GuiModList(null));
-        } else if ((n.equalsIgnoreCase("ninja") || n.equalsIgnoreCase("deninja") || n.equalsIgnoreCase("neo") || n.equalsIgnoreCase("deneo")) && Core.enable_cheat_commands) {
+        } else if ((n.equalsIgnoreCase("ninja") || n.equalsIgnoreCase("deninja") || n.equalsIgnoreCase("neo") || n.equalsIgnoreCase("deneo")) && FzConfig.enable_cheat_commands) {
             if (mc.isSingleplayer()) {
                 float tps = n.equalsIgnoreCase("ninja") ? 0.5F : 1F;
                 mc.timer.timerSpeed = tps;
             }
-        } else if (n.equalsIgnoreCase("watchdog") && Core.lagssie_watcher) {
+        } else if (n.equalsIgnoreCase("watchdog") && FzConfig.lagssie_watcher) {
             if (args.size() != 2) {
                 player.addChatMessage("Usage: /f watchdog <waitInterval>");
                 return;
@@ -154,7 +155,7 @@ public class MiscClientProxy extends MiscProxy {
             float dilation = Float.parseFloat(args.get(1));
             dilation = Math.max(0.1F, dilation);
             dilation = Math.min(1F, dilation);
-            Core.lowest_dilation = dilation;
+            FzConfig.lowest_dilation = dilation;
         } else {
             player.addChatMessage("Unknown command: " + n);
         }
@@ -165,7 +166,7 @@ public class MiscClientProxy extends MiscProxy {
         //give the first achievement, because it is stupid and nobody cares.
         //If you're using this mod, you've probably opened your inventory before anyways.
         StatFileWriter sfw = Minecraft.getMinecraft().statFileWriter;
-        if (sfw != null && !sfw.hasAchievementUnlocked(AchievementList.openInventory) && !Core.add_branding) {
+        if (sfw != null && !sfw.hasAchievementUnlocked(AchievementList.openInventory) && !FzConfig.add_branding) {
             sfw.readStat(AchievementList.openInventory, 1);
             Core.logInfo("Achievement Get! You've opened your inventory hundreds of times already! Yes! You're welcome!");
         }
@@ -269,10 +270,10 @@ public class MiscClientProxy extends MiscProxy {
         if (Float.isInfinite(newTps) || Float.isNaN(newTps)) {
             return;
         }
-        if (!Core.use_tps_reports) {
+        if (!FzConfig.use_tps_reports) {
             return;
         }
-        newTps = Math.min(1.5F, Math.max(Core.lowest_dilation, newTps));
+        newTps = Math.min(1.5F, Math.max(FzConfig.lowest_dilation, newTps));
         Minecraft mc = Minecraft.getMinecraft();
         mc.timer.timerSpeed = newTps;
     }
@@ -280,8 +281,8 @@ public class MiscClientProxy extends MiscProxy {
     LagssieWatchDog watch_dog = null;
     
     void startLagWatchDog() {
-        if (Core.lagssie_watcher) {
-            watch_dog = new LagssieWatchDog(Thread.currentThread(), Core.lagssie_interval);
+        if (FzConfig.lagssie_watcher) {
+            watch_dog = new LagssieWatchDog(Thread.currentThread(), FzConfig.lagssie_interval);
             Thread dog = new Thread(watch_dog);
             dog.setDaemon(true);
             dog.start();
