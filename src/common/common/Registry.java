@@ -861,11 +861,18 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         TileEntityGrinder.addRecipe(new ItemStack(Block.gravel), new ItemStack(Block.sand), 1);
         TileEntityGrinder.addRecipe(new ItemStack(Block.grass), new ItemStack(Block.dirt), 1);
         TileEntityGrinder.addRecipe(new ItemStack(Block.mycelium), new ItemStack(Block.dirt), 1);
-        TileEntityGrinder.addRecipe(new ItemStack(Block.oreDiamond), new ItemStack(Item.diamond), 2.25F);
-        TileEntityGrinder.addRecipe(new ItemStack(Block.oreEmerald), new ItemStack(Item.emerald), 2.25F);
-        TileEntityGrinder.addRecipe(new ItemStack(Block.oreRedstone), new ItemStack(Item.redstone), 6.5F);
-        TileEntityGrinder.addRecipe(new ItemStack(Block.oreLapis), new ItemStack(Item.dyePowder, 1, 4), 8);
-        TileEntityGrinder.addRecipe(new ItemStack(Block.oreCoal), new ItemStack(Item.coal), 3.5F);
+        
+        //Values based on Fortune I
+        TileEntityGrinder.addRecipe(new ItemStack(Block.oreCoal), new ItemStack(Item.coal), 1.5F);
+        TileEntityGrinder.addRecipe(new ItemStack(Block.oreRedstone), new ItemStack(Item.redstone), 5F);
+        TileEntityGrinder.addRecipe(new ItemStack(Block.oreDiamond), new ItemStack(Item.diamond), 1.25F);
+        TileEntityGrinder.addRecipe(new ItemStack(Block.oreEmerald), new ItemStack(Item.emerald), 1.25F);
+        TileEntityGrinder.addRecipe(new ItemStack(Block.oreNetherQuartz), new ItemStack(Item.netherQuartz), 1.5F /* It should actually be 1.25, but I feel like being generous here. */);
+        TileEntityGrinder.addRecipe(new ItemStack(Block.oreLapis), new ItemStack(Item.dyePowder, 1, 4), 8.5F);
+        
+        //Deconstruction recipes
+        TileEntityGrinder.addRecipe(new ItemStack(Block.glowStone), new ItemStack(Item.glowstone, 1, 4), 4F);
+        
         oreRecipe(mixer_item,
                 " X ",
                 "WMW",
