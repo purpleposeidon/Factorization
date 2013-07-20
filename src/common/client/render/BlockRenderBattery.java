@@ -21,21 +21,27 @@ public class BlockRenderBattery extends FactorizationBlockRender {
     @Override
     protected
     void render(RenderBlocks rb) {
+        TileEntityBattery bat;
         if (world_mode) {
-            TileEntityBattery bat = new Coord(Minecraft.getMinecraft().theWorld, x, y, z).getTE(TileEntityBattery.class);
-            if (bat == null) {
-                return;
-            }
-            renderBatteryDisplay(rb, bat.getFullness());
-            renderNormalBlock(rb, FactoryType.BATTERY.md);
+            bat = new Coord(Minecraft.getMinecraft().theWorld, x, y, z).getTE(TileEntityBattery.class);
+        } else {
+            bat = (TileEntityBattery) FactoryType.BATTERY.getRepresentative();
+            bat.onPlacedBy(null, is, 0);
         }
+        if (bat == null) {
+            return;
+        }
+        renderBatteryDisplay(rb, bat.getFullness());
+        renderNormalBlock(rb, FactoryType.BATTERY.md);
     }
     
     void renderInventoryMode(RenderBlocks rb, ItemRenderType type) {
+        Minecraft mc = Minecraft.getMinecraft();
+        mc.renderEngine.bindResourceTexture(Core.blockAtlas);
         renderNormalBlock(rb, FactoryType.BATTERY.md);
         GL11.glPushMatrix();
         //TODO: Need to render with the correct positioning for the hand
-        //if (type == EQUIPPED || type == ENTITY) {
+        //if (type == = ENTITY) 
         //TextureUtil.bindTexture(Core.texture_file_block);
         renderBatteryDisplay(rb, item_fullness);
         GL11.glPopMatrix();

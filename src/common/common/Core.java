@@ -15,6 +15,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatMessageComponent;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.Icon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
@@ -30,6 +31,8 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.registry.EntityRegistry;
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
@@ -38,6 +41,7 @@ import factorization.api.ChargeMetalBlockConductance;
 import factorization.api.Coord;
 import factorization.client.gui.FactorizationNotify;
 import factorization.common.compat.CompatManager;
+import factorization.common.servo.ServoMotor;
 
 @Mod(modid = Core.modId, name = Core.name, version = Core.version)
 @NetworkMod(
@@ -91,7 +95,7 @@ public class Core {
         
         NetworkRegistry.instance().registerGuiHandler(this, proxy);
 
-        registry.registerSimpleTileEntities();
+        registerSimpleTileEntities();
         registry.makeItems();
         FzConfig.config.save();
         registry.makeOther();
@@ -104,6 +108,15 @@ public class Core {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             isMainClientThread.set(true);
         }
+    }
+    
+    void registerSimpleTileEntities() {
+        FactoryType.registerTileEntities();
+        GameRegistry.registerTileEntity(TileEntityFzNull.class, "fz.null");
+        //TileEntity renderers are registered in the client proxy
+        
+        EntityRegistry.registerModEntity(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", 0, Core.instance, 1, 10, false);
+        EntityRegistry.registerModEntity(ServoMotor.class, "factory_servo", 1, Core.instance, 100, 1, true);
     }
 
     @EventHandler
@@ -139,8 +152,6 @@ public class Core {
         FZLogger.setParent(FMLLog.getLogger());
         logInfo("This is Factorization " + version);
     }
-    
-    
     
     public static void logWarning(String format, Object... formatParameters) {
         FZLogger.log(Level.WARNING, String.format(format,  formatParameters));
@@ -200,7 +211,7 @@ public class Core {
         profileEnd();
     }
     
-    private static void addTranslationHints(String hint_key, List list) {
+    private static void addTranslationHints(String hint_key, List list, String prefix) {
         StringTranslate st = StringTranslate.getInstance();
         if (st.containsTranslateKey(hint_key) /* func_94520_b = containsTranslateKey */ ) {
             String hint = st.translateKey(hint_key);
@@ -208,7 +219,7 @@ public class Core {
                 hint = hint.trim();
                 if (hint.length() > 0) {
                     for (String s : hint.split("\\\\n") /* whee */) {
-                        list.add(s);
+                        list.add(prefix + s);
                     }
                 }
             }
@@ -218,21 +229,25 @@ public class Core {
     public static void brand(ItemStack is, EntityPlayer player, List list, boolean verbose) { //NORELEASE: Formatting.
         final Item it = is.getItem();
         String name = it.getUnlocalizedName(is);
-        addTranslationHints(name + ".hint", list);
-        if (proxy.isClientHoldingShift()) {
-            addTranslationHints(name + ".shift", list);
+        addTranslationHints(name + ".hint", list, "" + EnumChatFormatting.ITALIC);
+        if (player != null && proxy.isClientHoldingShift()) {
+            addTranslationHints(name + ".shift", list, "" + EnumChatFormatting.DARK_GRAY + EnumChatFormatting.ITALIC);
         }
         if (it instanceof ItemFactorization) {
             ((ItemFactorization) it).addExtraInformation(is, player, list, verbose);
         }
+        String brand = "";
         if (FzConfig.add_branding) {
-            list.add("Factorization");
+            brand += "Factorization";
         }
         if (cheat) {
-            list.add("Cheat mode!");
+            brand += " Cheat mode!";
         }
         if (dev_environ) {
-            list.add("Development!");
+            brand += " Development!";
+        }
+        if (brand.length() > 0) {
+            list.add(EnumChatFormatting.DARK_GRAY + brand.trim());
         }
     }
     
@@ -382,6 +397,6 @@ public class Core {
     public static void bindGuiTexture(String name) {
         //bad design; should have a GuiFz. meh.
         TextureManager tex = Minecraft.getMinecraft().renderEngine;
-        tex.bindResourceTexture(getResource("gui/" + name + ".png"));
+        tex.bindResourceTexture(getResource("textures/gui/" + name + ".png"));
     }
 }

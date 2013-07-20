@@ -41,7 +41,6 @@ import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.event.FMLInterModComms;
-import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -51,7 +50,6 @@ import factorization.common.TileEntityGreenware.ClayState;
 import factorization.common.servo.ItemServoMotor;
 import factorization.common.servo.ItemServoRailWidget;
 import factorization.common.servo.ServoComponent;
-import factorization.common.servo.ServoMotor;
 import factorization.common.servo.actuators.ActuatorItemSyringe;
 
 public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler {
@@ -65,7 +63,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
     public ItemStack router_item, servorail_item;
     
-    public ItemStack maker_item, stamper_item, packager_item,
+    public ItemStack stamper_item, packager_item,
             barrel_item,
             lamp_item, air_item,
             slagfurnace_item, battery_item_hidden, leydenjar_item, leydenjar_item_full, heater_item, steamturbine_item, solarboiler_item,
@@ -150,15 +148,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 //		ReflectionHelper.setPrivateValue(Block.class, null, newDiamond, "blockDiamond", "field_72071_ax"); TODO: Reflection-set blockDiamond.
     }
 
-    void registerSimpleTileEntities() {
-        FactoryType.registerTileEntities();
-        GameRegistry.registerTileEntity(TileEntityFzNull.class, "fz.null");
-        //TileEntity renderers are registered in the client proxy
-        
-        EntityRegistry.registerModEntity(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", 0, Core.instance, 1, 10, false);
-        EntityRegistry.registerModEntity(ServoMotor.class, "factory_servo", 1, Core.instance, 100, 1, true);
-    }
-
     /*private void addName(Object what, String name) {
         Core.proxy.addName(what, name);
     }*/
@@ -195,7 +184,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         ore_reduced = new ItemOreProcessing(itemID("oreReduced", 9036), 2 * 16 + 6, "reduced");
         ore_crystal = new ItemOreProcessing(itemID("oreCrystal", 9037), 2 * 16 + 7, "crystal");
         sludge = new ItemCraftingComponent(itemID("sludge", 9039), "sludge");
-        OreDictionary.registerOre("FZ.sludge", sludge);
+        OreDictionary.registerOre("sludge", sludge);
         //ItemBlocks
         item_factorization = (ItemFactorizationBlock) Item.itemsList[factory_block.blockID];
         item_resource = (ItemBlockResource) Item.itemsList[resource_block.blockID];
@@ -239,10 +228,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
         //Darkness & Evil
         diamond_shard = new ItemCraftingComponent(itemID("diamondShard", 9006), "diamond_shard");
-        OreDictionary.registerOre("FZ.diamondShard", diamond_shard);
         wrath_igniter = new ItemWrathIgniter(itemID("wrathIgniter", 9007));
         dark_iron = new ItemCraftingComponent(itemID("darkIron", 9008), "dark_iron_ingot");
-        OreDictionary.registerOre("FZ.darkIron", dark_iron);
 
         bag_of_holding = new ItemBagOfHolding(itemID("bagOfHolding", 9001));
         
@@ -367,11 +354,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         shapelessRecipe(BOH, BOH, dark_iron, Item.enderPearl, Item.leather); //ILI!
         boh_upgrade_recipe = FactorizationUtil.createShapelessRecipe(BOH, BOH, dark_iron, Item.enderPearl, Item.leather); // I !
         // Pocket Crafting Table (pocket table)
-        recipe(new ItemStack(pocket_table),
+        oreRecipe(new ItemStack(pocket_table),
                 " #",
                 "| ",
                 '#', Block.workbench,
-                '|', Item.stick);
+                '|', "stickWood");
 
         // tiny demons
         recipe(new ItemStack(logicMatrixIdentifier),
@@ -407,11 +394,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         FurnaceRecipes.smelting().addSmelting(resource_block.blockID, 0 /* MD for silver */, new ItemStack(silver_ingot), 0.3F);
 
         //ceramics
-        recipe(new ItemStack(sculpt_tool),
+        oreRecipe(new ItemStack(sculpt_tool),
                 " c",
                 "/ ",
                 'c', Item.clay,
-                '/', Item.stick);
+                '/', "stickWood");
         ItemSculptingTool.addModeChangeRecipes();
         oreRecipe(new ItemStack(glaze_bucket),
                 "_ _",
@@ -700,20 +687,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'W', "logWood",
                 '-', "slabWood");
 
-        // Craft maker
-        recipe(maker_item,
-                "#p#",
-                "# #",
-                "#C#",
-                '#', Block.cobblestone,
-                'p', Block.pistonBase,
-                'C', Block.workbench);
-        fake_is = maker_item;
-
         // Craft stamper
         recipe(stamper_item,
                 "#p#",
-                "III",
+                "#I#",
                 "#C#",
                 '#', Block.cobblestone,
                 'p', Block.pistonBase,
@@ -721,13 +698,14 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'C', Block.workbench);
 
         //Packager
-        recipe(packager_item,
-                "#M#",
-                "# #",
-                "#S#",
+        oreRecipe(stamper_item,
+                "#p#",
+                "III",
+                "#C#",
                 '#', Block.cobblestone,
-                'M', maker_item,
-                'S', stamper_item);
+                'p', Block.pistonBase,
+                'I', Item.ingotIron,
+                'C', Block.workbench);
 
         // Wrath lamp
         oreRecipe(lamp_item,
@@ -798,7 +776,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "LIL",
                 'W', "plankWood",
                 'S', Item.sign,
-                '/', Item.stick,
+                '/', "stickWood",
                 'L', "ingotLead",
                 'I', Item.ingotIron);
         oreRecipe(new ItemStack(battery, 1, 2),
@@ -904,11 +882,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //		TileEntityMixer.addRecipe(
         //				new ItemStack[] { new ItemStack(Item.slimeBall), new ItemStack(Item.bucketMilk), new ItemStack(Block.leaves) },
         //				new ItemStack[] { new ItemStack(Item.slimeBall, 2), new ItemStack(Item.bucketEmpty) });
-        recipe(crystallizer_item,
+        oreRecipe(crystallizer_item,
                 "-",
                 "S",
                 "U",
-                '-', Item.stick,
+                '-', "stickWood",
                 'S', Item.silk,
                 'U', Item.cauldron);
         ItemStack lime = new ItemStack(Item.dyePowder, 1, 10);

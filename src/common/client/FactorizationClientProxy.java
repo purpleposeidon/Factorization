@@ -389,7 +389,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderEmpty(FactoryType.EXTENDED);
 
         ItemRenderCapture capture = new ItemRenderCapture();
-        MinecraftForgeClient.registerItemRenderer(Core.registry.battery.itemID, new BatteryItemRender(renderBattery)); //TODO: Do battery rendering using the capture!
         MinecraftForgeClient.registerItemRenderer(Core.registry.factory_block.blockID, capture);
         MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket.itemID, new ItemRenderGlazeBucket());
         MinecraftForge.EVENT_BUS.register(new FactorizationNotify());

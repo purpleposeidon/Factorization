@@ -15,7 +15,7 @@ public class TileEntityStamper extends TileEntityFactorization {
     // save these naughty juvenile males
     ItemStack input;
     ItemStack output;
-    ArrayList<ItemStack> outputBuffer;
+    final ArrayList<ItemStack> outputBuffer = new ArrayList(4);
 
     @Override
     public BlockClass getBlockClass() {
@@ -80,7 +80,7 @@ public class TileEntityStamper extends TileEntityFactorization {
         super.writeToNBT(tag);
         saveItem("input", tag, input);
         saveItem("output", tag, output);
-        if (outputBuffer != null && outputBuffer.size() > 0) {
+        if (outputBuffer.size() > 0) {
             NBTTagList buffer = new NBTTagList();
             for (ItemStack item : outputBuffer) {
                 if (item == null) {
@@ -99,15 +99,14 @@ public class TileEntityStamper extends TileEntityFactorization {
         super.readFromNBT(tag);
         input = readItem("input", tag);
         output = readItem("output", tag);
+        outputBuffer.clear();
         if (tag.hasKey("buffer")) {
             NBTTagList buffer = tag.getTagList("buffer");
             int bufferSize = buffer.tagCount();
             if (bufferSize > 0) {
-                outputBuffer = new ArrayList<ItemStack>();
                 for (int i = 0; i < bufferSize; i++) {
-                    outputBuffer.add(ItemStack
-                            .loadItemStackFromNBT((NBTTagCompound) buffer
-                                    .tagAt(i)));
+                    final NBTTagCompound it = (NBTTagCompound) buffer.tagAt(i);
+                    outputBuffer.add(ItemStack.loadItemStackFromNBT(it));
                 }
             }
         }
@@ -134,18 +133,55 @@ public class TileEntityStamper extends TileEntityFactorization {
         return true;
     }
 
+    void dumpBuffer() {
+        if (outputBuffer.isEmpty()) {
+            return;
+        }
+        // put outputBuffer into output
+        Iterator<ItemStack> it = outputBuffer.iterator();
+        while (it.hasNext()) {
+            ItemStack here = it.next();
+            if (here == null) {
+                it.remove();
+                continue;
+            }
+            if (output == null) {
+                output = here;
+                it.remove();
+                needLogic();
+                continue;
+            }
+            if (FactorizationUtil.couldMerge(output, here)) {
+                needLogic();
+                int can_take = output.getMaxStackSize() - output.stackSize;
+                if (here.stackSize > can_take) {
+                    output.stackSize += can_take;
+                    here.stackSize -= can_take; // will be > 0, keep in list
+                    break; // output's full
+                }
+                output.stackSize += here.stackSize;
+                it.remove();
+            }
+        }
+    }
+    
+    protected List<ItemStack> tryCrafting() {
+        List<ItemStack> fakeResult = FactorizationUtil.craft1x1(this, true, input);
+        if (canMerge(fakeResult)) {
+            return FactorizationUtil.craft1x1(this, false, input.splitStack(1));
+        }
+        return null;
+    }
+    
     @Override
     void doLogic() {
         int input_count = (input == null) ? 0 : input.stackSize;
         boolean can_add = output == null
                 || output.stackSize < output.getMaxStackSize();
-        if (outputBuffer == null && can_add && input != null && input.stackSize > 0) {
-            List<ItemStack> fakeResult = FactorizationUtil.craft1x1(this, true, input);
-            if (canMerge(fakeResult)) {
-                //really craft
-                List<ItemStack> craftResult = FactorizationUtil.craft1x1(this, false, input);
-                input.stackSize--;
-                outputBuffer.addAll(craftResult);
+        if (outputBuffer.size() == 0 && can_add && input_count > 0) {
+            List<ItemStack> craft = tryCrafting();
+            if (craft != null) {
+                outputBuffer.addAll(craft);
                 needLogic();
                 drawActive(3);
             }
@@ -155,40 +191,8 @@ public class TileEntityStamper extends TileEntityFactorization {
             input = null;
         }
 
-        if (outputBuffer != null) {
-            // put outputBuffer into output
-            Iterator<ItemStack> it = outputBuffer.iterator();
-            while (it.hasNext()) {
-                ItemStack here = it.next();
-                if (here == null) {
-                    it.remove();
-                    continue;
-                }
-                if (output == null) {
-                    output = here;
-                    it.remove();
-                    needLogic();
-                    continue;
-                }
-                if (FactorizationUtil.couldMerge(output, here)) {
-                    needLogic();
-                    int can_take = output.getMaxStackSize() - output.stackSize;
-                    if (here.stackSize > can_take) {
-                        output.stackSize += can_take;
-                        here.stackSize -= can_take; // will be > 0, keep in list
-                        break; // output's full
-                    }
-                    output.stackSize += here.stackSize;
-                    it.remove();
-                }
-            }
-        }
-
-        if (outputBuffer != null && outputBuffer.size() == 0) {
-            // It got emptied. Maybe we can fit something else in?
-            outputBuffer = null;
-            needLogic();
-        }
+        dumpBuffer();
+        
         int new_input_count = (input == null) ? 0 : input.stackSize;
         if (input_count != new_input_count) {
             needLogic();

@@ -349,7 +349,6 @@ public class BlockFactorization extends BlockContainer {
         Registry reg = Core.registry;
         //common
         itemList.add(reg.barrel_item);
-        itemList.add(reg.maker_item);
         itemList.add(reg.stamper_item);
         itemList.add(reg.packager_item);
         itemList.add(reg.slagfurnace_item);
@@ -362,7 +361,7 @@ public class BlockFactorization extends BlockContainer {
         //itemList.add(reg.sentrydemon_item);
 
         //electric
-        //itemList.add(reg.battery_item_hidden);
+        itemList.add(reg.battery_item_hidden);
         if (reg.battery != null) {
             //These checks are for buildcraft, which is hatin'.
             itemList.add(new ItemStack(reg.battery, 1, 2));
@@ -544,7 +543,7 @@ public class BlockFactorization extends BlockContainer {
     
     @Override
     public void updateTick(World w, int x, int y, int z, Random rand) {
-        new Coord(w, x, y, z).notifyBlockChange();
+        w.notifyBlockChange(x, y, z, blockID);
     }
     
     

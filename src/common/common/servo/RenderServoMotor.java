@@ -37,7 +37,8 @@ public class RenderServoMotor extends RenderEntity {
     boolean loaded_model = false;
 
     void loadSprocketModel() {
-        IModelCustom sprocket = AdvancedModelLoader.loadModel(Core.model_dir + "sprocket/sprocket.obj");
+        //IModelCustom sprocket = AdvancedModelLoader.loadModel(Core.model_dir + "sprocket/sprocket.obj");
+        IModelCustom sprocket = AdvancedModelLoader.loadModel("/assets/factorization/models/sprocket/sprocket.obj"); //TODO: Resourceify!
         sprocket_display_list = GLAllocation.generateDisplayLists(1);
         GL11.glNewList(sprocket_display_list, GL11.GL_COMPILE);
         sprocket.renderAll();

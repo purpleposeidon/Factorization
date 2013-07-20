@@ -58,7 +58,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     }
     
     @Override
-    void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
         super.onPlacedBy(player, is, side);
         updater = new InitialBuild();
     }

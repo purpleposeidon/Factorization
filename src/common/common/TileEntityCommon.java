@@ -77,7 +77,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         return true;
     }
 
-    void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
+    public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
         customName = FactorizationUtil.getCustomItemName(is);
     }
     

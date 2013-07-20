@@ -14,7 +14,15 @@ public class ItemFactorization extends Item {
     public ItemFactorization(int itemId, String name, TabType tabType) {
         super(itemId);
         setUnlocalizedName("factorization:" + name.replace('.', '/'));
+        Core.tab(this, tabType);
     }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    protected String getIconString() {
+        return unlocalizedName;
+    }
+    
     @Override
     @SideOnly(Side.CLIENT)
     public final void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
