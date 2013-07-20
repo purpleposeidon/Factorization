@@ -24,9 +24,6 @@ class ConductorSet implements Comparable {
     }
     
     boolean addConductor(IChargeConductor other) {
-        if (memberCount > maxMemberCount) {
-            return false;
-        }
         other.getCharge().conductorSet = this;
         memberCount++;
         return true;
@@ -41,13 +38,21 @@ class ConductorSet implements Comparable {
             neighborIterator = neighbors.iterator();
         }
         ConductorSet luckyNeighbor = neighborIterator.next(); //balance our charge with this neighbor
+        if (luckyNeighbor.memberCount <= 0) {
+            neighborIterator.remove();
+            return;
+        }
         if (luckyNeighbor.memberCount + memberCount < maxMemberCount && luckyNeighbor.memberCount <= memberCount) {
             //EAT our neighbor! Oh my!
             Iterable<IChargeConductor> noms = luckyNeighbor.getMembers(luckyNeighbor.leader);
+            totalCharge += luckyNeighbor.totalCharge;
             for (IChargeConductor nom : noms) {
                 //nom.om();
                 addConductor(nom);
             }
+            luckyNeighbor.totalCharge = 0;
+            luckyNeighbor.memberCount = 0;
+            luckyNeighbor.leader = null;
             neighborIterator.remove();
             return;
         }

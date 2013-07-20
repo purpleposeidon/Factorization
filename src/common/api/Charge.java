@@ -131,7 +131,7 @@ public class Charge implements IDataSerializable {
             conductorSet.update();
         }
         int seed = ((te.xCoord << 4 + te.zCoord) << 8) + te.yCoord;
-        if (justCreated || (w.getWorldTime() + seed) % 600 == 0) {
+        if (justCreated || (w.getTotalWorldTime() + seed) % 600 == 0) {
             justCreated = false;
             if (conductorSet.leader == null) {
                 conductorSet.leader = conductor;
@@ -150,12 +150,23 @@ public class Charge implements IDataSerializable {
         if (conductorSet == null) {
             return;
         }
-        for (IChargeConductor hereConductor : conductorSet.getMembers(conductor)) {
-            Charge hereCharge = hereConductor.getCharge();
-            int saveCharge = hereCharge.getValue();
-            new ConductorSet(hereCharge.conductor);
-            hereCharge.setValue(saveCharge);
+        final int memberCount = conductorSet.memberCount;
+        if (memberCount <= 1) {
+            return;
         }
+        //setValue(0);
+        
+        for (IChargeConductor hereConductor : conductorSet.getMembers(conductor)) {
+            if (hereConductor == conductor) {
+                continue;
+            }
+            Charge hereCharge = hereConductor.getCharge();
+            final int val = hereCharge.getValue();
+            new ConductorSet(hereConductor).totalCharge = val;
+            conductorSet.memberCount--;
+            conductorSet.totalCharge -= val;
+        }
+        conductorSet = null;
     }
     
     public static class ChargeDensityReading {

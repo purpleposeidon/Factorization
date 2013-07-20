@@ -1,15 +1,10 @@
 package factorization.api;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import cpw.mods.fml.common.registry.GameRegistry;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
 import factorization.common.Core;
-import factorization.common.FactorizationUtil;
 import factorization.common.FzConfig;
 import factorization.fzds.TransferLib;
 
@@ -22,39 +17,40 @@ public class ChargeMetalBlockConductance {
         if (!FzConfig.invasiveCharge) {
             return;
         }
-        GameRegistry.registerTileEntity(InvasiveCharge.class, "factorization.invasiveCharge");
-        
-        for (String metalName : Arrays.asList(
-                "Copper", "Tin", "Lead", "Gold", "Silver", /* standard blocks */
-                "Emerald" /* a joke. */, 
-                "Aluminum", "Platinum", "Zinc", /* weird mod metals */
-                "AluminumBrass", "Cobalt", "Ardite", "Manyullyn" /* tcons metalss */ )) {
-            subIngots: for (ItemStack is : OreDictionary.getOres("block" + metalName)) {
-                int metadata = is.getItemDamage();
-                if (is.hasTagCompound() || metadata < 0 || metadata > 16) {
-                    continue;
-                }
-                if (is.itemID >= Block.blocksList.length || is.itemID <= 0) {
-                    continue;
-                }
-                Block b = Block.blocksList[is.itemID];
-                if (b == null) {
-                    continue;
-                }
-                if (b.hasTileEntity(metadata)) {
-                    continue;
-                }
-                for (ItemStack exclude : excludeOres) {
-                    if (FactorizationUtil.couldMerge(exclude, is)) {
-                        continue subIngots;
-                    }
-                }
-                put(b.blockID, metadata);
-            }
-        }
-        for (Block block : new Block[] { Block.blockIron, Block.blockGold, Block.blockEmerald }) {
-            put(block.blockID, 0);
-        }
+        throw new IllegalArgumentException("Invasive charge disabled");
+//		GameRegistry.registerTileEntity(InvasiveCharge.class, "factorization.invasiveCharge");
+//		
+//		for (String metalName : Arrays.asList(
+//				"Copper", "Tin", "Lead", "Gold", "Silver", /* standard blocks */
+//				"Emerald" /* a joke. */, 
+//				"Aluminum", "Platinum", "Zinc", /* weird mod metals */
+//				"AluminumBrass", "Cobalt", "Ardite", "Manyullyn" /* tcons metalss */ )) {
+//			subIngots: for (ItemStack is : OreDictionary.getOres("block" + metalName)) {
+//				int metadata = is.getItemDamage();
+//				if (is.hasTagCompound() || metadata < 0 || metadata > 16) {
+//					continue;
+//				}
+//				if (is.itemID >= Block.blocksList.length || is.itemID <= 0) {
+//					continue;
+//				}
+//				Block b = Block.blocksList[is.itemID];
+//				if (b == null) {
+//					continue;
+//				}
+//				if (b.hasTileEntity(metadata)) {
+//					continue;
+//				}
+//				for (ItemStack exclude : excludeOres) {
+//					if (FactorizationUtil.couldMerge(exclude, is)) {
+//						continue subIngots;
+//					}
+//				}
+//				put(b.blockID, metadata);
+//			}
+//		}
+//		for (Block block : new Block[] { Block.blockIron, Block.blockGold, Block.blockEmerald }) {
+//			put(block.blockID, 0);
+//		}
     }
     
     static void put(int id, int md) {
