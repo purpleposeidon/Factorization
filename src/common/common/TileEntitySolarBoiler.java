@@ -142,7 +142,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
         FluidStack water = waterTank.getFluid();
         FluidStack steam = steamTank.getFluid();
         Coord here = getCoord();
-        long seed = here.seed() + worldObj.getWorldTime();
+        long seed = here.seed() + worldObj.getTotalWorldTime();
         if (steam.amount > 0 && seed % 5 == 0) {
             //Send steam upwards
             Coord above = here.add(0, 1, 0);

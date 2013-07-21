@@ -319,11 +319,11 @@ public class TileEntityBarrel extends TileEntityFactorization {
         if (entityplayer.worldObj.isRemote) {
             return true;
         }
-        if (worldObj.getWorldTime() - lastClick < 10 && item != null) {
+        if (worldObj.getTotalWorldTime() - lastClick < 10 && item != null) {
             addAllItems(entityplayer);
             return true;
         }
-        lastClick = worldObj.getWorldTime();
+        lastClick = worldObj.getTotalWorldTime();
         int handslot = entityplayer.inventory.currentItem;
         if (handslot < 0 || handslot > 8) {
             return true;

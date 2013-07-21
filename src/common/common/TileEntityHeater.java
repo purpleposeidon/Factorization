@@ -109,8 +109,9 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
             charge.update();
             return;
         }
-        long now = worldObj.getWorldTime() + here.seed();
+        long now = worldObj.getTotalWorldTime() + here.seed();
         int rate = 4;
+        long i = now % rate;
         if (now % rate == 0) {
             int heatToRemove = maxHeat - heat;
             int avail = Math.min(heatToRemove, charge.getValue());

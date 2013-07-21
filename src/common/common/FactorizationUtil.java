@@ -222,14 +222,14 @@ public class FactorizationUtil {
     public static boolean itemCanFire(World w, ItemStack is, int tickDelay) {
         NBTTagCompound tag = getTag(is);
         long t = tag.getLong("lf");
-        if (t > w.getWorldTime()) {
-            tag.setLong("lf", w.getWorldTime());
+        if (t > w.getTotalWorldTime()) {
+            tag.setLong("lf", w.getTotalWorldTime());
             return true;
         }
-        if (t + tickDelay > w.getWorldTime()) {
+        if (t + tickDelay > w.getTotalWorldTime()) {
             return false;
         }
-        tag.setLong("lf", w.getWorldTime());
+        tag.setLong("lf", w.getTotalWorldTime());
         return true;
     }
 

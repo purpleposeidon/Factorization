@@ -270,7 +270,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
     }
 
     void doUpdate() {
-        if ((worldObj.getWorldTime() + random_time_offset) % 25 != 0) {
+        if ((worldObj.getTotalWorldTime() + random_time_offset) % 25 != 0) {
             return;
         }
         if (rand.nextFloat() > .95) {

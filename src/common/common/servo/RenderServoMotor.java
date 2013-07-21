@@ -214,7 +214,7 @@ public class RenderServoMotor extends RenderEntity {
         FzInv inv = motor.getInv();
         final Minecraft mc = Minecraft.getMinecraft();
         long range = 9*20;
-        double d = motor.worldObj.getWorldTime() + partial;
+        double d = motor.worldObj.getTotalWorldTime() + partial;
         float now = (float) ((d % range)/(double)range);
         //double warp = Math.cos(Math.toRadians(360*now/20)) + 2;
         int count = 0;

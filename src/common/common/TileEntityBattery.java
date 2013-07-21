@@ -39,6 +39,9 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     @Override
     public String getInfo() {
         float f = storage * 100 / max_storage;
+        if (Core.dev_environ) {
+            return "Storage: " + ((int) f) + "%\n" + storage + "/" + max_storage;
+        }
         return "Storage: " + ((int) f) + "%";
     }
 
@@ -75,7 +78,7 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
             return;
         }
         charge.update();
-        //if (getCoord().seed() + worldObj.getWorldTime() % 10 != 0) {
+        //if (getCoord().seed() + worldObj.getTotalWorldTime() % 10 != 0) {
         //	return;
         //}
         int val = getCharge().getValue();
