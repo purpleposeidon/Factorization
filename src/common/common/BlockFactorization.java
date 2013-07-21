@@ -285,7 +285,6 @@ public class BlockFactorization extends BlockContainer {
                 if (tec.getCoord().equals(here)) {
                     destroyedTE  = tec;
                     it.remove();
-                    break;
                 }
             }
             if (destroyedTE == null) {
