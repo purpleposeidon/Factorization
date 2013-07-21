@@ -52,7 +52,7 @@ public class Core {
     public static final String modId = "factorization";
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
-    public static final String version = "0.8.02dev0"; //@VERSION@
+    public static final String version = "0.8.03dev0"; //@VERSION@
     public Core() {
         instance = this;
         fzconfig = new FzConfig();
@@ -226,7 +226,7 @@ public class Core {
         }
     }
     
-    public static void brand(ItemStack is, EntityPlayer player, List list, boolean verbose) { //NORELEASE: Formatting.
+    public static void brand(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         final Item it = is.getItem();
         String name = it.getUnlocalizedName(is);
         addTranslationHints(name + ".hint", list, "" + EnumChatFormatting.ITALIC);
@@ -281,11 +281,7 @@ public class Core {
     }
     
     public static enum TabType {
-        REDSTONE(CreativeTabs.tabRedstone), TOOLS(CreativeTabs.tabTools), MISC(CreativeTabs.tabMisc), MATERIALS(CreativeTabs.tabMaterials), ART(CreativeTabs.tabMisc), SERVOS(CreativeTabs.tabTools);
-        CreativeTabs type;
-        TabType(CreativeTabs type) {
-            this.type = type;
-        }
+        ART, CHARGE, OREP, SERVOS, ROCKETRY, TOOLS, BLOCKS, MATERIALS;
     }
     
     public static CreativeTabs tabFactorization = new CreativeTabs("factorizationTab") {
@@ -299,15 +295,11 @@ public class Core {
     };
     
     public static Item tab(Item item, TabType tabType) {
-        CreativeTabs tab = tabType.type;
-        //item.setCreativeTab(tab);
         item.setCreativeTab(tabFactorization);
         return item;
     }
     
     public static Block tab(Block block, TabType tabType) {
-        CreativeTabs tab = tabType.type;
-        //block.setCreativeTab(tab);
         block.setCreativeTab(tabFactorization);
         return block;
     }

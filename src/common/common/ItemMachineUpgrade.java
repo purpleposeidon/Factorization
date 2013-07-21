@@ -14,7 +14,7 @@ public class ItemMachineUpgrade extends ItemFactorization {
     String name, type;
 
     protected ItemMachineUpgrade(int id, String name, String type, FactoryType machineType, int upgradeId) {
-        super(id, name, TabType.MISC);
+        super(id, name, TabType.TOOLS);
         this.machineType = machineType;
         this.upgradeId = upgradeId;
         this.name = name;

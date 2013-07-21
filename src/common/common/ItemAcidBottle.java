@@ -17,7 +17,7 @@ import net.minecraft.world.World;
 public class ItemAcidBottle extends ItemFactorization {
 
     public ItemAcidBottle(int id) {
-        super(id, "acid", TabType.MISC);
+        super(id, "acid", TabType.CHARGE);
         setMaxStackSize(16);
     }
     

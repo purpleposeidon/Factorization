@@ -134,7 +134,7 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
         if (steam == null) {
             steamTank.setFluid(steam = FluidRegistry.getFluidStack("Steam", 0));
         }
-        long seed = getCoord().seed() + worldObj.getWorldTime();
+        long seed = getCoord().seed() + worldObj.getTotalWorldTime();
         if (seed % 5 == 0) {
             if (fan_speed > steam.amount) {
                 fan_speed -= 10;
