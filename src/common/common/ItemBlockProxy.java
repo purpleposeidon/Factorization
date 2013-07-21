@@ -1,6 +1,11 @@
 package factorization.common;
 
+import java.util.List;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -109,4 +114,8 @@ public class ItemBlockProxy extends ItemFactorization {
     public boolean getShareTag() {
         return true;
     }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void getSubItems(int itemId, CreativeTabs tab, List list) { } //The items will be added elsewhere
 }

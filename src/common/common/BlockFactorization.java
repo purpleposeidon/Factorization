@@ -353,12 +353,6 @@ public class BlockFactorization extends BlockContainer {
         itemList.add(reg.slagfurnace_item);
         itemList.add(reg.parasieve_item);
 
-        //dark
-        itemList.add(reg.router_item);
-        itemList.add(reg.servorail_item);
-        itemList.add(reg.lamp_item);
-        //itemList.add(reg.sentrydemon_item);
-
         //electric
         //itemList.add(reg.battery_item_hidden);
         if (reg.battery != null) {
@@ -387,8 +381,10 @@ public class BlockFactorization extends BlockContainer {
             itemList.add(new ItemStack(reg.rocket_engine));
         }
         
-        //itemList.add(core.cutter_item);
-        //itemList.add(core.queue_item);
+        //dark
+        itemList.add(reg.router_item);
+        itemList.add(reg.servorail_item);
+        itemList.add(reg.lamp_item);
     }
 
     @Override

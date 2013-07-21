@@ -3,7 +3,6 @@ package factorization.common;
 import java.util.List;
 
 import net.minecraft.client.renderer.texture.IconRegister;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -95,11 +94,6 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     @Override
     public boolean isDamageable() {
         return false;
-    }
-    
-    @Override
-    public void getSubItems(int itemIndexThisIsARetardedParameterJustFYI, CreativeTabs tab, List list) {
-        list.add(new ItemStack(Core.registry.battery, 1, 2));
     }
     
     @Override
