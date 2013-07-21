@@ -74,6 +74,10 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
     public static void remakeModel() {
         diamondModel = null;
     }
+    
+    public float interp(float oldValue, float newValue, float partial) {
+        return oldValue*(1 - partial) + newValue*partial;
+    }
 
     @Override
     public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
@@ -81,7 +85,7 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
         TileEntityGrinder grinder = (TileEntityGrinder) te;
         GL11.glPushMatrix();
         GL11.glTranslatef((float) (x + 0.5), (float) (y + 5F / 16F), (float) (z + 0.5));
-        GL11.glRotatef(grinder.rotation / 5.0F, 0, 1, 0);
+        GL11.glRotatef(interp(grinder.prev_rotation, grinder.rotation, partial) / 5.0F, 0, 1, 0);
         renderGrindHead();
         GL11.glPopMatrix();
         Core.profileEndRender();
