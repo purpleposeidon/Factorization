@@ -1,0 +1,163 @@
+#en_US localizations
+factorization.factoryBlock.BARREL.name=Barrel
+factorization.factoryBlock.MAKER.name=Craftpacket Maker
+factorization.factoryBlock.STAMPER.name=Craftpacket Stamper
+factorization.factoryBlock.PACKAGER.name=Packager
+factorization.factoryBlock.SLAGFURNACE.name=Slag Furnace
+factorization.factoryBlock.ROUTER.name=Router
+#factorization.factoryBlock.ROUTER.hint=Also try Servos!
+factorization.factoryBlock.LAMP.name=Wrath Lamp
+factorization.factoryBlock.BATTERY.name=(Hidden battery)
+item.factorization:charge_battery.name=Battery Block
+item.factorization:charge_battery.hint=Charge bounds: 20-30
+factorization.factoryBlock.LEYDENJAR.name=Leyden Jar
+factorization.factoryBlock.LEYDENJAR.hint=Charge bounds: 100-150
+factorization.factoryBlock.SOLARBOILER.name=Solar Boiler
+factorization.factoryBlock.SOLARBOILER.hint=Water in below,\nthis in circle of mirrors,\nsteam flows to turbine
+factorization.factoryBlock.STEAMTURBINE.name=Steam Turbine
+factorization.factoryBlock.STEAMTURBINE.hint=Convert steam to charge
+item.factorization:mirror.name=Mirror
+item.factorization:mirror.hint=Reflects sunlight at Solar Boilers
+factorization.factoryBlock.HEATER.name=Furnace Heater
+factorization.factoryBlock.LEADWIRE.name=Lead Wire
+factorization.factoryBlock.GRINDER.name=Grinder
+factorization.factoryBlock.MIXER.name=Mixer
+factorization.factoryBlock.CRYSTALLIZER.name=Crystallizer
+factorization.factoryBlock.CERAMIC.name=Sculpture
+factorization.factoryBlock.SERVORAIL.name=Servo Rail
+factorization.factoryBlock.PARASIEVE.name=Parasieve
+tile.factorization.ResourceBlock.SILVERORE.name=Silver Ore
+tile.factorization.ResourceBlock.SILVERBLOCK.name=Block of Silver
+tile.factorization.ResourceBlock.LEADBLOCK.name=Block of Lead
+tile.factorization.ResourceBlock.DARKIRONBLOCK.name=Block of Dark Iron
+
+item.factorization:craftpacket.name=Craftpacket
+item.factorization:craftpacket_complete.name=Craftpacket
+item.factorization:tool/bag_of_holding.name=Bag of Holding
+item.factorization:tool/pocket_crafting_table.name=Pocket Crafting Table
+item.factorization:tool/wand_of_cooling.name=Wand of Cooling
+item.factorization:diamond_shard.name=Diamond Shard
+item.factorization:diamond_shard.hint=Exploded diamond block
+item.factorization:tool/wrath_igniter.name=Wrath Igniter
+item.factorization:dark_iron_ingot.name=Dark Iron Ingot
+item.factorization:lead_ingot.name=Lead Ingot
+item.factorization:silver_ingot.name=Silver Ingot
+item.factorization:router/item_filter.name=Item Filter
+item.factorization:router/machine_filter.name=Machine Filter
+item.factorization:router/speed.name=Speed Boost
+item.factorization:router/thorough.name=Thoroughness
+item.factorization:router/bandwidth.name=Bandwidth
+item.factorization:acid.name=Sulfuric Acid
+item.factorization:acid_regia.name=Aqua Regia
+item.factorization:magnet.name=Magnet
+item.factorization:insulated_coil.name=Insulated Coil
+item.factorization:motor.name=Motor
+item.factorization:fan.name=Fan
+item.factorization:tool/charge_meter.name=Charge Meter
+item.factorization:router/eject.name=Auto-Ejector
+item.factorization:barrel_upgrade.name=Extra-Dimensional Storage
+item.factorization:diamond_cutting_head.name=Diamond Cutting Head
+item.factorization:sludge.name=Sludge
+item.factorization:sludge.hint=Byproduct of washing ore gravel
+item.factorization:sculptTool.name=Sculpting Tool
+item.factorization:ceramics/glaze_bucket.name=Glaze Bucket
+item.factorization:tool/angular_saw.name=Cube Saw
+item.factorization:tool/matrix_programmer.name=Logic Matrix Programmer
+item.factorization:tool/matrix_programmer.hint=Found in dungeons
+item.factorization:tool/matrix_programmer.shift=Ancient code repository
+item.factorization:logic_matrix.name=Blank Logic Matrix
+item.factorization:logic_matrix_identifier.name=Logic Matrix: Identifier
+item.factorization:heat_hole.name=Heat Hole
+item.factorization:nether_powder.name=Netherrack Powder
+item.factorization:rocket/rocket_engine.name=Rocket Engine
+item.factorization:rocket/powder_rocket_fuel.name=Powdered Rocket Fuel
+item.factorization:rocket/rocket_fuel_bucket.name=Bucket of Powdered Rocket Fuel
+item.factorization:rocket/inverium_drop.name=Inverium
+
+itemGroup.factorizationTab=Factorization
+
+#Ores
+item.factorization:ore/gravel/IRON.name=Dirty Iron Gravel
+item.factorization:ore/gravel/GOLD.name=Dirty Gold Gravel
+item.factorization:ore/gravel/TIN.name=Dirty Tin Gravel
+item.factorization:ore/gravel/COPPER.name=Dirty Copper Gravel
+item.factorization:ore/gravel/GALENA.name=Dirty Silver Gravel
+
+item.factorization:ore/clean/IRON.name=Clean Iron Gravel
+item.factorization:ore/clean/GOLD.name=Clean Gold Gravel
+item.factorization:ore/clean/TIN.name=Clean Tin Gravel
+item.factorization:ore/clean/COPPER.name=Clean Copper Gravel
+item.factorization:ore/clean/GALENA.name=Clean Silver Gravel
+
+item.factorization:ore/reduced/IRON.name=Reduced Iron Chunks
+item.factorization:ore/reduced/GOLD.name=Reduced Gold Chunks
+item.factorization:ore/reduced/TIN.name=Reduced Tin Chunks
+item.factorization:ore/reduced/COPPER.name=Reduced Copper Chunks
+item.factorization:ore/reduced/SILVER.name=Reduced Silver Chunks
+item.factorization:ore/reduced/LEAD.name=Reduced Lead Chunks
+
+item.factorization:ore/crystal/IRON.name=Crystalline Iron
+item.factorization:ore/crystal/GOLD.name=Crystalline Gold
+item.factorization:ore/crystal/TIN.name=Crystalline Tin
+item.factorization:ore/crystal/COPPER.name=Crystalline Copper
+item.factorization:ore/crystal/SILVER.name=Crystalline Silver
+item.factorization:ore/crystal/LEAD.name=Crystalline Lead
+
+#Glazes
+item.factorization:ceramics/glaze_bucket.ST_VECHS_BLACK.name=St. Vech's Black
+item.factorization:ceramics/glaze_bucket.TEMPLE_WHITE.name=Temple White
+item.factorization:ceramics/glaze_bucket.SALLYS_WHITE.name=Sally's White
+item.factorization:ceramics/glaze_bucket.CLEAR.name=Clear
+item.factorization:ceramics/glaze_bucket.REDSTONE_OXIDE.name=Redstone Oxide
+item.factorization:ceramics/glaze_bucket.LAPIS_OXIDE.name=Lapis Oxide
+item.factorization:ceramics/glaze_bucket.PURPLE_OXIDE.name=Purple Oxide
+item.factorization:ceramics/glaze_bucket.LEAD_OXIDE.name=Lead Oxide
+item.factorization:ceramics/glaze_bucket.FIRE_ENGINE_RED.name=Fire Engine Red
+item.factorization:ceramics/glaze_bucket.CELEDON.name=Celedon
+item.factorization:ceramics/glaze_bucket.IRON_BLUE.name=Iron Blue
+item.factorization:ceramics/glaze_bucket.STONEWARE_SLIP.name=Stoneware Slip
+item.factorization:ceramics/glaze_bucket.TENMOKU.name=Tenmoku
+item.factorization:ceramics/glaze_bucket.PEKING_BLUE.name=Peking Blue
+item.factorization:ceramics/glaze_bucket.SHINO.name=Malcolm's Shino
+
+#Glaze bases
+item.factorization:ceramics/glaze_bucket.base_common.name=Glaze Base: Common
+item.factorization:ceramics/glaze_bucket.base_matte.name=Glaze Base: Matte
+item.factorization:ceramics/glaze_bucket.base_translucent.name=Glaze Base: Translucent
+item.factorization:ceramics/glaze_bucket.base_shiny.name=Glaze Base: Shiny
+item.factorization:ceramics/glaze_bucket.base_bright.name=Glaze Base: Bright
+item.factorization:ceramics/glaze_bucket.base_unreal.name=Glaze Base: Unreal
+item.factorization:ceramics/glaze_bucket.base_mimicry.name=Glaze Base: Mimicing
+
+
+#Servos
+factorization:servo/component.name=Servo Component
+item.factorization:servo/servo.name=Servo
+#item.factorization:servo/servo.hint=See the changelog.\nPlease give feedback!
+item.factorization:servo/sprocket.name=Dark Iron Sprocket
+item.factorization:servo/servo_motor.name=Servo Motor
+item.factorization:servo/component.fz.decorator.equipmentBay.name=Loading Bay
+item.factorization:servo/component.fz.decorator.equipmentBay.hint=Equips or unequips from an inventory
+item.factorization:servo/component.fz.instruction.pulse.name=Redstone Pulse
+item.factorization:servo/component.fz.instruction.activateactuator.name=Click
+item.factorization:servo/component.fz.instruction.boop.name=Boop
+item.factorization:servo/component.fz.instruction.boop.hint=Boops
+item.factorization:servo/component.fz.instruction.setdirection.name=Set Direction
+item.factorization:servo/component.fz.instruction.rotatetop.name=Point Top
+item.factorization:servo/component.fz.instruction.sum.name=Sum
+item.factorization:servo/component.fz.instruction.sum.hint=push (pop + pop)
+item.factorization:servo/component.fz.instruction.product.name=Product
+item.factorization:servo/component.fz.instruction.product.hint=push (pop * pop)
+item.factorization:servo/component.fz.instruction.integervalue.name=Integer
+item.factorization:servo/component.fz.instruction.integervalue.hint=push a number
+item.factorization:servo/component.fz.instruction.dup.name=Duplicate
+item.factorization:servo/component.fz.instruction.dup.hint=Copy an integer
+item.factorization:servo/component.fz.instruction.drop.name=Drop
+item.factorization:servo/component.fz.instruction.drop.hint=Remove an integer
+item.factorization:servo/component.fz.instruction.configureactuator.name=Configure Actuator
+item.factorization:servo/component.fz.instruction.configureactuator.hint=Configure or deconfigure an actuator
+item.factorization:servo/component.fz.instruction.spin.name=Spin
+item.factorization:servo/actuator/item_syringe.name=Item Syringe
+item.factorization:servo/actuator/item_syringe.hint=Remove or Insert items
+
+
