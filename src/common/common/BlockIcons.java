@@ -7,6 +7,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.common.FactorizationTextureLoader.Directory;
 import factorization.common.FactorizationTextureLoader.IconGroup;
+import factorization.common.FactorizationTextureLoader.Ignore;
 
 public class BlockIcons {
     public static Icon uv_test,
@@ -157,7 +158,8 @@ public class BlockIcons {
     
     public static class ArrowyBox extends IconGroup {
         public Icon front, side_N, side_E, back;
-        public Icon side_S, side_W; //NORELEASE: @Ignore annotation on these
+        @Ignore
+        public Icon side_S, side_W;
 
         @Override
         public void afterRegister() {
