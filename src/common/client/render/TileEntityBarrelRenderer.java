@@ -148,11 +148,8 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
         int color = 0xbbbbbb;
         if (barrel.canLose()) {
             t = "!! " + t + " !!";
-            //			if (barrel.worldObj.getWorldTime() / 40 % 2 == 0 && barrel.flamingExplosion()) {
-            //				color = 0xccaaaa;
-            //			}
         }
-        // XXX TODO: This sometimes renders too bright. Probably some OpenGL
+        // XXX TODO NORELEASE: This sometimes renders too bright. Probably some OpenGL
         // state that some other part of the render is changing. Any ideas?
         // some possibilities: +TEXTURE_2D +BLEND ±LIGHTING
         GL11.glDisable(GL11.GL_LIGHTING);
