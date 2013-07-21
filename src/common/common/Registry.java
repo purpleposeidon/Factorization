@@ -137,7 +137,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         GameRegistry.registerCraftingHandler(this);
         GameRegistry.registerWorldGenerator(this);
 
-        Core.tab(factory_block, Core.TabType.MATERIALS);
+        Core.tab(factory_block, Core.TabType.BLOCKS);
+        Core.tab(resource_block, TabType.BLOCKS);
         
         final Block vanillaDiamond = Block.blockDiamond;
         final int diamondId = vanillaDiamond.blockID;
@@ -188,7 +189,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //ItemBlocks
         item_factorization = (ItemFactorizationBlock) Item.itemsList[factory_block.blockID];
         item_resource = (ItemBlockResource) Item.itemsList[resource_block.blockID];
-        Core.tab(resource_block, TabType.MATERIALS);
 
         //BlockFactorization stuff
         router_item = FactoryType.ROUTER.itemStack();
@@ -260,8 +260,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         fan = new ItemCraftingComponent(itemID("fan", 9028), "fan");
         diamond_cutting_head = new ItemCraftingComponent(itemID("diamondCuttingHead", 9038), "diamond_cutting_head");
         charge_meter = new ItemChargeMeter(itemID("chargemeter", 9029));
-        mirror = new ItemBlockProxy(itemID("mirror", 9030), mirror_item_hidden);
-        mirror.setUnlocalizedName("factorization:mirror");
+        mirror = new ItemBlockProxy(itemID("mirror", 9030), mirror_item_hidden, "mirror", TabType.CHARGE);
         battery = new ItemBattery(itemID("battery", 9033));
         leydenjar_item_full = ItemStack.copyItemStack(leydenjar_item);
         NBTTagCompound tag = new NBTTagCompound();
@@ -281,8 +280,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         nether_powder = new ItemCraftingComponent(itemID("netherPowder", 9050), "nether_powder");
         if (FzConfig.enable_dimension_slice) {
             rocket_fuel = new ItemCraftingComponent(itemID("heldRocketFuel", 9051), "rocket/powder_rocket_fuel");
-            rocket_engine = new ItemBlockProxy(itemID("rocketEngine", 9053), rocket_engine_item_hidden);
-            rocket_engine.setUnlocalizedName("factorization:rocket/rocket_engine").setMaxStackSize(1);
+            rocket_engine = new ItemBlockProxy(itemID("rocketEngine", 9053), rocket_engine_item_hidden, "rocket/rocket_engine", TabType.ROCKETRY);
+            rocket_engine.setMaxStackSize(1);
             bucket_rocket_fuel = new ItemCraftingComponent(itemID("bucketRocketFuel", 9054), "rocket/rocket_fuel_bucket");
             bucket_rocket_fuel.setMaxStackSize(1);
             bucket_rocket_fuel.setContainerItem(Item.bucketEmpty);
@@ -927,12 +926,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'L', "ingotLead",
                 'U', Item.cauldron);
         FurnaceRecipes.smelting().addSmelting(sludge.itemID, 0, new ItemStack(Item.clay), 0.1F);
-//		TileEntityMixer.addRecipe(
-//				new ItemStack[] { new ItemStack(sludge, 1), new ItemStack(Block.dirt), new ItemStack(Item.bucketWater) },
-//				new ItemStack[] { new ItemStack(Item.clay), new ItemStack(Item.bucketEmpty) });
-        //		TileEntityMixer.addRecipe(
-        //				new ItemStack[] { new ItemStack(Item.slimeBall), new ItemStack(Item.bucketMilk), new ItemStack(Block.leaves) },
-        //				new ItemStack[] { new ItemStack(Item.slimeBall, 2), new ItemStack(Item.bucketEmpty) });
         oreRecipe(crystallizer_item,
                 "-",
                 "S",
@@ -1034,7 +1027,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         if (!FzConfig.gen_silver_ore) {
             return;
         }
-        if ((chunkZ + 3*chunkX) % 5 != 0) {
+        if ((world.getWorldInfo().getSeed() + chunkZ + 3*chunkX) % 5 != 0) {
             return;
         }
         int x = chunkX*16 + rand.nextInt(16);
