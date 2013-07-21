@@ -100,9 +100,9 @@ public class ItemPocketTable extends ItemFactorization {
             if (key != null && key != "") {
                 String enabled_or_installed = NEI_status == 1 ? "enabled" : "installed";
                 if (NEI_status != -1) {
-                    infoList.add("Press " + key + " to activate from anywhere.");
+                    infoList.add(Core.hintFormat + "Press " + key + " to activate from anywhere.");
                 } else {
-                    infoList.add("Press " + key + " to activate.");
+                    infoList.add(Core.hintFormat + "Press " + key + " to activate.");
                 }
             }
         }

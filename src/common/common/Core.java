@@ -226,12 +226,15 @@ public class Core {
         }
     }
     
+    public static final String hintFormat = "" + EnumChatFormatting.ITALIC;
+    public static final String shiftFormat = "" + EnumChatFormatting.DARK_GRAY + EnumChatFormatting.ITALIC;
+    
     public static void brand(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         final Item it = is.getItem();
         String name = it.getUnlocalizedName(is);
-        addTranslationHints(name + ".hint", list, "" + EnumChatFormatting.ITALIC);
+        addTranslationHints(name + ".hint", list, hintFormat);
         if (player != null && proxy.isClientHoldingShift()) {
-            addTranslationHints(name + ".shift", list, "" + EnumChatFormatting.DARK_GRAY + EnumChatFormatting.ITALIC);
+            addTranslationHints(name + ".shift", list, shiftFormat);
         }
         if (it instanceof ItemFactorization) {
             ((ItemFactorization) it).addExtraInformation(is, player, list, verbose);
@@ -247,7 +250,7 @@ public class Core {
             brand += " Development!";
         }
         if (brand.length() > 0) {
-            list.add(EnumChatFormatting.DARK_GRAY + brand.trim());
+            list.add(EnumChatFormatting.BLUE + brand.trim());
         }
     }
     
@@ -354,6 +357,10 @@ public class Core {
             return "<null item; bug?>";
         }
         return i.getUnlocalizedName() + ".name";
+    }
+    
+    public static String translate(String key) {
+        return ("" + StatCollector.translateToLocal(key + ".name")).trim();
     }
     
     public static void sendChatMessage(boolean raw, ICommandSender sender, String msg) {
