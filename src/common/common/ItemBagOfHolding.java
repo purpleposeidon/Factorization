@@ -328,6 +328,9 @@ public class ItemBagOfHolding extends ItemFactorization implements IActOnCraft {
         if (!bad && bag && pearl && dark_iron && leather) {
             result.setTagCompound(is.getTagCompound());
             addPearl(result);
+            if (getNumOfCols(result) >= 16) {
+                result.setItemDamage(1);
+            }
         }
     }
 }
