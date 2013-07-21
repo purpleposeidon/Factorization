@@ -54,7 +54,7 @@ public class FzConfig {
     public static boolean equal_opportunities_for_mobs = true;
     public static boolean invasiveCharge = false;
     public static boolean enable_solar_steam = true;
-    public static String language_file = "/mods/factorization/en_US.lang"; //NORELEASE: Wrong, use resourcepacks?
+    public static String language_file = "/mods/factorization/en_US.lang"; //NORELEASE: Wrong, use resourcepacks? I think we've got this setup now so that we don't need to do any loading ourselves now. Yeah, that file isn't even here anymore. Should be good.
 
     
 
@@ -168,8 +168,8 @@ public class FzConfig {
         boilers_suck_water = getBoolConfig("boilersSuckWater", "server", boilers_suck_water, "If false, water must be piped in");
         steam_output_adjust = getDoubleConfig("steamOutputAdjustment", "server", steam_output_adjust, "Scale how much steam is produced by the solar boiler");
         stretchy_clay = getBoolConfig("stretchyClay", "server", stretchy_clay, "If true, maximum clay lump volume is 1 m³ instead of (1 m³)/4");
-        tps_reporting_interval = getIntConfig("tpsReportInterval", "server", tps_reporting_interval, "How many ticks the server will wait before sending out TPS reports. 20 ticks = 1 second.");
-        equal_opportunities_for_mobs = getBoolConfig("equalOpportunitiesForMobs", "server", equal_opportunities_for_mobs, null);
+        tps_reporting_interval = getIntConfig("tpsReportInterval", "server", tps_reporting_interval, "How many ticks the server will wait before sending out TPS reports. 20 ticks = 1 second, unless it's lagging.");
+        equal_opportunities_for_mobs = getBoolConfig("equalOpportunitiesForMobs", "server", equal_opportunities_for_mobs, "Causes some mobs to rarely spawn wearing your armor");
         //invasiveCharge = getBoolConfig("invasiveCharge", "server", invasiveCharge, "Set to true to prevent charge from connecting over metal blocks.");
         //Broken. Doesn't work.
         enable_solar_steam = getBoolConfig("enableSolarSteam", "server", enable_solar_steam, "Set to false to disable the crafting recipe for solar2steam machines");

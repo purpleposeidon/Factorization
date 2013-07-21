@@ -22,7 +22,7 @@ public class MobEqualizer {
             return;
         }
         EntityMob ent = (EntityMob) event.entityLiving;
-        if (event.world.rand.nextInt(100) > event.world.difficultySetting) {
+        if (event.world.rand.nextInt(400) > event.world.difficultySetting) {
             return;
         }
         EntityPlayer template = pickNearPlayer(event);
