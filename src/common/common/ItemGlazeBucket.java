@@ -6,7 +6,6 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumMovingObjectType;
@@ -63,7 +62,7 @@ public class ItemGlazeBucket extends ItemFactorization {
         if (isMimic(is)) {
             ItemStack hint = getSource(is);
             if (hint != null) {
-                return base + ": " + hint.getDisplayName();
+                return Core.translate(getUnlocalizedName() + ".mimicry_prefix") + " " + hint.getDisplayName();
             }
         }
         return base;
@@ -194,22 +193,6 @@ public class ItemGlazeBucket extends ItemFactorization {
             return null;
         }
         return new ItemStack(b, 1, getBlockMd(is));
-    }
-    
-    @Override
-    protected void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
-        ItemStack hint = getSource(is);
-        NBTTagCompound tag = FactorizationUtil.getTag(is);
-        if (!tag.hasNoTags()) {
-            list.add("Ceramic Glaze");
-        }
-        if (hint != null) {
-            Item hi = hint.getItem();
-            hi.addInformation(hint, player, list, verbose);
-            if (hi == Item.itemsList[Core.registry.resource_block.blockID]) {
-                return; //No Core.brand
-            }
-        }
     }
 
     @Override

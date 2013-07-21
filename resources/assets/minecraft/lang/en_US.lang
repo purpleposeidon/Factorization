@@ -130,6 +130,8 @@ item.factorization:ceramics/glaze_bucket.base_bright.name=Glaze Base: Bright
 item.factorization:ceramics/glaze_bucket.base_unreal.name=Glaze Base: Unreal
 item.factorization:ceramics/glaze_bucket.base_mimicry.name=Glaze Base: Mimicing
 
+item.factorization:ceramics/glaze_bucket.mimicry_prefix.name=Mimicing Glaze:
+
 
 #Servos
 factorization:servo/component.name=Servo Component
