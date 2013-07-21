@@ -858,11 +858,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         
         //Values based on Fortune I
         TileEntityGrinder.addRecipe(new ItemStack(Block.oreCoal), new ItemStack(Item.coal), 1.5F);
-        TileEntityGrinder.addRecipe(new ItemStack(Block.oreRedstone), new ItemStack(Item.redstone), 5F);
-        TileEntityGrinder.addRecipe(new ItemStack(Block.oreDiamond), new ItemStack(Item.diamond), 1.25F);
-        TileEntityGrinder.addRecipe(new ItemStack(Block.oreEmerald), new ItemStack(Item.emerald), 1.25F);
+        TileEntityGrinder.addRecipe("oreRedstone", new ItemStack(Item.redstone), 5F);
+        TileEntityGrinder.addRecipe("oreDiamond", new ItemStack(Item.diamond), 1.25F);
+        TileEntityGrinder.addRecipe("oreEmerald", new ItemStack(Item.emerald), 1.25F);
         TileEntityGrinder.addRecipe(new ItemStack(Block.oreNetherQuartz), new ItemStack(Item.netherQuartz), 1.5F /* It should actually be 1.25, but I feel like being generous here. */);
-        TileEntityGrinder.addRecipe(new ItemStack(Block.oreLapis), new ItemStack(Item.dyePowder, 1, 4), 8.5F);
+        TileEntityGrinder.addRecipe("oreLapis", new ItemStack(Item.dyePowder, 1, 4), 8.5F);
         
         //VANILLA RECIPES
         //These are based on going through the Search tab in the creative menu

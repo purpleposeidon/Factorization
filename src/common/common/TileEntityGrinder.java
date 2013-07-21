@@ -4,10 +4,13 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.oredict.OreDictionary;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Charge;
@@ -133,10 +136,11 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         return false;
     }
 
-    public int rotation;
+    public int rotation, prev_rotation;
 
     @Override
     public void updateEntity() {
+        prev_rotation = rotation;
         rotation += speed;
         charge.update();
         super.updateEntity();
@@ -200,7 +204,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
 
     public static ArrayList<GrinderRecipe> recipes = new ArrayList();
 
-    public static void addRecipe(ItemStack input, ItemStack output, float probability) {
+    public static void addRecipe(Object input, ItemStack output, float probability) {
         GrinderRecipe toAdd = new GrinderRecipe(input, output, probability);
         for (GrinderRecipe gr : recipes) {
             if (gr.input.equals(toAdd.input)) {
@@ -219,25 +223,19 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         if (gr == null) {
             return false;
         }
-        if (FactorizationUtil.couldMerge(gr.input, input)) {
-            if (output == null) {
-                return true;
-            }
-            if (!FactorizationUtil.couldMerge(output, gr.output)) {
-                return false;
-            }
-            if (output.stackSize + Math.ceil(gr.probability) > output.getMaxStackSize()) {
-                return false;
-            }
+        if (output == null) {
             return true;
         }
-        return false;
+        return FactorizationUtil.couldMerge(output, gr.output) 
+                && output.stackSize + Math.ceil(gr.probability) <= output.getMaxStackSize();
     }
     
     GrinderRecipe getRecipe() {
         for (GrinderRecipe gr : recipes) {
-            if (FactorizationUtil.couldMerge(gr.input, input)) {
-                return gr;
+            for (ItemStack is : gr.getInput()) {
+                if (FactorizationUtil.couldMerge(is, input)) {
+                    return gr;
+                }
             }
         }
         return null;
@@ -248,7 +246,10 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         if (gr == null) {
             return;
         }
-        if (FactorizationUtil.couldMerge(gr.input, input)) {
+        for (ItemStack is : gr.getInput()) {
+            if (!FactorizationUtil.couldMerge(is, input)) {
+                continue;
+            }
             if (output == null) {
                 output = gr.output.copy();
                 output.stackSize = 0;
@@ -267,13 +268,33 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     }
 
     public static class GrinderRecipe {
-        public ItemStack input, output;
+        private Object input;
+        public ItemStack output;
         public float probability;
 
-        GrinderRecipe(ItemStack input, ItemStack output, float probability) {
+        GrinderRecipe(Object input, ItemStack output, float probability) {
+            if (input instanceof Block) {
+                input = new ItemStack((Block) input, 1, FactorizationUtil.WILDCARD_DAMAGE);
+            }
+            if (input instanceof Item) {
+                input = new ItemStack((Item) input, 1, FactorizationUtil.WILDCARD_DAMAGE);
+            }
+            if (input instanceof ItemStack) {
+                ItemStack is = (ItemStack) input;
+                ArrayList<ItemStack> ar = new ArrayList();
+                ar.add(is);
+                input = ar;
+            }
             this.input = input;
             this.output = output;
             this.probability = probability;
+        }
+        
+        ArrayList<ItemStack> getInput() {
+            if (input instanceof String) {
+                return OreDictionary.getOres((String) input);
+            }
+            return (ArrayList<ItemStack>) input;
         }
     }
     
