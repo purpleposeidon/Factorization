@@ -1,3 +1,15 @@
+0.8.03
+  Ported to 1.6.2
+  Did some weeding:
+    Bye-bye wand of cooling, inverium, craft packets
+    BoH limited to 16 columns
+  Bug fixes:
+    battery item renderer
+    Fixed item drop backlog breaking
+  Tweaks:
+    Servo inventory limited to 4 items; this might cause item loss, but won't matter because they're creative-mode only.
+    Tons more grinder recipes
+
 0.8.01
   Everything now supports comparators
   Fixed smooth turning in servos

@@ -106,7 +106,7 @@ So, rewriting it. When the player gets embedded onto a DSE:
 REARCHITECTING
 --------------
 Kill Wrath (This will make the mod so much simpler...):
-  - Wrath lamp will take something inverium'd (dark iron? That might be a bit too... intense.)
+  - Wrath lamp will require a ton of nebulae to craft
   - Dark iron obtained in ore form from asteroids (or if that takes too long, from inverium-ing iron blocks)
   - Actual wrath fire will be gone. So:
       - No more wrath forges
@@ -114,32 +114,29 @@ Kill Wrath (This will make the mod so much simpler...):
       - No more terrible particle effects
   - This will remove a use for diamond shards.
 
+TO TEST
+-------
+Wrenching parasieves (Probably alright)
+Did the drop bug with BlockFactorization.destroyed_tes get fixed? (Probably alright)
 
 
 TOP LIST (that's become somewhat less tops. Oops.)
 --------
-pocket crafting table seems to have issues under... either netlag or server lag. Change the action keys to be done client-side? Hmm. Are we running them both sides, but the server doesn't keep up? That really doesn't make sense tho. This is pretty important.
-offset silver ore gen by the seed
-somehow the wrong item is dropping? Like, that one list is being weird?
-(test wrenching parasieves)
+pocket crafting table seems to have issues under... either netlag or server lag. Change the action keys to be done client-side? Hmm. Are we running them both sides, but the server doesn't keep up? That really doesn't make sense tho. This is pretty important, since item loss can occur from this!
 make mirrors less of a PITA to break
 make chat line limit less suck
-support abyssal ores by adding oreDiamond, oreLapis, and oreEmerald (Well, there's the other oreFoos I guess too.)
+Can we safely put "oreQuartz" as an OD grinder recipe w/o messing up with Applied Energetics?
 underground silver temples/vaults. With moon lamps? :D
 onInventoryUpdate all the TEs
-fix redstone getting stuck on
-are we wasting a quad on the bottom of the mirror stand?
+fix redstone getting stuck on for servo rail pulses
 bag of holding width tooltip
 breaking lead wiring with fist doesn't drop
-maybe make dev builds public or so...
 determine what the real colors of all these raw glazes are
 smooth sandstone double slab (Are there other variants?)
 The new IInventory has stuff for preventing things from being put into slots. All machines, and especially routers.
 Tossing barrels (Or, well, anything) through mystcraft portals with the gravity gun
 Look at what errors we get if the FZDS code isn't in
 either bats are spawning in the hammer dimension, or we're getting entity updates that we shouldn't be
-Grinder acting weird?
-Forestry liquid containers/vanilla water bottles working in the mixer
 Misc Nonsense:
   fix vanilla's middle clicking
 notification system upgrade:
@@ -148,9 +145,6 @@ notification system upgrade:
   be able to send an item along with the message. It'll serialize it & stuff. And then there'll be format messages that control how the item is shown: the item name, the item name + the extra information, render the item in-line with the text, or render the item to the side of the message
   extra controls for clearing up other notifications: get rid of nearby messages (barrels), start fading the message away as soon as it shows up (energy measurements), remove any messages that have the same typename as this one, leave the message up for # seconds
 Modularize FZ/astro so that astro has no deps & can be removed for public release
-regularize fluid volumes for mixer/crystallizer; how can we make buckets of aqua regia?
-either figure out how to get mystcraft (?) loading TEs properly, or have the client automatically request the proper TE
-  (perhaps change that new TileEntity() in BlockFZ to new UnloadedFZTE()
 Config option for ore processing output
 configuration method for adding ores?
 test with dedicated server (not from eclipse....)
