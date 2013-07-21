@@ -323,7 +323,7 @@ public class BlockFactorization extends BlockContainer {
             NBTTagCompound tag = new NBTTagCompound();
             tag.setInteger("storage", bat.storage);
             is.setTagCompound(tag);
-            Core.registry.battery.normalizeDamage(is);
+            //Core.registry.battery.normalizeDamage(is);
         }
         if (f.getFactoryType() == FactoryType.LEYDENJAR) {
             //TODO: refactor, is lameness
@@ -361,7 +361,7 @@ public class BlockFactorization extends BlockContainer {
         //itemList.add(reg.sentrydemon_item);
 
         //electric
-        itemList.add(reg.battery_item_hidden);
+        //itemList.add(reg.battery_item_hidden);
         if (reg.battery != null) {
             //These checks are for buildcraft, which is hatin'.
             itemList.add(new ItemStack(reg.battery, 1, 2));
