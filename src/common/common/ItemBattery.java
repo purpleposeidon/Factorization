@@ -10,12 +10,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import factorization.api.IActOnCraft;
+import factorization.common.Core.TabType;
 
 public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     //3 States: Empty. Enough for 1 magnet. Enough for 2 magnets.
     public ItemBattery(int id) {
-        super(id, Core.registry.battery_item_hidden);
-        setUnlocalizedName("factorization:charge_battery");
+        super(id, Core.registry.battery_item_hidden, "charge_battery", TabType.CHARGE);
         setMaxStackSize(1);
         setMaxDamage(0); //'2' is not the number for this.
         setNoRepair();
@@ -47,7 +47,7 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     }
 
     @Override
-    public void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
+    public void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         if (is.getTagCompound() != null && is.getTagCompound().hasKey("storage")) {
             float fullness = TileEntityBattery.getFullness(getStorage(is));
             list.add((int) (fullness * 100) + "% charged");

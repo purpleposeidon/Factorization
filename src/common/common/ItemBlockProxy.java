@@ -1,21 +1,19 @@
 package factorization.common;
 
-import java.util.List;
-
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import factorization.common.Core.TabType;
 
-public class ItemBlockProxy extends Item {
+public class ItemBlockProxy extends ItemFactorization {
     //TODO: Why doesn't this just extend ItemBlock?
     ItemStack proxy;
     int blockID;
 
-    protected ItemBlockProxy(int par1, ItemStack proxy) {
-        super(par1);
+    protected ItemBlockProxy(int id, ItemStack proxy, String name, TabType tabType) {
+        super(id, name, tabType);
         this.proxy = proxy.copy();
         this.blockID = ((ItemBlock) proxy.getItem()).getBlockID();
     }
@@ -86,7 +84,7 @@ public class ItemBlockProxy extends Item {
         {
             return false;
         }
-        else if (par3World.canPlaceEntityOnSide(this.blockID, par4, par5, par6, false, par7, par2EntityPlayer, par1ItemStack))
+        else if (par3World.canPlaceEntityOnSide(this.blockID, par4, par5, par6, false, par7, /*par2EntityPlayer*/ null /* Changed to null in 1.6.2. Was previously the player. And sometime before that was null. Like, seriously, wtf? */, par1ItemStack))
         {
             Block block = Block.blocksList[this.blockID];
             int j1 = this.getMetadata(par1ItemStack.getItemDamage());
@@ -110,10 +108,5 @@ public class ItemBlockProxy extends Item {
     @Override
     public boolean getShareTag() {
         return true;
-    }
-    
-    @Override
-    public void addInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
-        Core.brand(is, player, infoList, verbose);
     }
 }
