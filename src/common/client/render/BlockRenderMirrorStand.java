@@ -20,8 +20,10 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
     
     private static Quaternion mirrorTilt = Quaternion.getRotationQuaternionRadians(Math.toRadians(-45), 1, 0, 0);
     @Override
-    protected
-    void render(RenderBlocks rb) {
+    protected void render(RenderBlocks rb) {
+        if (!world_mode) {
+            return;
+        }
         Core.profileStart("mirror");
         float height = 7.25F / 16F;
         float radius = 1F / 16F;
