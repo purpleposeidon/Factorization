@@ -360,7 +360,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
             }
         } else {
             draw_active = (draw_active > 0) ? (byte)(draw_active - 1) : 0;
-            if (need_logic_check && 0 == worldObj.getWorldTime() % getLogicSpeed()) {
+            if (need_logic_check && 0 == worldObj.getTotalWorldTime() % getLogicSpeed()) {
                 need_logic_check = false;
                 doLogic();
             }
