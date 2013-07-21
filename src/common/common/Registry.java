@@ -856,11 +856,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'I', Item.ingotIron,
                 '*', diamond_cutting_head,
                 'M', motor);
-        TileEntityGrinder.addRecipe(new ItemStack(Block.stone), new ItemStack(Block.cobblestone), 1);
-        TileEntityGrinder.addRecipe(new ItemStack(Block.cobblestone), new ItemStack(Block.gravel), 1);
-        TileEntityGrinder.addRecipe(new ItemStack(Block.gravel), new ItemStack(Block.sand), 1);
-        TileEntityGrinder.addRecipe(new ItemStack(Block.grass), new ItemStack(Block.dirt), 1);
-        TileEntityGrinder.addRecipe(new ItemStack(Block.mycelium), new ItemStack(Block.dirt), 1);
         
         //Values based on Fortune I
         TileEntityGrinder.addRecipe(new ItemStack(Block.oreCoal), new ItemStack(Item.coal), 1.5F);
@@ -870,8 +865,57 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         TileEntityGrinder.addRecipe(new ItemStack(Block.oreNetherQuartz), new ItemStack(Item.netherQuartz), 1.5F /* It should actually be 1.25, but I feel like being generous here. */);
         TileEntityGrinder.addRecipe(new ItemStack(Block.oreLapis), new ItemStack(Item.dyePowder, 1, 4), 8.5F);
         
-        //Deconstruction recipes
-        TileEntityGrinder.addRecipe(new ItemStack(Block.glowStone), new ItemStack(Item.glowstone, 1, 4), 4F);
+        //VANILLA RECIPES
+        //These are based on going through the Search tab in the creative menu
+        //When we turn the Grinder into a Lacerator, anything not specified here will be broken in the usual manner.
+        TileEntityGrinder.addRecipe(Block.stone, new ItemStack(Block.cobblestone), 1);
+        TileEntityGrinder.addRecipe(Block.cobblestone, new ItemStack(Block.gravel), 1);
+        TileEntityGrinder.addRecipe("treeSapling", new ItemStack(Item.stick), 1.25F);
+        TileEntityGrinder.addRecipe(Block.gravel, new ItemStack(Block.sand), 1);
+        TileEntityGrinder.addRecipe("treeLeaves", new ItemStack(Item.stick), 0.5F);
+        TileEntityGrinder.addRecipe(Block.glass, new ItemStack(Block.sand), 0.1F);
+        TileEntityGrinder.addRecipe(Block.web, new ItemStack(Item.silk), 0.25F);
+        TileEntityGrinder.addRecipe(Block.brick, new ItemStack(Item.brick), 3.5F);
+        TileEntityGrinder.addRecipe(Block.cobblestoneMossy, new ItemStack(Block.gravel), 1);
+        //Now's a fine time to add the mob spawner
+        TileEntityGrinder.addRecipe(Block.mobSpawner, new ItemStack(Block.fenceIron), 2.5F);
+        //No stairs, no slabs.
+        //Chest, but we don't want to support wood transmutes.
+        TileEntityGrinder.addRecipe(Block.furnaceIdle, new ItemStack(Block.cobblestone), 7F);
+        TileEntityGrinder.addRecipe(Block.furnaceBurning, new ItemStack(Block.stone), 7F);
+        TileEntityGrinder.addRecipe(Block.ladder, new ItemStack(Item.stick), 1.5F);
+        TileEntityGrinder.addRecipe(Block.snow, new ItemStack(Item.snowball), 0.25F);
+        TileEntityGrinder.addRecipe(Block.blockSnow, new ItemStack(Item.snowball), 4F);
+        TileEntityGrinder.addRecipe(Block.blockClay, new ItemStack(Item.clay), 4F);
+        TileEntityGrinder.addRecipe(Block.fence, new ItemStack(Item.stick), 2.5F);
+        //Netherrack dust is handled elsewhere!
+        TileEntityGrinder.addRecipe(Block.glowStone, new ItemStack(Item.glowstone, 1, 4), 4F);
+        TileEntityGrinder.addRecipe(Block.trapdoor, new ItemStack(Item.stick), 3.5F);
+        TileEntityGrinder.addRecipe(Block.stoneBrick, new ItemStack(Block.cobblestone), 0.75F);
+        TileEntityGrinder.addRecipe(Block.thinGlass, new ItemStack(Block.sand), 0.1F/16F);
+        TileEntityGrinder.addRecipe(Block.melon, new ItemStack(Item.melon), 7.75F);
+        TileEntityGrinder.addRecipe(Block.fenceGate, new ItemStack(Item.stick), 2.5F);
+        TileEntityGrinder.addRecipe(Block.netherBrick, new ItemStack(Item.netherrackBrick), 3.5F);
+        TileEntityGrinder.addRecipe(Block.netherFence, new ItemStack(Item.netherrackBrick), 2.5F);
+        //TODO: Asbestos from endstone
+        TileEntityGrinder.addRecipe(Block.redstoneLampActive, new ItemStack(Item.glowstone), 4F);
+        TileEntityGrinder.addRecipe(Block.redstoneLampIdle, new ItemStack(Item.glowstone), 4F);
+        //Don't want to be responsible for some netherstar exploit involving a beacon, so no beacon.
+        //Walls have weird geometry
+        TileEntityGrinder.addRecipe(Block.blockNetherQuartz, new ItemStack(Item.netherQuartz), 3.5F);
+        TileEntityGrinder.addRecipe(Block.field_111038_cB /* blockHay */, new ItemStack(Item.wheat), 8.25F);
+        
+        //So, that's blocks. How about items?
+        TileEntityGrinder.addRecipe(Item.book, new ItemStack(Item.leather), 0.75F); //Naughty.
+        TileEntityGrinder.addRecipe(Item.enchantedBook, new ItemStack(Item.leather), 0.9F);
+        //NOTE: We're going to have to do something tricksy for the lacerator...
+        //These go to Block.skull, but the item damagevalue != block metadata.
+        TileEntityGrinder.addRecipe(new ItemStack(Item.skull, 1, 0 /* skele */), new ItemStack(Item.dyePowder, 1, 15 /* bonemeal */), 6.5F);
+        TileEntityGrinder.addRecipe(new ItemStack(Item.skull, 1, 2 /* zombie */), new ItemStack(Item.rottenFlesh), 2.5F);
+        TileEntityGrinder.addRecipe(new ItemStack(Item.skull, 1, 3 /* player */), new ItemStack(Item.rottenFlesh), 3.5F);
+        TileEntityGrinder.addRecipe(new ItemStack(Item.skull, 1, 4 /* creeper */), new ItemStack(Item.gunpowder), 1.5F);
+        
+        
         
         oreRecipe(mixer_item,
                 " X ",
