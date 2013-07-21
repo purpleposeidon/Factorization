@@ -195,7 +195,7 @@ public class BlockFactorization extends BlockContainer {
     
     @Override
     public void registerIcons(IconRegister reg) {
-        FactorizationTextureLoader.register(reg, BlockIcons.class);
+        FactorizationTextureLoader.register(reg, BlockIcons.class, null, "factorization:");
         Core.proxy.texturepackChanged();
     }
     

@@ -20,7 +20,7 @@ public class ItemPocketTable extends ItemFactorization {
     @Override
     public void registerIcons(IconRegister reg) {
         super.registerIcons(reg);
-        FactorizationTextureLoader.register(reg, ItemIcons.class);
+        FactorizationTextureLoader.register(reg, ItemIcons.class, null, "factorization:");
     }
 
     @Override
