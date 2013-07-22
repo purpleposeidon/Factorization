@@ -6,7 +6,6 @@ import java.util.List;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 
@@ -80,18 +79,7 @@ public class TileEntityStamper extends TileEntityFactorization {
         super.writeToNBT(tag);
         saveItem("input", tag, input);
         saveItem("output", tag, output);
-        if (outputBuffer.size() > 0) {
-            NBTTagList buffer = new NBTTagList();
-            for (ItemStack item : outputBuffer) {
-                if (item == null) {
-                    continue;
-                }
-                NBTTagCompound btag = new NBTTagCompound();
-                item.writeToNBT(btag);
-                buffer.appendTag(btag);
-            }
-            tag.setTag("buffer", buffer);
-        }
+        writeBuffer("buffer", tag, outputBuffer);
     }
 
     @Override
@@ -99,17 +87,7 @@ public class TileEntityStamper extends TileEntityFactorization {
         super.readFromNBT(tag);
         input = readItem("input", tag);
         output = readItem("output", tag);
-        outputBuffer.clear();
-        if (tag.hasKey("buffer")) {
-            NBTTagList buffer = tag.getTagList("buffer");
-            int bufferSize = buffer.tagCount();
-            if (bufferSize > 0) {
-                for (int i = 0; i < bufferSize; i++) {
-                    final NBTTagCompound it = (NBTTagCompound) buffer.tagAt(i);
-                    outputBuffer.add(ItemStack.loadItemStackFromNBT(it));
-                }
-            }
-        }
+        readBuffer("buffer", tag, outputBuffer);
     }
 
     boolean canMerge(List<ItemStack> items) {

@@ -2,6 +2,7 @@ package factorization.common;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -12,6 +13,7 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
@@ -181,6 +183,35 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         }
     }
 
+    protected final void writeBuffer(String bufferName, NBTTagCompound tag, ArrayList<ItemStack> outputBuffer) {
+        if (outputBuffer.size() > 0) {
+            NBTTagList buffer = new NBTTagList();
+            for (ItemStack item : outputBuffer) {
+                if (item == null) {
+                    continue;
+                }
+                NBTTagCompound btag = new NBTTagCompound();
+                item.writeToNBT(btag);
+                buffer.appendTag(btag);
+            }
+            tag.setTag(bufferName, buffer);
+        }
+    }
+    
+    protected final void readBuffer(String bufferName, NBTTagCompound tag, ArrayList<ItemStack> outputBuffer) {
+        outputBuffer.clear();
+        if (tag.hasKey(bufferName)) {
+            NBTTagList buffer = tag.getTagList(bufferName);
+            int bufferSize = buffer.tagCount();
+            if (bufferSize > 0) {
+                for (int i = 0; i < bufferSize; i++) {
+                    final NBTTagCompound it = (NBTTagCompound) buffer.tagAt(i);
+                    outputBuffer.add(ItemStack.loadItemStackFromNBT(it));
+                }
+            }
+        }
+    }
+    
     public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
         return false;
     }
