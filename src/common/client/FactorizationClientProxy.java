@@ -382,7 +382,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 FactoryType.PACKAGER,
                 FactoryType.SLAGFURNACE,
                 FactoryType.SOLARBOILER,
-                FactoryType.PARASIEVE
+                FactoryType.PARASIEVE,
+                FactoryType.COMPRESSIONCRAFTER
                 }) {
             FactorizationBlockRender.setDefaultRender(ft);
         }
