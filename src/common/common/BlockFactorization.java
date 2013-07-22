@@ -385,6 +385,7 @@ public class BlockFactorization extends BlockContainer {
         itemList.add(reg.router_item);
         itemList.add(reg.servorail_item);
         itemList.add(reg.lamp_item);
+        itemList.add(reg.compression_crafter_item);
     }
 
     @Override
