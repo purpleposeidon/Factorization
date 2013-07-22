@@ -15,6 +15,7 @@ import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
@@ -38,7 +39,8 @@ public class RenderServoMotor extends RenderEntity {
 
     void loadSprocketModel() {
         //IModelCustom sprocket = AdvancedModelLoader.loadModel(Core.model_dir + "sprocket/sprocket.obj");
-        IModelCustom sprocket = AdvancedModelLoader.loadModel("/assets/factorization/models/sprocket/sprocket.obj"); //TODO: Resourceify!
+        //IModelCustom sprocket = AdvancedModelLoader.loadModel("/assets/factorization/models/sprocket/sprocket.obj"); //TODO: Resourceify!
+        IModelCustom sprocket = AdvancedModelLoader.loadModel("factorization:models/sprocket/sprocket.obj"); //TODO: Resourceify!
         sprocket_display_list = GLAllocation.generateDisplayLists(1);
         GL11.glNewList(sprocket_display_list, GL11.GL_COMPILE);
         sprocket.renderAll();
@@ -166,16 +168,24 @@ public class RenderServoMotor extends RenderEntity {
         boolean render_stacks = false;
         if (highlighted) {
             GL11.glDisable(GL11.GL_TEXTURE_2D);
-            boolean dso = debug_servo_orientation;
-            debug_servo_orientation = false;
-            GL11.glColor4f(0.0F, 0.75F, 0.75F, 0.11F);
             GL11.glEnable(GL11.GL_BLEND);
+            GL11.glDisable(GL11.GL_LIGHTING);
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            renderMainModel(motor, partial, ro, true);
-            debug_servo_orientation = dso;
+            float gray = 0.65F;
+            GL11.glColor4f(gray, gray, gray, 0.8F);
+            GL11.glLineWidth(1.5F);
+            GL11.glDepthMask(false);
+            Minecraft mc = Minecraft.getMinecraft();
+            float d = 1F, h = 0.25F;
+            AxisAlignedBB ab = AxisAlignedBB.getBoundingBox(-d, -h, -d, d, h, d);
+            mc.renderGlobal.drawOutlinedBoundingBox(ab);
+            ab.offset(ab.minX, ab.minY, ab.minZ);
             GL11.glEnable(GL11.GL_TEXTURE_2D);
-            GL11.glColor4f(1, 1, 1, 1);
             GL11.glDisable(GL11.GL_BLEND);
+            GL11.glEnable(GL11.GL_LIGHTING);
+            
+            
+            
             EntityPlayer player = Core.proxy.getClientPlayer();
             if (player != null) {
                 ItemStack is = player.getHeldItem();
