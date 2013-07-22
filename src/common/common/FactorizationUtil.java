@@ -1104,7 +1104,7 @@ public class FactorizationUtil {
     
     private static ThreadLocal<ArrayList<ForgeDirection>> direction_cache = new ThreadLocal<ArrayList<ForgeDirection>>();
 
-    public static ArrayList<ForgeDirection> dirtyDirectionCache() {
+    public static ArrayList<ForgeDirection> dirtyDirectionCache() { //NORELEASE There's a thin in ForgeDirection for this.
         ArrayList<ForgeDirection> ret = direction_cache.get();
         if (ret == null) {
             ret = new ArrayList(6);
@@ -1180,7 +1180,9 @@ public class FactorizationUtil {
         return craft3x3(where, fake, slots3x3);
     }
     
+    public static boolean craft_succeeded = false;
     public static List<ItemStack> craft3x3(TileEntity where, boolean fake, ItemStack... slots) {
+        craft_succeeded = false;
         // Return the crafting result, and any leftover ingredients (buckets)
         // If the crafting recipe fails, return our contents.
         if (wantSize(9, where, slots)) {
@@ -1198,6 +1200,7 @@ public class FactorizationUtil {
         final ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
         if (fake) {
             ret.add(result);
+            craft_succeeded = true;
             return ret;
         }
         Coord pos = null;
@@ -1217,6 +1220,7 @@ public class FactorizationUtil {
         FactorizationUtil.addInventoryToArray(craft, ret);
         FactorizationUtil.addInventoryToArray(fakePlayer.inventory, ret);
 
+        craft_succeeded = true;
         return ret;
     }
 }
