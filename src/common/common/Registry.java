@@ -71,7 +71,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             leadwire_item, grinder_item, mixer_item, crystallizer_item,
             greenware_item,
             rocket_engine_item_hidden,
-            parasieve_item;
+            parasieve_item,
+            compression_crafter_item;
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item;
     public ItemStack is_factory, is_lamp, is_lightair;
@@ -194,6 +195,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         router_item = FactoryType.ROUTER.itemStack();
         servorail_item = FactoryType.SERVORAIL.itemStack();
         parasieve_item = FactoryType.PARASIEVE.itemStack();
+        compression_crafter_item = FactoryType.COMPRESSIONCRAFTER.itemStack();
         barrel_item = FactoryType.BARREL.itemStack();
         stamper_item = FactoryType.STAMPER.itemStack();
         lamp_item = FactoryType.LAMP.itemStack();
