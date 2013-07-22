@@ -163,6 +163,18 @@ public class TileEntityBarrel extends TileEntityFactorization {
         }
         return null;
     }
+    
+    @Override
+    public boolean canExtractItem(int slot, ItemStack is, int _side) {
+        if (item == null) {
+            return false;
+        }
+        ForgeDirection side = ForgeDirection.getOrientation(_side);
+        if (side == ForgeDirection.DOWN) {
+            return FactorizationUtil.couldMerge(is, item);
+        }
+        return false;
+    }
 
     static int sizeOf(ItemStack is) {
         if (is == null) {
