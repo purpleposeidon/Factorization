@@ -39,7 +39,9 @@ public class BlockIcons {
         leyden_metal, leyden_rim, leyden_glass, leyden_glass_side, leyden_knob;
     
     @Directory("craft")
-    public static BlockIcons.ActivatingMachineIcon maker, stamper, packager;
+    public static BlockIcons.ActivatingMachineIcon stamper, packager;
+    
+    public static Icon compactFace, compactBack, compactSide;
     
     @Directory("machine")
     public static Icon
@@ -48,6 +50,7 @@ public class BlockIcons {
         grinder_bottom, grinder_top, grinder_side, grinder_bottom_top_edge,
         heater_heat, heater_spiral,
         parasieve_front, parasieve_side, parasieve_back;
+    
     @Directory("machine")
     public static SimpleMachine slag_furnace;
     public static Icon machine$slag_furnace_face_on;
