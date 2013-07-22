@@ -35,6 +35,7 @@ public enum FactoryType {
     LEYDENJAR(26, false, TileEntityLeydenJar.class, "factory_leyjar"), //inefficient bulk energy storage
     SERVORAIL(27, false, TileEntityServoRail.class, "factory_rail"),
     PARASIEVE(28, true, TileEntityParaSieve.class, "factory_sieve"),
+    COMPRESSIONCRAFTER(29, false, TileEntityCompressionCrafter.class, "factory_compact"),
     
 
     POCKETCRAFTGUI(101, true)
