@@ -25,6 +25,7 @@ import com.google.common.io.ByteArrayDataOutput;
 
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
+import factorization.common.FactorizationUtil;
 
 public class Coord implements IDataSerializable {
     public World w;
@@ -725,5 +726,35 @@ public class Coord implements IDataSerializable {
             return 0;
         }
         return b.getComparatorInputOverride(w, x, y, z, side.ordinal());
+    }
+    
+    private static Vec3 nullVec = Vec3.createVectorHelper(0, 0, 0);
+    public ItemStack getPickBlock(ForgeDirection dir) {
+        Block b = getBlock();
+        if (b == null) {
+            return null;
+        }
+        MovingObjectPosition mop = createMop(dir, nullVec);
+        return b.getPickBlock(mop, w, x, y, z);
+    }
+    
+    public ItemStack getBrokenBlock() {
+        Block b = getBlock();
+        if (b == null) {
+            return null;
+        }
+        ArrayList<ItemStack> dropped = b.getBlockDropped(w, x, y, z, getMd(), 0);
+        if (dropped == null || dropped.isEmpty()) {
+            return null;
+        }
+        ItemStack main = dropped.remove(0);
+        for (int i = 0; i < dropped.size(); i++) {
+            ItemStack other = dropped.get(i);
+            if (!FactorizationUtil.couldMerge(main, other)) {
+                return null;
+            }
+            main.stackSize += other.stackSize;
+        }
+        return main;
     }
 }

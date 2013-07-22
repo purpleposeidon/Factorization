@@ -64,7 +64,9 @@ public class DeltaCoord implements IDataSerializable {
     }
     
     public ForgeDirection getDirection() {
-        for (ForgeDirection d : ForgeDirection.values()) {
+        ForgeDirection[] values = ForgeDirection.VALID_DIRECTIONS;
+        for (int i = 0; i < values.length; i++) {
+            ForgeDirection d = values[i];
             if (d.offsetX == x && d.offsetY == y && d.offsetZ == z) {
                 return d;
             }
