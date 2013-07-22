@@ -276,7 +276,6 @@ public class ItemBagOfHolding extends ItemFactorization implements IActOnCraft {
     }
 
     @Override
-    //-- XXX Waiting for MCP update
     public boolean getShareTag() {
         //Note: This function might be removed/unnecessary next MC version or something...
         return true;
