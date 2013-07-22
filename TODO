@@ -123,7 +123,6 @@ Did the drop bug with BlockFactorization.destroyed_tes get fixed? (Probably alri
 TOP LIST (that's become somewhat less tops. Oops.)
 --------
 pocket crafting table seems to have issues under... either netlag or server lag. Change the action keys to be done client-side? Hmm. Are we running them both sides, but the server doesn't keep up? That really doesn't make sense tho. This is pretty important, since item loss can occur from this!
-make mirrors less of a PITA to break
 make chat line limit less suck
 Can we safely put "oreQuartz" as an OD grinder recipe w/o messing up with Applied Energetics?
 underground silver temples/vaults. With moon lamps? :D
@@ -133,8 +132,6 @@ bag of holding width tooltip
 breaking lead wiring with fist doesn't drop
 determine what the real colors of all these raw glazes are
 smooth sandstone double slab (Are there other variants?)
-The new IInventory has stuff for preventing things from being put into slots. All machines, and especially routers.
-Tossing barrels (Or, well, anything) through mystcraft portals with the gravity gun
 Look at what errors we get if the FZDS code isn't in
 either bats are spawning in the hammer dimension, or we're getting entity updates that we shouldn't be
 Misc Nonsense:
