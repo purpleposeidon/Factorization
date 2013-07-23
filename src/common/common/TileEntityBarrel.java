@@ -171,7 +171,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
         }
         ForgeDirection side = ForgeDirection.getOrientation(_side);
         if (side == ForgeDirection.DOWN) {
-            return FactorizationUtil.couldMerge(is, item);
+            return itemMatch(is);
         }
         return false;
     }
@@ -188,7 +188,9 @@ public class TileEntityBarrel extends TileEntityFactorization {
             return false;
         }
         item.stackSize = is.stackSize;
-        return FactorizationUtil.couldMerge(item, is);
+        boolean b = FactorizationUtil.couldMerge(item, is);
+        item.stackSize = 1;
+        return b;
     }
 
     @Override
