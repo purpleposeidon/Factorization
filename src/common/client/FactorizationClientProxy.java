@@ -354,6 +354,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             setTileEntityRenderer(TileEntityCrystallizer.class, new TileEntityCrystallizerRender());
             setTileEntityRenderer(TileEntitySteamTurbine.class, new TileEntitySteamTurbineRender());
             setTileEntityRenderer(TileEntityLeydenJar.class, new TileEntityLeydenJarRender());
+            setTileEntityRenderer(TileEntityCompressionCrafter.class, new TileEntityCompressionCrafterRenderer());
             // End section that is azanor's fault
         }
 
@@ -372,6 +373,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderGrinder();
         new BlockRenderMixer();
         new BlockRenderCrystallizer();
+        new BlockRenderCompressionCrafter();
         new BlockRenderGreenware().setup();
         new BlockRenderRocketEngine();
         new BlockRenderServoRail();
@@ -382,8 +384,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 FactoryType.PACKAGER,
                 FactoryType.SLAGFURNACE,
                 FactoryType.SOLARBOILER,
-                FactoryType.PARASIEVE,
-                FactoryType.COMPRESSIONCRAFTER
+                FactoryType.PARASIEVE
                 }) {
             FactorizationBlockRender.setDefaultRender(ft);
         }

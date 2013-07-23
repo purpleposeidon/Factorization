@@ -598,7 +598,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 //
                 ServoRailDecor = 161, ServoRailDecorUpdate = 162,
                 //
-                CompressionCrafter = 163;
+                CompressionCrafter = 163, CompressionCrafterBeginCrafting = 164;
     }
 
 }

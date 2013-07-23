@@ -41,7 +41,8 @@ public class BlockIcons {
     @Directory("craft")
     public static BlockIcons.ActivatingMachineIcon stamper, packager;
     
-    public static Icon compactFace, compactBack, compactSide;
+    @Directory("machine")
+    public static Icon compactFace, compactBack, compactSide, compactSideSlide;
     
     @Directory("machine")
     public static Icon

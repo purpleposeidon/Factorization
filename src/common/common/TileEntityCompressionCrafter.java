@@ -20,7 +20,16 @@ import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityCompressionCrafter extends TileEntityCommon {
-
+    //NORELEASE: CompACT bugs:
+    // localizations
+    // recipes
+    // item rendering
+    // inefficiency of implementation. >_>
+    // crafting >1 item at a time
+    // texture
+    // redstone signal update issue
+    // the packet isn't getting sent from every compactor.
+    
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.COMPRESSIONCRAFTER;
@@ -35,8 +44,12 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     byte b_facing = (byte) ForgeDirection.UP.ordinal();
     final ArrayList<ItemStack> outputBuffer = new ArrayList(4);
     
-    ForgeDirection getFacing() {
+    public ForgeDirection getFacing() {
         return ForgeDirection.getOrientation(b_facing);
+    }
+    
+    public float getProgressPerc() {
+        return Math.max(progress, 0)/20F;
     }
     
     @Override
@@ -61,15 +74,10 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         ForgeDirection f = getFacing();
         if (dir == f) {
             return BlockIcons.compactFace;
-        }
-        return BlockIcons.dark_iron_block;
-        /*
-        if (dir == f) {
-            return BlockIcons.compactFace;
         } else if (dir == f.getOpposite()) {
             return BlockIcons.compactBack;
         }
-        return BlockIcons.compactSide;*/
+        return BlockIcons.compactSide;
     }
     
     @Override
@@ -81,11 +89,8 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     
     @Override
     public void updateEntity() {
-        if (worldObj.isRemote) {
-            return; //NORELEASE: Can take this out client-side?w
-        }
         if (progress != 0 && progress++ == 20) {
-            if (getFacing() != ForgeDirection.UNKNOWN) {
+            if (!worldObj.isRemote && getFacing() != ForgeDirection.UNKNOWN) {
                 craft(false);
             }
             progress = -10;
@@ -104,6 +109,10 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         }
         if (craft(true)) {
             progress = 1;
+            TileEntityCompressionCrafter cc = findEdgeRoot();
+            if (cc != null) {
+                spreadCraftingAction();
+            }
         }
     }
     
@@ -168,6 +177,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     
     static class CellInfo {
         static final int BARREL = 0, BREAK = 1, SMACKED = 2, PICKED = 3, length = 4;
+        //TODO: Crafting with liquids would be rad
         
         final Coord cell;
         ItemStack[] items = new ItemStack[length];
@@ -176,6 +186,9 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
             this.cell = cell;
             TileEntityBarrel barrel = cell.getTE(TileEntityBarrel.class);
             if (barrel != null) {
+                if (barrel.item == null) {
+                    return;
+                }
                 ItemStack b = barrel.item.copy();
                 b.stackSize = 1;
                 items[BARREL] = b;
@@ -253,7 +266,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         }
         final ForgeDirection up = getFacing();
         final ForgeDirection right = getRightDirection();
-        final int height = getPairDistance() - 1;
+        int height = getPairDistance() - 1;
         if (height < 0) {
             return null;
         }
@@ -261,7 +274,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         if (otherEdge == null) {
             return null;
         }
-        final int width = otherEdge.getPairDistance() - 1;
+        int width = otherEdge.getPairDistance() - 1;
         if (width < 0) {
             return null;
         }
@@ -285,7 +298,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     };
     
     private static int cellIndex(int x, int y) {
-        return cellIndices[y][2 - x];
+        return cellIndices[2 - y][x];
     }
     
     private TileEntityCompressionCrafter look(ForgeDirection d) {
@@ -344,11 +357,28 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     
     private ForgeDirection getRightDirection() {
         //"The right chest is obviously the right one" -- etho, badly quoted.
+        ForgeDirection fd = getFacing();
         Coord here = getCoord();
         ForgeDirection[] validDirections = ForgeDirection.VALID_DIRECTIONS;
         for (int i = 0; i < validDirections.length; i++) {
             ForgeDirection dir = validDirections[i];
-            if (isFrame(here.add(dir))) {
+            if (dir == fd || dir == fd.getOpposite()) {
+                continue;
+            }
+            TileEntityCompressionCrafter cc = here.add(dir).getTE(TileEntityCompressionCrafter.class);
+            if (cc != null && cc.getFacing() == fd) {
+                return dir;
+            }
+        }
+        //Could be 1xn.
+        Coord front = here.add(fd);
+        for (int i = 0; i < validDirections.length; i++) {
+            ForgeDirection dir = validDirections[i];
+            if (dir == fd || dir == fd.getOpposite()) {
+                continue;
+            }
+            TileEntityCompressionCrafter cc = front.add(dir).getTE(TileEntityCompressionCrafter.class);
+            if (cc != null && cc.getFacing().getOpposite() == dir) {
                 return dir;
             }
         }
@@ -403,6 +433,22 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         return -1;
     }
     
+    TileEntityCompressionCrafter getPair() {
+        final ForgeDirection cd = getFacing();
+        Coord here = getCoord();
+        for (int i = 1; i <= 4; i++) {
+            here.adjust(cd);
+            TileEntityCompressionCrafter cc = here.getTE(TileEntityCompressionCrafter.class);
+            if (cc != null) {
+                if (cc.getFacing().getOpposite() != cd) {
+                    return null;
+                }
+                return cc;
+            }
+        }
+        return null;
+    }
+    
     @Override
     public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
@@ -413,6 +459,10 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
             progress = input.readByte();
             return true;
         }
+        if (messageType == MessageType.CompressionCrafterBeginCrafting) {
+            progress = 1;
+            return true;
+        }
         return false;
     }
     
@@ -421,4 +471,34 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         return getDescriptionPacketWith(MessageType.CompressionCrafter, b_facing, progress);
     }
     
+    void spreadCraftingAction() {
+        informAction();
+        TileEntityCompressionCrafter cc = getOtherSideRoot(getRightDirection());
+        if (cc != null) {
+            cc.informAction();
+        }
+    }
+    
+    void informAction() {
+        final ForgeDirection right = getRightDirection();
+        TileEntityCompressionCrafter here = this;
+        Coord at = getCoord();
+        for (int i = 1; i <= 4; i++) {
+            here.informClient();
+            TileEntityCompressionCrafter cc = here.getPair();
+            if (cc != null) {
+                cc.informClient();
+            }
+            at.adjust(right);
+            here = at.getTE(TileEntityCompressionCrafter.class);
+            if (here == null) {
+                break;
+            }
+        }
+    }
+    
+    void informClient() {
+        broadcastMessage(null, MessageType.CompressionCrafterBeginCrafting);
+        progress = 1;
+    }
 }
