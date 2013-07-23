@@ -94,8 +94,6 @@ public class MiscClientProxy extends MiscProxy {
             player.sendChatMessage("/me is at " + ((int) player.posX) + ", " + ((int) player.posY) + ", " + ((int) player.posZ));
         } else if (n.equalsIgnoreCase("saveoptions") || n.equalsIgnoreCase("savesettings") || n.equalsIgnoreCase("so") || n.equalsIgnoreCase("ss")) {
             mc.gameSettings.saveOptions();
-        } else if (n.equalsIgnoreCase("relang")) {
-            Core.registry.loadLanguages();
         } else if (n.equalsIgnoreCase("render_above") || n.equalsIgnoreCase("render_everything_lagfest")) {
             Object wr_list = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, 5);
             if (!(wr_list instanceof WorldRenderer[])) {

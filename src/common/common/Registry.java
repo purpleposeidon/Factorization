@@ -1,9 +1,5 @@
 package factorization.common;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -42,7 +38,6 @@ import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
 import factorization.common.Core.TabType;
@@ -1170,29 +1165,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     @Override
     public String getLabel() {
         return "FZ_registry";
-    }
-    
-    public void loadLanguages() {
-        URL url = this.getClass().getResource(FzConfig.language_file);
-        if (url == null) {
-            Core.logSevere("Language file %s was not found", url);
-            return;
-        }
-        try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
-            String line;
-            while ((line = in.readLine()) != null) {
-                line = line.trim();
-                if (line.startsWith("#") || !line.contains("=")) {
-                    continue;
-                }
-                String parts[] = line.split("=");
-                String key = parts[0], value = parts[1];
-                LanguageRegistry.instance().addStringLocalization(key, value);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     void sendIMC() {

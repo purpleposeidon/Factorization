@@ -121,7 +121,6 @@ public class Core {
 
     @EventHandler
     public void modsLoaded(FMLPostInitializationEvent event) {
-        registry.loadLanguages();
         TileEntityWrathFire.setupBurning();
         TileEntitySolarBoiler.setupSteam();
         foph.addDictOres();
