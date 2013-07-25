@@ -10,11 +10,12 @@ FZ=`pwd`
 OUT=~/Dropbox/dev/Factorization-dev.jar
 
 pushd ../forge/mcp/reobf/minecraft  > /dev/zero
-  cp -R $FZ/texture/mods ./
+  cp -R $FZ/resources/* ./
+  #cp -R $FZ/texture/mods ./
   cp $FZ/*.info ./
   cp $FZ/CHANGELOG ./
-  rm $OUT
-  jar -cf $OUT CHANGELOG *.info factorization/ ./mods
+  rm -f $OUT
+  jar -cf $OUT CHANGELOG *.info factorization/ pack.mcmeta assets/
   #jar -cf ~/Dropbox/dev/$OUT *Factorization*.class *.info factorization/
 popd > /dev/zero
 #pushd ~/mc/

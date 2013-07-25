@@ -13,9 +13,9 @@ pushd src/minecraft/factorization
   ln -s $BASE/src/common/* ./
 popd
 
-pushd src/minecraft/
-  ln -s $BASE/APIS/* ./
-popd
+#pushd src/minecraft/
+#  ln -s $BASE/APIS/* ./
+#popd
 
 pushd lib/
   ln -s $BASE/resources/mods/
