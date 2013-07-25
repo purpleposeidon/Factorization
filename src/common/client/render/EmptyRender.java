@@ -12,6 +12,5 @@ public class EmptyRender extends Render {
     }
     
     @Override
-    protected ResourceLocation getResourceLocationToBind(Entity entity) { return null; }
-
+    protected ResourceLocation getEntityTexture(Entity entity) { return null; }
 }

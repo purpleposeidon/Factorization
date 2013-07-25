@@ -17,7 +17,7 @@ import factorization.api.IChargeConductor;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHandler, IChargeConductor {
-    FluidTank steamTank = new FluidTank(TileEntitySolarBoiler.steam_stack.copy(), 1000*16, this);
+    FluidTank steamTank = new FluidTank(/*this,*/ TileEntitySolarBoiler.steam_stack.copy(), 1000*16);
     Charge charge = new Charge(this);
     int fan_speed = 0;
     public int fan_rotation = 0;

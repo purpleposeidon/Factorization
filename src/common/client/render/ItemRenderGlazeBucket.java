@@ -79,7 +79,7 @@ public class ItemRenderGlazeBucket implements IItemRenderer {
         if (glaze == null) {
             glaze = Core.blockMissingIcon;
         }
-        re.bindResourceTexture(Core.blockAtlas);
+        re.bindTexture(Core.blockAtlas);
         
         double lx = 4, ly = 5;
         double hx = 12, hy = 13;

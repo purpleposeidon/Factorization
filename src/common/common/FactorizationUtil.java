@@ -446,7 +446,7 @@ public class FactorizationUtil {
             if (forceInsert) {
                 return true;
             }
-            return under.isStackValidForSlot(slotIndex(i), is) && couldMerge(get(i), is);
+            return under.isItemValidForSlot(slotIndex(i), is) && couldMerge(get(i), is);
         }
         
         public boolean isEmpty() {
@@ -709,7 +709,7 @@ public class FactorizationUtil {
         }
         
         @Override
-        public boolean isStackValidForSlot(int i, ItemStack itemstack) {
+        public boolean isItemValidForSlot(int i, ItemStack itemstack) {
             return cont.getSlot(i).isItemValid(itemstack);
         }
         

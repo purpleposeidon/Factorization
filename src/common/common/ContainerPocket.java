@@ -163,7 +163,7 @@ public class ContainerPocket extends ContainerWorkbench {
         }
         
         @Override
-        public boolean isStackValidForSlot(int i, ItemStack itemstack) {
+        public boolean isItemValidForSlot(int i, ItemStack itemstack) {
             return true;
         }
     }

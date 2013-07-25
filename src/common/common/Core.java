@@ -395,6 +395,6 @@ public class Core {
     public static void bindGuiTexture(String name) {
         //bad design; should have a GuiFz. meh.
         TextureManager tex = Minecraft.getMinecraft().renderEngine;
-        tex.bindResourceTexture(getResource("textures/gui/" + name + ".png"));
+        tex.bindTexture(getResource("textures/gui/" + name + ".png"));
     }
 }

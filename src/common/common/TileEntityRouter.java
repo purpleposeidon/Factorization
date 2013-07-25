@@ -811,7 +811,7 @@ public class TileEntityRouter extends TileEntityFactorization {
     }
     
     @Override
-    public boolean isStackValidForSlot(int s, ItemStack itemstack) {
+    public boolean isItemValidForSlot(int s, ItemStack itemstack) {
         if (upgradeItemFilter && is_input) {
             return itemPassesExtractFilter(itemstack);
         }

@@ -27,8 +27,8 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
         }
     }
     
-    FluidTank waterTank = new FluidTank(water_stack.copy(), 1000*8, this);
-    FluidTank steamTank = new FluidTank(steam_stack.copy(), 1000*8, this);
+    FluidTank waterTank = new FluidTank(/*this, */ water_stack.copy(), 1000*8);
+    FluidTank steamTank = new FluidTank(/*this, */ steam_stack.copy(), 1000*8);
     int reflector_count = 0;
     
     public TileEntitySolarBoiler() {

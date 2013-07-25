@@ -63,11 +63,11 @@ public class ActivateActuator extends Instruction {
                 float dz = (float) (hitVec.zCoord - z);
                 is.tryPlaceItemIntoWorld(player, motor.worldObj, x, y, z, mop.sideHit, dx, dy, dz);
             } else if (mop.typeOfHit == EnumMovingObjectType.ENTITY) {
-                if (mop.entityHit.interact(player)) {
+                if (mop.entityHit.func_130002_c(player)) {
                     return;
                 }
                 if (mop.entityHit instanceof EntityLiving) {
-                    is.interactWith(player, (EntityLiving)mop.entityHit);
+                    is.func_111282_a(player, (EntityLiving)mop.entityHit);
                 }
             }
         } catch (IOException e) { } finally {

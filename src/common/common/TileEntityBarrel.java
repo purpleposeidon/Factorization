@@ -250,7 +250,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     }
     
     @Override
-    public boolean isStackValidForSlot(int slotIndex, ItemStack itemstack) {
+    public boolean isItemValidForSlot(int slotIndex, ItemStack itemstack) {
         if (itemstack == null) {
             return false;
         }

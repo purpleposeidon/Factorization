@@ -149,7 +149,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     }
 
     @Override
-    public boolean isStackValidForSlot(int i, ItemStack itemstack) {
+    public boolean isItemValidForSlot(int i, ItemStack itemstack) {
         if (i < filters.length) {
             return true;
         }
@@ -157,7 +157,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         if (target == null) {
             return false;
         }
-        return target.isStackValidForSlot(i - filters.length, itemstack) && itemPassesFilter(itemstack);
+        return target.isItemValidForSlot(i - filters.length, itemstack) && itemPassesFilter(itemstack);
     }
 
     @Override

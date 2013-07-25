@@ -66,7 +66,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     }
     
     @Override
-    public boolean isStackValidForSlot(int slotIndex, ItemStack itemstack) {
+    public boolean isItemValidForSlot(int slotIndex, ItemStack itemstack) {
         if (slotIndex == 0) {
             return true;
         }

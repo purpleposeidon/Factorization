@@ -487,7 +487,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     @Override
-    public boolean interact(EntityPlayer player) {
+    public boolean func_130002_c(EntityPlayer player) {
         ItemStack is = FactorizationUtil.normalize(player.getHeldItem());
         if (is == null) {
             return false;
@@ -721,7 +721,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     public void closeChest() { }
 
     @Override
-    public boolean isStackValidForSlot(int i, ItemStack itemstack) {
+    public boolean isItemValidForSlot(int i, ItemStack itemstack) {
         return true;
     }
     

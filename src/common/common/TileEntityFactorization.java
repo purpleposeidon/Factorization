@@ -326,7 +326,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     
     @Override
     public boolean canInsertItem(int i, ItemStack itemstack, int j) {
-        return isStackValidForSlot(i, itemstack);
+        return isItemValidForSlot(i, itemstack);
     }
     
     @Override

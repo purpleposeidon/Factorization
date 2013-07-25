@@ -122,6 +122,7 @@ Did the drop bug with BlockFactorization.destroyed_tes get fixed? (Probably alri
 
 TOP LIST (that's become somewhat less tops. Oops.)
 --------
+★★★Talk to RLP about monetization plan★★★
 pocket crafting table seems to have issues under... either netlag or server lag. Change the action keys to be done client-side? Hmm. Are we running them both sides, but the server doesn't keep up? That really doesn't make sense tho. This is pretty important, since item loss can occur from this!
 make chat line limit less suck
 Can we safely put "oreQuartz" as an OD grinder recipe w/o messing up with Applied Energetics?

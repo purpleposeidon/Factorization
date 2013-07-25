@@ -61,7 +61,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
     }
     
     @Override
-    protected ResourceLocation getResourceLocationToBind(Entity entity) { return null; }
+    protected ResourceLocation getEntityTexture(Entity entity) { return null; }
 
     class DSRenderInfo {
         //final int width = Hammer.cellWidth;
@@ -169,7 +169,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                     wr.isInFrustum = true; //XXX might not be necessary
                     int displayList = wr.getGLCallListForPass(pass);
                     if (displayList >= 0) {
-                        bindResourceLocationTexture(Core.blockAtlas);
+                        bindTexture(Core.blockAtlas);
                         glCallList(displayList);
                     }
                 }

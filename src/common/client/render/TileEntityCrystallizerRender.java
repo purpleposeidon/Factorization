@@ -50,7 +50,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             glTranslatef(0.5F, 3F / 16F, 0.5F);
             glScalef(s, s, s);
             glTranslatef(-0.5F, 0, 1F / 32F);
-            re.bindResourceTexture(Core.blockAtlas);
+            re.bindTexture(Core.blockAtlas);
 
             int var18 = crys.growing_crystal.getItem().getColorFromItemStack(crys.growing_crystal, 0);
             float r = (float) (var18 >> 16 & 255) / 255.0F;
@@ -86,7 +86,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
                 glColor4f(1F, 1F, 1F, 1);
                 glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_ALPHA);
             }
-            re.bindResourceTexture(Core.blockAtlas);
+            re.bindTexture(Core.blockAtlas);
             float u0 = tex.getMinU();
             float v0 = tex.getMinV();
             float u1 = tex.getMaxU();

@@ -260,14 +260,14 @@ public class RenderServoMotor extends RenderEntity {
     ResourceLocation servo_uv = Core.getResource("/models/sprocket/servo_uv.png");
     
     @Override
-    protected ResourceLocation getResourceLocationToBind(Entity par1Entity) {
+    protected ResourceLocation getEntityTexture(Entity par1Entity) {
         return servo_uv;
     }
     
     void renderMainModel(ServoMotor motor, float partial, double ro, boolean hilighting) {
         // TODO: Put our textures into ItemIcons
         GL11.glPushMatrix();
-        bindResourceLocationTexture(servo_uv);
+        bindTexture(servo_uv);
         if (loaded_model == false) {
             loadSprocketModel();
             loaded_model = true;
@@ -315,7 +315,7 @@ public class RenderServoMotor extends RenderEntity {
         //Axles
         GL11.glPopMatrix();
         if (!hilighting) {
-            bindResourceLocationTexture(Core.itemAtlas);
+            bindTexture(Core.itemAtlas);
         }
         renderServoPlate();
     }
