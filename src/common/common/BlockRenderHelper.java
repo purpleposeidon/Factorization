@@ -110,6 +110,9 @@ public class BlockRenderHelper extends Block {
         return textures[side];
     }
     
+    public VectorUV[][] getFaceVertices() {
+        return faceCache;
+    }
     
     @SideOnly(Side.CLIENT)
     public void renderForTileEntity() {

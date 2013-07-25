@@ -34,14 +34,14 @@ public class TileEntityPackager extends TileEntityStamper {
                 matrix[i] = p;
             }
             to_remove = 9;
-            testOutput = FactorizationUtil.craft3x3(this, true, matrix);
+            testOutput = FactorizationUtil.craft3x3(this, true, false, matrix);
         } else if (input.stackSize >= 4) {
             matrix[0] = p;
             matrix[1] = p;
             matrix[3] = p;
             matrix[4] = p;
             to_remove = 4;
-            testOutput = FactorizationUtil.craft3x3(this, true, matrix);
+            testOutput = FactorizationUtil.craft3x3(this, true, false, matrix);
         }
         
         if (testOutput == null || testOutput.isEmpty()) {
@@ -51,7 +51,7 @@ public class TileEntityPackager extends TileEntityStamper {
         if (!canMerge(testOutput)) {
             return null;
         }
-        List<ItemStack> ret = FactorizationUtil.craft3x3(this, false, matrix);
+        List<ItemStack> ret = FactorizationUtil.craft3x3(this, false, false, matrix);
         input.stackSize -= to_remove;
         input = FactorizationUtil.normalize(input);
         return ret;

@@ -1,8 +1,9 @@
 #en_US localizations
 factorization.factoryBlock.BARREL.name=Barrel
-factorization.factoryBlock.MAKER.name=Craftpacket Maker
-factorization.factoryBlock.STAMPER.name=Craftpacket Stamper
+factorization.factoryBlock.STAMPER.name=Stamper
+factorization.factoryBlock.STAMPER.hint=Craft a single item
 factorization.factoryBlock.PACKAGER.name=Packager
+factorization.factoryBlock.PACKAGER.hint=Craft 9 or 4 items
 factorization.factoryBlock.SLAGFURNACE.name=Slag Furnace
 factorization.factoryBlock.ROUTER.name=Router
 #factorization.factoryBlock.ROUTER.hint=Also try Servos!
@@ -27,6 +28,10 @@ factorization.factoryBlock.CRYSTALLIZER.name=Crystallizer
 factorization.factoryBlock.CERAMIC.name=Sculpture
 factorization.factoryBlock.SERVORAIL.name=Servo Rail
 factorization.factoryBlock.PARASIEVE.name=Parasieve
+factorization.factoryBlock.COMPRESSIONCRAFTER.name=Compression Crafter
+factorization.factoryBlock.COMPRESSIONCRAFTER.hint=Crafting walls\nActivated by redstone
+factorization.factoryBlock.COMPRESSIONCRAFTER.shift=Try a hollow 5x5 with no corners
+
 tile.factorization.ResourceBlock.SILVERORE.name=Silver Ore
 tile.factorization.ResourceBlock.SILVERBLOCK.name=Block of Silver
 tile.factorization.ResourceBlock.LEADBLOCK.name=Block of Lead

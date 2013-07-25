@@ -1140,10 +1140,6 @@ public class FactorizationUtil {
         return craft;
     }
     
-    static ItemStack findMatchingRecipe(InventoryCrafting craft, World world) {
-        return CraftingManager.getInstance().findMatchingRecipe(craft, world);
-    }
-    
     private static final ItemStack[] slots3x3 = new ItemStack[9];
     
     static boolean wantSize(int size, TileEntity where, ItemStack...slots) {
@@ -1163,7 +1159,7 @@ public class FactorizationUtil {
             slots3x3[i] = null;
         }
         slots3x3[4] = what;
-        return craft3x3(where, fake, slots3x3);
+        return craft3x3(where, fake, false, slots3x3);
     }
     
     public static List<ItemStack> craft2x2(TileEntity where, boolean fake, ItemStack...slots) {
@@ -1177,25 +1173,30 @@ public class FactorizationUtil {
         slots3x3[1] = slots[1];
         slots3x3[3] = slots[2];
         slots3x3[4] = slots[3];
-        return craft3x3(where, fake, slots3x3);
+        return craft3x3(where, fake, false, slots3x3);
     }
     
     public static boolean craft_succeeded = false;
-    public static List<ItemStack> craft3x3(TileEntity where, boolean fake, ItemStack... slots) {
+    public static ArrayList<ItemStack> emptyArrayList = new ArrayList(0);
+    public static List<ItemStack> craft3x3(TileEntity where, boolean fake, boolean leaveSlots, ItemStack... slots) {
         craft_succeeded = false;
         // Return the crafting result, and any leftover ingredients (buckets)
         // If the crafting recipe fails, return our contents.
         if (wantSize(9, where, slots)) {
-            return Arrays.asList(slots);
+            return leaveSlots ? emptyArrayList : Arrays.asList(slots);
         }
 
         InventoryCrafting craft = getCrafter(slots);
 
-        ItemStack result = CraftingManager.getInstance().findMatchingRecipe(craft, where == null ? null : where.worldObj);
+        IRecipe recipe = findMatchingRecipe(craft, where == null ? null : where.worldObj);
+        ItemStack result = null;
+        if (recipe != null) {
+            result = recipe.getCraftingResult(craft);
+        }
         
         if (result == null) {
             // crafting failed, dump everything
-            return Arrays.asList(slots);
+            return leaveSlots ? emptyArrayList : Arrays.asList(slots);
         }
         final ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
         if (fake) {
@@ -1217,10 +1218,105 @@ public class FactorizationUtil {
         SlotCrafting slot = new SlotCrafting(fakePlayer, craft, craftResult, 0, 0, 0);
         slot.onPickupFromSlot(fakePlayer, result);
         ret.add(result);
-        FactorizationUtil.addInventoryToArray(craft, ret);
+        if (!leaveSlots) {
+            FactorizationUtil.addInventoryToArray(craft, ret);
+        }
         FactorizationUtil.addInventoryToArray(fakePlayer.inventory, ret);
 
         craft_succeeded = true;
         return ret;
     }
+    
+    
+    static List<IRecipe> recipeCache = new ArrayList();
+    public static IRecipe findMatchingRecipe(InventoryCrafting inv, World world) {
+        List<IRecipe> craftingManagerRecipes = CraftingManager.getInstance().getRecipeList();
+        if (craftingManagerRecipes.size() != recipeCache.size()) {
+            recipeCache.addAll(craftingManagerRecipes);
+            recipeCache.add(stupid_hacky_vanilla_item_repair_recipe);
+        }
+        for (int i = 0; i < recipeCache.size(); i++) {
+            IRecipe recipe = recipeCache.get(i);
+            if (recipe.matches(inv, world)) {
+                if (i > 50) {
+                    int j = i/3;
+                    IRecipe swapeh = recipeCache.get(j);
+                    recipeCache.set(j, recipe);
+                    recipeCache.set(i, swapeh);
+                }
+                return recipe;
+            }
+        }
+        return null;
+    }
+    
+    private static IRecipe stupid_hacky_vanilla_item_repair_recipe = new IRecipe() {
+        ItemStack firstItem, secondItem, result;
+        
+        void update(IInventory par1InventoryCrafting) {
+            //This is copied from CraftingManager.findMatchingRecipe
+            firstItem = secondItem = result = null;
+            int i = 0;
+            int j;
+
+            for (j = 0; j < par1InventoryCrafting.getSizeInventory(); ++j)
+            {
+                ItemStack itemstack2 = par1InventoryCrafting.getStackInSlot(j);
+
+                if (itemstack2 != null)
+                {
+                    if (i == 0)
+                    {
+                        firstItem = itemstack2;
+                    }
+
+                    if (i == 1)
+                    {
+                        secondItem = itemstack2;
+                    }
+
+                    ++i;
+                }
+            }
+
+            if (i == 2 && firstItem.itemID == secondItem.itemID && firstItem.stackSize == 1 && secondItem.stackSize == 1 && Item.itemsList[firstItem.itemID].isRepairable())
+            {
+                Item item = Item.itemsList[firstItem.itemID];
+                int k = item.getMaxDamage() - firstItem.getItemDamageForDisplay();
+                int l = item.getMaxDamage() - secondItem.getItemDamageForDisplay();
+                int i1 = k + l + item.getMaxDamage() * 5 / 100;
+                int j1 = item.getMaxDamage() - i1;
+
+                if (j1 < 0)
+                {
+                    j1 = 0;
+                }
+
+                result = new ItemStack(firstItem.itemID, 1, j1);
+            }
+        }
+        
+        @Override
+        public boolean matches(InventoryCrafting inventorycrafting, World world) {
+            update(inventorycrafting);
+            return result != null;
+        }
+
+        @Override
+        public ItemStack getCraftingResult(InventoryCrafting inventorycrafting) {
+            update(inventorycrafting);
+            return result;
+        }
+
+        @Override
+        public int getRecipeSize() {
+            return 2;
+        }
+
+        @Override
+        public ItemStack getRecipeOutput() {
+            return null;
+        }
+        
+    };
 }

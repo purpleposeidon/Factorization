@@ -694,14 +694,23 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'C', Block.workbench);
 
         //Packager
-        oreRecipe(stamper_item,
+        oreRecipe(packager_item,
                 "#p#",
-                "III",
+                "P P",
                 "#C#",
                 '#', Block.cobblestone,
                 'p', Block.pistonBase,
                 'I', Item.ingotIron,
                 'C', Block.workbench);
+        
+        //Compression Crafter
+        oreRecipe(compression_crafter_item,
+                "D",
+                "C",
+                "P",
+                'D', dark_iron,
+                'C', Block.workbench,
+                'P', Block.pistonBase);
 
         // Wrath lamp
         oreRecipe(lamp_item,
