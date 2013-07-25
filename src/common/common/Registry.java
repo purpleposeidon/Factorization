@@ -141,8 +141,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         Block.blocksList[diamondId] = null;
         BlockOreStorageShatterable newDiamond = new BlockOreStorageShatterable(diamondId, vanillaDiamond);
         newDiamond.setHardness(5.0F).setResistance(10.0F).setStepSound(Block.soundMetalFootstep).setUnlocalizedName("blockDiamond");
-        //Block.blockDiamond /* field_72071_ax */ = newDiamond;
-//		ReflectionHelper.setPrivateValue(Block.class, null, newDiamond, "blockDiamond", "field_72071_ax"); TODO: Reflection-set blockDiamond.
+        //Block.blockDiamond /* blockDiamond */ = newDiamond;
+//		ReflectionHelper.setPrivateValue(Block.class, null, newDiamond, "blockDiamond", "blockDiamond"); TODO: Reflection-set blockDiamond.
     }
 
     /*private void addName(Object what, String name) {
@@ -171,7 +171,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             if (it == null) {
                 continue; //This is weird.
             }
-            it.setTextureName(it.getUnlocalizedName());
+            it.func_111206_d(it.getUnlocalizedName());
         }
     }
 

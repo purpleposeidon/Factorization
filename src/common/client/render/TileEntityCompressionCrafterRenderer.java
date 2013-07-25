@@ -26,7 +26,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         if (cc == null) {
             return;
         }
-        bindTexture(Core.blockAtlas);
+        func_110628_a(Core.blockAtlas);
         float p = cc.getProgressPerc();
         p *= 7F/16F;
         final float textureOffset = p;

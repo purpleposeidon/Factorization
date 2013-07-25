@@ -128,7 +128,7 @@ public class RecipeSlagFurnace extends TemplateRecipeHandler {
 
     @Override
     public String getGuiTexture() {
-        return Core.gui_dir + "slagfurnacegui.png";
+        return Core.gui_nei + "slagfurnacegui.png";
     }
 
     @Override

@@ -27,7 +27,7 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
     RenderItem itemRender; // = new RenderItem();
     Random random = new Random();
     private RenderBlocks renderBlocks = new RenderBlocks();
-    static boolean field_77024_a = true;
+    static boolean renderWithColor = true;
     float item_rotation = 0;
     boolean render_item, render_text;
     boolean is_obscured = false;
@@ -184,7 +184,7 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
             TextureManager re = Minecraft.getMinecraft().renderEngine;
             FontRenderer fr = getFontRenderer();
             if (!ForgeHooksClient.renderInventoryItem(renderBlocks, re, is, true, 0, 0, 0)) {
-                //renderItem.func_82406_b(fr, re, is, 0, 0);
+                //renderItem.renderItemAndEffectIntoGUI(fr, re, is, 0, 0);
                 renderItem.renderItemIntoGUI(fr, re, is, 0, 0);
                 //renderItem.drawItemIntoGui(fr, re, is.itemID, is.getItemDamage(), is.getIconIndex(), 0, 0);
             }

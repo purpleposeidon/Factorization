@@ -19,7 +19,7 @@ public class ItemFactorization extends Item {
     
     @Override
     @SideOnly(Side.CLIENT)
-    protected String getIconString() {
+    protected String func_111208_A() {
         return unlocalizedName;
     }
     

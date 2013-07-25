@@ -37,8 +37,14 @@ public class RecipeGrinder extends TemplateRecipeHandler {
     public void loadUsageRecipes(ItemStack ingredient) {
         //XXX NOTE: This is probably a lame implementation of this function.
         for (GrinderRecipe gr : TileEntityGrinder.recipes) {
-            if (ingredient == null || ingredient.isItemEqual(gr.input)) {
+            if (ingredient == null) {
                 arecipes.add(new CachedGrinderRecipe(gr));
+            }
+            for (ItemStack is : gr.getInput()) {
+                if (ingredient.isItemEqual(is)) {
+                    arecipes.add(new CachedGrinderRecipe(gr));
+                    break;
+                }
             }
         }
     }
@@ -57,7 +63,7 @@ public class RecipeGrinder extends TemplateRecipeHandler {
 
         @Override
         public PositionedStack getIngredient() {
-            return new PositionedStack(gr.input, 51, 24);
+            return new PositionedStack(gr.getInput(), 51, 24);
         }
 
     }
@@ -95,7 +101,7 @@ public class RecipeGrinder extends TemplateRecipeHandler {
 
     @Override
     public String getGuiTexture() {
-        return Core.gui_dir + "grinder.png";
+        return Core.gui_nei + "grinder.png";
     }
 
     @Override

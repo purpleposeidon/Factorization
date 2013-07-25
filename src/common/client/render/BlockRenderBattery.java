@@ -37,7 +37,7 @@ public class BlockRenderBattery extends FactorizationBlockRender {
     
     void renderInventoryMode(RenderBlocks rb, ItemRenderType type) {
         Minecraft mc = Minecraft.getMinecraft();
-        mc.renderEngine.bindTexture(Core.blockAtlas);
+        mc.renderEngine.func_110577_a(Core.blockAtlas);
         renderNormalBlock(rb, FactoryType.BATTERY.md);
         GL11.glPushMatrix();
         //TODO: Need to render with the correct positioning for the hand

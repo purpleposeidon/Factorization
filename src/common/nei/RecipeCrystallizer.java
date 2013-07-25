@@ -1,16 +1,17 @@
 package factorization.nei;
 
+import static codechicken.core.gui.GuiDraw.changeTexture;
+import static codechicken.core.gui.GuiDraw.drawTexturedModalRect;
+
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.item.ItemStack;
-
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.item.ItemStack;
 import codechicken.nei.PositionedStack;
-import codechicken.nei.forge.GuiContainerManager;
 import codechicken.nei.recipe.GuiRecipe;
 import codechicken.nei.recipe.TemplateRecipeHandler;
 import factorization.client.gui.GuiCrystallizer;
@@ -44,7 +45,6 @@ public class RecipeCrystallizer extends TemplateRecipeHandler  {
         for (CrystalRecipe cr : TileEntityCrystallizer.recipes) {
             if (ingredient == null
                     || ingredient.isItemEqual(cr.input)
-                    || (ingredient.getItem() == Core.registry.inverium && cr.inverium_count > 0)
                     || ingredient.isItemEqual(cr.solution)) {
                 arecipes.add(new CachedCrystallizerRecipe(cr));
             }
@@ -72,13 +72,7 @@ public class RecipeCrystallizer extends TemplateRecipeHandler  {
         public ArrayList<PositionedStack> getOtherStacks() {
             ArrayList<PositionedStack> ret = new ArrayList();
             ret.add(new PositionedStack(cr.input, 75, 2 + 15));
-            if (cr.inverium_count > 0) {
-                ItemStack inverium = new ItemStack(Core.registry.inverium, cr.inverium_count, 1 /* TODO: This'll need to be updated when it becomes fake */);
-                ret.add(new PositionedStack(inverium, 103, 44 + 15));
-                ret.add(new PositionedStack(cr.solution, 47, 44 + 15));
-            } else {
-                ret.add(new PositionedStack(cr.solution, 75, 58 + 15));
-            }
+            ret.add(new PositionedStack(cr.solution, 75, 58 + 15));
             ret.add(new PositionedStack(Core.registry.heater_item, 0, 75));
             return ret;
         }
@@ -128,7 +122,14 @@ public class RecipeCrystallizer extends TemplateRecipeHandler  {
 
     @Override
     public String getGuiTexture() {
-        return Core.gui_dir + "crystal.png";
+        return Core.gui_nei + "crystal.png";
+    }
+    
+    @Override
+    public void drawBackground(int recipe) {
+        GL11.glColor4f(1, 1, 1, 1);
+        changeTexture(getGuiTexture());
+        drawTexturedModalRect(0, 0 + 15, 5, 11, 166, 65 + 30);
     }
 
     @Override
@@ -136,16 +137,18 @@ public class RecipeCrystallizer extends TemplateRecipeHandler  {
         return "fz.crystallizing";
     }
     
+    /*
     public void drawBackground(GuiContainerManager gui, int recipe)
     {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        
         gui.bindTexture(getGuiTexture());
         gui.drawTexturedModalRect(0, 15, 5, 11, 166, 95);
-    }
+    }*/
     
     @Override
-    public void drawExtras(GuiContainerManager gui, int recipe) {
-        super.drawExtras(gui, recipe);
+    public void drawExtras(int recipe) {
+        super.drawExtras(recipe);
         //drawProgressBar(gui, 43 - 5, 89 + 4, 0, 192, 90, 16, 20*60, 0);
         
         

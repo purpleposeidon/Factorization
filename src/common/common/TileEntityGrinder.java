@@ -290,7 +290,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
             this.probability = probability;
         }
         
-        ArrayList<ItemStack> getInput() {
+        public ArrayList<ItemStack> getInput() {
             if (input instanceof String) {
                 return OreDictionary.getOres((String) input);
             }

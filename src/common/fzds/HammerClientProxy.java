@@ -228,7 +228,7 @@ public class HammerClientProxy extends HammerProxy {
                     Core.proxy.getProfiler());
             send_queue = Minecraft.getMinecraft().thePlayer.sendQueue;
             NCH_class = (Class<NetClientHandler>)send_queue.getClass();
-            NCH_worldClient_field = ReflectionHelper.findField(NCH_class, "worldClient", "field_72564_i", "i");
+            NCH_worldClient_field = ReflectionHelper.findField(NCH_class, "worldClient", "worldClient", "i");
             Minecraft mc = Minecraft.getMinecraft();
         }
     }
@@ -547,7 +547,7 @@ public class HammerClientProxy extends HammerProxy {
                         clickBlockCreative(this.mc, this, x, y, z, side);
                         this.blockHitDelay = 5;
                     }
-                    else if (!this.isHittingBlock || !this.sameToolAndBlock(x, y, z) /* func_85182_a sameToolAndBlock */)
+                    else if (!this.isHittingBlock || !this.sameToolAndBlock(x, y, z) /* sameToolAndBlock sameToolAndBlock */)
                     {
                         if (this.isHittingBlock)
                         {

@@ -12,5 +12,5 @@ public class EmptyRender extends Render {
     }
     
     @Override
-    protected ResourceLocation getEntityTexture(Entity entity) { return null; }
+    protected ResourceLocation func_110775_a(Entity entity) { return null; }
 }

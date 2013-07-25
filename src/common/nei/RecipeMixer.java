@@ -165,7 +165,7 @@ public class RecipeMixer extends TemplateRecipeHandler {
 
     @Override
     public String getGuiTexture() {
-        return Core.gui_dir + "mixer.png";
+        return Core.gui_nei + "mixer.png";
     }
 
     @Override

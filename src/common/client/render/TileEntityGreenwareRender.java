@@ -22,7 +22,7 @@ public class TileEntityGreenwareRender extends TileEntitySpecialRenderer {
         //prevents AO flickering on & off
         int lt = gw.lastTouched;
         gw.lastTouched = 0;
-        bindTexture(Core.blockAtlas);
+        func_110628_a(Core.blockAtlas);
         GL11.glPushMatrix();
         GL11.glTranslated(viewx, viewy, viewz);
         BlockRenderGreenware.instance.renderInInventory();

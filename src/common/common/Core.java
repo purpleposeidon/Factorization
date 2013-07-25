@@ -212,7 +212,7 @@ public class Core {
     
     private static void addTranslationHints(String hint_key, List list, String prefix) {
         StringTranslate st = StringTranslate.getInstance();
-        if (st.containsTranslateKey(hint_key) /* func_94520_b = containsTranslateKey */ ) {
+        if (st.containsTranslateKey(hint_key) /* containsTranslateKey = containsTranslateKey */ ) {
             String hint = st.translateKey(hint_key);
             if (hint != null) {
                 hint = hint.trim();
@@ -363,11 +363,11 @@ public class Core {
     }
     
     public static void sendChatMessage(boolean raw, ICommandSender sender, String msg) {
-        sender.sendChatToPlayer(raw ? ChatMessageComponent.createFromText(msg) : ChatMessageComponent.createFromTranslationKey(msg));
+        sender.sendChatToPlayer(raw ? ChatMessageComponent.func_111066_d(msg) : ChatMessageComponent.func_111077_e(msg));
     }
     
     public static void sendUnlocalizedChatMessage(ICommandSender sender, String format, Object... params) {
-        sender.sendChatToPlayer(ChatMessageComponent.createFromTranslationWithSubstitutions(format, params));
+        sender.sendChatToPlayer(ChatMessageComponent.func_111082_b(format, params));
     }
     
     @SideOnly(Side.CLIENT)
@@ -380,6 +380,7 @@ public class Core {
     public final static String model_dir = "/mods/factorization/models/";
     public final static String real_texture_dir = "/mods/factorization/textures/";
     public final static String gui_dir = "/mods/factorization/textures/gui/";
+    public final static String gui_nei = "factorization:textures/gui/";
 //	public final static String texture_file_block = "/terrain.png";
 //	public final static String texture_file_item = "/gui/items.png";
     
@@ -395,6 +396,6 @@ public class Core {
     public static void bindGuiTexture(String name) {
         //bad design; should have a GuiFz. meh.
         TextureManager tex = Minecraft.getMinecraft().renderEngine;
-        tex.bindTexture(getResource("textures/gui/" + name + ".png"));
+        tex.func_110577_a(getResource("textures/gui/" + name + ".png"));
     }
 }

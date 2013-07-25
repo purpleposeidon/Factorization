@@ -99,7 +99,7 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
         TextureManager re = Minecraft.getMinecraft().renderEngine;
         glDisable(GL_LIGHTING);
 
-        re.bindTexture(Core.blockAtlas);
+        re.func_110577_a(Core.blockAtlas);
         //XXX TODO FIXME Move to somewhere more efficient
         //(Move the vector stuff out too...)
         Tessellator tess = Tessellator.instance;
