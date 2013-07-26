@@ -26,7 +26,7 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.*;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.AxisAlignedBB;
@@ -1319,4 +1319,53 @@ public class FactorizationUtil {
         }
         
     };
+    
+    //Returns the (approximate) size of an NBT tag.
+    public static int isTagBig(NBTBase tag, int bignessThreshold) {
+        if (tag == null) {
+            return 0;
+        }
+        if (tag instanceof NBTTagByte) {
+            return 1;
+        }
+        if (tag instanceof NBTTagByteArray) {
+            return 4 + 1*((NBTTagByteArray) tag).byteArray.length;
+        }
+        if (tag instanceof NBTTagDouble) {
+            return 8;
+        }
+        if (tag instanceof NBTTagCompound || tag instanceof NBTTagList) {
+            int sum_size = 1;
+            Iterable<NBTBase> collection;
+            if (tag instanceof NBTTagCompound) {
+                NBTTagCompound tc = (NBTTagCompound) tag;
+                collection = tc.getTags();
+            } else {
+                NBTTagList tl = (NBTTagList) tag;
+                collection = tl.tagList;
+            }
+            for (NBTBase sub : collection) {
+                sum_size += 1 + isTagBig(sub, bignessThreshold - sum_size);
+                String s = sub.getName();
+                sum_size += s == null ? 0 : s.length();
+                if (sum_size > bignessThreshold) {
+                    return sum_size;
+                }
+            }
+            return sum_size;
+        }
+        if (tag instanceof NBTTagFloat) {
+            return 4;
+        }
+        if (tag instanceof NBTTagInt) {
+            return 4;
+        }
+        if (tag instanceof NBTTagIntArray) {
+            return 4 + 4*((NBTTagIntArray) tag).intArray.length;
+        }
+        if (tag instanceof NBTTagLong) {
+            return 4;
+        }
+        return 1;
+    }
 }

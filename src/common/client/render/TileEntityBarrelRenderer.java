@@ -178,15 +178,16 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
         GL11.glTranslatef(8, 6, 0);
         GL11.glScalef(1, 1, 0.01F);
         {
-            //Original call:
-            //renderItem.renderItemIntoGUI(getFontRenderer(), Minecraft.getMinecraft().renderEngine, is, 0, 0);
-            //However, this draws the sparkly effect, which causes problems.
             TextureManager re = Minecraft.getMinecraft().renderEngine;
             FontRenderer fr = getFontRenderer();
-            if (!ForgeHooksClient.renderInventoryItem(renderBlocks, re, is, true, 0, 0, 0)) {
-                //renderItem.renderItemAndEffectIntoGUI(fr, re, is, 0, 0);
-                renderItem.renderItemIntoGUI(fr, re, is, 0, 0);
-                //renderItem.drawItemIntoGui(fr, re, is.itemID, is.getItemDamage(), is.getIconIndex(), 0, 0);
+            //this draws the sparkly effect, which causes problems.
+            if (is.hasEffect(0)) {
+                float orig_z = renderItem.zLevel;
+                renderItem.zLevel = 23;
+                renderItem.renderItemAndEffectIntoGUI(fr, re, is, 0, 0);
+                renderItem.zLevel = orig_z;
+            } else {
+                renderItem.renderItemAndEffectIntoGUI(fr, re, is, 0, 0);
             }
         }
         GL11.glPopMatrix();

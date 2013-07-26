@@ -354,8 +354,6 @@ public class CompressionState {
                 continue iteratePermutations;
             }
             
-            
-            
             ArrayList<ItemStack> total = new ArrayList(maxCraft);
             int items_used = 0;
             for (int craftCount = 0; craftCount < maxCraft; craftCount++) {

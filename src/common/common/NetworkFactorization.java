@@ -21,6 +21,7 @@ import net.minecraft.network.packet.Packet131MapData;
 import net.minecraft.server.management.PlayerInstance;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StringTranslate;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
@@ -45,8 +46,67 @@ public class NetworkFactorization implements ITinyPacketHandler {
         Core.network = this;
     }
     
+    private static ItemStack EMPTY_ITEMSTACK = new ItemStack(0, 0, 0);
+    
     int huge_tag_warnings = 0;
 
+    private void writeObjects(ByteArrayOutputStream outputStream, DataOutputStream output, Object... items) throws IOException {
+        for (Object item : items) {
+            if (item == null) {
+                throw new RuntimeException("Argument is null!");
+            }
+            if (item instanceof Integer) {
+                output.writeInt((Integer) item);
+            } else if (item instanceof Byte) {
+                output.writeByte((Byte) item);
+            } else if (item instanceof Short) {
+                output.writeShort((Short) item);
+            } else if (item instanceof String) {
+                output.writeUTF((String) item);
+            } else if (item instanceof Boolean) {
+                output.writeBoolean((Boolean) item);
+            } else if (item instanceof Float) {
+                output.writeFloat((Float) item);
+            } else if (item instanceof ItemStack) {
+                ItemStack is = (ItemStack) item;
+                NBTTagCompound tag = new NBTTagCompound();
+                final Item is_item = is.getItem();
+                NBTTagCompound orig_tag = is.getTagCompound();
+                if (FactorizationUtil.isTagBig(tag, 1024) >= 1024) {
+                    is.setTagCompound(null);
+                    if (huge_tag_warnings == 0) {
+                        Core.logWarning("FIXME: Need to add in Item.getTagForClient"); //TODO
+                    }
+                    if (huge_tag_warnings++ < 10) {
+                        Core.logWarning("Item " + is + " has a large NBT tag; it won't be sent over the wire.");
+                        if (huge_tag_warnings == 10) {
+                            Core.logWarning("(This will no longer be logged)");
+                        }
+                    }
+                }
+                is.writeToNBT(tag);
+                NBTBase.writeNamedTag(tag, output);
+                is.setTagCompound(orig_tag);
+            } else if (item instanceof VectorUV) {
+                VectorUV v = (VectorUV) item;
+                output.writeFloat((float) v.x);
+                output.writeFloat((float) v.y);
+                output.writeFloat((float) v.z);
+            } else if (item instanceof DeltaCoord) {
+                DeltaCoord dc = (DeltaCoord) item;
+                dc.write(output);
+            } else if (item instanceof Quaternion) {
+                Quaternion q = (Quaternion) item;
+                q.write(output);
+            } else if (item instanceof byte[]) {
+                byte[] b = (byte[]) item;
+                output.write(b, 0, b.length);
+            } else {
+                throw new RuntimeException("Don't know how to serialize " + item.getClass() + " (" + item + ")");
+            }
+        }
+    }
+    
     @SuppressWarnings("resource")
     public Packet TEmessagePacket(Coord src, int messageType, Object... items) {
         try {
@@ -57,70 +117,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
             output.writeInt(src.y);
             output.writeInt(src.z);
             output.writeShort(messageType);
-
-            for (Object item : items) {
-                if (item == null) {
-                    throw new RuntimeException("Argument is null!");
-                }
-                if (item instanceof Integer) {
-                    output.writeInt((Integer) item);
-                } else if (item instanceof Byte) {
-                    output.writeByte((Byte) item);
-                } else if (item instanceof Short) {
-                    output.writeShort((Short) item);
-                } else if (item instanceof String) {
-                    output.writeUTF((String) item);
-                } else if (item instanceof Boolean) {
-                    output.writeBoolean((Boolean) item);
-                } else if (item instanceof Float) {
-                    output.writeFloat((Float) item);
-                } else if (item instanceof ItemStack) {
-                    ItemStack is = (ItemStack) item;
-                    NBTTagCompound tag = new NBTTagCompound();
-                    final Item is_item = is.getItem();
-                    if (is_item == null || is_item.getShareTag()) {
-                        is.writeToNBT(tag);
-                    } else {
-                        NBTTagCompound backup = is.getTagCompound();
-                        is.writeToNBT(tag);
-                        is.setTagCompound(backup);
-                    }
-                    NBTBase.writeNamedTag(tag, output);
-                    if (outputStream.size() > 65536 && is.hasTagCompound()) {
-                        //Got an overflow! We'll blame the NBT tag.
-                        if (huge_tag_warnings++ < 10) {
-                            Core.logWarning("Item " + is + " probably has a huge NBT tag; it will be stripped from the packet; at " + src);
-                            if (huge_tag_warnings == 10) {
-                                Core.logWarning("(This will no longer be logged)");
-                            }
-                        }
-                        NBTTagCompound tag_copy = is.getTagCompound();
-                        is.setTagCompound(null);
-                        try {
-                            return TEmessagePacket(src, messageType, items);
-                        } finally {
-                            is.setTagCompound(tag_copy);
-                        }
-                    }
-                } else if (item instanceof VectorUV) {
-                    VectorUV v = (VectorUV) item;
-                    output.writeFloat((float) v.x);
-                    output.writeFloat((float) v.y);
-                    output.writeFloat((float) v.z);
-                } else if (item instanceof DeltaCoord) {
-                    DeltaCoord dc = (DeltaCoord) item;
-                    dc.write(output);
-                } else if (item instanceof Quaternion) {
-                    Quaternion q = (Quaternion) item;
-                    q.write(output);
-                } else if (item instanceof byte[]) {
-                    //NOTE: The size must be known elsewhere
-                    byte[] b = (byte[]) item;
-                    output.write(b, 0, b.length);
-                } else {
-                    throw new RuntimeException("Don't know how to serialize " + item.getClass() + " (" + item + ")");
-                }
-            }
+            writeObjects(outputStream, output, items);
             output.flush();
             return PacketDispatcher.getTinyPacket(Core.instance, factorizeTEChannel, outputStream.toByteArray());
         } catch (IOException e) {
@@ -144,13 +141,44 @@ public class NetworkFactorization implements ITinyPacketHandler {
         }
     }
     
-    public Packet notifyPacket(Coord where, String format, String ...args) {
+    public Packet notifyPacket(Object where, ItemStack item, String format, String ...args) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream output = new DataOutputStream(outputStream);
-            output.writeInt(where.x);
-            output.writeInt(where.y);
-            output.writeInt(where.z);
+            
+            if (where instanceof Vec3) {
+                output.writeByte(NotifyMessageType.VEC3);
+                Vec3 v = (Vec3) where;
+                output.writeDouble(v.xCoord);
+                output.writeDouble(v.yCoord);
+                output.writeDouble(v.zCoord);
+            } else if (where instanceof Coord) {
+                output.writeByte(NotifyMessageType.COORD);
+                Coord c = (Coord) where;
+                output.writeInt(c.x);
+                output.writeInt(c.y);
+                output.writeInt(c.z);
+            } else if (where instanceof Entity) {
+                output.writeByte(NotifyMessageType.ENTITY);
+                Entity ent = (Entity) where;
+                output.writeInt(ent.entityId);
+            } else if (where instanceof TileEntity) {
+                output.writeByte(NotifyMessageType.TILEENTITY);
+                TileEntity te = (TileEntity) where;
+                output.writeInt(te.xCoord);
+                output.writeInt(te.yCoord);
+                output.writeInt(te.zCoord);
+            } else {
+                return null;
+            }
+            
+            if (item == null) {
+                item = EMPTY_ITEMSTACK;
+            }
+            NBTTagCompound tag = new NBTTagCompound();
+            item.writeToNBT(tag);
+            NBTBase.writeNamedTag(tag, output);
+            
             output.writeUTF(format);
             output.writeInt(args.length);
             for (String a : args) {
@@ -277,14 +305,9 @@ public class NetworkFactorization implements ITinyPacketHandler {
         }
         if (who == null) {
             //send to everyone in range
-            //PacketDispatcher.sendPacketToAllAround(src.x, src.y, src.z, 128, src.w.getWorldInfo().getDimension(), toSend);
             Chunk srcChunk = src.getChunk();
             for (EntityPlayer player : (Iterable<EntityPlayer>) src.w.playerEntities) {
-//				if (player.chunksToLoad.contains(srcChunk)) {
-//					Core.proxy.addPacket(player, toSend);
-//				}
                 //XXX TODO: Make this not lame!
-                //if (entityplayermp.loadedChunks.contains(chunkcoordintpair))
                 double x = src.x - player.posX;
                 double z = src.z - player.posZ;
                 if (x*x + z*z > maxBroadcastDistSq) {
@@ -293,14 +316,6 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 if (!Core.proxy.playerListensToCoord(player, src)) {
                     continue;
                 }
-                //Apparently the below doesn't actually work. Huge fucking surprise.
-//				if (player instanceof EntityPlayerMP && src.w instanceof WorldServer) {
-//					EntityPlayerMP emp = (EntityPlayerMP) player;
-//					WorldServer world = (WorldServer) src.w;
-//					if (!world.getPlayerManager().isPlayerWatchingChunk(emp, src.x >> 4, src.y >> 4)) {
-//						continue;
-//					}
-//				}
                 Core.proxy.addPacket(player, toSend);
             }
         }
@@ -512,14 +527,51 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 return;
             }
             try {
-                int x = input.readInt(), y = input.readInt(), z = input.readInt();
+                Object target = null;
+                int x, y, z;
+                switch (input.readByte()) {
+                case NotifyMessageType.COORD:
+                    x = input.readInt();
+                    y = input.readInt();
+                    z = input.readInt();
+                    target = new Coord(me.worldObj, x, y, z);
+                    break;
+                case NotifyMessageType.ENTITY:
+                    int id = input.readInt();
+                    if (id == me.entityId) {
+                        target = me; //bebna
+                    } else {
+                        target = me.worldObj.getEntityByID(id);
+                    }
+                    break;
+                case NotifyMessageType.TILEENTITY:
+                    x = input.readInt();
+                    y = input.readInt();
+                    z = input.readInt();
+                    target = me.worldObj.getBlockTileEntity(x, y, z);
+                    break;
+                case NotifyMessageType.VEC3:
+                    target = Vec3.createVectorHelper(input.readDouble(), input.readDouble(), input.readDouble());
+                    break;
+                default: return;
+                }
+                if (target == null) {
+                    return;
+                }
+                
+                NBTTagCompound tag = (NBTTagCompound) NBTBase.readNamedTag(input);
+                ItemStack item = ItemStack.loadItemStackFromNBT(tag);
+                if (item != null && EMPTY_ITEMSTACK.isItemEqual(item)) {
+                    item = null;
+                }
+                
                 String msg = input.readUTF();
                 int argCount = input.readInt();
                 String args[] = new String[argCount];
                 for (int i = 0; i < argCount; i++) {
                     args[i] = input.readUTF();
                 }
-                Core.notify(me, new Coord(me.worldObj, x, y, z), msg, args);
+                Core.notify(me, target, item, msg, args);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -599,6 +651,10 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 ServoRailDecor = 161, ServoRailDecorUpdate = 162,
                 //
                 CompressionCrafter = 163, CompressionCrafterBeginCrafting = 164;
+    }
+    
+    static public class NotifyMessageType {
+        public static final byte COORD = 0, VEC3 = 1, ENTITY = 2, TILEENTITY = 3;
     }
 
 }

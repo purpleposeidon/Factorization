@@ -255,11 +255,20 @@ public class Core {
         }
     }
     
+    public static void notify(EntityPlayer player, Object where, ItemStack item, String format, String ...args) {
+        if (player != null && player.worldObj.isRemote) {
+            FactorizationNotify.addMessage(where, item, format, args);
+        } else {
+            Coord target = Coord.tryLoad(player != null ? player.worldObj : null, where);
+            network.broadcastPacket(player, target, network.notifyPacket(where, item, format, args));
+        }
+    }
+    
     public static void notify(EntityPlayer player, Coord where, String format, String ...args) {
         if (player != null && player.worldObj.isRemote) {
-            FactorizationNotify.addMessage(where, format, args);
+            FactorizationNotify.addMessage(where, null, format, args);
         } else {
-            network.broadcastPacket(player, where, network.notifyPacket(where, format, args));
+            network.broadcastPacket(player, where, network.notifyPacket(where, null, format, args));
         }
     }
     

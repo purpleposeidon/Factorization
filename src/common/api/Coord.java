@@ -57,6 +57,25 @@ public class Coord implements IDataSerializable {
         this(w, mop.blockX, mop.blockY, mop.blockZ);
     }
     
+    public static Coord tryLoad(World world, Object o) {
+        if (o instanceof Coord) {
+            return (Coord) o;
+        }
+        if (o instanceof Vec3) {
+            Vec3 vec = (Vec3) o;
+            return new Coord(world, vec.xCoord, vec.yCoord, vec.zCoord);
+        }
+        if (o instanceof Entity) {
+            Entity e = (Entity) o;
+            return new Coord(e);
+        }
+        if (o instanceof TileEntity) {
+            TileEntity te = (TileEntity) o;
+            return new Coord(te);
+        }
+        return null;
+    }
+    
     public static Coord of(int x, int y, int z) {
         return of((World) null, x, y, z);
     }

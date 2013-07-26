@@ -267,9 +267,9 @@ public class TileEntityBarrel extends TileEntityFactorization {
         if (item == null && getItemCount() == 0) {
             Core.notify(entityplayer, getCoord(), "Empty");
         } else if (getItemCount() >= getMaxSize()) {
-            Core.notify(entityplayer, getCoord(), "Full of %s", Core.getTranslationKey(item)); //NORELEASE: We need to fix our Notification system so that we can send ItemStacks over the wire to be translated client-side.
+            Core.notify(entityplayer, getCoord(), item, "Full of {ITEM_NAME}{ITEM_INFOS_NEWLINE}"); //NORELEASE: We need to fix our Notification system so that we can send ItemStacks over the wire to be translated client-side.
         } else {
-            Core.notify(entityplayer, getCoord(), "%s %s", "" + getItemCount(), Core.getTranslationKey(item));
+            Core.notify(entityplayer, getCoord(), item, "%s {ITEM_NAME}{ITEM_INFOS_NEWLINE}", "" + getItemCount());
         }
     }
 
