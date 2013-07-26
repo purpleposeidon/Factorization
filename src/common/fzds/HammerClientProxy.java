@@ -411,6 +411,7 @@ public class HammerClientProxy extends HammerProxy {
         //shadowSelected = null;
     }
     
+    @Override
     void updateRayPosition(DseRayTarget ray) {
         if (ray.parent.centerOffset == null) {
             return;

@@ -367,6 +367,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         }
     }
 
+    @Override
     public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;

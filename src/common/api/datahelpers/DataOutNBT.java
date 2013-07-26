@@ -13,6 +13,7 @@ public class DataOutNBT extends DataHelperNBT {
         this(new NBTTagCompound());
     }
     
+    @Override
     public NBTTagCompound getTag() {
         return tag;
     }

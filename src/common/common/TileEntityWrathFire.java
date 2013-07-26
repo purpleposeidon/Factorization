@@ -83,6 +83,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
             return this.id << 4 + this.md;
         }
 
+        @Override
         public String toString() {
             return this.id + ":" + this.md;
         }

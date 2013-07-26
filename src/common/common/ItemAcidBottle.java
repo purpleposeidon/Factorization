@@ -56,14 +56,17 @@ public class ItemAcidBottle extends ItemFactorization {
         return name;
     }
 
+    @Override
     public int getMaxItemUseDuration(ItemStack par1ItemStack) {
         return 32;
     }
 
+    @Override
     public EnumAction getItemUseAction(ItemStack par1ItemStack) {
         return EnumAction.drink;
     }
 
+    @Override
     public ItemStack onItemRightClick(ItemStack is, World w, EntityPlayer player) {
         player.setItemInUse(is, getMaxItemUseDuration(is));
         return is;

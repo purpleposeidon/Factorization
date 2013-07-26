@@ -58,6 +58,7 @@ public class ItemFactorizationBlock extends ItemBlock {
         return Core.registry.factory_block.getIcon(0, damage);
     }
 
+    @Override
     public int getMetadata(int i) {
         return 15;
         //return i;

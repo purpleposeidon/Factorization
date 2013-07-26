@@ -13,22 +13,29 @@ import factorization.common.Core;
 import factorization.common.ItemPocketTable;
 
 public class NEI_FactorizationInputConfig implements IConfigureNEI {
+    @Override
     public void loadConfig() {
         ItemPocketTable.NEI_status = 1;
         GuiContainerManager.addInputHandler(new IContainerInputHandler() {
             @Override
             public void onMouseUp(GuiContainer gui, int mousex, int mousey, int button) { }
 
+            @Override
             public void onMouseScrolled(GuiContainer gui, int mousex, int mousey, int scrolled) { }
 
+            @Override
             public void onMouseClicked(GuiContainer gui, int mousex, int mousey, int button) { }
 
+            @Override
             public void onKeyTyped(GuiContainer gui, char keyChar, int keyID) { }
 
+            @Override
             public boolean mouseScrolled(GuiContainer gui, int mousex, int mousey, int scrolled) { return false; }
 
+            @Override
             public boolean mouseClicked(GuiContainer gui, int mousex, int mousey, int button) { return false; }
 
+            @Override
             public boolean lastKeyTyped(GuiContainer gui, char keyChar, int keyID) {
                 if (FactorizationClientProxy.bag_swap_key.keyCode == keyID) {
                     Command cmd = Command.bagShuffle;
@@ -47,6 +54,7 @@ public class NEI_FactorizationInputConfig implements IConfigureNEI {
                 return false;
             }
 
+            @Override
             public boolean keyTyped(GuiContainer gui, char keyChar, int keyCode) { return false; }
 
             @Override

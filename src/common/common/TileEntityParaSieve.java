@@ -66,7 +66,8 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     }
     
     private boolean is_recursing = false;
-    private static ThreadLocal<Integer> recursion_count = new ThreadLocal<Integer>() { protected Integer initialValue() {return 0;};};
+    private static ThreadLocal<Integer> recursion_count = new ThreadLocal<Integer>() { @Override
+    protected Integer initialValue() {return 0;};};
     
     protected boolean beginRecursion() {
         recursion_count.set(recursion_count.get() + 1);

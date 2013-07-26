@@ -756,10 +756,12 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         isAirBorne = false; //If this is true, we get packet spam
     }
     
+    @Override
     public boolean can(DeltaCapability cap) {
         return cap.in(capabilities);
     }
     
+    @Override
     public DimensionSliceEntity permit(DeltaCapability cap) {
         capabilities |= cap.bit;
         if (cap == DeltaCapability.ORACLE) {
@@ -780,6 +782,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         return this;
     }
     
+    @Override
     public DimensionSliceEntity forbid(DeltaCapability cap) {
         capabilities &= ~cap.bit;
         return this;

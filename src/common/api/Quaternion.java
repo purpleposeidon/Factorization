@@ -116,6 +116,7 @@ public class Quaternion implements IDataSerializable {
     }
     
     private static ThreadLocal<double[]> localStaticArray = new ThreadLocal<double[]>() {
+        @Override
         protected double[] initialValue() {
             return new double[4];
         };

@@ -56,6 +56,7 @@ public class TileEntityRocketEngine extends TileEntityCommon {
         return BlockClass.DarkIron;
     }
     
+    @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
         tag.setBoolean("inSlice", inSlice);
@@ -66,6 +67,7 @@ public class TileEntityRocketEngine extends TileEntityCommon {
         tag.setBoolean("lastValidationStatus", lastValidationStatus);
     };
     
+    @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
         inSlice = tag.getBoolean("inSlice");

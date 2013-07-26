@@ -106,12 +106,14 @@ public class DeltaChunk {
         dse.posX = (int)vrm.xCoord;
         dse.posY = (int)vrm.yCoord;
         dse.posZ = (int)vrm.zCoord;
-        mapper.fillDse(new DseDestination() {public void include(Coord real) {
+        mapper.fillDse(new DseDestination() {@Override
+        public void include(Coord real) {
             shadow.set(real);
             dse.real2shadow(shadow);
             TransferLib.move(real, shadow, false, true);
         }});
-        mapper.fillDse(new DseDestination() {public void include(Coord real) {
+        mapper.fillDse(new DseDestination() {@Override
+        public void include(Coord real) {
             if (wipeSrc) {
                 TransferLib.rawErase(real);
             }

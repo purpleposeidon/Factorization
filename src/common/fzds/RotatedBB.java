@@ -65,7 +65,8 @@ public class RotatedBB extends AxisAlignedBB {
         return true;
     }
     
-    private static ThreadLocal<Vec3[]> vertexBuffer = new ThreadLocal<Vec3[]>() { protected Vec3[] initialValue() {
+    private static ThreadLocal<Vec3[]> vertexBuffer = new ThreadLocal<Vec3[]>() { @Override
+    protected Vec3[] initialValue() {
         Vec3[] ret = new Vec3[8];
         for (int i = 0; i < ret.length; i++) {
             ret[i] = Vec3.createVectorHelper(0, 0, 0);

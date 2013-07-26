@@ -697,6 +697,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         }
     }
 
+    @Override
     public void broadcastMessage(EntityPlayer who, int messageType, Object... items) {
         Core.network.broadcastMessage(who, getCoord(), messageType, items);
     }

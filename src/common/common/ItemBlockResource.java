@@ -13,6 +13,7 @@ public class ItemBlockResource extends ItemBlock {
         setHasSubtypes(true);
     }
 
+    @Override
     public int getMetadata(int i) {
         return i;
     }

@@ -23,6 +23,7 @@ public class ItemServoRailWidget extends ItemFactorization {
         super(itemId, "servo/component", TabType.SERVOS);
     }
     
+    @Override
     public String getUnlocalizedName(ItemStack is) {
         ServoComponent sc = get(is);
         if (sc == null) {
@@ -31,6 +32,7 @@ public class ItemServoRailWidget extends ItemFactorization {
         return super.getUnlocalizedName(is) + "." + sc.getName();
     }
     
+    @Override
     public String getItemDisplayName(ItemStack is) {
         String s = super.getItemDisplayName(is);
         if (s == null || s.length() == 0) {
@@ -128,6 +130,7 @@ public class ItemServoRailWidget extends ItemFactorization {
         list.addAll(subItemsCache);
     }
     
+    @Override
     public Icon getIcon(ItemStack stack, int renderPass, EntityPlayer player, ItemStack usingItem, int useRemaining) {
         return getIcon(stack, renderPass);
     }

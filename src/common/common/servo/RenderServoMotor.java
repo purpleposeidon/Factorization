@@ -94,6 +94,7 @@ public class RenderServoMotor extends RenderEntity {
     private Quaternion q0 = new Quaternion(), q1 = new Quaternion();
     private static boolean debug_servo_orientation = Core.dev_environ;
 
+    @Override
     public void doRender(Entity ent, double x, double y, double z, float yaw, float partial) {
         Core.profileStartRender("servo");
         MovingObjectPosition mop = Minecraft.getMinecraft().objectMouseOver;
@@ -339,6 +340,7 @@ public class RenderServoMotor extends RenderEntity {
     static ItemStack equiped_item = null;
 
     static EntityLiving item_holder = new EntityLiving(null) {
+        @Override
         public ItemStack getHeldItem() {
             return equiped_item;
         }

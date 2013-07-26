@@ -126,6 +126,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
         item_filter_buttons.clear();
         item_filter_buttons.add(global_buttons.currentRight + 8, row_top + 6, "Item Filter");
         item_filter_buttons.setTest(new Predicate<TileEntity>() {
+            @Override
             public boolean test(TileEntity a) {
                 return ((TileEntityRouter) a).upgradeItemFilter;
             }
@@ -137,6 +138,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
         strict_entity_button = machine_filter_buttons.add(strict_entity, sebl, row_top, sebw, bh, "visit all"); //visit near/visit all
         next_entity_button = machine_filter_buttons.add(next_entity, LEFT, row2_top, xSize - 16, bh, any_inv);
         machine_filter_buttons.setTest(new Predicate<TileEntity>() {
+            @Override
             public boolean test(TileEntity a) {
                 return ((TileEntityRouter) a).upgradeMachineFilter;
             }
@@ -151,6 +153,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
         speed_buttons.add(LEFT, line1, Core.registry.router_speed.getItemDisplayName(null));
         speed_buttons.add(LEFT, line2, "No delay when visiting machines");
         speed_buttons.setTest(new Predicate<TileEntity>() {
+            @Override
             public boolean test(TileEntity a) {
                 return ((TileEntityRouter) a).upgradeSpeed;
             }
@@ -160,6 +163,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
         thorough_buttons.add(LEFT, line1, Core.registry.router_thorough.getItemDisplayName(null));
         thorough_buttons.add(LEFT, line2, "Always finish serving machines");
         thorough_buttons.setTest(new Predicate<TileEntity>() {
+            @Override
             public boolean test(TileEntity a) {
                 return ((TileEntityRouter) a).upgradeThorough;
             }
@@ -169,6 +173,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
         bandwidth_buttons.add(LEFT, line1, Core.registry.router_throughput.getItemDisplayName(null));
         bandwidth_buttons.add(LEFT, line2, "Move stacks at a time");
         bandwidth_buttons.setTest(new Predicate<TileEntity>() {
+            @Override
             public boolean test(TileEntity a) {
                 return ((TileEntityRouter) a).upgradeThroughput;
             }
@@ -177,6 +182,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
         ejector_buttons.clear();
         eject_direction_button = ejector_buttons.add(eject_direction, LEFT, row2_top, xSize - 16, bh, "to ...");
         ejector_buttons.setTest(new Predicate<TileEntity>() {
+            @Override
             public boolean test(TileEntity a) {
                 return ((TileEntityRouter) a).upgradeEject;
             }
@@ -255,6 +261,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
         fontRenderer.drawString("Inventory", 8, (ySize - 96) + 2, 0x404040);
     }
 
+    @Override
     protected void drawGuiContainerBackgroundLayer(float f, int i, int j) {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         Core.bindGuiTexture("routergui");
@@ -418,6 +425,7 @@ public class GuiRouter extends GuiContainer implements IClickable {
         }
     }
 
+    @Override
     protected void mouseClicked(int x, int y, int button) {
         super.mouseClicked(x, y, button);
         global_buttons.handleClick(this, mc, x, y, button);
