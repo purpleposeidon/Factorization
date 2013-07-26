@@ -117,19 +117,19 @@ public class ItemOreProcessing extends ItemFactorization implements IActOnCraft 
 
     @Override
     public void onCraft(ItemStack is, IInventory craftMatrix, int craftSlot, ItemStack result, EntityPlayer player) {
-        if (result == null) {
+        if (result == null || player == null) {
             return;
+        }
+        if (player.worldObj != null) {
+            if (player.worldObj.isRemote) {
+                return;
+            }
         }
         if (result.getItem() != Core.registry.ore_clean_gravel) {
             return;
         }
         if (is.getItem() != Core.registry.ore_dirty_gravel) {
             return;
-        }
-        if (player != null && player.worldObj != null) {
-            if (player.worldObj.isRemote) {
-                return;
-            }
         }
         boolean any = false;
         for (int stack_index = 0; stack_index < is.stackSize; stack_index++) {

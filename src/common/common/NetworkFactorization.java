@@ -404,10 +404,8 @@ public class NetworkFactorization implements ITinyPacketHandler {
                     world.setBlockTileEntity(x, y, z, spawn);
                 }
 
-                if (spawn != null) {
-                    spawn.useExtraInfo(extraData);
-                    spawn.useExtraInfo2(extraData2);
-                }
+                spawn.useExtraInfo(extraData);
+                spawn.useExtraInfo2(extraData2);
             }
 
             if (messageType == -1) {

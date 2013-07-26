@@ -1085,8 +1085,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public boolean onItemPickup(EntityItemPickupEvent event) {
         EntityPlayer player = event.entityPlayer;
         EntityItem item = event.item;
+        if (item == null) {
+            return true;
+        }
         ItemStack is = item.getEntityItem();
-        if (item == null || is == null || is.stackSize == 0) {
+        if (is == null || is.stackSize == 0) {
             return true;
         }
         if (player.isDead) {

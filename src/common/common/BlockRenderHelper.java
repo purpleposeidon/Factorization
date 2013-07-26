@@ -302,6 +302,7 @@ public class BlockRenderHelper extends Block {
     public void renderRotated(Tessellator tess, Coord c) {
         if (c == null) {
             renderRotated(tess, 0, 0, 0);
+            return;
         }
         for (int f = 0; f < faceCache.length; f++) {
             if (textures[f] == null) {

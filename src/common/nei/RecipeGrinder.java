@@ -39,6 +39,7 @@ public class RecipeGrinder extends TemplateRecipeHandler {
         for (GrinderRecipe gr : TileEntityGrinder.recipes) {
             if (ingredient == null) {
                 arecipes.add(new CachedGrinderRecipe(gr));
+                continue;
             }
             for (ItemStack is : gr.getInput()) {
                 if (ingredient.isItemEqual(is)) {

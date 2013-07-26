@@ -216,6 +216,9 @@ public class WireConnections {
             }
             getExtremes(part, min, max);
         }
+        if (min == null || max == null) {
+            return;
+        }
         min = min.add(8, 8, 8);
         max = max.add(8, 8, 8);
         min.scale(1F / 16F);
