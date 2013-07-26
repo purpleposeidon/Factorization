@@ -89,7 +89,7 @@ public class Charge implements IDataSerializable {
         Coord here = conductor.getCoord();
         if (here.w == null) {
             //BAH! BAH I say! Can't do this nicely because we don't have a world!
-            new ConductorSet(conductor);
+            ConductorSet assignedConductorSet = new ConductorSet(conductor);
             return;
         }
         Iterable<Coord> neighbors = here.getNeighborsAdjacent();
@@ -114,7 +114,7 @@ public class Charge implements IDataSerializable {
                 return;
             }
         }
-        new ConductorSet(conductor);
+        ConductorSet assignedConductorSet = new ConductorSet(conductor);
     }
 
     /*** 

@@ -17,6 +17,7 @@ public class BlockLightAir extends Block {
     static public final int air_md = 0;
     static public final int fire_md = 1;
     static MaterialTransparent actuallyTransparentMaterial = new MaterialTransparent(Material.air.materialMapColor) {
+        @Override
         public boolean isOpaque() {
             return true;
         }

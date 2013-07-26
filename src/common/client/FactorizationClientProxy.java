@@ -339,6 +339,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(clazz, r);
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void registerRenderers() {
         if (FzConfig.render_barrel_item || FzConfig.render_barrel_text) {

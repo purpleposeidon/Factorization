@@ -105,13 +105,18 @@ public class RecipeMixer extends TemplateRecipeHandler {
                 default: //But it's incomplete!
                 case 4:
                     ret.add(new PositionedStack(recipe.inputs.get(3), w + 18, h + 18));
+                    //$FALL-THROUGH$
                 case 3:
                     ret.add(new PositionedStack(recipe.inputs.get(2), w, h + 18));
+                    //$FALL-THROUGH$
                 case 2:
                     ret.add(new PositionedStack(recipe.inputs.get(1), w, h));
+                    //$FALL-THROUGH$
                 case 1:
                     ret.add(new PositionedStack(recipe.inputs.get(0), w + 18, h));
+                    //$FALL-THROUGH$
                 case 0:
+                    //$FALL-THROUGH$
                 } //Huh, ti mi cnino
             } catch (Exception e) {
                 e.printStackTrace();
@@ -135,13 +140,18 @@ public class RecipeMixer extends TemplateRecipeHandler {
             default:
             case 4:
                 ret.add(new PositionedStack(output.get(3), w + 18, h + 18));
+                //$FALL-THROUGH$
             case 3:
                 ret.add(new PositionedStack(output.get(2), w, h + 18));
+                //$FALL-THROUGH$
             case 2:
                 ret.add(new PositionedStack(output.get(1), w + 18, h));
+                //$FALL-THROUGH$
             case 1:
                 ret.add(new PositionedStack(output.get(0), w, h));
+                //$FALL-THROUGH$
             case 0:
+                //$FALL-THROUGH$
             }
             return ret;
         }

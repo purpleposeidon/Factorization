@@ -13,6 +13,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.NetHandler;
 import net.minecraft.network.packet.Packet;
@@ -46,6 +47,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
     
     int huge_tag_warnings = 0;
 
+    @SuppressWarnings("resource")
     public Packet TEmessagePacket(Coord src, int messageType, Object... items) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -83,7 +85,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                         is.writeToNBT(tag);
                         is.setTagCompound(backup);
                     }
-                    NBTTagCompound.writeNamedTag(tag, output);
+                    NBTBase.writeNamedTag(tag, output);
                     if (outputStream.size() > 65536 && is.hasTagCompound()) {
                         //Got an overflow! We'll blame the NBT tag.
                         if (huge_tag_warnings++ < 10) {
@@ -155,7 +157,6 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 output.writeUTF(a);
             }
             output.flush();
-            new PacketDispatcher();
             return PacketDispatcher.getTinyPacket(Core.instance, factorizeNtfyChannel, outputStream.toByteArray());
         } catch (IOException e) {
             e.printStackTrace();
@@ -163,6 +164,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
         }
     }
     
+    @SuppressWarnings("resource")
     public Packet entityPacket(Entity to, short messageType, Object ...items) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -198,7 +200,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                         is.writeToNBT(tag);
                         is.setTagCompound(backup);
                     }
-                    NBTTagCompound.writeNamedTag(tag, output);
+                    NBTBase.writeNamedTag(tag, output);
                     if (outputStream.size() > 65536 && is.hasTagCompound()) {
                         //Got an overflow! We'll blame the NBT tag.
                         if (huge_tag_warnings++ < 10) {

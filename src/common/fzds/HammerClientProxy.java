@@ -254,9 +254,9 @@ public class HammerClientProxy extends HammerProxy {
         try {
             NCH_worldClient_field.set(send_queue, wc);
         } catch (IllegalArgumentException e) {
-            new RuntimeException("Failed to set SendQueue world due to reflection failure", e);
+            throw new RuntimeException("Failed to set SendQueue world due to reflection failure", e);
         } catch (IllegalAccessException e) {
-            new RuntimeException("Failed to set SendQueue world due to reflection failure", e);
+            throw new RuntimeException("Failed to set SendQueue world due to reflection failure", e);
         }
     }
     

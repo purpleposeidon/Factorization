@@ -289,7 +289,6 @@ public class BlockFactorization extends BlockContainer {
             }
             if (destroyedTE == null) {
                 Core.logWarning("No IFactoryType TE behind block that was destroyed, and nothing saved!");
-                destroyedTE = null;
                 return ret;
             }
             Coord destr = destroyedTE.getCoord();
@@ -303,7 +302,7 @@ public class BlockFactorization extends BlockContainer {
                 destroyedTE = null;
                 return ret;
             }
-            f = (IFactoryType) destroyedTE;
+            f = destroyedTE;
             destroyedTE = null;
         }
         ItemStack is = new ItemStack(Core.registry.item_factorization, 1, f.getFactoryType().md);
