@@ -74,7 +74,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         if (update_count > update_limit) {
             if (airToUpdate.size() > 1024*8) {
                 if (!spammed_console) {
-                    Core.logSevere("TileEntityWrathLamp.airToUpdate has %i entries!", airToUpdate.size()); //NORELEASE: %i
+                    Core.logSevere("TileEntityWrathLamp.airToUpdate has %s entries!", airToUpdate.size());
                     spammed_console = true;
                 }
                 return;

@@ -30,6 +30,7 @@ run("rm " + mfurl)
 
 #Check for baddies
 run("ack-grep NORELEASE src/")
+run("ack-grep '%i' src/")
 
 #Factorization
 run("./make")

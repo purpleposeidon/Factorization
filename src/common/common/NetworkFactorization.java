@@ -349,7 +349,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
         case factorizeCmdChannel: handleCmd(data); break;
         case factorizeNtfyChannel: handleNtfy(input); break;
         case factorizeEntityChannel: handleEntity(input); break;
-        default: Core.logWarning("Got packet with invalid channel %i with player = %s ", channel, me); break;
+        default: Core.logWarning("Got packet with invalid channel %s with player = %s ", channel, me); break;
         }
 
         currentPlayer.set(null);
@@ -543,7 +543,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
             }
             
             if (!(to instanceof IEntityMessage)) {
-                Core.logFine("Packet to inappropriate entity #%i: %i", entityId, messageType);
+                Core.logFine("Packet to inappropriate entity #%s: %s", entityId, messageType);
             }
             IEntityMessage iem = (IEntityMessage) to;
             
