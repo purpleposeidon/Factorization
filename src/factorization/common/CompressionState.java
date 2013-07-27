@@ -44,6 +44,29 @@ public class CompressionState {
     
     //Return true if the passed in CompACT is valid
     boolean populateState(TileEntityCompressionCrafter cc) {
+        /*
+         * Later I've realized that there's probably a simpler algorithm. This guy here is probably simpler. (Not completely described.)
+         * 
+         * get_clockwise_direction: TECC -> (direction, direction)
+         * 		Returns the two directions that could be 'clockwise' for the TECC.
+         * 		lower coords of the other-axiis is not correct. Might lookup in an array, or a rotation might be cool.
+         *  find_root: TECC -> (clockwise_direction, root_TECC)
+         *  	Similar to before
+         *  get_length: ICoord -> expected_face -> clockwise_direction -> int
+         *  	counts how many TECC are in direction; returns -1 if count is >3, or if there's one facing the wrong way, or...
+         *  	populate the hashset as we check each one
+         *  	make sure each faces expected_face
+         *  
+         *  root, right = find_root here
+         *  width = get_length root root.facing right
+         *  assert width > 0
+         *  height = get_length (root + right*width + facing) right.getOpposite root.facing
+         *  assert height > 0
+         *  width2 = get_length (root + right*(width - 1) + facing*height) root.facing.getOpposite right.getOpposite
+         *  assert width == width2
+         *  height2 = get_length (root + right.getOpposite + facing*height) right root.facing.getOpposite
+         *  assert height == height2
+         */
         start = cc;
         up = cc.getFacing();
         if (up == ForgeDirection.UNKNOWN) {
