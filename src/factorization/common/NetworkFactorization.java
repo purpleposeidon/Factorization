@@ -34,6 +34,7 @@ import factorization.api.DeltaCoord;
 import factorization.api.IEntityMessage;
 import factorization.api.Quaternion;
 import factorization.api.VectorUV;
+import factorization.notify.NotifyImplementation;
 
 public class NetworkFactorization implements ITinyPacketHandler {
     protected final static short factorizeTEChannel = 0; //used for tile entities
@@ -571,7 +572,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 for (int i = 0; i < argCount; i++) {
                     args[i] = input.readUTF();
                 }
-                Core.notify(me, target, item, msg, args);
+                NotifyImplementation.recieve(me, target, item, msg, args);
             } catch (IOException e) {
                 e.printStackTrace();
             }

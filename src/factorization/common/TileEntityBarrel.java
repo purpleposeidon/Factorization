@@ -14,6 +14,7 @@ import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
+import factorization.notify.Notify;
 
 //Based off of technology found stockpiled in the long-abandoned dwarven fortress of "Nod Semor, the Toad of Unity".
 
@@ -265,11 +266,13 @@ public class TileEntityBarrel extends TileEntityFactorization {
 
     void info(EntityPlayer entityplayer) {
         if (item == null && getItemCount() == 0) {
-            Core.notify(entityplayer, getCoord(), "Empty");
+            Notify.send(entityplayer, getCoord(), "Empty");
         } else if (getItemCount() >= getMaxSize()) {
-            Core.notify(entityplayer, getCoord(), item, "Full of {ITEM_NAME}{ITEM_INFOS_NEWLINE}"); //NORELEASE: We need to fix our Notification system so that we can send ItemStacks over the wire to be translated client-side.
+            Notify.withItem(item);
+            Notify.send(entityplayer, getCoord(), "Full of {ITEM_NAME}{ITEM_INFOS_NEWLINE}");
         } else {
-            Core.notify(entityplayer, getCoord(), item, "%s {ITEM_NAME}{ITEM_INFOS_NEWLINE}", "" + getItemCount());
+            Notify.withItem(item);
+            Notify.send(entityplayer, getCoord(), "%s {ITEM_NAME}{ITEM_INFOS_NEWLINE}", "" + getItemCount());
         }
     }
 
@@ -351,7 +354,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
 
         if (is.isItemDamaged()) {
             if (getItemCount() == 0) {
-                Core.notify(entityplayer, getCoord(), "No storing damaged items");
+                Notify.send(entityplayer, getCoord(), "No storing damaged items");
             } else {
                 info(entityplayer);
             }
@@ -362,7 +365,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
 
         if (!itemMatch(is)) {
             if (Core.getTranslationKey(is.getItem()).equals(Core.getTranslationKey(item))) {
-                Core.notify(entityplayer, getCoord(), "That item is different");
+                Notify.send(entityplayer, getCoord(), "That item is different");
             } else {
                 info(entityplayer);
             }
@@ -423,7 +426,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
         }
         if (hand != null && !itemMatch(hand)) {
             if (Core.getTranslationKey(hand).equals(Core.getTranslationKey(item))) {
-                Core.notify(entityplayer, getCoord(), "That item is different");
+                Notify.send(entityplayer, getCoord(), "That item is different");
             } else {
                 info(entityplayer);
             }

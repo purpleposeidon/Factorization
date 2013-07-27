@@ -34,6 +34,7 @@ import factorization.fzds.DeltaChunk.AreaMap;
 import factorization.fzds.DeltaChunk.DseDestination;
 import factorization.fzds.api.DeltaCapability;
 import factorization.fzds.api.IDeltaChunk;
+import factorization.notify.Notify;
 
 public class FZDSCommand extends CommandBase {
     //private static DimensionSliceEntity currentWE = null;
@@ -460,8 +461,8 @@ public class FZDSCommand extends CommandBase {
                 }
                 final Coord lower = low.copy();
                 final Coord upper = up.copy();
-                Core.notify(null, lower, "Low");
-                Core.notify(null, upper, "High");
+                Notify.send(lower, "Low");
+                Notify.send(null, upper, "High");
                 
                 IDeltaChunk dse = DeltaChunk.makeSlice(Hammer.fzds_command_channel, lower, upper, new AreaMap() {
                     @Override

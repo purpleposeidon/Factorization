@@ -39,6 +39,7 @@ import factorization.api.datahelpers.Share;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
 import factorization.common.FactorizationUtil.FzInv;
+import factorization.notify.Notify;
 
 public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IEntityMessage, IInventory {
     public static final int STACKS = 16;
@@ -625,7 +626,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     public void putError(Object error) {
         if (!worldObj.isRemote) {
-            Core.notify(null, getCurrentPos(), "" + error);
+            Notify.send(getCurrentPos(), "%s", error.toString());
         }
         ServoStack ss = getServoStack(STACK_ERRNO);
         if (ss.getFreeSpace() <= 0) {

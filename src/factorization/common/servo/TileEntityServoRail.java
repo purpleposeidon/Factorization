@@ -29,10 +29,11 @@ import factorization.common.BlockClass;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
 import factorization.common.Core;
-import factorization.common.Core.NotifyStyle;
 import factorization.common.FactoryType;
 import factorization.common.NetworkFactorization.MessageType;
 import factorization.common.TileEntityCommon;
+import factorization.notify.Notify;
+import factorization.notify.Notify.Style;
 
 public class TileEntityServoRail extends TileEntityCommon implements IChargeConductor {
     public static final float width = 7F/16F;
@@ -235,7 +236,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             }
             String info = decoration.getInfo();
             if (info != null) {
-                Core.notify(entityplayer, getCoord(), info);
+                Notify.send(entityplayer, getCoord(), info);
             }
         }
         return ret;
@@ -279,7 +280,8 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
                 Core.logWarning("Component packet error at %s %s:", this, getCoord());
                 e.printStackTrace();
                 decoration = null;
-                Core.notify(null, getCoord(), NotifyStyle.FORCELONG, "Component packet error!\nSee console log.");
+                Notify.withStyle(Style.FORCE, Style.LONG);
+                Notify.send(null, getCoord(), "Component packet error!\nSee console log.");
                 return super.getDescriptionPacket();
             }
             return getDescriptionPacketWith(with_update ? MessageType.ServoRailDecorUpdate : MessageType.ServoRailDecor, baos.toByteArray());

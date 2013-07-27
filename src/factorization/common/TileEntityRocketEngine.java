@@ -25,11 +25,12 @@ import net.minecraft.util.Vec3;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
-import factorization.common.Core.NotifyStyle;
 import factorization.common.NetworkFactorization.MessageType;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.TransferLib;
 import factorization.fzds.api.IDeltaChunk;
+import factorization.notify.Notify;
+import factorization.notify.Notify.Style;
 
 public class TileEntityRocketEngine extends TileEntityCommon {
     boolean inSlice = false;
@@ -132,23 +133,25 @@ public class TileEntityRocketEngine extends TileEntityCommon {
         }
         DeltaCoord dc = getCornerDirection(player, side);
         if (dc == null) {
-            Core.notify(player, c, "Place it differently");
+            Notify.send(player, c, "Place it differently");
             return false;
         }
         boolean fail = false;
         for (Coord spot : getArea(c, dc)) {
             if (!spot.isReplacable()) {
                 if (fail == false) {
-                    Core.clearNotifications(player);
+                    Notify.clear(player);
                     fail = true;
                 }
                 if (!spot.equals(c)) {
-                    Core.notify(player, spot, NotifyStyle.FORCE, "X");
+                    Notify.withStyle(Style.FORCE);
+                    Notify.send(player, spot, "X");
                 }
             }
         }
         if (fail) {
-            Core.notify(player, c, NotifyStyle.FORCE, "Obstructed");
+            Notify.withStyle(Style.FORCE);
+            Notify.send(player, c, "Obstructed");
             return false;
         }
         AxisAlignedBB area = AxisAlignedBB.getBoundingBox(c.x, c.y, c.z, c.x, c.y, c.z);
@@ -158,7 +161,8 @@ public class TileEntityRocketEngine extends TileEntityCommon {
         for (Object o : c.w.getEntitiesWithinAABBExcludingEntity(null, area)) {
             Entity e = (Entity) o;
             if (e.canBeCollidedWith() || e instanceof EntityLiving || true) {
-                Core.notify(player, c, NotifyStyle.FORCE, "Obstructed by entity");
+                Notify.withStyle(Style.FORCE);
+                Notify.send(player, c, "Obstructed by entity");
                 Coord ec = new Coord(e);
                 if (!ec.equals(c)) {
                     String it = "(this guy)";
@@ -168,7 +172,8 @@ public class TileEntityRocketEngine extends TileEntityCommon {
                     if (e instanceof EntityCreeper) {
                         it = "(thissss guy)";
                     }
-                    Core.notify(player, new Coord(e), NotifyStyle.FORCE, it);
+                    Notify.withStyle(Style.FORCE);
+                    Notify.send(player, e, it);
                 }
                 return false;
             }
@@ -312,18 +317,18 @@ for x in range(0, len(d[0])):
         double score = fireCount / perfect;
         if (score >= 0.5) {
             if (solver.entireRocket.size() == 0) {
-                Core.notify(null, getCoord(), "No body?\nBug!");
+                Notify.send(getCoord(), "No body?\nBug!");
             } else {
                 return solver;
             }
         } else {
-            Core.notify(null, getCoord(), "Nope!");
+            Notify.send(getCoord(), "Nope!");
         }
         return null;
     }
     
     void ignite(ContiguitySolver solver) {
-        Core.notify(null, getCoord(), "Ignition");
+        Notify.send(getCoord(), "Ignition");
         isLeaderEngine = true;
         for (TileEntityRocketEngine engine : solver.engines) {
             engine.isFiring = true;
@@ -411,7 +416,7 @@ for x in range(0, len(d[0])):
             return true;
         }
         if (isValid(entityplayer)) {
-            Core.notify(entityplayer, getCoord(), "Rocket is valid");
+            Notify.send(entityplayer, getCoord(), "Rocket is valid");
         }
         return true;
     }
@@ -468,7 +473,8 @@ for x in range(0, len(d[0])):
     public void notifyArea(EntityPlayer player) {
         ContiguitySolver solver = canIgnite(player);
         for (Coord c : solver.entireRocket) {
-            Core.notify(player, c, NotifyStyle.FORCE, "" + c.y);
+            Notify.withStyle(Style.FORCE);
+            Notify.send(player, c, "" + c.y);
         }
     }
         
@@ -483,10 +489,10 @@ for x in range(0, len(d[0])):
         public void notify(TileEntityRocketEngine where, EntityPlayer who) {
             if (who != null) {
                 if (mark == null) {
-                    Core.notify(who, where.getCoord(), msg);
+                    Notify.send(who, where.getCoord(), msg);
                 } else {
-                    Core.notify(who, where.getCoord(), "Validation failed");
-                    Core.notify(who, mark, msg);
+                    Notify.send(who, where.getCoord(), "Validation failed");
+                    Notify.send(who, mark, msg);
                 }
             }
         }

@@ -38,8 +38,6 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.ChargeMetalBlockConductance;
-import factorization.api.Coord;
-import factorization.client.gui.FactorizationNotify;
 import factorization.common.compat.CompatManager;
 import factorization.common.servo.ServoMotor;
 
@@ -255,43 +253,6 @@ public class Core {
         }
     }
     
-    public static void notify(EntityPlayer player, Object where, ItemStack item, String format, String ...args) {
-        if (player != null && player.worldObj.isRemote) {
-            FactorizationNotify.addMessage(where, item, format, args);
-        } else {
-            Coord target = Coord.tryLoad(player != null ? player.worldObj : null, where);
-            network.broadcastPacket(player, target, network.notifyPacket(where, item, format, args));
-        }
-    }
-    
-    public static void notify(EntityPlayer player, Coord where, String format, String ...args) {
-        if (player != null && player.worldObj.isRemote) {
-            FactorizationNotify.addMessage(where, null, format, args);
-        } else {
-            network.broadcastPacket(player, where, network.notifyPacket(where, null, format, args));
-        }
-    }
-    
-    public static void notify(EntityPlayer player, Coord where, NotifyStyle style, String format, String ...args) {
-        if (style == NotifyStyle.FORCE || style == NotifyStyle.FORCELONG) {
-            format = "\b" + format;
-        }
-        if (style == NotifyStyle.LONG || style == NotifyStyle.FORCELONG) {
-            format = "\t" + format;
-        }
-        notify(player, where, format, args);
-    }
-    
-    public static void clearNotifications(EntityPlayer player) {
-        if (player != null) {
-            //We aren't willing to do global clears
-            notify(player, new Coord(player), "!clear");
-        }
-    }
-    
-    public static enum NotifyStyle {
-        FORCE, LONG, FORCELONG
-    }
     
     public static enum TabType {
         ART, CHARGE, OREP, SERVOS, ROCKETRY, TOOLS, BLOCKS, MATERIALS;

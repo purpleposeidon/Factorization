@@ -22,7 +22,6 @@ public class FzConfig {
     public static boolean render_barrel_item = true;
     public static boolean render_barrel_text = true;
     public static boolean render_barrel_close = false;
-    public static boolean notify_in_chat = false;
     public static int entity_relight_task_id = -1;
     public static boolean gen_silver_ore = true;
     public static int silver_ore_node_size = 25;
@@ -122,7 +121,6 @@ public class FzConfig {
             render_barrel_item = getBoolConfig("renderBarrelItem", "client", render_barrel_item, null);
             render_barrel_item = getBoolConfig("renderBarrelText", "client", render_barrel_text, null);
             render_barrel_close = getBoolConfig("renderBarrelClose", "client", render_barrel_close, "If true, render barrel info only when nearby");
-            notify_in_chat = getBoolConfig("notifyInChat", "client", notify_in_chat, "If true, notifications are put in the chat log instead in the world");
             renderTEs = getBoolConfig("renderOtherTileEntities", "client", renderTEs, "If false, most TEs won't draw, making everything look broken but possibly improving FPS");
             renderAO = getBoolConfig("renderAmbientOcclusion", "client", renderAO, "If false, never use smooth lighting for drawing sculptures");
             String attempt = getStringConfig("pocketCraftingActionKeys", "client", pocketActions, "3 keys for: removing (x), cycling (c), balancing (b)");

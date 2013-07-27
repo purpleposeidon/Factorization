@@ -31,6 +31,7 @@ import factorization.api.IFactoryType;
 import factorization.common.NetworkFactorization.MessageType;
 import factorization.common.servo.Decorator;
 import factorization.common.servo.TileEntityServoRail;
+import factorization.notify.Notify;
 
 public class BlockFactorization extends BlockContainer {
     public boolean fake_normal_render = false;
@@ -265,7 +266,7 @@ public class BlockFactorization extends BlockContainer {
         Coord here = new Coord(world, x, y, z);
         TileEntityCommon tec = here.getTE(TileEntityCommon.class);
         if (tec == null) {
-            Core.notify(null, here, "No TileEntity!");
+            Notify.send(player, here, "No TileEntity!");
             return super.removeBlockByPlayer(world, player, x, y, z);
         }
         return tec.removeBlockByPlayer(player);

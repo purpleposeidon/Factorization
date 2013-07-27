@@ -40,6 +40,7 @@ import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.Quaternion;
 import factorization.common.NetworkFactorization.MessageType;
+import factorization.notify.Notify;
 
 public class TileEntityGreenware extends TileEntityCommon {
     public static int MAX_PARTS = 32;
@@ -426,7 +427,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             return false;
         }
         if (state != ClayState.WET) {
-            Core.notify(player, getCoord(), "Not wet");
+            Notify.send(player, getCoord(), "Not wet");
             return false;
         }
         if (!creative) {
@@ -437,7 +438,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             return true;
         }
         if (parts.size() >= MAX_PARTS) {
-            Core.notify(player, getCoord(), "Too complex");
+            Notify.send(player, getCoord(), "Too complex");
             held.stackSize++;
             return false;
         }
@@ -546,7 +547,7 @@ public class TileEntityGreenware extends TileEntityCommon {
                 }
             }
             //return false; -- Actually, let's allow this.
-            Core.notify(null, c, "!");
+            Notify.send(null, c, "!"); //This is to indicate that things will be a bit messed up here. FIXME: Let block collision boxes go outside the block
         }
 
         return true;

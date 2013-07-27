@@ -17,6 +17,7 @@ import factorization.common.Core.TabType;
 import factorization.common.FactorizationUtil.FzInv;
 import factorization.common.TileEntityGreenware.ClayLump;
 import factorization.common.TileEntityGreenware.ClayState;
+import factorization.notify.Notify;
 
 public class ItemSculptingTool extends ItemFactorization {
 
@@ -160,7 +161,7 @@ public class ItemSculptingTool extends ItemFactorization {
         if (mode == ToolMode.MOLD) {
             int is_fired = state.compareTo(ClayState.BISQUED);
             if (is_fired < 0) {
-                Core.notify(player, here, "Not fired");
+                Notify.send(player, here, "Not fired");
                 return true;
             }
             FzInv inv = FactorizationUtil.openInventory(player.inventory, 0);
@@ -181,7 +182,7 @@ public class ItemSculptingTool extends ItemFactorization {
                     }
                 }
                 if (!hasSlab || materialCount < neededClay) {
-                    Core.notify(player, here, "Need wood slab\nAnd %s clay", "" + neededClay);
+                    Notify.send(player, here, "Need wood slab\nAnd %s clay", "" + neededClay); //TODO: Localize properly
                     return false;
                 }
                 inv.pull(FactorizationUtil.makeWildcard(Block.woodSingleSlab), 1, false);
@@ -208,14 +209,15 @@ public class ItemSculptingTool extends ItemFactorization {
             }
             switch (state) {
             case DRY:
-                Core.notify(player, gw.getCoord(), "The clay is dry\nUse a %s.", Core.getTranslationKey(Item.bucketWater));
+                Notify.withItem(new ItemStack(Item.bucketWater));
+                Notify.send(player, gw.getCoord(), "The clay is dry\nUse a {ITEM_NAME}");
                 break;
             case BISQUED:
             case HIGHFIRED:
-                Core.notify(player, gw.getCoord(), "This has been fired");
+                Notify.send(player, gw.getCoord(), "This has been fired");
                 break;
             default:
-                Core.notify(player, gw.getCoord(), "This clay can not be reshaped.");
+                Notify.send(player, gw.getCoord(), "This clay can not be reshaped.");
                 break;
             }
             return false;
@@ -263,7 +265,7 @@ public class ItemSculptingTool extends ItemFactorization {
             }
             break;
         case MOLD:
-            Core.notify(player, here, "Not fired");
+            Notify.send(player, here, "Not fired");
             return true;
         }
         if (gw.isValidLump(test)) {

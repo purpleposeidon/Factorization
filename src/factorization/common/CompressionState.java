@@ -10,6 +10,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
+import factorization.notify.Notify;
 
 public class CompressionState {
     TileEntityCompressionCrafter start, root, otherEdge;
@@ -31,13 +32,13 @@ public class CompressionState {
     }
     
     void error(TileEntityCompressionCrafter at, String msg) {
-        Core.notify(null, new Coord(at), msg);
+        Notify.send(new Coord(at), msg);
         errored = true;
     }
     
     void unknownError(TileEntityCompressionCrafter at, String msg) {
         if (errored) return;
-        Core.notify(null, new Coord(at), msg);
+        Notify.send(new Coord(at), msg);
         errored = true;
     }
     

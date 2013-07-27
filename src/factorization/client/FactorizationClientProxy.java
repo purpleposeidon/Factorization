@@ -31,7 +31,6 @@ import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
-import factorization.client.gui.FactorizationNotify;
 import factorization.client.gui.GuiCrystallizer;
 import factorization.client.gui.GuiGrinder;
 import factorization.client.gui.GuiMixer;
@@ -395,7 +394,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         MinecraftForgeClient.registerItemRenderer(Core.registry.factory_block.blockID, capture);
         MinecraftForgeClient.registerItemRenderer(Core.registry.battery.itemID, new BatteryItemRender(renderBattery));
         MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket.itemID, new ItemRenderGlazeBucket());
-        MinecraftForge.EVENT_BUS.register(new FactorizationNotify());
         
         if (Minecraft.getMinecraft().session.username.equals("neptunepink")) {
             Core.FZLogger.setLevel(Level.FINE);

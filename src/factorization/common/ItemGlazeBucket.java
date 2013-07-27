@@ -18,6 +18,7 @@ import factorization.api.Coord;
 import factorization.common.Core.TabType;
 import factorization.common.TileEntityGreenware.ClayLump;
 import factorization.common.TileEntityGreenware.ClayState;
+import factorization.notify.Notify;
 
 public class ItemGlazeBucket extends ItemFactorization {
     public static final int MAX_CHARGES = 32;
@@ -218,10 +219,11 @@ public class ItemGlazeBucket extends ItemFactorization {
         switch (state) {
         case WET:
         case DRY:
-            Core.notify(player, clay.getCoord(), "Use a Furnace Heater");
+            Notify.withItem(Core.registry.heater_item);
+            Notify.send(player, clay.getCoord(), "Use a {ITEM_NAME} to bisque");
             return is;
         case HIGHFIRED:
-            Core.notify(player, clay.getCoord(), "Already high-fired");
+            Notify.send(player, clay.getCoord(), "Already high-fired");
             return is;
         }
         ClayLump part = clay.parts.get(mop.subHit);

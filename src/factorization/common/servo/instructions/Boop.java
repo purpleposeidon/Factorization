@@ -8,9 +8,9 @@ import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
-import factorization.common.Core;
 import factorization.common.servo.Instruction;
 import factorization.common.servo.ServoMotor;
+import factorization.notify.Notify;
 
 public class Boop extends Instruction {
     @Override
@@ -20,7 +20,7 @@ public class Boop extends Instruction {
 
     @Override
     public void motorHit(ServoMotor motor) {
-        Core.notify(null, motor.getCurrentPos(), "Boop");
+        Notify.send(null, motor.getCurrentPos(), "Boop");
     }
     
     @Override

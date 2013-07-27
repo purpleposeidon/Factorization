@@ -17,10 +17,10 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
-import factorization.common.Core;
 import factorization.common.servo.ActuatorItem;
 import factorization.common.servo.Instruction;
 import factorization.common.servo.ServoMotor;
+import factorization.notify.Notify;
 
 public class ActivateActuator extends Instruction {
 
@@ -51,7 +51,7 @@ public class ActivateActuator extends Instruction {
             if (mop == null) {
                 mop = rayTrace(motor);
             }
-            Core.notify(null, new Coord(motor.worldObj, mop), "X"); //NORELEASE
+            Notify.send(null, new Coord(motor.worldObj, mop), "X"); //NORELEASE
             if (is.getItem() instanceof ActuatorItem) {
                 ActuatorItem ai = (ActuatorItem) is.getItem();
                 ai.use(is, player, motor, mop);

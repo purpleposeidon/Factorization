@@ -11,6 +11,7 @@ import factorization.api.Coord;
 import factorization.api.IChargeConductor;
 import factorization.api.IMeterInfo;
 import factorization.common.Core.TabType;
+import factorization.notify.Notify;
 
 public class ItemChargeMeter extends ItemFactorization {
 
@@ -40,7 +41,7 @@ public class ItemChargeMeter extends ItemFactorization {
             if (im == null) {
                 return false;
             }
-            Core.notify(player, here, "%s", im.getInfo());
+            Notify.send(player, here, "%s", im.getInfo());
             return true;
         }
         if (w.isRemote) {
@@ -74,7 +75,7 @@ public class ItemChargeMeter extends ItemFactorization {
             msg = "Charge: " + ic.getCharge().getValue();
         }
         msg += inf;
-        Core.notify(toNotify, here, "%s", msg);
+        Notify.send(player, here, "%s", msg, "");
         return true;
     }
 }
