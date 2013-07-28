@@ -292,34 +292,42 @@ public class TileEntityMixer extends TileEntityFactorization implements
         return false;
     }
     
-    boolean recipeMatches(List<ItemStack> recipeItems) {
+    boolean recipeMatches(List<Object> recipeItems) {
         ItemStack[] in = new ItemStack[input.length];
+        int inputCount = 0;
         for (int i = 0; i < input.length; i++) {
             if (input[i] != null) {
                 in[i] = input[i].copy();
+                inputCount++;
             }
         }
+        int foundCount = 0;
         for (int i = 0; i < recipeItems.size(); i++) {
             Object o = recipeItems.get(i);
             List<ItemStack> all;
             if (o instanceof ItemStack) {
                 all = Arrays.asList((ItemStack)o);
             } else {
-                all = (List<ItemStack>) o;
+                all = new ArrayList();
+                all.addAll((List<ItemStack>) o);
             }
             boolean found = false;
             for (int R = 0; R < all.size(); R++) {
                 ItemStack recipeItem = all.get(R);
                 if (removeMatching(in, recipeItem)) {
                     found = true;
+                    if (all.size() > 1) {
+                        all = Arrays.asList(recipeItem);
+                    }
                     break;
                 }
             }
             if (!found) {
                 return false;
             }
+            foundCount++;
         }
-        return true;
+        return foundCount == inputCount;
     }
     
     private static ArrayList<RecipeMatchInfo> recipe_cache = null;
