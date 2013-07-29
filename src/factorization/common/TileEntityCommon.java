@@ -78,8 +78,16 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     boolean canPlaceAgainst(EntityPlayer player, Coord c, int side) {
         return true;
     }
+    
+    public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+        onPlacedBy(player, is, side);
+    }
 
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
+        loadFromStack(is);
+    }
+    
+    public void loadFromStack(ItemStack is) {
         customName = FactorizationUtil.getCustomItemName(is);
     }
     
@@ -267,5 +275,10 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
             return Container.calcRedstoneFromInventory((IInventory)this);
         }
         return 0;
+    }
+    
+    @Override
+    public String toString() {
+        return super.toString() + " a " + getFactoryType() + " at " + getCoord();
     }
 }

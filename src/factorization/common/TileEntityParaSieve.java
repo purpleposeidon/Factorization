@@ -259,7 +259,6 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             return false;
         }
         facing_direction = ao;
-        getCoord().markBlockForUpdate();
         return true;
     }
 }

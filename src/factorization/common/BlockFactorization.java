@@ -325,7 +325,7 @@ public class BlockFactorization extends BlockContainer {
             //Core.registry.battery.normalizeDamage(is);
         }
         if (f.getFactoryType() == FactoryType.LEYDENJAR) {
-            //TODO: refactor, is lameness
+            //TODO NORELEASE: refactor, is lameness
             NBTTagCompound tag = FactorizationUtil.getTag(is);
             TileEntityLeydenJar jar = (TileEntityLeydenJar) f;
             tag.setInteger("storage", jar.storage);
@@ -335,6 +335,10 @@ public class BlockFactorization extends BlockContainer {
 //		}
         if (f.getFactoryType() == FactoryType.ROCKETENGINE) {
             is = new ItemStack(Core.registry.rocket_engine);
+        }
+        if (f.getFactoryType() == FactoryType.DAYBARREL) {
+            TileEntityDayBarrel barrel = (TileEntityDayBarrel) f;
+            is = TileEntityDayBarrel.makeBarrel(barrel.type, barrel.woodLog, barrel.woodSlab);
         }
         ret.add(is);
         return ret;
@@ -348,6 +352,7 @@ public class BlockFactorization extends BlockContainer {
         Registry reg = Core.registry;
         //common
         itemList.add(reg.barrel_item);
+        
         itemList.add(reg.stamper_item);
         itemList.add(reg.packager_item);
         itemList.add(reg.slagfurnace_item);
@@ -386,6 +391,20 @@ public class BlockFactorization extends BlockContainer {
         itemList.add(reg.servorail_item);
         itemList.add(reg.lamp_item);
         itemList.add(reg.compression_crafter_item);
+        
+        //Barrels
+        if (reg.daybarrel != null) {
+            //itemList.add(new ItemStack(reg.daybarrel));
+            int count = 0;
+            for (ItemStack is : TileEntityDayBarrel.barrel_items) {
+                count++;
+                if (TileEntityDayBarrel.getUpgrade(is) == TileEntityDayBarrel.Type.NORMAL) {
+                    itemList.add(is);
+                } else if (count < TileEntityDayBarrel.Type.TYPE_COUNT) {
+                    itemList.add(is);
+                }
+            }
+        }
     }
 
     @Override
@@ -567,10 +586,13 @@ public class BlockFactorization extends BlockContainer {
         Core.proxy.randomDisplayTickFor(w, x, y, z, rand);
     }
 
+    
+    public static int CURRENT_PASS = 0;
     @Override
     public boolean canRenderInPass(int pass) {
-        return pass == 0;
-        //return pass == 0 || pass == 1;
+        //return pass == 0;
+        CURRENT_PASS = pass;
+        return pass == 0 || pass == 1;
     }
 
     @Override
@@ -633,11 +655,16 @@ public class BlockFactorization extends BlockContainer {
     
     @Override
     public boolean rotateBlock(World worldObj, int x, int y, int z, ForgeDirection axis) {
-        TileEntityCommon tec = new Coord(worldObj, x, y, z).getTE(TileEntityCommon.class);
+        final Coord at = new Coord(worldObj, x, y, z);
+        TileEntityCommon tec = at.getTE(TileEntityCommon.class);
         if (tec == null) {
             return false;
         }
-        return tec.rotate(axis);
+        boolean suc = tec.rotate(axis);
+        if (suc) {
+            at.markBlockForUpdate();
+        }
+        return suc;
     }
     
     @Override

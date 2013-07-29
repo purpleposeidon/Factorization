@@ -52,6 +52,13 @@ public class Quaternion implements IDataSerializable {
         this(w, dir.offsetX, dir.offsetY, dir.offsetZ);
     }
     
+    public void loadFrom(VectorUV v) {
+        this.w = 1;
+        this.x = v.x;
+        this.y = v.y;
+        this.z = v.z;
+    }
+    
     public boolean isEqual(Quaternion other) {
         return w == other.w && x == other.x && y == other.y && z == other.z; 
     }
@@ -283,8 +290,7 @@ public class Quaternion implements IDataSerializable {
     private static final double DOT_THRESHOLD = 0.9995;
     public Quaternion slerp(Quaternion other, double t) {
         //From http://number-none.com/product/Understanding%20Slerp,%20Then%20Not%20Using%20It/index.html (encoding = Western; ISO-8859-1)
-        
-        
+
         // v0 and v1 should be unit length or else
         // something broken will happen.
 
@@ -301,17 +307,23 @@ public class Quaternion implements IDataSerializable {
             result.incrNormalize();
             return result;
         }
-        dot = Math.min(-1, Math.max(1, dot)); 	// Robustness: Stay within domain of acos()
-        double theta_0 = Math.acos(dot);  		// theta_0 = angle between input vectors
-        double theta = theta_0*t;    			// theta = angle between v0 and result 
+        dot = Math.min(-1, Math.max(1, dot)); // Robustness: Stay within domain of acos()
+        double theta_0 = Math.acos(dot); // theta_0 = angle between input vectors
+        double theta = theta_0 * t; // theta = angle between v0 and result
 
         Quaternion v2 = other.add(this, -dot);
-        v2.incrNormalize();              		// { v0, v2 } is now an orthonormal basis
-        
+        v2.incrNormalize(); // { v0, v2 } is now an orthonormal basis
+
         Quaternion ret = this.scale(Math.cos(theta));
         v2.incrScale(Math.sin(theta));
         ret.incrAdd(v2);
         return ret;
+    }
+    
+    public double getAngleBetween(Quaternion other) {
+        double dot = dotProduct(other);
+        dot = Math.min(-1, Math.max(1, dot));
+        return Math.acos(dot);
     }
     
     /**
@@ -374,6 +386,15 @@ public class Quaternion implements IDataSerializable {
         double m = magnitude();
         incrConjugate();
         incrScale(1/(m*m));
+    }
+    
+    public void incrCross(Quaternion other) {
+        double X = this.y * other.z - this.z * other.y;
+        double Y = this.z * other.x - this.x * other.z;
+        double Z = this.x * other.y - this.y * other.x;
+        this.x = X;
+        this.y = Y;
+        this.z = Z;
     }
     
     /**

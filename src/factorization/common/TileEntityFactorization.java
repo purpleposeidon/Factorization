@@ -55,6 +55,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         if (player == null) {
             return;
         }
+        super.onPlacedBy(player, is, side);
         setFacingDirectionFromEntity(player);
     }
 
@@ -330,7 +331,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }
     
     @Override
-    public boolean canExtractItem(int i, ItemStack itemstack, int j) {
+    public boolean canExtractItem(int slot, ItemStack itemstack, int side) {
         return true;
     }
 

@@ -1,5 +1,7 @@
 package factorization.common;
 
+import java.io.DataInput;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -40,6 +42,9 @@ import net.minecraftforge.fluids.FluidEvent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.oredict.OreDictionary;
+
+import org.lwjgl.opengl.GL11;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -213,7 +218,7 @@ public class FactorizationUtil {
     }
     
     public static String getCustomItemName(ItemStack is) {
-        if (is.hasDisplayName()) {
+        if (is != null && is.hasDisplayName()) {
             return is.getDisplayName();
         }
         return null;
@@ -980,12 +985,16 @@ public class FactorizationUtil {
     
 
     public static int determineOrientation(EntityPlayer player) {
-        if (player.rotationPitch > 75) {
+        if (player.rotationPitch > 85) {
             return 0;
         }
-        if (player.rotationPitch <= -75) {
+        if (player.rotationPitch <= -85) {
             return 1;
         }
+        return determineFlatOrientation(player);
+    }
+    
+    public static int determineFlatOrientation(EntityPlayer player) {
         //stolen from BlockPistonBase.determineOrientation. It was reversed, & we handle the y-axis differently
         int var7 = MathHelper.floor_double((double) ((180 + player.rotationYaw) * 4.0F / 360.0F) + 0.5D) & 3;
         return var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0)));
@@ -1231,22 +1240,36 @@ public class FactorizationUtil {
     static List<IRecipe> recipeCache = new ArrayList();
     public static IRecipe findMatchingRecipe(InventoryCrafting inv, World world) {
         List<IRecipe> craftingManagerRecipes = CraftingManager.getInstance().getRecipeList();
-        if (craftingManagerRecipes.size() != recipeCache.size()) {
-            recipeCache.addAll(craftingManagerRecipes);
-            recipeCache.add(stupid_hacky_vanilla_item_repair_recipe);
-        }
-        for (int i = 0; i < recipeCache.size(); i++) {
-            IRecipe recipe = recipeCache.get(i);
-            if (recipe.matches(inv, world)) {
-                if (i > 50) {
-                    int j = i/3;
-                    IRecipe swapeh = recipeCache.get(j);
-                    recipeCache.set(j, recipe);
-                    recipeCache.set(i, swapeh);
-                }
-                return recipe;
+        if (Core.serverStarted) {
+            if (craftingManagerRecipes.size() != recipeCache.size()) {
+                recipeCache.addAll(craftingManagerRecipes);
+                recipeCache.add(stupid_hacky_vanilla_item_repair_recipe);
             }
+            for (int i = 0; i < recipeCache.size(); i++) {
+                IRecipe recipe = recipeCache.get(i);
+                if (recipe.matches(inv, world)) {
+                    if (i > 50) {
+                        int j = i/3;
+                        IRecipe swapeh = recipeCache.get(j);
+                        recipeCache.set(j, recipe);
+                        recipeCache.set(i, swapeh);
+                    }
+                    return recipe;
+                }
+            }
+        } else {
+            for (int i = 0; i < craftingManagerRecipes.size(); i++) {
+                IRecipe recipe = craftingManagerRecipes.get(i);
+                ItemStack output = recipe.getRecipeOutput();
+                if (oreDictionarySimilar("plankWood", output)) {
+                    System.out.println("NORELEASE: Here's one");
+                }
+                if (recipe.matches(inv, world)) {
+                    return recipe;
+                }
+            } 
         }
+        
         return null;
     }
     
@@ -1367,5 +1390,42 @@ public class FactorizationUtil {
             return 4;
         }
         return 1;
+    }
+    
+    static public ItemStack readStack(DataInput input) throws IOException {
+        ItemStack is = ItemStack.loadItemStackFromNBT((NBTTagCompound) NBTBase.readNamedTag(input));
+        if (is == null || is.itemID == 0) {
+            return null;
+        }
+        return is;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static void rotateForDirection(ForgeDirection dir) {
+        switch (dir) {
+        case WEST:
+            break;
+        case EAST:
+            GL11.glRotatef(180, 0, 1, 0);
+            break;
+        case NORTH:
+            GL11.glRotatef(-90, 0, 1, 0);
+            break;
+        case SOUTH:
+            GL11.glRotatef(90, 0, 1, 0);
+            break;
+        case UP:
+            GL11.glRotatef(-90, 0, 0, 1);
+            break;
+        case DOWN:
+            GL11.glRotatef(90, 0, 0, 1);
+            break;
+        }
+    }
+    
+    static NBTTagCompound item2tag(ItemStack is) {
+        NBTTagCompound tag = new NBTTagCompound();
+        is.writeToNBT(tag);
+        return tag;
     }
 }

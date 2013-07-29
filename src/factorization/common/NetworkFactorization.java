@@ -47,7 +47,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
         Core.network = this;
     }
     
-    private static ItemStack EMPTY_ITEMSTACK = new ItemStack(0, 0, 0);
+    public static final ItemStack EMPTY_ITEMSTACK = new ItemStack(0, 0, 0);
     
     int huge_tag_warnings = 0;
 

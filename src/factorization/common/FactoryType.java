@@ -36,6 +36,7 @@ public enum FactoryType {
     SERVORAIL(27, false, TileEntityServoRail.class, "factory_rail"),
     PARASIEVE(28, true, TileEntityParaSieve.class, "factory_sieve"),
     COMPRESSIONCRAFTER(29, false, TileEntityCompressionCrafter.class, "factory_compact"),
+    DAYBARREL(30, false, TileEntityDayBarrel.class, "factory_barrel2"),
     
 
     POCKETCRAFTGUI(101, true)

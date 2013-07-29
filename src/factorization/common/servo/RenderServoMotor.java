@@ -55,28 +55,6 @@ public class RenderServoMotor extends RenderEntity {
         return a.getRotation(b);
     }
 
-    void rotateForDirection(ForgeDirection dir) {
-        switch (dir) {
-        case WEST:
-            break;
-        case EAST:
-            GL11.glRotatef(180, 0, 1, 0);
-            break;
-        case NORTH:
-            GL11.glRotatef(-90, 0, 1, 0);
-            break;
-        case SOUTH:
-            GL11.glRotatef(90, 0, 1, 0);
-            break;
-        case UP:
-            GL11.glRotatef(-90, 0, 0, 1);
-            break;
-        case DOWN:
-            GL11.glRotatef(90, 0, 0, 1);
-            break;
-        }
-    }
-
     static Vec3 quat_vector = Vec3.createVectorHelper(0, 0, 0);
     static Quaternion start = new Quaternion(), end = new Quaternion();
 

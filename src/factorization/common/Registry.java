@@ -3,6 +3,7 @@ package factorization.common;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
@@ -59,7 +60,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemStack router_item, servorail_item;
     
     public ItemStack stamper_item, packager_item,
-            barrel_item,
+            barrel_item, daybarrel_item_hidden,
             lamp_item, air_item,
             slagfurnace_item, battery_item_hidden, leydenjar_item, leydenjar_item_full, heater_item, steamturbine_item, solarboiler_item,
             mirror_item_hidden,
@@ -105,6 +106,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemServoRailWidget servo_widget_instruction, servo_widget_decor;
     public ActuatorItemSyringe actuator_item_manipulator;
     public ItemStack dark_iron_sprocket, sprocket_motor;
+    public ItemDayBarrel daybarrel;
 
     public Material materialMachine = /*Material.anvil; */ new Material(MapColor.ironColor); //If we use vanilla's, TConstruct tools aren't stupid slow. If we use ours, blocks will drop when broken by hand.
 
@@ -192,6 +194,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         parasieve_item = FactoryType.PARASIEVE.itemStack();
         compression_crafter_item = FactoryType.COMPRESSIONCRAFTER.itemStack();
         barrel_item = FactoryType.BARREL.itemStack();
+        daybarrel_item_hidden = FactoryType.DAYBARREL.itemStack();
         stamper_item = FactoryType.STAMPER.itemStack();
         lamp_item = FactoryType.LAMP.itemStack();
         packager_item = FactoryType.PACKAGER.itemStack();
@@ -294,6 +297,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         dark_iron_sprocket = new ItemStack(new ItemCraftingComponent(itemID("darkIronSprocket", 9059), "servo/sprocket"));
         sprocket_motor = new ItemStack(new ItemCraftingComponent(itemID("servoMotor", 9060), "servo/servo_motor"));
         
+        //Barrels
+        daybarrel = new ItemDayBarrel(itemID("daybarrelItem", 9062), "daybarrel");
         postMakeItems();
     }
 
@@ -665,24 +670,15 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'C', Block.cobblestone,
                 '_', Block.pressurePlatePlanks,
                 'P', Block.pistonBase);
-        recipe(new ItemStack(barrel_enlarge),
-                "IOI",
-                "BWB",
-                "ILI",
-                'I', dark_iron,
-                'W', barrel_item,
-                'O', Item.enderPearl,
-                'B', Item.blazeRod,
-                'L', Item.leather);
 
         // Barrel
-        oreRecipe(barrel_item,
-                "W-W",
-                "W W",
-                "WWW",
-                'W', "logWood",
-                '-', "slabWood");
-
+        // Add the recipes for vanilla woods.
+        for (int i = 0; i < 4; i++) {
+            ItemStack log = new ItemStack(Block.wood, 1, i);
+            ItemStack slab = new ItemStack(Block.woodSingleSlab, 1, i);
+            TileEntityDayBarrel.makeRecipe(log, slab);
+        }
+        
         // Craft stamper
         recipe(stamper_item,
                 "#p#",
@@ -1190,6 +1186,42 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "factorization slag furnace recipes@fz.slagging"
         }) {
             FMLInterModComms.sendRuntimeMessage(Core.instance, "NEIPlugins", "register-crafting-handler", Core.name + "@" + msg);
+        }
+    }
+    
+    void addOtherRecipes() {
+        List<ItemStack> known_slabs = OreDictionary.getOres("slabWood");
+        ArrayList<ItemStack> theLogs = new ArrayList();
+        for (ItemStack log : OreDictionary.getOres("logWood")) {
+            if (log.itemID == Block.wood.blockID) {
+                //Skip vanilla
+                continue;
+            }
+            theLogs.add(log);
+        }
+        for (ItemStack log : theLogs) {
+            log = log.copy();
+            if (log.getItemDamage() == FactorizationUtil.WILDCARD_DAMAGE) {
+                log.setItemDamage(0);
+            }
+            List<ItemStack> planks = FactorizationUtil.craft1x1(null, true, log);
+            if (planks == null || planks.size() != 1) {
+                continue;
+            }
+            ItemStack plank = planks.get(0).copy();
+            plank.stackSize = 1;
+            List<ItemStack> slabs = FactorizationUtil.craft3x3(null, true, true, new ItemStack[] {
+                    plank, plank, plank,
+                    null, null, null,
+                    null, null, null
+            });
+            if (slabs.size() != 1) {
+                continue;
+            }
+            ItemStack slab = slabs.get(0);
+            if (FactorizationUtil.oreDictionarySimilar("slabWood", slab)) {
+                TileEntityDayBarrel.makeRecipe(log, slab);
+            }
         }
     }
 }

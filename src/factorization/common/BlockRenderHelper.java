@@ -177,8 +177,7 @@ public class BlockRenderHelper extends Block {
     
     //We could add stuff for simple 90 degree rotations
     private static final int X = 0, Y = 1, Z = 2, U = 3, V = 4;
-    private static ForgeDirection[] dirs = ForgeDirection.values();
-    private static VectorUV center = new VectorUV();
+    private VectorUV center = new VectorUV();
     
     @SideOnly(Side.CLIENT)
     public BlockRenderHelper begin() {
@@ -278,8 +277,49 @@ public class BlockRenderHelper extends Block {
         }
     }
     
+    Quaternion A = new Quaternion(), B = new Quaternion(), C = new Quaternion();
+    
+    Quaternion getNormal(VectorUV a, VectorUV b, VectorUV c) {
+        //Dir = (B - A) x (C - A)
+        //Norm = Dir / len(Dir)
+        A.loadFrom(a);
+        B.loadFrom(b);
+        C.loadFrom(c);
+        
+        A.incrScale(-1);
+        B.incrAdd(A);
+        C.incrAdd(A);
+        
+        B.incrCross(C);
+        B.incrNormalize();
+        return B;
+    }
+    
     @SideOnly(Side.CLIENT)
     public void renderRotated(Tessellator tess, int x, int y, int z) {
+        for (int f = 0; f < faceCache.length; f++) {
+            if (textures[f] == null) {
+                continue;
+            }
+            VectorUV[] face = faceCache[f];
+            float lighting = getNormalizedLighting(face, center);
+            lighting /= 255F; /* because below is from 0 - 0xFF */
+            int color = colors[f];
+            float color_r = (color & 0xFF0000) >> 16;
+            float color_g = (color & 0x00FF00) >> 8;
+            float color_b = (color & 0x0000FF);
+            tess.setColorOpaque_F(lighting*color_r, lighting*color_g, lighting*color_b);
+            
+            
+            for (int i = 0; i < face.length; i++) {
+                VectorUV vert = face[i];
+                tess.addVertexWithUV(vert.x + x, vert.y + y, vert.z + z, vert.u, vert.v);
+            }
+        }
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public void renderRotatedUnshaded(Tessellator tess, int x, int y, int z) {
         for (int f = 0; f < faceCache.length; f++) {
             if (textures[f] == null) {
                 continue;
@@ -310,6 +350,7 @@ public class BlockRenderHelper extends Block {
             }
             VectorUV[] face = faceCache[f];
             float lighting = getNormalizedLighting(face, center);
+            lighting /= 255F; /* because below is from 0 - 0xFF */
             tess.setColorOpaque_F(lighting, lighting, lighting);
             int brightness = getMixedBrightnessForBlock(c.w, c.x, c.y, c.z);
             tess.setBrightness(brightness);

@@ -1,11 +1,13 @@
 package factorization.client.render;
 
 import net.minecraft.block.Block;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.client.MinecraftForgeClient;
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
+import factorization.common.BlockFactorization;
 import factorization.common.BlockLightAir;
 import factorization.common.Core;
 import factorization.common.TileEntityCommon;
@@ -32,7 +34,7 @@ public class FactorizationRender implements ISimpleBlockRenderingHandler {
         Core.profileStart("fz");
         try {
             int md = world.getBlockMetadata(x, y, z);
-            int renderPass = 0; //MinecraftForgeClient.getRenderPass(); Bluh
+            int renderPass = BlockFactorization.CURRENT_PASS; //MinecraftForgeClient.getRenderPass(); //Bluh
             TileEntity te = world.getBlockTileEntity(x, y, z);
             if (te instanceof TileEntityCommon) {
                 TileEntityCommon tec = (TileEntityCommon) te;

@@ -11,10 +11,12 @@ import net.minecraft.nbt.NBTTagCompound;
 
 public class FactorizationHack {
     //TODO: All this can be moved elsewhere
+    @Deprecated
     static public ItemStack loadItemStackFromDataInput(DataInput input) throws IOException {
         return ItemStack.loadItemStackFromNBT((NBTTagCompound) NBTBase.readNamedTag(input));
     }
 
+    @Deprecated
     static public void tagWrite(NBTTagCompound tag, DataOutputStream output) throws IOException {
         NBTBase.writeNamedTag(tag, output);
     }

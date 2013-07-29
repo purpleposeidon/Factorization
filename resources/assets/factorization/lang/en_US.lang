@@ -1,5 +1,8 @@
 #en_US localizations
 factorization.factoryBlock.BARREL.name=Barrel
+factorization.factoryBlock.DAYBARREL.name=Barrel
+factorization.factoryBlock.DAYBARREL.format.name=%2$s Barrel
+factorization.factoryBlock.DAYBARREL.format2.name=%1$s %2$s Barrel
 factorization.factoryBlock.STAMPER.name=Stamper
 factorization.factoryBlock.STAMPER.hint=Craft a single item
 factorization.factoryBlock.PACKAGER.name=Packager

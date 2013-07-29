@@ -344,6 +344,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         if (FzConfig.render_barrel_item || FzConfig.render_barrel_text) {
             setTileEntityRenderer(TileEntityBarrel.class, new TileEntityBarrelRenderer(FzConfig.render_barrel_item, FzConfig.render_barrel_text));
         }
+        setTileEntityRenderer(TileEntityDayBarrel.class, new TileEntityDayBarrelRenderer());
         setTileEntityRenderer(TileEntityGreenware.class, new TileEntityGreenwareRender());
         if (FzConfig.renderTEs) {
             // This is entirely Azanor's fault.
@@ -363,6 +364,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
         RenderingRegistry.registerBlockHandler(new FactorizationRender());
         BlockRenderBattery renderBattery = new BlockRenderBattery();
+        BlockRenderDayBarrel renderBarrel = new BlockRenderDayBarrel();
         new BlockRenderLeydenJar();
         new BlockRenderDefault();
         new BlockRenderHeater();
@@ -394,6 +396,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         MinecraftForgeClient.registerItemRenderer(Core.registry.factory_block.blockID, capture);
         MinecraftForgeClient.registerItemRenderer(Core.registry.battery.itemID, new BatteryItemRender(renderBattery));
         MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket.itemID, new ItemRenderGlazeBucket());
+        MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel.itemID, new DayBarrelItemRenderer(renderBarrel));
         
         if (Minecraft.getMinecraft().session.username.equals("neptunepink")) {
             Core.FZLogger.setLevel(Level.FINE);

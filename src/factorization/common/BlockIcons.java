@@ -78,6 +78,8 @@ public class BlockIcons {
     
     @Directory("storage")
     public static SimpleMachine barrel, ed_barrel;
+    @Directory("storage")
+    public static Icon daybarrel_side, daybarrel_front, daybarrel_top;
     
     public static ArrowyBox servo$set_direction, servo$set_facing;
     public static Icon servo$activate, servo$activate_sneaky;

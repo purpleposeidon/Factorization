@@ -82,6 +82,7 @@ public class Core {
             cheat_servo_energy = false;
         }
     }
+    static public boolean serverStarted = false;
 
 
 
@@ -123,6 +124,7 @@ public class Core {
         TileEntitySolarBoiler.setupSteam();
         foph.addDictOres();
         registry.sendIMC();
+        registry.addOtherRecipes();
         (new CompatManager()).loadCompat();
         ChargeMetalBlockConductance.setup();
         finished_loading = true;
@@ -131,6 +133,7 @@ public class Core {
     @EventHandler
     public void registerServerCommands(FMLServerStartingEvent event) {
         isMainServerThread.set(true);
+        serverStarted = true;
     }
 
     ItemStack getExternalItem(String className, String classField, String description) {

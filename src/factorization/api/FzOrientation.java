@@ -77,6 +77,7 @@ public enum FzOrientation {
     
     private FzOrientation nextFaceRotation, prevFaceRotation;
     private int rotation;
+    private FzOrientation swapped;
     
     private static FzOrientation[] valuesCache = values();
     
@@ -91,6 +92,14 @@ public enum FzOrientation {
         }
         for (FzOrientation o : values()) {
             o.setupRotation();
+        }
+        for (FzOrientation o : values()) {
+            for (FzOrientation t : values()) {
+                if (o.facing == t.top && o.top == t.facing) {
+                    o.swapped = t;
+                    break;
+                }
+            }
         }
         if (valuesCache.length == 0) {
             throw new RuntimeException("lolwut");
@@ -159,6 +168,18 @@ public enum FzOrientation {
         return prevFaceRotation;
     }
     
+    public FzOrientation getNextRotationOnTop() {
+        return getSwapped().getNextRotationOnFace().getSwapped();
+    }
+    
+    public FzOrientation getPrevRotationOnTop() {
+        return getSwapped().getPrevRotationOnFace().getSwapped();
+    }
+    
+    public FzOrientation rotateOnTop(int count) {
+        return getSwapped().rotateOnFace(count).getSwapped();
+    }
+    
     public static FzOrientation getOrientation(int index) {
         if (index >= 0 && index < valuesCache.length) {
             return valuesCache[index];
@@ -205,5 +226,9 @@ public enum FzOrientation {
         Vec3 ret = Vec3.createVectorHelper(0, 0, 0);
         setDiagonalVector(ret);
         return ret;
+    }
+    
+    public FzOrientation getSwapped() {
+        return swapped;
     }
 }
