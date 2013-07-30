@@ -400,7 +400,7 @@ public class BlockFactorization extends BlockContainer {
                 count++;
                 if (TileEntityDayBarrel.getUpgrade(is) == TileEntityDayBarrel.Type.NORMAL) {
                     itemList.add(is);
-                } else if (count < TileEntityDayBarrel.Type.TYPE_COUNT) {
+                } else if (count <= TileEntityDayBarrel.Type.TYPE_COUNT) {
                     itemList.add(is);
                 }
             }
