@@ -148,13 +148,9 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
         if (barrel.canLose()) {
             t = "!! " + t + " !!";
         }
-        // XXX TODO NORELEASE: This sometimes renders too bright. Probably some OpenGL
-        // state that some other part of the render is changing. Any ideas?
-        // some possibilities: +TEXTURE_2D +BLEND ±LIGHTING
         GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glDisable(GL11.GL_BLEND);
         fontRender.drawString(t, -fontRender.getStringWidth(t) / 2, 0, color);
-        // Seems like using anything other than 0 for alpha fucks shit up?
-        // That function is ass. I hate it.
 
         GL11.glDepthMask(true);
         GL11.glPopMatrix();
