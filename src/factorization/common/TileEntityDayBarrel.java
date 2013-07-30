@@ -55,7 +55,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         
         public static final int TYPE_COUNT = values().length;
     }
-    
+    private int last_mentioned_count = -1;
     
     //Factoryish stuff
     @Override
@@ -101,6 +101,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
         putData(new DataInNBT(tag));
+        last_mentioned_count = getItemCount();
     }
     
     void putData(DataHelper data) {
@@ -116,6 +117,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             }
             woodLog = data.as(Share.VISIBLE, "log").putItemStack(woodLog);
             woodSlab = data.as(Share.VISIBLE, "slab").putItemStack(woodSlab);
+            type = data.as(Share.VISIBLE, "type").putEnum(type);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -142,6 +144,9 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         if (item == null) {
             return 0;
         }
+        if (type == Type.CREATIVE) {
+            return 32*item.getMaxStackSize();
+        }
         if (topStack == null || !itemMatch(topStack)) {
             topStack = item.copy();
             topStack.stackSize = 0;
@@ -150,7 +155,8 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             bottomStack = item.copy();
             bottomStack.stackSize = 0;
         }
-        return bottomStack.stackSize + middleCount + topStack.stackSize;
+        int ret = bottomStack.stackSize + middleCount + topStack.stackSize;
+        return ret;
     }
     
     public int getMaxSize() {
@@ -168,10 +174,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         if (is == null || item == null) {
             return false;
         }
-        item.stackSize = is.stackSize;
-        boolean b = FactorizationUtil.couldMerge(item, is);
-        item.stackSize = 1;
-        return b;
+        return FactorizationUtil.couldMerge(item, is);
     }
     
     boolean taint(ItemStack is) {
@@ -268,10 +271,10 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         for (int X = 0; X < pointy; X++) {
             fo = fo.getNextRotationOnFace();
         }
-        if (FactorizationUtil.determineOrientation(player) > 2 /* player isn't looking straight down */
+        if (FactorizationUtil.determineOrientation(player) >= 2 /* player isn't looking straight down */
                 && side < 2 /* and the side is the bottom */) {
             side = FactorizationUtil.determineOrientation(player);
-            fo = FzOrientation.fromDirection(ForgeDirection.getOrientation(side));
+            fo = FzOrientation.fromDirection(ForgeDirection.getOrientation(side).getOpposite());
             FzOrientation perfect = fo.pointTopTo(ForgeDirection.UP);
             if (perfect != FzOrientation.UNKNOWN) {
                 fo = perfect;
@@ -286,6 +289,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         super.loadFromStack(is);
         woodLog = getLog(is);
         woodSlab = getSlab(is);
+        type = getUpgrade(is);
     }
     
     
@@ -294,7 +298,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     Packet getPacket(int messageType) {
         if (messageType == NetworkFactorization.MessageType.BarrelItem) {
-            return Core.network.TEmessagePacket(getCoord(), messageType, item, getItemCount());
+            return Core.network.TEmessagePacket(getCoord(), messageType, NetworkFactorization.nullItem(item), getItemCount());
         } else if (messageType == NetworkFactorization.MessageType.BarrelCount) {
             return Core.network.TEmessagePacket(getCoord(), messageType, getItemCount());
         } else {
@@ -310,19 +314,17 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         broadcastMessage(null, getPacket(messageType));
     }
     
-    public ItemStack getItemForNet() {
-        return item == null ? NetworkFactorization.EMPTY_ITEMSTACK : item;
-    }
-    
     @Override
     public Packet getDescriptionPacket() {
-        System.out.println(this + "  " + orientation); //NORELEASE
+        int count = getItemCount();
+        ItemStack theItem = item;
         return getDescriptionPacketWith(MessageType.BarrelDescription,
-                getItemForNet(),
-                getItemCount(),
+                NetworkFactorization.nullItem(theItem),
+                count,
                 woodLog,
                 woodSlab,
-                (byte) orientation.ordinal());
+                (byte) orientation.ordinal(),
+                (byte) type.ordinal());
     }
     
     @Override
@@ -336,7 +338,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             woodLog = FactorizationUtil.readStack(input);
             woodSlab = FactorizationUtil.readStack(input);
             orientation = FzOrientation.getOrientation(input.readByte());
-            System.out.println(this + "  " + orientation); //NORELEASE
+            type = Type.valueOf(input.readByte());
             return true;
         }
         if (messageType == MessageType.BarrelCount) {
@@ -360,8 +362,20 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     //Inventory code
     
-    
-    
+    @Override
+    public void onInventoryChanged() {
+        updateStacks();
+        int c = getItemCount();
+        if (c != last_mentioned_count) {
+            if (last_mentioned_count*c == 0) {
+                //One of them was 0
+                updateClients(MessageType.BarrelItem);
+            } else {
+                updateClients(MessageType.BarrelCount);
+            }
+            last_mentioned_count = c;
+        }
+    }
     
     @Override
     public int getSizeInventory() {
@@ -375,14 +389,16 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             return;
         }
         int count = getItemCount();
-        if (count == 0) {
-            topStack = bottomStack = item = null;
-            middleCount = 0;
-            return;
+        if (type == Type.STICKY) {
+            count--;
+            if (count < 0) {
+                return;
+            }
         }
         int upperLine = getMaxSize() - item.getMaxStackSize();
+        topStack = item.copy();
+        bottomStack = item.copy();
         if (count > upperLine) {
-            topStack = item.copy();
             topStack.stackSize = count - upperLine;
             count -= topStack.stackSize;
         }
@@ -392,32 +408,33 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         bottomStack.stackSize = Math.min(item.getMaxStackSize(), count);
         count -= bottomStack.stackSize;
         middleCount = count;
+        if (type == Type.STICKY) {
+            middleCount++;
+        }
     }
     
     @Override
     public ItemStack getStackInSlot(int i) {
-        ForgeDirection d = ForgeDirection.getOrientation(i);
         cleanBarrel();
-        if (isTop(d)) {
+        if (i == 0) {
             return topStack;
         }
-        if (isBackOrBottom(d)) {
+        if (i == 1) {
             return bottomStack;
         }
         return null;
     }
 
     @Override
-    public void setInventorySlotContents(int i, ItemStack is) {
-        ForgeDirection d = ForgeDirection.getOrientation(i);
+    public void setInventorySlotContents(int slot, ItemStack is) {
         if (is != null && !taint(is)) {
             Core.logWarning("Bye bye, %s", is);
             Thread.dumpStack();
             return;
         }
-        if (isTop(d)) {
+        if (slot == 0) {
             topStack = is;
-        } else if (isBottom(d)) {
+        } else if (slot == 1) {
             bottomStack = is;
         } else {
             Core.logWarning("Say goodbye, %s !", is);
@@ -432,26 +449,22 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack is) {
-        ForgeDirection d = ForgeDirection.getOrientation(i);
-        if (isTop(d)) {
-            if (item == null) {
-                return true;
-            }
-            if (is.isItemDamaged()) {
-                return false;
-            }
-            return itemMatch(is);
+        if (i != 0) {
+            return false;
         }
-        return false;
+        if (item == null) {
+            return true;
+        }
+        if (is != null && is.isItemDamaged()) {
+            return false;
+        }
+        return itemMatch(is);
     }
     
     @Override
     public boolean canExtractItem(int slot, ItemStack itemstack, int side) {
         ForgeDirection d = ForgeDirection.getOrientation(side);
-        if (isTop(d.getOpposite())) {
-            return true;
-        }
-        return false;
+        return isTop(d.getOpposite());
     }
 
     
@@ -606,7 +619,6 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             to_remove--;
         }
         ejectItem(makeStack(to_remove), false, entityplayer, last_hit_side);
-        last_hit_side = -1;
         changeItemCount(-to_remove);
         cleanBarrel();
         last_hit_side = -1;
@@ -619,8 +631,12 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             Notify.withItem(item);
             Notify.send(entityplayer, getCoord(), "Full of {ITEM_NAME}{ITEM_INFOS_NEWLINE}");
         } else {
+            String count = "" + getItemCount();
+            if (type == Type.CREATIVE) {
+                count = "Infinite";
+            }
             Notify.withItem(item);
-            Notify.send(entityplayer, getCoord(), "%s {ITEM_NAME}{ITEM_INFOS_NEWLINE}", "" + getItemCount());
+            Notify.send(entityplayer, getCoord(), "%s {ITEM_NAME}{ITEM_INFOS_NEWLINE}", count);
         }
     }
     
@@ -667,7 +683,10 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     @Override
     public void dropContents() {
-        if (item == null || getItemCount() <= 0) {
+        if (type == Type.CREATIVE) {
+            return;
+        }
+        if (item == null || getItemCount() <= 0 ) {
             return;
         }
         int count = getItemCount();
@@ -686,7 +705,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     public boolean canLose() {
-        return getItemCount() > maxStackDrop*item.getMaxStackSize();
+        return item == null ? false : getItemCount() > maxStackDrop*item.getMaxStackSize();
     }
     
     public static ItemStack makeBarrel(Type type, ItemStack log, ItemStack slab) {
@@ -695,6 +714,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         NBTTagCompound tag = FactorizationUtil.getTag(barrel_item);
         tag.setTag("log", FactorizationUtil.item2tag(log));
         tag.setTag("slab", FactorizationUtil.item2tag(slab));
+        barrel_item.setItemDamage(type.ordinal());
         return barrel_item;
     }
     
@@ -724,12 +744,14 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         Core.registry.recipe(make(Type.SILKY, log, slab),
                 "#",
                 "B",
+                "#",
                 '#', silkTouch,
                 'B', normal);
         Core.registry.recipe(make(Type.HOPPING, log, slab),
-                "R",
+                "V",
                 "B",
-                'R', Item.redstone,
+                "V",
+                'V', Block.hopperBlock,
                 'B', normal);
         Core.registry.recipe(make(Type.LARGER, log, slab),
                 "B",
