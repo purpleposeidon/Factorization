@@ -53,7 +53,6 @@ public class FzConfig {
     public static boolean equal_opportunities_for_mobs = true;
     public static boolean invasiveCharge = false;
     public static boolean enable_solar_steam = true;
-    public static String language_file = "/mods/factorization/en_US.lang"; //NORELEASE: Wrong, use resourcepacks? I think we've got this setup now so that we don't need to do any loading ourselves now. Yeah, that file isn't even here anymore. Should be good.
 
     
 
@@ -143,7 +142,6 @@ public class FzConfig {
         int config_silver_size = getIntConfig("silverOreNodeSize", "general", silver_ore_node_size, "The size of silver ore nodes. Between 5 & 35. Default is 25");
         silver_ore_node_size = Math.max(5, Math.min(config_silver_size, 35));
         add_branding = getBoolConfig("addBranding", "general", add_branding, null); //For our Tekkit friends
-        language_file = getStringConfig("languageFile", "general", language_file, "Filename on the Java classpath with the localizations");
         
         enable_dimension_slice = getBoolConfig("enableDimensionSlices", "dimensionSlices", enable_dimension_slice, "work in progress; may be unstable");
         spread_wrathfire = getBoolConfig("spreadWrathFire", "server", spread_wrathfire, null);

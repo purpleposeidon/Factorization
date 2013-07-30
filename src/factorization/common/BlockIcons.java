@@ -113,7 +113,7 @@ public class BlockIcons {
     }
     
     public static abstract class ExtendedIcon implements Icon {
-        protected Icon under;
+        public Icon under;
         
         public ExtendedIcon(Icon under) {
             this.under = under;

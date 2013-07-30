@@ -985,10 +985,10 @@ public class FactorizationUtil {
     
 
     public static int determineOrientation(EntityPlayer player) {
-        if (player.rotationPitch > 85) {
+        if (player.rotationPitch > 75) {
             return 0;
         }
-        if (player.rotationPitch <= -85) {
+        if (player.rotationPitch <= -75) {
             return 1;
         }
         return determineFlatOrientation(player);
@@ -1113,7 +1113,8 @@ public class FactorizationUtil {
     
     private static ThreadLocal<ArrayList<ForgeDirection>> direction_cache = new ThreadLocal<ArrayList<ForgeDirection>>();
 
-    public static ArrayList<ForgeDirection> dirtyDirectionCache() { //NORELEASE There's a thin in ForgeDirection for this.
+    public static ArrayList<ForgeDirection> dirtyDirectionCache() {
+        //We can't use the one in ForgeDirection because this guy gets shuffled.
         ArrayList<ForgeDirection> ret = direction_cache.get();
         if (ret == null) {
             ret = new ArrayList(6);
@@ -1261,9 +1262,6 @@ public class FactorizationUtil {
             for (int i = 0; i < craftingManagerRecipes.size(); i++) {
                 IRecipe recipe = craftingManagerRecipes.get(i);
                 ItemStack output = recipe.getRecipeOutput();
-                if (oreDictionarySimilar("plankWood", output)) {
-                    System.out.println("NORELEASE: Here's one");
-                }
                 if (recipe.matches(inv, world)) {
                     return recipe;
                 }

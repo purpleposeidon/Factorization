@@ -49,7 +49,6 @@ import factorization.common.servo.ServoComponent;
 import factorization.common.servo.actuators.ActuatorItemSyringe;
 
 public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler {
-    //NORELEASE: Consolidate item IDs of crafting components in 1.6 release
     public ItemFactorizationBlock item_factorization;
     public ItemBlockResource item_resource;
     public BlockFactorization factory_block, factory_rendering_block = null;
@@ -1202,7 +1201,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         for (ItemStack log : theLogs) {
             log = log.copy();
             if (log.getItemDamage() == FactorizationUtil.WILDCARD_DAMAGE) {
-                log.setItemDamage(0);
+                log.setItemDamage(0); //NORELEASE: Oh, we can just use Block.addCreativeItems
             }
             List<ItemStack> planks = FactorizationUtil.craft1x1(null, true, log);
             if (planks == null || planks.size() != 1) {

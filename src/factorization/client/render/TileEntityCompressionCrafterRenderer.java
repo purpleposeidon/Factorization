@@ -3,7 +3,6 @@ package factorization.client.render;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
@@ -19,33 +18,35 @@ import factorization.common.Core;
 import factorization.common.TileEntityCompressionCrafter;
 
 public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRenderer {
+    float textureOffset;
+    ExtendedIcon interp_side = new ExtendedIcon(BlockIcons.compactSideSlide) {
+        @Override
+        @SideOnly(Side.CLIENT)
+        public float getInterpolatedU(double d0) {
+            return under.getInterpolatedU(d0);
+        }
 
+        @Override
+        @SideOnly(Side.CLIENT)
+        public float getInterpolatedV(double d0) {
+            return under.getInterpolatedV(d0 + 12*textureOffset);
+        }
+        
+    };
+    
     @Override
     public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
         TileEntityCompressionCrafter cc = (TileEntityCompressionCrafter) te;
         if (cc == null) {
             return;
         }
+        interp_side.under = BlockIcons.compactSideSlide;
         func_110628_a(Core.blockAtlas);
         float p = cc.getProgressPerc();
         p *= 7F/16F;
-        final float textureOffset = p;
         
         BlockRenderHelper block = Core.registry.blockRender;
-        Icon interp_side = new ExtendedIcon(BlockIcons.compactSideSlide) { //NORELEASE: Pull out!
-            @Override
-            @SideOnly(Side.CLIENT)
-            public float getInterpolatedU(double d0) {
-                return under.getInterpolatedU(d0);
-            }
-
-            @Override
-            @SideOnly(Side.CLIENT)
-            public float getInterpolatedV(double d0) {
-                return under.getInterpolatedV(d0 + 12*textureOffset);
-            }
-            
-        };
+        textureOffset = p;
         
         block.useTextures(
                 null, null,
