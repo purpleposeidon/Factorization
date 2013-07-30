@@ -14,9 +14,9 @@ import org.lwjgl.opengl.GL11;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.common.TileEntityDayBarrel;
+import factorization.common.TileEntityDayBarrel.Type;
 
 public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
-    static int NORELEASE_i = 0;
     @Override
     public void renderTileEntityAt(TileEntity tileentity, double x, double y, double z, float partial) {
         if (!(tileentity instanceof TileEntityDayBarrel)) {
@@ -24,7 +24,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         }
         TileEntityDayBarrel barrel = (TileEntityDayBarrel) tileentity;
         ItemStack is = barrel.item;
-        if (is == null) {
+        if (is == null || barrel.getItemCount() == 0) {
             return;
         }
         GL11.glPushMatrix();
@@ -46,14 +46,17 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         GL11.glRotatef(90, 0, 1, 0);
         GL11.glTranslated(0.25, 0.25 - 1.0/16.0, -1.0/128.0);
         
-        renderItemCount(barrel);
+        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glDisable(GL11.GL_LIGHTING);
+        renderItemCount(is, barrel);
         handleRenderItem(is);
-        GL11.glPopMatrix();
+        GL11.glEnable(GL11.GL_LIGHTING);
         
-        NORELEASE_i++;
+        
+        GL11.glPopMatrix();
     }
     
-    void renderItemCount(TileEntityDayBarrel barrel) {
+    void renderItemCount(ItemStack item, TileEntityDayBarrel barrel) {
         FontRenderer fontRender = getFontRenderer();
         GL11.glPushMatrix();
         GL11.glTranslated(-0.25, 0.125, 0);
@@ -64,15 +67,16 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         GL11.glRotatef(180, 0, 0, 1);
 
         String t = "";
-        int ms = barrel.item.getMaxStackSize();
-        if (ms == 1 || barrel.getItemCount() == ms) {
-            t += barrel.getItemCount();
+        int ms = item.getMaxStackSize();
+        int count = barrel.getItemCount();
+        if (ms == 1 || count == ms) {
+            t += count;
         } else {
-            int q = barrel.getItemCount() / ms;
+            int q = count / ms;
             if (q > 0) {
-                t += (barrel.getItemCount() / ms) + "*" + ms;
+                t += (count / ms) + "*" + ms;
             }
-            int r = (barrel.getItemCount() % ms);
+            int r = (count % ms);
             if (r != 0) {
                 if (q > 0) {
                     t += " + ";
@@ -84,8 +88,10 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         if (barrel.canLose()) {
             t = "!! " + t + " !!";
         }
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_LIGHTING);
+        if (barrel.type == Type.CREATIVE) {
+            t = "∞";
+        }
+        
         fontRender.drawString(t, -fontRender.getStringWidth(t) / 2, 0, color);
         
         GL11.glDepthMask(true);
