@@ -497,10 +497,7 @@ public class BlockRenderHelper extends Block {
         currentFace[i].z = Z == 0 ? minZ : maxZ;
     }
     
-    static private ForgeDirection getFaceDirection(VectorUV[] vecs, VectorUV center) {
-        VectorUV here = vecs[0].add(vecs[2]);
-        here.scale(0.5);
-        here = here.add(center);
+    static private ForgeDirection getDirectionFromVector(VectorUV here) {
         double x = Math.abs(here.x), y = Math.abs(here.y), z = Math.abs(here.z);
         if (x >= y && x >= z) {
             return here.x >= 0 ? ForgeDirection.WEST : ForgeDirection.EAST;
@@ -515,9 +512,14 @@ public class BlockRenderHelper extends Block {
     }
     
     private static final float[] directionLighting = new float[] {0.5F, 1F, 0.8F, 0.8F, 0.6F, 0.6F};
-    static private float getNormalizedLighting(VectorUV[] vecs, VectorUV center) {
-        return directionLighting[getFaceDirection(vecs, center).ordinal()];
+    VectorUV normal_uv = new VectorUV();
+    private float getNormalizedLighting(VectorUV[] vecs, VectorUV center) {
+        Quaternion normal = getNormal(vecs[0], vecs[1], vecs[2]);
+        normal_uv.x = normal.x;
+        normal_uv.y = normal.y;
+        normal_uv.z = normal.z;
+        ForgeDirection dir = getDirectionFromVector(normal_uv);
+        return directionLighting[dir.ordinal()];
     }
-
 
 }
