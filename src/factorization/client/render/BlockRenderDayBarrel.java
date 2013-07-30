@@ -32,7 +32,11 @@ public class BlockRenderDayBarrel extends FactorizationBlockRender {
     
     @Override
     void renderSecondPass(RenderBlocks rb) {
+        //NOTE: We can almost get away with doing this in the first render pass.
+        //But GL_BLEND is not consistently enabled.
         doRender(rb, 1);
+        //We can also almost get away with enabling GL_BLEND in this ISBRH.
+        //But then my conscience attacks.
     }
     
     void doRender(RenderBlocks rb, int pass) {
