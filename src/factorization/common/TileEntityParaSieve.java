@@ -167,6 +167,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         if (target == null) {
             return new int[0];
         }
+        side = facing_direction;
         if (target instanceof ISidedInventory) {
             int[] ret = Arrays.clone(((ISidedInventory)target).getAccessibleSlotsFromSide(side));
             for (int i = 0; i < ret.length; i++) {
@@ -208,7 +209,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             return true;
         }
         if (target instanceof ISidedInventory) {
-            return ((ISidedInventory) target).canExtractItem(slot - filters.length, itemstack, side) && itemPassesFilter(itemstack);
+            return ((ISidedInventory) target).canExtractItem(slot - filters.length, itemstack, facing_direction) && itemPassesFilter(itemstack);
         }
         return itemPassesFilter(itemstack);
     }
