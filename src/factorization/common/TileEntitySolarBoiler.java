@@ -131,7 +131,14 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
         return Math.max(reflector_count - 3, 0);
     }
     
-    void sanitize() { /* hopefully not actually needed. */ }
+    void sanitize() {
+        if (waterTank.getFluid() == null) {
+            waterTank.setFluid(water_stack.copy());
+        }
+        if (steamTank.getFluid() == null) {
+            steamTank.setFluid(steam_stack.copy());
+        }
+    }
     
     @Override
     public void updateEntity() {
