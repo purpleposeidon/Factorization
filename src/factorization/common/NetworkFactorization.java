@@ -657,5 +657,8 @@ public class NetworkFactorization implements ITinyPacketHandler {
     static public class NotifyMessageType {
         public static final byte COORD = 0, VEC3 = 1, ENTITY = 2, TILEENTITY = 3;
     }
-
+    
+    public static ItemStack nullItem(ItemStack is) {
+        return is == null ? EMPTY_ITEMSTACK : is;
+    }
 }
