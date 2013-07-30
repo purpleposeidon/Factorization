@@ -303,11 +303,11 @@ public class BlockRenderHelper extends Block {
             }
             VectorUV[] face = faceCache[f];
             float lighting = getNormalizedLighting(face, center);
-            lighting /= 255F; /* because below is from 0 - 0xFF */
             int color = colors[f];
             float color_r = (color & 0xFF0000) >> 16;
             float color_g = (color & 0x00FF00) >> 8;
             float color_b = (color & 0x0000FF);
+            lighting /= 255F; /* because the colors go from 0x00 to 0xFF*/
             tess.setColorOpaque_F(lighting*color_r, lighting*color_g, lighting*color_b);
             
             
@@ -325,11 +325,12 @@ public class BlockRenderHelper extends Block {
                 continue;
             }
             VectorUV[] face = faceCache[f];
-            float lighting = getNormalizedLighting(face, center);
+            float lighting = 1; // getNormalizedLighting(face, center);
             int color = colors[f];
             float color_r = (color & 0xFF0000) >> 16;
             float color_g = (color & 0x00FF00) >> 8;
             float color_b = (color & 0x0000FF);
+            lighting /= 255F; /* because the colors go from 0x00 to 0xFF*/
             tess.setColorOpaque_F(lighting*color_r, lighting*color_g, lighting*color_b);
             for (int i = 0; i < face.length; i++) {
                 VectorUV vert = face[i];
@@ -344,21 +345,7 @@ public class BlockRenderHelper extends Block {
             renderRotated(tess, 0, 0, 0);
             return;
         }
-        for (int f = 0; f < faceCache.length; f++) {
-            if (textures[f] == null) {
-                continue;
-            }
-            VectorUV[] face = faceCache[f];
-            float lighting = getNormalizedLighting(face, center);
-            lighting /= 255F; /* because below is from 0 - 0xFF */
-            tess.setColorOpaque_F(lighting, lighting, lighting);
-            int brightness = getMixedBrightnessForBlock(c.w, c.x, c.y, c.z);
-            tess.setBrightness(brightness);
-            for (int v = 0; v < face.length; v++) {
-                VectorUV vert = face[v];
-                tess.addVertexWithUV(vert.x + c.x, vert.y + c.y, vert.z + c.z, vert.u, vert.v);
-            }
-        }
+        renderRotated(tess, c.x, c.y, c.z);
     }
     
     static Vec3 midCache = Vec3.createVectorHelper(0, 0, 0);
