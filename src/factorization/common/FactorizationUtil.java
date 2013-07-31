@@ -759,7 +759,11 @@ public class FactorizationUtil {
         }
         if (orig_inv instanceof net.minecraft.inventory.ISidedInventory) {
             final net.minecraft.inventory.ISidedInventory inv = (net.minecraft.inventory.ISidedInventory) orig_inv;
-            final int[] slotMap = inv.getAccessibleSlotsFromSide(side);
+            int[] _ = inv.getAccessibleSlotsFromSide(side);
+            if (_ == null) {
+                _ = new int[0];
+            }
+            final int[] slotMap = _;
             return new FzInv(inv) {
                 @Override
                 int slotIndex(int i) {
