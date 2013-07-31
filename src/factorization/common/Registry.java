@@ -962,7 +962,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     private void makeServoRecipes() {
         ItemStack rails = servorail_item.copy();
         rails.stackSize = 8;
-        oreRecipe(rails, "DLD",
+        oreRecipe(rails, "LDL",
                 'D', dark_iron,
                 'L', "ingotLead");
         oreRecipe(dark_iron_sprocket,
