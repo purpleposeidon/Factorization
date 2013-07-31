@@ -7,6 +7,7 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.util.AxisAlignedBB;
@@ -185,6 +186,15 @@ public class TileEntityExtension extends TileEntityCommon {
             return super.getIcon(dir);
         }
         return p.getIcon(dir);
+    }
+    
+    @Override
+    public ItemStack getDroppedBlock() {
+        TileEntityCommon p = getParent();
+        if (p == null) {
+            return null;
+        }
+        return p.getDroppedBlock();
     }
 }
 

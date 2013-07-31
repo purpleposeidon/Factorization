@@ -830,4 +830,10 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         }
         return false;
     }
+    
+    @Override
+    public ItemStack getDroppedBlock() {
+        ItemStack is = makeBarrel(type, woodLog, woodSlab);
+        return is;
+    }
 }

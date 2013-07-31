@@ -145,4 +145,14 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
         int new_storage = (int) (max_storage * perc);
         storage = new_storage;
     }
+    
+    @Override
+    public ItemStack getDroppedBlock() {
+        ItemStack is = new ItemStack(Core.registry.battery);
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setInteger("storage", storage);
+        is.setTagCompound(tag);
+        Core.registry.battery.normalizeDamage(is);
+        return is;
+    }
 }

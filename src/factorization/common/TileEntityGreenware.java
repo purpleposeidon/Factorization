@@ -880,4 +880,9 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
         return getIcon(parts.get(0), dir.ordinal());
     }
+    
+    @Override
+    public ItemStack getDroppedBlock() {
+        return getItem();
+    }
 }

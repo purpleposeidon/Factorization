@@ -10,6 +10,7 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.server.management.PlayerInstance;
@@ -302,5 +303,14 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         if (!decoration.isFreeToPlace()) {
             getCoord().spawnItem(decoration.toItem());
         }
+    }
+    
+    @Override
+    public ItemStack getPickedBlock() {
+        final Decorator decoration = getDecoration();
+        if (decoration != null) {
+            return decoration.toItem();
+        }
+        return getDroppedBlock();
     }
 }

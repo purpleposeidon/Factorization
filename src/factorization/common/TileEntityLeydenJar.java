@@ -207,4 +207,12 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     public int getDynamicLight() {
         return (int) (getLevel()*7);
     }
+    
+    @Override
+    public ItemStack getDroppedBlock() {
+        ItemStack is = new ItemStack(Core.registry.item_factorization, 1, getFactoryType().md);
+        NBTTagCompound tag = FactorizationUtil.getTag(is);
+        tag.setInteger("storage", storage);
+        return is;
+    }
 }

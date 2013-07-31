@@ -15,7 +15,6 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Icon;
@@ -29,8 +28,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
 import factorization.common.NetworkFactorization.MessageType;
-import factorization.common.servo.Decorator;
-import factorization.common.servo.TileEntityServoRail;
 import factorization.notify.Notify;
 
 public class BlockFactorization extends BlockContainer {
@@ -61,48 +58,7 @@ public class BlockFactorization extends BlockContainer {
         if (tec == null) {
             return null;
         }
-        FactoryType ft = tec.getFactoryType();
-        if (ft == FactoryType.EXTENDED) {
-            TileEntityCommon parent = ((TileEntityExtension)tec).getParent();
-            if (parent != null) {
-                tec = parent;
-                ft = parent.getFactoryType();
-            }
-        }
-        if (ft == FactoryType.MIRROR) {
-            return new ItemStack(Core.registry.mirror);
-        }
-        if (ft == FactoryType.BATTERY) {
-            ItemStack is = new ItemStack(Core.registry.battery);
-            TileEntityBattery bat = (TileEntityBattery) tec;
-            NBTTagCompound tag = new NBTTagCompound();
-            tag.setInteger("storage", bat.storage);
-            is.setTagCompound(tag);
-            Core.registry.battery.normalizeDamage(is);
-            return is;
-        }
-        if (ft == FactoryType.LEYDENJAR) {
-            //TODO: refactor, is lameness
-            ItemStack is = new ItemStack(Core.registry.item_factorization, 1, tec.getFactoryType().md);
-            NBTTagCompound tag = FactorizationUtil.getTag(is);
-            TileEntityLeydenJar jar = (TileEntityLeydenJar) tec;
-            tag.setInteger("storage", jar.storage);
-            return is;
-        }
-        if (ft == FactoryType.CERAMIC) {
-            return ((TileEntityGreenware) tec).getItem();
-        }
-        if (ft == FactoryType.ROCKETENGINE) {
-            return new ItemStack(Core.registry.rocket_engine);
-        }
-        if (ft == FactoryType.SERVORAIL) {
-            TileEntityServoRail sr = (TileEntityServoRail) tec;
-            final Decorator decoration = sr.getDecoration();
-            if (decoration != null) {
-                return decoration.toItem();
-            }
-        }
-        return new ItemStack(Core.registry.item_factorization, 1, ft.md);
+        return tec.getPickedBlock();
     }
 
     @Override
@@ -277,7 +233,7 @@ public class BlockFactorization extends BlockContainer {
     public ArrayList<ItemStack> getBlockDropped(World world, int X, int Y, int Z, int md, int fortune) {
         ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
         Coord here = new Coord(world, X, Y, Z);
-        IFactoryType f = here.getTE(IFactoryType.class);
+        TileEntityCommon f = here.getTE(TileEntityCommon.class);
         if (f == null) {
             Iterator<TileEntityCommon> it = destroyed_tes.iterator();
             TileEntityCommon destroyedTE = null;
@@ -306,40 +262,7 @@ public class BlockFactorization extends BlockContainer {
             f = destroyedTE;
             destroyedTE = null;
         }
-        ItemStack is = new ItemStack(Core.registry.item_factorization, 1, f.getFactoryType().md);
-        if (f.getFactoryType() == FactoryType.EXTENDED) {
-            TileEntityCommon parent = ((TileEntityExtension) f).getParent();
-            if (parent != null) {
-                f = parent;
-            }
-        }
-        if (f.getFactoryType() == FactoryType.MIRROR) {
-            is = new ItemStack(Core.registry.mirror);
-        }
-        if (f.getFactoryType() == FactoryType.BATTERY) {
-            is = new ItemStack(Core.registry.battery);
-            TileEntityBattery bat = (TileEntityBattery) f;
-            NBTTagCompound tag = new NBTTagCompound();
-            tag.setInteger("storage", bat.storage);
-            is.setTagCompound(tag);
-            //Core.registry.battery.normalizeDamage(is);
-        }
-        if (f.getFactoryType() == FactoryType.LEYDENJAR) {
-            //TODO NORELEASE: refactor, is lameness
-            NBTTagCompound tag = FactorizationUtil.getTag(is);
-            TileEntityLeydenJar jar = (TileEntityLeydenJar) f;
-            tag.setInteger("storage", jar.storage);
-        }
-//		if (f.getFactoryType() == FactoryType.GREENWARE) {
-//			is = ((TileEntityGreenware) f).getItem();
-//		}
-        if (f.getFactoryType() == FactoryType.ROCKETENGINE) {
-            is = new ItemStack(Core.registry.rocket_engine);
-        }
-        if (f.getFactoryType() == FactoryType.DAYBARREL) {
-            TileEntityDayBarrel barrel = (TileEntityDayBarrel) f;
-            is = TileEntityDayBarrel.makeBarrel(barrel.type, barrel.woodLog, barrel.woodSlab);
-        }
+        ItemStack is = f.getDroppedBlock();
         ret.add(is);
         return ret;
     }

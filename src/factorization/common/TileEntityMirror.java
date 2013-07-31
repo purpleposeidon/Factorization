@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.util.Icon;
@@ -303,5 +304,10 @@ public class TileEntityMirror extends TileEntityCommon {
     @SideOnly(Side.CLIENT)
     public Icon getIcon(ForgeDirection dir) {
         return BlockIcons.mirror_front;
+    }
+    
+    @Override
+    public ItemStack getDroppedBlock() {
+        return new ItemStack(Core.registry.mirror);
     }
 }

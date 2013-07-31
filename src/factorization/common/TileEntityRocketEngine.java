@@ -710,5 +710,10 @@ for x in range(0, len(d[0])):
         }
     
     }
+    
+    @Override
+    public ItemStack getDroppedBlock() {
+        return new ItemStack(Core.registry.rocket_engine);
+    }
 
 }
