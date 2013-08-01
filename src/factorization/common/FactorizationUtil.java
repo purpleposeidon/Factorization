@@ -1242,11 +1242,22 @@ public class FactorizationUtil {
     }
     
     
-    static List<IRecipe> recipeCache = new ArrayList();
+    static ArrayList<IRecipe> recipeCache = new ArrayList();
+    private static int cache_fear = 10;
     public static IRecipe findMatchingRecipe(InventoryCrafting inv, World world) {
         List<IRecipe> craftingManagerRecipes = CraftingManager.getInstance().getRecipeList();
         if (Core.serverStarted) {
+            cache_fear--;
+            if (cache_fear > 0) {
+                return lookupRecipeUncached(inv, world);
+            }
             if (craftingManagerRecipes.size() != recipeCache.size()) {
+                if (cache_fear < 0) {
+                    cache_fear = 10;
+                    return lookupRecipeUncached(inv, world);
+                }
+                recipeCache.clear();
+                recipeCache.ensureCapacity(craftingManagerRecipes.size());
                 recipeCache.addAll(craftingManagerRecipes);
                 recipeCache.add(stupid_hacky_vanilla_item_repair_recipe);
             }
@@ -1263,15 +1274,21 @@ public class FactorizationUtil {
                 }
             }
         } else {
-            for (int i = 0; i < craftingManagerRecipes.size(); i++) {
-                IRecipe recipe = craftingManagerRecipes.get(i);
-                ItemStack output = recipe.getRecipeOutput();
-                if (recipe.matches(inv, world)) {
-                    return recipe;
-                }
-            } 
+            return lookupRecipeUncached(inv, world);
         }
         
+        return null;
+    }
+    
+    public static IRecipe lookupRecipeUncached(InventoryCrafting inv, World world) {
+        List<IRecipe> craftingManagerRecipes = CraftingManager.getInstance().getRecipeList();
+        for (int i = 0; i < craftingManagerRecipes.size(); i++) {
+            IRecipe recipe = craftingManagerRecipes.get(i);
+            ItemStack output = recipe.getRecipeOutput();
+            if (recipe.matches(inv, world)) {
+                return recipe;
+            }
+        }
         return null;
     }
     

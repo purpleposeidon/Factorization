@@ -9,6 +9,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -20,11 +21,13 @@ import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.Share;
+import factorization.common.FactorizationUtil.FzInv;
 import factorization.common.NetworkFactorization.MessageType;
 import factorization.notify.Notify;
 
@@ -34,7 +37,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     private int middleCount;
     private ItemStack bottomStack;
     private static final ItemStack DEFAULT_LOG = new ItemStack(Block.wood);
-    private static final ItemStack DEFAULT_SLAB = new ItemStack(Block.wood);
+    private static final ItemStack DEFAULT_SLAB = new ItemStack(Block.planks);
     public ItemStack woodLog = DEFAULT_LOG.copy(), woodSlab = DEFAULT_SLAB.copy();
     
     public FzOrientation orientation = FzOrientation.FACE_UP_POINT_NORTH;
@@ -118,6 +121,12 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             woodLog = data.as(Share.VISIBLE, "log").putItemStack(woodLog);
             woodSlab = data.as(Share.VISIBLE, "slab").putItemStack(woodSlab);
             type = data.as(Share.VISIBLE, "type").putEnum(type);
+            if (woodLog == null) {
+                woodLog = DEFAULT_LOG;
+            }
+            if (woodSlab == null) {
+                woodSlab = DEFAULT_SLAB;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -137,7 +146,42 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             return;
         }
         needLogic();
-        //TODO: Hop!
+        
+        if (getItemCount() == 0) {
+            return;
+        }
+        if (orientation == FzOrientation.UNKNOWN) {
+            return;
+        }
+        if (getItemCount() < getMaxSize()) {
+            Coord here = getCoord();
+            here.adjust(orientation.top);
+            IInventory upi = here.getTE(IInventory.class);
+            FzInv upinv = FactorizationUtil.openInventory(upi, orientation.top.getOpposite());
+            
+            if (upinv != null && upinv.pull(item, 1, true) != null) {
+                changeItemCount(1);
+            }
+        }
+        if (getItemCount() > 0) {
+            Coord here = getCoord();
+            here.adjust(orientation.top.getOpposite());
+            IInventory downi = here.getTE(IInventory.class);
+            FzInv downinv = FactorizationUtil.openInventory(downi, orientation.top);
+            
+            if (downinv != null) {
+                ItemStack toPush = getStackInSlot(1).splitStack(1);
+                ItemStack got = downinv.push(toPush);
+                if (got == null) {
+                    changeItemCount(-1);
+                }
+            }
+        }
+    }
+    
+    @Override
+    int getLogicSpeed() {
+        return 8; //To match hoppers
     }
     
     public int getItemCount() {
@@ -671,6 +715,10 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     @SideOnly(Side.CLIENT)
     public Icon getIcon(ForgeDirection dir) {
         if (dir.offsetY != 0) {
+            if (woodSlab.itemID < Block.blocksList.length && Block.blocksList[woodSlab.itemID] != null) {
+                Block b = Block.blocksList[woodSlab.itemID];
+                return b.getIcon(0, woodSlab.getItemDamage());
+            }
             return woodSlab.getItem().getIcon(woodSlab, 0);
         }
         Item theItem = woodLog.getItem();

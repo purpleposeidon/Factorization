@@ -1196,13 +1196,30 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 //Skip vanilla
                 continue;
             }
+            if (log.getItemDamage() == FactorizationUtil.WILDCARD_DAMAGE && log.itemID < Block.blocksList.length) {
+                Block b = Block.blocksList[log.itemID];
+                if (b != null) {
+                    ArrayList<ItemStack> subItems = new ArrayList();
+                    b.addCreativeItems(subItems);
+                    if (!subItems.isEmpty()) {
+                        theLogs.addAll(subItems);
+                        continue;
+                    } else {
+                        Core.logWarning("The logWood %s (%s) has wildcard damage, but did not seem to implement Block.addCreativeItems(). Proceeding to make stuff up.", log, b);
+                        for (int md = 0; md < 16; md++) {
+                            ItemStack is = log.copy();
+                            is.setItemDamage(md);
+                            is.stackSize = 1;
+                            theLogs.add(is);
+                        }
+                        continue;
+                    }
+                }
+            }
             theLogs.add(log);
         }
         for (ItemStack log : theLogs) {
             log = log.copy();
-            if (log.getItemDamage() == FactorizationUtil.WILDCARD_DAMAGE) {
-                log.setItemDamage(0); //NORELEASE: Oh, we can just use Block.addCreativeItems
-            }
             List<ItemStack> planks = FactorizationUtil.craft1x1(null, true, log);
             if (planks == null || planks.size() != 1) {
                 continue;
@@ -1214,7 +1231,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                     null, null, null,
                     null, null, null
             });
-            if (slabs.size() != 1) {
+            if (slabs.size() != 1 || !FactorizationUtil.craft_succeeded) {
                 continue;
             }
             ItemStack slab = slabs.get(0);

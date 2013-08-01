@@ -41,7 +41,7 @@ import factorization.api.ChargeMetalBlockConductance;
 import factorization.common.compat.CompatManager;
 import factorization.common.servo.ServoMotor;
 
-@Mod(modid = Core.modId, name = Core.name, version = Core.version)
+@Mod(modid = Core.modId, name = Core.name, version = Core.version, dependencies = "after:Forestry")
 @NetworkMod(
         clientSideRequired = true,
         tinyPacketHandler = NetworkFactorization.class
