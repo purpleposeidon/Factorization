@@ -159,4 +159,14 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         }
         return null;
     }
+    
+    @Override
+    public boolean rotate(ForgeDirection axis) {
+        byte new_b = (byte) axis.ordinal();
+        if (new_b == b_facing) {
+            return false;
+        }
+        b_facing = new_b;
+        return true;
+    }
 }
