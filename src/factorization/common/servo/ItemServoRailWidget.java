@@ -77,14 +77,14 @@ public class ItemServoRailWidget extends ItemFactorization {
             TileEntityServoRail rail = here.getTE(TileEntityServoRail.class);
             if (rail != null && rail.decoration == null) {
                 rail.setDecoration(dec);
-            }
-            if (world.isRemote){
-                here.redraw();
-            } else {
-                here.markBlockForUpdate();
-            }
-            if (!dec.isFreeToPlace() && !player.capabilities.isCreativeMode) {
-                is.stackSize--;
+                if (world.isRemote){
+                    here.redraw();
+                } else {
+                    here.markBlockForUpdate();
+                }
+                if (!dec.isFreeToPlace() && !player.capabilities.isCreativeMode) {
+                    is.stackSize--;
+                }
             }
         }
         return super.onItemUse(is, player, world, x, y, z, side, vx, vy, vz);
