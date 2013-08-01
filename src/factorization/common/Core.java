@@ -48,6 +48,7 @@ import factorization.common.servo.ServoMotor;
         )
 public class Core {
     //NORELEASE: GUIs need text and crafting GUIs need fixed textures
+    //NORELEASE: We should repackage stuff. And rename the API package possibly.
     public static final String modId = "factorization";
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
