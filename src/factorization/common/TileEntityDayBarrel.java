@@ -240,16 +240,16 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         return d == orientation.top;
     }
     
+    boolean isTopOrBack(ForgeDirection d) {
+        return d == orientation.top || d == orientation.facing.getOpposite();
+    }
+    
     boolean isBottom(ForgeDirection d) {
         return d == orientation.top.getOpposite();
     }
     
     boolean isBack(ForgeDirection d) {
         return d == orientation.facing.getOpposite();
-    }
-    
-    boolean isBackOrBottom(ForgeDirection d) {
-        return d == orientation.facing.getOpposite() || d == orientation.top.getOpposite();
     }
     
     public void setItemCount(int val) {
@@ -411,7 +411,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         updateStacks();
         int c = getItemCount();
         if (c != last_mentioned_count) {
-            if (last_mentioned_count*c == 0) {
+            if (last_mentioned_count*c <= 0) {
                 //One of them was 0
                 updateClients(MessageType.BarrelItem);
             } else {
@@ -516,10 +516,10 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     @Override
     public int[] getAccessibleSlotsFromSide(int i) {
         ForgeDirection d = ForgeDirection.getOrientation(i);
-        if (isTop(d)) {
+        if (isTopOrBack(d)) {
             return top_slot;
         }
-        if (isBackOrBottom(d)) {
+        if (isBottom(d)) {
             return bottom_slot;
         }
         return no_slots;
