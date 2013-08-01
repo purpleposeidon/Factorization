@@ -262,4 +262,13 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         facing_direction = ao;
         return true;
     }
+    
+    @Override
+    public void onInventoryChanged() {
+        super.onInventoryChanged();
+        IInventory inv = getTarget();
+        if (inv != null) {
+            inv.onInventoryChanged();
+        }
+    }
 }

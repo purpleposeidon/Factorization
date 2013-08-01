@@ -408,6 +408,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     @Override
     public void onInventoryChanged() {
+        super.onInventoryChanged();
         updateStacks();
         int c = getItemCount();
         if (c != last_mentioned_count) {
