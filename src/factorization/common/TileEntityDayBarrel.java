@@ -147,23 +147,28 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         }
         needLogic();
         
-        if (getItemCount() == 0) {
-            return;
-        }
         if (orientation == FzOrientation.UNKNOWN) {
             return;
         }
-        if (getItemCount() < getMaxSize()) {
+        boolean youve_changed_jim = false;
+        int itemCount = getItemCount();
+        if (itemCount < getMaxSize()) {
             Coord here = getCoord();
             here.adjust(orientation.top);
             IInventory upi = here.getTE(IInventory.class);
             FzInv upinv = FactorizationUtil.openInventory(upi, orientation.top.getOpposite());
             
-            if (upinv != null && upinv.pull(item, 1, true) != null) {
-                changeItemCount(1);
+            if (upinv != null) {
+                ItemStack got = upinv.pull(item, 1, true);
+                if (got != null) {
+                    taint(got);
+                    changeItemCount(1);
+                    updateStacks();
+                    youve_changed_jim = true;
+                }
             }
         }
-        if (getItemCount() > 0) {
+        if (itemCount > 0) {
             Coord here = getCoord();
             here.adjust(orientation.top.getOpposite());
             IInventory downi = here.getTE(IInventory.class);
@@ -173,9 +178,14 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
                 ItemStack toPush = getStackInSlot(1).splitStack(1);
                 ItemStack got = downinv.push(toPush);
                 if (got == null) {
-                    changeItemCount(-1);
+                    updateStacks();
+                    cleanBarrel();
+                    youve_changed_jim = true;
                 }
             }
+        }
+        if (youve_changed_jim) {
+            onInventoryChanged();
         }
     }
     
@@ -204,10 +214,10 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     public int getMaxSize() {
-        if (item == null) {
-            return 0;
+        int size = 64*64;
+        if (item != null) {
+            size = item.getMaxStackSize()*64;
         }
-        int size = item.getMaxStackSize()*64;
         if (type == Type.LARGER) {
             size *= 2;
         }
