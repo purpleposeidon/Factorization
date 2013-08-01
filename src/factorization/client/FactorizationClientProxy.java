@@ -398,7 +398,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket.itemID, new ItemRenderGlazeBucket());
         MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel.itemID, new DayBarrelItemRenderer(renderBarrel));
         
-        if (Minecraft.getMinecraft().session.username.equals("neptunepink")) {
+        if (Minecraft.getMinecraft().func_110432_I().username.equals("neptunepink")) {
             Core.FZLogger.setLevel(Level.FINE);
         }
     }
