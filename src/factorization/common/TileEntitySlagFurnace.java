@@ -324,4 +324,17 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     public Packet getDescriptionPacket() {
         return super.getDescriptionPacketWith(MessageType.FurnaceBurnTime, this.furnaceBurnTime);
     }
+    
+    @Override
+    public boolean rotate(ForgeDirection axis) {
+        if (axis.offsetY != 0) {
+            return false;
+        }
+        byte newd = (byte) axis.ordinal();
+        if (newd != facing_direction) {
+            facing_direction = newd;
+            return true;
+        }
+        return false;
+    }
 }
