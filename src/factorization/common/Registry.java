@@ -1015,6 +1015,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         BlockClass.Barrel.harvest("axe", 1);
         BlockClass.Machine.harvest("pickaxe", 0);
         BlockClass.MachineLightable.harvest("pickaxe", 0);
+        BlockClass.MachineDynamicLightable.harvest("pickaxe", 0);
         MinecraftForge.setBlockHarvestLevel(resource_block, "pickaxe", 2);
     }
 
