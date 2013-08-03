@@ -428,10 +428,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         shapelessOreRecipe(base_common, new ItemStack(glaze_bucket), Item.bucketWater, Block.sand, Item.clay);
         shapelessOreRecipe(base_matte, base_common, Item.clay, Block.sand, charcoal);
         shapelessOreRecipe(base_translucent, base_common, Block.sand, Block.sand, Block.sand);
-        shapelessOreRecipe(base_shiny, base_common, netherquartz, Block.sand, charcoal);
-        shapelessOreRecipe(base_bright, base_shiny, bonemeal, nether_powder, lead_chunks);
-        shapelessOreRecipe(base_unreal, base_bright, diamond_shard, Item.eyeOfEnder, dark_iron);
-        shapelessOreRecipe(glaze_base_mimicry, base_unreal, Item.eyeOfEnder, Item.slimeBall, lapis);
+        shapelessOreRecipe(base_shiny, base_common, netherquartz, charcoal);
+        shapelessOreRecipe(base_bright, base_shiny, nether_powder, lead_chunks);
+        shapelessOreRecipe(base_unreal, base_bright, Item.glowstone);
+        shapelessOreRecipe(glaze_base_mimicry, base_unreal, Item.redstone, Item.slimeBall, lapis);
         
         ItemStack blackWool = new ItemStack(Block.cloth, 1, 15);
         BasicGlazes.ST_VECHS_BLACK.recipe(base_matte, blackWool);
@@ -442,7 +442,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         BasicGlazes.LAPIS_OXIDE.recipe(base_common, lapis);
         BasicGlazes.PURPLE_OXIDE.recipe(base_common, Item.redstone, lapis);
         BasicGlazes.LEAD_OXIDE.recipe(base_common, lead_chunks);
-        BasicGlazes.FIRE_ENGINE_RED.recipe(base_bright, Item.redstone);
+        BasicGlazes.FIRE_ENGINE_RED.recipe(base_bright, Item.redstone, Item.redstone, Item.redstone);
         BasicGlazes.CELEDON.recipe(base_translucent, Item.slimeBall);
         BasicGlazes.IRON_BLUE.recipe(base_shiny, lapis, iron_chunks);
         BasicGlazes.STONEWARE_SLIP.recipe(base_common, sludge);
@@ -546,7 +546,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                             return false;
                         }
                         Block b = Block.blocksList[is.itemID];
-                        if (b == null) {
+                        if (b == null || b.getUnlocalizedName().equals("tile.ForgeFiller")) {
                             return false;
                         }
                         other_items++;
