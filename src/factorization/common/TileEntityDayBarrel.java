@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
@@ -387,16 +385,15 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         if (is == null || !is.hasTagCompound()) {
             return null;
         }
-        return ItemStack.loadItemStackFromNBT(is.getTagCompound().getCompoundTag("SilkItem"));
+        NBTTagCompound tag = is.getTagCompound();
+        if (tag.hasKey("SilkItem")) {
+            return ItemStack.loadItemStackFromNBT(is.getTagCompound().getCompoundTag("SilkItem"));
+        }
+        return null;
     }
     
-    private static int measureRecursion(ItemStack is) {
-        int depth = 0;
-        while (depth < 40 && is != null) {
-            depth++;
-            is = getSilkedItem(is);
-        }
-        return depth;
+    private static boolean isNested(ItemStack is) {
+        return getSilkedItem(is) != null;
     }
     
     
@@ -561,6 +558,9 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             return false;
         }
         if (item == null) {
+            if (isNested(is)) {
+                return false;
+            }
             return true;
         }
         if (is != null && is.isItemDamaged()) {
@@ -619,10 +619,9 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             info(entityplayer);
             return true;
         }
-        if (type == Type.SILKY && !worldObj.isRemote) {
-            if (doRecursionThingie(is, entityplayer, handslot, side)) {
-                return true;
-            }
+        if (!worldObj.isRemote && isNested(is)) {
+            Notify.send(entityplayer, getCoord(), "No.");
+            return true;
         }
 
         if (is.isItemDamaged()) {
@@ -986,65 +985,5 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             tag.setTag("SilkItem", si);
         }
         return is;
-    }
-    
-    boolean doRecursionThingie(ItemStack is, EntityPlayer entityplayer, int handslot, ForgeDirection side) {
-        int recursion = measureRecursion(is);
-        if (recursion > 0) {
-            String threat = "Argh!";
-            String[] msgs = new String[] {
-                    "?",
-                    "No",
-                    "Bad",
-                    "Stop.",
-                    "I'm warning you!",
-                    "I'll bust out the creepers!",
-                    "You don't want the creepers, do you?",
-                    "You... you want the creepers.",
-                    "*sigh*",
-                    "This is absurd",
-                    "You're really doing this",
-                    "I can't believe it.",
-                    "Okay.",
-                    "Look.",
-                    "I can't just give you a creeper for practically free.",
-                    "That's, like, bad EMC.",
-                    "This is just like, what, a few stacks of wood now?",
-                    "Not to mention all of those Silk Touch books",
-                    "Maybe that's close enough.",
-                    "But still",
-                    "You can't just convert a ton of nested wood & magic into a creeper.",
-                    "That's not how things work.",
-                    "Okay, it *is* minecraft.",
-                    "And I do play god a little bit.",
-                    "But it's not how I operate.",
-                    "SNEAK ATTACK! BUAH HA HA HA!" //Uhm. Lol.
-            };
-            if (recursion < msgs.length) {
-                threat = msgs[recursion];
-            }
-            Notify.send(entityplayer, getCoord(), threat);
-            if (recursion >= msgs.length - 1) {
-                entityplayer.inventory.setInventorySlotContents(handslot, null);
-                Coord top = getCoord().add(side);
-                
-                EntityWolf wolf = new EntityWolf(entityplayer.worldObj);
-                wolf.setLocationAndAngles(top.x, top.y, top.z, 0, 0);
-                wolf.setCustomNameTag("yo dawg");
-                wolf.setAttackTarget(entityplayer);
-                wolf.worldObj.spawnEntityInWorld(wolf);
-                
-                EntityCreeper sparky = new EntityCreeper(worldObj);
-                sparky.setLocationAndAngles(top.x, top.y, top.z, 0, 0);
-                worldObj.spawnEntityInWorld(sparky);
-                sparky.setTarget(entityplayer);
-                sparky.mountEntity(wolf);
-                
-                getCoord().removeTE();
-                getCoord().setId(0);
-                return true;
-            }
-        }
-        return false;
     }
 }
