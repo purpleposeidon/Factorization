@@ -227,8 +227,6 @@ public class HammerClientProxy extends HammerProxy {
                     login.difficultySetting,
                     Core.proxy.getProfiler());
             send_queue = Minecraft.getMinecraft().thePlayer.sendQueue;
-            NCH_class = (Class<NetClientHandler>)send_queue.getClass();
-            NCH_worldClient_field = ReflectionHelper.findField(NCH_class, "worldClient", "worldClient", "i");
             Minecraft mc = Minecraft.getMinecraft();
         }
     }
@@ -247,17 +245,9 @@ public class HammerClientProxy extends HammerProxy {
     }
     
     private static NetClientHandler send_queue;
-    private static Class<NetClientHandler> NCH_class;
-    private static Field NCH_worldClient_field;
     
     private void setSendQueueWorld(WorldClient wc) {
-        try {
-            NCH_worldClient_field.set(send_queue, wc);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Failed to set SendQueue world due to reflection failure", e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("Failed to set SendQueue world due to reflection failure", e);
-        }
+        send_queue.worldClient = wc;
     }
     
     private void setWorldAndPlayer(WorldClient wc, EntityClientPlayerMP player) {
