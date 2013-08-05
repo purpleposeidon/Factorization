@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
+import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
@@ -17,6 +19,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.oredict.ShapedOreRecipe;
@@ -367,8 +370,34 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         woodLog = getLog(is);
         woodSlab = getSlab(is);
         type = getUpgrade(is);
+        if (type == Type.SILKY && is.hasTagCompound()) {
+            NBTTagCompound tag = is.getTagCompound();
+            int loadCount = tag.getInteger("SilkCount");
+            if (loadCount != 0) {
+                ItemStack loadItem = getSilkedItem(is);
+                if (loadItem != null) {
+                    taint(loadItem);
+                    setItemCount(loadCount);
+                }
+            }
+        }
     }
     
+    public static ItemStack getSilkedItem(ItemStack is) {
+        if (is == null || !is.hasTagCompound()) {
+            return null;
+        }
+        return ItemStack.loadItemStackFromNBT(is.getTagCompound().getCompoundTag("SilkItem"));
+    }
+    
+    private static int measureRecursion(ItemStack is) {
+        int depth = 0;
+        while (depth < 40 && is != null) {
+            depth++;
+            is = getSilkedItem(is);
+        }
+        return depth;
+    }
     
     
     //Network stuff
@@ -590,6 +619,11 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             info(entityplayer);
             return true;
         }
+        if (type == Type.SILKY && !worldObj.isRemote) {
+            if (doRecursionThingie(is, entityplayer, handslot, side)) {
+                return true;
+            }
+        }
 
         if (is.isItemDamaged()) {
             if (getItemCount() == 0) {
@@ -690,6 +724,10 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             info(entityplayer);
             return;
         }
+        if (ForgeHooks.canToolHarvestBlock(Block.wood, 0, entityplayer.getHeldItem())) {
+            return;
+        }
+        
         int to_remove = Math.min(item.getMaxStackSize(), getItemCount());
         if (entityplayer.isSneaking() && to_remove >= 1) {
             to_remove = 1;
@@ -766,7 +804,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     @Override
     public void dropContents() {
-        if (type == Type.CREATIVE) {
+        if (type == Type.CREATIVE || type == Type.SILKY) {
             return;
         }
         if (item == null || getItemCount() <= 0 ) {
@@ -940,6 +978,73 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     @Override
     public ItemStack getDroppedBlock() {
         ItemStack is = makeBarrel(type, woodLog, woodSlab);
+        if (type == Type.SILKY && item != null && getItemCount() > 0) {
+            NBTTagCompound tag = FactorizationUtil.getTag(is);
+            tag.setInteger("SilkCount", getItemCount());
+            NBTTagCompound si = new NBTTagCompound();
+            item.writeToNBT(si);
+            tag.setTag("SilkItem", si);
+        }
         return is;
+    }
+    
+    boolean doRecursionThingie(ItemStack is, EntityPlayer entityplayer, int handslot, ForgeDirection side) {
+        int recursion = measureRecursion(is);
+        if (recursion > 0) {
+            String threat = "Argh!";
+            String[] msgs = new String[] {
+                    "?",
+                    "No",
+                    "Bad",
+                    "Stop.",
+                    "I'm warning you!",
+                    "I'll bust out the creepers!",
+                    "You don't want the creepers, do you?",
+                    "You... you want the creepers.",
+                    "*sigh*",
+                    "This is absurd",
+                    "You're really doing this",
+                    "I can't believe it.",
+                    "Okay.",
+                    "Look.",
+                    "I can't just give you a creeper for practically free.",
+                    "That's, like, bad EMC.",
+                    "This is just like, what, a few stacks of wood now?",
+                    "Not to mention all of those Silk Touch books",
+                    "Maybe that's close enough.",
+                    "But still",
+                    "You can't just convert a ton of nested wood & magic into a creeper.",
+                    "That's not how things work.",
+                    "Okay, it *is* minecraft.",
+                    "And I do play god a little bit.",
+                    "But it's not how I operate.",
+                    "SNEAK ATTACK! BUAH HA HA HA!" //Uhm. Lol.
+            };
+            if (recursion < msgs.length) {
+                threat = msgs[recursion];
+            }
+            Notify.send(entityplayer, getCoord(), threat);
+            if (recursion >= msgs.length - 1) {
+                entityplayer.inventory.setInventorySlotContents(handslot, null);
+                Coord top = getCoord().add(side);
+                
+                EntityWolf wolf = new EntityWolf(entityplayer.worldObj);
+                wolf.setLocationAndAngles(top.x, top.y, top.z, 0, 0);
+                wolf.setCustomNameTag("yo dawg");
+                wolf.setAttackTarget(entityplayer);
+                wolf.worldObj.spawnEntityInWorld(wolf);
+                
+                EntityCreeper sparky = new EntityCreeper(worldObj);
+                sparky.setLocationAndAngles(top.x, top.y, top.z, 0, 0);
+                worldObj.spawnEntityInWorld(sparky);
+                sparky.setTarget(entityplayer);
+                sparky.mountEntity(wolf);
+                
+                getCoord().removeTE();
+                getCoord().setId(0);
+                return true;
+            }
+        }
+        return false;
     }
 }
