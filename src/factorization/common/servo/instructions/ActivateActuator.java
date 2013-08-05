@@ -47,7 +47,16 @@ public class ActivateActuator extends Instruction {
         try {
             EntityPlayer player = motor.getPlayer();
             player.setSneaking(sneaky);
-            MovingObjectPosition mop = player.rayTrace(1.0, 1); //NORELEASE client-side only!
+            MovingObjectPosition mop;
+            {
+                //Copied from EntityLivingBase.rayTrace
+                double distance = 1;
+                float partial = 1;
+                Vec3 positionVector = player.getPosition(partial);
+                Vec3 lookVector = player.getLook(partial);
+                Vec3 directionVector = positionVector.addVector(lookVector.xCoord * distance, lookVector.yCoord * distance, lookVector.zCoord * distance);
+                mop = motor.worldObj.clip(positionVector, directionVector, true);
+            }
             if (mop == null) {
                 mop = rayTrace(motor);
             }
@@ -61,7 +70,13 @@ public class ActivateActuator extends Instruction {
                 float dx = (float) (hitVec.xCoord - x);
                 float dy = (float) (hitVec.yCoord - y);
                 float dz = (float) (hitVec.zCoord - z);
-                is.tryPlaceItemIntoWorld(player, motor.worldObj, x, y, z, mop.sideHit, dx, dy, dz);
+                Item it = is.getItem();
+                if (it.onItemUseFirst(is, player, motor.worldObj, x, y, z, mop.sideHit, dx, dy, dz)) {
+                    return;
+                }
+                if (it.onItemUse(is, player, motor.worldObj, x, y, z, mop.sideHit, dx, dy, dz)) {
+                    return;
+                }
             } else if (mop.typeOfHit == EnumMovingObjectType.ENTITY) {
                 if (mop.entityHit.func_130002_c(player)) {
                     return;
@@ -71,13 +86,10 @@ public class ActivateActuator extends Instruction {
                 }
             }
         } catch (IOException e) { } finally {
-            if (is.stackSize <= 0) {
-                motor.getInv().set(0, null);
-            }
             motor.finishUsingPlayer();
         }
     }
-    
+
     MovingObjectPosition rayTrace(ServoMotor motor) {
         //First look for entities.
         Coord c = motor.getCurrentPos();
