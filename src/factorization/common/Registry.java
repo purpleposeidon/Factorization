@@ -1232,11 +1232,16 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                     null, null, null,
                     null, null, null
             });
+            ItemStack slab;
+            String odType;
             if (slabs.size() != 1 || !FactorizationUtil.craft_succeeded) {
-                continue;
+                slab = plank;
+                odType = "plankWood";
+            } else {
+                slab = slabs.get(0);
+                odType = "slabWood";
             }
-            ItemStack slab = slabs.get(0);
-            if (FactorizationUtil.oreDictionarySimilar("slabWood", slab)) {
+            if (FactorizationUtil.oreDictionarySimilar(odType, slab)) {
                 TileEntityDayBarrel.makeRecipe(log, slab);
             }
         }
