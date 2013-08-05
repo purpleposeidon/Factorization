@@ -132,7 +132,7 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
         }
         FluidStack steam = steamTank.getFluid();
         if (steam == null) {
-            steamTank.setFluid(steam = FluidRegistry.getFluidStack("Steam", 0));
+            steamTank.setFluid(steam = FluidRegistry.getFluidStack("steam", 0));
         }
         long seed = getCoord().seed() + worldObj.getTotalWorldTime();
         if (seed % 5 == 0) {
