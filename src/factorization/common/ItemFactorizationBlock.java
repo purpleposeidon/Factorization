@@ -40,12 +40,12 @@ public class ItemFactorizationBlock extends ItemBlock {
             //create our TileEntityFactorization
             //Coord c = new Coord(w, x, y, z).towardSide(side);
 
-            w.setBlockTileEntity(here.x, here.y, here.z, te);
             if (te instanceof TileEntityCommon) {
                 TileEntityCommon tec = (TileEntityCommon) te;
                 tec.onPlacedBy(player, is, side, hitX, hitY, hitZ);
                 tec.getBlockClass().enforce(here);
             }
+            w.setBlockTileEntity(here.x, here.y, here.z, te);
             
             here.markBlockForUpdate();
             return true;
