@@ -217,7 +217,6 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         if (target.stackSize <= amount) {
             ItemStack ret = target;
             setInventorySlotContents(i, null);
-            onInventoryChanged();
             return ret;
         }
 
@@ -225,7 +224,6 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         if (target.stackSize == 0) {
             setInventorySlotContents(i, null);
         }
-        onInventoryChanged();
         return ret;
     }
 
