@@ -103,10 +103,10 @@ public class CompressionState {
         return true;
     }
     
-    private TileEntityCompressionCrafter findEdgeRoot(TileEntityCompressionCrafter at) { //NORELEASE static
+    private static ForgeDirection[] forgeDirections = new ForgeDirection[] { ForgeDirection.DOWN, ForgeDirection.NORTH, ForgeDirection.WEST };
+    private static TileEntityCompressionCrafter findEdgeRoot(TileEntityCompressionCrafter at) {
         final ForgeDirection cd = at.getFacing();
         TileEntityCompressionCrafter first = at;
-        ForgeDirection[] forgeDirections = new ForgeDirection[] { ForgeDirection.DOWN, ForgeDirection.NORTH, ForgeDirection.WEST }; //NORELEASE: static
         for (int directionIndex = 0; directionIndex < forgeDirections.length; directionIndex++) {
             ForgeDirection d = forgeDirections[directionIndex];
             if (d == cd || d.getOpposite() == cd) {
@@ -201,7 +201,7 @@ public class CompressionState {
         
         public CellInfo(Coord cell, ForgeDirection top) {
             this.cell = cell;
-            TileEntityBarrel barrel = cell.getTE(TileEntityBarrel.class);
+            TileEntityDayBarrel barrel = cell.getTE(TileEntityDayBarrel.class);
             if (barrel != null) {
                 if (barrel.item == null) {
                     return;
@@ -238,8 +238,8 @@ public class CompressionState {
                 cell.setId(0);
                 break;
             case BARREL:
-                leftOvers = null;
-                cell.getTE(TileEntityBarrel.class).changeItemCount(-amount);
+                leftOvers.stackSize = 0;
+                cell.getTE(TileEntityDayBarrel.class).changeItemCount(-amount);
                 break;
             case SMACKED:
                 List<ItemStack> craftRes = FactorizationUtil.craft1x1(null, true, items[BREAK]);
@@ -257,7 +257,10 @@ public class CompressionState {
                 return craftRes;
             }
             List<ItemStack> ret = new ArrayList(1);
-            ret.add(FactorizationUtil.normalize(leftOvers));
+            leftOvers = FactorizationUtil.normalize(leftOvers);
+            if (leftOvers != null) {
+                ret.add(leftOvers);
+            }
             return ret;
         }
         

@@ -49,7 +49,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
             return 0;
         }
         if (progress > 0) {
-            return progress/20F;
+            return (float) Math.sqrt(progress/20F);
         }
         return Math.min(1, (progress*1F)/-10F);
     }
