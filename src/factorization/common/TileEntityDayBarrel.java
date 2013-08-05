@@ -19,6 +19,8 @@ import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.oredict.ShapedOreRecipe;
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -773,7 +775,11 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         NBTTagCompound tag = FactorizationUtil.getTag(barrel_item);
         tag.setTag("log", FactorizationUtil.item2tag(log));
         tag.setTag("slab", FactorizationUtil.item2tag(slab));
-        barrel_item.setItemDamage(type.ordinal());
+        int dmg = log.itemID*16 + log.getItemDamage();
+        dmg %= 1000;
+        dmg *= 10;
+        dmg += type.ordinal();
+        barrel_item.setItemDamage(dmg);
         return barrel_item;
     }
     
@@ -788,7 +794,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         make(Type.CREATIVE, new ItemStack(Block.blockDiamond), new ItemStack(Block.dragonEgg));
     }
     
-    private static ItemStack silkTouch = Item.enchantedBook.getEnchantedItemStack(new EnchantmentData(Enchantment.silkTouch, 1));
+    static ItemStack silkTouch = Item.enchantedBook.getEnchantedItemStack(new EnchantmentData(Enchantment.silkTouch, 1));
     public static void makeRecipe(ItemStack log, ItemStack slab) {
         ItemStack normal = make(Type.NORMAL, log, slab);
         Core.registry.recipe(normal,
@@ -800,32 +806,50 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         
         //Note: Don't add creative. That'd be bad.
         //And don't add normal, since that'd be silly.
-        Core.registry.recipe(make(Type.SILKY, log, slab),
+        int width = 1;
+        int height = 2;
+        GameRegistry.addRecipe(new ShapedOreRecipe(make(Type.SILKY, log, slab), 
                 "#",
                 "B",
-                "#",
                 '#', silkTouch,
-                'B', normal);
+                'B', normal) {
+            public final boolean minecraft_is_a_soggy_bag_of_shit = true;
+            @Override
+            public boolean checkItemEquals(ItemStack target, ItemStack input) {
+                if (input != null && input.itemID == silkTouch.itemID) {
+                    return FactorizationUtil.couldMerge(silkTouch, input);
+                }
+                return super.checkItemEquals(target, input);
+            }
+        });
+        /*Core.registry.recipe(make(Type.SILKY, log, slab), 
+                "#",
+                "B",
+                '#', silkTouch,
+                'B', normal);*/
         Core.registry.recipe(make(Type.HOPPING, log, slab),
-                "V",
-                "B",
-                "V",
-                'V', Block.hopperBlock,
-                'B', normal);
+                "Y",
+                "0",
+                "Y",
+                'Y', Block.hopperBlock,
+                '0', normal);
         Core.registry.recipe(make(Type.LARGER, log, slab),
-                "B",
-                "V",
-                "B",
-                'B', normal,
-                'V', Block.hopperBlock);
+                "0",
+                "Y",
+                "0",
+                '0', normal,
+                'Y', Block.hopperBlock);
         Core.registry.recipe(make(Type.STICKY, log, slab),
-                "O",
-                "B",
-                'O', Item.slimeBall,
-                'B', normal);
+                "*",
+                "0",
+                '*', Item.slimeBall,
+                '0', normal);
     }
     
     static Type getUpgrade(ItemStack is) {
+        if (is == null) {
+            return Type.NORMAL;
+        }
         NBTTagCompound tag = is.getTagCompound();
         if (tag == null) {
             return Type.NORMAL;
@@ -837,8 +861,9 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         try {
             return Type.valueOf(name);
         } catch (IllegalArgumentException e) {
-            Core.logWarning("%s has invalid barrel Type %s", is, name);
+            Core.logWarning("%s has invalid barrel Type %s. Resetting it.", is, name);
             e.printStackTrace();
+            tag.removeTag("type");
             return Type.NORMAL;
         }
     }
