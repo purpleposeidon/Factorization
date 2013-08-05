@@ -193,7 +193,15 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     @Override
     int getLogicSpeed() {
-        return 8; //To match hoppers
+        return 8; //To match vanilla hoppers
+    }
+    
+    @Override
+    public void neighborChanged() {
+        super.neighborChanged();
+        if (type == Type.HOPPING) {
+            needLogic();
+        }
     }
     
     public int getItemCount() {
@@ -338,6 +346,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         }
         orientation = fo;
         loadFromStack(is);
+        needLogic();
     }
     
     @Override
@@ -431,6 +440,9 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
                 updateClients(MessageType.BarrelCount);
             }
             last_mentioned_count = c;
+        }
+        if (type == Type.HOPPING) {
+            needLogic();
         }
     }
     
