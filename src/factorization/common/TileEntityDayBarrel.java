@@ -253,7 +253,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             item.stackSize = 0;
             return true;
         }
-        return false;
+        return FactorizationUtil.couldMerge(item, is);
     }
     
     boolean isTop(ForgeDirection d) {
@@ -285,10 +285,22 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             middleCount = 0;
             item = null;
         }
+        if (middleCount == 0) {
+            topStack = bottomStack = item = null;
+            updateClients(MessageType.BarrelCount);
+            onInventoryChanged();
+            return;
+        }
         if (middleCount > getMaxSize()) {
             Core.logSevere("Factorization barrel size " + middleCount + " is larger than the maximum, " + getMaxSize() + " at " + getCoord());
         }
-        topStack = bottomStack = null;
+        if (topStack == null) {
+            topStack = item.copy();
+        }
+        if (bottomStack == null) {
+            bottomStack = item.copy();
+        }
+        topStack.stackSize = bottomStack.stackSize = 0;
         updateStacks();
         updateClients(MessageType.BarrelCount);
         onInventoryChanged();
@@ -465,8 +477,6 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             }
         }
         int upperLine = getMaxSize() - item.getMaxStackSize();
-        topStack = item.copy();
-        bottomStack = item.copy();
         if (count > upperLine) {
             topStack.stackSize = count - upperLine;
             count -= topStack.stackSize;
@@ -484,7 +494,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     @Override
     public ItemStack getStackInSlot(int i) {
-        cleanBarrel();
+        updateStacks();
         if (i == 0) {
             return topStack;
         }
