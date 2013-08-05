@@ -104,6 +104,9 @@ public enum Command {
             //transferStackInSlot
             pocket.transferStackInSlot(player, i);
         }
+        if (player.openContainer instanceof ContainerPocket) {
+            ((ContainerPocket) player.openContainer).updateMatrix();
+        }
     }
     
     private boolean rotateAll(InventoryPlayer inv, int slots[]) {
@@ -265,5 +268,8 @@ public enum Command {
             inv.setInventorySlotContents(i, toMove.splitStack(1));
         }
         inv.setInventorySlotContents(slot, FactorizationUtil.normalize(toMove));
+        if (player.openContainer instanceof ContainerPocket) {
+            ((ContainerPocket) player.openContainer).updateMatrix();
+        }
     }
 }
