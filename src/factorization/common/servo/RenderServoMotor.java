@@ -13,6 +13,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
@@ -38,10 +40,20 @@ public class RenderServoMotor extends RenderEntity {
     boolean loaded_model = false;
     
     void loadSprocketModel() {
-        //IModelCustom sprocket = AdvancedModelLoader.loadModel(Core.model_dir + "sprocket/sprocket.obj");
-        IModelCustom sprocket = AdvancedModelLoader.loadModel("/factorization/common/servo/sprocket.obj");
         //TODO: Resourceify! FIXME: Blame forge.
-        //IModelCustom sprocket = AdvancedModelLoader.loadModel("factorization:models/sprocket/sprocket.obj");
+        IModelCustom sprocket = null;
+        for (String modelLocation : new String[] { "/factorization/common/servo/sprocket.obj" }) {
+            try {
+                sprocket = AdvancedModelLoader.loadModel(modelLocation);
+                break;
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            }
+        }
+        if (sprocket == null) {
+            Core.logSevere("Did not find servo sprocket model");
+            return;
+        }
         sprocket_display_list = GLAllocation.generateDisplayLists(1);
         GL11.glNewList(sprocket_display_list, GL11.GL_COMPILE);
         sprocket.renderAll();
@@ -71,7 +83,7 @@ public class RenderServoMotor extends RenderEntity {
     }
 
     private Quaternion q0 = new Quaternion(), q1 = new Quaternion();
-    private static boolean debug_servo_orientation = Core.dev_environ;
+    private static boolean debug_servo_orientation = false;
 
     @Override
     public void doRender(Entity ent, double x, double y, double z, float yaw, float partial) {
@@ -154,7 +166,6 @@ public class RenderServoMotor extends RenderEntity {
             float gray = 0.65F;
             GL11.glColor4f(gray, gray, gray, 0.8F);
             GL11.glLineWidth(1.5F);
-            GL11.glDepthMask(false);
             Minecraft mc = Minecraft.getMinecraft();
             float d = 1F, h = 0.25F;
             AxisAlignedBB ab = AxisAlignedBB.getBoundingBox(-d, -h, -d, d, h, d);
@@ -177,17 +188,12 @@ public class RenderServoMotor extends RenderEntity {
         }
         GL11.glScalef(1 / s, 1 / s, 1 / s);
         GL11.glPushMatrix();
-        ItemStack held = motor.getHeldItem();
-        if (held != null && held.getItem().isFull3D()) {
-            GL11.glTranslatef(0, 0.5F, 0);
-        }
-        renderItem(motor, held, partial);
+        renderInventory(motor, partial);
         GL11.glPopMatrix();
         GL11.glPopMatrix();
         if (render_stacks) {
             GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
             GL11.glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
-            renderInventory(motor, partial);
             renderStacks(motor);
         }
         GL11.glPopMatrix();
@@ -198,6 +204,22 @@ public class RenderServoMotor extends RenderEntity {
     RenderItem renderItem = new RenderItem();
 
     void renderInventory(ServoMotor motor, float partial) {
+        ItemStack held = motor.getHeldItem();
+        if (held != null) {
+            //if held.getItem().isFull3D()...
+            GL11.glPushMatrix();
+            GL11.glTranslatef(0, 3.5F/16F, 0);
+            Item item = held.getItem();
+            if (item instanceof ItemBlock) {
+                GL11.glTranslatef(1F/16F, 2.75F/16F, 2.5F/16F);
+                GL11.glRotatef(45, 0, 1, 0);
+                GL11.glRotatef(23.5F, 0, 0, -1);
+            }
+            renderItem(motor, held, partial);
+            GL11.glPopMatrix();
+        }
+        
+        
         GL11.glPushMatrix();
         GL11.glRotatef(90, 1, 0, 0);
         float s = 1/4F;
@@ -206,24 +228,19 @@ public class RenderServoMotor extends RenderEntity {
         long range = 9*20;
         double d = motor.worldObj.getTotalWorldTime() + partial;
         float now = (float) ((d % range)/(double)range);
-        //double warp = Math.cos(Math.toRadians(360*now/20)) + 2;
-        int count = 0;
-        for (int i = 0; i < inv.size(); i++) {
-            count += inv.get(i) == null ? 0 : 1;
-        }
-        int c = 0;
+        boolean first = true;
         for (int i = 0; i < inv.size(); i++) {
             ItemStack is = inv.get(i);
-            if (/*is == actuator || */ is == null) {
+            if (is == null) {
                 continue;
             }
-            c++;
+            if (first) {
+                first = false;
+                continue;
+            }
             GL11.glPushMatrix();
-            float theta = 360/count*c;
-            GL11.glRotatef(theta, 0, 1, 0);
-            GL11.glTranslatef(0.65F, -0.25F, 0);
+            GL11.glTranslatef(0.65F, 0.25F, -0.125F);
             GL11.glScalef(s, s, s);
-            GL11.glRotatef(90, 1, 0, 0);
             GL11.glRotatef(-90, 0, 0, 1);
             try {
                 renderItem(motor, is, partial);
@@ -245,7 +262,6 @@ public class RenderServoMotor extends RenderEntity {
     }
     
     void renderMainModel(ServoMotor motor, float partial, double ro, boolean hilighting) {
-        // TODO: Put our textures into ItemIcons
         GL11.glPushMatrix();
         func_110776_a(servo_uv);
         if (loaded_model == false) {
@@ -347,18 +363,24 @@ public class RenderServoMotor extends RenderEntity {
         }
         dummy_entity.worldObj = motor.worldObj;
         holder_render.setRenderManager(renderManager);
-        // holder_render.renderItem(partial);
         do_renderItem(equiped_item);
     }
 
     public void do_renderItem(ItemStack itemstack) {
         // Yoinked from RenderBiped.renderEquippedItems
         GL11.glPushMatrix();
-        GL11.glRotatef(180 - 45, 0, 1, 0);
-        float s = 1F / 2F;
+        float s = 1F / 4F;
         GL11.glScalef(s, s, s);
-
-        // GL11.glTranslatef(-0.0625F, 0.4375F, 0.0625F);
+        
+        
+        //Pre-emptively undo transformations that the item renderer does so that we don't get a stupid angle
+        //Minecraft render code is terrible.
+        GL11.glTranslatef(0.9375F, 0.0625F, -0.0F);
+        GL11.glRotatef(-335.0F, 0.0F, 0.0F, 1.0F);
+        GL11.glRotatef(-50.0F, 0.0F, 1.0F, 0.0F);
+        float f6 = 1.5F;
+        GL11.glScalef(f6, f6, f6);
+        
         this.renderManager.itemRenderer.renderItem(dummy_entity, itemstack, 0);
 
         if (itemstack.getItem().requiresMultipleRenderPasses()) {
