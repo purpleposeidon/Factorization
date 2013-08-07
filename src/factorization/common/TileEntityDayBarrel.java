@@ -164,6 +164,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             if (upinv != null) {
                 ItemStack got = upinv.pull(item, 1, true);
                 if (got != null) {
+                    upi.onInventoryChanged();
                     taint(got);
                     changeItemCount(1);
                     updateStacks();
@@ -181,9 +182,12 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
                 ItemStack toPush = getStackInSlot(1).splitStack(1);
                 ItemStack got = downinv.push(toPush);
                 if (got == null) {
+                    downi.onInventoryChanged();
                     updateStacks();
                     cleanBarrel();
                     youve_changed_jim = true;
+                } else {
+                    getStackInSlot(1).stackSize++;
                 }
             }
         }
@@ -468,6 +472,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     @Override
     public void onInventoryChanged() {
         super.onInventoryChanged();
+        cleanBarrel();
         updateStacks();
         int c = getItemCount();
         if (c != last_mentioned_count) {
@@ -619,10 +624,6 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             info(entityplayer);
             return true;
         }
-        if (!worldObj.isRemote && isNested(is)) {
-            Notify.send(entityplayer, getCoord(), "No.");
-            return true;
-        }
 
         if (is.isItemDamaged()) {
             if (getItemCount() == 0) {
@@ -630,6 +631,11 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             } else {
                 info(entityplayer);
             }
+            return true;
+        }
+        
+        if (!worldObj.isRemote && isNested(is) && (item == null || itemMatch(is))) {
+            Notify.send(entityplayer, getCoord(), "No.");
             return true;
         }
 
@@ -850,7 +856,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     static {
-        make(Type.CREATIVE, new ItemStack(Block.blockDiamond), new ItemStack(Block.dragonEgg));
+        make(Type.CREATIVE, new ItemStack(Block.blockDiamond), new ItemStack(Block.bedrock));
     }
     
     static ItemStack silkTouch = Item.enchantedBook.getEnchantedItemStack(new EnchantmentData(Enchantment.silkTouch, 1));
@@ -983,6 +989,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             NBTTagCompound si = new NBTTagCompound();
             item.writeToNBT(si);
             tag.setTag("SilkItem", si);
+            tag.setLong("rnd", hashCode() + worldObj.getTotalWorldTime());
         }
         return is;
     }
