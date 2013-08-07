@@ -78,8 +78,20 @@ public class BlockIcons {
     
     @Directory("storage")
     public static SimpleMachine barrel, ed_barrel;
+    
     @Directory("storage")
-    public static Icon daybarrel_side, daybarrel_front, daybarrel_top;
+    public static BarrelTextureset normal, silky, hopping, larger, sticky;
+    
+    public static class BarrelTextureset extends IconGroup {
+        public Icon side, front, top;
+        
+        @Override
+        public IconGroup prefix(String prefix) {
+            this.group_prefix = prefix + "/";
+            return this;
+        }
+    }
+    
     
     public static ArrowyBox servo$set_direction, servo$set_facing;
     public static Icon servo$activate, servo$activate_sneaky;

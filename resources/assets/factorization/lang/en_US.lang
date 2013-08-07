@@ -1,5 +1,5 @@
 #en_US localizations
-factorization.factoryBlock.BARREL.name=Barrel
+factorization.factoryBlock.BARREL.name=Deprecated Barrel
 factorization.factoryBlock.DAYBARREL.name=Barrel
 factorization.factoryBlock.DAYBARREL.format.name=%2$s Barrel
 factorization.factoryBlock.DAYBARREL.format2.name=%1$s %2$s Barrel
@@ -64,7 +64,7 @@ item.factorization:motor.name=Motor
 item.factorization:fan.name=Fan
 item.factorization:tool/charge_meter.name=Charge Meter
 item.factorization:router/eject.name=Auto-Ejector
-item.factorization:barrel_upgrade.name=Extra-Dimensional Storage
+item.factorization:barrel_upgrade.name=Deprecated Extra-Dimensional Storage
 item.factorization:diamond_cutting_head.name=Diamond Cutting Head
 item.factorization:sludge.name=Sludge
 item.factorization:sludge.hint=Byproduct of washing ore gravel

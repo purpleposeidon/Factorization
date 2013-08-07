@@ -54,10 +54,18 @@ public class BlockRenderDayBarrel extends FactorizationBlockRender {
                 block.setTexture(i, barrel.getIcon(ForgeDirection.getOrientation(i)));
             }
         } else {
-            block.useTexture(BlockIcons.daybarrel_side);
-            block.setTexture(0, BlockIcons.daybarrel_top);
-            block.setTexture(1, BlockIcons.daybarrel_top);
-            block.setTexture(4, BlockIcons.daybarrel_front);
+            BlockIcons.BarrelTextureset set;
+            switch (barrel.type) {
+            case HOPPING: set = BlockIcons.hopping; break;
+            case LARGER: set = BlockIcons.larger; break;
+            case SILKY: set = BlockIcons.silky; break;
+            case STICKY: set = BlockIcons.sticky; break;
+            default: set = BlockIcons.normal; break;
+            }
+            block.useTexture(set.side);
+            block.setTexture(0, set.top);
+            block.setTexture(1, set.top);
+            block.setTexture(4, set.front);
         }
         float blockOffset = pass == 0 ? 0 : -1F/512F;
         block.setBlockBoundsOffset(blockOffset, blockOffset, blockOffset);
