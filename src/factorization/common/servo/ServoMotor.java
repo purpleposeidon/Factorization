@@ -50,7 +50,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             stacks[i] = new ServoStack();
         }
     }
-    private ItemStack[] inv = new ItemStack[4], inv_last_sent = new ItemStack[inv.length];
+    private ItemStack[] inv = new ItemStack[5], inv_last_sent = new ItemStack[inv.length];
     public int next_stack = 0;
 
     boolean dampenVelocity;
