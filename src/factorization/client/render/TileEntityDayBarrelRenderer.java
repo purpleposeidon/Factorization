@@ -65,6 +65,9 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
     
     void renderItemCount(ItemStack item, TileEntityDayBarrel barrel) {
         FontRenderer fontRender = getFontRenderer();
+        if (fontRender == null) {
+            return;
+        }
         GL11.glPushMatrix();
         GL11.glTranslated(-0.25, 0.125, 0);
         //GL11.glDepthMask(false);

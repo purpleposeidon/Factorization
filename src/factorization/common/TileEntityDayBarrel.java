@@ -374,7 +374,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             if (loadCount != 0) {
                 ItemStack loadItem = getSilkedItem(is);
                 if (loadItem != null) {
-                    taint(loadItem);
+                    item = loadItem;
                     setItemCount(loadCount);
                 }
             }
