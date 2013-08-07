@@ -198,6 +198,7 @@ public class CompressionState {
         
         final Coord cell;
         ItemStack[] items = new ItemStack[length];
+        boolean airBlock = true;
         
         public CellInfo(Coord cell, ForgeDirection top) {
             this.cell = cell;
@@ -210,6 +211,7 @@ public class CompressionState {
                 b.stackSize = Math.min(16, barrel.getItemCount());
                 b.stackSize = Math.min(b.stackSize, b.getMaxStackSize());
                 items[BARREL] = b;
+                airBlock = false;
                 return;
             }
             items[PICKED] = cell.getPickBlock(top);
@@ -221,6 +223,7 @@ public class CompressionState {
                     items[SMACKED] = craftRes.get(0);
                 }
             }
+            airBlock = items[PICKED] == null && items[BREAK] == null && items[SMACKED] == null;
         }
         
         private static final ArrayList<ItemStack> empty = new ArrayList<ItemStack>();
@@ -375,6 +378,9 @@ public class CompressionState {
                 if (is != null) {
                     any = true;
                     maxCraft = Math.min(maxCraft, is.stackSize);
+                }
+                if (is == null && !ci.airBlock) {
+                    continue iteratePermutations;
                 }
             }
             if (!any) {
