@@ -145,6 +145,9 @@ public class TileEntityStamper extends TileEntityFactorization {
     
     protected List<ItemStack> tryCrafting() {
         List<ItemStack> fakeResult = FactorizationUtil.craft1x1(this, true, input);
+        if (!FactorizationUtil.craft_succeeded) {
+            return null;
+        }
         if (canMerge(fakeResult)) {
             return FactorizationUtil.craft1x1(this, false, input.splitStack(1));
         }
