@@ -32,7 +32,7 @@ public class GuiStamper extends GuiContainer {
             drawTexturedModalRect(l + 26, i1 + 45, 178, 19, 16, 16);
         }
         if (t == FactoryType.PACKAGER) {
-            drawTexturedModalRect(l + 11, i1 + 45, 178, 35, 19, 10);
+            drawTexturedModalRect(l + 11, i1 + 45, 178, 35, 25, 10);
         }
     }
 
