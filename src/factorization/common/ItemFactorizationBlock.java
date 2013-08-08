@@ -42,6 +42,7 @@ public class ItemFactorizationBlock extends ItemBlock {
 
             if (te instanceof TileEntityCommon) {
                 TileEntityCommon tec = (TileEntityCommon) te;
+                here.setAsTileEntityLocation(tec);
                 tec.onPlacedBy(player, is, side, hitX, hitY, hitZ);
                 tec.getBlockClass().enforce(here);
             }

@@ -47,12 +47,11 @@ import factorization.common.servo.ServoMotor;
         tinyPacketHandler = NetworkFactorization.class
         )
 public class Core {
-    //NORELEASE: GUIs need text and crafting GUIs need fixed textures
     //NORELEASE: We should repackage stuff. And rename the API package possibly.
     public static final String modId = "factorization";
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
-    public static final String version = "0.8.03dev6"; //@VERSION@
+    public static final String version = "0.8.04beta2"; //@VERSION@
     public Core() {
         instance = this;
         fzconfig = new FzConfig();

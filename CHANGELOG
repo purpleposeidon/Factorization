@@ -7,13 +7,55 @@
     battery item renderer
     Fixed item drop backlog breaking
   Tweaks:
-    Servo inventory limited to 4 items; this might cause item loss, but won't matter because they're creative-mode only.
+    Servo inventory limited to 5 items; this might cause item loss, but that doesn't actually matter since they're creative-mode only (Still! Grrr.).
     Tons more grinder recipes
 
+  Barrels: Rewritten.
+    They can have any orientation; use some wrench to change it
+    They can be filled from the back as well as the top
+    Wood:
+      They have to be crafted using a single type of wood.
+      They will show what wood they were made out of. So you can have Oak Barrels, Eucalyptus Barrels...
+      If there is no slab to go with a log, then a plank can be used instead.
+    Now available in 6 delicious flavors:
+      Normal: Same as the old barrel.
+      Larger: 100% larger than normal barrels.
+      Hopping: Acts like a hopper.
+      Sticky: Leaves the last item.
+      Silky: Keeps its contents. Break with an axe to prevent spills.
+      Creative: Available in the creative menu; gives infinite items.
+    The old barrels should hang around, but won't be craftable.
+  
+  Compression crafter: New!
+    Variable-sized in-world crafting table.
+    The internal area can be between 1x1 and 3x3
+    Place the compression crafters from inside so that the grid is facing inwards (just like creating an End Portal frame in creative mode)
+    To craft, apply a redstone signal to one of the compression walls. The wall that gets the signal defines which way is up. (So you can craft north, south, east, west, vertically, and upside down.)
+    The crafting results are dropped as an item entity.
+    It has an interesting way of populating the crafting grid:
+      1: It will try to use the contents of a barrel
+      2: It will try to use the items that are dropped when the block is broken
+      3: It will try to use the items that result from breaking the block, and then crafting what it drops.
+      4: It will try to use the block as an item exactly as it is in-world.
+    It can craft up to 16 items at once, tho this tends to be possible using only barrels.
+    Examples:
+      Crafting a piston using 4 cobblestone, 3 wood planks, 1 block of iron, and 1 block of redstone will drop 1 piston, 8 redstone, and 8 iron
+      Crafting a 2x2 of nether quartz ore will drop a block of nether quartz.
+      5 wood logs can make 4 boats
+
+  Reminder: Diamond shards are made by blowing up a placed block of diamond
+  Fixed sculpture shading
+
+  Parasieves: Added in 0.8.00 I think. Oops.
+    Placing a parasieve up against an inventory will extend and filter it.
+    The filter passes nothing if nothing is in it.
+    The top slots are paired with the bottom slots. If an item is in both slots, this will define a range of items to use. This considers things like the presence of an NBT tag, damage value, and the class of the item.
+
+
 0.8.01
-  Everything now supports comparators
+  Everything now supports comparators (probably everything)
   Fixed smooth turning in servos
-  Servos can now right click with any item; now the only thing that makes actuators special is that the servo can configure them.
+  Servos can now right click with any item; now the only thing that makes actuators special is that the servo can configure them. (Buggy/broken)
 
 0.8.00
   Changed license

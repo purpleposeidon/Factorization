@@ -45,7 +45,7 @@ run("mediafire upload --quiet " + oldfile + " > " + mfurl)
 mediafire_url = open(mfurl).read().strip().strip("()").strip()
 
 print "\n"*4
-LOG  = "Factorization " + version + " (MC 1.5.1)\n"
+LOG  = "Factorization " + version + " (MC 1.6.2)\n"
 LOG += '''
 [url="{0}"]adfly + MediaFire[/url], or\n[url="{1}"]adfly + DropBox[/url]
 '''.format(

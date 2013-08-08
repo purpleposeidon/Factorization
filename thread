@@ -22,7 +22,7 @@ Right click a barrel with an item to drop it in; left-click to remove. Double-ri
 Is 64 stacks not nearly enough for your cobblegen? There's an upgrade for that...
 
 
-[u]The [b]Crafting Machines[/b][/u]
+[s][u]The [b]Crafting Machines[/b][/u][/s] [i](out of date)[/i]
 The crafting automation tools found in certain other mods makes automatic crafting far too easy. This crafting system has two machines, the Maker and the Stamper. These machines need to be used with (for example!) RedPower's tube system to make them actually be automatic.
 
 [img]http://i.imgur.com/H83w7.png[/img]
@@ -53,9 +53,7 @@ This mod adds silver ore. It can be found between y-level 7 and 55. It generates
 The slag furnace works similarly to the vanilla furnace, but has an extra output slot. It also uses twice the fuel. For most ores, it will produce an ingot with a low chance of making two instead of one, and also some stone. Silver ore will make silver ingots and lead ingots. Silver is used for mirrors, and lead is used for electrical wiring.
 
 [u][b]Diamond Shards[/b][/u]
-The recipe for Diamond Shards is very expensive and volatile. Diamond Shards can only be safely created in a Stamper. (You can make the Craft Packet directly from a crafting table.)
-[img]http://i.imgur.com/XzkE8.png[/img]
-(This picture is old, it now gives 18 shards)
+Diamond shards are made by blowing up a block of diamond with TNT. Doing this will give you 18 diamond shards.
 
 [/spoiler]
 
@@ -223,6 +221,7 @@ Servo Motors have 16 seperate stacks for things like integers, strings, and inst
 
 [u]Other Stuff/Future Plans[/u]
 [spoiler]
+Finish Servos
 ? ? ?
 [/spoiler]
 
@@ -231,14 +230,19 @@ Servo Motors have 16 seperate stacks for things like integers, strings, and inst
 [u][b][size=6][anchor=INSTALL]Installation[/anchor][/size][/b][/u]
 This is a [url="http://files.minecraftforge.net/"]Minecraft Forge[/url] mod. It uses 3 block IDs, and a bunch of item IDs.
 
-1. Install [url="http://files.minecraftforge.net/"]Minecraft Forge[/url] by extracting the contents of the forge download into the Minecraft jar. Be sure to delete the META-INF/ folder ([u]unless you are installing a server![/u]). The version of Forge that I'm using is given by the download link. Anything newer will usually work, and sometimes older versions will work as well.
-2. Check that the forge install worked by running the client (or the server). Forge information should be on the title screen (or in the server's logs). Exit minecraft.
+1. Download and run the [url="http://files.minecraftforge.net/"]Minecraft Forge Installer[/url]. The version of Forge that I'm using is given by the download link. Anything newer will usually work, and sometimes older versions will work as well.
+2. Check that the forge install worked by running the client (or the server). Forge information should be on the title screen (or in the server's logs). Stop minecraft.
 3. Put Factorization.jar into the mods folder.
-4. Optional: Install [url="http://www.minecraftforum.net/topic/909223-125132-smp-chickenbones-mods/"]NEI[/url] by placing CodeChickenCore and NotEnoughItems into the [b][u]core[/u][/b]mods folder. This will let you use the Pocket Crafting Table and Bag of Holding from within other GUIs.
+4. Optional: Install [url="http://www.minecraftforum.net/topic/909223-125132-smp-chickenbones-mods/"]Not Enough Items[/url]. This will let you use the Pocket Crafting Table and Bag of Holding from within other GUIs.
 
 
 
 [u][b][size=6][anchor=DOWNLOAD]Download[/anchor][/size][/b][/u]
+Factorization 0.8.04beta1 (MC 1.6.2)
+[url="http://adf.ly/2137658/www.mediafire.com/?mgmlzafwqfuflyw"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.8.04beta1.jar"]adfly + DropBox[/url]
+Built on 2013-08-07 against Minecraft Forge 9.10.0.790
+
 Factorization 0.8.01 (MC 1.5.2)
 [url="http://adf.ly/2137658/http://www.mediafire.com/?0x3gc3kcl4rp4x2"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.8.01.jar"]adfly + DropBox[/url]
@@ -300,7 +304,6 @@ Factorization 0.7.3 (#4) (MC 1.4.5)
 [url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.7.3.jar"]adfly + DropBox[/url]
 Built on 2012-11-22 against Minecraft Forge 6.4.0.382
 
-
 Factorization 0.6.13 (MC 1.4.2)
 [url="http://adf.ly/2137658/http://www.mediafire.com/?wpaeqxh53xmx7th"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.6.13_310.jar"]adfly + DropBox[/url]
@@ -352,9 +355,8 @@ Factorization 0.5.3 (MC 1.3.2)
 [u][b][size=6][anchor=LICENSE]License[/anchor][/size][/b][/u]
 This mod may be used in modpacks under the following conditions:
 1. There is a post in this thread that the mod is being used in a modpack. If it is a public modpack, then it must include the pack's name and the website or URL where the modpack can be found. If it is a private modpack, then mention this in your post. (I would like the post to contain also a description of the modpack and an estimate of the number of users, but this isn't necessary.)
-2. The modpack must include in it a text file listing for each public mod: the name of the mod, the mod's author, and the mod's website or forum thread.
+2. The modpack must include in it a text file, or something similar, listing for each public mod: the name of the mod, the mod's author, and the mod's website or forum thread.
 
 
-[u][b][size=6][anchor=BUGS]BUGS[/anchor][/size][/b][/u]
-Please report them to me in #factorization on Espernet; I don't make a habit of reading this thread.
-
+[u][b][size=6][anchor=BUGS]Bugs & Other Problems[/anchor][/size][/b][/u]
+Please report them to me in #factorization on Espernet; I don't make a habit of reading this thread. I am quite interested in balance, as I tend to have a bit of a heavy hand. Small/simple/tiny feature requests may be welcomed, but Ideas are not.
