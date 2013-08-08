@@ -1,5 +1,6 @@
 package factorization.common;
 
+import java.util.Arrays;
 import java.util.List;
 
 import net.minecraft.item.ItemStack;
@@ -34,14 +35,22 @@ public class TileEntityPackager extends TileEntityStamper {
                 matrix[i] = p;
             }
             to_remove = 9;
-            testOutput = FactorizationUtil.craft3x3(this, true, false, matrix);
-        } else if (input.stackSize >= 4) {
+            testOutput = FactorizationUtil.craft3x3(this, true, true, matrix);
+        } else {
+            FactorizationUtil.craft_succeeded = false;
+        }
+        if (input.stackSize >= 4 && !FactorizationUtil.craft_succeeded) {
+            Arrays.fill(matrix, null);
             matrix[0] = p;
             matrix[1] = p;
             matrix[3] = p;
             matrix[4] = p;
             to_remove = 4;
-            testOutput = FactorizationUtil.craft3x3(this, true, false, matrix);
+            testOutput = FactorizationUtil.craft3x3(this, true, true, matrix);
+        }
+        
+        if (!FactorizationUtil.craft_succeeded) {
+            return null;
         }
         
         if (testOutput == null || testOutput.isEmpty()) {
