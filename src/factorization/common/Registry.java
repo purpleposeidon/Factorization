@@ -454,7 +454,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //Sculpture combiniation recipe
         GameRegistry.addRecipe(new IRecipe() {
             ArrayList<ItemStack> merge(InventoryCrafting inv) {
-                if (inv.stackList.length < 2) { //TODO NORELEASE: Do this the less cheaty way?
+                if (inv.stackList.length < 2) {
                     return null;
                 }
                 ArrayList<ItemStack> match = new ArrayList<ItemStack>(2);
@@ -474,7 +474,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                         return null;
                     }
                 }
-                if (match.size() < 2) {
+                if (match.size() != 2) {
                     return null;
                 }
                 return match;
@@ -862,7 +862,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         TileEntityGrinder.addRecipe("oreRedstone", new ItemStack(Item.redstone), 5F);
         TileEntityGrinder.addRecipe("oreDiamond", new ItemStack(Item.diamond), 1.25F);
         TileEntityGrinder.addRecipe("oreEmerald", new ItemStack(Item.emerald), 1.25F);
-        TileEntityGrinder.addRecipe(new ItemStack(Block.oreNetherQuartz), new ItemStack(Item.netherQuartz), 1.5F /* It should actually be 1.25, but I feel like being generous here. */);
+        TileEntityGrinder.addRecipe(new ItemStack(Block.oreNetherQuartz), new ItemStack(Item.netherQuartz), 2.5F /* It should actually be 1.25, but I feel like being EXTRA generous here. */);
         TileEntityGrinder.addRecipe("oreLapis", new ItemStack(Item.dyePowder, 1, 4), 8.5F);
         
         //VANILLA RECIPES
