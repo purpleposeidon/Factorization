@@ -1,28 +1,25 @@
 package factorization.client.gui;
 
-import net.minecraft.inventory.Container;
-import net.minecraft.client.gui.inventory.GuiContainer;
-
 import org.lwjgl.opengl.GL11;
 
-import factorization.common.ContainerCrystallizer;
+import factorization.common.ContainerFactorization;
 import factorization.common.Core;
 import factorization.common.TileEntityCrystallizer;
 
-public class GuiCrystallizer extends GuiContainer {
-    ContainerCrystallizer factContainer;
+public class GuiCrystallizer extends FactorizationGui {
     TileEntityCrystallizer crys;
 
-    public GuiCrystallizer(Container container) {
+    public GuiCrystallizer(ContainerFactorization container) {
         super(container);
-        factContainer = (ContainerCrystallizer) container;
         crys = (TileEntityCrystallizer) factContainer.factory;
         xSize = 175;
         ySize = 188;
     }
-
-    protected void drawGuiContainerForegroundLayer() {
-        fontRenderer.drawString(crys.getInvName(), 6, 6, 0x404040);
+    
+    @Override
+    protected void drawGuiContainerForegroundLayer(int foo, int bar) {
+        fontRenderer.drawString(factContainer.factory.getInvName(), 8, 6, 0x404040);
+        //"inventory" doesn't fit.
     }
 
     @Override

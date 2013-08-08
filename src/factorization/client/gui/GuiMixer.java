@@ -1,22 +1,17 @@
 package factorization.client.gui;
 
-import net.minecraft.client.gui.inventory.GuiContainer;
-
 import org.lwjgl.opengl.GL11;
 
-import factorization.common.ContainerFactorization;
 import factorization.common.ContainerMixer;
 import factorization.common.Core;
 import factorization.common.TileEntityMixer;
 
-public class GuiMixer extends GuiContainer {
-    ContainerMixer factContainer;
+public class GuiMixer extends FactorizationGui {
     TileEntityMixer mixer;
 
-    public GuiMixer(ContainerFactorization cont) {
+    public GuiMixer(ContainerMixer cont) {
         super(cont);
-        factContainer = (ContainerMixer) cont;
-        mixer = factContainer.mixer;
+        mixer = cont.mixer;
     }
 
     protected void drawGuiContainerForegroundLayer() {

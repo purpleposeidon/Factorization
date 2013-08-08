@@ -1,25 +1,16 @@
 package factorization.client.gui;
 
-import net.minecraft.client.gui.inventory.GuiContainer;
-
 import org.lwjgl.opengl.GL11;
 
 import factorization.common.ContainerFactorization;
 import factorization.common.Core;
 import factorization.common.FactoryType;
 
-public class GuiStamper extends GuiContainer {
-    ContainerFactorization factContainer;
-
+public class GuiStamper extends FactorizationGui {
     public GuiStamper(ContainerFactorization container) {
         super(container);
-        factContainer = container;
     }
-
-    protected void drawGuiContainerForegroundLayer() {
-        fontRenderer.drawString(factContainer.factory.getInvName(), 60, 12 /* 12 */, 0x404040);
-    }
-
+    
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int i, int j) {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);

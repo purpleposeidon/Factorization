@@ -1,20 +1,16 @@
 package factorization.client.gui;
 
-import net.minecraft.client.gui.inventory.GuiContainer;
-
 import org.lwjgl.opengl.GL11;
 
 import factorization.common.ContainerFactorization;
 import factorization.common.Core;
 import factorization.common.TileEntitySlagFurnace;
 
-public class GuiSlag extends GuiContainer {
-    ContainerFactorization factContainer;
+public class GuiSlag extends FactorizationGui {
     TileEntitySlagFurnace furnace;
 
     public GuiSlag(ContainerFactorization cont) {
         super(cont);
-        this.factContainer = cont;
         furnace = (TileEntitySlagFurnace) cont.factory;
     }
 

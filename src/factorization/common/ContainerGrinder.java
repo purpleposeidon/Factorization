@@ -7,7 +7,7 @@ public class ContainerGrinder extends ContainerFactorization {
     int lastProgress = -1;
     public TileEntityGrinder grinder;
     public ContainerGrinder(EntityPlayer entityplayer, TileEntityFactorization grinder) {
-        super(entityplayer, grinder.getFactoryType());
+        super(entityplayer, grinder);
         this.grinder = (TileEntityGrinder) grinder; 
     }
 

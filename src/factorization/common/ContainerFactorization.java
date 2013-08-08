@@ -17,20 +17,13 @@ public class ContainerFactorization extends Container {
     FactoryType type;
     int slot_start, slot_end;
     int player_slot_start, player_slot_end;
-    EntityPlayer entityplayer;
+    public EntityPlayer entityplayer;
     int invdx = 0, invdy = 0;
 
-    public ContainerFactorization(EntityPlayer entityplayer,
-            TileEntityFactorization factory) {
+    public ContainerFactorization(EntityPlayer entityplayer, TileEntityFactorization factory) {
         this.factory = factory;
         this.entityplayer = entityplayer;
         this.type = factory.getFactoryType();
-    }
-
-    public ContainerFactorization(EntityPlayer entityplayer, FactoryType type) {
-        this.factory = null;
-        this.entityplayer = entityplayer;
-        this.type = type;
     }
 
     class FactorySlot extends Slot {

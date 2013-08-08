@@ -6,7 +6,7 @@ import net.minecraft.inventory.ICrafting;
 public class ContainerMixer extends ContainerFactorization {
     public TileEntityMixer mixer;
     public ContainerMixer(EntityPlayer entityplayer, TileEntityFactorization tef) {
-        super(entityplayer, tef.getFactoryType());
+        super(entityplayer, tef);
         mixer = (TileEntityMixer) tef;
     }
 

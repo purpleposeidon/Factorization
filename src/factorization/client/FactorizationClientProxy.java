@@ -108,7 +108,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             gui = new GuiGrinder(cont);
         }
         if (ID == FactoryType.MIXER.gui) {
-            gui = new GuiMixer(cont);
+            gui = new GuiMixer((ContainerMixer)cont);
         }
         if (ID == FactoryType.CRYSTALLIZER.gui) {
             gui = new GuiCrystallizer(cont);

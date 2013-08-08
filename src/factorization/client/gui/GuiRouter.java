@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.tileentity.TileEntity;
@@ -21,7 +20,7 @@ import factorization.common.Core;
 import factorization.common.NetworkFactorization.MessageType;
 import factorization.common.TileEntityRouter;
 
-public class GuiRouter extends GuiContainer implements IClickable {
+public class GuiRouter extends FactorizationGui implements IClickable {
     TileEntityRouter router;
     final int mode_button_id = 1, upgrade_button_id = 2;
     final int direction_button_id = 10, slot_up = 11, slot_down = 12;

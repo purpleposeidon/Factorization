@@ -5,22 +5,15 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import org.lwjgl.opengl.GL11;
 
 import factorization.common.ContainerFactorization;
-import factorization.common.ContainerGrinder;
 import factorization.common.Core;
 import factorization.common.TileEntityGrinder;
 
 public class GuiGrinder extends GuiContainer {
-    ContainerGrinder factContainer;
     TileEntityGrinder grinder;
 
     public GuiGrinder(ContainerFactorization cont) {
         super(cont);
-        factContainer = (ContainerGrinder) cont;
-        grinder = factContainer.grinder;
-    }
-
-    protected void drawGuiContainerForegroundLayer() {
-        fontRenderer.drawString(grinder.getInvName(), 60, 6, 0x404040);
+        grinder = (TileEntityGrinder) cont.factory;
     }
 
     @Override
