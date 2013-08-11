@@ -443,7 +443,7 @@ public class FactorizationUtil {
             return normalize(is);
         }
         
-        public boolean canExtract(int i, ItemStack is) {
+        public boolean canExtract(int slot, ItemStack is) {
             return true;
         }
         
@@ -590,7 +590,12 @@ public class FactorizationUtil {
         }
         
         public ItemStack pull(int slot, int limit) {
-            return under.decrStackSize(slotIndex(slot), limit);
+            int i = slotIndex(slot);
+            ItemStack is = under.getStackInSlot(i);
+            if (!canExtract(slot, is)) {
+                return null;
+            }
+            return under.decrStackSize(i, limit);
         }
         
         public ItemStack pull(ItemStack toMatch, int limit, boolean strict) {
@@ -776,8 +781,8 @@ public class FactorizationUtil {
                 }
                 
                 @Override
-                public boolean canExtract(int i, ItemStack is) {
-                    return inv.canExtractItem(slotMap[i], is, side);
+                public boolean canExtract(int slot, ItemStack is) {
+                    return inv.canExtractItem(slotMap[slot], is, side);
                 }
                 
                 @Override
