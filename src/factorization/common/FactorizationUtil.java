@@ -835,7 +835,7 @@ public class FactorizationUtil {
         IInventory origChest = (TileEntityChest) chest;
         World world = chest.worldObj;
         int i = chest.xCoord, j = chest.yCoord, k = chest.zCoord;
-        int chestBlock = Block.chest.blockID;
+        int chestBlock = chest.getBlockType().blockID;
         if (world.getBlockId(i - 1, j, k) == chestBlock) {
             return new InventoryLargeChest(origChest.getInvName(), (TileEntityChest) world.getBlockTileEntity(i - 1, j, k), origChest);
         }
