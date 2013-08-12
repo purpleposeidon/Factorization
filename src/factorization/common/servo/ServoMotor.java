@@ -7,13 +7,19 @@ import java.util.Collections;
 import java.util.Random;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
+import net.minecraft.util.EnumMovingObjectType;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.FakePlayer;
 import net.minecraftforge.common.ForgeDirection;
@@ -120,6 +126,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 getCurrentPos().spawnItem(toToss);
             }
             fakePlayer.inventory.armorInventory[i] = null;
+        }
+        for (int i = 0; i < inv.length; i++) {
+            inv[i] = FactorizationUtil.normalize(inv[i]);
         }
     }
     
@@ -739,5 +748,103 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             }
         }
         return null;
+    }
+    
+    public boolean click(boolean sneaky) {
+        for (int i = 0; i < inv.length; i++) {
+            if (clickItem(inv[i], sneaky)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public boolean clickItem(ItemStack is, boolean sneaky) {
+        if (is == null) {
+            return false;
+        }
+        try {
+            EntityPlayer player = getPlayer();
+            player.setSneaking(sneaky);
+            for (MovingObjectPosition mop : rayTrace(this)) {
+                if (is.getItem() instanceof ActuatorItem) {
+                    ActuatorItem ai = (ActuatorItem) is.getItem();
+                    if (ai.use(is, player, this, mop)) {
+                        return true;
+                    }
+                } else if (mop.typeOfHit == EnumMovingObjectType.TILE) {
+                    Vec3 hitVec = mop.hitVec;
+                    int x = mop.blockX, y = mop.blockY, z = mop.blockZ;
+                    float dx = (float) (hitVec.xCoord - x);
+                    float dy = (float) (hitVec.yCoord - y);
+                    float dz = (float) (hitVec.zCoord - z);
+                    Item it = is.getItem();
+                    if (it.onItemUseFirst(is, player, worldObj, x, y, z, mop.sideHit, dx, dy, dz)) {
+                        return true;
+                    }
+                    if (it.onItemUse(is, player, worldObj, x, y, z, mop.sideHit, dx, dy, dz)) {
+                        return true;
+                    }
+                } else if (mop.typeOfHit == EnumMovingObjectType.ENTITY) {
+                    if (mop.entityHit.func_130002_c(player)) {
+                        return true;
+                    }
+                    if (mop.entityHit instanceof EntityLiving) {
+                        if (is.func_111282_a(player, (EntityLiving)mop.entityHit)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) { } finally {
+            finishUsingPlayer();
+        }
+        return false;
+    }
+    
+
+    private final ArrayList<MovingObjectPosition> ret = new ArrayList<MovingObjectPosition>();
+    ArrayList<MovingObjectPosition> rayTrace(ServoMotor motor) {
+        ret.clear();
+        final Coord c = motor.getCurrentPos();
+        final ForgeDirection top = motor.orientation.top;
+        final ForgeDirection face = motor.orientation.facing;
+        final ForgeDirection right = face.getRotation(top);
+        
+        AxisAlignedBB ab = AxisAlignedBB.getAABBPool().getAABB(
+                c.x + top.offsetX, c.y + top.offsetY, c.z + top.offsetZ,  
+                c.x + 1 + top.offsetX, c.y + 1 + top.offsetY, c.z + 1 + top.offsetZ);
+        for (Entity entity : (Iterable<Entity>)motor.worldObj.getEntitiesWithinAABBExcludingEntity(motor, ab)) {
+            if (!entity.canBeCollidedWith()) {
+                continue;
+            }
+            ret.add(new MovingObjectPosition(entity));
+        }
+        
+        nullVec.xCoord = nullVec.yCoord = nullVec.zCoord = 0;
+        Coord targetBlock = c.add(top);
+        mopBlock(ret, targetBlock, top.getOpposite()); //nose-to-nose with the servo
+        mopBlock(ret, targetBlock.add(top), top.getOpposite()); //a block away
+        if (ret.size() == 0) {
+            mopBlock(ret, targetBlock.add(face), face.getOpposite()); //running forward
+            mopBlock(ret, targetBlock.add(face.getOpposite()), face); //running backward
+            if (ret.size() == 0) {
+                mopBlock(ret, targetBlock.add(right), right.getOpposite()); //to the servo's right
+                mopBlock(ret, targetBlock.add(right.getOpposite()), right); //to the servo's left
+            }
+        }
+        return ret;
+    }
+    
+    private static final Vec3 nullVec = Vec3.createVectorHelper(0, 0, 0);
+    void mopBlock(ArrayList<MovingObjectPosition> list, Coord target, ForgeDirection side) {
+        if (target.isAir()) {
+            return;
+        }
+        AxisAlignedBB aabb = target.getSelectedBoundingBoxFromPool();
+        if (aabb == null) {
+            return;
+        }
+        list.add(target.createMop(side, nullVec));
     }
 }
