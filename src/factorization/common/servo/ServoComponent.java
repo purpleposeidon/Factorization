@@ -247,7 +247,8 @@ public abstract class ServoComponent implements IDataSerializable {
     }
     
     static {
-        registerRecursivelyFromPackage("factorization.common.servo");
+        registerRecursivelyFromPackage("factorization.common.servo.actuators");
+        registerRecursivelyFromPackage("factorization.common.servo.instructions");
     }
     
     public static void setupRecipes() {
