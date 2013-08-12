@@ -228,20 +228,20 @@ public class RenderServoMotor extends RenderEntity {
         long range = 9*20;
         double d = motor.worldObj.getTotalWorldTime() + partial;
         float now = (float) ((d % range)/(double)range);
-        boolean first = true;
         for (int i = 0; i < inv.size(); i++) {
             ItemStack is = inv.get(i);
-            if (is == null) {
-                continue;
-            }
-            if (first) {
-                first = false;
+            if (is == null || is == held) {
                 continue;
             }
             GL11.glPushMatrix();
             GL11.glTranslatef(0.65F, 0.25F, -0.125F);
             GL11.glScalef(s, s, s);
             GL11.glRotatef(-90, 0, 0, 1);
+            float offset = i;
+            if (i > 2) {
+                offset += 1;
+            }
+            GL11.glTranslatef((offset - 2)*0.8F, -1.5F, 0);
             try {
                 renderItem(motor, is, partial);
             } catch (Exception e) {
