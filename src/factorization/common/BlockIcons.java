@@ -100,6 +100,7 @@ public class BlockIcons {
     public static Icon servo$configure, servo$deconfigure;
     public static Icon servo$pulse;
     public static Icon servo$spin_cc, servo$spin_ccc;
+    public static Icon servo$speed1, servo$speed2, servo$speed3, servo$speed4, servo$speed5;
     
     public static class ActivatingMachineIcon extends IconGroup {
         public Icon top, bottom, side, side_on;
