@@ -58,6 +58,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
     private ItemStack[] inv = new ItemStack[5], inv_last_sent = new ItemStack[inv.length];
     public int next_stack = 0;
+    public boolean skipNextInstruction = false;
 
     boolean dampenVelocity;
 
@@ -198,6 +199,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         pos_next = data.as(Share.VISIBLE, "pos_next").put(pos_next);
         pos_prev = data.as(Share.VISIBLE, "pos_prev").put(pos_prev);
         pos_progress = data.as(Share.VISIBLE, "pos_progress").putFloat(pos_progress);
+        skipNextInstruction = data.as(Share.VISIBLE, "skip").putBoolean(skipNextInstruction);
         new_motor = data.as(Share.PRIVATE, "new").putBoolean(new_motor);
         for (int i = 0; i < STACKS; i++) {
             String name = "stack" + i;
@@ -491,6 +493,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             return;
         }
         if (getCurrentPos().isPowered()) {
+            return;
+        }
+        if (skipNextInstruction) {
+            skipNextInstruction = false;
             return;
         }
         rail.decoration.motorHit(this);
@@ -825,6 +831,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         Coord targetBlock = c.add(top);
         mopBlock(ret, targetBlock, top.getOpposite()); //nose-to-nose with the servo
         mopBlock(ret, targetBlock.add(top), top.getOpposite()); //a block away
+        mopBlock(ret, targetBlock.add(top.getOpposite()), top);
         if (ret.size() == 0) {
             mopBlock(ret, targetBlock.add(face), face.getOpposite()); //running forward
             mopBlock(ret, targetBlock.add(face.getOpposite()), face); //running backward
