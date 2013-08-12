@@ -327,7 +327,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
             }
             foundCount++;
         }
-        return foundCount == inputCount;
+        return foundCount >= recipeItems.size();
     }
     
     private static ArrayList<RecipeMatchInfo> recipe_cache = null;
@@ -549,17 +549,37 @@ public class TileEntityMixer extends TileEntityFactorization implements
         InventoryCrafting craft = FactorizationUtil.makeCraftingGrid();
         int craft_slot = 0;
         FzInv inv = FactorizationUtil.openInventory(this, ForgeDirection.UP);
-        for (int i_input = 0; i_input < mr.inputs.size(); i_input++) {
-            Object o = mr.inputs.get(i_input);
+        ArrayList recipeInputs = new ArrayList();
+        for (Object o : mr.inputs) {
+            if (o instanceof ItemStack) {
+                recipeInputs.add(((ItemStack) o).copy());
+            } else {
+                ArrayList<ItemStack> cp = new ArrayList();
+                for (ItemStack is : (Iterable<ItemStack>) o) {
+                    cp.add(is.copy());
+                }
+                recipeInputs.add(cp);
+            }
+        }
+        for (int i_input = 0; i_input < recipeInputs.size(); i_input++) {
+            Object o = recipeInputs.get(i_input);
             if (o instanceof ItemStack) {
                 ItemStack is = (ItemStack) o;
                 craft_slot = add(craft, craft_slot, inv.pull(is, is.stackSize, false));
+                is.stackSize = 0;
             } else {
-                for (ItemStack is : (Iterable<ItemStack>) o) {
+                for (ItemStack is : ((Iterable<ItemStack>) o)) {
                     ItemStack got = FactorizationUtil.normalize(inv.pull(is, 1, false));
                     if (got != null) {
+                        for (Iterator<ItemStack> iterator = ((Iterable<ItemStack>) o).iterator(); iterator.hasNext();) {
+                            ItemStack others = iterator.next();
+                            if (others != is) {
+                                iterator.remove();
+                            }
+                        }
+                        is.stackSize--;
                         craft_slot = add(craft, craft_slot, got);
-                        continue;
+                        break;
                     }
                 }
             }
