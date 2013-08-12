@@ -60,8 +60,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     public int next_stack = 0;
     public boolean skipNextInstruction = false;
 
-    boolean dampenVelocity;
-
     Coord pos_prev, pos_next;
     float pos_progress;
     
@@ -69,6 +67,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     public FzOrientation prevOrientation = FzOrientation.UNKNOWN, orientation = FzOrientation.UNKNOWN;
     public ForgeDirection nextDirection = ForgeDirection.UNKNOWN;
     private byte speed_b;
+    public byte target_speed = 2;
     private static final double max_speed_b = 127;
     double accumulated_motion;
     
@@ -78,7 +77,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     double sprocket_rotation = 0, prev_sprocket_rotation = 0;
     double servo_reorient = 0, prev_servo_reorient = 0;
 
-    static final double maxSpeed = 0.0875, slowedSpeed = maxSpeed / 20, minSpeed = slowedSpeed / 10;
+    private static final double normal_speed = 0.0875;
+    private static final double[] targetSpeeds = {normal_speed / 3, normal_speed / 2, normal_speed, normal_speed*2, normal_speed*4};
+    private static final double speed_limit = targetSpeeds[targetSpeeds.length - 1];
 
     private static class MessageType {
         static final short motor_description = 100, motor_direction = 101, motor_speed = 102, motor_inventory = 103;
@@ -131,6 +132,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         for (int i = 0; i < inv.length; i++) {
             inv[i] = FactorizationUtil.normalize(inv[i]);
         }
+        onInventoryChanged();
     }
     
     /**
@@ -195,6 +197,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         orientation = data.as(Share.VISIBLE, "Orient").putFzOrientation(orientation);
         nextDirection = data.as(Share.VISIBLE, "nextDir").putEnum(nextDirection);
         speed_b = data.as(Share.VISIBLE, "speedb").putByte(speed_b);
+        target_speed = data.as(Share.VISIBLE, "speedt").putByte(target_speed);
         accumulated_motion = data.as(Share.PRIVATE, "accumulated_motion").putDouble(accumulated_motion);
         pos_next = data.as(Share.VISIBLE, "pos_next").put(pos_next);
         pos_prev = data.as(Share.VISIBLE, "pos_prev").put(pos_prev);
@@ -217,6 +220,15 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
     }
 
+    public double getTargetSpeed() {
+        try {
+            return targetSpeeds[target_speed];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            target_speed = 1;
+            return targetSpeeds[target_speed];
+        }
+    }
+    
     boolean validPosition(Coord c) {
         return c.getTE(TileEntityServoRail.class) != null;
     }
@@ -276,19 +288,12 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     void updateSpeed() {
-        final double speed = getProperSpeed() ;
+        final double speed = getProperSpeed();
+        final double maxSpeed = getTargetSpeed();
         boolean should_accelerate = speed < maxSpeed && orientation != FzOrientation.UNKNOWN;
-        if (dampenVelocity || hasSignal(Signal.STOP_MOTOR) || hasSignal(Signal.SLOW_MOTOR)) {
-            speed_b = (byte) (speed_b * 2 / 3);
-            if (speed < slowedSpeed) {
-                dampenVelocity = false;
-                if (hasSignal(Signal.STOP_MOTOR)) {
-                    if (speed < minSpeed) {
-                        speed_b = 0;
-                    }
-                }
-            }
-            should_accelerate = false;
+        if (speed > maxSpeed) {
+            speed_b = (byte) Math.max(maxSpeed, (speed_b/2) - 1);
+            return;
         }
         if (Core.cheat_servo_energy) {
             if (should_accelerate) {
@@ -483,10 +488,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         return pos_next;
     }
 
-    boolean hasSignal(Signal signal) {
-        return false;
-    }
-
     void onEnterNewBlock() {
         TileEntityServoRail rail = getCurrentPos().getTE(TileEntityServoRail.class);
         if (rail == null /* :| */ || rail.decoration == null) {
@@ -583,10 +584,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 pos_next.asDeltaCoord(),
                 (byte) orientation.ordinal(),
                 (byte) nextDirection.ordinal());
-        /*for (int i = 0; i < inv_last_sent.length; i++) {
+        for (int i = 0; i < inv_last_sent.length; i++) {
             inv_last_sent[i] = EMPTY_ITEM; //makes sure everything gets updated properly.
         }
-        onInventoryChanged();*/
+        onInventoryChanged();
     }
     
     @Override
@@ -594,17 +595,15 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             throws IOException {
         switch (messageType) {
         case MessageType.motor_inventory:
+            for (int i = 0; i < inv.length; i++) {
+                inv[i] = null;
+            }
             while (true) {
                 byte index = input.readByte();
                 if (index < 0) {
                     break;
                 }
-                int id = input.readInt(), damage = input.readInt();
-                ItemStack is = null;
-                if (id != 0) {
-                    is = new ItemStack(id, 1, damage);
-                }
-                inv[index] = is;
+                inv[index] = FactorizationUtil.readStack(input);
             }
             return true;
         case MessageType.motor_description:
@@ -624,7 +623,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
 
     public double getProperSpeed() {
         double perc = speed_b/(max_speed_b);
-        return maxSpeed*perc;
+        return speed_limit*perc;
     }
     
     public void dropItemStacks(Iterable<ItemStack> toDrop) {
@@ -695,26 +694,14 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     private static final ItemStack EMPTY_ITEM = new ItemStack(0, 0, 0);
     @Override
     public void onInventoryChanged() {
-        updateInventory(inv.length);
-    }
-    
-    public void updateInventory(int slot_count) {
         ArrayList<Object> toSend = new ArrayList(18);
-        for (byte i = 0; i < slot_count; i++) {
+        for (byte i = 0; i < inv.length; i++) {
             if (FactorizationUtil.identical(inv[i], inv_last_sent[i])) {
                 continue;
             }
-            toSend.add(i);
-            if (inv[i] == null) {
-                toSend.add(0);
-                toSend.add(0);
-            } else {
-                int id = (int)inv[i].itemID;
-                toSend.add(id);
-                inv[i].itemID = 1;
-                int damage = inv[i].getItemDamage(); /* field is private for some reason; we'll trust that stone does the right thing. */
-                inv[i].itemID = id;
-                toSend.add(damage);
+            if (inv[i] != null) {
+                toSend.add(i);
+                toSend.add(inv[i]);
             }
             inv_last_sent[i] = inv[i];
         }

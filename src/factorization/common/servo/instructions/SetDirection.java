@@ -39,11 +39,9 @@ public class SetDirection extends Instruction {
     @Override
     public void motorHit(ServoMotor motor) {
         ForgeDirection d = dir.getOpposite();
-        if (motor.testDirection(d)) {
-            motor.nextDirection = d;
+        motor.nextDirection = d;
+        if (d == motor.orientation.facing.getOpposite()) {
             motor.swapOrientations();
-        } else {
-            motor.nextDirection = d;
         }
     }
 
