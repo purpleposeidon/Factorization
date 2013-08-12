@@ -666,6 +666,14 @@ public class Coord implements IDataSerializable {
         return b.getCollisionBoundingBoxFromPool(w, x, y, z);
     }
     
+    public AxisAlignedBB getSelectedBoundingBoxFromPool() {
+        Block b = getBlock();
+        if (b == null) {
+            return null;
+        }
+        return b.getSelectedBoundingBoxFromPool(w, x, y, z);
+    }
+    
     public void notifyOfNeighborChange(int neighborId) {
         w.notifyBlocksOfNeighborChange(x, y, z, neighborId);
     }
