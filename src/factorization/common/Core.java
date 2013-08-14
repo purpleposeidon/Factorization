@@ -76,7 +76,6 @@ public class Core {
     public static boolean debug_network = false;
     public static boolean show_fine_logging = false;
     public static boolean dev_environ = (Boolean) ReflectionHelper.getPrivateValue(cpw.mods.fml.relauncher.CoreModManager.class, null, "deobfuscatedEnvironment");
-    public static boolean servos_enabled = version.contains("dev");
     static {
         if (!dev_environ) {
             cheat = false;
@@ -265,10 +264,7 @@ public class Core {
     public static CreativeTabs tabFactorization = new CreativeTabs("factorizationTab") {
         @Override
         public Item getTabIconItem() {
-            if (servos_enabled) {
-                return registry.logicMatrixProgrammer;
-            }
-            return registry.pocket_table;
+            return registry.logicMatrixProgrammer;
         }
     };
     

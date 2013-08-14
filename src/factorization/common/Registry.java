@@ -954,9 +954,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         }
         
         //Servos
-        if (Core.servos_enabled) {
-            makeServoRecipes();
-        }
+        makeServoRecipes();
     }
     
     private void makeServoRecipes() {
