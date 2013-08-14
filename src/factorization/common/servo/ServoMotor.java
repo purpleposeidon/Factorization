@@ -27,6 +27,7 @@ import net.minecraftforge.common.ForgeDirection;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 
+import cpw.mods.fml.common.network.FMLNetworkHandler;
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -86,6 +87,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
     
     private EntityPlayer fakePlayer;
+    short actions_since_last_sync = 0;
 
     public ServoMotor(World world) {
         super(world);
@@ -327,11 +329,30 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
     }
     
+    public void penalizeSpeed() {
+        if (speed_b > 4) {
+            speed_b--;
+        }
+    }
+    
+    public void desync(boolean totally) {
+        if (totally) {
+            actions_since_last_sync = Short.MAX_VALUE;
+        } else {
+            need_description_packet = true;
+        }
+    }
+    
     void doLogic() {
         if (orientation == FzOrientation.UNKNOWN) {
             pickNextOrientation();
         }
         if (!worldObj.isRemote) {
+            if (actions_since_last_sync > 200) {
+                actions_since_last_sync = 0;
+                Packet toSend = FMLNetworkHandler.getEntitySpawningPacket(this);
+                Core.network.broadcastPacket(worldObj, (int) posX, (int) posY, (int) posZ, toSend);
+            }
             updateSpeed();
         }
         final double speed = getProperSpeed() ;
@@ -375,6 +396,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     
     boolean pickNextOrientation() {
+        actions_since_last_sync++;
         boolean ret = pickNextOrientation_impl();
         pos_next = pos_prev.add(orientation.facing);
         return ret;
@@ -501,10 +523,12 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             return;
         }
         rail.decoration.motorHit(this);
+        actions_since_last_sync++;
     }
 
     @Override
     public boolean func_130002_c(EntityPlayer player) {
+        desync(true);
         ItemStack is = FactorizationUtil.normalize(player.getHeldItem());
         if (is == null) {
             return false;

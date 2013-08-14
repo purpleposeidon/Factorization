@@ -160,8 +160,9 @@ public class RenderServoMotor extends RenderEntity {
         boolean render_stacks = false;
         if (highlighted) {
             GL11.glDisable(GL11.GL_TEXTURE_2D);
-            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_LIGHTING_BIT);
             GL11.glDisable(GL11.GL_LIGHTING);
+            GL11.glEnable(GL11.GL_BLEND);
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             float gray = 0.65F;
             GL11.glColor4f(gray, gray, gray, 0.8F);
@@ -171,11 +172,8 @@ public class RenderServoMotor extends RenderEntity {
             AxisAlignedBB ab = AxisAlignedBB.getBoundingBox(-d, -h, -d, d, h, d);
             mc.renderGlobal.drawOutlinedBoundingBox(ab);
             ab.offset(ab.minX, ab.minY, ab.minZ);
+            GL11.glPopAttrib();
             GL11.glEnable(GL11.GL_TEXTURE_2D);
-            GL11.glDisable(GL11.GL_BLEND);
-            GL11.glEnable(GL11.GL_LIGHTING);
-            
-            
             
             EntityPlayer player = Core.proxy.getClientPlayer();
             if (player != null) {
