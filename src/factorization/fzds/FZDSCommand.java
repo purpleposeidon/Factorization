@@ -456,7 +456,7 @@ public class FZDSCommand extends CommandBase {
                 DeltaCoord dimensions = up.difference(low);
                 int area = Math.abs(dimensions.x*dimensions.y*dimensions.z);
                 if (area > Hammer.max_fzds_grab_area) {
-                    sendChat("The area is too big: " + area);
+                    sendChat("The area is too big: " + area + "; max is " + Hammer.max_fzds_grab_area);
                     return;
                 }
                 final Coord lower = low.copy();

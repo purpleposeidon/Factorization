@@ -6,9 +6,11 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import factorization.api.Quaternion;
+import factorization.common.Core;
 import factorization.common.FactorizationUtil;
 
 public class MetaAxisAlignedBB extends AxisAlignedBB {
+    //NORELEASE, Optimization: If not rotated, check more vanilla-like, and mutate the parameter to test instead of shadowaabbs.
     World shadowWorld;
     AxisAlignedBB shadowAABB;
     Vec3 offset; //used to convert realspace to hammerspace
@@ -119,7 +121,9 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
     @Override
     public boolean intersectsWith(AxisAlignedBB collider) {
         AxisAlignedBB shadow_version = AabbReal2Shadow(collider);
+        Core.profileStart("getUnderlying");
         List<AxisAlignedBB> bbs = getUnderlying(shadow_version);
+        Core.profileEnd();
         for (int i = 0; i < bbs.size(); i++) {
             AxisAlignedBB here = mutateLocal(bbs.get(i));
             if (here.intersectsWith(shadow_version)) {

@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -327,6 +327,13 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         return true;
     }
     
+    private static final IEntitySelector excludeDseRelatedEntities = new IEntitySelector() {
+        @Override
+        public boolean isEntityApplicable(Entity entity) {
+            return !(entity.getClass() == DseCollider.class || entity.boundingBox == null);
+        }
+    };
+    
     void updateMotion() {
         if (motionX == 0 && motionY == 0 && motionZ == 0 && rotationalVelocity.isZero()) {
             return;
@@ -340,17 +347,17 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         prevPosX = posX;
         prevPosY = posY;
         prevPosZ = posZ;
-        
+
         Quaternion rotation_copy = new Quaternion(rotation);
-        
+
         posX += motionX;
         posY += motionY;
         posZ += motionZ;
         rotation.incrMultiply(rotationalVelocity);
         last_shared_rotation.incrMultiply(last_shared_rotational_velocity);
-        
+
         boolean moved = true;
-        
+
         if (!noClip && can(DeltaCapability.COLLIDE)) {
             List<AxisAlignedBB> collisions = worldObj.getCollidingBoundingBoxes(this, realArea);
             AxisAlignedBB collision = null;
@@ -362,7 +369,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 }
             }
             if (collision != null) {
-                //XXX TODO: This collision is terribad
+                // XXX TODO: This collision is terribad
                 posX -= motionX;
                 posY -= motionY;
                 posZ -= motionZ;
@@ -372,68 +379,36 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 rotation = rotation_copy;
             }
         }
-        if (moved) {
-            double s = 5;
-            double dx = (posX - prevPosX)*s;
-            double dy = (posY - prevPosY)*s;
-            double dz = (posZ - prevPosZ)*s;
-            //List ents = worldObj.getEntitiesWithinAABBExcludingEntity(this, realDragArea);
-            List ents =  worldObj.getEntitiesWithinAABBExcludingEntity(this, metaAABB);
+        if (moved && can(DeltaCapability.DRAG)) {
+            List ents = worldObj.getEntitiesWithinAABBExcludingEntity(this, metaAABB, excludeDseRelatedEntities);
             for (int i = 0; i < ents.size(); i++) {
                 Entity e = (Entity) ents.get(i);
-                double friction_expansion = 0.01;
+                double friction_expansion = -0.01;
                 AxisAlignedBB ebb = e.boundingBox;
                 if (ebb == null) {
                     continue;
                 }
-                AxisAlignedBB febb = ebb.expand(friction_expansion, friction_expansion, friction_expansion); //could multiply stuff by velocity
-                if (!metaAABB.intersectsWith(febb)) {
+                if (motionY > 0) {
+                    ebb = ebb.expand(-motionX, -motionY, -motionZ);
+                }
+                if (motionX != 0 || motionZ != 0) {
+                    ebb = ebb.contract(friction_expansion, friction_expansion, friction_expansion);
+                }
+                // could multiply stuff by velocity
+                if (!metaAABB.intersectsWith(ebb)) {
+                    //NORELEASE: metaAABB.intersectsWith is very slow, especially with lots of entities
                     continue;
                 }
-                e.posX += dx;
-                e.posY += dy;
-                e.posZ += dz;
+                e.setPosition(e.posX + motionX, e.posY + motionY, e.posZ + motionZ);
+                e.prevPosX += motionX;
+                e.prevPosY += motionY;
+                e.prevPosZ += motionZ;
                 
-                /*
-                //EntityLiving.moveEntityWithHeading: f2 = Block.blocksList[i].slipperiness * 0.91F;
-                //slipperiness = 0.6 by default, so...
-                double ratio = 0.6*0.91;
-                ratio = 0;
-                //The entity's speed needs to approach ours
-                e.motionX = motionX + (e.motionX - motionX)*ratio;
-                e.motionY = motionY + (e.motionY - motionY)*ratio;
-                e.motionZ = motionZ + (e.motionZ - motionZ)*ratio;*/
-                
-                
-                
-                e.prevPosX = e.posX;
-                e.prevPosY = e.posY;
-                e.prevPosZ = e.posZ;
-                /*
-                e.lastTickPosX = e.posX;
-                e.lastTickPosY = e.posY;
-                e.lastTickPosZ = e.posZ;
-                e.onGround = true;
-                e.lastTickPosX += dx;
-                e.lastTickPosY += dy;
-                e.lastTickPosZ += dz;*/
-                //e.motionX = e.motionX*ratio + motionX*(1 - ratio);
-                if (Math.abs(e.motionX) < motionX) {
-                    e.motionX = motionX;
-                }
-                if (Math.abs(e.motionY) < motionY) {
+                if (motionY > 0 && e.motionY < motionY) {
                     e.motionY = motionY;
-                    e.motionY += 0.04;
+                    e.fallDistance += (float) Math.abs(motionY - e.motionY);
                 }
-                if (Math.abs(e.motionZ) < motionZ) {
-                    e.motionZ = motionZ;
-                }
-                //We have troubles with the player's limbs moving weirdly. Entity.limbSwing and Entity.limbYaw.
-                if (e instanceof EntityLiving) {
-                    EntityLiving el = (EntityLiving) e;
-                    el.limbSwing = 0;
-                    el.limbYaw = 0;
-                }
+                e.onGround = true;
             }
             updateRealArea();
         }
@@ -460,6 +435,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     
     void doUpdate() {
+        Core.profileStart("init");
         if (worldObj.isRemote) {
             prevTickRotation.update(rotation);
             rayOutOfDate = true;
@@ -472,7 +448,10 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             proxy.worldObj.spawnEntityInWorld(proxy);
             return;
         }
+        Core.profileEnd();
+        Core.profileStart("updateMotion");
         updateMotion();
+        Core.profileEnd();
         if (!worldObj.isRemote && can(DeltaCapability.ROTATE)) {
             shareRotationInfo();
         }

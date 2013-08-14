@@ -66,7 +66,7 @@ public class Hammer {
     public static World worldClient = null; //This is actually a WorldClient that is actually HammerClientProxy.HammerWorldClient
     public static double DSE_ChunkUpdateRangeSquared = Math.pow(16*8, 2); //This is actually set when the server starts
     public static int fzds_command_channel = 0;
-    public static int max_fzds_grab_area = 25*25*25;
+    public static int max_fzds_grab_area = 16*16*80*4;
     
     static Set<IDeltaChunk> serverSlices = new WeakSet(), clientSlices = new WeakSet();
     
