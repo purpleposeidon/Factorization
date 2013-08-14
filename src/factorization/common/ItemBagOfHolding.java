@@ -225,7 +225,7 @@ public class ItemBagOfHolding extends ItemFactorization implements IActOnCraft {
     @Override
     // ...
     public boolean hasEffect(ItemStack par1ItemStack) {
-        return System.currentTimeMillis() / 75000 % 7 == 5;
+        return false;
     }
 
     public boolean insertItem(ItemStack is, ItemStack add) {
