@@ -33,6 +33,7 @@ public class BlockResource extends Block {
         for (BasicGlazes glaze : BasicGlazes.values()) {
             glaze.icon = Core.texture(reg, "ceramics/glaze/" + glaze.name());
         }
+        Core.registry.steamFluid.setIcons(BlockIcons.steam);
     }
 
     

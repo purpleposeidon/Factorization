@@ -250,13 +250,5 @@ public class BlockIcons {
         }
     }
     
-    SteamIcon steam;
-    
-    public static class SteamIcon extends IconGroup {
-        Icon texture;
-        @Override
-        public void afterRegister() {
-            Core.registry.steamFluid.setIcons(texture);
-        }
-    }
+    public static Icon steam;
 }
