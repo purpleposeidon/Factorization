@@ -217,6 +217,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     
     public void setDecoration(Decorator newDecor) {
         decoration = newDecor;
+        onInventoryChanged();
     }
     
     public Decorator getDecoration() {
