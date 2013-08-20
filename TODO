@@ -76,18 +76,16 @@ Did the drop bug with BlockFactorization.destroyed_tes get fixed? (Probably alri
 TOP LIST (that's become somewhat less tops. Oops.)
 --------
 ★★★Talk to RLP about monetization plan★★★
-make chat line limit less suck
-Can we safely put "oreQuartz" as an OD grinder recipe w/o messing up with Applied Energetics?
 underground silver temples/vaults. With moon lamps? :D
 onInventoryUpdate all the TEs
 fix redstone getting stuck on for servo rail pulses
 can't glaze a sculpture cloned from an already glazed sculpture
-breaking lead wiring with fist doesn't drop
 change raw glaze colors to their real colors
 smooth sandstone double slab (Are there other variants?)
 Look at what errors we get if the FZDS code isn't in
 either bats are spawning in the hammer dimension, or we're getting entity updates that we shouldn't be
 having more boilers/mirrors seems to give you more steam somehow
+comparator support for batteries & leyden jars
 Misc Nonsense:
   fix vanilla's middle clicking
 notification system upgrade:
@@ -97,11 +95,11 @@ notification system upgrade:
   extra controls for clearing up other notifications: get rid of nearby messages (barrels), start fading the message away as soon as it shows up (energy measurements), remove any messages that have the same typename as this one, leave the message up for # seconds
 Modularize FZ/astro so that astro has no deps & can be removed for public release
 Config option for ore processing output
+IMC for adding new Ores to the Ore Processing chain (For TCons metals; aluminum, ardite, cobalt)
 configuration method for adding ores?
 test with dedicated server (not from eclipse....)
 Placing/breaking wrath lamp in hammerspace seems to cause the client to crap its pants
 Don't keep non-weak references to worlds ("MapMaker.weakKeys().buildMap()") except in Entity/TileEntity
-RP heating
 register ore blocks
 To kill NEI's shift-? cheat: clear out RecipeInfo.overlayMap... or something.  Hmm....
   Might want to just remove instances whose class = DefaultOverlayHandler or BrewingOverlayHandler.

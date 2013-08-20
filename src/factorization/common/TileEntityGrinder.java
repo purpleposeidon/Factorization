@@ -233,7 +233,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     GrinderRecipe getRecipe() {
         for (GrinderRecipe gr : recipes) {
             for (ItemStack is : gr.getInput()) {
-                if (FactorizationUtil.couldMerge(is, input)) {
+                if (FactorizationUtil.wildcardSimilar(is, input)) {
                     return gr;
                 }
             }

@@ -59,6 +59,11 @@ public class NotifyImplementation extends Notify {
             public String getCommandName() {
                 return "mutter";
             }
+            
+            @Override
+            public boolean canCommandSenderUseCommand(ICommandSender sender) {
+                return sender instanceof Entity;
+            }
         });
     }
     
