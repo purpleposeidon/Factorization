@@ -501,6 +501,15 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             return;
         }
         int count = getItemCount();
+        if (count == 0) {
+            topStack = bottomStack = null;
+            middleCount = 0;
+            return;
+        }
+        if (bottomStack == null) {
+            bottomStack = item.copy();
+            bottomStack.stackSize = 0;
+        }
         if (type == Type.STICKY) {
             count--;
             if (count < 0) {
@@ -511,8 +520,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         if (count > upperLine) {
             topStack.stackSize = count - upperLine;
             count -= topStack.stackSize;
-        }
-        else {
+        } else {
             topStack.stackSize = 0;
         }
         bottomStack.stackSize = Math.min(item.getMaxStackSize(), count);
