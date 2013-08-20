@@ -3,6 +3,7 @@ package factorization.common;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -20,14 +21,24 @@ public class ItemOreProcessing extends ItemFactorization implements IActOnCraft 
         TIN(3, 0xD7F7FF, "Tin", "oreTin", "ingotTin"),
         COPPER(4, 0xD68C39, "Copper", "oreCopper", "ingotCopper"),
         SILVER(5, 0x7B96B9, "Silver", null, "ingotSilver"),
-        GALENA(6, 0x687B99, "Galena", "oreSilver", null)
+        GALENA(6, 0x687B99, "Galena", "oreSilver", null),
+        //FOR MDIYOOO!!!!!
+        NATURAL_ALUMINUM(7, 0xF6F6F6, "Aluminum", "oreNaturalAluminum", "ingotNaturalAluminum"),
+        COBALT(8, 0x2376DD, "Cobalt", "oreCobalt", "ingotCobalt"),
+        ARDITE(9, 0xF48A00, "Ardite", "oreArdite", "ingotArdite")
         ;
+        static {
+            COBALT.surounding_medium = new ItemStack(Block.netherrack);
+            ARDITE.surounding_medium = new ItemStack(Block.netherrack);
+        }
+        
         int ID;
         int color;
         String en_name;
         String OD_ore, OD_ingot;
         boolean enabled = false;
         ItemStack processingResult = null;
+        ItemStack surounding_medium = new ItemStack(Block.stone);
         private OreType(int ID, int color, String en_name, String OD_ore, String OD_ingot) {
             this.ID = ID;
             this.color = color;

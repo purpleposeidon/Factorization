@@ -2,6 +2,7 @@ package factorization.common;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -39,7 +40,7 @@ public class FactorizationOreProcessingHandler {
         //Everything can be slagged
         oreType.enable();
         if (oreType != OreType.LEAD && oreType != OreType.SILVER && oreType != OreType.GALENA) {
-            TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, ingot, 0.4F, Block.stone);
+            TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, ingot, 0.4F, oreType.surounding_medium);
         } else if (oreType == OreType.SILVER) {
             TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, new ItemStack(Core.registry.lead_ingot), 1F, ingot);
         }
@@ -153,12 +154,11 @@ public class FactorizationOreProcessingHandler {
     
     void addDictOres() {
         loadWater();
-        handleNewOre("ingotIron", new ItemStack(Item.ingotIron, 1));
-        handleNewOre("oreIron", new ItemStack(Block.oreIron, 1));
-        handleNewOre("ingotGold", new ItemStack(Item.ingotGold, 1));
-        handleNewOre("oreGold", new ItemStack(Block.oreGold, 1));
         
-        for (String oreClass : ItemOreProcessing.OD_ores) {
+        for (OreType type : ItemOreProcessing.OreType.values()) {
+            String oreClass = type.OD_ore;
+            String ingotClass = type.OD_ingot;
+            
             ItemStack bestIngot = null;
             Iterable<ItemStack> oreList = OreDictionary.getOres(oreClass);
             if (oreList == null || !oreList.iterator().hasNext()) {
@@ -167,7 +167,19 @@ public class FactorizationOreProcessingHandler {
             for (ItemStack ore : oreList) {
                 ItemStack smeltsTo = FurnaceRecipes.smelting().getSmeltingResult(ore);
                 if (smeltsTo == null) {
-                    continue;
+                    if (ingotClass == null) {
+                        break;
+                    }
+                    Iterable<ItemStack> ingotList = OreDictionary.getOres(ingotClass);
+                    if (ingotList == null) {
+                        continue;
+                    }
+                    Iterator<ItemStack> it = ingotList.iterator();
+                    if (!it.hasNext()) {
+                        continue;
+                    }
+                    bestIngot = it.next();
+                    break;
                 }
                 if (bestIngot == null || ore.getItemDamage() != 0) {
                     bestIngot = smeltsTo;
