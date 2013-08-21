@@ -164,7 +164,7 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
                     }
                     return ret;
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 Core.logWarning("Wasn't able to do tab completion, probably because on the server? Uh, someone mention this to neptunepink please.");
                 e.printStackTrace();
             }
