@@ -11,7 +11,7 @@ OUT=~/Dropbox/dev/Factorization-dev.jar
 
 pushd ../forge/mcp/reobf/minecraft  > /dev/zero
   cp -R $FZ/resources/* ./
-  #cp -R $FZ/texture/mods ./
+  rm -rf ./assets/factorization/lang/.git/
   cp $FZ/*.info ./
   cp $FZ/CHANGELOG ./
   cp /home/poseidon/Development/factorization/factorization/src/factorization/common/servo/sprocket.obj factorization/common/servo/sprocket.obj
