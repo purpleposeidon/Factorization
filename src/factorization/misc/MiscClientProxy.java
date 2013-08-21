@@ -1,6 +1,13 @@
 package factorization.misc;
 
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.EnumSet;
 import java.util.List;
@@ -11,11 +18,9 @@ import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.Entity;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatFileWriter;
-import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
+import net.minecraft.util.EnumChatFormatting;
 import cpw.mods.fml.client.GuiModList;
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
@@ -28,82 +33,114 @@ import factorization.common.Core;
 import factorization.common.FzConfig;
 
 public class MiscClientProxy extends MiscProxy {
-    @Override
-    void runCommand(List<String> args) {
-        if (args == null) {
-            args = new ArrayList<String>();
+    @Retention(value = RUNTIME)
+    @Target(value = METHOD)
+    static @interface alias {
+        public String[] value();
+    }
+    
+    @Retention(value = RUNTIME)
+    @Target(value = METHOD)
+    static @interface sketchy { }
+    
+    @Retention(value = RUNTIME)
+    @Target(value = METHOD)
+    static @interface help {
+        public String value();
+    }
+    
+    public static class miscCommands { //NOTE: *not* SideOnly'd.
+        static Minecraft mc;
+        static EntityClientPlayerMP player;
+        static String arg0, arg1;
+        
+        @alias({"date", "time"})
+        @help("Show the real-world time")
+        public static String now() {
+            return Calendar.getInstance().getTime().toString();
         }
-        Minecraft mc = Minecraft.getMinecraft();
-        String n;
-        if (args.size() == 0) {
-            n = "about";
-        } else {
-            n = args.get(0);
+        
+        @alias({"help", "?"})
+        public static void about() {
+            player.addChatMessage("Miscellaneous Client Commands; from Factorization, by neptunepink");
+            player.addChatMessage("Use /f list go see the sub-commands.");
         }
-        int i = mc.gameSettings.renderDistance;
-        boolean found_number = true;
-        if (n.equalsIgnoreCase("far")) {
-            i = 0;
-        } else if (n.equalsIgnoreCase("normal")) {
-            i = 1;
-        } else if (n.equalsIgnoreCase("short")) {
-            i = 2;
-        } else if (n.equalsIgnoreCase("tiny")) {
-            i = 3;
-        } else if (n.equalsIgnoreCase("micro")) {
-            i = 4;
-        } else if (n.equalsIgnoreCase("microfog")) {
-            i = 5;
-        } else if (n.equalsIgnoreCase("+")) {
-            i++;
-        } else if (n.equalsIgnoreCase("-")) {
-            i--;
-        } else {
-            try {
-                i = Integer.parseInt(n);
-            } catch (NumberFormatException e) {
-                found_number = false;
+        
+        @help("Lists available subcommands. Can also search the list.")
+        public static void list() {
+            String em = "" + EnumChatFormatting.GREEN;
+            for (Method method : miscCommands.class.getMethods()) {
+                if (!commandAllowed(method)) {
+                    continue;
+                }
+                
+                String msg = em + method.getName() + EnumChatFormatting.RESET;
+                alias a = method.getAnnotation(alias.class);
+                if (a != null) {
+                    for (String v : a.value()) {
+                        msg += ", " + em + v + EnumChatFormatting.RESET;
+                    }
+                }
+                help h = method.getAnnotation(help.class);
+                if (h != null) {
+                    msg += ": " + h.value();
+                }
+                if (method.getAnnotation(sketchy.class) != null) {
+                    msg += EnumChatFormatting.DARK_GRAY + " [SKETCHY]";
+                }
+                if (arg1 == null || arg1.length() == 0) {
+                    player.addChatMessage(msg);
+                } else if (msg.contains(arg1)) {
+                    player.addChatMessage(msg);
+                }
             }
-        }
-        if (!mc.isSingleplayer() || !FzConfig.enable_sketchy_client_commands) {
-            if (i < 0) {
-                i = 0;
+            String msg = "";
+            boolean first = true;
+            for (String v : new String[] {"0", "1", "2", "3", "4", "+", "-"}) {
+                if (!first) {
+                    msg += ", ";
+                }
+                first = false;
+                msg += em + v + EnumChatFormatting.RESET;
             }
+            msg += ": " + "Changes the fog";
+            player.addChatMessage(msg);
         }
-        if (i > 8) {
-            i = 8; //seems to have started crashing. Lame.
-        }
-        if (found_number) { 
-            mc.gameSettings.renderDistance = i;
-            return;
-        }
-        EntityClientPlayerMP player = mc.thePlayer;
-        if (n.equalsIgnoreCase("pauserender")) {
-            mc.skipRenderWorld = !mc.skipRenderWorld;
-        } else if (n.equalsIgnoreCase("now") || n.equalsIgnoreCase("date") || n.equalsIgnoreCase("time")) {
-            player.addChatMessage(Calendar.getInstance().getTime().toString());
-        } else if (n.equalsIgnoreCase("about") || n.equalsIgnoreCase("?") || n.equalsIgnoreCase("help")) {
-            player.addChatMessage("Misc client-side commands; from Factorization by neptunepink");
-            player.addChatMessage("Use tab to get the subcommands");
-        } else if (n.equalsIgnoreCase("clear") || n.equalsIgnoreCase("cl")) {
+        
+        @alias({"cl"})
+        @help("Erases the chat window")
+        public static void clear() {
             List cp = new ArrayList();
             cp.addAll(mc.ingameGUI.getChatGUI().getSentMessages());
             mc.ingameGUI.getChatGUI().clearChatMessages(); 
             mc.ingameGUI.getChatGUI().getSentMessages().addAll(cp);
-        } else if (n.equalsIgnoreCase("saycoords") && FzConfig.enable_sketchy_client_commands) {
+        }
+        
+        @sketchy
+        @help("Reveals your coordinates in-chat")
+        public static void saycoords() {
             player.sendChatMessage("/me is at " + ((int) player.posX) + ", " + ((int) player.posY) + ", " + ((int) player.posZ));
-        } else if (n.equalsIgnoreCase("saveoptions") || n.equalsIgnoreCase("savesettings") || n.equalsIgnoreCase("so") || n.equalsIgnoreCase("ss")) {
+        }
+        
+        @alias({"ss"})
+        @help("Saves game settings. (Vanilla seems to need help with this.)")
+        public static String savesettings() {
             mc.gameSettings.saveOptions();
-        } else if (n.equalsIgnoreCase("render_above") || n.equalsIgnoreCase("render_everything_lagfest")) {
-            Object wr_list = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, 5);
+            return "Saved settings";
+        }
+        
+        @alias({"render_everything_lagfest"})
+        @help("Render a ton of terrain at once (may lock your game up for a while)")
+        public static void render_above() {
+            Object wr_list = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, "field_72768_k", "sortedWorldRenderers");
             if (!(wr_list instanceof WorldRenderer[])) {
                 mc.thePlayer.addChatMessage("Reflection failed");
                 return;
             }
-            boolean lagfest = n.equalsIgnoreCase("render_everything_lagfest");
             WorldRenderer[] lizt = (WorldRenderer[]) wr_list;
             int did = 0;
             int total = 0;
+            boolean lagfest = arg0.contains("lagfest");
             for (WorldRenderer wr : lizt) {
                 total++;
                 if (wr.needsUpdate) {
@@ -115,47 +152,209 @@ public class MiscClientProxy extends MiscProxy {
                 }
             }
             player.addChatMessage("Rendered " + did + " chunks out of " + total);
-        } else if (n.equalsIgnoreCase("noclip") && FzConfig.enable_cheat_commands && mc.isSingleplayer()) {
-            boolean next = !mc.gameSettings.noclip;
-            mc.gameSettings.noclip = next;
-            mc.thePlayer.noClip = next;
-            for (World w : DimensionManager.getWorlds()) {
-                for (Object o : w.playerEntities) {
-                    Entity e = (Entity) o;
-                    e.noClip = next;
-                }
-            }
-        } else if (n.equalsIgnoreCase("c") || n.equalsIgnoreCase("creative")) {
+        }
+        
+        @alias("c")
+        @help("Switch between creative and survival mode")
+        public static void creative() {
+            //Not sketchy since you wouldn't be able to run it anyways.
             player.sendChatMessage("/gamemode " + (player.capabilities.isCreativeMode ? 0 : 1));
-        } else if (n.equalsIgnoreCase("n") || n.equalsIgnoreCase("nice") || n.equalsIgnoreCase("makenice")) {
+        }
+        
+        @alias({"n", "makenice"})
+        @help("Makes it a sunny morning")
+        public static void nice() {
             if (player.worldObj.isRaining()) {
                 player.sendChatMessage("/toggledownfall");
             }
             double angle =player.worldObj.getCelestialAngle(0) % 360;
             if (angle < 45 || angle > 90+45) {
-                player.sendChatMessage("/time set day");
+                player.sendChatMessage("/time set " + 20*60);
             }
             player.sendChatMessage("/f cl");
-        } else if (n.equalsIgnoreCase("mods")) {
+        }
+        
+        @help("Shows the mods screen")
+        public static void mods() {
             mc.displayGuiScreen(new GuiModList(null));
-        } else if ((n.equalsIgnoreCase("ninja") || n.equalsIgnoreCase("deninja") || n.equalsIgnoreCase("neo") || n.equalsIgnoreCase("deneo")) && FzConfig.enable_cheat_commands) {
+        }
+        
+        @sketchy
+        @alias({"neo", "deneo", "deninja"})
+        @help("Makes the world run slowly (single-player client-side only). Can specify custom timerSpeed.")
+        public static String ninja() {
             if (mc.isSingleplayer()) {
-                float tps = n.equalsIgnoreCase("ninja") ? 0.5F : 1F;
+                float tps;
+                if (arg0.startsWith("de")) {
+                    tps = 1F;
+                } else {
+                    tps = 0.5F;
+                    tps = Float.parseFloat(arg1);
+                }
+                tps = Math.max(0.1F, tps);
+                tps = Math.min(1, tps);
                 mc.timer.timerSpeed = tps;
+                if (arg0.contains("neo")) {
+                    if (tps == 1) {
+                        return "Go back to sleep, Neo.";
+                    } else {
+                        return "Wake up, Neo.";
+                    }
+                }
             }
-        } else if (n.equalsIgnoreCase("watchdog") && FzConfig.lagssie_watcher) {
-            if (args.size() != 2) {
-                player.addChatMessage("Usage: /f watchdog <waitInterval>");
-                return;
+            return null;
+        }
+        
+        @help("Sets the watchdog waitInterval")
+        public static String watchdog() {
+            if (MiscClientProxy.watch_dog == null) {
+                return "Watchdog disabled. Enable in config, or use /f startwatchdog";
             }
-            watch_dog.sleep_time = Double.parseDouble(args.get(1));
-        } else if (n.equalsIgnoreCase("timedilation") || n.equalsIgnoreCase("td")) {
-            float dilation = Float.parseFloat(args.get(1));
+            
+            if (arg1 == null) {
+                return "Usage: /f watchdog [waitInterval=" + watch_dog.sleep_time + "]";
+            }
+            watch_dog.sleep_time = Double.parseDouble(arg1);
+            return "Set waitInterval to " + watch_dog.sleep_time;
+        }
+        
+        @help("Starts the watchdog")
+        public static String startwatchdog() {
+            if (MiscClientProxy.watch_dog == null) {
+                FzConfig.lagssie_watcher = true;
+                MiscClientProxy.startLagWatchDog();
+                return "Started watchdog.";
+            } else {
+                return "Watchdog already running.";
+            }
+        }
+        
+        @alias({"td"})
+        @help("Sets the minimum time dilation (between 0.1 and 1), or disables it (0)")
+        public static String timedilation() {
+            if (arg1 == null) {
+                String msg = "Current time dilation: " + mc.timer.timerSpeed;
+                if (!FzConfig.use_tps_reports) {
+                    msg += " ";
+                    msg += "(Disabled)";
+                }
+                return msg;
+            }
+            float dilation = Float.parseFloat(arg1);
+            if (dilation <= 0) {
+                FzConfig.use_tps_reports = false;
+                return "Time dilation disabled";
+            }
             dilation = Math.max(0.1F, dilation);
             dilation = Math.min(1F, dilation);
             FzConfig.lowest_dilation = dilation;
+            if (!FzConfig.use_tps_reports) {
+                FzConfig.use_tps_reports = true;
+                return "Enabled time dilation at " + dilation;
+            } else {
+                return "Set minimum time dilation to " + dilation;
+            }
+        }
+        
+        //Remember to include 'public' for anything added here.
+    }
+    
+    @Override
+    void runCommand(List<String> args) { //TODO NORELEASE try/catch. And PLEASE make this thing USABLE! Also poke the server-side
+        if (args == null) {
+            args = new ArrayList<String>();
+        }
+        Minecraft mc = Minecraft.getMinecraft();
+        String n;
+        if (args.size() == 0) {
+            args = Arrays.asList("help");
+            n = "help";
         } else {
-            player.addChatMessage("Unknown command: " + n);
+            n = args.get(0);
+        }
+        int i = mc.gameSettings.renderDistance;
+        boolean found_number = true;
+        if (n.equalsIgnoreCase("+")) {
+            i++;
+        } else if (n.equalsIgnoreCase("-")) {
+            i--;
+        } else {
+            try {
+                i = Integer.parseInt(n);
+            } catch (NumberFormatException e) {
+                found_number = false;
+            }
+        }
+        if (found_number) {
+            if (!mc.isSingleplayer() || !FzConfig.enable_sketchy_client_commands) {
+                if (i < 0) {
+                    i = 0;
+                }
+            }
+            if (i > 8) {
+                i = 8; //seems to have started crashing. Lame.
+            }
+            mc.gameSettings.renderDistance = i;
+            return;
+        }
+        
+        for (Method method : miscCommands.class.getMethods()) {
+            if (method.getDeclaringClass() == Object.class || method.getParameterTypes().length != 0) {
+                continue;
+            }
+            if (method.getName().equals(n)) {
+                tryCall(method, args);
+                return;
+            }
+            alias a = method.getAnnotation(alias.class);
+            if (a == null) {
+                continue;
+            }
+            for (String an : a.value()) {
+                if (an.equals(n)) {
+                    tryCall(method, args);
+                    return;
+                }
+            }
+        }
+        mc.thePlayer.addChatMessage("Unknown command. Try /f list.");
+    }
+    
+    static boolean commandAllowed(Method method) {
+        if (method.getAnnotation(sketchy.class) != null && !FzConfig.enable_sketchy_client_commands) {
+            return false;
+        }
+        if (method.getDeclaringClass() == Object.class || method.getParameterTypes().length != 0) {
+            return false;
+        }
+        return true;
+    }
+    
+    void tryCall(Method method, List<String> args) {
+        Minecraft mc = Minecraft.getMinecraft();
+        if (!commandAllowed(method)) {
+            mc.thePlayer.addChatMessage("That command is disabled");
+            return;
+        }
+        try {
+            miscCommands.mc = mc;
+            miscCommands.player = mc.thePlayer;
+            miscCommands.arg0 = args.get(0);
+            if (args.size() >= 2) {
+                miscCommands.arg1 = args.get(1);
+            }
+            
+            Object ret = method.invoke(null);
+            if (ret != null) {
+                mc.thePlayer.addChatMessage(ret.toString());
+            }
+        } catch (Exception e) {
+            mc.thePlayer.addChatMessage("Caught an exception from command; see console");
+            e.printStackTrace();
+        } finally {
+            miscCommands.mc = null;
+            miscCommands.player = null;
+            miscCommands.arg0 = miscCommands.arg1 = null;
         }
     }
     
@@ -276,9 +475,9 @@ public class MiscClientProxy extends MiscProxy {
         mc.timer.timerSpeed = newTps;
     }
     
-    LagssieWatchDog watch_dog = null;
+    static LagssieWatchDog watch_dog = null;
     
-    void startLagWatchDog() {
+    static void startLagWatchDog() {
         if (FzConfig.lagssie_watcher) {
             watch_dog = new LagssieWatchDog(Thread.currentThread(), FzConfig.lagssie_interval);
             Thread dog = new Thread(watch_dog);

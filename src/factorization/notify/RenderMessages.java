@@ -59,7 +59,7 @@ public class RenderMessages extends RenderMessagesProxy {
                 m.creationTime = 0;
             }
         }
-        if (msg.msg == null || msg.msg.trim() == "") {
+        if (msg.msg == null || msg.msg.trim().length() == 0) {
             return;
         }
         messages.add(msg);

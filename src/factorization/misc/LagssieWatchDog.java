@@ -37,7 +37,7 @@ public class LagssieWatchDog implements Runnable {
     @Override
     public void run() {
         log("Woof! I am Lagssie the Lag Watch Dog! (from Factorization's Miscellaneous Nonsense)");
-        log("You can change how often I check for freezups with the command /f watchdog <waitInterval>");
+        log("You can change how often I check for freezups with the command /f watchdog <waitInterval>; I also have configuration options!");
         int last_tick = 0;
         boolean had_good_tick = true;
         Random rng = new Random();

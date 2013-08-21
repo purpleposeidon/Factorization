@@ -3,6 +3,8 @@ package factorization.misc;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.LinkedList;
@@ -69,7 +71,7 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
     @EventHandler
     public void modsLoaded(FMLPostInitializationEvent event) {
         //Fixes lack of creeper dungeons
-        DungeonHooks.addDungeonMob("Creeper", 1); //Etho, of all people, found one. It'd be nice if they were just a bit rarer.
+        DungeonHooks.addDungeonMob("Creeper", 1); //Etho, of all people, found one. It'd be nice if they were just a bit rarer. Scaling everything else up seems like a poor solution tho.
         String THATS_SOME_VERY_NICE_SOURCE_CODE_YOU_HAVE_THERE[] = {
                 "##  ##",
                 "##  ##",
@@ -128,33 +130,45 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
             player.playerNetServerHandler.sendPacketToPlayer(instance.makeCmdPacket(args));
         }
         
-        static List<String> fogCommands = Arrays.asList("far", "0", "normal", "1", "short", "2", "tiny", "3", "micro", "4", "microfog", "5", "+", "-", "pauserender", "now", "about", "clear", "saycoords", "saveoptions");
-        
         @Override
         public String getCommandUsage(ICommandSender icommandsender) {
-            String ret = "";
-            for (String s : fogCommands) {
-                ret += s + " ";
-            }
-            return ret.trim();
+            return "/f <subcommand, such as 'help' or 'list'>";
         }
         
         @Override
         public List addTabCompletionOptions(ICommandSender sender, String[] args) {
-            //TODO: Non-lame
-            if (args.length == 1) {
-                String arg0 = args[0];
-                List<String> ret = new LinkedList();
-                for (String cmd : fogCommands) {
-                    if (cmd.startsWith(arg0)) {
-                        ret.add(cmd);
+            try {
+                if (args.length == 1) {
+                    String arg0 = args[0];
+                    List<String> availCommands = new ArrayList<String>(50);
+                    availCommands.addAll(Arrays.asList("0", "1", "2", "3", "4", "+", ""));
+                    for (Method method : MiscClientProxy.miscCommands.class.getMethods()) {
+                        if (method.getDeclaringClass() == Object.class || method.getParameterTypes().length != 0) {
+                            continue;
+                        }
+                        availCommands.add(method.getName());
+                        MiscClientProxy.alias a = method.getAnnotation(MiscClientProxy.alias.class);
+                        if (a == null) {
+                            continue;
+                        }
+                        for (String name : a.value()) {
+                            availCommands.add(name);
+                        }
                     }
+                    
+                    List<String> ret = new LinkedList();
+                    for (String name : availCommands) {
+                        if (name.startsWith(arg0)) {
+                            ret.add(name);
+                        }
+                    }
+                    return ret;
                 }
-                return ret;
-            } else if (args.length > 1) {
-                return new LinkedList();
+            } catch (Exception e) {
+                Core.logWarning("Wasn't able to do tab completion, probably because on the server? Uh, someone mention this to neptunepink please.");
+                e.printStackTrace();
             }
-            return fogCommands;
+            return new LinkedList();
         }
         
         @Override

@@ -44,15 +44,25 @@ public class NotifyImplementation extends Notify {
                 if (!(sender instanceof TileEntity || sender instanceof Entity)) {
                     return;
                 }
-                String msg = Joiner.on(" ").join(args);
+                EnumSet theStyle = EnumSet.noneOf(Style.class);
+                for (int i = 0; i < args.length; i++) {
+                    String s = args[i];
+                    if (s.equalsIgnoreCase("--long")) {
+                        theStyle.add(Style.LONG);
+                    } else {
+                        break;
+                    }
+                    args[i] = "";
+                }
+                String msg = Joiner.on(" ").join(args).trim();
                 msg = msg.replace("\\n", "\n");
                 //Notify.send(sender, "%s", msg);
-                Notify.send(null, sender, EnumSet.of(Style.LONG), null, "%s", msg);
+                Notify.send(null, sender, theStyle, null, "%s", msg);
             }
             
             @Override
             public String getCommandUsage(ICommandSender icommandsender) {
-                return "/mutter something something something";
+                return "/mutter [--long] some text. If blank, erases the muttering.";
             }
             
             @Override
@@ -63,6 +73,11 @@ public class NotifyImplementation extends Notify {
             @Override
             public boolean canCommandSenderUseCommand(ICommandSender sender) {
                 return sender instanceof Entity;
+            }
+            
+            @Override
+            public int getRequiredPermissionLevel() {
+                return 0;
             }
         });
     }
