@@ -35,6 +35,7 @@ run("ack-grep '%i' src/")
 #Factorization
 run("./make")
 run("cp ~/Dropbox/dev/Factorization-dev.jar " + oldfile)
+run("cp CHANGELOG ~/Dropbox/Public/old/")
 
 #Dropbox
 dropbox_url = "dl.dropbox.com/u/76265666/old/" + filename
