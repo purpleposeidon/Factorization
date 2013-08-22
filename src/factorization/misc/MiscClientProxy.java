@@ -29,6 +29,7 @@ import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.common.Core;
 import factorization.common.FzConfig;
 
@@ -109,6 +110,7 @@ public class MiscClientProxy extends MiscProxy {
         
         @alias({"cl"})
         @help("Erases the chat window")
+        @SideOnly(Side.CLIENT)
         public static void clear() {
             List cp = new ArrayList();
             cp.addAll(mc.ingameGUI.getChatGUI().getSentMessages());
@@ -124,6 +126,7 @@ public class MiscClientProxy extends MiscProxy {
         
         @alias({"ss"})
         @help("Saves game settings. (Vanilla seems to need help with this.)")
+        @SideOnly(Side.CLIENT)
         public static String savesettings() {
             mc.gameSettings.saveOptions();
             return "Saved settings";
@@ -131,6 +134,7 @@ public class MiscClientProxy extends MiscProxy {
         
         @alias({"render_everything_lagfest"})
         @help("Render a ton of terrain at once (may lock your game up for a while)")
+        @SideOnly(Side.CLIENT)
         public static void render_above() {
             Object wr_list = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, "field_72768_k", "sortedWorldRenderers");
             if (!(wr_list instanceof WorldRenderer[])) {
@@ -175,6 +179,7 @@ public class MiscClientProxy extends MiscProxy {
         }
         
         @help("Shows the mods screen")
+        @SideOnly(Side.CLIENT)
         public static void mods() {
             mc.displayGuiScreen(new GuiModList(null));
         }
@@ -182,6 +187,7 @@ public class MiscClientProxy extends MiscProxy {
         @sketchy
         @alias({"neo", "deneo", "deninja"})
         @help("Makes the world run slowly (single-player client-side only). Can specify custom timerSpeed.")
+        @SideOnly(Side.CLIENT)
         public static String ninja() {
             if (mc.isSingleplayer()) {
                 float tps;
@@ -231,6 +237,7 @@ public class MiscClientProxy extends MiscProxy {
         
         @alias({"td"})
         @help("Sets the minimum time dilation (between 0.1 and 1), or disables it (0)")
+        @SideOnly(Side.CLIENT)
         public static String timedilation() {
             if (arg1 == null) {
                 String msg = "Current time dilation: " + mc.timer.timerSpeed;
@@ -256,7 +263,7 @@ public class MiscClientProxy extends MiscProxy {
             }
         }
         
-        //Remember to include 'public' for anything added here.
+        //Remember to include 'public' for anything added here. May need SideOnly(CLIENT) for things that access Minecraft.class.
     }
     
     @Override
