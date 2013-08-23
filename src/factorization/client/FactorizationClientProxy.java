@@ -2,7 +2,6 @@ package factorization.client;
 
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.IllegalFormatException;
 import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
@@ -48,17 +47,6 @@ import factorization.common.servo.ServoMotor;
 public class FactorizationClientProxy extends FactorizationProxy {
     public FactorizationClientProxy() {
         MinecraftForge.EVENT_BUS.register(this);
-    }
-    
-    @Override
-    public void broadcastTranslate(EntityPlayer who, String... msg) {
-        String format = msg[0];
-        String params[] = new String[msg.length - 1];
-        System.arraycopy(msg, 1, params, 0, msg.length - 1);
-        try {
-            who.addChatMessage(String.format(format, (Object[]) params));
-        } catch (IllegalFormatException e) {
-        }
     }
 
     @Override

@@ -5,8 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.IllegalFormatException;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -20,7 +18,6 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet131MapData;
 import net.minecraft.server.management.PlayerInstance;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.StringTranslate;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -38,7 +35,7 @@ import factorization.notify.NotifyImplementation;
 
 public class NetworkFactorization implements ITinyPacketHandler {
     protected final static short factorizeTEChannel = 0; //used for tile entities
-    protected final static short factorizeMsgChannel = 1; //used for sending translatable chat messages
+    
     protected final static short factorizeCmdChannel = 2; //used for player keys
     protected final static short factorizeNtfyChannel = 3; //used to show messages in-world
     protected final static short factorizeEntityChannel = 4; //used for entities
@@ -121,21 +118,6 @@ public class NetworkFactorization implements ITinyPacketHandler {
             writeObjects(outputStream, output, items);
             output.flush();
             return PacketDispatcher.getTinyPacket(Core.instance, factorizeTEChannel, outputStream.toByteArray());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public Packet translatePacket(String... items) {
-        try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            DataOutputStream output = new DataOutputStream(outputStream);
-            for (String i : items) {
-                output.writeUTF(i);
-            }
-            output.flush();
-            return PacketDispatcher.getTinyPacket(Core.instance, factorizeMsgChannel, outputStream.toByteArray());
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -361,7 +343,6 @@ public class NetworkFactorization implements ITinyPacketHandler {
         DataInputStream input = new DataInputStream(inputStream);
         switch (channel) {
         case factorizeTEChannel: handleTE(input); break;
-        case factorizeMsgChannel: handleMsg(input); break;
         case factorizeCmdChannel: handleCmd(data); break;
         case factorizeNtfyChannel: handleNtfy(input); break;
         case factorizeEntityChannel: handleEntity(input); break;
@@ -443,42 +424,6 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 handleForeignMessage(world, x, y, z, tec, messageType, input);
             }
         } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    void handleMsg(DataInputStream input) {
-        if (FMLCommonHandler.instance().getSide() != Side.CLIENT) {
-            return; // so, an SMP client sends *us* a message? Nah.
-        }
-        String main;
-        try {
-            main = input.readUTF();
-        } catch (IOException e1) {
-            return;
-        }
-        ArrayList<String> items = new ArrayList<String>();
-        try {
-            while (true) {
-                String orig = input.readUTF();
-                String name = orig + ".name";
-                String transd = StringTranslate.getInstance().translateKey(name);
-                if (transd.compareTo(name) == 0) {
-                    items.add(orig);
-                } else {
-                    items.add(transd);
-                }
-            }
-        } catch (IOException e) {
-        }
-        try {
-            getCurrentPlayer().addChatMessage(String.format(main, items.toArray()));
-        } catch (IllegalFormatException e) {
-            System.err.print("Illegal format: \"" + main + '"');
-            for (String i : items) {
-                System.err.print(" \"" + i + "\"");
-            }
-            System.err.println();
             e.printStackTrace();
         }
     }

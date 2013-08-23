@@ -272,7 +272,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
 
         //Misc
         pocket_table = new ItemPocketTable(itemID("pocketCraftingTable", 9002));
-        steamFluid = new Fluid("steam").setDensity(-500).setGaseous(true).setViscosity(100).setUnlocalizedName("factorization:fluid/steam");
+        steamFluid = new Fluid("steam").setDensity(-500).setGaseous(true).setViscosity(100).setUnlocalizedName("factorization:fluid/steam").setTemperature(273 + 110);
         FluidRegistry.registerFluid(steamFluid);
         
         //Rocketry
@@ -454,9 +454,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //Sculpture combiniation recipe
         GameRegistry.addRecipe(new IRecipe() {
             ArrayList<ItemStack> merge(InventoryCrafting inv) {
-                if (inv.stackList.length < 2) {
-                    return null;
-                }
+                //NORELEASE: Test below. Oh, and also: test this as well.
+                //if (inv.stackList.length < 2) {
+                //	return null;
+                //}
                 ArrayList<ItemStack> match = new ArrayList<ItemStack>(2);
                 int part_count = 0;
                 for (int i = 0; i < inv.getSizeInventory(); i++) {

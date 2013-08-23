@@ -195,7 +195,9 @@ public class MiscClientProxy extends MiscProxy {
                     tps = 1F;
                 } else {
                     tps = 0.5F;
-                    tps = Float.parseFloat(arg1);
+                    try {
+                        tps = Float.parseFloat(arg1);
+                    } catch (Throwable t) {}
                 }
                 tps = Math.max(0.1F, tps);
                 tps = Math.min(1, tps);

@@ -1,23 +1,15 @@
 package factorization.common;
 
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.packet.NetHandler;
 import net.minecraft.network.NetServerHandler;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.NetHandler;
 import net.minecraft.profiler.Profiler;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
 
 public class FactorizationServerProxy extends FactorizationProxy {
     //XXX TODO: This is *all* wrong. Err, except maybe makeItemsSide().
-    
-    @Override
-    public void broadcastTranslate(EntityPlayer who, String... msg) {
-        Packet p = Core.network.translatePacket(msg);
-        EntityPlayerMP player = (EntityPlayerMP) who;
-        addPacket(player, p);
-    }
 
     @Override
     public EntityPlayer getPlayer(NetHandler handler) {

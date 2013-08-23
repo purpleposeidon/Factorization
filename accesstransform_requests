@@ -1,0 +1,19 @@
+Block.(min|max)(x|y|z)
+DamageSource: all methods
+Entity.invulnerable
+EntityLiving.equipmentDropChances
+GuiContainer.getSlotAtPosition
+GUIContainer.getSlotAtPosition
+GuiContainer.itemRenderer
+InventoryCrafting.stackList
+Item.unlocalizedName
+Minecraft.isGamePaused
+Minecraft.session
+Minecraft.timer
+NBTTagList.tagList
+NetClientHandler.worldClient
+PlayerControllerMP: All fields
+PlayerControllerMP.sameToolAndBlock
+RenderGlobal.drawOutlinedBoundingBox
+ShapedOreRecipe.checkItemEquals >:D
+TextureMap.missingImage

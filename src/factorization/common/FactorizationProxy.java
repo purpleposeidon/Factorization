@@ -18,8 +18,6 @@ import cpw.mods.fml.common.network.Player;
 import factorization.api.Coord;
 
 public abstract class FactorizationProxy implements IGuiHandler {
-    public abstract void broadcastTranslate(EntityPlayer who, String... msg);
-
     public abstract EntityPlayer getPlayer(NetHandler handler);
 
     /** Send packet to other side */

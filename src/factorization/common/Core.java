@@ -19,7 +19,6 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.Icon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
-import net.minecraft.util.StringTranslate;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLLog;
@@ -214,9 +213,9 @@ public class Core {
     }
     
     private static void addTranslationHints(String hint_key, List list, String prefix) {
-        StringTranslate st = StringTranslate.getInstance();
-        if (st.containsTranslateKey(hint_key) /* containsTranslateKey = containsTranslateKey */ ) {
-            String hint = st.translateKey(hint_key);
+        if (StatCollector.func_94522_b(hint_key)) {
+            //if (st.containsTranslateKey(hint_key) /* containsTranslateKey = containsTranslateKey */ ) {
+            String hint = StatCollector.translateToLocal(hint_key);
             if (hint != null) {
                 hint = hint.trim();
                 if (hint.length() > 0) {
