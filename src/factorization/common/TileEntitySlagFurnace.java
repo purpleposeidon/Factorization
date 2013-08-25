@@ -297,7 +297,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
 
         static SmeltingResult getSlaggingResult(ItemStack input) {
             for (SmeltingResult res : smeltingResults) {
-                if (FactorizationUtil.couldMerge(input, res.input)) {
+                if (FactorizationUtil.wildcardSimilar(res.input, input)) {
                     return res;
                 }
             }

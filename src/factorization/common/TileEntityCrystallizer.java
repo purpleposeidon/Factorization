@@ -264,7 +264,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         void apply(TileEntityCrystallizer crys) {
             for (int i = 0; i < crys.inputs.length; i++) {
                 ItemStack is = crys.inputs[i];
-                if (is != null && FactorizationUtil.couldMerge(input, is)) {
+                if (is != null && FactorizationUtil.wildcardSimilar(input, is)) {
                     applyTo(crys, i);
                 }
             }

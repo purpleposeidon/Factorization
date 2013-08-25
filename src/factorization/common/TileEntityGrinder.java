@@ -247,7 +247,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
             return;
         }
         for (ItemStack is : gr.getInput()) {
-            if (!FactorizationUtil.couldMerge(is, input)) {
+            if (!FactorizationUtil.wildcardSimilar(is, input)) {
                 continue;
             }
             if (output == null) {
