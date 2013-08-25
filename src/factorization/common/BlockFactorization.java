@@ -319,12 +319,15 @@ public class BlockFactorization extends BlockContainer {
         if (reg.daybarrel != null) {
             //itemList.add(new ItemStack(reg.daybarrel));
             int count = 0;
+            int added = 0;
             for (ItemStack is : TileEntityDayBarrel.barrel_items) {
                 count++;
-                if (TileEntityDayBarrel.getUpgrade(is) == TileEntityDayBarrel.Type.NORMAL) {
+                if (count <= TileEntityDayBarrel.Type.TYPE_COUNT || count % (TileEntityDayBarrel.Type.TYPE_COUNT*2) == 0) {
                     itemList.add(is);
-                } else if (count <= TileEntityDayBarrel.Type.TYPE_COUNT) {
-                    itemList.add(is);
+                    added++;
+                    if (added >= TileEntityDayBarrel.Type.TYPE_COUNT + 9) {
+                        break;
+                    }
                 }
             }
         }
