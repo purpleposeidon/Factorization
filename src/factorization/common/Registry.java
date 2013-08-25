@@ -10,6 +10,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
@@ -19,7 +20,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.Tuple;
 import net.minecraft.util.WeightedRandomChestContent;
+import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.feature.WorldGenMinable;
@@ -39,6 +42,8 @@ import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.VillagerRegistry;
+import cpw.mods.fml.common.registry.VillagerRegistry.IVillageTradeHandler;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
 import factorization.common.Core.TabType;
@@ -233,8 +238,14 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         bag_of_holding = new ItemBagOfHolding(itemID("bagOfHolding", 9001));
         
         logicMatrixProgrammer = new ItemMatrixProgrammer(itemID("logicMatrixProgrammer", 9043));
-        ChestGenHooks dungeon = ChestGenHooks.getInfo(ChestGenHooks.DUNGEON_CHEST);
-        dungeon.addItem(new WeightedRandomChestContent(new ItemStack(logicMatrixProgrammer), 1, 1, 25)); //XXX TODO: Temporary, put these on asteroids.
+        for (String chestName : new String[] {
+                ChestGenHooks.STRONGHOLD_LIBRARY,
+                ChestGenHooks.DUNGEON_CHEST,
+                //TODO: Nether fortresses? Needs a forge thing tho.
+                }) {
+            ChestGenHooks dungeon = ChestGenHooks.getInfo(chestName);
+            dungeon.addItem(new WeightedRandomChestContent(new ItemStack(logicMatrixProgrammer), 1, 1, 35)); //XXX TODO: Temporary, put these on asteroids.
+        }
         logicMatrix = new ItemCraftingComponent(itemID("logicMatrix", 9044), "logic_matrix");
         logicMatrixIdentifier = new ItemCraftingComponent(itemID("logicMatrixID", 9045), "logic_matrix_identifier");
 
@@ -371,6 +382,20 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'M', logicMatrix,
                 'i', dark_iron,
                 'X', logicMatrixProgrammer);
+        int librarianVillager = 1;
+        VillagerRegistry.instance().registerVillageTradeHandler(librarianVillager, new IVillageTradeHandler() {
+            @Override
+            public void manipulateTradesForVillager(EntityVillager villager, MerchantRecipeList recipeList, Random random) {
+                int min = 2, max = 3;
+                Item item = Core.registry.logicMatrixProgrammer;
+                float chance = 1;
+                
+                if (min > 0 && max > 0) {
+                    EntityVillager.blacksmithSellingList.put(item.itemID, new Tuple(min, max));
+                }
+                EntityVillager.addBlacksmithItem(recipeList, item.itemID, random, chance);
+            }
+        });
         
         TileEntityCrystallizer.addRecipe(new ItemStack(Block.blockRedstone), new ItemStack(logicMatrix), 1, Core.registry.aqua_regia);
 
