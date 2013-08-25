@@ -41,12 +41,13 @@ import factorization.common.ItemIcons;
 public class RenderServoMotor extends RenderEntity {
     static int sprocket_display_list = -1;
     boolean loaded_model = false;
+    ResourceLocation servo_uv = Core.getResource("models/sprocket/servo_uv.png");
     
     void loadSprocketModel() throws IOException {
         IModelCustom sprocket = null;
         InputStream input = null;
         try {
-            ResourceLocation rl = new ResourceLocation("factorization", "models/sprocket/sprocket.obj");
+            ResourceLocation rl = Core.getResource("models/sprocket/sprocket.obj");
             input = Minecraft.getMinecraft().func_110442_L().func_110536_a(rl).func_110527_b();
             if (input == null) {
                 Core.logWarning("Missing servo sprocket model: " + rl);
@@ -259,7 +260,6 @@ public class RenderServoMotor extends RenderEntity {
         GL11.glPopMatrix();
     }
     
-    ResourceLocation servo_uv = Core.getResource("/models/sprocket/servo_uv.png");
     
     @Override
     protected ResourceLocation func_110775_a(Entity par1Entity) {
