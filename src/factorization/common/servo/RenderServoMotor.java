@@ -1,5 +1,8 @@
 package factorization.common.servo;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.model.ModelBiped;
@@ -21,8 +24,8 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.minecraftforge.client.model.IModelCustom;
+import net.minecraftforge.client.model.obj.WavefrontObject;
 import net.minecraftforge.common.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
@@ -39,21 +42,25 @@ public class RenderServoMotor extends RenderEntity {
     static int sprocket_display_list = -1;
     boolean loaded_model = false;
     
-    void loadSprocketModel() {
-        //TODO: Resourceify! FIXME: Blame forge.
+    void loadSprocketModel() throws IOException {
         IModelCustom sprocket = null;
-        for (String modelLocation : new String[] { "/factorization/common/servo/sprocket.obj" }) {
-            try {
-                sprocket = AdvancedModelLoader.loadModel(modelLocation);
-                break;
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
+        InputStream input = null;
+        try {
+            ResourceLocation rl = new ResourceLocation("factorization", "models/sprocket/sprocket.obj");
+            input = Minecraft.getMinecraft().func_110442_L().func_110536_a(rl).func_110527_b();
+            if (input == null) {
+                Core.logWarning("Missing servo sprocket model: " + rl);
+                return;
+            }
+            sprocket = new WavefrontObject(rl.toString(), input);
+            input.close();
+            input = null;
+        } finally {
+            if (input != null) {
+                input.close();
             }
         }
-        if (sprocket == null) {
-            Core.logSevere("Did not find servo sprocket model");
-            return;
-        }
+        
         sprocket_display_list = GLAllocation.generateDisplayLists(1);
         GL11.glNewList(sprocket_display_list, GL11.GL_COMPILE);
         sprocket.renderAll();
@@ -263,7 +270,12 @@ public class RenderServoMotor extends RenderEntity {
         GL11.glPushMatrix();
         func_110776_a(servo_uv);
         if (loaded_model == false) {
-            loadSprocketModel();
+            try {
+                loadSprocketModel();
+            } catch (Throwable e) {
+                Core.logWarning("Failed to load servo sprocket model");
+                e.printStackTrace();
+            }
             loaded_model = true;
         }
 

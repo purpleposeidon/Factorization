@@ -9,15 +9,13 @@ echo Packaging client
 FZ=`pwd`
 OUT=~/Dropbox/dev/Factorization-dev.jar
 
-pushd ../forge/mcp/reobf/minecraft  > /dev/zero
+pushd ../forge/mcp/reobf/minecraft > /dev/zero
   cp -R $FZ/resources/* ./
   rm -rf ./assets/factorization/lang/.git/
   cp $FZ/*.info ./
   cp $FZ/CHANGELOG ./
-  cp /home/poseidon/Development/factorization/factorization/src/factorization/common/servo/sprocket.obj factorization/common/servo/sprocket.obj
   rm -f $OUT
   jar -cf $OUT CHANGELOG *.info factorization/ pack.mcmeta assets/
-  #jar -cf ~/Dropbox/dev/$OUT *Factorization*.class *.info factorization/
 popd > /dev/zero
 #pushd ~/mc/
 #  ./install modded-1.3
