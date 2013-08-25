@@ -78,7 +78,13 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     
     @Override
     public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
-        return getTank(from).fill(resource, doFill);
+        if (resource.isFluidEqual(water_stack)) {
+            return waterTank.fill(resource, doFill);
+        } else if (resource.isFluidEqual(steam_stack)) {
+            return steamTank.fill(resource, doFill);
+        } else {
+            return 0;
+        }
     }
 
     @Override
