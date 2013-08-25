@@ -179,15 +179,18 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             FzInv downinv = FactorizationUtil.openInventory(downi, orientation.top);
             
             if (downinv != null) {
-                ItemStack toPush = getStackInSlot(1).splitStack(1);
-                ItemStack got = downinv.push(toPush);
-                if (got == null) {
-                    downi.onInventoryChanged();
-                    updateStacks();
-                    cleanBarrel();
-                    youve_changed_jim = true;
-                } else {
-                    getStackInSlot(1).stackSize++;
+                ItemStack bottom_item = getStackInSlot(1);
+                if (bottom_item != null) {
+                    ItemStack toPush = bottom_item.splitStack(1);
+                    ItemStack got = downinv.push(toPush);
+                    if (got == null) {
+                        downi.onInventoryChanged();
+                        updateStacks();
+                        cleanBarrel();
+                        youve_changed_jim = true;
+                    } else {
+                        bottom_item.stackSize++;
+                    }
                 }
             }
         }
