@@ -6,6 +6,16 @@
     https://github.com/purpleposeidon/FactorizationLocalizations if you would like to contribute localizations
   Tinker's Construct ores can now be processed
   Made the /f command user-friendly. Use it!
+  Made the leyden jar much easier to charge
+  TConstruct aluminum, ardite, and cobalt ores can be processed
+  Added the /mutter command; shows a message above your head
+  Bug fixes:
+    various recipes weren't crafting
+    Servo texture
+    Hopping barrel NPE
+    Solar boiler sending steam upwards
+    NEI recipe handlers
+
 
 0.8.03
   Ported to 1.6.2
