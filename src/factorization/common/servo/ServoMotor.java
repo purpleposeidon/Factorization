@@ -859,7 +859,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         if (target.isAir()) {
             return;
         }
-        AxisAlignedBB aabb = target.getSelectedBoundingBoxFromPool();
+        AxisAlignedBB aabb = target.getCollisionBoundingBoxFromPool();
         if (aabb == null) {
             return;
         }

@@ -23,6 +23,8 @@ import net.minecraftforge.common.ForgeDirection;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.FactorizationUtil;
@@ -666,6 +668,7 @@ public class Coord implements IDataSerializable {
         return b.getCollisionBoundingBoxFromPool(w, x, y, z);
     }
     
+    @SideOnly(Side.CLIENT)
     public AxisAlignedBB getSelectedBoundingBoxFromPool() {
         Block b = getBlock();
         if (b == null) {
