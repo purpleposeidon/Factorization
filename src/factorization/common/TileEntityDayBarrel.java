@@ -579,9 +579,6 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             }
             return true;
         }
-        if (is != null && is.isItemDamaged()) {
-            return false;
-        }
         return itemMatch(is);
     }
     
@@ -633,15 +630,6 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         ItemStack is = entityplayer.inventory.getStackInSlot(handslot);
         if (is == null) {
             info(entityplayer);
-            return true;
-        }
-
-        if (is.isItemDamaged()) {
-            if (getItemCount() == 0) {
-                Notify.send(entityplayer, getCoord(), "No storing damaged items");
-            } else {
-                info(entityplayer);
-            }
             return true;
         }
         
