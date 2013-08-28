@@ -101,6 +101,9 @@ public class HammerInfo {
     
     public int getPaddingForChannel(int channel) {
         ConfigCategory cat = channel2category.get(channel);
+        if (cat == null) {
+            return defaultPadding;
+        }
         Property prop = cat.get("padding");
         int ret = prop.getInt(defaultPadding);
         return ret;

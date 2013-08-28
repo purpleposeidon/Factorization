@@ -28,6 +28,7 @@ import factorization.api.DeltaCoord;
 import factorization.common.NetworkFactorization.MessageType;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.TransferLib;
+import factorization.fzds.api.DeltaCapability;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.notify.Notify;
 import factorization.notify.Notify.Style;
@@ -162,6 +163,10 @@ public class TileEntityRocketEngine extends TileEntityCommon {
             Entity e = (Entity) o;
             if (e.canBeCollidedWith() || e instanceof EntityLiving || true) {
                 Notify.withStyle(Style.FORCE);
+                if (e == player) {
+                    Notify.send(player, c, "You are in the way");
+                    return false;
+                }
                 Notify.send(player, c, "Obstructed by entity");
                 Coord ec = new Coord(e);
                 if (!ec.equals(c)) {
@@ -191,25 +196,20 @@ public class TileEntityRocketEngine extends TileEntityCommon {
                 myDestination = c;
             }
         }
-        
-        Coord here = getCoord();
-        TileEntityRocketEngine base = this;
-        if (!here.equals(myDestination)) {
-            here.removeTE();
-            base = new TileEntityRocketEngine();
-            myDestination.setId(FzConfig.factory_block_id);
-            myDestination.setTE(base);
-        }
+        myDestination.setId(Core.registry.factory_block);
+        getBlockClass().enforce(myDestination);
+        myDestination.setTE(this);
         
         for (Coord spot : area) {
             if (!spot.equals(myDestination)) {
                 spot.setId(FzConfig.factory_block_id);
-                TileEntityExtension tex = new TileEntityExtension(base);
+                TileEntityExtension tex = new TileEntityExtension(this);
                 spot.setTE(tex);
                 tex.getBlockClass().enforce(spot);
             }
             spot.redraw();
         }
+        
         ignitionRequest = true;
     }
     
@@ -287,6 +287,9 @@ for x in range(0, len(d[0])):
     }
     
     ContiguitySolver canIgnite(EntityPlayer player) {
+        if (isFiring) {
+            return null;
+        }
         int fireCount = 0;
         for (Coord n : getIgnitionArea()) {
             fireCount += n.isBlockBurning() ? 1 : 0;
@@ -317,7 +320,7 @@ for x in range(0, len(d[0])):
         double score = fireCount / perfect;
         if (score >= 0.5) {
             if (solver.entireRocket.size() == 0) {
-                Notify.send(getCoord(), "No body?\nBug!");
+                Notify.send(getCoord(), "No body?");
             } else {
                 return solver;
             }
@@ -330,6 +333,7 @@ for x in range(0, len(d[0])):
     void ignite(ContiguitySolver solver) {
         Notify.send(getCoord(), "Ignition");
         isLeaderEngine = true;
+        availableFuel = solver.fuel;
         for (TileEntityRocketEngine engine : solver.engines) {
             engine.isFiring = true;
             engine.inSlice = true;
@@ -357,18 +361,14 @@ for x in range(0, len(d[0])):
         
         Vec3 real = Vec3.createVectorHelper(0, 0, 0);
         Coord dest = new Coord(DeltaChunk.getServerShadowWorld(), 0, 0, 0);
-        for (TileEntityRocketEngine engine : solver.engines) {
-            Coord c = engine.getCoord();
-            solver.entireRocket.remove(c);
-            c.setAsVector(real);
-            dest.set(dse.real2shadow(real));
-            TransferLib.move(c, dest, true, true);
-        }
         for (Coord c : solver.entireRocket) {
             c.setAsVector(real);
             dest.set(dse.real2shadow(real));
             TransferLib.move(c, dest, true, true);
         }
+        dse.permit(DeltaCapability.DRAG);
+        dse.permit(DeltaCapability.INTERACT);
+        dse.permit(DeltaCapability.MOVE);
         worldObj.spawnEntityInWorld(dse);
     }
     
@@ -404,7 +404,7 @@ for x in range(0, len(d[0])):
             return false;
         } finally {
             long end = System.currentTimeMillis();
-            long delay = Math.max((end - start)*100, 2000);
+            long delay = Math.max((end - start)*100, 2000); //Wait at least 2 seconds before validating again
             next_free_time = end + delay;
         }
         return true;
@@ -415,8 +415,12 @@ for x in range(0, len(d[0])):
         if (worldObj.isRemote) {
             return true;
         }
+        if (isFiring) {
+            return true;
+        }
         if (isValid(entityplayer)) {
-            Notify.send(entityplayer, getCoord(), "Rocket is valid");
+            Notify.withStyle(Style.EXACTPOSITION);
+            Notify.send(entityplayer, getCoord(), "Rocket is valid!\nSuround the nozzles with fire to launch");
         }
         return true;
     }
@@ -484,16 +488,37 @@ for x in range(0, len(d[0])):
     static class RocketValidationException extends Exception {
         String msg;
         Coord mark = null;
+        
+        Notify.Style style = null;
+        ItemStack item = null;
+        
         public RocketValidationException(String msg) { this.msg = msg; }
         public RocketValidationException(String msg, Coord mark) { this.msg = msg; this.mark = mark; }
+        
+        public RocketValidationException with(Notify.Style style, ItemStack item) {
+            this.style = style;
+            this.item = item;
+            return this;
+        }
+        
         public void notify(TileEntityRocketEngine where, EntityPlayer who) {
             if (who != null) {
-                if (mark == null) {
-                    Notify.send(who, where.getCoord(), msg);
+                if (mark != null) {
+                    Coord xtra = where.getCoord();
+                    if (xtra.distance(mark) > 2) {
+                        Notify.withStyle(Style.EXACTPOSITION);
+                        Notify.send(who, where.getCoord(), "Validation failed");
+                    }
                 } else {
-                    Notify.send(who, where.getCoord(), "Validation failed");
-                    Notify.send(who, mark, msg);
+                    mark = where.getCoord();
                 }
+                if (style != null) {
+                    Notify.withStyle(style);
+                }
+                if (item != null) {
+                    Notify.withItem(item);
+                }
+                Notify.send(who, mark, msg);
             }
         }
     }
@@ -627,6 +652,8 @@ for x in range(0, len(d[0])):
                     return coord.getHardness() > 0;
                 }
             };
+            
+            //find all engines connected from the top
             List<Coord> seeds = Arrays.asList(mounting, mounting.add(1, 0, 0), mounting.add(1, 0, 1), mounting.add(0, 0, 1));
             mountingPlane.addAll(fillPlane(seeds, 0, isSolid));
             if (mountingPlane.size() == 0) {
@@ -636,14 +663,13 @@ for x in range(0, len(d[0])):
             for (Coord c : mountingPlane) {
                 addEngine(c.getTE(TileEntityCommon.class));
             }
-            movePlane(mountingPlane, new DeltaCoord(0, +3, 0));
-            
             for (TileEntityRocketEngine engine : engines) {
                 entireRocket.addAll(engine.getArea());
             }
+            movePlane(mountingPlane, new DeltaCoord(0, +3, 0));
+            
             
             ArrayList<Coord> heightScan = cloneArray(mountingPlane);
-            //HashSet<Coord> shadow = new HashSet(mountingPlane.size());
             int y = 0;
             DeltaCoord upwards = new DeltaCoord(0, 1, 0);
             entireRocket.addAll(cloneArray(mountingPlane));
@@ -706,6 +732,24 @@ for x in range(0, len(d[0])):
                     continue;
                 }
                 throw new RocketValidationException("Can't drag", below);
+            }
+            
+            ItemStack rocket_fuel = new ItemStack(Core.registry.rocket_fuel);
+            for (TileEntityRocketEngine engine : engines) {
+                mounting = engine.getCoord();
+                mounting.y += 3;
+                for (Coord c : new Coord[] { mounting, mounting.add(1, 0, 0), mounting.add(1, 0, 1), mounting.add(0, 0, 1) }) {
+                    TileEntityDayBarrel b = c.getTE(TileEntityDayBarrel.class);
+                    if (b == null) {
+                        continue;
+                    }
+                    if (b.itemMatch(rocket_fuel)) {
+                        fuel += b.getItemCount();
+                    }
+                }
+            }
+            if (fuel <= 0) {
+                throw new RocketValidationException("No barrel of {ITEM_NAME}\nHere's a good spot.", mounting).with(Style.EXACTPOSITION,  rocket_fuel);
             }
         }
     

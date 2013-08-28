@@ -105,7 +105,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public Fluid steamFluid;
     public ItemCraftingComponent nether_powder, rocket_fuel;
     public ItemBlockProxy rocket_engine;
-    public ItemCraftingComponent bucket_rocket_fuel;
     public ItemServoMotor servo_motor_placer;
     public ItemServoRailWidget servo_widget_instruction, servo_widget_decor;
     public ActuatorItemSyringe actuator_item_manipulator;
@@ -289,12 +288,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //Rocketry
         nether_powder = new ItemCraftingComponent(itemID("netherPowder", 9050), "nether_powder");
         if (FzConfig.enable_dimension_slice) {
-            rocket_fuel = new ItemCraftingComponent(itemID("heldRocketFuel", 9051), "rocket/powder_rocket_fuel");
+            rocket_fuel = new ItemCraftingComponent(itemID("heldRocketFuel", 9051), "rocket/rocket_fuel");
             rocket_engine = new ItemBlockProxy(itemID("rocketEngine", 9053), rocket_engine_item_hidden, "rocket/rocket_engine", TabType.ROCKETRY);
             rocket_engine.setMaxStackSize(1);
-            bucket_rocket_fuel = new ItemCraftingComponent(itemID("bucketRocketFuel", 9054), "rocket/rocket_fuel_bucket");
-            bucket_rocket_fuel.setMaxStackSize(1);
-            bucket_rocket_fuel.setContainerItem(Item.bucketEmpty);
         }
         
         //Servos
@@ -964,9 +960,12 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         TileEntityCrystallizer.addRecipe(lime, new ItemStack(Item.slimeBall), 1, new ItemStack(Item.bucketMilk));
         
         //Rocketry
-        TileEntityGrinder.addRecipe(new ItemStack(Block.netherrack), new ItemStack(nether_powder, 1), 1);
+        TileEntityGrinder.addRecipe(new ItemStack(Block.netherrack), new ItemStack(nether_powder, 1), 2);
         if (FzConfig.enable_dimension_slice) {
-            shapelessRecipe(new ItemStack(rocket_fuel, 3), nether_powder, nether_powder, nether_powder, Item.fireballCharge);
+            shapelessRecipe(new ItemStack(rocket_fuel, 9),
+                    nether_powder, nether_powder, nether_powder,
+                    nether_powder, Item.fireballCharge, nether_powder,
+                    nether_powder, nether_powder, nether_powder);
             recipe(new ItemStack(rocket_engine),
                     "#F#",
                     "#I#",
@@ -974,7 +973,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                     '#', Block.blockIron,
                     'F', rocket_fuel,
                     'I', Item.ingotIron);
-            shapelessRecipe(new ItemStack(bucket_rocket_fuel), Item.bucketEmpty, rocket_fuel, rocket_fuel);
             ItemStack air = new ItemStack(Item.bucketEmpty, 0);
             ItemStack emptyBucket = new ItemStack(Item.bucketEmpty, 1);
         }

@@ -23,6 +23,7 @@ public class TransferLib {
      * 	0: Sneaky and intrusive. Set value in chunk directly (and make the block be stone)
      *  1: World.isRemote
      *  2: Direct
+     *  3: Vanilla, with flags.
      */
     public static void setRaw(Coord c, int id, int md, int use_method) {
         switch (use_method) {
@@ -53,10 +54,18 @@ public class TransferLib {
         case 2:
             c.setIdMd(id, md);
             break;
+        case 3:
+            c.w.setBlock(c.x, c.y, c.z, id, md, 0);
+            break;
         }
     }
     
     private static TileEntity wiper = new TileEntity();
+    
+    public static void rawRemoveTE(Coord c) {
+        Chunk chunk = c.w.getChunkFromBlockCoords(c.x, c.z);
+        chunk.chunkTileEntityMap.remove(new ChunkPosition(c.x & 15, c.y, c.z & 15));
+    }
     
     public static TileEntity move(Coord src, Coord dest, boolean wipeSrc, boolean overwriteDestination) {
         int id = src.getId();
@@ -72,14 +81,16 @@ public class TransferLib {
             if (wipeSrc) {
                 wiper.validate();
                 src.setTE(wiper);
-                Chunk chunk = src.w.getChunkFromBlockCoords(src.x, src.z);
-                chunk.chunkTileEntityMap.remove(new ChunkPosition(src.x & 15, src.y, src.z & 15));
+                rawRemoveTE(src);
             }
         }
         if (wipeSrc) {
             setRaw(src, 0, 0);
         }
         wiper.worldObj = null; //Don't hold onto a reference
+        if (dest.getTE() != null) {
+            rawRemoveTE(dest);
+        }
         setRaw(dest, id, md);
         if (teData != null) {
             teData.setInteger("x", dest.x);

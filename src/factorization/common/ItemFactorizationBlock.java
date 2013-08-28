@@ -46,7 +46,9 @@ public class ItemFactorizationBlock extends ItemBlock {
                 tec.onPlacedBy(player, is, side, hitX, hitY, hitZ);
                 tec.getBlockClass().enforce(here);
             }
-            w.setBlockTileEntity(here.x, here.y, here.z, te);
+            if (!(te instanceof TileEntityRocketEngine)) {
+                w.setBlockTileEntity(here.x, here.y, here.z, te);
+            }
             
             here.markBlockForUpdate();
             return true;

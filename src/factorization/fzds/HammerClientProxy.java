@@ -12,7 +12,6 @@ import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.NetClientHandler;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
@@ -42,7 +41,6 @@ import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.registry.TickRegistry;
-import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.client.render.EmptyRender;
@@ -413,8 +411,7 @@ public class HammerClientProxy extends HammerProxy {
         double origZ = player.posZ;
         Vec3 shadowPos = ray.parent.real2shadow(Vec3.createVectorHelper(origX, origY, origZ));
         MovingObjectPosition origMouseOver = mc.objectMouseOver;
-        final int pointedEntity_field_index = 6;
-        Entity origPointed = ReflectionHelper.getPrivateValue(EntityRenderer.class, mc.entityRenderer, pointedEntity_field_index);
+        Entity origPointed = mc.entityRenderer.pointedEntity;
         //It's private! It's used in one function! Why is this even a field?
         
         try {
@@ -461,7 +458,7 @@ public class HammerClientProxy extends HammerProxy {
             rayTarget = ray;
         } finally {
             mc.objectMouseOver = origMouseOver;
-            ReflectionHelper.setPrivateValue(EntityRenderer.class, mc.entityRenderer, origPointed, pointedEntity_field_index);
+            mc.entityRenderer.pointedEntity = origPointed;
         }
     }
     

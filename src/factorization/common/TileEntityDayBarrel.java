@@ -242,7 +242,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         return size;
     }
     
-    private boolean itemMatch(ItemStack is) {
+    public boolean itemMatch(ItemStack is) {
         if (is == null || item == null) {
             return false;
         }
