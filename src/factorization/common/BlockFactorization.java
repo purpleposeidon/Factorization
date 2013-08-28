@@ -274,7 +274,6 @@ public class BlockFactorization extends BlockContainer {
         }
         Registry reg = Core.registry;
         //common
-        itemList.add(reg.barrel_item);
         
         itemList.add(reg.stamper_item);
         itemList.add(reg.packager_item);
