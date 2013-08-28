@@ -23,7 +23,6 @@ import net.minecraftforge.event.ForgeSubscribe;
 import org.lwjgl.opengl.GL11;
 
 import factorization.api.Coord;
-import factorization.common.Core;
 import factorization.notify.Notify.Style;
 
 public class RenderMessages extends RenderMessagesProxy {
@@ -78,7 +77,6 @@ public class RenderMessages extends RenderMessagesProxy {
         if (messages.size() == 0) {
             return;
         }
-        Core.profileStart("factorizationNotify");
         Iterator<Message> it = messages.iterator();
         long deathTime = System.currentTimeMillis() - 1000 * 6;
         EntityLivingBase camera = Minecraft.getMinecraft().renderViewEntity;
@@ -109,7 +107,6 @@ public class RenderMessages extends RenderMessagesProxy {
 
         GL11.glPopMatrix();
         GL11.glPopAttrib();
-        Core.profileEnd();
     }
 
     RenderItem renderItem = new RenderItem();

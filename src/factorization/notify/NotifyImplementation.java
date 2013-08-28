@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -45,24 +46,31 @@ public class NotifyImplementation extends Notify {
                     return;
                 }
                 EnumSet theStyle = EnumSet.noneOf(Style.class);
+                ItemStack heldItem = null;
+                if (sender instanceof EntityLivingBase) {
+                    heldItem = ((EntityLivingBase) sender).getHeldItem();
+                }
+                ItemStack sendItem = null;
                 for (int i = 0; i < args.length; i++) {
                     String s = args[i];
                     if (s.equalsIgnoreCase("--long")) {
                         theStyle.add(Style.LONG);
+                    } else if (s.equalsIgnoreCase("--show-item") && heldItem != null) {
+                        theStyle.add(Style.DRAWITEM);
+                        sendItem = heldItem;
                     } else {
                         break;
                     }
-                    args[i] = "";
+                    args[i] = null;
                 }
-                String msg = Joiner.on(" ").join(args).trim();
+                String msg = Joiner.on(" ").skipNulls().join(args);
                 msg = msg.replace("\\n", "\n");
-                //Notify.send(sender, "%s", msg);
-                Notify.send(null, sender, theStyle, null, "%s", msg);
+                Notify.send(null, sender, theStyle, sendItem, "%s", msg);
             }
             
             @Override
             public String getCommandUsage(ICommandSender icommandsender) {
-                return "/mutter [--long] some text. If blank, erases the muttering.";
+                return "/mutter [--long] [--show-item] [--refer-item] some text. Clears if empty";
             }
             
             @Override

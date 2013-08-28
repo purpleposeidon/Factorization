@@ -26,6 +26,7 @@ public abstract class Notify {
         CLEAR,
         /**
          * If the message is for a {@link Coord} or {@link TileEntity}, then it will not take the block's bounding box into consideration
+         * (Other targets don't consider bounding boxes)
          */
         EXACTPOSITION,
         /**
