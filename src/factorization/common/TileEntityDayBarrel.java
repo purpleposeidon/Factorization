@@ -33,6 +33,7 @@ import factorization.api.datahelpers.Share;
 import factorization.common.FactorizationUtil.FzInv;
 import factorization.common.NetworkFactorization.MessageType;
 import factorization.notify.Notify;
+import factorization.notify.Notify.Style;
 
 public class TileEntityDayBarrel extends TileEntityFactorization {
     public ItemStack item;
