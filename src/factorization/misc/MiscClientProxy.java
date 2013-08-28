@@ -89,9 +89,7 @@ public class MiscClientProxy extends MiscProxy {
                 if (method.getAnnotation(sketchy.class) != null) {
                     msg += EnumChatFormatting.DARK_GRAY + " [SKETCHY]";
                 }
-                if (arg1 == null || arg1.length() == 0) {
-                    player.addChatMessage(msg);
-                } else if (msg.contains(arg1)) {
+                if (arg1 == null || arg1.length() == 0 || msg.contains(arg1)) {
                     player.addChatMessage(msg);
                 }
             }
@@ -105,7 +103,9 @@ public class MiscClientProxy extends MiscProxy {
                 msg += em + v + EnumChatFormatting.RESET;
             }
             msg += ": " + "Changes the fog";
-            player.addChatMessage(msg);
+            if (arg1 == null || arg1.length() == 0 || msg.contains(arg1)) {
+                player.addChatMessage(msg);
+            }
         }
         
         @alias({"cl"})
