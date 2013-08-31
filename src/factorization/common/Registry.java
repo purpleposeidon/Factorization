@@ -99,7 +99,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemCraftingComponent sludge;
     public ItemSculptingTool sculpt_tool;
     public ItemGlazeBucket glaze_bucket;
-    public ItemStack base_common, base_matte, base_translucent, base_shiny, base_bright, base_unreal, glaze_base_mimicry;
+    public ItemStack base_common, base_matte, base_translucent, base_shiny, base_bright, base_unreal, glaze_base_mimicry; //TODO: Get rid of this; flatten!
     public ItemCraftingComponent logicMatrix, logicMatrixIdentifier;
     public ItemMatrixProgrammer logicMatrixProgrammer;
     public Fluid steamFluid;
@@ -323,6 +323,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         if (res == null) {
             return;
         }
+        convertOreItems(params);
         GameRegistry.addRecipe(new ShapedOreRecipe(res, params));
     }
 
@@ -330,7 +331,20 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         if (res == null) {
             return;
         }
+        convertOreItems(params);
         GameRegistry.addRecipe(new ShapelessOreRecipe(res, params));
+    }
+    
+    private void convertOreItems(Object[] params) {
+        for (int i = 0; i < params.length; i++) {
+            if (params[i] == Block.cobblestone) {
+                params[i] = "cobblestone";
+            } else if (params[i] == Block.stone) {
+                params[i] = "stone";
+            } else if (params[i] == Item.stick) {
+                params[i] = "stickwood";
+            }
+        }
     }
 
     void makeRecipes() {
@@ -365,7 +379,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 " #",
                 "| ",
                 '#', Block.workbench,
-                '|', "stickWood");
+                '|', Item.stick);
 
         // tiny demons
         recipe(new ItemStack(logicMatrixIdentifier),
@@ -378,6 +392,16 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'M', logicMatrix,
                 'i', dark_iron,
                 'X', logicMatrixProgrammer);
+        recipe(new ItemStack(logicMatrixProgrammer),
+                "DSI",
+                " #>",
+                "BSI",
+                'D', Item.record13,
+                'B', Item.record11,
+                'S', diamond_shard,
+                'I', dark_iron,
+                '#', logicMatrix,
+                '>', Item.comparator);
         int librarianVillager = 1;
         VillagerRegistry.instance().registerVillageTradeHandler(librarianVillager, new IVillageTradeHandler() {
             @Override
@@ -419,7 +443,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 " c",
                 "/ ",
                 'c', Item.clay,
-                '/', "stickWood");
+                '/', Item.stick);
         ItemSculptingTool.addModeChangeRecipes();
         oreRecipe(new ItemStack(glaze_bucket),
                 "_ _",
@@ -701,23 +725,23 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         }
         
         // Craft stamper
-        recipe(stamper_item,
+        oreRecipe(stamper_item,
                 "#p#",
-                "#I#",
+                "#S#",
                 "#C#",
                 '#', Block.cobblestone,
                 'p', Block.pistonBase,
-                'I', Item.ingotIron,
+                'S', Item.stick,
                 'C', Block.workbench);
 
         //Packager
         oreRecipe(packager_item,
                 "#p#",
-                "P P",
+                "I I",
                 "#C#",
                 '#', Block.cobblestone,
                 'p', Block.pistonBase,
-                'I', Item.ingotIron,
+                'I', "ingotIron",
                 'C', Block.workbench);
         
         //Compression Crafter
@@ -768,6 +792,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         shapelessRecipe(sulfuric_acid, Item.gunpowder, Item.gunpowder, Item.coal, Item.potion);
         shapelessOreRecipe(sulfuric_acid, "dustSulfur", Item.coal, Item.potion);
         shapelessRecipe(aqua_regia, sulfuric_acid, nether_powder, Item.fireballCharge);
+        shapelessRecipe(aqua_regia, sulfuric_acid, Item.blazePowder, Item.fireballCharge); //I'd kind of like this to be a recipe for a different — but compatible — aqua regia. 
         recipe(new ItemStack(fan),
                 "I I",
                 " I ",
@@ -794,11 +819,11 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'M', motor );
         oreRecipe(new ItemStack(charge_meter),
                 "WSW",
-                "W/W",
+                "W|W",
                 "LIL",
                 'W', "plankWood",
                 'S', Item.sign,
-                '/', "stickWood",
+                '|', Item.stick,
                 'L', "ingotLead",
                 'I', Item.ingotIron);
         oreRecipe(new ItemStack(battery, 1, 2),
@@ -953,7 +978,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "-",
                 "S",
                 "U",
-                '-', "stickWood",
+                '-', Item.stick,
                 'S', Item.silk,
                 'U', Item.cauldron);
         ItemStack lime = new ItemStack(Item.dyePowder, 1, 10);
