@@ -100,6 +100,7 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
             storage += store_delta;
         }
         if (tier != storage * 32 / max_storage) {
+            onInventoryChanged();
             updateMeter();
         }
     }
@@ -154,5 +155,10 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
         is.setTagCompound(tag);
         Core.registry.battery.normalizeDamage(is);
         return is;
+    }
+    
+    @Override
+    public int getComparatorValue(ForgeDirection side) {
+        return (int) (getFullness()*0xF);
     }
 }

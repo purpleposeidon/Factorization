@@ -135,6 +135,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
             }
         }
         if (change) {
+            onInventoryChanged();
             updateClients();
         }
     }
@@ -214,5 +215,10 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
         NBTTagCompound tag = FactorizationUtil.getTag(is);
         tag.setInteger("storage", storage);
         return is;
+    }
+    
+    @Override
+    public int getComparatorValue(ForgeDirection side) {
+        return (int) (getLevel()*0xF);
     }
 }
