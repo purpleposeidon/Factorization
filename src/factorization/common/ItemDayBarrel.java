@@ -33,6 +33,7 @@ public class ItemDayBarrel extends ItemBlockProxy {
             lookup = "factorization.factoryBlock.DAYBARREL.format2";
         }
         lookup = Core.translate(lookup);
-        return String.format(lookup, upgrade.toString(), TileEntityDayBarrel.getLog(is).getDisplayName());
+        String type = Core.translate("factorization.factoryBlock.DAYBARREL." + upgrade);
+        return String.format(lookup, type, TileEntityDayBarrel.getLog(is).getDisplayName());
     }
 }
