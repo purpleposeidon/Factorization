@@ -343,7 +343,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             } else if (params[i] == Block.stone) {
                 params[i] = "stone";
             } else if (params[i] == Item.stick) {
-                params[i] = "stickwood";
+                params[i] = "stickWood";
             }
         }
     }
