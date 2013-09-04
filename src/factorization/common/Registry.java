@@ -66,7 +66,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemStack stamper_item, packager_item,
             barrel_item, daybarrel_item_hidden,
             lamp_item, air_item,
-            slagfurnace_item, battery_item_hidden, leydenjar_item, leydenjar_item_full, heater_item, steamturbine_item, solarboiler_item,
+            slagfurnace_item, battery_item_hidden, leydenjar_item, leydenjar_item_full, heater_item, steamturbine_item, solarboiler_item, caliometric_burner_item,
             mirror_item_hidden,
             leadwire_item, grinder_item, mixer_item, crystallizer_item,
             greenware_item,
@@ -206,6 +206,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         leydenjar_item = FactoryType.LEYDENJAR.itemStack();
         steamturbine_item = FactoryType.STEAMTURBINE.itemStack();
         solarboiler_item = FactoryType.SOLARBOILER.itemStack();
+        caliometric_burner_item = FactoryType.CALIOMETRIC_BURNER.itemStack();
         heater_item = FactoryType.HEATER.itemStack();
         mirror_item_hidden = FactoryType.MIRROR.itemStack();
         leadwire_item = FactoryType.LEADWIRE.itemStack();
@@ -817,6 +818,14 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'X', fan,
                 'L', "ingotLead",
                 'M', motor );
+        oreRecipe(caliometric_burner_item,
+                "BPB",
+                "BAB",
+                "BLB",
+                'B', Item.bone,
+                'P', Block.pistonStickyBase,
+                'A', sulfuric_acid,
+                'L', Item.leather);
         oreRecipe(new ItemStack(charge_meter),
                 "WSW",
                 "W|W",

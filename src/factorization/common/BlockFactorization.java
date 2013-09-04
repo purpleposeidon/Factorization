@@ -286,6 +286,7 @@ public class BlockFactorization extends BlockContainer {
             //These checks are for buildcraft, which is hatin'.
             itemList.add(new ItemStack(reg.battery, 1, 2));
         }
+        itemList.add(reg.caliometric_burner_item);
         itemList.add(reg.solarboiler_item);
         itemList.add(reg.steamturbine_item);
         //itemList.add(reg.mirror_item_hidden);

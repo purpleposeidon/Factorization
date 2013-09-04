@@ -202,10 +202,17 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
         if (getHeat() <= 0) {
             return; //nothing to heat
         }
+        applyHeat(getHeat()*time_scale);
+    }
+    
+    public void applyHeat(int heat) {
+        sanitize();
+        FluidStack water = waterTank.getFluid();
+        FluidStack steam = steamTank.getFluid();
         if (steam.amount >= steamTank.getCapacity()) {
             return; //no room for more steam
         }
-        int toBoil = Math.min(getHeat()*time_scale, water.amount);
+        int toBoil = Math.min(heat, water.amount);
         toBoil = Math.min(steamTank.getCapacity() - steam.amount, toBoil);
         int water_to_steam = 160; /* CovertJaguar gives 1:160 as the water:steam ratio */;
         water.amount -= Math.max(toBoil/water_to_steam, 1);

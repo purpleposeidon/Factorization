@@ -36,7 +36,8 @@ public class BlockIcons {
         boiler_side, boiler_top,
         mirror_front, mirror_back, mirror_side,
         turbine_top, turbine_bottom, turbine_side,
-        leyden_metal, leyden_rim, leyden_glass, leyden_glass_side, leyden_knob;
+        leyden_metal, leyden_rim, leyden_glass, leyden_glass_side, leyden_knob,
+        caliometric_side, caliometric_top;
     
     @Directory("craft")
     public static BlockIcons.ActivatingMachineIcon stamper, packager;
