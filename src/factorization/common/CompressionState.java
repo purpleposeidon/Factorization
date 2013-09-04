@@ -7,9 +7,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
+import factorization.common.FactorizationUtil.FzInv;
 import factorization.notify.Notify;
 
 public class CompressionState {
@@ -437,7 +439,65 @@ public class CompressionState {
                     my /= count;
                     mz /= count;
                 }
+                Coord sc = start.getCoord();
+                //NORELEASE: Do a buffering thingie instead! (And you can't craft if there's a buffer.)
+                //(collapseItemList)
+                int i = 0;
+                while (i < total.size()) {
+                    ItemStack is = FactorizationUtil.normalize(total.get(i));
+                    if (is == null) {
+                        total.remove(i);
+                        continue;
+                    }
+                    int s = i + 1;
+                    while (s < total.size()) {
+                        ItemStack other = FactorizationUtil.normalize(total.get(s));
+                        if (other == null) {
+                            total.remove(s);
+                            continue;
+                        }
+                        if (FactorizationUtil.couldMerge(is, other)) {
+                            int free = is.getMaxStackSize() - is.stackSize;
+                            if (free <= 0) {
+                                break;
+                            }
+                            int delta = Math.min(free, other.stackSize);
+                            is.stackSize += delta;
+                            other.stackSize -= delta;
+                            if (other.stackSize <= 0) {
+                                total.remove(s);
+                                continue;
+                            }
+                        }
+                        s++;
+                    }
+                    i++;
+                }
+                //should extract to new method. :P (dropItems)
+                for (int side = 0; side < 6; side++) {
+                    ForgeDirection fd = ForgeDirection.getOrientation(side);
+                    if (fd == up) {
+                        continue;
+                    }
+                    Coord neighbor = sc.add(fd);
+                    IInventory inv = neighbor.getTE(IInventory.class);
+                    if (inv == null) {
+                        continue;
+                    }
+                    FzInv fz = FactorizationUtil.openInventory(inv, fd.getOpposite());
+                    for (int j = 0; j < total.size(); j++) {
+                        ItemStack is = total.get(j);
+                        if (is == null) {
+                            continue;
+                        }
+                        total.set(j, fz.push(is));
+                    }
+                }
                 for (ItemStack is : total) {
+                    is = FactorizationUtil.normalize(is);
+                    if (is == null) {
+                        continue;
+                    }
                     EntityItem ei = new EntityItem(root.worldObj, mx + 0.5, my + 0.5, mz + 0.5, is);
                     root.worldObj.spawnEntityInWorld(ei);
                 }
