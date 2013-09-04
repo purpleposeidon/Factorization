@@ -9,6 +9,12 @@
   Made the leyden jar much easier to charge
   TConstruct aluminum, ardite, and cobalt ores can be processed
   Added the /mutter command; shows a message above your head
+  Barrels can store damaged items
+  Made the parasieve cheaper
+  Caliometric Burner, a new power source:
+    Uses food to make steam
+    Place next to a water boiler
+    (Also renamed "Solar Boiler" to "Water Boiler" since it boils water, not solars.)
   Bug fixes:
     various recipes weren't crafting
     Servo texture
