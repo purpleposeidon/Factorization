@@ -156,7 +156,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
         FluidStack steam = steamTank.getFluid();
         Coord here = getCoord();
         long seed = here.seed() + worldObj.getTotalWorldTime();
-        if (steam.amount > 0 && seed % 5 == 0) {
+        if (steam.amount > 0) {
             //Send steam upwards
             Coord above = here.add(0, 1, 0);
             IFluidHandler tc = above.getTE(IFluidHandler.class);
@@ -168,7 +168,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
             }
         }
         boolean random = seed % 40 == 0;
-        if (water.amount <= 0 || (random && water.amount < waterTank.getCapacity())) {
+        if (water.amount <= 0 || (random && water.amount < waterTank.getCapacity() - 1000)) {
             //pull water from below
             Coord below = here.add(0, -1, 0);
             IFluidHandler tc = below.getTE(IFluidHandler.class);
@@ -178,6 +178,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
                 if (below.getMd() == 0) {
                     below.setId(0);
                     water.amount += 1000;
+                    water.amount = Math.min(water.amount, waterTank.getCapacity());
                 }
             } else if (tc != null) {
                 ForgeDirection dir = ForgeDirection.UP;
@@ -215,7 +216,11 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
         int toBoil = Math.min(heat, water.amount);
         toBoil = Math.min(steamTank.getCapacity() - steam.amount, toBoil);
         int water_to_steam = 160; /* CovertJaguar gives 1:160 as the water:steam ratio */;
-        water.amount -= Math.max(toBoil/water_to_steam, 1);
+        int water_to_remove = Math.max(toBoil/water_to_steam, 1);
+        if (water_to_remove > water.amount) {
+            return;
+        }
+        water.amount -= water_to_remove;
         steam.amount += (int)(toBoil*FzConfig.steam_output_adjust);
     }
     

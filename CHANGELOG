@@ -14,7 +14,10 @@
   Caliometric Burner, a new power source:
     Uses food to make steam
     Place next to a water boiler
+    Right-click with food to feed it; food can also be fed through the sides.
+    A redstone signal will disable digestion.
     (Also renamed "Solar Boiler" to "Water Boiler" since it boils water, not solars.)
+  Water boilers output steam at full speed now
   Bug fixes:
     various recipes weren't crafting
     Servo texture

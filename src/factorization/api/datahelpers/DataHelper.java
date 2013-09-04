@@ -115,7 +115,12 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
     
     public final String putString(String value) throws IOException { return (String)put(value); }
     public final FzOrientation putFzOrientation(FzOrientation value) throws IOException { return (FzOrientation)put(value); }
-    public final ItemStack putItemStack(ItemStack value) throws IOException { return (ItemStack)put(value); }
+    public final ItemStack putItemStack(ItemStack value) throws IOException {
+        if (isReader() && value == null) {
+            value = new ItemStack(0, 0, 0);
+        }
+        return (ItemStack)put(value);
+    }
 
     public final <E extends Enum> E putEnum(E value) throws IOException { return (E)put(value); }
     

@@ -52,7 +52,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
         try {
-            (new DataOutNBT(tag)).put(this);
+            (new DataOutNBT(tag)).as(Share.PRIVATE, "").put(this);
         } catch (IOException e) { e.printStackTrace(); }
     }
     
@@ -60,7 +60,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
         try {
-            (new DataInNBT(tag)).put(this);
+            (new DataInNBT(tag)).as(Share.PRIVATE, "").put(this);
         } catch (IOException e) { e.printStackTrace(); }
     }
     
@@ -114,7 +114,11 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
     void doLogic() {
         needLogic();
         if (ticksUntilNextDigestion > 0 && foodQuality > 0) {
-            for (Coord c : getCoord().getRandomNeighborsAdjacent()) {
+            Coord here = getCoord();
+            if (here.isPowered()) {
+                return;
+            }
+            for (Coord c : here.getRandomNeighborsAdjacent()) {
                 TileEntitySolarBoiler boiler = c.getTE(TileEntitySolarBoiler.class);
                 if (boiler == null) {
                     continue;
