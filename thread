@@ -202,21 +202,53 @@ Specifically, you'll want to place the bag such that the number of inventory col
 
 [u][b][size=4][anchor=SERVO]Servos[/anchor][/size][/b][/u]
 [spoiler]
-There are a few parts to this: There are Servos, Servo Rails, Instructions/Decorators, and Actuators.
+INTRODUCTION
 
-The Servo works similarly to a minecart, but it draws a tiny amount of power from the Servo Rails. It can hold up to 9 items.
-
-Servo Rails do not require support. They do not collide. They are charge conductors.
-
-Instructions and Decorators are very similar. They are both placed onto Servo Rails, and do their thing when a Servo runs over them. The logic matrix programmer is their tool. Right clicking will cycle through their options, and shift-right clicking will remove them. A direct redstone signal will prevent them from operating. Instructions can be placed infinitely, unlike Decorators.
-
-An Actuator is an item that Servos and players can use. Click on a Servo with an Actuator to equip it. (They can also be equiped via the Equipment Bay decorator.) Actuators can be used by right-clicking or shift-right-clicking.
+Servos are machines that travel on Servo Rails. Instructions can be placed on the rails, which causes the Servo to do various things. The servo rail has to be energized with charge to power the servo; it consumes a tiny amount of power to keep it running. Servos have an inventory that can contain up to 5 items, and can be filled or emptied using hoppers. Instructions are crafted using a dark iron ingot, some item, and a logic matrix programmer. The Instruction item does not get used up when it is placed on a servo rail; it has infinite uses. There are some items (called Decorators) that are similar to instructions, but are not infinite. Instructios and Decorators can be removed from the rail by shift-clicking with a Logic Matrix Programmer (LMP). Some instructions can be configured using the programmer.
 
 
-The Item Syringe is an actuator. Right-clicking an inventory will pull an item out of it into the user's inventory, and shift-right-clicking will push an item into it from the user's inventory.
 
-(This area is not fully implemented)
-Servo Motors have 16 seperate stacks for things like integers, strings, and instructions. Each stack can hold up to 16 items. The math and configure instructions use a particular stack. The Item Syringe has two configuration parts: the slot, and how much to pull. By default it pulls from slot -1 (meaning any slot), and a limit of 64.
+INSTRUCTIONS
+
+Click: Right-clicks on a block (or entity) using an item in the inventory; similar to a redpower deployer. This is the most important instruction! Right clicking with an LMP configures it to shift-right-click.
+
+Set Speed: Changes how quickly the servo moves. 5-speed!
+
+Set Direction: Sets the servo's direction (pacman-style)
+
+Point Top: Spins the servo to point the top to that direction
+
+Compare: Pops an object from the argument stack, pops a second object of the same type, and compares them using the configured comparison function. Pushes a boolean. The comparison functions are: =, ≠, ≥, >, <, and ≤.
+
+Jump: Pops a boolean from the argument stack. If it is true, then the next instruction will be skipped.
+
+Integer: Pushes 1, or 0 to the argument stack.
+
+Sum, Product: Adds and multiplies two integers
+
+Redstone Pulse: Emits a brief pulse when the servo passes over
+
+
+
+
+
+INTERSECTIONS
+When a servo motor reaches an intersection, it uses these rules to pick which way to go:
+  - It tries to go the direction it was going previously, OR the direction last specified by a failed Set Direction
+  - Continue in the same direction
+  - It tries to go up (relative to the servo)
+  - It picks a direction at random
+  - As a last resort, it will go backwards
+
+
+STACKS
+This area is not fully implemented.
+
+Each Servo has 16 stacks, which can each hold 16 integers, booleans, strings, or instructions. The stacks can be inspected by looking at the Servo while holding an LMP. Some stacks are used for particular purposes. Presently, only 2 of the stacks are in any way accessible; one is for parameters, and the other is for error messages. When an instruction pops an item off the stack, it may be looking for a particular type. If this is the case, then it will ignore elements that do not match that type. The other stacks will be used as buffers, and for storing procedures.
+
+
+
+
 [/spoiler]
 
 [u]Other Stuff/Future Plans[/u]
@@ -238,9 +270,9 @@ This is a [url="http://files.minecraftforge.net/"]Minecraft Forge[/url] mod. It 
 
 
 [u][b][size=6][anchor=DOWNLOAD]Download[/anchor][/size][/b][/u]
-Factorization 0.8.04beta1 (MC 1.6.2)
-[url="http://adf.ly/2137658/www.mediafire.com/?mgmlzafwqfuflyw"]adfly + MediaFire[/url], or
-[url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.8.04beta1.jar"]adfly + DropBox[/url]
+Factorization 0.8.04beta2 (MC 1.6.2)
+[url="http://adf.ly/2137658/http://www.mediafire.com/?ply56ipk2rccxyx"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.8.04beta2.jar"]adfly + DropBox[/url]
 Built on 2013-08-07 against Minecraft Forge 9.10.0.790
 
 Factorization 0.8.01 (MC 1.5.2)
@@ -249,6 +281,12 @@ Factorization 0.8.01 (MC 1.5.2)
 Built on 2013-07-08 against Minecraft Forge 7.8.0.696
 
 Old versions [spoiler]
+
+Factorization 0.8.04beta1 (MC 1.6.2)
+[url="http://adf.ly/2137658/www.mediafire.com/?mgmlzafwqfuflyw"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.8.04beta1.jar"]adfly + DropBox[/url]
+Built on 2013-08-07 against Minecraft Forge 9.10.0.790
+
 Factorization 0.7.32 (MC 1.5.1)
 [url="http://adf.ly/2137658/http://www.mediafire.com/?7werppdz55se15w"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/dl.dropbox.com/u/76265666/old/Factorization-0.7.32.jar"]adfly + DropBox[/url]
