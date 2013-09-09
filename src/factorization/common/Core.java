@@ -333,6 +333,28 @@ public class Core {
         return ("" + StatCollector.translateToLocal(key + ".name")).trim();
     }
     
+    public static String translateExact(String key) {
+        String ret = StatCollector.translateToLocal(key);
+        if (ret == key) {
+            return null;
+        }
+        return ret;
+    }
+    
+    public static boolean canTranslateExact(String key) {
+        return translateExact(key) != null;
+    }
+    
+    public static String translateWithCorrectableFormat(String key, Object... params) {
+        String format = translate(key);
+        String ret = String.format(format, params);
+        String correctedTranslation = translateExact("factorization.replace:" + ret);
+        if (correctedTranslation != null) {
+            return correctedTranslation;
+        }
+        return ret;
+    }
+    
     public static void sendChatMessage(boolean raw, ICommandSender sender, String msg) {
         sender.sendChatToPlayer(raw ? ChatMessageComponent.func_111066_d(msg) : ChatMessageComponent.func_111077_e(msg));
     }
