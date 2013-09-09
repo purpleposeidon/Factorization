@@ -146,7 +146,7 @@ public class FactorizationOreProcessingHandler {
         FluidStack h20 = FluidContainerRegistry.getFluidForFilledItem(new ItemStack(Item.bucketWater));
         for (FluidContainerData container : FluidContainerRegistry.getRegisteredFluidContainerData()) {
             FluidStack liq = container.fluid;
-            if (h20.isFluidEqual(liq) && liq.amount == FluidContainerRegistry.BUCKET_VOLUME) {
+            if (h20.isFluidEqual(liq) && liq.amount == FluidContainerRegistry.BUCKET_VOLUME && container.filledContainer != null) {
                 OreDictionary.registerOre(waterBucket, container.filledContainer);
             }
         }
@@ -158,6 +158,10 @@ public class FactorizationOreProcessingHandler {
         for (OreType type : ItemOreProcessing.OreType.values()) {
             String oreClass = type.OD_ore;
             String ingotClass = type.OD_ingot;
+            
+            if (oreClass == null) {
+                continue;
+            }
             
             ItemStack bestIngot = null;
             Iterable<ItemStack> oreList = OreDictionary.getOres(oreClass);
