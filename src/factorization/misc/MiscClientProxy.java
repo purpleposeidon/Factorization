@@ -265,68 +265,74 @@ public class MiscClientProxy extends MiscProxy {
             }
         }
         
-        //Remember to include 'public' for anything added here. May need SideOnly(CLIENT) for things that access Minecraft.class.
+        //Remember to include 'public' for anything added here.
+        //Need to SideOnly(CLIENT) for things that access Minecraft.class, and add them to the list in the ICommand.
     }
     
     @Override
     void runCommand(List<String> args) { //TODO NORELEASE try/catch. And PLEASE make this thing USABLE! Also poke the server-side
-        if (args == null) {
-            args = new ArrayList<String>();
-        }
         Minecraft mc = Minecraft.getMinecraft();
-        String n;
-        if (args.size() == 0) {
-            args = Arrays.asList("help");
-            n = "help";
-        } else {
-            n = args.get(0);
-        }
-        int i = mc.gameSettings.renderDistance;
-        boolean found_number = true;
-        if (n.equalsIgnoreCase("+")) {
-            i++;
-        } else if (n.equalsIgnoreCase("-")) {
-            i--;
-        } else {
-            try {
-                i = Integer.parseInt(n);
-            } catch (NumberFormatException e) {
-                found_number = false;
+        try {
+            if (args == null) {
+                args = new ArrayList<String>();
             }
-        }
-        if (found_number) {
-            if (!mc.isSingleplayer() || !FzConfig.enable_sketchy_client_commands) {
-                if (i < 0) {
-                    i = 0;
+            String n;
+            if (args.size() == 0) {
+                args = Arrays.asList("help");
+                n = "help";
+            } else {
+                n = args.get(0);
+            }
+            int i = mc.gameSettings.renderDistance;
+            boolean found_number = true;
+            if (n.equalsIgnoreCase("+")) {
+                i++;
+            } else if (n.equalsIgnoreCase("-")) {
+                i--;
+            } else {
+                try {
+                    i = Integer.parseInt(n);
+                } catch (NumberFormatException e) {
+                    found_number = false;
                 }
             }
-            if (i > 8) {
-                i = 8; //seems to have started crashing. Lame.
-            }
-            mc.gameSettings.renderDistance = i;
-            return;
-        }
-        
-        for (Method method : miscCommands.class.getMethods()) {
-            if (method.getDeclaringClass() == Object.class || method.getParameterTypes().length != 0) {
-                continue;
-            }
-            if (method.getName().equals(n)) {
-                tryCall(method, args);
+            if (found_number) {
+                if (!mc.isSingleplayer() || !FzConfig.enable_sketchy_client_commands) {
+                    if (i < 0) {
+                        i = 0;
+                    }
+                }
+                if (i > 8) {
+                    i = 8; //seems to have started crashing. Lame.
+                }
+                mc.gameSettings.renderDistance = i;
                 return;
             }
-            alias a = method.getAnnotation(alias.class);
-            if (a == null) {
-                continue;
-            }
-            for (String an : a.value()) {
-                if (an.equals(n)) {
+            
+            for (Method method : miscCommands.class.getMethods()) {
+                if (method.getDeclaringClass() == Object.class || method.getParameterTypes().length != 0) {
+                    continue;
+                }
+                if (method.getName().equals(n)) {
                     tryCall(method, args);
                     return;
                 }
+                alias a = method.getAnnotation(alias.class);
+                if (a == null) {
+                    continue;
+                }
+                for (String an : a.value()) {
+                    if (an.equals(n)) {
+                        tryCall(method, args);
+                        return;
+                    }
+                }
             }
+            mc.thePlayer.addChatMessage("Unknown command. Try /f list.");
+        } catch (Exception e) {
+            mc.thePlayer.addChatMessage("Command failed; see console");
+            e.printStackTrace();
         }
-        mc.thePlayer.addChatMessage("Unknown command. Try /f list.");
     }
     
     static boolean commandAllowed(Method method) {

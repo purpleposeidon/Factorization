@@ -27,6 +27,7 @@ import net.minecraft.stats.AchievementList;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.DungeonHooks;
 import net.minecraftforge.common.MinecraftForge;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ICraftingHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Mod;
@@ -154,6 +155,16 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
                         for (String name : a.value()) {
                             availCommands.add(name);
                         }
+                    }
+                    
+                    if (FMLCommonHandler.instance().getSide() != Side.CLIENT) {
+                        //Sigh. There's not really any other way of doing this.
+                        availCommands.addAll(Arrays.asList(
+                                "clear", "cl",
+                                "savesettings", "ss",
+                                "render_above", "render_everything_lagfest",
+                                "mods"
+                                ));
                     }
                     
                     List<String> ret = new LinkedList();
