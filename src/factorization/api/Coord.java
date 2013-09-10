@@ -517,6 +517,9 @@ public class Coord implements IDataSerializable {
     }
 
     public boolean blockExists() {
+        if (w == null) {
+            return false;
+        }
         return w.blockExists(x, y, z);
     }
 

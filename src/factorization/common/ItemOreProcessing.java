@@ -131,10 +131,8 @@ public class ItemOreProcessing extends ItemFactorization implements IActOnCraft 
         if (result == null || player == null) {
             return;
         }
-        if (player.worldObj != null) {
-            if (player.worldObj.isRemote) {
-                return;
-            }
+        if (player.worldObj != null && player.worldObj.isRemote) {
+            return;
         }
         if (result.getItem() != Core.registry.ore_clean_gravel) {
             return;
@@ -143,31 +141,29 @@ public class ItemOreProcessing extends ItemFactorization implements IActOnCraft 
             return;
         }
         boolean any = false;
-        for (int stack_index = 0; stack_index < is.stackSize; stack_index++) {
-            if (Math.random() > 0.25) {
-                continue;
-            }
-            any = true;
-            for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
-                ItemStack pi = player.inventory.getStackInSlot(i);
-                if (pi != null && pi.getItem() == Core.registry.sludge) {
-                    if (pi.stackSize < pi.getMaxStackSize()) {
-                        pi.stackSize++;
-                        return;
-                    }
-                }
-            }
-            for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
-                ItemStack pi = player.inventory.getStackInSlot(i);
-                if (pi == null) {
-                    player.inventory.setInventorySlotContents(i, new ItemStack(Core.registry.sludge, 1));
+        if (Math.random() > 0.25) {
+            return;
+        }
+        any = true;
+        for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
+            ItemStack pi = player.inventory.getStackInSlot(i);
+            if (pi != null && pi.getItem() == Core.registry.sludge) {
+                if (pi.stackSize < pi.getMaxStackSize()) {
+                    pi.stackSize++;
                     return;
                 }
             }
-            player.dropPlayerItem(new ItemStack(Core.registry.sludge, 1));
         }
+        for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
+            ItemStack pi = player.inventory.getStackInSlot(i);
+            if (pi == null) {
+                player.inventory.setInventorySlotContents(i, new ItemStack(Core.registry.sludge, 1));
+                return;
+            }
+        }
+        player.dropPlayerItem(new ItemStack(Core.registry.sludge, 1));
         if (any) {
-            Core.proxy.updatePlayerInventory(player);
+            Core.proxy.updatePlayerInventory(player); //What's with this not actually working?
         }
     }
 }
