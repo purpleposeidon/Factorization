@@ -592,6 +592,9 @@ public class FactorizationUtil {
         public ItemStack pull(int slot, int limit) {
             int i = slotIndex(slot);
             ItemStack is = under.getStackInSlot(i);
+            if (normalize(is) == null) {
+                return null;
+            }
             if (!canExtract(slot, is)) {
                 return null;
             }

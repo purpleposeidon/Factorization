@@ -22,7 +22,7 @@
   Bug fixes:
     various recipes weren't crafting
     Servo texture
-    Hopping barrel NPE
+    Hopping barrel NPE, and another one involving furnaces
     Solar boiler sending steam upwards
     NEI recipe handlers
 
