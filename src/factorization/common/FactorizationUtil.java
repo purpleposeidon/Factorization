@@ -1452,4 +1452,38 @@ public class FactorizationUtil {
         is.writeToNBT(tag);
         return tag;
     }
+    
+    public static void collapseItemList(List<ItemStack> total) {
+        int i = 0;
+        while (i < total.size()) {
+            ItemStack is = normalize(total.get(i));
+            if (is == null) {
+                total.remove(i);
+                continue;
+            }
+            int s = i + 1;
+            while (s < total.size()) {
+                ItemStack other = normalize(total.get(s));
+                if (other == null) {
+                    total.remove(s);
+                    continue;
+                }
+                if (FactorizationUtil.couldMerge(is, other)) {
+                    int free = is.getMaxStackSize() - is.stackSize;
+                    if (free <= 0) {
+                        break;
+                    }
+                    int delta = Math.min(free, other.stackSize);
+                    is.stackSize += delta;
+                    other.stackSize -= delta;
+                    if (other.stackSize <= 0) {
+                        total.remove(s);
+                        continue;
+                    }
+                }
+                s++;
+            }
+            i++;
+        }
+    }
 }

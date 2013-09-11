@@ -2,8 +2,11 @@ package factorization.common;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
@@ -12,10 +15,14 @@ import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.Coord;
+import factorization.common.FactorizationUtil.FzInv;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityCompressionCrafter extends TileEntityCommon {
     static ThreadLocal<CompressionState> states = new ThreadLocal();
+    
+    ArrayList<ItemStack> buffer = new ArrayList();
     
     CompressionState getStateHelper() {
         CompressionState cs = states.get();
@@ -61,6 +68,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         tag.setByte("dir", b_facing);
         tag.setBoolean("root", isCrafterRoot);
         tag.setBoolean("rs", powered);
+        writeBuffer("buff", tag, buffer);
     }
     
     @Override
@@ -70,6 +78,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         b_facing = tag.getByte("dir");
         isCrafterRoot = tag.getBoolean("root");
         powered = tag.getBoolean("rs");
+        readBuffer("buff", tag, buffer);
     }
     
     @Override
@@ -103,6 +112,33 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
                 }
             }
             progress = -10;
+        }
+        
+        if (!buffer.isEmpty()) {
+            Coord sc = getCoord();
+            for (int side = 0; side < 6; side++) {
+                ForgeDirection fd = ForgeDirection.getOrientation(side);
+                if (fd == getFacing()) {
+                    continue;
+                }
+                Coord neighbor = sc.add(fd);
+                IInventory inv = neighbor.getTE(IInventory.class);
+                if (inv == null) {
+                    continue;
+                }
+                FzInv fz = FactorizationUtil.openInventory(inv, fd.getOpposite());
+                while (!buffer.isEmpty()) {
+                    ItemStack is = FactorizationUtil.normalize(buffer.get(0));
+                    if (is != null) {
+                        is = FactorizationUtil.normalize(fz.push(is));
+                    }
+                    if (is == null) {
+                        buffer.remove(0);
+                    } else {
+                        break;
+                    }
+                }
+            }
         }
     }
     
@@ -168,5 +204,14 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         }
         b_facing = new_b;
         return true;
+    }
+    
+    @Override
+    protected void onRemove() {
+        super.onRemove();
+        Coord here = getCoord();
+        while (!buffer.isEmpty()) {
+            here.spawnItem(buffer.remove(0));
+        }
     }
 }

@@ -18,6 +18,7 @@
     A redstone signal will disable digestion.
     (Also renamed "Solar Boiler" to "Water Boiler" since it boils water, not solars.)
   Water boilers output steam at full speed now
+  Compression Crafter now requires an adjacent inventory to store crafting results
   Bug fixes:
     various recipes weren't crafting
     Servo texture
