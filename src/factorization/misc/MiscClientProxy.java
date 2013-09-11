@@ -270,7 +270,7 @@ public class MiscClientProxy extends MiscProxy {
     }
     
     @Override
-    void runCommand(List<String> args) { //TODO NORELEASE try/catch. And PLEASE make this thing USABLE! Also poke the server-side
+    void runCommand(List<String> args) {
         Minecraft mc = Minecraft.getMinecraft();
         try {
             if (args == null) {
