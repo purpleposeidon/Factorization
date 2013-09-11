@@ -688,8 +688,12 @@ public class Coord implements IDataSerializable {
         w.scheduleBlockUpdate(x, y, z, getId(), delay);
     }
     
-    @Deprecated //Need to use ent.setLocationAndAngles or whatever it's called
     public void setAsEntityLocation(Entity ent) {
+        ent.worldObj = w;
+        ent.setLocationAndAngles(x + 0.5, y, z + 0.5, ent.rotationYaw, ent.rotationPitch);
+    }
+    
+    public void setAsEntityLocationUnsafe(Entity ent) {
         ent.worldObj = w;
         ent.posX = x + 0.5;
         ent.posY = y;
