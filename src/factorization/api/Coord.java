@@ -143,6 +143,10 @@ public class Coord implements IDataSerializable {
     public void set(DeltaCoord dc) {
         set(w, dc.x, dc.y, dc.z);
     }
+    
+    public void set(TileEntity te) {
+        set(te.worldObj, te.xCoord, te.yCoord, te.zCoord);
+    }
 
     @Override
     public int hashCode() {

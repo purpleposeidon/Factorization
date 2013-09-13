@@ -12,10 +12,13 @@ import org.bouncycastle.util.Arrays;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.Coord;
 
 public class TileEntityParaSieve extends TileEntityFactorization implements ISidedInventory {
     ItemStack[] filters = new ItemStack[8];
     private boolean putting_nbt = false;
+    private boolean powered = false;
+    private long redstoneCache = -0xFF;
     
     @Override
     public FactoryType getFactoryType() {
@@ -52,8 +55,20 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         return true;
     }
     
+    static Coord hereCache = new Coord(null, 0, 0, 0);
+    private boolean isPowered() {
+        long now = worldObj.getTotalWorldTime();
+        if (now != redstoneCache) {
+            now = redstoneCache;
+            hereCache.set(this);
+            powered = hereCache.isPowered(); //Extremely remote possibility of thread-conflict; meh.
+        }
+        return powered;
+    }
+    
     boolean itemPassesFilter(ItemStack stranger) {
         boolean empty = true;
+        boolean p = isPowered();
         for (int i = 0; i < filters.length/2; i++) {
             ItemStack a = filters[i*2], b = filters[i*2 + 1];
             if (a == null && b == null) {
@@ -61,10 +76,10 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             }
             empty = false;
             if (FactorizationUtil.itemInRange(a, b, stranger)) {
-                return true;
+                return true ^ p;
             }
         }
-        return empty;
+        return empty ^ p;
     }
     
     private byte self_recursion = 0;
