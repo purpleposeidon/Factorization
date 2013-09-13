@@ -18,11 +18,13 @@ HAMMER
 ✓     -    activating blocks
       -    GUIs
       -    breaking blocks
+              - We'll just do everything ourselves; no trying to go through vanilla code
+
               - Server-side: Client will send packets similar to Packet14BlockDig; we'll bamboozle ItemInWorldManager (Or replace it with our own, possibly temporarily. This might be better, as it'd be very simple to replace it when we're done.)
               - Client-side: Can we set fields in places to make it do the digging animation?
               - Do that IWorldAccess partial block breaking rendering on the client; make sure the player packet proxy gets the packets
-✓ Step 6 is to get rotations working
-      -    Get collisions working when rotated
+X Step 6 is to get rotations working (Maybe later)
+X     -    Get collisions working when rotated
   Step 7 is rockets & shit.
       -    Refactor DSE & its rendering for Oracles
 ✓     -    Proper command system
@@ -33,8 +35,16 @@ HAMMER
 [01:14:36] <OvermindDL1> neptunepink: Stacktrace: at cpw.mods.fml.relauncher.ReflectionHelper.findField(ReflectionHelper.java:87) at factorization.fzds.HammerClientProxy.clientLogin(HammerClientProxy.java:230) at factorization.fzds.Hammer$1.clientLoggedIn(Hammer.java:126)
 
 
+2013-08-25 20:21:23 [INFO] [STDERR] java.lang.NullPointerException
+2013-08-25 20:21:23 [INFO] [STDERR]     at net.minecraft.client.renderer.RenderGlobal.func_72731_b(RenderGlobal.java:1718)
+2013-08-25 20:21:23 [INFO] [STDERR]     at net.minecraft.client.renderer.EntityRenderer.func_78471_a(EntityRenderer.java:1236)
+2013-08-25 20:21:23 [INFO] [STDERR]     at net.minecraft.client.renderer.EntityRenderer.func_78480_b(EntityRenderer.java:987)
+2013-08-25 20:21:23 [INFO] [STDERR]     at net.minecraft.client.Minecraft.func_71411_J(Minecraft.java:871)
+2013-08-25 20:21:23 [INFO] [STDERR]     at net.minecraft.client.Minecraft.run(Minecraft.java:760)
+2013-08-25 20:21:23 [INFO] [STDERR]     at java.lang.Thread.run(Unknown Source)
+Caused by rapid-fire pasting?
 
-(Uh-oh, why is TransferLib broken?)
+
 CovertJaguar_proper_packet_sending
 
 The hard rendering bit:
@@ -67,14 +77,35 @@ Kill Wrath (This will make the mod so much simpler...):
       - No more terrible particle effects
   - This will remove a use for diamond shards.
 
-TO TEST
--------
-Wrenching parasieves (Probably alright)
-Did the drop bug with BlockFactorization.destroyed_tes get fixed? (Probably alright)
+
+KILL
+----
+BOH
+WRATH (But this adds rocketry. Ha. Definitely makes the mod smaller.)
+All glazes except for mimicing
 
 
 TOP LIST (that's become somewhat less tops. Oops.)
 --------
+compression crafter behavior with filled flowerpots
+[15:43:34] <Hathadar> I have a router inserting into 4 induction furnaces.  The moment I place a machine filter on it and set it to the induction furnace it stops working.  It will not insert or extract.  0.8.01
+do hopping barrels resepct redstone yet?
+I wonder if the bug hopper has a crashlog for those compression crafters...
+get rid of spam re. barrel log types
+misc nonsense: add blocks that vanilla hides (for some reason) to creative menu, and a config option to disable this
+Lower barriers to entry for servos:
+  Add caliometric generator
+    (Suuuugar crystalllss.... hard rock candy....)
+  Eliminate dependencies on ore processing:
+    alternative aqua regia recipe (substitute blaze powder for nether powder? or maybe magma cream?)
+      Maybe this shouldn't make aqua regia; but instead an acid that's compatible.
+  Maybe we should see about flattening our mod in other areas as well.
+One of my ICommands is broken (???)
+Check making wrath lamps with compression crafters
+Servos need to IO items badly!
+caliometric generator
+localize barrel types (There's a ton of other things what need to be localized, y'know...)
+barrels ejecting items like mDiyo berries
 ★★★Talk to RLP about monetization plan★★★
 underground silver temples/vaults. With moon lamps? :D
 onInventoryUpdate all the TEs
@@ -95,7 +126,7 @@ notification system upgrade:
   extra controls for clearing up other notifications: get rid of nearby messages (barrels), start fading the message away as soon as it shows up (energy measurements), remove any messages that have the same typename as this one, leave the message up for # seconds
 Modularize FZ/astro so that astro has no deps & can be removed for public release
 Config option for ore processing output
-IMC for adding new Ores to the Ore Processing chain (For TCons metals; aluminum, ardite, cobalt)
+IMC for adding new Ores to the Ore Processing chain?
 configuration method for adding ores?
 test with dedicated server (not from eclipse....)
 Placing/breaking wrath lamp in hammerspace seems to cause the client to crap its pants

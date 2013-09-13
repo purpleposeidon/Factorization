@@ -11,7 +11,7 @@ import factorization.api.Coord;
 public enum BlockClass {
 
     Default(0, true, 0, 0, 1F),
-    DarkIron(1, true, 0, 0, 4F),
+    DarkIron(1, true, 0, 0, 3.25F),
     Barrel(2, true, 25, 0, 2F),
     //Cage(3, false, 0, 0, 5F),
     Lamp(4, false, 0, 15, 6F),
