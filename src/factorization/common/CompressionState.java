@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.ForgeDirection;
@@ -19,6 +20,7 @@ public class CompressionState {
     CellInfo[] cells = new CellInfo[9];
     HashSet<TileEntityCompressionCrafter> foundWalls = new HashSet(3*4);
     int height, width;
+    EntityPlayer player;
     
     boolean errored;
     
@@ -31,11 +33,12 @@ public class CompressionState {
         Arrays.fill(cells, null);
         errored = false;
         pair_height = -2;
+        player = null;
     }
     
     void error(TileEntityCompressionCrafter at, String msg, String... args) {
         if (errored) return;
-        Notify.send(at, msg, args);
+        Notify.send(player, at, msg, args);
         errored = true;
     }
     
@@ -178,7 +181,6 @@ public class CompressionState {
                 return dir;
             }
         }
-        showExample();
         return ForgeDirection.UNKNOWN;
     }
     
@@ -193,7 +195,17 @@ public class CompressionState {
         return 1;
     }
     
-    void showExample() {
+    void showTutorial(EntityPlayer player, TileEntityCompressionCrafter cc) {
+        reset();
+        this.player = player;
+        errored = true;
+        populateState(cc);
+        showExample();
+        reset();
+    }
+    
+    private void showExample() {
+        Notify.clear(player);
         int width = pickSize(), height = pickSize();
         ForgeDirection r = ForgeDirection.WEST;
         if (up.offsetX*r.offsetX != 0) {
@@ -222,7 +234,8 @@ public class CompressionState {
         }
         
         Notify.withStyle(Style.FORCE);
-        error(root, "Need more Compression Crafters\nPlace some as marked for a %sx%s:", ""+width, ""+height);
+        errored = false;
+        error(root, "Place as marked for a %sx%s\nThen give a redstone signal", ""+width, ""+height);
     }
     
     void mark(Coord c) {
@@ -231,7 +244,7 @@ public class CompressionState {
         }
         Notify.withItem(Core.registry.compression_crafter_item);
         Notify.withStyle(Style.FORCE, Style.EXACTPOSITION, Style.DRAWITEM);
-        Notify.send(c, "");
+        Notify.send(player, c, "");
     }
     
     private TileEntityCompressionCrafter getOtherSideRoot() {

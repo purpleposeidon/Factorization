@@ -3,7 +3,6 @@ package factorization.common;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -213,5 +212,35 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         while (!buffer.isEmpty()) {
             here.spawnItem(buffer.remove(0));
         }
+    }
+    
+    @Override
+    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
+        if (worldObj.isRemote) {
+            return false;
+        }
+        if (entityplayer.isSneaking()) {
+            return false;
+        }
+        Coord c = getCoord();
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    if (Math.abs(dx) + Math.abs(dy) + Math.abs(dz) == 3) {
+                        continue;
+                    }
+                    c.set(worldObj, xCoord + dx, yCoord + dy, zCoord + dz);
+                    TileEntity te = c.getTE(TileEntityCompressionCrafter.class);
+                    if (te == this) {
+                        continue;
+                    }
+                    if (te != null) {
+                        return false;
+                    }
+                }
+            }
+        }
+        getStateHelper().showTutorial(entityplayer, this);
+        return false;
     }
 }
