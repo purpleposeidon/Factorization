@@ -32,8 +32,14 @@ public class ActuatorItemSyringe extends ActuatorItem {
 
         @Override
         public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-            slot = data.asSameShare(prefix + "slot").put(slot);
-            limit = data.asSameShare(prefix + "limit").put(limit);
+            if (data.isWriter()) {
+                //Bluh. :/
+                slot = data.asSameShare(prefix + "slot").put(slot);
+                limit = data.asSameShare(prefix + "limit").put(limit);
+            } else {
+                limit = data.asSameShare(prefix + "limit").put(limit);
+                slot = data.asSameShare(prefix + "slot").put(slot);
+            }
             return this;
         }		
     }
