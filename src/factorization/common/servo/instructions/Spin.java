@@ -3,6 +3,7 @@ package factorization.common.servo.instructions;
 import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
@@ -12,7 +13,6 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
-import factorization.common.Core;
 import factorization.common.servo.Instruction;
 import factorization.common.servo.ServoMotor;
 
@@ -39,7 +39,7 @@ public class Spin extends Instruction {
 
     @Override
     protected ItemStack getRecipeItem() {
-        return new ItemStack(Core.registry.fan);
+        return new ItemStack(Item.silk);
     }
 
     @Override
