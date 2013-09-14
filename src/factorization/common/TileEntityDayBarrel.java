@@ -154,6 +154,9 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         if (orientation == FzOrientation.UNKNOWN) {
             return;
         }
+        if (worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0) {
+            return;
+        }
         boolean youve_changed_jim = false;
         int itemCount = getItemCount();
         if (itemCount < getMaxSize()) {
