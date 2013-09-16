@@ -1,5 +1,6 @@
 package factorization.client.render;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
@@ -43,7 +44,8 @@ public class DayBarrelItemRenderer implements IItemRenderer {
         render_barrel.renderInInventory();
         render_barrel.is = is;
         render_barrel.renderType = type;
-        render_barrel.render((RenderBlocks)data[0]);
+        RenderBlocks rb = Minecraft.getMinecraft().renderGlobal.globalRenderBlocks;
+        render_barrel.render(rb);
         ItemStack silk = TileEntityDayBarrel.getSilkedItem(is);
         if (silk != null) {
             if (tesr == null) {
