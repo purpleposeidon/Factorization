@@ -75,7 +75,7 @@ public class ItemChargeMeter extends ItemFactorization {
             msg = "Charge: " + ic.getCharge().getValue();
         }
         msg += inf;
-        Notify.send(player, here, "%s", msg, "");
+        Notify.send(player, ic, "%s", msg, "");
         return true;
     }
 }
