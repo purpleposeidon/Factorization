@@ -2,23 +2,30 @@
   Localizations:
     German localizations by Vexatos!
     Spanish localizations by Darkona!
+    Chinese localizations by crafteverywhere!
     Thanks!
     https://github.com/purpleposeidon/FactorizationLocalizations if you would like to contribute localizations
-  Tinker's Construct ores can now be processed
+  Tinker's Construct aluminum, ardite, and cobalt ores can be processed
   Made the /f command user-friendly. Use it!
-  Made the leyden jar much easier to charge
-  TConstruct aluminum, ardite, and cobalt ores can be processed
   Added the /mutter command; shows a message above your head
-  Barrels can store damaged items
-  Made the parasieve cheaper
+  Made the leyden jar much easier to charge
+  Barrels:
+    Can now store damaged items
+    Hopping barrels respect redstone signal.
+  Parasieve:
+    Now cheaper
+    Filter can be inverted with a redstone signal
+  Compression Crafter:
+    now requires an adjacent inventory to store crafting results, instead of dumping everything on the ground
+    improved self-documentation
   Caliometric Burner, a new power source:
-    Uses food to make steam
     Place next to a water boiler
+    Uses food to make steam. Higher quality food makes more steam.
     Right-click with food to feed it; food can also be fed through the sides.
     A redstone signal will disable digestion.
     (Also renamed "Solar Boiler" to "Water Boiler" since it boils water, not solars.)
   Water boilers output steam at full speed now
-  Compression Crafter now requires an adjacent inventory to store crafting results
+  Items with NBT tag 'noFzBarrel' can't be put into barrels by clicking
   Bug fixes:
     various recipes weren't crafting
     Servo texture

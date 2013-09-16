@@ -641,6 +641,11 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             Notify.send(entityplayer, getCoord(), "No.");
             return true;
         }
+        
+        NBTTagCompound tag = is.getTagCompound();
+        if (tag != null && tag.hasKey("noFzBarrel")) {
+            return false;
+        }
 
         boolean veryNew = taint(is);
 
