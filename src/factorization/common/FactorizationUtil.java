@@ -785,6 +785,9 @@ public class FactorizationUtil {
                 
                 @Override
                 public boolean canExtract(int slot, ItemStack is) {
+                    if (is == null) {
+                        return false;
+                    }
                     return inv.canExtractItem(slotMap[slot], is, side);
                 }
                 

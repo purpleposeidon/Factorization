@@ -1260,7 +1260,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                         theLogs.addAll(subItems);
                         continue;
                     } else {
-                        Core.logWarning("The logWood %s (%s) has wildcard damage, but did not seem to implement Block.addCreativeItems(). Proceeding to make stuff up.", log, b);
                         for (int md = 0; md < 16; md++) {
                             ItemStack is = log.copy();
                             is.setItemDamage(md);
