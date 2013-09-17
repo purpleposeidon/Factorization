@@ -84,28 +84,37 @@ BOH
 WRATH (But this adds rocketry. Ha. Definitely makes the mod smaller.)
 All glazes except for mimicing
 
-
-TOP LIST (that's become somewhat less tops. Oops.)
---------
-compression crafter behavior with filled flowerpots
-[15:43:34] <Hathadar> I have a router inserting into 4 induction furnaces.  The moment I place a machine filter on it and set it to the induction furnace it stops working.  It will not insert or extract.  0.8.01
-do hopping barrels resepct redstone yet?
-I wonder if the bug hopper has a crashlog for those compression crafters...
-get rid of spam re. barrel log types
-misc nonsense: add blocks that vanilla hides (for some reason) to creative menu, and a config option to disable this
+SERVOS
+------
+regarding actuators:
+  Move them out of the inventory, into a separate thing
+  Have these actuators:
+    Freaky Robot Hand: Deployer. Not much more to it. (I mean unless you want left click. Erm.)
+    Computer: Evaluate stack (and stuff)
+    Inventory Manipulator: by itself, a boring push/pull
+    Grabber: Picks up blocks and entities. Uses FZDS fun-times.
+  We'll keep a "generic use actuator instruction", but we'll also add instructions for each actuator. Possibly multiple ones per actuator.
+Servos need to IO items badly!
 Lower barriers to entry for servos:
-  Add caliometric generator
     (Suuuugar crystalllss.... hard rock candy....)
   Eliminate dependencies on ore processing:
     alternative aqua regia recipe (substitute blaze powder for nether powder? or maybe magma cream?)
       Maybe this shouldn't make aqua regia; but instead an acid that's compatible.
   Maybe we should see about flattening our mod in other areas as well.
+
+TOP LIST (that's become somewhat less tops. Oops.)
+--------
+compression crafters:
+  flowerpots
+  blocks of hardness -1
+  making wrath lamps
 One of my ICommands is broken (???)
-Check making wrath lamps with compression crafters
-Servos need to IO items badly!
-caliometric generator
+slag furnace. dude. fix the not-lighting-up thing already.
+[15:43:34] <Hathadar> I have a router inserting into 4 induction furnaces.  The moment I place a machine filter on it and set it to the induction furnace it stops working.  It will not insert or extract.  0.8.01
+I wonder if the bug hopper has any interesting crashlogs!
+One of my ICommands is broken!?
 localize barrel types (There's a ton of other things what need to be localized, y'know...)
-barrels ejecting items like mDiyo berries
+barrels ejecting items like mDiyo berries do
 ★★★Talk to RLP about monetization plan★★★
 underground silver temples/vaults. With moon lamps? :D
 onInventoryUpdate all the TEs
@@ -116,19 +125,15 @@ smooth sandstone double slab (Are there other variants?)
 Look at what errors we get if the FZDS code isn't in
 either bats are spawning in the hammer dimension, or we're getting entity updates that we shouldn't be
 having more boilers/mirrors seems to give you more steam somehow
-comparator support for batteries & leyden jars
 Misc Nonsense:
   fix vanilla's middle clicking
 notification system upgrade:
-  IMC system for sending messages (should work server & client side)
-  be able to specify: an entity ID, a floating position, or a coordinate
-  be able to send an item along with the message. It'll serialize it & stuff. And then there'll be format messages that control how the item is shown: the item name, the item name + the extra information, render the item in-line with the text, or render the item to the side of the message
   extra controls for clearing up other notifications: get rid of nearby messages (barrels), start fading the message away as soon as it shows up (energy measurements), remove any messages that have the same typename as this one, leave the message up for # seconds
+  being able to group messages together might be nice; so you could do "clear tutorialMessages".
 Modularize FZ/astro so that astro has no deps & can be removed for public release
 Config option for ore processing output
 IMC for adding new Ores to the Ore Processing chain?
 configuration method for adding ores?
-test with dedicated server (not from eclipse....)
 Placing/breaking wrath lamp in hammerspace seems to cause the client to crap its pants
 Don't keep non-weak references to worlds ("MapMaker.weakKeys().buildMap()") except in Entity/TileEntity
 register ore blocks
@@ -141,15 +146,7 @@ back to ceramics?
 https://github.com/MinecraftForge/MinecraftForge/commit/34ebfcd9785c3c50c3ac743eb1e9cbf000df10dc
 
 
-[High-rez texture bugs]
-wrath lamp particles
-GUIs ?????
-clay statue probably has bad UV or something
-make multiple copies of the metal texture for each ore processing machine
-http://www.minecraftforum.net/index.php?app=members&module=messaging&section=view&do=showConversation&topicID=1984385&st=0#msg3439990
-
 [Low-Priority Bugs]
-Comparators & barrels
 > Apparently, Killing yourself by Drinking Sulfuric Acid, will dupe the acid. Hence I started with 8, drank two, and I now have 12.
 Get rid of as many getEffectiveSide() calls as we can; we often have a World hanging around somewhere we can use instead.
 implementing that generic block rotation API when it comes out if ever
