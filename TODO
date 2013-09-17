@@ -115,6 +115,7 @@ I wonder if the bug hopper has any interesting crashlogs!
 One of my ICommands is broken!?
 localize barrel types (There's a ton of other things what need to be localized, y'know...)
 barrels ejecting items like mDiyo berries do
+leyden jars & batteries should overcharge slightly so that they can drop exactly 100%-charged stuff
 ★★★Talk to RLP about monetization plan★★★
 underground silver temples/vaults. With moon lamps? :D
 onInventoryUpdate all the TEs

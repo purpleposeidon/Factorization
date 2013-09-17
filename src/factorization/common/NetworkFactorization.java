@@ -590,8 +590,6 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 //
                 SculptDescription = 130, SculptNew = 132, SculptMove = 133, SculptRemove = 134, SculptState = 135,
                 //
-                FurnaceBurnTime = 140,
-                //
                 ExtensionInfo = 150, RocketState = 151,
                 //
                 ServoRailDecor = 161, ServoRailDecorUpdate = 162,

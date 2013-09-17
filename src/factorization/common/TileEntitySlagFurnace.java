@@ -8,11 +8,9 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.packet.Packet;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
-import factorization.api.Coord;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntitySlagFurnace extends TileEntityFactorization {
@@ -30,7 +28,6 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
 
     @Override
     public Icon getIcon(ForgeDirection dir) {
-        draw_active = (byte) (furnaceBurnTime > 0 ? 1 : 0);
         if (draw_active > 0 && facing_direction == dir.ordinal()) {
             return BlockIcons.machine$slag_furnace_face_on;
         }
@@ -113,19 +110,18 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
 
     @Override
     public void updateEntity() {
-        boolean burnState = isBurning();
-        if (furnaceBurnTime > 0) {
-            furnaceBurnTime--;
-        }
+        boolean prevBurnState = isBurning();
         if (worldObj.isRemote) {
             return;
+        }
+        if (furnaceBurnTime > 0) {
+            furnaceBurnTime--;
         }
 
         boolean invChanged = false;
 
         if (this.furnaceBurnTime <= 0 && this.canSmelt()) {
             this.currentFuelItemBurnTime = this.furnaceBurnTime = TileEntityFurnace.getItemBurnTime(this.furnaceItemStacks[fuel]) / 2;
-            broadcastMessage(null, MessageType.FurnaceBurnTime, this.furnaceBurnTime);
 
             if (this.furnaceBurnTime > 0)
             {
@@ -155,12 +151,10 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
             this.furnaceCookTime = 0;
         }
 
-        if (burnState != isBurning() || (isBurning() && draw_active != 1)) {
-            draw_active = -1;
-            drawActive(furnaceBurnTime > 0 ? 2 : 0);
-            Coord here = getCoord();
-            here.redraw();
-            here.updateLight();
+        boolean burning = isBurning();
+        if (prevBurnState != burning) {
+            draw_active = (byte) (burning ? 0 : -1);
+            drawActive(1);
         }
 
         if (invChanged) {
@@ -313,16 +307,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
             }
             return true;
         }
-        if (messageType == MessageType.FurnaceBurnTime) {
-            this.furnaceBurnTime = input.readInt();
-            return true;
-        }
         return false;
-    }
-    
-    @Override
-    public Packet getDescriptionPacket() {
-        return super.getDescriptionPacketWith(MessageType.FurnaceBurnTime, this.furnaceBurnTime);
     }
     
     @Override
