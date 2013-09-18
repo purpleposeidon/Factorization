@@ -37,3 +37,5 @@ for arg in sys.argv[1:]:
         handleFile(os.path.join(dirpath, fn))
   else:
     handleFile(arg)
+
+print "Use git add -e"
