@@ -176,7 +176,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             if (it == null) {
                 continue; //This is weird.
             }
-            it.func_111206_d(it.getUnlocalizedName());
+            it.setTextureName(it.getUnlocalizedName());
         }
     }
 
@@ -959,7 +959,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //Don't want to be responsible for some netherstar exploit involving a beacon, so no beacon.
         //Walls have weird geometry
         TileEntityGrinder.addRecipe(Block.blockNetherQuartz, new ItemStack(Item.netherQuartz), 3.5F);
-        TileEntityGrinder.addRecipe(Block.field_111038_cB /* blockHay */, new ItemStack(Item.wheat), 8.25F);
+        TileEntityGrinder.addRecipe(Block.hay /* blockHay */, new ItemStack(Item.wheat), 8.25F);
         
         //So, that's blocks. How about items?
         TileEntityGrinder.addRecipe(Item.book, new ItemStack(Item.leather), 0.75F); //Naughty.

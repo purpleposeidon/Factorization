@@ -48,7 +48,7 @@ public class RenderServoMotor extends RenderEntity {
         InputStream input = null;
         try {
             ResourceLocation rl = Core.getResource("models/sprocket/sprocket.obj");
-            input = Minecraft.getMinecraft().func_110442_L().func_110536_a(rl).func_110527_b();
+            input = Minecraft.getMinecraft().getResourceManager().getResource(rl).getInputStream();
             if (input == null) {
                 Core.logWarning("Missing servo sprocket model: " + rl);
                 return;
@@ -262,13 +262,13 @@ public class RenderServoMotor extends RenderEntity {
     
     
     @Override
-    protected ResourceLocation func_110775_a(Entity par1Entity) {
+    protected ResourceLocation getEntityTexture(Entity par1Entity) {
         return servo_uv;
     }
     
     void renderMainModel(ServoMotor motor, float partial, double ro, boolean hilighting) {
         GL11.glPushMatrix();
-        func_110776_a(servo_uv);
+        bindTexture(servo_uv);
         if (loaded_model == false) {
             try {
                 loadSprocketModel();
@@ -321,7 +321,7 @@ public class RenderServoMotor extends RenderEntity {
         //Axles
         GL11.glPopMatrix();
         if (!hilighting) {
-            func_110776_a(Core.itemAtlas);
+            bindTexture(Core.itemAtlas);
         }
         renderServoPlate();
     }

@@ -46,7 +46,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
             return;
         }
         interp_side.under = BlockIcons.compactSideSlide;
-        func_110628_a(Core.blockAtlas);
+        bindTexture(Core.blockAtlas);
         float p = cc.getProgressPerc();
         p *= 7F/16F;
         

@@ -136,7 +136,7 @@ public class MiscClientProxy extends MiscProxy {
         @help("Render a ton of terrain at once (may lock your game up for a while)")
         @SideOnly(Side.CLIENT)
         public static void render_above() {
-            Object wr_list = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, "field_72768_k", "sortedWorldRenderers");
+            Object wr_list = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, "sortedWorldRenderers", "sortedWorldRenderers");
             if (!(wr_list instanceof WorldRenderer[])) {
                 mc.thePlayer.addChatMessage("Reflection failed");
                 return;

@@ -19,7 +19,7 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
     public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glPushMatrix();
-        func_110628_a(Core.blockAtlas);
+        bindTexture(Core.blockAtlas);
         //GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         float color = 0.1F;
         TileEntityHeater heater = (TileEntityHeater) te;

@@ -527,7 +527,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     @Override
-    public boolean func_130002_c(EntityPlayer player) {
+    public boolean interactFirst(EntityPlayer player) {
         desync(true);
         ItemStack is = FactorizationUtil.normalize(player.getHeldItem());
         if (is == null) {
@@ -803,7 +803,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                         return true;
                     }
                 } else if (mop.typeOfHit == EnumMovingObjectType.ENTITY) {
-                    if (mop.entityHit.func_130002_c(player)) {
+                    if (mop.entityHit.interactFirst(player)) {
                         return true;
                     }
                     if (mop.entityHit instanceof EntityLiving) {

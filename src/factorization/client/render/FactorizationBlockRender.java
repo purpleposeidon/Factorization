@@ -370,7 +370,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         
         final TextureManager tex = Minecraft.getMinecraft().renderEngine;
         tex.bindTexture(tex.getResourceLocation(1 /* 1 = item icons */));
-        //tex.func_110577_a(tex.func_130087_a(1 /* 1 = item icons */));
+        //tex.bindTexture(tex.getResourceLocation(1 /* 1 = item icons */));
 
         Tessellator tessellator = Tessellator.instance;
         float f = icon.getMinU();

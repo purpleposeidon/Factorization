@@ -44,8 +44,8 @@ public class MobEqualizer {
         }
         ArrayList<ItemStack> weapons = new ArrayList();
         if (!(ent instanceof IRangedAttackMob) || event.world.rand.nextBoolean()) {
-            //float orig_damage = (float)ent.getAttributeInstanceForAttributeType__func_110148_a(SharedMonsterAttributes.attackDamage__field_111264_e).getDamage__func_111126_e();
-            float orig_damage = (float)ent.func_110148_a(SharedMonsterAttributes.attackDamage).getAttributeValue();
+            //float orig_damage = (float)ent.getAttributeInstanceForAttributeType__getEntityAttribute(SharedMonsterAttributes.attackDamage__attackDamage).getDamage__getAttributeValue();
+            float orig_damage = (float)ent.getEntityAttribute(SharedMonsterAttributes.attackDamage).getAttributeValue();
             for (int i = 0; i < 9; i++) {
                 ItemStack is = template.inventory.getStackInSlot(i);
                 if (is == null) {
@@ -61,8 +61,8 @@ public class MobEqualizer {
                 }
                 ItemStack orig_weapon = ent.getCurrentItemOrArmor(0);
                 ent.setCurrentItemOrArmor(0, is);
-                //float f = (float)ent.getAttributeInstanceForAttributeType__func_110148_a(SharedMonsterAttributes.attackDamage__field_111264_e).getDamage__func_111126_e();
-                float f = (float)ent.func_110148_a(SharedMonsterAttributes.field_111264_e).func_111126_e();
+                //float f = (float)ent.getAttributeInstanceForAttributeType__getEntityAttribute(SharedMonsterAttributes.attackDamage__attackDamage).getDamage__getAttributeValue();
+                float f = (float)ent.getEntityAttribute(SharedMonsterAttributes.attackDamage).getAttributeValue();
                 ent.setCurrentItemOrArmor(0, orig_weapon);
                 if (f <= orig_damage) { //TODO NORELEASE: This might be too low?
                     continue;
@@ -79,8 +79,8 @@ public class MobEqualizer {
         }
         
         event.setCanceled(true);
-        //ent.initCreature__func_110161_a(null); // We need to cancel the event so that we can call this before the below happens
-        ent.func_110161_a(null); // We need to cancel the event so that we can call this before the below happens
+        //ent.initCreature__onSpawnWithEgg(null); // We need to cancel the event so that we can call this before the below happens
+        ent.onSpawnWithEgg(null); // We need to cancel the event so that we can call this before the below happens
         if (!ent.canPickUpLoot()) {
             return;
         }
