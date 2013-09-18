@@ -299,14 +299,6 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         return is;
     }
 
-    ItemStack unfake(ItemStack is) {
-        //err, why is this here...
-        if (is.isItemEqual(Core.registry.crystallizer_item) /* no NBT okay */) {
-            return null;
-        }
-        return is;
-    }
-
     @Override
     public Packet getAuxillaryInfoPacket() {
         return getDescriptionPacketWith(MessageType.CrystallizerInfo, null2fake(growing_crystal), null2fake(solution), progress);
@@ -318,8 +310,8 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
             return true;
         }
         if (messageType == MessageType.CrystallizerInfo) {
-            growing_crystal = unfake(FactorizationHack.loadItemStackFromDataInput(input));
-            solution = unfake(FactorizationHack.loadItemStackFromDataInput(input));
+            growing_crystal = FactorizationUtil.readStack(input);
+            solution = FactorizationUtil.readStack(input);
             progress = input.readInt();
             return true;
         }

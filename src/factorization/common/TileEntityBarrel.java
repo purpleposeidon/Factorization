@@ -580,12 +580,12 @@ public class TileEntityBarrel extends TileEntityFactorization {
             int i = input.readInt();
             upgrade = input.readInt();
             if (i > 0) {
-                item = FactorizationHack.loadItemStackFromDataInput(input);
+                item = FactorizationUtil.readStack(input);
             }
             setItemCount(i);
             break;
         case MessageType.BarrelItem:
-            item = FactorizationHack.loadItemStackFromDataInput(input);
+            item = FactorizationUtil.readStack(input);
             break;
         default:
             return false;
