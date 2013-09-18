@@ -369,8 +369,8 @@ abstract public class FactorizationBlockRender implements ICoord {
 
         
         final TextureManager tex = Minecraft.getMinecraft().renderEngine;
-        //tex.bindTexture(tex.getResourceLocationForSpriteNumber__func_130087_a(1 /* 1 = item icons */));
-        tex.func_110577_a(tex.func_130087_a(1 /* 1 = item icons */));
+        tex.bindTexture(tex.getResourceLocation(1 /* 1 = item icons */));
+        //tex.func_110577_a(tex.func_130087_a(1 /* 1 = item icons */));
 
         Tessellator tessellator = Tessellator.instance;
         float f = icon.getMinU();
@@ -386,7 +386,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         //GL11.glRotatef(50.0F, 0.0F, 1.0F, 0.0F);
         //GL11.glRotatef(335.0F, 0.0F, 0.0F, 1.0F);
         //GL11.glTranslatef(-0.9375F, -0.0625F, 0.0F);
-        ItemRenderer.renderItemIn2D(tessellator, f1, f2, f, f3, icon.getOriginX(), icon.getOriginY(), 0.0625F);
+        ItemRenderer.renderItemIn2D(tessellator, f1, f2, f, f3, icon.getIconWidth(), icon.getIconHeight(), 0.0625F);
     }
 
     public void renderMotor(RenderBlocks rb, float yoffset) {

@@ -298,7 +298,7 @@ public class HammerClientProxy extends HammerProxy {
         real_player.worldObj = w;
         if (fake_player == null || w != fake_player.worldObj) {
             //TODO NORELEASE: Cache
-            fake_player = new EntityClientPlayerMP(mc, mc.theWorld /* why is this real world? */, mc.func_110432_I(), real_player.sendQueue /* not sure about this one. */);
+            fake_player = new EntityClientPlayerMP(mc, mc.theWorld /* why is this real world? */, mc.getSession(), real_player.sendQueue /* not sure about this one. */);
         }
         setWorldAndPlayer((WorldClient) w, fake_player);
     }

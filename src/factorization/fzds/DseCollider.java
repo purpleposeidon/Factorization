@@ -39,6 +39,9 @@ public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdd
             } else {
                 return;
             }
+        } else if (parent == null) {
+            setDead();
+            return;
         }
         if (parent.isDead && !worldObj.isRemote) {
             setDead();
@@ -61,12 +64,6 @@ public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdd
         }
         return parent.metaAABB;
         //return boundingBox;
-    }
-    
-    @Override
-    public boolean addEntityID(NBTTagCompound par1nbtTagCompound) {
-        //Don't save this entity
-        return false;
     }
     
     @Override

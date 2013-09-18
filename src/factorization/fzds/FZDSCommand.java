@@ -210,7 +210,7 @@ public class FZDSCommand extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) {
         if (sender instanceof EntityPlayerMP) {
             EntityPlayerMP player = (EntityPlayerMP) sender;
-            boolean op = MinecraftServer.getServer().getConfigurationManager().areCommandsAllowed(player.username);
+            boolean op = MinecraftServer.getServer().getConfigurationManager().isPlayerOpped(player.username);
             boolean cr = player.capabilities.isCreativeMode;
             if (!(op || cr)) {
                 Core.sendChatMessage(true, sender, "You must be op or in creative mode to use these commands");

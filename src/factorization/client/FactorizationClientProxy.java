@@ -386,7 +386,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket.itemID, new ItemRenderGlazeBucket());
         MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel.itemID, new DayBarrelItemRenderer(renderBarrel));
         
-        if (Minecraft.getMinecraft().func_110432_I().func_111285_a().equals("neptunepink")) {
+        if (Minecraft.getMinecraft().getSession().getUsername().equals("neptunepink")) {
             Core.FZLogger.setLevel(Level.FINE);
         }
     }
@@ -428,9 +428,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
     public void onStitch(TextureStitchEvent.Post event) {
         int t = event.map.textureType;
         if (t == 0 /* terrain */) {
-            Core.blockMissingIcon = event.map.func_110572_b("this code for getting the missing Icon brought to you by LexManos");
+            Core.blockMissingIcon = event.map.getAtlasSprite("this code for getting the missing Icon brought to you by LexManos");
         } else if (t == 1 /* items */) {
-            Core.itemMissingIcon = event.map.func_110572_b("this code for getting the missing Icon brought to you by Tahg");
+            Core.itemMissingIcon = event.map.getAtlasSprite("this code for getting the missing Icon brought to you by Tahg");
         }
     }
 }

@@ -287,7 +287,7 @@ public class CompressionState {
         
         public CellInfo(Coord cell, ForgeDirection top) {
             this.cell = cell;
-            if (cell.isAir()) {
+            if (cell.isAir() || cell.getHardness() < 0) {
                 airBlock = true;
                 return;
             }
@@ -500,7 +500,7 @@ public class CompressionState {
                         if (ci == null) {
                             continue;
                         }
-                        ci.updateBarrelExtraction(maxCraft - 1);
+                        ci.updateBarrelExtraction(maxCraft);
                     }
                 }
                 List<ItemStack> result = FactorizationUtil.craft3x3(root, fake, !fake && craftCount != maxCraft - 1, craftingGrid);
@@ -517,6 +517,7 @@ public class CompressionState {
                     return true;
                 }
                 
+                items_used++;
                 for (int i = 0; i < 9; i++) {
                     CellInfo ci = cells[i];
                     if (ci != null) {
@@ -525,7 +526,6 @@ public class CompressionState {
                 }
                 
                 total.addAll(result);
-                items_used++;
             }
             FactorizationUtil.collapseItemList(total);
             start.buffer = total;

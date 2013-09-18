@@ -237,6 +237,14 @@ public class BlockRenderHelper extends Block {
         return this;
     }
     
+    public BlockRenderHelper rotateCenter(Quaternion q) {
+        float d = 0.5F;
+        translate(-d, -d, -d);
+        rotate(q);
+        translate(d, d, d);
+        return this;
+    }
+    
     public BlockRenderHelper translate(float dx, float dy, float dz) {
         //Move the vertices
         for (int f = 0; f < faceCache.length; f++) {
@@ -358,7 +366,7 @@ public class BlockRenderHelper extends Block {
     
     
     VectorUV[] currentFace;
-    VectorUV[][] faceCache = new VectorUV[6][4];
+    public VectorUV[][] faceCache = new VectorUV[6][4];
     {
         for (int i = 0; i < faceCache.length; i++) {
             currentFace = faceCache[i];

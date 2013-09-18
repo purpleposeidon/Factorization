@@ -78,5 +78,5 @@ public class HammerChunkProvider implements IChunkProvider {
     public void recreateStructures(int var1, int var2) { }
 
     @Override
-    public void func_104112_b() { } //Something about saveExtraData; see ChunkProviderServer.java:298
+    public void saveExtraData() { }
 }

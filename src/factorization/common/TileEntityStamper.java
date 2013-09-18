@@ -194,11 +194,6 @@ public class TileEntityStamper extends TileEntityFactorization {
     }
     
     @Override
-    public boolean power() {
-        return draw_active > 0;
-    }
-    
-    @Override
     int getLogicSpeed() {
         return 16;
     }

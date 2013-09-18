@@ -11,6 +11,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
+import factorization.api.VectorUV;
 import factorization.common.BlockIcons;
 import factorization.common.BlockIcons.ExtendedIcon;
 import factorization.common.BlockRenderHelper;
@@ -34,6 +35,10 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         
     };
     
+    static double myRound(double x) {
+        return x > 0.5 ? 1 : 0;
+    }
+    
     @Override
     public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
         TileEntityCompressionCrafter cc = (TileEntityCompressionCrafter) te;
@@ -53,15 +58,17 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
                 interp_side, interp_side,
                 interp_side, interp_side
                 );
-        final float d = 1F/128F;
-        block.setBlockBounds(d, d, d, 1 - d, 1 /*- p*/, 1 - d);
+        float d = -1F/256F;
+        d = 0;
+        block.setBlockBounds(0 - d, 0.5F - 1F/256F, 0 - d, 1 + d, 1F, 1 + d);
         ForgeDirection facing = cc.getFacing();
         FzOrientation fo = FzOrientation.fromDirection(facing);
         Quaternion q = Quaternion.fromOrientation(fo);
         GL11.glPushMatrix();
         GL11.glTranslatef((float) x, (float) y, (float) z);
         block.begin();
-        block.rotateMiddle(q);
+        
+        block.rotateCenter(q);
         
         Tessellator.instance.startDrawingQuads();
         Tessellator.instance.setBrightness(block.getMixedBrightnessForBlock(cc.worldObj, cc.xCoord, cc.yCoord, cc.zCoord));

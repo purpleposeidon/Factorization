@@ -278,13 +278,7 @@ public class Core {
     }
     
     public static String getProperKey(ItemStack is) {
-        String n = is.getItem().getUnlocalizedName(is);
-        if (n == null || n.length() == 0) {
-            n = is.getItem().getUnlocalizedName();
-        }
-        if (n == null || n.length() == 0) {
-            n = is.getItemName();
-        }
+        String n = is.getUnlocalizedName();
         if (n == null || n.length() == 0) {
             n = "???";
         }
@@ -356,11 +350,11 @@ public class Core {
     }
     
     public static void sendChatMessage(boolean raw, ICommandSender sender, String msg) {
-        sender.sendChatToPlayer(raw ? ChatMessageComponent.func_111066_d(msg) : ChatMessageComponent.func_111077_e(msg));
+        sender.sendChatToPlayer(raw ? ChatMessageComponent.createFromText(msg) : ChatMessageComponent.createFromTranslationKey(msg));
     }
     
     public static void sendUnlocalizedChatMessage(ICommandSender sender, String format, Object... params) {
-        sender.sendChatToPlayer(ChatMessageComponent.func_111082_b(format, params));
+        sender.sendChatToPlayer(ChatMessageComponent.createFromTranslationWithSubstitutions(format, params));
     }
     
     @SideOnly(Side.CLIENT)
@@ -389,6 +383,6 @@ public class Core {
     public static void bindGuiTexture(String name) {
         //bad design; should have a GuiFz. meh.
         TextureManager tex = Minecraft.getMinecraft().renderEngine;
-        tex.func_110577_a(getResource("textures/gui/" + name + ".png"));
+        tex.bindTexture(getResource("textures/gui/" + name + ".png"));
     }
 }

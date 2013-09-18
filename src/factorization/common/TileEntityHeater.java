@@ -303,6 +303,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
 
     boolean TEF_canSmelt(TileEntityFurnace diss) {
         //private function for TileEntityFurnace.canSmelt, boooo
+        //NOTE: We can get rid of this now, thanks to those nice changes FML makes.
         if (diss.getStackInSlot(0) == null) {
             return false;
         } else {

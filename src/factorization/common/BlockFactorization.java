@@ -491,6 +491,18 @@ public class BlockFactorization extends BlockContainer {
     //Maybe we should only give weak power?
     @Override
     public int isProvidingStrongPower(IBlockAccess w, int x, int y, int z, int side) {
+        /*if (side < 2) {
+            return 0;
+        }
+        TileEntity te = w.getBlockTileEntity(x, y, z);
+        if (te instanceof TileEntityCommon) {
+            return ((TileEntityCommon) te).power() ? 15 : 0;
+        }*/
+        return 0;
+    }
+    
+    @Override
+    public int isProvidingWeakPower(IBlockAccess w, int x, int y, int z, int side) {
         if (side < 2) {
             return 0;
         }
@@ -499,11 +511,6 @@ public class BlockFactorization extends BlockContainer {
             return ((TileEntityCommon) te).power() ? 15 : 0;
         }
         return 0;
-    }
-    
-    @Override
-    public int isProvidingWeakPower(IBlockAccess w, int x, int y, int z, int side) {
-        return isProvidingStrongPower(w, x, y, z, side);
     }
 
     @Override

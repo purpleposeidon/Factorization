@@ -63,7 +63,7 @@ public class ItemRenderGlazeBucket implements IItemRenderer {
         }
         if (type == ItemRenderType.EQUIPPED) {
             Icon bi = bucket.getIconFromDamage(0);
-            ItemRenderer.renderItemIn2D(tess, bi.getMinU(), bi.getMinV(), bi.getMaxU(), bi.getMaxV(), bi.getOriginX(), bi.getOriginY(), 0.0625F);
+            ItemRenderer.renderItemIn2D(tess, bi.getMinU(), bi.getMinV(), bi.getMaxU(), bi.getMaxV(), bi.getIconWidth(), bi.getIconHeight(), 0.0625F);
             float s = 1F/16F;
             GL11.glScalef(s, s, s);
         } else {
@@ -79,7 +79,7 @@ public class ItemRenderGlazeBucket implements IItemRenderer {
         if (glaze == null) {
             glaze = Core.blockMissingIcon;
         }
-        re.func_110577_a(Core.blockAtlas);
+        re.bindTexture(Core.blockAtlas);
         
         double lx = 4, ly = 5;
         double hx = 12, hy = 13;

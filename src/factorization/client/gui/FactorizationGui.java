@@ -17,7 +17,7 @@ public abstract class FactorizationGui extends GuiContainer {
     protected void drawGuiContainerForegroundLayer(int foo, int bar) {
         fontRenderer.drawString(factContainer.factory.getInvName(), 8, 6, 0x404040);
         InventoryPlayer ip = factContainer.entityplayer.inventory;
-        this.fontRenderer.drawString(ip.isInvNameLocalized() ? ip.getInvName() : I18n.func_135053_a(ip.getInvName()), 8, this.ySize - 96 + 2, 4210752);
+        this.fontRenderer.drawString(ip.isInvNameLocalized() ? ip.getInvName() : I18n.getString(ip.getInvName()), 8, this.ySize - 96 + 2, 4210752);
     }
     
     

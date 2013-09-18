@@ -137,14 +137,14 @@ public class BlockIcons {
         
         @Override
         @SideOnly(Side.CLIENT)
-        public int getOriginX() {
-            return under.getOriginX();
+        public int getIconWidth() {
+            return under.getIconWidth();
         }
         
         @Override
         @SideOnly(Side.CLIENT)
-        public int getOriginY() {
-            return under.getOriginY();
+        public int getIconHeight() {
+            return under.getIconHeight();
         }
         
         @Override

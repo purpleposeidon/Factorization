@@ -108,9 +108,9 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
         return furnaceBurnTime > 0;
     }
 
+    boolean prevBurnState = false;
     @Override
     public void updateEntity() {
-        boolean prevBurnState = isBurning();
         if (worldObj.isRemote) {
             return;
         }
@@ -155,6 +155,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
         if (prevBurnState != burning) {
             draw_active = (byte) (burning ? 0 : -1);
             drawActive(1);
+            prevBurnState = burning;
         }
 
         if (invChanged) {

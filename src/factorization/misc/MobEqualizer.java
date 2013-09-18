@@ -45,7 +45,7 @@ public class MobEqualizer {
         ArrayList<ItemStack> weapons = new ArrayList();
         if (!(ent instanceof IRangedAttackMob) || event.world.rand.nextBoolean()) {
             //float orig_damage = (float)ent.getAttributeInstanceForAttributeType__func_110148_a(SharedMonsterAttributes.attackDamage__field_111264_e).getDamage__func_111126_e();
-            float orig_damage = (float)ent.func_110148_a(SharedMonsterAttributes.field_111264_e).func_111126_e();
+            float orig_damage = (float)ent.func_110148_a(SharedMonsterAttributes.attackDamage).getAttributeValue();
             for (int i = 0; i < 9; i++) {
                 ItemStack is = template.inventory.getStackInSlot(i);
                 if (is == null) {

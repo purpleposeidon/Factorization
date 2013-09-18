@@ -37,6 +37,6 @@ public class FactorizationServerProxy extends FactorizationProxy {
             return true;
         }
         ServerConfigurationManager conf = server.getConfigurationManager();
-        return conf.areCommandsAllowed(player.username);
+        return conf.isPlayerOpped(player.username);
     }
 }
