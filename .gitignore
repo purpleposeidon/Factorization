@@ -14,9 +14,5 @@ texture/ignore
 *.blend2
 .*
 eclipse/
-APIS/
-vanillaLibs
-BARRELDAY
-chickenbones/
-factorization.zip
-localizations
+DeSrg/fields.csv
+DeSrg/methods.csv
