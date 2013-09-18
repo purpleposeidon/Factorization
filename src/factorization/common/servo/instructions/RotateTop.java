@@ -3,7 +3,6 @@ package factorization.common.servo.instructions;
 import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;

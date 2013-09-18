@@ -11,7 +11,6 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
-import factorization.api.VectorUV;
 import factorization.common.BlockIcons;
 import factorization.common.BlockIcons.ExtendedIcon;
 import factorization.common.BlockRenderHelper;
