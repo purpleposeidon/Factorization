@@ -39,7 +39,7 @@ public class NEI_FactorizationInputConfig implements IConfigureNEI {
             public boolean lastKeyTyped(GuiContainer gui, char keyChar, int keyID) {
                 if (FactorizationClientProxy.bag_swap_key.keyCode == keyID) {
                     Command cmd = Command.bagShuffle;
-                    if (Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.keyCode)) {
+                    if (Minecraft.getMinecraft().gameSettings.keyBindSneak.pressed) {
                         cmd = cmd.reverse;
                     }
                     cmd.call(Core.proxy.getClientPlayer());
