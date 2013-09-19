@@ -17,7 +17,9 @@
     Filter can be inverted with a redstone signal
   Compression Crafter:
     now requires an adjacent inventory to store crafting results, instead of dumping everything on the ground
-    improved self-documentation
+    improved self-documentation (and hopefully not annoying. >_>)
+    items that have durability, such as wrath igniters, will be re-used as much as the other crafting materials permit
+    crafts up to 32 items at once
   Caliometric Burner, a new power source:
     Place next to a water boiler
     Uses food to make steam. Higher quality food makes more steam.

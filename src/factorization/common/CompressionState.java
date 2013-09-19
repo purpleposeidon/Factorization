@@ -8,6 +8,7 @@ import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
@@ -470,7 +471,8 @@ public class CompressionState {
         Arrays.fill(craftingGrid, null);
         iteratePermutations: for (int mode = 0; mode < CellInfo.length; mode++) {
             boolean any = false;
-            int maxCraft = 16;
+            int maxCraft = 32;
+            boolean[] containerItem = new boolean[9];
             for (int i = 0; i < 9; i++) {
                 CellInfo ci = cells[i];
                 if (ci == null) {
@@ -479,15 +481,43 @@ public class CompressionState {
                 }
                 ItemStack is = ci.items[ci.getBestMode(mode)];
                 craftingGrid[i] = is;
-                if (is != null) {
-                    any = true;
+                if (is == null) {
+                    if (!ci.airBlock) {
+                        continue iteratePermutations;
+                    }
+                    continue;
+                }
+                any = true;
+                Item it = is.getItem();
+                if (is.getMaxStackSize() == 1 && it.hasContainerItem() && it.getMaxDamage() > 1) {
+                    ItemStack testSubject = is.copy();
+                    int useCount = 0;
+                    int origDamage = is.getItemDamage();
+                    while (useCount < maxCraft) {
+                        if (is.getItemDamage() > is.getMaxDamage()) {
+                            break;
+                        }
+                        is = it.getContainerItemStack(is);
+                        if (is == null || is.stackSize == 0 || is.getItemDamage() == origDamage || is.getItem() != it) {
+                            break;
+                        }
+                        useCount++;
+                    }
+                    if (useCount > 0) {
+                        containerItem[i] = true;
+                    }
+                    maxCraft = Math.min(maxCraft, useCount);
+                } else {
                     maxCraft = Math.min(maxCraft, is.stackSize);
                 }
-                if (is == null && !ci.airBlock) {
-                    continue iteratePermutations;
-                }
+                
             }
             if (!any) {
+                continue iteratePermutations;
+            }
+            
+            FactorizationUtil.craft3x3(root, true, true, craftingGrid);
+            if (!FactorizationUtil.craft_succeeded) {
                 continue iteratePermutations;
             }
             
@@ -506,9 +536,17 @@ public class CompressionState {
                 List<ItemStack> result = FactorizationUtil.craft3x3(root, fake, !fake && craftCount != maxCraft - 1, craftingGrid);
                 if (!FactorizationUtil.craft_succeeded) {
                     if (craftCount == 0) {
-                        continue iteratePermutations;
+                        continue iteratePermutations; //This won't usually happen except for very strange recipes
                     } else {
                         break;
+                    }
+                }
+                for (int i = 0; i < 9; i++) {
+                    if (containerItem[i]) {
+                        ItemStack got = craftingGrid[i];
+                        if (got != null) {
+                            craftingGrid[i] = got.getItem().getContainerItemStack(got);
+                        }
                     }
                 }
                 
