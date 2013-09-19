@@ -1253,21 +1253,14 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             }
             if (log.getItemDamage() == FactorizationUtil.WILDCARD_DAMAGE && log.itemID < Block.blocksList.length) {
                 Block b = Block.blocksList[log.itemID];
-                if (b != null) {
-                    ArrayList<ItemStack> subItems = new ArrayList();
-                    b.addCreativeItems(subItems);
-                    if (!subItems.isEmpty()) {
-                        theLogs.addAll(subItems);
-                        continue;
-                    } else {
-                        for (int md = 0; md < 16; md++) {
-                            ItemStack is = log.copy();
-                            is.setItemDamage(md);
-                            is.stackSize = 1;
-                            theLogs.add(is);
-                        }
-                        continue;
-                    }
+                if (b == null) {
+                    continue;
+                }
+                for (int md = 0; md < 16; md++) {
+                    ItemStack is = log.copy();
+                    is.setItemDamage(md);
+                    is.stackSize = 1;
+                    theLogs.add(is);
                 }
             }
             theLogs.add(log);
