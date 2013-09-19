@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
@@ -16,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.util.Icon;
+import net.minecraftforge.common.FakePlayer;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.ForgeSubscribe;
@@ -747,7 +749,10 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         if (to_remove > 1 && to_remove == getItemCount()) {
             to_remove--;
         }
-        ejectItem(makeStack(to_remove), false, entityplayer, last_hit_side);
+        EntityItem ent = ejectItem(makeStack(to_remove), false, entityplayer, last_hit_side);
+        if (ent != null && !(entityplayer instanceof FakePlayer)) {
+            ent.onCollideWithPlayer(entityplayer);
+        }
         changeItemCount(-to_remove);
         cleanBarrel();
         last_hit_side = -1;

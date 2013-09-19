@@ -153,12 +153,12 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         return Math.copySign(1, c);
     }
 
-    void ejectItem(ItemStack is, boolean violent, EntityPlayer player, int to_side) {
+    EntityItem ejectItem(ItemStack is, boolean violent, EntityPlayer player, int to_side) {
         if (worldObj.isRemote) {
-            return;
+            return null;
         }
         if (is == null || is.stackSize == 0) {
-            return;
+            return null;
         }
         if (player == null) {
             to_side = -1;
@@ -205,6 +205,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         ent.motionY = vel.yCoord*mult;
         ent.motionZ = vel.zCoord*mult;
         worldObj.spawnEntityInWorld(ent);
+        return ent;
     }
 
     @Override
