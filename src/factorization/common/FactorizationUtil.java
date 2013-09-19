@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -1123,13 +1124,9 @@ public class FactorizationUtil {
         }
     }
     
-    
-    
-    
     private static ThreadLocal<ArrayList<ForgeDirection>> direction_cache = new ThreadLocal<ArrayList<ForgeDirection>>();
 
-    public static ArrayList<ForgeDirection> dirtyDirectionCache() {
-        //We can't use the one in ForgeDirection because this guy gets shuffled.
+    public static ArrayList<ForgeDirection> getRandomDirections(Random rand) {
         ArrayList<ForgeDirection> ret = direction_cache.get();
         if (ret == null) {
             ret = new ArrayList(6);
@@ -1138,11 +1135,12 @@ public class FactorizationUtil {
             }
             direction_cache.set(ret);
         }
+        Collections.shuffle(ret, rand);
         return ret;
     }
     
     private static ThreadLocal<Random> random_cache = new ThreadLocal<Random>();
-
+    
     public static Random dirtyRandomCache() {
         Random ret = random_cache.get();
         if (ret == null) {

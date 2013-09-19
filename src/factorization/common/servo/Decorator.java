@@ -137,4 +137,6 @@ public abstract class Decorator extends ServoComponent {
     public String getInfo() {
         return null;
     }
+    
+    public void onPlacedOnRail(TileEntityServoRail sr) {}
 }

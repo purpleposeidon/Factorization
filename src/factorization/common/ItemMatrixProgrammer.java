@@ -30,6 +30,7 @@ public class ItemMatrixProgrammer extends ItemFactorization {
         if (rail == null) {
             return false;
         }
+        rail.priority = 0;
         Decorator decor = rail.getDecoration();
         if (decor == null) {
             return false;

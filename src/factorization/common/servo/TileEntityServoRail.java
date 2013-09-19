@@ -41,6 +41,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     
     Charge charge = new Charge(this);
     Decorator decoration = null;
+    public byte priority = 0;
     
     @Override
     public FactoryType getFactoryType() {
@@ -72,18 +73,20 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
+        charge.writeToNBT(tag);
+        tag.setByte("priority", priority);
         if (decoration != null) {
             NBTTagCompound decor = new NBTTagCompound();
             decoration.save(decor);
             tag.setTag(decor_tag_key, decor);
         }
-        charge.writeToNBT(tag);
     }
     
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
         charge.readFromNBT(tag);
+        priority = tag.getByte("priority");
         if (!tag.hasKey(decor_tag_key)) {
             return;
         }
@@ -217,6 +220,9 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     
     public void setDecoration(Decorator newDecor) {
         decoration = newDecor;
+        if (decoration != null) {
+            decoration.onPlacedOnRail(this);
+        }
         onInventoryChanged();
     }
     

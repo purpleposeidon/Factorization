@@ -3,7 +3,6 @@ package factorization.common.servo;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Random;
 
 import net.minecraft.entity.Entity;
@@ -66,7 +65,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     
     public FzOrientation prevOrientation = FzOrientation.UNKNOWN, orientation = FzOrientation.UNKNOWN;
-    public ForgeDirection nextDirection = ForgeDirection.UNKNOWN;
+    public ForgeDirection nextDirection = ForgeDirection.UNKNOWN, lastDirection = ForgeDirection.UNKNOWN;
     private byte speed_b;
     public byte target_speed = 2;
     private static final double max_speed_b = 127;
@@ -198,6 +197,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         prevOrientation = data.as(Share.PRIVATE, "prevOrient").putFzOrientation(prevOrientation);
         orientation = data.as(Share.VISIBLE, "Orient").putFzOrientation(orientation);
         nextDirection = data.as(Share.VISIBLE, "nextDir").putEnum(nextDirection);
+        lastDirection = data.as(Share.VISIBLE, "lastDir").putEnum(lastDirection);
         speed_b = data.as(Share.VISIBLE, "speedb").putByte(speed_b);
         target_speed = data.as(Share.VISIBLE, "speedt").putByte(target_speed);
         accumulated_motion = data.as(Share.PRIVATE, "accumulated_motion").putDouble(accumulated_motion);
@@ -231,24 +231,16 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
     }
     
-    boolean validPosition(Coord c) {
-        return c.getTE(TileEntityServoRail.class) != null;
+    boolean validPosition(Coord c, boolean desperate) {
+        TileEntityServoRail sr = c.getTE(TileEntityServoRail.class);
+        if (sr == null) {
+            return false;
+        }
+        return sr.priority >= 0 || desperate;
     }
 
-    boolean validDirection(ForgeDirection dir) {
-        return validPosition(getCurrentPos().add(dir));
-    }
-    
-    void checkDirection() {
-        if (validDirection(orientation.facing)) {
-            return;
-        }
-        if (validDirection(nextDirection)) {
-            swapOrientations();
-            return;
-        }
-        speed_b = 0;
-        orientation = FzOrientation.UNKNOWN;
+    boolean validDirection(ForgeDirection dir, boolean desperate) {
+        return validPosition(getCurrentPos().add(dir), desperate);
     }
 
     private boolean need_description_packet = false;
@@ -259,9 +251,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             if (prevOrientation == FzOrientation.UNKNOWN ) {
                 prevOrientation = orientation;
             }
-        }
-        if (ticksExisted == 1) {
-            checkDirection();
         }
         super.onEntityUpdate();
         if (worldObj.isRemote) {
@@ -380,11 +369,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         return rand;
     }
     
-    public boolean testDirection(ForgeDirection d) {
+    public boolean testDirection(ForgeDirection d, boolean desperate) {
         if (d == ForgeDirection.UNKNOWN) {
             return false;
         }
-        return validDirection(d);
+        return validDirection(d, desperate);
     }
     
     static int similarity(FzOrientation base, FzOrientation novel) {
@@ -402,16 +391,16 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         return ret;
     }
     
-    public void swapOrientations() {
+    public void changeOrientation(ForgeDirection dir) {
         ForgeDirection orig_direction = orientation.facing;
         ForgeDirection orig_top = orientation.top;
-        FzOrientation start = FzOrientation.fromDirection(nextDirection);
+        FzOrientation start = FzOrientation.fromDirection(dir);
         FzOrientation perfect = start.pointTopTo(orig_top);
         if (perfect == FzOrientation.UNKNOWN) {
-            if (nextDirection == orig_top) {
+            if (dir == orig_top) {
                 //convex turn
                 perfect = start.pointTopTo(orig_direction.getOpposite());
-            } else if (nextDirection == orig_top.getOpposite()) {
+            } else if (dir == orig_top.getOpposite()) {
                 //concave turn
                 perfect = start.pointTopTo(orig_direction);
             }
@@ -420,45 +409,84 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             }
         }
         orientation = perfect;
-        nextDirection = orig_direction;
+        lastDirection = orig_direction;
+        if (orientation.facing == nextDirection) {
+            nextDirection = ForgeDirection.UNKNOWN;
+        }
     }
 
     boolean pickNextOrientation_impl() {
+        ArrayList<ForgeDirection> dirs = FactorizationUtil.getRandomDirections(worldObj.rand);
+        int available_nonbackwards_directions = 0;
+        Coord look = pos_next.copy();
+        int all_count = 0;
+        for (int i = 0; i < dirs.size(); i++) {
+            ForgeDirection fd = dirs.get(i);
+            look.set(pos_next);
+            look.adjust(fd);
+            TileEntityServoRail sr = look.getTE(TileEntityServoRail.class);
+            if (sr == null) {
+                continue;
+            }
+            all_count++;
+            if (fd == orientation.facing.getOpposite()) {
+                continue;
+            }
+            if (sr.priority > 0) {
+                changeOrientation(fd);
+                need_description_packet = true; //NORELEASE: Check this out: Does the client simulate the same as the server? (Probably not.) Use a particle marker.
+                return true;
+            }
+            if (sr.priority == 0) {
+                available_nonbackwards_directions++;
+            }
+        }
+        
+        if (all_count == 0) {
+            //Sadness
+            speed_b = 0;
+            return false;
+        }
+        
+        final boolean desperate = available_nonbackwards_directions < 1;
         final ForgeDirection direction = orientation.facing;
-        if (nextDirection != direction.getOpposite() && testDirection(nextDirection)) {
+        final ForgeDirection opposite = direction.getOpposite();
+        
+        if (nextDirection != opposite && testDirection(nextDirection, desperate)) {
             // We can go the way we were told to go next
-            swapOrientations();
+            changeOrientation(nextDirection);
             return true;
         }
-        if (testDirection(direction)) {
+        if (testDirection(direction, desperate)) {
             // Our course is fine.
             return true;
         }
-        // We've hit eg a T intersection, and we aren't pointing towards one of the branches
-        final ForgeDirection top = orientation.top;
-        if (testDirection(top)) {
-            // We'll turn upwards
-            nextDirection = top;
-            swapOrientations();
+        if (lastDirection != opposite && testDirection(lastDirection, desperate)) {
+            // Try the direction we were going before (this makes us go in zig-zags)
+            changeOrientation(lastDirection);
             return true;
         }
-        // We'll pick a random direction. Going backwards is our last resort.
-        final ForgeDirection opposite = direction.getOpposite();
-        ArrayList<ForgeDirection> dirs = FactorizationUtil.dirtyDirectionCache();
-        Collections.shuffle(dirs, getRandom());
+        final ForgeDirection top = orientation.top;
+        if (testDirection(top, desperate) /* top being opposite won't be an issue because of Geometry */ ) {
+            // We'll turn upwards.
+            changeOrientation(top);
+            return true;
+        }
+        
+        // We'll pick a random direction; we're re-using the list from before, should be fine.
+        // Going backwards is our last resort.
         for (int i = 0; i < 6; i++) {
             ForgeDirection d = dirs.get(i);
-            if (d == opposite || d == direction || d == nextDirection || d == top || d == nextDirection) {
+            if (d == nextDirection || d == direction || d == opposite || d == lastDirection || d == top) {
                 continue;
             }
-            if (validDirection(d)) {
-                nextDirection = d;
-                swapOrientations();
+            if (validDirection(d, desperate)) {
+                changeOrientation(d);
                 need_description_packet = true; //NORELEASE: Check this out: Does the client simulate the same as the server? (Probably not.) Use a particle marker.
                 return true;
             }
         }
-        if (validDirection(opposite)) {
+        if (validDirection(opposite, true)) {
             orientation = FzOrientation.fromDirection(opposite).pointTopTo(top);
             if (orientation != FzOrientation.UNKNOWN) {
                 return true;

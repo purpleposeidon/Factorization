@@ -104,6 +104,7 @@ public class BlockIcons {
     public static Icon servo$speed1, servo$speed2, servo$speed3, servo$speed4, servo$speed5;
     public static Icon servo$cmp_lt, servo$cmp_le, servo$cmp_eq, servo$cmp_ne, servo$cmp_ge, servo$cmp_gt;
     public static Icon servo$jmp;
+    public static Icon servo$entry_require, servo$entry_forbid;
     
     public static class ActivatingMachineIcon extends IconGroup {
         public Icon top, bottom, side, side_on;

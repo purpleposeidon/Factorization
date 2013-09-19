@@ -41,7 +41,7 @@ public class SetDirection extends Instruction {
         ForgeDirection d = dir.getOpposite();
         motor.nextDirection = d;
         if (d == motor.orientation.facing.getOpposite()) {
-            motor.swapOrientations();
+            motor.changeOrientation(d);
         }
     }
 
