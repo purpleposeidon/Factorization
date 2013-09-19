@@ -80,7 +80,7 @@ Kill Wrath (This will make the mod so much simpler...):
 
 KILL
 ----
-BOH
+BOH -- Nah, it could be done better I think.
 WRATH (But this adds rocketry. Ha. Definitely makes the mod smaller.)
 All glazes except for mimicing
 
@@ -106,19 +106,18 @@ TOP LIST (that's become somewhat less tops. Oops.)
 --------
 compression crafters:
   flowerpots
-  making wrath lamps
   rendering. :(
 One of my ICommands is broken (???)
 [15:43:34] <Hathadar> I have a router inserting into 4 induction furnaces.  The moment I place a machine filter on it and set it to the induction furnace it stops working.  It will not insert or extract.  0.8.01
 I wonder if the bug hopper has any interesting crashlogs!
 One of my ICommands is broken!?
 localize barrel types (There's a ton of other things what need to be localized, y'know...)
-barrels ejecting items like mDiyo berries do
 leyden jars & batteries should overcharge slightly so that they can drop exactly 100%-charged stuff
 ★★★Talk to RLP about monetization plan★★★
 underground silver temples/vaults. With moon lamps? :D
 onInventoryUpdate all the TEs
 fix redstone getting stuck on for servo rail pulses
+Test BoH key with NEI installed & with sneak key set to a mouse button.
 can't glaze a sculpture cloned from an already glazed sculpture
 change raw glaze colors to their real colors
 smooth sandstone double slab (Are there other variants?)
@@ -140,6 +139,7 @@ register ore blocks
 To kill NEI's shift-? cheat: clear out RecipeInfo.overlayMap... or something.  Hmm....
   Might want to just remove instances whose class = DefaultOverlayHandler or BrewingOverlayHandler.
 http://jezek2.advel.cz/tmp/jstackalloc/javadoc/
+in-place barrel upgrading
 
 back to ceramics?
    - a new tool: export to obj tool. And if we have an export, maybe an import would be nice. Could export the sculpture, or export the chunk! Use a hacked up tessellator.
