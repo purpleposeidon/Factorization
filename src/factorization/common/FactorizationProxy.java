@@ -67,27 +67,6 @@ public abstract class FactorizationProxy implements IGuiHandler {
         return getContainer(ID, player, world, x, y, z);
     }
 
-    //CLIENT
-    /*
-    public void addName(Object objectToName, String name) {
-        String objectName;
-        if (objectToName instanceof Item) {
-            objectName = ((Item) objectToName).getItemName();
-        } else if (objectToName instanceof Block) {
-            objectName = ((Block) objectToName).getUnlocalizedName();
-        } else if (objectToName instanceof ItemStack) {
-            objectName = ((ItemStack) objectToName).getItem().getItemNameIS((ItemStack) objectToName);
-        } else if (objectToName instanceof String) {
-            objectName = (String) objectToName;
-        } else {
-            throw new IllegalArgumentException(String.format("Illegal object for naming %s", objectToName));
-        }
-        addNameDirect(objectName + ".name", name);
-    }
-    
-    public void addNameDirect(String localId, String translate) {
-    }*/
-
     public String translateItemStack(ItemStack is) {
         if (is == null) {
             return "<null itemstack; bug?>";
@@ -120,14 +99,6 @@ public abstract class FactorizationProxy implements IGuiHandler {
     }
 
     public void registerRenderers() {
-    }
-
-    //SERVER
-    /** If on SMP, send packet to tell player what he's holding */
-    public void updateHeldItem(EntityPlayer player) {
-        if (!player.worldObj.isRemote) {
-            ((EntityPlayerMP) player).updateHeldItem();
-        }
     }
 
     public void updatePlayerInventory(EntityPlayer player) {

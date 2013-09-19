@@ -42,10 +42,6 @@ public enum FactoryType {
 
     POCKETCRAFTGUI(101, true)
     ;
-    
-    static {
-        //CERAMIC.disable();
-    }
 
     final public int md;
     final public int gui;

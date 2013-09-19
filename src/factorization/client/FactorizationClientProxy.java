@@ -108,13 +108,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         return gui;
     }
 
-    //CLIENT
-    /*
-    @Override
-    public void addNameDirect(String localId, String translation) {
-        LanguageRegistry.instance().addStringLocalization(localId, "en_US", translation);
-    }*/
-
     @Override
     public String translateItemStack(ItemStack is) {
         if (is == null) {

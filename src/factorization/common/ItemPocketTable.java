@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -33,11 +34,11 @@ public class ItemPocketTable extends ItemFactorization {
         if (save != null) {
             player.inventory.setItemStack(null);
         }
-        if (!world.isRemote) {
-            player.openGui(Core.instance, FactoryType.POCKETCRAFTGUI.gui, null, 0, 0, 0);
-            if (save != null) {
-                player.inventory.setItemStack(save);
-                Core.proxy.updateHeldItem(player);
+        player.openGui(Core.instance, FactoryType.POCKETCRAFTGUI.gui, null, 0, 0, 0);
+        if (save != null) {
+            player.inventory.setItemStack(save);
+            if (!player.worldObj.isRemote) {
+                ((EntityPlayerMP) player).updateHeldItem();
             }
         }
         return stack;
