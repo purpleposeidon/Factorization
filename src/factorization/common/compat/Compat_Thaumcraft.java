@@ -1,11 +1,12 @@
 package factorization.common.compat;
 
+/*
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.research.IScanEventHandler;
-import thaumcraft.api.research.ScanResult;
+import thaumcraft.api.research.ScanResult;*/
 
 
 
