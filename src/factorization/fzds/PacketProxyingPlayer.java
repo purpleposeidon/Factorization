@@ -178,6 +178,10 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements IFzdsEnt
         if (trackedPlayers.isEmpty()) {
             return;
         }
+        if (dimensionSlice.isDead) {
+            setDead();
+            return;
+        }
         Packet wrappedPacket = new Packet220FzdsWrap(packet);
         Iterator<EntityPlayerMP> it = trackedPlayers.iterator();
         while (it.hasNext()) {
