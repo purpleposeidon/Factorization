@@ -2,14 +2,17 @@ package factorization.fzds;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import net.minecraft.block.Block;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.SyntaxErrorException;
+import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
@@ -175,14 +178,14 @@ public class FZDSCommand extends CommandBase {
     }
     
     public static enum Requires {
-        OP, PLAYER, COORD, SELECTION, CREATIVE;
+        OP, PLAYER, COORD, SLICE_SELECTED, CREATIVE;
         
         void apply(SubCommand sc) {
             switch (this) {
             case OP: sc.needOp = true; break;
             case PLAYER: sc.needPlayer = true; break;
             case COORD: sc.needCoord = true; break;
-            case SELECTION: sc.needSelection = true; break;
+            case SLICE_SELECTED: sc.needSelection = true; break;
             case CREATIVE: sc.needCreative = true; break;
             }
         }
@@ -218,14 +221,14 @@ public class FZDSCommand extends CommandBase {
             }
         }
         if (args.length == 0) {
-            runCommand(help, sender, new String[] {"help"});
+            runSubCommand(help, sender, new String[] {"help"});
             return;
         }
         String cmd = args[0];
         for (SubCommand sc : subCommands) {
             for (String alias : sc.altNames) {
                 if (alias.equalsIgnoreCase(cmd)) {
-                    runCommand(sc, sender, args);
+                    runSubCommand(sc, sender, args);
                     return;
                 }
             }
@@ -239,15 +242,41 @@ public class FZDSCommand extends CommandBase {
         currentSelection = new WeakReference<IDeltaChunk>(dse);
     }
     
+    public static Coord parseCoord(World world, String src) {
+        ArrayList<Integer> parts = new ArrayList<Integer>();
+        for (String part : comma.split(src.substring(1))) {
+            parts.add(Integer.parseInt(part));
+        }
+        if (parts.size() == 4) {
+            world = DimensionManager.getWorld(parts.remove(0));
+        }
+        if (world == null) {
+            throw new WrongUsageException("No world specified");
+        }
+        return new Coord(world, parts.get(0), parts.get(1), parts.get(2));
+    }
+    
     private static Splitter comma = Splitter.on(",");
-    void runCommand(SubCommand cmd, ICommandSender sender, String[] args) {
+    
+    private static World visitedWorld;
+    void visitWorld(World w) {
+        if (visitedWorld == null) {
+            visitedWorld = w;
+        } else if (visitedWorld != w) {
+            throw new CommandException("References to different dimensions");
+        }
+    }
+    
+    void runSubCommand(SubCommand cmd, ICommandSender sender, String[] args) {
         cmd.reset();
         cmd.setup(sender);
         ArrayList<String> cleanedArgs = new ArrayList<String>();
+        visitedWorld = null;
+        boolean first = true;
         for (String a : args) {
             if (Strings.isNullOrEmpty(a)) {
                 continue;
-            } else if (a.startsWith("@")) {
+            } else if (a.startsWith("$")) {
                 //set the player
                 if (!cmd.op) {
                     throw new CommandException("You are not allowed to use arbitrary players");
@@ -255,20 +284,24 @@ public class FZDSCommand extends CommandBase {
                 cmd.player = MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(a.substring(1));
                 if (cmd.player == null) {
                     throw new CommandException("Player not found");
-                } 
+                }
+                visitWorld(cmd.player.worldObj);
             } else if (a.startsWith("#")) {
-                if (!cmd.op) {
-                    throw new CommandException("You are not allowed to use arbitrary locations");
+                cmd.user = parseCoord(sender.getEntityWorld(), a.substring(1));
+                visitWorld(cmd.user.w);
+            } else if (a.startsWith("@") && first == false) {
+                String name = a.substring(1);
+                Coord replace = positionVariables.get(name);
+                if (replace == null) {
+                    throw new CommandException("Undefined position variable: " + a);
                 }
-                ArrayList<Integer> parts = new ArrayList<Integer>();
-                for (String stupid : comma.split(a.substring(1))) {
-                    parts.add(Integer.parseInt(stupid));
-                }
-                World w = DimensionManager.getWorld(parts.get(0));
-                cmd.user = new Coord(w, parts.get(1), parts.get(2), parts.get(3));
+                visitWorld(replace.w);
+                String r = "" + replace.x + "," + replace.y + "," + replace.z;
+                cleanedArgs.add(r);
             } else {
                 cleanedArgs.add(a);
             }
+            first = false;
         }
         if (cmd.player != null) {
             cmd.user = new Coord(cmd.player);
@@ -323,6 +356,8 @@ public class FZDSCommand extends CommandBase {
         return bits[bits.length - 1];
     }
     
+    static HashMap<String, Coord> positionVariables = new HashMap<String, Coord>(); //NOTE: This keeps references to worlds. Oh well.
+    
     static {
         help = add(new SubCommand("help", "[subcmd]+") {
             @Override
@@ -362,7 +397,7 @@ public class FZDSCommand extends CommandBase {
                     }
                 }
                 sendChat(join(good));
-                sendChat("To specify a Coord or player: #worldId,x,y,z @PlayerName");
+                sendChat("To specify a Coord or player: #worldId,x,y,z $PlayerName");
                 sendChat("Best commands: cut d drop");
             }});
         add(new SubCommand ("go|gob|got") {
@@ -387,7 +422,7 @@ public class FZDSCommand extends CommandBase {
                     tp.destination.moveToTopBlock();
                     player.setPositionAndUpdate(tp.destination.x + 0.5, tp.destination.y, tp.destination.z + 0.5);
                 }
-            }}, Requires.PLAYER, Requires.CREATIVE, Requires.SELECTION);
+            }}, Requires.PLAYER, Requires.CREATIVE, Requires.SLICE_SELECTED);
         add(new SubCommand("enterhammer") {
             @Override
             String details() { return "Teleports the player into hammerspace"; }
@@ -428,7 +463,7 @@ public class FZDSCommand extends CommandBase {
                 DSTeleporter tp = getTp();
                 tp.destination = new Coord(selected);
                 manager.transferPlayerToDimension(player, selected.dimension, tp);
-            }}, Requires.PLAYER, Requires.CREATIVE, Requires.SELECTION);
+            }}, Requires.PLAYER, Requires.CREATIVE, Requires.SLICE_SELECTED);
         add(new SubCommand("tome") {
             @Override
             String details() { return "Warps selection to player"; }
@@ -437,10 +472,10 @@ public class FZDSCommand extends CommandBase {
                 selected.posX = user.x;
                 selected.posY = user.y;
                 selected.posZ = user.z;
-            }}, Requires.COORD, Requires.SELECTION);
-        add(new SubCommand("cut|rcut|copy|rcopy", "x,y,z", "x,y,z") {
+            }}, Requires.COORD, Requires.SLICE_SELECTED);
+        add(new SubCommand("cut|copy", "x,y,z", "x,y,z") {
             @Override
-            String details() { return "Creates a Slice from the range given" + pick("rcut", ", relative to user's position", ""); }
+            String details() { return "Creates a Slice from the range given"; }
             @Override
             void call(String[] args) {
                 Coord base;
@@ -485,7 +520,7 @@ public class FZDSCommand extends CommandBase {
             @Override
             void call(String[] args) {
                 //selected.get
-            }}, Requires.SELECTION);
+            }}, Requires.SLICE_SELECTED);
         add(new SubCommand("drop") {
             @Override
             String details() { return "Returns a Slice's blocks to the world, destroying the Slice"; }
@@ -495,14 +530,14 @@ public class FZDSCommand extends CommandBase {
                 DeltaChunk.clear(selected);
                 selected.setDead();
                 setSelection(null);
-            }}, Requires.SELECTION);
+            }}, Requires.SLICE_SELECTED);
         add(new SubCommand("paste") {
             @Override
             String details() { return "Clones a Slice's blocks into the world"; }
             @Override
             void call(String[] args) {
                 DeltaChunk.paste(selected, true);
-            }}, Requires.SELECTION, Requires.CREATIVE);
+            }}, Requires.SLICE_SELECTED, Requires.CREATIVE);
         add(new SubCommand("oracle") {
             @Override
             void call(String[] args) {
@@ -529,7 +564,7 @@ public class FZDSCommand extends CommandBase {
                 selected.posX = (int) selected.posX;
                 selected.posY = (int) selected.posY;
                 selected.posZ = (int) selected.posZ;
-            }}, Requires.SELECTION);
+            }}, Requires.SLICE_SELECTED);
         add(new SubCommand("removeall") {
             @Override
             String details() { return "Removes all Slices"; }
@@ -554,7 +589,7 @@ public class FZDSCommand extends CommandBase {
             void call(String[] args) {
                 sendChat("> " + selected);
                 setSelection(selected);
-            }}, Requires.SELECTION);
+            }}, Requires.SLICE_SELECTED);
         add(new SubCommand("rot?") {
             @Override
             String details() { return "Gives the rotation & angular velocity of the selection"; }
@@ -565,7 +600,7 @@ public class FZDSCommand extends CommandBase {
                 if (!selected.can(DeltaCapability.ROTATE)) {
                     sendChat("(Does not have the ROTATE cap, so this is meaningless)");
                 }
-            }}, Requires.SELECTION);
+            }}, Requires.SLICE_SELECTED);
         add(new SubCommand("+|-") {
             @Override
             String details() { return "Changes which (loaded) Slice is selected"; }
@@ -622,7 +657,7 @@ public class FZDSCommand extends CommandBase {
                 selected.setDead();
                 setSelection(null);
                 sendChat("Made dead");
-            }}, Requires.SELECTION);
+            }}, Requires.SLICE_SELECTED);
         add(new SubCommand("sr|sw", "angle°", "[direction=UP]") {
             @Override
             String details() { return "Sets the Slice's rotation"; }
@@ -664,7 +699,7 @@ public class FZDSCommand extends CommandBase {
                 }
                 Quaternion toMod = derivative == 0 ? selected.getRotation() : selected.getRotationalVelocity();
                 toMod.update(Quaternion.getRotationQuaternionRadians(theta, dir));
-            }}, Requires.SELECTION);
+            }}, Requires.SLICE_SELECTED);
         add(new SubCommand("d|s|v|r|w", "+|=", "[W=1]", "X", "Y", "Z") {
             @Override
             String details() { return "Changes or sets displacement/velocity/rotation/angular_velocity"; }
@@ -727,7 +762,7 @@ public class FZDSCommand extends CommandBase {
                 } else {
                     sendChat("+ or =?");
                 }
-            }}, Requires.SELECTION);
+            }}, Requires.SLICE_SELECTED);
         add(new SubCommand("dirty") {
             @Override
             String details() { return "[Moves the selection back and forth]"; }
@@ -736,7 +771,7 @@ public class FZDSCommand extends CommandBase {
                 selected.getRotationalVelocity().w *= -1;
                 selected.getRotation().w *= -1;
                 selected.getRotation().w += 0.1;
-            }}, Requires.SELECTION);
+            }}, Requires.SLICE_SELECTED);
         add(new SubCommand("caps") {
             @Override
             String details() { return "Lists the available Caps"; }
@@ -760,7 +795,7 @@ public class FZDSCommand extends CommandBase {
                     }
                 }
                 sendChat(r);
-            }}, Requires.SELECTION);
+            }}, Requires.SLICE_SELECTED);
         add(new SubCommand("cap+|cap-", "CAP+") {
             @Override
             String details() { return "Gives or takes away Caps. May cause client desyncing."; }
@@ -774,7 +809,7 @@ public class FZDSCommand extends CommandBase {
                         selected.forbid(cap);
                     }
                 }
-            }}, Requires.SELECTION, Requires.OP);
+            }}, Requires.SLICE_SELECTED, Requires.OP);
         add(new SubCommand("scale", "newScale") {
             @Override
             void call(String[] args) {
@@ -783,7 +818,7 @@ public class FZDSCommand extends CommandBase {
                     return;
                 }
                 ((DimensionSliceEntity) selected).scale = Float.parseFloat(args[0]);
-            }}, Requires.SELECTION, Requires.CREATIVE);
+            }}, Requires.SLICE_SELECTED, Requires.CREATIVE);
         add(new SubCommand("alpha", "newOpacity") {
             @Override
             void call(String[] args) {
@@ -792,11 +827,65 @@ public class FZDSCommand extends CommandBase {
                     return;
                 }
                 ((DimensionSliceEntity) selected).opacity = Float.parseFloat(args[0]);
-            }}, Requires.SELECTION, Requires.CREATIVE);
-        add(new SubCommand("setBlockMethod 0=intrusive_lowlevel;1=world.isRemote;2=world.setBlock") {
+            }}, Requires.SLICE_SELECTED, Requires.CREATIVE);
+        add(new SubCommand("setBlockMethod", "0=lowlevel|1=world.isRemote|2=world.setBlock|3=2+flags") {
             @Override
             void call(String[] args) {
                 int mode = Integer.parseInt(args[0]);
+                sendChat("setBlockMethod was " + TransferLib.set_method + ", is now " + mode);
+                TransferLib.set_method = mode;
             }}, Requires.OP, Requires.CREATIVE);
+        add(new SubCommand("@", "name [position|'unset']") {
+            @Override
+            String details() {
+                return "Set position variables ('@name' gets replaced with position)";
+            }
+            @Override
+            void call(String[] args) {
+                String name = args[0];
+                Coord val = user;
+                if (args.length == 2) {
+                    String parse = args[1];
+                    if (parse.equalsIgnoreCase("unset")) {
+                        if (positionVariables.remove(name) != null) {
+                            sendChat("Unset: " + name);
+                        } else {
+                            sendChat("Didn't exist: " + name);
+                        }
+                        return;
+                    }
+                    val = parseCoord(user.w, parse);
+                }
+                positionVariables.put(name, val);
+                sendChat("@" + name + " = " + val);
+                Notify.send(null, val, name);
+            }}, Requires.COORD);
+        add(new SubCommand("@?|@??", "[search]") {
+            @Override
+            String details() {
+                return "Show, and maybe list, position variables";
+            }
+            @Override
+            void call(String[] args) {
+                boolean print = arg0.equalsIgnoreCase("@??");
+                String search = "";
+                if (args.length == 1) {
+                    search = args[0];
+                }
+                for (Entry<String, Coord> var : positionVariables.entrySet()) {
+                    String name = var.getKey();
+                    Coord pos = var.getValue();
+                    if (pos.w != user.w) {
+                        continue;
+                    }
+                    if (!name.contains(search)) {
+                        continue;
+                    }
+                    Notify.send(player, pos, name);
+                    if (print) {
+                        sendChat(name + ": " + pos);
+                    }
+                }
+            }}, Requires.COORD, Requires.PLAYER);
     }
 }

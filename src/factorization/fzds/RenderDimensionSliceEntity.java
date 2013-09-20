@@ -106,6 +106,8 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 for (int x = 0; x <= xSizeChunk; x++) {
                     for (int z = 0; z <= zSizeChunk; z++) {
                         //We could allocate lists per WR instead?
+                        //NORELEASE: w.loadedTileEntityList might be wrong? Might be inefficient?
+                        //It creates a list... maybe we should use that instead?
                         renderers[i] = new WorldRenderer(corner.w, corner.w.loadedTileEntityList, corner.x + x*16, corner.y + y*16, corner.z + z*16, getRenderList() + i*wr_display_list_size);
                         renderers[i].posXClip = x*16;
                         renderers[i].posYClip = y*16;
