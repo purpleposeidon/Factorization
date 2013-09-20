@@ -51,7 +51,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         FactorizationBlockRender ret = renderMap[md];
         if (ret == null) {
             renderMap[md] = defaultRender;
-            Core.logFine("No renderer for ID " + md);
+            Core.logFine("Using default renderer for ID " + md);
             return defaultRender;
         }
         return ret;
