@@ -16,7 +16,7 @@ public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdd
     DimensionSliceEntity parent;
     Vec3 offset;
     
-    int parent_id;
+    int parent_id = -1;
     
     public DseCollider(World world) {
         super(world);
@@ -81,6 +81,11 @@ public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdd
 
     @Override
     public void writeSpawnData(ByteArrayDataOutput data) {
+        if (parent == null) {
+            data.writeInt(-1);
+            setDead();
+            return;
+        }
         data.writeInt(parent.entityId);
         data.writeDouble(offset.xCoord);
         data.writeDouble(offset.yCoord);
@@ -90,6 +95,10 @@ public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdd
     @Override
     public void readSpawnData(ByteArrayDataInput data) {
         parent_id = data.readInt();
+        if (parent_id == -1) {
+            setDead();
+            return;
+        }
         offset = Vec3.createVectorHelper(data.readDouble(), data.readDouble(), data.readDouble());
     }
     
