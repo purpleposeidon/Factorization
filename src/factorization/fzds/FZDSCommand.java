@@ -20,6 +20,7 @@ import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityCommandBlock;
 import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
@@ -289,7 +290,7 @@ public class FZDSCommand extends CommandBase {
             } else if (a.startsWith("#")) {
                 cmd.user = parseCoord(sender.getEntityWorld(), a.substring(1));
                 visitWorld(cmd.user.w);
-            } else if (a.startsWith("@") && first == false) {
+            } else if (a.startsWith("@") && first == false && !a.startsWith("@?") && !a.equals("@")) {
                 String name = a.substring(1);
                 Coord replace = positionVariables.get(name);
                 if (replace == null) {
@@ -331,18 +332,23 @@ public class FZDSCommand extends CommandBase {
     }
     
     static String join(ArrayList<SubCommand> cmd) {
-        String ret = "";
+        String ret = " ";
+        boolean first = true;
         for (SubCommand sc : cmd) {
-            ret += " ";
+            if (!first) {
+                ret += "\n";
+            }
+            first = false;
+            ret += EnumChatFormatting.GREEN;
             if (sc.help.length == 1) {
                 ret += sc.help[0];
             } else {
-                ret += "(" + sc.help[0];
+                ret += sc.help[0];
                 for (int i = 1; i < sc.help.length; i++) {
                     ret += " " + sc.help[i];
                 }
-                ret += ")";
             }
+            ret += EnumChatFormatting.RESET + ": " + sc.details();
         }
         return ret;
     }
@@ -403,7 +409,7 @@ public class FZDSCommand extends CommandBase {
         add(new SubCommand ("go|gob|got") {
             @Override
             String details() {
-                return "Teleports player to the " + pick("gob", "bottom", "got", "top", "center") + " of the selection, in Hammerspace. Be ready to fly.";
+                return "Teleports player to the center/bottom/top of the selection, in Hammerspace. Be ready to fly.";
             }
             @Override
             public void call(String[] args) {
@@ -828,7 +834,11 @@ public class FZDSCommand extends CommandBase {
                 }
                 ((DimensionSliceEntity) selected).opacity = Float.parseFloat(args[0]);
             }}, Requires.SLICE_SELECTED, Requires.CREATIVE);
-        add(new SubCommand("setBlockMethod", "0=lowlevel|1=world.isRemote|2=world.setBlock|3=2+flags") {
+        add(new SubCommand("setBlockMethod", "mode") {
+            @Override
+            String details() {
+                return "0=lowlevel 1=world.isRemote 2=world.setBlock 3=world.setBlock2+flags";
+            }
             @Override
             void call(String[] args) {
                 int mode = Integer.parseInt(args[0]);
