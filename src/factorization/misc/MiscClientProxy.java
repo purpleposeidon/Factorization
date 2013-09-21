@@ -16,11 +16,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatFileWriter;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.MathHelper;
 import cpw.mods.fml.client.GuiModList;
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
@@ -43,6 +45,10 @@ public class MiscClientProxy extends MiscProxy {
     @Retention(value = RUNTIME)
     @Target(value = METHOD)
     static @interface sketchy { }
+    
+    @Retention(value = RUNTIME)
+    @Target(value = METHOD)
+    static @interface cheaty { }
     
     @Retention(value = RUNTIME)
     @Target(value = METHOD)
@@ -88,6 +94,9 @@ public class MiscClientProxy extends MiscProxy {
                 }
                 if (method.getAnnotation(sketchy.class) != null) {
                     msg += EnumChatFormatting.DARK_GRAY + " [SKETCHY]";
+                }
+                if (method.getAnnotation(cheaty.class) != null) {
+                    msg += EnumChatFormatting.RED + " [CHEATY]";
                 }
                 if (arg1 == null || arg1.length() == 0 || msg.contains(arg1)) {
                     player.addChatMessage(msg);
@@ -184,7 +193,7 @@ public class MiscClientProxy extends MiscProxy {
             mc.displayGuiScreen(new GuiModList(null));
         }
         
-        @sketchy
+        @cheaty
         @alias({"neo", "deneo", "deninja"})
         @help("Makes the world run slowly (single-player client-side only). Can specify custom timerSpeed.")
         @SideOnly(Side.CLIENT)
@@ -265,6 +274,47 @@ public class MiscClientProxy extends MiscProxy {
             }
         }
         
+        @cheaty
+        @SideOnly(Side.CLIENT)
+        @help("Re-renders the chunk as a wireframe")
+        public static String wireframe() {
+            Object wr_list = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, "sortedWorldRenderers", "sortedWorldRenderers");
+            if (!(wr_list instanceof WorldRenderer[])) {
+                return "Reflection failed";
+            }
+            WorldRenderer[] lizt = (WorldRenderer[]) wr_list;
+            double px = mc.thePlayer.posX, py = mc.thePlayer.posY, pz = mc.thePlayer.posZ;
+            for (WorldRenderer wr : lizt) {
+                if (wr.posXMinus < px && px < wr.posXPlus
+                        && wr.posYMinus < py && py < wr.posYPlus
+                        && wr.posZMinus < pz && pz < wr.posZPlus) {
+                    Tessellator real_tess = Tessellator.instance;
+                    Tessellator.instance = new WireframeTessellator();
+                    wr.markDirty();
+                    wr.updateRenderer();
+                    Tessellator.instance = real_tess;
+                    return null;
+                }
+            }
+            return "You aren't in a rendering chunk. Remarkable.";
+        }
+        
+        static Tessellator orig = null;
+        @cheaty
+        @SideOnly(Side.CLIENT)
+        @help("Render all the things with a wireframe")
+        public static String globalWireframe() {
+            if (orig == null) {
+                orig = Tessellator.instance;
+                Tessellator.instance = new WireframeTessellator();
+                return "Run the command again to disable. Note that some effects may persist until MC is restarted.";
+            } else {
+                Tessellator.instance = orig;
+                orig = null;
+                return "Restored normal Tessellator";
+            }
+        }
+        
         //Remember to include 'public' for anything added here.
         //Need to SideOnly(CLIENT) for things that access Minecraft.class, and add them to the list in the ICommand.
     }
@@ -302,6 +352,9 @@ public class MiscClientProxy extends MiscProxy {
                         i = 0;
                     }
                 }
+                if (i > 3) {
+                    Minecraft.getMinecraft().gameSettings.fancyGraphics = false; //avoid a forge crash
+                }
                 if (i > 8) {
                     i = 8; //seems to have started crashing. Lame.
                 }
@@ -336,10 +389,18 @@ public class MiscClientProxy extends MiscProxy {
     }
     
     static boolean commandAllowed(Method method) {
+        if (method.getDeclaringClass() == Object.class || method.getParameterTypes().length != 0) {
+            return false;
+        }
+        Minecraft mc = Minecraft.getMinecraft();
+        boolean canCheat = mc.thePlayer.capabilities.isCreativeMode && mc.isSingleplayer();
+        if (canCheat) {
+            return true;
+        }
         if (method.getAnnotation(sketchy.class) != null && !FzConfig.enable_sketchy_client_commands) {
             return false;
         }
-        if (method.getDeclaringClass() == Object.class || method.getParameterTypes().length != 0) {
+        if (method.getAnnotation(cheaty.class) != null) {
             return false;
         }
         return true;
