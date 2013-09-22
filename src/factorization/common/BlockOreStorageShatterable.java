@@ -31,6 +31,7 @@ public class BlockOreStorageShatterable extends BlockOreStorage {
             return;
         }
         Coord c = new Coord(world, x, y, z);
+        c.setId(0);
         int i = 18;
         while (i > 0) {
             int spawn = world.rand.nextInt(3) + 2;
@@ -38,10 +39,21 @@ public class BlockOreStorageShatterable extends BlockOreStorage {
             i -= spawn;
             EntityItem ent = c.spawnItem(new ItemStack(Core.registry.diamond_shard, spawn));
             ent.invulnerable = true;
-            ent.motionX = world.rand.nextGaussian()/4;
-            ent.motionY = world.rand.nextGaussian()/4;
-            ent.motionZ = world.rand.nextGaussian()/4;
+            ent.motionX = randShardVelocity(world);
+            ent.motionY = randShardVelocity(world);
+            ent.motionZ = randShardVelocity(world);
         }
+    }
+    
+    double randShardVelocity(World world) {
+        double r = world.rand.nextGaussian()/4;
+        double max = 0.3;
+        if (r > max) {
+            r = max;
+        } else if (r < -max) {
+            r = -max;
+        }
+        return r;
     }
     
     @Override
