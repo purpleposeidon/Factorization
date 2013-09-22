@@ -981,6 +981,9 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     @Override
     public boolean rotate(ForgeDirection axis) {
+        if (axis == ForgeDirection.UNKNOWN) {
+            return false;
+        }
         if (axis == orientation.facing || axis.getOpposite() == orientation.facing) {
             orientation = orientation.getNextRotationOnFace();
             return true;
@@ -989,7 +992,8 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             orientation = orientation.getNextRotationOnTop();
             return true;
         }
-        return false;
+        orientation = FzOrientation.fromDirection(axis);
+        return true;
     }
     
     @Override
