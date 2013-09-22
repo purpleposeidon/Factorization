@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
@@ -45,6 +46,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     byte b_facing = (byte) ForgeDirection.UP.ordinal();
     boolean isCrafterRoot = false;
     boolean powered = false;
+    public Coord upperCorner, lowerCorner;
     
     public ForgeDirection getFacing() {
         return ForgeDirection.getOrientation(b_facing);
@@ -58,6 +60,10 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
             return (float) Math.sqrt(progress/20F);
         }
         return Math.min(1, (progress*1F)/-10F);
+    }
+    
+    public boolean isPrimaryCrafter() {
+        return isCrafterRoot && progress > 0;
     }
     
     @Override
@@ -109,6 +115,8 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
                 if (!signal) {
                     powered = false;
                 }
+            } else {
+                upperCorner = lowerCorner = null;
             }
             progress = -10;
         }
@@ -147,11 +155,8 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         if (worldObj.isRemote) {
             return;
         }
-        if (progress != 0) {
-            return;
-        }
         boolean signal = worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0;
-        if (signal != powered && signal) {
+        if (signal != powered && signal && progress == 0) {
             getStateHelper().craft(true, this);
             isCrafterRoot = true;
         }
@@ -171,6 +176,18 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         }
         if (messageType == MessageType.CompressionCrafterBeginCrafting) {
             progress = 1;
+            return true;
+        }
+        if (messageType == MessageType.CompressionCrafterBounds) {
+            upperCorner = new Coord(worldObj, input.readInt(), input.readInt(), input.readInt());
+            lowerCorner = new Coord(worldObj, input.readInt(), input.readInt(), input.readInt());
+            Coord.sort(lowerCorner, upperCorner);
+            if (lowerCorner.distanceSq(upperCorner) > 25) {
+                Core.logFine("Server wanted us to render a large area!");
+                lowerCorner = upperCorner = null;
+            } else {
+                isCrafterRoot = true;
+            }
             return true;
         }
         return false;
@@ -242,5 +259,14 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         }
         getStateHelper().showTutorial(entityplayer, this);
         return false;
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public AxisAlignedBB getRenderBoundingBox() {
+        if (isPrimaryCrafter()) {
+            return INFINITE_EXTENT_AABB; //NORELEASE: Do it better.
+        }
+        return super.getRenderBoundingBox();
     }
 }

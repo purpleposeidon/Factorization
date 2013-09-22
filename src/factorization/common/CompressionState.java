@@ -12,6 +12,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
+import factorization.common.NetworkFactorization.MessageType;
 import factorization.notify.Notify;
 import factorization.notify.Notify.Style;
 
@@ -577,6 +578,30 @@ public class CompressionState {
         for (TileEntityCompressionCrafter cc : foundWalls) {
             cc.informClient();
         }
+        int minX, minY, minZ, maxX, maxY, maxZ;
+        minX = minY = minZ = maxX = maxY = maxZ = 0; //shadup
+        boolean first = true;
+        for (int i = 0; i < cells.length; i++) {
+            CellInfo ci = cells[i];
+            if (ci == null) {
+                continue;
+            }
+            Coord c = ci.cell;
+            if (first) {
+                minX = maxX = c.x;
+                minY = maxY = c.y;
+                minZ = maxZ = c.z;
+                first = false;
+                continue;
+            }
+            minX = Math.min(c.x, minX);
+            minY = Math.min(c.y, minY);
+            minZ = Math.min(c.z, minZ);
+            maxX = Math.max(c.x, maxX);
+            maxY = Math.max(c.y, maxY);
+            maxZ = Math.max(c.z, maxZ);
+        }
+        start.broadcastMessage(null, MessageType.CompressionCrafterBounds, minX, minY, minZ, maxX, maxY, maxZ);
     }
     
     
