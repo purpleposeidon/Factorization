@@ -20,6 +20,10 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     private boolean powered = false;
     private long redstoneCache = -0xFF;
     
+    public TileEntityParaSieve() {
+        facing_direction = 2;
+    }
+    
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.PARASIEVE;
