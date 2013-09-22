@@ -100,7 +100,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemSculptingTool sculpt_tool;
     public ItemGlazeBucket glaze_bucket;
     public ItemStack base_common, base_matte, base_translucent, base_shiny, base_bright, base_unreal, glaze_base_mimicry; //TODO: Get rid of this; flatten!
-    public ItemCraftingComponent logicMatrix, logicMatrixIdentifier;
+    public ItemCraftingComponent logicMatrix, logicMatrixIdentifier, logicMatrixController;
     public ItemMatrixProgrammer logicMatrixProgrammer;
     public Fluid steamFluid;
     public ItemCraftingComponent nether_powder, rocket_fuel;
@@ -248,6 +248,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         }
         logicMatrix = new ItemCraftingComponent(itemID("logicMatrix", 9044), "logic_matrix");
         logicMatrixIdentifier = new ItemCraftingComponent(itemID("logicMatrixID", 9045), "logic_matrix_identifier");
+        logicMatrixController = new ItemCraftingComponent(itemID("logicMatrixCtrl", 9063), "logic_matrix_controller");
 
         router_item_filter = new ItemMachineUpgrade(itemID("routerItemFilter", 9016), "router/item_filter", "Router Upgrade", FactoryType.ROUTER, 0);
         router_machine_filter = new ItemMachineUpgrade(itemID("routerMachineFilter", 9017), "router/machine_filter", "Router Upgrade", FactoryType.ROUTER, 1);
@@ -382,11 +383,15 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 '#', Block.workbench,
                 '|', Item.stick);
 
-        // tiny demons
         recipe(new ItemStack(logicMatrixIdentifier),
                 "MiX",
                 'M', logicMatrix,
-                'i', Item.netherQuartz /* netherquartz */,
+                'i', Item.netherQuartz,
+                'X', logicMatrixProgrammer);
+        oreRecipe(new ItemStack(logicMatrixController),
+                "MiX",
+                'M', logicMatrix,
+                'i', "ingotSilver",
                 'X', logicMatrixProgrammer);
         recipe(new ItemStack(logicMatrixProgrammer),
                 "MiX",
