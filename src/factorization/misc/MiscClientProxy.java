@@ -3,6 +3,7 @@ package factorization.misc;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
@@ -22,7 +23,6 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatFileWriter;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.MathHelper;
 import cpw.mods.fml.client.GuiModList;
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
@@ -276,6 +276,81 @@ public class MiscClientProxy extends MiscProxy {
         
         @cheaty
         @SideOnly(Side.CLIENT)
+        @help("Dump chunk to .obj")
+        public static String exportChunk() {
+            Object wr_list = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, "sortedWorldRenderers", "sortedWorldRenderers");
+            if (!(wr_list instanceof WorldRenderer[])) {
+                return "Reflection failed";
+            }
+            WorldRenderer[] lizt = (WorldRenderer[]) wr_list;
+            double px = mc.thePlayer.posX, py = mc.thePlayer.posY, pz = mc.thePlayer.posZ;
+            for (WorldRenderer wr : lizt) {
+                if (wr.posXMinus < px && px < wr.posXPlus
+                        && wr.posYMinus < py && py < wr.posYPlus
+                        && wr.posZMinus < pz && pz < wr.posZPlus) {
+                    Tessellator real_tess = Tessellator.instance;
+                    File output = new File("./chunkExport.obj");
+                    try {
+                        ExporterTessellator ex = new ExporterTessellator(output);
+                        Tessellator.instance = ex;
+                        wr.markDirty();
+                        wr.updateRenderer();
+                        ex.doneDumping();
+                    } finally {
+                        Tessellator.instance = real_tess;
+                    }
+                    return "Written to " + output;
+                }
+            }
+            return "You aren't in a rendering chunk. Remarkable.";
+        }
+        
+        @cheaty
+        @SideOnly(Side.CLIENT)
+        @help("Dump all terrain to a .obj. This can take a while! Watch the console.")
+        public static String exportWorld() {
+            Object wr_list = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, "sortedWorldRenderers", "sortedWorldRenderers");
+            if (!(wr_list instanceof WorldRenderer[])) {
+                return "Reflection failed";
+            }
+            double maxDist = 256;
+            if (arg1 != null && arg1 != "") {
+                maxDist = Double.parseDouble(arg1);
+            }
+            WorldRenderer[] lizt = (WorldRenderer[]) wr_list;
+            Tessellator real_tess = Tessellator.instance;
+            File output = new File("./worldExport.obj");
+            
+            try {
+                ExporterTessellator ex = new ExporterTessellator(output);
+                Tessellator.instance = ex;
+                int total = lizt.length;
+                double px = mc.thePlayer.posX, py = mc.thePlayer.posY, pz = mc.thePlayer.posZ;
+                int skipped = 0;
+                for (int i = 0; i < lizt.length; i++) {
+                    WorldRenderer wr = lizt[i];
+                    double dx = wr.posX - px;
+                    double dy = wr.posY - py;
+                    double dz = wr.posZ - pz;
+                    double dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                    if (dist > maxDist) {
+                        skipped++;
+                        continue;
+                    }
+                    System.out.println("Writing chunk " + i + "/" + total + " at " + wr.posX + " " + wr.posY + " " + wr.posZ);
+                    wr.markDirty();
+                    wr.updateRenderer();
+                }
+                System.out.println("Skipped " + skipped + " chunks");
+                ex.doneDumping();
+            } finally {
+                Tessellator.instance = real_tess;
+            }
+            return "Done!";
+        }
+        
+        @cheaty
+        @SideOnly(Side.CLIENT)
         @help("Re-renders the chunk as a wireframe")
         public static String wireframe() {
             Object wr_list = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, "sortedWorldRenderers", "sortedWorldRenderers");
@@ -303,7 +378,7 @@ public class MiscClientProxy extends MiscProxy {
         @cheaty
         @SideOnly(Side.CLIENT)
         @help("Render all the things with a wireframe")
-        public static String globalWireframe() {
+        public static String wireframeGlobal() {
             if (orig == null) {
                 orig = Tessellator.instance;
                 Tessellator.instance = new WireframeTessellator();

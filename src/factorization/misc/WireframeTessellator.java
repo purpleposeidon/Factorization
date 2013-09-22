@@ -18,6 +18,7 @@ import org.lwjgl.opengl.GLContext;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+@SuppressWarnings("static-access")
 @SideOnly(Side.CLIENT)
 public class WireframeTessellator extends Tessellator
 {
@@ -163,6 +164,7 @@ public class WireframeTessellator extends Tessellator
     /**
      * Draws the data set up in this tessellator and resets the state to prepare for new drawing.
      */
+    @Override
     public int draw()
     {
         verts = 0;
@@ -338,6 +340,7 @@ public class WireframeTessellator extends Tessellator
     /**
      * Sets draw mode in the tessellator to draw quads.
      */
+    @Override
     public void startDrawingQuads()
     {
         this.startDrawing(7);
@@ -346,6 +349,7 @@ public class WireframeTessellator extends Tessellator
     /**
      * Resets tessellator state and prepares for drawing (with the specified draw mode).
      */
+    @Override
     public void startDrawing(int par1)
     {
         if (this.isDrawing)
@@ -368,6 +372,7 @@ public class WireframeTessellator extends Tessellator
     /**
      * Sets the texture coordinates.
      */
+    @Override
     public void setTextureUV(double par1, double par3)
     {
         this.hasTexture = true;
@@ -375,6 +380,7 @@ public class WireframeTessellator extends Tessellator
         this.textureV = par3;
     }
 
+    @Override
     public void setBrightness(int par1)
     {
         this.hasBrightness = true;
@@ -384,6 +390,7 @@ public class WireframeTessellator extends Tessellator
     /**
      * Sets the RGB values as specified, converting from floats between 0 and 1 to integers from 0-255.
      */
+    @Override
     public void setColorOpaque_F(float par1, float par2, float par3)
     {
         this.setColorOpaque((int)(par1 * 255.0F), (int)(par2 * 255.0F), (int)(par3 * 255.0F));
@@ -392,6 +399,7 @@ public class WireframeTessellator extends Tessellator
     /**
      * Sets the RGBA values for the color, converting from floats between 0 and 1 to integers from 0-255.
      */
+    @Override
     public void setColorRGBA_F(float par1, float par2, float par3, float par4)
     {
         this.setColorRGBA((int)(par1 * 255.0F), (int)(par2 * 255.0F), (int)(par3 * 255.0F), (int)(par4 * 255.0F));
@@ -400,6 +408,7 @@ public class WireframeTessellator extends Tessellator
     /**
      * Sets the RGB values as specified, and sets alpha to opaque.
      */
+    @Override
     public void setColorOpaque(int par1, int par2, int par3)
     {
         this.setColorRGBA(par1, par2, par3, 255);
@@ -408,6 +417,7 @@ public class WireframeTessellator extends Tessellator
     /**
      * Sets the RGBA values for the color. Also clamps them to 0-255.
      */
+    @Override
     public void setColorRGBA(int par1, int par2, int par3, int par4)
     {
         if (!this.isColorDisabled)
@@ -468,6 +478,7 @@ public class WireframeTessellator extends Tessellator
     /**
      * Adds a vertex specifying both x,y,z and the texture u,v for it.
      */
+    @Override
     public void addVertexWithUV(double par1, double par3, double par5, double par7, double par9)
     {
         this.setTextureUV(par7, par9);
@@ -477,6 +488,7 @@ public class WireframeTessellator extends Tessellator
     
     private double startX, startY, startZ;
     int verts = 0;
+    @Override
     public void addVertex(double x, double y, double z) {
         if (drawMode != GL11.GL_QUADS) {
             _addVertex(x, y, z);
@@ -580,6 +592,7 @@ public class WireframeTessellator extends Tessellator
     /**
      * Sets the color to the given opaque value (stored as byte values packed in an integer).
      */
+    @Override
     public void setColorOpaque_I(int par1)
     {
         int j = par1 >> 16 & 255;
@@ -591,6 +604,7 @@ public class WireframeTessellator extends Tessellator
     /**
      * Sets the color to the given color (packed as bytes in integer) and alpha values.
      */
+    @Override
     public void setColorRGBA_I(int par1, int par2)
     {
         int k = par1 >> 16 & 255;
@@ -602,6 +616,7 @@ public class WireframeTessellator extends Tessellator
     /**
      * Disables colors for the current draw call.
      */
+    @Override
     public void disableColor()
     {
         this.isColorDisabled = true;
@@ -610,6 +625,7 @@ public class WireframeTessellator extends Tessellator
     /**
      * Sets the normal for the current draw call.
      */
+    @Override
     public void setNormal(float par1, float par2, float par3)
     {
         this.hasNormals = true;
@@ -622,6 +638,7 @@ public class WireframeTessellator extends Tessellator
     /**
      * Sets the translation for all vertices in the current draw call.
      */
+    @Override
     public void setTranslation(double par1, double par3, double par5)
     {
         this.xOffset = par1;
@@ -632,6 +649,7 @@ public class WireframeTessellator extends Tessellator
     /**
      * Offsets the translation for all vertices in the current draw call.
      */
+    @Override
     public void addTranslation(float par1, float par2, float par3)
     {
         this.xOffset += (double)par1;
