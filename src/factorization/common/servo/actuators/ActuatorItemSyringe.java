@@ -32,6 +32,7 @@ public class ActuatorItemSyringe extends ActuatorItem {
 
         @Override
         public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+            //TODO NORELEASE: The function calling this should reverse the output when serializing to stack
             if (data.isWriter()) {
                 //Bluh. :/
                 slot = data.asSameShare(prefix + "slot").put(slot);
