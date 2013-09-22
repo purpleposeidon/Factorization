@@ -1,7 +1,9 @@
 #!/bin/bash
 
 #mv ../forge/mcp/eclipse ../
-
+pushd ../forge/
+  python install.py
+popd
 ./embed_source
 echo "Remember to set the lib/ classpath in eclipse!"
 
