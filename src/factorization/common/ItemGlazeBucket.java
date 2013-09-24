@@ -105,8 +105,7 @@ public class ItemGlazeBucket extends ItemFactorization {
     }
     
     private byte getBlockSide(ItemStack is) {
-        return 0;
-        //return FactorizationUtil.getTag(is).getByte("bsd");
+        return FactorizationUtil.getTag(is).getByte("bsd");
     }
     
     private boolean isMimic(ItemStack is) {
@@ -130,7 +129,7 @@ public class ItemGlazeBucket extends ItemFactorization {
         done = false;
     }
     
-    void add(ItemStack is) {
+    void addGlaze(ItemStack is) {
         if (!done) {
             subItems.add(is);
         }
@@ -159,7 +158,7 @@ public class ItemGlazeBucket extends ItemFactorization {
         tag.setByte("bmd", (byte)md);
         tag.setByte("bsd", (byte)side);
         tag.setInteger("remaining", MAX_CHARGES);
-        add(is);
+        addGlaze(is);
         return is;
     }
     
@@ -216,25 +215,33 @@ public class ItemGlazeBucket extends ItemFactorization {
             return is;
         }
         ClayState state = clay.getState();
-        switch (state) {
-        case WET:
-        case DRY:
-            Notify.withItem(Core.registry.heater_item);
-            Notify.send(player, clay.getCoord(), "Use a {ITEM_NAME} to bisque");
-            return is;
-        case HIGHFIRED:
-            Notify.send(player, clay.getCoord(), "Already high-fired");
-            return is;
+        if (player.capabilities.isCreativeMode) {
+            if (state != ClayState.HIGHFIRED) {
+                clay.totalHeat = TileEntityGreenware.highfireHeat + 1;
+            }
+        } else {
+            switch (state) {
+            case WET:
+            case DRY:
+                Notify.withItem(Core.registry.heater_item);
+                Notify.send(player, clay.getCoord(), "Use a {ITEM_NAME} to bisque");
+                return is;
+            case HIGHFIRED:
+                Notify.send(player, clay.getCoord(), "Already high-fired");
+                return is;
+            }
         }
         ClayLump part = clay.parts.get(mop.subHit);
-        int id = getBlockId(is);
-        int md = getBlockMd(is);
-        if (part.icon_id == id && part.icon_md == md) {
+        short id = getBlockId(is);
+        byte md = getBlockMd(is);
+        byte sd = getBlockSide(is);
+        if (part.icon_id == id && part.icon_md == md && part.icon_side == sd) {
             return is;
         }
-        if (useCharge(is) || player.capabilities.isCreativeMode) {
-            part.icon_id = getBlockId(is);
-            part.icon_md = getBlockMd(is);
+        if (player.capabilities.isCreativeMode || useCharge(is)) {
+            part.icon_id = id;
+            part.icon_md = md;
+            part.icon_side = sd;
             clay.changeLump(mop.subHit, part);
             clay.glazesApplied = true;
             return is;

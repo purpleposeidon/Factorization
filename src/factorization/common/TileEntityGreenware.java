@@ -61,6 +61,7 @@ public class TileEntityGreenware extends TileEntityCommon {
 
         public short icon_id; // But only for blocks; no items
         public byte icon_md;
+        public byte icon_side;
 
         public Quaternion quat;
 
@@ -75,6 +76,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             out.writeByte(maxZ);
             out.writeShort(icon_id);
             out.writeByte(icon_md);
+            out.writeByte(icon_side);
             quat.write(out);
         }
 
@@ -87,6 +89,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             tag.setByte("hz", maxZ);
             tag.setShort("icon_id", icon_id);
             tag.setByte("icon_md", icon_md);
+            tag.setByte("icon_sd", icon_side);
             quat.writeToTag(tag, "r");
         }
 
@@ -99,6 +102,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             out.add(maxZ);
             out.add(icon_id);
             out.add(icon_md);
+            out.add(icon_side);
             out.add(quat);
         }
 
@@ -111,6 +115,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             maxZ = in.readByte();
             icon_id = in.readShort();
             icon_md = in.readByte();
+            icon_side = in.readByte();
             quat = Quaternion.read(in);
             return this;
         }
@@ -124,6 +129,11 @@ public class TileEntityGreenware extends TileEntityCommon {
             maxZ = tag.getByte("hz");
             icon_id = tag.getShort("icon_id");
             icon_md = tag.getByte("icon_md");
+            if (tag.hasKey("icon_sd")) {
+                icon_side = tag.getByte("icon_sd");
+            } else {
+                icon_side = -1;
+            }
             quat = Quaternion.loadFromTag(tag, "r");
             return this;
         }
@@ -145,6 +155,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             offset(16, 16 + 1, 16);
             icon_id = (short) FzConfig.resource_id;
             icon_md = (byte) ResourceType.BISQUE.md;
+            icon_side = -1;
             quat = new Quaternion();
             return this;
         }
@@ -207,7 +218,6 @@ public class TileEntityGreenware extends TileEntityCommon {
 
     public static int dryTime = 20 * 60 * 2; // 2 minutes
     public static int bisqueHeat = 1000, highfireHeat = bisqueHeat * 20;
-    public static final int clayIconStart = 12 * 16;
 
     // Client-side only
     public boolean shouldRenderTesr = false;
@@ -241,6 +251,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     }
 
     public Icon getIcon(ClayLump lump, int side) {
+        //NOTE: This isn't what's actually used for rendering.
         switch (getState()) {
         case WET:
             return Block.blockClay.getBlockTextureFromSide(side);

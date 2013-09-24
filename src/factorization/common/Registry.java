@@ -99,7 +99,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemCraftingComponent sludge;
     public ItemSculptingTool sculpt_tool;
     public ItemGlazeBucket glaze_bucket;
-    public ItemStack base_common, base_matte, base_translucent, base_shiny, base_bright, base_unreal, glaze_base_mimicry; //TODO: Get rid of this; flatten!
+    public ItemStack base_common, glaze_base_mimicry;
     public ItemCraftingComponent logicMatrix, logicMatrixIdentifier, logicMatrixController;
     public ItemMatrixProgrammer logicMatrixProgrammer;
     public Fluid steamFluid;
@@ -459,14 +459,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 '#', "plankWood");
         
         base_common = glaze_bucket.makeCraftingGlaze("base_common");
-        base_matte = glaze_bucket.makeCraftingGlaze("base_matte");
-        base_translucent = glaze_bucket.makeCraftingGlaze("base_translucent");
-        base_shiny = glaze_bucket.makeCraftingGlaze("base_shiny");
-        base_bright = glaze_bucket.makeCraftingGlaze("base_bright");
-        base_unreal = glaze_bucket.makeCraftingGlaze("base_unreal");
         glaze_base_mimicry = glaze_bucket.makeCraftingGlaze("base_mimicry");
         
-        glaze_bucket.add(glaze_base_mimicry);
+        glaze_bucket.addGlaze(glaze_base_mimicry);
         
         ItemStack charcoal = new ItemStack(Item.coal, 1, 1);
         ItemStack bonemeal = new ItemStack(Item.dyePowder, 1, 15);
@@ -475,31 +470,35 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         ItemStack iron_chunks = new ItemStack(ore_reduced, 1, ItemOreProcessing.OreType.IRON.ID);
         Item netherquartz = Item.netherQuartz;
         Item netherbrick = Item.netherrackBrick;
+        Block sand = Block.sand;
+        Item redstone=  Item.redstone;
+        Item slimeBall = Item.slimeBall;
+        ItemStack blackWool = new ItemStack(Block.cloth, 1, 15);
         
         shapelessOreRecipe(base_common, new ItemStack(glaze_bucket), Item.bucketWater, Block.sand, Item.clay);
-        shapelessOreRecipe(base_matte, base_common, Item.clay, Block.sand, charcoal);
-        shapelessOreRecipe(base_translucent, base_common, Block.sand, Block.sand, Block.sand);
-        shapelessOreRecipe(base_shiny, base_common, netherquartz, charcoal);
-        shapelessOreRecipe(base_bright, base_shiny, nether_powder, lead_chunks);
-        shapelessOreRecipe(base_unreal, base_bright, Item.glowstone);
-        shapelessOreRecipe(glaze_base_mimicry, base_unreal, Item.redstone, Item.slimeBall, lapis);
+        shapelessOreRecipe(glaze_base_mimicry, base_common, Item.redstone, Item.slimeBall, lapis);
         
-        ItemStack blackWool = new ItemStack(Block.cloth, 1, 15);
-        BasicGlazes.ST_VECHS_BLACK.recipe(base_matte, blackWool);
-        BasicGlazes.TEMPLE_WHITE.recipe(base_common, bonemeal);
-        BasicGlazes.SALLYS_WHITE.recipe(base_shiny, netherquartz);
-        BasicGlazes.CLEAR.recipe(base_translucent, Block.sand);
-        BasicGlazes.REDSTONE_OXIDE.recipe(base_common, Item.redstone);
+        BasicGlazes.ST_VECHS_BLACK.recipe(base_common, blackWool, charcoal);
+        BasicGlazes.TEMPLE_WHITE.recipe(base_common, bonemeal, bonemeal);
+        BasicGlazes.SALLYS_WHITE.recipe(base_common, netherquartz, netherquartz);
+        BasicGlazes.CLEAR.recipe(base_common, sand, sand);
+        BasicGlazes.REDSTONE_OXIDE.recipe(base_common, redstone);
         BasicGlazes.LAPIS_OXIDE.recipe(base_common, lapis);
-        BasicGlazes.PURPLE_OXIDE.recipe(base_common, Item.redstone, lapis);
+        BasicGlazes.PURPLE_OXIDE.recipe(base_common, redstone, lapis);
         BasicGlazes.LEAD_OXIDE.recipe(base_common, lead_chunks);
-        BasicGlazes.FIRE_ENGINE_RED.recipe(base_bright, Item.redstone, Item.redstone, Item.redstone);
-        BasicGlazes.CELEDON.recipe(base_translucent, Item.slimeBall);
-        BasicGlazes.IRON_BLUE.recipe(base_shiny, lapis, iron_chunks);
-        BasicGlazes.STONEWARE_SLIP.recipe(base_common, sludge);
-        BasicGlazes.TENMOKU.recipe(base_common, netherbrick);
-        BasicGlazes.PEKING_BLUE.recipe(base_bright, lapis);
-        BasicGlazes.SHINO.recipe(base_matte, Item.redstone, netherquartz);
+        BasicGlazes.FIRE_ENGINE_RED.recipe(base_common, redstone, redstone);
+        BasicGlazes.CELEDON.recipe(base_common, sand, slimeBall);
+        BasicGlazes.IRON_BLUE.recipe(base_common, lapis, iron_chunks);
+        BasicGlazes.STONEWARE_SLIP.recipe(base_common, sludge, sludge);
+        BasicGlazes.TENMOKU.recipe(base_common, netherbrick, netherbrick);
+        BasicGlazes.PEKING_BLUE.recipe(base_common, lapis, netherquartz);
+        BasicGlazes.SHINO.recipe(base_common, redstone, netherquartz);
+        
+        ItemStack waterFeature = glaze_bucket.makeMimicingGlaze(Block.waterMoving.blockID, 0, -1);
+        ItemStack lavaFeature = glaze_bucket.makeMimicingGlaze(Block.lavaMoving.blockID, 0, -1);
+        shapelessOreRecipe(waterFeature, base_common, Item.bucketWater);
+        shapelessOreRecipe(lavaFeature, base_common, Item.bucketLava);
+        
         Core.registry.glaze_bucket.doneMakingStandardGlazes();
         
         //Sculpture combiniation recipe
@@ -617,19 +616,22 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 return glaze_base_mimicry;
             }
             
+            final int[] side_map = new int[] {
+                    1, 2, 1,
+                    4, 0, 5,
+                    0, 3, 0
+            };
             @Override
             public ItemStack getCraftingResult(InventoryCrafting inventorycrafting) {
-                int[] side_map = {
-                        1, 2, 1,
-                        4, 0, 5,
-                        0, 3, 0
-                };
+                int bucket_slot = -1, block_slot = -1;
+
                 for (int i = 0; i < inventorycrafting.getSizeInventory(); i++) {
                     ItemStack is = inventorycrafting.getStackInSlot(i);
                     if (is == null) {
                         continue;
                     }
                     if (FactorizationUtil.couldMerge(glaze_base_mimicry, is)) {
+                        bucket_slot = i;
                         continue;
                     }
                     if (is.itemID >= Block.blocksList.length) {
@@ -640,16 +642,24 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                         continue;
                     }
                     Block b = Block.blocksList[is.itemID];
-                    if (b == null) {
+                    if (b == null || b.getUnlocalizedName().equals("tile.ForgeFiller")) {
                         continue;
                     }
-                    int side = 0;
-                    try {
-                        side = side_map[i];
-                    } catch (ArrayIndexOutOfBoundsException e) {}
-                    return glaze_bucket.makeMimicingGlaze(is.itemID, is.getItemDamage(), side);
+                    block_slot = i;
                 }
-                return null;
+                if (bucket_slot == -1 || block_slot == -1) {
+                    return null;
+                }
+                int side = 0;
+                try {
+                    if (block_slot == 4) {
+                        side = side_map[block_slot];
+                    } else {
+                        side = -1;
+                    }
+                } catch (ArrayIndexOutOfBoundsException e) {}
+                ItemStack is = inventorycrafting.getStackInSlot(block_slot);
+                return glaze_bucket.makeMimicingGlaze(is.itemID, is.getItemDamage(), side);
             }
         });
 

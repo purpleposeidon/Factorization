@@ -148,11 +148,15 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
                 Block it = Block.blocksList[rc.icon_id];
                 if (it == null) {
                     block.useTexture(BlockIcons.error);
-                    //continue; //boo // err, huh?
                 } else {
                     for (int i = 0; i < 6; i++) {
-                        block.setTexture(i, it.getIcon(i, rc.icon_md));
-                        //int color = it.getRenderColor(rc.icon_md);
+                        int useIcon = i;
+                        if (rc.icon_side == -1) {
+                            block.setTexture(i, it.getIcon(useIcon, rc.icon_md));
+                        } else {
+                            useIcon = rc.icon_side;
+                            block.useTexture(it.getIcon(useIcon, rc.icon_md));
+                        }
                         int color = 0xFFFFFF; 
                         if (greenware.worldObj != null) {
                             try {
@@ -160,16 +164,23 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
                             } catch (Throwable t) {
                                 if (!spammed) {
                                     spammed = true;
-                                    Core.logWarning("%s could not give a Block.colorMultiplier", it);
+                                    Core.logWarning("%s: could not get a Block.colorMultiplier from %s", greenware.getCoord(), it);
                                     t.printStackTrace();
                                 }
                             }
                         } else {
-                            color = it.getRenderColor(i);
+                            color = it.getRenderColor(useIcon);
                         }
                         if (color != 0xFFFFFF) {
                             colors_changed = true;
-                            block.setColor(i, color);
+                            if (rc.icon_side == -1) {
+                                block.setColor(i, color);
+                            } else {
+                                block.setColor(color);
+                            }
+                        }
+                        if (rc.icon_side != -1) {
+                            break;
                         }
                     }
                 }
