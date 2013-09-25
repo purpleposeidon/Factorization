@@ -17,6 +17,8 @@ import factorization.notify.Notify;
 import factorization.notify.Notify.Style;
 
 public class CompressionState {
+    static int MAX_CRAFT = 32;
+    
     TileEntityCompressionCrafter start, root, otherEdge;
     ForgeDirection up, right, otherEdgeRight;
     CellInfo[] cells = new CellInfo[9];
@@ -299,10 +301,11 @@ public class CompressionState {
                     return;
                 }
                 ItemStack b = barrel.item.copy();
-                b.stackSize = Math.min(16, barrel.getItemCount());
+                b.stackSize = Math.min(MAX_CRAFT, barrel.getItemCount());
                 b.stackSize = Math.min(b.stackSize, b.getMaxStackSize());
                 items[BARREL] = b;
                 airBlock = false;
+                //Barrel blocks can't be used to craft, even if they're empty.
                 return;
             }
             items[PICKED] = cell.getPickBlock(top);
@@ -332,7 +335,7 @@ public class CompressionState {
                 cell.setId(0);
                 break;
             case BARREL:
-                leftOvers.stackSize = 0;
+                //leftOvers.stackSize = 0;
                 cell.getTE(TileEntityDayBarrel.class).changeItemCount(-amount);
                 break;
             case SMACKED:
@@ -472,7 +475,7 @@ public class CompressionState {
         Arrays.fill(craftingGrid, null);
         iteratePermutations: for (int mode = 0; mode < CellInfo.length; mode++) {
             boolean any = false;
-            int maxCraft = 32;
+            int maxCraft = MAX_CRAFT;
             boolean[] containerItem = new boolean[9];
             for (int i = 0; i < 9; i++) {
                 CellInfo ci = cells[i];
@@ -557,14 +560,13 @@ public class CompressionState {
                 }
                 
                 items_used++;
-                for (int i = 0; i < 9; i++) {
-                    CellInfo ci = cells[i];
-                    if (ci != null) {
-                        ci.consume(ci.getBestMode(mode), items_used);
-                    }
-                }
-                
                 total.addAll(result);
+            }
+            for (int i = 0; i < 9; i++) {
+                CellInfo ci = cells[i];
+                if (ci != null) {
+                    ci.consume(ci.getBestMode(mode), items_used);
+                }
             }
             FactorizationUtil.collapseItemList(total);
             start.buffer = total;
