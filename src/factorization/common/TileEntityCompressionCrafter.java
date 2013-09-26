@@ -265,7 +265,16 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getRenderBoundingBox() {
         if (isPrimaryCrafter()) {
-            return INFINITE_EXTENT_AABB; //NORELEASE: Do it better.
+            AxisAlignedBB ab = super.getRenderBoundingBox();
+            //This could be more precise.
+            int d = 7;
+            ab.maxX += d;
+            ab.maxY += d;
+            ab.maxZ += d;
+            ab.minX -= d;
+            ab.minY -= d;
+            ab.minZ -= d;
+            return ab;
         }
         return super.getRenderBoundingBox();
     }
