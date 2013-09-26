@@ -85,17 +85,16 @@ public class TileEntityMixer extends TileEntityFactorization implements
                 outputBuffer.add(is);
             }
         }
-        
-        setDirty();
     }
     
-    void setDirty() {
+    @Override
+    public void onInventoryChanged() {
         if (worldObj != null && worldObj.isRemote) {
             return;
         }
         dirty = true;
         cache = null;
-        onInventoryChanged();
+        super.onInventoryChanged();
     }
     
     @Override
@@ -105,7 +104,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         for (ItemStack is : outputBuffer) {
             FactorizationUtil.spawnItemStack(here, is);
         }
-        setDirty();
+        onInventoryChanged();
     }
 
     @Override
@@ -115,7 +114,6 @@ public class TileEntityMixer extends TileEntityFactorization implements
 
     @Override
     public ItemStack getStackInSlot(int slot) {
-        //setDirty();
         if (slot >= 0 && slot < input.length) {
             return input[slot];
         }
@@ -128,7 +126,6 @@ public class TileEntityMixer extends TileEntityFactorization implements
 
     @Override
     public void setInventorySlotContents(int slot, ItemStack is) {
-        setDirty();
         if (slot >= 0 && slot < input.length) {
             input[slot] = is;
             return;
@@ -138,6 +135,11 @@ public class TileEntityMixer extends TileEntityFactorization implements
             output[slot] = is;
             return;
         }
+    }
+    
+    @Override
+    public ItemStack decrStackSize(int i, int amount) {
+        return super.decrStackSize(i, amount);
     }
 
     @Override
@@ -596,7 +598,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         outputBuffer.add(out);
         FactorizationUtil.addInventoryToArray(craft, outputBuffer);
         FactorizationUtil.addInventoryToArray(fakePlayer.inventory, outputBuffer);
-        setDirty();
+        onInventoryChanged();
     }
     
     boolean dumpBuffer() {
@@ -639,6 +641,12 @@ public class TileEntityMixer extends TileEntityFactorization implements
         }
         progress += speed;
         if (getRemainingProgress() <= 0 || Core.cheat) {
+            if (!recipeMatches(mr.inputs)) {
+                onInventoryChanged();
+                dirty = true;
+                progress = 0;
+                return;
+            }
             progress = 0;
             craftRecipe(mr);
             normalize(input);
