@@ -126,7 +126,7 @@ public class Hammer {
             });
             
             TickRegistry.registerTickHandler(new ITickHandler() {
-                EnumSet<TickType> clientTick = EnumSet.of(TickType.CLIENT);
+                EnumSet<TickType> clientTick = EnumSet.of(TickType.WORLD); //NORELEASE: WORLD or CLIENT? CLIENT might tick twice?
                 @Override
                 public EnumSet<TickType> ticks() {
                     return clientTick;
