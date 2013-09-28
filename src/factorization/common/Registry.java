@@ -960,7 +960,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         TileEntityGrinder.addRecipe(Block.blockClay, new ItemStack(Item.clay), 4F);
         TileEntityGrinder.addRecipe(Block.fence, new ItemStack(Item.stick), 2.5F);
         //Netherrack dust is handled elsewhere!
-        TileEntityGrinder.addRecipe(Block.glowStone, new ItemStack(Item.glowstone, 1, 4), 4F);
+        TileEntityGrinder.addRecipe(Block.glowStone, new ItemStack(Item.glowstone, 4), 4F);
         TileEntityGrinder.addRecipe(Block.trapdoor, new ItemStack(Item.stick), 3.5F);
         TileEntityGrinder.addRecipe(Block.stoneBrick, new ItemStack(Block.cobblestone), 0.75F);
         TileEntityGrinder.addRecipe(Block.thinGlass, new ItemStack(Block.sand), 0.1F/16F);
