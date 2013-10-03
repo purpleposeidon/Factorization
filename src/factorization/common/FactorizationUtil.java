@@ -1490,4 +1490,27 @@ public class FactorizationUtil {
             i++;
         }
     }
+    
+    public static boolean significantChange(float a, float b) {
+        if (a == b) {
+            return false;
+        }
+        if (a == 0 || b == 0) {
+            a = Math.abs(a);
+            b = Math.abs(b);
+        }
+        float thresh = Math.abs(a - b)/Math.max(a, b);
+        return thresh > 0.05;
+    }
+    
+    /**
+     * 
+     * @param oldValue
+     * @param newValue
+     * @param partial
+     * @return the linear interpolation of the two values
+     */
+    public static float interp(float oldValue, float newValue, float partial) {
+        return oldValue*(1 - partial) + newValue*partial;
+    }
 }
