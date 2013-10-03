@@ -1,6 +1,7 @@
 package factorization.api.datahelpers;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -120,6 +121,22 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
             value = new ItemStack(0, 0, 0);
         }
         return (ItemStack)put(value);
+    }
+    public final ArrayList<ItemStack> putItemArray(ArrayList<ItemStack> value) throws IOException {
+        String prefix = name;
+        int len = asSameShare(prefix + "_len").putInt(value.size());
+        if (isReader()) {
+            value.clear();
+            value.ensureCapacity(len);
+            for (int i = 0; i < len; i++) {
+                value.add(asSameShare(prefix + "_" + i).putItemStack(null));
+            }
+        } else {
+            for (int i = 0; i < len; i++) {
+                asSameShare(prefix + "_" + i).putItemStack(value.get(i));
+            }
+        }
+        return value;
     }
 
     public final <E extends Enum> E putEnum(E value) throws IOException { return (E)put(value); }
