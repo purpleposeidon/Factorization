@@ -45,8 +45,9 @@ public class MiscNet implements IPacketHandler {
             while (input.available() > 0) {
                 text.add(input.readUTF());
             }
-        } catch (IOException e) {
+        } catch (Throwable e) {
             e.printStackTrace();
+            return;
         }
         try {
             MiscellaneousNonsense.proxy.runCommand(text);

@@ -58,8 +58,6 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
     public static MiscellaneousNonsense instance;
     public static int newMaxChatLength = 250;
     
-    public static final String RichardG_touches_himself_while_reading_my_code = "Confirmed to be true; there have been multiple sightings by respected authorities";
-    
     public MiscellaneousNonsense() {
         MiscellaneousNonsense.instance = this;
     }
@@ -128,6 +126,9 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
                 return;
             }
             EntityPlayerMP player = (EntityPlayerMP) sender;
+            if (args == null || args.length == 0) {
+                args = new String[] { "help" };
+            }
             player.playerNetServerHandler.sendPacketToPlayer(instance.makeCmdPacket(args));
         }
         
