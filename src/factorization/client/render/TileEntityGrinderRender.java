@@ -26,11 +26,11 @@ import factorization.common.Core;
 import factorization.common.TileEntityGrinder;
 
 public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
-    static class DiamondModel {
+    public static class DiamondModel {
         TexturedQuad quads[] = new TexturedQuad[4];
         Icon diamond = Block.blockDiamond.getBlockTextureFromSide(0);
         
-        float near = 2F / 32F, far = 5F / 32F, point = -10F / 32F;
+        float near = 2F / 32F, far = 5F / 32F, point = -12F / 32F;
         float u_edge = 0; //diamond.getWidth()/16;
         float v_edge = 0; //diamond.getHeight()/16;
         float du1 = diamond.getMinU() + u_edge;
@@ -69,7 +69,7 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
         }
     }
 
-    static DiamondModel diamondModel = null;
+    public static DiamondModel diamondModel = null;
     
     public static void remakeModel() {
         diamondModel = null;
@@ -91,10 +91,11 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
         Core.profileEndRender();
     }
 
-    static void renderGrindHead() {
+    public static void renderGrindHead() {
         if (diamondModel == null) {
             diamondModel = new DiamondModel();
         }
+        
         
         TextureManager re = Minecraft.getMinecraft().renderEngine;
         glDisable(GL_LIGHTING);
@@ -128,7 +129,7 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
         for (int i = 0; i < 8; i++) {
             glPushMatrix();
             glRotatef(i * 360 / 8, 0, 1, 0);
-            glTranslatef(2.5F / 16F, 0, 0);
+            glTranslatef(3.5F / 16F, -1F/32F, 0);
             glRotatef(15, 1, 0, 0);
             glRotatef(10, 0, 0, 1);
 

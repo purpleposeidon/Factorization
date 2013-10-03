@@ -39,8 +39,7 @@ public class FactorizationRender implements ISimpleBlockRenderingHandler {
                 TileEntityCommon tec = (TileEntityCommon) te;
                 int fmd = tec.getFactoryType().md;
                 FactorizationBlockRender FBR = FactorizationBlockRender.getRenderer(fmd);
-                FBR.renderInWorld(world, x, y, z);
-                FBR.setMetadata(fmd);
+                FBR.renderInWorld(world, x, y, z, fmd, tec);
                 if (renderPass == 0) {
                     FBR.render(renderBlocks);
                 } else if (renderPass == 1) {

@@ -17,7 +17,7 @@ public class BlockRenderWire extends FactorizationBlockRender {
         if (world_mode) {
             Tessellator.instance.setBrightness(Core.registry.factory_block.getMixedBrightnessForBlock(w, x, y, z));
             Coord me = new Coord(Minecraft.getMinecraft().theWorld, x, y, z);
-            for (WireRenderingCube rc : new WireConnections(me.getTE(TileEntityWire.class)).getParts()) {
+            for (WireRenderingCube rc : new WireConnections((TileEntityWire) te).getParts()) {
                 renderCube(rc);
             }
         } else {

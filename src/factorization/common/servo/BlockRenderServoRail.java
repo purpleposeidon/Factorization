@@ -1,7 +1,6 @@
 package factorization.common.servo;
 
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 import factorization.client.render.FactorizationBlockRender;
 import factorization.common.BlockIcons;
@@ -36,7 +35,6 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
     protected void render(RenderBlocks rb) {
         TileEntityServoRail rail = null;
         if (world_mode) {
-            TileEntity te = w.getBlockTileEntity(x, y, z);
             if (te instanceof TileEntityServoRail) {
                 rail = (TileEntityServoRail) te;
                 Decorator dec = rail.decoration;

@@ -58,21 +58,14 @@ abstract public class FactorizationBlockRender implements ICoord {
     }
     
     public FactorizationBlockRender() {
-        if (getFactoryType() != null) {
-            int md = getFactoryType().md;
-            if (renderMap[md] != null) {
-                throw new RuntimeException("Tried to overwrite a renderer");
-            }
-            renderMap[md] = this;
-        } else {
-            if (defaultRender != null) {
-                throw new RuntimeException("Tried to overwrite a renderer");
-            }
-            defaultRender = this;
-        }
+        initialize(getFactoryType());
     }
     
     public FactorizationBlockRender(FactoryType ft) {
+        initialize(ft);
+    }
+    
+    private void initialize(FactoryType ft) {
         if (ft != null) {
             int md = ft.md;
             if (renderMap[md] != null) {
@@ -102,14 +95,15 @@ abstract public class FactorizationBlockRender implements ICoord {
         return new Coord(Minecraft.getMinecraft().theWorld, x, y, z);
     }
 
-    public final void renderInWorld(IBlockAccess w, int wx, int wy, int wz) {
+    public final void renderInWorld(IBlockAccess w, int wx, int wy, int wz, int md, TileEntity te) {
         world_mode = true;
         this.w = w;
         x = wx;
         y = wy;
         z = wz;
         use_vertex_offset = true;
-        te = null;
+        this.metadata = md;
+        this.te = te;
     }
 
     public final void renderInInventory() {

@@ -17,6 +17,11 @@ import factorization.common.TileEntityDayBarrel;
 import factorization.common.TileEntityDayBarrel.Type;
 
 public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
+    //NOTE TODO: This could be optimized by using a custom font renderer.
+    //Create a font icon digits, '+', '*', '!', and '∞'; add it to both atlases.
+    //This would let the barrel render with a single texture binding for standard items.
+    //Another optimization: don't render if the barrel's facing a solid block
+    //(A third optimization: somehow get the SBRH to cull faces. Complicated & expensive?)
     @Override
     public void renderTileEntityAt(TileEntity tileentity, double x, double y, double z, float partial) {
         if (!(tileentity instanceof TileEntityDayBarrel)) {

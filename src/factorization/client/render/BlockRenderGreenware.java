@@ -81,7 +81,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
             }
             return;
         }
-        TileEntityGreenware gw = getCoord().getTE(TileEntityGreenware.class);
+        TileEntityGreenware gw = (TileEntityGreenware) te;
         if (gw == null) {
             return;
         }

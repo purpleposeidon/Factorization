@@ -25,7 +25,7 @@ public class BlockRenderCompressionCrafter extends FactorizationBlockRender {
         block.setBlockBoundsOffset(0, 0, 0);
         ForgeDirection dir = ForgeDirection.WEST;
         if (world_mode) {
-            TileEntityCompressionCrafter cc = getCoord().getTE(TileEntityCompressionCrafter.class);
+            TileEntityCompressionCrafter cc = (TileEntityCompressionCrafter) te;
             if (cc == null) {
                 return;
             }
