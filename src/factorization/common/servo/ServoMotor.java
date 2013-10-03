@@ -811,7 +811,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         try {
             EntityPlayer player = getPlayer();
             player.setSneaking(sneaky);
-            for (MovingObjectPosition mop : rayTrace(this)) {
+            for (MovingObjectPosition mop : rayTrace()) {
                 if (is.getItem() instanceof ActuatorItem) {
                     ActuatorItem ai = (ActuatorItem) is.getItem();
                     if (ai.use(is, player, this, mop)) {
@@ -849,17 +849,17 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
 
     private final ArrayList<MovingObjectPosition> ret = new ArrayList<MovingObjectPosition>();
-    ArrayList<MovingObjectPosition> rayTrace(ServoMotor motor) {
+    ArrayList<MovingObjectPosition> rayTrace() {
         ret.clear();
-        final Coord c = motor.getCurrentPos();
-        final ForgeDirection top = motor.orientation.top;
-        final ForgeDirection face = motor.orientation.facing;
+        final Coord c = getCurrentPos();
+        final ForgeDirection top = orientation.top;
+        final ForgeDirection face = orientation.facing;
         final ForgeDirection right = face.getRotation(top);
         
         AxisAlignedBB ab = AxisAlignedBB.getAABBPool().getAABB(
                 c.x + top.offsetX, c.y + top.offsetY, c.z + top.offsetZ,  
                 c.x + 1 + top.offsetX, c.y + 1 + top.offsetY, c.z + 1 + top.offsetZ);
-        for (Entity entity : (Iterable<Entity>)motor.worldObj.getEntitiesWithinAABBExcludingEntity(motor, ab)) {
+        for (Entity entity : (Iterable<Entity>)worldObj.getEntitiesWithinAABBExcludingEntity(this, ab)) {
             if (!entity.canBeCollidedWith()) {
                 continue;
             }
