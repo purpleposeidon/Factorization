@@ -42,7 +42,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
 
     @Override
     public Packet getDescriptionPacket() {
-        //Wow. Would you people please *stop* fucking with the names?
+        //Scar tissue. Lazy.
         return getAuxillaryInfoPacket();
     }
     
@@ -58,18 +58,18 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         }
     }
 
-    byte getExtraInfo() {
+    protected byte getExtraInfo() {
         return 0;
     }
 
-    byte getExtraInfo2() {
+    protected byte getExtraInfo2() {
         return 0;
     }
 
-    void useExtraInfo(byte b) {
+    protected void useExtraInfo(byte b) {
     }
 
-    void useExtraInfo2(byte b) {
+    protected void useExtraInfo2(byte b) {
     }
 
     void sendFullDescription(EntityPlayer player) {

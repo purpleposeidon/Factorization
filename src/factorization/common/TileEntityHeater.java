@@ -77,12 +77,12 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
     }
 
     @Override
-    byte getExtraInfo() {
+    protected byte getExtraInfo() {
         return heat;
     }
 
     @Override
-    void useExtraInfo(byte b) {
+    protected void useExtraInfo(byte b) {
         heat = b;
     }
 

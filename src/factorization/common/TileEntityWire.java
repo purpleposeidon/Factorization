@@ -49,12 +49,12 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     }
 
     @Override
-    byte getExtraInfo() {
+    protected byte getExtraInfo() {
         return supporting_side;
     }
 
     @Override
-    void useExtraInfo(byte b) {
+    protected void useExtraInfo(byte b) {
         supporting_side = b;
     }
 

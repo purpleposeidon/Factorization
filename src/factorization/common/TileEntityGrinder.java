@@ -147,11 +147,13 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     }
     
     @Override
+    protected
     byte getExtraInfo2() {
         return (byte) speed;
     }
     
     @Override
+    protected
     void useExtraInfo2(byte b) {
         speed = b;
     }

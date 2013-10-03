@@ -671,12 +671,12 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
 
     @Override
-    byte getExtraInfo2() {
+    protected byte getExtraInfo2() {
         return (byte) speed;
     }
 
     @Override
-    void useExtraInfo(byte b) {
+    protected void useExtraInfo(byte b) {
         speed = b;
     }
 }

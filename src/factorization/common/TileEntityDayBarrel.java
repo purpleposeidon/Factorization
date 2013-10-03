@@ -77,22 +77,22 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     @Override
-    byte getExtraInfo() {
+    protected byte getExtraInfo() {
         return (byte) orientation.ordinal();
     }
     
     @Override
-    void useExtraInfo(byte b) {
+    protected void useExtraInfo(byte b) {
         orientation = FzOrientation.getOrientation(b);
     }
 
     @Override
-    byte getExtraInfo2() {
+    protected byte getExtraInfo2() {
         return (byte) type.ordinal();
     }
     
     @Override
-    void useExtraInfo2(byte b) {
+    protected void useExtraInfo2(byte b) {
         type = Type.valueOf(b);
     }
     

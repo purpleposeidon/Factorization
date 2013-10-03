@@ -109,24 +109,24 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }
 
     @Override
-    byte getExtraInfo() {
+    protected byte getExtraInfo() {
         return facing_direction;
     }
 
     @Override
-    byte getExtraInfo2() {
+    protected byte getExtraInfo2() {
         return draw_active > Byte.MAX_VALUE ? Byte.MAX_VALUE : draw_active;
     }
 
     @Override
-    void useExtraInfo(byte b) {
+    protected void useExtraInfo(byte b) {
         if (worldObj.isRemote) {
             facing_direction = b;
         }
     }
 
     @Override
-    void useExtraInfo2(byte b) {
+    protected void useExtraInfo2(byte b) {
         if (worldObj.isRemote) {
             draw_active = b;
         }
