@@ -131,6 +131,7 @@ public class Charge implements IDataSerializable {
             conductorSet.update();
         }
         int seed = ((te.xCoord << 4 + te.zCoord) << 8) + te.yCoord;
+        //Does the time part really need to be here?
         if (justCreated || (w.getTotalWorldTime() + seed) % 600 == 0) {
             justCreated = false;
             if (conductorSet.leader == null) {
