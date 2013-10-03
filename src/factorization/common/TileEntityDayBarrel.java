@@ -639,7 +639,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         }
         
         if (!worldObj.isRemote && isNested(is) && (item == null || itemMatch(is))) {
-            Notify.send(entityplayer, getCoord(), "No.");
+            Notify.send(entityplayer, this, "No.");
             return true;
         }
         
@@ -652,7 +652,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
 
         if (!itemMatch(is)) {
             if (Core.getTranslationKey(is.getItem()).equals(Core.getTranslationKey(item))) {
-                Notify.send(entityplayer, getCoord(), "That item is different");
+                Notify.send(entityplayer, this, "That item is different");
             } else {
                 info(entityplayer);
             }
@@ -682,7 +682,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         }
         if (hand != null && !itemMatch(hand)) {
             if (Core.getTranslationKey(hand).equals(Core.getTranslationKey(item))) {
-                Notify.send(entityplayer, getCoord(), "That item is different");
+                Notify.send(entityplayer, this, "That item is different");
             } else {
                 info(entityplayer);
             }
@@ -760,17 +760,17 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     void info(EntityPlayer entityplayer) {
         if (item == null && getItemCount() == 0) {
-            Notify.send(entityplayer, getCoord(), "Empty");
+            Notify.send(entityplayer, this, "Empty");
         } else if (getItemCount() >= getMaxSize()) {
             Notify.withItem(item);
-            Notify.send(entityplayer, getCoord(), "Full of {ITEM_NAME}{ITEM_INFOS_NEWLINE}");
+            Notify.send(entityplayer, this, "Full of {ITEM_NAME}{ITEM_INFOS_NEWLINE}");
         } else {
             String count = "" + getItemCount();
             if (type == Type.CREATIVE) {
                 count = "Infinite";
             }
             Notify.withItem(item);
-            Notify.send(entityplayer, getCoord(), "%s {ITEM_NAME}{ITEM_INFOS_NEWLINE}", count);
+            Notify.send(entityplayer, this, "%s {ITEM_NAME}{ITEM_INFOS_NEWLINE}", count);
         }
     }
     
