@@ -209,7 +209,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     public static void addRecipe(Object input, ItemStack output, float probability) {
         GrinderRecipe toAdd = new GrinderRecipe(input, output, probability);
         for (GrinderRecipe gr : recipes) {
-            if (gr.input.equals(toAdd.input)) {
+            if (gr.getOreDictionaryInput().equals(input)) {
                 return;
             }
         }
@@ -270,34 +270,43 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     }
 
     public static class GrinderRecipe {
-        private Object input;
+        private String oreName = null;
+        private ItemStack itemstack = null;
+        private ArrayList<ItemStack> inputArray = new ArrayList();
         public ItemStack output;
         public float probability;
 
         GrinderRecipe(Object input, ItemStack output, float probability) {
-            if (input instanceof Block) {
-                input = new ItemStack((Block) input, 1, FactorizationUtil.WILDCARD_DAMAGE);
-            }
-            if (input instanceof Item) {
-                input = new ItemStack((Item) input, 1, FactorizationUtil.WILDCARD_DAMAGE);
-            }
-            if (input instanceof ItemStack) {
-                ItemStack is = (ItemStack) input;
-                ArrayList<ItemStack> ar = new ArrayList();
-                ar.add(is);
-                input = ar;
-            }
-            this.input = input;
             this.output = output;
             this.probability = probability;
+            if (input instanceof Block) {
+                itemstack = new ItemStack((Block) input, 1, FactorizationUtil.WILDCARD_DAMAGE);
+            } else if (input instanceof Item) {
+                itemstack = new ItemStack((Item) input, 1, FactorizationUtil.WILDCARD_DAMAGE);
+            } else if (input instanceof ItemStack) {
+                itemstack = (ItemStack) input;
+            } else {
+                this.oreName = (String) input;
+                return;
+            }
+            inputArray.add(itemstack);
         }
         
         public ArrayList<ItemStack> getInput() {
-            if (input instanceof String) {
-                return OreDictionary.getOres((String) input);
+            if (oreName != null) {
+                return OreDictionary.getOres(oreName);
             }
-            return (ArrayList<ItemStack>) input;
+            ArrayList<ItemStack> ret = new ArrayList(1);
+            return inputArray;
         }
+        
+        public Object getOreDictionaryInput() {
+            if (oreName != null) {
+                return oreName;
+            }
+            return itemstack;
+        }
+        
     }
     
     @Override

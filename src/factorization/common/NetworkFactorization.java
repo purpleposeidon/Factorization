@@ -580,7 +580,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 //
                 HeaterHeat = 80,
                 //
-                GrinderSpeed = 90,
+                GrinderSpeed = 90, LaceratorSpeed = 91,
                 //
                 MixerSpeed = 100,
                 //

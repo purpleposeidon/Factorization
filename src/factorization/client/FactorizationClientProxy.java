@@ -43,6 +43,7 @@ import factorization.common.*;
 import factorization.common.servo.BlockRenderServoRail;
 import factorization.common.servo.RenderServoMotor;
 import factorization.common.servo.ServoMotor;
+import factorization.common.sockets.SocketLacerator;
 
 public class FactorizationClientProxy extends FactorizationProxy {
     public FactorizationClientProxy() {
@@ -330,13 +331,13 @@ public class FactorizationClientProxy extends FactorizationProxy {
         if (FzConfig.renderTEs) {
             // This is entirely Azanor's fault.
             setTileEntityRenderer(TileEntityHeater.class, new TileEntityHeaterRenderer());
-            //setTileEntityRenderer(TileEntityMirror.class, new TileEntityMirrorRenderer());
             setTileEntityRenderer(TileEntityGrinder.class, new TileEntityGrinderRender());
             setTileEntityRenderer(TileEntityMixer.class, new TileEntityMixerRenderer());
             setTileEntityRenderer(TileEntityCrystallizer.class, new TileEntityCrystallizerRender());
             setTileEntityRenderer(TileEntitySteamTurbine.class, new TileEntitySteamTurbineRender());
             setTileEntityRenderer(TileEntityLeydenJar.class, new TileEntityLeydenJarRender());
             setTileEntityRenderer(TileEntityCompressionCrafter.class, new TileEntityCompressionCrafterRenderer());
+            setTileEntityRenderer(SocketLacerator.class, new TileEntitySocketRenderer());
             // End section that is azanor's fault
         }
 
@@ -360,6 +361,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderGreenware().setup();
         new BlockRenderRocketEngine();
         new BlockRenderServoRail();
+        new BlockRenderSocketBase(FactoryType.SOCKET_EMPTY);
+        new BlockRenderSocketBase(FactoryType.SOCKET_LACERATOR);
         for (FactoryType ft : new FactoryType[] {
                 FactoryType.ROUTER,
                 FactoryType.STAMPER,

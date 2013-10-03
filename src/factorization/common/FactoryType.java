@@ -1,9 +1,11 @@
 package factorization.common;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import factorization.common.servo.TileEntityServoRail;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
+import cpw.mods.fml.common.registry.GameRegistry;
+import factorization.common.servo.TileEntityServoRail;
+import factorization.common.sockets.SocketEmpty;
+import factorization.common.sockets.SocketLacerator;
 
 public enum FactoryType {
     ROUTER(0, true, TileEntityRouter.class, "factory_router"), // Send/retrieve items from connected inventories
@@ -38,15 +40,24 @@ public enum FactoryType {
     COMPRESSIONCRAFTER(29, false, TileEntityCompressionCrafter.class, "factory_compact"),
     DAYBARREL(30, false, TileEntityDayBarrel.class, "factory_barrel2"),
     CALIOMETRIC_BURNER(31, false, TileEntityCaliometricBurner.class, "factory_calory"),
+    SOCKET_EMPTY(32, false, SocketEmpty.class, "fzsock_empty"),
+    SOCKET_LACERATOR(33, false, SocketLacerator.class, "fzsock_lacerate"),
     
 
     POCKETCRAFTGUI(101, true)
     ;
 
+    public static int MAX_ID = 0;
+    static {
+        for (FactoryType ft : values()) {
+            MAX_ID = Math.max(MAX_ID, ft.md);
+        }
+    }
+    
     final public int md;
     final public int gui;
     final public boolean hasGui;
-    final private Class clazz;
+    final private Class<? extends TileEntityCommon> clazz;
     final public String te_id;
     private TileEntityCommon representative;
     private boolean can_represent = true;
@@ -66,12 +77,14 @@ public enum FactoryType {
             try {
                 representative = ((Class<? extends TileEntityCommon>)clazz).newInstance();
             } catch (Throwable e) {
-                throw new IllegalArgumentException(e);
+                throw new IllegalArgumentException("Can not instantiate: " + toString(), e);
             }
             MinecraftForge.EVENT_BUS.register(representative);
         }
         return representative;
     }
+    
+    public Class<? extends TileEntityCommon> getFactoryTypeClass() { return clazz; }
 
     static class mapper {
         //bluh java
@@ -161,5 +174,9 @@ public enum FactoryType {
 
     public boolean connectRedstone() {
         return this == ROUTER || this == STAMPER || this == PACKAGER;
+    }
+    
+    public ItemStack asSocketItem() {
+        return new ItemStack(Core.registry.socket_part, 1, md);
     }
 }

@@ -14,6 +14,7 @@ public enum BlockClass {
     DarkIron(1, true, 0, 0, 3.25F),
     Barrel(2, true, 25, 0, 2F),
     //Cage(3, false, 0, 0, 5F),
+    Socket(3, false, 0, 0, 3F),
     Lamp(4, false, 0, 15, 6F),
     //LightAir(5, false, 0, 15, 0),
     //WrathFire(6, false, 0, 4, 0),

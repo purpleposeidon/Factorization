@@ -61,7 +61,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public BlockLightAir lightair_block;
     public BlockResource resource_block;
 
-    public ItemStack router_item, servorail_item;
+    public ItemStack router_item, servorail_item, empty_socket_item;
     
     public ItemStack stamper_item, packager_item,
             barrel_item, daybarrel_item_hidden,
@@ -110,8 +110,9 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ActuatorItemSyringe actuator_item_manipulator;
     public ItemStack dark_iron_sprocket, sprocket_motor;
     public ItemDayBarrel daybarrel;
+    public ItemSocketPart socket_part;
 
-    public Material materialMachine = /*Material.anvil; */ new Material(MapColor.ironColor); //If we use vanilla's, TConstruct tools aren't stupid slow. If we use ours, blocks will drop when broken by hand.
+    public Material materialMachine = new Material(MapColor.ironColor);
 
     WorldGenMinable silverGen;
     
@@ -194,6 +195,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         //BlockFactorization stuff
         router_item = FactoryType.ROUTER.itemStack();
         servorail_item = FactoryType.SERVORAIL.itemStack();
+        empty_socket_item = FactoryType.SOCKET_EMPTY.itemStack();
         parasieve_item = FactoryType.PARASIEVE.itemStack();
         compression_crafter_item = FactoryType.COMPRESSIONCRAFTER.itemStack();
         barrel_item = FactoryType.BARREL.itemStack();
@@ -304,6 +306,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         actuator_item_manipulator = new ActuatorItemSyringe(itemID("actuatorItemManipulator", 9058));
         dark_iron_sprocket = new ItemStack(new ItemCraftingComponent(itemID("darkIronSprocket", 9059), "servo/sprocket"));
         sprocket_motor = new ItemStack(new ItemCraftingComponent(itemID("servoMotor", 9060), "servo/servo_motor"));
+        socket_part = new ItemSocketPart(itemID("socketPart", 9064), "socket/", TabType.SERVOS);
         
         //Barrels
         daybarrel = new ItemDayBarrel(itemID("daybarrelItem", 9062), "daybarrel");
@@ -1028,6 +1031,17 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         
         //Servos
         makeServoRecipes();
+        oreRecipe(empty_socket_item,
+                "#",
+                "-",
+                "#",
+                '#', Block.fenceIron,
+                '-', "slabWood");
+        oreRecipe(FactoryType.SOCKET_LACERATOR.asSocketItem(),
+                "*",
+                "M",
+                '*', diamond_cutting_head,
+                'M', motor);
     }
     
     private void makeServoRecipes() {
@@ -1085,6 +1099,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         BlockClass.Machine.harvest("pickaxe", 1);
         BlockClass.MachineLightable.harvest("pickaxe", 1);
         BlockClass.MachineDynamicLightable.harvest("pickaxe", 1);
+        BlockClass.Socket.harvest("axe", 1);
+        BlockClass.Socket.harvest("pickaxe", 1);
         MinecraftForge.setBlockHarvestLevel(resource_block, "pickaxe", 2);
     }
 
