@@ -363,6 +363,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderServoRail();
         new BlockRenderSocketBase(FactoryType.SOCKET_EMPTY);
         new BlockRenderSocketBase(FactoryType.SOCKET_LACERATOR);
+        new BlockRenderSocketBase(FactoryType.SOCKET_ROBOTHAND);
         for (FactoryType ft : new FactoryType[] {
                 FactoryType.ROUTER,
                 FactoryType.STAMPER,

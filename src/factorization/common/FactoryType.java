@@ -6,6 +6,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.common.servo.TileEntityServoRail;
 import factorization.common.sockets.SocketEmpty;
 import factorization.common.sockets.SocketLacerator;
+import factorization.common.sockets.SocketRobotHand;
 
 public enum FactoryType {
     ROUTER(0, true, TileEntityRouter.class, "factory_router"), // Send/retrieve items from connected inventories
@@ -42,6 +43,7 @@ public enum FactoryType {
     CALIOMETRIC_BURNER(31, false, TileEntityCaliometricBurner.class, "factory_calory"),
     SOCKET_EMPTY(32, false, SocketEmpty.class, "fzsock_empty"),
     SOCKET_LACERATOR(33, false, SocketLacerator.class, "fzsock_lacerate"),
+    SOCKET_ROBOTHAND(34, false, SocketRobotHand.class, "fzsock_hand"),
     
 
     POCKETCRAFTGUI(101, true)

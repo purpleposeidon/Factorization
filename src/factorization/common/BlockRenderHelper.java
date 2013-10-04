@@ -214,6 +214,9 @@ public class BlockRenderHelper extends Block {
         return Core.proxy.BlockRenderHelper_has_texture(this, f);
     }
     
+    /**
+     * Rotate around the block's 0,0,0 or something. You don't want this one.
+     */
     public BlockRenderHelper rotate(Quaternion q) {
         //Apply the Quaternion to the vertices
         for (int f = 0; f < faceCache.length; f++) {
@@ -229,6 +232,9 @@ public class BlockRenderHelper extends Block {
         return this;
     }
     
+    /**
+     * Rotate around the block's bounding box center of mass. You probably don't want this one.
+     */
     public BlockRenderHelper rotateMiddle(Quaternion q) {
         Vec3 d = getBoundsMiddle();
         translate((float)(-d.xCoord), (float)(-d.yCoord), (float)(-d.zCoord));
@@ -237,6 +243,9 @@ public class BlockRenderHelper extends Block {
         return this;
     }
     
+    /**
+     * Rotate around the center of the block. Use this one!
+     */
     public BlockRenderHelper rotateCenter(Quaternion q) {
         float d = 0.5F;
         translate(-d, -d, -d);
