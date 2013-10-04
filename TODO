@@ -45,6 +45,8 @@ X     -    Get collisions working when rotated
 Caused by rapid-fire pasting?
 
 
+
+
 CovertJaguar_proper_packet_sending
 
 The hard rendering bit:
@@ -82,7 +84,6 @@ KILL
 ----
 BOH -- Nah, it could be done better I think.
 WRATH (But this adds rocketry. Ha. Definitely makes the mod smaller.)
-All glazes except for mimicing
 
 SERVOS
 ------
@@ -90,10 +91,20 @@ regarding actuators:
   Move them out of the inventory, into a separate thing
   Have these actuators:
     Freaky Robot Hand: Deployer. Not much more to it. (I mean unless you want left click. Erm.)
-    Computer: Evaluate stack (and stuff)
     Inventory Manipulator: by itself, a boring push/pull
     Grabber: Picks up blocks and entities. Uses FZDS fun-times.
   We'll keep a "generic use actuator instruction", but we'll also add instructions for each actuator. Possibly multiple ones per actuator.
+  All the socket-tools we'll have:
+    ✓ Lacerator
+    Grasper
+    ✓ Robot Arm
+    Ball Lightning Gun
+    Item Vacuum
+    Chicken Baster
+    Launcher (dispenser)
+
+  Sockets are blocks that can have tools mounted into them, like item & liquid manipulators, and lots of other things. Then servos are a mobile socket. Mmmm. Let's say "no" to being able to use them in your hand. This simplifies things A LOT.
+
 Servos need to IO items badly!
 Lower barriers to entry for servos:
     (Suuuugar crystalllss.... hard rock candy....)
@@ -107,12 +118,17 @@ TOP LIST (that's become somewhat less tops. Oops.)
 compression crafters:
   flowerpots
   rendering. :(
+  fire -> chainmail?
 One of my ICommands is broken (???)
+barrel placement options:
+  - always place facing up; if shift-clicking with empty fist, rotate like a wrench
+  - if clicking near the middle of the block, place up
 [15:43:34] <Hathadar> I have a router inserting into 4 induction furnaces.  The moment I place a machine filter on it and set it to the induction furnace it stops working.  It will not insert or extract.  0.8.01
 I wonder if the bug hopper has any interesting crashlogs!
 One of my ICommands is broken!?
 localize barrel types (There's a ton of other things what need to be localized, y'know...)
 leyden jars & batteries should overcharge slightly so that they can drop exactly 100%-charged stuff
+hopping barrels could be optimized if they're moving something above them to below them!
 ★★★Talk to RLP about monetization plan★★★
 underground silver temples/vaults. With moon lamps? :D
 onInventoryUpdate all the TEs
@@ -120,6 +136,8 @@ fix redstone getting stuck on for servo rail pulses
 Test BoH key with NEI installed & with sneak key set to a mouse button.
 can't glaze a sculpture cloned from an already glazed sculpture
 change raw glaze colors to their real colors
+sparks in leyden jar when held aren't centered
+there's a proper client commands thing now
 smooth sandstone double slab (Are there other variants?)
 Look at what errors we get if the FZDS code isn't in
 either bats are spawning in the hammer dimension, or we're getting entity updates that we shouldn't be

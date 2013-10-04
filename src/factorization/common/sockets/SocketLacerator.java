@@ -14,7 +14,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -101,9 +100,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             Notify.send(this, "%s items buffered", "" + buffer.size());
             return false;
         }
-        Coord here = getCoord();
-        here.adjust(facing.getOpposite());
-        if (here.getTE(IInventory.class) == null) {
+        if (getBackingInventory(this) == null) {
             Notify.send(this, "No output inventory");
             return false;
         }
