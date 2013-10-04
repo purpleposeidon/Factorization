@@ -6,15 +6,19 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Icon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
+import net.minecraftforge.common.FakePlayer;
 import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -101,13 +105,13 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         return (Iterable<Entity>)worldObj.getEntitiesWithinAABBExcludingEntity(ent, ab);
     }
     
-    protected final boolean rayTrace(final ISocketHolder socket, final Entity ent, final Coord c, final FzOrientation orientation, final boolean powered, final boolean lookAround, final boolean onlyFirst) {
+    protected final boolean rayTrace(final ISocketHolder socket, final Entity ent, final Coord coord, final FzOrientation orientation, final boolean powered, final boolean lookAround, final boolean onlyFirst) {
         final ForgeDirection top = orientation.top;
         final ForgeDirection face = orientation.facing;
         final ForgeDirection right = face.getRotation(top);
         
         
-        for (Entity entity : getEntities(ent, c, top, 0)) {
+        for (Entity entity : getEntities(ent, coord, top, 0)) {
             if (!entity.canBeCollidedWith()) {
                 continue;
             }
@@ -117,7 +121,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         }
         
         nullVec.xCoord = nullVec.yCoord = nullVec.zCoord = 0;
-        Coord targetBlock = c.add(top);
+        Coord targetBlock = coord.add(top);
         if (mopBlock(targetBlock, top.getOpposite(), socket, false, powered)) return true; //nose-to-nose with the servo
         if (onlyFirst) return false;
         if (mopBlock(targetBlock.add(top), top.getOpposite(), socket, false, powered)) return true; //a block away
@@ -227,6 +231,35 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     @Override
     public ItemStack getDroppedBlock() {
         return FactoryType.SOCKET_EMPTY.itemStack();
+    }
+    
+    private static FakePlayer silkyPlayer;
+    
+    protected FakePlayer getFakePlayer() {
+        if (silkyPlayer == null) {
+            silkyPlayer = new FakePlayer(worldObj, "[Lacerator]");
+        }
+        ItemStack pick = new ItemStack(Item.pickaxeDiamond);
+        pick.addEnchantment(Enchantment.silkTouch, 1);
+        silkyPlayer.worldObj = worldObj;
+        silkyPlayer.posX = xCoord;
+        silkyPlayer.posY = yCoord;
+        silkyPlayer.posZ = zCoord;
+        silkyPlayer.inventory.mainInventory[0] = pick;
+        return silkyPlayer;
+    }
+    
+    protected IInventory getBackingInventory(ISocketHolder socket) {
+        if (socket == this) {
+            TileEntity te = worldObj.getBlockTileEntity(xCoord - facing.offsetX,yCoord - facing.offsetY,zCoord - facing.offsetZ);
+            if (te instanceof IInventory) {
+                return (IInventory) te;
+            }
+            return null;
+        } else if (socket instanceof IInventory) {
+            return (IInventory) socket;
+        }
+        return null;
     }
     
     //Overridable code

@@ -30,17 +30,17 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
         TexturedQuad quads[] = new TexturedQuad[4];
         Icon diamond = Block.blockDiamond.getBlockTextureFromSide(0);
         
-        float near = 2F / 32F, far = 5F / 32F, point = -12F / 32F;
+        float near = 2F / 32F, far = 5F / 32F, point = -18F / 32F;
         float u_edge = 0; //diamond.getWidth()/16;
         float v_edge = 0; //diamond.getHeight()/16;
-        float du1 = diamond.getMinU() + u_edge;
-        float du2 = diamond.getMaxU() - u_edge;
-        float dv1 = diamond.getMinV() + v_edge;
-        float dv2 = diamond.getMaxV() - v_edge;
+        float du1 = diamond.getInterpolatedU(6);
+        float du2 = diamond.getInterpolatedU(16 - 6);
+        float dv1 = diamond.getInterpolatedV(0);
+        float dv2 = diamond.getInterpolatedV(15.75);
         float dum = (du1 + du2)/2;
         float dvm = (dv1 + dv2)/2;
         
-        PositionTextureVertex down = new PositionTextureVertex(Vec3.createVectorHelper(0, point, 0), dum, dvm), //the pointy end
+        PositionTextureVertex down = new PositionTextureVertex(Vec3.createVectorHelper(near/2, point, far/-3), dum, dvm), //the pointy end
                 //numpad directions
                 v6 = new PositionTextureVertex(Vec3.createVectorHelper(far, 0, 0), du2, dv2),
                 v2 = new PositionTextureVertex(Vec3.createVectorHelper(0, 0, -near), du1, dv2),
@@ -117,9 +117,9 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
         GL11.glTranslatef(0, 2F / 16F, 0);
         BlockRenderHelper block = BlockRenderHelper.instance;
         block.useTexture(Block.blockIron.getBlockTextureFromSide(0));
-        //block.useTexture(Block.cloth.getBlockTextureFromSideAndMetadata(0, 4));
-        block.setBlockBoundsOffset(1F/8F, 7F/16F, 1F/8F);
-        //block.setBlockBoundsOffset(0, 0, 0);
+        float e = 1F/8F;
+        block.setBlockBounds(e, 7F/16F, e, 1 - e, 8F/16F, 1 - e);
+        //block.setBlockBoundsOffset(1F/8F, 7F/16F, 1F/8F);
         block.begin();
         block.translate(-0.5F, -0.5F, -0.5F);
         block.renderForTileEntity();
@@ -130,9 +130,6 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
             glPushMatrix();
             glRotatef(i * 360 / 8, 0, 1, 0);
             glTranslatef(3.5F / 16F, -1F/32F, 0);
-            glRotatef(15, 1, 0, 0);
-            glRotatef(10, 0, 0, 1);
-
             diamondModel.render(Tessellator.instance, 1F);
             glPopMatrix();
         }

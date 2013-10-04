@@ -10,14 +10,12 @@ import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
@@ -77,22 +75,6 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     }
     
     
-    private static FakePlayer silkyPlayer;
-    
-    FakePlayer getFakePlayer() {
-        if (silkyPlayer == null) {
-            silkyPlayer = new FakePlayer(worldObj, "[Lacerator]");
-        }
-        ItemStack pick = new ItemStack(Item.pickaxeDiamond);
-        pick.addEnchantment(Enchantment.silkTouch, 1);
-        silkyPlayer.worldObj = worldObj;
-        silkyPlayer.posX = xCoord;
-        silkyPlayer.posY = yCoord;
-        silkyPlayer.posZ = zCoord;
-        silkyPlayer.inventory.mainInventory[0] = pick;
-        return silkyPlayer;
-    }
-    
     @Override
     public boolean canUpdate() {
         return true;
@@ -146,13 +128,11 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             slowDown();
             return;
         }
-        coord.adjust(facing.getOpposite());
-        if (coord.getTE(IInventory.class) == null) {
+        if (getBackingInventory(socket) == null) {
             slowDown();
             return;
         }
-        coord.adjust(facing);
-        if (dumpBuffer(buffer)) {
+        if (socket.dumpBuffer(buffer)) {
             slowDown();
             return;
         }
@@ -407,7 +387,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         GL11.glTranslatef(d, d, d);
         Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())).glRotate();
         GL11.glRotatef(FactorizationUtil.interp(prev_rotation, rotation, partial) / 5.0F, 0, 1, 0);
-        GL11.glTranslatef(0, -7F/16F, 0);
+        GL11.glTranslatef(0, -4F/16F, 0);
         TileEntityGrinderRender.renderGrindHead();
         if (ticked) {
             ticked = false;
@@ -424,8 +404,10 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         float d = 4.0F / 16.0F;
         float yd = -d + 0.003F;
         BlockRenderHelper block = BlockRenderHelper.instance;
-        block.useTexture(metal);
-        float yoffset = 0;
+        block.useTextures(null, null,
+                metal, metal,
+                metal, metal);
+        float yoffset = 4F/16F;
         block.setBlockBounds(d, d + yd + yoffset + 2F/16F, d, 1 - d, 1 - (d + 0F/16F) + yd + yoffset, 1 - d);
         block.begin();
         block.rotateCenter(Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())));
