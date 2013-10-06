@@ -214,7 +214,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         return !(speed > min_speed && rand.nextInt(max_speed) < speed/4);
     }
     
-    public static final DamageSource laceration = new DamageSource("laceration") {};
+    public static final DamageSource laceration = new DamageSource("laceration") {}; //NORELEASE: Localization
     
     @Override
     public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {

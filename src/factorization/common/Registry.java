@@ -61,7 +61,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public BlockLightAir lightair_block;
     public BlockResource resource_block;
 
-    public ItemStack router_item, servorail_item, empty_socket_item;
+    public ItemStack router_item, servorail_item;
+    public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
     
     public ItemStack stamper_item, packager_item,
             barrel_item, daybarrel_item_hidden,
@@ -307,6 +308,10 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         dark_iron_sprocket = new ItemStack(new ItemCraftingComponent(itemID("darkIronSprocket", 9059), "servo/sprocket"));
         sprocket_motor = new ItemStack(new ItemCraftingComponent(itemID("servoMotor", 9060), "servo/servo_motor"));
         socket_part = new ItemSocketPart(itemID("socketPart", 9064), "socket/", TabType.SERVOS);
+        
+        socket_lacerator = FactoryType.SOCKET_LACERATOR.asSocketItem();
+        socket_robot_hand = FactoryType.SOCKET_ROBOTHAND.asSocketItem();
+        socket_shifter = FactoryType.SOCKET_SHIFTER.asSocketItem();
         
         //Barrels
         daybarrel = new ItemDayBarrel(itemID("daybarrelItem", 9062), "daybarrel");
@@ -1042,6 +1047,22 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 "M",
                 '*', diamond_cutting_head,
                 'M', motor);
+        oreRecipe(FactoryType.SOCKET_SHIFTER.asSocketItem(),
+                "V",
+                "@",
+                "D",
+                'V', Block.hopperBlock,
+                '@', logicMatrixController,
+                'D', Block.dropper);
+        oreRecipe(FactoryType.SOCKET_ROBOTHAND.asSocketItem(),
+                "+*I",
+                "+@+",
+                "I*+",
+                '+', servorail_item,
+                '*', sprocket_motor,
+                '@', logicMatrixController,
+                'I', dark_iron
+                );
     }
     
     private void makeServoRecipes() {

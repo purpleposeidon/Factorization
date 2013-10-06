@@ -65,7 +65,9 @@ public class BlockIcons {
     
     public static Icon ceramics$bisque, ceramics$dry, ceramics$stand, ceramics$rawglaze;
     
-    public static Icon socket$face, socket$side, socket$hand, socket$arm0, socket$arm1, socket$arm2, socket$arm3;
+    public static Icon socket$face, socket$side;
+    public static Icon socket$hand, socket$arm0, socket$arm1, socket$arm2, socket$arm3;
+    public static Icon socket$shifter_front, socket$shifter_side;
     
     public static class RouterFace extends IconGroup {
         public Icon on, off;

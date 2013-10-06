@@ -7,6 +7,7 @@ import factorization.common.servo.TileEntityServoRail;
 import factorization.common.sockets.SocketEmpty;
 import factorization.common.sockets.SocketLacerator;
 import factorization.common.sockets.SocketRobotHand;
+import factorization.common.sockets.SocketShifter;
 
 public enum FactoryType {
     ROUTER(0, true, TileEntityRouter.class, "factory_router"), // Send/retrieve items from connected inventories
@@ -44,6 +45,7 @@ public enum FactoryType {
     SOCKET_EMPTY(32, false, SocketEmpty.class, "fzsock_empty"),
     SOCKET_LACERATOR(33, false, SocketLacerator.class, "fzsock_lacerate"),
     SOCKET_ROBOTHAND(34, false, SocketRobotHand.class, "fzsock_hand"),
+    SOCKET_SHIFTER(35, false, SocketShifter.class, "fzsock_shift"),
     
 
     POCKETCRAFTGUI(101, true)

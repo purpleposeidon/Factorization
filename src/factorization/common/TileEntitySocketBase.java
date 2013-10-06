@@ -25,7 +25,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.IChargeConductor;
-import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.IDataSerializable;
@@ -33,6 +32,11 @@ import factorization.common.FactorizationUtil.FzInv;
 import factorization.common.sockets.SocketEmpty;
 
 public abstract class TileEntitySocketBase extends TileEntityCommon implements ISocketHolder, IDataSerializable {
+    /*
+     * Some notes for when we get these moving on servos:
+     * 		These vars need to be set: worldObj, [xyz]Coord, facing
+     * 		Some things might call this's ISocketHolder methods rather than the passed in ISocketHolder's methods
+     */
     public static Random rand = new Random();
     public ForgeDirection facing = ForgeDirection.UP;
 
@@ -270,9 +274,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     public abstract FactoryType getFactoryType();
     
     @Override
-    public boolean canUpdate() {
-        return false;
-    }
+    public abstract boolean canUpdate();
     
     @Override
     public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
@@ -298,11 +300,6 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     @SideOnly(Side.CLIENT)
     public void renderStatic(Tessellator tess) {}
-    
-    @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        return this;
-    }
     
     @Override
     public boolean extractCharge(int amount) {
