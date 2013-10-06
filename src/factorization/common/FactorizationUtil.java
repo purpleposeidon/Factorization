@@ -375,7 +375,7 @@ public class FactorizationUtil {
             this.under = inv;
         }
         
-        void setInsertForce(boolean b) {
+        public void setInsertForce(boolean b) {
             forceInsert = b;
         }
         
