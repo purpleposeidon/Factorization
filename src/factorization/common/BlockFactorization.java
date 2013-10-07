@@ -623,4 +623,13 @@ public class BlockFactorization extends BlockContainer {
         }
         return tec.getComparatorValue(ForgeDirection.getOrientation(side));
     }
+    
+    @Override
+    public boolean getBlocksMovement(IBlockAccess world, int x, int y, int z) {
+        int md = world.getBlockMetadata(x, y, z);
+        if (md == BlockClass.Wire.md) {
+            return true;
+        }
+        return false;
+    }
 }
