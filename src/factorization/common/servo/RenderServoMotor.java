@@ -8,6 +8,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelZombie;
 import net.minecraft.client.renderer.GLAllocation;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderBiped;
 import net.minecraft.client.renderer.entity.RenderEntity;
 import net.minecraft.client.renderer.entity.RenderItem;
@@ -21,10 +22,10 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.Icon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.client.model.IModelCustom;
 import net.minecraftforge.client.model.obj.WavefrontObject;
 import net.minecraftforge.common.ForgeDirection;
 
@@ -32,44 +33,77 @@ import org.lwjgl.opengl.GL11;
 
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
-import factorization.common.BlockRenderHelper;
+import factorization.common.BlockIcons;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
 import factorization.common.FactorizationUtil.FzInv;
-import factorization.common.ItemIcons;
+import factorization.common.TileEntitySocketBase;
 
 public class RenderServoMotor extends RenderEntity {
-    static int sprocket_display_list = -1;
-    boolean loaded_model = false;
-    ResourceLocation servo_uv = Core.getResource("models/sprocket/servo_uv.png");
+    static int both_lists = -1, sprocket_display_list = -1, chasis_display_list = -1;
+    boolean loaded_models = false;
     
-    void loadSprocketModel() throws IOException {
-        IModelCustom sprocket = null;
-        InputStream input = null;
-        try {
-            ResourceLocation rl = Core.getResource("models/sprocket/sprocket.obj");
-            input = Minecraft.getMinecraft().getResourceManager().getResource(rl).getInputStream();
-            if (input == null) {
-                Core.logWarning("Missing servo sprocket model: " + rl);
-                return;
-            }
-            sprocket = new WavefrontObject(rl.toString(), input);
-            input.close();
-            input = null;
-        } finally {
-            if (input != null) {
-                input.close();
-            }
+    private static Icon subsetIcon;
+    private static Tessellator subsetTessellator = new Tessellator() {
+        @Override
+        public void setTextureUV(double u, double v) {
+            super.setTextureUV(subsetIcon.getInterpolatedU(u*16), subsetIcon.getInterpolatedV(v*16));
         }
-        
-        sprocket_display_list = GLAllocation.generateDisplayLists(1);
-        GL11.glNewList(sprocket_display_list, GL11.GL_COMPILE);
-        sprocket.renderAll();
-        GL11.glEndList();
+    };
+    
+    static void loadModel(int displayList, String modelName, Icon icon) {
+        try {
+            WavefrontObject sprocket = null;
+            InputStream input = null;
+            try {
+                ResourceLocation rl = Core.getResource(modelName);
+                input = Minecraft.getMinecraft().getResourceManager().getResource(rl).getInputStream();
+                if (input == null) {
+                    Core.logWarning("Missing servo sprocket model: " + rl);
+                    return;
+                }
+                sprocket = new WavefrontObject(rl.toString(), input);
+                input.close();
+                input = null;
+            } finally {
+                if (input != null) {
+                    input.close();
+                }
+            }
+            
+            GL11.glNewList(displayList, GL11.GL_COMPILE);
+            double modelScale = 1.0/16.0;
+            GL11.glScaled(modelScale, modelScale, modelScale);
+            subsetIcon = icon;
+            subsetTessellator.startDrawingQuads();
+            sprocket.tessellateAll(subsetTessellator);
+            subsetTessellator.draw();
+            modelScale = 1/modelScale;
+            GL11.glScaled(modelScale, modelScale, modelScale);
+            GL11.glEndList();
+        } catch (IOException e) {
+            Core.logWarning("Failed to load model %s", modelName);
+            e.printStackTrace();
+        }
+    }
+    
+    void loadModels() {
+        if (both_lists != -1) {
+            GLAllocation.deleteDisplayLists(both_lists);
+        }
+        both_lists = GLAllocation.generateDisplayLists(3);
+        sprocket_display_list = both_lists + 0;
+        chasis_display_list = both_lists + 1;
+        loadModel(sprocket_display_list, "models/servo/socket.obj", BlockIcons.servo$model$gear);
+        loadModel(chasis_display_list, "models/servo/chasis.obj", BlockIcons.servo$model$chasis);
     }
 
     void renderSprocket() {
         GL11.glCallList(sprocket_display_list);
+    }
+    
+    void renderChasis() {
+        GL11.glCallList(chasis_display_list);
     }
 
     ForgeDirection getPerpendicular(ForgeDirection a, ForgeDirection b) {
@@ -105,7 +139,56 @@ public class RenderServoMotor extends RenderEntity {
         GL11.glPushMatrix();
 
         motor.interpolatePosition((float) Math.pow(motor.pos_progress, 2));
+        float reorientInterpolation = interp(motor.servo_reorient, motor.prev_servo_reorient, partial);
+        orientMotor(motor, partial, reorientInterpolation);
 
+        renderMainModel(motor, partial, reorientInterpolation, false);
+        renderSocketAttachment(motor.socket, partial);
+        
+        boolean render_details = false;
+        if (highlighted) {
+            GL11.glDisable(GL11.GL_TEXTURE_2D);
+            GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_LIGHTING_BIT);
+            GL11.glDisable(GL11.GL_LIGHTING);
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            float gray = 0.65F;
+            GL11.glColor4f(gray, gray, gray, 0.8F);
+            GL11.glLineWidth(1.5F);
+            Minecraft mc = Minecraft.getMinecraft();
+            float d = 1F, h = 0.25F;
+            AxisAlignedBB ab = AxisAlignedBB.getBoundingBox(-d, -h, -d, d, h, d);
+            mc.renderGlobal.drawOutlinedBoundingBox(ab);
+            ab.offset(ab.minX, ab.minY, ab.minZ);
+            GL11.glPopAttrib();
+            GL11.glEnable(GL11.GL_TEXTURE_2D);
+            
+            EntityPlayer player = Core.proxy.getClientPlayer();
+            if (player != null) {
+                ItemStack is = player.getHeldItem();
+                final ItemStack helmet = player.getCurrentArmor(3);
+                if (is != null && is.getItem() == Core.registry.logicMatrixProgrammer ||
+                        (helmet != null && FactorizationUtil.oreDictionarySimilar("visionInducingEyewear", helmet))) {
+                    render_details = true;
+                }
+            }
+        }
+        
+        if (render_details) {
+            renderInventory(motor, partial);
+        }
+        GL11.glPopMatrix();
+        if (render_details) {
+            GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
+            GL11.glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
+            renderStacks(motor);
+        }
+        GL11.glPopMatrix();
+        motor.interpolatePosition(motor.pos_progress);
+        Core.profileEndRender();
+    }
+    
+    void orientMotor(ServoMotor motor, float partial, float reorientInterpolation) {
         final FzOrientation orientation = motor.orientation;
         final FzOrientation prevOrientation = motor.prevOrientation;
 
@@ -131,7 +214,6 @@ public class RenderServoMotor extends RenderEntity {
         }
 
         // Servo facing
-        float ro = interp(motor.servo_reorient, motor.prev_servo_reorient, partial);
         Quaternion qt;
         if (prevOrientation == orientation) {
             qt = Quaternion.fromOrientation(orientation);
@@ -141,7 +223,7 @@ public class RenderServoMotor extends RenderEntity {
             if (q0.dotProduct(q1) < 0) {
                 q0.incrScale(-1);
             }
-            q0.incrLerp(q1, ro);
+            q0.incrLerp(q1, reorientInterpolation);
             qt = q0;
         }
         qt.glRotate();
@@ -159,52 +241,25 @@ public class RenderServoMotor extends RenderEntity {
             GL11.glEnable(GL11.GL_TEXTURE_2D);
             GL11.glEnable(GL11.GL_LIGHTING);
         }
-
-        // Scale
-        float s = 0.5F;
-        GL11.glScalef(s, s, s);
-
-        renderMainModel(motor, partial, ro, false);
-        boolean render_stacks = false;
-        if (highlighted) {
-            GL11.glDisable(GL11.GL_TEXTURE_2D);
-            GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_LIGHTING_BIT);
-            GL11.glDisable(GL11.GL_LIGHTING);
-            GL11.glEnable(GL11.GL_BLEND);
-            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            float gray = 0.65F;
-            GL11.glColor4f(gray, gray, gray, 0.8F);
-            GL11.glLineWidth(1.5F);
-            Minecraft mc = Minecraft.getMinecraft();
-            float d = 1F, h = 0.25F;
-            AxisAlignedBB ab = AxisAlignedBB.getBoundingBox(-d, -h, -d, d, h, d);
-            mc.renderGlobal.drawOutlinedBoundingBox(ab);
-            ab.offset(ab.minX, ab.minY, ab.minZ);
-            GL11.glPopAttrib();
-            GL11.glEnable(GL11.GL_TEXTURE_2D);
-            
-            EntityPlayer player = Core.proxy.getClientPlayer();
-            if (player != null) {
-                ItemStack is = player.getHeldItem();
-                final ItemStack helmet = player.getCurrentArmor(3);
-                if (is != null && is.getItem() == Core.registry.logicMatrixProgrammer || FactorizationUtil.oreDictionarySimilar("visionInducingEyewear", helmet)) {
-                    render_stacks = true;
-                }
-            }
-        }
-        GL11.glScalef(1 / s, 1 / s, 1 / s);
+    }
+    
+    void renderSocketAttachment(TileEntitySocketBase socket, float partial) {
+        float d = -0.5F;
+        float y = -2F/16F;
+        GL11.glTranslatef(d, y, d);
+        socket.xCoord = socket.yCoord = socket.zCoord = 0;
+        socket.facing = ForgeDirection.UP;
+        
         GL11.glPushMatrix();
-        renderInventory(motor, partial);
+        socket.renderTesr(partial);
         GL11.glPopMatrix();
-        GL11.glPopMatrix();
-        if (render_stacks) {
-            GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
-            GL11.glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
-            renderStacks(motor);
-        }
-        GL11.glPopMatrix();
-        Core.profileEndRender();
-        motor.interpolatePosition(motor.pos_progress);
+        
+        bindTexture(Core.blockAtlas);
+        Tessellator tess = Tessellator.instance;
+        tess.startDrawingQuads();
+        socket.renderStatic(tess);
+        tess.draw();
+        GL11.glTranslatef(-d, -y, -d);
     }
 
     RenderItem renderItem = new RenderItem();
@@ -263,21 +318,26 @@ public class RenderServoMotor extends RenderEntity {
     
     @Override
     protected ResourceLocation getEntityTexture(Entity par1Entity) {
-        return servo_uv;
+        return Core.blockAtlas;
     }
     
     void renderMainModel(ServoMotor motor, float partial, double ro, boolean hilighting) {
         GL11.glPushMatrix();
-        bindTexture(servo_uv);
-        if (loaded_model == false) {
+        //0.1 blender units = 1/16 m
+        float scale = 0.1F*16F;
+        GL11.glScalef(scale, scale, scale);
+        bindTexture(Core.blockAtlas);
+        if (!loaded_models) {
             try {
-                loadSprocketModel();
+                loadModels();
             } catch (Throwable e) {
                 Core.logWarning("Failed to load servo sprocket model");
                 e.printStackTrace();
             }
-            loaded_model = true;
+            loaded_models = true;
         }
+        double modelScale = 1.0/16.0;
+        renderChasis();
 
         // Sprocket rotation
         double rail_width = TileEntityServoRail.width;
@@ -301,7 +361,7 @@ public class RenderServoMotor extends RenderEntity {
             }
         }
         // Sprocket rendering. (You wouldn't have been able to tell by reading the code.)
-        float height_d = -1.5F/64F;
+        float height_d = 2F/16F; // -1.5F/64F;
         GL11.glRotatef(180, 1, 0, 0);
         {
             GL11.glPushMatrix();
@@ -317,28 +377,7 @@ public class RenderServoMotor extends RenderEntity {
             renderSprocket();
             GL11.glPopMatrix();
         }
-
-        //Axles
-        GL11.glPopMatrix();
-        if (!hilighting) {
-            bindTexture(Core.itemAtlas);
-        }
-        renderServoPlate();
-    }
-    
-    void renderServoPlate() {
-        GL11.glPushMatrix();
-        GL11.glTranslatef(0.6F, 2.5F/16F, 0F);
-        float sh = 2F, sv = 1.5F;
-        GL11.glScalef(sh, sv, sh);
-        BlockRenderHelper block = Core.registry.blockRender;
-        float height = 7F/16F;
-        block.setBlockBounds(0, 8F/16F, 0, 10F/16F, 9F/16F, 1);
-        block.useTextures(ItemIcons.servo$plate, ItemIcons.servo$plate,
-                ItemIcons.servo$plate_side_left, ItemIcons.servo$plate_side_right,
-                ItemIcons.servo$plate_side_red, ItemIcons.servo$plate_side_silver);
-        Minecraft mc = Minecraft.getMinecraft();
-        block.renderForInventory(mc.renderGlobal.globalRenderBlocks);
+        
         GL11.glPopMatrix();
     }
 
