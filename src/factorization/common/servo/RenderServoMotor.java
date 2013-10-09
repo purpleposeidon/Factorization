@@ -94,7 +94,7 @@ public class RenderServoMotor extends RenderEntity {
         both_lists = GLAllocation.generateDisplayLists(3);
         sprocket_display_list = both_lists + 0;
         chasis_display_list = both_lists + 1;
-        loadModel(sprocket_display_list, "models/servo/socket.obj", BlockIcons.servo$model$gear);
+        loadModel(sprocket_display_list, "models/servo/sprocket.obj", BlockIcons.servo$model$sprocket);
         loadModel(chasis_display_list, "models/servo/chasis.obj", BlockIcons.servo$model$chasis);
     }
 
