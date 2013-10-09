@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -22,8 +23,6 @@ import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.oredict.ShapedOreRecipe;
-import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -364,6 +363,13 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
                 && side < 2 /* and the side is the bottom */) {
             side = FactorizationUtil.determineOrientation(player);
             fo = FzOrientation.fromDirection(ForgeDirection.getOrientation(side).getOpposite());
+            FzOrientation perfect = fo.pointTopTo(ForgeDirection.UP);
+            if (perfect != FzOrientation.UNKNOWN) {
+                fo = perfect;
+            }
+        }
+        double dist = Math.max(Math.abs(u), Math.abs(v));
+        if (dist < 0.33) {
             FzOrientation perfect = fo.pointTopTo(ForgeDirection.UP);
             if (perfect != FzOrientation.UNKNOWN) {
                 fo = perfect;
@@ -821,7 +827,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     @Override
     public void dropContents() {
-        if (type == Type.CREATIVE || type == Type.SILKY) {
+        if (type == Type.CREATIVE || (type == Type.SILKY && broken_with_silk_touch)) {
             return;
         }
         if (item == null || getItemCount() <= 0 ) {
@@ -885,20 +891,12 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         //And don't add normal, since that'd be silly.
         int width = 1;
         int height = 2;
-        GameRegistry.addRecipe(new ShapedOreRecipe(make(Type.SILKY, log, slab), 
-                "#",
-                "B",
-                '#', silkTouch,
-                'B', normal) {
-            public final boolean minecraft_is_a_soggy_bag_of_shit = true;
-            @Override
-            public boolean checkItemEquals(ItemStack target, ItemStack input) {
-                if (input != null && input.itemID == silkTouch.itemID) {
-                    return FactorizationUtil.couldMerge(silkTouch, input);
-                }
-                return super.checkItemEquals(target, input);
-            }
-        });
+        Core.registry.recipe(make(Type.SILKY, log, slab),
+                "XXX",
+                "XOX",
+                "XXX",
+                'X', Block.web,
+                'O', normal);
         /*Core.registry.recipe(make(Type.SILKY, log, slab), 
                 "#",
                 "B",
@@ -1008,5 +1006,13 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             tag.setLong("rnd", hashCode() + worldObj.getTotalWorldTime());
         }
         return is;
+    }
+    
+    boolean broken_with_silk_touch = false;
+    
+    @Override
+    boolean removeBlockByPlayer(EntityPlayer player) {
+        broken_with_silk_touch = EnchantmentHelper.getSilkTouchModifier(player);
+        return super.removeBlockByPlayer(player);
     }
 }
