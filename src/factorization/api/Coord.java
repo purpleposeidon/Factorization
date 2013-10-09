@@ -475,12 +475,18 @@ public class Coord implements IDataSerializable {
         return Block.blocksList[getId()];
     }
 
+    @Deprecated //1.7'll be making this not a thing
     public int getId() {
         return w.getBlockId(x, y, z);
     }
 
+    @Deprecated //1.7'll be getting rid of this (tho we'll need it for now...)
     public int getMd() {
         return w.getBlockMetadata(x, y, z);
+    }
+    
+    public int getRawId() {
+        return w.getBlockId(x, y, z);
     }
 
     public boolean isAir() {
@@ -581,33 +587,40 @@ public class Coord implements IDataSerializable {
     
     public static final int NOTIFY_NEIGHBORS = 1, UPDATE = 2, ONLY_UPDATE_SERVERSIDE = 4; //TODO, this'll end up in Forge probably
 
+    @Deprecated
     public boolean setId(int id, boolean notify) {
         int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
         return w.setBlock(x, y, z, id, 0, notifyFlag);
     }
 
+    @Deprecated
     public boolean setMd(int md, boolean notify) {
         int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
         return w.setBlockMetadataWithNotify(x, y, z, md, notifyFlag);
     }
 
+    @Deprecated
     public boolean setIdMd(int id, int md, boolean notify) {
         int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
         return w.setBlock(x, y, z, id, md, notifyFlag);
     }
 
+    @Deprecated
     public boolean setId(int id) {
         return setId(id, true);
     }
 
+    @Deprecated
     public boolean setMd(int md) {
         return setMd(md, true);
     }
 
+    @Deprecated
     public boolean setIdMd(int id, int md) {
         return setIdMd(id, md, true);
     }
 
+    @Deprecated
     public boolean setId(Block block) {
         return setId(block.blockID);
     }
