@@ -1,5 +1,8 @@
 package factorization.common;
 
+import java.util.List;
+
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -34,5 +37,13 @@ public class ItemDayBarrel extends ItemBlockProxy {
         }
         String type = Core.translate("factorization.factoryBlock.DAYBARREL." + upgrade);
         return Core.translateWithCorrectableFormat(lookup, type, TileEntityDayBarrel.getLog(is).getDisplayName());
+    }
+    
+    @Override
+    protected void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
+        Type upgrade = TileEntityDayBarrel.getUpgrade(is);
+        if (upgrade == Type.SILKY) {
+            list.add(Core.translateThis("factorization.factoryBlock.DAYBARREL.SILKY.silkhint"));
+        }
     }
 }
