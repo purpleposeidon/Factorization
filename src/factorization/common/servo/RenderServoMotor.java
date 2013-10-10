@@ -156,7 +156,7 @@ public class RenderServoMotor extends RenderEntity {
             GL11.glColor4f(gray, gray, gray, 0.8F);
             GL11.glLineWidth(1.5F);
             Minecraft mc = Minecraft.getMinecraft();
-            float d = 1F, h = 0.25F;
+            float d = 1F/2F, h = 0.25F;
             AxisAlignedBB ab = AxisAlignedBB.getBoundingBox(-d, -h, -d, d, h, d);
             mc.renderGlobal.drawOutlinedBoundingBox(ab);
             ab.offset(ab.minX, ab.minY, ab.minZ);
@@ -244,6 +244,8 @@ public class RenderServoMotor extends RenderEntity {
     }
     
     void renderSocketAttachment(TileEntitySocketBase socket, float partial) {
+        float s = 12F/16F;
+        GL11.glScalef(s, s, s);
         float d = -0.5F;
         float y = -2F/16F;
         GL11.glTranslatef(d, y, d);
@@ -254,7 +256,6 @@ public class RenderServoMotor extends RenderEntity {
         socket.renderTesr(partial);
         GL11.glPopMatrix();
         
-        bindTexture(Core.blockAtlas);
         Tessellator tess = Tessellator.instance;
         tess.startDrawingQuads();
         socket.renderStatic(tess);
@@ -323,9 +324,6 @@ public class RenderServoMotor extends RenderEntity {
     
     void renderMainModel(ServoMotor motor, float partial, double ro, boolean hilighting) {
         GL11.glPushMatrix();
-        //0.1 blender units = 1/16 m
-        float scale = 0.1F*16F;
-        GL11.glScalef(scale, scale, scale);
         bindTexture(Core.blockAtlas);
         if (!loaded_models) {
             try {
@@ -336,19 +334,18 @@ public class RenderServoMotor extends RenderEntity {
             }
             loaded_models = true;
         }
-        double modelScale = 1.0/16.0;
         renderChasis();
 
-        // Sprocket rotation
+        // Determine the sprocket location & rotation
         double rail_width = TileEntityServoRail.width;
         double radius = 0.56 /* from sprocket center to the outer edge of the ring (excluding the teeth) */
                     + 0.06305 /* half the width of the teeth */;
         double constant = Math.PI * 2 * (radius);
-        double dr = motor.sprocket_rotation - motor.prev_sprocket_rotation;
-        double partial_rotation = motor.prev_sprocket_rotation + dr * partial;
+        double partial_rotation = FactorizationUtil.interp((float) motor.prev_sprocket_rotation, (float) motor.sprocket_rotation, partial);
         final double angle = constant * partial_rotation;
 
         radius = 0.25 - 1.0 / 48.0;
+        radius = -4.0/16.0;
 
         float rd = (float) (radius + rail_width);
         if (motor.orientation != motor.prevOrientation) {
@@ -360,8 +357,8 @@ public class RenderServoMotor extends RenderEntity {
                 rd += stretch_interp / 8;
             }
         }
-        // Sprocket rendering. (You wouldn't have been able to tell by reading the code.)
-        float height_d = 2F/16F; // -1.5F/64F;
+        // Render them
+        float height_d = 2F/16F;
         GL11.glRotatef(180, 1, 0, 0);
         {
             GL11.glPushMatrix();

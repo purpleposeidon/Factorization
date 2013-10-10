@@ -138,6 +138,9 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
         }
         return value;
     }
+    public final NBTTagCompound putTag(NBTTagCompound value) throws IOException {
+        return (NBTTagCompound)put(value);
+    }
 
     public final <E extends Enum> E putEnum(E value) throws IOException { return (E)put(value); }
     
