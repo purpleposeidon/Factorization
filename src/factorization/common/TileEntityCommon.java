@@ -177,7 +177,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
         tag.setString("ver", Core.version);
-        getBlockClass().enforceQuiet(getCoord()); //NOTE: This won't actually work for the quiting save; but a second save'll take care of that.
+        //getBlockClass().enforceQuiet(getCoord()); //NOTE: This won't actually work for the quiting save; but a second save'll take care of that.
         if (customName != null) {
             tag.setString("customName", customName);
         }
