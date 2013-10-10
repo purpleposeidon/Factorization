@@ -3,7 +3,6 @@ package factorization.common.sockets;
 import java.io.IOException;
 
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.entity.Entity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.ForgeDirection;
@@ -50,7 +49,7 @@ public class SocketShifter extends TileEntitySocketBase {
     }
     
     @Override
-    public void genericUpdate(ISocketHolder socket, Entity ent, Coord coord, boolean powered) {
+    public void genericUpdate(ISocketHolder socket, Coord coord, boolean powered) {
         if (worldObj.isRemote) {
             return;
         }

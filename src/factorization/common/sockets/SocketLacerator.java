@@ -117,7 +117,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     }
     
     @Override
-    public void genericUpdate(ISocketHolder socket, Entity ent, Coord coord, boolean powered) {
+    public void genericUpdate(ISocketHolder socket, Coord coord, boolean powered) {
         genericUpdate_implementation(socket, ent, coord, powered);
         if (FactorizationUtil.significantChange(last_shared_speed, speed)) {
             socket.sendMessage(MessageType.LaceratorSpeed, speed);

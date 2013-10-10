@@ -213,7 +213,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     @Override
     public void updateEntity() {
-        genericUpdate(this, null, getCoord(), isBlockPowered());
+        genericUpdate(this, getCoord(), isBlockPowered());
     }
     
     @Override
@@ -266,9 +266,18 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         return null;
     }
     
+    @Override
+    public boolean extractCharge(int amount) {
+        if (this instanceof IChargeConductor) {
+            IChargeConductor cc = (IChargeConductor) this;
+            return cc.getCharge().tryTake(amount) >= amount;
+        }
+        return false;
+    }
+    
     //Overridable code
     
-    public void genericUpdate(ISocketHolder socket, Entity ent, Coord coord, boolean powered) { }
+    public void genericUpdate(ISocketHolder socket, Coord coord, boolean powered) { }
     
     @Override
     public abstract FactoryType getFactoryType();
@@ -301,12 +310,6 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     @SideOnly(Side.CLIENT)
     public void renderStatic(Tessellator tess) {}
     
-    @Override
-    public boolean extractCharge(int amount) {
-        if (this instanceof IChargeConductor) {
-            IChargeConductor cc = (IChargeConductor) this;
-            return cc.getCharge().tryTake(amount) >= amount;
-        }
-        return false;
-    }
+    @SideOnly(Side.CLIENT)
+    public void renderInServo(float partial) {}
 }

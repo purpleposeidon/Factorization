@@ -3,6 +3,7 @@ package factorization.common.servo;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.entity.Entity;
@@ -13,6 +14,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
@@ -44,10 +46,15 @@ import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.Share;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
+import factorization.common.FactoryType;
+import factorization.common.ISocketHolder;
+import factorization.common.ItemSocketPart;
 import factorization.common.FactorizationUtil.FzInv;
+import factorization.common.TileEntitySocketBase;
+import factorization.common.sockets.SocketEmpty;
 import factorization.notify.Notify;
 
-public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IEntityMessage, IInventory {
+public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IEntityMessage, IInventory, ISocketHolder {
     public static final int STACKS = 16;
     public static final int STACK_EQUIPMENT = 0, STACK_ARGUMENT = 1, STACK_IO = 2, STACK_CONFIG = 3, STACK_ERRNO = 4;
     private ServoStack[] stacks = new ServoStack[STACKS];
@@ -56,13 +63,14 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             stacks[i] = new ServoStack();
         }
     }
-    private ItemStack[] inv = new ItemStack[5], inv_last_sent = new ItemStack[inv.length];
-    public int next_stack = 0;
+    private ItemStack[] inv = new ItemStack[4], inv_last_sent = new ItemStack[inv.length];
     public boolean skipNextInstruction = false;
 
     Coord pos_prev, pos_next;
     float pos_progress;
     
+    public TileEntitySocketBase socket = new SocketEmpty();
+    public boolean isSocketActive = false;
     
     public FzOrientation prevOrientation = FzOrientation.UNKNOWN, orientation = FzOrientation.UNKNOWN;
     public ForgeDirection nextDirection = ForgeDirection.UNKNOWN, lastDirection = ForgeDirection.UNKNOWN;
@@ -205,12 +213,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         pos_prev = data.as(Share.VISIBLE, "pos_prev").put(pos_prev);
         pos_progress = data.as(Share.VISIBLE, "pos_progress").putFloat(pos_progress);
         skipNextInstruction = data.as(Share.VISIBLE, "skip").putBoolean(skipNextInstruction);
-        new_motor = data.as(Share.PRIVATE, "new").putBoolean(new_motor);
+        new_motor = data.as(Share.PRIVATE, "new").putBoolean(new_motor); //NORELEASE: This isn't used?
         for (int i = 0; i < STACKS; i++) {
             String name = "stack" + i;
             stacks[i] = data.as(Share.VISIBLE, name).put(stacks[i]);
         }
-        next_stack = data.as(Share.VISIBLE, "next_stack").putInt(next_stack);
         for (int i = 0; i < inv.length; i++) {
             ItemStack is = inv[i] == null ? EMPTY_ITEM : inv[i];
             is = data.as(Share.VISIBLE, "inv" + i).putItemStack(is);
@@ -220,6 +227,21 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 inv[i] = is.itemID == 0 ? null : is;
             }
         }
+        data.as(Share.VISIBLE, "sock");
+        if (data.isReader()) {
+            NBTTagCompound tag = data.putTag(new NBTTagCompound());
+            TileEntity te = TileEntity.createAndLoadEntity(tag);
+            if (te instanceof TileEntitySocketBase) {
+                socket = (TileEntitySocketBase) te;
+            } else {
+                socket = new SocketEmpty();
+            }
+        } else {
+            NBTTagCompound output = new NBTTagCompound();
+            socket.writeToNBT(output);
+            data.putTag(output);
+        }
+        isSocketActive = data.as(Share.VISIBLE, "sockon").putBoolean(isSocketActive);
     }
 
     public double getTargetSpeed() {
@@ -254,6 +276,8 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
         super.onEntityUpdate();
         if (worldObj.isRemote) {
+            prev_sprocket_rotation = sprocket_rotation;
+            prev_servo_reorient = servo_reorient;
             doLogic();
         } else {
             byte orig_speed = speed_b;
@@ -346,6 +370,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
         final double speed = getProperSpeed() ;
         if (speed <= 0 || orientation == FzOrientation.UNKNOWN) {
+            updateSocket();
             return;
         }
         accumulated_motion += speed;
@@ -354,9 +379,19 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             pos_progress--;
             accumulated_motion = Math.min(pos_progress, speed);
             pos_prev = pos_next;
+            updateSocket();
             onEnterNewBlock();
             pickNextOrientation();
+        } else {
+            updateSocket();
         }
+    }
+    
+    void updateSocket() {
+        Coord here = getCurrentPos();
+        here.setAsTileEntityLocation(socket);
+        socket.facing = orientation.top;
+        socket.genericUpdate(this, here, isSocketActive);
     }
     
     public Random getRandom() {
@@ -514,10 +549,8 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         accumulated_motion -= move;
         pos_progress += move;
         if (worldObj.isRemote) {
-            prev_sprocket_rotation = sprocket_rotation;
             sprocket_rotation += move;
             
-            prev_servo_reorient = servo_reorient;
             if (orientation != prevOrientation) {
                 servo_reorient = Math.min(1, servo_reorient + move);
                 if (servo_reorient >= 1) {
@@ -560,6 +593,18 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         ItemStack is = FactorizationUtil.normalize(player.getHeldItem());
         if (is == null) {
             return false;
+        }
+        if (socket instanceof SocketEmpty && is.getItem() instanceof ItemSocketPart) {
+            int md = is.getItemDamage();
+            if (md > 0 && md < FactoryType.MAX_ID) {
+                try {
+                    socket = (TileEntitySocketBase) FactoryType.fromMd(md).getFactoryTypeClass().newInstance();
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    Notify.send(null, this, "Exception; see console log\n" + e.getMessage());
+                }
+            }
+            is.stackSize--;
         }
         if (is.getItem() instanceof ActuatorItem) {
             ItemStack toPush = is.splitStack(1);
@@ -670,7 +715,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             nextDirection = ForgeDirection.getOrientation(input.readByte());
             return true;
         }
-        return false;
+        return socket.handleMessageFromServer(messageType, input);
     }
 
     public double getProperSpeed() {
@@ -892,5 +937,40 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             return;
         }*/
         list.add(target.createMop(side, nullVec));
+    }
+    
+    @Override
+    public boolean dumpBuffer(List<ItemStack> buffer) {
+        if (buffer.isEmpty()) {
+            return false;
+        }
+        FzInv me = FactorizationUtil.openInventory(this, false);
+        ItemStack got = buffer.get(0);
+        if (got == null) {
+            buffer.remove(0);
+            return true;
+        }
+        ItemStack res = me.push(buffer.get(0));
+        if (res == null) {
+            buffer.remove(0);
+        } else {
+            buffer.set(0, res);
+        }
+        return true;
+    }
+    
+    @Override
+    public boolean extractCharge(int amount) {
+        IChargeConductor wire = getCurrentPos().getTE(IChargeConductor.class);
+        if (wire == null) {
+            return false;
+        }
+        return wire.getCharge().tryTake(amount) >= amount;
+    }
+    
+    @Override
+    public void sendMessage(int msgType, Object... msg) {
+        Packet toSend = Core.network.entityPacket(this, msgType, msg);
+        Core.network.broadcastPacket(worldObj, (int) posX, (int) posY, (int) posZ, toSend); 
     }
 }

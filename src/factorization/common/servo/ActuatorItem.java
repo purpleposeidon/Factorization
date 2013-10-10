@@ -15,7 +15,7 @@ import factorization.common.Core;
 import factorization.common.Core.TabType;
 import factorization.common.ItemCraftingComponent;
 
-public abstract class ActuatorItem extends ItemCraftingComponent {
+public abstract class ActuatorItem extends ItemCraftingComponent { //NORELEASE: Delete!
     public ActuatorItem(int itemId, String name) {
         super(itemId, name);
         Core.tab(this, TabType.SERVOS);
