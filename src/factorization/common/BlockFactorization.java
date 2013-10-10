@@ -1,6 +1,7 @@
 package factorization.common;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -205,7 +206,7 @@ public class BlockFactorization extends BlockContainer {
     }
     
     LinkedList<TileEntityCommon> destroyed_tes = new LinkedList<TileEntityCommon>();
-
+    
     @Override
     public void breakBlock(World w, int x, int y, int z, int id, int md) {
         Coord here = new Coord(w, x, y, z);
@@ -321,14 +322,15 @@ public class BlockFactorization extends BlockContainer {
             //itemList.add(new ItemStack(reg.daybarrel));
             int count = 0;
             int added = 0;
+            
+            int types = TileEntityDayBarrel.Type.TYPE_COUNT - 1;
+            Calendar cal = Calendar.getInstance();
+            int doy = cal.get(Calendar.DAY_OF_YEAR) - 1 /* start at 0, not 1 */;
+            int wood_of_the_day = doy % (types - 1);
             for (ItemStack is : TileEntityDayBarrel.barrel_items) {
                 count++;
-                if (count <= TileEntityDayBarrel.Type.TYPE_COUNT || count % (TileEntityDayBarrel.Type.TYPE_COUNT*2) == 0) {
+                if (count > wood_of_the_day*types + 1 && count <= (wood_of_the_day+1)*types + 1) {
                     itemList.add(is);
-                    added++;
-                    if (added >= TileEntityDayBarrel.Type.TYPE_COUNT + 9) {
-                        break;
-                    }
                 }
             }
         }
