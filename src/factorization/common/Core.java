@@ -126,6 +126,7 @@ public class Core {
         registry.addOtherRecipes();
         (new CompatManager()).loadCompat();
         ChargeMetalBlockConductance.setup();
+        for (FactoryType ft : FactoryType.values()) ft.getRepresentative(); // Make sure everyone's registered to the EVENT_BUS
         finished_loading = true;
     }
     
@@ -325,6 +326,10 @@ public class Core {
     
     public static String translate(String key) {
         return ("" + StatCollector.translateToLocal(key + ".name")).trim();
+    }
+    
+    public static String translateThis(String key) {
+        return ("" + StatCollector.translateToLocal(key)).trim();
     }
     
     public static String translateExact(String key) {

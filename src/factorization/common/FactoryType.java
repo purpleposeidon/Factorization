@@ -72,6 +72,10 @@ public enum FactoryType {
             return null;
         }
         if (representative == null) {
+            if (clazz == null) {
+                can_represent = false;
+                return null;
+            }
             if (can_represent) {
                 can_represent = TileEntityCommon.class.isAssignableFrom(clazz);
                 if (!can_represent) {
