@@ -3,6 +3,7 @@ package factorization.common.sockets;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -17,15 +18,19 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChatMessageComponent;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumMovingObjectType;
 import net.minecraft.util.Icon;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.StatCollector;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.FakePlayer;
 import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.event.EventPriority;
 import net.minecraftforge.event.ForgeSubscribe;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
 import org.lwjgl.opengl.GL11;
@@ -130,6 +135,12 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             return;
         }
         if (socket.dumpBuffer(buffer)) {
+            for (Iterator<ItemStack> iterator = buffer.iterator(); iterator.hasNext();) {
+                ItemStack is = iterator.next();
+                if (FactorizationUtil.normalize(is) == null) {
+                    iterator.remove();
+                }
+            }
             slowDown();
             return;
         }
@@ -141,6 +152,9 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             grab_items = false;
             
             for (Entity entity : getEntities(ent, coord, orientation.top, 1)) {
+                if (entity.isDead) {
+                    continue;
+                }
                 if (entity instanceof EntityItem) {
                     EntityItem ei = (EntityItem) entity;
                     if (ei.ticksExisted > 1) {
@@ -179,6 +193,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     void processCollectedItem(ItemStack is) {
         if (!grind_items) {
             buffer.add(is);
+            return;
         }
         boolean appliedRecipe = false;
         ArrayList<GrinderRecipe> recipes = TileEntityGrinder.recipes;
@@ -214,10 +229,62 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         return !(speed > min_speed && rand.nextInt(max_speed) < speed/4);
     }
     
-    public static final DamageSource laceration = new DamageSource("laceration") {}; //NORELEASE: Localization
+    public static final DamageSource laceration = new DamageSource("laceration") {
+        @Override
+        public ChatMessageComponent getDeathMessage(EntityLivingBase victim) {
+            String ret = "death.attack.laceration.";
+            if (victim.worldObj != null) {
+                long now = victim.worldObj.getTotalWorldTime();
+                ret += (now % 6) + 1;
+            } else {
+                ret += "1";
+            }
+            
+            EntityLivingBase attacker = victim.func_94060_bK();
+            String fightingMessage = ret + ".player";
+            if (attacker != null && StatCollector.func_94522_b(fightingMessage)) {
+                return ChatMessageComponent.createFromTranslationWithSubstitutions(fightingMessage, victim.getTranslatedEntityName(), attacker.getTranslatedEntityName());
+            } else {
+                return ChatMessageComponent.createFromTranslationWithSubstitutions(ret, victim.getTranslatedEntityName());
+            }
+        }
+    }; //NORELEASE: Localization
+    
+    static SocketLacerator dropGrabber = null;
     
     @Override
     public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
+        dropGrabber = this;
+        try {
+            return _handleRay(socket, mop, mopIsThis, powered);
+        } finally {
+            dropGrabber = null;
+        }
+    }
+    
+    @ForgeSubscribe(priority = EventPriority.LOWEST)
+    public void captureDrops(BlockEvent.HarvestDropsEvent event) {
+        if (dropGrabber == null) {
+            return;
+        }
+        if (dropGrabber != this) {
+            dropGrabber.captureDrops(event);
+            return;
+        }
+        final int maxDist = 2*2;
+        int dist = (xCoord - event.x)*(xCoord - event.x) + (yCoord - event.y)*(yCoord - event.y) + (zCoord - event.z)*(zCoord - event.z);
+        if (dist > maxDist) {
+            return;
+        }
+        ArrayList<ItemStack> drops = event.drops;
+        for (int i = 0; i < drops.size(); i++) {
+            ItemStack is = drops.get(i);
+            processCollectedItem(is);
+        }
+        drops.clear();
+    }
+    
+    private boolean _handleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
         if (mop == null) return false;
         if (mopIsThis) return false;
         
@@ -270,14 +337,14 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                 progress++;
             }
             if (progress >= grind_time || Core.cheat) {
+                grab_items = true;
+                grind_items = true;
                 if (barrel == null) {
                     FakePlayer player = getFakePlayer();
                     block.onBlockHarvested(worldObj, mop.blockX, mop.blockY, mop.blockZ, md, player);
                     if (block.removeBlockByPlayer(worldObj, player, mop.blockX, mop.blockY, mop.blockZ)) {
                         block.onBlockDestroyedByPlayer(worldObj, mop.blockX, mop.blockY, mop.blockZ, md);
                         block.harvestBlock(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, 0);
-                        grab_items = true;
-                        grind_items = true;
                     }
                 } else if (barrel.getItemCount() > 0) {
                     ItemStack is = barrel.item.copy();
