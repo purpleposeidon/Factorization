@@ -1,9 +1,7 @@
 package factorization.client.render;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import factorization.api.Coord;
 import factorization.common.Core;
 import factorization.common.FactoryType;
 import factorization.common.TileEntityWire;
@@ -16,7 +14,9 @@ public class BlockRenderWire extends FactorizationBlockRender {
     void render(RenderBlocks rb) {
         if (world_mode) {
             Tessellator.instance.setBrightness(Core.registry.factory_block.getMixedBrightnessForBlock(w, x, y, z));
-            Coord me = new Coord(Minecraft.getMinecraft().theWorld, x, y, z);
+            if (te == null) {
+                return;
+            }
             for (WireRenderingCube rc : new WireConnections((TileEntityWire) te).getParts()) {
                 renderCube(rc);
             }
