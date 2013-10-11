@@ -63,7 +63,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
             return;
         }
         FzOrientation orientation = FzOrientation.fromDirection(facing).getSwapped();
-        rayTrace(socket, ent, coord, orientation, powered, false, false);
+        rayTrace(socket, coord, orientation, powered, false, false);
     }
     
     @Override

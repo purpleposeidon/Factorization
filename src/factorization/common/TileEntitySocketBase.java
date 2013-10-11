@@ -83,7 +83,11 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         }
     }
     
-    protected Iterable<Entity> getEntities(Entity ent, Coord c, ForgeDirection top, int d) {
+    protected Iterable<Entity> getEntities(ISocketHolder socket, Coord c, ForgeDirection top, int d) {
+        Entity ent = null;
+        if (socket instanceof Entity) {
+            ent = (Entity) socket;
+        }
         int one = 1;
         AxisAlignedBB ab = AxisAlignedBB.getAABBPool().getAABB(
                 c.x + top.offsetX, c.y + top.offsetY, c.z + top.offsetZ,  
@@ -109,13 +113,12 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         return (Iterable<Entity>)worldObj.getEntitiesWithinAABBExcludingEntity(ent, ab);
     }
     
-    protected final boolean rayTrace(final ISocketHolder socket, final Entity ent, final Coord coord, final FzOrientation orientation, final boolean powered, final boolean lookAround, final boolean onlyFirst) {
+    protected final boolean rayTrace(final ISocketHolder socket, final Coord coord, final FzOrientation orientation, final boolean powered, final boolean lookAround, final boolean onlyFirst) {
         final ForgeDirection top = orientation.top;
         final ForgeDirection face = orientation.facing;
         final ForgeDirection right = face.getRotation(top);
         
-        
-        for (Entity entity : getEntities(ent, coord, top, 0)) {
+        for (Entity entity : getEntities(socket, coord, top, 0)) {
             if (!entity.canBeCollidedWith()) {
                 continue;
             }

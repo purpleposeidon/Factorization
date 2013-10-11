@@ -118,14 +118,14 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     
     @Override
     public void genericUpdate(ISocketHolder socket, Coord coord, boolean powered) {
-        genericUpdate_implementation(socket, ent, coord, powered);
+        genericUpdate_implementation(socket, coord, powered);
         if (FactorizationUtil.significantChange(last_shared_speed, speed)) {
             socket.sendMessage(MessageType.LaceratorSpeed, speed);
             last_shared_speed = speed;
         }
     }
     
-    private void genericUpdate_implementation(ISocketHolder socket, Entity ent, Coord coord, boolean powered) {
+    private void genericUpdate_implementation(ISocketHolder socket, Coord coord, boolean powered) {
         if (powered) {
             slowDown();
             return;
@@ -145,13 +145,13 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             return;
         }
         FzOrientation orientation = FzOrientation.fromDirection(facing).getSwapped();
-        if (!rayTrace(this, null, coord, orientation, powered, false, true) && !powered) {
+        if (!rayTrace(socket, coord, orientation, powered, false, true) && !powered) {
             slowDown(); //because nothing's telling us to stay on
         }
         if (grab_items) {
             grab_items = false;
             
-            for (Entity entity : getEntities(ent, coord, orientation.top, 1)) {
+            for (Entity entity : getEntities(socket, coord, orientation.top, 1)) {
                 if (entity.isDead) {
                     continue;
                 }
