@@ -606,14 +606,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             }
             is.stackSize--;
         }
-        if (is.getItem() instanceof ActuatorItem) {
-            ItemStack toPush = is.splitStack(1);
-            if (FactorizationUtil.getStackSize(getInv().push(toPush)) <= 0) {
-                return false;
-            }
-            is.stackSize++;
-            return false;
-        }
         return false;
     }
     
@@ -853,41 +845,32 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         if (is == null) {
             return false;
         }
-        try {
-            EntityPlayer player = getPlayer();
-            player.setSneaking(sneaky);
-            for (MovingObjectPosition mop : rayTrace()) {
-                if (is.getItem() instanceof ActuatorItem) {
-                    ActuatorItem ai = (ActuatorItem) is.getItem();
-                    if (ai.use(is, player, this, mop)) {
+        EntityPlayer player = getPlayer();
+        player.setSneaking(sneaky);
+        for (MovingObjectPosition mop : rayTrace()) {
+            if (mop.typeOfHit == EnumMovingObjectType.TILE) {
+                Vec3 hitVec = mop.hitVec;
+                int x = mop.blockX, y = mop.blockY, z = mop.blockZ;
+                float dx = (float) (hitVec.xCoord - x);
+                float dy = (float) (hitVec.yCoord - y);
+                float dz = (float) (hitVec.zCoord - z);
+                Item it = is.getItem();
+                if (it.onItemUseFirst(is, player, worldObj, x, y, z, mop.sideHit, dx, dy, dz)) {
+                    return true;
+                }
+                if (it.onItemUse(is, player, worldObj, x, y, z, mop.sideHit, dx, dy, dz)) {
+                    return true;
+                }
+            } else if (mop.typeOfHit == EnumMovingObjectType.ENTITY) {
+                if (mop.entityHit.interactFirst(player)) {
+                    return true;
+                }
+                if (mop.entityHit instanceof EntityLiving) {
+                    if (is.func_111282_a(player, (EntityLiving)mop.entityHit)) {
                         return true;
-                    }
-                } else if (mop.typeOfHit == EnumMovingObjectType.TILE) {
-                    Vec3 hitVec = mop.hitVec;
-                    int x = mop.blockX, y = mop.blockY, z = mop.blockZ;
-                    float dx = (float) (hitVec.xCoord - x);
-                    float dy = (float) (hitVec.yCoord - y);
-                    float dz = (float) (hitVec.zCoord - z);
-                    Item it = is.getItem();
-                    if (it.onItemUseFirst(is, player, worldObj, x, y, z, mop.sideHit, dx, dy, dz)) {
-                        return true;
-                    }
-                    if (it.onItemUse(is, player, worldObj, x, y, z, mop.sideHit, dx, dy, dz)) {
-                        return true;
-                    }
-                } else if (mop.typeOfHit == EnumMovingObjectType.ENTITY) {
-                    if (mop.entityHit.interactFirst(player)) {
-                        return true;
-                    }
-                    if (mop.entityHit instanceof EntityLiving) {
-                        if (is.func_111282_a(player, (EntityLiving)mop.entityHit)) {
-                            return true;
-                        }
                     }
                 }
             }
-        } catch (IOException e) { } finally {
-            finishUsingPlayer();
         }
         return false;
     }

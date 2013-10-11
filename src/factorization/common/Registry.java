@@ -51,7 +51,6 @@ import factorization.common.TileEntityGreenware.ClayState;
 import factorization.common.servo.ItemServoMotor;
 import factorization.common.servo.ItemServoRailWidget;
 import factorization.common.servo.ServoComponent;
-import factorization.common.servo.actuators.ActuatorItemSyringe;
 
 public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler {
     public ItemFactorizationBlock item_factorization;
@@ -108,7 +107,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemBlockProxy rocket_engine;
     public ItemServoMotor servo_motor_placer;
     public ItemServoRailWidget servo_widget_instruction, servo_widget_decor;
-    public ActuatorItemSyringe actuator_item_manipulator;
     public ItemStack dark_iron_sprocket, sprocket_motor;
     public ItemDayBarrel daybarrel;
     public ItemSocketPart socket_part;
@@ -304,7 +302,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         servo_widget_instruction = new ItemServoRailWidget(itemID("servoWidgetInstruction", 9061));
         servo_widget_decor.setMaxStackSize(16);
         servo_widget_instruction.setMaxStackSize(1);
-        actuator_item_manipulator = new ActuatorItemSyringe(itemID("actuatorItemManipulator", 9058));
         dark_iron_sprocket = new ItemStack(new ItemCraftingComponent(itemID("darkIronSprocket", 9059), "servo/sprocket"));
         sprocket_motor = new ItemStack(new ItemCraftingComponent(itemID("servoMotor", 9060), "servo/servo_motor"));
         socket_part = new ItemSocketPart(itemID("socketPart", 9064), "socket/", TabType.SERVOS);
@@ -1092,14 +1089,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'S', "ingotSilver",
                 '#', logicMatrix,
                 'P', logicMatrixProgrammer);
-        oreRecipe(new ItemStack(actuator_item_manipulator),
-                "| |",
-                "|#|",
-                "|P|",
-                '#', Block.glass,
-                '|', Block.thinGlass,
-                '-', Block.pressurePlatePlanks,
-                'P', Block.pistonBase);
         ServoComponent.setupRecipes();
         recipe(parasieve_item,
                 "#",
