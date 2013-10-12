@@ -76,7 +76,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
             if (is == null || !inv.canExtract(i, is)) {
                 continue;
             }
-            is = inv.pull(i, 1);
+            player.inventory.mainInventory[0] = is = inv.pull(i, 1);
             if (is == null) {
                 continue; //Unexpected...
             }

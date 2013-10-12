@@ -113,7 +113,7 @@ public class FzConfig {
         lightair_id = getBlockConfig("lightAirBlockId", lightair_id, "WrathFire and invisible lamp-air made by WrathLamps");
         resource_id = getBlockConfig("resourceBlockId", resource_id, "Ores and metal blocks mostly");
 
-        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+        {
             debug_light_air = getBoolConfig("debugLightAir", "client", debug_light_air, "Show invisible lamp-air");
             pocket_craft_anywhere = getBoolConfig("anywherePocketCraft", "client", pocket_craft_anywhere, "Lets you open the pocket crafting table from GUIs");
             bag_swap_anywhere = getBoolConfig("anywhereBagSwap", "client", bag_swap_anywhere, "Lets you use the bag from GUIs");

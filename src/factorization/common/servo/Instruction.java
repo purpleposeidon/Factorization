@@ -36,7 +36,7 @@ public abstract class Instruction extends Decorator {
     protected void addRecipes() {
         Core.registry.recipe(toItem(),
                 "I<#",
-                'I', Core.registry.dark_iron,
+                'I', Core.registry.instruction_plate,
                 '<', getRecipeItem(),
                 '#', Core.registry.logicMatrixProgrammer);
     }

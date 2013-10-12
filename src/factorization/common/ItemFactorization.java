@@ -10,6 +10,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 public class ItemFactorization extends Item {
+    private int spriteNumber = 1;
 
     public ItemFactorization(int itemId, String name, TabType tabType) {
         super(itemId);
@@ -30,4 +31,14 @@ public class ItemFactorization extends Item {
     }
     
     protected void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {}
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public int getSpriteNumber() {
+        return spriteNumber;
+    }
+    
+    public void setSpriteNumber(int num) {
+        this.spriteNumber = num;
+    }
 }

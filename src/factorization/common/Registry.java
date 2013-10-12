@@ -110,6 +110,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemStack dark_iron_sprocket, sprocket_motor;
     public ItemDayBarrel daybarrel;
     public ItemSocketPart socket_part;
+    public ItemCraftingComponent instruction_plate;
 
     public Material materialMachine = new Material(MapColor.ironColor);
 
@@ -305,6 +306,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         dark_iron_sprocket = new ItemStack(new ItemCraftingComponent(itemID("darkIronSprocket", 9059), "servo/sprocket"));
         sprocket_motor = new ItemStack(new ItemCraftingComponent(itemID("servoMotor", 9060), "servo/servo_motor"));
         socket_part = new ItemSocketPart(itemID("socketPart", 9064), "socket/", TabType.SERVOS);
+        instruction_plate = new ItemCraftingComponent(itemID("instructionPlate", 9065), "servo/instruction_plate", TabType.SERVOS);
+        instruction_plate.setSpriteNumber(0);
         
         socket_lacerator = FactoryType.SOCKET_LACERATOR.asSocketItem();
         socket_robot_hand = FactoryType.SOCKET_ROBOTHAND.asSocketItem();
@@ -436,11 +439,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 " B",
                 'D', diamond_shard,
                 'B', Item.netherrackBrick /* netherbrick */);
-        //recipe(new ItemStack(wrath_igniter), // ah hell naw
-        //		"D ",
-        //		" B",
-        //		'D', Item.diamond,
-        //		'B', Block.netherBrick);
 
         //Resources
         recipe(new ItemStack(lead_ingot, 9), "#", '#', lead_block_item);
@@ -1058,8 +1056,13 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 '+', servorail_item,
                 '*', sprocket_motor,
                 '@', logicMatrixController,
-                'I', dark_iron
-                );
+                'I', dark_iron);
+        oreRecipe(new ItemStack(instruction_plate, 5),
+                "I ",
+                "I>",
+                "I ",
+                'I', dark_iron,
+                '>', logicMatrixProgrammer);
     }
     
     private void makeServoRecipes() {

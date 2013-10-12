@@ -88,24 +88,17 @@ WRATH (But this adds rocketry. Ha. Definitely makes the mod smaller.)
 SERVOS
 ------
 regarding actuators:
-  Move them out of the inventory, into a separate thing
-  Have these actuators:
-    Freaky Robot Hand: Deployer. Not much more to it. (I mean unless you want left click. Erm.)
-    Inventory Manipulator: by itself, a boring push/pull
-    Grabber: Picks up blocks and entities. Uses FZDS fun-times.
   We'll keep a "generic use actuator instruction", but we'll also add instructions for each actuator. Possibly multiple ones per actuator.
   All the socket-tools we'll have:
     ✓ Lacerator
-    Grasper
     ✓ Robot Arm
     Ball Lightning Gun
-    Item Vacuum
+    ✓ Item Vacuum
     Chicken Baster
     Launcher (dispenser)
+    Rotor (fzds)
+    Grasper (gravity gun; fzds for just one block? Eh....)
 
-  Sockets are blocks that can have tools mounted into them, like item & liquid manipulators, and lots of other things. Then servos are a mobile socket. Mmmm. Let's say "no" to being able to use them in your hand. This simplifies things A LOT.
-
-Servos need to IO items badly!
 Lower barriers to entry for servos:
     (Suuuugar crystalllss.... hard rock candy....)
   Eliminate dependencies on ore processing:
@@ -115,6 +108,18 @@ Lower barriers to entry for servos:
 
 TOP LIST (that's become somewhat less tops. Oops.)
 --------
+forge Contributing.md
+mobs have trouble with wires/servo rails. Something about EntityMoveHelper? Using Material.circuits makes the sheep happy.
+name for the thingie:
+  *displacer*
+  *dislocator*
+  *transit*
+  *shift*
+  *shuffle*
+  mover, plopper, shover, pusher, supplant, *translater*, localizer, hustle, motion, dynamo, conveyance, carriage, scrape
+  jumble
+
+
 compression crafters:
   flowerpots
   rendering. :(
@@ -127,7 +132,9 @@ barrel placement options:
 I wonder if the bug hopper has any interesting crashlogs!
 One of my ICommands is broken!?
 localize barrel types (There's a ton of other things what need to be localized, y'know...)
+localize ALL THE THINGS
 leyden jars & batteries should overcharge slightly so that they can drop exactly 100%-charged stuff
+seems we can't really rely on servo components being loaded by .zip inspecting; will have to do it by hand. x_x
 hopping barrels could be optimized if they're moving something above them to below them!
 ★★★Talk to RLP about monetization plan★★★
 underground silver temples/vaults. With moon lamps? :D
@@ -158,6 +165,9 @@ To kill NEI's shift-? cheat: clear out RecipeInfo.overlayMap... or something.  H
   Might want to just remove instances whose class = DefaultOverlayHandler or BrewingOverlayHandler.
 http://jezek2.advel.cz/tmp/jstackalloc/javadoc/
 in-place barrel upgrading
+richardG suggests doing world.blockExists to prevent orphaning chunks:
+  new socket stufff....
+  hopping barrels that are sideways
 
 back to ceramics?
    - a new tool: export to obj tool. And if we have an export, maybe an import would be nice. Could export the sculpture, or export the chunk! Use a hacked up tessellator.

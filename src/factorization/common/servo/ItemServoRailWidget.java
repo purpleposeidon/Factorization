@@ -137,18 +137,22 @@ public class ItemServoRailWidget extends ItemFactorization {
     
     @Override
     public Icon getIcon(ItemStack stack, int pass) {
-        if (pass != 0) {
-            return null;
+        if (pass == 0) {
+            return BlockIcons.servo$instruction_plate;
         }
-        ServoComponent sc = get(stack);
-        Icon ret = null;
-        if (sc instanceof Decorator) {
-            ret = ((Decorator) sc).getIcon(ForgeDirection.UNKNOWN);
+        if (pass == 1) {
+            ServoComponent sc = get(stack);
+            Icon ret = null;
+            if (sc instanceof Decorator) {
+                ret = ((Decorator) sc).getIcon(ForgeDirection.UNKNOWN);
+            }
+            if (ret == null) {
+                ret = BlockIcons.uv_test;
+            }
+            return ret;
         }
-        if (ret == null) {
-            ret = BlockIcons.uv_test;
-        }
-        return ret;
+        return null;
+        
     }
     
     @Override
@@ -165,6 +169,6 @@ public class ItemServoRailWidget extends ItemFactorization {
     
     @Override
     public int getRenderPasses(int metadata) {
-        return 1;
+        return 2;
     }
 }

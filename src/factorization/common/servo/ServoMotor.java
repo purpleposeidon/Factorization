@@ -55,6 +55,7 @@ import factorization.common.sockets.SocketEmpty;
 import factorization.notify.Notify;
 
 public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IEntityMessage, IInventory, ISocketHolder {
+    //NORELEASE: Have the servorail TileEntity store a reference to this?
     public static final int STACKS = 16;
     public static final int STACK_EQUIPMENT = 0, STACK_ARGUMENT = 1, STACK_IO = 2, STACK_CONFIG = 3, STACK_ERRNO = 4;
     private ServoStack[] stacks = new ServoStack[STACKS];
@@ -70,7 +71,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     float pos_progress;
     
     public TileEntitySocketBase socket = new SocketEmpty();
-    public boolean isSocketActive = false;
+    public boolean isSocketActive = false, isSocketPulsed = false;
     
     public FzOrientation prevOrientation = FzOrientation.UNKNOWN, orientation = FzOrientation.UNKNOWN;
     public ForgeDirection nextDirection = ForgeDirection.UNKNOWN, lastDirection = ForgeDirection.UNKNOWN;
@@ -242,6 +243,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             data.putTag(output);
         }
         isSocketActive = data.as(Share.VISIBLE, "sockon").putBoolean(isSocketActive);
+        isSocketPulsed = data.as(Share.VISIBLE, "sockpl").putBoolean(isSocketPulsed);
     }
 
     public double getTargetSpeed() {
@@ -391,7 +393,8 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         Coord here = getCurrentPos();
         here.setAsTileEntityLocation(socket);
         socket.facing = orientation.top;
-        socket.genericUpdate(this, here, isSocketActive);
+        socket.genericUpdate(this, here, isSocketActive ^ isSocketPulsed);
+        isSocketPulsed = false;
     }
     
     public Random getRandom() {

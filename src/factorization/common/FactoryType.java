@@ -10,6 +10,7 @@ import factorization.common.sockets.SocketRobotHand;
 import factorization.common.sockets.SocketShifter;
 
 public enum FactoryType {
+    //Traced here is the history of Factorization.
     ROUTER(0, true, TileEntityRouter.class, "factory_router"), // Send/retrieve items from connected inventories
     //1 -- This used to be CUTTER
     //2 -- This used to be MAKER

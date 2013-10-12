@@ -1,19 +1,15 @@
 Block.(min|max)(x|y|z)
-DamageSource: all methods
+DamageSource: all methods [mDiyo?]
 Entity.invulnerable
 EntityLiving.equipmentDropChances
 GuiContainer.getSlotAtPosition
-GUIContainer.getSlotAtPosition
-GuiContainer.itemRenderer
-InventoryCrafting.stackList
+GuiContainer.itemRenderer [mDiyo?]
+InventoryCrafting.stackList [mDiyo?]
 Item.unlocalizedName
 Minecraft.isGamePaused
-Minecraft.session
 Minecraft.timer
-NBTTagList.tagList
+NBTTagList.tagList (for the Collection)
 NetClientHandler.worldClient
 PlayerControllerMP: All fields
 PlayerControllerMP.sameToolAndBlock
 RenderGlobal.drawOutlinedBoundingBox
-ShapedOreRecipe.checkItemEquals >:D
-TextureMap.missingImage

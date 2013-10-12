@@ -11,11 +11,13 @@ import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatMessageComponent;
@@ -87,12 +89,6 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     @Override
     public void updateEntity() {
         charge.update();
-        if (worldObj.isRemote) {
-            prev_rotation = rotation;
-            rotation += speed / 4F;
-            ticked = true;
-            return;
-        }
         super.updateEntity();
     }
     
@@ -118,6 +114,12 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     
     @Override
     public void genericUpdate(ISocketHolder socket, Coord coord, boolean powered) {
+        if (worldObj.isRemote) {
+            prev_rotation = rotation;
+            rotation += speed / 4F;
+            ticked = true;
+            return;
+        }
         genericUpdate_implementation(socket, coord, powered);
         if (FactorizationUtil.significantChange(last_shared_speed, speed)) {
             socket.sendMessage(MessageType.LaceratorSpeed, speed);
@@ -313,7 +315,8 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             int id = worldObj.getBlockId(mop.blockX, mop.blockY, mop.blockZ);
             int md = worldObj.getBlockMetadata(mop.blockX, mop.blockY, mop.blockZ);
             Block block = Block.blocksList[id];
-            if (block.getBlockHardness(worldObj, mop.blockX, mop.blockY, mop.blockZ) < 0) {
+            float hardness = block.getBlockHardness(worldObj, mop.blockX, mop.blockY, mop.blockZ);
+            if (hardness < 0) {
                 speed -= max_speed/5;
                 return true;
             }
@@ -336,11 +339,14 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             } else {
                 progress++;
             }
-            if (progress >= grind_time || Core.cheat) {
+            if (progress >= grind_time*hardness || Core.cheat) {
                 grab_items = true;
                 grind_items = true;
                 if (barrel == null) {
                     FakePlayer player = getFakePlayer();
+                    ItemStack pick = new ItemStack(Item.pickaxeDiamond);
+                    pick.addEnchantment(Enchantment.silkTouch, 1);
+                    player.inventory.mainInventory[0] = pick;
                     block.onBlockHarvested(worldObj, mop.blockX, mop.blockY, mop.blockZ, md, player);
                     if (block.removeBlockByPlayer(worldObj, player, mop.blockX, mop.blockY, mop.blockZ)) {
                         block.onBlockDestroyedByPlayer(worldObj, mop.blockX, mop.blockY, mop.blockZ, md);

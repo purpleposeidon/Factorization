@@ -7,14 +7,15 @@
     https://github.com/purpleposeidon/FactorizationLocalizations if you would like to contribute localizations
   Commands:
     Made the /f command user-friendly. Use it!
-    Added the /mutter command; shows a message above your head
-  Buffs:
-    Made the leyden jar much easier to charge
-    Made glaze recipes be not ridiculous
   Barrels:
-    Can now store damaged items
+    Changed the silky barrel recipe from 1 silk touch book to 8 cobwebs, and they must be broken with a Silk Touch axe
     Hopping barrels respect redstone signal.
+    Hopefully made barrel placing more intuitive. It will always place upwards unless:
+      Clicked close to the edge of a horizontal face
+      Clicked against a vertical face while looking straight up/down.
+    Can now store damaged items
     Items with NBT tag 'noFzBarrel' can't be put into barrels by clicking
+
   Parasieve:
     Now cheaper
     Filter can be inverted with a redstone signal
@@ -46,6 +47,10 @@
     Renamed since it boils water, not solars.
     Output steam at full speed now.
   Tinker's Construct aluminum, ardite, and cobalt ores can be processed
+    Added the /mutter command; write messages above your head!
+  Buffs:
+    Made the leyden jar much easier to charge
+    Made glaze recipes be not ridiculous
   Bug fixes:
     various recipes weren't crafting
     Servo texture

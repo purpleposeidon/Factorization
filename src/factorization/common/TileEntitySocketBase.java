@@ -6,11 +6,9 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -119,9 +117,9 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         final ForgeDirection right = face.getRotation(top);
         
         for (Entity entity : getEntities(socket, coord, top, 0)) {
-            if (!entity.canBeCollidedWith()) {
-                continue;
-            }
+            //if (!entity.canBeCollidedWith()) {
+            //	continue;
+            //}
             if (handleRay(socket, new MovingObjectPosition(entity), false, powered)) {
                 return true;
             }
@@ -244,15 +242,15 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     protected FakePlayer getFakePlayer() {
         if (silkyPlayer == null) {
-            silkyPlayer = new FakePlayer(worldObj, "[Lacerator]");
+            silkyPlayer = new FakePlayer(worldObj, "[Socket]");
         }
-        ItemStack pick = new ItemStack(Item.pickaxeDiamond);
-        pick.addEnchantment(Enchantment.silkTouch, 1);
         silkyPlayer.worldObj = worldObj;
         silkyPlayer.posX = xCoord;
         silkyPlayer.posY = yCoord;
         silkyPlayer.posZ = zCoord;
-        silkyPlayer.inventory.mainInventory[0] = pick;
+        for (int i = 0; i < silkyPlayer.inventory.mainInventory.length; i++) {
+            silkyPlayer.inventory.mainInventory[i] = null;
+        }
         return silkyPlayer;
     }
     
