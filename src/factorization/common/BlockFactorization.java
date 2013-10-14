@@ -566,8 +566,11 @@ public class BlockFactorization extends BlockContainer {
     @Override
     @SideOnly(Side.CLIENT)
     public boolean addBlockDestroyEffects(World world, int x, int y, int z, int meta, EffectRenderer effectRenderer) {
-        Coord here = new Coord(world, x, y, z);
-        TileEntityCommon tec = here.getTE(TileEntityCommon.class);
+        TileEntity te = world.getBlockTileEntity(x, y, z);
+        if (!(te instanceof TileEntityCommon)) {
+            return false;
+        }
+        TileEntityCommon tec = (TileEntityCommon) te;
         Icon theIcon = (tec == null) ? BlockIcons.default_icon : tec.getIcon(ForgeDirection.DOWN);
         
         //copied & modified from EffectRenderer.addBlockDestroyEffects
@@ -581,7 +584,9 @@ public class BlockFactorization extends BlockContainer {
                     double d0 = (double)x + ((double)j1 + 0.5D) / (double)b0;
                     double d1 = (double)y + ((double)k1 + 0.5D) / (double)b0;
                     double d2 = (double)z + ((double)l1 + 0.5D) / (double)b0;
-                    effectRenderer.addEffect((new EntityDiggingFX(world, d0, d1, d2, d0 - (double)x - 0.5D, d1 - (double)y - 0.5D, d2 - (double)z - 0.5D, this, meta)).applyColourMultiplier(x, y, z));
+                    EntityDiggingFX fx = (new EntityDiggingFX(world, d0, d1, d2, d0 - (double)x - 0.5D, d1 - (double)y - 0.5D, d2 - (double)z - 0.5D, this, meta)).applyColourMultiplier(x, y, z);
+                    fx.setParticleIcon(theIcon);
+                    effectRenderer.addEffect(fx);
                 }
             }
         }
