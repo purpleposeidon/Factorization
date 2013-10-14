@@ -157,7 +157,18 @@ public class SocketShifter extends TileEntitySocketBase {
                 BlockIcons.socket$shifter_side, BlockIcons.socket$shifter_side,
                 BlockIcons.socket$shifter_side, BlockIcons.socket$shifter_side,
                 BlockIcons.socket$shifter_side, BlockIcons.socket$shifter_side);
-        block.setBlockBounds(0, 0, 0, 1, 12F/16F, 1);
+        float d = 4F/16F;
+        block.setBlockBounds(d, 8F/16F, d, 1-d, 12F/16F, 1-d);
+        block.begin();
+        block.rotateCenter(Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())));
+        block.renderRotated(tess, xCoord, yCoord, zCoord);
+        d = 5F/16F;
+        block.setBlockBounds(d, 3F/16F, d, 1-d, 12F/16F, 1-d);
+        block.begin();
+        block.rotateCenter(Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())));
+        block.renderRotated(tess, xCoord, yCoord, zCoord);
+        d = 6F/16F;
+        block.setBlockBounds(d, -2F/16F, d, 1-d, 12F/16F, 1-d);
         block.begin();
         block.rotateCenter(Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())));
         block.renderRotated(tess, xCoord, yCoord, zCoord);
