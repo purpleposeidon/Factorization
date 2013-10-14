@@ -46,18 +46,6 @@ public class BlockRenderSocketBase extends FactorizationBlockRender {
             block.renderForInventory(rb);
             GL11.glPopMatrix();
         }
-        
-        
-
-        switch (dir) { //NORELEASE?
-        case DOWN: break;
-        default:
-        case UP: break;
-        case NORTH: break;
-        case SOUTH: break;
-        case WEST: break;
-        case EAST: break;
-        }
     }
 
     @Override
