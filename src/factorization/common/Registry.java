@@ -1085,13 +1085,14 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'M', motor,
                 'c', Item.comparator);
         oreRecipe(new ItemStack(servo_motor_placer),
-                "MS ",
-                " #P",
-                "MS ",
+                "M#P",
+                " SC",
+                "M#P",
                 'M', sprocket_motor,
-                'S', "ingotSilver",
                 '#', logicMatrix,
-                'P', logicMatrixProgrammer);
+                'P', logicMatrixProgrammer,
+                'S', empty_socket_item,
+                'C', Block.chest);
         ServoComponent.setupRecipes();
         recipe(parasieve_item,
                 "#",

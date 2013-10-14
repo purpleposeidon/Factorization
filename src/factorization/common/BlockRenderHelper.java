@@ -247,6 +247,7 @@ public class BlockRenderHelper extends Block {
      * Rotate around the center of the block. Use this one!
      */
     public BlockRenderHelper rotateCenter(Quaternion q) {
+        //TODO: FzOrientation variant; could let us do mad render optimizations
         float d = 0.5F;
         translate(-d, -d, -d);
         rotate(q);
