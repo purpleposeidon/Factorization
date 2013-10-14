@@ -1,5 +1,8 @@
 package factorization.common.servo;
 
+import static org.lwjgl.opengl.GL11.GL_LIGHTING;
+import static org.lwjgl.opengl.GL11.glDisable;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -252,6 +255,7 @@ public class RenderServoMotor extends RenderEntity {
         socket.xCoord = socket.yCoord = socket.zCoord = 0;
         socket.facing = ForgeDirection.UP;
         
+        GL11.glDisable(GL_LIGHTING);
         GL11.glPushMatrix();
         socket.renderTesr(partial);
         GL11.glPopMatrix();
@@ -261,6 +265,7 @@ public class RenderServoMotor extends RenderEntity {
         socket.renderStatic(tess);
         tess.draw();
         GL11.glTranslatef(-d, -y, -d);
+        GL11.glEnable(GL_LIGHTING);
     }
 
     RenderItem renderItem = new RenderItem();
