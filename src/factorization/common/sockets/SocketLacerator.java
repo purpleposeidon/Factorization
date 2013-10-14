@@ -128,10 +128,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     }
     
     private void genericUpdate_implementation(ISocketHolder socket, Coord coord, boolean powered) {
-        if (powered) {
-            slowDown();
-            return;
-        }
+        //TODO: Decide if we should slow/stop the servo if we're grinding something.
         if (getBackingInventory(socket) == null) {
             slowDown();
             return;
@@ -147,8 +144,12 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             return;
         }
         FzOrientation orientation = FzOrientation.fromDirection(facing).getSwapped();
-        if (!rayTrace(socket, coord, orientation, powered, false, true) && !powered) {
-            slowDown(); //because nothing's telling us to stay on
+        if (!rayTrace(socket, coord, orientation, powered, false, true)) {
+            if (!powered) {
+                slowDown();
+            } else {
+                cantDoWork(socket);
+            }
         }
         if (grab_items) {
             grab_items = false;
@@ -250,7 +251,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                 return ChatMessageComponent.createFromTranslationWithSubstitutions(ret, victim.getTranslatedEntityName());
             }
         }
-    }; //NORELEASE: Localization
+    };
     
     static SocketLacerator dropGrabber = null;
     
@@ -582,11 +583,13 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             if (particle.motionY > speed/4) {
                 particle.motionY *= 3;
             }
+            particle.multipleParticleScaleBy(1 + rand.nextFloat()*2/3);
             origER.addEffect(particle);
         }
     }
     
     @ForgeSubscribe
+    @SideOnly(Side.CLIENT)
     public void resetEffectRenderer(WorldEvent.Unload loadEvent) {
         particleTweaker = null;
     }
