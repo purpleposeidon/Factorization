@@ -195,4 +195,6 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
             return value; //Uh, yeah. We don't know what it is.
         }
     }
+    
+    public void log(String message) {}
 }

@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -15,15 +14,16 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
+import factorization.common.BlockRenderHelper;
 import factorization.common.FactorizationUtil;
 import factorization.common.FactorizationUtil.FzInv;
-import factorization.common.BlockRenderHelper;
 import factorization.common.FactoryType;
 import factorization.common.ISocketHolder;
 import factorization.common.TileEntitySocketBase;
 
 public class SocketShifter extends TileEntitySocketBase {
-    int localSlot = -1, foreignSlot = -1;
+    boolean streamMode = true; // be like a hopper or a filter
+    int foreignSlot = -1;
     boolean exporting;
     byte transferLimit = 1;
     byte cooldown = 0;
@@ -34,18 +34,37 @@ public class SocketShifter extends TileEntitySocketBase {
     }
     
     @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        localSlot = data.as(Share.PRIVATE, "loc").putInt(localSlot);
-        foreignSlot = data.as(Share.PRIVATE, "for").putInt(foreignSlot);
-        exporting = data.as(Share.PRIVATE, "exp").putBoolean(exporting);
-        transferLimit = data.as(Share.PRIVATE, "lim").putByte(transferLimit);
-        cooldown = data.as(Share.PRIVATE, "wait").putByte(cooldown);
-        return this;
+    public boolean canUpdate() {
+        return true;
     }
     
     @Override
-    public boolean canUpdate() {
-        return true;
+    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+        streamMode = data.as(Share.MUTABLE, "strm").putBoolean(streamMode);
+        exporting = data.as(Share.MUTABLE, "exp").putBoolean(exporting);
+        foreignSlot = data.as(Share.MUTABLE, "for").putInt(foreignSlot);
+        transferLimit = data.as(Share.MUTABLE, "lim").putByte(transferLimit);
+        cooldown = data.as(Share.VISIBLE, "wait").putByte(cooldown);
+        if (data.isWriter()) {
+            return this;
+        }
+        //Validate input
+        if (streamMode) {
+            transferLimit = 1;
+        }
+        if (foreignSlot < 0) {
+            foreignSlot = 0;
+            data.log("foreign slot was < 0");
+        }
+        if (transferLimit > 64) {
+            transferLimit = 64;
+            data.log("transfer limit was > 64");
+        }
+        if (transferLimit < 1) {
+            transferLimit = 1;
+            data.log("transfer limit was < 1");
+        }
+        return this;
     }
     
     @Override
@@ -63,6 +82,7 @@ public class SocketShifter extends TileEntitySocketBase {
         FzInv localInv, foreignInv;
         ForgeDirection back = facing.getOpposite();
         if (socket != this) {
+            // meaning we're on a Servo
             localInv = FactorizationUtil.openInventory((IInventory) socket, facing);
         } else {
             coord.adjust(back);
@@ -79,75 +99,28 @@ public class SocketShifter extends TileEntitySocketBase {
             return;
         }
         if (exporting) {
-            exportItems(localInv, foreignInv);
+            if (foreignSlot == -1) {
+                localInv.transfer(foreignInv, transferLimit, null);
+            } else {
+                for (int localSlot = 0; localSlot < localInv.size(); localSlot++) {
+                    if (localInv.transfer(localSlot, foreignInv, foreignSlot, transferLimit)) {
+                        break;
+                    }
+                }
+            }
         } else {
-            exportItems(foreignInv, localInv);
+            if (foreignSlot == -1) {
+                foreignInv.transfer(localInv, transferLimit, null);
+            } else {
+                for (int localSlot = 0; localSlot < localInv.size(); localSlot++) {
+                    if (foreignInv.transfer(foreignSlot, localInv, localSlot, transferLimit)) {
+                        break;
+                    }
+                }
+            }
         }
+        cooldown = (byte) (streamMode ? 8 : 1);
     }
-    
-    void exportItems(FzInv local, FzInv foreign) {
-        int localStart, localEnd, foreignStart, foreignEnd;
-        int localSize = local.size(), foreignSize = foreign.size();
-        byte COOL = 8;
-        if (localSlot == -1) {
-            localStart = 0;
-            localEnd = localSize;
-        } else {
-            if (localSlot < 0 || localSlot >= localSize) {
-                cooldown = COOL;
-                return;
-            }
-            localStart = localSlot;
-            localEnd = localStart + 1;
-        }
-        if (foreignSlot == -1) {
-            foreignStart = 0;
-            foreignEnd = foreignSize;
-        } else {
-            if (foreignSlot < 0 || foreignSlot >= foreignSize) {
-                cooldown = COOL;
-                return;
-            }
-            foreignStart = foreignSlot;
-            foreignEnd = foreignSlot + 1;
-        }
-        
-        for (int l = localStart; l < localEnd; l++) {
-            ItemStack lis = local.get(l);
-            if (lis == null || !local.canExtract(l, lis)) {
-                continue;
-            }
-            int origSize = lis.stackSize;
-            for (int f = foreignStart; f < foreignEnd; f++) {
-                if (foreign.get(f) == null) {
-                    continue;
-                }
-                lis = foreign.pushInto(f, lis);
-                if (lis == null) {
-                    local.set(l, null);
-                    cooldown = COOL;
-                    return;
-                }
-            }
-            for (int f = foreignStart; f < foreignEnd; f++) {
-                if (foreign.get(f) != null) {
-                    continue;
-                }
-                lis = foreign.pushInto(f, lis);
-                if (lis == null) {
-                    local.set(l, null);
-                    cooldown = COOL;
-                    return;
-                }
-            }
-            if (FactorizationUtil.getStackSize(lis) == origSize) {
-                continue;
-            }
-            local.set(l, lis);
-            cooldown = COOL;
-        }
-    }
-    
     
     @Override
     @SideOnly(Side.CLIENT)
@@ -157,21 +130,16 @@ public class SocketShifter extends TileEntitySocketBase {
                 BlockIcons.socket$shifter_side, BlockIcons.socket$shifter_side,
                 BlockIcons.socket$shifter_side, BlockIcons.socket$shifter_side,
                 BlockIcons.socket$shifter_side, BlockIcons.socket$shifter_side);
-        float d = 4F/16F;
-        block.setBlockBounds(d, 8F/16F, d, 1-d, 12F/16F, 1-d);
-        block.begin();
-        block.rotateCenter(Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())));
-        block.renderRotated(tess, xCoord, yCoord, zCoord);
-        d = 5F/16F;
-        block.setBlockBounds(d, 3F/16F, d, 1-d, 12F/16F, 1-d);
-        block.begin();
-        block.rotateCenter(Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())));
-        block.renderRotated(tess, xCoord, yCoord, zCoord);
-        d = 6F/16F;
-        block.setBlockBounds(d, -2F/16F, d, 1-d, 12F/16F, 1-d);
-        block.begin();
-        block.rotateCenter(Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())));
-        block.renderRotated(tess, xCoord, yCoord, zCoord);
+        final float minYs[] = new float[] { 8F/16F, 3F/16F, -2F/16F };
+        final float ds[] = new float[] { 4F/16F, 5F/16F, 6F/16F };
+        for (int i = 0; i < ds.length; i++) {
+            float d = ds[i];
+            float minY = minYs[i];
+            block.setBlockBounds(d, minY, d, 1-d, 12F/16F, 1-d);
+            block.begin();
+            block.rotateCenter(Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())));
+            block.renderRotated(tess, xCoord, yCoord, zCoord);
+        }
     }
 
 }
