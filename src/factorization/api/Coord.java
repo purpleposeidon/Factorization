@@ -108,8 +108,9 @@ public class Coord implements IDataSerializable {
             Block b = getBlock();
             if (b != null) {
                 ret += " " + getBlock().getClass().getSimpleName();
+                ret += " " + b.getUnlocalizedName();
             } else {
-                ret += " air";
+                ret += " null";
             }
             TileEntity te = getTE();
             if (te != null) {
