@@ -5,7 +5,7 @@ import java.util.List;
 public class MiscProxy {
     void runCommand(List<String> args) { }
 
-    void fixAchievements() { }
+    void initializeClient() { }
     
     void registerLoadAlert() { }
 

@@ -79,8 +79,7 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
                 " #  # "
         };
         
-        //Fixes achievements
-        proxy.fixAchievements();
+        proxy.initializeClient();
         GameRegistry.registerCraftingHandler(new ICraftingHandler() {
             @Override public void onSmelting(EntityPlayer player, ItemStack item) { }
             

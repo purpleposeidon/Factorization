@@ -51,6 +51,7 @@ public class FzConfig {
     public static int max_rocket_height = 64;
     public static boolean stretchy_clay = true;
     public static boolean equal_opportunities_for_mobs = true;
+    public static boolean fix_nether_fog = true;
     public static boolean invasiveCharge = false;
     public static boolean enable_solar_steam = true;
 
@@ -136,6 +137,7 @@ public class FzConfig {
             lowest_dilation = Math.max(1, Math.min(0, lowest_dilation));
             lagssie_watcher = getBoolConfig("enableLagWatchDog", "client", lagssie_watcher, "If true, enables a thread that dumps a stack trace of Minecraft if it is paused for longer than lagWatchDogInterval");
             lagssie_interval = getDoubleConfig("lagWatchDogInterval", "client", lagssie_interval, "If the game is stuck for longer than this amount of time (in seconds), dump a stacktrace of what it is doing.");
+            fix_nether_fog = getBoolConfig("fixNetherFog", "client", fix_nether_fog, "Remove nether fog at short render distances");
         }
 
         gen_silver_ore = getBoolConfig("generateSilverOre", "general", gen_silver_ore, "This disables silver ore generation");

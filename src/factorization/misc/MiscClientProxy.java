@@ -6,7 +6,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -20,14 +22,25 @@ import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.network.INetworkManager;
+import net.minecraft.network.NetLoginHandler;
+import net.minecraft.network.packet.NetHandler;
+import net.minecraft.network.packet.Packet1Login;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatFileWriter;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldProviderHell;
+import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.client.GuiModList;
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
 import cpw.mods.fml.common.IScheduledTickHandler;
 import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.common.network.IConnectionHandler;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.Player;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
@@ -36,6 +49,8 @@ import factorization.common.Core;
 import factorization.common.FzConfig;
 
 public class MiscClientProxy extends MiscProxy {
+    static final Minecraft mc = Minecraft.getMinecraft();
+    
     @Retention(value = RUNTIME)
     @Target(value = METHOD)
     static @interface alias {
@@ -57,7 +72,6 @@ public class MiscClientProxy extends MiscProxy {
     }
     
     public static class miscCommands { //NOTE: *not* SideOnly'd.
-        static Minecraft mc;
         static EntityClientPlayerMP player;
         static String arg0, arg1;
         
@@ -396,7 +410,6 @@ public class MiscClientProxy extends MiscProxy {
     
     @Override
     void runCommand(List<String> args) {
-        Minecraft mc = Minecraft.getMinecraft();
         try {
             if (args == null) {
                 args = new ArrayList<String>();
@@ -467,7 +480,6 @@ public class MiscClientProxy extends MiscProxy {
         if (method.getDeclaringClass() == Object.class || method.getParameterTypes().length != 0) {
             return false;
         }
-        Minecraft mc = Minecraft.getMinecraft();
         boolean canCheat = mc.thePlayer.capabilities.isCreativeMode && mc.isSingleplayer();
         if (canCheat) {
             return true;
@@ -482,13 +494,11 @@ public class MiscClientProxy extends MiscProxy {
     }
     
     void tryCall(Method method, List<String> args) {
-        Minecraft mc = Minecraft.getMinecraft();
         if (!commandAllowed(method)) {
             mc.thePlayer.addChatMessage("That command is disabled");
             return;
         }
         try {
-            miscCommands.mc = mc;
             miscCommands.player = mc.thePlayer;
             miscCommands.arg0 = args.get(0);
             if (args.size() >= 2) {
@@ -503,14 +513,13 @@ public class MiscClientProxy extends MiscProxy {
             mc.thePlayer.addChatMessage("Caught an exception from command; see console");
             e.printStackTrace();
         } finally {
-            miscCommands.mc = null;
             miscCommands.player = null;
             miscCommands.arg0 = miscCommands.arg1 = null;
         }
     }
     
     @Override
-    void fixAchievements() {
+    void initializeClient() {
         //give the first achievement, because it is stupid and nobody cares.
         //If you're using this mod, you've probably opened your inventory before anyways.
         StatFileWriter sfw = Minecraft.getMinecraft().statFileWriter;
@@ -519,6 +528,64 @@ public class MiscClientProxy extends MiscProxy {
             Core.logInfo("Achievement Get! You've opened your inventory hundreds of times already! Yes! You're welcome!");
         }
         Minecraft.memoryReserve = new byte[0]; //Consider it an experiment. Would this break anything? I've *never* seen the out of memory screen.
+        MinecraftForge.EVENT_BUS.register(this);
+        NetworkRegistry.instance().registerConnectionHandler(new IConnectionHandler() {
+            @Override public void playerLoggedIn(Player player, NetHandler netHandler, INetworkManager manager) {
+                fixNetherFog(mc.theWorld);
+            }
+            
+            @Override public String connectionReceived(NetLoginHandler netHandler, INetworkManager manager) { return null; }
+            @Override public void connectionOpened(NetHandler netClientHandler, MinecraftServer server, INetworkManager manager) { }
+            @Override public void connectionOpened(NetHandler netClientHandler, String server, int port, INetworkManager manager) { }
+            @Override public void connectionClosed(INetworkManager manager) { }
+            @Override public void clientLoggedIn(NetHandler clientHandler, INetworkManager manager, Packet1Login login) { }
+        });
+    }
+    
+    static boolean setFinalField(Field field, Object instance, Object newValue) {
+        try {
+            field.setAccessible(true);
+            Field modifiersField = Field.class.getDeclaredField("modifiers");
+            modifiersField.setAccessible(true);
+            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+            field.set(instance, newValue);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+    
+    public void fixNetherFog(World world) {
+        if (!world.isRemote) {
+            return;
+        }
+        if (world.provider.getClass() != WorldProviderHell.class) {
+            return;
+        }
+        Field provider = ReflectionHelper.findField(World.class, "field_73011_w", "provider");
+        if (provider == null) {
+            return;
+        }
+        final WorldProviderHell origProvider = (WorldProviderHell) world.provider;
+        final WorldProviderHell myProvider = new WorldProviderHell() {
+            @Override
+            @SideOnly(Side.CLIENT)
+            public boolean doesXZShowFog(int par1, int par2) {
+                final int renderDistance = mc.gameSettings.renderDistance;
+                return renderDistance < 2;
+            }
+        };
+        if (!setFinalField(provider, world, myProvider)) {
+            Core.logWarning("[fixNetherFog] Unable to change world.worldProvider");
+        }
+        for (Field f : WorldProviderHell.class.getFields()) {
+            try {
+                f.set(myProvider, f.get(origProvider));
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
     }
     
     @Override
@@ -537,7 +604,6 @@ public class MiscClientProxy extends MiscProxy {
             @Override
             public void tickStart(EnumSet<TickType> type, Object... tickData) {
                 if (type.contains(TickType.CLIENT)) {
-                    Minecraft mc = Minecraft.getMinecraft();
                     if (count == 40) {
                         //playing any earlier doesn't seem to work (sound is probably loaded in a separate thread?)
                         if (mc.currentScreen instanceof GuiMainMenu) {
@@ -595,7 +661,6 @@ public class MiscClientProxy extends MiscProxy {
             }
             
             void sprint(boolean state) {
-                Minecraft mc = Minecraft.getMinecraft();
                 if (mc.currentScreen != null) {
                     return;
                 }
@@ -622,7 +687,6 @@ public class MiscClientProxy extends MiscProxy {
             return;
         }
         newTps = Math.min(1.5F, Math.max(FzConfig.lowest_dilation, newTps));
-        Minecraft mc = Minecraft.getMinecraft();
         mc.timer.timerSpeed = newTps;
     }
     
