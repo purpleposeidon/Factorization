@@ -105,19 +105,26 @@ public class NetworkFactorization implements ITinyPacketHandler {
         }
     }
     
+    public void prefixTePacket(DataOutputStream output, Coord src, int messageType) throws IOException {
+        output.writeInt(src.x);
+        output.writeInt(src.y);
+        output.writeInt(src.z);
+        output.writeShort(messageType);
+    }
+    
+    public Packet TEmessagePacket(ByteArrayOutputStream outputStream) throws IOException {
+        outputStream.flush();
+        return PacketDispatcher.getTinyPacket(Core.instance, factorizeTEChannel, outputStream.toByteArray());
+    }
+    
     @SuppressWarnings("resource")
     public Packet TEmessagePacket(Coord src, int messageType, Object... items) { //TODO: messageType should be a short
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream output = new DataOutputStream(outputStream);
-
-            output.writeInt(src.x);
-            output.writeInt(src.y);
-            output.writeInt(src.z);
-            output.writeShort(messageType);
+            prefixTePacket(output, src, messageType);
             writeObjects(outputStream, output, items);
-            output.flush();
-            return PacketDispatcher.getTinyPacket(Core.instance, factorizeTEChannel, outputStream.toByteArray());
+            return TEmessagePacket(outputStream);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -562,7 +569,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
         public final static int PlaySound = 11, PistonPush = 12;
         //TEF messages
         public final static int
-                DrawActive = 0, FactoryType = 1, DescriptionRequest = 2,
+                DrawActive = 0, FactoryType = 1, DescriptionRequest = 2, DataHelperEdit = 3,
                 //
                 MakerTarget = 11,
                 //
