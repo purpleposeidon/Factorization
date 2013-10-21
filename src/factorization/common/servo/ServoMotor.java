@@ -103,7 +103,13 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         double d = 0.5;
         pos_prev = new Coord(world, 0, 0, 0);
         pos_next = pos_prev.copy();
-        fakePlayer = new FakePlayer(world, "[Servo]");
+        fakePlayer = new FakePlayer(world, "[Servo]") {
+            @Override
+            public void openGui(Object mod, int modGuiId, World world, int x, int y, int z) {
+                // Blank for a work-around.
+                // TODO: Did FMLNetworkHandler.openGui get an .isRemote check?
+            }
+        };
         fakePlayer.inventory.mainInventory = inv;
     }
     
