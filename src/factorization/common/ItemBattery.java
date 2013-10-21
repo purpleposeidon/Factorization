@@ -64,10 +64,20 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
             }
         }
     }
-
+    
     @Override
-    public void onCraft(ItemStack is, IInventory craftMatrix, int craftSlot, ItemStack result,
-            EntityPlayer player) {
+    public boolean hasContainerItem() {
+        return true;
+    }
+    
+    @Override
+    public boolean doesContainerItemLeaveCraftingGrid(ItemStack par1ItemStack) {
+        return false;
+    }
+    
+    @Override
+    public ItemStack getContainerItemStack(ItemStack is) {
+        is = is.copy();
         normalizeDamage(is);
         int d = is.getItemDamage();
         if (d > 0) {
@@ -75,14 +85,20 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
             stor -= magnet_cost;
             setStorage(is, stor);
             normalizeDamage(is);
-            is.stackSize++;
         }
+        return is;
+    }
+
+    @Override
+    public void onCraft(ItemStack is, IInventory craftMatrix, int craftSlot, ItemStack result, EntityPlayer player) {
+        normalizeDamage(is);
         if (result.getItem() == Core.registry.battery) {
             is.stackSize--;
             result.itemID = is.itemID;
             result.stackSize = is.stackSize;
             result.setTagCompound(is.getTagCompound());
         }
+        // TODO FIXME: Dear gods, no. No. Oh god no.
         for (int i = 0; i < craftMatrix.getSizeInventory(); i++) {
             ItemStack wire = craftMatrix.getStackInSlot(i);
             if (wire != null && wire.isItemEqual(Core.registry.leadwire_item) /* no NBT okay */) {
