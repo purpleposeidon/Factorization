@@ -62,7 +62,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     @Override public Charge getCharge() { return charge; }
     
     short speed = 0;
-    byte progress;
+    short progress;
     short last_shared_speed = 0;
     boolean grab_items = false, grind_items = false;
     long targetHash = -1;
@@ -372,7 +372,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
         charge = data.as(Share.PRIVATE, "charge").put(charge);
         speed = data.as(Share.VISIBLE, "spd").putShort(speed);
-        progress = data.as(Share.PRIVATE, "prg").putByte(progress);
+        progress = data.as(Share.PRIVATE, "prg").putShort(progress);
         buffer = data.as(Share.PRIVATE, "buf").putItemArray(buffer);
         grab_items = data.as(Share.PRIVATE, "grb").putBoolean(grab_items);
         targetHash = data.as(Share.PRIVATE, "hsh").putLong(targetHash);
