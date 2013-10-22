@@ -3,7 +3,6 @@ package factorization.common.servo;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,7 +18,6 @@ import net.minecraftforge.common.ForgeDirection;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
-import com.google.common.reflect.ClassPath;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -32,6 +30,7 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
+import factorization.common.servo.instructions.*;
 
 public abstract class ServoComponent implements IDataSerializable {
     private static HashMap<String, Class<? extends ServoComponent>> componentMap = new HashMap<String, Class<? extends ServoComponent>>(50, 0.5F);
@@ -219,7 +218,7 @@ public abstract class ServoComponent implements IDataSerializable {
         //info.add("Servo Component");
     }
     
-    public static void registerRecursivelyFromPackage(String packageName) {
+    /*public static void registerRecursivelyFromPackage(String packageName) {
         ClassLoader loader = ServoComponent.class.getClassLoader();
         ClassPath cp;
         try {
@@ -244,11 +243,34 @@ public abstract class ServoComponent implements IDataSerializable {
                 ServoComponent.register(cl);
             }
         }
-    }
+    }*/
     
     static {
-        registerRecursivelyFromPackage("factorization.common.servo.actuators");
-        registerRecursivelyFromPackage("factorization.common.servo.instructions");
+        //registerRecursivelyFromPackage("factorization.common.servo.actuators");
+        //registerRecursivelyFromPackage("factorization.common.servo.instructions");
+        for (Class cl : new Class[] {
+                EntryControl.class,
+                RedstonePulse.class,
+                RotateTop.class,
+                Spin.class,
+                SetDirection.class,
+                SetSpeed.class,
+                SocketCtrl.class,
+                
+                Compare.class,
+                Drop.class,
+                Dup.class,
+                IntegerValue.class,
+                Jump.class,
+                Product.class,
+                Sum.class,
+                //ServoEquipmentBay.class,
+                WoodenServoGrate.class,
+                GlassServoGrate.class,
+                IronServoGrate.class
+        }) {
+            register(cl);
+        }
     }
     
     public static void setupRecipes() {
