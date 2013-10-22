@@ -87,6 +87,16 @@ WRATH (But this adds rocketry. Ha. Definitely makes the mod smaller.)
 
 SERVOS
 ------
+2013-10-11 21:29:03 [INFO] [STDERR] java.lang.NoSuchFieldError: particleTweaker
+2013-10-11 21:29:03 [INFO] [STDERR]     at factorization.common.sockets.SocketLacerator.resetEffectRenderer(SocketLacerator.java:591)
+2013-10-11 21:29:03 [INFO] [STDERR]     at net.minecraftforge.event.ASMEventHandler_99_SocketLacerator_resetEffectRenderer_Unload.invoke(.dynamic)
+2013-10-11 21:29:03 [INFO] [STDERR]     at net.minecraftforge.event.ASMEventHandler.invoke(ASMEventHandler.java:39)
+2013-10-11 21:29:03 [INFO] [STDERR]     at net.minecraftforge.event.EventBus.post(EventBus.java:108)
+2013-10-11 21:29:03 [INFO] [STDERR]     at net.minecraft.server.MinecraftServer.func_71260_j(MinecraftServer.java:398)
+2013-10-11 21:29:03 [INFO] [STDERR]     at net.minecraft.server.MinecraftServer.run(MinecraftServer.java:537)
+2013-10-11 21:29:03 [INFO] [STDERR]     at net.minecraft.server.ThreadMinecraftServer.run(SourceFile:583)
+^ fixed, but what about that particle scaling I put in along with the fix?
+
 regarding actuators:
   We'll keep a "generic use actuator instruction", but we'll also add instructions for each actuator. Possibly multiple ones per actuator.
   All the socket-tools we'll have:
@@ -105,32 +115,24 @@ Lower barriers to entry for servos:
     alternative aqua regia recipe (substitute blaze powder for nether powder? or maybe magma cream?)
       Maybe this shouldn't make aqua regia; but instead an acid that's compatible.
   Maybe we should see about flattening our mod in other areas as well.
+  Make dark iron an ore found at bedrock level
 
 TOP LIST (that's become somewhat less tops. Oops.)
 --------
 forge Contributing.md
-mobs have trouble with wires/servo rails. Something about EntityMoveHelper? Using Material.circuits makes the sheep happy.
-name for the thingie:
-  *displacer*
-  *dislocator*
-  *transit*
-  *shift*
-  *shuffle*
-  mover, plopper, shover, pusher, supplant, *translater*, localizer, hustle, motion, dynamo, conveyance, carriage, scrape
-  jumble
-
-
+myrathi's access transformer
 compression crafters:
   flowerpots
   rendering. :(
   fire -> chainmail?
 One of my ICommands is broken (???)
+One of my ICommands is broken!?
 barrel placement options:
   - always place facing up; if shift-clicking with empty fist, rotate like a wrench
   - if clicking near the middle of the block, place up
 [15:43:34] <Hathadar> I have a router inserting into 4 induction furnaces.  The moment I place a machine filter on it and set it to the induction furnace it stops working.  It will not insert or extract.  0.8.01
 I wonder if the bug hopper has any interesting crashlogs!
-One of my ICommands is broken!?
+  - Oh yay the bug hopper is no longer running!
 localize barrel types (There's a ton of other things what need to be localized, y'know...)
 localize ALL THE THINGS
 leyden jars & batteries should overcharge slightly so that they can drop exactly 100%-charged stuff
@@ -139,12 +141,11 @@ hopping barrels could be optimized if they're moving something above them to bel
 ★★★Talk to RLP about monetization plan★★★
 underground silver temples/vaults. With moon lamps? :D
 onInventoryUpdate all the TEs
-fix redstone getting stuck on for servo rail pulses
 Test BoH key with NEI installed & with sneak key set to a mouse button.
 can't glaze a sculpture cloned from an already glazed sculpture
 change raw glaze colors to their real colors
 sparks in leyden jar when held aren't centered
-there's a proper client commands thing now
+there's a proper client commands thing now in recent forge
 smooth sandstone double slab (Are there other variants?)
 Look at what errors we get if the FZDS code isn't in
 either bats are spawning in the hammer dimension, or we're getting entity updates that we shouldn't be
