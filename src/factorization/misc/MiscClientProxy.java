@@ -557,14 +557,16 @@ public class MiscClientProxy extends MiscProxy {
     }
     
     public void fixNetherFog(World world) {
-        if (!world.isRemote) {
+        if (world == null || !world.isRemote) {
             return;
         }
-        if (world.provider.getClass() != WorldProviderHell.class) {
+        if (world.provider == null || world.provider.getClass() != WorldProviderHell.class) {
             return;
         }
         Field provider = ReflectionHelper.findField(World.class, "field_73011_w", "provider");
         if (provider == null) {
+            //The field ACTUALLY COULD be not-found, despite using it normally a few lines up.
+            //Minecraft modding is great.
             return;
         }
         final WorldProviderHell origProvider = (WorldProviderHell) world.provider;

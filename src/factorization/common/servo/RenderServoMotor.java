@@ -1,7 +1,6 @@
 package factorization.common.servo;
 
 import static org.lwjgl.opengl.GL11.GL_LIGHTING;
-import static org.lwjgl.opengl.GL11.glDisable;
 
 import java.io.IOException;
 import java.io.InputStream;
