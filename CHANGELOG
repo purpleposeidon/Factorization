@@ -1,4 +1,4 @@
-0.8.04
+0.8.05
   Localizations:
     German localizations by Vexatos!
     Spanish localizations by Darkona!
@@ -7,6 +7,7 @@
     https://github.com/purpleposeidon/FactorizationLocalizations if you would like to contribute localizations
   Commands:
     Made the /f command user-friendly. Use it!
+    Added the /mutter command; write messages above your head!
   Barrels:
     Changed the silky barrel recipe from 1 silk touch book to 8 cobwebs, and they must be broken with a Silk Touch axe
     Hopping barrels respect redstone signal.
@@ -20,12 +21,13 @@
     Now cheaper
     Filter can be inverted with a redstone signal
   Compression Crafter:
+    BUG: Broken on servers; waiting for https://github.com/MinecraftForge/MinecraftForge/pull/781 to fix
     now requires an adjacent inventory to store crafting results, instead of dumping everything on the ground
     improved self-documentation (and hopefully not annoying. >_>)
     items that have durability, such as wrath igniters, will be re-used as much as the other crafting materials permit
     crafts up to max 32 items at once instead of 16
   Sockets:
-    These are blocks that you shove tools into
+    These are blocks that you shove specialized tools into
     The Lacerator:
       Combination mob/player grinder, (ore) Grinder, and block breaker
       Requires an inventory for outputing items opposite the business end
@@ -34,9 +36,12 @@
       Replaces the Grinder
     The Robotic Arm
       Clicks using items in the inventory behind it
+    The Item Shifter:
+      Pretty much just a hopper for now; more functionality coming
   Servos:
     Corrected intersection handling code
     Added the Entry Control instruction; tells servos which path to use or not use.
+    They can hold socketed tools
   Caliometric Burner, a new power source:
     Place next to a water boiler. Note that multiple burners can be next to a boiler
     Uses food to make steam. Higher quality food makes more steam.
@@ -47,7 +52,6 @@
     Renamed since it boils water, not solars.
     Output steam at full speed now.
   Tinker's Construct aluminum, ardite, and cobalt ores can be processed
-    Added the /mutter command; write messages above your head!
   Buffs:
     Made the leyden jar much easier to charge
     Made glaze recipes be not ridiculous
@@ -59,6 +63,7 @@
     NEI recipe handlers
     Slag furnaces light properly
     Mixer dupe bug
+    nether fog
 
 
 0.8.03
