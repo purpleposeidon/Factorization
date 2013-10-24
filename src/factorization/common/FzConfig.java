@@ -15,12 +15,16 @@ public class FzConfig {
     static int factory_block_id = 1000;
     static int lightair_id = 1001;
     static int resource_id = 1002;
+    static int fractured_bedrock_id = 1003;
+    static int dark_iron_ore_id = 1004;
     public static Pattern routerBan;
     public static boolean render_barrel_item = true;
     public static boolean render_barrel_text = true;
     public static boolean render_barrel_close = false;
     public static int entity_relight_task_id = -1;
     public static boolean gen_silver_ore = true;
+    public static boolean gen_dark_iron_ore = true;
+    public static boolean gen_broken_bedrock = true;
     public static int silver_ore_node_size = 25;
     public static boolean enable_dimension_slice = Core.dev_environ;
     public static int dimension_slice_dimid = -7;
@@ -51,6 +55,11 @@ public class FzConfig {
     public static boolean fix_nether_fog = true;
     public static boolean invasiveCharge = false;
     public static boolean enable_solar_steam = true;
+    
+    public static boolean enable_retrogen = false;
+    public static String retrogen_key = "DEFAULT";
+    public static boolean retrogen_silver = false;
+    public static boolean retrogen_dark_iron = false;
 
     
 
@@ -107,9 +116,11 @@ public class FzConfig {
             Core.logWarning("Error loading config: %s", e.toString());
             e.printStackTrace();
         }
-        factory_block_id = getBlockConfig("factoryBlockId", factory_block_id, "Factorization Machines.");
+        factory_block_id = getBlockConfig("factoryBlockId", factory_block_id, "Factorization TileEntities");
         lightair_id = getBlockConfig("lightAirBlockId", lightair_id, "WrathFire and invisible lamp-air made by WrathLamps");
         resource_id = getBlockConfig("resourceBlockId", resource_id, "Ores and metal blocks mostly");
+        dark_iron_ore_id = getBlockConfig("darkIronOre", dark_iron_ore_id, null);
+        fractured_bedrock_id = getBlockConfig("fracturedBedrockBlockId", fractured_bedrock_id, null);
 
         {
             debug_light_air = getBoolConfig("debugLightAir", "client", debug_light_air, "Show invisible lamp-air");
@@ -137,10 +148,24 @@ public class FzConfig {
             fix_nether_fog = getBoolConfig("fixNetherFog", "client", fix_nether_fog, "Remove nether fog at short render distances");
         }
 
-        gen_silver_ore = getBoolConfig("generateSilverOre", "general", gen_silver_ore, "This disables silver ore generation");
+        
+        add_branding = getBoolConfig("addBranding", "general", add_branding, null); //For our Tekkit friends
+        
+        gen_silver_ore = getBoolConfig("generateSilverOre", "general", gen_silver_ore, "Set to false to disable silver ore generation");
         int config_silver_size = getIntConfig("silverOreNodeSize", "general", silver_ore_node_size, "The size of silver ore nodes. Between 5 & 35. Default is 25");
         silver_ore_node_size = Math.max(5, Math.min(config_silver_size, 35));
-        add_branding = getBoolConfig("addBranding", "general", add_branding, null); //For our Tekkit friends
+        gen_dark_iron_ore = getBoolConfig("generateDarkIronOre", "general", gen_dark_iron_ore, "Set to false to disable dark iron ore generation");
+        gen_broken_bedrock = getBoolConfig("generateBrokenBedrock", "general", gen_broken_bedrock, "Set to false to disable broken bedrock spawning around dark iron ore");
+        if (fractured_bedrock_id <= 0) {
+            gen_broken_bedrock = false;
+        }
+        
+        {
+            enable_retrogen = getBoolConfig("enableRetrogen", "retrogen", enable_retrogen, null);
+            retrogen_key = getStringConfig("retrogenKey", "retrogen", retrogen_key, null);
+            retrogen_silver = getBoolConfig("retrogenSilver", "retrogen", retrogen_silver, null);
+            retrogen_dark_iron = getBoolConfig("retrogenDarkIron", "retrogen", retrogen_dark_iron, null);
+        }
         
         enable_dimension_slice = getBoolConfig("enableDimensionSlices", "dimensionSlices", enable_dimension_slice, "work in progress; may be unstable");
         spread_wrathfire = getBoolConfig("spreadWrathFire", "server", spread_wrathfire, null);

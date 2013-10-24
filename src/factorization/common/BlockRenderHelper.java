@@ -121,14 +121,20 @@ public class BlockRenderHelper extends Block {
     
     @SideOnly(Side.CLIENT)
     public void renderForInventory(RenderBlocks renderblocks) {
-        // This originally copied from RenderBlocks.renderBlockAsItem
         Tessellator tessellator = Tessellator.instance;
+        tessellator.startDrawingQuads();
+        renderForInventory(tessellator, renderblocks);
+        tessellator.draw();
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public void renderForInventory(Tessellator tessellator, RenderBlocks renderblocks) {
+        // This originally copied from RenderBlocks.renderBlockAsItem
         Icon texture;
         int i = 0;
         
         GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
         renderblocks.setRenderBoundsFromBlock(this);
-        tessellator.startDrawingQuads();
         if ((texture = textures[i++]) != null) {
             tessellator.setNormal(0.0F, -1F, 0.0F);
             renderblocks.renderFaceYNeg(this, 0.0D, 0.0D, 0.0D, texture);
@@ -153,7 +159,6 @@ public class BlockRenderHelper extends Block {
             tessellator.setNormal(1.0F, 0.0F, 0.0F);
             renderblocks.renderFaceXPos(this, 0.0D, 0.0D, 0.0D, texture);
         }
-        tessellator.draw();
         GL11.glTranslatef(0.5F, 0.5F, 0.5F);
         /*RenderHelper.enableGUIStandardItemLighting();
         rb.renderBlockAsItem(this, 0, 0);*/

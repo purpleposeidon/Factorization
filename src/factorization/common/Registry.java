@@ -16,6 +16,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
@@ -24,8 +25,6 @@ import net.minecraft.util.Tuple;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
@@ -38,7 +37,6 @@ import net.minecraftforge.oredict.ShapelessOreRecipe;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ICraftingHandler;
 import cpw.mods.fml.common.ITickHandler;
-import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -52,13 +50,15 @@ import factorization.common.servo.ItemServoMotor;
 import factorization.common.servo.ItemServoRailWidget;
 import factorization.common.servo.ServoComponent;
 
-public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler {
+public class Registry implements ICraftingHandler, ITickHandler {
     public ItemFactorizationBlock item_factorization;
     public ItemBlockResource item_resource;
     public BlockFactorization factory_block, factory_rendering_block = null;
     public BlockRenderHelper blockRender = null, serverTraceHelper = null, clientTraceHelper = null;
     public BlockLightAir lightair_block;
     public BlockResource resource_block;
+    public Block dark_iron_ore;
+    public Block fractured_bedrock_block;
 
     public ItemStack router_item, servorail_item;
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
@@ -113,10 +113,8 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public ItemCraftingComponent instruction_plate;
 
     public Material materialMachine = new Material(MapColor.ironColor);
-
-    WorldGenMinable silverGen;
     
-    final int WILDCARD = Short.MAX_VALUE;
+    WorldgenManager worldgenManager;
 
     void makeBlocks() {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
@@ -132,15 +130,20 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         resource_block = new BlockResource(FzConfig.resource_id);
         is_factory = new ItemStack(factory_block);
         is_lightair = new ItemStack(lightair_block);
+        dark_iron_ore = new BlockDarkIronOre(FzConfig.dark_iron_ore_id).setUnlocalizedName("factorization:darkIronOre").setTextureName("stone").setCreativeTab(Core.tabFactorization);
+        fractured_bedrock_block = new Block(FzConfig.fractured_bedrock_id, Material.rock).setBlockUnbreakable().setResistance(6000000).setUnlocalizedName("bedrock").setTextureName("bedrock").setCreativeTab(Core.tabFactorization);
+        ItemBlock itemDarkIronOre = new ItemBlock(FzConfig.dark_iron_ore_id - 256); //&lookofdisapproval;
+        ItemBlock itemFracturedBedrock = new ItemBlock(FzConfig.fractured_bedrock_id - 256); //&lookofdisapproval;
 
         GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FZ factory");
         GameRegistry.registerBlock(lightair_block, "FZ Lightair");
         GameRegistry.registerBlock(resource_block, ItemBlockResource.class, "FZ resource");
         GameRegistry.registerCraftingHandler(this);
-        GameRegistry.registerWorldGenerator(this);
 
         Core.tab(factory_block, Core.TabType.BLOCKS);
         Core.tab(resource_block, TabType.BLOCKS);
+        
+        worldgenManager = new WorldgenManager();
         
         final Block vanillaDiamond = Block.blockDiamond;
         final int diamondId = vanillaDiamond.blockID;
@@ -780,7 +783,7 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
                 'I', dark_iron,
                 'S', "ingotSilver",
                 'G', Block.thinGlass,
-                'W', new ItemStack(wrath_igniter, 1, WILDCARD));
+                'W', new ItemStack(wrath_igniter, 1, FactorizationUtil.WILDCARD_DAMAGE));
 
         //Slag furnace
         recipe(slagfurnace_item,
@@ -1117,63 +1120,28 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
         BlockClass.Socket.harvest("pickaxe", 1);
         MinecraftForge.setBlockHarvestLevel(resource_block, "pickaxe", 2);
     }
-
-    public void makeOther() { 
-        silverGen = new WorldGenMinable(resource_block.blockID, FzConfig.silver_ore_node_size);
-    }
+    
     
     @Override
-    public void generate(Random rand, int chunkX, int chunkZ, World world,
-            IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
-        if (!FzConfig.gen_silver_ore) {
-            return;
-        }
-        if ((world.getWorldInfo().getSeed() + chunkZ + 3*chunkX) % 5 != 0) {
-            return;
-        }
-        int x = chunkX*16 + rand.nextInt(16);
-        int z = chunkZ*16 + rand.nextInt(16);
-        int y = 5 + rand.nextInt(48);
-        silverGen.generate(world, rand, x, y, z);
-    }
-
-    public void onTickServer() {
-        //NOTE: This might bug out if worlds don't tick at the same rate or something! Or if they're in different threads!
-        //(Like THAT would ever happen, ah ha ha ha ha ha ha ha ha ha ha ha ha ha.)
+    public void tickStart(EnumSet<TickType> type, Object... tickData) {
         TileEntityWrathLamp.handleAirUpdates();
         TileEntityWrathFire.updateCount = 0;
     }
     
-    public boolean extractEnergy(EntityPlayer player, int chargeCount) {
-        IInventory inv = player.inventory;
-        int totalCharge = 0;
-        for (int i = 0; i < inv.getSizeInventory(); i++) {
-            ItemStack is = inv.getStackInSlot(i);
-            if (is == null || is.getItem() != battery) {
-                continue;
-            }
-            totalCharge += battery.getStorage(is);
-        }
-        if (totalCharge < chargeCount) {
-            return false;
-        }
-        for (int i = 0; i < inv.getSizeInventory(); i++) {
-            ItemStack is = inv.getStackInSlot(i);
-            if (is == null || is.getItem() != battery) {
-                continue;
-            }
-            int storage = battery.getStorage(is);
-            int delta = Math.min(chargeCount, storage);
-            storage -= delta;
-            chargeCount -= delta;
-            if (delta > 0) {
-                battery.setStorage(is, storage);
-            }
-            if (chargeCount <= 0) {
-                return true;
-            }
-        }
-        return false;
+    @Override
+    public void tickEnd(EnumSet<TickType> type, Object... tickData) {
+        worldgenManager.tickRetrogenQueue();
+    }
+
+    private EnumSet<TickType> serverTicks = EnumSet.of(TickType.SERVER);
+    @Override
+    public EnumSet<TickType> ticks() {
+        return serverTicks;
+    }
+
+    @Override
+    public String getLabel() {
+        return "FZ_registry";
     }
 
     @ForgeSubscribe
@@ -1253,27 +1221,6 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
     public void onSmelting(EntityPlayer player, ItemStack item) {
     }
 
-    @Override
-    public void tickStart(EnumSet<TickType> type, Object... tickData) {
-        this.onTickServer();
-    }
-
-    @Override
-    public void tickEnd(EnumSet<TickType> type, Object... tickData) {
-        
-    }
-
-    private EnumSet<TickType> serverTicks = EnumSet.of(TickType.SERVER);
-    @Override
-    public EnumSet<TickType> ticks() {
-        return serverTicks;
-    }
-
-    @Override
-    public String getLabel() {
-        return "FZ_registry";
-    }
-
     void sendIMC() {
         
         //Registers our recipe handlers to a list in NEIPlugins.
@@ -1337,4 +1284,5 @@ public class Registry implements ICraftingHandler, IWorldGenerator, ITickHandler
             }
         }
     }
+    
 }

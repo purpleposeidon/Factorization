@@ -26,7 +26,9 @@ public class BlockIcons {
         dark_iron_block,
         galena_ore,
         lead_block,
-        silver_block;
+        silver_block,
+        ore_dark_iron,
+        ore_dark_iron_glint;
     
     @Directory("charge")
     public static Icon
