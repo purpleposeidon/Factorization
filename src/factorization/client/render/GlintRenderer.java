@@ -25,18 +25,21 @@ public class GlintRenderer extends TileEntitySpecialRenderer {
 
     @Override
     public void renderTileEntityAt(TileEntity xte, double dx, double dy, double dz, float partial) {
-        double distPacity = Math.sqrt(dx*dx + dy*dy + dz*dz);
-        if (distPacity > 6) {
+        double distPacity = (dx + 0.5)*(dx + 0.5) + (dy + 0.5)*(dy + 0.5) + (dz + 0.5)*(dz + 0.5);
+        if (distPacity > 6*6) {
             return;
         }
-        distPacity = (6 - distPacity)/6;
+        if (distPacity > 4*4) {
+            distPacity = (6 - Math.sqrt(distPacity))/2;
+        } else {
+            distPacity = 1;
+        }
         BlockDarkIronOre.Glint te = (Glint) xte;
         te.lastRenderedTick = te.worldObj.getTotalWorldTime();
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 0, 0xF0);
         bindTexture(Core.blockAtlas);
         GL11.glPushMatrix();
-        GL11.glTranslated(dx, dy, dz);
-        GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT);
+        GL11.glTranslated(dx + 0.5F, dy + 0.5F, dz + 0.5F);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         
@@ -53,13 +56,11 @@ public class GlintRenderer extends TileEntitySpecialRenderer {
             sideVec.zCoord = dir.offsetZ;
             //lookVec .dot. sideVec = cos(angle)
             double theta = Math.acos(lookVec.dotProduct(sideVec));
-            float opacity = (float) (theta/Math.PI);
-            opacity -= 0.55F;
-            if (opacity < 0) {
-                continue;
-            }
+            float opacity = (float) (theta/(2*Math.PI));
             opacity *= Math.min(te.age, 10)/10F;
             opacity *= distPacity;
+            //if (opacity > 0.35F) opacity = 0.35F;
+            opacity *= 0.7F;
             GL11.glColor4f(1, 1, 1, opacity);
             block.useTexture(null);
             block.setTexture(dir.ordinal(), BlockIcons.ore_dark_iron_glint);
@@ -68,7 +69,6 @@ public class GlintRenderer extends TileEntitySpecialRenderer {
             block.setBlockBounds(a, a, a, b, b, b);
             block.renderForInventory(rb);
         }
-        GL11.glPopAttrib();
         GL11.glColor4f(1, 1, 1, 1);
         GL11.glPopMatrix();
     }
