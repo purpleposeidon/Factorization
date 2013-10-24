@@ -1,7 +1,5 @@
 package factorization.common;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -10,6 +8,9 @@ import net.minecraft.util.Icon;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.ForgeDirection;
+
+import org.lwjgl.opengl.GL11;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -121,44 +122,37 @@ public class BlockRenderHelper extends Block {
     
     @SideOnly(Side.CLIENT)
     public void renderForInventory(RenderBlocks renderblocks) {
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        renderForInventory(tessellator, renderblocks);
-        tessellator.draw();
-    }
-    
-    @SideOnly(Side.CLIENT)
-    public void renderForInventory(Tessellator tessellator, RenderBlocks renderblocks) {
         // This originally copied from RenderBlocks.renderBlockAsItem
         Icon texture;
-        int i = 0;
-        
-        GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
+        Tessellator tessellator = Tessellator.instance;
+        tessellator.startDrawingQuads();
         renderblocks.setRenderBoundsFromBlock(this);
-        if ((texture = textures[i++]) != null) {
+        if ((texture = textures[0]) != null) {
             tessellator.setNormal(0.0F, -1F, 0.0F);
             renderblocks.renderFaceYNeg(this, 0.0D, 0.0D, 0.0D, texture);
         }
-        if ((texture = textures[i++]) != null) {
+        if ((texture = textures[1]) != null) {
             tessellator.setNormal(0.0F, 1.0F, 0.0F);
             renderblocks.renderFaceYPos(this, 0.0D, 0.0D, 0.0D, texture);
         }
-        if ((texture = textures[i++]) != null) {
+        if ((texture = textures[2]) != null) {
             tessellator.setNormal(0.0F, 0.0F, -1F);
             renderblocks.renderFaceZNeg(this, 0.0D, 0.0D, 0.0D, texture);
         }
-        if ((texture = textures[i++]) != null) {
+        if ((texture = textures[3]) != null) {
             tessellator.setNormal(0.0F, 0.0F, 1.0F);
             renderblocks.renderFaceZPos(this, 0.0D, 0.0D, 0.0D, texture);
         }
-        if ((texture = textures[i++]) != null) {
+        if ((texture = textures[4]) != null) {
             tessellator.setNormal(-1F, 0.0F, 0.0F);
             renderblocks.renderFaceXNeg(this, 0.0D, 0.0D, 0.0D, texture);
         }
-        if ((texture = textures[i++]) != null) {
+        if ((texture = textures[5]) != null) {
             tessellator.setNormal(1.0F, 0.0F, 0.0F);
             renderblocks.renderFaceXPos(this, 0.0D, 0.0D, 0.0D, texture);
         }
+        GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
+        tessellator.draw();
         GL11.glTranslatef(0.5F, 0.5F, 0.5F);
         /*RenderHelper.enableGUIStandardItemLighting();
         rb.renderBlockAsItem(this, 0, 0);*/
