@@ -25,7 +25,8 @@ public class ItemOreProcessing extends ItemFactorization implements IActOnCraft 
         //FOR MDIYOOO!!!!!
         NATURAL_ALUMINUM(7, 0xF6F6F6, "Aluminum", "oreNaturalAluminum", "ingotNaturalAluminum"),
         COBALT(8, 0x2376DD, "Cobalt", "oreCobalt", "ingotCobalt"),
-        ARDITE(9, 0xF48A00, "Ardite", "oreArdite", "ingotArdite")
+        ARDITE(9, 0xF48A00, "Ardite", "oreArdite", "ingotArdite"),
+        DARKIRON(10, 0x5000D4, "Dark Iron", "oreFzDarkIron", "ingotFzDarkIron")
         ;
         static {
             COBALT.surounding_medium = new ItemStack(Block.netherrack);

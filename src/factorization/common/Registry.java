@@ -79,7 +79,6 @@ public class Registry implements ICraftingHandler, ITickHandler {
     public ItemBagOfHolding bag_of_holding;
     public ItemPocketTable pocket_table;
     public ItemCraftingComponent diamond_shard;
-    public IRecipe diamond_shard_recipe;
     public ItemStack diamond_shard_packet;
     public IRecipe boh_upgrade_recipe;
     public ItemWrathIgniter wrath_igniter;
@@ -130,7 +129,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
         resource_block = new BlockResource(FzConfig.resource_id);
         is_factory = new ItemStack(factory_block);
         is_lightair = new ItemStack(lightair_block);
-        dark_iron_ore = new BlockDarkIronOre(FzConfig.dark_iron_ore_id).setUnlocalizedName("factorization:darkIronOre").setTextureName("stone").setCreativeTab(Core.tabFactorization);
+        dark_iron_ore = new BlockDarkIronOre(FzConfig.dark_iron_ore_id).setUnlocalizedName("factorization:darkIronOre").setTextureName("stone").setCreativeTab(Core.tabFactorization).setHardness(3.0F).setResistance(5.0F);
         fractured_bedrock_block = new Block(FzConfig.fractured_bedrock_id, Material.rock).setBlockUnbreakable().setResistance(6000000).setUnlocalizedName("bedrock").setTextureName("bedrock").setCreativeTab(Core.tabFactorization);
         ItemBlock itemDarkIronOre = new ItemBlock(FzConfig.dark_iron_ore_id - 256); //&lookofdisapproval;
         ItemBlock itemFracturedBedrock = new ItemBlock(FzConfig.fractured_bedrock_id - 256); //&lookofdisapproval;
@@ -227,6 +226,11 @@ public class Registry implements ICraftingHandler, ITickHandler {
         lead_block_item = ResourceType.LEADBLOCK.itemStack("Block of Lead");
         dark_iron_block_item = ResourceType.DARKIRONBLOCK.itemStack("Block of Dark Iron");
 
+
+        diamond_shard = new ItemCraftingComponent(itemID("diamondShard", 9006), "diamond_shard");
+        wrath_igniter = new ItemWrathIgniter(itemID("wrathIgniter", 9007));
+        dark_iron = new ItemCraftingComponent(itemID("darkIron", 9008), "dark_iron_ingot");
+        
         lead_ingot = new ItemCraftingComponent(itemID("leadIngot", 9014), "lead_ingot");
         silver_ingot = new ItemCraftingComponent(itemID("silverIngot", 9015), "silver_ingot");
         OreDictionary.registerOre("oreSilver", silver_ore_item);
@@ -234,11 +238,10 @@ public class Registry implements ICraftingHandler, ITickHandler {
         OreDictionary.registerOre("ingotLead", new ItemStack(lead_ingot));
         OreDictionary.registerOre("blockSilver", silver_block_item);
         OreDictionary.registerOre("blockLead", lead_block_item);
+        OreDictionary.registerOre("oreFzDarkIron", dark_iron_ore);
+        OreDictionary.registerOre("ingotFzDarkIron", dark_iron);
+        OreDictionary.registerOre("blockFzDarkIron", dark_iron_block_item);
 
-        //Darkness & Evil
-        diamond_shard = new ItemCraftingComponent(itemID("diamondShard", 9006), "diamond_shard");
-        wrath_igniter = new ItemWrathIgniter(itemID("wrathIgniter", 9007));
-        dark_iron = new ItemCraftingComponent(itemID("darkIron", 9008), "dark_iron_ingot");
 
         bag_of_holding = new ItemBagOfHolding(itemID("bagOfHolding", 9001));
         
@@ -448,7 +451,8 @@ public class Registry implements ICraftingHandler, ITickHandler {
         recipe(new ItemStack(silver_ingot, 9), "#", '#', silver_block_item);
         oreRecipe(lead_block_item, "###", "###", "###", '#', "ingotLead");
         oreRecipe(silver_block_item, "###", "###", "###", '#', "ingotSilver");
-        FurnaceRecipes.smelting().addSmelting(resource_block.blockID, 0 /* MD for silver */, new ItemStack(silver_ingot), 0.3F);
+        FurnaceRecipes.smelting().addSmelting(resource_block.blockID, ResourceType.SILVERORE.md, new ItemStack(silver_ingot), 0.3F);
+        FurnaceRecipes.smelting().addSmelting(dark_iron_ore.blockID, 0, new ItemStack(dark_iron), 0.5F);
 
         //ceramics
         oreRecipe(new ItemStack(sculpt_tool),
@@ -792,10 +796,6 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "CFC",
                 'C', Block.cobblestone,
                 'F', Block.furnaceIdle);
-        OreDictionary.registerOre("oreIron", new ItemStack(Block.oreIron));
-        OreDictionary.registerOre("oreGold", new ItemStack(Block.oreGold));
-        OreDictionary.registerOre("ingotIron", new ItemStack(Item.ingotIron));
-        OreDictionary.registerOre("ingotGold", new ItemStack(Item.ingotGold));
         
         //most ores give 0.4F stone, but redstone is dense.
         //mining redstone normally gives 4 to 6 ore. 5.8F should get you a slightly better yield.
@@ -1119,6 +1119,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
         BlockClass.Socket.harvest("axe", 1);
         BlockClass.Socket.harvest("pickaxe", 1);
         MinecraftForge.setBlockHarvestLevel(resource_block, "pickaxe", 2);
+        MinecraftForge.setBlockHarvestLevel(dark_iron_ore, "pickaxe", 2);
     }
     
     
