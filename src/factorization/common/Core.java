@@ -50,7 +50,7 @@ public class Core {
     public static final String modId = "factorization";
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
-    public static final String version = "0.8.05beta01"; //@VERSION@
+    public static final String version = "0.8.06"; //@VERSION@
     public Core() {
         instance = this;
         fzconfig = new FzConfig();
