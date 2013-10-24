@@ -42,4 +42,9 @@ public class ItemMatrixProgrammer extends ItemFactorization {
         c.redraw();
         return false;
     }
+    
+    @Override
+    public boolean isItemTool(ItemStack is) {
+        return true;
+    }
 }

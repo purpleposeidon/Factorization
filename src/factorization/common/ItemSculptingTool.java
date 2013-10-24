@@ -326,4 +326,9 @@ public class ItemSculptingTool extends ItemFactorization {
             break;
         }
     }
+    
+    @Override
+    public boolean isItemTool(ItemStack is) {
+        return true;
+    }
 }
