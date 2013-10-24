@@ -96,7 +96,6 @@ public class Core {
         registerSimpleTileEntities();
         registry.makeItems();
         FzConfig.config.save();
-        registry.makeOther();
         registry.makeRecipes();
         registry.setToolEffectiveness();
         proxy.registerKeys();
