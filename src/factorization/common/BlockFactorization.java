@@ -333,6 +333,8 @@ public class BlockFactorization extends BlockContainer {
                     itemList.add(is);
                 }
             }
+            //ugly; the first item in the list is the creative barrel; it oughta be separate
+            itemList.add(TileEntityDayBarrel.barrel_items.get(0));
         }
     }
 
