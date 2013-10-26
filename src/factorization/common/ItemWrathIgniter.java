@@ -3,7 +3,6 @@ package factorization.common;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import factorization.api.Coord;
 import factorization.common.Core.TabType;
 
 public class ItemWrathIgniter extends ItemFactorization {
@@ -29,16 +28,8 @@ public class ItemWrathIgniter extends ItemFactorization {
     
     public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y,
             int z, int side, float vecx, float vecy, float vecz) {
-        Coord baseBlock = new Coord(w, x, y, z);
-        Coord fireBlock = baseBlock.copy().towardSide(side);
-        if (fireBlock.getId() != 0) {
-            if (!fireBlock.isAir()) {
-                return true;
-            }
-        }
-        is.damageItem(2, player);
-        TileEntityWrathFire.ignite(baseBlock, fireBlock, player);
-        return true;
+        player.addChatMessage("Wrath fire is going away! Dark Iron Ore is found near bedrock...");
+        return false;
     }
     
     @Override
