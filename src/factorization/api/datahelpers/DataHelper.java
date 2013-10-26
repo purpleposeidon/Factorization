@@ -145,7 +145,7 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
     public final <E extends Enum> E putEnum(E value) throws IOException { return (E)put(value); }
     
     private static final Class[] validTypes = new Class[] {
-        Boolean.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, NBTTagCompound.class
+        Boolean.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, NBTTagCompound.class, String.class
     };
     public final Object putUntypedOject(Object value) throws IOException {
         if (!valid) {
@@ -153,7 +153,7 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
         }
         final String orig_name = name;
         if (isReader()) {
-            int typeIndex = asSameShare(orig_name + ".type").put(-1);
+            byte typeIndex = asSameShare(orig_name + ".type").putByte((byte)-1);
             asSameShare(orig_name);
             if (typeIndex < 0 || typeIndex > validTypes.length) {
                 return value; //Fun times.
@@ -177,22 +177,25 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
                 value = (double) 0;
             } else if (type == NBTTagCompound.class) {
                 value = new NBTTagCompound();
+            } else if (type == String.class) {
+                value = "";
             } else {
                 return null;
             }
             return put(value);
         } else {
             Class value_type = value.getClass();
-            for (int i = 0; i < validTypes.length; i++) {
+            for (byte i = 0; i < validTypes.length; i++) {
                 Class type = validTypes[i];
                 if (value_type == type) {
-                    asSameShare(orig_name + ".type").put(i);
+                    asSameShare(orig_name + ".type").putByte(i);
                     asSameShare(orig_name);
                     put(value);
                     return value;
                 }
             }
-            return value; //Uh, yeah. We don't know what it is.
+            throw new IllegalArgumentException("Don't know how to handle: " + value_type);
+            //return value; //Uh, yeah. We don't know what it is.
         }
     }
     
