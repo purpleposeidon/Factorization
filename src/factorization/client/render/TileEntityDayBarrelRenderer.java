@@ -75,7 +75,6 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         }
         GL11.glPushMatrix();
         GL11.glTranslated(-0.25, 0.125, 0);
-        //GL11.glDepthMask(false);
 
         float scale = 0.01F;
         GL11.glScalef(scale, scale, scale);
@@ -109,7 +108,6 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         
         fontRender.drawString(t, -fontRender.getStringWidth(t) / 2, 0, color);
         
-        GL11.glDepthMask(true);
         GL11.glPopMatrix();
     }
 
