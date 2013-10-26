@@ -22,6 +22,8 @@ import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.NetLoginHandler;
 import net.minecraft.network.packet.NetHandler;
@@ -30,6 +32,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatFileWriter;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.EnumMovingObjectType;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderHell;
 import net.minecraftforge.common.MinecraftForge;
@@ -45,7 +49,9 @@ import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.Coord;
 import factorization.common.Core;
+import factorization.common.FactorizationUtil;
 import factorization.common.FzConfig;
 
 public class MiscClientProxy extends MiscProxy {
@@ -635,6 +641,100 @@ public class MiscClientProxy extends MiscProxy {
             }
         };
         TickRegistry.registerScheduledTickHandler(th, Side.CLIENT);
+        th = new IScheduledTickHandler() {
+            @Override
+            public EnumSet<TickType> ticks() {
+                return EnumSet.of(TickType.CLIENT);
+            }
+            
+            @Override
+            public void tickStart(EnumSet<TickType> type, Object... tickData) {
+                if (!mc.gameSettings.keyBindPickBlock.pressed) {
+                    return;
+                }
+                EntityPlayer player = mc.thePlayer;
+                if (player == null) {
+                    return;
+                }
+                if (player.capabilities.isCreativeMode) {
+                    return;
+                }
+                if (mc.currentScreen != null) {
+                    return;
+                }
+                MovingObjectPosition mop = mc.objectMouseOver;
+                if (mop == null || mop.typeOfHit != EnumMovingObjectType.TILE) {
+                    return;
+                }
+                Coord here = new Coord(player.worldObj, mop);
+                if (vanillaSatisfied(mop, here, player)) {
+                    return;
+                }
+                // Search the inventory for the exact block. Failing that, search for the broken version
+                List<ItemStack> validItems = Arrays.asList(here.getPickBlock(mop), here.getBrokenBlock());
+                int firstEmpty = -1;
+                if (player.getHeldItem() == null) {
+                    firstEmpty = player.inventory.currentItem;
+                }
+                for (int i = 0; i < player.inventory.mainInventory.length; i++) {
+                    for (ItemStack needle : validItems) {
+                        if (needle == null) {
+                            continue;
+                        }
+                        ItemStack is = player.inventory.mainInventory[i];
+                        if (is == null && firstEmpty == -1 && i < 9) {
+                            firstEmpty = i;
+                        }
+                        if (is == null || !FactorizationUtil.couldMerge(needle, is)) {
+                            continue;
+                        }
+                        if (i < 9) {
+                            player.inventory.currentItem = i;
+                            return;
+                        }
+                        if (firstEmpty != -1) {
+                            player.inventory.currentItem = firstEmpty;
+                        }
+                        int targetSlot = player.inventory.currentItem;
+                        mc.playerController.windowClick(player.inventoryContainer.windowId, i, targetSlot, 2, player);
+                        return;
+                    }
+                }
+            }
+            
+            private Minecraft mc = Minecraft.getMinecraft();
+            @Override
+            public void tickEnd(EnumSet<TickType> type, Object... tickData) {
+                
+            }
+            
+            private boolean vanillaSatisfied(MovingObjectPosition mop, Coord here, EntityPlayer player) {
+                ItemStack held = player.inventory.getStackInSlot(player.inventory.currentItem);
+                if (held == null) {
+                    return false;
+                }
+                if (FactorizationUtil.couldMerge(held, here.getPickBlock(mop))) {
+                    return true;
+                }
+                if (FactorizationUtil.couldMerge(held, here.getBrokenBlock())) {
+                    return true;
+                }
+                return false;
+            }
+            
+            @Override
+            public String getLabel() {
+                return "FZMisc PickBlock helper";
+            }
+            
+            @Override
+            public int nextTickSpacing() {
+                return 1;
+            }
+        };
+        if (FzConfig.fix_middle_click) {
+            TickRegistry.registerTickHandler(th, Side.CLIENT);
+        }
     }
     
     

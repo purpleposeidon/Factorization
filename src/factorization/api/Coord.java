@@ -795,6 +795,14 @@ public class Coord implements IDataSerializable {
         return b.getPickBlock(mop, w, x, y, z);
     }
     
+    public ItemStack getPickBlock(MovingObjectPosition mop) {
+        Block b = getBlock();
+        if (b == null) {
+            return null;
+        }
+        return b.getPickBlock(mop, w, x, y, z);
+    }
+    
     public ItemStack getBrokenBlock() {
         Block b = getBlock();
         if (b == null) {
