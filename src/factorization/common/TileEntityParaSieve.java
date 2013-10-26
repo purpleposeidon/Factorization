@@ -50,6 +50,13 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         putting_nbt = false;
     }
     
+    @Override
+    public void dropContents() {
+        putting_nbt = true;
+        super.dropContents();
+        putting_nbt = false;
+    }
+    
     public ForgeDirection getFacing() {
         return ForgeDirection.getOrientation(facing_direction).getOpposite();
     }
