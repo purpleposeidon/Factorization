@@ -267,7 +267,8 @@ public abstract class ServoComponent implements IDataSerializable {
                 //ServoEquipmentBay.class,
                 WoodenServoGrate.class,
                 GlassServoGrate.class,
-                IronServoGrate.class
+                IronServoGrate.class,
+                ShifterControl.class
         }) {
             register(cl);
         }

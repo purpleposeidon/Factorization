@@ -27,6 +27,8 @@ import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.FactorizationUtil.FzInv;
+import factorization.common.servo.LoggerDataHelper;
+import factorization.common.servo.ServoMotor;
 import factorization.common.sockets.SocketEmpty;
 
 public abstract class TileEntitySocketBase extends TileEntityCommon implements ISocketHolder, IDataSerializable {
@@ -79,6 +81,20 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * @return false if clean; true if there was something wrong
+     */
+    public boolean sanitize(ServoMotor motor) {
+        LoggerDataHelper dh = new LoggerDataHelper(motor);
+        try {
+            serialize("", dh);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return true;
+        }
+        return dh.hadError;
     }
     
     protected Iterable<Entity> getEntities(ISocketHolder socket, Coord c, ForgeDirection top, int d) {

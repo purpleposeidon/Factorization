@@ -111,6 +111,7 @@ public class BlockIcons {
     public static Icon servo$jmp;
     public static Icon servo$entry_require, servo$entry_forbid;
     public static Icon servo$socket_on, servo$socket_off, servo$socket_pulse;
+    public static Icon servo$ctrl$shift_import, servo$ctrl$shift_export, servo$ctrl$shift_target_slot, servo$ctrl$shift_transfer_limit;
     public static Icon servo$instruction_plate;
     
     public static class ActivatingMachineIcon extends IconGroup {

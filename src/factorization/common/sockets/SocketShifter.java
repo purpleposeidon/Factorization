@@ -22,10 +22,10 @@ import factorization.common.ISocketHolder;
 import factorization.common.TileEntitySocketBase;
 
 public class SocketShifter extends TileEntitySocketBase {
-    boolean streamMode = true; // be like a hopper or a filter
-    int foreignSlot = -1;
-    boolean exporting;
-    byte transferLimit = 1;
+    public boolean streamMode = true; // be like a hopper or a filter
+    public int foreignSlot = -1;
+    public boolean exporting;
+    public byte transferLimit = 1;
     byte cooldown = 0;
     
     @Override
