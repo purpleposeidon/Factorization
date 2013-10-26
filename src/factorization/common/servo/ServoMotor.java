@@ -111,6 +111,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             }
         };
         fakePlayer.inventory.mainInventory = inv;
+        isImmuneToFire = true;
     }
     
     public EntityPlayer getPlayer() {
@@ -343,6 +344,8 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 } else if (to_drain == 0) {
                     failure = false;
                 }
+            } else {
+                despawn(false);
             }
             if (failure) {
                 speed_b = (byte) Math.max(speed_b - 1, 0);
@@ -375,6 +378,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 Core.network.broadcastPacket(worldObj, (int) posX, (int) posY, (int) posZ, toSend);
             }
             updateSpeed();
+        }
+        if (isDead) {
+            return;
         }
         final double speed = getProperSpeed() ;
         if (speed <= 0 || orientation == FzOrientation.UNKNOWN) {
@@ -628,16 +634,24 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             return false;
         }
         EntityPlayer player = (EntityPlayer) src;
-        if (!worldObj.isRemote) {
-            setDead();
-            ArrayList<ItemStack> toDrop = new ArrayList();
-            toDrop.add(new ItemStack(Core.registry.servo_motor_placer));
-            for (ItemStack is : inv) {
-                toDrop.add(is);
-            }
-            dropItemStacks(toDrop);
-        }
+        despawn(player.capabilities.isCreativeMode);
         return true;
+    }
+    
+    void despawn(boolean creativeModeHit) {
+        if (worldObj.isRemote) {
+            return;
+        }
+        setDead();
+        if (creativeModeHit) {
+            return;
+        }
+        ArrayList<ItemStack> toDrop = new ArrayList();
+        toDrop.add(new ItemStack(Core.registry.servo_motor_placer));
+        for (ItemStack is : inv) {
+            toDrop.add(is);
+        }
+        dropItemStacks(toDrop);
     }
 
     @Override
