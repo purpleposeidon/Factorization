@@ -57,7 +57,7 @@ import factorization.notify.Notify;
 public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IEntityMessage, IInventory, ISocketHolder {
     //NORELEASE: Have the servorail TileEntity store a reference to this?
     public static final int STACKS = 16;
-    public static final int STACK_EQUIPMENT = 0, STACK_ARGUMENT = 1, STACK_IO = 2, STACK_CONFIG = 3, STACK_ERRNO = 4;
+    public static final int STACK_EQUIPMENT = 0, STACK_ARGUMENT = 4, STACK_IO = 2, STACK_CONFIG = 3, STACK_ERRNO = 15;
     private ServoStack[] stacks = new ServoStack[STACKS];
     {
         for (int i = 0; i < stacks.length; i++) {
