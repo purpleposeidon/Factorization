@@ -25,7 +25,7 @@ public class FzConfig {
     public static boolean gen_silver_ore = true;
     public static boolean gen_dark_iron_ore = true;
     public static boolean gen_broken_bedrock = true;
-    public static int silver_ore_node_size = 25;
+    public static int silver_ore_node_new_size = 18;
     public static boolean enable_dimension_slice = Core.dev_environ;
     public static int dimension_slice_dimid = -7;
     public static int force_max_entity_radius = -1;
@@ -152,8 +152,8 @@ public class FzConfig {
         add_branding = getBoolConfig("addBranding", "general", add_branding, null); //For our Tekkit friends
         
         gen_silver_ore = getBoolConfig("generateSilverOre", "general", gen_silver_ore, "Set to false to disable silver ore generation");
-        int config_silver_size = getIntConfig("silverOreNodeSize", "general", silver_ore_node_size, "The size of silver ore nodes. Between 5 & 35. Default is 25");
-        silver_ore_node_size = Math.max(5, Math.min(config_silver_size, 35));
+        int config_silver_size = getIntConfig("silverOreNodeNewSize", "general", silver_ore_node_new_size, "The size of silver ore nodes. Between 5 & 35. Default is " + silver_ore_node_new_size);
+        silver_ore_node_new_size = Math.max(5, Math.min(config_silver_size, 35));
         gen_dark_iron_ore = getBoolConfig("generateDarkIronOre", "general", gen_dark_iron_ore, "Set to false to disable dark iron ore generation");
         gen_broken_bedrock = getBoolConfig("generateBrokenBedrock", "general", gen_broken_bedrock, "Set to false to disable broken bedrock spawning around dark iron ore");
         if (fractured_bedrock_id <= 0) {

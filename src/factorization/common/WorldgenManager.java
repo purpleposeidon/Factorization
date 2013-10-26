@@ -26,7 +26,7 @@ public class WorldgenManager {
     void setupWorldGenerators() {
         if (FzConfig.gen_silver_ore) {
             silverGen = new IWorldGenerator() {
-                WorldGenMinable gen = new WorldGenMinable(Core.registry.resource_block.blockID, FzConfig.silver_ore_node_size);
+                WorldGenMinable gen = new WorldGenMinable(Core.registry.resource_block.blockID, FzConfig.silver_ore_node_new_size);
                 @Override
                 public void generate(Random rand, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
                     if (!FzConfig.gen_silver_ore) {
@@ -35,13 +35,13 @@ public class WorldgenManager {
                     if (!world.provider.isSurfaceWorld()) {
                         return;
                     }
-                    if ((world.getWorldInfo().getSeed() + chunkZ + 3*chunkX) % 5 != 0) {
-                        return;
+                    int count = 1 + (rand.nextBoolean() && rand.nextBoolean() && rand.nextBoolean() ? 1 : 0);
+                    for (int i = 0; i < count; i++) {
+                        int x = chunkX*16 + rand.nextInt(16);
+                        int z = chunkZ*16 + rand.nextInt(16);
+                        int y = 4 + rand.nextInt(42);
+                        gen.generate(world, rand, x, y, z);
                     }
-                    int x = chunkX*16 + rand.nextInt(16);
-                    int z = chunkZ*16 + rand.nextInt(16);
-                    int y = 5 + rand.nextInt(48);
-                    gen.generate(world, rand, x, y, z);
                 }
             };
             GameRegistry.registerWorldGenerator(silverGen);
@@ -109,7 +109,7 @@ public class WorldgenManager {
                     if (chunkX == 0 && chunkZ == 0) {
                         x = z = 0;
                     } else {
-                        if (random.nextInt(10) < 3) {
+                        if (random.nextInt(10) < 2) {
                             return;
                         }
                         
@@ -129,8 +129,6 @@ public class WorldgenManager {
                     }
                     stoneId = stoneBlock.blockID;
                     stoneMd = world.getBlockMetadata(x, 1, z);
-                    
-                    System.out.println("NORELEASE: Genning dark iron ore at " + x + " 1 " + z);
                     
                     //The spike
                     int height = 4 + random.nextInt(3);
