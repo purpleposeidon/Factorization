@@ -52,9 +52,9 @@ public class SocketShifter extends TileEntitySocketBase {
         if (streamMode) {
             transferLimit = 1;
         }
-        if (foreignSlot < 0) {
-            foreignSlot = 0;
-            data.log("foreign slot was < 0");
+        if (foreignSlot < -1) {
+            foreignSlot = -1;
+            data.log("foreign slot was < -1");
         }
         if (transferLimit > 64) {
             transferLimit = 64;
