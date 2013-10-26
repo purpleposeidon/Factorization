@@ -64,7 +64,7 @@ public class MobEqualizer {
                 //float f = (float)ent.getAttributeInstanceForAttributeType__getEntityAttribute(SharedMonsterAttributes.attackDamage__attackDamage).getDamage__getAttributeValue();
                 float f = (float)ent.getEntityAttribute(SharedMonsterAttributes.attackDamage).getAttributeValue();
                 ent.setCurrentItemOrArmor(0, orig_weapon);
-                if (f <= orig_damage) { //TODO NORELEASE: This might be too low?
+                if (f <= orig_damage) {
                     continue;
                 }
                 weapons.add(is);
