@@ -1,3 +1,14 @@
+0.8.06
+  Added Dark Iron Ore:
+    Found around Y=4; watch for changes in the bedrock
+    Wrath fire can no longer be created; the igniter will hang around for crafting wrath lamps
+    Can be ore-processed in the usual manner
+  Servos:
+    Break themselves when not on a rail
+    Added the Item Shifter Control instruction; it may pop an integer from the argument stack
+  Fixed middle click
+
+
 0.8.05
   Localizations:
     German localizations by Vexatos!
