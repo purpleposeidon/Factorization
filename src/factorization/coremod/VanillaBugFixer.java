@@ -17,6 +17,7 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
 public class VanillaBugFixer implements IFMLLoadingPlugin {
     //NORELEASE: Okay, but what happens if it runs on a stand-alone server? It probably doesn't even HAVE the functions. ;_;
     //If this is the case, we'll just have to patch them back in (with extra code for each override vanilla adds)
+    //-Dfml.coreMods.load=factorization.coremod.VanillaBugFixer
     static final String packageName = "factorization.coremod";
 
     @Override
@@ -33,7 +34,10 @@ public class VanillaBugFixer implements IFMLLoadingPlugin {
                     sideStripper
             };
         }
-        return new String[] {};
+        return new String[] {
+                sideStripper
+        }; //NORELEASE
+        //return new String[] {};
     }
 
     @Override
