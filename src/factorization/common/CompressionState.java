@@ -603,7 +603,8 @@ public class CompressionState {
             maxY = Math.max(c.y, maxY);
             maxZ = Math.max(c.z, maxZ);
         }
-        start.broadcastMessage(null, MessageType.CompressionCrafterBounds, minX, minY, minZ, maxX, maxY, maxZ);
+        ForgeDirection axis = right.getRotation(up);
+        start.broadcastMessage(null, MessageType.CompressionCrafterBounds, minX, minY, minZ, maxX, maxY, maxZ, (byte) axis.ordinal());
     }
     
     

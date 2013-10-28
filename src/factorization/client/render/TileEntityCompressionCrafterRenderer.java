@@ -52,7 +52,8 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         }
         interp_side.under = BlockIcons.compactSideSlide;
         bindTexture(Core.blockAtlas);
-        final float squishy = 2F/16F;
+        final float squishy = 3F/16F;
+        final float extraAxialSquish = 10F/16F;
         float perc = cc.getProgressPerc();
         float p = perc*squishy;
         
@@ -83,33 +84,32 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         block.renderForTileEntity();
         Tessellator.instance.draw();
         
-        GL11.glPopMatrix();
-        
         if (cc.isPrimaryCrafter() && cc.upperCorner != null && cc.lowerCorner != null
                 && Minecraft.getMinecraft().gameSettings.fancyGraphics && Core.dev_environ /* NORELEASE */) {
-            //Also: A config option?
-            //Maybe just only if on fancy.
-            GL11.glPushMatrix();
-            GL11.glTranslatef((float) x, (float) y, (float) z);
-            GL11.glTranslated(0.5, 0.5, 0.5);
-            GL11.glScalef(1 - p, 1 + p, 1 - p);
-            GL11.glTranslated(-0.5, -0.5, -0.5);
             GL11.glTranslatef(-cc.xCoord, -cc.yCoord, -cc.zCoord);
-            float dx = cc.upperCorner.x - cc.lowerCorner.x;
-            float dy = cc.upperCorner.y - cc.lowerCorner.y;
-            float dz = cc.upperCorner.z - cc.lowerCorner.z;
-            dx *= p;
-            dy *= p;
-            dz *= p;
-            //GL11.glTranslatef(dx, -dy, -dz);
-            float dtX = dx - dx*p;
-            float dtY = dy - dy*p;
-            float dtZ = dz - dz*p;
-            GL11.glTranslatef(0, 0, 0);
-            drawSquishingBlocks(cc.upperCorner, cc.lowerCorner, partial);
-            GL11.glPopMatrix();
+            
+            Coord up = cc.upperCorner;
+            Coord lo = cc.lowerCorner;
+            float cx = (up.x + lo.x + 1)/2F;
+            float cy = (up.y + lo.y + 1)/2F;
+            float cz = (up.z + lo.z + 1)/2F;
+            float sx, sy, sz;
+            ForgeDirection fd = cc.craftingAxis;
+            sx = sy = sz = 1 - p;
+            if (fd.offsetX != 0) sx = 1 + perc*extraAxialSquish;
+            if (fd.offsetY != 0) sy = 1 + perc*extraAxialSquish;
+            if (fd.offsetZ != 0) sz = 1 + perc*extraAxialSquish;
+            
+            //Unfortunately, the transformed origin is equal to the world's origin.
+            //So it scales towards the origin instead of the center of the compression area.
+            //We need to translate some amount to make up for it.
+            //Actual position: cx*sx; desired is cx. So translate cx - cx*sx
+            GL11.glTranslatef(cx - cx*sx, cy - cy*sy, cz - cz*sz);
+            
+            GL11.glScalef(sx, sy, sz);
+            drawSquishingBlocks(up, lo, partial);
         }
-        
+        GL11.glPopMatrix();
         GL11.glEnable(GL11.GL_LIGHTING);
     }
 
@@ -159,7 +159,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
                             TileEntity te;
                             if ((te = w.getBlockTileEntity(x, y, z)) != null) {
                                 Tessellator.instance = tesrator;
-                                TileEntityRenderer.instance.renderTileEntity(te, partial);
+                                //TileEntityRenderer.instance.renderTileEntity(te, partial); //NORELEASE
                                 Tessellator.instance = tess;
                             }
                             continue;

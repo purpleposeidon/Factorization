@@ -47,6 +47,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     boolean isCrafterRoot = false;
     boolean powered = false;
     public Coord upperCorner, lowerCorner;
+    public ForgeDirection craftingAxis = ForgeDirection.UP;
     
     public ForgeDirection getFacing() {
         return ForgeDirection.getOrientation(b_facing);
@@ -181,6 +182,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         if (messageType == MessageType.CompressionCrafterBounds) {
             upperCorner = new Coord(worldObj, input.readInt(), input.readInt(), input.readInt());
             lowerCorner = new Coord(worldObj, input.readInt(), input.readInt(), input.readInt());
+            craftingAxis = ForgeDirection.getOrientation(input.readByte());
             Coord.sort(lowerCorner, upperCorner);
             if (lowerCorner.distanceSq(upperCorner) > 25) {
                 Core.logFine("Server wanted us to render a large area!");
