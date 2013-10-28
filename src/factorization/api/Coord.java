@@ -27,6 +27,8 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
+import factorization.common.BlockHelper;
+import factorization.common.Core;
 import factorization.common.FactorizationUtil;
 
 public class Coord implements IDataSerializable {
@@ -481,7 +483,6 @@ public class Coord implements IDataSerializable {
         return w.getBlockId(x, y, z);
     }
 
-    @Deprecated //1.7'll be getting rid of this (tho we'll need it for now...)
     public int getMd() {
         return w.getBlockMetadata(x, y, z);
     }
@@ -786,13 +787,28 @@ public class Coord implements IDataSerializable {
     }
     
     private static Vec3 nullVec = Vec3.createVectorHelper(0, 0, 0);
+    private static boolean spam = false;
     public ItemStack getPickBlock(ForgeDirection dir) {
         Block b = getBlock();
         if (b == null) {
             return null;
         }
         MovingObjectPosition mop = createMop(dir, nullVec);
-        return b.getPickBlock(mop, w, x, y, z);
+        try {
+            return b.getPickBlock(mop, w, x, y, z);
+        } catch (NoSuchMethodError t) {
+            if (!spam) {
+                Core.logWarning("Block.getPickBlock is unusable on the server." +
+            " A workaround prevents crashes, but may possibly allow dupe bugs." +
+            " The developer is no longer interested in wasting his time, energy, and vitality on this matter." +
+            " This is not a bug, it is a fact of life." +
+            " Do not attempt to report it. If you have happened somehow to have actually improved the situation in Forge/Vanilla," +
+            " the developer would, of course, be happy to learn of it. Otherwise, if I hear about it, I will ban you or something.");
+                t.printStackTrace();
+                spam = true;
+            }
+            return BlockHelper.getPlacingItem(b, mop, w, x, y, z);
+        }
     }
     
     public ItemStack getPickBlock(MovingObjectPosition mop) {
