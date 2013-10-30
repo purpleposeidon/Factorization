@@ -1,5 +1,7 @@
 package factorization.client.render;
 
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -7,6 +9,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 
@@ -43,6 +46,8 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
     static double myRound(double x) {
         return x > 0.5 ? 1 : 0;
     }
+    
+    Random rand = new Random();
     
     @Override
     public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
@@ -85,9 +90,15 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         Tessellator.instance.draw();
         
         if (cc.isPrimaryCrafter() && cc.upperCorner != null && cc.lowerCorner != null
-                && Minecraft.getMinecraft().gameSettings.fancyGraphics && Core.dev_environ /* NORELEASE */) {
+                && Minecraft.getMinecraft().gameSettings.fancyGraphics) {
+            GL11.glPushMatrix();
             GL11.glTranslatef(-cc.xCoord, -cc.yCoord, -cc.zCoord);
-            
+            if (perc > 0.75F) {
+                float jiggle = perc - 0.75F;
+                jiggle /= 32; //this gets us 1 pixel of jiggle room
+                rand.setSeed((long)(((long) Integer.MAX_VALUE)*perc));
+                GL11.glTranslatef((float) rand.nextGaussian()*jiggle, (float) rand.nextGaussian()*jiggle, (float) rand.nextGaussian()*jiggle);
+            }
             Coord up = cc.upperCorner;
             Coord lo = cc.lowerCorner;
             float cx = (up.x + lo.x + 1)/2F;
@@ -108,11 +119,50 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
             
             GL11.glScalef(sx, sy, sz);
             drawSquishingBlocks(up, lo, partial);
+            GL11.glPopMatrix();
+            
+            sx = sy = sz = 1;
+            float s = 17F/16F;
+            if (fd.offsetX != 0) sx = s;
+            if (fd.offsetY != 0) sy = s;
+            if (fd.offsetZ != 0) sz = s;
+            GL11.glScalef(sx, sy, sz);
+            GL11.glTranslatef(lo.x - cc.xCoord, lo.y - cc.yCoord, lo.z - cc.zCoord);
+            sx -= 1;
+            sy -= 1;
+            sz -= 1;
+            sx /= -2;
+            sy /= -2;
+            sz /= -2;
+            GL11.glTranslatef(sx, sy, sz);
+            //GL11.glTranslatef(-(up.x - lo.x), -(up.y - lo.y), -(up.z - lo.z + 1));
+            drawObscurringBox();
         }
         GL11.glPopMatrix();
         GL11.glEnable(GL11.GL_LIGHTING);
     }
-
+    
+    private void drawObscurringBox() {
+        //contentSize is determined by _drawSquishingBlocks
+        if (contentSize == null) {
+            return;
+        }
+        bindTexture(Core.blockAtlas);
+        BlockRenderHelper block = BlockRenderHelper.instance;
+        contentSize.maxX -= contentSize.minX;
+        contentSize.minX = 0;
+        contentSize.maxY -= contentSize.minY;
+        contentSize.minY = 0;
+        contentSize.maxZ -= contentSize.minZ;
+        contentSize.minZ = 0;
+        block.useTexture(BlockIcons.dark_iron_block);
+        block.setBlockBounds(0, 0, 0, (float) contentSize.maxX, (float) contentSize.maxY, (float) contentSize.maxZ);
+        block.begin();
+        Tessellator.instance.startDrawingQuads();
+        block.renderForTileEntity();
+        Tessellator.instance.draw();
+    }
+    
     private static Tessellator tess = new Tessellator();
     
     private void drawSquishingBlocks(Coord upperCorner, Coord lowerCorner, float partial) {
@@ -137,7 +187,9 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
     }
     
     private static Tessellator tesrator = new Tessellator();
+    AxisAlignedBB contentSize;
     private void _drawSquishingBlocks(Coord upperCorner, Coord lowerCorner, float partial) {
+        contentSize = null;
         bindTexture(Core.blockAtlas);
         Tessellator.instance.startDrawingQuads();
         World w = upperCorner.w;
@@ -153,13 +205,36 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
                     for (int z = lowerCorner.z; z <= upperCorner.z; z++) {
                         Block b = Block.blocksList[w.getBlockId(x, y, z)];
                         if (b == null) {
+                            if (renderPass == 3) {
+                                if (contentSize == null) {
+                                    contentSize = AxisAlignedBB.getBoundingBox(x, y, z, x + 1, y + 1, z + 1);
+                                } else {
+                                    contentSize.minX = Math.min(contentSize.minX, x);
+                                    contentSize.maxX = Math.max(contentSize.maxX, x + 1);
+                                    contentSize.minY = Math.min(contentSize.minY, y);
+                                    contentSize.maxY = Math.max(contentSize.maxY, y + 1);
+                                    contentSize.minZ = Math.min(contentSize.minZ, z);
+                                    contentSize.maxZ = Math.max(contentSize.maxZ, z + 1);
+                                }
+                            }
                             continue;
                         }
                         if (renderPass == 3) {
+                            if (contentSize == null) {
+                                contentSize = b.getCollisionBoundingBoxFromPool(w, x, y, z);
+                            } else {
+                                AxisAlignedBB extend = b.getCollisionBoundingBoxFromPool(w, x, y, z);
+                                contentSize.minX = Math.min(contentSize.minX, extend.minX);
+                                contentSize.maxX = Math.max(contentSize.maxX, extend.maxX);
+                                contentSize.minY = Math.min(contentSize.minY, extend.minY);
+                                contentSize.maxY = Math.max(contentSize.maxY, extend.maxY);
+                                contentSize.minZ = Math.min(contentSize.minZ, extend.minZ);
+                                contentSize.maxZ = Math.max(contentSize.maxZ, extend.maxZ);
+                            }
                             TileEntity te;
                             if ((te = w.getBlockTileEntity(x, y, z)) != null) {
                                 Tessellator.instance = tesrator;
-                                //TileEntityRenderer.instance.renderTileEntity(te, partial); //NORELEASE
+                                TileEntityRenderer.instance.renderTileEntity(te, partial);
                                 Tessellator.instance = tess;
                             }
                             continue;
