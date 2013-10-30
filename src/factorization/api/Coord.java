@@ -594,8 +594,12 @@ public class Coord implements IDataSerializable {
         int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
         return w.setBlock(x, y, z, id, 0, notifyFlag);
     }
+    
+    public boolean setId(Block block, boolean notify) {
+        int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
+        return w.setBlock(x, y, z, block.blockID, 0, notifyFlag);
+    }
 
-    @Deprecated
     public boolean setMd(int md, boolean notify) {
         int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
         return w.setBlockMetadataWithNotify(x, y, z, md, notifyFlag);
@@ -606,13 +610,17 @@ public class Coord implements IDataSerializable {
         int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
         return w.setBlock(x, y, z, id, md, notifyFlag);
     }
+    
+    public boolean setIdMd(Block block, int md, boolean notify) {
+        int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
+        return w.setBlock(x, y, z, block.blockID, md, notifyFlag);
+    }
 
     @Deprecated
     public boolean setId(int id) {
         return setId(id, true);
     }
 
-    @Deprecated
     public boolean setMd(int md) {
         return setMd(md, true);
     }
@@ -622,7 +630,6 @@ public class Coord implements IDataSerializable {
         return setIdMd(id, md, true);
     }
 
-    @Deprecated
     public boolean setId(Block block) {
         return setId(block.blockID);
     }
@@ -798,13 +805,13 @@ public class Coord implements IDataSerializable {
             return b.getPickBlock(mop, w, x, y, z);
         } catch (NoSuchMethodError t) {
             if (!spam) {
-                Core.logWarning("Block.getPickBlock is unusable on the server." +
+                /*Core.logWarning("Block.getPickBlock is unusable on the server." +
             " A workaround prevents crashes, but may possibly allow dupe bugs." +
             " The developer is no longer interested in wasting his time, energy, and vitality on this matter." +
             " This is not a bug, it is a fact of life." +
             " Do not attempt to report it. If you have happened somehow to have actually improved the situation in Forge/Vanilla," +
             " the developer would, of course, be happy to learn of it. Otherwise, if I hear about it, I will ban you or something.");
-                t.printStackTrace();
+                t.printStackTrace();*/
                 spam = true;
             }
             return BlockHelper.getPlacingItem(b, mop, w, x, y, z);
