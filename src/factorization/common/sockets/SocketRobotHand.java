@@ -144,7 +144,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
             return false;
         }
         if (getBackingInventory(this) == null) {
-            Notify.send(this, "No output inventory");
+            Notify.send(this, "Missing inventory block");
         }
         return false;
     }
