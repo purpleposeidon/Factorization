@@ -239,7 +239,7 @@ public class CompressionState {
         
         Notify.withStyle(Style.FORCE);
         errored = false;
-        error(root, "Place as marked for a %sx%s\nThen give a redstone signal", ""+width, ""+height);
+        error(root, "Place as marked for %sx%s crafting grid\nThen give a redstone signal", ""+width, ""+height);
     }
     
     void mark(Coord c) {
