@@ -17,6 +17,7 @@ import factorization.common.TileEntityMixer;
 import factorization.common.TileEntityMixer.RecipeMatchInfo;
 
 public class RecipeMixer extends TemplateRecipeHandler {
+    //FIXME: People keep sending invalid bug reports for the mixer because it can't really merge OD ItemStacks.
     @Override
     public void loadCraftingRecipes(ItemStack result) {
         //XXX NOTE: This is probably a lame implementation of this function.

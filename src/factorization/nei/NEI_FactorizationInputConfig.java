@@ -1,7 +1,5 @@
 package factorization.nei;
 
-import org.lwjgl.input.Keyboard;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import codechicken.nei.api.IConfigureNEI;

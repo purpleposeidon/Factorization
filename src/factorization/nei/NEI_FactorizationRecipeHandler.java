@@ -10,7 +10,7 @@ public class NEI_FactorizationRecipeHandler implements IConfigureNEI {
     public void loadConfig() {
         put(new RecipeCrystallizer());
         put(new RecipeGrinder());
-        put(new RecipeMixer());
+        //put(new RecipeMixer());
         put(new RecipeSlagFurnace());
     }
     

@@ -1,15 +1,19 @@
 package factorization.nei;
 
 import java.awt.Rectangle;
+import java.util.Arrays;
 import java.util.List;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.recipe.GuiRecipe;
 import codechicken.nei.recipe.TemplateRecipeHandler;
 import factorization.client.gui.GuiGrinder;
 import factorization.common.Core;
+import factorization.common.FactorizationUtil;
 import factorization.common.TileEntityGrinder;
 import factorization.common.TileEntityGrinder.GrinderRecipe;
 
@@ -36,13 +40,19 @@ public class RecipeGrinder extends TemplateRecipeHandler {
     @Override
     public void loadUsageRecipes(ItemStack ingredient) {
         //XXX NOTE: This is probably a lame implementation of this function.
+        if (FactorizationUtil.couldMerge(ingredient, Core.registry.socket_lacerator)) {
+            ingredient = null;
+        }
+        if (FactorizationUtil.couldMerge(ingredient, Core.registry.empty_socket_item)) {
+            ingredient = null;
+        }
         for (GrinderRecipe gr : TileEntityGrinder.recipes) {
             if (ingredient == null) {
                 arecipes.add(new CachedGrinderRecipe(gr));
                 continue;
             }
             for (ItemStack is : gr.getInput()) {
-                if (ingredient.isItemEqual(is)) {
+                if (FactorizationUtil.wildcardSimilar(is, ingredient)) {
                     arecipes.add(new CachedGrinderRecipe(gr));
                     break;
                 }
@@ -50,6 +60,11 @@ public class RecipeGrinder extends TemplateRecipeHandler {
         }
     }
 
+    static final List<PositionedStack> socketBits = Arrays.asList(
+            new PositionedStack(Core.registry.socket_lacerator.copy(), 51+18, 24),
+            new PositionedStack(Core.registry.empty_socket_item, 51+18*2, 24)
+            );
+    
     class CachedGrinderRecipe extends CachedRecipe {
         GrinderRecipe gr;
 
@@ -59,12 +74,17 @@ public class RecipeGrinder extends TemplateRecipeHandler {
 
         @Override
         public PositionedStack getResult() {
-            return new PositionedStack(gr.output, 111, 24);
+            return new PositionedStack(gr.output, 51+18*3, 24);
         }
 
         @Override
         public PositionedStack getIngredient() {
             return new PositionedStack(gr.getInput(), 51, 24);
+        }
+        
+        @Override
+        public List<PositionedStack> getOtherStacks() {
+            return socketBits;
         }
 
     }
@@ -82,6 +102,12 @@ public class RecipeGrinder extends TemplateRecipeHandler {
         if (prob != 0) {
             currenttip.add(((int)prob) + "%"); 
         }
+        for (ItemStack is : gr.getInput()) {
+            if (FactorizationUtil.wildcardSimilar(is, stack)) {
+                currenttip.add("In a barrel, or as a block");
+                break;
+            }
+        }
         return currenttip;
     }
 
@@ -97,16 +123,27 @@ public class RecipeGrinder extends TemplateRecipeHandler {
 
     @Override
     public String getRecipeName() {
-        return "Grinder";
+        return "Lacerator";
     }
 
     @Override
+    public void drawForeground(int recipe) { }
+    @Override
+    public void drawBackground(int recipe) { }
+    
+    @Override
     public String getGuiTexture() {
-        return Core.gui_nei + "grinder.png";
+        return "unused";
     }
 
     @Override
     public String getOverlayIdentifier() {
         return "fz.grinding";
+    }
+    
+    @Override
+    public List<String> handleTooltip(GuiRecipe gui, List<String> currenttip,
+            int recipe) {
+        return currenttip;
     }
 }
