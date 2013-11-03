@@ -3,17 +3,9 @@ package factorization.misc;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.LinkedList;
-import java.util.List;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -27,7 +19,6 @@ import net.minecraft.stats.AchievementList;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.DungeonHooks;
 import net.minecraftforge.common.MinecraftForge;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ICraftingHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Mod;
@@ -36,7 +27,6 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.IConnectionHandler;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.PacketDispatcher;
@@ -48,7 +38,7 @@ import factorization.common.Core;
 import factorization.common.FzConfig;
 
 @Mod(modid = MiscellaneousNonsense.modId, name = MiscellaneousNonsense.name, version = Core.version, dependencies = "required-after: " + Core.modId)
-@NetworkMod(clientSideRequired = true, packetHandler = MiscNet.class, channels = {MiscNet.cmdChannel, MiscNet.tpsChannel}, connectionHandler = MiscellaneousNonsense.class)
+@NetworkMod(clientSideRequired = true, packetHandler = MiscNet.class, channels = {MiscNet.tpsChannel}, connectionHandler = MiscellaneousNonsense.class)
 public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
     public static final String modId = Core.modId + ".misc";
     public static final String name = "Factorization Miscellaneous Nonsense";
@@ -104,108 +94,6 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         //TODO: Make middle-clicking nicer
         if (FzConfig.equal_opportunities_for_mobs) {
             MinecraftForge.EVENT_BUS.register(new MobEqualizer());
-        }
-    }
-    
-    @EventHandler
-    public void addCommands(FMLServerStartingEvent event) {
-        event.registerServerCommand(new FogCommand());
-    }
-    
-    static class FogCommand extends CommandBase {
-
-        @Override
-        public String getCommandName() {
-            return "f";
-        }
-
-        @Override
-        public void processCommand(ICommandSender sender, String[] args) {
-            if (!(sender instanceof EntityPlayerMP)) {
-                return;
-            }
-            EntityPlayerMP player = (EntityPlayerMP) sender;
-            if (args == null || args.length == 0) {
-                args = new String[] { "help" };
-            }
-            player.playerNetServerHandler.sendPacketToPlayer(instance.makeCmdPacket(args));
-        }
-        
-        @Override
-        public String getCommandUsage(ICommandSender icommandsender) {
-            return "/f <subcommand, such as 'help' or 'list'>";
-        }
-        
-        @Override
-        public List addTabCompletionOptions(ICommandSender sender, String[] args) {
-            try {
-                if (args.length == 1) {
-                    String arg0 = args[0];
-                    List<String> availCommands = new ArrayList<String>(50);
-                    availCommands.addAll(Arrays.asList("0", "1", "2", "3", "4", "+", ""));
-                    for (Method method : MiscClientProxy.miscCommands.class.getMethods()) {
-                        if (method.getDeclaringClass() == Object.class || method.getParameterTypes().length != 0) {
-                            continue;
-                        }
-                        availCommands.add(method.getName());
-                        MiscClientProxy.alias a = method.getAnnotation(MiscClientProxy.alias.class);
-                        if (a == null) {
-                            continue;
-                        }
-                        for (String name : a.value()) {
-                            availCommands.add(name);
-                        }
-                    }
-                    
-                    if (FMLCommonHandler.instance().getSide() != Side.CLIENT) {
-                        //Sigh. There's not really any other way of doing this.
-                        availCommands.addAll(Arrays.asList(
-                                "clear", "cl",
-                                "savesettings", "ss",
-                                "render_above", "render_everything_lagfest",
-                                "mods"
-                                ));
-                    }
-                    
-                    List<String> ret = new LinkedList();
-                    for (String name : availCommands) {
-                        if (name.startsWith(arg0)) {
-                            ret.add(name);
-                        }
-                    }
-                    return ret;
-                }
-            } catch (Throwable e) {
-                Core.logWarning("Wasn't able to do tab completion!");
-                e.printStackTrace();
-                return Arrays.asList("tab_completion_failed");
-            }
-            return new LinkedList();
-        }
-        
-        @Override
-        public boolean canCommandSenderUseCommand(ICommandSender sender) {
-            return sender instanceof EntityPlayerMP;
-        }
-        
-        @Override
-        public int getRequiredPermissionLevel() {
-            return 0;
-        }
-    }
-    
-    public Packet makeCmdPacket(String items[]) {
-        try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            DataOutputStream output = new DataOutputStream(outputStream);
-            for (String i : items) {
-                output.writeUTF(i);
-            }
-            output.flush();
-            return PacketDispatcher.getPacket(MiscNet.cmdChannel, outputStream.toByteArray());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
         }
     }
     

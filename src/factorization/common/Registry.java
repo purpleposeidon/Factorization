@@ -767,7 +767,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "#C#",
                 '#', Block.cobblestone,
                 'p', Block.pistonBase,
-                'I', "ingotIron",
+                'I', Item.ingotIron,
                 'C', Block.workbench);
         
         //Compression Crafter
@@ -925,14 +925,15 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "SSS",
                 'S', diamond_shard,
                 'I', Item.ingotIron);
-        oreRecipe(grinder_item,
+        /* oreRecipe(grinder_item,
                 "LIL",
                 "I*I",
                 "IMI",
                 'L', "ingotLead",
                 'I', Item.ingotIron,
                 '*', diamond_cutting_head,
-                'M', motor);
+                'M', motor);*/
+        shapelessRecipe(socket_lacerator, grinder_item);
         
         //Values based on Fortune I
         TileEntityGrinder.addRecipe(new ItemStack(Block.oreCoal), new ItemStack(Item.coal), 1.5F);
@@ -966,7 +967,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
         TileEntityGrinder.addRecipe(Block.blockClay, new ItemStack(Item.clay), 4F);
         TileEntityGrinder.addRecipe(Block.fence, new ItemStack(Item.stick), 2.5F);
         //Netherrack dust is handled elsewhere!
-        TileEntityGrinder.addRecipe(Block.glowStone, new ItemStack(Item.glowstone, 4), 4F);
+        TileEntityGrinder.addRecipe(Block.glowStone, new ItemStack(Item.glowstone), 4F);
         TileEntityGrinder.addRecipe(Block.trapdoor, new ItemStack(Item.stick), 3.5F);
         TileEntityGrinder.addRecipe(Block.stoneBrick, new ItemStack(Block.cobblestone), 0.75F);
         TileEntityGrinder.addRecipe(Block.thinGlass, new ItemStack(Block.sand), 0.1F/16F);
@@ -1015,7 +1016,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
         TileEntityCrystallizer.addRecipe(lime, new ItemStack(Item.slimeBall), 1, new ItemStack(Item.bucketMilk));
         
         //Rocketry
-        TileEntityGrinder.addRecipe(new ItemStack(Block.netherrack), new ItemStack(nether_powder, 1), 2);
+        TileEntityGrinder.addRecipe(new ItemStack(Block.netherrack), new ItemStack(nether_powder, 1), 1);
         if (FzConfig.enable_dimension_slice) {
             shapelessRecipe(new ItemStack(rocket_fuel, 9),
                     nether_powder, nether_powder, nether_powder,

@@ -3,7 +3,6 @@ package factorization.misc;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetworkManager;
@@ -12,7 +11,6 @@ import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.Player;
 
 public class MiscNet implements IPacketHandler {
-    public static final String cmdChannel = "fzmsc.cmd";
     public static final String tpsChannel = "fzmsc.tps";
     
     public MiscNet() {
@@ -33,27 +31,8 @@ public class MiscNet implements IPacketHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return;
         }
-        if (!cmdChannel.equals(packet.channel)) {
-            return;
-        }
-        ArrayList<String> text = new ArrayList();
-        try {
-            ByteArrayInputStream bais = new ByteArrayInputStream(packet.data);
-            DataInputStream input = new DataInputStream(bais);
-            while (input.available() > 0) {
-                text.add(input.readUTF());
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return;
-        }
-        try {
-            MiscellaneousNonsense.proxy.runCommand(text);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        return;
     }
 
 }
