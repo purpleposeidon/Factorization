@@ -28,7 +28,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockHelper;
-import factorization.common.Core;
 import factorization.common.FactorizationUtil;
 
 public class Coord implements IDataSerializable {
@@ -452,6 +451,9 @@ public class Coord implements IDataSerializable {
 
     public TileEntity getTE() {
         if (w == null) {
+            return null;
+        }
+        if (!blockExists()) {
             return null;
         }
         return w.getBlockTileEntity(x, y, z);
