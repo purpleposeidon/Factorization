@@ -16,3 +16,4 @@ texture/ignore
 eclipse/
 DeSrg/fields.csv
 DeSrg/methods.csv
+build/Factorization-dev.jar

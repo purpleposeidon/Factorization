@@ -7,7 +7,7 @@ echo Packaging client
 #./build_core_mod
 
 FZ=`pwd`
-OUT=~/Dropbox/dev/Factorization-dev.jar
+OUT=$FZ/build/Factorization-dev.jar
 
 pushd ../forge/mcp/reobf/minecraft > /dev/zero
   cp -R $FZ/resources/* ./
