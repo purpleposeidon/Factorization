@@ -457,8 +457,9 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         float d = 0.5F;
         GL11.glTranslatef(d, d, d);
         Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())).glRotate();
-        GL11.glRotatef(FactorizationUtil.interp(prev_rotation, rotation, partial) / 5.0F, 0, 1, 0);
-        GL11.glTranslatef(0, -4F/16F, 0);
+        float turn = FactorizationUtil.interp(prev_rotation, rotation, partial) / 5.0F;
+        GL11.glRotatef(turn, 0, 1, 0);
+        GL11.glTranslatef(0, -4F/16F + (float) Math.abs(Math.sin(turn/800))/32F, 0);
         TileEntityGrinderRender.renderGrindHead();
         if (ticked) {
             ticked = false;
