@@ -118,26 +118,24 @@ Lower barriers to entry for servos:
   Maybe we should see about flattening our mod in other areas as well.
   Make dark iron an ore found at bedrock level
 
-TOP LIST (that's become somewhat less tops. Oops.)
+TOP LIST
 --------
-NEI
-Also, NEI + gregtech = wtf anvil sounds apparently?
 forge Contributing.md
 myrathi's access transformer
-compression crafters:
-  flowerpots
-  rendering. :(
-  fire -> chainmail?
+silky barrels broken?
+
+LESS TOP LIST
+-------------
+test parasieves + comparators + recursion depth. Somehow.
+localize ALL THE THINGS
+sparks in leyden jar when held aren't centered
 One of my ICommands is broken (???)
-One of my ICommands is broken!?
-barrel placement options:
-  - always place facing up; if shift-clicking with empty fist, rotate like a wrench
-  - if clicking near the middle of the block, place up
+  One of my ICommands is broken!?
+  /help works right, right?
 [15:43:34] <Hathadar> I have a router inserting into 4 induction furnaces.  The moment I place a machine filter on it and set it to the induction furnace it stops working.  It will not insert or extract.  0.8.01
 I wonder if the bug hopper has any interesting crashlogs!
   - Oh yay the bug hopper is no longer running!
 localize barrel types (There's a ton of other things what need to be localized, y'know...)
-localize ALL THE THINGS
 leyden jars & batteries should overcharge slightly so that they can drop exactly 100%-charged stuff
 seems we can't really rely on servo components being loaded by .zip inspecting; will have to do it by hand. x_x
 hopping barrels could be optimized if they're moving something above them to below them!
@@ -147,14 +145,10 @@ onInventoryUpdate all the TEs
 Test BoH key with NEI installed & with sneak key set to a mouse button.
 can't glaze a sculpture cloned from an already glazed sculpture
 change raw glaze colors to their real colors
-sparks in leyden jar when held aren't centered
-there's a proper client commands thing now in recent forge
 smooth sandstone double slab (Are there other variants?)
 Look at what errors we get if the FZDS code isn't in
 either bats are spawning in the hammer dimension, or we're getting entity updates that we shouldn't be
 having more boilers/mirrors seems to give you more steam somehow
-Misc Nonsense:
-  fix vanilla's middle clicking
 notification system upgrade:
   extra controls for clearing up other notifications: get rid of nearby messages (barrels), start fading the message away as soon as it shows up (energy measurements), remove any messages that have the same typename as this one, leave the message up for # seconds
   being able to group messages together might be nice; so you could do "clear tutorialMessages".
@@ -168,7 +162,6 @@ register ore blocks
 To kill NEI's shift-? cheat: clear out RecipeInfo.overlayMap... or something.  Hmm....
   Might want to just remove instances whose class = DefaultOverlayHandler or BrewingOverlayHandler.
 http://jezek2.advel.cz/tmp/jstackalloc/javadoc/
-in-place barrel upgrading
 richardG suggests doing world.blockExists to prevent orphaning chunks:
   new socket stufff....
   hopping barrels that are sideways
@@ -191,13 +184,9 @@ optimize these TEs. Prolly use whatever it is that Entity Models use?
 Redstone signal on furnace heaters
 right-clicking a barrel with a tool could put stuff in as if you had right-clicked with an empty hand
 glowing glazes
-ore processing for dark iron (and possibly wrath-burn other blocks besides iron)
 Go over our API stuff. Clean up. Make sure other people can actually use stuff. (Maybe test this?)
-slowpoke discussion re. barrel balancing. Maybe an upgrade for automating barrel content access?
 Occasionally enable all warnings & clean things up
 railgun, except for steve
-
-always test everything in SMP! jegus!
 
 Need more uses for diamond shards!
   Shard spear? :o  Something about dark crystals. 

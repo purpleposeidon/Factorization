@@ -290,4 +290,6 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public ItemStack getPickedBlock() {
         return getDroppedBlock();
     }
+    
+    public void onNeighborTileChanged(int tilex, int tiley, int tilez) {}
 }

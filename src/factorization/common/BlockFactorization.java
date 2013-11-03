@@ -641,4 +641,13 @@ public class BlockFactorization extends BlockContainer {
         }
         return false;
     }
+    
+    @Override
+    public void onNeighborTileChange(World world, int x, int y, int z,
+            int tilex, int tiley, int tilez) {
+        TileEntity te = world.getBlockTileEntity(x, y, z);
+        if (te instanceof TileEntityCommon) {
+            ((TileEntityCommon) te).onNeighborTileChanged(tilex, tiley, tilez);
+        }
+    }
 }

@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
+import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.ForgeDirection;
 
 import org.bouncycastle.util.Arrays;
@@ -13,12 +14,12 @@ import org.bouncycastle.util.Arrays;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
+import factorization.common.FactorizationUtil.FzInv;
 
 public class TileEntityParaSieve extends TileEntityFactorization implements ISidedInventory {
     ItemStack[] filters = new ItemStack[8];
     private boolean putting_nbt = false;
-    private boolean powered = false;
-    private long redstoneCache = -0xFF;
+    private byte redstone_cache = -1;
     
     public TileEntityParaSieve() {
         facing_direction = 2;
@@ -68,13 +69,16 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     
     static Coord hereCache = new Coord(null, 0, 0, 0);
     private boolean isPowered() {
-        long now = worldObj.getTotalWorldTime();
-        if (now != redstoneCache) {
-            now = redstoneCache;
+        if (redstone_cache == -1) {
             hereCache.set(this);
-            powered = hereCache.isPowered(); //Extremely remote possibility of thread-conflict; meh.
+            redstone_cache = (byte) (hereCache.isPowered() ? 1 : 0);
         }
-        return powered;
+        return redstone_cache == 1;
+    }
+    
+    @Override
+    public void neighborChanged() {
+        redstone_cache = -1;
     }
     
     boolean itemPassesFilter(ItemStack stranger) {
@@ -292,7 +296,35 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             if (_beginRecursion()) {
                 return 11;
             }
-            return getCoord().add(getFacing()).getComparatorOverride(getFacing().getOpposite());
+            boolean empty = true;
+            for (int i = 0; i < filters.length; i++) {
+                if (filters[i] != null) {
+                    empty = false;
+                    break;
+                }
+            }
+            if (empty) {
+                return getCoord().add(getFacing()).getComparatorOverride(getFacing().getOpposite());
+            }
+            FzInv inv = FactorizationUtil.openInventory(getCoord().add(getFacing()).getTE(IInventory.class), getFacing().getOpposite());
+            if (inv == null) {
+                return getCoord().add(getFacing()).getComparatorOverride(getFacing().getOpposite());
+            }
+            int filledSlots = 0;
+            float fullness = 0;
+            for (int i = 0; i < inv.size(); ++i) {
+                ItemStack is = inv.get(i);
+                if (is == null || !itemPassesFilter(is)) {
+                    continue;
+                }
+                filledSlots++;
+                fullness += is.stackSize / (float) Math.min(inv.under.getInventoryStackLimit(), is.getMaxStackSize());
+            }
+            if (filledSlots == 0) {
+                return 0;
+            }
+            fullness /= (float) inv.size();
+            return MathHelper.floor_float(fullness * 14.0F) + 1;
         } finally {
             endRecursion();
         }
@@ -323,6 +355,24 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
                 return;
             }
             inv.onInventoryChanged();
+        } finally {
+            endRecursion();
+        }
+    }
+    
+    @Override
+    public void onNeighborTileChanged(int tilex, int tiley, int tilez) {
+        ForgeDirection facing = getFacing();
+        boolean isOurs = xCoord + facing.offsetX == tilex &&  yCoord + facing.offsetY == tiley &&  zCoord + facing.offsetZ == tilez;
+        if (!isOurs) {
+            return;
+        }
+        try {
+            IInventory inv = getRecursiveTarget();
+            if (inv == null) {
+                return;
+            }
+            super.onInventoryChanged();
         } finally {
             endRecursion();
         }

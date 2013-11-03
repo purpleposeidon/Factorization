@@ -7,6 +7,9 @@
     Break themselves when not on a rail
     Added the Item Shifter Control instruction; it may pop an integer from the argument stack
   Fixed middle click
+  Deprecated grinders for lacerators; they can be converted
+  Removed the buggy and kind of pointless mixer NEI handler
+  Parasieve works nicely with comparators now
 
 
 0.8.05
