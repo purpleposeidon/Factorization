@@ -323,6 +323,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         ForgeDirection facing = ForgeDirection.getOrientation(side);
         double u = 0.5, v = 0.5; //We pick the axiis based on which side gets clicked
         switch (facing) {
+        case UNKNOWN:
         case DOWN:
             u = 1 - hitX;
             v = hitZ;
