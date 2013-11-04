@@ -221,15 +221,17 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
                         }
                         if (renderPass == 3) {
                             if (contentSize == null) {
-                                contentSize = b.getCollisionBoundingBoxFromPool(w, x, y, z);
+                                contentSize = b.getSelectedBoundingBoxFromPool(w, x, y, z);
                             } else {
-                                AxisAlignedBB extend = b.getCollisionBoundingBoxFromPool(w, x, y, z);
-                                contentSize.minX = Math.min(contentSize.minX, extend.minX);
-                                contentSize.maxX = Math.max(contentSize.maxX, extend.maxX);
-                                contentSize.minY = Math.min(contentSize.minY, extend.minY);
-                                contentSize.maxY = Math.max(contentSize.maxY, extend.maxY);
-                                contentSize.minZ = Math.min(contentSize.minZ, extend.minZ);
-                                contentSize.maxZ = Math.max(contentSize.maxZ, extend.maxZ);
+                                AxisAlignedBB extend = b.getSelectedBoundingBoxFromPool(w, x, y, z);
+                                if (extend != null) {
+                                    contentSize.minX = Math.min(contentSize.minX, extend.minX);
+                                    contentSize.maxX = Math.max(contentSize.maxX, extend.maxX);
+                                    contentSize.minY = Math.min(contentSize.minY, extend.minY);
+                                    contentSize.maxY = Math.max(contentSize.maxY, extend.maxY);
+                                    contentSize.minZ = Math.min(contentSize.minZ, extend.minZ);
+                                    contentSize.maxZ = Math.max(contentSize.maxZ, extend.maxZ);
+                                }
                             }
                             TileEntity te;
                             if ((te = w.getBlockTileEntity(x, y, z)) != null) {
