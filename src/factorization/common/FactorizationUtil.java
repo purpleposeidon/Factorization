@@ -397,6 +397,26 @@ public class FactorizationUtil {
             return Math.min(dest_free, under.getInventoryStackLimit());
         }
         
+        public int getFreeSpaceFor(ItemStack target, int maxNeeded) {
+            int space = 0;
+            int spaceInEmpty = Math.min(target.getMaxStackSize(), under.getInventoryStackLimit());
+            for (int i = 0; i < size(); i++) {
+                if (!canInsert(i, target)) continue;
+                ItemStack is = get(i);
+                if (is == null) {
+                    space += spaceInEmpty;
+                } else if (couldMerge(target, is)) {
+                    space += spaceInEmpty - is.stackSize;
+                } else {
+                    continue;
+                }
+                if (space >= maxNeeded) {
+                    return space;
+                }
+            }
+            return space;
+        }
+        
         public boolean canPush(ItemStack is) {
             for (int i = 0; i < size(); i++) {
                 ItemStack here = get(i);
@@ -497,27 +517,27 @@ public class FactorizationUtil {
             return false;
         }
         
-        public boolean transfer(int i, FzInv dest_inv, int dest_i, int max_transfer) {
+        public int transfer(int i, FzInv dest_inv, int dest_i, int max_transfer) {
             ItemStack src = normalize(get(i));
             if (src == null) {
-                return false;
+                return 0;
             }
             if (!canExtract(i, src)) {
-                return false;
+                return 0;
             }
             ItemStack dest = dest_inv.get(dest_i);
             if (dest == null) {
                 dest = src.copy();
                 dest.stackSize = 0;
             } else if (!couldMerge(src, dest)) {
-                return false;
+                return 0;
             }
             if (!dest_inv.canInsert(dest_i, src)) {
-                return false;
+                return 0;
             }
             int dest_free = dest_inv.getFreeSpace(dest_i);
             if (dest_free < 1) {
-                return false;
+                return 0;
             }
             int delta = Math.min(dest_free, src.stackSize);
             delta = Math.min(max_transfer, delta);
@@ -528,7 +548,7 @@ public class FactorizationUtil {
             set(i, src);
             dest_inv.under.onInventoryChanged();
             under.onInventoryChanged();
-            return true;
+            return delta;
         }
         
         public ItemStack push(ItemStack is) {

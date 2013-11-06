@@ -46,7 +46,7 @@ public enum FactoryType {
     SOCKET_EMPTY(32, false, SocketEmpty.class, "fzsock_empty"),
     SOCKET_LACERATOR(33, false, SocketLacerator.class, "fzsock_lacerate"),
     SOCKET_ROBOTHAND(34, false, SocketRobotHand.class, "fzsock_hand"),
-    SOCKET_SHIFTER(35, false, SocketShifter.class, "fzsock_shift"),
+    SOCKET_SHIFTER(35, true, SocketShifter.class, "fzsock_shift"),
     
 
     POCKETCRAFTGUI(101, true)

@@ -3,9 +3,12 @@
     Found around Y=4; watch for changes in the bedrock
     Wrath fire can no longer be created; the igniter will hang around for crafting wrath lamps
     Can be ore-processed in the usual manner
-  Servos:
-    Break themselves when not on a rail
-    Added the Item Shifter Control instruction; it may pop an integer from the argument stack
+  Servos break themselves when not on a rail
+  Item Shifter:
+    Added the Item Shifter Control instruction
+      Multi-mode; it may pop an integer from the argument stack
+    The 'transfer limit' is now an exact amount of items to transfer
+    Clicking on a block-socketed Shifter with an LMP'll open up a config GUI
   Fixed middle click
   Deprecated grinders for lacerators; they can be converted
   Removed the buggy and kind of pointless mixer NEI handler

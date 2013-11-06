@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -40,11 +41,11 @@ public class SocketShifter extends TileEntitySocketBase {
     
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        streamMode = data.as(Share.MUTABLE, "strm").putBoolean(streamMode);
         exporting = data.as(Share.MUTABLE, "exp").putBoolean(exporting);
+        streamMode = data.as(Share.MUTABLE, "strm").putBoolean(streamMode);
         foreignSlot = data.as(Share.MUTABLE, "for").putInt(foreignSlot);
         transferLimit = data.as(Share.MUTABLE, "lim").putByte(transferLimit);
-        cooldown = data.as(Share.VISIBLE, "wait").putByte(cooldown);
+        cooldown = data.as(Share.PRIVATE, "wait").putByte(cooldown);
         if (data.isWriter()) {
             return this;
         }
@@ -72,13 +73,27 @@ public class SocketShifter extends TileEntitySocketBase {
         if (worldObj.isRemote) {
             return;
         }
-        if (cooldown > 0) {
-            cooldown--;
-            return;
+        if (streamMode) {
+            if (cooldown > 0) {
+                cooldown--;
+                return;
+            }
+            if (!powered) {
+                return;
+            }
+        } else {
+            if (!powered && cooldown > 0) {
+                cooldown--;
+                return;
+            }
+            if (cooldown > 0) {
+                return;
+            }
+            if (!powered) {
+                return;
+            }
         }
-        if (!powered) {
-            return;
-        }
+        
         FzInv localInv, foreignInv;
         ForgeDirection back = facing.getOpposite();
         if (socket != this) {
@@ -98,28 +113,102 @@ public class SocketShifter extends TileEntitySocketBase {
         if (foreignInv == null) {
             return;
         }
+        
+        FzInv pullInv, pushInv;
+        int pullStart, pullEnd, pushStart, pushEnd;
         if (exporting) {
+            pullInv = localInv;
+            pushInv = foreignInv;
+            pullStart = 0;
+            pullEnd = localInv.size() - 1;
             if (foreignSlot == -1) {
-                localInv.transfer(foreignInv, transferLimit, null);
+                pushStart = 0;
+                pushEnd = foreignInv.size() - 1;
             } else {
-                for (int localSlot = 0; localSlot < localInv.size(); localSlot++) {
-                    if (localInv.transfer(localSlot, foreignInv, foreignSlot, transferLimit)) {
-                        break;
-                    }
-                }
+                pushStart = pushEnd = foreignSlot;
             }
         } else {
+            pullInv = foreignInv;
+            pushInv = localInv;
+            pushStart = 0;
+            pushEnd = localInv.size() - 1;
             if (foreignSlot == -1) {
-                foreignInv.transfer(localInv, transferLimit, null);
+                pullStart = 0;
+                pullEnd = foreignInv.size() - 1;
             } else {
-                for (int localSlot = 0; localSlot < localInv.size(); localSlot++) {
-                    if (foreignInv.transfer(foreignSlot, localInv, localSlot, transferLimit)) {
-                        break;
-                    }
+                pullStart = pullEnd = foreignSlot;
+            }
+        }
+        
+        
+        boolean[] visitedSlots = new boolean[pullInv.size()];
+        outermostLoop: for (int pull = pullStart; pull <= pullEnd; pull++) {
+            if (countItem(pullInv, pull, transferLimit, visitedSlots) < transferLimit) {
+                continue;
+            }
+            ItemStack is = pullInv.get(pull);
+            int freeForIs = pushInv.getFreeSpaceFor(is, transferLimit);
+            if (freeForIs < transferLimit) {
+                continue;
+            }
+            //Found an item suitable for transfer
+            int stillNeeded = transferLimit;
+            int pushHere = pushStart;
+            for (int pi = pull; pi <= pullEnd; pi++) {
+                ItemStack toPull = pullInv.get(pi);
+                if (toPull == null) continue;
+                if (!FactorizationUtil.couldMerge(is, toPull)) continue;
+                int origSize = toPull.stackSize;
+                for (; pushHere <= pushEnd; pushHere++) {
+                    int delta = pullInv.transfer(pi, pushInv, pushHere, stillNeeded);
+                    stillNeeded -= delta;
+                    origSize -= delta;
+                    if (stillNeeded <= 0) break outermostLoop;
+                    if (origSize <= 0) break;
+                }
+            }
+            break; //Shouldn't actually get here.
+        }
+        
+        cooldown = (byte) (streamMode ? 8 : 1);
+    }
+    
+    int countItem(FzInv inv, int start, int minimum, boolean[] visitedSlots) {
+        if (visitedSlots[start]) {
+            return 0;
+        }
+        visitedSlots[start] = true;
+        ItemStack seed = inv.get(start);
+        if (seed == null || seed.stackSize == 0) {
+            return 0;
+        }
+        if (!inv.canExtract(start, seed)) {
+            return 0;
+        }
+        int count = seed.stackSize;
+        if (count >= minimum) {
+            return count;
+        }
+        start += 1;
+        for (int i = start; i < inv.size(); i++) {
+            if (visitedSlots[i]) continue;
+            ItemStack is = inv.get(i);
+            if (is == null) {
+                visitedSlots[i] = true;
+                continue;
+            }
+            if (FactorizationUtil.couldMerge(seed, is)) {
+                visitedSlots[i] = true;
+                if (!inv.canExtract(i, is)) {
+                    continue;
+                }
+                count += is.stackSize;
+                if (count >= minimum) {
+                    return count;
                 }
             }
         }
-        cooldown = (byte) (streamMode ? 8 : 1);
+        return count;
     }
     
     @Override

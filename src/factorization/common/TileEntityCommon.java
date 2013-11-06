@@ -27,6 +27,8 @@ import factorization.api.Coord;
 import factorization.api.IChargeConductor;
 import factorization.api.ICoord;
 import factorization.api.IFactoryType;
+import factorization.api.datahelpers.DataInPacketClientEdited;
+import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.NetworkFactorization.MessageType;
 
 public abstract class TileEntityCommon extends TileEntity implements ICoord, IFactoryType {

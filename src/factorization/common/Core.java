@@ -50,7 +50,7 @@ public class Core {
     public static final String modId = "factorization";
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
-    public static final String version = "0.8.06b06"; //@VERSION@
+    public static final String version = "0.8.07b01"; //@VERSION@
     public Core() {
         instance = this;
         fzconfig = new FzConfig();
@@ -335,6 +335,14 @@ public class Core {
         String ret = StatCollector.translateToLocal(key);
         if (ret == key) {
             return null;
+        }
+        return ret;
+    }
+    
+    public static String tryTranslate(String key, String fallback) {
+        String ret = translateExact(key);
+        if (ret == null) {
+            return fallback;
         }
         return ret;
     }

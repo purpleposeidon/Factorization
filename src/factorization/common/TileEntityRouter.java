@@ -416,14 +416,14 @@ public class TileEntityRouter extends TileEntityFactorization {
                 if (!itemPassesInsertFilter(inv, buffer)) {
                     return false;
                 }
-                if (me.transfer(0, inv, slot, toMove)) {
+                if (me.transfer(0, inv, slot, toMove) > 0) {
                     return true;
                 }
             } else {
                 if (!itemPassesExtractFilter(inv.get(slot))) {
                     continue;
                 }
-                if (inv.transfer(slot, me, 0, toMove)) {
+                if (inv.transfer(slot, me, 0, toMove) > 0) {
                     return true;
                 }
             }

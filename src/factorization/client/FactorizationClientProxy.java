@@ -30,6 +30,7 @@ import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
+import factorization.api.datahelpers.IDataSerializable;
 import factorization.client.gui.GuiCrystallizer;
 import factorization.client.gui.GuiGrinder;
 import factorization.client.gui.GuiMixer;
@@ -43,6 +44,7 @@ import factorization.common.*;
 import factorization.common.servo.BlockRenderServoRail;
 import factorization.common.servo.RenderServoMotor;
 import factorization.common.servo.ServoMotor;
+import factorization.common.sockets.GuiDataConfig;
 import factorization.common.sockets.SocketLacerator;
 
 public class FactorizationClientProxy extends FactorizationProxy {
@@ -104,6 +106,13 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }
         if (ID == FactoryType.PARASIEVE.gui) {
             gui = new GuiParasieve(cont);
+        }
+        if (ID == FactoryType.SOCKET_SHIFTER.gui) {
+            IDataSerializable ids = new Coord(world, x, y, z).getTE(IDataSerializable.class);
+            if (ids == null) {
+                return null;
+            }
+            gui = new GuiDataConfig(ids);
         }
         cont.addSlotsForGui(fac, player.inventory);
         return gui;

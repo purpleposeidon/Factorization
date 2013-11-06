@@ -569,9 +569,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
         public final static int PlaySound = 11, PistonPush = 12;
         //TEF messages
         public final static int
-                DrawActive = 0, FactoryType = 1, DescriptionRequest = 2, DataHelperEdit = 3,
-                //
-                MakerTarget = 11,
+                DrawActive = 0, FactoryType = 1, DescriptionRequest = 2, DataHelperEdit = 3, OpenDataHelperGui = 4,
                 //
                 RouterSlot = 20, RouterTargetSide = 21, RouterMatch = 22, RouterIsInput = 23,
                 RouterLastSeen = 24, RouterMatchToVisit = 25, RouterDowngrade = 26,

@@ -1,10 +1,13 @@
 package factorization.common;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,11 +27,16 @@ import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.IChargeConductor;
 import factorization.api.datahelpers.DataInNBT;
+import factorization.api.datahelpers.DataInPacket;
+import factorization.api.datahelpers.DataInPacketClientEdited;
 import factorization.api.datahelpers.DataOutNBT;
+import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.FactorizationUtil.FzInv;
+import factorization.common.NetworkFactorization.MessageType;
 import factorization.common.servo.LoggerDataHelper;
 import factorization.common.servo.ServoMotor;
+import factorization.common.sockets.GuiDataConfig;
 import factorization.common.sockets.SocketEmpty;
 
 public abstract class TileEntitySocketBase extends TileEntityCommon implements ISocketHolder, IDataSerializable {
@@ -302,9 +310,36 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     @Override
     public abstract boolean canUpdate();
     
+    @SideOnly(Side.CLIENT)
     @Override
     public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
-        return super.handleMessageFromServer(messageType, input);
+        if (super.handleMessageFromServer(messageType, input)) {
+            return true;
+        }
+        if (messageType == MessageType.OpenDataHelperGui) {
+            if (!worldObj.isRemote) {
+                return false;
+            }
+            DataInPacket dip = new DataInPacket(input, Side.CLIENT);
+            serialize("", dip);
+            Minecraft.getMinecraft().displayGuiScreen(new GuiDataConfig(this));
+            return true;
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean handleMessageFromClient(int messageType, DataInputStream input) throws IOException {
+        if (super.handleMessageFromClient(messageType, input)) {
+            return true;
+        }
+        if (messageType == MessageType.DataHelperEdit) {
+            DataInPacketClientEdited di = new DataInPacketClientEdited(input);
+            this.serialize("", di);
+            onInventoryChanged();
+            return true;
+        }
+        return false;
     }
     
     /**
@@ -319,6 +354,35 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
      */
     public boolean uninstall() {
         return true;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    @Override
+    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
+        ItemStack held = entityplayer.getHeldItem();
+        if (held == null) {
+            return false;
+        }
+        if (held.getItem() != Core.registry.logicMatrixProgrammer) {
+            return false;
+        }
+        if (worldObj.isRemote) {
+            return true;
+        } else {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(baos);
+            DataOutPacket dop = new DataOutPacket(dos, Side.SERVER);
+            try {
+                Coord coord = getCoord();
+                Core.network.prefixTePacket(dos, coord, MessageType.OpenDataHelperGui);
+                serialize("", dop);
+                Core.network.broadcastPacket(entityplayer, coord, Core.network.TEmessagePacket(baos));
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+            return false;
+        }
     }
     
     @SideOnly(Side.CLIENT)
