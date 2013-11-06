@@ -31,6 +31,9 @@ import factorization.common.FzConfig;
 
 public class MiscClientCommands implements ICommand {
     static final Minecraft mc = Minecraft.getMinecraft();
+    static int queued_action = 0;
+    static int queue_delay = 0;
+    static final int SHOW_MODS_LIST = 1, CLEAR_CHAT = 2;
     
     public int compareTo(ICommand other) {
         return this.getCommandName().compareTo(other.getCommandName());
@@ -148,16 +151,15 @@ public class MiscClientCommands implements ICommand {
         @alias({"cl"})
         @help("Erases the chat window")
         public static void clear() {
-            List cp = new ArrayList();
-            cp.addAll(mc.ingameGUI.getChatGUI().getSentMessages());
-            mc.ingameGUI.getChatGUI().clearChatMessages(); 
-            mc.ingameGUI.getChatGUI().getSentMessages().addAll(cp);
+            queued_action = CLEAR_CHAT;
         }
         
         @sketchy
         @help("Reveals your coordinates in-chat")
         public static void saycoords() {
-            player.sendChatMessage("/me is at " + ((int) player.posX) + ", " + ((int) player.posY) + ", " + ((int) player.posZ));
+            player.sendChatMessage("/me is at " + ((int) player.posX) + ", "
+                    + ((int) player.posY) + ", " + ((int) player.posZ) + " in dimension "
+                    + player.worldObj.provider.dimensionId);
         }
         
         @alias({"ss"})
@@ -210,12 +212,13 @@ public class MiscClientCommands implements ICommand {
                 player.sendChatMessage("/time set " + 20*60);
             }
             clear();
+            queue_delay = 10;
         }
         
         @help("Shows the mods screen")
         @SideOnly(Side.CLIENT)
         public static void mods() {
-            mc.displayGuiScreen(new GuiModList(null));
+            queued_action = SHOW_MODS_LIST;
         }
         
         @cheaty
@@ -571,5 +574,27 @@ public class MiscClientCommands implements ICommand {
             miscCommands.player = null;
             miscCommands.arg0 = miscCommands.arg1 = null;
         }
+    }
+    
+    static void tick() {
+        if (queued_action == 0) {
+            return;
+        }
+        if (queue_delay > 0) {
+            queue_delay--;
+            return;
+        }
+        switch (queued_action) {
+        case CLEAR_CHAT:
+            List cp = new ArrayList();
+            cp.addAll(mc.ingameGUI.getChatGUI().getSentMessages());
+            mc.ingameGUI.getChatGUI().clearChatMessages(); 
+            mc.ingameGUI.getChatGUI().getSentMessages().addAll(cp);
+            break;
+        case SHOW_MODS_LIST:
+            mc.displayGuiScreen(new GuiModList(null));
+            break;
+        }
+        queued_action = 0;
     }
 }
