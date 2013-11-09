@@ -89,18 +89,19 @@ public class RenderMessages extends RenderMessagesProxy {
         GL11.glTranslated(-cx, -cy, -cz);
         GL11.glPushAttrib(GL11.GL_BLEND);
 
+        GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glDepthMask(false);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glColor4f(1, 1, 1, 1);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        
         while (it.hasNext()) {
             Message m = it.next();
             if (m.creationTime < deathTime || m.world != w || !m.stillValid()) {
                 it.remove();
                 continue;
             }
-            GL11.glDisable(GL11.GL_LIGHTING);
-            GL11.glDepthMask(false);
-            GL11.glDisable(GL11.GL_DEPTH_TEST);
-            GL11.glEnable(GL11.GL_BLEND);
-            GL11.glColor4f(1, 1, 1, 1);
-            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             renderMessage(m, event.partialTicks);
         }
         GL11.glEnable(GL11.GL_LIGHTING);
@@ -147,7 +148,6 @@ public class RenderMessages extends RenderMessagesProxy {
             }
         }
         GL11.glTranslatef(x + 0.5F, y, z + 0.5F);
-        GL11.glNormal3f(0.0F, 1.0F, 0.0F);
         float pvx = RenderManager.instance.playerViewX;
         float pvy = -RenderManager.instance.playerViewY;
         Minecraft mc = Minecraft.getMinecraft();
