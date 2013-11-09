@@ -1053,14 +1053,14 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 'V', Block.hopperBlock,
                 '@', logicMatrixController,
                 'D', Block.dropper);
-        oreRecipe(FactoryType.SOCKET_ROBOTHAND.asSocketItem(),
-                "+*I",
+        oreRecipe(socket_robot_hand,
+                "+*P",
                 "+@+",
-                "I*+",
+                "P*+",
                 '+', servorail_item,
-                '*', sprocket_motor,
+                '*', dark_iron_sprocket,
                 '@', logicMatrixController,
-                'I', dark_iron);
+                'P', Block.pistonBase);
         oreRecipe(new ItemStack(instruction_plate, 5),
                 "I ",
                 "I>",
@@ -1075,7 +1075,9 @@ public class Registry implements ICraftingHandler, ITickHandler {
         oreRecipe(rails, "LDL",
                 'D', dark_iron,
                 'L', "ingotLead");
-        oreRecipe(dark_iron_sprocket,
+        ItemStack two_sprockets = dark_iron_sprocket.copy();
+        two_sprockets.stackSize = 2;
+        oreRecipe(two_sprockets,
                 " D ",
                 "DSD",
                 " D ",
