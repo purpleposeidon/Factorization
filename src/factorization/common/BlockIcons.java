@@ -113,6 +113,7 @@ public class BlockIcons {
     public static Icon servo$socket_on, servo$socket_off, servo$socket_pulse;
     public static Icon servo$ctrl$shift_import, servo$ctrl$shift_export, servo$ctrl$shift_target_slot, servo$ctrl$shift_transfer_limit, servo$ctrl$shift_stream, servo$ctrl$shift_pulse;
     public static Icon servo$instruction_plate;
+    public static Icon servo$trap;
     
     public static class ActivatingMachineIcon extends IconGroup {
         public Icon top, bottom, side, side_on;

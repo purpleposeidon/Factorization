@@ -256,6 +256,7 @@ public abstract class ServoComponent implements IDataSerializable {
                 SetDirection.class,
                 SetSpeed.class,
                 SocketCtrl.class,
+                Trap.class,
                 
                 Compare.class,
                 Drop.class,

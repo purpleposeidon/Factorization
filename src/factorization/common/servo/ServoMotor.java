@@ -80,6 +80,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     public byte target_speed = 2;
     private static final double max_speed_b = 127;
     double accumulated_motion;
+    public boolean stopped = false, prevStopped = false;
     
     boolean new_motor = true;
     
@@ -196,6 +197,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         } catch (IllegalStateException e) {
             e.printStackTrace(); //Hrm! Why? (I mean, besides the obvious.)
         }
+        prevOrientation = orientation;
     }
 
     @Override
@@ -252,6 +254,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
         isSocketActive = data.as(Share.VISIBLE, "sockon").putBoolean(isSocketActive);
         isSocketPulsed = data.as(Share.VISIBLE, "sockpl").putBoolean(isSocketPulsed);
+        stopped = data.as(Share.VISIBLE, "stop").putBoolean(stopped);
     }
 
     public double getTargetSpeed() {
@@ -288,17 +291,34 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         if (worldObj.isRemote) {
             prev_sprocket_rotation = sprocket_rotation;
             prev_servo_reorient = servo_reorient;
-            doLogic();
+            if (!stopped) {
+                doLogic();
+            }
+            if (stopped) {
+                speed_b = 0;
+            }
         } else {
             byte orig_speed = speed_b;
-            doLogic();
-            need_description_packet |= orig_speed != speed_b;
-            if (need_description_packet) {
-                need_description_packet  = false;
-                describe();
+            if (!stopped) {
+                doLogic();
             }
+            if (stopped) {
+                speed_b = 0;
+            }
+            need_description_packet |= orig_speed != speed_b;
         }
         interpolatePosition(pos_progress);
+        if (stopped && getCurrentPos().isWeaklyPowered()) {
+            stopped = false;
+        }
+        if (stopped != prevStopped) {
+            desync(true);
+        }
+        if (need_description_packet) {
+            need_description_packet = false;
+            describe();
+        }
+        prevStopped = stopped;
     }
     
     public void interpolatePosition(float interp) {
@@ -701,7 +721,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 pos_prev.asDeltaCoord(),
                 pos_next.asDeltaCoord(),
                 (byte) orientation.ordinal(),
-                (byte) nextDirection.ordinal());
+                (byte) nextDirection.ordinal()
+                //, (boolean) stopped
+                );
         for (int i = 0; i < inv_last_sent.length; i++) {
             inv_last_sent[i] = EMPTY_ITEM; //makes sure everything gets updated properly.
         }
@@ -732,7 +754,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             interpolatePosition(pos_progress);
             //$FALL-THROUGH$~~~~~!
         case MessageType.motor_direction:
-            orientation = FzOrientation.getOrientation(input.readByte());
+            prevOrientation = orientation = FzOrientation.getOrientation(input.readByte());
             nextDirection = ForgeDirection.getOrientation(input.readByte());
             return true;
         }

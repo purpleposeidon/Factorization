@@ -132,6 +132,7 @@ public class RenderServoMotor extends RenderEntity {
     @Override
     public void doRender(Entity ent, double x, double y, double z, float yaw, float partial) {
         Core.profileStartRender("servo");
+        //Ugh, there's some state that changes when mousing over an item in the inventory...
         MovingObjectPosition mop = Minecraft.getMinecraft().objectMouseOver;
         boolean highlighted = mop != null && mop.entityHit == ent;
         ServoMotor motor = (ServoMotor) ent;
@@ -194,7 +195,7 @@ public class RenderServoMotor extends RenderEntity {
     void orientMotor(ServoMotor motor, float partial, float reorientInterpolation) {
         final FzOrientation orientation = motor.orientation;
         final FzOrientation prevOrientation = motor.prevOrientation;
-
+        
         if (debug_servo_orientation) {
             GL11.glDisable(GL11.GL_LIGHTING);
             GL11.glDisable(GL11.GL_TEXTURE_2D);

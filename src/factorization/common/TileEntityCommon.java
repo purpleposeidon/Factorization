@@ -100,21 +100,20 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public void neighborChanged() {
     }
     
-    private static TileEntityCommon pulsingTE = null;
+    private long pulseTime = -1000;
     
     public void pulse() {
         Coord here = getCoord();
         if (here.w.isRemote) {
             return;
         }
-        pulsingTE = this;
+        pulseTime = worldObj.getTotalWorldTime();
         here.notifyNeighbors();
         here.scheduleUpdate(4);
-        pulsingTE = null;
     }
     
     public boolean power() {
-        return this == pulsingTE;
+        return pulseTime + 4 > worldObj.getTotalWorldTime();
     }
 
     public AxisAlignedBB getCollisionBoundingBoxFromPool() {
@@ -183,6 +182,9 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         if (customName != null) {
             tag.setString("customName", customName);
         }
+        if (worldObj != null && power()) {
+            tag.setLong("rps", pulseTime);
+        }
     }
     
     @Override
@@ -190,6 +192,9 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         super.readFromNBT(tag);
         if (tag.hasKey("customName")) {
             customName = tag.getString("customName");
+        }
+        if (tag.hasKey("rps")) {
+            pulseTime = tag.getLong("rps");
         }
     }
 

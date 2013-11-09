@@ -768,6 +768,10 @@ public class Coord implements IDataSerializable {
         return w.getBlockPowerInput(x, y, z) > 0;
     }
     
+    public boolean isWeaklyPowered() {
+        return w.isBlockIndirectlyGettingPowered(x, y, z);
+    }
+    
     public static void iterateCube(Coord a, Coord b, ICoordFunction func) {
         a = a.copy();
         b = b.copy();
