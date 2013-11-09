@@ -1029,8 +1029,6 @@ public class Registry implements ICraftingHandler, ITickHandler {
                     '#', Block.blockIron,
                     'F', rocket_fuel,
                     'I', Item.ingotIron);
-            ItemStack air = new ItemStack(Item.bucketEmpty, 0);
-            ItemStack emptyBucket = new ItemStack(Item.bucketEmpty, 1);
         }
         
         //Servos
