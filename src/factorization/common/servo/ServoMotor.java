@@ -22,6 +22,7 @@ import net.minecraft.util.EnumMovingObjectType;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.FakePlayer;
 import net.minecraftforge.common.ForgeDirection;
 
@@ -390,12 +391,17 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         accumulated_motion += speed;
         moveMotor();
         if (pos_progress >= 1) {
-            pos_progress--;
+            pos_progress -= 1F;
             accumulated_motion = Math.min(pos_progress, speed);
+            Chunk oldChunk = pos_prev.getChunk(), newChunk = pos_next.getChunk();
             pos_prev = pos_next;
             updateSocket();
             onEnterNewBlock();
             pickNextOrientation();
+            if (oldChunk != newChunk) {
+                oldChunk.setChunkModified();
+                newChunk.setChunkModified();
+            }
         } else {
             updateSocket();
         }
@@ -822,6 +828,8 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
         toSend.add(-1);
         broadcast(MessageType.motor_inventory, toSend.toArray());
+        getCurrentPos().getChunk().setChunkModified();
+        getNextPos().getChunk().setChunkModified();
     }
     
     @Override
