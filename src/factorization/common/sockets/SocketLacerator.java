@@ -308,31 +308,33 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             }
             return true;
         } else if (mop.typeOfHit == EnumMovingObjectType.TILE) {
+            int id = worldObj.getBlockId(mop.blockX, mop.blockY, mop.blockZ);
+            Block block = Block.blocksList[id];
+            TileEntity te = null;
+            TileEntityDayBarrel barrel = null;
+            if (block == Core.registry.factory_block) {
+                te = worldObj.getBlockTileEntity(mop.blockX, mop.blockY, mop.blockZ);
+                if (te instanceof TileEntityDayBarrel) {
+                    barrel = (TileEntityDayBarrel) te;
+                    if (barrel.item == null) {
+                        return false;
+                    }
+                }
+            }
             if (cantDoWork(socket)) return true;
             socket.extractCharge(1); //It's fine if it fails
             
             //Below: A demonstration of why Coord exists
             long foundHash = (mop.blockX) + (mop.blockY << 2) + (mop.blockZ << 4);
-            int id = worldObj.getBlockId(mop.blockX, mop.blockY, mop.blockZ);
             int md = worldObj.getBlockMetadata(mop.blockX, mop.blockY, mop.blockZ);
-            Block block = Block.blocksList[id];
             float hardness = block.getBlockHardness(worldObj, mop.blockX, mop.blockY, mop.blockZ);
             if (hardness < 0) {
                 speed -= max_speed/5;
                 return true;
             }
             foundHash = (foundHash << 4) + id*16 + md;
-            TileEntityDayBarrel barrel = null;
-            TileEntity te = null;
-            if (block == Core.registry.factory_block) {
-                te = worldObj.getBlockTileEntity(mop.blockX, mop.blockY, mop.blockZ);
-                if (te instanceof TileEntityDayBarrel) {
-                    barrel = (TileEntityDayBarrel) te;
-                    if (barrel.item == null) {
-                        return true;
-                    }
-                    foundHash += barrel.item.itemID*5 + barrel.item.getItemDamage()*10;
-                }
+            if (barrel != null) {
+                foundHash += barrel.item.itemID*5 + barrel.item.getItemDamage()*10;
             }
             if (foundHash != targetHash) {
                 targetHash = foundHash;
