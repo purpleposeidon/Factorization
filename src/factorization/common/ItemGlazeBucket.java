@@ -229,6 +229,7 @@ public class ItemGlazeBucket extends ItemFactorization {
             case HIGHFIRED:
                 Notify.send(player, clay.getCoord(), "Already high-fired");
                 return is;
+            default: break;
             }
         }
         ClayLump part = clay.parts.get(mop.subHit);

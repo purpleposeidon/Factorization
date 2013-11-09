@@ -117,7 +117,6 @@ public class NetworkFactorization implements ITinyPacketHandler {
         return PacketDispatcher.getTinyPacket(Core.instance, factorizeTEChannel, outputStream.toByteArray());
     }
     
-    @SuppressWarnings("resource")
     public Packet TEmessagePacket(Coord src, int messageType, Object... items) { //TODO: messageType should be a short
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -182,7 +181,6 @@ public class NetworkFactorization implements ITinyPacketHandler {
         }
     }
     
-    @SuppressWarnings("resource")
     public Packet entityPacket(Entity to, int messageType, Object ...items) { //TODO: messageType should be short
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

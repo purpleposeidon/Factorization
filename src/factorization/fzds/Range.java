@@ -32,6 +32,7 @@ class Range {
         case SOUTH:
             include(point.zCoord);
             break;
+        case UNKNOWN: break;
         }
     }
     

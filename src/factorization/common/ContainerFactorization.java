@@ -174,6 +174,7 @@ public class ContainerFactorization extends Container {
         return factory.isUseableByPlayer(entityplayer);
     }
 
+    @SuppressWarnings("incomplete-switch")
     @Override
     //transferStackInSlot
     public ItemStack transferStackInSlot(EntityPlayer player, int i) {

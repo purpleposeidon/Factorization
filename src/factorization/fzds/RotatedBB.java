@@ -137,6 +137,7 @@ public class RotatedBB extends AxisAlignedBB {
         case NORTH:
         case SOUTH:
             return new Range(aabb.minZ, aabb.maxZ);
+        case UNKNOWN: return null;
         }
         return null;
     }

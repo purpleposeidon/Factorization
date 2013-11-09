@@ -324,6 +324,7 @@ public class ItemSculptingTool extends ItemFactorization {
         case DOWN:
             cube.minY -= delta;
             break;
+        case UNKNOWN: break;
         }
     }
     

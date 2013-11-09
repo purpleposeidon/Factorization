@@ -392,8 +392,7 @@ public class TileEntityGreenware extends TileEntityCommon {
                 }
             }
         }
-        switch (getState()) {
-        case WET:
+        if (getState() == ClayState.WET) {
             if (!worldObj.isRaining()) {
                 lastTouched++;
             }
@@ -401,7 +400,6 @@ public class TileEntityGreenware extends TileEntityCommon {
                 totalHeat--;
                 lastTouched++;
             }
-            break;
         }
         if (getState() != lastState) {
             lastState = getState();
