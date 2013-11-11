@@ -1,3 +1,12 @@
+0.8.09
+  Changelog links in the OP? Madness!
+  Bug fixes:
+    Robot arm will hopefully play nicer with local-side barrels
+    Socket items don't try to merge in your inventory
+
+0.8.08
+  Antinerfed recipes for sprockets & robot arms
+
 0.8.06
   Added Dark Iron Ore:
     Found around Y=4; watch for changes in the bedrock

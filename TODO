@@ -88,6 +88,7 @@ WRATH (But this adds rocketry. Ha. Definitely makes the mod smaller.)
 SERVOS
 ------
 
+
 2013-10-11 21:29:03 [INFO] [STDERR] java.lang.NoSuchFieldError: particleTweaker
 2013-10-11 21:29:03 [INFO] [STDERR]     at factorization.common.sockets.SocketLacerator.resetEffectRenderer(SocketLacerator.java:591)
 2013-10-11 21:29:03 [INFO] [STDERR]     at net.minecraftforge.event.ASMEventHandler_99_SocketLacerator_resetEffectRenderer_Unload.invoke(.dynamic)
@@ -120,12 +121,11 @@ Lower barriers to entry for servos:
 
 TOP LIST
 --------
-forge Contributing.md
-myrathi's access transformer
-silky barrels broken?
+compression crafter keep rendering until blocks get cleared... prolly a packet?
 
 LESS TOP LIST
 -------------
+config files for disabling barrel types
 test parasieves + comparators + recursion depth. Somehow.
 localize ALL THE THINGS
 sparks in leyden jar when held aren't centered
