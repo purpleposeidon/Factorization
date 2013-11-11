@@ -73,23 +73,38 @@ public class SocketRobotHand extends TileEntitySocketBase {
         boolean foundAny = false;
         for (int i = 0; i < inv.size(); i++) {
             ItemStack is = inv.get(i);
-            if (is == null || !inv.canExtract(i, is)) {
+            if (is == null || is.stackSize <= 0 || !inv.canExtract(i, is)) {
                 continue;
             }
-            player.inventory.mainInventory[0] = is = inv.pull(i, 1);
-            if (is == null) {
-                continue; //Unexpected...
-            }
+            player.inventory.mainInventory[0] = is;
             foundAny = true;
+            ItemStack orig = is.copy();
             if (clickItem(player, is, mop)) {
-                if (is.stackSize > 0) {
-                    is = inv.pushInto(i, is);
-                    if (is != null) {
-                        is = inv.push(is);
-                        if (is != null) {
-                            getCoord().spawnItem(is); //Uh-oh!
+                if (is.stackSize <= 0 || !FactorizationUtil.couldMerge(orig, is)) {
+                    // The item has changed! We have to... put it back somehow. Jesus.
+                    // Worst case: barrel of magic jumping beans that change color.
+                    // To handle: extract the entire stack. It is lost. Attempt to stuff the rest of the inv back in.
+                    // Anything that can't be stuffed gets dropped.
+                    inv.pullFromSlot(i); //Bye-bye!
+                    if (is != null && is.stackSize > 0) {
+                        is = inv.pushInto(i, is);
+                        if (is == null || is.stackSize == 0) {
+                            player.inventory.mainInventory[0] = null;
                         }
                     }
+                    Coord here = null;
+                    for (int j = 0; j < player.inventory.getSizeInventory(); j++) {
+                        ItemStack toPush = player.inventory.getStackInSlot(j);
+                        ItemStack toDrop = inv.push(toPush);
+                        if (toDrop != null && toDrop.stackSize > 0) {
+                            if (here == null) here = getCoord();
+                            here.spawnItem(toDrop);
+                        }
+                        player.inventory.setInventorySlotContents(i, null);
+                    }
+                    inv.onInventoryChanged();
+                } else {
+                    inv.set(i, is);
                 }
                 return true;
             }
@@ -121,7 +136,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
                 }
             }
         }
-        return true; //uh, yeah. Weird.
+        return false;
     }
     
     @Override
