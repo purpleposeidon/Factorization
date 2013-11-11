@@ -18,6 +18,8 @@ public class ItemSocketPart extends ItemFactorization {
 
     public ItemSocketPart(int itemId, String name, TabType tabType) {
         super(itemId, name, tabType);
+        setHasSubtypes(true);
+        setMaxDamage(0);
     }
     
     
