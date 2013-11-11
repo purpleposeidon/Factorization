@@ -1130,8 +1130,8 @@ public class FactorizationUtil {
         }, 3, 3);
     }
     
-    public static EntityPlayer makePlayer(final Coord where, String use) {
-        EntityPlayer fakePlayer = new FakePlayer(where.w, "[FZ " + use +  "]") {
+    public static FakePlayer makePlayer(final Coord where, String use) {
+        FakePlayer fakePlayer = new FakePlayer(where.w, "[FZ " + use +  "]") {
             @Override
             public ChunkCoordinates getPlayerCoordinates() { return new ChunkCoordinates(where.x, where.y, where.z); }
         };

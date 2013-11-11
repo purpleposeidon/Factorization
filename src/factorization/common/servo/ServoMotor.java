@@ -96,7 +96,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         static final short motor_description = 100, motor_direction = 101, motor_speed = 102, motor_inventory = 103;
     }
     
-    private EntityPlayer fakePlayer;
     short actions_since_last_sync = 0;
 
     public ServoMotor(World world) {
@@ -105,53 +104,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         double d = 0.5;
         pos_prev = new Coord(world, 0, 0, 0);
         pos_next = pos_prev.copy();
-        fakePlayer = new FakePlayer(world, "[Servo]") {
-            @Override
-            public void openGui(Object mod, int modGuiId, World world, int x, int y, int z) {
-                // Blank for a work-around.
-                // TODO: Did FMLNetworkHandler.openGui get an .isRemote check?
-            }
-        };
-        fakePlayer.inventory.mainInventory = inv;
         isImmuneToFire = true;
-    }
-    
-    public EntityPlayer getPlayer() {
-        ForgeDirection fd = orientation.facing;
-        interpolatePosition(0.5F);
-        //fakePlayer.setPosition(Math.floor(posX), posY, Math.floor(posZ));
-        double x = Math.floor(posX) + fd.offsetX*1;
-        double y = posY;
-        double z = Math.floor(posZ) + fd.offsetY*1;
-        if (fd == ForgeDirection.NORTH) { //Don't ask me why.
-            x++; //Why?
-            //Dude. I said not to ask.
-        }
-        fakePlayer.setPosition(x, y, z);
-        fakePlayer.rotationYaw = (float)Math.atan2(fd.offsetX, fd.offsetZ);
-        fakePlayer.rotationPitch = fd.offsetY*90;
-        //setPosition(posX, posY - 1024, posZ);
-        interpolatePosition(pos_progress);
-        return fakePlayer;
-    }
-    
-    public void finishUsingPlayer() {
-        //setPosition(posX, posY + 1024, posZ);
-        for (int i = 0; i < fakePlayer.inventory.armorInventory.length; i++) {
-            ItemStack is = fakePlayer.inventory.armorInventory[i];
-            if (is == null) {
-                continue;
-            }
-            ItemStack toToss = getInv().push(is);
-            if (toToss != null) {
-                getCurrentPos().spawnItem(toToss);
-            }
-            fakePlayer.inventory.armorInventory[i] = null;
-        }
-        for (int i = 0; i < inv.length; i++) {
-            inv[i] = FactorizationUtil.normalize(inv[i]);
-        }
-        onInventoryChanged();
     }
     
     /**
@@ -884,50 +837,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
         return null;
     }
-    
-    public boolean click(boolean sneaky) {
-        for (int i = 0; i < inv.length; i++) {
-            if (clickItem(inv[i], sneaky)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    public boolean clickItem(ItemStack is, boolean sneaky) {
-        if (is == null) {
-            return false;
-        }
-        EntityPlayer player = getPlayer();
-        player.setSneaking(sneaky);
-        for (MovingObjectPosition mop : rayTrace()) {
-            if (mop.typeOfHit == EnumMovingObjectType.TILE) {
-                Vec3 hitVec = mop.hitVec;
-                int x = mop.blockX, y = mop.blockY, z = mop.blockZ;
-                float dx = (float) (hitVec.xCoord - x);
-                float dy = (float) (hitVec.yCoord - y);
-                float dz = (float) (hitVec.zCoord - z);
-                Item it = is.getItem();
-                if (it.onItemUseFirst(is, player, worldObj, x, y, z, mop.sideHit, dx, dy, dz)) {
-                    return true;
-                }
-                if (it.onItemUse(is, player, worldObj, x, y, z, mop.sideHit, dx, dy, dz)) {
-                    return true;
-                }
-            } else if (mop.typeOfHit == EnumMovingObjectType.ENTITY) {
-                if (mop.entityHit.interactFirst(player)) {
-                    return true;
-                }
-                if (mop.entityHit instanceof EntityLiving) {
-                    if (is.func_111282_a(player, (EntityLiving)mop.entityHit)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-    
 
     private final ArrayList<MovingObjectPosition> ret = new ArrayList<MovingObjectPosition>();
     ArrayList<MovingObjectPosition> rayTrace() {

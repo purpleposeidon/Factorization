@@ -266,7 +266,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     protected FakePlayer getFakePlayer() {
         if (silkyPlayer == null) {
-            silkyPlayer = new FakePlayer(worldObj, "[Socket]");
+            silkyPlayer = FactorizationUtil.makePlayer(getCoord(), "socket");
         }
         silkyPlayer.worldObj = worldObj;
         silkyPlayer.posX = xCoord;
