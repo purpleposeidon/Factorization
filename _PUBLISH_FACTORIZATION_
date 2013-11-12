@@ -56,6 +56,11 @@ run("dropbox_uploader.sh upload " + oldfile + " Public/old/" + filename)
 #Mediafire
 run("mediafire upload --quiet " + oldfile + " > " + mfurl)
 mediafire_url = open(mfurl).read().strip().strip("()").strip()
+if mediafire_url == "":
+  print("Mediafire upload failed! Lameness! Enter the URL to use:")
+  mediafire_url = raw_input()
+
+#Don't add non-trivial tasks here unless we can get mediafire behaving properly.
 
 print "\n"*4
 LOG  = "Factorization " + version + " (MC " + mcversion + ")\n"
