@@ -19,8 +19,8 @@ import factorization.common.servo.ServoStack;
 import factorization.common.sockets.SocketShifter;
 
 public class ShifterControl extends Instruction {
-    static final byte EXPORT_MODE = 0, IMPORT_MODE = 1, TRANSFER_LIMIT = 2, TARGET_SLOT = 3, PULSE = 4, STREAM = 5;
-    static final byte MODE_MAX = STREAM + 1;
+    static final byte EXPORT_MODE = 0, IMPORT_MODE = 1, TRANSFER_LIMIT = 2, TARGET_SLOT = 3, STREAM = 4, PULSE_EXACT = 5, PULSE_SOME = 6;
+    static final byte MODE_MAX = PULSE_SOME + 1;
     byte mode = EXPORT_MODE;
     
     @Override
@@ -48,10 +48,9 @@ public class ShifterControl extends Instruction {
         case IMPORT_MODE:
             shifter.exporting = mode == EXPORT_MODE;
             return;
-        case PULSE:
-        case STREAM:
-            shifter.streamMode = mode == STREAM;
-            return;
+        case STREAM: shifter.mode = SocketShifter.ShifterMode.MODE_STREAM; return;
+        case PULSE_EXACT: shifter.mode = SocketShifter.ShifterMode.MODE_PULSE_EXACT; return;
+        case PULSE_SOME: shifter.mode = SocketShifter.ShifterMode.MODE_PULSE_SOME; return;
         case TRANSFER_LIMIT:
         case TARGET_SLOT:
             ServoStack ss = motor.getServoStack(ServoMotor.STACK_ARGUMENT);
@@ -89,10 +88,11 @@ public class ShifterControl extends Instruction {
         default:
         case EXPORT_MODE: return "Export Items";
         case IMPORT_MODE: return "Import Items";
-        case TRANSFER_LIMIT: return "Set Transfer Timit";
+        case TRANSFER_LIMIT: return "Set Transfer Limit";
         case TARGET_SLOT: return "Set Target Slot";
-        case STREAM: return "Streaming Transfer";
-        case PULSE: return "Pulsed Transfer";
+        case STREAM: return "Stream Transfer";
+        case PULSE_EXACT: return "Pulse Transfer Exact";
+        case PULSE_SOME: return "Pulse Transfer Some";
         }
     }
     
@@ -104,8 +104,9 @@ public class ShifterControl extends Instruction {
         case IMPORT_MODE: return BlockIcons.servo$ctrl$shift_import;
         case TRANSFER_LIMIT: return BlockIcons.servo$ctrl$shift_transfer_limit;
         case TARGET_SLOT: return BlockIcons.servo$ctrl$shift_target_slot;
+        case PULSE_EXACT: return BlockIcons.servo$ctrl$shift_pulse_exact;
+        case PULSE_SOME: return BlockIcons.servo$ctrl$shift_pulse_some;
         case STREAM: return BlockIcons.servo$ctrl$shift_stream;
-        case PULSE: return BlockIcons.servo$ctrl$shift_pulse;
         }
     }
 

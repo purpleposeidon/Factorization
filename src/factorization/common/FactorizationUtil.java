@@ -39,9 +39,11 @@ import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagIntArray;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagLong;
+import net.minecraft.stats.StatBase;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.ChatMessageComponent;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
@@ -1143,10 +1145,15 @@ public class FactorizationUtil {
         }, 3, 3);
     }
     
-    public static FakePlayer makePlayer(final Coord where, String use) {
-        FakePlayer fakePlayer = new FakePlayer(where.w, "[FZ " + use +  "]") {
-            @Override
-            public ChunkCoordinates getPlayerCoordinates() { return new ChunkCoordinates(where.x, where.y, where.z); }
+    public static EntityPlayer makePlayer(final Coord where, String use) {
+        EntityPlayer fakePlayer = new EntityPlayer(where.w, "[FZ " + use +  "]") {
+            //TODO: Forge'll probably have this working properly by the time I catch up to it.
+            public void sendChatToPlayer(String s) {}
+            @Override public void sendChatToPlayer(ChatMessageComponent chatmessagecomponent) { }
+            public boolean canCommandSenderUseCommand(int i, String s) { return false; }
+            @Override public ChunkCoordinates getPlayerCoordinates() { return new ChunkCoordinates(where.x, where.y, where.z); }
+            @Override public void addStat(StatBase par1StatBase, int par2) { }
+            @Override public void openGui(Object mod, int modGuiId, World world, int x, int y, int z) { }
         };
         where.setAsEntityLocation(fakePlayer);
         return fakePlayer;

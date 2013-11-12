@@ -111,7 +111,7 @@ public class BlockIcons {
     public static Icon servo$jmp;
     public static Icon servo$entry_require, servo$entry_forbid;
     public static Icon servo$socket_on, servo$socket_off, servo$socket_pulse;
-    public static Icon servo$ctrl$shift_import, servo$ctrl$shift_export, servo$ctrl$shift_target_slot, servo$ctrl$shift_transfer_limit, servo$ctrl$shift_stream, servo$ctrl$shift_pulse;
+    public static Icon servo$ctrl$shift_import, servo$ctrl$shift_export, servo$ctrl$shift_target_slot, servo$ctrl$shift_transfer_limit, servo$ctrl$shift_stream, servo$ctrl$shift_pulse_some, servo$ctrl$shift_pulse_exact;
     public static Icon servo$instruction_plate;
     public static Icon servo$trap;
     

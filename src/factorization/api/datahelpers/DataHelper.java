@@ -53,7 +53,7 @@ public abstract class DataHelper {
      * @return o if isWriter(); else the read value
      * @throws IOException
      */
-    public final <E> E put(E o) throws IOException {
+    public <E> E put(E o) throws IOException {
         if (!valid) {
             return o;
         }
@@ -200,4 +200,8 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
     }
     
     public void log(String message) {}
+    
+    public boolean hasLegacy(String name) {
+        return false;
+    }
 }

@@ -53,5 +53,10 @@ public class DataInNBT extends DataHelperNBT {
         }
         return o;
     }
+    
+    @Override
+    public boolean hasLegacy(String name) {
+        return tag.hasKey(name);
+    }
 
 }
