@@ -262,9 +262,9 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         return FactoryType.SOCKET_EMPTY.itemStack();
     }
     
-    private static FakePlayer silkyPlayer;
+    private static EntityPlayer silkyPlayer;
     
-    protected FakePlayer getFakePlayer() {
+    protected EntityPlayer getFakePlayer() {
         if (silkyPlayer == null) {
             silkyPlayer = FactorizationUtil.makePlayer(getCoord(), "socket");
         }
@@ -350,11 +350,9 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
     
     /**
-     * @return true if successfully uninstalled; return false to block uninstallation
+     * Called when the socket is removed from a servo motor
      */
-    public boolean uninstall() {
-        return true;
-    }
+    public void uninstall() { }
     
     @SideOnly(Side.CLIENT)
     @Override
