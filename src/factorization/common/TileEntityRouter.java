@@ -308,9 +308,11 @@ public class TileEntityRouter extends TileEntityFactorization {
         }
 
         invName = invName.toLowerCase();
+        boolean anyNegations = false;
         for (String comp : match.split("\\|")) {
             comp = comp.toLowerCase();
             if (comp.startsWith("!")) {
+                anyNegations = true;
                 comp = comp.replaceFirst("!", "");
                 if (invName.startsWith(comp)) {
                     return false;
@@ -321,7 +323,7 @@ public class TileEntityRouter extends TileEntityFactorization {
                 }
             }
         }
-        return false;
+        return anyNegations;
     }
 
     boolean itemPassesInsertFilter(FzInv inv, ItemStack is) {
