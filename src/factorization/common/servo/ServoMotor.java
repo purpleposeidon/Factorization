@@ -150,7 +150,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         } catch (IllegalStateException e) {
             e.printStackTrace(); //Hrm! Why? (I mean, besides the obvious.)
         }
-        prevOrientation = orientation;
     }
 
     @Override
@@ -166,7 +165,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
 
     void putData(DataHelper data) throws IOException {
         data.as(Share.VISIBLE, "controller");
-        prevOrientation = data.as(Share.PRIVATE, "prevOrient").putFzOrientation(prevOrientation);
         orientation = data.as(Share.VISIBLE, "Orient").putFzOrientation(orientation);
         nextDirection = data.as(Share.VISIBLE, "nextDir").putEnum(nextDirection);
         lastDirection = data.as(Share.VISIBLE, "lastDir").putEnum(lastDirection);
@@ -630,6 +628,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         for (ItemStack is : inv) {
             toDrop.add(is);
         }
+        if (socket != null) {
+            socket.uninstall();
+            toDrop.add(new ItemStack(Core.registry.socket_part, 1, socket.getFactoryType().md));
+        }
         dropItemStacks(toDrop);
     }
 
@@ -707,7 +709,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             interpolatePosition(pos_progress);
             //$FALL-THROUGH$~~~~~!
         case MessageType.motor_direction:
-            prevOrientation = orientation = FzOrientation.getOrientation(input.readByte());
+            orientation = FzOrientation.getOrientation(input.readByte());
             nextDirection = ForgeDirection.getOrientation(input.readByte());
             return true;
         }
