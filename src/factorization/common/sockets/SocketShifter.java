@@ -23,7 +23,11 @@ import factorization.common.ISocketHolder;
 import factorization.common.TileEntitySocketBase;
 
 public class SocketShifter extends TileEntitySocketBase {
-    public boolean streamMode = true; // be like a hopper or a filter
+    public static enum ShifterMode {
+        MODE_STREAM, MODE_PULSE_EXACT, MODE_PULSE_SOME;
+    }
+    //public boolean streamMode = true; // be like a hopper or a filter
+    public ShifterMode mode = ShifterMode.MODE_STREAM;
     public int foreignSlot = -1;
     public boolean exporting;
     public byte transferLimit = 1;
@@ -42,7 +46,11 @@ public class SocketShifter extends TileEntitySocketBase {
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
         exporting = data.as(Share.MUTABLE, "exp").putBoolean(exporting);
-        streamMode = data.as(Share.MUTABLE, "strm").putBoolean(streamMode);
+        if (data.hasLegacy("strm")) {
+            mode = data.as(Share.MUTABLE, "strm").putBoolean(true) ? ShifterMode.MODE_STREAM : ShifterMode.MODE_PULSE_EXACT;
+        } else {
+            mode = data.as(Share.MUTABLE, "mode").putEnum(mode);
+        }
         foreignSlot = data.as(Share.MUTABLE, "for").putInt(foreignSlot);
         transferLimit = data.as(Share.MUTABLE, "lim").putByte(transferLimit);
         cooldown = data.as(Share.PRIVATE, "wait").putByte(cooldown);
@@ -50,7 +58,7 @@ public class SocketShifter extends TileEntitySocketBase {
             return this;
         }
         //Validate input
-        if (streamMode) {
+        if (mode == ShifterMode.MODE_STREAM) {
             transferLimit = 1;
         }
         if (foreignSlot < -1) {
@@ -73,7 +81,7 @@ public class SocketShifter extends TileEntitySocketBase {
         if (worldObj.isRemote) {
             return;
         }
-        if (streamMode) {
+        if (mode == ShifterMode.MODE_STREAM) {
             if (cooldown > 0) {
                 cooldown--;
                 return;
@@ -140,37 +148,46 @@ public class SocketShifter extends TileEntitySocketBase {
             }
         }
         
-        
-        boolean[] visitedSlots = new boolean[pullInv.size()];
-        outermostLoop: for (int pull = pullStart; pull <= pullEnd; pull++) {
-            if (countItem(pullInv, pull, transferLimit, visitedSlots) < transferLimit) {
-                continue;
-            }
-            ItemStack is = pullInv.get(pull);
-            int freeForIs = pushInv.getFreeSpaceFor(is, transferLimit);
-            if (freeForIs < transferLimit) {
-                continue;
-            }
-            //Found an item suitable for transfer
-            int stillNeeded = transferLimit;
-            int pushHere = pushStart;
-            for (int pi = pull; pi <= pullEnd; pi++) {
-                ItemStack toPull = pullInv.get(pi);
-                if (toPull == null) continue;
-                if (!FactorizationUtil.couldMerge(is, toPull)) continue;
-                int origSize = toPull.stackSize;
-                for (; pushHere <= pushEnd; pushHere++) {
-                    int delta = pullInv.transfer(pi, pushInv, pushHere, stillNeeded);
-                    stillNeeded -= delta;
-                    origSize -= delta;
-                    if (stillNeeded <= 0) break outermostLoop;
-                    if (origSize <= 0) break;
+        if (mode == ShifterMode.MODE_PULSE_SOME) {
+            out: for (int pull = pullStart; pull <= pullEnd; pull++) {
+                for (int push = 0; push < pushInv.size(); push++) {
+                    if (pullInv.transfer(pull, pushInv, push, transferLimit) > 0) {
+                        break out;
+                    }
                 }
             }
-            break; //Shouldn't actually get here.
+        } else {
+            boolean[] visitedSlots = new boolean[pullInv.size()];
+            out: for (int pull = pullStart; pull <= pullEnd; pull++) {
+                if (countItem(pullInv, pull, transferLimit, visitedSlots) < transferLimit) {
+                    continue;
+                }
+                ItemStack is = pullInv.get(pull);
+                int freeForIs = pushInv.getFreeSpaceFor(is, transferLimit);
+                if (freeForIs < transferLimit) {
+                    continue;
+                }
+                //Found an item suitable for transfer
+                int stillNeeded = transferLimit;
+                int pushHere = pushStart;
+                for (int pi = pull; pi <= pullEnd; pi++) {
+                    ItemStack toPull = pullInv.get(pi);
+                    if (toPull == null) continue;
+                    if (!FactorizationUtil.couldMerge(is, toPull)) continue;
+                    int origSize = toPull.stackSize;
+                    for (; pushHere <= pushEnd; pushHere++) {
+                        int delta = pullInv.transfer(pi, pushInv, pushHere, stillNeeded);
+                        stillNeeded -= delta;
+                        origSize -= delta;
+                        if (stillNeeded <= 0) break out;
+                        if (origSize <= 0) break;
+                    }
+                }
+                break; //Shouldn't actually get here.
+            }
         }
         
-        cooldown = (byte) (streamMode ? 8 : 1);
+        cooldown = (byte) (mode == ShifterMode.MODE_STREAM ? 8 : 1);
     }
     
     int countItem(FzInv inv, int start, int minimum, boolean[] visitedSlots) {

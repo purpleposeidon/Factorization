@@ -346,7 +346,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                 grab_items = true;
                 grind_items = true;
                 if (barrel == null) {
-                    FakePlayer player = getFakePlayer();
+                    EntityPlayer player = getFakePlayer();
                     ItemStack pick = new ItemStack(Item.pickaxeDiamond);
                     pick.addEnchantment(Enchantment.silkTouch, 1);
                     player.inventory.mainInventory[0] = pick;

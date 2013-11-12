@@ -68,7 +68,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
     
     @Override
     public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
-        FakePlayer player = getFakePlayer();
+        EntityPlayer player = getFakePlayer();
         FzInv inv = FactorizationUtil.openInventory(getBackingInventory(socket), facing);
         boolean foundAny = false;
         for (int i = 0; i < inv.size(); i++) {
@@ -112,7 +112,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
         return foundAny;
     }
     
-    boolean clickItem(FakePlayer player, ItemStack is, MovingObjectPosition mop) {
+    boolean clickItem(EntityPlayer player, ItemStack is, MovingObjectPosition mop) {
         if (mop.typeOfHit == EnumMovingObjectType.TILE) {
             Vec3 hitVec = mop.hitVec;
             int x = mop.blockX, y = mop.blockY, z = mop.blockZ;

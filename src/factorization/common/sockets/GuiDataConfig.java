@@ -96,12 +96,10 @@ public class GuiDataConfig extends GuiScreen {
             drawString(fontRenderer, label, posLabel, posY, color);
         }
         
-        void renderControl(int mouseX, int mouseY) {
-            drawString(fontRenderer, object.toString(), posControl, posY, color);
-        }
+        void renderControl(int mouseX, int mouseY) { }
         
         int getLabelWidth() {
-            return fontRenderer.getStringWidth(label)*2;
+            return fontRenderer.getStringWidth(label) + 80;
         }
         
         void mouseClick(int mouseX, int mouseY, boolean rightClick) {
@@ -135,15 +133,11 @@ public class GuiDataConfig extends GuiScreen {
             button = button(0, Core.tryTranslate(getTrans() + "." + val, "" + val));
         }
         
-        void updateButtonText() {
-            initGui();
-        }
-        
         @Override
         void buttonPressed(UsefulButton button, boolean rightClick) {
             val = !val;
             object = val;
-            updateButtonText();
+            initGui();
         }
     }
     
@@ -214,6 +208,39 @@ public class GuiDataConfig extends GuiScreen {
         }
     }
     
+    class EnumField<E extends Enum> extends Field {
+        E val;
+        UsefulButton button;
+        public EnumField(String name, E object, int posY) {
+            super(name, object, posY);
+            val = object;
+        }
+        
+        @Override
+        void initGui() {
+            super.initGui();
+            button = button(0, Core.tryTranslate(getTrans() + "." + val, "" + val));
+        }
+        
+        @Override
+        void buttonPressed(UsefulButton button, boolean rightClick) {
+            int ord = val.ordinal();
+            E[] family = (E[]) val.getClass().getEnumConstants();
+            if (rightClick) {
+                ord = ord == 0 ? family.length - 1 : ord - 1;
+            } else {
+                ord = ord + 1 == family.length ? 0 : ord + 1;
+            }
+            object = val = family[ord];
+            initGui();
+        }
+        
+        @Override
+        void put(Map<String, Object> map) {
+            map.put(name, val.ordinal());
+        }
+    }
+    
     public GuiDataConfig(IDataSerializable ids) {
         this.ids = ids;
         this.te = (TileEntity) ids;
@@ -263,6 +290,17 @@ public class GuiDataConfig extends GuiScreen {
             }
             
             @Override
+            public <E> E put(E o) throws IOException {
+                if (!valid) {
+                    return o;
+                }
+                if (o instanceof Enum) {
+                    return (E) putImplementation(o);
+                }
+                return super.put(o);
+            }
+            
+            @Override
             protected <E> Object putImplementation(E o) throws IOException {
                 if (!valid) {
                     return 0;
@@ -274,6 +312,8 @@ public class GuiDataConfig extends GuiScreen {
                     fields.add(new BooleanField(name, o, posY));
                 } else if (o instanceof Number) {
                     fields.add(new NumberField(name, o, posY));
+                } else if (o instanceof Enum) {
+                    fields.add(new EnumField<Enum>(name, (Enum) o, posY));
                 } else {
                     fields.add(new Field(name, o, posY));
                 }
