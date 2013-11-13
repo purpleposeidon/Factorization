@@ -477,9 +477,8 @@ public class RenderServoMotor extends RenderEntity {
             if (i == 0) {
                 GL11.glPushMatrix();
             }
-            String text = o.toString();
             GL11.glTranslatef(0, -10, 0);;
-            fr.drawString(text, 0, 0, color, false);
+            fr.drawString(o != null ? o.toString() : "null", 0, 0, color, false);
             i++;
         }
         if (i > 0) {
