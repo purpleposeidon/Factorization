@@ -1,3 +1,8 @@
+0.8.10
+  Servos actually drop their socket tool when broken
+  New mode for item shifter; doesn't transfer the exact amount of items.
+  (And a few other bug fixes)
+
 0.8.09
   Changelog links in the OP? Madness!
   Bug fixes:

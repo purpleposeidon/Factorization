@@ -124,6 +124,9 @@ public class SocketShifter extends TileEntitySocketBase {
         
         FzInv pullInv, pushInv;
         int pullStart, pullEnd, pushStart, pushEnd;
+        if (foreignSlot >= foreignInv.size()) {
+            return;
+        }
         if (exporting) {
             pullInv = localInv;
             pushInv = foreignInv;
