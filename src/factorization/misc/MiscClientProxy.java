@@ -182,10 +182,13 @@ public class MiscClientProxy extends MiscProxy {
                 return EnumSet.of(TickType.CLIENT);
             }
             
+            boolean wasClicked = false;
+            
             @Override
             public void tickStart(EnumSet<TickType> type, Object... tickData) {
                 MiscClientCommands.tick();
                 if (!mc.gameSettings.keyBindPickBlock.pressed) {
+                    wasClicked = false;
                     return;
                 }
                 EntityPlayer player = mc.thePlayer;
@@ -198,6 +201,10 @@ public class MiscClientProxy extends MiscProxy {
                 if (mc.currentScreen != null) {
                     return;
                 }
+                if (wasClicked) {
+                    return;
+                }
+                wasClicked = true;
                 MovingObjectPosition mop = mc.objectMouseOver;
                 if (mop == null || mop.typeOfHit != EnumMovingObjectType.TILE) {
                     return;
@@ -207,7 +214,7 @@ public class MiscClientProxy extends MiscProxy {
                     return;
                 }
                 // Search the inventory for the exact block. Failing that, search for the broken version
-                List<ItemStack> validItems = Arrays.asList(here.getPickBlock(mop), here.getBrokenBlock());
+                List<ItemStack> validItems = Arrays.asList(here.getPickBlock(mop), here.getBrokenBlock(), new ItemStack(here.getId(), 1, here.getMd()));
                 int firstEmpty = -1;
                 if (player.getHeldItem() == null) {
                     firstEmpty = player.inventory.currentItem;
