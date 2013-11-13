@@ -19,6 +19,8 @@ import net.minecraft.stats.AchievementList;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.DungeonHooks;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.oredict.OreDictionary.OreRegisterEvent;
 import cpw.mods.fml.common.ICraftingHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Mod;
@@ -91,10 +93,10 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         proxy.registerSprintKey();
         TickRegistry.registerTickHandler(this, Side.SERVER);
         TickRegistry.registerTickHandler(this, Side.CLIENT);
-        //TODO: Make middle-clicking nicer
         if (FzConfig.equal_opportunities_for_mobs) {
             MinecraftForge.EVENT_BUS.register(new MobEqualizer());
         }
+        OreDictionary.registerOre("greggy_greg_do_please_kindly_stuff_a_sock_in_it", new ItemStack(Item.diamond, 64));
     }
     
     public Packet makeTpsReportPacket(float tps) {
