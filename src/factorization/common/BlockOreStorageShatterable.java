@@ -24,6 +24,9 @@ public class BlockOreStorageShatterable extends BlockOreStorage {
         return false;
     }
     
+    //<Player> i think i'm calling getblockdropped before killing it
+    //<Player> so if you drop stuff yourself in breakblock or whatever, it'll break
+    
     @Override
     public void onBlockDestroyedByExplosion(World world, int x, int y, int z, Explosion explosion) {
         super.onBlockDestroyedByExplosion(world, x, y, z, explosion);
