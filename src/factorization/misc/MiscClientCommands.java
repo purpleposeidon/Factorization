@@ -10,19 +10,21 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.EnumChatFormatting;
 import cpw.mods.fml.client.GuiModList;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -410,6 +412,25 @@ public class MiscClientCommands implements ICommand {
                 Tessellator.instance = orig;
                 orig = null;
                 return "Restored normal Tessellator";
+            }
+        }
+        
+        static Map backup = null, empty = new HashMap();
+        
+        @help("Disable or enable TileEntity special renderers")
+        public static String tesrtoggle() {
+            if (backup == null) {
+                if (TileEntityRenderer.instance.specialRendererMap == null) {
+                    return "no TESRs!";
+                }
+                backup = TileEntityRenderer.instance.specialRendererMap;
+                TileEntityRenderer.instance.specialRendererMap = empty;
+                return "TESRs disabled";
+            } else {
+                empty.clear();
+                TileEntityRenderer.instance.specialRendererMap = backup;
+                backup = null;
+                return "TESRs enabled; requires chunk update to restart drawing";
             }
         }
         
