@@ -367,11 +367,16 @@ public class Registry implements ICraftingHandler, ITickHandler {
         recipe(new ItemStack(Block.stoneDoubleSlab),
                 "-",
                 "-",
-                '-', new ItemStack(Block.stoneSingleSlab, 1));
+                '-', new ItemStack(Block.stoneSingleSlab));
         recipe(new ItemStack(Block.stoneDoubleSlab, 4, 8),
                 "##",
                 "##",
                 '#', new ItemStack(Block.stoneDoubleSlab));
+        recipe(new ItemStack(Block.stoneDoubleSlab, 2, 9),
+                "#",
+                "#",
+                '#', new ItemStack(Block.sandStone, 1, 2));
+        
         shapelessRecipe(new ItemStack(dark_iron, 4), dark_iron_block_item);
         recipe(dark_iron_block_item,
                 "II",
