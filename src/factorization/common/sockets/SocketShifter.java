@@ -2,9 +2,13 @@ package factorization.common.sockets;
 
 import java.io.IOException;
 
+import javax.swing.text.StyledEditorKit.ForegroundAction;
+
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.entity.Entity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -119,7 +123,20 @@ public class SocketShifter extends TileEntitySocketBase {
         foreignInv = FactorizationUtil.openInventory(coord.getTE(IInventory.class), back);
         coord.adjust(back);
         if (foreignInv == null) {
-            return;
+            final ForgeDirection top = facing;
+            
+            for (Entity entity : getEntities(socket, coord, top, 0)) {
+                if (!(entity instanceof IInventory)) {
+                    continue;
+                }
+                foreignInv = FactorizationUtil.openInventory(entity, false);
+                if (foreignInv != null) {
+                    break;
+                }
+            }
+            if (foreignInv == null) {
+                return;
+            }
         }
         
         FzInv pullInv, pushInv;
