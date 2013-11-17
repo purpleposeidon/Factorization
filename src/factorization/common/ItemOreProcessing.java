@@ -9,6 +9,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
 import factorization.common.Core.TabType;
 
@@ -132,7 +134,11 @@ public class ItemOreProcessing extends ItemFactorization implements IActOnCraft 
         if (result == null || player == null) {
             return;
         }
-        if (player.worldObj != null && player.worldObj.isRemote) {
+        if (player.worldObj == null) {
+            if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+                return;
+            }
+        } else if (player.worldObj.isRemote) {
             return;
         }
         if (result.getItem() != Core.registry.ore_clean_gravel) {
@@ -146,25 +152,9 @@ public class ItemOreProcessing extends ItemFactorization implements IActOnCraft 
             return;
         }
         any = true;
-        for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
-            ItemStack pi = player.inventory.getStackInSlot(i);
-            if (pi != null && pi.getItem() == Core.registry.sludge) {
-                if (pi.stackSize < pi.getMaxStackSize()) {
-                    pi.stackSize++;
-                    return;
-                }
-            }
-        }
-        for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
-            ItemStack pi = player.inventory.getStackInSlot(i);
-            if (pi == null) {
-                player.inventory.setInventorySlotContents(i, new ItemStack(Core.registry.sludge, 1));
-                return;
-            }
-        }
-        player.dropPlayerItem(new ItemStack(Core.registry.sludge, 1));
-        if (any) {
-            Core.proxy.updatePlayerInventory(player); //What's with this not actually working?
+        ItemStack toAdd = new ItemStack(Core.registry.sludge);
+        if (!player.inventory.addItemStackToInventory(toAdd)) {
+            player.dropPlayerItem(new ItemStack(Core.registry.sludge, 1));
         }
     }
 }

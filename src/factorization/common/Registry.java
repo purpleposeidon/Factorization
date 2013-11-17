@@ -87,7 +87,6 @@ public class Registry implements ICraftingHandler, ITickHandler {
     public ItemMachineUpgrade router_item_filter, router_machine_filter, router_speed,
             router_thorough, router_throughput, router_eject;
     public ItemMachineUpgrade barrel_enlarge;
-    public ItemStack fake_is;
     public ItemAcidBottle acid;
     public ItemCraftingComponent magnet, insulated_coil, motor, fan, diamond_cutting_head;
     public ItemStack sulfuric_acid, aqua_regia;

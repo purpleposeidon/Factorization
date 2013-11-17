@@ -46,7 +46,7 @@ public class GuiPocketTable extends GuiContainer {
             String msg = null;
             switch (i) {
             case 0: msg = "Empty the crafting grid"; break;
-            case 1: msg = "Slide stacks ↷, alternating"; break;
+            case 1: msg = "Swirl items ↷"; break;
             case 2: msg = "Balance items"; break;
             case 3: msg = "Fill grid with item under cursor"; break;
             }
@@ -59,7 +59,6 @@ public class GuiPocketTable extends GuiContainer {
         }
         // this.fontRenderer.drawString("123456789", 178, 10, 4210752);
         // we can fit only that much
-        // also maybe draw a nice reference for keys to press for below
     }
 
     @Override
@@ -86,7 +85,7 @@ public class GuiPocketTable extends GuiContainer {
             return;
         }
         if (my_key == FzConfig.pocketActions.charAt(1) /* c */) {
-            Command.craftMove.call(mc.thePlayer);
+            Command.craftSwirl.call(mc.thePlayer);
             return;
         }
         if (my_key == FzConfig.pocketActions.charAt(2) /* b */) {

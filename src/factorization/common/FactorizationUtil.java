@@ -325,11 +325,20 @@ public class FactorizationUtil {
         return is;
     }
     
-    public static ItemStack transferSlotToSlots(Slot clickSlot, Iterable<Slot> destinations) {
+    public static ItemStack transferSlotToSlots(EntityPlayer player, Slot clickSlot, Iterable<Slot> destinations) {
+        ItemStack got = tryTransferSlotToSlots(player, clickSlot, destinations);
+        if (got != null) {
+            clickSlot.putStack(got);
+        }
+        return null;
+    }
+    
+    public static ItemStack tryTransferSlotToSlots(EntityPlayer player, Slot clickSlot, Iterable<Slot> destinations) {
         ItemStack clickStack = normalize(clickSlot.getStack());
         if (clickStack == null) {
             return null;
         }
+        clickSlot.onPickupFromSlot(player, clickStack);
         //try to fill up partially filled slots
         for (Slot slot : destinations) {
             ItemStack is = normalize(slot.getStack());
@@ -370,8 +379,7 @@ public class FactorizationUtil {
             }
         }
         
-        clickSlot.putStack(normalize(clickStack));
-        return null;
+        return normalize(clickStack);
     }
     
     public static abstract class FzInv {
