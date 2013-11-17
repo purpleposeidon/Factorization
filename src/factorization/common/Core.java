@@ -227,7 +227,7 @@ public class Core {
         }
     }
     
-    public static final String hintFormat = "" + EnumChatFormatting.ITALIC;
+    public static final String hintFormat = "" + EnumChatFormatting.DARK_PURPLE;
     public static final String shiftFormat = "" + EnumChatFormatting.DARK_GRAY + EnumChatFormatting.ITALIC;
     
     public static void brand(ItemStack is, EntityPlayer player, List list, boolean verbose) {
