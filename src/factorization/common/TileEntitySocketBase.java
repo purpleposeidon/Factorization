@@ -186,6 +186,11 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
     
     @Override
+    public boolean isBlockSolidOnSide(int side) {
+        return side == facing.getOpposite().ordinal();
+    }
+    
+    @Override
     public final void sendMessage(int msgType, Object ...msg) {
         broadcastMessage(null, msgType, msg);
     }
@@ -354,7 +359,6 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
      */
     public void uninstall() { }
     
-    @SideOnly(Side.CLIENT)
     @Override
     public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
         ItemStack held = entityplayer.getHeldItem();
@@ -365,7 +369,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
             return false;
         }
         if (worldObj.isRemote) {
-            return true;
+            return false;
         } else {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             DataOutputStream dos = new DataOutputStream(baos);

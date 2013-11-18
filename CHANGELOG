@@ -1,3 +1,15 @@
+0.8.12
+  Pocket crafting table:
+    Rewrote the container; hopefully it'll stop being laggy & buggy. 
+    Rewrote the action of the 'c' key; it is now "swirls".
+
+0.8.11
+  Miscellaneous Nonsense:
+    Added /f tesrtoggle
+    Improved the improved PickBlock
+  Added a recipe for accessing vanilla's smooth sandstone blocks (There are also similar recipes for similar blocks.)
+
+
 0.8.10
   Servos actually drop their socket tool when broken
   New mode for item shifter; doesn't transfer the exact amount of items.

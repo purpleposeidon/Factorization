@@ -152,7 +152,7 @@ public class Coord implements IDataSerializable {
 
     @Override
     public int hashCode() {
-        return (((x * 11) % 71) << 7) + ((z * 7) % 479) + y;
+        return (((x * 11) % 71) << 7) + ((z * 7) % 479) + y; //TODO: This hashcode is probably terrible.
     }
 
     @Override

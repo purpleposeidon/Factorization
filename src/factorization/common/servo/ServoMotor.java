@@ -242,17 +242,13 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         if (worldObj.isRemote) {
             prev_sprocket_rotation = sprocket_rotation;
             prev_servo_reorient = servo_reorient;
-            if (!stopped) {
-                doLogic();
-            }
+            doLogic();
             if (stopped) {
                 speed_b = 0;
             }
         } else {
             byte orig_speed = speed_b;
-            if (!stopped) {
-                doLogic();
-            }
+            doLogic();
             if (stopped) {
                 speed_b = 0;
             }
@@ -340,6 +336,13 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
     
     void doLogic() {
+        if (isDead) {
+            return;
+        }
+        if (stopped) {
+            updateSocket();
+            return;
+        }
         if (orientation == FzOrientation.UNKNOWN) {
             pickNextOrientation();
         }
@@ -350,9 +353,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 Core.network.broadcastPacket(worldObj, (int) posX, (int) posY, (int) posZ, toSend);
             }
             updateSpeed();
-        }
-        if (isDead) {
-            return;
         }
         final double speed = getProperSpeed() ;
         if (speed <= 0 || orientation == FzOrientation.UNKNOWN) {

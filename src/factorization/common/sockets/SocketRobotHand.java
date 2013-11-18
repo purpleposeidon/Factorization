@@ -81,14 +81,15 @@ public class SocketRobotHand extends TileEntitySocketBase {
             ItemStack orig = is.copy();
             if (clickItem(player, is, mop)) {
                 if (is.stackSize <= 0 || !FactorizationUtil.couldMerge(orig, is)) {
-                    // The item has changed! We have to... put it back somehow. Jesus.
+                    // Easiest case: the item is all used up.
                     // Worst case: barrel of magic jumping beans that change color.
                     // To handle: extract the entire stack. It is lost. Attempt to stuff the rest of the inv back in.
-                    // Anything that can't be stuffed gets dropped.
-                    inv.pullFromSlot(i); //Bye-bye!
-                    if (is != null && is.stackSize > 0) {
+                    // Anything that can't be stuffed gets dropped on the ground.
+                    // This could break with funky items/inventories tho.
+                    inv.set(i, null); //Bye-bye!
+                    if (is.stackSize > 0) {
                         is = inv.pushInto(i, is);
-                        if (is == null || is.stackSize == 0) {
+                        if (is == null || is.stackSize <= 0) {
                             player.inventory.mainInventory[0] = null;
                         }
                     }
@@ -102,10 +103,11 @@ public class SocketRobotHand extends TileEntitySocketBase {
                         }
                         player.inventory.setInventorySlotContents(i, null);
                     }
-                    inv.onInventoryChanged();
                 } else {
+                    // We aren't calling inv.decrStackInSlot.
                     inv.set(i, is);
                 }
+                inv.onInventoryChanged();
                 return true;
             }
         }

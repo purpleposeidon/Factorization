@@ -404,7 +404,6 @@ public class FactorizationUtil {
         
         public void set(int i, ItemStack is) {
             under.setInventorySlotContents(slotIndex(i), is);
-            under.onInventoryChanged();
         }
         
         public int getFreeSpace(int i) {
@@ -517,6 +516,7 @@ public class FactorizationUtil {
                     is = dest_inv.push(is);
                     if (orig_size != getStackSize(is)) {
                         set(i, is);
+                        onInventoryChanged();
                         return true;
                     }
                 } else {
@@ -529,6 +529,7 @@ public class FactorizationUtil {
                         is.stackSize -= taken;
                         is = normalize(is);
                         set(i, is);
+                        onInventoryChanged();
                         return true;
                     }
                 }

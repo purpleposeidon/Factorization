@@ -32,8 +32,6 @@ X     -    Get collisions working when rotated
       -    Put in a whitelist for Blocks, Entities, and TileEntities. (Probably a Object.getClass() mapping)
   Step 9 is "drop into the pending mods folder; run away giggling."
 
-[01:14:36] <OvermindDL1> neptunepink: Stacktrace: at cpw.mods.fml.relauncher.ReflectionHelper.findField(ReflectionHelper.java:87) at factorization.fzds.HammerClientProxy.clientLogin(HammerClientProxy.java:230) at factorization.fzds.Hammer$1.clientLoggedIn(Hammer.java:126)
-
 
 2013-08-25 20:21:23 [INFO] [STDERR] java.lang.NullPointerException
 2013-08-25 20:21:23 [INFO] [STDERR]     at net.minecraft.client.renderer.RenderGlobal.func_72731_b(RenderGlobal.java:1718)
@@ -88,28 +86,17 @@ WRATH (But this adds rocketry. Ha. Definitely makes the mod smaller.)
 SERVOS
 ------
 
-
-2013-10-11 21:29:03 [INFO] [STDERR] java.lang.NoSuchFieldError: particleTweaker
-2013-10-11 21:29:03 [INFO] [STDERR]     at factorization.common.sockets.SocketLacerator.resetEffectRenderer(SocketLacerator.java:591)
-2013-10-11 21:29:03 [INFO] [STDERR]     at net.minecraftforge.event.ASMEventHandler_99_SocketLacerator_resetEffectRenderer_Unload.invoke(.dynamic)
-2013-10-11 21:29:03 [INFO] [STDERR]     at net.minecraftforge.event.ASMEventHandler.invoke(ASMEventHandler.java:39)
-2013-10-11 21:29:03 [INFO] [STDERR]     at net.minecraftforge.event.EventBus.post(EventBus.java:108)
-2013-10-11 21:29:03 [INFO] [STDERR]     at net.minecraft.server.MinecraftServer.func_71260_j(MinecraftServer.java:398)
-2013-10-11 21:29:03 [INFO] [STDERR]     at net.minecraft.server.MinecraftServer.run(MinecraftServer.java:537)
-2013-10-11 21:29:03 [INFO] [STDERR]     at net.minecraft.server.ThreadMinecraftServer.run(SourceFile:583)
-^ fixed, but what about that particle scaling I put in along with the fix?
-
 regarding actuators:
   We'll keep a "generic use actuator instruction", but we'll also add instructions for each actuator. Possibly multiple ones per actuator.
   All the socket-tools we'll have:
     ✓ Lacerator
     ✓ Robot Arm
-    Ball Lightning Gun
     ✓ Item Vacuum
     Chicken Baster
     Launcher (dispenser)
     Rotor (fzds)
     Grasper (gravity gun; fzds for just one block? Eh....)
+    Ball Lightning Gun
 
 Lower barriers to entry for servos:
     (Suuuugar crystalllss.... hard rock candy....)
@@ -121,10 +108,26 @@ Lower barriers to entry for servos:
 
 TOP LIST
 --------
-compression crafter keep rendering until blocks get cleared... prolly a packet?
+review servo motor packets
+
+LMP store instructions... Like a bag or a backpack
+  - maybe let you merge instructions together?
+give blocks & items names for 1.7 update
+tool for renaming commands
+our TEs could do that crazy thermex optimization thing; some function that gets called before onUpdate. But we have to make sure that we aren't cheating anywhere. It's TileEntity.hasWorldObj(); no inherent issues with overriding, except what we make. So check them.
+
+
+UNTRIAGED
+---------
+Lead ore processing
+let compression crafters look harder for adjacent inventories?
+have the compression crafter keep rendering until blocks get cleared... prolly a packet?
+light shining through our blocks; barrels
+
 
 LESS TOP LIST
 -------------
+can we move the position the servo renders at back? So that it can look like it's turning at a better place...
 config files for disabling barrel types
 test parasieves + comparators + recursion depth. Somehow.
 localize ALL THE THINGS
@@ -157,6 +160,7 @@ Config option for ore processing output
 IMC for adding new Ores to the Ore Processing chain?
 configuration method for adding ores?
 Placing/breaking wrath lamp in hammerspace seems to cause the client to crap its pants
+texture error messages
 Don't keep non-weak references to worlds ("MapMaker.weakKeys().buildMap()") except in Entity/TileEntity
 register ore blocks
 To kill NEI's shift-? cheat: clear out RecipeInfo.overlayMap... or something.  Hmm....
