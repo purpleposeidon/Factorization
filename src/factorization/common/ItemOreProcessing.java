@@ -19,7 +19,7 @@ public class ItemOreProcessing extends ItemFactorization implements IActOnCraft 
     public static enum OreType {
         IRON(0, 0xD8D8D8, "Iron", "oreIron", "ingotIron"),
         GOLD(1, 0xEEEB28, "Gold", "oreGold", "ingotGold"),
-        LEAD(2, 0x2F2C3C, "Lead", null, "ingotLead"),
+        LEAD(2, 0x2F2C3C, "Lead", "oreLead", "ingotLead"),
         TIN(3, 0xD7F7FF, "Tin", "oreTin", "ingotTin"),
         COPPER(4, 0xD68C39, "Copper", "oreCopper", "ingotCopper"),
         SILVER(5, 0x7B96B9, "Silver", null, "ingotSilver"),
@@ -114,7 +114,7 @@ public class ItemOreProcessing extends ItemFactorization implements IActOnCraft 
                     show = false;
                 }
                 if (this == Core.registry.ore_dirty_gravel || this == Core.registry.ore_clean_gravel) {
-                    if (oreType == OreType.SILVER || oreType == OreType.LEAD) {
+                    if (oreType == OreType.SILVER) {
                         show = false;
                     }
                 }

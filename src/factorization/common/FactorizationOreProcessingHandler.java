@@ -104,7 +104,9 @@ public class FactorizationOreProcessingHandler {
             int r = (int)REDUCE;
             TileEntitySlagFurnace.SlagRecipes.register(clean, r, reduced, REDUCE - r, reduced);
             //reduced chunks -> crystals
-            TileEntityCrystallizer.addRecipe(reduced, crystal, CRYSTALLIZE, Core.registry.aqua_regia);
+            if (oreType != OreType.LEAD) {
+                TileEntityCrystallizer.addRecipe(reduced, crystal, CRYSTALLIZE, Core.registry.aqua_regia);
+            }
         }
     }
     
