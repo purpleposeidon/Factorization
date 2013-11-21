@@ -2,6 +2,7 @@ package factorization.common.sockets;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -28,7 +29,6 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.StatCollector;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.FakePlayer;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.event.EventPriority;
 import net.minecraftforge.event.ForgeSubscribe;
@@ -37,6 +37,7 @@ import net.minecraftforge.event.world.WorldEvent;
 
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Charge;
@@ -48,9 +49,17 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.client.render.TileEntityGrinderRender;
-import factorization.common.*;
+import factorization.common.BlockIcons;
+import factorization.common.BlockRenderHelper;
+import factorization.common.Core;
+import factorization.common.FactorizationUtil;
+import factorization.common.FactoryType;
+import factorization.common.ISocketHolder;
 import factorization.common.NetworkFactorization.MessageType;
+import factorization.common.TileEntityDayBarrel;
+import factorization.common.TileEntityGrinder;
 import factorization.common.TileEntityGrinder.GrinderRecipe;
+import factorization.common.TileEntitySocketBase;
 import factorization.notify.Notify;
 
 public class SocketLacerator extends TileEntitySocketBase implements IChargeConductor, ISidedInventory {
@@ -67,6 +76,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     boolean grab_items = false, grind_items = false;
     long targetHash = -1;
     boolean ticked = false;
+    boolean isPowered = false;
     
     final static byte grind_time = 75;
     final static short max_speed = 400;
@@ -120,6 +130,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             ticked = true;
             return;
         }
+        isPowered = powered;
         genericUpdate_implementation(socket, coord, powered);
         if (FactorizationUtil.significantChange(last_shared_speed, speed)) {
             socket.sendMessage(MessageType.LaceratorSpeed, speed);
@@ -221,7 +232,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     
     boolean cantDoWork(ISocketHolder socket) {
         //Calls this in two places in handleRay because we may have unlacerable mops
-        if (socket.extractCharge(4)) {
+        if (!isPowered && socket.extractCharge(4)) {
             speed = (short) Math.min(max_speed, speed + 4);
             if (speed == max_speed) {
                 return false;
@@ -287,6 +298,12 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         drops.clear();
     }
     
+    private static Field hitField = ReflectionHelper.findField(EntityLivingBase.class, "field_70718_bc", "recentlyHit");
+    static {
+        if (hitField == null) {
+            Core.logSevere("SocketLacerator didn't find field for EntityLivingBase.recentlyHit!");
+        }
+    }
     private boolean _handleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
         if (mop == null) return false;
         if (mopIsThis) return false;
@@ -299,8 +316,17 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             if (elb.isDead || elb.getHealth() <= 0) return false;
             if (cantDoWork(socket)) return true && !grab_items;
             socket.extractCharge(1); //It's fine if it fails
-            
-            if (elb.attackEntityFrom(laceration, 4F*speed/max_speed)) {
+            float damage = 4F*speed/max_speed;
+            if (elb.getHealth() <= damage && rand.nextInt(20) == 1) { 
+                if (hitField != null) {
+                    try {
+                        hitField.set(elb, 100);
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            if (elb.attackEntityFrom(laceration, damage)) {
                 if (elb.getHealth() <= 0) {
                     grab_items = true;
                 }
