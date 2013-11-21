@@ -7,6 +7,8 @@ import java.util.logging.Logger;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiErrorScreen;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.command.ICommandSender;
@@ -19,7 +21,9 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.Icon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
+import net.minecraftforge.common.ForgeVersion;
 import net.minecraftforge.common.MinecraftForge;
+import cpw.mods.fml.client.CustomModLoadingErrorDisplayException;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
@@ -40,7 +44,7 @@ import factorization.api.ChargeMetalBlockConductance;
 import factorization.common.compat.CompatManager;
 import factorization.common.servo.ServoMotor;
 
-@Mod(modid = Core.modId, name = Core.name, version = Core.version, dependencies = "after:Forestry")
+@Mod(modid = Core.modId, name = Core.name, version = Core.version)
 @NetworkMod(
         clientSideRequired = true,
         tinyPacketHandler = NetworkFactorization.class
@@ -83,10 +87,24 @@ public class Core {
     }
     static public boolean serverStarted = false;
 
-
+    void checkForge() {
+        int maxForge = 953;
+        if (ForgeVersion.buildVersion > maxForge) {
+            if (System.getProperty("factorization.ignoreForgeVersion", "") == "") {
+                Core.logSevere("Loading despite scary-looking forge version > " + maxForge);
+            } else {
+                String msg = "This forge is for pre-1.7 use only! The Forge version must be <= " + maxForge + ".\n" +
+                        "Get a compatible forge from http://files.minecraftforge.net/minecraftforge/index_legacy.html\n" +
+                        "You can force loading to continue by passing -Dfactorization.ignoreForgeVersion=true to the JVM.";
+                Core.logSevere(msg);
+                throw new RuntimeException(msg);
+            }
+        }
+    }
 
     @EventHandler
     public void load(FMLPreInitializationEvent event) {
+        checkForge();
         fzconfig.loadConfig(event.getSuggestedConfigurationFile());
         registry.makeBlocks();
         TickRegistry.registerTickHandler(registry, Side.SERVER);
