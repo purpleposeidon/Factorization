@@ -27,6 +27,8 @@ public class BlockOreStorageShatterable extends BlockOreStorage {
     //<Player> i think i'm calling getblockdropped before killing it
     //<Player> so if you drop stuff yourself in breakblock or whatever, it'll break
     
+    //See Explosion.doExplosionB
+    
     @Override
     public void onBlockDestroyedByExplosion(World world, int x, int y, int z, Explosion explosion) {
         super.onBlockDestroyedByExplosion(world, x, y, z, explosion);
@@ -46,6 +48,11 @@ public class BlockOreStorageShatterable extends BlockOreStorage {
             ent.motionY = randShardVelocity(world);
             ent.motionZ = randShardVelocity(world);
         }
+    }
+    
+    @Override
+    public void onBlockExploded(World world, int x, int y, int z, Explosion explosion) {
+        super.onBlockExploded(world, x, y, z, explosion);
     }
     
     double randShardVelocity(World world) {
