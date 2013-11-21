@@ -30,6 +30,8 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockHelper;
 import factorization.common.FactorizationUtil;
 
+// Note: The rules for holding on to references to Coord are the same as for holding on to World.
+// Don't keep references to them outside of things that are in worlds to avoid mem-leaks; or be careful about it.
 public class Coord implements IDataSerializable {
     public World w;
     public int x, y, z;
