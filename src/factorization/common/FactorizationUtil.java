@@ -841,7 +841,7 @@ public class FactorizationUtil {
                     if (forceInsert) {
                         return true;
                     }
-                    return inv.canInsertItem(slotMap[i], is, side);
+                    return super.canInsert(i, is) && inv.canInsertItem(slotMap[i], is, side);
                 }};
         } else {
             return new PlainInvWrapper(orig_inv);
