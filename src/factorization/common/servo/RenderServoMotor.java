@@ -5,11 +5,13 @@ import static org.lwjgl.opengl.GL11.GL_LIGHTING;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelZombie;
 import net.minecraft.client.renderer.GLAllocation;
+import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderBiped;
 import net.minecraft.client.renderer.entity.RenderEntity;
@@ -32,6 +34,7 @@ import net.minecraftforge.client.model.obj.WavefrontObject;
 import net.minecraftforge.common.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
@@ -61,7 +64,7 @@ public class RenderServoMotor extends RenderEntity {
                 ResourceLocation rl = Core.getResource(modelName);
                 input = Minecraft.getMinecraft().getResourceManager().getResource(rl).getInputStream();
                 if (input == null) {
-                    Core.logWarning("Missing servo sprocket model: " + rl);
+                    Core.logWarning("Missing 3D model: " + rl);
                     return;
                 }
                 sprocket = new WavefrontObject(rl.toString(), input);
@@ -178,14 +181,14 @@ public class RenderServoMotor extends RenderEntity {
             }
         }
         
-        if (render_details) {
-            renderInventory(motor, partial);
-        }
+        renderInventory(motor, partial);
         GL11.glPopMatrix();
         if (render_details) {
+            GL11.glDisable(GL11.GL_DEPTH_TEST);
             GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
             GL11.glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
             renderStacks(motor);
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
         }
         GL11.glPopMatrix();
         motor.interpolatePosition(motor.pos_progress);
@@ -272,25 +275,9 @@ public class RenderServoMotor extends RenderEntity {
     RenderItem renderItem = new RenderItem();
 
     void renderInventory(ServoMotor motor, float partial) {
-        ItemStack held = motor.getHeldItem();
-        if (held != null) {
-            //if held.getItem().isFull3D()...
-            GL11.glPushMatrix();
-            GL11.glTranslatef(0, 3.5F/16F, 0);
-            Item item = held.getItem();
-            if (item instanceof ItemBlock) {
-                GL11.glTranslatef(1F/16F, 2.75F/16F, 2.5F/16F);
-                GL11.glRotatef(45, 0, 1, 0);
-                GL11.glRotatef(23.5F, 0, 0, -1);
-            }
-            renderItem(motor, held, partial);
-            GL11.glPopMatrix();
-        }
-        
-        
         GL11.glPushMatrix();
         GL11.glRotatef(90, 1, 0, 0);
-        float s = 1/4F;
+        float s = 0.75F;
         FzInv inv = motor.getInv();
         final Minecraft mc = Minecraft.getMinecraft();
         long range = 9*20;
@@ -298,18 +285,15 @@ public class RenderServoMotor extends RenderEntity {
         float now = (float) ((d % range)/(double)range);
         for (int i = 0; i < inv.size(); i++) {
             ItemStack is = inv.get(i);
-            if (is == null || is == held) {
+            if (is == null) {
                 continue;
             }
             GL11.glPushMatrix();
-            GL11.glTranslatef(0.65F, 0.25F, -0.125F);
+            GL11.glTranslatef(0, 0, -0.25F);
+            GL11.glRotatef(-90*i, 0, 0, 1);
+            GL11.glTranslatef(0, 0.4F, 0);
+            GL11.glRotatef(-90, 1, 0, 0);
             GL11.glScalef(s, s, s);
-            GL11.glRotatef(-90, 0, 0, 1);
-            float offset = i;
-            if (i > 2) {
-                offset += 1;
-            }
-            GL11.glTranslatef((offset - 2)*0.8F, -1.5F, 0);
             try {
                 renderItem(motor, is, partial);
             } catch (Exception e) {
@@ -330,6 +314,7 @@ public class RenderServoMotor extends RenderEntity {
     
     void renderMainModel(ServoMotor motor, float partial, double ro, boolean hilighting) {
         GL11.glPushMatrix();
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         bindTexture(Core.blockAtlas);
         if (!loaded_models) {
             try {
@@ -419,17 +404,26 @@ public class RenderServoMotor extends RenderEntity {
     }
 
     public void do_renderItem(ItemStack itemstack) {
-        // Yoinked from RenderBiped.renderEquippedItems
+        // Copied from RenderBiped.renderEquippedItems
         GL11.glPushMatrix();
         float s = 1F / 4F;
         GL11.glScalef(s, s, s);
         
+        // Pre-emptively undo transformations that the item renderer does so
+        // that we don't get a stupid angle. Minecraft render code is terrible.
+        boolean needRotationFix = true;
+        if (itemstack.getItem() instanceof ItemBlock && itemstack.itemID < Block.blocksList.length) {
+            Block block = Block.blocksList[itemstack.itemID];
+            if (block != null && RenderBlocks.renderItemIn3d(block.getRenderType())) {
+                needRotationFix = false;
+            }
+        }
+        if (needRotationFix) {
+            GL11.glTranslatef(0.9375F, 0.0625F, -0.0F);
+            GL11.glRotatef(-335.0F, 0.0F, 0.0F, 1.0F);
+            GL11.glRotatef(-50.0F, 0.0F, 1.0F, 0.0F);
+        }
         
-        //Pre-emptively undo transformations that the item renderer does so that we don't get a stupid angle
-        //Minecraft render code is terrible.
-        GL11.glTranslatef(0.9375F, 0.0625F, -0.0F);
-        GL11.glRotatef(-335.0F, 0.0F, 0.0F, 1.0F);
-        GL11.glRotatef(-50.0F, 0.0F, 1.0F, 0.0F);
         float f6 = 1.5F;
         GL11.glScalef(f6, f6, f6);
         
@@ -440,7 +434,6 @@ public class RenderServoMotor extends RenderEntity {
                 this.renderManager.itemRenderer.renderItem(dummy_entity, itemstack, x);
             }
         }
-
         GL11.glPopMatrix();
     }
 
