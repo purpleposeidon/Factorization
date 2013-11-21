@@ -205,7 +205,8 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
     
     protected boolean isBlockPowered() {
-        return worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0;
+        return worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord);
+        //return worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0;
     }
     
     @Override
@@ -360,8 +361,8 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     public void uninstall() { }
     
     @Override
-    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
-        ItemStack held = entityplayer.getHeldItem();
+    public boolean activate(EntityPlayer player, ForgeDirection side) {
+        ItemStack held = player.getHeldItem();
         if (held == null) {
             return false;
         }
@@ -378,13 +379,30 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
                 Coord coord = getCoord();
                 Core.network.prefixTePacket(dos, coord, MessageType.OpenDataHelperGui);
                 serialize("", dop);
-                Core.network.broadcastPacket(entityplayer, coord, Core.network.TEmessagePacket(baos));
+                Core.network.broadcastPacket(player, coord, Core.network.TEmessagePacket(baos));
             } catch (IOException e) {
                 e.printStackTrace();
-                return false;
             }
             return false;
         }
+    }
+    
+    public boolean activateOnServo(EntityPlayer player, ServoMotor motor) {
+        if (worldObj.isRemote) {
+            return false;
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(baos);
+        DataOutPacket dop = new DataOutPacket(dos, Side.SERVER);
+        try {
+            Coord coord = getCoord();
+            Core.network.prefixEntityPacket(dos, motor, MessageType.OpenDataHelperGui);
+            serialize("", dop);
+            Core.network.broadcastPacket(player, coord, Core.network.entityPacket(baos));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
     
     @SideOnly(Side.CLIENT)

@@ -12,12 +12,11 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 
 import org.lwjgl.input.Keyboard;
-
-import cpw.mods.fml.relauncher.Side;
 
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
@@ -32,6 +31,7 @@ import factorization.common.NetworkFactorization.MessageType;
 public class GuiDataConfig extends GuiScreen {
     IDataSerializable ids;
     TileEntity te;
+    Entity containingEntity;
     
     ArrayList<Field> fields = new ArrayList();
     int posLabel, posControl;
@@ -246,6 +246,12 @@ public class GuiDataConfig extends GuiScreen {
         this.te = (TileEntity) ids;
     }
     
+    public GuiDataConfig(IDataSerializable ids, Entity container) {
+        this.ids = ids;
+        this.te = (TileEntity) ids;
+        this.containingEntity = container;
+    }
+    
     void closeScreen() {
         keyTyped('\0', 1);
     }
@@ -417,8 +423,14 @@ public class GuiDataConfig extends GuiScreen {
         DataOutputStream dos = new DataOutputStream(baos);
         DataOutPacket dop = new DataOutPacketClientEdited(dos);
         Coord here = new Coord((TileEntity) ids);
-        Core.network.prefixTePacket(dos, here, MessageType.DataHelperEdit);
-        ids.serialize("", dop);
-        Core.network.broadcastPacket(mc.thePlayer, here, Core.network.TEmessagePacket(baos));
+        if (containingEntity == null) {
+            Core.network.prefixTePacket(dos, here, MessageType.DataHelperEdit);
+            ids.serialize("", dop);
+            Core.network.broadcastPacket(mc.thePlayer, here, Core.network.TEmessagePacket(baos));
+        } else {
+            Core.network.prefixEntityPacket(dos, containingEntity, MessageType.DataHelperEdit);
+            ids.serialize("", dop);
+            Core.network.broadcastPacket(mc.thePlayer, here, Core.network.entityPacket(baos));
+        }
     }
 }

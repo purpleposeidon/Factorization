@@ -6,11 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
@@ -18,12 +17,10 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
-import net.minecraft.util.EnumMovingObjectType;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.common.FakePlayer;
 import net.minecraftforge.common.ForgeDirection;
 
 import com.google.common.io.ByteArrayDataInput;
@@ -42,16 +39,18 @@ import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataInPacket;
+import factorization.api.datahelpers.DataInPacketClientEdited;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.Share;
 import factorization.common.Core;
 import factorization.common.FactorizationUtil;
+import factorization.common.FactorizationUtil.FzInv;
 import factorization.common.FactoryType;
 import factorization.common.ISocketHolder;
-import factorization.common.ItemSocketPart;
-import factorization.common.FactorizationUtil.FzInv;
+import factorization.common.NetworkFactorization.MessageType;
 import factorization.common.TileEntitySocketBase;
+import factorization.common.sockets.GuiDataConfig;
 import factorization.common.sockets.SocketEmpty;
 import factorization.notify.Notify;
 
@@ -91,10 +90,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     private static final double normal_speed = 0.0875;
     private static final double[] targetSpeeds = {normal_speed / 3, normal_speed / 2, normal_speed, normal_speed*2, normal_speed*4};
     private static final double speed_limit = targetSpeeds[targetSpeeds.length - 1];
-
-    private static class MessageType {
-        static final short motor_description = 100, motor_direction = 101, motor_speed = 102, motor_inventory = 103;
-    }
     
     short actions_since_last_sync = 0;
 
@@ -528,7 +523,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         speed_b = (byte) Math.min(speed_b, max_speed_b);
     }
 
-    void broadcast(short message_type, Object... msg) {
+    void broadcast(int message_type, Object... msg) {
         Packet p = Core.network.entityPacket(this, message_type, msg);
         Core.network.broadcastPacket(worldObj, (int) posX, (int) posY, (int) posZ, p);
     }
@@ -568,7 +563,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         if (rail == null /* :| */ || rail.decoration == null) {
             return;
         }
-        if (getCurrentPos().isPowered()) {
+        if (getCurrentPos().isWeaklyPowered()) {
             return;
         }
         if (skipNextInstruction) {
@@ -586,7 +581,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         if (is == null) {
             return false;
         }
-        if (socket instanceof SocketEmpty && is.getItem() instanceof ItemSocketPart) {
+        if (socket instanceof SocketEmpty) {
             int md = is.getItemDamage();
             if (md > 0 && md < FactoryType.MAX_ID) {
                 try {
@@ -596,7 +591,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                     Notify.send(null, this, "Exception; see console log\n" + e.getMessage());
                 }
             }
-            is.stackSize--;
+            if (!player.capabilities.isCreativeMode) {
+                is.stackSize--;
+            }
+        } else if (socket != null) {
+            return socket.activateOnServo(player, this);
         }
         return false;
     }
@@ -686,9 +685,30 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
     
     @Override
-    public boolean handleMessage(short messageType, DataInputStream input)
+    public boolean handleMessageFromClient(short messageType, DataInputStream input) throws IOException {
+        if (messageType == MessageType.DataHelperEdit) {
+            DataInPacketClientEdited di = new DataInPacketClientEdited(input);
+            socket.serialize("", di);
+            onInventoryChanged();
+            return true;
+        }
+        return false;
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean handleMessageFromServer(short messageType, DataInputStream input)
             throws IOException {
         switch (messageType) {
+        case MessageType.OpenDataHelperGui:
+            if (!worldObj.isRemote) {
+                return false;
+            } else {
+                DataInPacket dip = new DataInPacket(input, Side.CLIENT);
+                socket.serialize("", dip);
+                Minecraft.getMinecraft().displayGuiScreen(new GuiDataConfig(socket, this));
+            }
+            break;
         case MessageType.motor_inventory:
             for (int i = 0; i < inv.length; i++) {
                 inv[i] = null;

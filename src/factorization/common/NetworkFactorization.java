@@ -181,75 +181,23 @@ public class NetworkFactorization implements ITinyPacketHandler {
         }
     }
     
+    public void prefixEntityPacket(DataOutputStream output, Entity to, int messageType) throws IOException {
+        output.writeInt(to.entityId);
+        output.writeShort(messageType);
+    }
+    
+    public Packet entityPacket(ByteArrayOutputStream outputStream) throws IOException {
+        outputStream.flush();
+        return PacketDispatcher.getTinyPacket(Core.instance, factorizeEntityChannel, outputStream.toByteArray());
+    }
+    
     public Packet entityPacket(Entity to, int messageType, Object ...items) { //TODO: messageType should be short
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream output = new DataOutputStream(outputStream);
-
-            output.writeInt(to.entityId);
-            output.writeShort(messageType);
-
-            for (Object item : items) {
-                if (item == null) {
-                    throw new RuntimeException("Argument is null!");
-                }
-                if (item instanceof Integer) {
-                    output.writeInt((Integer) item);
-                } else if (item instanceof Byte) {
-                    output.writeByte((Byte) item);
-                } else if (item instanceof Short) {
-                    output.writeShort((Short) item);
-                } else if (item instanceof String) {
-                    output.writeUTF((String) item);
-                } else if (item instanceof Boolean) {
-                    output.writeBoolean((Boolean) item);
-                } else if (item instanceof Float) {
-                    output.writeFloat((Float) item);
-                } else if (item instanceof ItemStack) {
-                    ItemStack is = (ItemStack) item;
-                    NBTTagCompound tag = new NBTTagCompound();
-                    final Item is_item = is.getItem();
-                    if (is_item == null || is_item.getShareTag()) {
-                        is.writeToNBT(tag);
-                    } else {
-                        NBTTagCompound backup = is.getTagCompound();
-                        is.writeToNBT(tag);
-                        is.setTagCompound(backup);
-                    }
-                    NBTBase.writeNamedTag(tag, output);
-                    if (outputStream.size() > 65536 && is.hasTagCompound()) {
-                        //Got an overflow! We'll blame the NBT tag.
-                        if (huge_tag_warnings++ < 10) {
-                            Core.logWarning("Item " + is + " probably has a huge NBT tag; it will be stripped from the packet; packet for entity " + to);
-                            if (huge_tag_warnings == 10) {
-                                Core.logWarning("(This will no longer be logged)");
-                            }
-                        }
-                        NBTTagCompound tag_copy = is.getTagCompound();
-                        is.setTagCompound(null);
-                        try {
-                            return entityPacket(to, messageType, items);
-                        } finally {
-                            is.setTagCompound(tag_copy);
-                        }
-                    }
-                } else if (item instanceof VectorUV) {
-                    VectorUV v = (VectorUV) item;
-                    output.writeFloat((float) v.x);
-                    output.writeFloat((float) v.y);
-                    output.writeFloat((float) v.z);
-                } else if (item instanceof DeltaCoord) {
-                    DeltaCoord dc = (DeltaCoord) item;
-                    dc.write(output);
-                } else if (item instanceof Quaternion) {
-                    Quaternion q = (Quaternion) item;
-                    q.write(output);
-                } else {
-                    throw new RuntimeException("Don't know how to serialize " + item.getClass() + " (" + item + ")");
-                }
-            }
-            output.flush();
-            return PacketDispatcher.getTinyPacket(Core.instance, factorizeEntityChannel, outputStream.toByteArray());
+            prefixEntityPacket(output, to, messageType);
+            writeObjects(outputStream, output, items);
+            return entityPacket(outputStream);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -532,21 +480,19 @@ public class NetworkFactorization implements ITinyPacketHandler {
     void handleEntity(DataInputStream input) {
         try {
             World world = getCurrentPlayer().worldObj;
-            if (!world.isRemote) {
-                return;
-            }
             int entityId = input.readInt();
             short messageType = input.readShort();
             Entity to = world.getEntityByID(entityId);
             if (to == null) {
                 if (Core.dev_environ) {
-                    //Core.logFine("Packet to unknown entity #%s: %s", entityId, messageType);
+                    Core.logFine("Packet to unknown entity #%s: %s", entityId, messageType);
                 }
                 return;
             }
             
             if (!(to instanceof IEntityMessage)) {
                 Core.logFine("Packet to inappropriate entity #%s: %s", entityId, messageType);
+                return;
             }
             IEntityMessage iem = (IEntityMessage) to;
             
@@ -555,7 +501,14 @@ public class NetworkFactorization implements ITinyPacketHandler {
             }
             
             boolean handled;
-            iem.handleMessage(messageType, input);
+            if (world.isRemote) {
+                handled = iem.handleMessageFromServer(messageType, input);
+            } else {
+                handled = iem.handleMessageFromClient(messageType, input);
+            }
+            if (!handled) {
+                Core.logFine("Got unhandled message: " + messageType + " for " + iem);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -597,7 +550,9 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 //
                 ServoRailDecor = 161, ServoRailDecorUpdate = 162,
                 //
-                CompressionCrafter = 163, CompressionCrafterBeginCrafting = 164, CompressionCrafterBounds = 165;
+                CompressionCrafter = 163, CompressionCrafterBeginCrafting = 164, CompressionCrafterBounds = 165,
+                //
+                motor_description = 170, motor_direction = 171, motor_speed = 172, motor_inventory = 173;
     }
     
     static public class NotifyMessageType {
