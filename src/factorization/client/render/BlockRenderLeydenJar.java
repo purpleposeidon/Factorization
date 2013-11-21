@@ -78,7 +78,7 @@ public class BlockRenderLeydenJar extends FactorizationBlockRender {
                     jar.updateSparks(sparks);
                 }
             }
-            if (renderType == ItemRenderType.ENTITY || renderType == ItemRenderType.EQUIPPED) {
+            if (renderType == ItemRenderType.ENTITY || renderType == ItemRenderType.EQUIPPED || renderType == ItemRenderType.EQUIPPED_FIRST_PERSON) {
                 float t = -0.5F;
                 GL11.glTranslatef(t, t, t);
                 sparks.render();
