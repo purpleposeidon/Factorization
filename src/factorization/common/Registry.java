@@ -1102,13 +1102,15 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 'S', empty_socket_item,
                 'C', Block.chest);
         ServoComponent.setupRecipes();
-        recipe(parasieve_item,
-                "#",
-                "H",
-                "m",
+        oreRecipe(parasieve_item,
+                "C#C",
+                "ImI",
+                "CvC",
+                'C', Block.cobblestone,
                 '#', Block.fenceIron,
-                'H', Block.hopperBlock,
-                'm', logicMatrixIdentifier);
+                'I', Item.ingotIron,
+                'm', logicMatrixIdentifier,
+                'v', Block.dropper);
     }
 
     public void setToolEffectiveness() {
