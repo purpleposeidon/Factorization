@@ -62,8 +62,9 @@ public class SocketShifter extends TileEntitySocketBase {
             return this;
         }
         //Validate input
-        if (mode == ShifterMode.MODE_STREAM) {
+        if (mode == ShifterMode.MODE_STREAM && transferLimit != 1) {
             transferLimit = 1;
+            data.log("transfer limit must be 1 in stream mode");
         }
         if (foreignSlot < -1) {
             foreignSlot = -1;
