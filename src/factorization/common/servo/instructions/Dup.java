@@ -27,7 +27,7 @@ public class Dup extends Instruction {
     @Override
     public void motorHit(ServoMotor motor) {
         ServoStack stack = motor.getServoStack(ServoMotor.STACK_ARGUMENT);
-        Integer a = stack.popType(Integer.class);
+        Object a = stack.pop();
         stack.push(a);
         stack.push(a);
     }

@@ -262,6 +262,7 @@ public abstract class ServoComponent implements IDataSerializable {
                 Drop.class,
                 Dup.class,
                 IntegerValue.class,
+                BooleanValue.class,
                 Jump.class,
                 Product.class,
                 Sum.class,
