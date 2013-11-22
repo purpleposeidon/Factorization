@@ -89,12 +89,12 @@ public class TileEntityMixer extends TileEntityFactorization implements
     
     @Override
     public void onInventoryChanged() {
+        super.onInventoryChanged();
         if (worldObj != null && worldObj.isRemote) {
             return;
         }
         dirty = true;
         cache = null;
-        super.onInventoryChanged();
     }
     
     @Override
