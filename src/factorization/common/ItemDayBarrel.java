@@ -2,6 +2,7 @@ package factorization.common;
 
 import java.util.List;
 
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import cpw.mods.fml.relauncher.Side;
@@ -46,4 +47,8 @@ public class ItemDayBarrel extends ItemBlockProxy {
             list.add(Core.translateThis("factorization.factoryBlock.DAYBARREL.SILKY.silkhint"));
         }
     }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(IconRegister par1IconRegister) { }
 }

@@ -3,6 +3,7 @@ package factorization.common.servo;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -171,4 +172,8 @@ public class ItemServoRailWidget extends ItemFactorization {
     public int getRenderPasses(int metadata) {
         return 2;
     }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(IconRegister par1IconRegister) { }
 }
