@@ -177,7 +177,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
         }
 
         private void calculate(Coord furnace) {
-            for (int i = 0; i < 2; i++) {
+            for (int i = 1; i <= 2; i++) {
                 if (heat <= maxHeat / 2) {
                     return;
                 }
@@ -186,7 +186,10 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
                 } else {
                     cookTime += 1;
                 }
-                heat--;
+                heat -= i;
+                if (burnTime > topBurnTime / 2) {
+                    break;
+                }
             }
         }
     }
