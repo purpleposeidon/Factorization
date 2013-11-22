@@ -181,12 +181,14 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
                 if (heat <= maxHeat / 2) {
                     return;
                 }
+                int mul = 1;
                 if (burnTime < topBurnTime) {
                     burnTime += 1;
                 } else {
                     cookTime += 1;
+                    mul = 2;
                 }
-                heat -= i;
+                heat -= mul*i;
                 if (burnTime > topBurnTime / 2) {
                     break;
                 }
