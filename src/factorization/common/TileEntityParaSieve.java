@@ -1,6 +1,7 @@
 package factorization.common;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -14,8 +15,11 @@ import net.minecraftforge.common.ForgeDirection;
 
 import org.bouncycastle.util.Arrays;
 
+import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
+import cpw.mods.fml.common.registry.ItemData;
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -460,17 +464,31 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         Core.logFine("[parasieve] Classifying items");
         HashMap<String, Short> modMap = new HashMap();
         short seen = 1;
+        Map<Integer, ItemData> dataMap = null;
+        try {
+            dataMap = (Map<Integer, ItemData>) ReflectionHelper.getPrivateValue(GameData.class, null, "idMap");
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
         for (Item item : Item.itemsList) {
             if (item == null) {
                 continue;
             }
             UniqueIdentifier ui = GameRegistry.findUniqueIdentifierFor(item);
-            if (ui == null) {
-                continue;
+            String modName = null;
+            if (ui != null) {
+                modName = ui.modId;
             }
-            Short val = modMap.get(ui.modId);
+            if (modName == null && dataMap != null) {
+                ItemData id = dataMap.get(item.itemID);
+                modName = id.getModId();
+            }
+            if (modName == null) {
+                modName = "vanilla?";
+            }
+            Short val = modMap.get(modName);
             if (val == null) {
-                modMap.put(ui.modId, seen);
+                modMap.put(modName, seen);
                 val = seen;
                 seen++;
             }
