@@ -88,7 +88,7 @@ public enum FactoryType {
             } catch (Throwable e) {
                 throw new IllegalArgumentException("Can not instantiate: " + toString(), e);
             }
-            MinecraftForge.EVENT_BUS.register(representative);
+            representative.representYoSelf();
         }
         return representative;
     }

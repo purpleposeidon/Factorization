@@ -1,7 +1,10 @@
 package factorization.common;
 
+import java.util.HashMap;
+
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -11,6 +14,8 @@ import net.minecraftforge.common.ForgeDirection;
 
 import org.bouncycastle.util.Arrays;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -20,6 +25,8 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     ItemStack[] filters = new ItemStack[8];
     private boolean putting_nbt = false;
     private byte redstone_cache = -1;
+    
+    static short[] itemId2modIndex = new short[Item.itemsList.length]; 
     
     public TileEntityParaSieve() {
         facing_direction = 2;
@@ -81,6 +88,75 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         redstone_cache = -1;
     }
     
+    static boolean itemInRange(ItemStack a, ItemStack b, ItemStack stranger) {
+        if (stranger == null) {
+            return false;
+        }
+        if (a == null || b == null) {
+            if (a != null) {
+                return FactorizationUtil.couldMerge(a, stranger);
+            }
+            if (b != null) {
+                return FactorizationUtil.couldMerge(b, stranger);
+            }
+            return false;
+        }
+        if (a.itemID != b.itemID) {
+            //Compare on mods
+            short aId = itemId2modIndex[a.itemID];
+            short bId = itemId2modIndex[b.itemID];
+            if (aId == bId && aId != 0) {
+                return itemId2modIndex[stranger.itemID] == aId;
+            }
+            //Compare on Item class
+            Class ca = a.getItem().getClass(), cb = b.getItem().getClass();
+            Class c_stranger = stranger.getItem().getClass();
+            if (ca == cb) {
+                return ca == c_stranger;
+            }
+            //Broadest match: return true if the stranger starts with the common prefix
+            String na = ca.getName();
+            String nb = cb.getName();
+            String n_stranger = c_stranger.getName();
+            int end = Math.min(na.length(), nb.length());
+            int end_stranger = n_stranger.length();
+            for (int i = 0; i < end; i++) {
+                char x = na.charAt(i);
+                char y = nb.charAt(i);
+                if (x == y) {
+                    if (end_stranger <= i || n_stranger.charAt(i) != x) {
+                        return false;
+                    }
+                } else {
+                    return true;
+                }
+            }
+            return true; //all 3 names were identical
+        }
+        if (a.itemID != stranger.itemID) {
+            return false; //It doesn't match! How could we have been so silly as to not notice?
+        }
+        int mda = a.getItemDamage(), mdb = b.getItemDamage(), md_stranger = stranger.getItemDamage();
+        //Only check tag compounds if both items have one.
+        if (a.hasTagCompound() == b.hasTagCompound()) {
+            if (a.hasTagCompound()) {
+                //We aren't going to go all the way with this; that'd be too difficult & expensive
+                if (!a.getTagCompound().equals(stranger.getTagCompound())) {
+                    return false;
+                }
+            } else if (stranger.hasTagCompound()) {
+                return false; //no a tag, no b tag, but stranger tag
+            }
+        }
+        if (mda < mdb) {
+            return mda <= md_stranger && md_stranger <= mdb;
+        } else if (mda > mdb) {
+            return mda >= md_stranger && md_stranger >= mdb;
+        } else {
+            return mda == md_stranger;
+        }
+    }
+    
     boolean itemPassesFilter(ItemStack stranger) {
         boolean empty = true;
         boolean p = isPowered();
@@ -90,7 +166,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
                 continue;
             }
             empty = false;
-            if (FactorizationUtil.itemInRange(a, b, stranger)) {
+            if (itemInRange(a, b, stranger)) {
                 return true ^ p;
             }
         }
@@ -376,5 +452,30 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         } finally {
             endRecursion();
         }
+    }
+    
+    @Override
+    public void representYoSelf() {
+        super.representYoSelf();
+        Core.logFine("[parasieve] Classifying items");
+        HashMap<String, Short> modMap = new HashMap();
+        short seen = 1;
+        for (Item item : Item.itemsList) {
+            if (item == null) {
+                continue;
+            }
+            UniqueIdentifier ui = GameRegistry.findUniqueIdentifierFor(item);
+            if (ui == null) {
+                continue;
+            }
+            Short val = modMap.get(ui.modId);
+            if (val == null) {
+                modMap.put(ui.modId, seen);
+                val = seen;
+                seen++;
+            }
+            itemId2modIndex[item.itemID] = val;
+        }
+        Core.logFine("[parasieve] Done");
     }
 }

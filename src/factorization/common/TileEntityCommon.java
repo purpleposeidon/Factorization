@@ -21,6 +21,7 @@ import net.minecraft.util.Icon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -299,4 +300,8 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     }
     
     public void onNeighborTileChanged(int tilex, int tiley, int tilez) {}
+    
+    public void representYoSelf() {
+        MinecraftForge.EVENT_BUS.register(this);
+    }
 }
