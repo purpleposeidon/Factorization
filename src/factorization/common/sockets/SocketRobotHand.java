@@ -107,7 +107,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
                     // We aren't calling inv.decrStackInSlot.
                     inv.set(i, is);
                 }
-                inv.onInventoryChanged();
+                inv.onInvChanged();
                 return true;
             }
         }

@@ -105,51 +105,70 @@ Lower barriers to entry for servos:
       Maybe this shouldn't make aqua regia; but instead an acid that's compatible.
   Maybe we should see about flattening our mod in other areas as well.
   Make dark iron an ore found at bedrock level
+  Have a stack that's a "reaction" stack. So when the 'status' stack gets updated (this would be typical of a socket command), this stack could be triggered.
 
-TOP LIST
---------
-review servo motor packets
+IMMEDIATE (for next public release)
+---------
+servos:
+  review servo motor packets; send servo stack update packets only when holding an LMP
 
+
+
+SOON
+----
+start a dev blog
+pocket crafting table isn't quite syncing properly on servers, eg. 8 wood in a corner, swirl, get a button instead of a chest...
+  Maybe that Container transaction stuff?
+  [We've made the commands not execute client-side; we'll see if that fixes it in a not-terrible way...]
+forge public/AT bullshit
+do maths on energy conversion:
+  food to steam; we might even be able to do the heater thing? I suppose we COULD just blacklist boilers for furnace heaters...
+  steam to charge to furnace-ing
+  heaters: adding fuel should be cheap; progress not so much. Make 1 heater give 1 fuel instead of 2
+  (And we still need cooking food to be worthwhile!)
 LMP store instructions... Like a bag or a backpack
-  - maybe let you merge instructions together?
-give blocks & items names for 1.7 update
+  - maybe let you merge instructions together? But then middle clicking.
 tool for renaming commands
-our TEs could do that crazy thermex optimization thing; some function that gets called before onUpdate. But we have to make sure that we aren't cheating anywhere. It's TileEntity.hasWorldObj(); no inherent issues with overriding, except what we make. So check them.
+let compression crafters look harder for adjacent inventories?
+Test BoH key with NEI installed & with sneak key set to a mouse button.
+Church Organ
+
+LESS SOON
+---------
+give blocks & items names for 1.7 update; will need to update FML
+ack for TODO/XXX/FIXME
+fix shading of faces of blocks that are in barrels
 
 
 UNTRIAGED
 ---------
-Lead ore processing
-let compression crafters look harder for adjacent inventories?
 have the compression crafter keep rendering until blocks get cleared... prolly a packet?
 light shining through our blocks; barrels
+thaumcraft wood barrels?
+open sourcing the mod
+can we move the position the servo renders at back? So that it can look like it's turning at a better place...
+Do we remove aluminum ore processing? It feels unnecessary to me.
+show what instruction is being hilighted in big?
 
 
 LESS TOP LIST
 -------------
-can we move the position the servo renders at back? So that it can look like it's turning at a better place...
+"Puff Blocks": 9 feathers; it's the building block helper thingie
+Notify is using FZ net code
+clean up texture error messages (unused textures)
 config files for disabling barrel types
 test parasieves + comparators + recursion depth. Somehow.
 localize ALL THE THINGS
-sparks in leyden jar when held aren't centered
-One of my ICommands is broken (???)
-  One of my ICommands is broken!?
-  /help works right, right?
-[15:43:34] <Hathadar> I have a router inserting into 4 induction furnaces.  The moment I place a machine filter on it and set it to the induction furnace it stops working.  It will not insert or extract.  0.8.01
 I wonder if the bug hopper has any interesting crashlogs!
   - Oh yay the bug hopper is no longer running!
 localize barrel types (There's a ton of other things what need to be localized, y'know...)
 leyden jars & batteries should overcharge slightly so that they can drop exactly 100%-charged stuff
-seems we can't really rely on servo components being loaded by .zip inspecting; will have to do it by hand. x_x
 hopping barrels could be optimized if they're moving something above them to below them!
 ★★★Talk to RLP about monetization plan★★★
 underground silver temples/vaults. With moon lamps? :D
 onInventoryUpdate all the TEs
-Test BoH key with NEI installed & with sneak key set to a mouse button.
 can't glaze a sculpture cloned from an already glazed sculpture
 change raw glaze colors to their real colors
-smooth sandstone double slab (Are there other variants?)
-Look at what errors we get if the FZDS code isn't in
 either bats are spawning in the hammer dimension, or we're getting entity updates that we shouldn't be
 having more boilers/mirrors seems to give you more steam somehow
 notification system upgrade:
@@ -160,7 +179,6 @@ Config option for ore processing output
 IMC for adding new Ores to the Ore Processing chain?
 configuration method for adding ores?
 Placing/breaking wrath lamp in hammerspace seems to cause the client to crap its pants
-texture error messages
 Don't keep non-weak references to worlds ("MapMaker.weakKeys().buildMap()") except in Entity/TileEntity
 register ore blocks
 To kill NEI's shift-? cheat: clear out RecipeInfo.overlayMap... or something.  Hmm....
@@ -172,17 +190,12 @@ richardG suggests doing world.blockExists to prevent orphaning chunks:
 
 back to ceramics?
    - a new tool: export to obj tool. And if we have an export, maybe an import would be nice. Could export the sculpture, or export the chunk! Use a hacked up tessellator.
-https://github.com/MinecraftForge/MinecraftForge/commit/34ebfcd9785c3c50c3ac743eb1e9cbf000df10dc
 
 
 [Low-Priority Bugs]
-> Apparently, Killing yourself by Drinking Sulfuric Acid, will dupe the acid. Hence I started with 8, drank two, and I now have 12.
-Get rid of as many getEffectiveSide() calls as we can; we often have a World hanging around somewhere we can use instead.
-implementing that generic block rotation API when it comes out if ever
 barrel lighting (normals.); it's a bit dark on dark mode.
+our TEs could do that crazy thermex optimization thing; some function that gets called before onUpdate. But we have to make sure that we aren't cheating anywhere. It's TileEntity.hasWorldObj(); no inherent issues with overriding, except what we make. So check them.
 do block breaking animations properly (after 1.3). Look at src/minecraft/net/minecraft/src/RenderGlobal.java +1569 renderWorld()
-optimize these TEs. Prolly use whatever it is that Entity Models use?
-  grinder
 
 [Features]
 Redstone signal on furnace heaters
@@ -190,7 +203,6 @@ right-clicking a barrel with a tool could put stuff in as if you had right-click
 glowing glazes
 Go over our API stuff. Clean up. Make sure other people can actually use stuff. (Maybe test this?)
 Occasionally enable all warnings & clean things up
-railgun, except for steve
 
 Need more uses for diamond shards!
   Shard spear? :o  Something about dark crystals. 
@@ -392,3 +404,22 @@ Moderator:
   prevents you from using items based on their package? Probably voids them from your inventor as well.
 
 Invasive charge'd be nice (lets you transmit charge through metal blocks)
+
+When we get to doing sound:
+  Overwrite TileEntityNoteBlock (& NoteBlock may be necessary as well)
+  Shift-clicking tunes down
+  Putting a white/gray/light gray/black wool block over the note dampens the sound (and continues searching upward for...)
+  Blocks of metal.
+  silver, stakced up:
+    1 block gives a bell
+    2 gives a weaker organ
+    3 gives a stronger organ
+    4 gives an awesome organ
+    5 gives an epic organ
+  gold: a cymbal; would make sense for wider platforms of gold to make different pitches or something?
+  dark iron: a cool mournful saw noise
+  water: sine wave
+  lava: square wave
+  iron: saw wave (cactus'd make sense, but isn't actually possible :p)
+  another note block (maybe? the actual noteblock might interfere): something synthesizy
+  obsidian: something brittle?

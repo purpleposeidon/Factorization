@@ -29,6 +29,7 @@ import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
@@ -54,7 +55,7 @@ public class Core {
     public static final String modId = "factorization";
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
-    public static final String version = "0.8.14"; //@VERSION@
+    public static final String version = "0.8.15"; //@VERSION@
     public Core() {
         instance = this;
         fzconfig = new FzConfig();
@@ -133,13 +134,18 @@ public class Core {
         EntityRegistry.registerModEntity(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", 0, Core.instance, 1, 10, false);
         EntityRegistry.registerModEntity(ServoMotor.class, "factory_servo", 1, Core.instance, 100, 1, true);
     }
+    
+    @EventHandler
+    public void handleInteractions(FMLInitializationEvent event) {
+        registry.sendIMC();
+    }
 
     @EventHandler
     public void modsLoaded(FMLPostInitializationEvent event) {
         TileEntityWrathFire.setupBurning();
         TileEntitySolarBoiler.setupSteam();
         foph.addDictOres();
-        registry.sendIMC();
+
         registry.addOtherRecipes();
         (new CompatManager()).loadCompat();
         ChargeMetalBlockConductance.setup();

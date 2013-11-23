@@ -33,7 +33,7 @@ public class SocketShifter extends TileEntitySocketBase {
     //public boolean streamMode = true; // be like a hopper or a filter
     public ShifterMode mode = ShifterMode.MODE_STREAM;
     public int foreignSlot = -1;
-    public boolean exporting;
+    public boolean exporting = true;
     public byte transferLimit = 1;
     byte cooldown = 0;
     
@@ -169,10 +169,14 @@ public class SocketShifter extends TileEntitySocketBase {
             }
         }
         
+        pushInv.setCallOnInventoryChanged(false);
+        pullInv.setCallOnInventoryChanged(false);
+        boolean had_change = false;
         if (mode == ShifterMode.MODE_PULSE_SOME) {
             out: for (int pull = pullStart; pull <= pullEnd; pull++) {
                 for (int push = 0; push < pushInv.size(); push++) {
                     if (pullInv.transfer(pull, pushInv, push, transferLimit) > 0) {
+                        had_change= true;
                         break out;
                     }
                 }
@@ -188,26 +192,43 @@ public class SocketShifter extends TileEntitySocketBase {
                 if (freeForIs < transferLimit) {
                     continue;
                 }
-                //Found an item suitable for transfer
-                int stillNeeded = transferLimit;
-                int pushHere = pushStart;
-                for (int pi = pull; pi <= pullEnd; pi++) {
-                    ItemStack toPull = pullInv.get(pi);
-                    if (toPull == null) continue;
-                    if (!FactorizationUtil.couldMerge(is, toPull)) continue;
-                    int origSize = toPull.stackSize;
-                    for (; pushHere <= pushEnd; pushHere++) {
-                        int delta = pullInv.transfer(pi, pushInv, pushHere, stillNeeded);
-                        stillNeeded -= delta;
-                        origSize -= delta;
-                        if (stillNeeded <= 0) break out;
-                        if (origSize <= 0) break;
+                //We've found an item to move. We shall move this item. This item will fit.
+                //If it doesn't fit, then the inventory is weird and should stop being weird.
+                had_change = true;
+                int limit = transferLimit;
+                for (int i = pull; i <= pullEnd; i++) {
+                    if (!FactorizationUtil.couldMerge(is, pullInv.get(i))) {
+                        continue;
+                    }
+                    while (limit > 0) {
+                        int origLimit = limit;
+                        //old stack pass
+                        for (int push = pushStart; push <= pushEnd; push++) {
+                            if (pushInv.get(push) == null) continue;
+                            int delta = pullInv.transfer(i, pushInv, push, limit);
+                            limit -= delta;
+                            if (limit <= 0) break out;
+                        }
+                        if (limit <= 0) break out;
+                        //new stack pass
+                        for (int push = pushStart; push <= pushEnd; push++) {
+                            if (pushInv.get(push) != null) continue;
+                            int delta = pullInv.transfer(i, pushInv, push, limit);
+                            limit -= delta;
+                            if (limit <= 0) break out;
+                        }
+                        if (limit == origLimit) break;
                     }
                 }
-                break; //Shouldn't actually get here.
+                break out;
             }
         }
-        
+        if (had_change) {
+            pullInv.setCallOnInventoryChanged(true);
+            pushInv.setCallOnInventoryChanged(true);
+            pullInv.onInvChanged();
+            pushInv.onInvChanged();
+        }
         cooldown = (byte) (mode == ShifterMode.MODE_STREAM ? 8 : 1);
     }
     

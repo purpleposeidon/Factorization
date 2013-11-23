@@ -323,6 +323,7 @@ public class FactorizationUtil {
         abstract int slotIndex(int i);
         
         boolean forceInsert = false;
+        boolean callInvChanged = true;
         
         final IInventory under;
         
@@ -332,6 +333,16 @@ public class FactorizationUtil {
         
         public void setInsertForce(boolean b) {
             forceInsert = b;
+        }
+        
+        public void setCallOnInventoryChanged(boolean b) {
+            callInvChanged = b;
+        }
+        
+        public void onInvChanged() {
+            if (callInvChanged) {
+                under.onInventoryChanged();
+            }
         }
         
         public ItemStack get(int i) {
@@ -399,7 +410,7 @@ public class FactorizationUtil {
                     is = null;
                 }
                 under.setInventorySlotContents(slotIndex, toPut);
-                under.onInventoryChanged();
+                onInvChanged();
                 return is;
             }
             if (!FactorizationUtil.couldMerge(dest, is)) {
@@ -414,7 +425,7 @@ public class FactorizationUtil {
             dest.stackSize += delta;
             is.stackSize -= delta;
             under.setInventorySlotContents(slotIndex, dest);
-            under.onInventoryChanged();
+            onInvChanged();
             return normalize(is);
         }
         
@@ -452,7 +463,7 @@ public class FactorizationUtil {
                     is = dest_inv.push(is);
                     if (orig_size != getStackSize(is)) {
                         set(i, is);
-                        onInventoryChanged();
+                        onInvChanged();
                         return true;
                     }
                 } else {
@@ -465,7 +476,7 @@ public class FactorizationUtil {
                         is.stackSize -= taken;
                         is = normalize(is);
                         set(i, is);
-                        onInventoryChanged();
+                        onInvChanged();
                         return true;
                     }
                 }
@@ -502,8 +513,10 @@ public class FactorizationUtil {
             src = normalize(src);
             dest_inv.set(dest_i, dest);
             set(i, src);
-            dest_inv.under.onInventoryChanged();
-            under.onInventoryChanged();
+            if (callInvChanged) {
+                dest_inv.under.onInventoryChanged();
+                under.onInventoryChanged();
+            }
             return delta;
         }
         
@@ -628,10 +641,6 @@ public class FactorizationUtil {
                 start = end;
             }
             return new SubsetInv(this, start, end);
-        }
-        
-        public void onInventoryChanged() {
-            under.onInventoryChanged();
         }
     }
     

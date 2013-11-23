@@ -45,6 +45,7 @@ import cpw.mods.fml.common.registry.VillagerRegistry.IVillageTradeHandler;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
 import factorization.common.Core.TabType;
+import factorization.common.ItemOreProcessing.OreType;
 import factorization.common.TileEntityGreenware.ClayState;
 import factorization.common.servo.ItemServoMotor;
 import factorization.common.servo.ItemServoRailWidget;
@@ -1230,7 +1231,6 @@ public class Registry implements ICraftingHandler, ITickHandler {
     }
 
     void sendIMC() {
-        
         //Registers our recipe handlers to a list in NEIPlugins.
         //Format: "Factorization@<Recipe Name>@<outputId that used to view all recipes>"
         for (String msg : new String[] {
@@ -1240,6 +1240,13 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "factorization slag furnace recipes@fz.slagging"
         }) {
             FMLInterModComms.sendRuntimeMessage(Core.instance, "NEIPlugins", "register-crafting-handler", Core.name + "@" + msg);
+        }
+        //Disables the Thaumcraft infernal furnace nugget bonus for crystalline metal
+        for (OreType ot : ItemOreProcessing.OreType.values()) {
+            if (!ot.enabled) {
+                continue;
+            }
+            FMLInterModComms.sendMessage("Thaumcraft", "smeltBonusExclude", new ItemStack(ore_crystal, 1, ot.ID));
         }
     }
     
