@@ -1,7 +1,38 @@
+0.8.17
+  Improved a couple recipes
+  Servo instructions mention if powered
+  Rewrote servo packet code
+
+0.8.16
+  Squashed more bugs; the chitinous chrunching melody bewitches.
+  Servo doesn't drop an empty socket
+  Servo has slightly less horrible bounding box probably
+  Caliometric burner:
+    better quality food lasts longer
+    all food gives same amount of heat
+    redstone signal stops eating, but not digestion
+  Heater:
+    A single heater no longer gives the speed bonus
+    Will consume more power
+  Fixed lacerator not breaking certain blocks with metadata properly
+
+0.8.15
+  Item shifter uses smarter insertion than lame hoppers
+  Sockets accept weak redstone signal
+
+0.8.14
+  A single furnace heater will no longer give a speed boost; you'll have to use two or more. Also made them use more power.
+  Thaumcraft: Crystalline metals won't give the nugget bonus. Because >3x'd be just silly ;) Other stages however remain uneffected.
+  Even more bug fixes!
+
+0.8.13
+  Bug fixes
+
 0.8.12
   Pocket crafting table:
     Rewrote the container; hopefully it'll stop being laggy & buggy. 
     Rewrote the action of the 'c' key; it is now "swirls".
+  Other bug fixes.
 
 0.8.11
   Miscellaneous Nonsense:

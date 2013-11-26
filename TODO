@@ -10,6 +10,7 @@ HAMMER
 ✓     -    send chunks to players
       -    Actually update the terrain when it changes
       -    Actually consistently render the terrain when spawned
+      -    Actually releasing the display list when leaving the dimension
 ✓ Step 4 is to make the DSE interact with the real world
 ✓     -    DSE persistence
 ✓     -    external entity collisions, using custom AABBs
@@ -111,15 +112,18 @@ IMMEDIATE (for next public release)
 ---------
 servos:
   review servo motor packets; send servo stack update packets only when holding an LMP
-
-
+pocket crafting table isn't quite syncing properly on servers, eg. 8 wood in a corner, swirl, get a button instead of a chest...
+  Maybe that Container transaction stuff?
+  [We've made the commands not execute client-side; we'll see if that fixes it in a not-terrible way...]
+  the server isn't updating the crafting slot after commands are executed? This is probably the issue...
+  [Alright, probably good now. Test?]
+let compression crafters look harder for adjacent inventories?
+compression crafter notification showing a bunch of ==='s? o_O
 
 SOON
 ----
 start a dev blog
-pocket crafting table isn't quite syncing properly on servers, eg. 8 wood in a corner, swirl, get a button instead of a chest...
-  Maybe that Container transaction stuff?
-  [We've made the commands not execute client-side; we'll see if that fixes it in a not-terrible way...]
+document servos
 forge public/AT bullshit
 do maths on energy conversion:
   food to steam; we might even be able to do the heater thing? I suppose we COULD just blacklist boilers for furnace heaters...
@@ -129,7 +133,6 @@ do maths on energy conversion:
 LMP store instructions... Like a bag or a backpack
   - maybe let you merge instructions together? But then middle clicking.
 tool for renaming commands
-let compression crafters look harder for adjacent inventories?
 Test BoH key with NEI installed & with sneak key set to a mouse button.
 Church Organ
 
@@ -412,7 +415,7 @@ When we get to doing sound:
   Blocks of metal.
   silver, stakced up:
     1 block gives a bell
-    2 gives a weaker organ
+    2 gives a weaker organ (or maybe a flute noise?)
     3 gives a stronger organ
     4 gives an awesome organ
     5 gives an epic organ
@@ -421,5 +424,13 @@ When we get to doing sound:
   water: sine wave
   lava: square wave
   iron: saw wave (cactus'd make sense, but isn't actually possible :p)
+  lapis block: ocarina
   another note block (maybe? the actual noteblock might interfere): something synthesizy
   obsidian: something brittle?
+
+
+Chaos orbs:
+  toss one. They cause some sort of crazy semi-scripted event. The endermen sell them. "1 cup of Chaos, scooped from beyond the edge of all Shadow"
+    array of Object[], +Integer = noteblock, -Integer = timed delay; spawn vexian mob stacks
+
+https://en.wikipedia.org/wiki/Astra_(weapon)
