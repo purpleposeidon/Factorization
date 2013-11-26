@@ -107,13 +107,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         if (ID == FactoryType.PARASIEVE.gui) {
             gui = new GuiParasieve(cont);
         }
-        if (ID == FactoryType.SOCKET_SHIFTER.gui) {
-            IDataSerializable ids = new Coord(world, x, y, z).getTE(IDataSerializable.class);
-            if (ids == null) {
-                return null;
-            }
-            gui = new GuiDataConfig(ids);
-        }
         cont.addSlotsForGui(fac, player.inventory);
         return gui;
     }
