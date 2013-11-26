@@ -60,6 +60,7 @@ import factorization.common.TileEntityDayBarrel;
 import factorization.common.TileEntityGrinder;
 import factorization.common.TileEntityGrinder.GrinderRecipe;
 import factorization.common.TileEntitySocketBase;
+import factorization.common.servo.ServoMotor;
 import factorization.notify.Notify;
 
 public class SocketLacerator extends TileEntitySocketBase implements IChargeConductor, ISidedInventory {
@@ -529,13 +530,14 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     //Render code
     @Override
     @SideOnly(Side.CLIENT)
-    public void renderTesr(float partial) {
+    public void renderTesr(ServoMotor motor, float partial) {
         float d = 0.5F;
         GL11.glTranslatef(d, d, d);
         Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())).glRotate();
         float turn = FactorizationUtil.interp(prev_rotation, rotation, partial) / 5.0F;
         GL11.glRotatef(turn, 0, 1, 0);
-        GL11.glTranslatef(0, -4F/16F + (float) Math.abs(Math.sin(turn/800))/32F, 0);
+        float sd = motor == null ? 0 : 3F/16F;
+        GL11.glTranslatef(0, -4F/16F + sd + (float) Math.abs(Math.sin(turn/800))/32F, 0);
         TileEntityGrinderRender.renderGrindHead();
         if (ticked) {
             ticked = false;
@@ -547,7 +549,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void renderStatic(Tessellator tess) {
+    public void renderStatic(ServoMotor motor, Tessellator tess) {
         Icon metal = BlockIcons.motor_texture;
         float d = 4.0F / 16.0F;
         float yd = -d + 0.003F;
@@ -555,8 +557,9 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         block.useTextures(null, null,
                 metal, metal,
                 metal, metal);
-        float yoffset = 4F/16F;
-        block.setBlockBounds(d, d + yd + yoffset + 2F/16F, d, 1 - d, 1 - (d + 0F/16F) + yd + yoffset, 1 - d);
+        float yoffset = 5F/16F;
+        float sd = motor == null ? 0 : 2F/16F;
+        block.setBlockBounds(d, d + yd + yoffset + 2F/16F + sd, d, 1 - d, 1 - (d + 0F/16F) + yd + yoffset, 1 - d);
         block.begin();
         block.rotateCenter(Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())));
         block.renderRotated(tess, xCoord, yCoord, zCoord);

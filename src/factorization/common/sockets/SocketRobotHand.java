@@ -27,6 +27,7 @@ import factorization.common.FactorizationUtil.FzInv;
 import factorization.common.FactoryType;
 import factorization.common.ISocketHolder;
 import factorization.common.TileEntitySocketBase;
+import factorization.common.servo.ServoMotor;
 import factorization.notify.Notify;
 
 public class SocketRobotHand extends TileEntitySocketBase {
@@ -143,7 +144,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void renderStatic(Tessellator tess) {
+    public void renderStatic(ServoMotor motor, Tessellator tess) {
         BlockRenderHelper block = BlockRenderHelper.instance;
         float w = 6F/16F;
         block.setBlockBoundsOffset(w, 0, w);
@@ -152,6 +153,9 @@ public class SocketRobotHand extends TileEntitySocketBase {
                 BlockIcons.socket$arm2, BlockIcons.socket$arm3);
         block.begin();
         block.rotateCenter(Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())));
+        if (motor != null) {
+            block.translate(0, -2F/16F, 0);
+        }
         block.renderRotated(tess, xCoord, yCoord, zCoord);
     }
     

@@ -149,7 +149,7 @@ public class RenderServoMotor extends RenderEntity {
         orientMotor(motor, partial, reorientInterpolation);
 
         renderMainModel(motor, partial, reorientInterpolation, false);
-        renderSocketAttachment(motor.socket, partial);
+        renderSocketAttachment(motor, motor.socket, partial);
         
         boolean render_details = false;
         if (highlighted) {
@@ -250,26 +250,10 @@ public class RenderServoMotor extends RenderEntity {
         }
     }
     
-    void renderSocketAttachment(TileEntitySocketBase socket, float partial) {
-        float s = 12F/16F;
-        GL11.glScalef(s, s, s);
-        float d = -0.5F;
-        float y = -2F/16F;
-        GL11.glTranslatef(d, y, d);
+    void renderSocketAttachment(ServoMotor motor, TileEntitySocketBase socket, float partial) {
         socket.xCoord = socket.yCoord = socket.zCoord = 0;
         socket.facing = ForgeDirection.UP;
-        
-        GL11.glDisable(GL_LIGHTING);
-        GL11.glPushMatrix();
-        socket.renderTesr(partial);
-        GL11.glPopMatrix();
-        
-        Tessellator tess = Tessellator.instance;
-        tess.startDrawingQuads();
-        socket.renderStatic(tess);
-        tess.draw();
-        GL11.glTranslatef(-d, -y, -d);
-        GL11.glEnable(GL_LIGHTING);
+        socket.renderInServo(motor, partial);
     }
 
     RenderItem renderItem = new RenderItem();

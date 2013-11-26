@@ -22,6 +22,7 @@ import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
 import factorization.common.FactorizationUtil;
 import factorization.common.FactorizationUtil.FzInv;
+import factorization.common.servo.ServoMotor;
 import factorization.common.FactoryType;
 import factorization.common.ISocketHolder;
 import factorization.common.TileEntitySocketBase;
@@ -272,7 +273,7 @@ public class SocketShifter extends TileEntitySocketBase {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void renderStatic(Tessellator tess) {
+    public void renderStatic(ServoMotor motor, Tessellator tess) {
         BlockRenderHelper block = BlockRenderHelper.instance;
         block.useTextures(BlockIcons.socket$shifter_front, null,
                 BlockIcons.socket$shifter_side, BlockIcons.socket$shifter_side,
@@ -280,7 +281,9 @@ public class SocketShifter extends TileEntitySocketBase {
                 BlockIcons.socket$shifter_side, BlockIcons.socket$shifter_side);
         final float minYs[] = new float[] { 8F/16F, 3F/16F, -2F/16F };
         final float ds[] = new float[] { 4F/16F, 5F/16F, 6F/16F };
-        for (int i = 0; i < ds.length; i++) {
+        int end = ds.length;
+        if (motor != null) end--;
+        for (int i = 0; i < end; i++) {
             float d = ds[i];
             float minY = minYs[i];
             block.setBlockBounds(d, minY, d, 1-d, 12F/16F, 1-d);
@@ -289,5 +292,4 @@ public class SocketShifter extends TileEntitySocketBase {
             block.renderRotated(tess, xCoord, yCoord, zCoord);
         }
     }
-
 }

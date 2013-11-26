@@ -39,7 +39,7 @@ public class BlockRenderSocketBase extends FactorizationBlockRender {
             block.begin();
             block.rotateCenter(Quaternion.fromOrientation(FzOrientation.fromDirection(dir.getOpposite())));
             block.renderRotated(Tessellator.instance, x, y, z);
-            socket.renderStatic(Tessellator.instance);
+            socket.renderStatic(null, Tessellator.instance);
         } else {
             GL11.glPushMatrix();
             GL11.glRotatef(90, 1, 0, 0);

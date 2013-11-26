@@ -14,7 +14,7 @@ public class TileEntitySocketRenderer extends TileEntitySpecialRenderer {
             TileEntitySocketBase tes = (TileEntitySocketBase) tileentity;
             GL11.glPushMatrix();
             GL11.glTranslated(dx, dy, dz);
-            tes.renderTesr(partial);
+            tes.renderTesr(null, partial);
             GL11.glPopMatrix();
         }
     }

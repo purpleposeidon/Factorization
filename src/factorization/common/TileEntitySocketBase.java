@@ -1,11 +1,15 @@
 package factorization.common;
 
+import static org.lwjgl.opengl.GL11.GL_LIGHTING;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
+
+import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
@@ -415,11 +419,29 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
     
     @SideOnly(Side.CLIENT)
-    public void renderTesr(float partial) {}
+    public void renderTesr(ServoMotor motor, float partial) {}
     
     @SideOnly(Side.CLIENT)
-    public void renderStatic(Tessellator tess) {}
+    public void renderStatic(ServoMotor motor, Tessellator tess) {}
     
     @SideOnly(Side.CLIENT)
-    public void renderInServo(float partial) {}
+    public void renderInServo(ServoMotor motor, float partial) {
+        float s = 12F/16F;
+        GL11.glScalef(s, s, s);
+        float d = -0.5F;
+        float y = -2F/16F;
+        GL11.glTranslatef(d, y, d);
+        
+        GL11.glDisable(GL_LIGHTING);
+        GL11.glPushMatrix();
+        renderTesr(motor, partial);
+        GL11.glPopMatrix();
+        
+        Tessellator tess = Tessellator.instance;
+        tess.startDrawingQuads();
+        renderStatic(motor, tess);
+        tess.draw();
+        GL11.glTranslatef(-d, -y, -d);
+        GL11.glEnable(GL_LIGHTING);
+    }
 }
