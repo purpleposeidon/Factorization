@@ -25,6 +25,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Charge;
+import factorization.api.Coord;
 import factorization.api.IChargeConductor;
 import factorization.common.BlockClass;
 import factorization.common.BlockIcons;
@@ -235,7 +236,8 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         if (decoration == null) {
             return false;
         }
-        boolean ret = decoration.onClick(entityplayer, getCoord(), side);
+        final Coord here = getCoord();
+        boolean ret = decoration.onClick(entityplayer, here, side);
         if (!worldObj.isRemote) {
             WorldServer world = (WorldServer) worldObj;
             PlayerInstance playerInstance = world.getPlayerManager().getOrCreateChunkWatcher(xCoord >> 4, zCoord >> 4, false);
@@ -243,12 +245,14 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
                 playerInstance.sendToAllPlayersWatchingChunk(_getDescriptionPacket(true));
             }
             String info = decoration.getInfo();
+            if (here.isWeaklyPowered()) {
+                info = (info == null ? "" : info + "\n") + "(disabled by redstone)";
+            }
             if (info != null) {
-                Notify.send(entityplayer, getCoord(), info);
+                Notify.send(entityplayer, here, info);
             }
         }
         return ret;
-        //return super.activate(entityplayer);
     }
     
     @Override
