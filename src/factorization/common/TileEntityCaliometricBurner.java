@@ -113,11 +113,8 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
     @Override
     void doLogic() {
         needLogic();
+        Coord here = getCoord();
         if (ticksUntilNextDigestion > 0 && foodQuality > 0) {
-            Coord here = getCoord();
-            if (here.isPowered()) {
-                return;
-            }
             for (Coord c : here.getRandomNeighborsAdjacent()) {
                 TileEntitySolarBoiler boiler = c.getTE(TileEntitySolarBoiler.class);
                 if (boiler == null) {
@@ -128,7 +125,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
             }
         }
         ticksUntilNextDigestion--;
-        if (ticksUntilNextDigestion <= 0) {
+        if (ticksUntilNextDigestion <= 0 && !here.isPowered()) {
             foodQuality = consumeFood();
         }
     }
@@ -143,12 +140,12 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
         if (stomache == null) {
             return 0;
         }
-        ticksUntilNextDigestion = 20*60;
-        int ret = getFoodValue(stomache);
+        int noms = getFoodValue(stomache);
         stomache = FactorizationUtil.normalDecr(stomache);
         onInventoryChanged();
         Sound.caliometricDigest.playAt(this);
-        return ret;
+        ticksUntilNextDigestion = 20*10*noms;
+        return 8;
     }
     
     int getFoodValue(ItemStack is) {

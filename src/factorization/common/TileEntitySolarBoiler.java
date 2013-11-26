@@ -156,19 +156,19 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
         FluidStack steam = steamTank.getFluid();
         Coord here = getCoord();
         long seed = here.seed() + worldObj.getTotalWorldTime();
-        if (steam.amount > 0) {
+        if (steam.amount*2 > steamTank.getCapacity()) {
             //Send steam upwards
             Coord above = here.add(0, 1, 0);
             IFluidHandler tc = above.getTE(IFluidHandler.class);
             if (tc != null) {
                 FluidStack sending_steam = steam.copy();
-                sending_steam.amount = Math.min(sending_steam.amount, Math.max(1, getHeat()/10));
+                sending_steam.amount = Math.min(sending_steam.amount, 1000);
                 steam.amount -= tc.fill(ForgeDirection.DOWN, steam.copy(), true);
                 steam.amount = Math.max(0, steam.amount);
             }
         }
         boolean random = seed % 40 == 0;
-        if (water.amount <= 0 || (random && water.amount < waterTank.getCapacity() - 1000)) {
+        if (water.amount <= 1000 || (random && water.amount < waterTank.getCapacity() - 1000)) {
             //pull water from below
             Coord below = here.add(0, -1, 0);
             IFluidHandler tc = below.getTE(IFluidHandler.class);
