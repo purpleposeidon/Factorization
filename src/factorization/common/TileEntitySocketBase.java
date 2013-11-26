@@ -362,6 +362,9 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     @Override
     public boolean activate(EntityPlayer player, ForgeDirection side) {
+        if (worldObj.isRemote) {
+            return false;
+        }
         ItemStack held = player.getHeldItem();
         if (held == null) {
             return false;
@@ -369,26 +372,32 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         if (held.getItem() != Core.registry.logicMatrixProgrammer) {
             return false;
         }
-        if (worldObj.isRemote) {
-            return false;
-        } else {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            DataOutputStream dos = new DataOutputStream(baos);
-            DataOutPacket dop = new DataOutPacket(dos, Side.SERVER);
-            try {
-                Coord coord = getCoord();
-                Core.network.prefixTePacket(dos, coord, MessageType.OpenDataHelperGui);
-                serialize("", dop);
-                Core.network.broadcastPacket(player, coord, Core.network.TEmessagePacket(baos));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return false;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(baos);
+        DataOutPacket dop = new DataOutPacket(dos, Side.SERVER);
+        try {
+            Coord coord = getCoord();
+            Core.network.prefixTePacket(dos, coord, MessageType.OpenDataHelperGui);
+            serialize("", dop);
+            Core.network.broadcastPacket(player, coord, Core.network.TEmessagePacket(baos));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return false;
     }
     
     public boolean activateOnServo(EntityPlayer player, ServoMotor motor) {
         if (worldObj.isRemote) {
+            return false;
+        }
+        ItemStack held = player.getHeldItem();
+        if (held == null) {
+            return false;
+        }
+        if (held.getItem() != Core.registry.logicMatrixProgrammer) {
+            return false;
+        }
+        if (!getFactoryType().hasGui) {
             return false;
         }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
