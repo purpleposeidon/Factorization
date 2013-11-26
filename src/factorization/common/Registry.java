@@ -377,10 +377,11 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "#",
                 '#', new ItemStack(Block.sandStone, 1, 2));
         
-        shapelessRecipe(new ItemStack(dark_iron, 4), dark_iron_block_item);
+        shapelessRecipe(new ItemStack(dark_iron, 9), dark_iron_block_item);
         recipe(dark_iron_block_item,
-                "II",
-                "II",
+                "III",
+                "III",
+                "III",
                 'I', dark_iron);
 
         // Bag of holding
@@ -1002,10 +1003,9 @@ public class Registry implements ICraftingHandler, ITickHandler {
         
         oreRecipe(mixer_item,
                 " X ",
-                "WMW",
+                " M ",
                 "LUL",
                 'X', fan,
-                'W', Item.bucketWater,
                 'M', motor,
                 'L', "ingotLead",
                 'U', Item.cauldron);
