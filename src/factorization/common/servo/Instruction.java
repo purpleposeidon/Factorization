@@ -10,15 +10,6 @@ import factorization.common.Core;
 public abstract class Instruction extends Decorator {
     @Override
     public boolean onClick(EntityPlayer player, Coord block, ForgeDirection side) {
-        /*TileEntityServoRail rail = block.getTE(TileEntityServoRail.class);
-        if (rail == null) {
-            return false;
-        }
-        if (rail.decoration != null) {
-            FactorizationUtil.spawnItemStack(player, rail.decoration.toItem());
-        }
-        rail.setDecoration(this);
-        return true;*/
         return false;
     }
     
@@ -36,9 +27,13 @@ public abstract class Instruction extends Decorator {
     protected void addRecipes() {
         Core.registry.recipe(toItem(),
                 "I<#",
-                'I', Core.registry.instruction_plate,
+                'I', getInstructionPlate(),
                 '<', getRecipeItem(),
                 '#', Core.registry.logicMatrixProgrammer);
+    }
+    
+    protected ItemStack getInstructionPlate() {
+        return new ItemStack(Core.registry.instruction_plate);
     }
     
     protected abstract ItemStack getRecipeItem();
