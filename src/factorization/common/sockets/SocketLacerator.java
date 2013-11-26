@@ -84,6 +84,9 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     ArrayList<ItemStack> buffer = new ArrayList();
     
     private float rotation = 0, prev_rotation = 0;
+    int lastX, lastY = -10, lastZ;
+    int currentX, currentY = -1, currentZ;
+    boolean needsReset = false;
     
     @Override
     public FactoryType getFactoryType() {
@@ -131,15 +134,23 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             return;
         }
         isPowered = powered;
+        needsReset = true;
+        currentY = -1;
         genericUpdate_implementation(socket, coord, powered);
         if (FactorizationUtil.significantChange(last_shared_speed, speed)) {
             socket.sendMessage(MessageType.LaceratorSpeed, speed);
             last_shared_speed = speed;
         }
+        if (needsReset && lastY >= 0) {
+            int id = worldObj.getBlockId(lastX, lastY, lastZ);
+            worldObj.destroyBlockInWorldPartially(id, lastX, lastY, lastZ, 99);
+        }
+        lastX = currentX;
+        lastY = currentY;
+        lastZ = currentZ;
     }
     
     private void genericUpdate_implementation(ISocketHolder socket, Coord coord, boolean powered) {
-        //TODO: Decide if we should slow/stop the servo if we're grinding something.
         if (getBackingInventory(socket) == null) {
             slowDown();
             return;
@@ -368,14 +379,41 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             } else {
                 progress++;
             }
+            if (barrel == null) {
+                float perc = progress/((float)grind_time*hardness);
+                int breakage = (int) (perc*10);
+                worldObj.destroyBlockInWorldPartially(id, mop.blockX, mop.blockY, mop.blockZ, breakage);
+                needsReset = false;
+                currentX = mop.blockX;
+                currentY = mop.blockY;
+                currentZ = mop.blockZ;
+            }
             if (progress >= grind_time*hardness || Core.cheat) {
                 grab_items = true;
                 grind_items = true;
                 if (barrel == null) {
+                    
+                    int l = id;
+                    int i1 = md;
+                    worldObj.playAuxSFX(2001, mop.blockX, mop.blockY, mop.blockZ, id + (md << 12));
+                    
                     EntityPlayer player = getFakePlayer();
                     ItemStack pick = new ItemStack(Item.pickaxeDiamond);
                     pick.addEnchantment(Enchantment.silkTouch, 1);
                     player.inventory.mainInventory[0] = pick;
+                    {
+                        ItemStack itemstack = pick;
+                        boolean canHarvest = false;
+                        if (block != null)
+                        {
+                            canHarvest = block.canHarvestBlock(player, md);
+                        }
+
+                        boolean didRemove = removeBlock(player, block, md, mop.blockX, mop.blockY, mop.blockZ);
+                        if (didRemove && canHarvest) {
+                            Block.blocksList[id].harvestBlock(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, md);
+                        }
+                    }
                     block.onBlockHarvested(worldObj, mop.blockX, mop.blockY, mop.blockZ, md, player);
                     if (block.removeBlockByPlayer(worldObj, player, mop.blockX, mop.blockY, mop.blockZ)) {
                         block.onBlockDestroyedByPlayer(worldObj, mop.blockX, mop.blockY, mop.blockZ, md);
@@ -394,6 +432,16 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         } else {
             return false;
         }
+    }
+    
+    private boolean removeBlock(EntityPlayer thisPlayerMP, Block block, int md, int x, int y, int z) {
+        if (block == null) return false;
+        block.onBlockHarvested(worldObj, x, y, z, md, thisPlayerMP);
+        if (block.removeBlockByPlayer(worldObj, thisPlayerMP, x, y, z)) {
+            block.onBlockDestroyedByPlayer(worldObj, x, y, z, md);
+            return true;
+        }
+        return false;
     }
     
     @Override
