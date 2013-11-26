@@ -627,7 +627,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         for (ItemStack is : inv) {
             toDrop.add(is);
         }
-        if (socket != null) {
+        if (socket != null && !(socket instanceof SocketEmpty)) {
             socket.uninstall();
             toDrop.add(new ItemStack(Core.registry.socket_part, 1, socket.getFactoryType().md));
         }
@@ -656,9 +656,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         this.posX = x;
         this.posY = y;
         this.posZ = z;
-        double neg_size = 0;
-        double pos_size = 1;
-        double height = 8F/16F;
+        double neg_size = -0.25;
+        double pos_size = 0.75;
+        double height = 2F/16F;
         double dy = 0.5;
         this.boundingBox.setBounds(x - neg_size, dy + y - height, z - neg_size, x + pos_size, dy + y + height, z + pos_size);
     }
