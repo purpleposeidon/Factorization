@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.Callable;
 
 import net.minecraft.block.Block;
 import net.minecraft.command.CommandBase;
@@ -87,6 +88,7 @@ public class FZDSCommand extends CommandBase {
         boolean creative;
         IDeltaChunk selected;
         
+        /** args: the arguments, not including the name */
         abstract void call(String[] args);
         
         private void reset() {
@@ -522,7 +524,7 @@ public class FZDSCommand extends CommandBase {
                 dse.worldObj.spawnEntityInWorld(dse);
                 setSelection(dse);
             }}, Requires.COORD);
-        add(new SubCommand("include") { //TODO
+        add(new SubCommand("include") { //TODO: would pull blocks into the slice
             @Override
             void call(String[] args) {
                 //selected.get
@@ -598,7 +600,7 @@ public class FZDSCommand extends CommandBase {
             }}, Requires.SLICE_SELECTED);
         add(new SubCommand("rot?") {
             @Override
-            String details() { return "Gives the rotation & angular velocity of the selection"; }
+            String details() { return "Shows the rotation & angular velocity of the selection"; }
             @Override
             void call(String[] args) {
                 sendChat("r = " + selected.getRotation());
@@ -897,5 +899,22 @@ public class FZDSCommand extends CommandBase {
                     }
                 }
             }}, Requires.COORD, Requires.PLAYER);
+        add(new SubCommand("construct", "x,y,z", "x,y,z") {
+            @Override
+            String details() {
+                return "Create a DSE from Hammerspace coordinates";
+            }
+
+            @Override
+            void call(String[] args) {
+                Coord origin = new Coord(DeltaChunk.getServerShadowWorld(), 0, 0, 0);
+                Coord low = origin.add(DeltaCoord.parse(args[0]));
+                Coord upr = origin.add(DeltaCoord.parse(args[1]));
+                Coord.sort(low, upr);
+                IDeltaChunk ent = DeltaChunk.construct(low, upr);
+                user.setAsEntityLocation(ent);
+                user.w.spawnEntityInWorld(ent);
+            }
+        }, Requires.COORD);
     }
 }

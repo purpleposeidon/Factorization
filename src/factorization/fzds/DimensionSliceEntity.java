@@ -92,7 +92,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     @Override
     public String toString() {
-        return super.toString() + " - " + hammerCell + "  to  " + farCorner;
+        return super.toString() + " - from " + hammerCell + "  to  " + farCorner + "   center at " + centerOffset;
     }
     
     @Override

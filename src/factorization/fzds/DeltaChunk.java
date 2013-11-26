@@ -124,6 +124,10 @@ public class DeltaChunk {
         return dse;
     }
     
+    public static IDeltaChunk construct(final Coord min, final Coord max) {
+        return new DimensionSliceEntity(getServerShadowWorld(), min, max);
+    }
+    
     public static void paste(IDeltaChunk selected, boolean overwriteDestination) {
         Coord a = new Coord(DeltaChunk.getServerShadowWorld(), 0, 0, 0);
         Coord b = a.copy();
