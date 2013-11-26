@@ -215,6 +215,7 @@ public class ContainerPocket extends Container {
             craftSwirl();
             break;
         }
+        updateCraft();
     }
 
     @Override
