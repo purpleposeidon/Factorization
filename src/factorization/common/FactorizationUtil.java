@@ -80,7 +80,7 @@ public class FactorizationUtil {
         } else if (a == null || b == null) {
             return false;
         }
-        return couldMerge(a, b) && a.stackSize == b.stackSize;
+        return couldMerge(a, b);
     }
     
     /**

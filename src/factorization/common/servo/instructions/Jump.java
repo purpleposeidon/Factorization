@@ -27,13 +27,13 @@ public class Jump extends Instruction {
     @Override
     public void motorHit(ServoMotor motor) {
         Boolean b = motor.getServoStack(ServoMotor.STACK_ARGUMENT).popType(Boolean.class);
+        motor.stacks_changed = true;
         if (b == null) {
             motor.putError("Jump: Stack Underflow of Boolean");
             return;
         }
         motor.skipNextInstruction = b;
         motor.penalizeSpeed();
-        motor.desync(true);
     }
 
     @Override

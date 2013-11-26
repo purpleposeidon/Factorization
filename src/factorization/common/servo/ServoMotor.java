@@ -1,6 +1,8 @@
 package factorization.common.servo;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +28,10 @@ import net.minecraftforge.common.ForgeDirection;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 
-import cpw.mods.fml.common.network.FMLNetworkHandler;
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
-import factorization.api.DeltaCoord;
 import factorization.api.FzOrientation;
 import factorization.api.IChargeConductor;
 import factorization.api.IEntityMessage;
@@ -61,9 +61,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     private ServoStack[] stacks = new ServoStack[STACKS];
     {
         for (int i = 0; i < stacks.length; i++) {
-            stacks[i] = new ServoStack();
+            stacks[i] = new ServoStack(this);
         }
     }
+    public boolean stacks_changed = false;
     private ItemStack[] inv = new ItemStack[4], inv_last_sent = new ItemStack[inv.length];
     public boolean skipNextInstruction = false;
 
@@ -79,9 +80,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     public byte target_speed = 2;
     private static final double max_speed_b = 127;
     double accumulated_motion;
-    public boolean stopped = false, prevStopped = false;
-    
-    boolean new_motor = true;
+    public boolean stopped = false;
     
     //For client-side rendering
     double sprocket_rotation = 0, prev_sprocket_rotation = 0;
@@ -90,8 +89,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     private static final double normal_speed = 0.0875;
     private static final double[] targetSpeeds = {normal_speed / 3, normal_speed / 2, normal_speed, normal_speed*2, normal_speed*4};
     private static final double speed_limit = targetSpeeds[targetSpeeds.length - 1];
-    
-    short actions_since_last_sync = 0;
 
     public ServoMotor(World world) {
         super(world);
@@ -111,6 +108,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         pickNextOrientation();
         pickNextOrientation();
         interpolatePosition(0);
+        prevOrientation = orientation;
         worldObj.spawnEntityInWorld(this);
     }
 
@@ -165,12 +163,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         lastDirection = data.as(Share.VISIBLE, "lastDir").putEnum(lastDirection);
         speed_b = data.as(Share.VISIBLE, "speedb").putByte(speed_b);
         target_speed = data.as(Share.VISIBLE, "speedt").putByte(target_speed);
-        accumulated_motion = data.as(Share.PRIVATE, "accumulated_motion").putDouble(accumulated_motion);
+        accumulated_motion = data.as(Share.VISIBLE, "accumulated_motion").putDouble(accumulated_motion);
         pos_next = data.as(Share.VISIBLE, "pos_next").put(pos_next);
         pos_prev = data.as(Share.VISIBLE, "pos_prev").put(pos_prev);
         pos_progress = data.as(Share.VISIBLE, "pos_progress").putFloat(pos_progress);
         skipNextInstruction = data.as(Share.VISIBLE, "skip").putBoolean(skipNextInstruction);
-        new_motor = data.as(Share.PRIVATE, "new").putBoolean(new_motor); //NORELEASE: This isn't used?
         for (int i = 0; i < STACKS; i++) {
             String name = "stack" + i;
             stacks[i] = data.as(Share.VISIBLE, name).put(stacks[i]);
@@ -224,15 +221,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         return validPosition(getCurrentPos().add(dir), desperate);
     }
 
-    private boolean need_description_packet = false;
     private static Quaternion target_orientation = new Quaternion();
+    
     @Override
     public void onEntityUpdate() {
-        if (new_motor) {
-            if (prevOrientation == FzOrientation.UNKNOWN ) {
-                prevOrientation = orientation;
-            }
-        }
         super.onEntityUpdate();
         if (worldObj.isRemote) {
             prev_sprocket_rotation = sprocket_rotation;
@@ -243,24 +235,39 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             }
         } else {
             byte orig_speed = speed_b;
+            FzOrientation orig_or = orientation;
             doLogic();
             if (stopped) {
                 speed_b = 0;
             }
-            need_description_packet |= orig_speed != speed_b;
+            if (orig_speed != speed_b || orig_or != orientation) {
+                Coord a = getCurrentPos();
+                Coord b = getNextPos();
+                broadcast(MessageType.servo_brief, (byte) orientation.ordinal(), speed_b,
+                        a.x, a.y, a.z,
+                        b.x, b.y, b.z,
+                        pos_progress);
+                //NOTE: Could be spammy. Speed might be too important to not send tho.
+            }
+            if (stacks_changed) {
+                try {
+                    stacks_changed = false;
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    DataOutputStream dos = new DataOutputStream(baos);
+                    Core.network.prefixEntityPacket(dos, this, MessageType.servo_complete);
+                    DataHelper data = new DataOutPacket(dos, Side.SERVER);
+                    putData(data);
+                    Packet toSend = Core.network.entityPacket(baos);
+                    Core.network.broadcastPacketToLMPers(this, toSend);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         interpolatePosition(pos_progress);
         if (stopped && getCurrentPos().isWeaklyPowered()) {
             stopped = false;
         }
-        if (stopped != prevStopped) {
-            desync(true);
-        }
-        if (need_description_packet) {
-            need_description_packet = false;
-            describe();
-        }
-        prevStopped = stopped;
     }
     
     public void interpolatePosition(float interp) {
@@ -322,14 +329,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
     }
     
-    public void desync(boolean totally) {
-        if (totally) {
-            actions_since_last_sync = Short.MAX_VALUE;
-        } else {
-            need_description_packet = true;
-        }
-    }
-    
     void doLogic() {
         if (isDead) {
             return;
@@ -342,11 +341,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             pickNextOrientation();
         }
         if (!worldObj.isRemote) {
-            if (actions_since_last_sync > 200) {
-                actions_since_last_sync = 0;
-                Packet toSend = FMLNetworkHandler.getEntitySpawningPacket(this);
-                Core.network.broadcastPacket(worldObj, (int) posX, (int) posY, (int) posZ, toSend);
-            }
             updateSpeed();
         }
         final double speed = getProperSpeed() ;
@@ -407,7 +401,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     
     boolean pickNextOrientation() {
-        actions_since_last_sync++;
         boolean ret = pickNextOrientation_impl();
         pos_next = pos_prev.add(orientation.facing);
         return ret;
@@ -456,7 +449,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             }
             if (sr.priority > 0) {
                 changeOrientation(fd);
-                need_description_packet = true; //NORELEASE: Check this out: Does the client simulate the same as the server? (Probably not.) Use a particle marker.
                 return true;
             }
             if (sr.priority == 0) {
@@ -504,7 +496,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             }
             if (validDirection(d, desperate)) {
                 changeOrientation(d);
-                need_description_packet = true; //NORELEASE: Check this out: Does the client simulate the same as the server? (Probably not.) Use a particle marker.
                 return true;
             }
         }
@@ -571,12 +562,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             return;
         }
         rail.decoration.motorHit(this);
-        actions_since_last_sync++;
     }
 
     @Override
     public boolean interactFirst(EntityPlayer player) {
-        desync(true);
+        stacks_changed = true;
         ItemStack is = FactorizationUtil.normalize(player.getHeldItem());
         if (is == null) {
             return false;
@@ -667,22 +657,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     public void setPositionAndRotation(double x, double y, double z, float yaw, float pitch) {
         super.setPositionAndRotation(x, y, z, yaw, pitch);
     }
-
-    void describe() {
-        broadcast(MessageType.motor_description,
-                speed_b,
-                pos_progress,
-                pos_prev.asDeltaCoord(),
-                pos_next.asDeltaCoord(),
-                (byte) orientation.ordinal(),
-                (byte) nextDirection.ordinal()
-                //, (boolean) stopped
-                );
-        for (int i = 0; i < inv_last_sent.length; i++) {
-            inv_last_sent[i] = EMPTY_ITEM; //makes sure everything gets updated properly.
-        }
-        onInventoryChanged();
-    }
     
     @Override
     public boolean handleMessageFromClient(short messageType, DataInputStream input) throws IOException {
@@ -697,8 +671,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(short messageType, DataInputStream input)
-            throws IOException {
+    public boolean handleMessageFromServer(short messageType, DataInputStream input) throws IOException {
         switch (messageType) {
         case MessageType.OpenDataHelperGui:
             if (!worldObj.isRemote) {
@@ -708,11 +681,8 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 socket.serialize("", dip);
                 Minecraft.getMinecraft().displayGuiScreen(new GuiDataConfig(socket, this));
             }
-            break;
-        case MessageType.motor_inventory:
-            for (int i = 0; i < inv.length; i++) {
-                inv[i] = null;
-            }
+            return true;
+        case MessageType.servo_item:
             while (true) {
                 byte index = input.readByte();
                 if (index < 0) {
@@ -721,16 +691,29 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 inv[index] = FactorizationUtil.readStack(input);
             }
             return true;
-        case MessageType.motor_description:
-            speed_b = input.readByte();
+        case MessageType.servo_brief:
+            Coord a = getCurrentPos();
+            Coord b = getNextPos();
+            
+            byte ord = input.readByte();
+            byte newspeed = input.readByte();
+            orientation = FzOrientation.getOrientation(ord);
+            speed_b = newspeed;
+            a.x = input.readInt();
+            a.y = input.readInt();
+            a.z = input.readInt();
+            b.x = input.readInt();
+            b.y = input.readInt();
+            b.z = input.readInt();
             pos_progress = input.readFloat();
-            pos_prev.set(DeltaCoord.read(input));
-            pos_next.set(DeltaCoord.read(input));
-            interpolatePosition(pos_progress);
-            //$FALL-THROUGH$~~~~~!
-        case MessageType.motor_direction:
-            orientation = FzOrientation.getOrientation(input.readByte());
-            nextDirection = ForgeDirection.getOrientation(input.readByte());
+            return true;
+        case MessageType.servo_complete:
+            try {
+                DataHelper data = new DataInPacket(input, Side.CLIENT);
+                putData(data);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             return true;
         }
         return socket.handleMessageFromServer(messageType, input);
@@ -807,26 +790,29 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     private static final ItemStack EMPTY_ITEM = new ItemStack(0, 0, 0);
+    private boolean sync_all = false; //NORELEASE: rmff
+    
     @Override
     public void onInventoryChanged() {
-        ArrayList<Object> toSend = new ArrayList(18);
+        ArrayList<Object> toSend = new ArrayList(inv.length*2);
         for (byte i = 0; i < inv.length; i++) {
-            if (FactorizationUtil.identical(inv[i], inv_last_sent[i])) {
-                continue;
+            if (!sync_all) {
+                if (FactorizationUtil.identical(inv[i], inv_last_sent[i])) {
+                    continue;
+                }
             }
-            if (inv[i] != null) {
-                toSend.add(i);
-                toSend.add(inv[i]);
-            }
+            toSend.add(i);
+            toSend.add(inv[i] == null ? EMPTY_ITEM : inv[i]);
             inv_last_sent[i] = inv[i];
         }
         if (toSend.isEmpty()) {
             return;
         }
         toSend.add(-1);
-        broadcast(MessageType.motor_inventory, toSend.toArray());
+        broadcast(MessageType.servo_item, toSend.toArray());
         getCurrentPos().getChunk().setChunkModified();
         getNextPos().getChunk().setChunkModified();
+        sync_all = false;
     }
     
     @Override

@@ -9,6 +9,7 @@ import java.io.IOException;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
@@ -273,6 +274,35 @@ public class NetworkFactorization implements ITinyPacketHandler {
             return;
         }
         pi.sendToAllPlayersWatchingChunk(toSend);
+    }
+    
+    public void broadcastPacketToLMPers(Entity servo, Packet toSend) {
+        if (toSend == null) {
+            return;
+        }
+        World world = servo.worldObj;
+        int xCoord = (int) servo.posX;
+        int zCoord = (int) servo.posZ;
+        if (world.isRemote) {
+            return;
+        }
+        WorldServer w = (WorldServer) world;
+        PlayerInstance pi = w.getPlayerManager().getOrCreateChunkWatcher(xCoord >> 4, zCoord >> 4, false);
+        if (pi == null) {
+            return;
+        }
+        //Yoinked from pi.sendToAllPlayersWatchingChunk(toSend) to optimize packet sending
+        for (int i = 0; i < pi.playersInChunk.size(); ++i) {
+            EntityPlayerMP entityplayermp = (EntityPlayerMP) pi.playersInChunk.get(i);
+            ItemStack held = entityplayermp.getHeldItem();
+            if (held == null || held.getItem() != Core.registry.logicMatrixProgrammer) {
+                continue;
+            }
+            
+            if (!entityplayermp.loadedChunks.contains(pi.chunkLocation)) {
+                entityplayermp.playerNetServerHandler.sendPacketToPlayer(toSend);
+            }
+        }
     }
 
     static final private ThreadLocal<EntityPlayer> currentPlayer = new ThreadLocal<EntityPlayer>();
@@ -552,7 +582,8 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 //
                 CompressionCrafter = 163, CompressionCrafterBeginCrafting = 164, CompressionCrafterBounds = 165,
                 //
-                motor_description = 170, motor_direction = 171, motor_speed = 172, motor_inventory = 173;
+                //motor_description = 170, motor_direction = 171, motor_speed = 172, motor_inventory = 173,
+                servo_brief = 174, servo_item = 175, servo_complete = 176;
     }
     
     static public class NotifyMessageType {

@@ -166,38 +166,6 @@ public abstract class ServoComponent implements IDataSerializable {
     public abstract String getName();
     
     /**
-     * Attempt to update the ServoComponent's configuration from stack. {@link deconfigure} will be called first.
-     * @param stack
-     */
-    public final boolean configure(ServoStack stack) {
-        try {
-            stack.getDataHelper(true).put(this);
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
-    }
-    
-    /**
-     * Used to wipe everything clean, to emptiness. Important conditions:
-     * <ul>
-     * 	<li>Be sure to include the ItemStacks that were sucked up via configure() so that nothing gets destroyed.</li>
-     *  <li>Calling deconfigure() and configure() (or in the other order) with the same stack should keep the same state,
-     *  tho there are some cases where this is not feasible.</li>
-     * </ul>
-     * @param list to add state to.
-     */
-    public final void deconfigure(LinkedList<Object> stack) {
-        ServoStack out = new ServoStack();
-        out.setContentsList(stack);
-        try {
-            out.getDataHelper(false).put(this);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    /**
      * Render to the Tessellator. This must be appropriate for a SimpleBlockRenderingHandler.
      * @param where to render it at in world. If null, it is being rendered in an inventory (or so). Render to 0,0,0.
      * @param rb RenderBlocks
