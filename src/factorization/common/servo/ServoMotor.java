@@ -55,7 +55,7 @@ import factorization.common.sockets.SocketEmpty;
 import factorization.notify.Notify;
 
 public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IEntityMessage, IInventory, ISocketHolder {
-    //NORELEASE: Have the servorail TileEntity store a reference to this?
+    //NOTE: If there's issues with servos getting lost/duped; we could have the TE save the servo. (Would have to be a list tho)
     public static final int STACKS = 16;
     public static final int STACK_EQUIPMENT = 0, STACK_ARGUMENT = 4, STACK_IO = 2, STACK_CONFIG = 3, STACK_ERRNO = 15;
     private ServoStack[] stacks = new ServoStack[STACKS];
@@ -790,16 +790,13 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     private static final ItemStack EMPTY_ITEM = new ItemStack(0, 0, 0);
-    private boolean sync_all = false; //NORELEASE: rmff
     
     @Override
     public void onInventoryChanged() {
         ArrayList<Object> toSend = new ArrayList(inv.length*2);
         for (byte i = 0; i < inv.length; i++) {
-            if (!sync_all) {
-                if (FactorizationUtil.identical(inv[i], inv_last_sent[i])) {
-                    continue;
-                }
+            if (FactorizationUtil.identical(inv[i], inv_last_sent[i])) {
+                continue;
             }
             toSend.add(i);
             toSend.add(inv[i] == null ? EMPTY_ITEM : inv[i]);
@@ -812,7 +809,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         broadcast(MessageType.servo_item, toSend.toArray());
         getCurrentPos().getChunk().setChunkModified();
         getNextPos().getChunk().setChunkModified();
-        sync_all = false;
     }
     
     @Override
