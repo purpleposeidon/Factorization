@@ -164,7 +164,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
             sat = 0.1F;
         }
         heal += Math.min(0, heal*2*sat);
-        return heal*(heal/2);
+        return heal*(heal/4);
     }
     
     @Override
@@ -185,12 +185,23 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
     }
     
     void info(EntityPlayer entityplayer) {
+        String append = "";
+        if (ticksUntilNextDigestion > 0) {
+            int n = (ticksUntilNextDigestion/20);
+            int min = n/60;
+            int s = n % 60;
+            append = "\n" + min + ":";
+            if (s < 10) {
+                append += "0";
+            }
+            append += s;
+        }
         if (stomache == null || stomache.stackSize == 0) {
-            Notify.send(entityplayer, this, "Empty");
+            Notify.send(entityplayer, this, "Empty" + append);
             return;
         }
         Notify.withItem(stomache);
-        Notify.send(entityplayer, this, stomache.stackSize + " {ITEM_NAME}");
+        Notify.send(entityplayer, this, stomache.stackSize + " {ITEM_NAME}" + append);
     }
 
 }
