@@ -27,7 +27,7 @@ public class Trap extends Instruction {
     @Override
     public void motorHit(ServoMotor motor) {
         if (!motor.getCurrentPos().isWeaklyPowered()) {
-            motor.stopped = true;
+            motor.setStopped(true);
         }
     }
 

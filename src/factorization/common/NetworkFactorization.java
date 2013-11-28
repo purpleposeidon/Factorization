@@ -583,7 +583,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 CompressionCrafter = 163, CompressionCrafterBeginCrafting = 164, CompressionCrafterBounds = 165,
                 //
                 //motor_description = 170, motor_direction = 171, motor_speed = 172, motor_inventory = 173,
-                servo_brief = 174, servo_item = 175, servo_complete = 176;
+                servo_brief = 174, servo_item = 175, servo_complete = 176, servo_stopped = 177;
     }
     
     static public class NotifyMessageType {

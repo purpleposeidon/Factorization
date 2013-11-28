@@ -80,7 +80,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     public byte target_speed = 2;
     private static final double max_speed_b = 127;
     double accumulated_motion;
-    public boolean stopped = false;
+    private boolean stopped = false;
     
     //For client-side rendering
     double sprocket_rotation = 0, prev_sprocket_rotation = 0;
@@ -241,12 +241,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 speed_b = 0;
             }
             if (orig_speed != speed_b || orig_or != orientation) {
-                Coord a = getCurrentPos();
-                Coord b = getNextPos();
-                broadcast(MessageType.servo_brief, (byte) orientation.ordinal(), speed_b,
-                        a.x, a.y, a.z,
-                        b.x, b.y, b.z,
-                        pos_progress);
+                broadcastBriefUpdate();
                 //NOTE: Could be spammy. Speed might be too important to not send tho.
             }
             if (stacks_changed) {
@@ -266,7 +261,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
         interpolatePosition(pos_progress);
         if (stopped && getCurrentPos().isWeaklyPowered()) {
-            stopped = false;
+            setStopped(false);
         }
     }
     
@@ -706,6 +701,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             b.y = input.readInt();
             b.z = input.readInt();
             pos_progress = input.readFloat();
+            if (speed_b > 0) {
+                stopped = false;
+            }
             return true;
         case MessageType.servo_complete:
             try {
@@ -714,6 +712,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            return true;
+        case MessageType.servo_stopped:
+            stopped = input.readBoolean();
             return true;
         }
         return socket.handleMessageFromServer(messageType, input);
@@ -921,5 +922,22 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     public void sendMessage(int msgType, Object... msg) {
         Packet toSend = Core.network.entityPacket(this, msgType, msg);
         Core.network.broadcastPacket(worldObj, (int) posX, (int) posY, (int) posZ, toSend); 
+    }
+    
+    public void setStopped(boolean newState) {
+        if (stopped == newState) return;
+        stopped = newState;
+        if (!worldObj.isRemote) {
+            //sendMessage(MessageType.servo_stopped, stopped);
+        }
+    }
+    
+    public void broadcastBriefUpdate() {
+        Coord a = getCurrentPos();
+        Coord b = getNextPos();
+        broadcast(MessageType.servo_brief, (byte) orientation.ordinal(), speed_b,
+                a.x, a.y, a.z,
+                b.x, b.y, b.z,
+                pos_progress);
     }
 }
