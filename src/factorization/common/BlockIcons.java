@@ -108,7 +108,7 @@ public class BlockIcons {
     public static Icon servo$spin_cc, servo$spin_ccc;
     public static Icon servo$speed1, servo$speed2, servo$speed3, servo$speed4, servo$speed5;
     public static Icon servo$cmp_lt, servo$cmp_le, servo$cmp_eq, servo$cmp_ne, servo$cmp_ge, servo$cmp_gt;
-    public static Icon servo$jmp;
+    public static Icon servo$jmp_instruction, servo$jmp_tile;
     public static Icon servo$entry_require, servo$entry_forbid;
     public static Icon servo$socket_on, servo$socket_off, servo$socket_pulse;
     public static Icon servo$ctrl$shift_import, servo$ctrl$shift_export, servo$ctrl$shift_target_slot, servo$ctrl$shift_transfer_limit, servo$ctrl$shift_stream, servo$ctrl$shift_pulse_some, servo$ctrl$shift_pulse_exact;

@@ -66,7 +66,8 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
     public boolean stacks_changed = false;
     private ItemStack[] inv = new ItemStack[4], inv_last_sent = new ItemStack[inv.length];
-    public boolean skipNextInstruction = false;
+    public byte jmp = 0;
+    public static final byte JMP_NONE = 0, JMP_NEXT_INSTRUCTION = 1, JMP_NEXT_TILE = 2;
 
     Coord pos_prev, pos_next;
     float pos_progress;
@@ -167,7 +168,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         pos_next = data.as(Share.VISIBLE, "pos_next").put(pos_next);
         pos_prev = data.as(Share.VISIBLE, "pos_prev").put(pos_prev);
         pos_progress = data.as(Share.VISIBLE, "pos_progress").putFloat(pos_progress);
-        skipNextInstruction = data.as(Share.VISIBLE, "skip").putBoolean(skipNextInstruction);
+        if (data.hasLegacy("skip")) {
+            jmp = data.as(Share.VISIBLE, "skip").putBoolean(jmp == 0) == true ? JMP_NEXT_INSTRUCTION : JMP_NONE;
+        } else {
+            jmp = data.as(Share.VISIBLE, "jmp").putByte(jmp);
+        }
         for (int i = 0; i < STACKS; i++) {
             String name = "stack" + i;
             stacks[i] = data.as(Share.VISIBLE, name).put(stacks[i]);
@@ -547,13 +552,19 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     void onEnterNewBlock() {
         TileEntityServoRail rail = getCurrentPos().getTE(TileEntityServoRail.class);
         if (rail == null /* :| */ || rail.decoration == null) {
+            if (jmp == JMP_NEXT_TILE) {
+                jmp = JMP_NONE;
+            }
             return;
         }
         if (getCurrentPos().isWeaklyPowered()) {
+            if (jmp == JMP_NEXT_TILE) {
+                jmp = JMP_NONE;
+            }
             return;
         }
-        if (skipNextInstruction) {
-            skipNextInstruction = false;
+        if (jmp != JMP_NONE) {
+            jmp = JMP_NONE;
             return;
         }
         rail.decoration.motorHit(this);

@@ -1,3 +1,9 @@
+0.18
+  Fix rendering of multiple notifications
+  Fix servo resuming from a trap (hopefully?)
+  Fix Lacerator leaving partial breaks on blocks like sugarcane
+  Added "Unconditional Skip"; it's filed under the Jump instruction
+
 0.8.17
   Improved a couple recipes
   Servo instructions mention if powered
