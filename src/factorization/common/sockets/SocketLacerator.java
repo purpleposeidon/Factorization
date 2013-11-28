@@ -380,7 +380,8 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             } else {
                 progress++;
             }
-            if (barrel == null) {
+            boolean doBreak = progress >= grind_time*hardness || Core.cheat;
+            if (barrel == null && !doBreak) {
                 float perc = progress/((float)grind_time*hardness);
                 int breakage = (int) (perc*10);
                 worldObj.destroyBlockInWorldPartially(id, mop.blockX, mop.blockY, mop.blockZ, breakage);
@@ -389,7 +390,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                 currentY = mop.blockY;
                 currentZ = mop.blockZ;
             }
-            if (progress >= grind_time*hardness || Core.cheat) {
+            if (doBreak) {
                 grab_items = true;
                 grind_items = true;
                 if (barrel == null) {
