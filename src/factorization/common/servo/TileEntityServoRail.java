@@ -246,7 +246,11 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             }
             String info = decoration.getInfo();
             if (here.isWeaklyPowered()) {
-                info = (info == null ? "" : info + "\n") + "(disabled by redstone)";
+                Notify.withItem(new ItemStack(Block.torchRedstoneActive));
+                Notify.withStyle(Style.DRAWITEM);
+                if (info == null) {
+                    info = "";
+                }
             }
             if (info != null) {
                 Notify.send(entityplayer, here, info);
