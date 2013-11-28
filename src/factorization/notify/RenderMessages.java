@@ -88,8 +88,7 @@ public class RenderMessages extends RenderMessagesProxy {
         GL11.glPushMatrix();
         GL11.glTranslated(-cx, -cy, -cz);
         GL11.glPushAttrib(GL11.GL_BLEND);
-
-        GL11.glDisable(GL11.GL_LIGHTING);
+        
         GL11.glDepthMask(false);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
         GL11.glEnable(GL11.GL_BLEND);
@@ -102,11 +101,12 @@ public class RenderMessages extends RenderMessagesProxy {
                 it.remove();
                 continue;
             }
+            GL11.glDisable(GL11.GL_LIGHTING);
             renderMessage(m, event.partialTicks);
         }
         GL11.glEnable(GL11.GL_LIGHTING);
         GL11.glDisable(GL11.GL_BLEND);
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glColor4f(1, 1, 1, 1);
 
         GL11.glPopMatrix();
         GL11.glPopAttrib();
@@ -187,16 +187,6 @@ public class RenderMessages extends RenderMessagesProxy {
             RenderBlocks rb = mc.renderGlobal.globalRenderBlocks;
             
             GL11.glTranslatef((float) (halfWidth + 4), lineCount, 0);
-            /*
-            EntityItem entityitem = new EntityItem(mc.theWorld, 0.0D, 0.0D, 0.0D, m.item);
-            entityitem.getEntityItem().stackSize = 1;
-            entityitem.hoverStart = 0.0F;
-            RenderItem.renderInFrame = true;
-            float s = 40;
-            GL11.glScalef(s, s, s);
-            RenderManager.instance.renderEntityWithPosYaw(entityitem, 0.0D, 0.0D, 0.0D, 0.0F, 0.0F);
-            RenderItem.renderInFrame = false;
-            */
             renderItem.renderItemAndEffectIntoGUI(fr, re, m.item, 0, 0);
         }
 
