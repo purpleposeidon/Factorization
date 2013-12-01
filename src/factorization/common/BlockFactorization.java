@@ -508,9 +508,6 @@ public class BlockFactorization extends BlockContainer {
     
     @Override
     public int isProvidingWeakPower(IBlockAccess w, int x, int y, int z, int side) {
-        if (side < 2) {
-            return 0;
-        }
         TileEntity te = w.getBlockTileEntity(x, y, z);
         if (te instanceof TileEntityCommon) {
             return ((TileEntityCommon) te).power() ? 15 : 0;
