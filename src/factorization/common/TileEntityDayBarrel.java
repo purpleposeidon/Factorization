@@ -889,20 +889,12 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
                 '-', slab);
         
         //Note: Don't add creative. That'd be bad.
-        //And don't add normal, since that'd be silly.
-        int width = 1;
-        int height = 2;
         Core.registry.recipe(make(Type.SILKY, log, slab),
                 "XXX",
                 "XOX",
                 "XXX",
                 'X', Block.web,
                 'O', normal);
-        /*Core.registry.recipe(make(Type.SILKY, log, slab), 
-                "#",
-                "B",
-                '#', silkTouch,
-                'B', normal);*/
         Core.registry.recipe(make(Type.HOPPING, log, slab),
                 "Y",
                 "0",

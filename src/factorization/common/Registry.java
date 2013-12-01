@@ -1251,7 +1251,6 @@ public class Registry implements ICraftingHandler, ITickHandler {
     }
     
     void addOtherRecipes() {
-        List<ItemStack> known_slabs = OreDictionary.getOres("slabWood");
         ArrayList<ItemStack> theLogs = new ArrayList();
         for (ItemStack log : OreDictionary.getOres("logWood")) {
             if (log.itemID == Block.wood.blockID) {
@@ -1274,14 +1273,14 @@ public class Registry implements ICraftingHandler, ITickHandler {
         }
         for (ItemStack log : theLogs) {
             log = log.copy();
-            List<ItemStack> planks = FactorizationUtil.craft1x1(null, true, log);
+            List<ItemStack> planks = FactorizationUtil.craft1x1(null, true, log.copy());
             if (planks == null || planks.size() != 1) {
                 continue;
             }
             ItemStack plank = planks.get(0).copy();
             plank.stackSize = 1;
             List<ItemStack> slabs = FactorizationUtil.craft3x3(null, true, true, new ItemStack[] {
-                    plank, plank, plank,
+                    plank.copy(), plank.copy(), plank.copy(),
                     null, null, null,
                     null, null, null
             });
@@ -1294,9 +1293,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 slab = slabs.get(0);
                 odType = "slabWood";
             }
-            if (FactorizationUtil.oreDictionarySimilar(odType, slab)) {
-                TileEntityDayBarrel.makeRecipe(log, slab);
-            }
+            TileEntityDayBarrel.makeRecipe(log, slab);
         }
     }
     
