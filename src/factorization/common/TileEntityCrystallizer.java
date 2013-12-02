@@ -59,12 +59,11 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
 
     @Override
     public void setInventorySlotContents(int slot, ItemStack is) {
-        needLogic();
         if (slot == inputs.length) {
             output = is;
-            return;
+        } else {
+            inputs[slot] = is;
         }
-        inputs[slot] = is;
         onInventoryChanged();
     }
 
