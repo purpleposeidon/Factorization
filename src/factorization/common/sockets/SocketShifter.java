@@ -56,8 +56,8 @@ public class SocketShifter extends TileEntitySocketBase {
         } else {
             mode = data.as(Share.MUTABLE, "mode").putEnum(mode);
         }
-        foreignSlot = data.as(Share.MUTABLE, "for").putInt(foreignSlot);
         transferLimit = data.as(Share.MUTABLE, "lim").putByte(transferLimit);
+        foreignSlot = data.as(Share.MUTABLE, "for").putInt(foreignSlot);
         cooldown = data.as(Share.PRIVATE, "wait").putByte(cooldown);
         if (data.isWriter()) {
             return this;
@@ -174,10 +174,15 @@ public class SocketShifter extends TileEntitySocketBase {
         pullInv.setCallOnInventoryChanged(false);
         boolean had_change = false;
         if (mode == ShifterMode.MODE_PULSE_SOME) {
+            int toMove = transferLimit;
             out: for (int pull = pullStart; pull <= pullEnd; pull++) {
                 for (int push = 0; push < pushInv.size(); push++) {
-                    if (pullInv.transfer(pull, pushInv, push, transferLimit) > 0) {
-                        had_change= true;
+                    int delta = pullInv.transfer(pull, pushInv, push, toMove);
+                    toMove -= delta;
+                    if (delta > 0) {
+                        had_change = true;
+                    }
+                    if (toMove <= 0) {
                         break out;
                     }
                 }
