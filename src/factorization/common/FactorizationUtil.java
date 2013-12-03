@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.WeakHashMap;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -317,7 +318,7 @@ public class FactorizationUtil {
         
         return normalize(clickStack);
     }
-    
+
     public static abstract class FzInv {
         public abstract int size();
         abstract int slotIndex(int i);
@@ -1099,18 +1100,34 @@ public class FactorizationUtil {
         }, 3, 3);
     }
     
+    private static class FzFakePlayer extends EntityPlayer {
+        Coord where;
+
+        private FzFakePlayer(World par1World, String par2Str, Coord where) {
+            super(par1World, par2Str);
+            this.where = where;
+        }
+
+        //TODO: Forge'll probably have this working properly by the time I catch up to it.
+        public void sendChatToPlayer(String s) {}
+        @Override public void sendChatToPlayer(ChatMessageComponent chatmessagecomponent) { }
+        public boolean canCommandSenderUseCommand(int i, String s) { return false; }
+        @Override public ChunkCoordinates getPlayerCoordinates() { return new ChunkCoordinates(where.x, where.y, where.z); }
+        @Override public void addStat(StatBase par1StatBase, int par2) { }
+        @Override public void openGui(Object mod, int modGuiId, World world, int x, int y, int z) { }
+    }
+    
+    private static WeakHashMap<World, FzFakePlayer> fakePlayerCache = new WeakHashMap();
+    
     public static EntityPlayer makePlayer(final Coord where, String use) {
-        EntityPlayer fakePlayer = new EntityPlayer(where.w, "[FZ " + use +  "]") {
-            //TODO: Forge'll probably have this working properly by the time I catch up to it.
-            public void sendChatToPlayer(String s) {}
-            @Override public void sendChatToPlayer(ChatMessageComponent chatmessagecomponent) { }
-            public boolean canCommandSenderUseCommand(int i, String s) { return false; }
-            @Override public ChunkCoordinates getPlayerCoordinates() { return new ChunkCoordinates(where.x, where.y, where.z); }
-            @Override public void addStat(StatBase par1StatBase, int par2) { }
-            @Override public void openGui(Object mod, int modGuiId, World world, int x, int y, int z) { }
-        };
-        where.setAsEntityLocation(fakePlayer);
-        return fakePlayer;
+        FzFakePlayer found = fakePlayerCache.get(where.w);
+        if (found == null) {
+            found = new FzFakePlayer(where.w, "[FZ]", where);
+            fakePlayerCache.put(where.w, found);
+        }
+        found.where = where;
+        where.setAsEntityLocation(found);
+        return found;
     }
     
     public static void addInventoryToArray(IInventory inv, ArrayList<ItemStack> ret) {
