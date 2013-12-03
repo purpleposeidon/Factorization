@@ -12,6 +12,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
+import factorization.common.FactorizationUtil.FzInv;
 import factorization.common.NetworkFactorization.MessageType;
 import factorization.notify.Notify;
 import factorization.notify.Notify.Style;
@@ -110,18 +111,8 @@ public class CompressionState {
         }
         
         boolean found_inv = false;
-        Coord ccPos = cc.getCoord();
-        for (int i = 0; i < 6; i++) {
-            ForgeDirection fd = ForgeDirection.getOrientation(i);
-            if (fd == up) {
-                continue;
-            }
-            if (ccPos.add(fd).getTE(IInventory.class) != null) {
-                found_inv = true;
-                break;
-            }
-        }
-        if (!found_inv) {
+        FzInv[] inv = cc.getAdjacentInventories();
+        if (inv[0] == null) {
             error(cc, "Need output inventory\n(Like a chest)");
             return false;
         }

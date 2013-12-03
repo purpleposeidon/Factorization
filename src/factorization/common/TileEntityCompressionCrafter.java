@@ -122,32 +122,58 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
             progress = -10;
         }
         
-        if (!buffer.isEmpty()) {
-            Coord sc = getCoord();
-            for (int side = 0; side < 6; side++) {
-                ForgeDirection fd = ForgeDirection.getOrientation(side);
-                if (fd == getFacing()) {
-                    continue;
+        dumpBuffer();
+    }
+    
+    void dumpBuffer() {
+        if (buffer.isEmpty()) return;
+        for (FzInv fz : getAdjacentInventories()) {
+            if (fz == null) break;
+            while (!buffer.isEmpty()) {
+                ItemStack is = FactorizationUtil.normalize(buffer.get(0));
+                if (is != null) {
+                    is = FactorizationUtil.normalize(fz.push(is));
                 }
-                Coord neighbor = sc.add(fd);
-                IInventory inv = neighbor.getTE(IInventory.class);
-                if (inv == null) {
-                    continue;
-                }
-                FzInv fz = FactorizationUtil.openInventory(inv, fd.getOpposite());
-                while (!buffer.isEmpty()) {
-                    ItemStack is = FactorizationUtil.normalize(buffer.get(0));
-                    if (is != null) {
-                        is = FactorizationUtil.normalize(fz.push(is));
-                    }
-                    if (is == null) {
-                        buffer.remove(0);
-                    } else {
-                        break;
-                    }
+                if (is == null) {
+                    buffer.remove(0);
+                } else {
+                    break;
                 }
             }
         }
+    }
+    
+    FzInv[] getAdjacentInventories() {
+        FzInv[] ret = new FzInv[6*5];
+        int i = 0;
+        Coord me = getCoord();
+        final ForgeDirection facing = getFacing();
+        final ForgeDirection behind = facing.getOpposite();
+        for (ForgeDirection fd : ForgeDirection.VALID_DIRECTIONS) {
+            if (fd == facing) {
+                continue;
+            }
+            ForgeDirection back = fd.getOpposite();
+            Coord sc = me.add(fd);
+            IInventory inv = sc.getTE(IInventory.class);
+            if (inv != null) {
+                ret[i++] = FactorizationUtil.openInventory(inv, back);
+            } else if (fd != behind) {
+                TileEntityCompressionCrafter neighbor = sc.getTE(TileEntityCompressionCrafter.class);
+                if (neighbor == null) continue;
+                if (neighbor.getFacing() != facing) continue;
+                //recursiveish search
+                for (ForgeDirection nfd : ForgeDirection.VALID_DIRECTIONS) {
+                    if (nfd == facing) continue;
+                    if (nfd == back) continue;
+                    Coord sd = sc.add(nfd);
+                    ForgeDirection newBack = nfd.getOpposite();
+                    IInventory newInv = sd.getTE(IInventory.class);
+                    if (newInv != null) ret[i++] = FactorizationUtil.openInventory(newInv, newBack);
+                }
+            }
+        }
+        return ret;
     }
     
     @Override
