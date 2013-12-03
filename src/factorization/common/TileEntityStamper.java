@@ -47,7 +47,6 @@ public class TileEntityStamper extends TileEntityFactorization {
 
     @Override
     public ItemStack getStackInSlot(int i) {
-        needLogic(); //Hey there, Builcraft. Fix your shit!
         switch (i) {
         case 0:
             return input;
@@ -66,7 +65,6 @@ public class TileEntityStamper extends TileEntityFactorization {
         if (i == 1) {
             output = itemstack;
         }
-        onInventoryChanged();
     }
     
     @Override
@@ -117,6 +115,7 @@ public class TileEntityStamper extends TileEntityFactorization {
         }
         // put outputBuffer into output
         Iterator<ItemStack> it = outputBuffer.iterator();
+        boolean any = false;
         while (it.hasNext()) {
             ItemStack here = it.next();
             if (here == null) {
@@ -126,11 +125,11 @@ public class TileEntityStamper extends TileEntityFactorization {
             if (output == null) {
                 output = here;
                 it.remove();
-                needLogic();
+                any = true;
                 continue;
             }
             if (FactorizationUtil.couldMerge(output, here)) {
-                needLogic();
+                any = true;
                 int can_take = output.getMaxStackSize() - output.stackSize;
                 if (here.stackSize > can_take) {
                     output.stackSize += can_take;
@@ -140,6 +139,9 @@ public class TileEntityStamper extends TileEntityFactorization {
                 output.stackSize += here.stackSize;
                 it.remove();
             }
+        }
+        if (any) {
+            onInventoryChanged();
         }
     }
     
@@ -163,7 +165,7 @@ public class TileEntityStamper extends TileEntityFactorization {
             List<ItemStack> craft = tryCrafting();
             if (craft != null) {
                 outputBuffer.addAll(craft);
-                needLogic();
+                onInventoryChanged();
                 drawActive(3);
             }
         }
