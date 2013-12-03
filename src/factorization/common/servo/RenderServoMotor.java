@@ -172,10 +172,7 @@ public class RenderServoMotor extends RenderEntity {
             EntityPlayer player = Core.proxy.getClientPlayer();
             if (player != null) {
                 ItemStack is = player.getHeldItem();
-                //final ItemStack helmet = player.getCurrentArmor(3);
-                if (is != null && is.getItem() == Core.registry.logicMatrixProgrammer
-                        /* || (helmet != null && FactorizationUtil.oreDictionarySimilar("visionInducingEyewear", helmet)) */
-                    ) {
+                if (is != null && is.getItem() == Core.registry.logicMatrixProgrammer) {
                     render_details = true;
                 }
             }
