@@ -80,7 +80,7 @@ public class RenderMessages extends RenderMessagesProxy {
             return;
         }
         Iterator<Message> it = messages.iterator();
-        long deathTime = System.currentTimeMillis() - 1000 * 6;
+        long deathTime = System.currentTimeMillis();
         EntityLivingBase camera = Minecraft.getMinecraft().renderViewEntity;
         double cx = camera.lastTickPosX + (camera.posX - camera.lastTickPosX) * (double) event.partialTicks;
         double cy = camera.lastTickPosY + (camera.posY - camera.lastTickPosY) * (double) event.partialTicks;
@@ -92,17 +92,23 @@ public class RenderMessages extends RenderMessagesProxy {
         GL11.glDepthMask(false);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
         GL11.glEnable(GL11.GL_BLEND);
-        GL11.glColor4f(1, 1, 1, 1);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glColor4f(1, 1, 1, 1);
         
         while (it.hasNext()) {
             Message m = it.next();
-            if (m.creationTime < deathTime || m.world != w || !m.stillValid()) {
+            long timeExisted = deathTime - m.creationTime;
+            if (timeExisted > m.lifeTime || m.world != w || !m.stillValid()) {
                 it.remove();
                 continue;
             }
             GL11.glDisable(GL11.GL_LIGHTING);
-            renderMessage(m, event.partialTicks);
+            if (m.style.contains(Style.FADE)) {
+                float opacity = timeExisted / (float) m.lifeTime;
+                renderMessage(m, event.partialTicks, opacity);
+            } else {
+                renderMessage(m, event.partialTicks, 1);
+            }
         }
         GL11.glEnable(GL11.GL_LIGHTING);
         GL11.glDisable(GL11.GL_BLEND);
@@ -114,7 +120,7 @@ public class RenderMessages extends RenderMessagesProxy {
 
     RenderItem renderItem = new RenderItem();
 
-    private void renderMessage(Message m, float partial) {
+    private void renderMessage(Message m, float partial, float opacity) {
         int width = 0;
         int height = 0;
         String[] lines = m.msg.split("\n");
@@ -169,7 +175,7 @@ public class RenderMessages extends RenderMessagesProxy {
         if (m.show_item) {
             item_add += 24;
         }
-        tess.setColorRGBA_F(0.0F, 0.0F, 0.0F, 0.125F);
+        tess.setColorRGBA_F(0.0F, 0.0F, 0.0F, 0.125F*opacity);
         tess.addVertex((double) (-halfWidth - 1), (double) (-1), 0.0D);
         tess.addVertex((double) (-halfWidth - 1), (double) (8 + var16), 0.0D);
         tess.addVertex((double) (halfWidth + 1 + item_add), (double) (8 + var16), 0.0D);
@@ -177,8 +183,9 @@ public class RenderMessages extends RenderMessagesProxy {
         tess.draw();
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         int i = 0;
+        int color = 0xFFFFFFFF;
         for (String line : lines) {
-            fr.drawString(line, -fr.getStringWidth(line) / 2, 10 * i, -1);
+            fr.drawString(line, -fr.getStringWidth(line) / 2, 10 * i, color);
             i++;
         }
 

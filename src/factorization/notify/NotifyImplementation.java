@@ -12,11 +12,13 @@ import net.minecraft.tileentity.TileEntity;
 
 import com.google.common.base.Joiner;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.common.Core;
 
@@ -96,7 +98,7 @@ public class NotifyImplementation extends Notify {
             return;
         }
         format = styleMessage(style, format);
-        if (player != null && player.worldObj.isRemote) {
+        if ((player != null && player.worldObj.isRemote) || FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
             proxy.addMessage(where, item, format, args);
         } else {
             Coord target = Coord.tryLoad(player != null ? player.worldObj : null, where);

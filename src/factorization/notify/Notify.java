@@ -32,7 +32,11 @@ public abstract class Notify {
         /**
          * This message will have its item drawn on the right side.
          */
-        DRAWITEM
+        DRAWITEM,
+        /**
+         * The message will start fading immediately. (Well, it's supposed to. The rendering is broken.)
+         */
+        FADE
     }
     
     /**

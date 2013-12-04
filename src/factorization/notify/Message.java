@@ -22,6 +22,7 @@ class Message {
     EnumSet<Style> style;
     
     long creationTime;
+    long lifeTime;
     boolean position_important = false;
     boolean show_item = false;
 
@@ -36,8 +37,9 @@ class Message {
         msg = parts[1];
         
         creationTime = System.currentTimeMillis();
+        lifeTime = 1000 * 6;
         if (style.contains(Style.LONG)) {
-            creationTime += 1000 * 5;
+            lifeTime += 1000 * 5;
         }
         position_important = style.contains(Style.EXACTPOSITION);
         show_item = style.contains(Style.DRAWITEM);
