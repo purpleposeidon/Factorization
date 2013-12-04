@@ -322,7 +322,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
                 return true;
             }
             if (target instanceof ISidedInventory) {
-                return ((ISidedInventory) target).canInsertItem(slot - filters.length, itemstack, side) && itemPassesFilter(itemstack);
+                return ((ISidedInventory) target).canInsertItem(slot - filters.length, itemstack, getFacing().getOpposite().ordinal()) && itemPassesFilter(itemstack);
             }
             return itemPassesFilter(itemstack);
         } finally {
