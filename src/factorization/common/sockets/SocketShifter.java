@@ -187,7 +187,7 @@ public class SocketShifter extends TileEntitySocketBase {
                     }
                 }
             }
-        } else {
+        } else { //NOTE: An optimization is available if limit == 1
             boolean[] visitedSlots = new boolean[pullInv.size()];
             out: for (int pull = pullStart; pull <= pullEnd; pull++) {
                 if (countItem(pullInv, pull, transferLimit, visitedSlots) < transferLimit) {
