@@ -55,13 +55,12 @@ public class Core {
     public static final String modId = "factorization";
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
-    public static final String version = "0.8.18"; //@VERSION@
+    public static final String version = "0.8.19"; //@VERSION@
     public Core() {
         instance = this;
         fzconfig = new FzConfig();
         registry = new Registry();
-        foph = new FactorizationOreProcessingHandler(); //We don't register foph yet.
-        MinecraftForge.EVENT_BUS.register(registry);
+        foph = new FactorizationOreProcessingHandler();
     }
     
     // runtime storage
@@ -91,6 +90,7 @@ public class Core {
     void checkForge() {
         int maxForge = 953;
         if (ForgeVersion.buildVersion > maxForge) {
+            //This needs to go away in 1.7.
             if (System.getProperty("factorization.ignoreForgeVersion", "") == "") {
                 Core.logSevere("Loading despite scary-looking forge version > " + maxForge);
             } else {
@@ -105,6 +105,7 @@ public class Core {
 
     @EventHandler
     public void load(FMLPreInitializationEvent event) {
+        MinecraftForge.EVENT_BUS.register(registry);
         checkForge();
         fzconfig.loadConfig(event.getSuggestedConfigurationFile());
         registry.makeBlocks();
