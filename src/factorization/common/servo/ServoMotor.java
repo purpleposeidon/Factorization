@@ -53,6 +53,7 @@ import factorization.common.TileEntitySocketBase;
 import factorization.common.sockets.GuiDataConfig;
 import factorization.common.sockets.SocketEmpty;
 import factorization.notify.Notify;
+import factorization.notify.Notify.Style;
 
 public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IEntityMessage, IInventory, ISocketHolder {
     //NOTE: If there's issues with servos getting lost/duped; we could have the TE save the servo. (Would have to be a list tho)
@@ -76,6 +77,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     public boolean isSocketActive = false, isSocketPulsed = false;
     
     public FzOrientation prevOrientation = FzOrientation.UNKNOWN, orientation = FzOrientation.UNKNOWN;
+    public FzOrientation pendingClientOrientation = FzOrientation.UNKNOWN;
     public ForgeDirection nextDirection = ForgeDirection.UNKNOWN, lastDirection = ForgeDirection.UNKNOWN;
     private byte speed_b;
     public byte target_speed = 2;
@@ -530,9 +532,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             sprocket_rotation += move;
             
             if (orientation != prevOrientation) {
-                servo_reorient = Math.min(1, servo_reorient + move);
+                servo_reorient += move;
                 if (servo_reorient >= 1) {
-                    prev_servo_reorient = servo_reorient = 0;
+                    servo_reorient -= 1;
+                    prev_servo_reorient = servo_reorient;
                     prevOrientation = orientation;
                 }
             } else {
@@ -700,11 +703,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         case MessageType.servo_brief:
             Coord a = getCurrentPos();
             Coord b = getNextPos();
-            
-            byte ord = input.readByte();
-            byte newspeed = input.readByte();
-            orientation = FzOrientation.getOrientation(ord);
-            speed_b = newspeed;
+            FzOrientation no = FzOrientation.getOrientation(input.readByte());
+            if (no != prevOrientation) {
+                orientation = no;
+            }
+            speed_b = input.readByte();
             a.x = input.readInt();
             a.y = input.readInt();
             a.z = input.readInt();
