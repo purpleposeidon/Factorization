@@ -3,12 +3,20 @@ package factorization.misc;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.List;
 
+import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.NetLoginHandler;
 import net.minecraft.network.packet.NetHandler;
@@ -17,10 +25,11 @@ import net.minecraft.network.packet.Packet1Login;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DungeonHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.oredict.OreDictionary;
-import net.minecraftforge.oredict.OreDictionary.OreRegisterEvent;
 import cpw.mods.fml.common.ICraftingHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Mod;
@@ -36,6 +45,7 @@ import cpw.mods.fml.common.network.Player;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
+import factorization.api.Coord;
 import factorization.common.Core;
 import factorization.common.FzConfig;
 
@@ -128,6 +138,7 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         //lag();
         if (type.contains(TickType.SERVER)) {
             MinecraftServer ms = MinecraftServer.getServer();
+            try { rockets(ms); } finally { /* What could I say? */ }
             if (ms.getTickCounter() < ms.tickTimeArray.length) {
                 //Ignore startup
                 return;
@@ -195,5 +206,101 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         try {
             Thread.sleep(1000 / 10);
         } catch (InterruptedException e) { }
+    }
+    
+
+    private boolean launched = false;
+    final static int check_time = 20*60;
+    int checks = check_time;
+    void rockets(MinecraftServer ms) {
+        launched = false;
+        if (checks-- > 0 || launched) {
+            return;
+        }
+        checks = check_time;
+        
+        //Test date
+        boolean right_day = false;
+        if (ms.worldServers == null && ms.worldServers.length > 0) {
+            Calendar cal = ms.worldServers[0].getCurrentDate();
+            if (cal.get(Calendar.DAY_OF_MONTH) == 21 && cal.get(Calendar.MONTH) == Calendar.DECEMBER) {
+                right_day = true;
+            }
+        }
+        if (!right_day) return;
+        
+        //Test for night time
+        World w = ms.getEntityWorld();
+        if (w == null) return;
+        float angle = w.getCelestialAngle(1);
+        if (!(angle > 0.3 && angle < 0.7)) {
+            return;
+        }
+        
+        //Get chunks
+        List<EntityPlayer> players = (List<EntityPlayer>) w.playerEntities;
+        if (players.isEmpty()) {
+            return;
+        }
+        HashSet<Chunk> loadedChunks = new HashSet();
+        for (EntityPlayer player : players) {
+            int d = 3;
+            Coord p = new Coord(player);
+            for (int dx = -d; dx <= d; dx++) {
+                for (int dz = -d; dz <= d; dz++) {
+                    Coord vis = p.add(dx*16, 0, dz*16);
+                    if (vis.blockExists()) {
+                        loadedChunks.add(vis.getChunk());
+                    }
+                }
+            }
+        }
+        
+        //Make rocket item
+        ItemStack red_is = new ItemStack(Item.firework);
+        NBTTagCompound tag = new NBTTagCompound("Fireworks");
+        tag.setByte("Flight", (byte) 3);
+        NBTTagList explosions = new NBTTagList("Explosions");
+        {
+            NBTTagCompound explo = new NBTTagCompound();
+            explo.setBoolean("Trail", true);
+            explo.setBoolean("Flicker", true);
+            int[] colors = new int[] {0xFFFF25};
+            explo.setIntArray("Colors", colors);
+            explo.setIntArray("FadeColors", colors);
+            explosions.appendTag(explo);
+        }
+        {
+            NBTTagCompound explo = new NBTTagCompound();
+            explo.setBoolean("Trail", true);
+            explo.setBoolean("Flicker", true);
+            int[] colors = new int[] {0xFF2525};
+            explo.setIntArray("Colors", colors);
+            explo.setIntArray("FadeColors", colors);
+            explo.setByte("Type", (byte)2);
+            explosions.appendTag(explo);
+        }
+        tag.setTag("Explosions", explosions);
+        
+        NBTTagCompound wrap = new NBTTagCompound("tag");
+        wrap.setTag("Fireworks", tag);
+        red_is.setTagCompound(wrap);
+        
+        //Spawn rockets
+        ArrayList<Chunk> chunks = new ArrayList(loadedChunks);
+        Collections.shuffle(chunks);
+        int rocketCount = 206;
+        for (Chunk chunk : chunks) {
+            if (w.rand.nextBoolean()) continue;
+            if (rocketCount <= 0) break;
+            rocketCount--;
+            int dx = w.rand.nextInt(16);
+            int dz = w.rand.nextInt(16);
+            int x = chunk.xPosition*16 + dx;
+            int z = chunk.zPosition*16 + dz;
+            int y = chunk.getHeightValue(dx, dz);
+            
+            w.spawnEntityInWorld(new EntityFireworkRocket(w, x, y, z, red_is));
+        }
     }
 }
