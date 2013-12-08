@@ -1117,16 +1117,23 @@ public class FactorizationUtil {
         @Override public void openGui(Object mod, int modGuiId, World world, int x, int y, int z) { }
     }
     
-    private static WeakHashMap<World, FzFakePlayer> fakePlayerCache = new WeakHashMap();
+    private static HashMap<String, WeakHashMap<World, FzFakePlayer>> usedPlayerCache = new HashMap();
     
     public static EntityPlayer makePlayer(final Coord where, String use) {
+        WeakHashMap<World, FzFakePlayer> fakePlayerCache = usedPlayerCache.get(use);
+        if (fakePlayerCache == null) {
+            fakePlayerCache = new WeakHashMap<World, FzFakePlayer>();
+            usedPlayerCache.put(use, fakePlayerCache);
+        }
         FzFakePlayer found = fakePlayerCache.get(where.w);
         if (found == null) {
-            found = new FzFakePlayer(where.w, "[FZ]", where);
+            found = new FzFakePlayer(where.w, "[FZ." + use + "]", where);
             fakePlayerCache.put(where.w, found);
         }
         found.where = where;
         where.setAsEntityLocation(found);
+        Arrays.fill(found.inventory.armorInventory, null);
+        Arrays.fill(found.inventory.mainInventory, null);
         return found;
     }
     
