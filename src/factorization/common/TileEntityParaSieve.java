@@ -3,12 +3,14 @@ package factorization.common;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Icon;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.ForgeDirection;
@@ -30,7 +32,15 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     private boolean putting_nbt = false;
     private byte redstone_cache = -1;
     
-    static short[] itemId2modIndex = new short[Item.itemsList.length]; 
+    static short[] itemId2modIndex = new short[Item.itemsList.length];
+    
+    TileEntity cached_te = null;
+    Entity cached_ent = null;
+    
+    void dirtyCache() {
+        cached_te = null;
+        cached_ent = null;
+    }
     
     public TileEntityParaSieve() {
         facing_direction = 2;
@@ -90,6 +100,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     @Override
     public void neighborChanged() {
         redstone_cache = -1;
+        dirtyCache();
     }
     
     static boolean itemInRange(ItemStack a, ItemStack b, ItemStack stranger) {
@@ -198,6 +209,23 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         stack_recursion.set(Math.max(0, sr - 1));
     }
     
+    AxisAlignedBB target_area = AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
+    AxisAlignedBB getTargetArea() {
+        final ForgeDirection f = getFacing();
+        target_area.minX = xCoord + f.offsetX;
+        target_area.minY = yCoord + f.offsetY;
+        target_area.minZ = zCoord + f.offsetZ;
+        target_area.maxX = target_area.minX + 1;
+        target_area.maxY = target_area.minY + 1;
+        target_area.maxZ = target_area.minZ + 1;
+        return target_area;
+    }
+    
+    boolean isEntityInRange(Entity ent) {
+        if (ent == null) return false;
+        return ent.getBoundingBox().intersectsWith(getTargetArea());
+    }
+    
     IInventory getRecursiveTarget() {
         if (_beginRecursion() || putting_nbt || worldObj == null || worldObj.isRemote) {
             return null;
@@ -206,10 +234,27 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         if (facing == ForgeDirection.UNKNOWN) {
             return null;
         }
-        //return getCoord().add(facing).getTE(IInventory.class);
+        if (cached_te != null) {
+            if (!cached_te.isInvalid()) {
+                return FactorizationUtil.openDoubleChest((IInventory) cached_te, true);
+            }
+            cached_te = null;
+        } else if (cached_ent != null) {
+            if (!cached_ent.isDead && cached_ent.boundingBox.intersectsWith(getTargetArea())) {
+                return (IInventory) cached_ent;
+            }
+            cached_ent = null;
+        }
         TileEntity te = worldObj.getBlockTileEntity(xCoord + facing.offsetX, yCoord + facing.offsetY, zCoord + facing.offsetZ);
         if (te instanceof IInventory) {
+            cached_te = te;
             return FactorizationUtil.openDoubleChest((IInventory) te, true);
+        }
+        for (Entity ent : (Iterable<Entity>)worldObj.getEntitiesWithinAABB(IInventory.class, getTargetArea())) {
+            if (ent instanceof IInventory) {
+                cached_ent = ent;
+                return (IInventory) ent;
+            }
         }
         return null;
     }
@@ -418,6 +463,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     
     @Override
     public boolean rotate(ForgeDirection axis) {
+        dirtyCache();
         byte ao = (byte) axis.ordinal();
         if (ao == facing_direction) {
             return false;
