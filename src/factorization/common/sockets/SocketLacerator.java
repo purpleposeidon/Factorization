@@ -10,6 +10,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.particle.EntityFX;
+import net.minecraft.client.renderer.DestroyBlockProgress;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.enchantment.Enchantment;
@@ -85,9 +86,8 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     ArrayList<ItemStack> buffer = new ArrayList();
     
     private float rotation = 0, prev_rotation = 0;
-    int lastX, lastY = -10, lastZ;
-    int currentX, currentY = -1, currentZ;
-    boolean needsReset = false;
+    
+    MovingObjectPosition present_breaking_target = null, previous_breaking_target = null;
     
     @Override
     public FactoryType getFactoryType() {
@@ -126,6 +126,14 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         speed = (short) Math.max(0, speed - 1);
     }
     
+    void destroyPartially(MovingObjectPosition mop, int amount) {
+        if (mop == null) return;
+        int blockId = mop.subHit; //We abuse this to store the block ID!
+        //This is necessary because vanilla seems to key things by the block ID.
+        //Otherwise we'd have partial breaks floating around...
+        worldObj.destroyBlockInWorldPartially(blockId, mop.blockX, mop.blockY, mop.blockZ, amount);
+    }
+    
     @Override
     public void genericUpdate(ISocketHolder socket, Coord coord, boolean powered) {
         if (worldObj.isRemote) {
@@ -135,20 +143,27 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             return;
         }
         isPowered = powered;
-        needsReset = true;
-        currentY = -1;
         genericUpdate_implementation(socket, coord, powered);
         if (FactorizationUtil.significantChange(last_shared_speed, speed)) {
             socket.sendMessage(MessageType.LaceratorSpeed, speed);
             last_shared_speed = speed;
         }
-        if (needsReset && lastY >= 0) {
-            int id = worldObj.getBlockId(lastX, lastY, lastZ);
-            worldObj.destroyBlockInWorldPartially(id, lastX, lastY, lastZ, 99);
+        
+        if (previous_breaking_target != null && present_breaking_target != null) {
+            if (previous_breaking_target.blockX != present_breaking_target.blockX
+                    || previous_breaking_target.blockY != present_breaking_target.blockY
+                    || previous_breaking_target.blockZ != present_breaking_target.blockZ) {
+                destroyPartially(previous_breaking_target, 99);
+            }
+        } else if (present_breaking_target == null) {
+            destroyPartially(previous_breaking_target, 99);
         }
-        lastX = currentX;
-        lastY = currentY;
-        lastZ = currentZ;
+        
+        previous_breaking_target = present_breaking_target;
+        if (progress == 0) {
+            destroyPartially(present_breaking_target, 99);
+            present_breaking_target = null;
+        }
     }
     
     private void genericUpdate_implementation(ISocketHolder socket, Coord coord, boolean powered) {
@@ -173,6 +188,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             } else {
                 cantDoWork(socket);
             }
+            progress = 0;
         }
         if (grab_items) {
             grab_items = false;
@@ -344,6 +360,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                 }
                 targetHash = -1;
             }
+            progress = 0;
             return true;
         } else if (mop.typeOfHit == EnumMovingObjectType.TILE) {
             int id = worldObj.getBlockId(mop.blockX, mop.blockY, mop.blockZ);
@@ -362,7 +379,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             if (cantDoWork(socket)) return true;
             socket.extractCharge(1); //It's fine if it fails
             
-            //Below: A demonstration of why Coord exists
+            //Below: A brief demonstration of why Coord exists
             long foundHash = (mop.blockX) + (mop.blockY << 2) + (mop.blockZ << 4);
             int md = worldObj.getBlockMetadata(mop.blockX, mop.blockY, mop.blockZ);
             float hardness = block.getBlockHardness(worldObj, mop.blockX, mop.blockY, mop.blockZ);
@@ -381,20 +398,19 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                 progress++;
             }
             boolean doBreak = progress >= grind_time*hardness || Core.cheat;
+            mop.subHit = id; //We abuse this to store the block ID!
             if (barrel == null && !doBreak) {
                 float perc = progress/((float)grind_time*hardness);
                 int breakage = (int) (perc*10);
-                worldObj.destroyBlockInWorldPartially(id, mop.blockX, mop.blockY, mop.blockZ, breakage);
-                needsReset = false;
-                currentX = mop.blockX;
-                currentY = mop.blockY;
-                currentZ = mop.blockZ;
+                destroyPartially(mop, breakage);
+                present_breaking_target = mop;
+            } else if (doBreak) {
+                destroyPartially(mop, 99);
             }
             if (doBreak) {
                 grab_items = true;
                 grind_items = true;
                 if (barrel == null) {
-                    
                     int l = id;
                     int i1 = md;
                     worldObj.playAuxSFX(2001, mop.blockX, mop.blockY, mop.blockZ, id + (md << 12));
@@ -406,8 +422,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                     {
                         ItemStack itemstack = pick;
                         boolean canHarvest = false;
-                        if (block != null)
-                        {
+                        if (block != null) {
                             canHarvest = block.canHarvestBlock(player, md);
                         }
 
@@ -421,6 +436,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                         block.onBlockDestroyedByPlayer(worldObj, mop.blockX, mop.blockY, mop.blockZ, md);
                         block.harvestBlock(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, 0);
                     }
+                    player.inventory.mainInventory[0] = null;
                 } else if (barrel.getItemCount() > 0) {
                     ItemStack is = barrel.item.copy();
                     is.stackSize = 1;
@@ -673,5 +689,13 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     @SideOnly(Side.CLIENT)
     public void resetEffectRenderer(WorldEvent.Unload loadEvent) {
         particleTweaker = null;
+    }
+    
+    @Override
+    public void uninstall() {
+        if (!worldObj.isRemote) {
+            destroyPartially(present_breaking_target, 99);
+            destroyPartially(previous_breaking_target, 99);
+        }
     }
 }

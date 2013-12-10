@@ -254,6 +254,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     @Override
     protected void onRemove() {
         super.onRemove();
+        uninstall();
         if (!(this instanceof SocketEmpty)) {
             getCoord().spawnItem(new ItemStack(Core.registry.socket_part, 1, getFactoryType().md));
         }
