@@ -111,14 +111,8 @@ Lower barriers to entry for servos:
 IMMEDIATE (for next public release)
 ---------
 servos:
-  review servo motor packets; send servo stack update packets only when holding an LMP
-pocket crafting table isn't quite syncing properly on servers, eg. 8 wood in a corner, swirl, get a button instead of a chest...
-  Maybe that Container transaction stuff?
-  [We've made the commands not execute client-side; we'll see if that fixes it in a not-terrible way...]
-  the server isn't updating the crafting slot after commands are executed? This is probably the issue...
-  [Alright, probably good now. Test?]
-let compression crafters look harder for adjacent inventories?
-compression crafter notification showing a bunch of ==='s? o_O
+  2 consecutive turns doesn't show the 2nd turn nicely -- No, that's not the behavior.
+
 
 SOON
 ----
@@ -132,7 +126,6 @@ do maths on energy conversion:
   (And we still need cooking food to be worthwhile!)
 LMP store instructions... Like a bag or a backpack
   - maybe let you merge instructions together? But then middle clicking.
-tool for renaming commands
 Test BoH key with NEI installed & with sneak key set to a mouse button.
 Church Organ
 
@@ -152,6 +145,12 @@ open sourcing the mod
 can we move the position the servo renders at back? So that it can look like it's turning at a better place...
 Do we remove aluminum ore processing? It feels unnecessary to me.
 show what instruction is being hilighted in big?
+SoundLogic thaumcraft aspects
+pocket crafting table, clicking 1-item-at-a-time for the craft output, seems laggy. Are we over-syncing?
+[profiling problems:] -- These two should be alright now
+  [constructing a player causes a recipe match; maybe just keep 1 FakePlayer and use it everywhere?]
+  [findMatchingRecipes also slow; our cache system isn't doing its thing? Or it's being called when it shouldn't be.]
+tool for renaming commands
 
 
 LESS TOP LIST
@@ -184,6 +183,7 @@ configuration method for adding ores?
 Placing/breaking wrath lamp in hammerspace seems to cause the client to crap its pants
 Don't keep non-weak references to worlds ("MapMaker.weakKeys().buildMap()") except in Entity/TileEntity
 register ore blocks
+compression crafter notification showing a bunch of ==='s? o_O
 To kill NEI's shift-? cheat: clear out RecipeInfo.overlayMap... or something.  Hmm....
   Might want to just remove instances whose class = DefaultOverlayHandler or BrewingOverlayHandler.
 http://jezek2.advel.cz/tmp/jstackalloc/javadoc/

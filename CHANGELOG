@@ -1,4 +1,15 @@
-0.18
+0.8.20
+  Giving out slightly fewer free silk touch diamond pickaxes
+  Fixed lacerator partial breaks
+  Parasieve can interact with entities like chestcarts and servos
+  [I'd like for them to do comparator output, but this isn't reasonably possible.]
+  Added a /f command/config option to make servo instructions not be myopia-inducingly small
+
+0.8.19
+  Compression crafters look slightly harder for output inventories
+  Made steam boilers more willing to output steam again
+
+0.8.18
   Fix rendering of multiple notifications
   Fix servo resuming from a trap (hopefully?)
   Fix Lacerator leaving partial breaks on blocks like sugarcane
