@@ -56,6 +56,7 @@ public class FzConfig {
     public static boolean fix_middle_click = true;
     public static boolean invasiveCharge = false;
     public static boolean enable_solar_steam = true;
+    public static boolean large_servo_instructions = false;
     
     public static boolean enable_retrogen = false;
     public static String retrogen_key = "DEFAULT";
@@ -148,6 +149,7 @@ public class FzConfig {
             lagssie_interval = getDoubleConfig("lagWatchDogInterval", "client", lagssie_interval, "If the game is stuck for longer than this amount of time (in seconds), dump a stacktrace of what it is doing.");
             fix_nether_fog = getBoolConfig("fixNetherFog", "client", fix_nether_fog, "Remove nether fog at short render distances");
             fix_middle_click = getBoolConfig("fixPickBlock", "client", fix_middle_click, "Make middle clicking more useful");
+            large_servo_instructions = getBoolConfig("largeServoInstructions", "client", large_servo_instructions, "Render servo instructions extra-large. This can also be toggled on and off using '/f servoInstructionSize'.");
         }
 
         

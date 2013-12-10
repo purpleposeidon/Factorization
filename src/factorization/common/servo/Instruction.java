@@ -5,6 +5,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.common.Core;
+import factorization.common.FzConfig;
 
 
 public abstract class Instruction extends Decorator {
@@ -41,5 +42,13 @@ public abstract class Instruction extends Decorator {
     /** @return true if calling this instruction should stop execution for the tick. Things that might cause world-interaction should do this. */
     public boolean interrupts() {
         return false;
+    }
+    
+    @Override
+    public float getSize() {
+        if (FzConfig.large_servo_instructions) {
+            return 3F/16F;
+        }
+        return super.getSize();
     }
 }

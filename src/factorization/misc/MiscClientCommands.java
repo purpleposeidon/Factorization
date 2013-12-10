@@ -434,6 +434,12 @@ public class MiscClientCommands implements ICommand {
             }
         }
         
+        @help("Change how large servo instructions are rendered. (This also has a config option.)")
+        public static String servoInstructionSize() {
+            FzConfig.large_servo_instructions = !FzConfig.large_servo_instructions;
+            return "Servo instruction size toggled; requires a chunk update to redraw.";
+        }
+        
         //Remember to include 'public' for anything added here.
         //Need to SideOnly(CLIENT) for things that access Minecraft.class, and add them to the list in the ICommand.
     }
