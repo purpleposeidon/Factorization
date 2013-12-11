@@ -33,3 +33,7 @@ popd > /dev/zero
 
 ./apply_ats_to_source.py
 
+mkdir -p ../jars/resourcepacks/
+pushd ../jars/resourcepacks/ > /dev/zero
+  ln -s $FZ/resources FzResources
+popd > /dev/zero

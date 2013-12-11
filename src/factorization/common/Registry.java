@@ -115,6 +115,14 @@ public class Registry implements ICraftingHandler, ITickHandler {
     
     WorldgenManager worldgenManager;
 
+    static void registerItem(Item item) {
+        GameRegistry.registerItem(item, item.getUnlocalizedName(), Core.modId);
+    }
+    
+    static void registerItem(Block block) {
+        registerItem(new ItemStack(block).getItem());
+    }
+    
     void makeBlocks() {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             //Theoretically, not necessary. I bet BUKKIT would flip its shit tho.
@@ -138,6 +146,12 @@ public class Registry implements ICraftingHandler, ITickHandler {
         GameRegistry.registerBlock(lightair_block, "FZ Lightair");
         GameRegistry.registerBlock(resource_block, ItemBlockResource.class, "FZ resource");
         GameRegistry.registerCraftingHandler(this);
+        
+        registerItem(factory_block);
+        registerItem(lightair_block);
+        registerItem(resource_block);
+        registerItem(dark_iron_ore);
+        registerItem(fractured_bedrock_block);
 
         Core.tab(factory_block, Core.TabType.BLOCKS);
         Core.tab(resource_block, TabType.BLOCKS);
@@ -173,13 +187,13 @@ public class Registry implements ICraftingHandler, ITickHandler {
     }
     
     void postMakeItems() {
-        //NORELEASE: Okay, ItemFactorization is overdue now. Get rid of this function.
         for (int id : added_ids) {
             Item it = Item.itemsList[id + 256];
             if (it == null) {
                 continue; //This is weird.
             }
             it.setTextureName(it.getUnlocalizedName());
+            registerItem(it);
         }
     }
 
@@ -305,8 +319,8 @@ public class Registry implements ICraftingHandler, ITickHandler {
         
         //Servos
         servo_motor_placer = new ItemServoMotor(itemID("servoMotorPlacer", 9056));
-        servo_widget_decor = new ItemServoRailWidget(itemID("servoWidgetDecor", 9057));
-        servo_widget_instruction = new ItemServoRailWidget(itemID("servoWidgetInstruction", 9061));
+        servo_widget_decor = new ItemServoRailWidget(itemID("servoWidgetDecor", 9057), "servo/decorator");
+        servo_widget_instruction = new ItemServoRailWidget(itemID("servoWidgetInstruction", 9061), "servo/component");
         servo_widget_decor.setMaxStackSize(16);
         servo_widget_instruction.setMaxStackSize(1);
         dark_iron_sprocket = new ItemStack(new ItemCraftingComponent(itemID("darkIronSprocket", 9059), "servo/sprocket"));

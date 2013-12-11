@@ -20,8 +20,8 @@ import factorization.common.FactorizationUtil;
 import factorization.common.ItemFactorization;
 
 public class ItemServoRailWidget extends ItemFactorization {
-    public ItemServoRailWidget(int itemId) {
-        super(itemId, "servo/component", TabType.SERVOS);
+    public ItemServoRailWidget(int itemId, String name) {
+        super(itemId, name, TabType.SERVOS);
     }
     
     @Override
