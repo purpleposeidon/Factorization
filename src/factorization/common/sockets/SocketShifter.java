@@ -186,6 +186,9 @@ public class SocketShifter extends TileEntitySocketBase {
                         break out;
                     }
                 }
+                if (had_change) {
+                    break;
+                }
             }
         } else { //NOTE: An optimization is available if limit == 1
             boolean[] visitedSlots = new boolean[pullInv.size()];
