@@ -1,3 +1,6 @@
+0.8.23
+  Fix socket's "transer some" to stop after moving 1 stack.
+
 0.8.20
   Giving out slightly fewer free silk touch diamond pickaxes
   Fixed lacerator partial breaks
