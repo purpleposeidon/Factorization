@@ -193,6 +193,11 @@ public class ItemSculptingTool extends ItemFactorization {
             rep.totalHeat = 0;
             rep.glazesApplied = false;
             rep.lastTouched = 0;
+            for (ClayLump part : rep.parts) {
+                part.icon_id = 0;
+                part.icon_md = 0;
+                part.icon_side = -1;
+            }
             ItemStack toDrop = rep.getItem();
             if (gw.customName != null) {
                 toDrop.setItemName(gw.customName);
