@@ -534,10 +534,6 @@ public class Registry implements ICraftingHandler, ITickHandler {
         //Sculpture combiniation recipe
         GameRegistry.addRecipe(new IRecipe() {
             ArrayList<ItemStack> merge(InventoryCrafting inv) {
-                //NORELEASE: Test below. Oh, and also: test this as well.
-                //if (inv.stackList.length < 2) {
-                //	return null;
-                //}
                 ArrayList<ItemStack> match = new ArrayList<ItemStack>(2);
                 int part_count = 0;
                 for (int i = 0; i < inv.getSizeInventory(); i++) {
