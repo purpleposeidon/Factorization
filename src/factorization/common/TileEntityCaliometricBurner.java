@@ -164,7 +164,8 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
             sat = 0.1F;
         }
         heal += Math.min(0, heal*2*sat);
-        return heal*(heal/4);
+        int r = (int)(heal*(heal/4F));
+        return Math.max(heal, r);
     }
     
     @Override
