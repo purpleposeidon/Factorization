@@ -68,8 +68,8 @@ public class FactorizationOreProcessingHandler {
             FurnaceRecipes.smelting().addSmelting(is.itemID, is.getItemDamage(), ingot, xp);
         }
         if (oreType != OreType.LEAD && oreType != OreType.SILVER) {
-            TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.42857142857143F, ingot, 0.2F, Block.dirt);
-            //TODO: This should output reduced chunks instead!
+            TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.1F, ingot, 0.2F, Block.dirt);
+            //Or it could output reduced chunks instead.
         }
     }
     
