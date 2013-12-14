@@ -39,7 +39,9 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
         Tessellator.instance.setBrightness(brightness);
         Tessellator.instance.setColorOpaque_F(color, color, color);
         block.renderForTileEntity();
+        GL11.glDisable(GL11.GL_BLEND);
         Tessellator.instance.draw();
+        GL11.glEnable(GL11.GL_BLEND);
         GL11.glPopMatrix();
         GL11.glColor4f(1, 1, 1, 1);
         GL11.glEnable(GL11.GL_LIGHTING);
