@@ -207,7 +207,7 @@ public class MiscClientCommands implements ICommand {
         @help("Makes it a sunny morning")
         public static void nice() {
             if (player.worldObj.isRaining()) {
-                player.sendChatMessage("/toggledownfall");
+                player.sendChatMessage("/weather clear");
             }
             double angle =player.worldObj.getCelestialAngle(0) % 360;
             if (angle < 45 || angle > 90+45) {
@@ -440,8 +440,14 @@ public class MiscClientCommands implements ICommand {
             return "Servo instruction size toggled; requires a chunk update to redraw.";
         }
         
-        //Remember to include 'public' for anything added here.
-        //Need to SideOnly(CLIENT) for things that access Minecraft.class, and add them to the list in the ICommand.
+        @help("Makes it always day, clear weather, etc.")
+        public static void setupSterileTestWorld() {
+            player.sendChatMessage("/gamerule doDaylightCycle false");
+            player.sendChatMessage("/weather clear 999999");
+            player.sendChatMessage("/time set " + 20*60);
+        }
+        
+        //Remember to include 'public static' for anything added here.
     }
     
     @Override
