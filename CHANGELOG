@@ -1,3 +1,11 @@
+0.8.24
+  Fixed dirty gravel ore slagging recipe being missed out on the probability reassignment.
+  Heater won't go transparent
+  Robotic arm does buckets now, sort of.
+  Sculptures made by molding a high-fired piece won't think they've still got the original glaze on.
+  Caliometric burner accepts low-quality foods again.
+  Limit barrel error spam
+
 0.8.23
   Fix socket's "transer some" to stop after moving 1 stack.
 
