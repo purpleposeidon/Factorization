@@ -131,7 +131,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         int blockId = mop.subHit; //We abuse this to store the block ID!
         //This is necessary because vanilla seems to key things by the block ID.
         //Otherwise we'd have partial breaks floating around...
-        worldObj.destroyBlockInWorldPartially(blockId, mop.blockX, mop.blockY, mop.blockZ, amount);
+        worldObj.destroyBlockInWorldPartially(hashCode(), mop.blockX, mop.blockY, mop.blockZ, amount);
     }
     
     @Override
@@ -365,6 +365,9 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         } else if (mop.typeOfHit == EnumMovingObjectType.TILE) {
             int id = worldObj.getBlockId(mop.blockX, mop.blockY, mop.blockZ);
             Block block = Block.blocksList[id];
+            if (block == null || block.isAirBlock(worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
+                return false;
+            }
             TileEntity te = null;
             TileEntityDayBarrel barrel = null;
             if (block == Core.registry.factory_block) {
@@ -425,6 +428,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                         if (block != null) {
                             canHarvest = block.canHarvestBlock(player, md);
                         }
+                        canHarvest = true; //Hack-around for cobalt/ardite. Hmm.
 
                         boolean didRemove = removeBlock(player, block, md, mop.blockX, mop.blockY, mop.blockZ);
                         if (didRemove && canHarvest) {
@@ -553,7 +557,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())).glRotate();
         float turn = FactorizationUtil.interp(prev_rotation, rotation, partial) / 5.0F;
         GL11.glRotatef(turn, 0, 1, 0);
-        float sd = motor == null ? 0 : 3F/16F;
+        float sd = motor == null ? 1F/16F : 3F/16F;
         GL11.glTranslatef(0, -4F/16F + sd + (float) Math.abs(Math.sin(turn/800))/32F, 0);
         TileEntityGrinderRender.renderGrindHead();
         if (ticked) {

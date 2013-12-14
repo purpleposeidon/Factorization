@@ -2,16 +2,18 @@ package factorization.common.sockets;
 
 import java.io.IOException;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumMovingObjectType;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.FakePlayer;
+import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -20,6 +22,7 @@ import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
+import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
 import factorization.common.FactorizationUtil;
@@ -45,7 +48,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
     
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        wasPowered = data.asSameShare("pow").putBoolean(wasPowered);
+        wasPowered = data.as(Share.PRIVATE, "pow").putBoolean(wasPowered);
         return this;
     }
     
@@ -64,60 +67,84 @@ public class SocketRobotHand extends TileEntitySocketBase {
             return;
         }
         FzOrientation orientation = FzOrientation.fromDirection(facing).getSwapped();
+        fakePlayer = null;
         rayTrace(socket, coord, orientation, powered, false, false);
+        fakePlayer = null;
     }
+    
+    EntityPlayer fakePlayer;
     
     @Override
     public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
-        EntityPlayer player = getFakePlayer();
+        if (fakePlayer == null) {
+            fakePlayer = getFakePlayer();
+        }
+        EntityPlayer player = fakePlayer;
         FzInv inv = FactorizationUtil.openInventory(getBackingInventory(socket), facing);
         boolean foundAny = false;
+        int anEmpty = -1;
         for (int i = 0; i < inv.size(); i++) {
             ItemStack is = inv.get(i);
             if (is == null || is.stackSize <= 0 || !inv.canExtract(i, is)) {
+                if (anEmpty != -1) {
+                    anEmpty = i;
+                }
                 continue;
             }
             player.inventory.mainInventory[0] = is;
             foundAny = true;
-            ItemStack orig = is.copy();
-            if (clickItem(player, is, mop)) {
-                if (is.stackSize <= 0 || !FactorizationUtil.couldMerge(orig, is)) {
-                    // Easiest case: the item is all used up.
-                    // Worst case: barrel of magic jumping beans that change color.
-                    // To handle: extract the entire stack. It is lost. Attempt to stuff the rest of the inv back in.
-                    // Anything that can't be stuffed gets dropped on the ground.
-                    // This could break with funky items/inventories tho.
-                    inv.set(i, null); //Bye-bye!
-                    if (is.stackSize > 0) {
-                        is = inv.pushInto(i, is);
-                        if (is == null || is.stackSize <= 0) {
-                            player.inventory.mainInventory[0] = null;
-                        }
-                    }
-                    Coord here = null;
-                    for (int j = 0; j < player.inventory.getSizeInventory(); j++) {
-                        ItemStack toPush = player.inventory.getStackInSlot(j);
-                        ItemStack toDrop = inv.push(toPush);
-                        if (toDrop != null && toDrop.stackSize > 0) {
-                            if (here == null) here = getCoord();
-                            here.spawnItem(toDrop);
-                        }
-                        player.inventory.setInventorySlotContents(i, null);
-                    }
-                } else {
-                    // We aren't calling inv.decrStackInSlot.
-                    inv.set(i, is);
-                }
-                inv.onInvChanged();
+            if (clickWithInventory(i, inv, player, is, mop)) {
                 return true;
             }
         }
-        return foundAny;
+        if (!foundAny && anEmpty != -1) {
+            return clickWithInventory(anEmpty, inv, player, null, mop);
+        }
+        return false;
+    }
+    
+    boolean clickWithInventory(int i, FzInv inv, EntityPlayer player, ItemStack is, MovingObjectPosition mop) {
+        ItemStack orig = is == null ? null : is.copy();
+        boolean result = clickItem(player, is, mop);
+        int newSize = FactorizationUtil.getStackSize(is);
+        is = player.inventory.mainInventory[0];
+        // Easiest case: the item is all used up.
+        // Worst case: barrel of magic jumping beans that change color.
+        // (Or more realistically, a barrel of empty buckets for milking a cow...)
+        // To handle: extract the entire stack. It is lost. Attempt to stuff the rest of the inv back in.
+        // Anything that can't be stuffed gets dropped on the ground.
+        // This could break with funky items/inventories tho.
+        if (newSize <= 0 || !FactorizationUtil.couldMerge(orig, is)) {
+            inv.set(i, null); //Bye-bye!
+            if (newSize > 0) {
+                is = inv.pushInto(i, is);
+                if (is == null || is.stackSize <= 0) {
+                    player.inventory.mainInventory[0] = null;
+                }
+            }
+        } else {
+            // We aren't calling inv.decrStackInSlot.
+            inv.set(i, is);
+            player.inventory.mainInventory[0] = null;
+        }
+        Coord here = null;
+        for (int j = 0; j < player.inventory.getSizeInventory(); j++) {
+            ItemStack toPush = player.inventory.getStackInSlot(j);
+            ItemStack toDrop = inv.push(toPush);
+            if (toDrop != null && toDrop.stackSize > 0) {
+                if (here == null) here = getCoord();
+                here.spawnItem(toDrop);
+            }
+            player.inventory.setInventorySlotContents(j, null);
+        }
+        inv.onInvChanged();
+        return result;
     }
     
     boolean clickItem(EntityPlayer player, ItemStack is, MovingObjectPosition mop) {
         if (mop.typeOfHit == EnumMovingObjectType.TILE) {
-            Vec3 hitVec = mop.hitVec;
+            return mcClick(player, mop, is);
+            /*Vec3 hitVec = mop.hitVec;
             int x = mop.blockX, y = mop.blockY, z = mop.blockZ;
             float dx = (float) (hitVec.xCoord - x);
             float dy = (float) (hitVec.yCoord - y);
@@ -128,7 +155,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
             }
             if (it.onItemUse(is, player, worldObj, x, y, z, mop.sideHit, dx, dy, dz)) {
                 return true;
-            }
+            }*/
         } else if (mop.typeOfHit == EnumMovingObjectType.ENTITY) {
             if (mop.entityHit.interactFirst(player)) {
                 return true;
@@ -140,6 +167,62 @@ public class SocketRobotHand extends TileEntitySocketBase {
             }
         }
         return false;
+    }
+    
+    boolean mcClick(EntityPlayer player, MovingObjectPosition mop, ItemStack itemstack) {
+        //Yoinked and cleaned up from Minecraft.clickMouse and PlayerControllerMP.onPlayerRightClick
+        final World world = player.worldObj;
+        final int x = mop.blockX;
+        final int y = mop.blockY;
+        final int z = mop.blockZ;
+        final int side = mop.sideHit;
+        final Vec3 hitVec = mop.hitVec;
+        final float dx = (float)hitVec.xCoord - (float)x;
+        final float dy = (float)hitVec.yCoord - (float)y;
+        final float dz = (float)hitVec.zCoord - (float)z;
+        final Item item = itemstack == null ? null : itemstack.getItem();
+        
+        boolean ret = false;
+        do {
+            //PlayerControllerMP.onPlayerRightClick
+            if (itemstack != null && item.onItemUseFirst(itemstack, player, world, x, y, z, side, dx, dy, dz)) {
+                ret = true;
+                break;
+            }
+            
+            if (!player.isSneaking() || itemstack == null || item.shouldPassSneakingClickToBlock(world, x, y, z)) {
+                int blockId = world.getBlockId(x, y, z);
+            
+                if (blockId > 0 && Block.blocksList[blockId].onBlockActivated(world, x, y, z, player, side, dx, dy, dz)) {
+                    ret = true;
+                    break;
+                }
+            }
+            if (itemstack == null) {
+                ret = false;
+                break;
+            }
+            if (item instanceof ItemBlock) {
+                ItemBlock itemblock = (ItemBlock)item;
+                if (!itemblock.canPlaceItemBlockOnSide(world, x, y, z, side, player, itemstack)) {
+                    ret = false;
+                    break;
+                }
+            }
+            if (!itemstack.tryPlaceItemIntoWorld(player, world, x, y, z, side, dx, dy, dz)) {
+                ret = false;
+                break;
+            }
+        } while (false);
+        int origSize = itemstack.stackSize;
+        ItemStack mutatedItem = itemstack.useItemRightClick(world, player);
+
+        if (mutatedItem == itemstack && (mutatedItem == null || mutatedItem.stackSize == origSize)) {
+            return ret;
+        }
+        player.inventory.mainInventory[player.inventory.currentItem] = mutatedItem;
+
+        return true;
     }
     
     @Override

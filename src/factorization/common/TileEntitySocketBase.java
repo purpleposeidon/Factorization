@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
@@ -23,8 +21,10 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Icon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.FakePlayer;
 import net.minecraftforge.common.ForgeDirection;
+
+import org.lwjgl.opengl.GL11;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -145,9 +145,9 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         final ForgeDirection right = face.getRotation(top);
         
         for (Entity entity : getEntities(socket, coord, top, 0)) {
-            //if (!entity.canBeCollidedWith()) {
-            //	continue;
-            //}
+            if (entity == socket) {
+                continue;
+            }
             if (handleRay(socket, new MovingObjectPosition(entity), false, powered)) {
                 return true;
             }
@@ -158,7 +158,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         if (mopBlock(targetBlock, top.getOpposite(), socket, false, powered)) return true; //nose-to-nose with the servo
         if (onlyFirst) return false;
         if (mopBlock(targetBlock.add(top), top.getOpposite(), socket, false, powered)) return true; //a block away
-        if (mopBlock(targetBlock.add(top.getOpposite()), top, socket, true, powered)) return true;
+        if (mopBlock(coord, top, socket, true, powered)) return true;
         if (!lookAround) return false;
         if (mopBlock(targetBlock.add(face), face.getOpposite(), socket, false, powered)) return true; //running forward
         if (mopBlock(targetBlock.add(face.getOpposite()), face, socket, false, powered)) return true; //running backward
@@ -169,9 +169,10 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     private static final Vec3 nullVec = Vec3.createVectorHelper(0, 0, 0);
     boolean mopBlock(Coord target, ForgeDirection side, ISocketHolder socket, boolean mopIsThis, boolean powered) {
-        if (target.isAir()) {
-            return false;
-        }
+        nullVec.xCoord = xCoord + side.offsetX;
+        nullVec.yCoord = yCoord + side.offsetY;
+        nullVec.zCoord = zCoord + side.offsetZ;
+        
         return handleRay(socket, target.createMop(side, nullVec), mopIsThis, powered);
     }
     
@@ -273,20 +274,24 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         return FactoryType.SOCKET_EMPTY.itemStack();
     }
     
-    private static EntityPlayer silkyPlayer;
+    private static float[] pitch = new float[] {-90, 90, 0, 0, 0, 0, 0};
+    private static float[] yaw = new float[] {0, 0, 180, 0, 90, -90, 0};
     
     protected EntityPlayer getFakePlayer() {
-        if (silkyPlayer == null) {
-            silkyPlayer = FactorizationUtil.makePlayer(getCoord(), "socket");
+        EntityPlayer player = FactorizationUtil.makePlayer(getCoord(), "socket");
+        player.worldObj = worldObj;
+        player.prevPosX = player.posX = xCoord + 0.5;
+        player.prevPosY = player.posY = yCoord + 0.5 - player.getEyeHeight() + facing.offsetY;
+        player.prevPosZ = player.posZ = zCoord + 0.5;
+        for (int i = 0; i < player.inventory.mainInventory.length; i++) {
+            player.inventory.mainInventory[i] = null;
         }
-        silkyPlayer.worldObj = worldObj;
-        silkyPlayer.posX = xCoord;
-        silkyPlayer.posY = yCoord;
-        silkyPlayer.posZ = zCoord;
-        for (int i = 0; i < silkyPlayer.inventory.mainInventory.length; i++) {
-            silkyPlayer.inventory.mainInventory[i] = null;
-        }
-        return silkyPlayer;
+        
+        int i = facing.ordinal();
+        player.rotationPitch = player.prevRotationPitch = pitch[i];
+        player.rotationYaw = player.prevRotationYaw = yaw[i];
+        
+        return player;
     }
     
     protected IInventory getBackingInventory(ISocketHolder socket) {

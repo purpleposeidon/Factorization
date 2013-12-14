@@ -580,7 +580,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         if (is == null) {
             return false;
         }
-        if (socket instanceof SocketEmpty) {
+        if (socket instanceof SocketEmpty && is.getItem() == Core.registry.socket_part) {
             int md = is.getItemDamage();
             if (md > 0 && md < FactoryType.MAX_ID) {
                 try {
