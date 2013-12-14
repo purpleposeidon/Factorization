@@ -290,10 +290,15 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         changeItemCount(0);
     }
     
+    private boolean spammed = false;
     public void changeItemCount(int delta) {
         middleCount = getItemCount() + delta;
         if (middleCount < 0) {
-            Core.logSevere("Tried to set the item count to negative value " + middleCount + " at " + getCoord());
+            if (!spammed) {
+                Core.logSevere("Tried to set the item count to negative value " + middleCount + " at " + getCoord());
+                Thread.dumpStack();
+                spammed = true;
+            }
             middleCount = 0;
             item = null;
         }
@@ -303,8 +308,11 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             onInventoryChanged();
             return;
         }
-        if (middleCount > getMaxSize()) {
-            Core.logSevere("Factorization barrel size " + middleCount + " is larger than the maximum, " + getMaxSize() + " at " + getCoord());
+        if (middleCount > getMaxSize() && !spammed && worldObj != null) {
+            Core.logSevere("Factorization barrel size, " + middleCount + ", is larger than the maximum, " + getMaxSize() + ". Contents: " + item + " " + (item != null ? item.getItem() : "<null>") + " At: " + getCoord());
+            Core.logSevere("Did the max stack size go down, or is someone doing something bad?");
+            Thread.dumpStack();
+            spammed = true;
         }
         if (topStack == null) {
             topStack = item.copy();
@@ -561,8 +569,11 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     @Override
     public void setInventorySlotContents(int slot, ItemStack is) {
         if (is != null && !taint(is)) {
-            Core.logWarning("Bye bye, %s", is);
-            Thread.dumpStack();
+            if (!spammed) {
+                Core.logWarning("Bye bye, %s", is);
+                Thread.dumpStack();
+                spammed = true;
+            }
             return;
         }
         if (slot == 0) {
@@ -570,8 +581,11 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         } else if (slot == 1) {
             bottomStack = is;
         } else {
-            Core.logWarning("Say goodbye, %s !", is);
-            Thread.dumpStack();
+            if (!spammed) {
+                Core.logWarning("Say goodbye, %s !", is);
+                Thread.dumpStack();
+                spammed = true;
+            }
         }
     }
 
