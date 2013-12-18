@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
+import factorization.common.Core;
 
 public class ServoStack implements IDataSerializable, Iterable {
     private LinkedList<Object> contents = new LinkedList<Object>();
@@ -22,6 +23,11 @@ public class ServoStack implements IDataSerializable, Iterable {
     }
 
     public boolean push(Object o) {
+        if (o == null) {
+            Core.logSevere("Tried to push null!");
+            Thread.dumpStack();
+            return false;
+        }
         if (contents.size() >= maxSize) {
             return false;
         }
@@ -31,6 +37,11 @@ public class ServoStack implements IDataSerializable, Iterable {
     }
 
     public boolean append(Object o) {
+        if (o == null) {
+            Core.logSevere("Tried to append null!");
+            Thread.dumpStack();
+            return false;
+        }
         if (contents.size() >= maxSize) {
             return false;
         }

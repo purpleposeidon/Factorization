@@ -28,6 +28,10 @@ public class Dup extends Instruction {
     public void motorHit(ServoMotor motor) {
         ServoStack stack = motor.getServoStack(ServoMotor.STACK_ARGUMENT);
         Object a = stack.pop();
+        if (a == null) {
+            motor.putError("Dup: Stack underflow");
+            return;
+        }
         stack.push(a);
         stack.push(a);
     }
