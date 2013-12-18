@@ -17,6 +17,7 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
 
     @Override
     public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
+        GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glPushMatrix();
         bindTexture(Core.blockAtlas);
@@ -41,10 +42,10 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
         block.renderForTileEntity();
         GL11.glDisable(GL11.GL_BLEND);
         Tessellator.instance.draw();
-        GL11.glEnable(GL11.GL_BLEND);
         GL11.glPopMatrix();
         GL11.glColor4f(1, 1, 1, 1);
         GL11.glEnable(GL11.GL_LIGHTING);
+        GL11.glPopAttrib();
     }
 
 }
