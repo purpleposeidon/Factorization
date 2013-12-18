@@ -161,10 +161,9 @@ public class RenderServoMotor extends RenderEntity {
             float gray = 0.65F;
             GL11.glColor4f(gray, gray, gray, 0.8F);
             GL11.glLineWidth(1.5F);
-            Minecraft mc = Minecraft.getMinecraft();
             float d = 1F/2F, h = 0.25F;
             AxisAlignedBB ab = AxisAlignedBB.getBoundingBox(-d, -h, -d, d, h, d);
-            mc.renderGlobal.drawOutlinedBoundingBox(ab);
+            drawOutlinedBoundingBox(ab);
             ab.offset(ab.minX, ab.minY, ab.minZ);
             GL11.glPopAttrib();
             GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -190,6 +189,34 @@ public class RenderServoMotor extends RenderEntity {
         GL11.glPopMatrix();
         motor.interpolatePosition(motor.pos_progress);
         Core.profileEndRender();
+    }
+    
+    void drawOutlinedBoundingBox(AxisAlignedBB par1AxisAlignedBB) {
+        Tessellator tessellator = Tessellator.instance;
+        tessellator.startDrawing(3);
+        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.minY, par1AxisAlignedBB.minZ);
+        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.minY, par1AxisAlignedBB.minZ);
+        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.minY, par1AxisAlignedBB.maxZ);
+        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.minY, par1AxisAlignedBB.maxZ);
+        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.minY, par1AxisAlignedBB.minZ);
+        tessellator.draw();
+        tessellator.startDrawing(3);
+        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.minZ);
+        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.minZ);
+        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.maxZ);
+        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.maxZ);
+        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.minZ);
+        tessellator.draw();
+        tessellator.startDrawing(1);
+        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.minY, par1AxisAlignedBB.minZ);
+        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.minZ);
+        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.minY, par1AxisAlignedBB.minZ);
+        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.minZ);
+        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.minY, par1AxisAlignedBB.maxZ);
+        tessellator.addVertex(par1AxisAlignedBB.maxX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.maxZ);
+        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.minY, par1AxisAlignedBB.maxZ);
+        tessellator.addVertex(par1AxisAlignedBB.minX, par1AxisAlignedBB.maxY, par1AxisAlignedBB.maxZ);
+        tessellator.draw();
     }
     
     void orientMotor(ServoMotor motor, float partial, float reorientInterpolation) {
