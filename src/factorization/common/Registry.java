@@ -887,12 +887,6 @@ public class Registry implements ICraftingHandler, ITickHandler {
                     'W', leadwire_item,
                     'I', Item.ingotIron,
                     'B', new ItemStack(battery, 1, damage));
-            recipe(new ItemStack(battery, 1, damage - 1),
-                    "W",
-                    "B",
-                    "W",
-                    'W', leadwire_item,
-                    'B', new ItemStack(battery, 1, damage));
         }
         oreRecipe(leydenjar_item,
                 "#G#",
