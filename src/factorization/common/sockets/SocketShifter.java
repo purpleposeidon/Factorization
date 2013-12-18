@@ -177,6 +177,25 @@ public class SocketShifter extends TileEntitySocketBase {
             int toMove = transferLimit;
             out: for (int pull = pullStart; pull <= pullEnd; pull++) {
                 for (int push = 0; push < pushInv.size(); push++) {
+                    if (pushInv.get(push) == null) {
+                        continue;
+                    }
+                    int delta = pullInv.transfer(pull, pushInv, push, toMove);
+                    toMove -= delta;
+                    if (delta > 0) {
+                        had_change = true;
+                    }
+                    if (toMove <= 0) {
+                        break out;
+                    }
+                }
+                if (toMove <= 0) {
+                    break out;
+                }
+                for (int push = 0; push < pushInv.size(); push++) {
+                    if (pushInv.get(push) != null) {
+                        continue;
+                    }
                     int delta = pullInv.transfer(pull, pushInv, push, toMove);
                     toMove -= delta;
                     if (delta > 0) {
