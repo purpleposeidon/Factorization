@@ -14,9 +14,9 @@ import net.minecraft.item.ItemStack;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.recipe.GuiRecipe;
 import codechicken.nei.recipe.TemplateRecipeHandler;
-import factorization.client.gui.GuiCrystallizer;
-import factorization.common.TileEntityCrystallizer;
-import factorization.common.TileEntityCrystallizer.CrystalRecipe;
+import factorization.oreprocessing.GuiCrystallizer;
+import factorization.oreprocessing.TileEntityCrystallizer;
+import factorization.oreprocessing.TileEntityCrystallizer.CrystalRecipe;
 import factorization.shared.Core;
 
 public class RecipeCrystallizer extends TemplateRecipeHandler  {

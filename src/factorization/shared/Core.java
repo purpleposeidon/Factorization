@@ -43,13 +43,13 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.ChargeMetalBlockConductance;
 import factorization.charge.TileEntitySolarBoiler;
-import factorization.common.FactorizationOreProcessingHandler;
 import factorization.common.Registry;
-import factorization.common.TileEntityWrathFire;
-import factorization.common.TileEntityWrathLamp;
-import factorization.common.TileEntityWrathLamp.RelightTask;
 import factorization.compat.CompatManager;
+import factorization.oreprocessing.FactorizationOreProcessingHandler;
 import factorization.servo.ServoMotor;
+import factorization.wrath.TileEntityWrathFire;
+import factorization.wrath.TileEntityWrathLamp;
+import factorization.wrath.TileEntityWrathLamp.RelightTask;
 
 @Mod(modid = Core.modId, name = Core.name, version = Core.version)
 @NetworkMod(

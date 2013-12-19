@@ -17,11 +17,11 @@ import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
 import factorization.api.Coord;
 import factorization.common.BlockRenderHelper;
-import factorization.common.ContainerCrystallizer;
 import factorization.common.ContainerFactorization;
-import factorization.common.ContainerGrinder;
-import factorization.common.ContainerSlagFurnace;
 import factorization.crafting.ContainerMixer;
+import factorization.oreprocessing.ContainerCrystallizer;
+import factorization.oreprocessing.ContainerGrinder;
+import factorization.oreprocessing.ContainerSlagFurnace;
 import factorization.weird.ContainerPocket;
 
 public abstract class FactorizationProxy implements IGuiHandler {

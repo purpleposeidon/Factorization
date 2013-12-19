@@ -5,9 +5,14 @@ import java.util.Arrays;
 
 import factorization.crafting.TileEntityMixer;
 import factorization.crafting.TileEntityStamper;
+import factorization.oreprocessing.TileEntityCrystallizer;
+import factorization.oreprocessing.TileEntityGrinder;
+import factorization.oreprocessing.TileEntitySlagFurnace;
+import factorization.servo.TileEntityParaSieve;
 import factorization.shared.FactoryType;
 import factorization.shared.FzUtil;
 import factorization.shared.TileEntityFactorization;
+import factorization.wrath.TileEntityRouter;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -24,7 +29,7 @@ public class ContainerFactorization extends Container {
     int slot_start, slot_end;
     int player_slot_start, player_slot_end;
     public EntityPlayer entityplayer;
-    int invdx = 0, invdy = 0;
+    public int invdx = 0, invdy = 0;
 
     public ContainerFactorization(EntityPlayer entityplayer, TileEntityFactorization factory) {
         this.factory = factory;

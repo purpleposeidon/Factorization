@@ -6,7 +6,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
-import factorization.common.BlockLightAir;
+import factorization.wrath.BlockLightAir;
 
 public class FactorizationRender implements ISimpleBlockRenderingHandler {
     public FactorizationRender() {

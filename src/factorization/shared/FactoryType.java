@@ -12,18 +12,15 @@ import factorization.charge.TileEntityMirror;
 import factorization.charge.TileEntitySolarBoiler;
 import factorization.charge.TileEntitySteamTurbine;
 import factorization.charge.TileEntityWire;
-import factorization.common.TileEntityCrystallizer;
-import factorization.common.TileEntityGrinder;
-import factorization.common.TileEntityParaSieve;
 import factorization.common.TileEntityRocketEngine;
-import factorization.common.TileEntityRouter;
-import factorization.common.TileEntitySlagFurnace;
-import factorization.common.TileEntityWrathFire;
-import factorization.common.TileEntityWrathLamp;
 import factorization.crafting.TileEntityCompressionCrafter;
 import factorization.crafting.TileEntityMixer;
 import factorization.crafting.TileEntityPackager;
 import factorization.crafting.TileEntityStamper;
+import factorization.oreprocessing.TileEntityCrystallizer;
+import factorization.oreprocessing.TileEntityGrinder;
+import factorization.oreprocessing.TileEntitySlagFurnace;
+import factorization.servo.TileEntityParaSieve;
 import factorization.servo.TileEntityServoRail;
 import factorization.sockets.SocketEmpty;
 import factorization.sockets.SocketLacerator;
@@ -31,6 +28,9 @@ import factorization.sockets.SocketRobotHand;
 import factorization.sockets.SocketShifter;
 import factorization.weird.TileEntityBarrel;
 import factorization.weird.TileEntityDayBarrel;
+import factorization.wrath.TileEntityRouter;
+import factorization.wrath.TileEntityWrathFire;
+import factorization.wrath.TileEntityWrathLamp;
 
 public enum FactoryType {
     //Traced here is the history of Factorization.

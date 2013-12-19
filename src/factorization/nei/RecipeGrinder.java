@@ -11,9 +11,9 @@ import net.minecraft.item.ItemStack;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.recipe.GuiRecipe;
 import codechicken.nei.recipe.TemplateRecipeHandler;
-import factorization.client.gui.GuiGrinder;
-import factorization.common.TileEntityGrinder;
-import factorization.common.TileEntityGrinder.GrinderRecipe;
+import factorization.oreprocessing.GuiGrinder;
+import factorization.oreprocessing.TileEntityGrinder;
+import factorization.oreprocessing.TileEntityGrinder.GrinderRecipe;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
