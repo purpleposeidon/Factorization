@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.ceramics;
 
 import java.util.List;
 
@@ -13,19 +13,21 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
-import factorization.common.TileEntityGreenware.ClayLump;
-import factorization.common.TileEntityGreenware.ClayState;
+import factorization.ceramics.TileEntityGreenware.ClayLump;
+import factorization.ceramics.TileEntityGreenware.ClayState;
+import factorization.common.BlockRenderHelper;
+import factorization.common.ItemIcons;
 import factorization.notify.Notify;
 import factorization.shared.Core;
+import factorization.shared.Core.TabType;
 import factorization.shared.FactoryType;
 import factorization.shared.FzUtil;
-import factorization.shared.ItemFactorization;
-import factorization.shared.Core.TabType;
 import factorization.shared.FzUtil.FzInv;
+import factorization.shared.ItemFactorization;
 
 public class ItemSculptingTool extends ItemFactorization {
 
-    protected ItemSculptingTool(int id) {
+    public ItemSculptingTool(int id) {
         super(id, "sculptTool", TabType.ART);
         setNoRepair();
         setMaxDamage(0);
@@ -33,7 +35,7 @@ public class ItemSculptingTool extends ItemFactorization {
         setFull3D();
     }
     
-    static void addModeChangeRecipes() {
+    public static void addModeChangeRecipes() {
         int length = ToolMode.values().length;
         ToolMode mode[] = ToolMode.values();
         for (int i = 0; i < length; i++) {

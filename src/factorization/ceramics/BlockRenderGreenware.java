@@ -1,4 +1,4 @@
-package factorization.client.render;
+package factorization.ceramics;
 
 import java.util.Random;
 
@@ -8,12 +8,10 @@ import net.minecraft.client.renderer.Tessellator;
 
 import org.lwjgl.opengl.GL11;
 
-import factorization.common.BasicGlazes;
+import factorization.ceramics.TileEntityGreenware.ClayLump;
+import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
-import factorization.common.TileEntityGreenware;
-import factorization.common.TileEntityGreenware.ClayLump;
-import factorization.common.TileEntityGreenware.ClayState;
 import factorization.shared.Core;
 import factorization.shared.FactorizationBlockRender;
 import factorization.shared.FactoryType;

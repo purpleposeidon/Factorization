@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.ceramics;
 
 import java.io.DataInput;
 import java.io.DataInputStream;
@@ -39,6 +39,9 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.Quaternion;
+import factorization.common.BlockIcons;
+import factorization.common.BlockRenderHelper;
+import factorization.common.ResourceType;
 import factorization.notify.Notify;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
@@ -219,7 +222,7 @@ public class TileEntityGreenware extends TileEntityCommon {
 
     public ArrayList<ClayLump> parts = new ArrayList();
     public int lastTouched = 0;
-    int totalHeat = 0;
+    public int totalHeat = 0;
     boolean glazesApplied = false;
     private boolean partsValidated = false;
 
@@ -365,7 +368,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         loadParts(is.getTagCompound());
     }
 
-    ItemStack getItem() {
+    public ItemStack getItem() {
         ItemStack ret = Core.registry.greenware_item.copy();
         NBTTagCompound tag = new NBTTagCompound();
         writeParts(tag);

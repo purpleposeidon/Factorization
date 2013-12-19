@@ -15,13 +15,14 @@ import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
-import factorization.common.TileEntityGreenware.ClayState;
+import factorization.ceramics.TileEntityGreenware;
+import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.FactoryType;
+import factorization.shared.NetworkFactorization.MessageType;
 import factorization.shared.TileEntityCommon;
 import factorization.shared.TileEntityExtension;
-import factorization.shared.NetworkFactorization.MessageType;
 
 public class TileEntityHeater extends TileEntityCommon implements IChargeConductor {
     Charge charge = new Charge(this);

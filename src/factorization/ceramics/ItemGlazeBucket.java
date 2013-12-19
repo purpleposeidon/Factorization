@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.ceramics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,13 +15,14 @@ import net.minecraft.world.World;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
-import factorization.common.TileEntityGreenware.ClayLump;
-import factorization.common.TileEntityGreenware.ClayState;
+import factorization.ceramics.TileEntityGreenware.ClayLump;
+import factorization.ceramics.TileEntityGreenware.ClayState;
+import factorization.common.BlockIcons;
 import factorization.notify.Notify;
 import factorization.shared.Core;
+import factorization.shared.Core.TabType;
 import factorization.shared.FzUtil;
 import factorization.shared.ItemFactorization;
-import factorization.shared.Core.TabType;
 
 public class ItemGlazeBucket extends ItemFactorization {
     public static final int MAX_CHARGES = 32;
@@ -132,7 +133,7 @@ public class ItemGlazeBucket extends ItemFactorization {
         done = false;
     }
     
-    void addGlaze(ItemStack is) {
+    public void addGlaze(ItemStack is) {
         if (!done) {
             subItems.add(is);
         }

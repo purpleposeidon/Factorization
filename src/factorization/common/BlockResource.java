@@ -11,6 +11,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import factorization.api.Coord;
+import factorization.ceramics.BasicGlazes;
 import factorization.shared.Core;
 
 public class BlockResource extends Block {
@@ -21,7 +22,7 @@ public class BlockResource extends Block {
         setUnlocalizedName("factorization.ResourceBlock");
     }
     
-    static final int glaze_md_start = 17; 
+    public static final int glaze_md_start = 17; 
     
     @Override
     public void registerIcons(IconRegister reg) {

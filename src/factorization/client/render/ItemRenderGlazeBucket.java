@@ -13,7 +13,7 @@ import net.minecraftforge.client.IItemRenderer;
 
 import org.lwjgl.opengl.GL11;
 
-import factorization.common.ItemGlazeBucket;
+import factorization.ceramics.ItemGlazeBucket;
 import factorization.shared.Core;
 
 

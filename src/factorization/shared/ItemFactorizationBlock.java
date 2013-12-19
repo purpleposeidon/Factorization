@@ -11,8 +11,8 @@ import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
-import factorization.common.TileEntityGreenware;
-import factorization.common.TileEntityGreenware.ClayState;
+import factorization.ceramics.TileEntityGreenware;
+import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.common.TileEntityLeydenJar;
 import factorization.common.TileEntityRocketEngine;
 

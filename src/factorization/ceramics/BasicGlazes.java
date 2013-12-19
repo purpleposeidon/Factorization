@@ -1,12 +1,13 @@
-package factorization.common;
+package factorization.ceramics;
 
-import static factorization.common.GlazeTypes.BRIGHT;
-import static factorization.common.GlazeTypes.COMMON;
-import static factorization.common.GlazeTypes.MATTE;
-import static factorization.common.GlazeTypes.SHINY;
-import static factorization.common.GlazeTypes.TRANSLUCENT;
-import factorization.shared.Core;
+import static factorization.ceramics.GlazeTypes.BRIGHT;
+import static factorization.ceramics.GlazeTypes.COMMON;
+import static factorization.ceramics.GlazeTypes.MATTE;
+import static factorization.ceramics.GlazeTypes.SHINY;
+import static factorization.ceramics.GlazeTypes.TRANSLUCENT;
 import net.minecraft.util.Icon;
+import factorization.common.BlockResource;
+import factorization.shared.Core;
 
 public enum BasicGlazes {
     ST_VECHS_BLACK(MATTE, 0x1F1C1B),
@@ -31,7 +32,7 @@ public enum BasicGlazes {
     public Icon icon;
     public int raw_color;
     
-    static BasicGlazes[] values = values();
+    public static BasicGlazes[] values = values();
     
     private BasicGlazes(GlazeTypes type, int raw_color) {
         this.type = type;

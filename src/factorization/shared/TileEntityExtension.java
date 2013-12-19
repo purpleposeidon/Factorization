@@ -19,7 +19,7 @@ import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.DeltaCoord;
-import factorization.common.TileEntityGreenware;
+import factorization.ceramics.TileEntityGreenware;
 import factorization.shared.NetworkFactorization.MessageType;
 
 public class TileEntityExtension extends TileEntityCommon {
