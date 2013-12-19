@@ -3,6 +3,8 @@ package factorization.common;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import factorization.crafting.TileEntityMixer;
+import factorization.crafting.TileEntityStamper;
 import factorization.shared.FactoryType;
 import factorization.shared.FzUtil;
 import factorization.shared.TileEntityFactorization;

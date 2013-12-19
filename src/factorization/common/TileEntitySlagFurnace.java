@@ -181,7 +181,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
         return false;
     }
 
-    boolean canSmelt() {
+    public boolean canSmelt() {
         if (this.furnaceItemStacks[input] == null) {
             return false;
         }

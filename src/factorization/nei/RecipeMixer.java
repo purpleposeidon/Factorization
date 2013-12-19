@@ -10,9 +10,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.recipe.TemplateRecipeHandler;
-import factorization.client.gui.GuiMixer;
-import factorization.common.TileEntityMixer;
-import factorization.common.TileEntityMixer.RecipeMatchInfo;
+import factorization.crafting.GuiMixer;
+import factorization.crafting.TileEntityMixer;
+import factorization.crafting.TileEntityMixer.RecipeMatchInfo;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 

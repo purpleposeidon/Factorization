@@ -13,7 +13,7 @@ import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.ceramics.TileEntityGreenware;
 import factorization.ceramics.TileEntityGreenware.ClayState;
-import factorization.common.TileEntityLeydenJar;
+import factorization.charge.TileEntityLeydenJar;
 import factorization.common.TileEntityRocketEngine;
 
 public class ItemFactorizationBlock extends ItemBlock {

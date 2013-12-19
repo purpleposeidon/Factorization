@@ -129,7 +129,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         return ((float) progress) / (getProgressRemaining() + progress);
     }
 
-    boolean needHeat() {
+    public boolean needHeat() {
         if (heat >= topHeat) {
             return false;
         }

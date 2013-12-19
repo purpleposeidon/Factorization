@@ -20,9 +20,9 @@ import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoord;
 import factorization.api.VectorUV;
+import factorization.charge.WireRenderingCube;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
-import factorization.common.WireRenderingCube;
 
 abstract public class FactorizationBlockRender implements ICoord {
     static Block metal = Block.obsidian;
