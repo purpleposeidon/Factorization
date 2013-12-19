@@ -1,5 +1,5 @@
 [u][b][size=6][anchor=ABOUT]Factorization[/anchor][/size][/b][/u]
-This mod adds many machines for processing ore and crafting. It also has a few other useful things. The documentation in this post is super-seriously out of date; I should update it sometime.
+This mod adds many machines for processing ore and crafting. It also has a few other useful things. The documentation in this post is super-seriously out of date; I should update it sometime. Documentation for some newer things, such as servos, can be found [url="http://purpleposeidon.github.io/FzDocs/html/"]here[/url].
 
 Direwolf20 has made a mod spotlight! (For 0.6.6)
 [youtube]http://www.youtube.com/watch?v=syVswXHTGBg[/youtube]
@@ -461,3 +461,11 @@ This mod may be used in modpacks under the following conditions:
 For faster customer service, please report bugs & other problems to me in #factorization on irc.esper.net; I don't make a habit of reading this thread.
 
 If something seems like it should be easier than it is, let me know; I tend to have a bit of a heavy hand with these things. Small/simple/tiny feature requests may be welcomed, but Ideas are not.
+
+[u][b][size=6][anchor=LOCAL]Localizations & Translation[/anchor][/size][/b][/u]
+You can contribute localizations at the [url="https://github.com/purpleposeidon/FactorizationLocalizations"]Factorization Localizations Github Project[/url]. The following people have contributed:
+[list]
+[*][url="https://github.com/crafteverywhere"]crafteverywhere[/url]: zh_CN
+[*][url="https://github.com/Darkona"]Darkona[/url]: es_ES
+[*][url="https://github.com/Vexatos"]Vexatos[/url]: de_DE
+[/list]
