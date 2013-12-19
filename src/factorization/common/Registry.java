@@ -53,6 +53,7 @@ import factorization.charge.ItemAcidBottle;
 import factorization.charge.ItemBattery;
 import factorization.charge.ItemChargeMeter;
 import factorization.charge.TileEntityLeydenJar;
+import factorization.darkiron.BlockDarkIronOre;
 import factorization.oreprocessing.BlockOreStorageShatterable;
 import factorization.oreprocessing.ItemOreProcessing;
 import factorization.oreprocessing.ItemOreProcessing.OreType;

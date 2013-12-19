@@ -1,4 +1,4 @@
-package factorization.client.render;
+package factorization.darkiron;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -12,10 +12,9 @@ import net.minecraftforge.common.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
-import factorization.common.BlockDarkIronOre;
-import factorization.common.BlockDarkIronOre.Glint;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
+import factorization.darkiron.BlockDarkIronOre.Glint;
 import factorization.shared.Core;
 
 public class GlintRenderer extends TileEntitySpecialRenderer {

@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.astro;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -25,6 +25,7 @@ import net.minecraft.util.Vec3;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
+import factorization.common.BlockIcons;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.TransferLib;
 import factorization.fzds.api.DeltaCapability;

@@ -1,10 +1,9 @@
-package factorization.client.render;
+package factorization.astro;
 
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.common.BlockIcons;
-import factorization.common.TileEntityRocketEngine;
 import factorization.shared.BlockFactorization;
 import factorization.shared.FactorizationBlockRender;
 import factorization.shared.FactoryType;

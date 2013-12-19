@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.darkiron;
 
 import java.util.Random;
 
@@ -13,6 +13,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.common.BlockIcons;
 
 public class BlockDarkIronOre extends Block {
     public BlockDarkIronOre(int blockId) {
