@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.sockets;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.shared.FactoryType;
 import factorization.shared.ItemFactorization;
 import factorization.shared.Core.TabType;
-import factorization.sockets.SocketEmpty;
 
 public class ItemSocketPart extends ItemFactorization {
 

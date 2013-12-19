@@ -1,8 +1,7 @@
-package factorization.client.render;
+package factorization.sockets;
 
 import org.lwjgl.opengl.GL11;
 
-import factorization.common.TileEntitySocketBase;
 
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;

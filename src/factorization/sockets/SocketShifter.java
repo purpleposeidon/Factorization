@@ -20,8 +20,6 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
-import factorization.common.ISocketHolder;
-import factorization.common.TileEntitySocketBase;
 import factorization.servo.ServoMotor;
 import factorization.shared.FactoryType;
 import factorization.shared.FzUtil;

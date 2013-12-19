@@ -25,8 +25,6 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
-import factorization.common.ISocketHolder;
-import factorization.common.TileEntitySocketBase;
 import factorization.notify.Notify;
 import factorization.servo.ServoMotor;
 import factorization.shared.FactoryType;

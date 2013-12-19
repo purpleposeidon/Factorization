@@ -1,4 +1,4 @@
-package factorization.client.render;
+package factorization.sockets;
 
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
@@ -10,7 +10,6 @@ import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
-import factorization.common.TileEntitySocketBase;
 import factorization.shared.FactorizationBlockRender;
 import factorization.shared.FactoryType;
 

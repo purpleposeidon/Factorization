@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.sockets;
 
 import static org.lwjgl.opengl.GL11.GL_LIGHTING;
 
@@ -36,6 +36,7 @@ import factorization.api.datahelpers.DataInPacketClientEdited;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.IDataSerializable;
+import factorization.common.BlockIcons;
 import factorization.servo.LoggerDataHelper;
 import factorization.servo.ServoMotor;
 import factorization.shared.BlockClass;
@@ -45,8 +46,6 @@ import factorization.shared.FzUtil;
 import factorization.shared.TileEntityCommon;
 import factorization.shared.FzUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
-import factorization.sockets.GuiDataConfig;
-import factorization.sockets.SocketEmpty;
 
 public abstract class TileEntitySocketBase extends TileEntityCommon implements ISocketHolder, IDataSerializable {
     /*

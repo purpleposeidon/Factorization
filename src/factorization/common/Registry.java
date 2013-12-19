@@ -75,6 +75,7 @@ import factorization.shared.ItemBlockProxy;
 import factorization.shared.ItemCraftingComponent;
 import factorization.shared.ItemFactorizationBlock;
 import factorization.shared.Sound;
+import factorization.sockets.ItemSocketPart;
 import factorization.weird.ItemDayBarrel;
 import factorization.weird.ItemPocketTable;
 import factorization.weird.TileEntityDayBarrel;

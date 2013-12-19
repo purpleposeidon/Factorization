@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.sockets;
 
 import java.util.List;
 

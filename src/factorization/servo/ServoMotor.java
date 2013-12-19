@@ -43,8 +43,6 @@ import factorization.api.datahelpers.DataInPacketClientEdited;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.Share;
-import factorization.common.ISocketHolder;
-import factorization.common.TileEntitySocketBase;
 import factorization.notify.Notify;
 import factorization.notify.Notify.Style;
 import factorization.shared.Core;
@@ -53,7 +51,9 @@ import factorization.shared.FzUtil;
 import factorization.shared.FzUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.sockets.GuiDataConfig;
+import factorization.sockets.ISocketHolder;
 import factorization.sockets.SocketEmpty;
+import factorization.sockets.TileEntitySocketBase;
 
 public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IEntityMessage, IInventory, ISocketHolder {
     //NOTE: If there's issues with servos getting lost/duped; we could have the TE save the servo. (Would have to be a list tho)

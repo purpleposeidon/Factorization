@@ -39,10 +39,10 @@ import org.lwjgl.opengl.GL12;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
-import factorization.common.TileEntitySocketBase;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 import factorization.shared.FzUtil.FzInv;
+import factorization.sockets.TileEntitySocketBase;
 
 public class RenderServoMotor extends RenderEntity {
     static int both_lists = -1, sprocket_display_list = -1, chasis_display_list = -1;
