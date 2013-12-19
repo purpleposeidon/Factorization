@@ -14,9 +14,9 @@ import factorization.api.Coord;
 import factorization.api.IMeterInfo;
 import factorization.api.IReflectionTarget;
 import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
+import factorization.common.FzConfig;
 import factorization.shared.BlockClass;
-import factorization.shared.FactoryType;
-import factorization.shared.FzConfig;
 import factorization.shared.FzUtil;
 import factorization.shared.TileEntityCommon;
 

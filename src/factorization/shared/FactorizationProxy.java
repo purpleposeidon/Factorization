@@ -9,6 +9,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.NetHandler;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.profiler.Profiler;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.FakePlayer;
@@ -18,6 +20,7 @@ import cpw.mods.fml.common.network.Player;
 import factorization.api.Coord;
 import factorization.common.BlockRenderHelper;
 import factorization.common.ContainerFactorization;
+import factorization.common.FactoryType;
 import factorization.crafting.ContainerMixer;
 import factorization.oreprocessing.ContainerCrystallizer;
 import factorization.oreprocessing.ContainerGrinder;
@@ -25,18 +28,10 @@ import factorization.oreprocessing.ContainerSlagFurnace;
 import factorization.weird.ContainerPocket;
 
 public abstract class FactorizationProxy implements IGuiHandler {
-    public abstract EntityPlayer getPlayer(NetHandler handler);
 
-    /** Send packet to other side */
-    public void addPacket(EntityPlayer player, Packet packet) {
-        if (player.worldObj.isRemote) {
-            PacketDispatcher.sendPacketToServer(packet);
-        } else {
-            PacketDispatcher.sendPacketToPlayer(packet, (Player) player);
-        }
+    public Profiler getProfiler() {
+        return MinecraftServer.getServer().theProfiler;
     }
-
-    public abstract Profiler getProfiler();
 
     protected Container getContainer(int ID, EntityPlayer player, World world, int x, int y, int z) {
         if (ID == FactoryType.POCKETCRAFTGUI.gui) {
@@ -119,10 +114,6 @@ public abstract class FactorizationProxy implements IGuiHandler {
     public boolean playerListensToCoord(EntityPlayer player, Coord c) {
         //XXX TODO: Figure this out.
         return true;
-    }
-
-    public boolean isPlayerAdmin(EntityPlayer player) {
-        return false;
     }
     
     public void texturepackChanged() {}

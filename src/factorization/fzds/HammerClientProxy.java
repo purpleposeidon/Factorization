@@ -43,10 +43,10 @@ import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
+import factorization.common.FzConfig;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.shared.Core;
 import factorization.shared.EmptyRender;
-import factorization.shared.FzConfig;
 import factorization.shared.FzUtil;
 
 public class HammerClientProxy extends HammerProxy {

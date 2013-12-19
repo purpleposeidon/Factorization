@@ -15,7 +15,6 @@ import net.minecraftforge.event.world.ChunkDataEvent;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.shared.Core;
-import factorization.shared.FzConfig;
 
 public class WorldgenManager {
     {

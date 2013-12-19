@@ -10,8 +10,8 @@ import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
+import factorization.common.FactoryType;
 import factorization.shared.FactorizationBlockRender;
-import factorization.shared.FactoryType;
 
 public class BlockRenderSocketBase extends FactorizationBlockRender {
     final FactoryType forType;

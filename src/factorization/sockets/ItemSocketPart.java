@@ -11,7 +11,7 @@ import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import factorization.shared.FactoryType;
+import factorization.common.FactoryType;
 import factorization.shared.ItemFactorization;
 import factorization.shared.Core.TabType;
 

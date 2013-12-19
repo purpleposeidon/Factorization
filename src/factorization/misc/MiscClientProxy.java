@@ -51,8 +51,8 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
+import factorization.common.FzConfig;
 import factorization.shared.Core;
-import factorization.shared.FzConfig;
 import factorization.shared.FzUtil;
 
 public class MiscClientProxy extends MiscProxy {

@@ -29,6 +29,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
 import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
 import factorization.common.Registry;
 import factorization.notify.Notify;
 import factorization.shared.NetworkFactorization.MessageType;
@@ -131,11 +132,7 @@ public class BlockFactorization extends BlockContainer {
                 return false; //...?
             }
             entityplayer.addChatMessage("This block is missing its TileEntity, possibly due to a bug in Factorization.");
-            if (Core.proxy.isPlayerAdmin(entityplayer) || entityplayer.capabilities.isCreativeMode) {
-                entityplayer.addChatMessage("The block and its contents can not be recovered.");
-            } else {
-                entityplayer.addChatMessage("It can not be repaired without cheating.");
-            }
+            entityplayer.addChatMessage("The block and its contents can not be recovered without cheating.");
             return true;
         }
     }

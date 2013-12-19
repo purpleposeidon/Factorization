@@ -1,4 +1,4 @@
-package factorization.shared;
+package factorization.common;
 
 import java.io.File;
 import java.util.regex.Pattern;
@@ -7,6 +7,7 @@ import java.util.regex.PatternSyntaxException;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.Property;
 import cpw.mods.fml.common.registry.EntityRegistry;
+import factorization.shared.Core;
 
 public class FzConfig {
 
@@ -110,7 +111,7 @@ public class FzConfig {
         return prop.getString();
     }
     
-    void loadConfig(File configFile) {
+    public void loadConfig(File configFile) {
         config = new Configuration(configFile);
         try {
             config.load();

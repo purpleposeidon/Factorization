@@ -3,9 +3,9 @@ package factorization.crafting;
 import org.lwjgl.opengl.GL11;
 
 import factorization.common.ContainerFactorization;
+import factorization.common.FactoryType;
 import factorization.shared.Core;
 import factorization.shared.FactorizationGui;
-import factorization.shared.FactoryType;
 
 public class GuiStamper extends FactorizationGui {
     public GuiStamper(ContainerFactorization container) {

@@ -20,6 +20,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.DeltaCoord;
 import factorization.ceramics.TileEntityGreenware;
+import factorization.common.FactoryType;
 import factorization.shared.NetworkFactorization.MessageType;
 
 public class TileEntityExtension extends TileEntityCommon {

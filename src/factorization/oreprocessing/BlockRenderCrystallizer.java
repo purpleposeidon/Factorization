@@ -2,9 +2,9 @@ package factorization.oreprocessing;
 
 import net.minecraft.client.renderer.RenderBlocks;
 import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
 import factorization.shared.Core;
 import factorization.shared.FactorizationBlockRender;
-import factorization.shared.FactoryType;
 
 public class BlockRenderCrystallizer extends FactorizationBlockRender {
 

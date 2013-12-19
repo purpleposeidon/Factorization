@@ -23,6 +23,7 @@ import factorization.api.VectorUV;
 import factorization.charge.WireRenderingCube;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
+import factorization.common.FactoryType;
 
 abstract public class FactorizationBlockRender implements ICoord {
     static Block metal = Block.obsidian;
@@ -251,66 +252,6 @@ abstract public class FactorizationBlockRender implements ICoord {
         return a*scale + b*(1 - scale);
     }
 
-    float vertexColorResult;
-    int vertexBrightnessResult;
-    
-    
-    DeltaCoord outward = new DeltaCoord(), corner = new DeltaCoord();
-
-    int mixedBrightness[] = new int[3];
-    float aoLightValue[] = new float[3];
-    boolean aoGrass[] = new boolean[3];
-    private void calculateAO(ForgeDirection face, DeltaCoord corner, Coord here, int normalAxis) {
-        int array_index = 1;
-        for (int i = 0; i < 3; i++) {
-            if (i == normalAxis) {
-                //the corner
-                int px = here.x + corner.x;
-                int py = here.y + corner.y;
-                int pz = here.z + corner.z;
-                int ai = 0;
-                {
-                    mixedBrightness[ai] = getMixedBrightnessForBlock(here.w, px, py, pz);
-                    aoLightValue[ai] = getAmbientOcclusionLightValue(here.w, px, py, pz);
-                    aoGrass[ai] = Block.canBlockGrass[here.w.getBlockId(px, py, pz)];
-                }
-            } else {
-                //one of the two sides
-                int store = corner.get(i);
-                corner.set(i, 0);
-                int px = here.x + corner.x;
-                int py = here.y + corner.y;
-                int pz = here.z + corner.z;
-                int ai = array_index;
-                {
-                    mixedBrightness[ai] = getMixedBrightnessForBlock(here.w, px, py, pz);
-                    aoLightValue[ai] = getAmbientOcclusionLightValue(here.w, px, py, pz);
-                    aoGrass[ai] = Block.canBlockGrass[here.w.getBlockId(px, py, pz)];
-                }
-                array_index++;
-                corner.set(i, store);
-            }
-        }
-        int here_mixed = Block.stone.getMixedBrightnessForBlock(here.w, here.x + face.offsetX, here.y + face.offsetY, here.z + face.offsetZ);
-        float hereAmbient = getAmbientOcclusionLightValue(here.w, here.x, here.y, here.z);
-        if (!aoGrass[1] && !aoGrass[2]) {
-            mixedBrightness[0] = here_mixed;
-            aoLightValue[0] = hereAmbient;
-            aoLightValue[0] = 1;
-        }
-        vertexBrightnessResult = getAoBrightness(mixedBrightness[0], mixedBrightness[1], mixedBrightness[2], here_mixed);
-        
-        float color = aoLightValue[0] + aoLightValue[1] + aoLightValue[2] + hereAmbient;
-        color /= 3F; //So, uhm. Why does using 4 make this too dark? o_O (renderblocks uses 4)
-        color = Math.max(color, hereAmbient);
-        vertexColorResult = color * faceColor;
-    }
-    
-    float faceColor;
-    boolean isDebugVertex = false;
-    
-    static boolean force_inv = true;
-    static private int allFaces[] = { 0, 1, 2, 3, 4, 5 };
     
     protected void renderCube(WireRenderingCube rc) {
         if (!world_mode) {

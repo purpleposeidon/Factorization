@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import factorization.common.BlockIcons;
-import factorization.shared.FactoryType;
+import factorization.common.FactoryType;
 import factorization.shared.FzUtil;
 
 import net.minecraft.item.ItemStack;

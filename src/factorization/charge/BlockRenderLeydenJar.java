@@ -13,8 +13,8 @@ import net.minecraft.util.Icon;
 import net.minecraftforge.client.IItemRenderer.ItemRenderType;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
+import factorization.common.FactoryType;
 import factorization.shared.FactorizationBlockRender;
-import factorization.shared.FactoryType;
 
 public class BlockRenderLeydenJar extends FactorizationBlockRender {
 

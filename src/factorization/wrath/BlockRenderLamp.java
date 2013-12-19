@@ -3,11 +3,11 @@ package factorization.wrath;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.Icon;
+import factorization.common.FactoryType;
 import factorization.common.ResourceType;
 import factorization.shared.BlockFactorization;
 import factorization.shared.Core;
 import factorization.shared.FactorizationBlockRender;
-import factorization.shared.FactoryType;
 
 public class BlockRenderLamp extends FactorizationBlockRender {
 

@@ -6,8 +6,8 @@ import net.minecraft.util.Icon;
 import org.lwjgl.opengl.GL11;
 
 import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
 import factorization.shared.FactorizationBlockRender;
-import factorization.shared.FactoryType;
 
 public class BlockRenderGrinder extends FactorizationBlockRender {
     @Override

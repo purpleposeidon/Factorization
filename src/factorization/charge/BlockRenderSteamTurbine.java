@@ -9,9 +9,9 @@ import org.lwjgl.opengl.GL11;
 
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
 import factorization.shared.Core;
 import factorization.shared.FactorizationBlockRender;
-import factorization.shared.FactoryType;
 
 public class BlockRenderSteamTurbine extends FactorizationBlockRender {
 

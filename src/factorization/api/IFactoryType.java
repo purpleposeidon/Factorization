@@ -1,6 +1,6 @@
 package factorization.api;
 
-import factorization.shared.FactoryType;
+import factorization.common.FactoryType;
 
 public interface IFactoryType {
     FactoryType getFactoryType();

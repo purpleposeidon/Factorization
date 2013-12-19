@@ -4,8 +4,8 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.Icon;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
+import factorization.common.FactoryType;
 import factorization.shared.FactorizationBlockRender;
-import factorization.shared.FactoryType;
 
 public class BlockRenderServoRail extends FactorizationBlockRender {
 

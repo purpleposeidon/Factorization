@@ -15,6 +15,7 @@ import factorization.astro.TileEntityRocketEngine;
 import factorization.ceramics.TileEntityGreenware;
 import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.charge.TileEntityLeydenJar;
+import factorization.common.FactoryType;
 
 public class ItemFactorizationBlock extends ItemBlock {
     public ItemFactorizationBlock(int id) {

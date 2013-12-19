@@ -9,9 +9,9 @@ import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
+import factorization.common.FactoryType;
 import factorization.shared.Core;
 import factorization.shared.FactorizationBlockRender;
-import factorization.shared.FactoryType;
 
 public class BlockRenderDayBarrel extends FactorizationBlockRender {
 

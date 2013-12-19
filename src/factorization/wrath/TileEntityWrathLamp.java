@@ -16,9 +16,9 @@ import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
-import factorization.shared.FactoryType;
 import factorization.shared.TileEntityCommon;
 
 public class TileEntityWrathLamp extends TileEntityCommon {

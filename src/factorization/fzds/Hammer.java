@@ -38,9 +38,9 @@ import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
+import factorization.common.FzConfig;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.shared.Core;
-import factorization.shared.FzConfig;
 
 @Mod(modid = Hammer.modId, name = Hammer.name, version = Core.version, dependencies = "required-after: " + Core.modId)
 @NetworkMod(clientSideRequired = true, tinyPacketHandler = HammerNet.class)

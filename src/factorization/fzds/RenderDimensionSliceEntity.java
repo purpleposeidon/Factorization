@@ -36,9 +36,9 @@ import cpw.mods.fml.common.IScheduledTickHandler;
 import cpw.mods.fml.common.TickType;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
+import factorization.common.FzConfig;
 import factorization.fzds.api.DeltaCapability;
 import factorization.shared.Core;
-import factorization.shared.FzConfig;
 
 
 public class RenderDimensionSliceEntity extends Render implements IScheduledTickHandler {

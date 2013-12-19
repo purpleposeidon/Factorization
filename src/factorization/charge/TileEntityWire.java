@@ -18,9 +18,9 @@ import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
 import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
-import factorization.shared.FactoryType;
 import factorization.shared.TileEntityCommon;
 import factorization.shared.NetworkFactorization.MessageType;
 

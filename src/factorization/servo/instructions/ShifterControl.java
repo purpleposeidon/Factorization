@@ -11,10 +11,10 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.ServoStack;
-import factorization.shared.FactoryType;
 import factorization.sockets.SocketShifter;
 import factorization.sockets.TileEntitySocketBase;
 

@@ -6,7 +6,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import factorization.api.Coord;
-import factorization.shared.FactoryType;
+import factorization.common.FactoryType;
 import factorization.shared.ItemFactorization;
 import factorization.shared.TileEntityCommon;
 import factorization.shared.Core.TabType;

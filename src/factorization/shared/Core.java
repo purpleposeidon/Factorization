@@ -43,6 +43,8 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.ChargeMetalBlockConductance;
 import factorization.charge.TileEntitySolarBoiler;
+import factorization.common.FactoryType;
+import factorization.common.FzConfig;
 import factorization.common.Registry;
 import factorization.compat.CompatManager;
 import factorization.oreprocessing.FactorizationOreProcessingHandler;
@@ -74,7 +76,7 @@ public class Core {
     public static FzConfig fzconfig;
     public static Registry registry;
     public static FactorizationOreProcessingHandler foph;
-    @SidedProxy(clientSide = "factorization.client.FactorizationClientProxy", serverSide = "factorization.common.FactorizationServerProxy")
+    @SidedProxy(clientSide = "factorization.client.FactorizationClientProxy")
     public static FactorizationProxy proxy;
     public static NetworkFactorization network;
     public static int factory_rendertype = -1;

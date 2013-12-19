@@ -29,11 +29,11 @@ import factorization.api.Coord;
 import factorization.api.IChargeConductor;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
+import factorization.common.FactoryType;
 import factorization.notify.Notify;
 import factorization.notify.Notify.Style;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
-import factorization.shared.FactoryType;
 import factorization.shared.TileEntityCommon;
 import factorization.shared.NetworkFactorization.MessageType;
 

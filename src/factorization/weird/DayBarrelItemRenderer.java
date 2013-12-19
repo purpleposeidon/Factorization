@@ -8,7 +8,7 @@ import net.minecraftforge.client.IItemRenderer;
 
 import org.lwjgl.opengl.GL11;
 
-import factorization.shared.FactoryType;
+import factorization.common.FactoryType;
 import factorization.shared.TileEntityCommon;
 
 public class DayBarrelItemRenderer implements IItemRenderer {

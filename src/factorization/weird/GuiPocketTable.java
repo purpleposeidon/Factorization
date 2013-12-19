@@ -7,8 +7,8 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import factorization.common.Command;
+import factorization.common.FzConfig;
 import factorization.shared.Core;
-import factorization.shared.FzConfig;
 
 public class GuiPocketTable extends GuiContainer {
     public ContainerPocket containerPocket;

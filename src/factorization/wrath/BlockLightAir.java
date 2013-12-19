@@ -13,8 +13,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
+import factorization.common.FzConfig;
 import factorization.shared.Core;
-import factorization.shared.FzConfig;
 
 public class BlockLightAir extends Block {
     static public final int air_md = 0;

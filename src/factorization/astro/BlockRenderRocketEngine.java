@@ -4,9 +4,9 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
 import factorization.shared.BlockFactorization;
 import factorization.shared.FactorizationBlockRender;
-import factorization.shared.FactoryType;
 
 public class BlockRenderRocketEngine extends FactorizationBlockRender {
 

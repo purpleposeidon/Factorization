@@ -1,4 +1,4 @@
-package factorization.shared;
+package factorization.common;
 
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
@@ -22,6 +22,10 @@ import factorization.oreprocessing.TileEntityGrinder;
 import factorization.oreprocessing.TileEntitySlagFurnace;
 import factorization.servo.TileEntityParaSieve;
 import factorization.servo.TileEntityServoRail;
+import factorization.shared.Core;
+import factorization.shared.TileEntityCommon;
+import factorization.shared.TileEntityExtension;
+import factorization.shared.TileEntityFactorization;
 import factorization.sockets.SocketEmpty;
 import factorization.sockets.SocketLacerator;
 import factorization.sockets.SocketRobotHand;

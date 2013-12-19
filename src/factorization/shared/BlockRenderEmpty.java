@@ -1,5 +1,6 @@
 package factorization.shared;
 
+import factorization.common.FactoryType;
 import net.minecraft.client.renderer.RenderBlocks;
 
 public class BlockRenderEmpty extends FactorizationBlockRender {

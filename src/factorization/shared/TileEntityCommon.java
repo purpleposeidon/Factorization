@@ -29,6 +29,7 @@ import factorization.api.IChargeConductor;
 import factorization.api.ICoord;
 import factorization.api.IFactoryType;
 import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
 import factorization.shared.NetworkFactorization.MessageType;
 
 public abstract class TileEntityCommon extends TileEntity implements ICoord, IFactoryType {

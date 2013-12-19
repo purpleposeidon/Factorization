@@ -46,8 +46,8 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
+import factorization.common.FzConfig;
 import factorization.shared.Core;
-import factorization.shared.FzConfig;
 
 @Mod(modid = MiscellaneousNonsense.modId, name = MiscellaneousNonsense.name, version = Core.version, dependencies = "required-after: " + Core.modId)
 @NetworkMod(clientSideRequired = true, packetHandler = MiscNet.class, channels = {MiscNet.tpsChannel}, connectionHandler = MiscellaneousNonsense.class)

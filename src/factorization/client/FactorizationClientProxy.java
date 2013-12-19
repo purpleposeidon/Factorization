@@ -15,6 +15,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.NetHandler;
 import net.minecraft.profiler.Profiler;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
@@ -51,6 +52,8 @@ import factorization.charge.TileEntitySteamTurbineRender;
 import factorization.common.BlockRenderHelper;
 import factorization.common.Command;
 import factorization.common.ContainerFactorization;
+import factorization.common.FactoryType;
+import factorization.common.FzConfig;
 import factorization.crafting.BlockRenderCompressionCrafter;
 import factorization.crafting.BlockRenderMixer;
 import factorization.crafting.ContainerMixer;
@@ -86,8 +89,6 @@ import factorization.shared.EmptyRender;
 import factorization.shared.FactorizationBlockRender;
 import factorization.shared.FactorizationProxy;
 import factorization.shared.FactorizationRender;
-import factorization.shared.FactoryType;
-import factorization.shared.FzConfig;
 import factorization.shared.ItemRenderCapture;
 import factorization.shared.TileEntityFactorization;
 import factorization.sockets.BlockRenderSocketBase;
@@ -113,13 +114,12 @@ public class FactorizationClientProxy extends FactorizationProxy {
     }
 
     @Override
-    public EntityPlayer getPlayer(NetHandler handler) {
-        return Minecraft.getMinecraft().thePlayer;
-    }
-
-    @Override
     public Profiler getProfiler() {
-        return Minecraft.getMinecraft().mcProfiler;
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+            return Minecraft.getMinecraft().mcProfiler;
+        } else {
+            return super.getProfiler();
+        }
     }
 
     @Override

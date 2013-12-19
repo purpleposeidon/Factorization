@@ -17,6 +17,7 @@ import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.ICoord;
 import factorization.api.IFactoryType;
+import factorization.common.FactoryType;
 import factorization.shared.NetworkFactorization.MessageType;
 
 public abstract class TileEntityFactorization extends TileEntityCommon

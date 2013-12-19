@@ -26,6 +26,7 @@ import net.minecraft.world.chunk.Chunk;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.ITinyPacketHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
+import cpw.mods.fml.common.network.Player;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
@@ -33,6 +34,7 @@ import factorization.api.IEntityMessage;
 import factorization.api.Quaternion;
 import factorization.api.VectorUV;
 import factorization.common.Command;
+import factorization.common.FactoryType;
 import factorization.notify.NotifyImplementation;
 import factorization.weird.TileEntityBarrel;
 
@@ -51,6 +53,14 @@ public class NetworkFactorization implements ITinyPacketHandler {
     
     int huge_tag_warnings = 0;
 
+    void addPacket(EntityPlayer player, Packet packet) {
+        if (player.worldObj.isRemote) {
+            PacketDispatcher.sendPacketToServer(packet);
+        } else {
+            PacketDispatcher.sendPacketToPlayer(packet, (Player) player);
+        }
+    }
+    
     private void writeObjects(ByteArrayOutputStream outputStream, DataOutputStream output, Object... items) throws IOException {
         for (Object item : items) {
             if (item == null) {
@@ -212,7 +222,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
         data[0] = cmd.id;
         data[1] = arg;
         Packet packet = PacketDispatcher.getTinyPacket(Core.instance, factorizeCmdChannel, data);
-        Core.proxy.addPacket(player, packet);
+        addPacket(player, packet);
     }
 
     public void broadcastMessage(EntityPlayer who, Coord src, int messageType, Object... msg) {
@@ -225,7 +235,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
             broadcastPacket(who, src, toSend);
         }
         else {
-            Core.proxy.addPacket(who, toSend);
+            addPacket(who, toSend);
         }
     }
 
@@ -255,11 +265,11 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 if (!Core.proxy.playerListensToCoord(player, src)) {
                     continue;
                 }
-                Core.proxy.addPacket(player, toSend);
+                addPacket(player, toSend);
             }
         }
         else {
-            Core.proxy.addPacket(who, toSend);
+            addPacket(who, toSend);
         }
     }
     

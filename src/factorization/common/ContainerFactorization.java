@@ -9,7 +9,6 @@ import factorization.oreprocessing.TileEntityCrystallizer;
 import factorization.oreprocessing.TileEntityGrinder;
 import factorization.oreprocessing.TileEntitySlagFurnace;
 import factorization.servo.TileEntityParaSieve;
-import factorization.shared.FactoryType;
 import factorization.shared.FzUtil;
 import factorization.shared.TileEntityFactorization;
 import factorization.wrath.TileEntityRouter;

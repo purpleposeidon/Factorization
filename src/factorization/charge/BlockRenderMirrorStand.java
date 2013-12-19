@@ -8,10 +8,10 @@ import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
+import factorization.common.FactoryType;
 import factorization.common.ResourceType;
 import factorization.shared.Core;
 import factorization.shared.FactorizationBlockRender;
-import factorization.shared.FactoryType;
 
 public class BlockRenderMirrorStand extends FactorizationBlockRender {
     private static final int frontFace[] = {1};
