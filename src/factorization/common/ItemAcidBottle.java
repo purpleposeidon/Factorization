@@ -2,7 +2,10 @@ package factorization.common;
 
 import java.util.List;
 
-import factorization.common.Core.TabType;
+import factorization.shared.Core;
+import factorization.shared.ItemFactorization;
+import factorization.shared.Sound;
+import factorization.shared.Core.TabType;
 
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;

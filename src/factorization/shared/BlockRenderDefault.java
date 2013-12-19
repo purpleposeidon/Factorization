@@ -1,14 +1,11 @@
-package factorization.client.render;
+package factorization.shared;
 
 import net.minecraft.client.renderer.RenderBlocks;
-import factorization.common.FactoryType;
-import factorization.common.TileEntityCommon;
 
 public class BlockRenderDefault extends FactorizationBlockRender {
 
     @Override
-    protected
-    void render(RenderBlocks rb) {
+    public void render(RenderBlocks rb) {
         if (world_mode) {
             TileEntityCommon c = getCoord().getTE(TileEntityCommon.class);
             if (c == null) {
@@ -21,8 +18,7 @@ public class BlockRenderDefault extends FactorizationBlockRender {
     }
 
     @Override
-    protected
-    FactoryType getFactoryType() {
+    public FactoryType getFactoryType() {
         return null;
     }
 

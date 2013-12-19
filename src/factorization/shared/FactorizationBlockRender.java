@@ -1,4 +1,4 @@
-package factorization.client.render;
+package factorization.shared;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -20,24 +20,21 @@ import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoord;
 import factorization.api.VectorUV;
-import factorization.common.BlockFactorization;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
-import factorization.common.Core;
-import factorization.common.FactoryType;
 import factorization.common.WireRenderingCube;
 
 abstract public class FactorizationBlockRender implements ICoord {
     static Block metal = Block.obsidian;
     static Block glass = Block.glowStone;
 
-    protected boolean world_mode, use_vertex_offset;
-    protected IBlockAccess w;
-    protected int x, y, z;
-    protected int metadata;
-    protected TileEntity te;
-    protected ItemStack is;
-    protected ItemRenderType renderType;
+    public boolean world_mode, use_vertex_offset;
+    public IBlockAccess w;
+    public int x, y, z;
+    public int metadata;
+    public TileEntity te;
+    public ItemStack is;
+    public ItemRenderType renderType;
     
     private static FactorizationBlockRender renderMap[] = new FactorizationBlockRender[0xFF];
     private static FactorizationBlockRender defaultRender;
@@ -80,9 +77,9 @@ abstract public class FactorizationBlockRender implements ICoord {
         }
     }
     
-    protected abstract void render(RenderBlocks rb);
-    protected abstract FactoryType getFactoryType();
-    void renderSecondPass(RenderBlocks rb) {}
+    public abstract void render(RenderBlocks rb);
+    public abstract FactoryType getFactoryType();
+    public void renderSecondPass(RenderBlocks rb) {}
     
     @Override
     public Coord getCoord() {

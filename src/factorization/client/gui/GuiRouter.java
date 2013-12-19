@@ -16,9 +16,10 @@ import org.lwjgl.opengl.GL11;
 
 import factorization.client.gui.ButtonSet.Predicate;
 import factorization.common.ContainerFactorization;
-import factorization.common.Core;
-import factorization.common.NetworkFactorization.MessageType;
 import factorization.common.TileEntityRouter;
+import factorization.shared.Core;
+import factorization.shared.FactorizationGui;
+import factorization.shared.NetworkFactorization.MessageType;
 
 public class GuiRouter extends FactorizationGui implements IClickable {
     TileEntityRouter router;

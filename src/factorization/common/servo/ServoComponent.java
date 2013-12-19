@@ -28,9 +28,9 @@ import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
-import factorization.common.Core;
-import factorization.common.FzUtil;
 import factorization.common.servo.instructions.*;
+import factorization.shared.Core;
+import factorization.shared.FzUtil;
 
 public abstract class ServoComponent implements IDataSerializable {
     private static HashMap<String, Class<? extends ServoComponent>> componentMap = new HashMap<String, Class<? extends ServoComponent>>(50, 0.5F);

@@ -2,6 +2,9 @@ package factorization.common;
 
 import java.util.ArrayList;
 
+import factorization.shared.Core;
+import factorization.shared.FzUtil;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;

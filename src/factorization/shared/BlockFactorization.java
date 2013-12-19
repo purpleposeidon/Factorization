@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.shared;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -28,8 +28,12 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
-import factorization.common.NetworkFactorization.MessageType;
+import factorization.common.BlockIcons;
+import factorization.common.Registry;
+import factorization.common.TileEntityDayBarrel;
+import factorization.common.TileEntityDayBarrel.Type;
 import factorization.notify.Notify;
+import factorization.shared.NetworkFactorization.MessageType;
 
 public class BlockFactorization extends BlockContainer {
     public boolean fake_normal_render = false;

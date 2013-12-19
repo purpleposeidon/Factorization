@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
-import factorization.common.Core;
+import factorization.shared.Core;
 
 public class ServoStack implements IDataSerializable, Iterable {
     private LinkedList<Object> contents = new LinkedList<Object>();

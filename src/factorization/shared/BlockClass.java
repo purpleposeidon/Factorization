@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.shared;
 
 import net.minecraft.block.Block;
 import net.minecraftforge.common.MinecraftForge;
@@ -36,12 +36,12 @@ public enum BlockClass {
     }
 
     Block block; //XXX This actually gets set to the block properly right now, but it might not in a dynamic-block-ids future or something...?
-    int md;
-    boolean normalCube;
-    int flamability;
-    boolean isFlamable;
-    int lightValue;
-    float hardness; //Our default is 2
+    public final int md;
+    final boolean normalCube;
+    final int flamability;
+    final boolean isFlamable;
+    final int lightValue;
+    final float hardness; //Our default is 2
     boolean normal_cube = true;
 
     BlockClass(Block block, int md, boolean normalCube, int flamability, int lightValue, float hardness) {
@@ -77,7 +77,7 @@ public enum BlockClass {
     }
 
     //Makes sure the block at Coord is what it should be
-    void enforce(Coord c) {
+    public void enforce(Coord c) {
         if (c.getBlock() == block) {
             //only enforce if the block's right.
             if (c.setMd(md, false)) {
@@ -92,7 +92,7 @@ public enum BlockClass {
         }
     }
 
-    BlockClass harvest(String tool, int level) {
+    public BlockClass harvest(String tool, int level) {
         MinecraftForge.setBlockHarvestLevel(this.block, this.md, tool, level);
         return this;
     }

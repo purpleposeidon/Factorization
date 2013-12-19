@@ -5,14 +5,14 @@ import net.minecraft.client.renderer.RenderBlocks;
 import org.lwjgl.opengl.GL11;
 
 import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
-import factorization.common.FzConfig;
+import factorization.shared.FactorizationBlockRender;
+import factorization.shared.FactoryType;
+import factorization.shared.FzConfig;
 
 public class BlockRenderHeater extends FactorizationBlockRender {
 
     @Override
-    protected
-    void render(RenderBlocks rb) {
+    public void render(RenderBlocks rb) {
         float d = 0.5F / 32F;
         if (!world_mode || !FzConfig.renderTEs) {
             float c = 0.1F;
@@ -25,8 +25,7 @@ public class BlockRenderHeater extends FactorizationBlockRender {
     }
 
     @Override
-    protected
-    FactoryType getFactoryType() {
+    public FactoryType getFactoryType() {
         return FactoryType.HEATER;
     }
 

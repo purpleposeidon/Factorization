@@ -16,8 +16,13 @@ import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
-import factorization.common.FzUtil.FzInv;
-import factorization.common.NetworkFactorization.MessageType;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.FactoryType;
+import factorization.shared.FzUtil;
+import factorization.shared.TileEntityCommon;
+import factorization.shared.FzUtil.FzInv;
+import factorization.shared.NetworkFactorization.MessageType;
 
 public class TileEntityCompressionCrafter extends TileEntityCommon {
     static ThreadLocal<CompressionState> states = new ThreadLocal();

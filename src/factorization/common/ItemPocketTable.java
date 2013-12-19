@@ -8,7 +8,11 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import factorization.common.Core.TabType;
+import factorization.shared.Core;
+import factorization.shared.FactorizationTextureLoader;
+import factorization.shared.FactoryType;
+import factorization.shared.ItemFactorization;
+import factorization.shared.Core.TabType;
 
 public class ItemPocketTable extends ItemFactorization {
 

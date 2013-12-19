@@ -18,8 +18,16 @@ import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
-import factorization.common.FzUtil.FzInv;
-import factorization.common.NetworkFactorization.MessageType;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.FactoryType;
+import factorization.shared.FzConfig;
+import factorization.shared.FzUtil;
+import factorization.shared.FzUtil.FzInv;
+import factorization.shared.NetworkFactorization;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.Sound;
+import factorization.shared.TileEntityFactorization;
 
 public class TileEntityRouter extends TileEntityFactorization {
     final public int maxSearchPerTick = 16;
@@ -172,7 +180,7 @@ public class TileEntityRouter extends TileEntityFactorization {
     }
 
     @Override
-    void doLogic() {
+    protected void doLogic() {
         Core.profileStart("router");
         needLogic();
         ticksSinceLastSpam++;
@@ -656,7 +664,7 @@ public class TileEntityRouter extends TileEntityFactorization {
     }
 
     @Override
-    void sendFullDescription(EntityPlayer player) {
+    protected void sendFullDescription(EntityPlayer player) {
         super.sendFullDescription(player);
         broadcastItem(MessageType.ShareAll, player);
     }
@@ -794,12 +802,12 @@ public class TileEntityRouter extends TileEntityFactorization {
     }
 
     @Override
-    int getLogicSpeed() {
+    protected int getLogicSpeed() {
         return 2;
     }
 
     @Override
-    void makeNoise() {
+    protected void makeNoise() {
         putParticles(worldObj);
         if (rand.nextFloat() > 0.9898 && lastSeenAt != null) {
             Sound.routerCluck.playAt(this);

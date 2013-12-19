@@ -3,16 +3,16 @@ package factorization.client.render;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.Icon;
-import factorization.common.BlockFactorization;
-import factorization.common.Core;
-import factorization.common.FactoryType;
 import factorization.common.ResourceType;
+import factorization.shared.BlockFactorization;
+import factorization.shared.Core;
+import factorization.shared.FactorizationBlockRender;
+import factorization.shared.FactoryType;
 
 public class BlockRenderLamp extends FactorizationBlockRender {
 
     @Override
-    protected
-    void render(RenderBlocks rb) {
+    public void render(RenderBlocks rb) {
         float s = 1F / 16F;
         float p = 1F / 64F;
         float trim_out = BlockFactorization.lamp_pad;
@@ -41,8 +41,7 @@ public class BlockRenderLamp extends FactorizationBlockRender {
     }
     
     @Override
-    protected
-    FactoryType getFactoryType() {
+    public FactoryType getFactoryType() {
         return FactoryType.LAMP;
     }
 

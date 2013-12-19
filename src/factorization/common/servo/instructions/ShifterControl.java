@@ -11,12 +11,12 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
 import factorization.common.TileEntitySocketBase;
 import factorization.common.servo.Instruction;
 import factorization.common.servo.ServoMotor;
 import factorization.common.servo.ServoStack;
 import factorization.common.sockets.SocketShifter;
+import factorization.shared.FactoryType;
 
 public class ShifterControl extends Instruction {
     static final byte EXPORT_MODE = 0, IMPORT_MODE = 1, TRANSFER_LIMIT = 2, TARGET_SLOT = 3, STREAM = 4, PULSE_EXACT = 5, PULSE_SOME = 6;

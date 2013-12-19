@@ -1,6 +1,6 @@
 package factorization.common;
 
-import factorization.common.FactorizationTextureLoader.Directory;
+import factorization.shared.FactorizationTextureLoader.Directory;
 import net.minecraft.util.Icon;
 
 public class ItemIcons {

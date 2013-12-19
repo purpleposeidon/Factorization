@@ -29,11 +29,11 @@ import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.Quaternion;
-import factorization.common.Core;
 import factorization.fzds.api.DeltaCapability;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsCustomTeleport;
 import factorization.fzds.api.IFzdsEntryControl;
+import factorization.shared.Core;
 
 public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryControl, IEntityAdditionalSpawnData {
     //Dang, this is a lot of fields

@@ -4,13 +4,13 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.renderer.RenderBlocks;
 import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
+import factorization.shared.FactorizationBlockRender;
+import factorization.shared.FactoryType;
 
 public class BlockRenderMixer extends FactorizationBlockRender {
 
     @Override
-    protected
-    void render(RenderBlocks rb) {
+    public void render(RenderBlocks rb) {
         if (world_mode) {
             renderMotor(rb, 1F / 16F);
         }
@@ -24,8 +24,7 @@ public class BlockRenderMixer extends FactorizationBlockRender {
     }
 
     @Override
-    protected
-    FactoryType getFactoryType() {
+    public FactoryType getFactoryType() {
         return FactoryType.MIXER;
     }
 

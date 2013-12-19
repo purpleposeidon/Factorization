@@ -3,7 +3,8 @@ package factorization.common;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import factorization.common.Core.TabType;
+import factorization.shared.ItemFactorization;
+import factorization.shared.Core.TabType;
 
 public class ItemWrathIgniter extends ItemFactorization {
     public ItemWrathIgniter(int par1) {

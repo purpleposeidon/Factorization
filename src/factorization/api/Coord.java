@@ -27,8 +27,8 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
-import factorization.common.BlockHelper;
-import factorization.common.FzUtil;
+import factorization.shared.BlockHelper;
+import factorization.shared.FzUtil;
 
 // Note: The rules for holding on to references to Coord are the same as for holding on to World.
 // Don't keep references to them outside of things that are in worlds to avoid mem-leaks; or be careful about it.

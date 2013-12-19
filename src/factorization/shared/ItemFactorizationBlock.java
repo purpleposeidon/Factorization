@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.shared;
 
 import java.util.List;
 
@@ -9,8 +9,12 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
+import factorization.common.TileEntityGreenware;
 import factorization.common.TileEntityGreenware.ClayState;
+import factorization.common.TileEntityLeydenJar;
+import factorization.common.TileEntityRocketEngine;
 
 public class ItemFactorizationBlock extends ItemBlock {
     public ItemFactorizationBlock(int id) {
@@ -31,7 +35,8 @@ public class ItemFactorizationBlock extends ItemBlock {
         }
         TileEntity te = f.makeTileEntity();
         if (te instanceof TileEntityCommon) {
-            boolean good = ((TileEntityCommon) te).canPlaceAgainst(player, here.copy().towardSide(CubeFace.oppositeSide(side)), side);
+            int oppositeSide = ForgeDirection.getOrientation(side).getOpposite().ordinal();
+            boolean good = ((TileEntityCommon) te).canPlaceAgainst(player, here.copy().towardSide(oppositeSide), side);
             if (!good) {
                 return false;
             }

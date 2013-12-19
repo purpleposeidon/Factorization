@@ -15,7 +15,11 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.IReflectionTarget;
-import factorization.common.NetworkFactorization.MessageType;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.FactoryType;
+import factorization.shared.TileEntityCommon;
+import factorization.shared.NetworkFactorization.MessageType;
 
 public class TileEntityMirror extends TileEntityCommon {
     Coord reflection_target = null;

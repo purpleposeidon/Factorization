@@ -13,8 +13,8 @@ import net.minecraftforge.client.IItemRenderer;
 
 import org.lwjgl.opengl.GL11;
 
-import factorization.common.Core;
 import factorization.common.ItemGlazeBucket;
+import factorization.shared.Core;
 
 
 public class ItemRenderGlazeBucket implements IItemRenderer {

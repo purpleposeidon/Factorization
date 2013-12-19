@@ -15,10 +15,13 @@ import net.minecraft.world.World;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
-import factorization.common.Core.TabType;
 import factorization.common.TileEntityGreenware.ClayLump;
 import factorization.common.TileEntityGreenware.ClayState;
 import factorization.notify.Notify;
+import factorization.shared.Core;
+import factorization.shared.FzUtil;
+import factorization.shared.ItemFactorization;
+import factorization.shared.Core.TabType;
 
 public class ItemGlazeBucket extends ItemFactorization {
     public static final int MAX_CHARGES = 32;

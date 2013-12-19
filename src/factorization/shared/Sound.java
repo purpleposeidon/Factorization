@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.shared;
 
 import java.io.DataInput;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import factorization.api.Coord;
-import factorization.common.NetworkFactorization.MessageType;
+import factorization.shared.NetworkFactorization.MessageType;
 
 public enum Sound {
     // it might be kinda cool to have this be configable?
@@ -69,7 +69,7 @@ public enum Sound {
         Core.network.broadcastMessage(null, new Coord(w, x, y, z), MessageType.PlaySound, index, x, y, z);
     }
 
-    static void receive(DataInput input) {
+    public static void receive(DataInput input) {
         //TODO: We can pass a coord here anyways!
         try {
             int index = input.readInt(), x = input.readInt(), y = input.readInt(), z = input.readInt();

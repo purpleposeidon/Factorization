@@ -39,8 +39,15 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.Quaternion;
-import factorization.common.NetworkFactorization.MessageType;
 import factorization.notify.Notify;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.FactoryType;
+import factorization.shared.FzConfig;
+import factorization.shared.FzUtil;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityCommon;
+import factorization.shared.TileEntityExtension;
 
 public class TileEntityGreenware extends TileEntityCommon {
     public static int MAX_PARTS = 32;
@@ -676,7 +683,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     private static final Vec3 zeroVec = Vec3.createVectorHelper(0, 0, 0);
 
     @Override
-    boolean removeBlockByPlayer(EntityPlayer player) {
+    protected boolean removeBlockByPlayer(EntityPlayer player) {
         if (player.worldObj.isRemote) {
             return false;
         }

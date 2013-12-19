@@ -3,6 +3,8 @@ package factorization.common;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import factorization.shared.Core;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
@@ -38,7 +40,7 @@ public enum Command {
         this.reverse = rev;
     }
 
-    static void fromNetwork(EntityPlayer player, byte s, byte arg) {
+    public static void fromNetwork(EntityPlayer player, byte s, byte arg) {
         Command c = name.map.get(s);
         if (c == null) {
             Core.logWarning("Received invalid command #" + s);

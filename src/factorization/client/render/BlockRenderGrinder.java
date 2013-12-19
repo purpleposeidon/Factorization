@@ -6,12 +6,12 @@ import net.minecraft.util.Icon;
 import org.lwjgl.opengl.GL11;
 
 import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
+import factorization.shared.FactorizationBlockRender;
+import factorization.shared.FactoryType;
 
 public class BlockRenderGrinder extends FactorizationBlockRender {
     @Override
-    protected
-    void render(RenderBlocks rb) {
+    public void render(RenderBlocks rb) {
         //TODO: Optimize this!
         renderMotor(rb, 8F/16F);
         float p = 1F/16F;
@@ -43,8 +43,7 @@ public class BlockRenderGrinder extends FactorizationBlockRender {
     }
 
     @Override
-    protected
-    FactoryType getFactoryType() {
+    public FactoryType getFactoryType() {
         return FactoryType.GRINDER;
     }
 

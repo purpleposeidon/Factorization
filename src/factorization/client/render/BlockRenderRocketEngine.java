@@ -3,16 +3,16 @@ package factorization.client.render;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
-import factorization.common.BlockFactorization;
 import factorization.common.BlockIcons;
-import factorization.common.FactoryType;
 import factorization.common.TileEntityRocketEngine;
+import factorization.shared.BlockFactorization;
+import factorization.shared.FactorizationBlockRender;
+import factorization.shared.FactoryType;
 
 public class BlockRenderRocketEngine extends FactorizationBlockRender {
 
     @Override
-    protected
-    void render(RenderBlocks rb) {
+    public void render(RenderBlocks rb) {
         boolean oldAo = rb.enableAO;
         rb.enableAO = false;
         Icon body = BlockIcons.rocket_engine_invalid;
@@ -62,8 +62,7 @@ public class BlockRenderRocketEngine extends FactorizationBlockRender {
     }
 
     @Override
-    protected
-    FactoryType getFactoryType() {
+    public FactoryType getFactoryType() {
         return FactoryType.ROCKETENGINE;
     }
 

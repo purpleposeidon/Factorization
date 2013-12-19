@@ -12,10 +12,10 @@ import codechicken.nei.PositionedStack;
 import codechicken.nei.recipe.GuiRecipe;
 import codechicken.nei.recipe.TemplateRecipeHandler;
 import factorization.client.gui.GuiGrinder;
-import factorization.common.Core;
-import factorization.common.FzUtil;
 import factorization.common.TileEntityGrinder;
 import factorization.common.TileEntityGrinder.GrinderRecipe;
+import factorization.shared.Core;
+import factorization.shared.FzUtil;
 
 public class RecipeGrinder extends TemplateRecipeHandler {
     @Override

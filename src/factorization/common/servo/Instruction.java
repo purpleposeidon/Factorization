@@ -4,8 +4,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
-import factorization.common.Core;
-import factorization.common.FzConfig;
+import factorization.shared.Core;
+import factorization.shared.FzConfig;
 
 
 public abstract class Instruction extends Decorator {

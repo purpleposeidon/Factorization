@@ -11,8 +11,10 @@ import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import factorization.common.Core.TabType;
 import factorization.common.sockets.SocketEmpty;
+import factorization.shared.FactoryType;
+import factorization.shared.ItemFactorization;
+import factorization.shared.Core.TabType;
 
 public class ItemSocketPart extends ItemFactorization {
 

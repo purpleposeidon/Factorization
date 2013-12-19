@@ -25,7 +25,7 @@ import cpw.mods.fml.common.network.ITinyPacketHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
-import factorization.common.Core;
+import factorization.shared.Core;
 
 
 public class HammerNet implements ITinyPacketHandler {

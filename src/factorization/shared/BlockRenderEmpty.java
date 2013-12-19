@@ -1,7 +1,6 @@
-package factorization.client.render;
+package factorization.shared;
 
 import net.minecraft.client.renderer.RenderBlocks;
-import factorization.common.FactoryType;
 
 public class BlockRenderEmpty extends FactorizationBlockRender {
     FactoryType for_type;
@@ -10,12 +9,10 @@ public class BlockRenderEmpty extends FactorizationBlockRender {
         this.for_type = for_type;
     }
     @Override
-    protected
-    void render(RenderBlocks rb) { }
+    public void render(RenderBlocks rb) { }
 
     @Override
-    protected
-    FactoryType getFactoryType() {
+    public FactoryType getFactoryType() {
         return for_type;
     }
 

@@ -1,5 +1,6 @@
 package factorization.common;
 
+import factorization.shared.Core;
 import net.minecraft.item.ItemStack;
 
 public enum ResourceType {

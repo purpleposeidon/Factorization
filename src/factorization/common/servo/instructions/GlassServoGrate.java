@@ -3,7 +3,7 @@ package factorization.common.servo.instructions;
 import net.minecraft.block.Block;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
-import factorization.common.Core;
+import factorization.shared.Core;
 
 public class GlassServoGrate extends WoodenServoGrate {
     @Override

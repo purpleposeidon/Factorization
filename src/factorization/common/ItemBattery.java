@@ -9,7 +9,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import factorization.api.IActOnCraft;
-import factorization.common.Core.TabType;
+import factorization.shared.Core;
+import factorization.shared.FzUtil;
+import factorization.shared.ItemBlockProxy;
+import factorization.shared.Core.TabType;
 
 public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     //3 States: Empty. Enough for 1 magnet. Enough for 2 magnets.

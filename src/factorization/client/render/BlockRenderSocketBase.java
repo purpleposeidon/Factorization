@@ -10,8 +10,9 @@ import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
-import factorization.common.FactoryType;
 import factorization.common.TileEntitySocketBase;
+import factorization.shared.FactorizationBlockRender;
+import factorization.shared.FactoryType;
 
 public class BlockRenderSocketBase extends FactorizationBlockRender {
     final FactoryType forType;
@@ -21,7 +22,7 @@ public class BlockRenderSocketBase extends FactorizationBlockRender {
     }
 
     @Override
-    protected void render(RenderBlocks rb) {
+    public void render(RenderBlocks rb) {
         ForgeDirection dir = ForgeDirection.EAST;
         TileEntitySocketBase socket;
         BlockRenderHelper block = BlockRenderHelper.instance;
@@ -49,7 +50,7 @@ public class BlockRenderSocketBase extends FactorizationBlockRender {
     }
 
     @Override
-    protected FactoryType getFactoryType() {
+    public FactoryType getFactoryType() {
         return forType;
     }
 

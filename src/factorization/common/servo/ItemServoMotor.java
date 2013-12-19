@@ -6,10 +6,10 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
-import factorization.common.Core;
-import factorization.common.FzUtil;
-import factorization.common.ItemCraftingComponent;
-import factorization.common.Core.TabType;
+import factorization.shared.Core;
+import factorization.shared.FzUtil;
+import factorization.shared.ItemCraftingComponent;
+import factorization.shared.Core.TabType;
 
 public class ItemServoMotor extends ItemCraftingComponent {
 

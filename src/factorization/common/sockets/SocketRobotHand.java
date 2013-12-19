@@ -25,13 +25,13 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
-import factorization.common.FzUtil;
-import factorization.common.FzUtil.FzInv;
-import factorization.common.FactoryType;
 import factorization.common.ISocketHolder;
 import factorization.common.TileEntitySocketBase;
 import factorization.common.servo.ServoMotor;
 import factorization.notify.Notify;
+import factorization.shared.FactoryType;
+import factorization.shared.FzUtil;
+import factorization.shared.FzUtil.FzInv;
 
 public class SocketRobotHand extends TileEntitySocketBase {
     boolean wasPowered = false;

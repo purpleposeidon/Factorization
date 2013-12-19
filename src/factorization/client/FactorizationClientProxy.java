@@ -46,6 +46,17 @@ import factorization.common.servo.RenderServoMotor;
 import factorization.common.servo.ServoMotor;
 import factorization.common.sockets.GuiDataConfig;
 import factorization.common.sockets.SocketLacerator;
+import factorization.shared.BlockRenderDefault;
+import factorization.shared.BlockRenderEmpty;
+import factorization.shared.Core;
+import factorization.shared.EmptyRender;
+import factorization.shared.FactorizationBlockRender;
+import factorization.shared.FactorizationProxy;
+import factorization.shared.FactorizationRender;
+import factorization.shared.FactoryType;
+import factorization.shared.FzConfig;
+import factorization.shared.ItemRenderCapture;
+import factorization.shared.TileEntityFactorization;
 
 public class FactorizationClientProxy extends FactorizationProxy {
     public FactorizationClientProxy() {

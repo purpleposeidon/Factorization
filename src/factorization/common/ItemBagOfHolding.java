@@ -13,8 +13,11 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import factorization.api.IActOnCraft;
-import factorization.common.Core.TabType;
-import factorization.common.FzUtil.FzInv;
+import factorization.shared.Core;
+import factorization.shared.FzUtil;
+import factorization.shared.ItemFactorization;
+import factorization.shared.Core.TabType;
+import factorization.shared.FzUtil.FzInv;
 
 public class ItemBagOfHolding extends ItemFactorization implements IActOnCraft {
     //XXX: Sending NBT data of all the items might not be a good idea. We might force it to not be shared, and use the damage value for the pearl count.

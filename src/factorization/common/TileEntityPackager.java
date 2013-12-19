@@ -3,6 +3,9 @@ package factorization.common;
 import java.util.Arrays;
 import java.util.List;
 
+import factorization.shared.FactoryType;
+import factorization.shared.FzUtil;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;

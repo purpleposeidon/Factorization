@@ -12,11 +12,11 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
-import factorization.common.Core;
-import factorization.common.FzUtil;
-import factorization.common.FzUtil.FzInv;
 import factorization.common.servo.Decorator;
 import factorization.common.servo.ServoMotor;
+import factorization.shared.Core;
+import factorization.shared.FzUtil;
+import factorization.shared.FzUtil.FzInv;
 
 public class ServoEquipmentBay extends Decorator {
 

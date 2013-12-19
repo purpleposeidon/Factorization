@@ -10,7 +10,12 @@ import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Charge;
 import factorization.api.IChargeConductor;
-import factorization.common.NetworkFactorization.MessageType;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.FactoryType;
+import factorization.shared.FzUtil;
+import factorization.shared.TileEntityCommon;
+import factorization.shared.NetworkFactorization.MessageType;
 
 public class TileEntityBattery extends TileEntityCommon implements IChargeConductor {
     Charge charge = new Charge(this);

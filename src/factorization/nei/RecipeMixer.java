@@ -11,10 +11,10 @@ import net.minecraftforge.oredict.OreDictionary;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.recipe.TemplateRecipeHandler;
 import factorization.client.gui.GuiMixer;
-import factorization.common.Core;
-import factorization.common.FzUtil;
 import factorization.common.TileEntityMixer;
 import factorization.common.TileEntityMixer.RecipeMatchInfo;
+import factorization.shared.Core;
+import factorization.shared.FzUtil;
 
 public class RecipeMixer extends TemplateRecipeHandler {
     //FIXME: People keep sending invalid bug reports for the mixer because it can't really merge OD ItemStacks.

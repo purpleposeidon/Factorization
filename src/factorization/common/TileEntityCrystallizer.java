@@ -9,7 +9,12 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
-import factorization.common.NetworkFactorization.MessageType;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.FactoryType;
+import factorization.shared.FzUtil;
+import factorization.shared.TileEntityFactorization;
+import factorization.shared.NetworkFactorization.MessageType;
 
 public class TileEntityCrystallizer extends TileEntityFactorization {
     ItemStack inputs[] = new ItemStack[6];
@@ -138,7 +143,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     }
 
     @Override
-    void doLogic() {
+    protected void doLogic() {
         if (heat <= 0) {
             current_state = 1;
             empty();

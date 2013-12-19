@@ -9,18 +9,18 @@ import org.lwjgl.opengl.GL11;
 
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
-import factorization.common.Core;
-import factorization.common.FactoryType;
 import factorization.common.TileEntityWire;
 import factorization.common.WireConnections;
 import factorization.common.WireRenderingCube;
+import factorization.shared.Core;
+import factorization.shared.FactorizationBlockRender;
+import factorization.shared.FactoryType;
 
 public class BlockRenderSteamTurbine extends FactorizationBlockRender {
 
     TileEntityWire fake_wire = new TileEntityWire();
     @Override
-    protected
-    void render(RenderBlocks rb) {
+    public void render(RenderBlocks rb) {
         float m = 0.0001F;
         renderNormalBlock(rb, getFactoryType().md);
         
@@ -79,8 +79,7 @@ public class BlockRenderSteamTurbine extends FactorizationBlockRender {
     }
 
     @Override
-    protected
-    FactoryType getFactoryType() {
+    public FactoryType getFactoryType() {
         return FactoryType.STEAMTURBINE;
     }
 

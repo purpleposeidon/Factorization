@@ -11,16 +11,16 @@ import org.lwjgl.opengl.GL11;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
-import factorization.common.Core;
-import factorization.common.FactoryType;
 import factorization.common.TileEntityBattery;
+import factorization.shared.Core;
+import factorization.shared.FactorizationBlockRender;
+import factorization.shared.FactoryType;
 
 
 public class BlockRenderBattery extends FactorizationBlockRender {
     float item_fullness = 0;
     @Override
-    protected
-    void render(RenderBlocks rb) {
+    public void render(RenderBlocks rb) {
         TileEntityBattery bat;
         if (world_mode) {
             bat = new Coord(Minecraft.getMinecraft().theWorld, x, y, z).getTE(TileEntityBattery.class);
@@ -82,8 +82,7 @@ public class BlockRenderBattery extends FactorizationBlockRender {
 
 
     @Override
-    protected
-    FactoryType getFactoryType() {
+    public FactoryType getFactoryType() {
         return FactoryType.BATTERY;
     }
 }

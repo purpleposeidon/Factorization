@@ -8,9 +8,10 @@ import net.minecraft.util.Icon;
 import org.lwjgl.opengl.GL11;
 
 import factorization.common.BlockRenderHelper;
-import factorization.common.Core;
 import factorization.common.ItemIcons;
 import factorization.common.TileEntityMixer;
+import factorization.shared.Core;
+import factorization.shared.FactorizationBlockRender;
 
 public class TileEntityMixerRenderer extends TileEntitySpecialRenderer {
     @Override

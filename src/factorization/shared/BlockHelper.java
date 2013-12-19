@@ -1,6 +1,6 @@
-package factorization.common;
+package factorization.shared;
 
-import static factorization.common.BlockHelper.BlockStyle.*;
+import static factorization.shared.BlockHelper.BlockStyle.*;
 
 import java.util.ArrayList;
 

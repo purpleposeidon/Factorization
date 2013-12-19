@@ -12,7 +12,7 @@ import net.minecraftforge.common.Property;
 import cpw.mods.fml.common.Mod;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
-import factorization.common.Core;
+import factorization.shared.Core;
 
 public class HammerInfo {
     static File worldConfigFile = null;

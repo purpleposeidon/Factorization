@@ -7,9 +7,9 @@ import net.minecraftforge.client.IItemRenderer;
 
 import org.lwjgl.opengl.GL11;
 
-import factorization.common.Core;
-import factorization.common.FzUtil;
 import factorization.common.TileEntityBattery;
+import factorization.shared.Core;
+import factorization.shared.FzUtil;
 
 public class BatteryItemRender implements IItemRenderer {
     BlockRenderBattery render_battery;

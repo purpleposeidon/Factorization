@@ -3,8 +3,9 @@ package factorization.client.gui;
 import org.lwjgl.opengl.GL11;
 
 import factorization.common.ContainerFactorization;
-import factorization.common.Core;
 import factorization.common.TileEntityParaSieve;
+import factorization.shared.Core;
+import factorization.shared.FactorizationGui;
 
 public class GuiParasieve extends FactorizationGui {
     TileEntityParaSieve proto;

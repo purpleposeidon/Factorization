@@ -1,5 +1,6 @@
 package factorization.common;
 
+import factorization.shared.TileEntityFactorization;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ICrafting;
 

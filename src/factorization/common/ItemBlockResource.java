@@ -2,6 +2,8 @@ package factorization.common;
 
 import java.util.List;
 
+import factorization.shared.Core;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;

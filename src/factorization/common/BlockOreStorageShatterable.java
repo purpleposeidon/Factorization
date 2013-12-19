@@ -11,6 +11,7 @@ import net.minecraft.util.Icon;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import factorization.api.Coord;
+import factorization.shared.Core;
 
 public class BlockOreStorageShatterable extends BlockOreStorage {
     private final Block original;

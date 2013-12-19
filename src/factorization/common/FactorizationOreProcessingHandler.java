@@ -16,6 +16,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.OreDictionary.OreRegisterEvent;
 import factorization.common.ItemOreProcessing.OreType;
+import factorization.shared.Core;
 
 public class FactorizationOreProcessingHandler {
     private static final String waterBucket = "fz.waterBucketLike";
@@ -154,7 +155,7 @@ public class FactorizationOreProcessingHandler {
         }
     }
     
-    void addDictOres() {
+    public void addDictOres() {
         loadWater();
         
         for (OreType type : ItemOreProcessing.OreType.values()) {

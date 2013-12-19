@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.shared;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,6 +32,8 @@ import factorization.api.DeltaCoord;
 import factorization.api.IEntityMessage;
 import factorization.api.Quaternion;
 import factorization.api.VectorUV;
+import factorization.common.Command;
+import factorization.common.TileEntityBarrel;
 import factorization.notify.NotifyImplementation;
 
 public class NetworkFactorization implements ITinyPacketHandler {
@@ -307,7 +309,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
 
     static final private ThreadLocal<EntityPlayer> currentPlayer = new ThreadLocal<EntityPlayer>();
 
-    EntityPlayer getCurrentPlayer() {
+    public EntityPlayer getCurrentPlayer() {
         EntityPlayer ret = currentPlayer.get();
         if (ret == null) {
             throw new NullPointerException("currentPlayer wasn't set");
@@ -423,9 +425,6 @@ public class NetworkFactorization implements ITinyPacketHandler {
             case MessageType.PistonPush:
                 Block.pistonBase.onBlockEventReceived(world, x, y, z, 0, input.readInt());
                 here.setId(0);
-                break;
-            case MessageType.BarrelLoss:
-                TileEntityBarrel.spawnBreakParticles(here, input.readInt());
                 break;
             default:
                 if (here.blockExists() && here.getId() != 0) {
@@ -556,7 +555,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 RouterLastSeen = 24, RouterMatchToVisit = 25, RouterDowngrade = 26,
                 RouterUpgradeState = 27, RouterEjectDirection = 28,
                 //
-                BarrelDescription = 40, BarrelItem = 41, BarrelCount = 42, BarrelLoss = 43,
+                BarrelDescription = 40, BarrelItem = 41, BarrelCount = 42,
                 //
                 BatteryLevel = 50, LeydenjarLevel = 51,
                 //

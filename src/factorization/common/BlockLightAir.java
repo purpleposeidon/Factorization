@@ -12,6 +12,8 @@ import net.minecraft.util.Icon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import factorization.api.Coord;
+import factorization.shared.Core;
+import factorization.shared.FzConfig;
 
 public class BlockLightAir extends Block {
     static public final int air_md = 0;

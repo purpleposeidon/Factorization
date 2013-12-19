@@ -3,6 +3,10 @@ package factorization.common;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import factorization.shared.FactoryType;
+import factorization.shared.FzUtil;
+import factorization.shared.TileEntityFactorization;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;

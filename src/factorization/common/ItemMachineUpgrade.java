@@ -6,7 +6,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import factorization.api.Coord;
-import factorization.common.Core.TabType;
+import factorization.shared.FactoryType;
+import factorization.shared.ItemFactorization;
+import factorization.shared.TileEntityCommon;
+import factorization.shared.Core.TabType;
 
 public class ItemMachineUpgrade extends ItemFactorization {
     FactoryType machineType;

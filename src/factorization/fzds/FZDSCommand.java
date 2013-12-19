@@ -33,13 +33,13 @@ import com.google.common.base.Strings;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.Quaternion;
-import factorization.common.Core;
-import factorization.common.FzConfig;
 import factorization.fzds.DeltaChunk.AreaMap;
 import factorization.fzds.DeltaChunk.DseDestination;
 import factorization.fzds.api.DeltaCapability;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.notify.Notify;
+import factorization.shared.Core;
+import factorization.shared.FzConfig;
 
 public class FZDSCommand extends CommandBase {
     //private static DimensionSliceEntity currentWE = null;

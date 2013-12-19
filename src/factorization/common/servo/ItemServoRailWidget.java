@@ -14,10 +14,10 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
-import factorization.common.Core;
-import factorization.common.Core.TabType;
-import factorization.common.FzUtil;
-import factorization.common.ItemFactorization;
+import factorization.shared.Core;
+import factorization.shared.FzUtil;
+import factorization.shared.ItemFactorization;
+import factorization.shared.Core.TabType;
 
 public class ItemServoRailWidget extends ItemFactorization {
     public ItemServoRailWidget(int itemId, String name) {

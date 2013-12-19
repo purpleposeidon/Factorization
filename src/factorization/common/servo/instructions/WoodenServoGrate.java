@@ -9,9 +9,9 @@ import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
-import factorization.common.Core;
 import factorization.common.servo.Decorator;
 import factorization.common.servo.ServoMotor;
+import factorization.shared.Core;
 
 public class WoodenServoGrate extends Decorator {
 

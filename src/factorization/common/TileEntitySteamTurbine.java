@@ -14,7 +14,11 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 import factorization.api.Charge;
 import factorization.api.IChargeConductor;
-import factorization.common.NetworkFactorization.MessageType;
+import factorization.shared.BlockClass;
+import factorization.shared.FactoryType;
+import factorization.shared.FzUtil;
+import factorization.shared.TileEntityCommon;
+import factorization.shared.NetworkFactorization.MessageType;
 
 public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHandler, IChargeConductor {
     FluidTank steamTank = new FluidTank(/*this,*/ TileEntitySolarBoiler.steam_stack.copy(), 1000*16);

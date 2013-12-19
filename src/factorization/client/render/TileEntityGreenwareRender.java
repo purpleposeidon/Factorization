@@ -5,8 +5,8 @@ import net.minecraft.tileentity.TileEntity;
 
 import org.lwjgl.opengl.GL11;
 
-import factorization.common.Core;
 import factorization.common.TileEntityGreenware;
+import factorization.shared.Core;
 
 
 public class TileEntityGreenwareRender extends TileEntitySpecialRenderer {

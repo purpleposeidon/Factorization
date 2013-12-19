@@ -9,8 +9,8 @@ import org.lwjgl.opengl.GL11;
 
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
-import factorization.common.Core;
 import factorization.common.TileEntityHeater;
+import factorization.shared.Core;
 
 public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
     static RenderBlocks rb = new RenderBlocks();

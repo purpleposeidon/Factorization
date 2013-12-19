@@ -6,8 +6,8 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import factorization.api.Quaternion;
-import factorization.common.Core;
-import factorization.common.FzUtil;
+import factorization.shared.Core;
+import factorization.shared.FzUtil;
 
 public class MetaAxisAlignedBB extends AxisAlignedBB {
     //NORELEASE, Optimization: If not rotated, check more vanilla-like, and mutate the parameter to test instead of shadowaabbs.

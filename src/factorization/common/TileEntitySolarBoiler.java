@@ -13,6 +13,11 @@ import net.minecraftforge.fluids.IFluidHandler;
 import factorization.api.Coord;
 import factorization.api.IMeterInfo;
 import factorization.api.IReflectionTarget;
+import factorization.shared.BlockClass;
+import factorization.shared.FactoryType;
+import factorization.shared.FzConfig;
+import factorization.shared.FzUtil;
+import factorization.shared.TileEntityCommon;
 
 public class TileEntitySolarBoiler extends TileEntityCommon implements IReflectionTarget, IFluidHandler, IMeterInfo {
     public static Fluid steam;

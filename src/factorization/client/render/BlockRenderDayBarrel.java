@@ -9,14 +9,15 @@ import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
-import factorization.common.Core;
-import factorization.common.FactoryType;
 import factorization.common.TileEntityDayBarrel;
+import factorization.shared.Core;
+import factorization.shared.FactorizationBlockRender;
+import factorization.shared.FactoryType;
 
 public class BlockRenderDayBarrel extends FactorizationBlockRender {
 
     @Override
-    protected void render(RenderBlocks rb) {
+    public void render(RenderBlocks rb) {
         if (world_mode) {
             doRender(rb, 0);
         }
@@ -31,7 +32,7 @@ public class BlockRenderDayBarrel extends FactorizationBlockRender {
     }
     
     @Override
-    void renderSecondPass(RenderBlocks rb) {
+    public void renderSecondPass(RenderBlocks rb) {
         //NOTE: We can almost get away with doing this in the first render pass.
         //But GL_BLEND is not consistently enabled.
         doRender(rb, 1);
@@ -84,7 +85,7 @@ public class BlockRenderDayBarrel extends FactorizationBlockRender {
     
     
     @Override
-    protected FactoryType getFactoryType() {
+    public FactoryType getFactoryType() {
         return FactoryType.DAYBARREL;
     }
 

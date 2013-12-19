@@ -16,7 +16,7 @@ import factorization.common.BlockDarkIronOre;
 import factorization.common.BlockDarkIronOre.Glint;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
-import factorization.common.Core;
+import factorization.shared.Core;
 
 public class GlintRenderer extends TileEntitySpecialRenderer {
     

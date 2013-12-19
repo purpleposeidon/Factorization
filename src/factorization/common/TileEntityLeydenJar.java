@@ -21,7 +21,12 @@ import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.Share;
 import factorization.client.render.ChargeSparks;
-import factorization.common.NetworkFactorization.MessageType;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.FactoryType;
+import factorization.shared.FzUtil;
+import factorization.shared.TileEntityCommon;
+import factorization.shared.NetworkFactorization.MessageType;
 
 public class TileEntityLeydenJar extends TileEntityCommon implements IChargeConductor {
     private Charge charge = new Charge(this);

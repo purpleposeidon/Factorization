@@ -11,6 +11,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import factorization.api.Coord;
+import factorization.shared.Core;
 
 public class BlockResource extends Block {
     public Icon[] icons = new Icon[ResourceType.values().length];

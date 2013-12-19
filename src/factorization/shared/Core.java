@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.shared;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +42,12 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.ChargeMetalBlockConductance;
+import factorization.common.FactorizationOreProcessingHandler;
+import factorization.common.Registry;
+import factorization.common.TileEntitySolarBoiler;
+import factorization.common.TileEntityWrathFire;
+import factorization.common.TileEntityWrathLamp;
+import factorization.common.TileEntityWrathLamp.RelightTask;
 import factorization.common.compat.CompatManager;
 import factorization.common.servo.ServoMotor;
 

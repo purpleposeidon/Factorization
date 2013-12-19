@@ -1,6 +1,7 @@
-package factorization.common;
+package factorization.shared;
 
-import factorization.common.Core.TabType;
+import factorization.shared.Core.TabType;
+
 
 
 public class ItemCraftingComponent extends ItemFactorization {

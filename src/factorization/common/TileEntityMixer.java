@@ -28,8 +28,13 @@ import net.minecraftforge.oredict.ShapelessOreRecipe;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
-import factorization.common.FzUtil.FzInv;
-import factorization.common.NetworkFactorization.MessageType;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.FactoryType;
+import factorization.shared.FzUtil;
+import factorization.shared.FzUtil.FzInv;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityFactorization;
 
 public class TileEntityMixer extends TileEntityFactorization implements
         IChargeConductor {
@@ -206,7 +211,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
 
     @Override
-    int getLogicSpeed() {
+    protected int getLogicSpeed() {
         return 4;
     }
 
@@ -617,7 +622,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
 
     @Override
-    void doLogic() {
+    protected void doLogic() {
         needLogic();
         if (dumpBuffer()) {
             return;

@@ -13,8 +13,14 @@ import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import factorization.api.Coord;
-import factorization.common.NetworkFactorization.MessageType;
 import factorization.notify.Notify;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.FactoryType;
+import factorization.shared.FzConfig;
+import factorization.shared.FzUtil;
+import factorization.shared.TileEntityFactorization;
+import factorization.shared.NetworkFactorization.MessageType;
 
 //Based off of technology found stockpiled in the long-abandoned dwarven fortress of "Nod Semor, the Toad of Unity".
 
@@ -486,33 +492,11 @@ public class TileEntityBarrel extends TileEntityFactorization {
                 break;
             }
         }
-        if (count > 0) {
-            broadcastMessage(null, MessageType.BarrelLoss, upgrade);
-        }
         topStack = null;
         middleCount = 0;
         bottomStack = null;
     }
     
-    static void spawnBreakParticles(Coord c, int upgrade) {
-        if (upgrade > 0) {
-            //ender particles. Also, drop the item.
-            for (int theta = 0; theta < 360; theta += 1) {
-                if (rand.nextInt(10) != 2) {
-                    continue;
-                }
-                float speed = 2F;
-                float start = -2F;
-                double a = Math.toRadians(theta);
-                //c.w.spawnParticle("portal", c.x+0.5F, c.y+0.5F, c.z+0.5F, 0, 0, 0);
-                c.w.spawnParticle("portal", c.x+0.5F + Math.cos(a)*start, c.y, c.z+0.5F + Math.sin(a)*start, Math.cos(a)*speed, 0, Math.sin(a)*speed);
-            }
-        } else {
-            //This technically shouldn't happen.
-            c.w.spawnParticle("largesmoke", c.x+0.5F, c.y+0.5F, c.z+0.5F, 0, 0, 0);
-        }
-    }
-
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
@@ -530,7 +514,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     }
 
     @Override
-    void sendFullDescription(EntityPlayer player) {
+    protected void sendFullDescription(EntityPlayer player) {
         super.sendFullDescription(player);
         broadcastItem();
         changeItemCount(0);
@@ -547,7 +531,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     }
 
     @Override
-    void doLogic() {
+    protected void doLogic() {
     }
 
     @Override

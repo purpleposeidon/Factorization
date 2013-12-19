@@ -13,14 +13,14 @@ import net.minecraft.util.Icon;
 import net.minecraftforge.client.IItemRenderer.ItemRenderType;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
-import factorization.common.FactoryType;
 import factorization.common.TileEntityLeydenJar;
+import factorization.shared.FactorizationBlockRender;
+import factorization.shared.FactoryType;
 
 public class BlockRenderLeydenJar extends FactorizationBlockRender {
 
     @Override
-    protected
-    void render(RenderBlocks rb) {
+    public void render(RenderBlocks rb) {
         Icon glass = BlockIcons.leyden_glass_side;
         Icon knob = BlockIcons.leyden_knob;
         BlockRenderHelper block = BlockRenderHelper.instance;
@@ -93,7 +93,7 @@ public class BlockRenderLeydenJar extends FactorizationBlockRender {
     private WeakHashMap<ItemStack, ChargeSparks> sparkMap = new WeakHashMap<ItemStack, ChargeSparks>();
 
     @Override
-    protected FactoryType getFactoryType() {
+    public FactoryType getFactoryType() {
         return FactoryType.LEYDENJAR;
     }
 

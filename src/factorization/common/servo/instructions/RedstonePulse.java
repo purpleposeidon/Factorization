@@ -11,9 +11,9 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
-import factorization.common.TileEntityCommon;
 import factorization.common.servo.Instruction;
 import factorization.common.servo.ServoMotor;
+import factorization.shared.TileEntityCommon;
 
 public class RedstonePulse extends Instruction {
 

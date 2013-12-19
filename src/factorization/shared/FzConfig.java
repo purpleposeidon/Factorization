@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.shared;
 
 import java.io.File;
 import java.util.regex.Pattern;
@@ -12,11 +12,11 @@ public class FzConfig {
 
     // I'd totally unstatic all these, but bluh
     public static Configuration config;
-    static int factory_block_id = 1000;
-    static int lightair_id = 1001;
-    static int resource_id = 1002;
-    static int fractured_bedrock_id = 1003;
-    static int dark_iron_ore_id = 1004;
+    public static int factory_block_id = 1000;
+    public static int lightair_id = 1001;
+    public static int resource_id = 1002;
+    public static int fractured_bedrock_id = 1003;
+    public static int dark_iron_ore_id = 1004;
     public static Pattern routerBan;
     public static boolean render_barrel_item = true;
     public static boolean render_barrel_text = true;

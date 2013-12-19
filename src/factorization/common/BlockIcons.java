@@ -5,9 +5,10 @@ import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import factorization.common.FactorizationTextureLoader.Directory;
-import factorization.common.FactorizationTextureLoader.IconGroup;
-import factorization.common.FactorizationTextureLoader.Ignore;
+import factorization.shared.TileEntityFactorization;
+import factorization.shared.FactorizationTextureLoader.Directory;
+import factorization.shared.FactorizationTextureLoader.IconGroup;
+import factorization.shared.FactorizationTextureLoader.Ignore;
 
 public class BlockIcons {
     public static Icon uv_test,

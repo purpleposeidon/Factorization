@@ -1,7 +1,7 @@
 package factorization.common.compat;
 
 import cpw.mods.fml.common.Loader;
-import factorization.common.Core;
+import factorization.shared.Core;
 
 public class CompatManager {
     String[] mod_compats = new String[] {"IC2", "Thaumcraft"};

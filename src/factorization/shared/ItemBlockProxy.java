@@ -1,23 +1,23 @@
-package factorization.common;
+package factorization.shared;
 
 import java.util.List;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import factorization.common.Core.TabType;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import factorization.shared.Core.TabType;
 
 public class ItemBlockProxy extends ItemFactorization {
     //TODO: Why doesn't this just extend ItemBlock?
     ItemStack proxy;
     int blockID;
 
-    protected ItemBlockProxy(int id, ItemStack proxy, String name, TabType tabType) {
+    public ItemBlockProxy(int id, ItemStack proxy, String name, TabType tabType) {
         super(id, name, tabType);
         this.proxy = proxy.copy();
         this.blockID = ((ItemBlock) proxy.getItem()).getBlockID();

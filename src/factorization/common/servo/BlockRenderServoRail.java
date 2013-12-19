@@ -2,10 +2,10 @@ package factorization.common.servo;
 
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.Icon;
-import factorization.client.render.FactorizationBlockRender;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
-import factorization.common.FactoryType;
+import factorization.shared.FactorizationBlockRender;
+import factorization.shared.FactoryType;
 
 public class BlockRenderServoRail extends FactorizationBlockRender {
 
@@ -32,7 +32,7 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
     }
     
     @Override
-    protected void render(RenderBlocks rb) {
+    public void render(RenderBlocks rb) {
         TileEntityServoRail rail = null;
         if (world_mode) {
             if (te instanceof TileEntityServoRail) {
@@ -105,7 +105,7 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
     }
 
     @Override
-    protected FactoryType getFactoryType() {
+    public FactoryType getFactoryType() {
         return FactoryType.SERVORAIL;
     }
 }

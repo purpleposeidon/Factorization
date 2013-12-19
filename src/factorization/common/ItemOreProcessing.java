@@ -12,7 +12,9 @@ import net.minecraftforge.oredict.OreDictionary;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
-import factorization.common.Core.TabType;
+import factorization.shared.Core;
+import factorization.shared.ItemFactorization;
+import factorization.shared.Core.TabType;
 
 public class ItemOreProcessing extends ItemFactorization implements IActOnCraft {
     public static ArrayList<String> OD_ores = new ArrayList(), OD_ingots = new ArrayList();

@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.shared;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -17,7 +17,7 @@ import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.ICoord;
 import factorization.api.IFactoryType;
-import factorization.common.NetworkFactorization.MessageType;
+import factorization.shared.NetworkFactorization.MessageType;
 
 public abstract class TileEntityFactorization extends TileEntityCommon
         implements IInventory, ISidedInventory, ICoord, IFactoryType {
@@ -27,8 +27,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     public byte facing_direction = 3;
 
     //Runtime
-    static Random rand = new Random();
-    boolean need_logic_check = true;
+    protected boolean need_logic_check = true;
 
     @Override
     public abstract FactoryType getFactoryType();
@@ -36,16 +35,16 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     public void click(EntityPlayer entityplayer) {
     }
 
-    void makeNoise() {
+    protected void makeNoise() {
     }
 
-    abstract void doLogic();
+    protected abstract void doLogic();
 
-    int getLogicSpeed() {
+    protected int getLogicSpeed() {
         return 4;
     }
 
-    boolean canFaceVert() {
+    protected boolean canFaceVert() {
         return false;
     }
 
@@ -99,7 +98,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         }
     }
 
-    void needLogic() {
+    protected void needLogic() {
         need_logic_check = true;
     }
 
@@ -153,7 +152,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         return Math.copySign(1, c);
     }
 
-    EntityItem ejectItem(ItemStack is, boolean violent, EntityPlayer player, int to_side) {
+    protected EntityItem ejectItem(ItemStack is, boolean violent, EntityPlayer player, int to_side) {
         if (worldObj.isRemote) {
             return null;
         }
@@ -302,7 +301,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         tag.setTag("Items", invlist);
     }
 
-    static void saveItem(String name, NBTTagCompound tag, ItemStack is) {
+    protected static void saveItem(String name, NBTTagCompound tag, ItemStack is) {
         // TODO: Are these two as used as they could be?
         if (is == null) {
             return;
@@ -312,7 +311,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         tag.setCompoundTag(name, itag);
     }
 
-    static ItemStack readItem(String name, NBTTagCompound tag) {
+    protected static ItemStack readItem(String name, NBTTagCompound tag) {
         if (tag.hasKey(name)) {
             return ItemStack.loadItemStackFromNBT(tag.getCompoundTag(name));
         }

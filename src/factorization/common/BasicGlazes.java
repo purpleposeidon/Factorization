@@ -5,6 +5,7 @@ import static factorization.common.GlazeTypes.COMMON;
 import static factorization.common.GlazeTypes.MATTE;
 import static factorization.common.GlazeTypes.SHINY;
 import static factorization.common.GlazeTypes.TRANSLUCENT;
+import factorization.shared.Core;
 import net.minecraft.util.Icon;
 
 public enum BasicGlazes {

@@ -10,9 +10,9 @@ import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import factorization.common.Core;
 import factorization.fzds.HammerNet.HammerNetType;
 import factorization.fzds.api.DeltaCapability;
+import factorization.shared.Core;
 
 public class DseRayTarget extends Entity {
     //This is used on the client side to give the player something to smack

@@ -17,7 +17,11 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
-import factorization.common.NetworkFactorization.MessageType;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.FactoryType;
+import factorization.shared.TileEntityCommon;
+import factorization.shared.NetworkFactorization.MessageType;
 
 public class TileEntityWire extends TileEntityCommon implements IChargeConductor {
     public byte supporting_side;
@@ -115,14 +119,15 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     }
 
     @Override
-    boolean canPlaceAgainst(EntityPlayer player, Coord supporter, int side) {
+    public boolean canPlaceAgainst(EntityPlayer player, Coord supporter, int side) {
         if (supporter.isSolidOnSide(side)) {
             return true;
         }
         TileEntityWire parent = supporter.getTE(TileEntityWire.class);
         if (parent != null) {
             if (parent.is_directly_supported()) {
-                if (parent.supporting_side == side || parent.supporting_side == CubeFace.oppositeSide(side)) {
+                int opposite = ForgeDirection.getOrientation(side).getOpposite().ordinal();
+                if (parent.supporting_side == side || parent.supporting_side == opposite) {
                     return false;
                 }
                 return true;

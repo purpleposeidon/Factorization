@@ -1,4 +1,4 @@
-package factorization.client.render;
+package factorization.shared;
 
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.IItemRenderer;

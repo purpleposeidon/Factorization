@@ -8,14 +8,15 @@ import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
-import factorization.common.Core;
-import factorization.common.FactoryType;
 import factorization.common.TileEntityCompressionCrafter;
+import factorization.shared.Core;
+import factorization.shared.FactorizationBlockRender;
+import factorization.shared.FactoryType;
 
 public class BlockRenderCompressionCrafter extends FactorizationBlockRender {
 
     @Override
-    protected void render(RenderBlocks rb) {
+    public void render(RenderBlocks rb) {
         BlockRenderHelper block = Core.registry.blockRender;
         Icon side = BlockIcons.compactSide;
         block.useTextures(
@@ -60,7 +61,7 @@ public class BlockRenderCompressionCrafter extends FactorizationBlockRender {
     }
 
     @Override
-    protected FactoryType getFactoryType() {
+    public FactoryType getFactoryType() {
         return FactoryType.COMPRESSIONCRAFTER;
     }
 

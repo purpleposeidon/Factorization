@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.shared;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -19,7 +19,8 @@ import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.DeltaCoord;
-import factorization.common.NetworkFactorization.MessageType;
+import factorization.common.TileEntityGreenware;
+import factorization.shared.NetworkFactorization.MessageType;
 
 public class TileEntityExtension extends TileEntityCommon {
     private TileEntityCommon _parent = null;

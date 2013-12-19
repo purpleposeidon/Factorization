@@ -1,4 +1,4 @@
-package factorization.client.gui;
+package factorization.shared;
 
 import factorization.common.ContainerFactorization;
 import net.minecraft.client.gui.inventory.GuiContainer;

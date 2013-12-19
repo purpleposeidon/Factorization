@@ -23,8 +23,8 @@ import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
 import factorization.common.BlockIcons.ExtendedIcon;
 import factorization.common.BlockRenderHelper;
-import factorization.common.Core;
 import factorization.common.TileEntityCompressionCrafter;
+import factorization.shared.Core;
 
 public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRenderer {
     float textureOffset;

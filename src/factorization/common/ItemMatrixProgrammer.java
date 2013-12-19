@@ -4,9 +4,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import factorization.api.Coord;
-import factorization.common.Core.TabType;
 import factorization.common.servo.Decorator;
 import factorization.common.servo.TileEntityServoRail;
+import factorization.shared.ItemFactorization;
+import factorization.shared.Core.TabType;
 
 public class ItemMatrixProgrammer extends ItemFactorization {
     public ItemMatrixProgrammer(int id) {

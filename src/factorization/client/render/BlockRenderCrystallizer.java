@@ -2,14 +2,14 @@ package factorization.client.render;
 
 import net.minecraft.client.renderer.RenderBlocks;
 import factorization.common.BlockIcons;
-import factorization.common.Core;
-import factorization.common.FactoryType;
+import factorization.shared.Core;
+import factorization.shared.FactorizationBlockRender;
+import factorization.shared.FactoryType;
 
 public class BlockRenderCrystallizer extends FactorizationBlockRender {
 
     @Override
-    protected
-    void render(RenderBlocks rb) {
+    public void render(RenderBlocks rb) {
         Core.profileStart("crystallizer");
         int metal = 14, wood = 8 + 16, hollow = 10 + 16;
         float width = 2F / 16F;
@@ -23,8 +23,7 @@ public class BlockRenderCrystallizer extends FactorizationBlockRender {
     }
 
     @Override
-    protected
-    FactoryType getFactoryType() {
+    public FactoryType getFactoryType() {
         return FactoryType.CRYSTALLIZER;
     }
 

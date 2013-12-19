@@ -25,8 +25,8 @@ import factorization.api.datahelpers.DataOutPacketClientEdited;
 import factorization.api.datahelpers.DataValidator;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
-import factorization.common.Core;
-import factorization.common.NetworkFactorization.MessageType;
+import factorization.shared.Core;
+import factorization.shared.NetworkFactorization.MessageType;
 
 public class GuiDataConfig extends GuiScreen {
     IDataSerializable ids;

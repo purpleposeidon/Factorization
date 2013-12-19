@@ -44,12 +44,22 @@ import cpw.mods.fml.common.registry.VillagerRegistry;
 import cpw.mods.fml.common.registry.VillagerRegistry.IVillageTradeHandler;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
-import factorization.common.Core.TabType;
 import factorization.common.ItemOreProcessing.OreType;
 import factorization.common.TileEntityGreenware.ClayState;
 import factorization.common.servo.ItemServoMotor;
 import factorization.common.servo.ItemServoRailWidget;
 import factorization.common.servo.ServoComponent;
+import factorization.shared.BlockClass;
+import factorization.shared.BlockFactorization;
+import factorization.shared.Core;
+import factorization.shared.FactoryType;
+import factorization.shared.FzConfig;
+import factorization.shared.FzUtil;
+import factorization.shared.ItemBlockProxy;
+import factorization.shared.ItemCraftingComponent;
+import factorization.shared.ItemFactorizationBlock;
+import factorization.shared.Sound;
+import factorization.shared.Core.TabType;
 
 public class Registry implements ICraftingHandler, ITickHandler {
     public ItemFactorizationBlock item_factorization;
@@ -123,7 +133,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
         registerItem(new ItemStack(block).getItem());
     }
     
-    void makeBlocks() {
+    public void makeBlocks() {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             //Theoretically, not necessary. I bet BUKKIT would flip its shit tho.
             blockRender = new BlockRenderHelper();
@@ -197,7 +207,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
         }
     }
 
-    void makeItems() {
+    public void makeItems() {
         ore_dirty_gravel = new ItemOreProcessing(itemID("oreDirtyGravel", 9034), 2 * 16 + 4, "gravel");
         ore_clean_gravel = new ItemOreProcessing(itemID("oreCleanGravel", 9035), 2 * 16 + 5, "clean");
         ore_reduced = new ItemOreProcessing(itemID("oreReduced", 9036), 2 * 16 + 6, "reduced");
@@ -377,7 +387,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
         }
     }
 
-    void makeRecipes() {
+    public void makeRecipes() {
         recipe(new ItemStack(Block.stoneDoubleSlab),
                 "-",
                 "-",
@@ -1234,7 +1244,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
     public void onSmelting(EntityPlayer player, ItemStack item) {
     }
 
-    void sendIMC() {
+    public void sendIMC() {
         //Registers our recipe handlers to a list in NEIPlugins.
         //Format: "Factorization@<Recipe Name>@<outputId that used to view all recipes>"
         for (String msg : new String[] {
@@ -1254,7 +1264,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
         }
     }
     
-    void addOtherRecipes() {
+    public void addOtherRecipes() {
         ArrayList<ItemStack> theLogs = new ArrayList();
         for (ItemStack log : OreDictionary.getOres("logWood")) {
             if (log.itemID == Block.wood.blockID) {

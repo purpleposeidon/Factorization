@@ -7,8 +7,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import factorization.common.Core.TabType;
 import factorization.common.TileEntityDayBarrel.Type;
+import factorization.shared.Core;
+import factorization.shared.ItemBlockProxy;
+import factorization.shared.Core.TabType;
 
 public class ItemDayBarrel extends ItemBlockProxy {
 

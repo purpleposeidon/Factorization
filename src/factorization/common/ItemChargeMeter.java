@@ -10,8 +10,10 @@ import factorization.api.Charge.ChargeDensityReading;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
 import factorization.api.IMeterInfo;
-import factorization.common.Core.TabType;
 import factorization.notify.Notify;
+import factorization.shared.Core;
+import factorization.shared.Core.TabType;
+import factorization.shared.ItemFactorization;
 
 public class ItemChargeMeter extends ItemFactorization {
 

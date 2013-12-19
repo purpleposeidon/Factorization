@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
-import factorization.common.FactoryType;
 import factorization.common.TileEntitySocketBase;
+import factorization.shared.FactoryType;
 
 public class SocketEmpty extends TileEntitySocketBase {
     @Override

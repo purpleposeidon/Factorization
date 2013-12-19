@@ -11,11 +11,12 @@ import org.lwjgl.opengl.GL11;
 import factorization.common.BasicGlazes;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
-import factorization.common.Core;
-import factorization.common.FactoryType;
 import factorization.common.TileEntityGreenware;
 import factorization.common.TileEntityGreenware.ClayLump;
 import factorization.common.TileEntityGreenware.ClayState;
+import factorization.shared.Core;
+import factorization.shared.FactorizationBlockRender;
+import factorization.shared.FactoryType;
 
 public class BlockRenderGreenware extends FactorizationBlockRender {
     static BlockRenderGreenware instance;
@@ -35,8 +36,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
     private static TileEntityGreenware loader = new TileEntityGreenware();
     
     @Override
-    protected
-    void render(RenderBlocks rb) {
+    public void render(RenderBlocks rb) {
         if (!world_mode) {
             if (is == null) {
                 return;
@@ -224,8 +224,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
     }
 
     @Override
-    protected
-    FactoryType getFactoryType() {
+    public FactoryType getFactoryType() {
         return FactoryType.CERAMIC;
     }
 

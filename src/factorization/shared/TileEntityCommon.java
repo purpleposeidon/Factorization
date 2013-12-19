@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.shared;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -28,13 +28,12 @@ import factorization.api.Coord;
 import factorization.api.IChargeConductor;
 import factorization.api.ICoord;
 import factorization.api.IFactoryType;
-import factorization.api.datahelpers.DataInPacketClientEdited;
-import factorization.api.datahelpers.IDataSerializable;
-import factorization.common.NetworkFactorization.MessageType;
+import factorization.common.BlockIcons;
+import factorization.shared.NetworkFactorization.MessageType;
 
 public abstract class TileEntityCommon extends TileEntity implements ICoord, IFactoryType {
-    static Random rand = new Random();
-    protected String customName = null;
+    protected static Random rand = new Random();
+    public String customName = null;
 
     public abstract BlockClass getBlockClass();
     
@@ -75,10 +74,10 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     protected void useExtraInfo2(byte b) {
     }
 
-    void sendFullDescription(EntityPlayer player) {
+    protected void sendFullDescription(EntityPlayer player) {
     }
 
-    boolean canPlaceAgainst(EntityPlayer player, Coord c, int side) {
+    public boolean canPlaceAgainst(EntityPlayer player, Coord c, int side) {
         return true;
     }
     
@@ -94,7 +93,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         customName = FzUtil.getCustomItemName(is);
     }
     
-    boolean removeBlockByPlayer(EntityPlayer player) {
+    protected boolean removeBlockByPlayer(EntityPlayer player) {
         return Core.registry.resource_block.removeBlockByPlayer(worldObj, player, xCoord, yCoord, zCoord);
     }
 
@@ -237,11 +236,11 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         return false;
     }
 
-    protected void broadcastMessage(EntityPlayer who, int messageType, Object... msg) {
+    public void broadcastMessage(EntityPlayer who, int messageType, Object... msg) {
         Core.network.broadcastMessage(who, getCoord(), messageType, msg);
     }
     
-    protected void broadcastMessage(EntityPlayer who, Packet toSend) {
+    public void broadcastMessage(EntityPlayer who, Packet toSend) {
         Core.network.broadcastPacket(who, getCoord(), toSend);
     }
     
@@ -259,11 +258,11 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         return false;
     }
     
-    static ForgeDirection[] empty_rotation_array = new ForgeDirection[0];
-    static ForgeDirection[] flat_rotation_array = new ForgeDirection[] { 
+    public static final ForgeDirection[] empty_rotation_array = new ForgeDirection[0];
+    public static final ForgeDirection[] flat_rotation_array = new ForgeDirection[] { 
         ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.WEST, ForgeDirection.EAST
     };
-    static ForgeDirection[] full_rotation_array = new ForgeDirection[6];
+    public static final ForgeDirection[] full_rotation_array = new ForgeDirection[6];
     static {
         for (int i = 0; i < 6; i++) {
             full_rotation_array[i] = ForgeDirection.getOrientation(i);

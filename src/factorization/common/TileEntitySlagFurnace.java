@@ -11,7 +11,12 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
-import factorization.common.NetworkFactorization.MessageType;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.FactoryType;
+import factorization.shared.FzUtil;
+import factorization.shared.TileEntityFactorization;
+import factorization.shared.NetworkFactorization.MessageType;
 
 public class TileEntitySlagFurnace extends TileEntityFactorization {
     ItemStack furnaceItemStacks[] = new ItemStack[4];

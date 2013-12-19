@@ -2,9 +2,6 @@ package factorization.common;
 
 import java.io.IOException;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
@@ -12,6 +9,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
@@ -19,6 +18,11 @@ import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.notify.Notify;
+import factorization.shared.BlockClass;
+import factorization.shared.FactoryType;
+import factorization.shared.FzUtil;
+import factorization.shared.Sound;
+import factorization.shared.TileEntityFactorization;
 
 public class TileEntityCaliometricBurner extends TileEntityFactorization implements IDataSerializable {
     ItemStack stomache;
@@ -111,7 +115,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
     }
 
     @Override
-    void doLogic() {
+    protected void doLogic() {
         needLogic();
         Coord here = getCoord();
         if (ticksUntilNextDigestion > 0 && foodQuality > 0) {
@@ -131,7 +135,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
     }
     
     @Override
-    int getLogicSpeed() {
+    protected int getLogicSpeed() {
         return 1;
     }
     

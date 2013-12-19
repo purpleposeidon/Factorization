@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.shared;
 
 
 import java.lang.annotation.ElementType;

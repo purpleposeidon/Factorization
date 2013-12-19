@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
-import factorization.common.Core;
-import factorization.common.FzConfig;
 import factorization.fzds.TransferLib;
+import factorization.shared.Core;
+import factorization.shared.FzConfig;
 
 public class ChargeMetalBlockConductance {
     //static HashMap<Integer, ArrayList<Integer>> validBlocks = new HashMap();

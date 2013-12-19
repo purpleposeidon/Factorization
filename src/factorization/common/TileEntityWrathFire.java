@@ -14,6 +14,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.api.ICoord;
+import factorization.shared.Core;
+import factorization.shared.FzConfig;
+import factorization.shared.Sound;
 
 public class TileEntityWrathFire extends TileEntity implements ICoord {
     //constants

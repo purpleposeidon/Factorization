@@ -1,5 +1,7 @@
 package factorization.common;
 
+import static factorization.shared.TileEntityCommon.full_rotation_array;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +27,12 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
-import factorization.common.FzUtil.FzInv;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.FactoryType;
+import factorization.shared.FzUtil;
+import factorization.shared.FzUtil.FzInv;
+import factorization.shared.TileEntityFactorization;
 
 public class TileEntityParaSieve extends TileEntityFactorization implements ISidedInventory {
     ItemStack[] filters = new ItemStack[8];
@@ -84,7 +91,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     }
     
     @Override
-    boolean canFaceVert() {
+    protected boolean canFaceVert() {
         return true;
     }
     
@@ -395,7 +402,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     }
     
     @Override
-    void doLogic() { }
+    protected void doLogic() { }
 
     @Override
     public boolean canUpdate() {

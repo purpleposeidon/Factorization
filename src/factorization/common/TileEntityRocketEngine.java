@@ -25,13 +25,20 @@ import net.minecraft.util.Vec3;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
-import factorization.common.NetworkFactorization.MessageType;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.TransferLib;
 import factorization.fzds.api.DeltaCapability;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.notify.Notify;
 import factorization.notify.Notify.Style;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.FactoryType;
+import factorization.shared.FzConfig;
+import factorization.shared.FzUtil;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityCommon;
+import factorization.shared.TileEntityExtension;
 
 public class TileEntityRocketEngine extends TileEntityCommon {
     boolean inSlice = false;
@@ -125,7 +132,7 @@ public class TileEntityRocketEngine extends TileEntityCommon {
     }
     
     @Override
-    boolean canPlaceAgainst(EntityPlayer player, Coord c, int side) {
+    public boolean canPlaceAgainst(EntityPlayer player, Coord c, int side) {
         if (player.worldObj.isRemote) {
             return false;
         }

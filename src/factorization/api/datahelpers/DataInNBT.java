@@ -2,7 +2,7 @@ package factorization.api.datahelpers;
 
 import java.io.IOException;
 
-import factorization.common.Core;
+import factorization.shared.Core;
 
 import net.minecraft.nbt.NBTTagCompound;
 

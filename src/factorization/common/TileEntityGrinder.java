@@ -15,7 +15,12 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Charge;
 import factorization.api.IChargeConductor;
-import factorization.common.NetworkFactorization.MessageType;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.FactoryType;
+import factorization.shared.FzUtil;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityFactorization;
 
 public class TileEntityGrinder extends TileEntityFactorization implements IChargeConductor {
     ItemStack input, output;
@@ -159,7 +164,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     }
     
     @Override
-    void doLogic() {
+    protected void doLogic() {
         shareSpeed();
         needLogic();
         if (energy < 30) {

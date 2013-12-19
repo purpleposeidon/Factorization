@@ -8,6 +8,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
+import factorization.shared.BlockClass;
+import factorization.shared.FactoryType;
+import factorization.shared.FzUtil;
+import factorization.shared.Sound;
+import factorization.shared.TileEntityFactorization;
 
 
 public class TileEntityStamper extends TileEntityFactorization {
@@ -157,7 +162,7 @@ public class TileEntityStamper extends TileEntityFactorization {
     }
     
     @Override
-    void doLogic() {
+    protected void doLogic() {
         int input_count = (input == null) ? 0 : input.stackSize;
         boolean can_add = output == null
                 || output.stackSize < output.getMaxStackSize();
@@ -191,12 +196,12 @@ public class TileEntityStamper extends TileEntityFactorization {
     }
 
     @Override
-    void makeNoise() {
+    protected void makeNoise() {
         Sound.stamperUse.playAt(this);
     }
     
     @Override
-    int getLogicSpeed() {
+    protected int getLogicSpeed() {
         return 16;
     }
 }

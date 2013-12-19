@@ -1,8 +1,31 @@
-package factorization.common;
+package factorization.shared;
 
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.registry.GameRegistry;
+import factorization.common.TileEntityBarrel;
+import factorization.common.TileEntityBattery;
+import factorization.common.TileEntityCaliometricBurner;
+import factorization.common.TileEntityCompressionCrafter;
+import factorization.common.TileEntityCrystallizer;
+import factorization.common.TileEntityDayBarrel;
+import factorization.common.TileEntityGreenware;
+import factorization.common.TileEntityGrinder;
+import factorization.common.TileEntityHeater;
+import factorization.common.TileEntityLeydenJar;
+import factorization.common.TileEntityMirror;
+import factorization.common.TileEntityMixer;
+import factorization.common.TileEntityPackager;
+import factorization.common.TileEntityParaSieve;
+import factorization.common.TileEntityRocketEngine;
+import factorization.common.TileEntityRouter;
+import factorization.common.TileEntitySlagFurnace;
+import factorization.common.TileEntitySolarBoiler;
+import factorization.common.TileEntityStamper;
+import factorization.common.TileEntitySteamTurbine;
+import factorization.common.TileEntityWire;
+import factorization.common.TileEntityWrathFire;
+import factorization.common.TileEntityWrathLamp;
 import factorization.common.servo.TileEntityServoRail;
 import factorization.common.sockets.SocketEmpty;
 import factorization.common.sockets.SocketLacerator;
@@ -128,7 +151,7 @@ public enum FactoryType {
         disabled = true;
     }
 
-    TileEntityCommon makeTileEntity() {
+    public TileEntityCommon makeTileEntity() {
         if (clazz == null) {
             Core.logWarning("Note: " + this + " is a FactoryType with no associated TE");
             return null;
@@ -164,7 +187,7 @@ public enum FactoryType {
         return mapper.mapping[md];
     }
 
-    ItemStack itemStack() {
+    public ItemStack itemStack() {
         if (disabled) {
             return null;
         }

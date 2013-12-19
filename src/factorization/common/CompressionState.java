@@ -12,10 +12,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
-import factorization.common.FzUtil.FzInv;
-import factorization.common.NetworkFactorization.MessageType;
 import factorization.notify.Notify;
 import factorization.notify.Notify.Style;
+import factorization.shared.Core;
+import factorization.shared.FzUtil;
+import factorization.shared.FzUtil.FzInv;
+import factorization.shared.NetworkFactorization.MessageType;
 
 public class CompressionState {
     static int MAX_CRAFT = 32;

@@ -12,9 +12,9 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
-import factorization.common.Core;
 import factorization.common.servo.Instruction;
 import factorization.common.servo.ServoMotor;
+import factorization.shared.Core;
 
 public class RotateTop extends Instruction {
     ForgeDirection top = ForgeDirection.UP;

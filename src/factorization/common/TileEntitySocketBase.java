@@ -36,12 +36,17 @@ import factorization.api.datahelpers.DataInPacketClientEdited;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.IDataSerializable;
-import factorization.common.FzUtil.FzInv;
-import factorization.common.NetworkFactorization.MessageType;
 import factorization.common.servo.LoggerDataHelper;
 import factorization.common.servo.ServoMotor;
 import factorization.common.sockets.GuiDataConfig;
 import factorization.common.sockets.SocketEmpty;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.FactoryType;
+import factorization.shared.FzUtil;
+import factorization.shared.TileEntityCommon;
+import factorization.shared.FzUtil.FzInv;
+import factorization.shared.NetworkFactorization.MessageType;
 
 public abstract class TileEntitySocketBase extends TileEntityCommon implements ISocketHolder, IDataSerializable {
     /*

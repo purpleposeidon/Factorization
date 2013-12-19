@@ -11,9 +11,9 @@ import codechicken.nei.recipe.FurnaceRecipeHandler;
 import codechicken.nei.recipe.GuiRecipe;
 import codechicken.nei.recipe.TemplateRecipeHandler;
 import factorization.client.gui.GuiSlag;
-import factorization.common.Core;
 import factorization.common.TileEntitySlagFurnace;
 import factorization.common.TileEntitySlagFurnace.SmeltingResult;
+import factorization.shared.Core;
 
 public class RecipeSlagFurnace extends TemplateRecipeHandler {
     @Override

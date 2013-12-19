@@ -3,8 +3,9 @@ package factorization.client.gui;
 import org.lwjgl.opengl.GL11;
 
 import factorization.common.ContainerMixer;
-import factorization.common.Core;
 import factorization.common.TileEntityMixer;
+import factorization.shared.Core;
+import factorization.shared.FactorizationGui;
 
 public class GuiMixer extends FactorizationGui {
     TileEntityMixer mixer;

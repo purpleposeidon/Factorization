@@ -11,6 +11,7 @@ import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.IChargeConductor;
 import factorization.api.VectorUV;
+import factorization.shared.Core;
 
 public class WireConnections {
     TileEntityWire me;

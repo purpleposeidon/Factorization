@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.shared;
 
 import java.util.Random;
 
@@ -16,6 +16,13 @@ import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
 import factorization.api.Coord;
+import factorization.common.BlockRenderHelper;
+import factorization.common.ContainerCrystallizer;
+import factorization.common.ContainerFactorization;
+import factorization.common.ContainerGrinder;
+import factorization.common.ContainerMixer;
+import factorization.common.ContainerPocket;
+import factorization.common.ContainerSlagFurnace;
 
 public abstract class FactorizationProxy implements IGuiHandler {
     public abstract EntityPlayer getPlayer(NetHandler handler);

@@ -31,9 +31,15 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.Share;
-import factorization.common.FzUtil.FzInv;
-import factorization.common.NetworkFactorization.MessageType;
 import factorization.notify.Notify;
+import factorization.shared.BlockClass;
+import factorization.shared.Core;
+import factorization.shared.FactoryType;
+import factorization.shared.FzUtil;
+import factorization.shared.FzUtil.FzInv;
+import factorization.shared.NetworkFactorization;
+import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityFactorization;
 
 public class TileEntityDayBarrel extends TileEntityFactorization {
     public ItemStack item;
@@ -145,7 +151,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     @Override
-    void doLogic() {
+    protected void doLogic() {
         if (type != Type.HOPPING) {
             return;
         }
@@ -204,7 +210,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     @Override
-    int getLogicSpeed() {
+    protected int getLogicSpeed() {
         return 8; //To match vanilla hoppers
     }
     
@@ -1018,7 +1024,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     boolean broken_with_silk_touch = false;
     
     @Override
-    boolean removeBlockByPlayer(EntityPlayer player) {
+    protected boolean removeBlockByPlayer(EntityPlayer player) {
         broken_with_silk_touch = EnchantmentHelper.getSilkTouchModifier(player);
         return super.removeBlockByPlayer(player);
     }

@@ -52,17 +52,17 @@ import factorization.api.datahelpers.Share;
 import factorization.client.render.TileEntityGrinderRender;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
-import factorization.common.Core;
-import factorization.common.FzUtil;
-import factorization.common.FactoryType;
 import factorization.common.ISocketHolder;
-import factorization.common.NetworkFactorization.MessageType;
 import factorization.common.TileEntityDayBarrel;
 import factorization.common.TileEntityGrinder;
 import factorization.common.TileEntityGrinder.GrinderRecipe;
 import factorization.common.TileEntitySocketBase;
 import factorization.common.servo.ServoMotor;
 import factorization.notify.Notify;
+import factorization.shared.Core;
+import factorization.shared.FactoryType;
+import factorization.shared.FzUtil;
+import factorization.shared.NetworkFactorization.MessageType;
 
 public class SocketLacerator extends TileEntitySocketBase implements IChargeConductor, ISidedInventory {
     Charge charge = new Charge(this);
