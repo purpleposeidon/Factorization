@@ -189,7 +189,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
             return false;
         }
         item.stackSize = is.stackSize;
-        boolean b = FactorizationUtil.couldMerge(item, is);
+        boolean b = FzUtil.couldMerge(item, is);
         item.stackSize = 1;
         return b;
     }
@@ -469,7 +469,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     @Override
     public void dropContents() {
         if (upgrade > 0) {
-            FactorizationUtil.spawnItemStack(getCoord(), new ItemStack(Core.registry.barrel_enlarge));
+            FzUtil.spawnItemStack(getCoord(), new ItemStack(Core.registry.barrel_enlarge));
         }
         if (item == null || getItemCount() <= 0) {
             return;
@@ -580,12 +580,12 @@ public class TileEntityBarrel extends TileEntityFactorization {
             int i = input.readInt();
             upgrade = input.readInt();
             if (i > 0) {
-                item = FactorizationUtil.readStack(input);
+                item = FzUtil.readStack(input);
             }
             setItemCount(i);
             break;
         case MessageType.BarrelItem:
-            item = FactorizationUtil.readStack(input);
+            item = FzUtil.readStack(input);
             break;
         default:
             return false;

@@ -25,8 +25,8 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
-import factorization.common.FactorizationUtil;
-import factorization.common.FactorizationUtil.FzInv;
+import factorization.common.FzUtil;
+import factorization.common.FzUtil.FzInv;
 import factorization.common.FactoryType;
 import factorization.common.ISocketHolder;
 import factorization.common.TileEntitySocketBase;
@@ -80,7 +80,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
             fakePlayer = getFakePlayer();
         }
         EntityPlayer player = fakePlayer;
-        FzInv inv = FactorizationUtil.openInventory(getBackingInventory(socket), facing);
+        FzInv inv = FzUtil.openInventory(getBackingInventory(socket), facing);
         boolean foundAny = false;
         int anEmpty = -1;
         for (int i = 0; i < inv.size(); i++) {
@@ -106,7 +106,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
     boolean clickWithInventory(int i, FzInv inv, EntityPlayer player, ItemStack is, MovingObjectPosition mop) {
         ItemStack orig = is == null ? null : is.copy();
         boolean result = clickItem(player, is, mop);
-        int newSize = FactorizationUtil.getStackSize(is);
+        int newSize = FzUtil.getStackSize(is);
         is = player.inventory.mainInventory[0];
         // Easiest case: the item is all used up.
         // Worst case: barrel of magic jumping beans that change color.
@@ -114,7 +114,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
         // To handle: extract the entire stack. It is lost. Attempt to stuff the rest of the inv back in.
         // Anything that can't be stuffed gets dropped on the ground.
         // This could break with funky items/inventories tho.
-        if (newSize <= 0 || !FactorizationUtil.couldMerge(orig, is)) {
+        if (newSize <= 0 || !FzUtil.couldMerge(orig, is)) {
             inv.set(i, null); //Bye-bye!
             if (newSize > 0) {
                 is = inv.pushInto(i, is);

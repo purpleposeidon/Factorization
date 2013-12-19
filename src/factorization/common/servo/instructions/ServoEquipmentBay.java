@@ -13,8 +13,8 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
 import factorization.common.Core;
-import factorization.common.FactorizationUtil;
-import factorization.common.FactorizationUtil.FzInv;
+import factorization.common.FzUtil;
+import factorization.common.FzUtil.FzInv;
 import factorization.common.servo.Decorator;
 import factorization.common.servo.ServoMotor;
 
@@ -54,7 +54,7 @@ public class ServoEquipmentBay extends Decorator {
     }
 
     boolean try_(ServoMotor motor, Coord inv, ForgeDirection dir) {
-        return equip(motor, FactorizationUtil.openInventory(inv.getTE(IInventory.class), dir));
+        return equip(motor, FzUtil.openInventory(inv.getTE(IInventory.class), dir));
     }
 
     /**

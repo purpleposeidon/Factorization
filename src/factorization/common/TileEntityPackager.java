@@ -35,21 +35,21 @@ public class TileEntityPackager extends TileEntityStamper {
                 matrix[i] = p;
             }
             to_remove = 9;
-            testOutput = FactorizationUtil.craft3x3(this, true, true, matrix);
+            testOutput = FzUtil.craft3x3(this, true, true, matrix);
         } else {
-            FactorizationUtil.craft_succeeded = false;
+            FzUtil.craft_succeeded = false;
         }
-        if (input.stackSize >= 4 && !FactorizationUtil.craft_succeeded) {
+        if (input.stackSize >= 4 && !FzUtil.craft_succeeded) {
             Arrays.fill(matrix, null);
             matrix[0] = p;
             matrix[1] = p;
             matrix[3] = p;
             matrix[4] = p;
             to_remove = 4;
-            testOutput = FactorizationUtil.craft3x3(this, true, true, matrix);
+            testOutput = FzUtil.craft3x3(this, true, true, matrix);
         }
         
-        if (!FactorizationUtil.craft_succeeded) {
+        if (!FzUtil.craft_succeeded) {
             return null;
         }
         
@@ -60,9 +60,9 @@ public class TileEntityPackager extends TileEntityStamper {
         if (!canMerge(testOutput)) {
             return null;
         }
-        List<ItemStack> ret = FactorizationUtil.craft3x3(this, false, false, matrix);
+        List<ItemStack> ret = FzUtil.craft3x3(this, false, false, matrix);
         input.stackSize -= to_remove;
-        input = FactorizationUtil.normalize(input);
+        input = FzUtil.normalize(input);
         return ret;
     }
 }

@@ -167,7 +167,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
         if (output == null) {
             return true;
         }
-        if (!FactorizationUtil.couldMerge(output, res)) {
+        if (!FzUtil.couldMerge(output, res)) {
             return false;
         }
         if (output.stackSize + resSize <= output.getMaxStackSize()) {
@@ -292,7 +292,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
 
         static SmeltingResult getSlaggingResult(ItemStack input) {
             for (SmeltingResult res : smeltingResults) {
-                if (FactorizationUtil.wildcardSimilar(res.input, input)) {
+                if (FzUtil.wildcardSimilar(res.input, input)) {
                     return res;
                 }
             }

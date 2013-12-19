@@ -28,7 +28,7 @@ import net.minecraftforge.oredict.ShapelessOreRecipe;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
-import factorization.common.FactorizationUtil.FzInv;
+import factorization.common.FzUtil.FzInv;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityMixer extends TileEntityFactorization implements
@@ -102,7 +102,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         super.dropContents();
         Coord here = getCoord();
         for (ItemStack is : outputBuffer) {
-            FactorizationUtil.spawnItemStack(here, is);
+            FzUtil.spawnItemStack(here, is);
         }
         onInventoryChanged();
     }
@@ -238,7 +238,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
                     Object h = inputs.get(i);
                     if (h instanceof ItemStack) {
                         ItemStack here = (ItemStack) h;
-                        if (FactorizationUtil.couldMerge(here, it)) {
+                        if (FzUtil.couldMerge(here, it)) {
                             here.stackSize += s;
                             size += s;
                             return;
@@ -281,11 +281,11 @@ public class TileEntityMixer extends TileEntityFactorization implements
     boolean removeMatching(ItemStack[] hay, ItemStack needle) {
         needle = needle.copy();
         for (int i = 0; i < hay.length; i++) {
-            if (FactorizationUtil.wildcardSimilar(needle, hay[i])) {
+            if (FzUtil.wildcardSimilar(needle, hay[i])) {
                 int delta = Math.min(hay[i].stackSize, needle.stackSize);
                 hay[i].stackSize -= delta;
                 needle.stackSize -= delta;
-                hay[i] = FactorizationUtil.normalize(hay[i]);
+                hay[i] = FzUtil.normalize(hay[i]);
                 if (needle.stackSize <= 0) {
                     return true;
                 }
@@ -409,7 +409,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
             //We're going to filter out items like:
             //  Logic matrix programmers
             //  Diamond drawplates
-            ItemStack container = FactorizationUtil.normalize(item.getContainerItemStack(is));
+            ItemStack container = FzUtil.normalize(item.getContainerItemStack(is));
             if (container == null) {
                 return true;
             }
@@ -469,12 +469,12 @@ public class TileEntityMixer extends TileEntityFactorization implements
         for (ItemStack is : src) {
             //increase already-started stacks
             for (int i = 0; i < out.length; i++) {
-                if (out[i] != null && FactorizationUtil.couldMerge(is, out[i])) {
+                if (out[i] != null && FzUtil.couldMerge(is, out[i])) {
                     int free = out[i].getMaxStackSize() - out[i].stackSize;
                     int delta = Math.min(free, is.stackSize);
                     is.stackSize -= delta;
                     out[i].stackSize += delta;
-                    is = FactorizationUtil.normalize(is);
+                    is = FzUtil.normalize(is);
                     if (is == null) {
                         break;
                     }
@@ -548,9 +548,9 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
     
     void craftRecipe(RecipeMatchInfo mr) {
-        InventoryCrafting craft = FactorizationUtil.makeCraftingGrid();
+        InventoryCrafting craft = FzUtil.makeCraftingGrid();
         int craft_slot = 0;
-        FzInv inv = FactorizationUtil.openInventory(this, ForgeDirection.UP);
+        FzInv inv = FzUtil.openInventory(this, ForgeDirection.UP);
         ArrayList recipeInputs = new ArrayList();
         for (Object o : mr.inputs) {
             if (o instanceof ItemStack) {
@@ -571,7 +571,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
                 is.stackSize = 0;
             } else {
                 for (ItemStack is : ((Iterable<ItemStack>) o)) {
-                    ItemStack got = FactorizationUtil.normalize(inv.pull(is, 1, false));
+                    ItemStack got = FzUtil.normalize(inv.pull(is, 1, false));
                     if (got != null) {
                         for (Iterator<ItemStack> iterator = ((Iterable<ItemStack>) o).iterator(); iterator.hasNext();) {
                             ItemStack others = iterator.next();
@@ -586,7 +586,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
                 }
             }
         }
-        EntityPlayer fakePlayer = FactorizationUtil.makePlayer(getCoord(), "Mixer");
+        EntityPlayer fakePlayer = FzUtil.makePlayer(getCoord(), "Mixer");
         IInventory craftResult = new InventoryCraftResult();
         ItemStack out = mr.output.copy();
         if (out.stackSize < 1) {
@@ -596,15 +596,15 @@ public class TileEntityMixer extends TileEntityFactorization implements
         SlotCrafting slot = new SlotCrafting(fakePlayer, craft, craftResult, 0, 0, 0);
         slot.onPickupFromSlot(fakePlayer, out);
         outputBuffer.add(out);
-        FactorizationUtil.addInventoryToArray(craft, outputBuffer);
-        FactorizationUtil.addInventoryToArray(fakePlayer.inventory, outputBuffer);
+        FzUtil.addInventoryToArray(craft, outputBuffer);
+        FzUtil.addInventoryToArray(fakePlayer.inventory, outputBuffer);
         onInventoryChanged();
     }
     
     boolean dumpBuffer() {
         if (outputBuffer.size() > 0) {
             ItemStack toAdd = outputBuffer.get(0);
-            FzInv out = FactorizationUtil.openInventory(this, ForgeDirection.DOWN);
+            FzInv out = FzUtil.openInventory(this, ForgeDirection.DOWN);
             out.setInsertForce(true);
             Iterator<ItemStack> it = outputBuffer.iterator();
             while (it.hasNext()) {
@@ -657,7 +657,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
 
     void normalize(ItemStack is[]) {
         for (int i = 0; i < is.length; i++) {
-            is[i] = FactorizationUtil.normalize(is[i]);
+            is[i] = FzUtil.normalize(is[i]);
         }
     }
 

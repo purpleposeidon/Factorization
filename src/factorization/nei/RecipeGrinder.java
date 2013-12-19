@@ -13,7 +13,7 @@ import codechicken.nei.recipe.GuiRecipe;
 import codechicken.nei.recipe.TemplateRecipeHandler;
 import factorization.client.gui.GuiGrinder;
 import factorization.common.Core;
-import factorization.common.FactorizationUtil;
+import factorization.common.FzUtil;
 import factorization.common.TileEntityGrinder;
 import factorization.common.TileEntityGrinder.GrinderRecipe;
 
@@ -40,10 +40,10 @@ public class RecipeGrinder extends TemplateRecipeHandler {
     @Override
     public void loadUsageRecipes(ItemStack ingredient) {
         //XXX NOTE: This is probably a lame implementation of this function.
-        if (FactorizationUtil.couldMerge(ingredient, Core.registry.socket_lacerator)) {
+        if (FzUtil.couldMerge(ingredient, Core.registry.socket_lacerator)) {
             ingredient = null;
         }
-        if (FactorizationUtil.couldMerge(ingredient, Core.registry.empty_socket_item)) {
+        if (FzUtil.couldMerge(ingredient, Core.registry.empty_socket_item)) {
             ingredient = null;
         }
         for (GrinderRecipe gr : TileEntityGrinder.recipes) {
@@ -52,7 +52,7 @@ public class RecipeGrinder extends TemplateRecipeHandler {
                 continue;
             }
             for (ItemStack is : gr.getInput()) {
-                if (FactorizationUtil.wildcardSimilar(is, ingredient)) {
+                if (FzUtil.wildcardSimilar(is, ingredient)) {
                     arecipes.add(new CachedGrinderRecipe(gr));
                     break;
                 }
@@ -103,7 +103,7 @@ public class RecipeGrinder extends TemplateRecipeHandler {
             currenttip.add(((int)prob) + "%"); 
         }
         for (ItemStack is : gr.getInput()) {
-            if (FactorizationUtil.wildcardSimilar(is, stack)) {
+            if (FzUtil.wildcardSimilar(is, stack)) {
                 currenttip.add("In a barrel, or as a block");
                 break;
             }

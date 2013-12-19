@@ -20,8 +20,8 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
-import factorization.common.FactorizationUtil;
-import factorization.common.FactorizationUtil.FzInv;
+import factorization.common.FzUtil;
+import factorization.common.FzUtil.FzInv;
 import factorization.common.servo.ServoMotor;
 import factorization.common.FactoryType;
 import factorization.common.ISocketHolder;
@@ -112,17 +112,17 @@ public class SocketShifter extends TileEntitySocketBase {
         ForgeDirection back = facing.getOpposite();
         if (socket != this) {
             // meaning we're on a Servo
-            localInv = FactorizationUtil.openInventory((IInventory) socket, facing);
+            localInv = FzUtil.openInventory((IInventory) socket, facing);
         } else {
             coord.adjust(back);
-            localInv = FactorizationUtil.openInventory(coord.getTE(IInventory.class), facing);
+            localInv = FzUtil.openInventory(coord.getTE(IInventory.class), facing);
             coord.adjust(facing);
         }
         if (localInv == null) {
             return;
         }
         coord.adjust(facing);
-        foreignInv = FactorizationUtil.openInventory(coord.getTE(IInventory.class), back);
+        foreignInv = FzUtil.openInventory(coord.getTE(IInventory.class), back);
         coord.adjust(back);
         if (foreignInv == null) {
             final ForgeDirection top = facing;
@@ -131,7 +131,7 @@ public class SocketShifter extends TileEntitySocketBase {
                 if (!(entity instanceof IInventory)) {
                     continue;
                 }
-                foreignInv = FactorizationUtil.openInventory(entity, false);
+                foreignInv = FzUtil.openInventory(entity, false);
                 if (foreignInv != null) {
                     break;
                 }
@@ -225,7 +225,7 @@ public class SocketShifter extends TileEntitySocketBase {
                 had_change = true;
                 int limit = transferLimit;
                 for (int i = pull; i <= pullEnd; i++) {
-                    if (!FactorizationUtil.couldMerge(is, pullInv.get(i))) {
+                    if (!FzUtil.couldMerge(is, pullInv.get(i))) {
                         continue;
                     }
                     while (limit > 0) {
@@ -284,7 +284,7 @@ public class SocketShifter extends TileEntitySocketBase {
                 visitedSlots[i] = true;
                 continue;
             }
-            if (FactorizationUtil.couldMerge(seed, is)) {
+            if (FzUtil.couldMerge(seed, is)) {
                 visitedSlots[i] = true;
                 if (!inv.canExtract(i, is)) {
                     continue;

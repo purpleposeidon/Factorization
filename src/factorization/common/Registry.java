@@ -409,7 +409,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 'O', Item.enderPearl,
                 'L', Item.leather); // LOL!
         shapelessRecipe(BOH, BOH, dark_iron, Item.enderPearl, Item.leather); //ILI!
-        boh_upgrade_recipe = FactorizationUtil.createShapelessRecipe(BOH, BOH, dark_iron, Item.enderPearl, Item.leather); // I !
+        boh_upgrade_recipe = FzUtil.createShapelessRecipe(BOH, BOH, dark_iron, Item.enderPearl, Item.leather); // I !
         // Pocket Crafting Table (pocket table)
         oreRecipe(new ItemStack(pocket_table),
                 " #",
@@ -545,7 +545,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                         return null;
                     }
                     Item item = is.getItem();
-                    if (FactorizationUtil.similar(Core.registry.greenware_item, is)) {
+                    if (FzUtil.similar(Core.registry.greenware_item, is)) {
                         match.add(is);
                     } else {
                         return null;
@@ -612,7 +612,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                     if (is == null) {
                         continue;
                     }
-                    if (FactorizationUtil.couldMerge(glaze_base_mimicry, is)) {
+                    if (FzUtil.couldMerge(glaze_base_mimicry, is)) {
                         mimic_items++;
                     } else {
                         if (is.itemID >= Block.blocksList.length) {
@@ -656,7 +656,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                     if (is == null) {
                         continue;
                     }
-                    if (FactorizationUtil.couldMerge(glaze_base_mimicry, is)) {
+                    if (FzUtil.couldMerge(glaze_base_mimicry, is)) {
                         bucket_slot = i;
                         continue;
                     }
@@ -803,7 +803,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 'I', dark_iron,
                 'S', "ingotSilver",
                 'G', Block.thinGlass,
-                'W', new ItemStack(wrath_igniter, 1, FactorizationUtil.WILDCARD_DAMAGE));
+                'W', new ItemStack(wrath_igniter, 1, FzUtil.WILDCARD_DAMAGE));
 
         //Slag furnace
         recipe(slagfurnace_item,
@@ -1182,7 +1182,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 free_slots += 1;
                 continue;
             }
-            if (FactorizationUtil.couldMerge(is, here)) {
+            if (FzUtil.couldMerge(is, here)) {
                 int free = here.getMaxStackSize() - here.stackSize;
                 remaining_size -= free;
                 if (remaining_size <= 0) {
@@ -1261,7 +1261,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 //Skip vanilla
                 continue;
             }
-            if (log.getItemDamage() == FactorizationUtil.WILDCARD_DAMAGE && log.itemID < Block.blocksList.length) {
+            if (log.getItemDamage() == FzUtil.WILDCARD_DAMAGE && log.itemID < Block.blocksList.length) {
                 Block b = Block.blocksList[log.itemID];
                 if (b == null) {
                     continue;
@@ -1277,20 +1277,20 @@ public class Registry implements ICraftingHandler, ITickHandler {
         }
         for (ItemStack log : theLogs) {
             log = log.copy();
-            List<ItemStack> planks = FactorizationUtil.craft1x1(null, true, log.copy());
+            List<ItemStack> planks = FzUtil.craft1x1(null, true, log.copy());
             if (planks == null || planks.size() != 1) {
                 continue;
             }
             ItemStack plank = planks.get(0).copy();
             plank.stackSize = 1;
-            List<ItemStack> slabs = FactorizationUtil.craft3x3(null, true, true, new ItemStack[] {
+            List<ItemStack> slabs = FzUtil.craft3x3(null, true, true, new ItemStack[] {
                     plank.copy(), plank.copy(), plank.copy(),
                     null, null, null,
                     null, null, null
             });
             ItemStack slab;
             String odType;
-            if (slabs.size() != 1 || !FactorizationUtil.craft_succeeded) {
+            if (slabs.size() != 1 || !FzUtil.craft_succeeded) {
                 slab = plank;
                 odType = "plankWood";
             } else {

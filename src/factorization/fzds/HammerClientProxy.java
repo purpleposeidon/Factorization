@@ -45,7 +45,7 @@ import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.client.render.EmptyRender;
 import factorization.common.Core;
-import factorization.common.FactorizationUtil;
+import factorization.common.FzUtil;
 import factorization.common.FzConfig;
 import factorization.fzds.api.IDeltaChunk;
 
@@ -127,9 +127,9 @@ public class HammerClientProxy extends HammerProxy {
                 }
                 
                 Coord near = dse.getCorner(), far = dse.getFarCorner();
-                if (FactorizationUtil.intersect(near.x, far.x, lx, hx)
-                        && FactorizationUtil.intersect(near.y, far.y, ly, hy)
-                        && FactorizationUtil.intersect(near.z, far.z, lz, hz)) {
+                if (FzUtil.intersect(near.x, far.x, lx, hx)
+                        && FzUtil.intersect(near.y, far.y, ly, hy)
+                        && FzUtil.intersect(near.z, far.z, lz, hz)) {
                     RenderDimensionSliceEntity.markBlocksForUpdate((DimensionSliceEntity) dse, lx, ly, lz, hx, hy, hz);
                     dse.blocksChanged(lx, ly, lz);
                     dse.blocksChanged(hx, hy, hz);
@@ -451,10 +451,10 @@ public class HammerClientProxy extends HammerProxy {
             if (bb == null) {
                 System.out.println("NORELEASE?");
             }
-            Vec3 min = ray.parent.shadow2real(FactorizationUtil.getMin(bb));
-            Vec3 max = ray.parent.shadow2real(FactorizationUtil.getMax(bb));
-            FactorizationUtil.setMin(ray.boundingBox, min);
-            FactorizationUtil.setMax(ray.boundingBox, max);
+            Vec3 min = ray.parent.shadow2real(FzUtil.getMin(bb));
+            Vec3 max = ray.parent.shadow2real(FzUtil.getMax(bb));
+            FzUtil.setMin(ray.boundingBox, min);
+            FzUtil.setMax(ray.boundingBox, max);
             rayTarget = ray;
         } finally {
             mc.objectMouseOver = origMouseOver;

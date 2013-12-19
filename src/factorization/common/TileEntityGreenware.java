@@ -387,7 +387,7 @@ public class TileEntityGreenware extends TileEntityCommon {
                         lump.asDefault();
                     } else {
                         it.remove();
-                        FactorizationUtil.spawnItemStack(getCoord(), new ItemStack(Item.clay));
+                        FzUtil.spawnItemStack(getCoord(), new ItemStack(Item.clay));
                     }
                 }
             }
@@ -699,11 +699,11 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
         shouldDestroy |= state != ClayState.WET;
         if (shouldDestroy) {
-            FactorizationUtil.spawnItemStack(here, getItem());
+            FzUtil.spawnItemStack(here, getItem());
             here.setId(0);
         } else {
             removeLump(hit.subHit);
-            FactorizationUtil.spawnItemStack(here, new ItemStack(Item.clay));
+            FzUtil.spawnItemStack(here, new ItemStack(Item.clay));
         }
         return false;
     }

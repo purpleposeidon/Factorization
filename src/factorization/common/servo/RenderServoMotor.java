@@ -40,8 +40,8 @@ import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
 import factorization.common.Core;
-import factorization.common.FactorizationUtil;
-import factorization.common.FactorizationUtil.FzInv;
+import factorization.common.FzUtil;
+import factorization.common.FzUtil.FzInv;
 import factorization.common.TileEntitySocketBase;
 
 public class RenderServoMotor extends RenderEntity {
@@ -340,7 +340,7 @@ public class RenderServoMotor extends RenderEntity {
         double radius = 0.56 /* from sprocket center to the outer edge of the ring (excluding the teeth) */
                     + 0.06305 /* half the width of the teeth */;
         double constant = Math.PI * 2 * (radius);
-        double partial_rotation = FactorizationUtil.interp((float) motor.prev_sprocket_rotation, (float) motor.sprocket_rotation, partial);
+        double partial_rotation = FzUtil.interp((float) motor.prev_sprocket_rotation, (float) motor.sprocket_rotation, partial);
         final double angle = constant * partial_rotation;
 
         radius = 0.25 - 1.0 / 48.0;

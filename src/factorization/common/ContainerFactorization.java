@@ -189,9 +189,9 @@ public class ContainerFactorization extends Container {
         case SLAGFURNACE:
             if (i >= 4) {
                 if (TileEntityFurnace.getItemBurnTime(itemstack) > 0) {
-                    return FactorizationUtil.transferSlotToSlots(player, slot, Arrays.asList((Slot) inventorySlots.get(1)));
+                    return FzUtil.transferSlotToSlots(player, slot, Arrays.asList((Slot) inventorySlots.get(1)));
                 } else {
-                    return FactorizationUtil.transferSlotToSlots(player, slot, Arrays.asList((Slot) inventorySlots.get(0)));
+                    return FzUtil.transferSlotToSlots(player, slot, Arrays.asList((Slot) inventorySlots.get(0)));
                 }
             }
             break;
@@ -199,7 +199,7 @@ public class ContainerFactorization extends Container {
         case PACKAGER:
         case GRINDER:
             if (i >= 2) {
-                return FactorizationUtil.transferSlotToSlots(player, slot, Arrays.asList((Slot) inventorySlots.get(0)));
+                return FzUtil.transferSlotToSlots(player, slot, Arrays.asList((Slot) inventorySlots.get(0)));
             }
             break;
         case MIXER:
@@ -208,7 +208,7 @@ public class ContainerFactorization extends Container {
                 for (int j = 0; j < 4; j++) {
                     av.add((Slot)inventorySlots.get(j));
                 }
-                return FactorizationUtil.transferSlotToSlots(player, slot, av);
+                return FzUtil.transferSlotToSlots(player, slot, av);
             }
             break;
         case CRYSTALLIZER:
@@ -217,7 +217,7 @@ public class ContainerFactorization extends Container {
                 for (int j = 0; j < 6; j++) {
                     av.add((Slot)inventorySlots.get(j));
                 }
-                return FactorizationUtil.transferSlotToSlots(player, slot, av);
+                return FzUtil.transferSlotToSlots(player, slot, av);
             }
             break;
         }

@@ -44,7 +44,7 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
-        FactorizationUtil.writeTank(tag, steamTank, "steam");
+        FzUtil.writeTank(tag, steamTank, "steam");
         charge.writeToNBT(tag);
         tag.setInteger("fan", fan_speed);
     }
@@ -52,7 +52,7 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
-        FactorizationUtil.readTank(tag, steamTank, "steam");
+        FzUtil.readTank(tag, steamTank, "steam");
         charge.readFromNBT(tag);
         fan_speed = tag.getInteger("fan");
     }

@@ -16,7 +16,7 @@ import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.common.Core;
 import factorization.common.Core.TabType;
-import factorization.common.FactorizationUtil;
+import factorization.common.FzUtil;
 import factorization.common.ItemFactorization;
 
 public class ItemServoRailWidget extends ItemFactorization {
@@ -51,7 +51,7 @@ public class ItemServoRailWidget extends ItemFactorization {
     
     void update(ItemStack is, ServoComponent sc) {
         if (sc != null) {
-            sc.save(FactorizationUtil.getTag(is));
+            sc.save(FzUtil.getTag(is));
         } else {
             is.setTagCompound(null);
         }

@@ -14,7 +14,7 @@ import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.common.Core.TabType;
-import factorization.common.FactorizationUtil.FzInv;
+import factorization.common.FzUtil.FzInv;
 import factorization.common.TileEntityGreenware.ClayLump;
 import factorization.common.TileEntityGreenware.ClayState;
 import factorization.notify.Notify;
@@ -164,7 +164,7 @@ public class ItemSculptingTool extends ItemFactorization {
                 Notify.send(player, here, "Not fired");
                 return true;
             }
-            FzInv inv = FactorizationUtil.openInventory(player.inventory, 0);
+            FzInv inv = FzUtil.openInventory(player.inventory, 0);
             if (!player.capabilities.isCreativeMode) {
                 boolean hasSlab = false;
                 int materialCount = 0;
@@ -185,7 +185,7 @@ public class ItemSculptingTool extends ItemFactorization {
                     Notify.send(player, here, "Need wood slab\nAnd %s clay", "" + neededClay); //TODO: Localize properly
                     return false;
                 }
-                inv.pull(FactorizationUtil.makeWildcard(Block.woodSingleSlab), 1, false);
+                inv.pull(FzUtil.makeWildcard(Block.woodSingleSlab), 1, false);
                 inv.pull(new ItemStack(Item.clay), gw.parts.size(), false);
             }
             TileEntityGreenware rep = (TileEntityGreenware) FactoryType.CERAMIC.getRepresentative();

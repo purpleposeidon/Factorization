@@ -12,7 +12,7 @@ import codechicken.nei.PositionedStack;
 import codechicken.nei.recipe.TemplateRecipeHandler;
 import factorization.client.gui.GuiMixer;
 import factorization.common.Core;
-import factorization.common.FactorizationUtil;
+import factorization.common.FzUtil;
 import factorization.common.TileEntityMixer;
 import factorization.common.TileEntityMixer.RecipeMatchInfo;
 
@@ -130,7 +130,7 @@ public class RecipeMixer extends TemplateRecipeHandler {
                 if (o instanceof ItemStack) {
                     ItemStack is = (ItemStack) o;
                     if (is.getItem().hasContainerItem()) {
-                        ItemStack cnt = FactorizationUtil.normalize(is.getItem().getContainerItemStack(is));
+                        ItemStack cnt = FzUtil.normalize(is.getItem().getContainerItemStack(is));
                         if (cnt != null) {
                             output.add(cnt);
                         }

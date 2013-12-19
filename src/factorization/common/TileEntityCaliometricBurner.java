@@ -136,12 +136,12 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
     }
     
     int consumeFood() {
-        stomache = FactorizationUtil.normalize(stomache);
+        stomache = FzUtil.normalize(stomache);
         if (stomache == null) {
             return 0;
         }
         int noms = getFoodValue(stomache);
-        stomache = FactorizationUtil.normalDecr(stomache);
+        stomache = FzUtil.normalDecr(stomache);
         onInventoryChanged();
         Sound.caliometricDigest.playAt(this);
         ticksUntilNextDigestion = 20*10*noms;
@@ -178,7 +178,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
             info(entityplayer);
             return false;
         }
-        is = FactorizationUtil.openInventory(this, ForgeDirection.NORTH).push(is);
+        is = FzUtil.openInventory(this, ForgeDirection.NORTH).push(is);
         entityplayer.setCurrentItemOrArmor(0, is);
         info(entityplayer);
         onInventoryChanged();

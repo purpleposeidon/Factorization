@@ -18,7 +18,7 @@ import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
-import factorization.common.FactorizationUtil.FzInv;
+import factorization.common.FzUtil.FzInv;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityRouter extends TileEntityFactorization {
@@ -168,7 +168,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         if (target_inv == null) {
             return;
         }
-        buffer = FactorizationUtil.openInventory(target_inv, eject_direction).push(buffer);
+        buffer = FzUtil.openInventory(target_inv, eject_direction).push(buffer);
     }
 
     @Override
@@ -338,7 +338,7 @@ public class TileEntityRouter extends TileEntityFactorization {
                 continue;
             }
             empty_filter = false;
-            if (FactorizationUtil.couldMerge(here, is)) {
+            if (FzUtil.couldMerge(here, is)) {
                 matching_count += here.stackSize;
             }
         }
@@ -350,7 +350,7 @@ public class TileEntityRouter extends TileEntityFactorization {
             if (here == null) {
                 continue;
             }
-            if (FactorizationUtil.couldMerge(here, is)) {
+            if (FzUtil.couldMerge(here, is)) {
                 matching_count -= here.stackSize;
             }
         }
@@ -370,7 +370,7 @@ public class TileEntityRouter extends TileEntityFactorization {
                 continue;
             }
             hits++;
-            if (FactorizationUtil.couldMerge(filter[i], is)) {
+            if (FzUtil.couldMerge(filter[i], is)) {
                 return true;
             } else if (filter[i].itemID == is.itemID && is.getItem().isDamageable() && filter[i].isItemDamaged() && is.isItemDamaged()) {
                 //a slightly damaged sword will match all other damaged swords. A new sword should not.
@@ -394,7 +394,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         int start, end;
         FzInv inv;
         if (target_slot >= 0) {
-            if (!FactorizationUtil.canAccessSlot(t, target_slot)) {
+            if (!FzUtil.canAccessSlot(t, target_slot)) {
                 return false;
             }
             if (target_slot >= t.getSizeInventory()) {
@@ -402,16 +402,16 @@ public class TileEntityRouter extends TileEntityFactorization {
             }
             start = target_slot;
             end = target_slot + 1;
-            inv = new FactorizationUtil.PlainInvWrapper(t);
+            inv = new FzUtil.PlainInvWrapper(t);
         } else {
-            inv = FactorizationUtil.openInventory(t, target_side, false);
+            inv = FzUtil.openInventory(t, target_side, false);
             if (inv == null) {
                 return false;
             }
             start = 0;
             end = inv.size();
         }
-        FzInv me = FactorizationUtil.openInventory(this, 0, false);
+        FzInv me = FzUtil.openInventory(this, 0, false);
         int toMove = upgradeThroughput ? 64 : 1;
         for (int slot = start; slot < end; slot++) {
             if (is_input) {
@@ -470,7 +470,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         }
         Coord here = getCoord();
         for (ItemStack is : toDrop) {
-            FactorizationUtil.spawnItemStack(here, is);
+            FzUtil.spawnItemStack(here, is);
         }
     }
 

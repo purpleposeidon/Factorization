@@ -12,7 +12,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
-import factorization.common.FactorizationUtil.FzInv;
+import factorization.common.FzUtil.FzInv;
 import factorization.common.NetworkFactorization.MessageType;
 import factorization.notify.Notify;
 import factorization.notify.Notify.Style;
@@ -303,7 +303,7 @@ public class CompressionState {
             items[BREAK] = cell.getBrokenBlock();
             if (items[BREAK] != null) {
                 ItemStack b = items[BREAK];
-                List<ItemStack> craftRes = FactorizationUtil.craft1x1(null, true, b);
+                List<ItemStack> craftRes = FzUtil.craft1x1(null, true, b);
                 if (craftRes != null && craftRes.size() == 1) {
                     items[SMACKED] = craftRes.get(0);
                 }
@@ -330,10 +330,10 @@ public class CompressionState {
                 cell.getTE(TileEntityDayBarrel.class).changeItemCount(-amount);
                 break;
             case SMACKED:
-                List<ItemStack> craftRes = FactorizationUtil.craft1x1(null, true, items[BREAK]);
+                List<ItemStack> craftRes = FzUtil.craft1x1(null, true, items[BREAK]);
                 for (Iterator<ItemStack> it = craftRes.iterator(); it.hasNext();) {
                     ItemStack is = it.next();
-                    if (FactorizationUtil.couldMerge(is, leftOvers)) {
+                    if (FzUtil.couldMerge(is, leftOvers)) {
                         is.stackSize = leftOvers.stackSize;
                         if (is.stackSize <= 0) {
                             it.remove();
@@ -345,7 +345,7 @@ public class CompressionState {
                 return craftRes;
             }
             List<ItemStack> ret = new ArrayList(1);
-            leftOvers = FactorizationUtil.normalize(leftOvers);
+            leftOvers = FzUtil.normalize(leftOvers);
             if (leftOvers != null) {
                 ret.add(leftOvers);
             }
@@ -363,7 +363,7 @@ public class CompressionState {
         }
 
         public void updateBarrelExtraction(int maxCraft) {
-            if (FactorizationUtil.getStackSize(items[BARREL]) > maxCraft) {
+            if (FzUtil.getStackSize(items[BARREL]) > maxCraft) {
                 items[BARREL].stackSize = Math.min(items[BARREL].stackSize, maxCraft);
             }
         }
@@ -511,8 +511,8 @@ public class CompressionState {
                 continue iteratePermutations;
             }
             
-            FactorizationUtil.craft3x3(root, true, true, craftingGrid);
-            if (!FactorizationUtil.craft_succeeded) {
+            FzUtil.craft3x3(root, true, true, craftingGrid);
+            if (!FzUtil.craft_succeeded) {
                 continue iteratePermutations;
             }
             
@@ -528,8 +528,8 @@ public class CompressionState {
                         ci.updateBarrelExtraction(maxCraft);
                     }
                 }
-                List<ItemStack> result = FactorizationUtil.craft3x3(root, fake, !fake && craftCount != maxCraft - 1, craftingGrid);
-                if (!FactorizationUtil.craft_succeeded) {
+                List<ItemStack> result = FzUtil.craft3x3(root, fake, !fake && craftCount != maxCraft - 1, craftingGrid);
+                if (!FzUtil.craft_succeeded) {
                     if (craftCount == 0) {
                         continue iteratePermutations; //This won't usually happen except for very strange recipes
                     } else {
@@ -559,7 +559,7 @@ public class CompressionState {
                     ci.consume(ci.getBestMode(mode), items_used);
                 }
             }
-            FactorizationUtil.collapseItemList(total);
+            FzUtil.collapseItemList(total);
             start.buffer = total;
             return true;
         }

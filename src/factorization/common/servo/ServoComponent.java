@@ -29,7 +29,7 @@ import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.Core;
-import factorization.common.FactorizationUtil;
+import factorization.common.FzUtil;
 import factorization.common.servo.instructions.*;
 
 public abstract class ServoComponent implements IDataSerializable {
@@ -177,7 +177,7 @@ public abstract class ServoComponent implements IDataSerializable {
     public void renderDynamic() {
         Tessellator tess = Tessellator.instance;
         tess.startDrawingQuads();
-        renderStatic(null, FactorizationUtil.getRB());
+        renderStatic(null, FzUtil.getRB());
         tess.draw();
     }
     

@@ -53,7 +53,7 @@ import factorization.client.render.TileEntityGrinderRender;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
 import factorization.common.Core;
-import factorization.common.FactorizationUtil;
+import factorization.common.FzUtil;
 import factorization.common.FactoryType;
 import factorization.common.ISocketHolder;
 import factorization.common.NetworkFactorization.MessageType;
@@ -144,7 +144,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         }
         isPowered = powered;
         genericUpdate_implementation(socket, coord, powered);
-        if (FactorizationUtil.significantChange(last_shared_speed, speed)) {
+        if (FzUtil.significantChange(last_shared_speed, speed)) {
             socket.sendMessage(MessageType.LaceratorSpeed, speed);
             last_shared_speed = speed;
         }
@@ -174,7 +174,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         if (socket.dumpBuffer(buffer)) {
             for (Iterator<ItemStack> iterator = buffer.iterator(); iterator.hasNext();) {
                 ItemStack is = iterator.next();
-                if (FactorizationUtil.normalize(is) == null) {
+                if (FzUtil.normalize(is) == null) {
                     iterator.remove();
                 }
             }
@@ -241,7 +241,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         ArrayList<GrinderRecipe> recipes = TileEntityGrinder.recipes;
         for (int i = 0; i < recipes.size(); i++) {
             GrinderRecipe gr = recipes.get(i);
-            if (FactorizationUtil.oreDictionarySimilar(gr.getOreDictionaryInput(), is)) {
+            if (FzUtil.oreDictionarySimilar(gr.getOreDictionaryInput(), is)) {
                 ItemStack output = gr.output.copy();
                 output.stackSize = 0;
                 int min = (int) gr.probability;
@@ -543,7 +543,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         super.onRemove();
         Coord here = getCoord();
         for (ItemStack is : buffer) {
-            FactorizationUtil.spawnItemStack(here, is);
+            FzUtil.spawnItemStack(here, is);
         }
     }
     
@@ -555,7 +555,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         float d = 0.5F;
         GL11.glTranslatef(d, d, d);
         Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())).glRotate();
-        float turn = FactorizationUtil.interp(prev_rotation, rotation, partial) / 5.0F;
+        float turn = FzUtil.interp(prev_rotation, rotation, partial) / 5.0F;
         GL11.glRotatef(turn, 0, 1, 0);
         float sd = motor == null ? 1F/16F : 3F/16F;
         GL11.glTranslatef(0, -4F/16F + sd + (float) Math.abs(Math.sin(turn/800))/32F, 0);

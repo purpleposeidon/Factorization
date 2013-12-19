@@ -71,7 +71,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 NBTTagCompound tag = new NBTTagCompound();
                 final Item is_item = is.getItem();
                 NBTTagCompound orig_tag = is.getTagCompound();
-                if (FactorizationUtil.isTagBig(tag, 1024) >= 1024) {
+                if (FzUtil.isTagBig(tag, 1024) >= 1024) {
                     is.setTagCompound(null);
                     if (huge_tag_warnings == 0) {
                         Core.logWarning("FIXME: Need to add in Item.getTagForClient"); //TODO

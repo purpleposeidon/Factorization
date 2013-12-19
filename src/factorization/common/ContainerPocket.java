@@ -227,12 +227,12 @@ public class ContainerPocket extends Container {
     public ItemStack transferStackInSlot(EntityPlayer player, int slotId) {
         for (Slot slot : inventorySlots) {
             if (slot.slotNumber == slotId) {
-                return FactorizationUtil.transferSlotToSlots(player, slot, craftingSlots);
+                return FzUtil.transferSlotToSlots(player, slot, craftingSlots);
             }
         }
         for (Slot slot : craftingSlots) {
             if (slot.slotNumber == slotId) {
-                return FactorizationUtil.transferSlotToSlots(player, slot, inventorySlots);
+                return FzUtil.transferSlotToSlots(player, slot, inventorySlots);
             }
         }
         if (craftResultSlot.slotNumber == slotId) {
@@ -243,7 +243,7 @@ public class ContainerPocket extends Container {
             }
             ItemStack held = null;
             for (int count = getCraftCount(res); count > 0; count--) {
-                held = FactorizationUtil.tryTransferSlotToSlots(player, craftResultSlot, inventorySlots);
+                held = FzUtil.tryTransferSlotToSlots(player, craftResultSlot, inventorySlots);
                 if (held != null) {
                     break;
                 }
@@ -252,10 +252,10 @@ public class ContainerPocket extends Container {
                 if (newRes == null) {
                     break;
                 }
-                if (!FactorizationUtil.couldMerge(res, newRes)) {
+                if (!FzUtil.couldMerge(res, newRes)) {
                     break;
                 }
-                if (!FactorizationUtil.couldMerge(held, newRes)) {
+                if (!FzUtil.couldMerge(held, newRes)) {
                     break;
                 }
                 if (getCraftCount(newRes) <= 0) {
@@ -271,7 +271,7 @@ public class ContainerPocket extends Container {
                          emp.updateHeldItem();
                      }
                      held = null;
-                } else if (FactorizationUtil.couldMerge(cursor, held)) {
+                } else if (FzUtil.couldMerge(cursor, held)) {
                     int avail = cursor.getMaxStackSize() - cursor.stackSize;
                     int delta = Math.min(avail, held.stackSize);
                     held.stackSize -= delta;
@@ -299,7 +299,7 @@ public class ContainerPocket extends Container {
                 hasEmpty = true;
                 continue;
             }
-            if (FactorizationUtil.couldMerge(res, is)) {
+            if (FzUtil.couldMerge(res, is)) {
                 space_to_fill += is.getMaxStackSize() - is.stackSize;
             }
         }
@@ -315,7 +315,7 @@ public class ContainerPocket extends Container {
 
     void craftClear() {
         for (Slot slot : craftingSlots) {
-            FactorizationUtil.transferSlotToSlots(player, slot, mainInvThenHotbarSlots);
+            FzUtil.transferSlotToSlots(player, slot, mainInvThenHotbarSlots);
         }
         updateMatrix();
     }
@@ -390,7 +390,7 @@ public class ContainerPocket extends Container {
             }
 
             boolean add(ItemStack ta, int slot) {
-                if (FactorizationUtil.couldMerge(toMatch, ta)) {
+                if (FzUtil.couldMerge(toMatch, ta)) {
                     stackCount += ta.stackSize;
                     ta.stackSize = 0;
                     matchingSlots.add(slot);
@@ -456,7 +456,7 @@ public class ContainerPocket extends Container {
                 matrixSlot.putStack(toMove.splitStack(1));
             }
         }
-        playerInv.setInventorySlotContents(slot, FactorizationUtil.normalize(toMove));
+        playerInv.setInventorySlotContents(slot, FzUtil.normalize(toMove));
         updateMatrix();
     }
 }

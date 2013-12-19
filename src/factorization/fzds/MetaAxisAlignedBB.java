@@ -7,7 +7,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import factorization.api.Quaternion;
 import factorization.common.Core;
-import factorization.common.FactorizationUtil;
+import factorization.common.FzUtil;
 
 public class MetaAxisAlignedBB extends AxisAlignedBB {
     //NORELEASE, Optimization: If not rotated, check more vanilla-like, and mutate the parameter to test instead of shadowaabbs.
@@ -57,9 +57,9 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
          * Real space -> hammer space -> rotation space; rotate -> un-rotation space == hammer space
          */
         AxisAlignedBB shadow = real.getOffsetBoundingBox(-offset.xCoord, -offset.yCoord, -offset.zCoord);
-        Vec3 shadowMax = FactorizationUtil.getMax(shadow);
-        Vec3 shadowMin = FactorizationUtil.getMin(shadow);
-        Vec3 centerInShadowSpace = FactorizationUtil.averageVec(shadowMax, shadowMin);
+        Vec3 shadowMax = FzUtil.getMax(shadow);
+        Vec3 shadowMin = FzUtil.getMin(shadow);
+        Vec3 centerInShadowSpace = FzUtil.averageVec(shadowMax, shadowMin);
         Vec3 center = centerInShadowSpace.addVector(0, 0, 0);
         shadow2rotation(center);
         rotation.applyRotation(center);

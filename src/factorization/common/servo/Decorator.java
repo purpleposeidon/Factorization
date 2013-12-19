@@ -11,7 +11,7 @@ import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
 import factorization.common.Core;
-import factorization.common.FactorizationUtil;
+import factorization.common.FzUtil;
 
 
 public abstract class Decorator extends ServoComponent {
@@ -106,7 +106,7 @@ public abstract class Decorator extends ServoComponent {
         if (where == null) {
             block.renderForTileEntity();
         } else {
-            block.render(FactorizationUtil.getRB(), where);
+            block.render(FzUtil.getRB(), where);
         }
     }
     

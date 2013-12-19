@@ -52,7 +52,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.Core;
-import factorization.common.FactorizationUtil;
+import factorization.common.FzUtil;
 import factorization.common.FzConfig;
 
 public class MiscClientProxy extends MiscProxy {
@@ -228,7 +228,7 @@ public class MiscClientProxy extends MiscProxy {
                         if (is == null && firstEmpty == -1 && i < 9) {
                             firstEmpty = i;
                         }
-                        if (is == null || !FactorizationUtil.couldMerge(needle, is)) {
+                        if (is == null || !FzUtil.couldMerge(needle, is)) {
                             continue;
                         }
                         if (i < 9) {
@@ -256,10 +256,10 @@ public class MiscClientProxy extends MiscProxy {
                 if (held == null) {
                     return false;
                 }
-                if (FactorizationUtil.couldMerge(held, here.getPickBlock(mop))) {
+                if (FzUtil.couldMerge(held, here.getPickBlock(mop))) {
                     return true;
                 }
-                if (FactorizationUtil.couldMerge(held, here.getBrokenBlock())) {
+                if (FzUtil.couldMerge(held, here.getBrokenBlock())) {
                     return true;
                 }
                 return false;

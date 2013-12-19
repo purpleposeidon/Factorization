@@ -86,7 +86,7 @@ public class ItemFactorizationBlock extends ItemBlock {
                 infoList.add(state.toString());
             }
         }
-        if (FactorizationUtil.similar(is, Core.registry.leydenjar_item)) {
+        if (FzUtil.similar(is, Core.registry.leydenjar_item)) {
             if (is.hasTagCompound()) {
                 FactoryType ft = FactoryType.LEYDENJAR;
                 TileEntityLeydenJar jar = (TileEntityLeydenJar) ft.getRepresentative();

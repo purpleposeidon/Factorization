@@ -217,7 +217,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     }
 
     boolean canGrind() {
-        input = FactorizationUtil.normalize(input);
+        input = FzUtil.normalize(input);
         if (input == null) {
             return false;
         }
@@ -228,14 +228,14 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         if (output == null) {
             return true;
         }
-        return FactorizationUtil.couldMerge(output, gr.output) 
+        return FzUtil.couldMerge(output, gr.output) 
                 && output.stackSize + Math.ceil(gr.probability) <= output.getMaxStackSize();
     }
     
     GrinderRecipe getRecipe() {
         for (GrinderRecipe gr : recipes) {
             for (ItemStack is : gr.getInput()) {
-                if (FactorizationUtil.wildcardSimilar(is, input)) {
+                if (FzUtil.wildcardSimilar(is, input)) {
                     return gr;
                 }
             }
@@ -249,7 +249,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
             return;
         }
         for (ItemStack is : gr.getInput()) {
-            if (!FactorizationUtil.wildcardSimilar(is, input)) {
+            if (!FzUtil.wildcardSimilar(is, input)) {
                 continue;
             }
             if (output == null) {
@@ -260,7 +260,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
             output.stackSize += min;
             output.stackSize += rand.nextFloat() < (gr.probability - min) ? 1 : 0;
             input.stackSize--;
-            input = FactorizationUtil.normalize(input);
+            input = FzUtil.normalize(input);
             return;
         }
     }
@@ -280,9 +280,9 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
             this.output = output;
             this.probability = probability;
             if (input instanceof Block) {
-                itemstack = new ItemStack((Block) input, 1, FactorizationUtil.WILDCARD_DAMAGE);
+                itemstack = new ItemStack((Block) input, 1, FzUtil.WILDCARD_DAMAGE);
             } else if (input instanceof Item) {
-                itemstack = new ItemStack((Item) input, 1, FactorizationUtil.WILDCARD_DAMAGE);
+                itemstack = new ItemStack((Item) input, 1, FzUtil.WILDCARD_DAMAGE);
             } else if (input instanceof ItemStack) {
                 itemstack = (ItemStack) input;
             } else {

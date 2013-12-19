@@ -49,7 +49,7 @@ public class ItemGlazeBucket extends ItemFactorization {
     @Override
     public String getUnlocalizedName(ItemStack is) {
         String base = super.getUnlocalizedName(is);
-        NBTTagCompound tag = FactorizationUtil.getTag(is);
+        NBTTagCompound tag = FzUtil.getTag(is);
         if (tag.hasKey("gid")) {
             String key = tag.getString("gid");
             return base + "." + key;
@@ -81,12 +81,12 @@ public class ItemGlazeBucket extends ItemFactorization {
     }
     
     public int getCharges(ItemStack is) {
-        NBTTagCompound tag = FactorizationUtil.getTag(is);
+        NBTTagCompound tag = FzUtil.getTag(is);
         return tag.getInteger("remaining");
     }
     
     public boolean useCharge(ItemStack is) {
-        NBTTagCompound tag = FactorizationUtil.getTag(is);
+        NBTTagCompound tag = FzUtil.getTag(is);
         int remaining = tag.getInteger("remaining");
         if (remaining <= 0) {
             return false;
@@ -97,19 +97,19 @@ public class ItemGlazeBucket extends ItemFactorization {
     }
     
     private short getBlockId(ItemStack is) {
-        return FactorizationUtil.getTag(is).getShort("bid");
+        return FzUtil.getTag(is).getShort("bid");
     }
     
     private byte getBlockMd(ItemStack is) {
-        return FactorizationUtil.getTag(is).getByte("bmd");
+        return FzUtil.getTag(is).getByte("bmd");
     }
     
     private byte getBlockSide(ItemStack is) {
-        return FactorizationUtil.getTag(is).getByte("bsd");
+        return FzUtil.getTag(is).getByte("bsd");
     }
     
     private boolean isMimic(ItemStack is) {
-        return FactorizationUtil.getTag(is).getBoolean("mimic");
+        return FzUtil.getTag(is).getBoolean("mimic");
     }
     
     private ArrayList<ItemStack> subItems = new ArrayList<ItemStack>();
@@ -136,14 +136,14 @@ public class ItemGlazeBucket extends ItemFactorization {
     }
     
     void setGid(ItemStack is, String unique_id) {
-        FactorizationUtil.getTag(is).setString("gid", unique_id);
+        FzUtil.getTag(is).setString("gid", unique_id);
     }
     
     int md_for_nei = 0;
     
     public ItemStack makeCraftingGlaze(String unique_id) {
         ItemStack is = new ItemStack(this);
-        NBTTagCompound tag = FactorizationUtil.getTag(is);
+        NBTTagCompound tag = FzUtil.getTag(is);
         tag.setBoolean("fake", true);
         setGid(is, unique_id);
         is.setItemDamage(md_for_nei++);
@@ -153,7 +153,7 @@ public class ItemGlazeBucket extends ItemFactorization {
     
     private ItemStack makeGlazeWith(int id, int md, int side) {
         ItemStack is = new ItemStack(this);
-        NBTTagCompound tag = FactorizationUtil.getTag(is);
+        NBTTagCompound tag = FzUtil.getTag(is);
         tag.setShort("bid", (short)id);
         tag.setByte("bmd", (byte)md);
         tag.setByte("bsd", (byte)side);
@@ -176,12 +176,12 @@ public class ItemGlazeBucket extends ItemFactorization {
     }
     
     public void setMimicry(ItemStack is) {
-        NBTTagCompound tag = FactorizationUtil.getTag(is);
+        NBTTagCompound tag = FzUtil.getTag(is);
         tag.setBoolean("mimic", true);
     }
     
     public boolean isUsable(ItemStack is) {
-        if (FactorizationUtil.getTag(is).getBoolean("fake")) {
+        if (FzUtil.getTag(is).getBoolean("fake")) {
             return false;
         }
         return Block.blocksList[getBlockId(is)] != null;

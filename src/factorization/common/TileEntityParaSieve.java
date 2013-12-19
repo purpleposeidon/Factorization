@@ -25,7 +25,7 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
-import factorization.common.FactorizationUtil.FzInv;
+import factorization.common.FzUtil.FzInv;
 
 public class TileEntityParaSieve extends TileEntityFactorization implements ISidedInventory {
     ItemStack[] filters = new ItemStack[8];
@@ -109,10 +109,10 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         }
         if (a == null || b == null) {
             if (a != null) {
-                return FactorizationUtil.couldMerge(a, stranger);
+                return FzUtil.couldMerge(a, stranger);
             }
             if (b != null) {
-                return FactorizationUtil.couldMerge(b, stranger);
+                return FzUtil.couldMerge(b, stranger);
             }
             return false;
         }
@@ -236,7 +236,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         }
         if (cached_te != null) {
             if (!cached_te.isInvalid()) {
-                return FactorizationUtil.openDoubleChest((IInventory) cached_te, true);
+                return FzUtil.openDoubleChest((IInventory) cached_te, true);
             }
             cached_te = null;
         } else if (cached_ent != null) {
@@ -248,7 +248,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         TileEntity te = worldObj.getBlockTileEntity(xCoord + facing.offsetX, yCoord + facing.offsetY, zCoord + facing.offsetZ);
         if (te instanceof IInventory) {
             cached_te = te;
-            return FactorizationUtil.openDoubleChest((IInventory) te, true);
+            return FzUtil.openDoubleChest((IInventory) te, true);
         }
         for (Entity ent : (Iterable<Entity>)worldObj.getEntitiesWithinAABB(IInventory.class, getTargetArea())) {
             if (ent instanceof IInventory) {
@@ -431,7 +431,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             if (empty) {
                 return getCoord().add(getFacing()).getComparatorOverride(getFacing().getOpposite());
             }
-            FzInv inv = FactorizationUtil.openInventory(getCoord().add(getFacing()).getTE(IInventory.class), getFacing().getOpposite());
+            FzInv inv = FzUtil.openInventory(getCoord().add(getFacing()).getTE(IInventory.class), getFacing().getOpposite());
             if (inv == null) {
                 return getCoord().add(getFacing()).getComparatorOverride(getFacing().getOpposite());
             }

@@ -99,7 +99,7 @@ public class TileEntityStamper extends TileEntityFactorization {
             if (item == null) {
                 continue;
             }
-            if (!FactorizationUtil.couldMerge(output, item)) {
+            if (!FzUtil.couldMerge(output, item)) {
                 return false;
             }
             if (output.stackSize + item.stackSize > output.getMaxStackSize()) {
@@ -128,7 +128,7 @@ public class TileEntityStamper extends TileEntityFactorization {
                 any = true;
                 continue;
             }
-            if (FactorizationUtil.couldMerge(output, here)) {
+            if (FzUtil.couldMerge(output, here)) {
                 any = true;
                 int can_take = output.getMaxStackSize() - output.stackSize;
                 if (here.stackSize > can_take) {
@@ -146,12 +146,12 @@ public class TileEntityStamper extends TileEntityFactorization {
     }
     
     protected List<ItemStack> tryCrafting() {
-        List<ItemStack> fakeResult = FactorizationUtil.craft1x1(this, true, input);
-        if (!FactorizationUtil.craft_succeeded) {
+        List<ItemStack> fakeResult = FzUtil.craft1x1(this, true, input);
+        if (!FzUtil.craft_succeeded) {
             return null;
         }
         if (canMerge(fakeResult)) {
-            return FactorizationUtil.craft1x1(this, false, input.splitStack(1));
+            return FzUtil.craft1x1(this, false, input.splitStack(1));
         }
         return null;
     }

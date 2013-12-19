@@ -44,8 +44,8 @@ import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.Share;
 import factorization.common.Core;
-import factorization.common.FactorizationUtil;
-import factorization.common.FactorizationUtil.FzInv;
+import factorization.common.FzUtil;
+import factorization.common.FzUtil.FzInv;
 import factorization.common.FactoryType;
 import factorization.common.ISocketHolder;
 import factorization.common.NetworkFactorization.MessageType;
@@ -381,7 +381,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         //Synchronizing RNG state isn't worthwhile
         //It's possible things could end up in loops like this.
         //Could probably think of something else to throw in.
-        Random rand = FactorizationUtil.dirtyRandomCache();
+        Random rand = FzUtil.dirtyRandomCache();
         long seed = entityId + getCurrentPos().seed() << 5 + orientation.ordinal() << 2 + nextDirection.ordinal();
         rand.setSeed(seed);
         return rand;
@@ -433,7 +433,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     boolean pickNextOrientation_impl() {
-        ArrayList<ForgeDirection> dirs = FactorizationUtil.getRandomDirections(worldObj.rand);
+        ArrayList<ForgeDirection> dirs = FzUtil.getRandomDirections(worldObj.rand);
         int available_nonbackwards_directions = 0;
         Coord look = pos_next.copy();
         int all_count = 0;
@@ -576,7 +576,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     @Override
     public boolean interactFirst(EntityPlayer player) {
         stacks_changed = true;
-        ItemStack is = FactorizationUtil.normalize(player.getHeldItem());
+        ItemStack is = FzUtil.normalize(player.getHeldItem());
         if (is == null) {
             return false;
         }
@@ -697,7 +697,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 if (index < 0) {
                     break;
                 }
-                inv[index] = FactorizationUtil.readStack(input);
+                inv[index] = FzUtil.readStack(input);
             }
             return true;
         case MessageType.servo_brief:
@@ -741,7 +741,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     public void dropItemStacks(Iterable<ItemStack> toDrop) {
         for (ItemStack is : toDrop) {
-            FactorizationUtil.spawnItemStack(this, is);
+            FzUtil.spawnItemStack(this, is);
         }
     }
     
@@ -775,7 +775,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     @Override
     public ItemStack decrStackSize(int i, int j) {
         ItemStack ret = inv[i].splitStack(j);
-        inv[i] = FactorizationUtil.normalize(inv[i]);
+        inv[i] = FzUtil.normalize(inv[i]);
         return ret;
     }
 
@@ -810,7 +810,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     public void onInventoryChanged() {
         ArrayList<Object> toSend = new ArrayList(inv.length*2);
         for (byte i = 0; i < inv.length; i++) {
-            if (FactorizationUtil.identical(inv[i], inv_last_sent[i])) {
+            if (FzUtil.identical(inv[i], inv_last_sent[i])) {
                 continue;
             }
             toSend.add(i);
@@ -842,7 +842,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         return true;
     }
     
-    private FzInv my_fz_inv = FactorizationUtil.openInventory(this, 0);
+    private FzInv my_fz_inv = FzUtil.openInventory(this, 0);
     public FzInv getInv() {
         return my_fz_inv;
     }
@@ -908,7 +908,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         if (buffer.isEmpty()) {
             return false;
         }
-        FzInv me = FactorizationUtil.openInventory(this, false);
+        FzInv me = FzUtil.openInventory(this, false);
         ItemStack got = buffer.get(0);
         if (got == null) {
             buffer.remove(0);

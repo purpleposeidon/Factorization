@@ -28,7 +28,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockHelper;
-import factorization.common.FactorizationUtil;
+import factorization.common.FzUtil;
 
 // Note: The rules for holding on to references to Coord are the same as for holding on to World.
 // Don't keep references to them outside of things that are in worlds to avoid mem-leaks; or be careful about it.
@@ -846,7 +846,7 @@ public class Coord implements IDataSerializable {
         ItemStack main = dropped.remove(0);
         for (int i = 0; i < dropped.size(); i++) {
             ItemStack other = dropped.get(i);
-            if (!FactorizationUtil.couldMerge(main, other)) {
+            if (!FzUtil.couldMerge(main, other)) {
                 return null;
             }
             main.stackSize += other.stackSize;

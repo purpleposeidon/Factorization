@@ -36,7 +36,7 @@ import factorization.api.datahelpers.DataInPacketClientEdited;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.IDataSerializable;
-import factorization.common.FactorizationUtil.FzInv;
+import factorization.common.FzUtil.FzInv;
 import factorization.common.NetworkFactorization.MessageType;
 import factorization.common.servo.LoggerDataHelper;
 import factorization.common.servo.ServoMotor;
@@ -230,7 +230,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         if (invTe == null) {
             return true;
         }
-        FzInv inv = FactorizationUtil.openInventory(invTe, facing);
+        FzInv inv = FzUtil.openInventory(invTe, facing);
         if (inv == null) {
             return true;
         }
@@ -278,7 +278,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     private static float[] yaw = new float[] {0, 0, 180, 0, 90, -90, 0};
     
     protected EntityPlayer getFakePlayer() {
-        EntityPlayer player = FactorizationUtil.makePlayer(getCoord(), "socket");
+        EntityPlayer player = FzUtil.makePlayer(getCoord(), "socket");
         player.worldObj = worldObj;
         player.prevPosX = player.posX = xCoord + 0.5;
         player.prevPosY = player.posY = yCoord + 0.5 - player.getEyeHeight() + facing.offsetY;

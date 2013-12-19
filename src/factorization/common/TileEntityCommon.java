@@ -91,7 +91,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     }
     
     public void loadFromStack(ItemStack is) {
-        customName = FactorizationUtil.getCustomItemName(is);
+        customName = FzUtil.getCustomItemName(is);
     }
     
     boolean removeBlockByPlayer(EntityPlayer player) {

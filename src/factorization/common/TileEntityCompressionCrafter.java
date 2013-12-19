@@ -16,7 +16,7 @@ import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
-import factorization.common.FactorizationUtil.FzInv;
+import factorization.common.FzUtil.FzInv;
 import factorization.common.NetworkFactorization.MessageType;
 
 public class TileEntityCompressionCrafter extends TileEntityCommon {
@@ -102,7 +102,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
         super.onPlacedBy(player, is, side);
-        b_facing = (byte) FactorizationUtil.determineOrientation(player);
+        b_facing = (byte) FzUtil.determineOrientation(player);
         b_facing = (byte) ForgeDirection.getOrientation(b_facing).getOpposite().ordinal();
     }
     
@@ -130,9 +130,9 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         for (FzInv fz : getAdjacentInventories()) {
             if (fz == null) break;
             while (!buffer.isEmpty()) {
-                ItemStack is = FactorizationUtil.normalize(buffer.get(0));
+                ItemStack is = FzUtil.normalize(buffer.get(0));
                 if (is != null) {
-                    is = FactorizationUtil.normalize(fz.push(is));
+                    is = FzUtil.normalize(fz.push(is));
                 }
                 if (is == null) {
                     buffer.remove(0);
@@ -157,7 +157,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
             Coord sc = me.add(fd);
             IInventory inv = sc.getTE(IInventory.class);
             if (inv != null) {
-                ret[i++] = FactorizationUtil.openInventory(inv, back);
+                ret[i++] = FzUtil.openInventory(inv, back);
             } else if (fd != behind) {
                 TileEntityCompressionCrafter neighbor = sc.getTE(TileEntityCompressionCrafter.class);
                 if (neighbor == null) continue;
@@ -169,7 +169,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
                     Coord sd = sc.add(nfd);
                     ForgeDirection newBack = nfd.getOpposite();
                     IInventory newInv = sd.getTE(IInventory.class);
-                    if (newInv != null) ret[i++] = FactorizationUtil.openInventory(newInv, newBack);
+                    if (newInv != null) ret[i++] = FzUtil.openInventory(newInv, newBack);
                 }
             }
         }

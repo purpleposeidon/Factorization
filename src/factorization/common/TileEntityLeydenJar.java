@@ -194,7 +194,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
         if (is.hasTagCompound()) {
-            NBTTagCompound tag = FactorizationUtil.getTag(is);
+            NBTTagCompound tag = FzUtil.getTag(is);
             storage = tag.getInteger("storage");
         }
     }
@@ -212,7 +212,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     @Override
     public ItemStack getDroppedBlock() {
         ItemStack is = new ItemStack(Core.registry.item_factorization, 1, getFactoryType().md);
-        NBTTagCompound tag = FactorizationUtil.getTag(is);
+        NBTTagCompound tag = FzUtil.getTag(is);
         tag.setInteger("storage", storage);
         return is;
     }

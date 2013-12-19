@@ -26,7 +26,7 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     }
 
     public int getStorage(ItemStack is) {
-        NBTTagCompound tag = FactorizationUtil.getTag(is);
+        NBTTagCompound tag = FzUtil.getTag(is);
         if (tag.hasKey("storage")) {
             return tag.getInteger("storage");
         }
@@ -34,7 +34,7 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     }
 
     public void setStorage(ItemStack is, int new_charge) {
-        NBTTagCompound tag = FactorizationUtil.getTag(is);
+        NBTTagCompound tag = FzUtil.getTag(is);
         tag.setInteger("storage", new_charge);
         normalizeDamage(is);
     }
@@ -115,7 +115,7 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     @Override
     public void onCreated(ItemStack is, World w, EntityPlayer player) {
         if (is.getTagCompound() == null) {
-            NBTTagCompound tag = FactorizationUtil.getTag(is);
+            NBTTagCompound tag = FzUtil.getTag(is);
             tag.setInteger("storage", getStorage(is));
         }
     }

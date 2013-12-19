@@ -103,10 +103,10 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         slot = -1;
         max_size = -99;
         for (int i = 0; i < inputs.length; i++) {
-            if (must_match != null && inputs[i] != null && !FactorizationUtil.couldMerge(must_match, inputs[i])) {
+            if (must_match != null && inputs[i] != null && !FzUtil.couldMerge(must_match, inputs[i])) {
                 continue;
             }
-            int here_size = FactorizationUtil.getStackSize(inputs[i]);
+            int here_size = FzUtil.getStackSize(inputs[i]);
             if (here_size > max_size) {
                 max_size = here_size;
                 slot = i;
@@ -197,7 +197,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         for (ItemStack is : inputs) {
             if (is == null) {
                 continue;
-            } else if (FactorizationUtil.wildcardSimilar(toMatch, is)) {
+            } else if (FzUtil.wildcardSimilar(toMatch, is)) {
                 count += is.stackSize;
             }
         }
@@ -219,7 +219,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
 
         boolean matches(TileEntityCrystallizer crys) {
             if (crys.output != null) {
-                if (!FactorizationUtil.couldMerge(crys.output, output)) {
+                if (!FzUtil.couldMerge(crys.output, output)) {
                     return false;
                 }
                 if (crys.output.stackSize + output_count > crys.output.getMaxStackSize()) {
@@ -249,7 +249,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
             ItemStack is = input.copy();
             while (is.stackSize > 0) {
                 crys.inputs[slot].stackSize--;
-                crys.inputs[slot] = FactorizationUtil.normalize(crys.inputs[slot]);
+                crys.inputs[slot] = FzUtil.normalize(crys.inputs[slot]);
                 is.stackSize--;
             }
             if (crys.output == null) {
@@ -263,7 +263,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         void apply(TileEntityCrystallizer crys) {
             for (int i = 0; i < crys.inputs.length; i++) {
                 ItemStack is = crys.inputs[i];
-                if (is != null && FactorizationUtil.wildcardSimilar(input, is)) {
+                if (is != null && FzUtil.wildcardSimilar(input, is)) {
                     applyTo(crys, i);
                 }
             }
@@ -309,8 +309,8 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
             return true;
         }
         if (messageType == MessageType.CrystallizerInfo) {
-            growing_crystal = FactorizationUtil.readStack(input);
-            solution = FactorizationUtil.readStack(input);
+            growing_crystal = FzUtil.readStack(input);
+            solution = FzUtil.readStack(input);
             progress = input.readInt();
             return true;
         }

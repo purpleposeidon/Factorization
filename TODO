@@ -110,14 +110,15 @@ Lower barriers to entry for servos:
 
 IMMEDIATE (for next public release)
 ---------
-servos:
-  2 consecutive turns doesn't show the 2nd turn nicely -- No, that's not the behavior.
+Fix NEI thingie? 'c' ain't workin'
+/f entityrendertoggle; forgetTEs; forgetEnts
+[uh, does our SSP have an old version?]
+
 
 
 SOON
 ----
 start a dev blog
-document servos
 forge public/AT bullshit
 do maths on energy conversion:
   food to steam; we might even be able to do the heater thing? I suppose we COULD just blacklist boilers for furnace heaters...
@@ -128,12 +129,11 @@ LMP store instructions... Like a bag or a backpack
   - maybe let you merge instructions together? But then middle clicking.
 Test BoH key with NEI installed & with sneak key set to a mouse button.
 Church Organ
+fix shading of faces of blocks that are in barrels; research if such a fix is possible
 
 LESS SOON
 ---------
-give blocks & items names for 1.7 update; will need to update FML
 ack for TODO/XXX/FIXME
-fix shading of faces of blocks that are in barrels
 
 
 UNTRIAGED
@@ -151,10 +151,12 @@ pocket crafting table, clicking 1-item-at-a-time for the craft output, seems lag
   [constructing a player causes a recipe match; maybe just keep 1 FakePlayer and use it everywhere?]
   [findMatchingRecipes also slow; our cache system isn't doing its thing? Or it's being called when it shouldn't be.]
 tool for renaming commands
+servos: 2 consecutive turns doesn't show the 2nd turn nicely -- No, that's not the behavior.
 
 
 LESS TOP LIST
 -------------
+FML has code to disable mods now; can use it for FZDS...
 "Puff Blocks": 9 feathers; it's the building block helper thingie
 Notify is using FZ net code
 clean up texture error messages (unused textures)

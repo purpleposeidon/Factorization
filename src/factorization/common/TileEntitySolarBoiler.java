@@ -57,15 +57,15 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
-        FactorizationUtil.writeTank(tag, waterTank, "water");
-        FactorizationUtil.writeTank(tag, steamTank, "steam");
+        FzUtil.writeTank(tag, waterTank, "water");
+        FzUtil.writeTank(tag, steamTank, "steam");
     }
     
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
-        FactorizationUtil.readTank(tag, waterTank, "water");
-        FactorizationUtil.readTank(tag, steamTank, "steam");
+        FzUtil.readTank(tag, waterTank, "water");
+        FzUtil.readTank(tag, steamTank, "steam");
         sanitize();
     }
     
@@ -228,8 +228,8 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     protected void onRemove() {
         super.onRemove();
         Coord here = getCoord();
-        FactorizationUtil.spill(here, waterTank.getFluid());
-        FactorizationUtil.spill(here, steamTank.getFluid());
+        FzUtil.spill(here, waterTank.getFluid());
+        FzUtil.spill(here, steamTank.getFluid());
     }
     
     @Override

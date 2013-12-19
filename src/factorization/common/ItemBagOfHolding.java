@@ -14,7 +14,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import factorization.api.IActOnCraft;
 import factorization.common.Core.TabType;
-import factorization.common.FactorizationUtil.FzInv;
+import factorization.common.FzUtil.FzInv;
 
 public class ItemBagOfHolding extends ItemFactorization implements IActOnCraft {
     //XXX: Sending NBT data of all the items might not be a good idea. We might force it to not be shared, and use the damage value for the pearl count.
@@ -200,7 +200,7 @@ public class ItemBagOfHolding extends ItemFactorization implements IActOnCraft {
         if (!(te instanceof IInventory)) {
             return false;
         }
-        FzInv inv = FactorizationUtil.openInventory((IInventory)te, side);
+        FzInv inv = FzUtil.openInventory((IInventory)te, side);
 
         for (int row = 0; row < 4; row++) {
             ArrayList<ItemStack> items = getRow(is, row);
@@ -247,7 +247,7 @@ public class ItemBagOfHolding extends ItemFactorization implements IActOnCraft {
                     here.stackSize = 0;
                     row.set(col, here);
                 }
-                if (here == null || !FactorizationUtil.couldMerge(here, add)) {
+                if (here == null || !FzUtil.couldMerge(here, add)) {
                     continue;
                 }
                 should_add = true;

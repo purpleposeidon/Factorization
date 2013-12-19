@@ -102,7 +102,7 @@ public class TileEntityRocketEngine extends TileEntityCommon {
     
     DeltaCoord getCornerDirection(EntityPlayer player, int side) {
         ForgeDirection dir = ForgeDirection.getOrientation(side);
-        DeltaCoord dc = FactorizationUtil.getFlatDiagonalFacing(player);
+        DeltaCoord dc = FzUtil.getFlatDiagonalFacing(player);
         if (dc.isZero()) {
             return null;
         }

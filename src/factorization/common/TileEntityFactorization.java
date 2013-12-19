@@ -142,7 +142,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         // XXX TODO: ModLoader.genericContainerRemoval
         Coord here = getCoord();
         for (int i = 0; i < getSizeInventory(); i++) {
-            FactorizationUtil.spawnItemStack(here, getStackInSlot(i));
+            FzUtil.spawnItemStack(here, getStackInSlot(i));
         }
     }
     
