@@ -76,7 +76,7 @@ public class Core {
     public static FzConfig fzconfig;
     public static Registry registry;
     public static FactorizationOreProcessingHandler foph;
-    @SidedProxy(clientSide = "factorization.client.FactorizationClientProxy")
+    @SidedProxy(clientSide = "factorization.common.FactorizationClientProxy")
     public static FactorizationProxy proxy;
     public static NetworkFactorization network;
     public static int factory_rendertype = -1;
