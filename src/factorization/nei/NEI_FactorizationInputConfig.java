@@ -5,8 +5,8 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import codechicken.nei.api.IConfigureNEI;
 import codechicken.nei.forge.GuiContainerManager;
 import codechicken.nei.forge.IContainerInputHandler;
-import factorization.client.FactorizationClientProxy;
 import factorization.common.Command;
+import factorization.common.FactorizationClientProxy;
 import factorization.shared.Core;
 import factorization.weird.ItemPocketTable;
 

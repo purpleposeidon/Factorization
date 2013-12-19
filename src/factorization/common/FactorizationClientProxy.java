@@ -1,4 +1,4 @@
-package factorization.client;
+package factorization.common;
 
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -49,11 +49,6 @@ import factorization.charge.TileEntityLeydenJar;
 import factorization.charge.TileEntityLeydenJarRender;
 import factorization.charge.TileEntitySteamTurbine;
 import factorization.charge.TileEntitySteamTurbineRender;
-import factorization.common.BlockRenderHelper;
-import factorization.common.Command;
-import factorization.common.ContainerFactorization;
-import factorization.common.FactoryType;
-import factorization.common.FzConfig;
 import factorization.crafting.BlockRenderCompressionCrafter;
 import factorization.crafting.BlockRenderMixer;
 import factorization.crafting.ContainerMixer;
