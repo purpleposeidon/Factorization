@@ -21,8 +21,8 @@ import factorization.common.ContainerCrystallizer;
 import factorization.common.ContainerFactorization;
 import factorization.common.ContainerGrinder;
 import factorization.common.ContainerMixer;
-import factorization.common.ContainerPocket;
 import factorization.common.ContainerSlagFurnace;
+import factorization.weird.ContainerPocket;
 
 public abstract class FactorizationProxy implements IGuiHandler {
     public abstract EntityPlayer getPlayer(NetHandler handler);

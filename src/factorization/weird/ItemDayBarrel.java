@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.weird;
 
 import java.util.List;
 
@@ -7,14 +7,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import factorization.common.TileEntityDayBarrel.Type;
 import factorization.shared.Core;
-import factorization.shared.ItemBlockProxy;
 import factorization.shared.Core.TabType;
+import factorization.shared.ItemBlockProxy;
+import factorization.weird.TileEntityDayBarrel.Type;
 
 public class ItemDayBarrel extends ItemBlockProxy {
 
-    protected ItemDayBarrel(int id, String name) {
+    public ItemDayBarrel(int id, String name) {
         super(id, Core.registry.daybarrel_item_hidden, name, TabType.BLOCKS);
         setMaxDamage(0);
         setNoRepair();

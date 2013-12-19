@@ -1,4 +1,4 @@
-package factorization.client.render;
+package factorization.weird;
 
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
@@ -8,7 +8,6 @@ import net.minecraftforge.client.IItemRenderer;
 
 import org.lwjgl.opengl.GL11;
 
-import factorization.common.TileEntityDayBarrel;
 import factorization.shared.FactoryType;
 import factorization.shared.TileEntityCommon;
 

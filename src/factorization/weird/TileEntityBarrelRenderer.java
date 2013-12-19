@@ -1,4 +1,4 @@
-package factorization.client.render;
+package factorization.weird;
 
 import java.util.Random;
 
@@ -17,7 +17,6 @@ import net.minecraft.world.World;
 
 import org.lwjgl.opengl.GL11;
 
-import factorization.common.TileEntityBarrel;
 import factorization.shared.Core;
 
 public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {

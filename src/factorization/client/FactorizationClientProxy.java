@@ -35,7 +35,6 @@ import factorization.client.gui.GuiCrystallizer;
 import factorization.client.gui.GuiGrinder;
 import factorization.client.gui.GuiMixer;
 import factorization.client.gui.GuiParasieve;
-import factorization.client.gui.GuiPocketTable;
 import factorization.client.gui.GuiRouter;
 import factorization.client.gui.GuiSlag;
 import factorization.client.gui.GuiStamper;
@@ -57,6 +56,14 @@ import factorization.shared.ItemRenderCapture;
 import factorization.shared.TileEntityFactorization;
 import factorization.sockets.GuiDataConfig;
 import factorization.sockets.SocketLacerator;
+import factorization.weird.BlockRenderDayBarrel;
+import factorization.weird.ContainerPocket;
+import factorization.weird.DayBarrelItemRenderer;
+import factorization.weird.GuiPocketTable;
+import factorization.weird.TileEntityBarrel;
+import factorization.weird.TileEntityBarrelRenderer;
+import factorization.weird.TileEntityDayBarrel;
+import factorization.weird.TileEntityDayBarrelRenderer;
 
 public class FactorizationClientProxy extends FactorizationProxy {
     public FactorizationClientProxy() {

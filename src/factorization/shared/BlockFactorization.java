@@ -30,10 +30,10 @@ import factorization.api.Coord;
 import factorization.api.IFactoryType;
 import factorization.common.BlockIcons;
 import factorization.common.Registry;
-import factorization.common.TileEntityDayBarrel;
-import factorization.common.TileEntityDayBarrel.Type;
 import factorization.notify.Notify;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.weird.TileEntityDayBarrel;
+import factorization.weird.TileEntityDayBarrel.Type;
 
 public class BlockFactorization extends BlockContainer {
     public boolean fake_normal_render = false;

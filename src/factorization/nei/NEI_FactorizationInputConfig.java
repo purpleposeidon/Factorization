@@ -7,8 +7,8 @@ import codechicken.nei.forge.GuiContainerManager;
 import codechicken.nei.forge.IContainerInputHandler;
 import factorization.client.FactorizationClientProxy;
 import factorization.common.Command;
-import factorization.common.ItemPocketTable;
 import factorization.shared.Core;
+import factorization.weird.ItemPocketTable;
 
 public class NEI_FactorizationInputConfig implements IConfigureNEI {
     @Override

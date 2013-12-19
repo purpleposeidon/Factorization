@@ -3,12 +3,10 @@ package factorization.shared;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.registry.GameRegistry;
-import factorization.common.TileEntityBarrel;
 import factorization.common.TileEntityBattery;
 import factorization.common.TileEntityCaliometricBurner;
 import factorization.common.TileEntityCompressionCrafter;
 import factorization.common.TileEntityCrystallizer;
-import factorization.common.TileEntityDayBarrel;
 import factorization.common.TileEntityGreenware;
 import factorization.common.TileEntityGrinder;
 import factorization.common.TileEntityHeater;
@@ -31,6 +29,8 @@ import factorization.sockets.SocketEmpty;
 import factorization.sockets.SocketLacerator;
 import factorization.sockets.SocketRobotHand;
 import factorization.sockets.SocketShifter;
+import factorization.weird.TileEntityBarrel;
+import factorization.weird.TileEntityDayBarrel;
 
 public enum FactoryType {
     //Traced here is the history of Factorization.

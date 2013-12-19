@@ -53,7 +53,6 @@ import factorization.client.render.TileEntityGrinderRender;
 import factorization.common.BlockIcons;
 import factorization.common.BlockRenderHelper;
 import factorization.common.ISocketHolder;
-import factorization.common.TileEntityDayBarrel;
 import factorization.common.TileEntityGrinder;
 import factorization.common.TileEntityGrinder.GrinderRecipe;
 import factorization.common.TileEntitySocketBase;
@@ -63,6 +62,7 @@ import factorization.shared.Core;
 import factorization.shared.FactoryType;
 import factorization.shared.FzUtil;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.weird.TileEntityDayBarrel;
 
 public class SocketLacerator extends TileEntitySocketBase implements IChargeConductor, ISidedInventory {
     Charge charge = new Charge(this);

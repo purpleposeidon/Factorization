@@ -33,8 +33,8 @@ import factorization.api.IEntityMessage;
 import factorization.api.Quaternion;
 import factorization.api.VectorUV;
 import factorization.common.Command;
-import factorization.common.TileEntityBarrel;
 import factorization.notify.NotifyImplementation;
+import factorization.weird.TileEntityBarrel;
 
 public class NetworkFactorization implements ITinyPacketHandler {
     protected final static short factorizeTEChannel = 0; //used for tile entities

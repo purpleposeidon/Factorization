@@ -60,6 +60,9 @@ import factorization.shared.ItemCraftingComponent;
 import factorization.shared.ItemFactorizationBlock;
 import factorization.shared.Sound;
 import factorization.shared.Core.TabType;
+import factorization.weird.ItemDayBarrel;
+import factorization.weird.ItemPocketTable;
+import factorization.weird.TileEntityDayBarrel;
 
 public class Registry implements ICraftingHandler, ITickHandler {
     public ItemFactorizationBlock item_factorization;

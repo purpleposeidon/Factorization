@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.weird;
 
 import java.io.DataInputStream;
 import java.io.IOException;

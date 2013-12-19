@@ -18,6 +18,7 @@ import factorization.shared.Core;
 import factorization.shared.FzUtil;
 import factorization.shared.FzUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.weird.TileEntityDayBarrel;
 
 public class CompressionState {
     static int MAX_CRAFT = 32;

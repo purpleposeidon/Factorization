@@ -39,6 +39,7 @@ import factorization.shared.FzUtil;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.shared.TileEntityCommon;
 import factorization.shared.TileEntityExtension;
+import factorization.weird.TileEntityDayBarrel;
 
 public class TileEntityRocketEngine extends TileEntityCommon {
     boolean inSlice = false;

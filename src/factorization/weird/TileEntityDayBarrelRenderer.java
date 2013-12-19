@@ -1,4 +1,4 @@
-package factorization.client.render;
+package factorization.weird;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -13,8 +13,7 @@ import org.lwjgl.opengl.GL11;
 
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
-import factorization.common.TileEntityDayBarrel;
-import factorization.common.TileEntityDayBarrel.Type;
+import factorization.weird.TileEntityDayBarrel.Type;
 
 public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
     //NOTE TODO: This could be optimized by using a custom font renderer.

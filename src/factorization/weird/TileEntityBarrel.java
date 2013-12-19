@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.weird;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -13,6 +13,7 @@ import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import factorization.api.Coord;
+import factorization.common.BlockIcons;
 import factorization.notify.Notify;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;

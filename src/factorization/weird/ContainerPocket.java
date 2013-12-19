@@ -1,7 +1,8 @@
-package factorization.common;
+package factorization.weird;
 
 import java.util.ArrayList;
 
+import factorization.common.Command;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
