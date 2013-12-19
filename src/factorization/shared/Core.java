@@ -48,8 +48,8 @@ import factorization.common.TileEntitySolarBoiler;
 import factorization.common.TileEntityWrathFire;
 import factorization.common.TileEntityWrathLamp;
 import factorization.common.TileEntityWrathLamp.RelightTask;
-import factorization.common.compat.CompatManager;
-import factorization.common.servo.ServoMotor;
+import factorization.compat.CompatManager;
+import factorization.servo.ServoMotor;
 
 @Mod(modid = Core.modId, name = Core.name, version = Core.version)
 @NetworkMod(

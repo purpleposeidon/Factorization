@@ -41,11 +41,9 @@ import factorization.client.gui.GuiSlag;
 import factorization.client.gui.GuiStamper;
 import factorization.client.render.*;
 import factorization.common.*;
-import factorization.common.servo.BlockRenderServoRail;
-import factorization.common.servo.RenderServoMotor;
-import factorization.common.servo.ServoMotor;
-import factorization.common.sockets.GuiDataConfig;
-import factorization.common.sockets.SocketLacerator;
+import factorization.servo.BlockRenderServoRail;
+import factorization.servo.RenderServoMotor;
+import factorization.servo.ServoMotor;
 import factorization.shared.BlockRenderDefault;
 import factorization.shared.BlockRenderEmpty;
 import factorization.shared.Core;
@@ -57,6 +55,8 @@ import factorization.shared.FactoryType;
 import factorization.shared.FzConfig;
 import factorization.shared.ItemRenderCapture;
 import factorization.shared.TileEntityFactorization;
+import factorization.sockets.GuiDataConfig;
+import factorization.sockets.SocketLacerator;
 
 public class FactorizationClientProxy extends FactorizationProxy {
     public FactorizationClientProxy() {

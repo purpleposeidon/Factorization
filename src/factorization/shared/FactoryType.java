@@ -26,11 +26,11 @@ import factorization.common.TileEntitySteamTurbine;
 import factorization.common.TileEntityWire;
 import factorization.common.TileEntityWrathFire;
 import factorization.common.TileEntityWrathLamp;
-import factorization.common.servo.TileEntityServoRail;
-import factorization.common.sockets.SocketEmpty;
-import factorization.common.sockets.SocketLacerator;
-import factorization.common.sockets.SocketRobotHand;
-import factorization.common.sockets.SocketShifter;
+import factorization.servo.TileEntityServoRail;
+import factorization.sockets.SocketEmpty;
+import factorization.sockets.SocketLacerator;
+import factorization.sockets.SocketRobotHand;
+import factorization.sockets.SocketShifter;
 
 public enum FactoryType {
     //Traced here is the history of Factorization.

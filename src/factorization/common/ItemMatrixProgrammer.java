@@ -4,8 +4,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import factorization.api.Coord;
-import factorization.common.servo.Decorator;
-import factorization.common.servo.TileEntityServoRail;
+import factorization.servo.Decorator;
+import factorization.servo.TileEntityServoRail;
 import factorization.shared.ItemFactorization;
 import factorization.shared.Core.TabType;
 
