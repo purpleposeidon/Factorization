@@ -3,8 +3,8 @@ package factorization.servo;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.Icon;
 import factorization.common.BlockIcons;
-import factorization.common.BlockRenderHelper;
 import factorization.common.FactoryType;
+import factorization.shared.BlockRenderHelper;
 import factorization.shared.FactorizationBlockRender;
 
 public class BlockRenderServoRail extends FactorizationBlockRender {

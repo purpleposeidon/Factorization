@@ -79,6 +79,7 @@ import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
 import factorization.shared.BlockRenderDefault;
 import factorization.shared.BlockRenderEmpty;
+import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 import factorization.shared.EmptyRender;
 import factorization.shared.FactorizationBlockRender;

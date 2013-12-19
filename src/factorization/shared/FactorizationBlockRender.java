@@ -22,7 +22,6 @@ import factorization.api.ICoord;
 import factorization.api.VectorUV;
 import factorization.charge.WireRenderingCube;
 import factorization.common.BlockIcons;
-import factorization.common.BlockRenderHelper;
 import factorization.common.FactoryType;
 
 abstract public class FactorizationBlockRender implements ICoord {

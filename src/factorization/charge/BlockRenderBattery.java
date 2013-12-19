@@ -10,8 +10,8 @@ import org.lwjgl.opengl.GL11;
 
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
-import factorization.common.BlockRenderHelper;
 import factorization.common.FactoryType;
+import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 import factorization.shared.FactorizationBlockRender;
 

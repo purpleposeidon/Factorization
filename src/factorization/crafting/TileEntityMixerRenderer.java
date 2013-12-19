@@ -7,8 +7,8 @@ import net.minecraft.util.Icon;
 
 import org.lwjgl.opengl.GL11;
 
-import factorization.common.BlockRenderHelper;
 import factorization.common.ItemIcons;
+import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 import factorization.shared.FactorizationBlockRender;
 

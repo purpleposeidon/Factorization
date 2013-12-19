@@ -9,7 +9,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
-import factorization.common.BlockRenderHelper;
+import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 

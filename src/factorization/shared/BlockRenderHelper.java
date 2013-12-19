@@ -1,4 +1,4 @@
-package factorization.common;
+package factorization.shared;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -16,7 +16,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.api.VectorUV;
-import factorization.shared.Core;
+import factorization.common.BlockIcons;
+import factorization.common.FzConfig;
 
 public class BlockRenderHelper extends Block {
     //This class is used to make it easy (and very thread-safe) to render cubes of various sizes. It's a fake block.

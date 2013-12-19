@@ -13,8 +13,8 @@ import net.minecraftforge.common.ForgeDirection;
 import org.lwjgl.opengl.GL11;
 
 import factorization.common.BlockIcons;
-import factorization.common.BlockRenderHelper;
 import factorization.darkiron.BlockDarkIronOre.Glint;
+import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 
 public class GlintRenderer extends TileEntitySpecialRenderer {

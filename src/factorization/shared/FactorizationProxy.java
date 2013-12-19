@@ -18,7 +18,6 @@ import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
 import factorization.api.Coord;
-import factorization.common.BlockRenderHelper;
 import factorization.common.ContainerFactorization;
 import factorization.common.FactoryType;
 import factorization.crafting.ContainerMixer;

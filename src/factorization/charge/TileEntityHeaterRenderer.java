@@ -8,7 +8,7 @@ import net.minecraft.tileentity.TileEntity;
 import org.lwjgl.opengl.GL11;
 
 import factorization.common.BlockIcons;
-import factorization.common.BlockRenderHelper;
+import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 
 public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {

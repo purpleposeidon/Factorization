@@ -24,10 +24,10 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
-import factorization.common.BlockRenderHelper;
 import factorization.common.FactoryType;
 import factorization.notify.Notify;
 import factorization.servo.ServoMotor;
+import factorization.shared.BlockRenderHelper;
 import factorization.shared.FzUtil;
 import factorization.shared.FzUtil.FzInv;
 

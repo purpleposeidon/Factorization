@@ -9,8 +9,8 @@ import org.lwjgl.opengl.GL11;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
-import factorization.common.BlockRenderHelper;
 import factorization.common.FactoryType;
+import factorization.shared.BlockRenderHelper;
 import factorization.shared.FactorizationBlockRender;
 
 public class BlockRenderSocketBase extends FactorizationBlockRender {

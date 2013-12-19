@@ -68,6 +68,7 @@ import factorization.shared.BlockClass;
 import factorization.shared.BlockFactorization;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
+import factorization.shared.BlockRenderHelper;
 import factorization.shared.FzUtil;
 import factorization.shared.ItemBlockProxy;
 import factorization.shared.ItemCraftingComponent;

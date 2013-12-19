@@ -21,7 +21,7 @@ import net.minecraft.util.Vec3;
 
 import org.lwjgl.opengl.GL11;
 
-import factorization.common.BlockRenderHelper;
+import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 
 public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
