@@ -88,6 +88,11 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
             stomache = itemstack;
         }
     }
+    
+    @Override
+    public int getInventoryStackLimit() {
+        return 4;
+    }
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack itemstack) {
