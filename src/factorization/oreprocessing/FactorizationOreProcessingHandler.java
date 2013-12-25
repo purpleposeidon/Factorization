@@ -41,10 +41,10 @@ public class FactorizationOreProcessingHandler {
     void addProcessingEnds(OreType oreType, ItemStack ore, ItemStack ingot) {
         //Everything can be slagged
         oreType.enable();
-        if (oreType != OreType.LEAD && oreType != OreType.SILVER && oreType != OreType.GALENA) {
+        if (oreType != OreType.SILVER && oreType != OreType.GALENA) {
             TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, ingot, 0.4F, oreType.surounding_medium);
         } else if (oreType == OreType.SILVER) {
-            TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, new ItemStack(Core.registry.lead_ingot), 1F, ingot);
+            //TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, new ItemStack(Core.registry.lead_ingot), 1F, ingot);
         }
         if (oreType.processingResult != null) {
             return;
@@ -69,7 +69,7 @@ public class FactorizationOreProcessingHandler {
             float xp = FurnaceRecipes.smelting().getExperience(ore);
             FurnaceRecipes.smelting().addSmelting(is.itemID, is.getItemDamage(), ingot, xp);
         }
-        if (oreType != OreType.LEAD && oreType != OreType.SILVER) {
+        if (oreType != OreType.SILVER) {
             TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.1F, ingot, 0.2F, Block.dirt);
             //Or it could output reduced chunks instead.
         }
