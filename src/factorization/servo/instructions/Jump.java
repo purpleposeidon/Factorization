@@ -37,8 +37,10 @@ public class Jump extends Instruction {
                 motor.putError("Jump: Stack Underflow of Boolean");
                 return;
             }
-            motor.jmp = mode;
-            motor.penalizeSpeed();
+            if (b) {
+                motor.jmp = mode;
+                motor.penalizeSpeed();
+            }
         } else {
             motor.jmp = mode;
         }
