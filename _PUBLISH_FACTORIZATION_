@@ -39,7 +39,7 @@ changelogFilename = "changelogs/Changelog-" + version + ".txt"
 my_dropbox = "http://dl.dropbox.com/u/76265666/"
 
 #Check for baddies
-run("ack-grep NORELEASE src/")
+run("ack-grep --ignore-dir=src/factorization/fzds/ NORELEASE src/")
 run("ack-grep '%i' src/")
 
 #Factorization
