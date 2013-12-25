@@ -110,9 +110,20 @@ Lower barriers to entry for servos:
 
 IMMEDIATE (for next public release)
 ---------
-Fix NEI thingie? 'c' ain't workin'
 /f entityrendertoggle; forgetTEs; forgetEnts
-[uh, does our SSP have an old version?]
+servos:
+  refactor tool
+    click once, then click a direction to move instructions... or something. Hmm.
+    Maybe click to make a path? Too complicated.
+    If you've got like forking and branches or stuff, you'll have to start at the end and work back.
+  comment tool
+    Opens a gui to type text in
+[14:31:34] <digitalseraphim> also noticed i'm getting the error "foreign slot < -1" when the value is actually in the 600 range (i know its most likely always going to be invalid, but its not < -1)
+[14:32:07] <digitalseraphim> its been looping for a while, lol
+[14:32:12] <neptunepink> Might be values wrapping or something.
+[14:32:21] <digitalseraphim> yeah, thats what i figured
+[14:32:33] <digitalseraphim> is there a way to clear out error messages from the black stack yet?
+
 
 
 
@@ -134,6 +145,7 @@ fix shading of faces of blocks that are in barrels; research if such a fix is po
 LESS SOON
 ---------
 ack for TODO/XXX/FIXME
+FZ has been packagized; now turn the packages into sub-modules.
 
 
 UNTRIAGED

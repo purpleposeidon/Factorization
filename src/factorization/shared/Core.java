@@ -43,6 +43,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.ChargeMetalBlockConductance;
 import factorization.charge.TileEntitySolarBoiler;
+import factorization.common.FactorizationProxy;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.common.Registry;
@@ -76,7 +77,7 @@ public class Core {
     public static FzConfig fzconfig;
     public static Registry registry;
     public static FactorizationOreProcessingHandler foph;
-    @SidedProxy(clientSide = "factorization.common.FactorizationClientProxy")
+    @SidedProxy(clientSide = "factorization.common.FactorizationClientProxy", serverSide = "factorization.common.FactorizationProxy")
     public static FactorizationProxy proxy;
     public static NetworkFactorization network;
     public static int factory_rendertype = -1;
@@ -99,7 +100,7 @@ public class Core {
         int maxForge = 953;
         if (ForgeVersion.buildVersion > maxForge) {
             //This needs to go away in 1.7.
-            if (System.getProperty("factorization.ignoreForgeVersion", "") == "") {
+            if (System.getProperty("factorization.ignoreForgeVersion", "").equalsIgnoreCase("true")) {
                 Core.logSevere("Loading despite scary-looking forge version > " + maxForge);
             } else {
                 String msg = "This forge is for pre-1.7 use only! The Forge version must be <= " + maxForge + ".\n" +

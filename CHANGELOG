@@ -1,3 +1,10 @@
+0.8.25
+  Fix the jump instruction
+  Maybe improve the barrel lighting?
+  Repackaged things; some hard-coded mod interactions may break.
+  Caliometric burner can now hold only 4 items of food in its mouth at a time
+  Fix processing chain for lead ore (Pb, not Ag)
+
 0.8.24
   Fixed dirty gravel ore slagging recipe being missed out on the probability reassignment.
   Heater won't go transparent

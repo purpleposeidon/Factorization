@@ -1,4 +1,4 @@
-package factorization.shared;
+package factorization.common;
 
 import java.util.Random;
 
@@ -18,15 +18,15 @@ import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
 import factorization.api.Coord;
-import factorization.common.ContainerFactorization;
-import factorization.common.FactoryType;
 import factorization.crafting.ContainerMixer;
 import factorization.oreprocessing.ContainerCrystallizer;
 import factorization.oreprocessing.ContainerGrinder;
 import factorization.oreprocessing.ContainerSlagFurnace;
+import factorization.shared.BlockRenderHelper;
+import factorization.shared.TileEntityFactorization;
 import factorization.weird.ContainerPocket;
 
-public abstract class FactorizationProxy implements IGuiHandler {
+public class FactorizationProxy implements IGuiHandler {
 
     public Profiler getProfiler() {
         return MinecraftServer.getServer().theProfiler;

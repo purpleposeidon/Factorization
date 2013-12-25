@@ -83,7 +83,6 @@ import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 import factorization.shared.EmptyRender;
 import factorization.shared.FactorizationBlockRender;
-import factorization.shared.FactorizationProxy;
 import factorization.shared.FactorizationRender;
 import factorization.shared.ItemRenderCapture;
 import factorization.shared.TileEntityFactorization;
