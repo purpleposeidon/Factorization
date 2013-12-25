@@ -33,6 +33,7 @@ public class ItemSculptingTool extends ItemFactorization {
         setMaxDamage(0);
         setMaxStackSize(4);
         setFull3D();
+        setHasSubtypes(true);
     }
     
     public static void addModeChangeRecipes() {

@@ -22,6 +22,7 @@ public class ItemAcidBottle extends ItemFactorization {
     public ItemAcidBottle(int id) {
         super(id, "acid", TabType.CHARGE);
         setMaxStackSize(16);
+        setHasSubtypes(true);
     }
     
     @Override
