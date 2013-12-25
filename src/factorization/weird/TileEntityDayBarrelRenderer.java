@@ -2,6 +2,7 @@ package factorization.weird;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
@@ -10,6 +11,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL20;
 
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
@@ -31,6 +34,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         if (is == null || barrel.getItemCount() == 0) {
             return;
         }
+        //NORELEASE: Check glEnables/glDisables/pushAttrib...
         GL11.glPushMatrix();
         GL11.glTranslated(x, y, z);
         
@@ -60,11 +64,19 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glDisable(GL11.GL_LIGHTING);
         renderItemCount(is, barrel);
+        GL11.glEnable(GL11.GL_LIGHTING);
+        //NORELEASE: diff w/ previous version!
+        GL11.glEnable(GL11.GL_NORMALIZE);
+        
+        //These two enableStandardLighting calls *may* make it look better, but I'm guessing they're slow.
+        //RenderHelper.enableStandardItemLighting();
+        
         handleRenderItem(is);
         GL11.glEnable(GL11.GL_LIGHTING);
         
         
         GL11.glPopMatrix();
+        //RenderHelper.enableStandardItemLighting(); //Necessary for reset; might also be able to use pusthAttr?
     }
     
     void renderItemCount(ItemStack item, TileEntityDayBarrel barrel) {
@@ -115,11 +127,21 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
     public void handleRenderItem(ItemStack is) {
         //Got problems? Consider looking at ForgeHooksClient.renderInventoryItem, that might be better than this here.
         GL11.glPushMatrix();
-        GL11.glRotatef(180, 0, 0, 1);
-        //GL11.glTranslatef(-0.5F, -0.5F, 0);
         float scale = 1F/32F;
         GL11.glScalef(scale, scale, scale);
-        GL11.glScalef(1, 1, -0.02F);
+        if (true) {
+            GL11.glScalef(-1, -1, -1);
+            GL11.glScalef(1, 1, 0.02F);
+        } /*else {
+            GL11.glScalef(-1, -1, -1);
+            GL11.glScalef(1, 1, 0.02F);
+        }*/
+        //RenderHelper.enableGUIStandardItemLighting();
+        //RenderHelper.enableStandardItemLighting();
+        //RenderHelper.disableStandardItemLighting();
+        //GL11.glLight(GL11.GL_LIGHT0, GL11.GL_POSITION, RenderHelper.setColorBuffer(RenderHelper.field_82884_b.xCoord, RenderHelper.field_82884_b.yCoord, RenderHelper.field_82884_b.zCoord, 0.0D));
+        //GL11.glLight(GL11.GL_LIGHT1, GL11.GL_POSITION, RenderHelper.setColorBuffer(RenderHelper.field_82885_c.xCoord, RenderHelper.field_82885_c.yCoord, RenderHelper.field_82885_c.zCoord, 0.0D));
+        
         {
             TextureManager re = Minecraft.getMinecraft().renderEngine;
             FontRenderer fr = getFontRenderer();
