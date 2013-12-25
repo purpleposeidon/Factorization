@@ -3,7 +3,7 @@
 import json
 
 info = json.load(open("mcmod.info"))
-versioning_file = "src/factorization/common/Core.java"
+versioning_file = "src/factorization/shared/Core.java"
 
 version = None
 for line in open(versioning_file):
