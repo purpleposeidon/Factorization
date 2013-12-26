@@ -78,8 +78,8 @@ public class FactorizationTextureLoader {
                     f.set(instance, reg.registerIcon(icon_file.replace('$', '/')));
                 }
             }
-        } catch (ReflectiveOperationException e) {
-            //Shouldn't happen
+        } catch (Exception e) {
+            // Sigh.
             throw new IllegalArgumentException(e);
         }
     }
