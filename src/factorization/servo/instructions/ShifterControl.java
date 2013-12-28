@@ -63,7 +63,7 @@ public class ShifterControl extends Instruction {
             if (mode == TRANSFER_LIMIT) {
                 shifter.transferLimit = (byte) val;
             } else {
-                shifter.foreignSlot = (byte) val;
+                shifter.foreignSlot = val;
             }
             shifter.sanitize(motor);
             return;
