@@ -1,7 +1,11 @@
 package factorization.servo;
 
+import java.util.Arrays;
+
 import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.Icon;
+import net.minecraftforge.common.ForgeDirection;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockRenderHelper;
@@ -31,6 +35,7 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
         block.setTexture(b, icon);
     }
     
+    boolean[] extend = new boolean[6];
     @Override
     public void render(RenderBlocks rb) {
         TileEntityServoRail rail = null;
@@ -46,61 +51,52 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
             }
         }
         
-        
-        Icon icon = BlockIcons.servo$rail;
-        block = BlockRenderHelper.instance;
-        block.useTexture(icon);
-        float f = TileEntityServoRail.width;
-        boolean any = false;
         if (rail != null) {
             rail.fillSideInfo(sides);
         } else {
-            any = true;
             for (int i = 0; i < 6; i++) {
                 sides[i] = true;
             }
         }
-        for (int i = 0; i < central.length; i++) {
-            central[i] = icon;
-        }
-        int count = 0;
-        if (sides[0] || sides[1]) {
-            //DOWN, UP
-            central[2] = central[3] = central[4] = central[5] = null;
-            count++;
-            float low = sides[0] ? 0 : f;
-            float high = sides[1] ? 1 : 1 - f;
-            block.setBlockBounds(f, low, f, 1 - f, high, 1 - f);
-            removeTextures(0, 1);
-            renderBlock(rb, block);
-            restoreTextures(0, 1);
-        }
-        if (sides[2] || sides[3]) {
-            //NORTH, SOUTH
-            central[0] = central[1] = central[4] = central[5] = null;
-            count++;
-            float low = sides[2] ? 0 : f;
-            float high = sides[3] ? 1 : 1 - f;
-            block.setBlockBounds(f, f, low, 1 - f, 1 - f, high);
-            removeTextures(2, 3);
-            renderBlock(rb, block);
-            restoreTextures(2, 3);
-        }
-        if (sides[4] || sides[5]) {
-            //WEST, EAST
-            central[0] = central[1] = central[2] = central[3] = null;
-            count++;
-            float low = sides[4] ? 0 : f;
-            float high = sides[5] ? 1 : 1 - f;
-            block.setBlockBounds(low, f, f, high, 1 - f, 1 - f);
-            removeTextures(4, 5);
-            renderBlock(rb, block);
-            restoreTextures(4, 5);
-        }
-        if (count == 0) {
-            block.useTextures(central);
-            block.setBlockBounds(f, f, f, 1 - f, 1 - f, 1 - f);
-            renderBlock(rb, block);
+        Icon icon = BlockIcons.servo$rail;
+        block = BlockRenderHelper.instance;
+        
+        final float fL = TileEntityServoRail.width;
+        final float fH = 1 - fL;
+        
+        block.useTexture(null);
+        
+        for (ForgeDirection fd : ForgeDirection.VALID_DIRECTIONS) {
+            int i = fd.ordinal();
+            block.setTexture(i, icon);
+            boolean any = false;
+            for (ForgeDirection other : ForgeDirection.VALID_DIRECTIONS) {
+                if (fd == other || fd == other.getOpposite()) {
+                    continue;
+                }
+                int ord = other.ordinal();
+                any |= (extend[ord] = sides[ord]);
+            }
+            block.setTexture(i, sides[i] && !any? null : icon);
+            
+            block.setBlockBounds(
+                    extend[4] ? 0 : fL,
+                    extend[0] ? 0 : fL,
+                    extend[2] ? 0 : fL,
+                    extend[5] ? 1 : fH,
+                    extend[1] ? 1 : fH,
+                    extend[3] ? 1 : fH);
+
+            //renderBlock(rb, block);
+            if (world_mode) {
+                block.begin();
+                block.renderRotated(Tessellator.instance, x, y, z);
+            } else {
+                block.renderForInventory(rb);
+            }
+            
+            Arrays.fill(extend, false);
+            block.setTexture(i, null);
         }
     }
 
