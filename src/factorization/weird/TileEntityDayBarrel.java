@@ -593,6 +593,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
                 spammed = true;
             }
         }
+        worldObj.markTileEntityChunkModified(xCoord, yCoord, zCoord, this);
     }
 
     @Override
