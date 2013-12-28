@@ -443,9 +443,10 @@ public class MiscClientCommands implements ICommand {
             return "Servo instruction size toggled; requires a chunk update to redraw.";
         }
         
-        @help("Makes it always day, clear weather, etc.")
+        @help("Sets doDaylightCycle, doMobSpawning, weather, time")
         public static void setupSterileTestWorld() {
             player.sendChatMessage("/gamerule doDaylightCycle false");
+            player.sendChatMessage("/gamerule doMobSpawning false");
             player.sendChatMessage("/weather clear 999999");
             player.sendChatMessage("/time set " + 20*60);
         }
