@@ -15,6 +15,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Joiner;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -93,6 +95,7 @@ public class MiscClientCommands implements ICommand {
     public static class miscCommands {
         static EntityClientPlayerMP player;
         static String arg0, arg1;
+        static List<String> args;
         
         @alias({"date", "time"})
         @help("Show the real-world time")
@@ -447,6 +450,22 @@ public class MiscClientCommands implements ICommand {
             player.sendChatMessage("/time set " + 20*60);
         }
         
+        @help("Pass an /f command to the server (for Factions)")
+        @alias("/f")
+        public static void factions() {
+            String cmd = "";
+            boolean first = true;
+            for (String c : args) {
+                if (first) {
+                    first = false;
+                    cmd = c;
+                } else {
+                    cmd += " " + c;
+                }
+            }
+            player.sendChatMessage(cmd);
+        }
+        
         //Remember to include 'public static' for anything added here.
     }
     
@@ -595,6 +614,7 @@ public class MiscClientCommands implements ICommand {
             if (args.size() >= 2) {
                 miscCommands.arg1 = args.get(1);
             }
+            miscCommands.args = args;
             
             Object ret = method.invoke(null);
             if (ret != null) {
