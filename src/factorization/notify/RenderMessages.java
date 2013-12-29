@@ -136,7 +136,11 @@ public class RenderMessages extends RenderMessagesProxy {
         GL11.glPushMatrix();
         
         int lineCount = lines.length;
+        float centeringOffset = 0;
         if (m.show_item) {
+            if (lineCount == 1) {
+                centeringOffset = 5F;
+            }
             lineCount = Math.max(2, lineCount);
         }
 
@@ -184,16 +188,18 @@ public class RenderMessages extends RenderMessagesProxy {
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         int i = 0;
         int color = 0xFFFFFFFF;
+        GL11.glTranslatef(0, centeringOffset, 0);
         for (String line : lines) {
             fr.drawString(line, -fr.getStringWidth(line) / 2, 10 * i, color);
             i++;
         }
+        GL11.glTranslatef(0, -centeringOffset, 0);
 
         if (m.show_item) {
             TextureManager re = mc.renderEngine;
             RenderBlocks rb = mc.renderGlobal.globalRenderBlocks;
             
-            GL11.glTranslatef((float) (halfWidth + 4), lineCount, 0);
+            GL11.glTranslatef((float) (halfWidth + 4), -lineCount/2, 0);
             renderItem.renderItemAndEffectIntoGUI(fr, re, m.item, 0, 0);
         }
 
