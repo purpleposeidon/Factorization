@@ -80,8 +80,8 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     public FzOrientation pendingClientOrientation = FzOrientation.UNKNOWN;
     public ForgeDirection nextDirection = ForgeDirection.UNKNOWN, lastDirection = ForgeDirection.UNKNOWN;
     private byte speed_b;
-    public byte target_speed = 2;
-    private static final double max_speed_b = 127;
+    public byte target_speed_index = 2;
+    private static final byte max_speed_b = 127;
     double accumulated_motion;
     private boolean stopped = false;
     
@@ -89,9 +89,13 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     double sprocket_rotation = 0, prev_sprocket_rotation = 0;
     double servo_reorient = 0, prev_servo_reorient = 0;
 
-    private static final double normal_speed = 0.0875;
-    private static final double[] targetSpeeds = {normal_speed / 3, normal_speed / 2, normal_speed, normal_speed*2, normal_speed*4};
-    private static final double speed_limit = targetSpeeds[targetSpeeds.length - 1];
+    private static final byte normal_speed_byte = (byte) (max_speed_b/4);
+    private static final byte[] target_speeds_b = {normal_speed_byte/3, normal_speed_byte/2, normal_speed_byte, normal_speed_byte*2, normal_speed_byte*4};
+    private static final double normal_speed_double = 0.0875;
+    private static final double max_speed_double = normal_speed_double*4;
+    
+    
+    
 
     public ServoMotor(World world) {
         super(world);
@@ -165,7 +169,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         nextDirection = data.as(Share.VISIBLE, "nextDir").putEnum(nextDirection);
         lastDirection = data.as(Share.VISIBLE, "lastDir").putEnum(lastDirection);
         speed_b = data.as(Share.VISIBLE, "speedb").putByte(speed_b);
-        target_speed = data.as(Share.VISIBLE, "speedt").putByte(target_speed);
+        target_speed_index = data.as(Share.VISIBLE, "speedt").putByte(target_speed_index);
         accumulated_motion = data.as(Share.VISIBLE, "accumulated_motion").putDouble(accumulated_motion);
         pos_next = data.as(Share.VISIBLE, "pos_next").put(pos_next);
         pos_prev = data.as(Share.VISIBLE, "pos_prev").put(pos_prev);
@@ -205,15 +209,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         isSocketActive = data.as(Share.VISIBLE, "sockon").putBoolean(isSocketActive);
         isSocketPulsed = data.as(Share.VISIBLE, "sockpl").putBoolean(isSocketPulsed);
         stopped = data.as(Share.VISIBLE, "stop").putBoolean(stopped);
-    }
-
-    public double getTargetSpeed() {
-        try {
-            return targetSpeeds[target_speed];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            target_speed = 1;
-            return targetSpeeds[target_speed];
-        }
     }
     
     boolean validPosition(Coord c, boolean desperate) {
@@ -284,43 +279,23 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     void updateSpeed() {
-        final double speed = getProperSpeed();
-        final double maxSpeed = getTargetSpeed();
-        boolean should_accelerate = speed < maxSpeed && orientation != FzOrientation.UNKNOWN;
-        if (speed > maxSpeed) {
-            speed_b = (byte) Math.max(maxSpeed, (speed_b/2) - 1);
+        byte target_speed_b = target_speeds_b[target_speed_index];
+        
+        boolean should_accelerate = speed_b < target_speed_b && orientation != FzOrientation.UNKNOWN;
+        if (speed_b > target_speed_b) {
+            speed_b = (byte)Math.max(target_speed_b, speed_b*3/4 - 1);
             return;
         }
         if (Core.cheat_servo_energy) {
             if (should_accelerate) {
                 accelerate();
             }
-        } else {
-            long now = worldObj.getTotalWorldTime();
-            IChargeConductor conductor = getCurrentPos().getTE(IChargeConductor.class);
-            boolean failure = true;
-            if (conductor != null) {
-                int to_drain = 0;
-                if (should_accelerate) {
-                    if (now % 3 == 0) {
-                        to_drain = 2;
-                    } else {
-                        should_accelerate = false;
-                    }
-                } else if (now % 60 == 0) {
-                    to_drain = 1;
-                }
-                if (to_drain > 0 && should_accelerate && conductor.getCharge().tryTake(to_drain) >= to_drain) {
-                    accelerate();
-                    failure = false;
-                } else if (to_drain == 0) {
-                    failure = false;
-                }
-            } else {
-                despawn(false);
-            }
-            if (failure) {
-                speed_b = (byte) Math.max(speed_b - 1, 0);
+        }
+        long now = worldObj.getTotalWorldTime();
+        int m = 1 + target_speed_index;
+        if (should_accelerate && now % 3 == 0) {
+            if (extractCharge(8)) {
+                accelerate();
             }
         }
     }
@@ -553,6 +528,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     void onEnterNewBlock() {
+        final int m = target_speed_index + 1;
+        if (!extractCharge(m*2)) {
+            speed_b = (byte) Math.max(0, speed_b*3/4 - 1);
+        }
         TileEntityServoRail rail = getCurrentPos().getTE(TileEntityServoRail.class);
         if (rail == null /* :| */ || rail.decoration == null) {
             if (jmp == JMP_NEXT_TILE) {
@@ -735,8 +714,8 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     public double getProperSpeed() {
-        double perc = speed_b/(max_speed_b);
-        return speed_limit*perc;
+        double perc = speed_b/(double)(max_speed_b);
+        return max_speed_double*perc;
     }
     
     public void dropItemStacks(Iterable<ItemStack> toDrop) {
