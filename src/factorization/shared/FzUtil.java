@@ -360,7 +360,8 @@ public class FzUtil {
                 return under.getInventoryStackLimit();
             }
             int dest_free = dest.getMaxStackSize() - dest.stackSize;
-            return Math.min(dest_free, under.getInventoryStackLimit());
+            int ret = Math.min(dest_free, under.getInventoryStackLimit() - dest_free);
+            return Math.max(0, ret);
         }
         
         public int getFreeSpaceFor(ItemStack target, int maxNeeded) {
