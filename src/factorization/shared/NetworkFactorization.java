@@ -587,7 +587,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 //
                 ExtensionInfo = 150, RocketState = 151,
                 //
-                ServoRailDecor = 161, ServoRailDecorUpdate = 162,
+                ServoRailDecor = 161, ServoRailDecorUpdate = 162, ServoRailEditComment = 163,
                 //
                 CompressionCrafter = 163, CompressionCrafterBeginCrafting = 164, CompressionCrafterBounds = 165,
                 //

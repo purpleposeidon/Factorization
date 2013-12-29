@@ -60,15 +60,16 @@ import factorization.oreprocessing.ItemOreProcessing.OreType;
 import factorization.oreprocessing.TileEntityCrystallizer;
 import factorization.oreprocessing.TileEntityGrinder;
 import factorization.oreprocessing.TileEntitySlagFurnace;
+import factorization.servo.ItemCommenter;
 import factorization.servo.ItemMatrixProgrammer;
 import factorization.servo.ItemServoMotor;
 import factorization.servo.ItemServoRailWidget;
 import factorization.servo.ServoComponent;
 import factorization.shared.BlockClass;
 import factorization.shared.BlockFactorization;
+import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
-import factorization.shared.BlockRenderHelper;
 import factorization.shared.FzUtil;
 import factorization.shared.ItemBlockProxy;
 import factorization.shared.ItemCraftingComponent;
@@ -144,6 +145,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
     public ItemDayBarrel daybarrel;
     public ItemSocketPart socket_part;
     public ItemCraftingComponent instruction_plate;
+    public ItemCommenter servo_rail_comment_editor;
 
     public Material materialMachine = new Material(MapColor.ironColor);
     
@@ -362,6 +364,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
         socket_part = new ItemSocketPart(itemID("socketPart", 9064), "socket/", TabType.SERVOS);
         instruction_plate = new ItemCraftingComponent(itemID("instructionPlate", 9065), "servo/instruction_plate", TabType.SERVOS);
         instruction_plate.setSpriteNumber(0);
+        servo_rail_comment_editor = new ItemCommenter(itemID("servoCommenter", 9066), "servo/commenter");
         
         socket_lacerator = FactoryType.SOCKET_LACERATOR.asSocketItem();
         socket_robot_hand = FactoryType.SOCKET_ROBOTHAND.asSocketItem();
@@ -1108,6 +1111,11 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "I ",
                 'I', dark_iron,
                 '>', logicMatrixProgrammer);
+        oreRecipe(new ItemStack(servo_rail_comment_editor),
+                "#",
+                "T",
+                '#', instruction_plate,
+                'T', Item.sign);
     }
     
     private void makeServoRecipes() {

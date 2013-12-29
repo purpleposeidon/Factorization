@@ -16,6 +16,7 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.server.management.PlayerInstance;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.Icon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
@@ -43,6 +44,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     Charge charge = new Charge(this);
     Decorator decoration = null;
     public byte priority = 0;
+    String comment = "";
     
     @Override
     public FactoryType getFactoryType() {
@@ -81,6 +83,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             decoration.save(decor);
             tag.setTag(decor_tag_key, decor);
         }
+        tag.setString("rem", comment);
     }
     
     @Override
@@ -88,6 +91,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         super.readFromNBT(tag);
         charge.readFromNBT(tag);
         priority = tag.getByte("priority");
+        comment = tag.getString("rem");
         if (!tag.hasKey(decor_tag_key)) {
             return;
         }
@@ -233,33 +237,43 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     
     @Override
     public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
-        if (decoration == null) {
+        final Coord here = getCoord();
+        if (worldObj.isRemote) {
             return false;
         }
-        final Coord here = getCoord();
-        boolean ret = decoration.onClick(entityplayer, here, side);
-        if (!worldObj.isRemote) {
-            WorldServer world = (WorldServer) worldObj;
-            PlayerInstance playerInstance = world.getPlayerManager().getOrCreateChunkWatcher(xCoord >> 4, zCoord >> 4, false);
-            if (playerInstance != null) {
-                playerInstance.sendToAllPlayersWatchingChunk(_getDescriptionPacket(true));
-            }
-            String info = decoration.getInfo();
+        boolean ret = false;
+        if (decoration != null) {
+            ret = decoration.onClick(entityplayer, here, side);
+        }
+        WorldServer world = (WorldServer) worldObj;
+        PlayerInstance playerInstance = world.getPlayerManager().getOrCreateChunkWatcher(xCoord >> 4, zCoord >> 4, false);
+        if (playerInstance != null) {
+            playerInstance.sendToAllPlayersWatchingChunk(_getDescriptionPacket(true));
+        }
+        String info = "";
+        if (decoration != null) {
+            info = decoration.getInfo();
+            info = info == null ? "" : info;
             if (here.isWeaklyPowered()) {
                 Notify.withItem(new ItemStack(Block.torchRedstoneActive));
                 Notify.withStyle(Style.DRAWITEM);
-                if (info == null) {
-                    info = "";
-                }
             }
-            if (info != null) {
-                Notify.send(entityplayer, here, info);
+        }
+        
+        if (comment.length() > 0) {
+            if (info.length() > 0) {
+                info += "\n";
             }
+            info += EnumChatFormatting.ITALIC + comment;
+        }
+        if (info.length() > 0) {
+            Notify.send(entityplayer, here, info);
         }
         return ret;
     }
     
     @Override
+    @SideOnly(Side.CLIENT)
     public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
@@ -276,7 +290,21 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             decoration = (Decorator) sc;
             return true;
         }
+        if (messageType == MessageType.ServoRailEditComment) {
+            comment = input.readUTF();
+            FMLCommonHandler.instance().showGuiScreen(new GuiCommentEditor(this));
+            return true;
+        }
         return false;
+    }
+    
+    @Override
+    public boolean handleMessageFromClient(int messageType, DataInputStream input) throws IOException {
+        if (messageType == MessageType.ServoRailEditComment) {
+            comment = input.readUTF();
+            return true;
+        }
+        return super.handleMessageFromClient(messageType, input);
     }
     
     @Override

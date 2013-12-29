@@ -110,26 +110,52 @@ Lower barriers to entry for servos:
 
 IMMEDIATE (for next public release)
 ---------
-/f entityrendertoggle; forgetTEs; forgetEnts
+compat w/ whatever forge version Railcraft uses
+light shining through our blocks; barrels
 servos:
+  2 consecutive turns doesn't show the 2nd turn nicely -- No, that's not the behavior.
   refactor tool
     click once, then click a direction to move instructions... or something. Hmm.
     Maybe click to make a path? Too complicated.
     If you've got like forking and branches or stuff, you'll have to start at the end and work back.
   comment tool
     Opens a gui to type text in
-[14:31:34] <digitalseraphim> also noticed i'm getting the error "foreign slot < -1" when the value is actually in the 600 range (i know its most likely always going to be invalid, but its not < -1)
-[14:32:07] <digitalseraphim> its been looping for a while, lol
-[14:32:12] <neptunepink> Might be values wrapping or something.
-[14:32:21] <digitalseraphim> yeah, thats what i figured
-[14:32:33] <digitalseraphim> is there a way to clear out error messages from the black stack yet?
-
+  <digitalseraphim> also noticed i'm getting the error "foreign slot < -1" when the value is actually in the 600 range (i know its most likely always going to be invalid, but its not < -1)
+  <digitalseraphim> its been looping for a while, lol
+  <neptunepink> Might be values wrapping or something.
+  <digitalseraphim> yeah, thats what i figured
+  <digitalseraphim> is there a way to clear out error messages from the black stack yet?
+Picking up barrels
 
 
 
 SOON
 ----
-start a dev blog
+pocket crafting table, clicking 1-item-at-a-time for the craft output, seems laggy. Are we over-syncing?
+
+LESS SOON
+---------
+
+AFTER 1.7 PORT
+--------------
+open sourcing the mod; get stuff ready for that. What needs to happen? Probably after porting to 1.7
+  FZ has been packagized; now turn the packages into sub-modules.
+  ack for TODO/XXX/FIXME
+  start a dev blog; maybe at this time?
+Thaumcraft Compat:
+  thaumcraft wood barrels?
+  SoundLogic thaumcraft aspects
+  Remember to wrap mod compat module calls in try/catch!
+Do we remove aluminum ore processing? It feels unnecessary to me.
+Exchange Bag of Holding for just... free inventory space.
+ceramics easy-mode: glazing auto-high fires
+
+UNTRIAGED
+---------
+can we move the position the servo renders at back? So that it can look like it's turning at a better place...
+show what instruction is being hilighted in big?
+tool for renaming commands
+/f entityrendertoggle; forgetTEs; forgetEnts
 forge public/AT bullshit
 do maths on energy conversion:
   food to steam; we might even be able to do the heater thing? I suppose we COULD just blacklist boilers for furnace heaters...
@@ -142,28 +168,7 @@ Test BoH key with NEI installed & with sneak key set to a mouse button.
 Church Organ
 fix shading of faces of blocks that are in barrels; research if such a fix is possible
 
-LESS SOON
----------
-ack for TODO/XXX/FIXME
-FZ has been packagized; now turn the packages into sub-modules.
-
-
-UNTRIAGED
----------
-have the compression crafter keep rendering until blocks get cleared... prolly a packet?
-light shining through our blocks; barrels
-thaumcraft wood barrels?
-open sourcing the mod
-can we move the position the servo renders at back? So that it can look like it's turning at a better place...
-Do we remove aluminum ore processing? It feels unnecessary to me.
-show what instruction is being hilighted in big?
-SoundLogic thaumcraft aspects
-pocket crafting table, clicking 1-item-at-a-time for the craft output, seems laggy. Are we over-syncing?
-[profiling problems:] -- These two should be alright now
-  [constructing a player causes a recipe match; maybe just keep 1 FakePlayer and use it everywhere?]
-  [findMatchingRecipes also slow; our cache system isn't doing its thing? Or it's being called when it shouldn't be.]
-tool for renaming commands
-servos: 2 consecutive turns doesn't show the 2nd turn nicely -- No, that's not the behavior.
+ Let you lift up barrels, adds a ton of debuffs, maybe do some silly weird effects to inventory, could spill a bit when you drop them...
 
 
 LESS TOP LIST
