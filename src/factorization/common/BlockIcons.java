@@ -86,9 +86,6 @@ public class BlockIcons {
     public static Icon router$top, router$bottom;
     
     @Directory("storage")
-    public static SimpleMachine barrel, ed_barrel;
-    
-    @Directory("storage")
     public static BarrelTextureset normal, silky, hopping, larger, sticky;
     
     public static class BarrelTextureset extends IconGroup {

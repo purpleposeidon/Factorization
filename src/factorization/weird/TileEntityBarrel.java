@@ -55,10 +55,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     
     @Override
     public Icon getIcon(ForgeDirection dir) {
-        if (upgrade > 0) {
-            return BlockIcons.ed_barrel.get(this, dir);
-        }
-        return BlockIcons.barrel.get(this, dir);
+        return BlockIcons.error;
     }
     
     //These are some core barrel item-count manipulating functions.
