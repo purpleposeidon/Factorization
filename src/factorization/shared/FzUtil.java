@@ -359,8 +359,7 @@ public class FzUtil {
             if (dest == null) {
                 return under.getInventoryStackLimit();
             }
-            int dest_free = dest.getMaxStackSize() - dest.stackSize;
-            int ret = Math.min(dest_free, under.getInventoryStackLimit() - dest_free);
+            int ret = Math.min(under.getInventoryStackLimit(), dest.getMaxStackSize()) - dest.stackSize;
             return Math.max(0, ret);
         }
         
@@ -1536,5 +1535,18 @@ public class FzUtil {
      */
     public static float interp(float oldValue, float newValue, float partial) {
         return oldValue*(1 - partial) + newValue*partial;
+    }
+    
+    public static int getAxis(ForgeDirection fd) {
+        if (fd.offsetX != 0) {
+            return 1;
+        }
+        if (fd.offsetY != 0) {
+            return 2;
+        }
+        if (fd.offsetZ != 0) {
+            return 3;
+        }
+        return 0;
     }
 }
