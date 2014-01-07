@@ -398,11 +398,9 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
             return;
         }
         if (netherBrick.matches(baseBlock) || netherFence.matches(baseBlock) || netherStair.matches(baseBlock) || netherSlab.matches(baseBlock) || netherSlabUp.matches(baseBlock) || netherDoubleSlab.matches(baseBlock) ) {
-            Sound.wrathForge.playAt(player);
             //This doesn't need to be logged.
         }
         else {
-            Sound.wrathLight.playAt(fireBlock);
             if (!fireBlock.w.isRemote) {
                 Core.logInfo("Wrath Igniter used at " + fireBlock + " by '" + player.username + "'");
             }

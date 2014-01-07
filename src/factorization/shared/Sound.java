@@ -24,12 +24,11 @@ public enum Sound {
     bagSlurp("random.drink", 0.6, 8.0, false),
     demonSqueek("mob.enderman.scream", 0.9, 8, true),
     wandCool("random.fizz", .2, 0.5, true),
-    //shardMake("random.old_explode", 0.7, 1, true),
-    shardMake("random.explode", 0.7, 1, true),
-    wrathLight("mob.zombie.metal", 1, 3),
-    wrathForge("ambient.cave.cave", 1, 1),
     acidBurn("random.fizz", 1, 1, true),
-    caliometricDigest("random.burp", 1, 0.5, true)
+    caliometricDigest("random.burp", 1, 0.5, true),
+    barrelPunt("mob.zombie.infect", 0.9, 1.5, true),
+    barrelPunt2("mob.zombie.infect", 0.9, 3.5, true)
+    
     ;
     String src;
     float volume, pitch;

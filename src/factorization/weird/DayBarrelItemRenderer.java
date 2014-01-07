@@ -38,7 +38,9 @@ public class DayBarrelItemRenderer implements IItemRenderer {
         }
         if (type == ItemRenderType.EQUIPPED || type == ItemRenderType.EQUIPPED_FIRST_PERSON) {
             GL11.glTranslatef(0.5F, 0.5F, 0.5F);
+            GL11.glRotatef(-90, 0, 1, 0);
         }
+        GL11.glRotatef(90, 0, 1, 0);
         render_barrel.renderInInventory();
         render_barrel.is = is;
         render_barrel.renderType = type;
@@ -49,6 +51,7 @@ public class DayBarrelItemRenderer implements IItemRenderer {
             if (tesr == null) {
                 tesr = TileEntityRenderer.instance.getSpecialRendererForClass(TileEntityDayBarrel.class);
             }
+            GL11.glRotatef(180, 0, 1, 0);
             TileEntityCommon tec = FactoryType.DAYBARREL.getRepresentative();
             GL11.glRotatef(90, 0, 0, -1);
             GL11.glRotatef(90, 0, 1, 0);

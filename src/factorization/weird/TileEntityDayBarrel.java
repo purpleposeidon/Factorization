@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRailBase;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -17,6 +18,9 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.FakePlayer;
 import net.minecraftforge.common.ForgeDirection;
@@ -39,6 +43,7 @@ import factorization.shared.FzUtil;
 import factorization.shared.FzUtil.FzInv;
 import factorization.shared.NetworkFactorization;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.Sound;
 import factorization.shared.TileEntityFactorization;
 
 public class TileEntityDayBarrel extends TileEntityFactorization {
@@ -755,11 +760,181 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         }
         last_hit_side = event.face;
     }
+    
+    int getPuntStrength(EntityPlayer player) {
+        //strength * knocback
+        int strength = 0;
+        PotionEffect p_str = player.getActivePotionEffect(Potion.damageBoost);
+        PotionEffect p_wea = player.getActivePotionEffect(Potion.weakness);
+        if (p_str != null) {
+            strength += p_str.getAmplifier() + 1;
+        }
+        if (p_wea != null) {
+            strength -= p_wea.getAmplifier() + 1;
+        }
+        int knockback = EnchantmentHelper.getKnockbackModifier(player, null);
+        return strength*knockback;
+    }
+    
+    static boolean isStairish(Coord c) {
+        Block b = c.getBlock();
+        if (b == null) {
+            return false;
+        }
+        if (b instanceof BlockRailBase) {
+            return true;
+        }
+        AxisAlignedBB ab = c.getCollisionBoundingBoxFromPool();
+        ArrayList<AxisAlignedBB> list = new ArrayList();
+        b.addCollisionBoxesToList(c.w, c.x, c.y, c.z, ab, list, null);
+        for (AxisAlignedBB bb : list) {
+            if (bb.maxY - c.y <= 0.51) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    boolean punt(EntityPlayer player) {
+        int distance = getPuntStrength(player);
+        if (distance <= 0) {
+            return false;
+        }
+        ForgeDirection dir = ForgeDirection.getOrientation(last_hit_side).getOpposite();
+        if (dir == ForgeDirection.UNKNOWN) {
+            return false;
+        }
+        Coord src = getCoord();
+        Coord next = src;
+        FzOrientation newOrientation = orientation;
+        boolean doRotation = dir.offsetY == 0;
+        ForgeDirection rotationAxis = ForgeDirection.UNKNOWN;
+        if (doRotation) {
+            rotationAxis = dir.getRotation(ForgeDirection.UP);
+        }
+        if (player.isSneaking() && distance > 1) {
+            distance = 1;
+        }
+        int spillage = distance;
+        int doubleRolls = 0;
+        for (int i = 0; i < distance; i++) {
+            if (i > 6) {
+                break;
+            }
+            boolean must_rise_or_fail = false;
+            Coord peek = next.add(dir);
+            if (!peek.blockExists()) {
+                break;
+            }
+            Coord below = peek.add(ForgeDirection.DOWN);
+            int rotateCount = 1;
+            if (!peek.isReplacable()) {
+                if (!isStairish(peek)) {
+                    break;
+                }
+                Coord above = peek.add(ForgeDirection.UP);
+                if (!above.isAir() /* Not going to replace snow in this case */) {
+                    break;
+                }
+                next = above;
+                spillage += 3;
+                rotateCount++;
+                doubleRolls++;
+            } else if (below.isReplacable() && i != distance - 1) {
+                next = below;
+                spillage++;
+            } else {
+                next = peek;
+            }
+            if (!doRotation) {
+                rotateCount = 0;
+            }
+            //When we roll a barrel, the side we punch should face up
+            for (int r = rotateCount; r > 0; r--) {
+                ForgeDirection nTop = newOrientation.top.getRotation(rotationAxis);
+                ForgeDirection nFace = newOrientation.facing.getRotation(rotationAxis);
+                newOrientation = FzOrientation.fromDirection(nFace).pointTopTo(nTop);
+            }
+        }
+        if (src.equals(next)) {
+            return false;
+        }
+        if (!doRotation && orientation.top == ForgeDirection.UP && dir == ForgeDirection.UP) {
+            spillage = 0;
+        }
+        if (doubleRolls % 2 == 1) {
+            Sound.barrelPunt2.playAt(src);
+        } else {
+            Sound.barrelPunt.playAt(src);
+        }
+        src.removeTE();
+        src.setId(0);
+        if (newOrientation != FzOrientation.UNKNOWN) {
+            this.orientation = newOrientation;
+        }
+        this.validate();
+        next.setId(Core.registry.factory_block);
+        next.setTE(this);
+        last_hit_side = -1;
+        Coord spillAt = getCoord();
+        player.addExhaustion(0.5F);
+        ItemStack is = player.getHeldItem();
+        if (is != null && is.isItemStackDamageable()) {
+            is.damageItem(distance, player);
+            if (is.stackSize <= 0) {
+                player.destroyCurrentEquippedItem();
+            }
+        }
+        spillItems(spillage);
+        return true;
+    }
+    
+    void spillItems(int spillage) {
+        if (type == Type.STICKY) {
+            return;
+        }
+        if (rand.nextInt(4) > 0) {
+            return;
+        }
+        if (type == Type.HOPPING) {
+            spillage *= 1.5;
+        }
+        //TODO: If player has silk touch, and it's silky, then no spilling
+        int itemCount = getItemCount();
+        spillage += spillage*5*itemCount/getMaxSize();
+        if (item == null || spillage <= 0) {
+            return;
+        }
+        int maxStackSize = item.getMaxStackSize();
+        spillage = Math.min(spillage, maxStackSize*8);
+        spillage = rand.nextInt(spillage + 1);
+        spillage = Math.min(itemCount, spillage);
+        if (spillage <= 0 || maxStackSize <= 0) {
+            return;
+        }
+        FzInv me = FzUtil.openInventory(this, orientation.top.getOpposite());
+        Coord at = getCoord();
+        double motion = 0.125;
+        while (spillage > 0) {
+            ItemStack is = me.pullWithLimit(spillage);
+            if (is == null) {
+                break;
+            }
+            EntityItem ei = at.spawnItem(is);
+            /*ei.motionX = orientation.top.offsetX * motion;
+            ei.motionY = orientation.top.offsetY * motion;
+            ei.motionZ = orientation.top.offsetZ * motion;*/
+            spillage -= maxStackSize;
+        }
+    }
 
     @Override
     public void click(EntityPlayer entityplayer) {
-        // left click: remove a stack
+        // left click: remove a stack, or punt if properly equipped
         if (entityplayer.worldObj.isRemote) {
+            return;
+        }
+        if (punt(entityplayer)) {
             return;
         }
         if (getItemCount() == 0 || item == null) {

@@ -98,7 +98,7 @@ public class Core {
 
     void checkForge() {
         int maxForge = 953;
-        if (ForgeVersion.buildVersion > maxForge) {
+        if (ForgeVersion.getBuildVersion() > maxForge && ForgeVersion.getBuildVersion() != 965) {
             //This needs to go away in 1.7.
             if (System.getProperty("factorization.ignoreForgeVersion", "").equalsIgnoreCase("true")) {
                 Core.logSevere("Loading despite scary-looking forge version > " + maxForge);
