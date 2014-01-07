@@ -320,7 +320,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         if (!worldObj.isRemote) {
             updateSpeed();
         }
-        final double speed = getProperSpeed() ;
+        final double speed = getProperSpeed();
         if (speed <= 0 || orientation == FzOrientation.UNKNOWN) {
             updateSocket();
             return;
@@ -528,6 +528,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     void onEnterNewBlock() {
+        if (worldObj.isRemote) {
+            return;
+        }
         final int m = target_speed_index + 1;
         if (!extractCharge(m*2)) {
             speed_b = (byte) Math.max(0, speed_b*3/4 - 1);
@@ -585,6 +588,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
         Entity src = damageSource.getSourceOfDamage();
         if (!(src instanceof EntityPlayer)) {
+            return false;
+        }
+        if (isDead) {
             return false;
         }
         EntityPlayer player = (EntityPlayer) src;
