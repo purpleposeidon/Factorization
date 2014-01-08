@@ -55,6 +55,7 @@ public class FzConfig {
     public static boolean equal_opportunities_for_mobs = true;
     public static boolean fix_nether_fog = true;
     public static boolean fix_middle_click = true;
+    public static boolean embarken_wood = true;
     public static boolean invasiveCharge = false;
     public static boolean enable_solar_steam = true;
     public static boolean large_servo_instructions = false;
@@ -195,6 +196,7 @@ public class FzConfig {
         stretchy_clay = getBoolConfig("stretchyClay", "server", stretchy_clay, "If true, maximum clay lump volume is 1 m³ instead of (1 m³)/4");
         tps_reporting_interval = getIntConfig("tpsReportInterval", "server", tps_reporting_interval, "How many ticks the server will wait before sending out TPS reports. 20 ticks = 1 second, unless it's lagging.");
         equal_opportunities_for_mobs = getBoolConfig("equalOpportunitiesForMobs", "server", equal_opportunities_for_mobs, "Causes some mobs to rarely spawn wearing your armor");
+        embarken_wood = getBoolConfig("barkRecipes", "server", embarken_wood, "Adds recipes for bark variants of logs");
         //invasiveCharge = getBoolConfig("invasiveCharge", "server", invasiveCharge, "Set to true to prevent charge from connecting over metal blocks.");
         //Broken. Doesn't work.
         enable_solar_steam = getBoolConfig("enableSolarSteam", "server", enable_solar_steam, "Set to false to disable the crafting recipe for solar2steam machines");

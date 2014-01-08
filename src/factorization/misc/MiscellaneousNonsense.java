@@ -29,7 +29,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DungeonHooks;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.oredict.OreDictionary;
 import cpw.mods.fml.common.ICraftingHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Mod;
@@ -59,6 +58,7 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
     public static MiscProxy proxy;
     public static MiscellaneousNonsense instance;
     public static int newMaxChatLength = 250;
+    public static Embarkener embarkener = null;
     
     public MiscellaneousNonsense() {
         MiscellaneousNonsense.instance = this;
@@ -106,7 +106,9 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         if (FzConfig.equal_opportunities_for_mobs) {
             MinecraftForge.EVENT_BUS.register(new MobEqualizer());
         }
-        OreDictionary.registerOre("greggy_greg_do_please_kindly_stuff_a_sock_in_it", new ItemStack(Item.diamond, 64));
+        if (FzConfig.embarken_wood) {
+            embarkener = new Embarkener();
+        }
     }
     
     public Packet makeTpsReportPacket(float tps) {
