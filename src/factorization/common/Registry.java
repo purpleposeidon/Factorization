@@ -322,6 +322,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
         sulfuric_acid = new ItemStack(acid, 1);
         aqua_regia = new ItemStack(acid, 1, 1);
         OreDictionary.registerOre("sulfuricAcid", sulfuric_acid);
+        OreDictionary.registerOre("bottleSulfuricAcid", sulfuric_acid);
         OreDictionary.registerOre("aquaRegia", aqua_regia);
         magnet = new ItemCraftingComponent(itemID("magnet", 9025), "magnet");
         insulated_coil = new ItemCraftingComponent(itemID("coil", 9026), "insulated_coil");
