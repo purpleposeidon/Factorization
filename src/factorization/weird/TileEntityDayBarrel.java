@@ -320,7 +320,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             return;
         }
         if (middleCount > getMaxSize() && !spammed && worldObj != null) {
-            Core.logSevere("Factorization barrel size, " + middleCount + ", is larger than the maximum, " + getMaxSize() + ". Contents: " + item + " " + (item != null ? item.getItem() : "<null>") + " At: " + getCoord());
+            Core.logSevere("Factorization barrel size, " + middleCount + ", is larger than the maximum, " + getMaxSize() + ". Contents: " + item + " " + (item != null ? item.getItem() : "<null>") + " At: " + getCoord() + " BarrelType = " + type);
             Core.logSevere("Did the max stack size go down, or is someone doing something bad?");
             Thread.dumpStack();
             spammed = true;
