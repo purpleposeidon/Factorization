@@ -180,12 +180,11 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             return;
         }
         FzOrientation orientation = FzOrientation.fromDirection(facing).getSwapped();
-        if (!rayTrace(socket, coord, orientation, powered, false, true)) {
-            if (!powered) {
-                slowDown();
-            } else {
-                cantDoWork(socket);
-            }
+        if (powered) {
+            slowDown();
+            progress = 0;
+        } else if (!rayTrace(socket, coord, orientation, powered, false, true)) {
+            slowDown();
             progress = 0;
         }
         if (grab_items) {
