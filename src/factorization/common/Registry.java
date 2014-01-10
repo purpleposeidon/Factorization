@@ -1301,7 +1301,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
         ArrayList<ItemStack> theLogs = new ArrayList();
         for (ItemStack log : OreDictionary.getOres("logWood")) {
             if (log.itemID == Block.wood.blockID) {
-                //Skip vanilla
+                //Skip vanilla; NORELEASE: 1.7, check the new woods
                 continue;
             }
             if (log.getItemDamage() == FzUtil.WILDCARD_DAMAGE && log.itemID < Block.blocksList.length) {
@@ -1334,11 +1334,16 @@ public class Registry implements ICraftingHandler, ITickHandler {
             ItemStack slab;
             String odType;
             if (slabs.size() != 1 || !FzUtil.craft_succeeded) {
-                slab = plank;
+                slab = plank; // can't convert to slabs; strange wood
                 odType = "plankWood";
             } else {
                 slab = slabs.get(0);
                 odType = "slabWood";
+            }
+            // Some modwoods have planks, but no slabs, and their planks convert to vanilla slabs.
+            // In this case we're going to want to use the plank.
+            if (slab.itemID == Block.woodSingleSlab.blockID) {
+                slab = plank;
             }
             TileEntityDayBarrel.makeRecipe(log, slab);
         }
