@@ -529,22 +529,22 @@ public class FZDSCommand extends CommandBase {
             void call(String[] args) {
                 //selected.get
             }}, Requires.SLICE_SELECTED);
-        add(new SubCommand("drop") {
+        add(new SubCommand("drop", "[overwrite?]") {
             @Override
             String details() { return "Returns a Slice's blocks to the world, destroying the Slice"; }
             @Override
             void call(String[] args) {
-                DeltaChunk.paste(selected, true);
+                DeltaChunk.paste(selected, args.length > 1);
                 DeltaChunk.clear(selected);
                 selected.setDead();
                 setSelection(null);
             }}, Requires.SLICE_SELECTED);
-        add(new SubCommand("paste") {
+        add(new SubCommand("paste", "[overwrite?]") {
             @Override
             String details() { return "Clones a Slice's blocks into the world"; }
             @Override
             void call(String[] args) {
-                DeltaChunk.paste(selected, true);
+                DeltaChunk.paste(selected, args.length > 1);
             }}, Requires.SLICE_SELECTED, Requires.CREATIVE);
         add(new SubCommand("oracle") {
             @Override
