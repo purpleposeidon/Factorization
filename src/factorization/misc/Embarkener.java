@@ -44,10 +44,7 @@ public class Embarkener implements ITickHandler {
                     count++;
                     ItemStack log = new ItemStack(block, 1, md);
                     ItemStack barked = new ItemStack(block, 4, md | 0xC);
-                    Core.registry.recipe(barked, 
-                            "##",
-                            "##",
-                            '#', log);
+                    Core.registry.shapelessRecipe(barked, log, log, log, log);
                 }
             }
         }
