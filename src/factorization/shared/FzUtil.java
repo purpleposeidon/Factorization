@@ -75,6 +75,9 @@ public class FzUtil {
         return new ItemStack(item, 1, WILDCARD_DAMAGE);
     }
     
+    /**
+     * return if the two itemstacks are identical, excepting stacksize
+     */
     public static boolean identical(ItemStack a, ItemStack b) {
         if (a == null && b == null) {
             return true;
