@@ -1342,8 +1342,11 @@ public class Registry implements ICraftingHandler, ITickHandler {
             }
             // Some modwoods have planks, but no slabs, and their planks convert to vanilla slabs.
             // In this case we're going to want to use the plank.
+            // But if the plank is also vanilla, then keep the vanilla slab!
             if (slab.itemID == Block.woodSingleSlab.blockID) {
-                slab = plank;
+                if (plank.itemID != Block.planks.blockID /* NORELEASE: 1.7, new planks */) {
+                    slab = plank;
+                }
             }
             TileEntityDayBarrel.makeRecipe(log, slab);
         }
