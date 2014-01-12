@@ -183,8 +183,8 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     boolean itemPassesFilter(ItemStack stranger) {
         boolean empty = true;
         boolean p = isPowered();
-        for (int i = 0; i < filters.length/2; i++) {
-            ItemStack a = filters[i*2], b = filters[i*2 + 1];
+        for (int i = 0; i < filters.length; i += 2) {
+            ItemStack a = filters[i], b = filters[i + 1];
             if (a == null && b == null) {
                 continue;
             }
@@ -430,10 +430,9 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
                 return 11;
             }
             boolean empty = true;
-            for (int i = 0; i < filters.length; i++) {
-                if (filters[i] != null) {
+            for (int fidx = 0; fidx < filters.length; fidx++) {
+                if (filters[fidx] != null) {
                     empty = false;
-                    break;
                 }
             }
             if (empty) {
@@ -443,6 +442,37 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             if (inv == null) {
                 return getCoord().add(getFacing()).getComparatorOverride(getFacing().getOpposite());
             }
+            int custom_val = 0;
+            {
+                for (int fidx = 0; fidx < filters.length; fidx += 2) {
+                    final ItemStack low = filters[fidx];
+                    if (low == null) continue;
+                    final ItemStack high = filters[fidx+1];
+                    if (!FzUtil.identical(low, high)) continue;
+                    int min = Math.min(low.stackSize, high.stackSize);
+                    int max = Math.max(low.stackSize, high.stackSize);
+                    int count = 0;
+                    for (int i = 0; i < inv.size(); i++) {
+                        ItemStack is = inv.get(i);
+                        if (FzUtil.identical(low, is)) {
+                            count += is.stackSize;
+                        }
+                    }
+                    int res;
+                    if (count < min) {
+                        res = 0;
+                    } else if (count > max) {
+                        res = 0xF;
+                    } else {
+                        res = 1 + 0xE*(count - min)/max;
+                    }
+                    custom_val = Math.max(custom_val, res);
+                }
+                if (custom_val >= 0xF) {
+                    return 0xF;
+                }
+            }
+            
             int filledSlots = 0;
             float fullness = 0;
             for (int i = 0; i < inv.size(); ++i) {
@@ -454,10 +484,10 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
                 fullness += is.stackSize / (float) Math.min(inv.under.getInventoryStackLimit(), is.getMaxStackSize());
             }
             if (filledSlots == 0) {
-                return 0;
+                return custom_val;
             }
             fullness /= (float) inv.size();
-            return MathHelper.floor_float(fullness * 14.0F) + 1;
+            return Math.max(custom_val, MathHelper.floor_float(fullness * 14.0F) + 1);
         } finally {
             endRecursion();
         }
@@ -496,6 +526,8 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     
     @Override
     public void onNeighborTileChanged(int tilex, int tiley, int tilez) {
+        //NORELEASE [maybe]: seems like sometimes the comparator doesn't update?
+        //Does it happen if the comparator isn't pointing in-line or something?
         ForgeDirection facing = getFacing();
         boolean isOurs = xCoord + facing.offsetX == tilex &&  yCoord + facing.offsetY == tiley &&  zCoord + facing.offsetZ == tilez;
         if (!isOurs) {
@@ -523,6 +555,8 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             dataMap = (Map<Integer, ItemData>) ReflectionHelper.getPrivateValue(GameData.class, null, "idMap");
         } catch (Throwable e) {
             e.printStackTrace();
+            Core.logFine("[parasieve] Reflection failed!");
+            return;
         }
         for (Item item : Item.itemsList) {
             if (item == null) {
