@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
+import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
@@ -93,14 +94,15 @@ public class ItemFactorizationBlock extends ItemBlock {
             }
         }
         if (FzUtil.similar(is, Core.registry.leydenjar_item)) {
+            int perc = 0;
             if (is.hasTagCompound()) {
                 FactoryType ft = FactoryType.LEYDENJAR;
                 TileEntityLeydenJar jar = (TileEntityLeydenJar) ft.getRepresentative();
                 jar.onPlacedBy(player, is, 0);
-                infoList.add(((int)(jar.getLevel()*100) + "% charged"));
-            } else {
-                infoList.add("0% charged");
+                perc = (int)(jar.getLevel()*100);
+                //infoList.add(( + "% charged"));
             }
+            infoList.add(StatCollector.translateToLocalFormatted("factorization.factoryBlock.LEYDENJAR.perc", perc));
         }
         Core.brand(is, player, infoList, verbose);
     }

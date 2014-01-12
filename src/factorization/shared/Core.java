@@ -64,7 +64,7 @@ public class Core {
     public static final String modId = "factorization";
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
-    public static final String version = "0.8.26"; //@VERSION@
+    public static final String version = "0.8.27"; //@VERSION@
     public Core() {
         instance = this;
         fzconfig = new FzConfig();
@@ -271,8 +271,9 @@ public class Core {
         if (player != null && proxy.isClientHoldingShift()) {
             addTranslationHints(name + ".shift", list, shiftFormat);
         }
+        ArrayList<String> untranslated = new ArrayList();
         if (it instanceof ItemFactorization) {
-            ((ItemFactorization) it).addExtraInformation(is, player, list, verbose);
+            ((ItemFactorization) it).addExtraInformation(is, player, untranslated, verbose);
         }
         String brand = "";
         if (FzConfig.add_branding) {
@@ -285,7 +286,10 @@ public class Core {
             brand += " Development!";
         }
         if (brand.length() > 0) {
-            list.add(EnumChatFormatting.BLUE + brand.trim());
+            untranslated.add(EnumChatFormatting.BLUE + brand.trim());
+        }
+        for (String s : untranslated) {
+            list.add(StatCollector.translateToLocal(s));
         }
     }
     

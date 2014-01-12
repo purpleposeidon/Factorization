@@ -7,8 +7,10 @@ import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.Icon;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
@@ -121,9 +123,10 @@ public class ItemSculptingTool extends ItemFactorization {
     @Override
     public void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         ToolMode mode = getMode(is.getItemDamage());
-        list.add(mode.name);
+        String pre = "item.factorization:sculptTool.";
+        list.add(StatCollector.translateToLocal(pre + mode));
         for (ToolMode nextMode = mode.next; nextMode != mode; nextMode = nextMode.next) {
-            list.add("(" + nextMode.name + ")");
+            list.add(EnumChatFormatting.DARK_GRAY + "(" + StatCollector.translateToLocal(pre + nextMode) + ")");
         }
     }
     

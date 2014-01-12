@@ -7,6 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import factorization.common.FactoryType;
 import factorization.common.ItemIcons;
@@ -104,11 +105,11 @@ public class ItemPocketTable extends ItemFactorization {
             ClassLoader loader = getClass().getClassLoader();
             String key = Core.proxy.getPocketCraftingTableKey();
             if (key != null && key != "") {
-                String enabled_or_installed = NEI_status == 1 ? "enabled" : "installed";
+                final String prefix = "item.factorization:tool/pocket_crafting_table.";
                 if (NEI_status != -1) {
-                    infoList.add(Core.hintFormat + "Press " + key + " to activate from anywhere.");
+                    infoList.add(StatCollector.translateToLocalFormatted(prefix + "yesNEI", key));
                 } else {
-                    infoList.add(Core.hintFormat + "Press " + key + " to activate.");
+                    infoList.add(StatCollector.translateToLocalFormatted(prefix + "noNEI", key));
                 }
             }
         }

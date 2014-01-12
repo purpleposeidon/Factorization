@@ -7,6 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import factorization.api.IActOnCraft;
 import factorization.shared.Core;
@@ -50,19 +51,22 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
 
     @Override
     public void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
+        final String pre = "item.factorization:charge_battery.";
         if (is.getTagCompound() != null && is.getTagCompound().hasKey("storage")) {
             float fullness = TileEntityBattery.getFullness(getStorage(is));
+            String n = StatCollector.translateToLocalFormatted(pre + "perc", (int) (fullness * 100));
+            list.add(n);
             list.add((int) (fullness * 100) + "% charged");
         } else {
             switch (is.getItemDamage()) {
             case 0:
-                list.add("Low charge");
+                list.add(pre + "low");
                 break;
             case 1:
-                list.add("Medium charge");
+                list.add(pre + "mid");
                 break;
             case 2:
-                list.add("Full charge");
+                list.add(pre + "full");
                 break;
             }
         }
