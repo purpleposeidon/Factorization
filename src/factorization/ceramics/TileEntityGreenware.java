@@ -301,6 +301,8 @@ public class TileEntityGreenware extends TileEntityCommon {
         tag.setInteger("touch", lastTouched);
         tag.setInteger("heat", totalHeat);
         tag.setBoolean("glazed", glazesApplied);
+        tag.setByte("front", (byte)front.ordinal());
+        tag.setByte("rot", rotation);
     }
 
     @Override
@@ -310,8 +312,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         if (parts.size() == 0) {
             getCoord().setId(0);
         }
-        tag.setByte("front", (byte)front.ordinal());
-        tag.setByte("rot", rotation);
+        System.out.println("write: " + front + " " + rotation); //NORELEASE
     }
 
     public void loadParts(NBTTagCompound tag) {
@@ -333,16 +334,17 @@ public class TileEntityGreenware extends TileEntityCommon {
         lastTouched = tag.getInteger("touch");
         totalHeat = tag.getInteger("heat");
         glazesApplied = tag.getBoolean("glazed");
+        if (tag.hasKey("front")) {
+            front = ForgeDirection.getOrientation(tag.getByte("front"));
+            setRotation(tag.getByte("rot"));
+        }
     }
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
         loadParts(tag);
-        if (tag.hasKey("front")) {
-            front = ForgeDirection.getOrientation(tag.getByte("front"));
-            byte R = tag.getByte("rot");
-        }
+        System.out.println("read: " + front + " " + rotation); //NORELEASE
     }
     
     public void setRotation(byte newRotation) {
@@ -355,7 +357,8 @@ public class TileEntityGreenware extends TileEntityCommon {
         ArrayList<Object> args = new ArrayList(2 + parts.size() * 9);
         args.add(MessageType.SculptDescription);
         args.add(getState().ordinal());
-        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        args.add((byte)front.ordinal());
+        args.add(rotation);
         for (ClayLump lump : parts) {
             lump.write(args);
         }
@@ -668,6 +671,8 @@ public class TileEntityGreenware extends TileEntityCommon {
         switch (messageType) {
         case MessageType.SculptDescription:
             readStateChange(input);
+            front = ForgeDirection.getOrientation(input.readByte());
+            setRotation(input.readByte());
             parts.clear();
             ArrayList<Object> args = new ArrayList();
             while (true) {
