@@ -110,31 +110,34 @@ Lower barriers to entry for servos:
 
 IMMEDIATE (for next public release)
 ---------
-compat w/ whatever forge version Railcraft uses
+spilling items doesn't null out contents when it drops to 0
 light shining through our blocks; barrels
+sculptures:
+  rotating sculptures to face you when placed
+  easy mode glazing... or you know what? Let's just tone down the time it takes a tad
+  z-fighting; did we not do the minor-random-offset thing?
+
+
+
+
+SOON
+----
 servos:
   2 consecutive turns doesn't show the 2nd turn nicely -- No, that's not the behavior.
   refactor tool
     click once, then click a direction to move instructions... or something. Hmm.
     Maybe click to make a path? Too complicated.
     If you've got like forking and branches or stuff, you'll have to start at the end and work back.
-  comment tool
-    Opens a gui to type text in
-  <digitalseraphim> also noticed i'm getting the error "foreign slot < -1" when the value is actually in the 600 range (i know its most likely always going to be invalid, but its not < -1)
-  <digitalseraphim> its been looping for a while, lol
-  <neptunepink> Might be values wrapping or something.
-  <digitalseraphim> yeah, thats what i figured
   <digitalseraphim> is there a way to clear out error messages from the black stack yet?
-Picking up barrels
-
-
-
-SOON
-----
 pocket crafting table, clicking 1-item-at-a-time for the craft output, seems laggy. Are we over-syncing?
+biome ID conflict detection
 
 LESS SOON
 ---------
+servo power expansion stuff:
+  stack manipulation
+  calling functions
+  reading/loading stacks
 
 AFTER 1.7 PORT
 --------------
@@ -149,6 +152,8 @@ Thaumcraft Compat:
 Do we remove aluminum ore processing? It feels unnecessary to me.
 Exchange Bag of Holding for just... free inventory space.
 ceramics easy-mode: glazing auto-high fires
+AO shadows under servo rails?
+
 
 UNTRIAGED
 ---------
@@ -166,9 +171,11 @@ LMP store instructions... Like a bag or a backpack
   - maybe let you merge instructions together? But then middle clicking.
 Test BoH key with NEI installed & with sneak key set to a mouse button.
 Church Organ
-fix shading of faces of blocks that are in barrels; research if such a fix is possible
+instructions mess up servo rail tessellator shading?
 
- Let you lift up barrels, adds a ton of debuffs, maybe do some silly weird effects to inventory, could spill a bit when you drop them...
+NEVER/POSTPONED
+---------------
+fix shading of faces of blocks that are in barrels; research if such a fix is possible
 
 
 LESS TOP LIST
@@ -453,3 +460,7 @@ Chaos orbs:
     array of Object[], +Integer = noteblock, -Integer = timed delay; spawn vexian mob stacks
 
 https://en.wikipedia.org/wiki/Astra_(weapon)
+
+History speaks of "World Holes" as terrifying patches of void that ripped away entire chunks of land. Nowdays, world holes have been mostly tamed for practical use.
+
+

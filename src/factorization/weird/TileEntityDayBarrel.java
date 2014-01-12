@@ -926,6 +926,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             ei.motionZ = orientation.top.offsetZ * motion;*/
             spillage -= maxStackSize;
         }
+        me.onInvChanged();
     }
 
     @Override
