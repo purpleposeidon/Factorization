@@ -5,9 +5,11 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraftforge.common.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
+import factorization.api.Quaternion;
 import factorization.ceramics.TileEntityGreenware.ClayLump;
 import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.common.BlockIcons;
@@ -67,7 +69,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
                 }
                 renderDynamic(loader);
                 ClayState cs = loader.getState();
-                stand = cs == ClayState.WET || cs == ClayState.DRY;
+                stand = cs == ClayState.WET;
             } else {
                 setupRenderGenericLump().renderForInventory(rb);
             }
@@ -87,7 +89,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
             Tessellator.instance.setBrightness(Core.registry.factory_block.getMixedBrightnessForBlock(w, x, y, z));
         }
         ClayState state = gw.getState();
-        if (state == ClayState.DRY || state == ClayState.WET) {
+        if (state == ClayState.WET) {
             BlockRenderHelper block = setupRenderStand();
             block.render(rb, x, y, z);
         }
@@ -141,7 +143,12 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
             }
         }
         boolean colors_changed = false;
+        int total = greenware.parts.size();
+        double d = 1.0/(4096.0*total);
+        int offset = -total/2;
+        int rci = -1;
         for (ClayLump rc : greenware.parts) {
+            rci++;
             if (state == ClayState.HIGHFIRED) {
                 Block it = Block.blocksList[rc.icon_id];
                 if (it == null) {
@@ -190,6 +197,11 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
             rc.toBlockBounds(block);
             block.begin();
             block.rotateMiddle(rc.quat);
+            if (greenware.front != ForgeDirection.UNKNOWN && greenware.rotation > 0) {
+                block.rotateCenter(greenware.rotation_quat);
+            }
+            float o = (float) ((offset + rci)*d);
+            block.translate(o, o, o);
             block.renderRotated(Tessellator.instance, x, y, z);
         }
         if (colors_changed) {

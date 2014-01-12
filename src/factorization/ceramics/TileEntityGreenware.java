@@ -54,7 +54,10 @@ import factorization.shared.TileEntityExtension;
 
 public class TileEntityGreenware extends TileEntityCommon {
     public static int MAX_PARTS = 32;
-
+    ForgeDirection front = ForgeDirection.UNKNOWN;
+    byte rotation = 0;
+    Quaternion rotation_quat = Quaternion.getRotationQuaternionRadians(0, ForgeDirection.UP);
+    
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.CERAMIC;
@@ -174,13 +177,19 @@ public class TileEntityGreenware extends TileEntityCommon {
             b.setBlockBounds((minX - 16) / 16F, (minY - 16) / 16F, (minZ - 16) / 16F, (maxX - 16) / 16F, (maxY - 16) / 16F, (maxZ - 16) / 16F);
         }
 
-        public void toRotatedBlockBounds(BlockRenderHelper b) {
+        public void toRotatedBlockBounds(TileEntityGreenware gw, BlockRenderHelper b) {
             toBlockBounds(b);
+            b.beginNoIcons();
+            b.rotateMiddle(quat);
+            b.rotateCenter(gw.rotation_quat);
+            b.setBlockBoundsBasedOnRotation();
+            
             // TODO: This doesn't work! Lame!
-            /*
-             * b.beginNoIcons(); b.rotate(quat);
-             * b.setBlockBoundsBasedOnRotation();
-             */
+            /*b.beginNoIcons();
+            b.rotateMiddle(quat);
+            b.rotateCenter(gw.rotation_quat);
+            b.setBlockBoundsBasedOnRotation();
+            // */
         }
 
         public ClayLump copy() {
@@ -197,27 +206,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             return ret;
         }
 
-        private static HashSet<Coord> cache = new HashSet();
-        private static DeltaCoord m1 = new DeltaCoord(-1, -1, -1);
-        private static DeltaCoord d = new DeltaCoord();
 
-        public Collection<Coord> getOccupiedBlocks(Coord base) {
-            cache.clear();
-            DeltaCoord min = new DeltaCoord(minX / 16, minY / 16, minZ / 16);
-            min = min.add(m1);
-            DeltaCoord max = new DeltaCoord(maxX / 16, maxY / 16, maxZ / 16);
-            max = max.add(m1);
-            for (int dx = min.x; dx <= max.x; dx++) {
-                for (int dy = min.y; dy <= max.y; dy++) {
-                    for (int dz = min.z; dz <= max.z; dz++) {
-                        d.init(dx, dy, dz);
-                        ;
-                        cache.add(base.add(d));
-                    }
-                }
-            }
-            return cache;
-        }
     }
 
     public ArrayList<ClayLump> parts = new ArrayList();
@@ -321,6 +310,8 @@ public class TileEntityGreenware extends TileEntityCommon {
         if (parts.size() == 0) {
             getCoord().setId(0);
         }
+        tag.setByte("front", (byte)front.ordinal());
+        tag.setByte("rot", rotation);
     }
 
     public void loadParts(NBTTagCompound tag) {
@@ -348,6 +339,15 @@ public class TileEntityGreenware extends TileEntityCommon {
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
         loadParts(tag);
+        if (tag.hasKey("front")) {
+            front = ForgeDirection.getOrientation(tag.getByte("front"));
+            byte R = tag.getByte("rot");
+        }
+    }
+    
+    public void setRotation(byte newRotation) {
+        rotation = newRotation;
+        rotation_quat = Quaternion.getRotationQuaternionRadians(Math.PI*newRotation/2, ForgeDirection.UP);
     }
 
     @Override
@@ -365,13 +365,37 @@ public class TileEntityGreenware extends TileEntityCommon {
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
         super.onPlacedBy(player, is, side);
-        loadParts(is.getTagCompound());
+        NBTTagCompound tag = is.getTagCompound();
+        loadParts(tag);
+        ForgeDirection placement = ForgeDirection.getOrientation(FzUtil.determineFlatOrientation(player));
+        if (tag == null || !tag.hasKey("front")) {
+            front = placement;
+            setRotation((byte) 0);
+        } else if (placement.offsetY == 0 && placement != ForgeDirection.UNKNOWN) {
+            front = ForgeDirection.getOrientation(tag.getByte("front"));
+            if (front == ForgeDirection.UNKNOWN || front.offsetY != 0) {
+                setRotation((byte) 0);
+                front = placement;
+            } else {
+                ForgeDirection f = placement;
+                byte r = 0;
+                for (byte i = 0; i < 4; i++) {
+                    if (f == front) {
+                        r = i;
+                        break;
+                    }
+                    f = f.getRotation(ForgeDirection.UP);
+                }
+                setRotation(r);
+            }
+        }
     }
 
     public ItemStack getItem() {
         ItemStack ret = Core.registry.greenware_item.copy();
         NBTTagCompound tag = new NBTTagCompound();
         writeParts(tag);
+        tag.setByte("front", (byte)front.ordinal());
         ret.setTagCompound(tag);
         if (customName != null) {
             ret.setItemName(customName);
@@ -546,29 +570,44 @@ public class TileEntityGreenware extends TileEntityCommon {
             return false;
 
         // check for free space (needs to be last, as it can mutate the world)
-        for (Coord c : lump.getOccupiedBlocks(getCoord())) {
-            // This block needs to be an Extension, or this
-            if (c.isAir() || c.isReplacable()) {
-                c.setId(Core.registry.factory_block);
-                TileEntityExtension tex = new TileEntityExtension(this);
-                c.setTE(tex);
-                tex.getBlockClass().enforce(c);
-                continue;
-            }
-            TileEntity te = c.getTE();
-            if (te == this) {
-                continue;
-            }
-            if (te instanceof TileEntityExtension) {
-                TileEntityExtension tex = (TileEntityExtension) te;
-                if (tex.getParent() == this) {
-                    continue;
+        BlockRenderHelper block = Core.registry.serverTraceHelper;
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    AxisAlignedBB ab = AxisAlignedBB.getBoundingBox(xCoord + dx, yCoord + dy, zCoord + dz, xCoord + dx + 1, yCoord + dy + 1, zCoord + dz + 1);
+                    Coord c = getCoord();
+                    c.x += dx;
+                    c.y += dy;
+                    c.z += dz;
+                    lump.toRotatedBlockBounds(this, block);
+                    AxisAlignedBB in = block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
+                    if (ab.intersectsWith(in)) {
+                        // This block needs to be an Extension, or this
+                        if (c.isAir() || c.isReplacable()) {
+                            c.setId(Core.registry.factory_block);
+                            TileEntityExtension tex = new TileEntityExtension(this);
+                            c.setTE(tex);
+                            tex.getBlockClass().enforce(c);
+                            continue;
+                        }
+                        TileEntity te = c.getTE();
+                        if (te == this) {
+                            continue;
+                        }
+                        if (te instanceof TileEntityExtension) {
+                            TileEntityExtension tex = (TileEntityExtension) te;
+                            if (tex.getParent() == this) {
+                                continue;
+                            }
+                        }
+                        // We used to not allow this. We just make a bit of noise instead.
+                        // A notification will indicate that things will be a bit messed up here.
+                        // FIXME: Let block collision boxes go outside the block (Notch hard-coded for fences)
+                        Notify.send(null, c, "!");
+                    }
                 }
             }
-            //return false; -- Actually, let's allow this.
-            Notify.send(null, c, "!"); //This is to indicate that things will be a bit messed up here. FIXME: Let block collision boxes go outside the block
         }
-
         return true;
     }
 
@@ -743,10 +782,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         MovingObjectPosition shortest = null;
         for (int i = 0; i < parts.size(); i++) {
             ClayLump lump = parts.get(i);
-            lump.toRotatedBlockBounds(block);
-            block.beginNoIcons();
-            block.rotateMiddle(lump.quat);
-            block.setBlockBoundsBasedOnRotation();
+            lump.toRotatedBlockBounds(this, block);
             MovingObjectPosition mop = block.collisionRayTrace(worldObj, xCoord, yCoord, zCoord, startVec, endVec);
             Vec3Pool vp = worldObj.getWorldVec3Pool();
             if (mop != null) {
@@ -779,20 +815,20 @@ public class TileEntityGreenware extends TileEntityCommon {
     @ForgeSubscribe
     @SideOnly(Side.CLIENT)
     public void renderCeramicsSelection(DrawBlockHighlightEvent event) {
-        if (event.subID == -1) {
+        if (event.target.subHit == -1) {
             return;
         }
-        Coord c = new Coord(event.player.worldObj, event.target.blockX, event.target.blockY, event.target.blockZ);
+        Coord c = new Coord(event.player.worldObj, event.target);
         TileEntityGreenware clay = c.getTE(TileEntityGreenware.class);
         if (clay == null) {
             return;
         }
         event.setCanceled(true);
-        ClayLump lump = clay.parts.get(event.target.subHit);
-        BlockRenderHelper block = BlockRenderHelper.instance;
-        lump.toBlockBounds(block);
         EntityPlayer player = event.player;
         double partial = event.partialTicks;
+        ClayLump lump = clay.parts.get(event.target.subHit);
+        BlockRenderHelper block = Core.registry.clientTraceHelper;
+        lump.toRotatedBlockBounds(clay, block);
         double widen = 0.002;
         double oX = player.lastTickPosX + (player.posX - player.lastTickPosX) * partial;
         double oY = player.lastTickPosY + (player.posY - player.lastTickPosY) * partial;
@@ -818,7 +854,7 @@ public class TileEntityGreenware extends TileEntityCommon {
 
     // Copied. Private in RenderGlobal.drawOutlinedBoundingBox. For some stupid
     // pointless reason. Don't really feel like re-writing it to be public every
-    // update or submitting an AT.
+    // update or submitting an AT. (GL_LINES)
     private static void drawOutlinedBoundingBox(AxisAlignedBB aabb) {
         Tessellator tessellator = Tessellator.instance;
         tessellator.startDrawing(3);
@@ -863,16 +899,16 @@ public class TileEntityGreenware extends TileEntityCommon {
     public boolean addCollisionBoxesToList(Block ignore, AxisAlignedBB aabb, List list, Entity entity) {
         boolean remote = (entity != null && entity.worldObj != null) ? entity.worldObj.isRemote : FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT;
         BlockRenderHelper block = remote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
-        block.setBlockBounds(0, 0, 0, 1, 1F / 8F, 1);
         ClayState state = getState();
-        if (state == ClayState.WET || state == ClayState.DRY) {
+        if (state == ClayState.WET) {
+            block.setBlockBounds(0, 0, 0, 1, 1F / 8F, 1);
             AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
             if (aabb.intersectsWith(a)) {
                 list.add(a);
             }
         }
         for (ClayLump lump : parts) {
-            lump.toRotatedBlockBounds(block);
+            lump.toRotatedBlockBounds(this, block);
             AxisAlignedBB a = block.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord, zCoord);
             if (aabb.intersectsWith(a)) {
                 list.add(a);
