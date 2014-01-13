@@ -216,7 +216,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     private boolean partsValidated = false;
 
     public static int dryTime = 20 * 60 * 2; // 2 minutes
-    public static int bisqueHeat = 1000, highfireHeat = bisqueHeat * 20;
+    public static int bisqueHeat = 1000, highfireHeat = bisqueHeat * 10;
 
     // Client-side only
     public boolean shouldRenderTesr = false;
@@ -312,7 +312,6 @@ public class TileEntityGreenware extends TileEntityCommon {
         if (parts.size() == 0) {
             getCoord().setId(0);
         }
-        System.out.println("write: " + front + " " + rotation); //NORELEASE
     }
 
     public void loadParts(NBTTagCompound tag) {
@@ -344,7 +343,6 @@ public class TileEntityGreenware extends TileEntityCommon {
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
         loadParts(tag);
-        System.out.println("read: " + front + " " + rotation); //NORELEASE
     }
     
     public void setRotation(byte newRotation) {
