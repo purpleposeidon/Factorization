@@ -1,4 +1,4 @@
-0.8.27
+0.8.28
   Servos:
     Fix rail renderer UVs; changed its texture
     ShifterControl'll let you access slots as an int instead of a byte
@@ -8,9 +8,12 @@
     Polish: Szewek
     Russian: Anton
   Barrels can be pushed with a knockback sword after drinking a strength potion.
-    Push the barrel up a slab to effect 90° rotations
+    Only half of all possible orientations & positions are available with ordinary moves: push up a slab to get the other half
   redstone signal makes lacerator stop digging and slow down at the same time, instead of slowing then stopping.
   Added recipes for the secret vanilla all-bark logs. (This might cause mod compat bugs; let me know...)
+  Ceramic sculptures:
+    will now face towards you when you place them.
+    energy required for high firing has been halved
 
 0.8.25
   Fix the jump instruction

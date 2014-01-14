@@ -110,12 +110,8 @@ Lower barriers to entry for servos:
 
 IMMEDIATE (for next public release)
 ---------
-spilling items doesn't null out contents when it drops to 0
-light shining through our blocks; barrels
 sculptures:
-  rotating sculptures to face you when placed
   easy mode glazing... or you know what? Let's just tone down the time it takes a tad
-  z-fighting; did we not do the minor-random-offset thing?
 
 
 
@@ -131,6 +127,7 @@ servos:
   <digitalseraphim> is there a way to clear out error messages from the black stack yet?
 pocket crafting table, clicking 1-item-at-a-time for the craft output, seems laggy. Are we over-syncing?
 biome ID conflict detection
+light shining through our blocks; barrels
 
 LESS SOON
 ---------

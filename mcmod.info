@@ -5,7 +5,7 @@
   ], 
   "credits": "OvermindDL1", 
   "dependencies": [], 
-  "description": "Auto-crafting, ore processing, barrels, and other toys", 
+  "description": "Auto-crafting, ore processing, barrels, and other tools", 
   "mcversion": "1.6.4", 
   "modid": "factorization", 
   "name": "Factorization", 
@@ -13,6 +13,6 @@
   "screenshots": [], 
   "updateUrl": "", 
   "url": "http://minecraftforum.net/topic/1351802-", 
-  "version": "0.8.25"
+  "version": "0.8.28"
  }
 ]
