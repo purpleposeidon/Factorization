@@ -214,5 +214,9 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
         Notify.withItem(stomache);
         Notify.send(entityplayer, this, stomache.stackSize + " {ITEM_NAME}" + append);
     }
-
+    
+    @Override
+    public boolean canExtractItem(int slot, ItemStack itemstack, int side) {
+        return false;
+    }
 }
