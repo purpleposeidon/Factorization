@@ -1,63 +1,58 @@
 package factorization.astro;
 
 import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
+import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockFactorization;
+import factorization.shared.BlockRenderHelper;
 import factorization.shared.FactorizationBlockRender;
 
 public class BlockRenderRocketEngine extends FactorizationBlockRender {
 
     @Override
     public void render(RenderBlocks rb) {
-        boolean oldAo = rb.enableAO;
-        rb.enableAO = false;
         Icon body = BlockIcons.rocket_engine_invalid;
         Icon nozzle = BlockIcons.rocket_engine_nozzle, bottom = BlockIcons.rocket_engine_bottom_hole, top = BlockIcons.rocket_engine_top;
+        final Coord here = getCoord();
         if (world_mode) { //Really, it should be...
-            TileEntityRocketEngine rocket = getCoord().getTE(TileEntityRocketEngine.class);
+            TileEntityRocketEngine rocket = here.getTE(TileEntityRocketEngine.class);
             if (rocket != null && rocket.lastValidationStatus) {
                 body = BlockIcons.rocket_engine_valid;
             }
+        }
+        BlockRenderHelper block = BlockRenderHelper.instance;
+        Tessellator tess = Tessellator.instance;
+        {
+            tess.setBrightness(block.getMixedBrightnessForBlock(w, x, y, z));
+            //tess.setBrightness(this.renderMinY > 0.0D ? l : par1Block.getMixedBrightnessForBlock(this.blockAccess, par2, par3 - 1, par4));
+            tess.setColorOpaque_F(1, 1, 1);
         }
         float d = 2F/16F;
         float height = 6F/16F;
         float b = height*3 - 3F/16F;
         //The nozzle
-        BlockFactorization.sideDisable = ForgeDirection.DOWN.flag;
         for (int i = 1; i < 4; i++) {
-            if (i == 3) {
-                BlockFactorization.sideDisable |= ForgeDirection.UP.flag;
+            if (i == 1) {
+                block.useTextures(bottom, nozzle, nozzle, nozzle, nozzle, nozzle);
+            } else if (i == 2) {
+                block.useTextures(null, nozzle, nozzle, nozzle, nozzle, nozzle);
             }
-            renderPart(rb, nozzle,
-                    d*i, (i-1)*height, d*i,
+            block.setBlockBounds(d*i, (i-1)*height, d*i,
                     2 - d*i, height*(i), 2 - d*i);
+            block.begin();
+            block.renderRotated(tess, here);
+            //block.render(rb, here);
         }
-        BlockFactorization.sideDisable = -1 ^ (ForgeDirection.DOWN.flag);
-        int i = 1;
-        renderPart(rb, bottom,
-                d*i, (i-1)*height, d*i,
-                2 - d*i, height*(i), 2 - d*i);
-        
         //The body
-        BlockFactorization.sideDisable = ForgeDirection.DOWN.flag | ForgeDirection.UP.flag;
-        renderPart(rb, body,
-                0, b, 0,
+        block.useTextures(nozzle, top, body, body, body, body);
+        block.setBlockBounds(0, b, 0,
                 2, 3, 2);
-        
-        BlockFactorization.sideDisable = -1 ^ ForgeDirection.DOWN.flag;
-        renderPart(rb, nozzle,
-                0, b, 0,
-                2, 3, 2);
-        BlockFactorization.sideDisable = -1 ^ ForgeDirection.UP.flag;
-        renderPart(rb, top,
-                0, b, 0,
-                2, 3, 2);
-        
-        BlockFactorization.sideDisable = 0;
-        rb.enableAO = oldAo;
+        block.begin();
+        block.renderRotated(tess, here);
     }
 
     @Override
