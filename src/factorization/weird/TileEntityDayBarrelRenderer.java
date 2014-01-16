@@ -2,6 +2,7 @@ package factorization.weird;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
@@ -13,27 +14,11 @@ import org.lwjgl.opengl.GL11;
 
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
+import factorization.shared.Core;
 import factorization.weird.TileEntityDayBarrel.Type;
 
 public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
-    //NOTE TODO: This could be optimized by using a custom font renderer.
-    //Create a font icon digits, '+', '*', '!', and '∞'; add it to both atlases.
-    //This would let the barrel render with a single texture binding for standard items.
-    //Another optimization: don't render if the barrel's facing a solid block
-    //(A third optimization: somehow get the SBRH to cull faces. Complicated & expensive?)
-    @Override
-    public void renderTileEntityAt(TileEntity tileentity, double x, double y, double z, float partial) {
-        if (!(tileentity instanceof TileEntityDayBarrel)) {
-            return;
-        }
-        TileEntityDayBarrel barrel = (TileEntityDayBarrel) tileentity;
-        ItemStack is = barrel.item;
-        if (is == null || barrel.getItemCount() == 0) {
-            return;
-        }
-        GL11.glPushMatrix();
-        GL11.glTranslated(x, y, z);
-        
+    void doDraw(TileEntityDayBarrel barrel, ItemStack is) {
         FzOrientation bo = barrel.orientation;
         ForgeDirection face = bo.facing;
         if (face.offsetX + face.offsetY + face.offsetZ == 1) {
@@ -59,12 +44,54 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glDisable(GL11.GL_LIGHTING);
+        Core.profileStart("font");
         renderItemCount(is, barrel);
+        Core.profileEnd();
+        Core.profileStart("item");
         handleRenderItem(is);
+        Core.profileEnd();
         GL11.glEnable(GL11.GL_LIGHTING);
         
         
+    }
+    
+    //NOTE TODO: This could be optimized by using a custom font renderer.
+    //Create a font icon digits, '+', '*', '!', and '∞'; add it to both atlases.
+    //This would let the barrel render with a single texture binding for standard items.
+    //Another optimization: don't render if the barrel's facing a solid block
+    //(A third optimization: somehow get the SBRH to cull faces. Complicated & expensive?)
+    @Override
+    public void renderTileEntityAt(TileEntity tileentity, double x, double y, double z, float partial) {
+        if (!(tileentity instanceof TileEntityDayBarrel)) {
+            return;
+        }
+        TileEntityDayBarrel barrel = (TileEntityDayBarrel) tileentity;
+        ItemStack is = barrel.item;
+        if (is == null || barrel.getItemCount() == 0) {
+            return;
+        }
+        Core.profileStart("barrel");
+        GL11.glPushMatrix();
+        GL11.glTranslated(x, y, z);
+        
+        
+        if (true && barrel.type != Type.HOPPING) {
+            if (barrel.display_list == -1) {
+                if (barrel.display_list == -1) {
+                    barrel.display_list = GLAllocation.generateDisplayLists(1);
+                }
+                GL11.glNewList(barrel.display_list, GL11.GL_COMPILE_AND_EXECUTE); //NORELEASE
+                doDraw(barrel, is); //NORELEASE: have to free the display list after a while!
+                GL11.glEndList(); //NORELEASE: This requires freeing the display list!!!! NORELEASE
+            } else {
+                GL11.glCallList(barrel.display_list);
+            }
+        } else {
+            doDraw(barrel, is);
+        }
+        
         GL11.glPopMatrix();
+        Core.profileEnd();
     }
     
     void renderItemCount(ItemStack item, TileEntityDayBarrel barrel) {

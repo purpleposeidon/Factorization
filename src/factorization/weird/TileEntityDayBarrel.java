@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
+import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -54,6 +55,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     private static final ItemStack DEFAULT_LOG = new ItemStack(Block.wood);
     private static final ItemStack DEFAULT_SLAB = new ItemStack(Block.planks);
     public ItemStack woodLog = DEFAULT_LOG.copy(), woodSlab = DEFAULT_SLAB.copy();
+    int display_list = -1;
     
     public FzOrientation orientation = FzOrientation.FACE_UP_POINT_NORTH;
     public Type type = Type.NORMAL;
@@ -480,15 +482,18 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             woodSlab = FzUtil.readStack(input);
             orientation = FzOrientation.getOrientation(input.readByte());
             type = Type.valueOf(input.readByte());
+            display_list = -1;
             return true;
         }
         if (messageType == MessageType.BarrelCount) {
             setItemCount(input.readInt());
+            display_list = -1;
             return true;
         }
         if (messageType == MessageType.BarrelItem) {
             item = FzUtil.readStack(input);
             setItemCount(input.readInt());
+            display_list = -1;
             return true;
         }
         return false;
@@ -890,7 +895,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     void spillItems(int spillage) {
-        if (type == Type.STICKY) {
+        if (type == Type.STICKY || type == Type.CREATIVE) {
             return;
         }
         if (rand.nextInt(4) > 0) {
@@ -1072,7 +1077,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     static {
-        make(Type.CREATIVE, new ItemStack(Block.blockDiamond), new ItemStack(Block.bedrock));
+        make(Type.CREATIVE, new ItemStack(Block.bedrock), new ItemStack(Block.blockDiamond));
     }
     
     static ItemStack silkTouch = Item.enchantedBook.getEnchantedItemStack(new EnchantmentData(Enchantment.silkTouch, 1));
@@ -1204,5 +1209,25 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     protected boolean removeBlockByPlayer(EntityPlayer player) {
         broken_with_silk_touch = EnchantmentHelper.getSilkTouchModifier(player);
         return super.removeBlockByPlayer(player);
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    protected void finalize() throws Throwable {
+        super.finalize(); //NORELEASE
+        if (worldObj == null || !worldObj.isRemote) {
+            return;
+        }
+        System.out.println("NORELEASE: ? Barrel.finalize() " + display_list);
+        try {
+            if (display_list != -1) {
+                GLAllocation.deleteDisplayLists(display_list);
+                display_list = -1;
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return;
+        }
+        System.out.println("All good");
     }
 }
