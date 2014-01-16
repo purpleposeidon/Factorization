@@ -42,7 +42,7 @@ public class BlockFactorization extends BlockContainer {
         super(id, Core.registry.materialMachine);
         setHardness(2.0F);
         setResistance(5);
-        setLightOpacity(1);
+        setLightOpacity(0);
         canBlockGrass[id] = true;
         setTickRandomly(false);
     }
