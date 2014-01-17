@@ -21,6 +21,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.FakePlayer;
@@ -28,6 +29,7 @@ import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.world.ChunkEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -56,6 +58,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     private static final ItemStack DEFAULT_SLAB = new ItemStack(Block.planks);
     public ItemStack woodLog = DEFAULT_LOG.copy(), woodSlab = DEFAULT_SLAB.copy();
     int display_list = -1;
+    boolean should_use_display_list = true;
     
     public FzOrientation orientation = FzOrientation.FACE_UP_POINT_NORTH;
     public Type type = Type.NORMAL;
@@ -1211,23 +1214,53 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         return super.removeBlockByPlayer(player);
     }
     
+    static ArrayList<Integer> finalizedDisplayLists = new ArrayList();
+    
     @Override
     @SideOnly(Side.CLIENT)
     protected void finalize() throws Throwable {
-        super.finalize(); //NORELEASE
-        if (worldObj == null || !worldObj.isRemote) {
-            return;
-        }
-        System.out.println("NORELEASE: ? Barrel.finalize() " + display_list);
-        try {
+        super.finalize();
+        synchronized (finalizedDisplayLists) {
             if (display_list != -1) {
-                GLAllocation.deleteDisplayLists(display_list);
+                finalizedDisplayLists.add(display_list);
                 display_list = -1;
             }
-        } catch (Throwable t) {
-            t.printStackTrace();
+        }
+    }
+    
+    @SideOnly(Side.CLIENT)
+    final void freeDisplayList() {
+        if (display_list == -1) {
             return;
         }
-        System.out.println("All good");
+        GLAllocation.deleteDisplayLists(display_list);
+        display_list = -1;
+    }
+    
+    @ForgeSubscribe
+    @SideOnly(Side.CLIENT)
+    public void removeUnloadedDisplayLists(ChunkEvent.Unload event) {
+        if (!event.world.isRemote) return;
+        int count = 0;
+        for (TileEntity te : (Iterable<TileEntity>)event.getChunk().chunkTileEntityMap.values()) {
+            if (te instanceof TileEntityDayBarrel) {
+                TileEntityDayBarrel me = (TileEntityDayBarrel) te;
+                me.freeDisplayList();
+                count++;
+            }
+        }
+        if (count > 0) System.out.println("" + count + " display lists were unloaded"); //NORELEASE
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public static void iterateForFinalizedBarrels() {
+        synchronized (finalizedDisplayLists) {
+            System.out.println("Finalizing " + finalizedDisplayLists.size() + " display lists"); //NORELEASE
+            for (Integer i : finalizedDisplayLists) {
+                if (i == null) continue;
+                GLAllocation.deleteDisplayLists(i);
+            }
+            finalizedDisplayLists.clear();
+        }
     }
 }

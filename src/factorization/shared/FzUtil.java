@@ -1,5 +1,7 @@
 package factorization.shared;
 
+import static org.lwjgl.opengl.GL11.glGetError;
+
 import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,7 +51,6 @@ import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.FakePlayer;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.FluidEvent;
 import net.minecraftforge.fluids.FluidStack;
@@ -57,6 +58,7 @@ import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.oredict.OreDictionary;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.glu.GLU;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -1551,5 +1553,16 @@ public class FzUtil {
             return 3;
         }
         return 0;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public static boolean checkGLError(String op) {
+        int errSym = glGetError();
+        if (errSym != 0) {
+            Core.logSevere("GL Error @ " + op);
+            Core.logSevere(errSym + ": " + GLU.gluErrorString(errSym));
+            return true;
+        }
+        return false;
     }
 }

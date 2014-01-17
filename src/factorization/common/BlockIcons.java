@@ -87,6 +87,8 @@ public class BlockIcons {
     
     @Directory("storage")
     public static BarrelTextureset normal, silky, hopping, larger, sticky;
+    @Directory("storage")
+    public static Icon barrel_font;
     
     public static class BarrelTextureset extends IconGroup {
         public Icon side, front, top;

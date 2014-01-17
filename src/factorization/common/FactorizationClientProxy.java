@@ -27,7 +27,10 @@ import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.IScheduledTickHandler;
+import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
@@ -371,6 +374,31 @@ public class FactorizationClientProxy extends FactorizationProxy {
         KeyBindingRegistry.registerKeyBinding(CommandKeySet.create(
                 bag_swap_key, Command.bagShuffle,
                 pocket_key, Command.craftOpen));
+        TickRegistry.registerScheduledTickHandler(new IScheduledTickHandler() {
+            @Override
+            public void tickStart(EnumSet<TickType> type, Object... tickData) {}
+
+            @Override
+            public void tickEnd(EnumSet<TickType> type, Object... tickData) {
+                TileEntityDayBarrel.iterateForFinalizedBarrels();
+            }
+
+            @Override
+            public EnumSet<TickType> ticks() {
+                return EnumSet.of(TickType.CLIENT);
+            }
+
+            @Override
+            public String getLabel() {
+                return "fz.barrel_display_list_finalizer";
+            }
+
+            @Override
+            public int nextTickSpacing() {
+                return 20*30; //Every 30 seconds
+            }
+            
+        }, Side.CLIENT);
     }
 
     private void setTileEntityRenderer(Class clazz, TileEntitySpecialRenderer r) {

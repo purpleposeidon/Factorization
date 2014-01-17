@@ -13,4 +13,6 @@ public class ItemIcons {
     
     @Directory("ceramics")
     public static Icon move, reset, rotate_local, rotate_global, stretch, mold;
+    
+    public static Icon barrel_font;
 }
