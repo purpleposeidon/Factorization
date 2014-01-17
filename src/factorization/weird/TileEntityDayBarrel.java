@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
+import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -20,6 +21,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.FakePlayer;
@@ -27,6 +29,7 @@ import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.world.ChunkEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -54,6 +57,8 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     private static final ItemStack DEFAULT_LOG = new ItemStack(Block.wood);
     private static final ItemStack DEFAULT_SLAB = new ItemStack(Block.planks);
     public ItemStack woodLog = DEFAULT_LOG.copy(), woodSlab = DEFAULT_SLAB.copy();
+    int display_list = -1;
+    boolean should_use_display_list = true;
     
     public FzOrientation orientation = FzOrientation.FACE_UP_POINT_NORTH;
     public Type type = Type.NORMAL;
@@ -480,15 +485,18 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             woodSlab = FzUtil.readStack(input);
             orientation = FzOrientation.getOrientation(input.readByte());
             type = Type.valueOf(input.readByte());
+            display_list = -1;
             return true;
         }
         if (messageType == MessageType.BarrelCount) {
             setItemCount(input.readInt());
+            display_list = -1;
             return true;
         }
         if (messageType == MessageType.BarrelItem) {
             item = FzUtil.readStack(input);
             setItemCount(input.readInt());
+            display_list = -1;
             return true;
         }
         return false;
@@ -890,7 +898,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     void spillItems(int spillage) {
-        if (type == Type.STICKY) {
+        if (type == Type.STICKY || type == Type.CREATIVE) {
             return;
         }
         if (rand.nextInt(4) > 0) {
@@ -1072,7 +1080,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     static {
-        make(Type.CREATIVE, new ItemStack(Block.blockDiamond), new ItemStack(Block.bedrock));
+        make(Type.CREATIVE, new ItemStack(Block.bedrock), new ItemStack(Block.blockDiamond));
     }
     
     static ItemStack silkTouch = Item.enchantedBook.getEnchantedItemStack(new EnchantmentData(Enchantment.silkTouch, 1));
@@ -1204,5 +1212,55 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     protected boolean removeBlockByPlayer(EntityPlayer player) {
         broken_with_silk_touch = EnchantmentHelper.getSilkTouchModifier(player);
         return super.removeBlockByPlayer(player);
+    }
+    
+    static ArrayList<Integer> finalizedDisplayLists = new ArrayList();
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    protected void finalize() throws Throwable {
+        super.finalize();
+        synchronized (finalizedDisplayLists) {
+            if (display_list != -1) {
+                finalizedDisplayLists.add(display_list);
+                display_list = -1;
+            }
+        }
+    }
+    
+    @SideOnly(Side.CLIENT)
+    final void freeDisplayList() {
+        if (display_list == -1) {
+            return;
+        }
+        GLAllocation.deleteDisplayLists(display_list);
+        display_list = -1;
+    }
+    
+    @ForgeSubscribe
+    @SideOnly(Side.CLIENT)
+    public void removeUnloadedDisplayLists(ChunkEvent.Unload event) {
+        if (!event.world.isRemote) return;
+        int count = 0;
+        for (TileEntity te : (Iterable<TileEntity>)event.getChunk().chunkTileEntityMap.values()) {
+            if (te instanceof TileEntityDayBarrel) {
+                TileEntityDayBarrel me = (TileEntityDayBarrel) te;
+                me.freeDisplayList();
+                count++;
+            }
+        }
+        if (count > 0) System.out.println("" + count + " display lists were unloaded"); //NORELEASE
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public static void iterateForFinalizedBarrels() {
+        synchronized (finalizedDisplayLists) {
+            System.out.println("Finalizing " + finalizedDisplayLists.size() + " display lists"); //NORELEASE
+            for (Integer i : finalizedDisplayLists) {
+                if (i == null) continue;
+                GLAllocation.deleteDisplayLists(i);
+            }
+            finalizedDisplayLists.clear();
+        }
     }
 }

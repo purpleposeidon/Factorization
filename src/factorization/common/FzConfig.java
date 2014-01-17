@@ -21,6 +21,7 @@ public class FzConfig {
     public static Pattern routerBan;
     public static boolean render_barrel_item = true;
     public static boolean render_barrel_text = true;
+    public static boolean render_barrel_use_displaylists = true;
     public static boolean render_barrel_close = false;
     public static int entity_relight_task_id = -1;
     public static boolean gen_silver_ore = true;
