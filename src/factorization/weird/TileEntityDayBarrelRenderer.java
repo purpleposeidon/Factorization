@@ -83,19 +83,23 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         GL11.glTranslated(x, y, z);
         
         
-        if (false /* NORELEASE */ && FzConfig.render_barrel_use_displaylists && barrel.type != Type.HOPPING && barrel.should_use_display_list) {
+        if (FzConfig.render_barrel_use_displaylists && barrel.type != Type.HOPPING && barrel.should_use_display_list) {
             if (barrel.display_list == -1) {
                 FzUtil.checkGLError("FZ -- before barrel display list update. Someone left us a mess!");
                 if (barrel.display_list == -1) {
                     barrel.display_list = GLAllocation.generateDisplayLists(1);
                 }
-                GL11.glNewList(barrel.display_list, GL11.GL_COMPILE_AND_EXECUTE);
+                // https://www.opengl.org/archives/resources/faq/technical/displaylist.htm 16.070
+                GL11.glNewList(barrel.display_list, GL11.GL_COMPILE);
                 doDraw(barrel, is);
                 GL11.glEndList();
                 if (FzUtil.checkGLError("FZ -- after barrel display list; does the item have an advanced renderer?")) {
                     Core.logSevere("The item is: " + is);
                     Core.logSevere("At: " + new Coord(barrel));
                     barrel.should_use_display_list = false;
+                    doDraw(barrel, is);
+                } else {
+                    GL11.glCallList(barrel.display_list);
                 }
             } else {
                 GL11.glCallList(barrel.display_list);
