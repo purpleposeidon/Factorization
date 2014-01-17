@@ -33,7 +33,7 @@ import factorization.shared.FzUtil.FzInv;
 
 public class SocketRobotHand extends TileEntitySocketBase {
     boolean wasPowered = false;
-
+    boolean firstTry = false;
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.SOCKET_ROBOTHAND;
@@ -64,9 +64,10 @@ public class SocketRobotHand extends TileEntitySocketBase {
         if (back == null) {
             return;
         }
+        firstTry = true;
         FzOrientation orientation = FzOrientation.fromDirection(facing).getSwapped();
         fakePlayer = null;
-        rayTrace(socket, coord, orientation, powered, false, false);
+        rayTrace(socket, coord, orientation, powered, true, false);
         fakePlayer = null;
     }
     
@@ -104,6 +105,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
     boolean clickWithInventory(int i, FzInv inv, EntityPlayer player, ItemStack is, MovingObjectPosition mop) {
         ItemStack orig = is == null ? null : is.copy();
         boolean result = clickItem(player, is, mop);
+        firstTry = false;
         int newSize = FzUtil.getStackSize(is);
         is = player.inventory.mainInventory[0];
         // Easiest case: the item is all used up.
@@ -142,18 +144,6 @@ public class SocketRobotHand extends TileEntitySocketBase {
     boolean clickItem(EntityPlayer player, ItemStack is, MovingObjectPosition mop) {
         if (mop.typeOfHit == EnumMovingObjectType.TILE) {
             return mcClick(player, mop, is);
-            /*Vec3 hitVec = mop.hitVec;
-            int x = mop.blockX, y = mop.blockY, z = mop.blockZ;
-            float dx = (float) (hitVec.xCoord - x);
-            float dy = (float) (hitVec.yCoord - y);
-            float dz = (float) (hitVec.zCoord - z);
-            Item it = is.getItem();
-            if (it.onItemUseFirst(is, player, worldObj, x, y, z, mop.sideHit, dx, dy, dz)) {
-                return true;
-            }
-            if (it.onItemUse(is, player, worldObj, x, y, z, mop.sideHit, dx, dy, dz)) {
-                return true;
-            }*/
         } else if (mop.typeOfHit == EnumMovingObjectType.ENTITY) {
             if (mop.entityHit.interactFirst(player)) {
                 return true;
@@ -183,9 +173,16 @@ public class SocketRobotHand extends TileEntitySocketBase {
         boolean ret = false;
         do {
             //PlayerControllerMP.onPlayerRightClick
-            if (itemstack != null && item.onItemUseFirst(itemstack, player, world, x, y, z, side, dx, dy, dz)) {
-                ret = true;
-                break;
+            if (firstTry && itemstack != null) {
+                ItemStack orig = itemstack.copy();
+                if (item.onItemUseFirst(itemstack, player, world, x, y, z, side, dx, dy, dz)) {
+                    ret = true;
+                    break;
+                }
+                if (!FzUtil.identical(itemstack, orig)) {
+                    ret = true;
+                    break;
+                }
             }
             
             if (!player.isSneaking() || itemstack == null || item.shouldPassSneakingClickToBlock(world, x, y, z)) {
@@ -214,7 +211,9 @@ public class SocketRobotHand extends TileEntitySocketBase {
         } while (false);
         int origSize = itemstack.stackSize;
         ItemStack mutatedItem = itemstack.useItemRightClick(world, player);
-
+        if (!ret && !FzUtil.identical(mutatedItem, itemstack)) {
+            ret = true;
+        }
         if (mutatedItem == itemstack && (mutatedItem == null || mutatedItem.stackSize == origSize)) {
             return ret;
         }

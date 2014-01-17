@@ -11,9 +11,10 @@ import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.Coord;
 import factorization.common.FactoryType;
-import factorization.shared.ItemFactorization;
 import factorization.shared.Core.TabType;
+import factorization.shared.ItemFactorization;
 
 public class ItemSocketPart extends ItemFactorization {
 
@@ -99,22 +100,23 @@ public class ItemSocketPart extends ItemFactorization {
             World world, int x, int y, int z, int side,
             float hitX, float hitY, float hitZ) {
         int md = is.getItemDamage();
-        if (world.getBlockTileEntity(x, y, z) instanceof SocketEmpty) {
-            is.stackSize--;
-            SocketEmpty se = (SocketEmpty) world.getBlockTileEntity(x, y, z);
-            if (md > 0 && md < FactoryType.MAX_ID) {
-                try {
-                    TileEntitySocketBase socket = (TileEntitySocketBase) FactoryType.fromMd(md).getFactoryTypeClass().newInstance();
-                    world.setBlockTileEntity(x, y, z, socket);
-                    socket.facing = se.facing;
-                    world.markBlockForUpdate(x, y, z);
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
-            }
-            return true;
+        Coord here = new Coord(world, x, y, z);
+        is.stackSize--;
+        SocketEmpty se = here.getTE(SocketEmpty.class);
+        if (se == null) {
+            return super.onItemUse(is, player, world, x, y, z, side, hitX, hitY, hitZ);
         }
-        return super.onItemUse(is, player, world, x, y, z, side, hitX, hitY, hitZ);
+        if (md > 0 && md < FactoryType.MAX_ID) {
+            try {
+                TileEntitySocketBase socket = (TileEntitySocketBase) FactoryType.fromMd(md).getFactoryTypeClass().newInstance();
+                here.setTE(socket);
+                socket.facing = se.facing;
+                here.markBlockForUpdate();
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+        return true;
     }
     
     @Override

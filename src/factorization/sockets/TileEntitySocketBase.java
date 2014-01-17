@@ -284,9 +284,9 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     protected EntityPlayer getFakePlayer() {
         EntityPlayer player = FzUtil.makePlayer(getCoord(), "socket");
         player.worldObj = worldObj;
-        player.prevPosX = player.posX = xCoord + 0.5;
+        player.prevPosX = player.posX = xCoord + 0.5 + facing.offsetX;
         player.prevPosY = player.posY = yCoord + 0.5 - player.getEyeHeight() + facing.offsetY;
-        player.prevPosZ = player.posZ = zCoord + 0.5;
+        player.prevPosZ = player.posZ = zCoord + 0.5 + facing.offsetZ;
         for (int i = 0; i < player.inventory.mainInventory.length; i++) {
             player.inventory.mainInventory[i] = null;
         }
