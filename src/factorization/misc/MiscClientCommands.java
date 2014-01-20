@@ -475,7 +475,12 @@ public class MiscClientCommands implements ICommand {
         if (args == null || args.length == 0) {
             args = new String[] { "help" };
         }
-        runCommand(Arrays.asList(args));
+        ArrayList<String> better = new ArrayList();
+        for (String arg : args) {
+            if (arg == null || arg.length() == 0) continue;
+            better.add(arg);
+        }
+        runCommand(better);
     }
     
     @Override
