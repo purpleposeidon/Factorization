@@ -204,10 +204,8 @@ public class SocketRobotHand extends TileEntitySocketBase {
                     break;
                 }
             }
-            if (!itemstack.tryPlaceItemIntoWorld(player, world, x, y, z, side, dx, dy, dz)) {
-                ret = false;
-                break;
-            }
+            ret = itemstack.tryPlaceItemIntoWorld(player, world, x, y, z, side, dx, dy, dz);
+            break;
         } while (false);
         int origSize = itemstack.stackSize;
         ItemStack mutatedItem = itemstack.useItemRightClick(world, player);
