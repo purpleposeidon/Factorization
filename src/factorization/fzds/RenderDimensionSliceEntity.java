@@ -1,7 +1,6 @@
 package factorization.fzds;
 
 import static org.lwjgl.opengl.GL11.glCallList;
-import static org.lwjgl.opengl.GL11.glGetError;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
@@ -30,7 +29,6 @@ import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.world.WorldEvent;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.glu.GLU;
 
 import cpw.mods.fml.common.IScheduledTickHandler;
 import cpw.mods.fml.common.TickType;
@@ -39,6 +37,7 @@ import factorization.api.Quaternion;
 import factorization.common.FzConfig;
 import factorization.fzds.api.DeltaCapability;
 import factorization.shared.Core;
+import factorization.shared.FzUtil;
 
 
 public class RenderDimensionSliceEntity extends Render implements IScheduledTickHandler {
@@ -50,14 +49,6 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
     
     public RenderDimensionSliceEntity() {
         instance = this;
-    }
-    
-    static void checkGLError(String op) {
-        int errSym = glGetError();
-        if (errSym != 0) {
-            Core.logSevere("GL Error @ " + op);
-            Core.logSevere(errSym + ": " + GLU.gluErrorString(errSym));
-        }
     }
     
     @Override
@@ -101,7 +92,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             
             renderers = new WorldRenderer[cubicChunkCount];
             int i = 0;
-            checkGLError("FZDS before render");
+            FzUtil.checkGLError("FZDS before render");
             for (int y = 0; y <= ySizeChunk; y++) {
                 for (int x = 0; x <= xSizeChunk; x++) {
                     for (int z = 0; z <= zSizeChunk; z++) {
@@ -112,8 +103,8 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                         renderers[i].posXClip = x*16;
                         renderers[i].posYClip = y*16;
                         renderers[i].posZClip = z*16;
-                        renderers[i].markDirty();
-                        checkGLError("FZDS WorldRenderer init");
+                        //renderers[i].markDirty();
+                        FzUtil.checkGLError("FZDS WorldRenderer init");
                         i++;
                     }
                 }
@@ -131,7 +122,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             }
             boolean start_from_begining = last_update_index == 0;
             Core.profileStart("updateFzdsTerrain");
-            checkGLError("FZDS before WorldRender update");
+            FzUtil.checkGLError("FZDS before WorldRender update");
             final int update_limit = 20; //NORELEASE?
             int updates = 0;
             while (last_update_index < renderers.length) {
@@ -193,6 +184,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 for (int cdx = 0; cdx < xwidth; cdx++) {
                     for (int cdz = 0; cdz < zwidth; cdz++) {
                         Chunk here = corner.w.getChunkFromBlockCoords(corner.x + cdx*16, corner.z + cdz*16);
+                        Core.profileStart("entity");
                         for (int i1 = 0; i1 < here.entityLists.length; i1++) {
                             List<Entity> ents = (List<Entity>)here.entityLists[i1];
                             for (int i2 = 0; i2 < ents.size(); i2++) {
@@ -210,6 +202,8 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                                 RenderManager.instance.renderEntity(e, partialTicks);
                             }
                         }
+                        Core.profileEnd();
+                        Core.profileStart("tesr");
                         for (TileEntity te : ((Map<ChunkPosition, TileEntity>)here.chunkTileEntityMap).values()) {
                             //I warned you about comods, bro! I told you, dawg! (Shouldn't actually be a problem if we're rendering properly)
                             
@@ -220,6 +214,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                             TileEntityRenderer.instance.playerZ = te.zCoord;
                             TileEntityRenderer.instance.renderTileEntity(te, partialTicks);
                         }
+                        Core.profileEnd();
                     }
                 }
             } finally {
@@ -292,7 +287,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         DSRenderInfo renderInfo = getRenderInfo(dse);
         if (nest == 0) {
             Core.profileStart("fzds");
-            checkGLError("FZDS before render -- somebody left a mess!");
+            FzUtil.checkGLError("FZDS before render -- somebody left us a mess!");
             renderInfo.lastRenderInMegaticks = megatickCount;
         } else if (nest == 1) {
             Core.profileStart("recursion");
@@ -302,17 +297,20 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         try {
             final boolean oracle = dse.can(DeltaCapability.ORACLE);
             if (nest == 1) {
-                Core.profileStart("build");
-                if (oracle) {
-                    renderInfo.update();
-                } else {
-                    Hammer.proxy.setShadowWorld();
-                    try {
+                Core.profileStart("update");
+                try {
+                    if (oracle) {
                         renderInfo.update();
-                    } finally {
-                        Hammer.proxy.restoreRealWorld();
-                        Core.profileEnd();
+                    } else {
+                        Hammer.proxy.setShadowWorld();
+                        try {
+                            renderInfo.update();
+                        } finally {
+                            Hammer.proxy.restoreRealWorld();
+                        }
                     }
+                } finally {
+                    Core.profileEnd();
                 }
             }
             glPushMatrix();
@@ -338,8 +336,10 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 if (dse.opacity != 1) {
                     GL11.glColor4f(1, 1, 1, dse.opacity);
                 }
+                Core.profileStart("renderTerrain");
                 renderInfo.renderTerrain();
-                checkGLError("FZDS terrain display list render");
+                Core.profileEnd();
+                FzUtil.checkGLError("FZDS terrain display list render");
                 glTranslatef((float)(dse.posX - x), (float)(dse.posY - y), (float)(dse.posZ - z));
                 Coord c = dse.getCorner();
                 glTranslatef(-c.x, -c.y, -c.z);
@@ -357,7 +357,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                 } else {
                     renderInfo.renderEntities(partialTicks);
                 }
-                checkGLError("FZDS entity render");
+                FzUtil.checkGLError("FZDS entity render");
             } finally {
                 if (dse.opacity != 1) {
                     GL11.glColor4f(1, 1, 1, 1);
@@ -371,7 +371,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         finally {
             nest--;
             if (nest == 0) {
-                checkGLError("FZDS after render");
+                FzUtil.checkGLError("FZDS after render");
                 Core.profileEnd();
             } else if (nest == 1) {
                 Core.profileEnd();

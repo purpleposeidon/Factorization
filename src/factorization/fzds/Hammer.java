@@ -51,7 +51,7 @@ public class Hammer {
             "Yet on the morn we wake to find",
             "That mem'ry left so far behind.",
             "To deafened ears we ask, unseen,",
-            "“Which is life and which the dream?”"
+            "“Which is life and which the dream?”" // -- Aaron Diaz, http://dresdencodak.com/2006/03/02/zhuangzi/
     };
     
     
@@ -179,7 +179,7 @@ public class Hammer {
     }
     
     @EventHandler
-    public void setMainServerThread(FMLServerStartingEvent event) {
+    public void serverStartup(FMLServerStartingEvent event) {
         if (!enabled) {
             return;
         }
@@ -187,57 +187,7 @@ public class Hammer {
         DimensionManager.initDimension(dimensionID);
         assert DimensionManager.shouldLoadSpawn(dimensionID);
         World hammerWorld = DimensionManager.getWorld(dimensionID);
-        hammerWorld.addWorldAccess(new IWorldAccess() {
-            //TODO: Move to file; mix with Client Proxy's version
-            //Should lets DSEs know that they need to update their area when a block is changed 
-            @Override public void spawnParticle(String var1, double var2, double var4, double var6, double var8, double var10, double var12) { }
-            @Override public void onEntityCreate(Entity entity) { }
-            @Override public void onEntityDestroy(Entity entity) { }
-            @Override public void playSound(String var1, double var2, double var4, double var6, float var8, float var9) { }
-            @Override public void playRecord(String var1, int var2, int var3, int var4) { }
-            @Override public void playAuxSFX(EntityPlayer var1, int var2, int var3, int var4, int var5, int var6) { }
-            
-            @Override
-            public void markBlockRangeForRenderUpdate(int lx, int ly, int lz, int hx, int hy, int hz) {
-                markBlocksForUpdate(lx, ly, lz, hx, hy, hz);
-            }
-            
-            @Override
-            public void markBlockForUpdate(int x, int y, int z) {
-                markBlocksForUpdate(x, y, z, x, y, z);
-            }
-            
-            @Override
-            public void markBlockForRenderUpdate(int x, int y, int z) {
-                markBlocksForUpdate(x, y, z, x, y, z);
-            }
-            
-            Coord center = new Coord(DeltaChunk.getClientShadowWorld(), 0, 0, 0);
-            void markBlocksForUpdate(int lx, int ly, int lz, int hx, int hy, int hz) {
-                //Sorry, it could probably be a bit more efficient.
-                Coord lower = new Coord(null, lx, ly, lz);
-                Coord upper = new Coord(null, hx, hy, hz);
-                World realClientWorld = DeltaChunk.getClientRealWorld();
-                Iterator<IDeltaChunk> it = DeltaChunk.getSlices(realClientWorld).iterator();
-                while (it.hasNext()) {
-                    DimensionSliceEntity dse = (DimensionSliceEntity) it.next();
-                    if (dse.isDead) {
-                        it.remove(); //shouldn't happen. Keeping it anyways.
-                        continue;
-                    }
-                    if (dse.getCorner().inside(lower, upper) || dse.getFarCorner().inside(lower, upper)) {
-                        dse.blocksChanged(lx, ly, lz);
-                        dse.blocksChanged(hx, hy, hz);
-                    }
-                }
-            }
-            
-            
-            @Override
-            public void playSoundToNearExcept(EntityPlayer entityplayer, String s, double d0, double d1, double d2, float f, float f1) { }
-            @Override public void destroyBlockPartially(int var1, int var2, int var3, int var4, int var5) { }
-            @Override public void broadcastSound(int var1, int var2, int var3, int var4, int var5) { }
-        });
+        hammerWorld.addWorldAccess(new ShadowWorldAccess());
         int view_distance = MinecraftServer.getServer().getConfigurationManager().getViewDistance();
         //the undeobfed method comes after "isPlayerWatchingChunk", also in uses of ServerConfigurationManager.getViewDistance()
         //It returns how many blocks are visible.
