@@ -4,9 +4,10 @@
     ShifterControl'll let you access slots as an int instead of a byte
     Made the speed not be twitchy
     Added a Commenter; this tool lets you add comments to servo rails
+    A warning: I am going to reduce the number of inventory slots in a servo to 1.
   Localizations:
-    Polish: Szewek
-    Russian: Anton
+    Polish localizations by Szewek!
+    Russian localizations by Anton!
   Barrels can be pushed with a knockback sword after drinking a strength potion.
     Only half of all possible orientations & positions are available with ordinary moves: push up a slab to get the other half
   redstone signal makes lacerator stop digging and slow down at the same time, instead of slowing then stopping.

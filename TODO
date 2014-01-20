@@ -110,8 +110,11 @@ Lower barriers to entry for servos:
 
 IMMEDIATE (for next public release)
 ---------
-sculptures:
-  easy mode glazing... or you know what? Let's just tone down the time it takes a tad
+Run a pass through the item icons, particularly:
+    servo motor crafting component
+    servo entity placer
+How can we make our recipes even easier?
+    - maybe coils should give 8 instead of 4. It is pushing up into balance problems maybe, but it does make more sense for conservation-of-mass.
 
 
 
@@ -148,8 +151,6 @@ Thaumcraft Compat:
   Remember to wrap mod compat module calls in try/catch!
 Do we remove aluminum ore processing? It feels unnecessary to me.
 Exchange Bag of Holding for just... free inventory space.
-ceramics easy-mode: glazing auto-high fires
-AO shadows under servo rails?
 
 
 UNTRIAGED
@@ -169,7 +170,29 @@ LMP store instructions... Like a bag or a backpack
 Test BoH key with NEI installed & with sneak key set to a mouse button.
 Church Organ
 instructions mess up servo rail tessellator shading?
-
+sculptures:
+  easy mode glazing... or you know what? Let's just tone down the time it takes a tad
+add an LMP instruction (recipe may be difficult!). Clicks the instruction with an LMP.
+Add fan:
+    - pushes and pulls entities
+    - is an inventoryless mixer. Might also blow around chest contents? :D
+    - It doesn't need an inventory behind it. But if there *is* an inventory behind it, it will move items into/outof that inventory.
+    - two instructions: suck/blow and high/medium/low
+    - change socket tool placement. First click w/ a motor; then click w/ the original socket thingie.
+    Tell me more about using the fan as a mixer.
+        Uses the inventory in front of it as the base inventory for the mixer; then it spits mixed stuff out the back.
+        How does it deal with its configuration options?
+            Suck/blow changes nothing, it will still output to the back. OR it only works in suck mode. (Incidentally, suck mode will probably be the default mode?)
+            The speed setting will make it work faster.
+    - Redstone signal should operate exactly like the lacerator's.
+    - It also works on fluids.
+        If there is a liquid 'source' (either a TE providing a liquid, or a source block that we can handle) avail, then we push it in the appropriate direction. 
+        pushes about 7*speed blocks away, and 3*speed blocks up.
+        What about the filling algorithm? A pain, eh? Just something kinda randomish maybe?
+    - Oh, also, it can get power from steam. (Well, any hot gas.)
+    We should probably call it a portmanteau of "fan", "propeller", and "turbine".
+        good ones: fanturpeller impeller fanprobine fropellurbine fanturbine
+        propellurbine Fanpellerbine Fropebine Probifan Propefan Turbifan Turpefan spinnything Fanpellerbine Turpellefan Turbellefan propurbine turpeller
 NEVER/POSTPONED
 ---------------
 fix shading of faces of blocks that are in barrels; research if such a fix is possible
