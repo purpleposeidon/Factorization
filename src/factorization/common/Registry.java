@@ -1133,13 +1133,16 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 " D ",
                 'D', dark_iron,
                 'S', "ingotSilver");
-        recipe(sprocket_motor,
-                " S ",
-                "rMc",
+        oreRecipe(sprocket_motor,
+                "qCL",
+                "SM ",
+                "rCL",
+                'q', Item.netherQuartz,
+                'r', Item.redstone,
                 'S', dark_iron_sprocket,
-                'r', Item.redstoneRepeater,
-                'M', motor,
-                'c', Item.comparator);
+                'C', insulated_coil,
+                'M', magnet,
+                'L', "ingotLead");
         oreRecipe(new ItemStack(servo_motor_placer),
                 "M#P",
                 " SC",
