@@ -559,6 +559,9 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             }
         }
         int upperLine = getMaxSize() - item.getMaxStackSize();
+        if (topStack == null) {
+            topStack = item.copy();
+        }
         if (count > upperLine) {
             topStack.stackSize = count - upperLine;
             count -= topStack.stackSize;
