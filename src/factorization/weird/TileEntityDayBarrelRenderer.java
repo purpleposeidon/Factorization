@@ -6,7 +6,6 @@ import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -19,6 +18,7 @@ import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
+import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.common.ItemIcons;
 import factorization.shared.Core;
@@ -83,7 +83,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         GL11.glTranslated(x, y, z);
         
         
-        if (FzConfig.render_barrel_use_displaylists && barrel.type != Type.HOPPING && barrel.should_use_display_list) {
+        if (FzConfig.render_barrel_use_displaylists && barrel.type != Type.HOPPING && barrel.should_use_display_list && barrel != FactoryType.DAYBARREL.getRepresentative()) {
             if (barrel.display_list == -1) {
                 FzUtil.checkGLError("FZ -- before barrel display list update. Someone left us a mess!");
                 if (barrel.display_list == -1) {

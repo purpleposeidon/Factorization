@@ -1249,13 +1249,11 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
                 count++;
             }
         }
-        if (count > 0) System.out.println("" + count + " display lists were unloaded"); //NORELEASE
     }
     
     @SideOnly(Side.CLIENT)
     public static void iterateForFinalizedBarrels() {
         synchronized (finalizedDisplayLists) {
-            System.out.println("Finalizing " + finalizedDisplayLists.size() + " display lists"); //NORELEASE
             for (Integer i : finalizedDisplayLists) {
                 if (i == null) continue;
                 GLAllocation.deleteDisplayLists(i);
