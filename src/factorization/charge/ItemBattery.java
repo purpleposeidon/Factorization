@@ -23,11 +23,6 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
         setMaxDamage(0); //'2' is not the number for this.
         setNoRepair();
     }
-    
-    @Override
-    public void registerIcons(IconRegister par1IconRegister) {
-        // Nada
-    }
 
     public int getStorage(ItemStack is) {
         NBTTagCompound tag = FzUtil.getTag(is);
@@ -56,7 +51,6 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
             float fullness = TileEntityBattery.getFullness(getStorage(is));
             String n = StatCollector.translateToLocalFormatted(pre + "perc", (int) (fullness * 100));
             list.add(n);
-            list.add((int) (fullness * 100) + "% charged");
         } else {
             switch (is.getItemDamage()) {
             case 0:
