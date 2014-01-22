@@ -607,7 +607,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             return;
         }
         ArrayList<ItemStack> toDrop = new ArrayList();
-        toDrop.add(new ItemStack(Core.registry.servo_motor_placer));
+        toDrop.add(new ItemStack(Core.registry.servo_placer));
         for (ItemStack is : inv) {
             toDrop.add(is);
         }

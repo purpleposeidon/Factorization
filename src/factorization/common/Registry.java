@@ -124,7 +124,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
             router_thorough, router_throughput, router_eject;
     public ItemMachineUpgrade barrel_enlarge;
     public ItemAcidBottle acid;
-    public ItemCraftingComponent magnet, insulated_coil, motor, fan, diamond_cutting_head;
+    public ItemCraftingComponent insulated_coil, motor, fan, diamond_cutting_head;
     public ItemStack sulfuric_acid, aqua_regia;
     public ItemChargeMeter charge_meter;
     public ItemBlockProxy mirror;
@@ -139,9 +139,9 @@ public class Registry implements ICraftingHandler, ITickHandler {
     public Fluid steamFluid;
     public ItemCraftingComponent nether_powder, rocket_fuel;
     public ItemBlockProxy rocket_engine;
-    public ItemServoMotor servo_motor_placer;
+    public ItemServoMotor servo_placer;
     public ItemServoRailWidget servo_widget_instruction, servo_widget_decor;
-    public ItemStack dark_iron_sprocket, sprocket_motor;
+    public ItemStack dark_iron_sprocket, servo_motor;
     public ItemDayBarrel daybarrel;
     public ItemSocketPart socket_part;
     public ItemCraftingComponent instruction_plate;
@@ -324,7 +324,6 @@ public class Registry implements ICraftingHandler, ITickHandler {
         OreDictionary.registerOre("sulfuricAcid", sulfuric_acid);
         OreDictionary.registerOre("bottleSulfuricAcid", sulfuric_acid);
         OreDictionary.registerOre("aquaRegia", aqua_regia);
-        magnet = new ItemCraftingComponent(itemID("magnet", 9025), "magnet");
         insulated_coil = new ItemCraftingComponent(itemID("coil", 9026), "insulated_coil");
         motor = new ItemCraftingComponent(itemID("motor", 9027), "motor");
         fan = new ItemCraftingComponent(itemID("fan", 9028), "fan");
@@ -355,13 +354,13 @@ public class Registry implements ICraftingHandler, ITickHandler {
         }
         
         //Servos
-        servo_motor_placer = new ItemServoMotor(itemID("servoMotorPlacer", 9056));
+        servo_placer = new ItemServoMotor(itemID("servoMotorPlacer", 9056));
         servo_widget_decor = new ItemServoRailWidget(itemID("servoWidgetDecor", 9057), "servo/decorator");
         servo_widget_instruction = new ItemServoRailWidget(itemID("servoWidgetInstruction", 9061), "servo/component");
         servo_widget_decor.setMaxStackSize(16);
         servo_widget_instruction.setMaxStackSize(1);
         dark_iron_sprocket = new ItemStack(new ItemCraftingComponent(itemID("darkIronSprocket", 9059), "servo/sprocket"));
-        sprocket_motor = new ItemStack(new ItemCraftingComponent(itemID("servoMotor", 9060), "servo/servo_motor"));
+        servo_motor = new ItemStack(new ItemCraftingComponent(itemID("servoMotor", 9060), "servo/servo_motor"));
         socket_part = new ItemSocketPart(itemID("socketPart", 9064), "socket/", TabType.SERVOS);
         instruction_plate = new ItemCraftingComponent(itemID("instructionPlate", 9065), "servo/instruction_plate", TabType.SERVOS);
         instruction_plate.setSpriteNumber(0);
@@ -393,6 +392,19 @@ public class Registry implements ICraftingHandler, ITickHandler {
         }
         convertOreItems(params);
         GameRegistry.addRecipe(new ShapedOreRecipe(res, params));
+    }
+    
+    void batteryRecipe(ItemStack res, Object... params) {
+        for (int damage : new int[] { 1, 2 }) {
+            ArrayList items = new ArrayList(params.length);
+            for (Object p : params) {
+                if (p == battery) {
+                    p = new ItemStack(battery, 1, damage);
+                }
+                items.add(p);
+            }
+            oreRecipe(res, items.toArray());
+        }
     }
 
     public void shapelessOreRecipe(ItemStack res, Object... params) {
@@ -917,15 +929,6 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 'I', Item.ingotIron,
                 'L', "ingotLead",
                 'A', acid);
-        for (int damage : new int[] { 1, 2 }) {
-            recipe(new ItemStack(magnet),
-                    "WWW",
-                    "WIW",
-                    "WBW",
-                    'W', leadwire_item,
-                    'I', Item.ingotIron,
-                    'B', new ItemStack(battery, 1, damage));
-        }
         oreRecipe(leydenjar_item,
                 "#G#",
                 "#L#",
@@ -946,12 +949,12 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "LLL",
                 'L', "ingotLead",
                 'C', Block.blockClay);
-        oreRecipe(new ItemStack(motor),
+        batteryRecipe(new ItemStack(motor),
                 "CIC",
-                "CMC",
-                "LIL",
+                "CIC",
+                "LBL",
                 'C', insulated_coil,
-                'M', magnet,
+                'B', battery,
                 'L', "ingotLead",
                 'I', Item.ingotIron);
         if (FzConfig.enable_solar_steam) { //NOTE: This'll probably cause a bug when we use mirrors for other things
@@ -969,10 +972,10 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 'L', "ingotLead");
         recipe(new ItemStack(diamond_cutting_head),
                 "SSS",
-                "SIS",
+                "S-S",
                 "SSS",
                 'S', diamond_shard,
-                'I', Item.ingotIron);
+                '-', Block.pressurePlateIron);
         /* oreRecipe(grinder_item,
                 "LIL",
                 "I*I",
@@ -1133,21 +1136,22 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 " D ",
                 'D', dark_iron,
                 'S', "ingotSilver");
-        oreRecipe(sprocket_motor,
+        batteryRecipe(servo_motor,
                 "qCL",
-                "SM ",
+                "SIB",
                 "rCL",
                 'q', Item.netherQuartz,
                 'r', Item.redstone,
                 'S', dark_iron_sprocket,
                 'C', insulated_coil,
-                'M', magnet,
+                'I', Item.ingotIron,
+                'B', battery,
                 'L', "ingotLead");
-        oreRecipe(new ItemStack(servo_motor_placer),
+        oreRecipe(new ItemStack(servo_placer),
                 "M#P",
                 " SC",
                 "M#P",
-                'M', sprocket_motor,
+                'M', servo_motor,
                 '#', logicMatrix,
                 'P', logicMatrixProgrammer,
                 'S', empty_socket_item,
