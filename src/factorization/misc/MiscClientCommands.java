@@ -177,7 +177,7 @@ public class MiscClientCommands implements ICommand {
         @alias({"render_everything_lagfest"})
         @help("Render a ton of terrain at once (may lock your game up for a while)")
         public static void render_above() {
-            Object wr_list = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, "sortedWorldRenderers", "sortedWorldRenderers");
+            Object wr_list = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, "field_72768_k", "sortedWorldRenderers");
             if (!(wr_list instanceof WorldRenderer[])) {
                 mc.thePlayer.addChatMessage("Reflection failed");
                 return;
