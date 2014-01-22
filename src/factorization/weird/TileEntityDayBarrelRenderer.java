@@ -188,14 +188,15 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
             }
             if (!found) continue;
             double IX = i*char_width;
+            final double dy = 1.0 - (1.0/256.0);
             tess.addVertexWithUV(IX + char_width, 0, 0,
                     u + (x + 1)*du, v + y*dv);
             tess.addVertexWithUV(IX, 0, 0,
                     u + x*du, v + y*dv);
             tess.addVertexWithUV(IX, char_height,
-                    0, u + x*du, v + (y + 1)*dv);
+                    0, u + x*du, v + (y + dy)*dv);
             tess.addVertexWithUV(IX + char_width, char_height, 0,
-                    u + (x + 1)*du, v + (y + 1)*dv);
+                    u + (x + 1)*du, v + (y + dy)*dv);
             
         }
         tess.draw();
