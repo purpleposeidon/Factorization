@@ -75,7 +75,8 @@ public class Charge implements IDataSerializable {
     }
 
     public void readFromNBT(NBTTagCompound tag, String name) {
-        setValue(tag.getInteger(name));
+        int val = tag.getInteger(name);
+        setValue(val < 0 ? 0 : val);
     }
     
     public void readFromNBT(NBTTagCompound tag) {
