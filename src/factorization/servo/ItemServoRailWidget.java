@@ -82,6 +82,7 @@ public class ItemServoRailWidget extends ItemFactorization {
                     here.redraw();
                 } else {
                     here.markBlockForUpdate();
+                    rail.showDecorNotification(player);
                 }
                 if (!dec.isFreeToPlace() && !player.capabilities.isCreativeMode) {
                     is.stackSize--;

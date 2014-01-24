@@ -235,6 +235,29 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         return decoration;
     }
     
+    void showDecorNotification(EntityPlayer player) {
+        String info = "";
+        if (decoration == null) {
+            return;
+        }
+        info = decoration.getInfo();
+        info = info == null ? "" : info;
+        final Coord here = getCoord();
+        if (here.isWeaklyPowered()) {
+            Notify.withItem(new ItemStack(Block.torchRedstoneActive));
+            Notify.withStyle(Style.DRAWITEM);
+        }
+        if (comment.length() > 0) {
+            if (info.length() > 0) {
+                info += "\n";
+            }
+            info += EnumChatFormatting.ITALIC + comment;
+        }
+        if (info.length() > 0) {
+            Notify.send(player, here, info);
+        }
+    }
+    
     @Override
     public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
         final Coord here = getCoord();
@@ -250,25 +273,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         if (playerInstance != null) {
             playerInstance.sendToAllPlayersWatchingChunk(_getDescriptionPacket(true));
         }
-        String info = "";
-        if (decoration != null) {
-            info = decoration.getInfo();
-            info = info == null ? "" : info;
-            if (here.isWeaklyPowered()) {
-                Notify.withItem(new ItemStack(Block.torchRedstoneActive));
-                Notify.withStyle(Style.DRAWITEM);
-            }
-        }
-        
-        if (comment.length() > 0) {
-            if (info.length() > 0) {
-                info += "\n";
-            }
-            info += EnumChatFormatting.ITALIC + comment;
-        }
-        if (info.length() > 0) {
-            Notify.send(entityplayer, here, info);
-        }
+        showDecorNotification(entityplayer);
         return ret;
     }
     
