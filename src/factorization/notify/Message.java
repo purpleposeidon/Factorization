@@ -42,7 +42,7 @@ class Message {
             lifeTime += 1000 * 5;
         }
         position_important = style.contains(Style.EXACTPOSITION);
-        show_item = style.contains(Style.DRAWITEM);
+        show_item = style.contains(Style.DRAWITEM) && item != null;
         translate(args);
     }
     
