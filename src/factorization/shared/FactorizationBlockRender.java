@@ -310,7 +310,6 @@ abstract public class FactorizationBlockRender implements ICoord {
         float f3 = icon.getMaxV();
         float f4 = 0.0F;
         float f5 = 0.3F;
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         //GL11.glTranslatef(-f4, -f5, 0.0F);
         float f6 = 1.5F;
         //GL11.glScalef(f6, f6, f6);

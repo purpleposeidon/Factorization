@@ -141,6 +141,7 @@ public class RenderServoMotor extends RenderEntity {
         ServoMotor motor = (ServoMotor) ent;
 
         GL11.glPushMatrix();
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         GL11.glTranslated(x + 0.5, y + 0.5, z + 0.5);
         GL11.glPushMatrix();
 
@@ -188,6 +189,7 @@ public class RenderServoMotor extends RenderEntity {
         }
         GL11.glPopMatrix();
         motor.interpolatePosition(motor.pos_progress);
+        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
         Core.profileEndRender();
     }
     
@@ -322,7 +324,6 @@ public class RenderServoMotor extends RenderEntity {
     
     void renderMainModel(ServoMotor motor, float partial, double ro, boolean hilighting) {
         GL11.glPushMatrix();
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         bindTexture(Core.blockAtlas);
         if (!loaded_models) {
             try {
