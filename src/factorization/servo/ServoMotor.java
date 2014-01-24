@@ -66,7 +66,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
     }
     public boolean stacks_changed = false;
-    private ItemStack[] inv = new ItemStack[4], inv_last_sent = new ItemStack[inv.length];
+    private ItemStack[] inv = new ItemStack[1], inv_last_sent = new ItemStack[inv.length];
     public byte jmp = 0;
     public static final byte JMP_NONE = 0, JMP_NEXT_INSTRUCTION = 1, JMP_NEXT_TILE = 2;
 
