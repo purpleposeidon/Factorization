@@ -16,6 +16,7 @@ public class ItemCommenter extends ItemFactorization {
 
     public ItemCommenter(int itemId, String name) {
         super(itemId, name, TabType.SERVOS);
+        setMaxStackSize(1);
     }
 
     @Override

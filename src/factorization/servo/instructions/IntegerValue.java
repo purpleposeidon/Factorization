@@ -15,11 +15,11 @@ import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 
 public class IntegerValue extends Instruction {
-    int val = 1;
+    private int val = 1;
 
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        val = data.asSameShare(prefix + "val").put(val);
+        setVal(data.asSameShare(prefix + "val").put(getVal()));
         return this;
     }
 
@@ -30,14 +30,14 @@ public class IntegerValue extends Instruction {
 
     @Override
     public void motorHit(ServoMotor motor) {
-        motor.getServoStack(ServoMotor.STACK_ARGUMENT).push(val);
+        motor.getServoStack(ServoMotor.STACK_ARGUMENT).push(getVal());
     }
 
     @Override
     public Icon getIcon(ForgeDirection side) {
-        if (val == 1) {
+        if (getVal() == 1) {
             return BlockIcons.servo$one;
-        } else if (val == 0) {
+        } else if (getVal() == 0) {
             return BlockIcons.servo$zero;
         } else {
             return BlockIcons.servo$number;
@@ -52,11 +52,11 @@ public class IntegerValue extends Instruction {
     @Override
     public boolean onClick(EntityPlayer player, Coord block, ForgeDirection side) {
         if (playerHasProgrammer(player)) {
-            if (val == 0) {
-                val = 1;
+            if (getVal() == 0) {
+                setVal(1);
                 return true;
-            } else if (val == 1) {
-                val = 0;
+            } else if (getVal() == 1) {
+                setVal(0);
                 return true;
             }
         }
@@ -65,6 +65,14 @@ public class IntegerValue extends Instruction {
     
     @Override
     public String getInfo() {
-        return "" + val;
+        return "" + getVal();
+    }
+
+    public int getVal() {
+        return val;
+    }
+
+    public void setVal(int val) {
+        this.val = val;
     }
 }

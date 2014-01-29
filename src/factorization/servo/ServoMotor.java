@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
@@ -45,7 +46,7 @@ import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.notify.Notify;
-import factorization.notify.Notify.Style;
+import factorization.servo.instructions.IntegerValue;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 import factorization.shared.FzUtil.FzInv;
@@ -67,7 +68,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
     public boolean stacks_changed = false;
     private ItemStack[] inv = new ItemStack[1], inv_last_sent = new ItemStack[inv.length];
-    public byte jmp = 0;
+    public byte jmp = JMP_NONE;
+    public EntryAction entry_action = EntryAction.ENTRY_EXECUTE;
+    boolean cpu_blocked = false;
     public static final byte JMP_NONE = 0, JMP_NEXT_INSTRUCTION = 1, JMP_NEXT_TILE = 2;
 
     Coord pos_prev, pos_next;
@@ -179,6 +182,8 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         } else {
             jmp = data.as(Share.VISIBLE, "jmp").putByte(jmp);
         }
+        entry_action = data.as(Share.VISIBLE, "entryAction").putEnum(entry_action);
+        cpu_blocked = data.as(Share.VISIBLE, "cpuBlock").putBoolean(cpu_blocked);
         for (int i = 0; i < STACKS; i++) {
             String name = "stack" + i;
             stacks[i] = data.as(Share.VISIBLE, name).put(stacks[i]);
@@ -531,28 +536,70 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         if (worldObj.isRemote) {
             return;
         }
+        cpu_blocked = false;
         final int m = target_speed_index + 1;
         if (!extractCharge(m*2)) {
             speed_b = (byte) Math.max(0, speed_b*3/4 - 1);
         }
         TileEntityServoRail rail = getCurrentPos().getTE(TileEntityServoRail.class);
-        if (rail == null /* :| */ || rail.decoration == null) {
-            if (jmp == JMP_NEXT_TILE) {
-                jmp = JMP_NONE;
+        if (rail != null && rail.decoration != null) {
+            if (rail.decoration.preMotorHit(this)) {
+                return;
             }
-            return;
         }
-        if (getCurrentPos().isWeaklyPowered()) {
-            if (jmp == JMP_NEXT_TILE) {
-                jmp = JMP_NONE;
+        
+        switch (entry_action) {
+        default:
+        case ENTRY_EXECUTE:
+            if (rail == null /* :| */ || rail.decoration == null) {
+                if (jmp == JMP_NEXT_TILE) {
+                    jmp = JMP_NONE;
+                }
+                return;
             }
-            return;
+            if (getCurrentPos().isWeaklyPowered()) {
+                if (jmp == JMP_NEXT_TILE) {
+                    jmp = JMP_NONE;
+                }
+                return;
+            }
+            if (jmp != JMP_NONE) {
+                jmp = JMP_NONE;
+                return;
+            }
+            rail.decoration.motorHit(this);
+            break;
+        case ENTRY_LOAD:
+            if (rail.decoration != null) {
+                getServoStack(STACK_IO).push(rail.decoration.copyComponent());
+            }
+            break;
+        case ENTRY_WRITE:
+            ServoStack ss = getServoStack(STACK_IO);
+            if (ss.getSize() == 0) {
+                putError("IO stack is emtpy!");
+                break;
+            }
+            Object o = ss.pop();
+            if (o instanceof Instruction) {
+                rail.decoration = (Instruction) ((Instruction) o).copyComponent();
+                rail.sendDescriptionPacket();
+            } else if (o instanceof Integer) {
+                int val = (Integer) o;
+                IntegerValue iv = new IntegerValue();
+                iv.setVal(val);
+                rail.decoration = iv;
+                rail.sendDescriptionPacket();
+            } else {
+                putError("Can't write " + o + ", sorry!");
+            }
+            if (ss.getSize() == 0) {
+                entry_action = EntryAction.ENTRY_EXECUTE;
+            }
+            break;
+        case ENTRY_IGNORE:
+            break;
         }
-        if (jmp != JMP_NONE) {
-            jmp = JMP_NONE;
-            return;
-        }
-        rail.decoration.motorHit(this);
     }
 
     @Override
@@ -561,6 +608,15 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         ItemStack is = FzUtil.normalize(player.getHeldItem());
         if (is == null) {
             return false;
+        }
+        Item item = is.getItem();
+        if (item instanceof ItemServoRailWidget) {
+            ServoComponent sc = ServoComponent.fromItem(is);
+            if (sc instanceof Decorator) {
+                Decorator dec = (Decorator) sc;
+                dec.motorHit(this);
+                return true;
+            }
         }
         if (socket instanceof SocketEmpty && is.getItem() == Core.registry.socket_part) {
             int md = is.getItemDamage();

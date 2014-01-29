@@ -149,6 +149,12 @@ public abstract class ServoComponent implements IDataSerializable {
         return ret;
     }
     
+    public ServoComponent copyComponent() {
+        NBTTagCompound tag = new NBTTagCompound();
+        save(tag);
+        return load(tag);
+    }
+    
     public static ServoComponent fromItem(ItemStack is) {
         if (!is.hasTagCompound()) {
             return null;
@@ -238,7 +244,10 @@ public abstract class ServoComponent implements IDataSerializable {
                 WoodenServoGrate.class,
                 GlassServoGrate.class,
                 IronServoGrate.class,
-                ShifterControl.class
+                ShifterControl.class,
+                
+                ScanColor.class,
+                SetEntryAction.class
         }) {
             register(cl);
         }

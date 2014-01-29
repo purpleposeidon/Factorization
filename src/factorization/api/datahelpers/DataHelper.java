@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import factorization.api.FzColor;
 import factorization.api.FzOrientation;
 
 public abstract class DataHelper {
@@ -62,8 +63,7 @@ public abstract class DataHelper {
         }
         if (o instanceof Enum) {
             Enum value = (Enum) o;
-            int i = value.ordinal();
-            i = put(i);
+            int i = putInt(value.ordinal());
             if (isWriter()) {
                 return (E) value;
             }
@@ -144,64 +144,13 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
 
     public final <E extends Enum> E putEnum(E value) throws IOException { return (E)put(value); }
     
-    private static final Class[] validTypes = new Class[] {
-        Boolean.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, NBTTagCompound.class, String.class
-    };
-    public final Object putUntypedOject(Object value) throws IOException {
-        if (!valid) {
-            return value;
-        }
-        final String orig_name = name;
-        if (isReader()) {
-            byte typeIndex = asSameShare(orig_name + ".type").putByte((byte)-1);
-            asSameShare(orig_name);
-            if (typeIndex < 0 || typeIndex > validTypes.length) {
-                return value; //Fun times.
-            }
-            Class type = validTypes[typeIndex];
-            if (value != null && value.getClass() == type) {
-                return put(value);
-            }
-            //We don't have a good value. So, we'll have to create one.
-            if (type == Boolean.class) {
-                value = false;
-            } else if (type == Short.class) {
-                value = (short) 0;
-            } else if (type == Integer.class) {
-                value = (int) 0;
-            } else if (type == Long.class) {
-                value = (long) 0;
-            } else if (type == Float.class) {
-                value = (float) 0;
-            } else if (type == Double.class) {
-                value = (double) 0;
-            } else if (type == NBTTagCompound.class) {
-                value = new NBTTagCompound();
-            } else if (type == String.class) {
-                value = "";
-            } else {
-                return null;
-            }
-            return put(value);
-        } else {
-            Class value_type = value.getClass();
-            for (byte i = 0; i < validTypes.length; i++) {
-                Class type = validTypes[i];
-                if (value_type == type) {
-                    asSameShare(orig_name + ".type").putByte(i);
-                    asSameShare(orig_name);
-                    put(value);
-                    return value;
-                }
-            }
-            throw new IllegalArgumentException("Don't know how to handle: " + value_type);
-            //return value; //Uh, yeah. We don't know what it is.
-        }
-    }
-    
     public void log(String message) {}
     
     public boolean hasLegacy(String name) {
         return false;
+    }
+    
+    public boolean isValid() {
+        return valid;
     }
 }

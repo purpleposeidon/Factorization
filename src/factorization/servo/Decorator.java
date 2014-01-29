@@ -16,6 +16,13 @@ import factorization.shared.FzUtil;
 
 public abstract class Decorator extends ServoComponent {
     public abstract void motorHit(ServoMotor motor);
+    public boolean preMotorHit(ServoMotor motor) {
+        return false;
+    }
+    public CpuBlocking getBlockingBehavior() {
+        return CpuBlocking.NO_BLOCKING;
+    }
+    
     @SideOnly(Side.CLIENT)
     private static class StretchedIcon implements Icon {
         public Icon under;
@@ -139,4 +146,8 @@ public abstract class Decorator extends ServoComponent {
     }
     
     public void onPlacedOnRail(TileEntityServoRail sr) {}
+    
+    public boolean collides() {
+        return true;
+    }
 }

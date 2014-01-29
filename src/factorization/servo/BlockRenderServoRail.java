@@ -39,12 +39,16 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
     @Override
     public void render(RenderBlocks rb) {
         TileEntityServoRail rail = null;
+        boolean has_comment = false;
         if (world_mode) {
             if (te instanceof TileEntityServoRail) {
                 rail = (TileEntityServoRail) te;
                 Decorator dec = rail.decoration;
                 if (dec != null) {
                     dec.renderStatic(rail.getCoord(), rb);
+                }
+                if (rail.comment != null && rail.comment.length() > 0) {
+                    has_comment = true;
                 }
             } else {
                 return;
@@ -58,7 +62,7 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
                 sides[i] = true;
             }
         }
-        Icon icon = BlockIcons.servo$rail;
+        Icon icon = has_comment ? BlockIcons.servo$rail_comment : BlockIcons.servo$rail;
         block = BlockRenderHelper.instance;
         
         final float fL = TileEntityServoRail.width;

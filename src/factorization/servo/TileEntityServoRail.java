@@ -173,7 +173,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     
     @Override
     public boolean addCollisionBoxesToList(Block ignore, AxisAlignedBB aabb, List list, Entity entity) {
-        if (decoration != null && !(decoration instanceof Instruction)) {
+        if (decoration != null && decoration.collides()) {
             float f = decoration.getSize();
             boolean remote = (entity != null && entity.worldObj != null) ? entity.worldObj.isRemote : FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT;
             BlockRenderHelper block = remote ? Core.registry.clientTraceHelper : Core.registry.serverTraceHelper;
@@ -268,13 +268,17 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         if (decoration != null) {
             ret = decoration.onClick(entityplayer, here, side);
         }
+        sendDescriptionPacket();
+        showDecorNotification(entityplayer);
+        return ret;
+    }
+    
+    public void sendDescriptionPacket() {
         WorldServer world = (WorldServer) worldObj;
         PlayerInstance playerInstance = world.getPlayerManager().getOrCreateChunkWatcher(xCoord >> 4, zCoord >> 4, false);
         if (playerInstance != null) {
             playerInstance.sendToAllPlayersWatchingChunk(_getDescriptionPacket(true));
         }
-        showDecorNotification(entityplayer);
-        return ret;
     }
     
     @Override
@@ -293,6 +297,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
                 return false;
             }
             decoration = (Decorator) sc;
+            comment = input.readBoolean() ? "x" : null;
             return true;
         }
         if (messageType == MessageType.ServoRailEditComment) {
@@ -325,7 +330,8 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             DataOutputStream dos = new DataOutputStream(baos);
             try {
                 decoration.writeToPacket(dos);
-            } catch (Exception e) {
+                dos.writeBoolean(comment != null && comment.length() > 0);
+            } catch (Throwable e) {
                 Core.logWarning("Component packet error at %s %s:", this, getCoord());
                 e.printStackTrace();
                 decoration = null;

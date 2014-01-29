@@ -51,4 +51,9 @@ public abstract class Instruction extends Decorator {
         }
         return super.getSize();
     }
+    
+    @Override
+    public boolean collides() {
+        return false;
+    }
 }

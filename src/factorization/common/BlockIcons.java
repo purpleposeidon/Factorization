@@ -64,7 +64,7 @@ public class BlockIcons {
     public static Icon
         rocket_engine_top, rocket_engine_bottom_hole, rocket_engine_nozzle, rocket_engine_valid, rocket_engine_invalid;
     
-    public static Icon servo$rail;
+    public static Icon servo$rail, servo$rail_comment;
     public static Icon servo$model$chasis, servo$model$sprocket;
     
     public static Icon ceramics$bisque, ceramics$dry, ceramics$stand, ceramics$rawglaze;
@@ -114,6 +114,8 @@ public class BlockIcons {
     public static Icon servo$ctrl$shift_import, servo$ctrl$shift_export, servo$ctrl$shift_target_slot, servo$ctrl$shift_transfer_limit, servo$ctrl$shift_stream, servo$ctrl$shift_pulse_some, servo$ctrl$shift_pulse_exact;
     public static Icon servo$instruction_plate;
     public static Icon servo$trap;
+    public static Icon servo$entry_execute, servo$entry_load, servo$entry_write, servo$entry_ignore;
+    public static Icon servo$scan_color;
     
     public static class ActivatingMachineIcon extends IconGroup {
         public Icon top, bottom, side, side_on;
