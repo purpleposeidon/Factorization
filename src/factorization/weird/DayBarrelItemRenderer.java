@@ -56,7 +56,9 @@ public class DayBarrelItemRenderer implements IItemRenderer {
             GL11.glRotatef(90, 0, 0, -1);
             GL11.glRotatef(90, 0, 1, 0);
             GL11.glTranslated(-0.5, -0.5, -0.5);
+            GL11.glPushAttrib(GL11.GL_ENABLE_BIT | GL11.GL_COLOR_BUFFER_BIT);
             tesr.renderTileEntityAt(tec, 0, 0, 0, 0);
+            GL11.glPopAttrib();
         }
         GL11.glPopMatrix();
     }

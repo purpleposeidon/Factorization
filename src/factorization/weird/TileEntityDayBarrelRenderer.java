@@ -52,12 +52,8 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glDisable(GL11.GL_LIGHTING);
-        Core.profileStart("font");
         renderItemCount(is, barrel);
-        Core.profileEnd();
-        Core.profileStart("item");
         handleRenderItem(is);
-        Core.profileEnd();
         GL11.glEnable(GL11.GL_LIGHTING);
         
         
