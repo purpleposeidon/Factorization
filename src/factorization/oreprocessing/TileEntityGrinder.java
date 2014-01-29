@@ -23,7 +23,7 @@ import factorization.shared.FzUtil;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.shared.TileEntityFactorization;
 
-public class TileEntityGrinder extends TileEntityFactorization implements IChargeConductor {
+public class TileEntityGrinder extends TileEntityFactorization implements IChargeConductor { //NORELEASE: Remove when 1.7. If doing another 1.6 release, kill the textures/renderer?
     ItemStack input, output;
     Charge charge = new Charge(this);
     int progress = 0;
