@@ -1565,4 +1565,8 @@ public class FzUtil {
         }
         return false;
     }
+    
+    public static int getWorldDimension(World world) {
+        return world.provider.dimensionId;
+    }
 }
