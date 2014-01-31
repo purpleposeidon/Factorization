@@ -45,6 +45,9 @@ public class BlockRenderDayBarrel extends FactorizationBlockRender {
         TileEntityDayBarrel barrel;
         if (world_mode) {
             barrel = getCoord().getTE(TileEntityDayBarrel.class);
+            if (barrel == null) {
+                return;
+            }
         } else {
             barrel = (TileEntityDayBarrel) FactoryType.DAYBARREL.getRepresentative();
             barrel.loadFromStack(is);
