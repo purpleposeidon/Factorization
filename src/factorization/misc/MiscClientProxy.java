@@ -69,17 +69,6 @@ public class MiscClientProxy extends MiscProxy {
         }
         Minecraft.memoryReserve = new byte[0]; //Consider it an experiment. Would this break anything? I've *never* seen the out of memory screen.
         MinecraftForge.EVENT_BUS.register(this);
-        NetworkRegistry.instance().registerConnectionHandler(new IConnectionHandler() {
-            @Override public void playerLoggedIn(Player player, NetHandler netHandler, INetworkManager manager) {
-                fixNetherFog(mc.theWorld);
-            }
-            
-            @Override public String connectionReceived(NetLoginHandler netHandler, INetworkManager manager) { return null; }
-            @Override public void connectionOpened(NetHandler netClientHandler, MinecraftServer server, INetworkManager manager) { }
-            @Override public void connectionOpened(NetHandler netClientHandler, String server, int port, INetworkManager manager) { }
-            @Override public void connectionClosed(INetworkManager manager) { }
-            @Override public void clientLoggedIn(NetHandler clientHandler, INetworkManager manager, Packet1Login login) { }
-        });
         ClientCommandHandler.instance.registerCommand(new MiscClientCommands());
     }
     
@@ -95,40 +84,6 @@ public class MiscClientProxy extends MiscProxy {
             return false;
         }
         return true;
-    }
-    
-    public void fixNetherFog(World world) {
-        if (world == null || !world.isRemote) {
-            return;
-        }
-        if (world.provider == null || world.provider.getClass() != WorldProviderHell.class) {
-            return;
-        }
-        Field provider = ReflectionHelper.findField(World.class, "field_73011_w", "provider");
-        if (provider == null) {
-            //The field ACTUALLY COULD be not-found, despite using it normally a few lines up.
-            //Minecraft modding is great.
-            return;
-        }
-        final WorldProviderHell origProvider = (WorldProviderHell) world.provider;
-        final WorldProviderHell myProvider = new WorldProviderHell() {
-            @Override
-            @SideOnly(Side.CLIENT)
-            public boolean doesXZShowFog(int par1, int par2) {
-                final int renderDistance = mc.gameSettings.renderDistance;
-                return renderDistance < 2;
-            }
-        };
-        if (!setFinalField(provider, world, myProvider)) {
-            Core.logWarning("[fixNetherFog] Unable to change world.worldProvider");
-        }
-        for (Field f : WorldProviderHell.class.getFields()) {
-            try {
-                f.set(myProvider, f.get(origProvider));
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-        }
     }
     
     @Override
