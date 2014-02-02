@@ -25,7 +25,7 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.FactoryType;
 import factorization.sockets.ISocketHolder;
 
-public class PumpLiquids extends SocketFanturpeller {
+public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
     private static final int BUCKET = FluidContainerRegistry.BUCKET_VOLUME;
     private interface PumpAction {
         void suckIn();
@@ -481,5 +481,39 @@ public class PumpLiquids extends SocketFanturpeller {
     @Override
     protected boolean shouldFeedJuice() {
         return sourceAction != null && destinationAction != null;
+    }
+
+    @Override
+    public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+        if (from != sourceDirection) return 0;
+        return buffer.fill(resource, doFill);
+    }
+
+    @Override
+    public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+        return null;
+    }
+
+    @Override
+    public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+        return null;
+    }
+
+    @Override
+    public boolean canFill(ForgeDirection from, Fluid fluid) {
+        return from == sourceDirection;
+    }
+
+    @Override
+    public boolean canDrain(ForgeDirection from, Fluid fluid) {
+        return false;
+    }
+
+    static private FluidTankInfo[] no_info = new FluidTankInfo[0];
+    private FluidTankInfo[] tank_info = new FluidTankInfo[] { new FluidTankInfo(buffer) };
+    @Override
+    public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+        if (from == sourceDirection) return tank_info;
+        return no_info;
     }
 }
