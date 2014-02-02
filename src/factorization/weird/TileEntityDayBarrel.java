@@ -784,7 +784,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             strength -= p_wea.getAmplifier() + 1;
         }
         int knockback = EnchantmentHelper.getKnockbackModifier(player, null);
-        return strength*knockback;
+        return Math.max(1, strength*knockback);
     }
     
     static boolean isStairish(Coord c) {
@@ -1223,11 +1223,14 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     @SideOnly(Side.CLIENT)
     protected void finalize() throws Throwable {
         super.finalize();
-        synchronized (finalizedDisplayLists) {
-            if (display_list != -1) {
-                finalizedDisplayLists.add(display_list);
-                display_list = -1;
+        if (display_list != -1) {
+            if (Core.dev_environ) {
+                System.out.println("Barrel finalized"); //NORELEASE? Nah.
             }
+            synchronized (finalizedDisplayLists) {
+                    finalizedDisplayLists.add(display_list);
+            }
+            display_list = -1;
         }
     }
     
