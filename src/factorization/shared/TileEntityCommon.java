@@ -98,6 +98,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         return Core.registry.resource_block.removeBlockByPlayer(worldObj, player, xCoord, yCoord, zCoord);
     }
 
+    /** Called when there's a block update. */
     public void neighborChanged() {
     }
     
@@ -299,6 +300,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         return getDroppedBlock();
     }
     
+    /** Called when there's a comparatory-inventory-ish update */
     public void onNeighborTileChanged(int tilex, int tiley, int tilez) {}
     
     public void representYoSelf() {
