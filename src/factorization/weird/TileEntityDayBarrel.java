@@ -784,7 +784,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             strength -= p_wea.getAmplifier() + 1;
         }
         int knockback = EnchantmentHelper.getKnockbackModifier(player, null);
-        return Math.max(1, strength*knockback);
+        return Math.min(1, strength*knockback);
     }
     
     static boolean isStairish(Coord c) {
