@@ -109,6 +109,9 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         if (FzConfig.embarken_wood) {
             embarkener = new Embarkener();
         }
+        if (FzConfig.proper_projectile_physics) {
+            MinecraftForge.EVENT_BUS.register(new ProperProjectilePhysics());
+        }
     }
     
     public Packet makeTpsReportPacket(float tps) {
