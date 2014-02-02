@@ -36,6 +36,7 @@ public class GuiDataConfig extends GuiScreen {
     ArrayList<Field> fields = new ArrayList();
     int posLabel, posControl;
     boolean changed;
+    boolean orig_f1_state;;
     
     static class UsefulButton extends GuiButton {
         static FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
@@ -244,12 +245,18 @@ public class GuiDataConfig extends GuiScreen {
     public GuiDataConfig(IDataSerializable ids) {
         this.ids = ids;
         this.te = (TileEntity) ids;
+        mc = Minecraft.getMinecraft();
+        orig_f1_state = mc.gameSettings.hideGUI;
+        mc.gameSettings.hideGUI = true;
     }
     
     public GuiDataConfig(IDataSerializable ids, Entity container) {
         this.ids = ids;
         this.te = (TileEntity) ids;
         this.containingEntity = container;
+        mc = Minecraft.getMinecraft();
+        orig_f1_state = mc.gameSettings.hideGUI;
+        mc.gameSettings.hideGUI = true;
     }
     
     void closeScreen() {
@@ -351,7 +358,7 @@ public class GuiDataConfig extends GuiScreen {
     
     @Override
     public void drawScreen(int mouseX, int mouseY, float partial) {
-        drawDefaultBackground();
+        //drawDefaultBackground();
         super.drawScreen(mouseX, mouseY, partial);
         
         TextureManager tex = Minecraft.getMinecraft().renderEngine;
@@ -407,6 +414,7 @@ public class GuiDataConfig extends GuiScreen {
     @Override
     public void onGuiClosed() {
         super.onGuiClosed();
+        mc.gameSettings.hideGUI = orig_f1_state;
         if (!fields_valid || !changed) {
             return;
         }
