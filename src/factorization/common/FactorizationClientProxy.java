@@ -13,9 +13,7 @@ import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.NetHandler;
 import net.minecraft.profiler.Profiler;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
@@ -28,7 +26,6 @@ import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.IScheduledTickHandler;
-import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -92,6 +89,7 @@ import factorization.shared.TileEntityFactorization;
 import factorization.sockets.BlockRenderSocketBase;
 import factorization.sockets.SocketLacerator;
 import factorization.sockets.TileEntitySocketRenderer;
+import factorization.sockets.fanturpeller.SocketFanturpeller;
 import factorization.weird.BlockRenderDayBarrel;
 import factorization.weird.ContainerPocket;
 import factorization.weird.DayBarrelItemRenderer;
@@ -422,6 +420,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             setTileEntityRenderer(TileEntityLeydenJar.class, new TileEntityLeydenJarRender());
             setTileEntityRenderer(TileEntityCompressionCrafter.class, new TileEntityCompressionCrafterRenderer());
             setTileEntityRenderer(SocketLacerator.class, new TileEntitySocketRenderer());
+            setTileEntityRenderer(SocketFanturpeller.class, new TileEntitySocketRenderer());
             // End section that is azanor's fault
         }
 
@@ -449,7 +448,12 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 FactoryType.SOCKET_EMPTY,
                 FactoryType.SOCKET_LACERATOR,
                 FactoryType.SOCKET_ROBOTHAND,
-                FactoryType.SOCKET_SHIFTER
+                FactoryType.SOCKET_SHIFTER,
+                FactoryType.SOCKET_FANTURPELLER,
+                FactoryType.SOCKET_BLOWER,
+                FactoryType.SOCKET_PUMP,
+                FactoryType.SOCKET_POWERGEN,
+                FactoryType.SOCKET_MIXER
         }) {
             new BlockRenderSocketBase(ft);
         }

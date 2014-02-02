@@ -19,6 +19,9 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.IFluidBlock;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
@@ -852,5 +855,19 @@ public class Coord implements IDataSerializable {
             main.stackSize += other.stackSize;
         }
         return main;
+    }
+
+    public Fluid getFluid() {
+        Block b = getBlock();
+        if (b instanceof IFluidBlock) {
+            return ((IFluidBlock) b).getFluid();
+        }
+        if (b == Block.waterStill || b == Block.waterMoving) {
+            return FluidRegistry.WATER;
+        }
+        if (b == Block.lavaStill || b == Block.lavaMoving) {
+            return FluidRegistry.LAVA;
+        }
+        return null;
     }
 }

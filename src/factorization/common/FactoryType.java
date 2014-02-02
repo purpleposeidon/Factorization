@@ -1,7 +1,6 @@
 package factorization.common;
 
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.astro.TileEntityRocketEngine;
 import factorization.ceramics.TileEntityGreenware;
@@ -30,6 +29,11 @@ import factorization.sockets.SocketEmpty;
 import factorization.sockets.SocketLacerator;
 import factorization.sockets.SocketRobotHand;
 import factorization.sockets.SocketShifter;
+import factorization.sockets.fanturpeller.BlowEntities;
+import factorization.sockets.fanturpeller.GeneratePower;
+import factorization.sockets.fanturpeller.MixCrafting;
+import factorization.sockets.fanturpeller.PumpLiquids;
+import factorization.sockets.fanturpeller.SocketFanturpeller;
 import factorization.weird.TileEntityBarrel;
 import factorization.weird.TileEntityDayBarrel;
 import factorization.wrath.TileEntityRouter;
@@ -74,6 +78,11 @@ public enum FactoryType {
     SOCKET_LACERATOR(33, false, SocketLacerator.class, "fzsock_lacerate"),
     SOCKET_ROBOTHAND(34, false, SocketRobotHand.class, "fzsock_hand"),
     SOCKET_SHIFTER(35, true, SocketShifter.class, "fzsock_shift"),
+    SOCKET_FANTURPELLER(36, true, SocketFanturpeller.class, "fzsock_fanturpeller"),
+    SOCKET_PUMP(37, true, PumpLiquids.class, "fzsock_pump"),
+    SOCKET_POWERGEN(38, false, GeneratePower.class, "fzsock_gen"),
+    SOCKET_BLOWER(39, true, BlowEntities.class, "fzsock_blow"),
+    SOCKET_MIXER(40, false, MixCrafting.class, "fzsock_mix"),
     
 
     POCKETCRAFTGUI(101, true)
