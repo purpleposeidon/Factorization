@@ -12,10 +12,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.BlockFluidFinite;
 import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.IFluidHandler;
@@ -23,10 +21,10 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.FactoryType;
+import factorization.shared.FzUtil;
 import factorization.sockets.ISocketHolder;
 
-public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
-    private static final int BUCKET = FluidContainerRegistry.BUCKET_VOLUME;
+public class PumpLiquids extends BufferedFanturpeller {
     private interface PumpAction {
         void suckIn();
         FluidStack drainBlock(PumpCoord probe, boolean doDrain);
@@ -122,45 +120,22 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         
         @Override
         public FluidStack drainBlock(PumpCoord probe, boolean doDrain) {
-            Block b = Block.blocksList[worldObj.getBlockId(probe.x, probe.y, probe.z)];
-            if (!(b instanceof IFluidBlock)) {
-                Fluid vanilla;
-                if (b == Block.waterStill || b == Block.waterMoving) {
-                    vanilla = FluidRegistry.WATER;
-                } else if (b == Block.lavaStill || b == Block.lavaMoving) {
-                    vanilla = FluidRegistry.LAVA;
-                } else {
-                    return null;
-                }
-                if (worldObj.getBlockMetadata(probe.x, probe.y, probe.z) != 0) {
-                    return null;
-                }
-                if (doDrain) {
-                    worldObj.setBlockToAir(probe.x, probe.y, probe.z);
-                }
-                return new FluidStack(vanilla, BUCKET);
-            }
-            IFluidBlock block = (IFluidBlock) b;
-            if (!block.canDrain(worldObj, probe.x, probe.y, probe.z)) return null;
-            FluidStack fs = block.drain(worldObj, probe.x, probe.y, probe.z, false);
-            if (fs == null) return null;
-            if (fs.getFluid() != targetFluid) return null;
-            if (doDrain) {
-                fs = block.drain(worldObj, probe.x, probe.y, probe.z, true);
-            }
-            if (fs == null || fs.amount <= 0) return null;
-            return fs;
+            return FzUtil.drainSpecificBlockFluid(worldObj, probe.x, probe.y, probe.z, doDrain, targetFluid);
         }
         
         boolean updateFrontier() {
             if (visited.size() > max_pool) return false;
             if (frontier.isEmpty()) return false;
             Coord probe = new Coord(worldObj, 0, 0, 0);
+            int maxHeight = getMaxHeight();
+            int maxDistance = getMaxDistance();
             System.out.println("updateFrontier: " + frontier.size()); //NORELEASE
             int NORELEASE = 0;
             for (int amount = frontier.size(); amount > 0; amount--) {
                 PumpCoord pc = frontier.poll();
                 if (pc == null) return true;
+                if (pc.y >= maxHeight) continue;
+                if (pc.pathDistance >= maxDistance) continue;
                 boolean orig_is_liquid = drainBlock(pc, false) != null;
                 if (!orig_is_liquid) {
                     continue; //...oops!
@@ -209,6 +184,14 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
 
         @Override
         public void pumpOut() { }
+        
+        int getMaxHeight() {
+            return worldObj.getHeight();
+        }
+        
+        int getMaxDistance() {
+            return 64*target_speed;
+        }
     }
     
     private class Flooder extends Drainer {
@@ -299,12 +282,14 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
             Block block = Block.blocksList[fluid.getBlockID()];
             if (block == null) return false;
             if (drainBlock(pc, false) != null) return false;
-            at.setId(block);
-            if (block instanceof BlockFluidFinite) {
-                at.setMd(0xF); //Mmm.
-            }
+            at.setIdMd(block.blockID, block instanceof BlockFluidFinite ? 0xF : 0, true);
             buffer.setFluid(null);
             return true;
+        }
+        
+        @Override
+        int getMaxHeight() {
+            return yCoord + 1 + 3*target_speed;
         }
     }
     
@@ -358,10 +343,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         
     }
 
-    FluidTank buffer = new FluidTank(BUCKET);
     transient PumpAction sourceAction, destinationAction;
-    transient float maxRangeSq = 0;
-    transient float maxHeight = 0;
     transient ForgeDirection sourceDirection, destinationDirection;
     
     @Override
@@ -370,26 +352,10 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
     }
     
     @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        super.serialize(prefix, data);
-        if (data.isNBT()) { // Lame, but only just this once.
-            if (data.isReader()) {
-                buffer.readFromNBT(data.getTag());
-            } else {
-                buffer.writeToNBT(data.getTag());
-            }
-        }
-        return this;
-    }
-    
-    @Override
     protected void fanturpellerUpdate(ISocketHolder socket, Coord coord, boolean powered, boolean neighbor_changed) {
         if (worldObj.isRemote){
             return;
         }
-        maxRangeSq = (getTargetSpeed()*16);
-        maxRangeSq *= maxRangeSq;
-        maxHeight = yCoord + 1 + getTargetSpeed()/10*3;
         if (isSucking) {
             sourceDirection = facing;
             destinationDirection = facing.getOpposite();
@@ -417,6 +383,9 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         }
         if (!shouldDoWork()) {
             updateDestination(coord);
+            if (sourceAction == null) {
+                updateSource(coord);
+            }
         } else {
             updateSource(coord);
             updateDestination(coord);
@@ -459,7 +428,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
     }
     
     String easyName(Object obj) {
-        if (obj == null) return "none";
+        if (obj == null) return "None";
         return obj.getClass().getSimpleName();
     }
     
@@ -468,14 +437,14 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         FluidStack fs = buffer.getFluid();
         String fluid;
         if (fs == null) {
-            fluid = "empty";
+            fluid = "";
         } else {
-            fluid = fs.amount + "mB of " + fs.getFluid().getName();
+            fluid = "\n" + fs.amount + "mB of " + fs.getFluid().getName();
         }
-        return fluid + 
-                "\nSucking: " + isSucking + 
-                "\nSource action: " + easyName(sourceAction) + 
-                "\nDestination action: " + easyName(destinationAction);
+        return "Pump Liquids\n" + 
+                easyName(sourceAction) + 
+                " -> " + easyName(destinationAction) +
+                fluid;
     }
     
     @Override
@@ -484,36 +453,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
     }
 
     @Override
-    public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
-        if (from != sourceDirection) return 0;
-        return buffer.fill(resource, doFill);
-    }
-
-    @Override
-    public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
-        return null;
-    }
-
-    @Override
-    public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
-        return null;
-    }
-
-    @Override
-    public boolean canFill(ForgeDirection from, Fluid fluid) {
-        return from == sourceDirection;
-    }
-
-    @Override
-    public boolean canDrain(ForgeDirection from, Fluid fluid) {
-        return false;
-    }
-
-    static private FluidTankInfo[] no_info = new FluidTankInfo[0];
-    private FluidTankInfo[] tank_info = new FluidTankInfo[] { new FluidTankInfo(buffer) };
-    @Override
-    public FluidTankInfo[] getTankInfo(ForgeDirection from) {
-        if (from == sourceDirection) return tank_info;
-        return no_info;
+    int getRequiredCharge() {
+        return (int)getTargetSpeed();
     }
 }

@@ -52,9 +52,13 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidEvent;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.oredict.OreDictionary;
 
 import org.lwjgl.opengl.GL11;
@@ -1568,5 +1572,36 @@ public class FzUtil {
     
     public static int getWorldDimension(World world) {
         return world.provider.dimensionId;
+    }
+    
+    public static FluidStack drainSpecificBlockFluid(World worldObj, int x, int y, int z, boolean doDrain, Fluid targetFluid) {
+        Block b = Block.blocksList[worldObj.getBlockId(x, y, z)];
+        if (!(b instanceof IFluidBlock)) {
+            Fluid vanilla;
+            if (b == Block.waterStill || b == Block.waterMoving) {
+                vanilla = FluidRegistry.WATER;
+            } else if (b == Block.lavaStill || b == Block.lavaMoving) {
+                vanilla = FluidRegistry.LAVA;
+            } else {
+                return null;
+            }
+            if (worldObj.getBlockMetadata(x, y, z) != 0) {
+                return null;
+            }
+            if (doDrain) {
+                worldObj.setBlockToAir(x, y, z);
+            }
+            return new FluidStack(vanilla, FluidContainerRegistry.BUCKET_VOLUME);
+        }
+        IFluidBlock block = (IFluidBlock) b;
+        if (!block.canDrain(worldObj, x, y, z)) return null;
+        FluidStack fs = block.drain(worldObj, x, y, z, false);
+        if (fs == null) return null;
+        if (fs.getFluid() != targetFluid) return null;
+        if (doDrain) {
+            fs = block.drain(worldObj, x, y, z, true);
+        }
+        if (fs == null || fs.amount <= 0) return null;
+        return fs;
     }
 }

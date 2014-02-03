@@ -1,5 +1,6 @@
 package factorization.sockets.fanturpeller;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
@@ -7,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.util.Icon;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.IFluidHandler;
@@ -25,19 +27,21 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
+import factorization.oreprocessing.TileEntityGrinderRender;
 import factorization.servo.ServoMotor;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 import factorization.shared.FactorizationBlockRender;
 import factorization.shared.FzUtil;
+import factorization.shared.NetworkFactorization.MessageType;
 import factorization.sockets.ISocketHolder;
 import factorization.sockets.TileEntitySocketBase;
 
 public class SocketFanturpeller extends TileEntitySocketBase implements IChargeConductor {
     Charge charge = new Charge(this);
     boolean isSucking = false;
-    byte target_speed = 1; //NORELEASE: This isn't working right? Oh. Right. Ahhh....
-    float fanω; // because I can.
+    byte target_speed = 1;
+    float fanω, lastfanω; // because I can.
 
     transient float fanRotation, prevFanRotation;
 
@@ -88,7 +92,6 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
          * power. Must have a redstone signal, and front must be clear, and back
          * must contain a gas as a block or as an inventory
          */
-        if (!isSafeToDiscard()) return false;
         final Coord front = coord.add(facing);
         final Coord back = coord.add(facing.getOpposite());
 
@@ -162,12 +165,22 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
     }
     
     void replace(Coord at, SocketFanturpeller replacement) {
+        if (!isSafeToDiscard()) {
+            if (replacement instanceof BufferedFanturpeller && this instanceof BufferedFanturpeller) {
+                BufferedFanturpeller old = (BufferedFanturpeller) this;
+                BufferedFanturpeller rep = (BufferedFanturpeller) replacement;
+                rep.buffer = old.buffer;
+            } else {
+                return;
+            }
+        }
         replacement.facing = facing;
         replacement.isSucking = isSucking;
         replacement.target_speed = target_speed;
         replacement.fanω = fanω;
         replacement.fanRotation = fanRotation;
         replacement.prevFanRotation = prevFanRotation;
+        replacement.charge = charge;
         
         at.setTE(replacement);
     }
@@ -180,21 +193,22 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
     
     float getTargetSpeed() {
         if (!shouldFeedJuice()) return 0;
-        switch (target_speed) {
-        default:
-        case 0: return 0;
-        case 1: return 30;
-        case 2: return 20;
-        case 3: return 10;
-        }
+        return target_speed*10;
     }
     
     boolean shouldDoWork() {
         if (target_speed == 0) return false;
+        int direction = (isSucking ? -1 : 1);
         float ts = getTargetSpeed();
-        if (fanω >= ts) return true;
-        if (ts > fanω + 10) return false;
-        return (ts - fanω)/10.0F > rand.nextFloat(); 
+        if (Math.signum(fanω) != direction) return false;
+        float ω = Math.abs(fanω);
+        if (ω >= ts) return true;
+        if (ts > ω + 10) return false;
+        return (ts - ω)/10.0F > rand.nextFloat(); 
+    }
+    
+    int getRequiredCharge() {
+        return 0;
     }
     
     @Override
@@ -210,23 +224,30 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         prevFanRotation = fanRotation;
         fanturpellerUpdate(socket, coord, powered, neighbor_changed);
         if (!worldObj.isRemote) {
-            float ts = getTargetSpeed();
-            if (fanω > ts) {
-                float dω = (fanω/5) - 1;
-                if (fanω - dω < ts) {
-                    fanω = ts;
-                } else {
-                    fanω -= dω;
-                }
-            } else if (fanω < ts) {
-                if (charge.deplete(target_speed) >= target_speed) {
-                    fanω++;
-                } else {
-                    fanω = Math.max(0, fanω - 1);
+            final int need = getRequiredCharge();
+            if (need > 0) {
+                final float ts = getTargetSpeed() * (isSucking ? -1 : 1);
+                if (charge.deplete(need) < need) {
+                    fanω *= 0.9;
+                } else if (Math.abs(fanω) > Math.abs(ts)) { // we've been switched to a slower speed
+                    fanω = (fanω*9 + ts)/10;
+                    if (Math.abs(fanω) < Math.abs(ts)) {
+                        fanω = ts;
+                    }
+                } else if (Math.abs(fanω) < Math.abs(ts)) {
+                    fanω += Math.signum(ts);
+                    if (fanω > Math.abs(ts)) {
+                        fanω = ts;
+                    }
                 }
             }
+            
+            if (FzUtil.significantChange(fanω, lastfanω)) {
+                broadcastMessage(null, MessageType.FanturpellerSpeed, fanω);
+            }
+            lastfanω = fanω;
         }
-        fanRotation += isSucking ? fanω : -fanω;
+        fanRotation += fanω;
     }
     
     protected boolean shouldFeedJuice() {
@@ -234,6 +255,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
     }
     
     protected void fanturpellerUpdate(ISocketHolder socket, Coord coord, boolean powered, boolean neighbor_changed) {
+        fanω *= 0.95F;
     }
     
     protected boolean isSafeToDiscard() {
@@ -278,20 +300,48 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         block.renderRotated(tess, xCoord, yCoord, zCoord);
     }
     
+    protected float scaleRotation(float rotation) {
+        return rotation;
+    }
+    
     @Override
     @SideOnly(Side.CLIENT)
     public void renderTesr(ServoMotor motor, float partial) {
-        float sd = motor == null ? 10F/16F : 8F/16F;
-        GL11.glTranslatef(1, sd, 1);
-        float s = 14F/16F;
+        float d = 0.5F;
+        GL11.glTranslatef(d, d, d);
+        Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())).glRotate();
+        float turn = FzUtil.interp(prevFanRotation, fanRotation, partial);
+        GL11.glRotatef(turn, 0, 1, 0);
+        float sd = motor == null ? -2F/16F : 3F/16F;
+        GL11.glTranslatef(0, sd, 0);
+        
+        
+        float s = 12F/16F;
         if (motor != null) {
             s = 10F/16F;
         }
         GL11.glScalef(s, 1, s);
-        Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())).glRotate();
+        //TileEntityGrinderRender.renderGrindHead();
         GL11.glRotatef(90, 1, 0, 0);
-        float turn = FzUtil.interp(prevFanRotation, fanRotation, partial) / 5.0F;
-        GL11.glRotatef(turn, 0, 1, 0);
+        GL11.glTranslatef(-0.5F, -0.5F, 0);
         FactorizationBlockRender.renderItemIcon(Core.registry.fan.getIconFromDamage(0));
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
+        if (super.handleMessageFromServer(messageType, input)) {
+            return true;
+        }
+        if (messageType == MessageType.FanturpellerSpeed) {
+            fanω = input.readFloat();
+            return true;
+        }
+        return false;
+    }
+    
+    @Override
+    public Packet getDescriptionPacket() {
+        return getDescriptionPacketWith(MessageType.FanturpellerSpeed, fanω);
     }
 }
