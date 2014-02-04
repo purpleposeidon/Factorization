@@ -112,6 +112,9 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         if (FzConfig.proper_projectile_physics) {
             MinecraftForge.EVENT_BUS.register(new ProperProjectilePhysics());
         }
+        if (FzConfig.buffed_nametags) {
+            MinecraftForge.EVENT_BUS.register(new BuffNametags());
+        }
     }
     
     public Packet makeTpsReportPacket(float tps) {

@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -449,6 +450,27 @@ public class NetworkFactorization implements ITinyPacketHandler {
 
     }
     
+    boolean handleForeignEntityMessage(Entity ent, int messageType, DataInputStream input) throws IOException {
+        if (messageType == MessageType.EntityParticles) {
+            Random rand = new Random();
+            double px = rand.nextGaussian() * 0.02;
+            double py = rand.nextGaussian() * 0.02;
+            double pz = rand.nextGaussian() * 0.02;
+            
+            byte count = input.readByte();
+            String type = input.readUTF();
+            for (int i = 0; i < count; i++) {
+                ent.worldObj.spawnParticle(type,
+                        ent.posX + rand.nextFloat() * ent.width * 2.0 - ent.width,
+                        ent.posY + 0.5 + rand.nextFloat() * ent.height,
+                        ent.posZ + rand.nextFloat() * ent.width * 2.0 - ent.width,
+                        px, py, pz);
+            }
+            return true;
+        }
+        return false;
+    }
+    
     void handleCmd(byte[] data) {
         if (data == null || data.length < 2) {
             return;
@@ -530,7 +552,9 @@ public class NetworkFactorization implements ITinyPacketHandler {
             }
             
             if (!(to instanceof IEntityMessage)) {
-                Core.logFine("Packet to inappropriate entity #%s: %s", entityId, messageType);
+                if (!handleForeignEntityMessage(to, messageType, input)) {
+                    Core.logFine("Packet to inappropriate entity #%s: %s", entityId, messageType);
+                }
                 return;
             }
             IEntityMessage iem = (IEntityMessage) to;
@@ -546,7 +570,9 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 handled = iem.handleMessageFromClient(messageType, input);
             }
             if (!handled) {
-                Core.logFine("Got unhandled message: " + messageType + " for " + iem);
+                if (!handleForeignEntityMessage(to, messageType, input)) {
+                    Core.logFine("Got unhandled message: " + messageType + " for " + iem);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -559,7 +585,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
         public final static int PlaySound = 11, PistonPush = 12;
         //TEF messages
         public final static int
-                DrawActive = 0, FactoryType = 1, DescriptionRequest = 2, DataHelperEdit = 3, OpenDataHelperGui = 4,
+                DrawActive = 0, FactoryType = 1, DescriptionRequest = 2, DataHelperEdit = 3, OpenDataHelperGui = 4, EntityParticles = 5,
                 //
                 RouterSlot = 20, RouterTargetSide = 21, RouterMatch = 22, RouterIsInput = 23,
                 RouterLastSeen = 24, RouterMatchToVisit = 25, RouterDowngrade = 26,
@@ -577,7 +603,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 //
                 GrinderSpeed = 90, LaceratorSpeed = 91,
                 //
-                MixerSpeed = 100,
+                MixerSpeed = 100, FanturpellerSpeed = 101,
                 //
                 CrystallizerInfo = 110,
                 //
