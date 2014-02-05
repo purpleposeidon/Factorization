@@ -8,7 +8,7 @@ import factorization.api.datahelpers.Share;
 import factorization.notify.Notify;
 import factorization.servo.instructions.IntegerValue;
 
-public class Executioner implements IDataSerializable {
+public class Executioner {
     private transient final ServoMotor motor;
     
     public static final int STACKS = 16;
@@ -108,8 +108,7 @@ public class Executioner implements IDataSerializable {
         }
     }
     
-    @Override
-    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+    void putData(DataHelper data) throws IOException {
         if (data.hasLegacy("skip")) {
             jmp = data.as(Share.VISIBLE, "skip").putBoolean(jmp == 0) == true ? JMP_NEXT_INSTRUCTION : JMP_NONE;
         } else {
@@ -124,7 +123,6 @@ public class Executioner implements IDataSerializable {
         pc = data.as(Share.VISIBLE, "pc").putInt(pc);
         seg = data.as(Share.VISIBLE, "seg").putByte(seg);
         cpu_blocked = data.as(Share.VISIBLE, "cpuBlock").putBoolean(cpu_blocked);
-        return this;
     }
 
 }

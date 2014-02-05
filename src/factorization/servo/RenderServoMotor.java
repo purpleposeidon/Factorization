@@ -142,8 +142,8 @@ public class RenderServoMotor extends RenderEntity {
         GL11.glTranslated(x + 0.5, y + 0.5, z + 0.5);
         GL11.glPushMatrix();
 
-        motor.interpolatePosition((float) Math.pow(motor.pos_progress, 2));
-        float reorientInterpolation = interp(motor.servo_reorient, motor.prev_servo_reorient, partial);
+        motor.motionHandler.interpolatePosition((float) Math.pow(motor.motionHandler.pos_progress, 2));
+        float reorientInterpolation = interp(motor.motionHandler.servo_reorient, motor.motionHandler.prev_servo_reorient, partial);
         orientMotor(motor, partial, reorientInterpolation);
 
         renderMainModel(motor, partial, reorientInterpolation, false);
@@ -185,7 +185,7 @@ public class RenderServoMotor extends RenderEntity {
             GL11.glEnable(GL11.GL_DEPTH_TEST);
         }
         GL11.glPopMatrix();
-        motor.interpolatePosition(motor.pos_progress);
+        motor.motionHandler.interpolatePosition(motor.motionHandler.pos_progress);
         GL11.glDisable(GL12.GL_RESCALE_NORMAL);
         Core.profileEndRender();
     }
@@ -219,8 +219,8 @@ public class RenderServoMotor extends RenderEntity {
     }
     
     void orientMotor(ServoMotor motor, float partial, float reorientInterpolation) {
-        final FzOrientation orientation = motor.orientation;
-        final FzOrientation prevOrientation = motor.prevOrientation;
+        final FzOrientation orientation = motor.motionHandler.orientation;
+        final FzOrientation prevOrientation = motor.motionHandler.prevOrientation;
         
         if (debug_servo_orientation) {
             GL11.glDisable(GL11.GL_LIGHTING);
@@ -338,14 +338,14 @@ public class RenderServoMotor extends RenderEntity {
         double radius = 0.56 /* from sprocket center to the outer edge of the ring (excluding the teeth) */
                     + 0.06305 /* half the width of the teeth */;
         double constant = Math.PI * 2 * (radius);
-        double partial_rotation = FzUtil.interp((float) motor.prev_sprocket_rotation, (float) motor.sprocket_rotation, partial);
+        double partial_rotation = FzUtil.interp((float) motor.motionHandler.prev_sprocket_rotation, (float) motor.motionHandler.sprocket_rotation, partial);
         final double angle = constant * partial_rotation;
 
         radius = 0.25 - 1.0 / 48.0;
         radius = -4.0/16.0;
 
         float rd = (float) (radius + rail_width);
-        if (motor.orientation != motor.prevOrientation) {
+        if (motor.motionHandler.orientation != motor.motionHandler.prevOrientation) {
             double stretch_interp = ro * 2;
             if (stretch_interp < 1) {
                 if (stretch_interp > 0.5) {

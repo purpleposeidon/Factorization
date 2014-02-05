@@ -26,7 +26,7 @@ public class ScanColor extends Decorator {
     @Override
     public void motorHit(ServoMotor motor) {
         Coord at = motor.getCurrentPos();
-        at = at.add(motor.orientation.top);
+        at = at.add(motor.getOrientation().top);
         motor.getArgStack().push(FzColor.readColor(at));
     }
 

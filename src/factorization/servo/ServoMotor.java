@@ -60,43 +60,17 @@ import factorization.sockets.TileEntitySocketBase;
 
 public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IEntityMessage, IInventory, ISocketHolder {
     //NOTE: If there's issues with servos getting lost/duped; we could have the TE save the servo. (Would have to be a list tho)
+    public final MotionHandler motionHandler = new MotionHandler(this);
     public final Executioner executioner = new Executioner(this);
-    
-    private ItemStack[] inv = new ItemStack[1], inv_last_sent = new ItemStack[inv.length];
     public TileEntitySocketBase socket = new SocketEmpty();
     public boolean isSocketActive = false;
     public boolean isSocketPulsed = false;
     
+    private ItemStack[] inv = new ItemStack[1], inv_last_sent = new ItemStack[inv.length];
     
-    Coord pos_prev, pos_next;
-    float pos_progress;
-    public FzOrientation prevOrientation = FzOrientation.UNKNOWN, orientation = FzOrientation.UNKNOWN;
-    public FzOrientation pendingClientOrientation = FzOrientation.UNKNOWN;
-    public ForgeDirection nextDirection = ForgeDirection.UNKNOWN, lastDirection = ForgeDirection.UNKNOWN;
-    private byte speed_b;
-    public byte target_speed_index = 2;
-    private static final byte max_speed_b = 127;
-    double accumulated_motion;
-    private boolean stopped = false;
-    
-    //For client-side rendering
-    double sprocket_rotation = 0, prev_sprocket_rotation = 0;
-    double servo_reorient = 0, prev_servo_reorient = 0;
-
-    private static final byte normal_speed_byte = (byte) (max_speed_b/4);
-    private static final byte[] target_speeds_b = {normal_speed_byte/3, normal_speed_byte/2, normal_speed_byte, normal_speed_byte*2, normal_speed_byte*4};
-    private static final double normal_speed_double = 0.0875;
-    private static final double max_speed_double = normal_speed_double*4;
-    
-    
-    
-
     public ServoMotor(World world) {
         super(world);
         setSize(1, 1);
-        double d = 0.5;
-        pos_prev = new Coord(world, 0, 0, 0);
-        pos_next = pos_prev.copy();
         isImmuneToFire = true;
     }
     
@@ -104,19 +78,16 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
      * You <b>must</b> call this method instead of using worldObj.spawnEntityInWorld!
      */
     public void spawnServoMotor() {
-        pos_prev = new Coord(this);
-        pos_next = pos_prev.copy();
-        pickNextOrientation();
-        pickNextOrientation();
-        interpolatePosition(0);
-        prevOrientation = orientation;
+        motionHandler.beforeSpawn();
         worldObj.spawnEntityInWorld(this);
     }
 
-    @Override
-    protected void entityInit() {
-    }
-
+    
+    
+    
+    
+    // Serialization
+    
     @Override
     protected void readEntityFromNBT(NBTTagCompound nbttagcompound) {
         try {
@@ -125,7 +96,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             e.printStackTrace();
         }
     }
-
+    
     @Override
     protected void writeEntityToNBT(NBTTagCompound nbttagcompound) {
         try {
@@ -158,18 +129,8 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     void putData(DataHelper data) throws IOException {
-        orientation = data.as(Share.VISIBLE, "Orient").putFzOrientation(orientation);
-        nextDirection = data.as(Share.VISIBLE, "nextDir").putEnum(nextDirection);
-        lastDirection = data.as(Share.VISIBLE, "lastDir").putEnum(lastDirection);
-        speed_b = data.as(Share.VISIBLE, "speedb").putByte(speed_b);
-        target_speed_index = data.as(Share.VISIBLE, "speedt").putByte(target_speed_index);
-        accumulated_motion = data.as(Share.VISIBLE, "accumulated_motion").putDouble(accumulated_motion);
-        stopped = data.as(Share.VISIBLE, "stop").putBoolean(stopped);
-        pos_next = data.as(Share.VISIBLE, "pos_next").put(pos_next);
-        pos_prev = data.as(Share.VISIBLE, "pos_prev").put(pos_prev);
-        pos_progress = data.as(Share.VISIBLE, "pos_progress").putFloat(pos_progress);
-        
-        executioner.serialize("", data);
+        executioner.putData(data);
+        motionHandler.putData(data);
         
         for (int i = 0; i < inv.length; i++) {
             ItemStack is = inv[i] == null ? EMPTY_ITEM : inv[i];
@@ -198,41 +159,109 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         isSocketPulsed = data.as(Share.VISIBLE, "sockpl").putBoolean(isSocketPulsed);
     }
     
-    boolean validPosition(Coord c, boolean desperate) {
-        TileEntityServoRail sr = c.getTE(TileEntityServoRail.class);
-        if (sr == null) {
-            return false;
+    
+    
+    
+    // Networking
+    void broadcast(int message_type, Object... msg) {
+        Packet p = Core.network.entityPacket(this, message_type, msg);
+        Core.network.broadcastPacket(worldObj, (int) posX, (int) posY, (int) posZ, p);
+    }
+    
+    public void broadcastBriefUpdate() {
+        Coord a = getCurrentPos();
+        Coord b = getNextPos();
+        broadcast(MessageType.servo_brief, (byte) motionHandler.orientation.ordinal(), motionHandler.speed_b,
+                a.x, a.y, a.z,
+                b.x, b.y, b.z,
+                motionHandler.pos_progress);
+    }
+    
+    @Override
+    public boolean handleMessageFromClient(short messageType, DataInputStream input) throws IOException {
+        if (messageType == MessageType.DataHelperEdit) {
+            DataInPacketClientEdited di = new DataInPacketClientEdited(input);
+            socket.serialize("", di);
+            onInventoryChanged();
+            return true;
         }
-        return sr.priority >= 0 || desperate;
+        return false;
     }
-
-    boolean validDirection(ForgeDirection dir, boolean desperate) {
-        return validPosition(getCurrentPos().add(dir), desperate);
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean handleMessageFromServer(short messageType, DataInputStream input) throws IOException {
+        switch (messageType) {
+        case MessageType.OpenDataHelperGui:
+            if (!worldObj.isRemote) {
+                return false;
+            } else {
+                DataInPacket dip = new DataInPacket(input, Side.CLIENT);
+                socket.serialize("", dip);
+                Minecraft.getMinecraft().displayGuiScreen(new GuiDataConfig(socket, this));
+            }
+            return true;
+        case MessageType.servo_item:
+            while (true) {
+                byte index = input.readByte();
+                if (index < 0) {
+                    break;
+                }
+                inv[index] = FzUtil.readStack(input);
+            }
+            return true;
+        case MessageType.servo_brief:
+            Coord a = getCurrentPos();
+            Coord b = getNextPos();
+            FzOrientation no = FzOrientation.getOrientation(input.readByte());
+            if (no != motionHandler.prevOrientation) {
+                motionHandler.orientation = no;
+            }
+            motionHandler.speed_b = input.readByte();
+            a.x = input.readInt();
+            a.y = input.readInt();
+            a.z = input.readInt();
+            b.x = input.readInt();
+            b.y = input.readInt();
+            b.z = input.readInt();
+            motionHandler.pos_progress = input.readFloat();
+            if (motionHandler.speed_b > 0) {
+                motionHandler.stopped = false;
+            }
+            return true;
+        case MessageType.servo_complete:
+            try {
+                DataHelper data = new DataInPacket(input, Side.CLIENT);
+                putData(data);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return true;
+        case MessageType.servo_stopped:
+            motionHandler.stopped = input.readBoolean();
+            return true;
+        }
+        return socket.handleMessageFromServer(messageType, input);
     }
-
-    private static Quaternion target_orientation = new Quaternion();
+    
+    
+    
+    
+    
+    
+    // Main logic
     
     @Override
     public void onEntityUpdate() {
         super.onEntityUpdate();
+        if (isDead) {
+            return;
+        }
         if (worldObj.isRemote) {
-            prev_sprocket_rotation = sprocket_rotation;
-            prev_servo_reorient = servo_reorient;
-            doLogic();
-            if (stopped) {
-                speed_b = 0;
-            }
+            motionHandler.updateServoMotion();
         } else {
-            byte orig_speed = speed_b;
-            FzOrientation orig_or = orientation;
-            doLogic();
-            if (stopped) {
-                speed_b = 0;
-            }
-            if (orig_speed != speed_b || orig_or != orientation) {
-                broadcastBriefUpdate();
-                //NOTE: Could be spammy. Speed might be too important to not send tho.
-            }
+            
+            motionHandler.updateServoMotion();
             if (executioner.stacks_changed) {
                 try {
                     executioner.stacks_changed = false;
@@ -248,289 +277,21 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 }
             }
         }
-        interpolatePosition(pos_progress);
-        if (stopped && getCurrentPos().isWeaklyPowered()) {
-            setStopped(false);
-        }
-    }
-    
-    public void interpolatePosition(float interp) {
-        setPosition(
-                ip(pos_prev.x, pos_next.x, interp),
-                ip(pos_prev.y, pos_next.y, interp),
-                ip(pos_prev.z, pos_next.z, interp));
-    }
-    
-    static double ip(int a, int b, float interp) {
-        return a + (b - a)*interp;
-    }
-
-    void updateSpeed() {
-        byte target_speed_b = target_speeds_b[target_speed_index];
-        
-        boolean should_accelerate = speed_b < target_speed_b && orientation != FzOrientation.UNKNOWN;
-        if (speed_b > target_speed_b) {
-            speed_b = (byte)Math.max(target_speed_b, speed_b*3/4 - 1);
-            return;
-        }
-        if (Core.cheat_servo_energy) {
-            if (should_accelerate) {
-                accelerate();
-            }
-        }
-        long now = worldObj.getTotalWorldTime();
-        int m = 1 + target_speed_index;
-        if (should_accelerate && now % 3 == 0) {
-            if (extractCharge(8)) {
-                accelerate();
-            }
-        }
-    }
-    
-    public void penalizeSpeed() {
-        if (speed_b > 4) {
-            speed_b--;
-        }
-    }
-    
-    void doLogic() {
-        if (isDead) {
-            return;
-        }
-        if (stopped) {
-            updateSocket();
-            return;
-        }
-        if (orientation == FzOrientation.UNKNOWN) {
-            pickNextOrientation();
-        }
-        if (!worldObj.isRemote) {
-            updateSpeed();
-        }
-        final double speed = getProperSpeed();
-        if (speed <= 0 || orientation == FzOrientation.UNKNOWN) {
-            updateSocket();
-            return;
-        }
-        accumulated_motion += speed;
-        moveMotor();
-        if (pos_progress >= 1) {
-            pos_progress -= 1F;
-            accumulated_motion = Math.min(pos_progress, speed);
-            Chunk oldChunk = pos_prev.getChunk(), newChunk = pos_next.getChunk();
-            pos_prev = pos_next;
-            updateSocket();
-            onEnterNewBlock();
-            pickNextOrientation();
-            if (oldChunk != newChunk) {
-                oldChunk.setChunkModified();
-                newChunk.setChunkModified();
-            }
-        } else {
-            updateSocket();
-        }
     }
     
     void updateSocket() {
         Coord here = getCurrentPos();
         here.setAsTileEntityLocation(socket);
-        socket.facing = orientation.top;
+        socket.facing = motionHandler.orientation.top;
         socket.genericUpdate(this, here, isSocketActive ^ isSocketPulsed);
         isSocketPulsed = false;
     }
     
-    public Random getRandom() {
-        //Synchronizing RNG state isn't worthwhile
-        //It's possible things could end up in loops like this.
-        //Could probably think of something else to throw in.
-        Random rand = FzUtil.dirtyRandomCache();
-        long seed = entityId + getCurrentPos().seed() << 5 + orientation.ordinal() << 2 + nextDirection.ordinal();
-        rand.setSeed(seed);
-        return rand;
-    }
-    
-    public boolean testDirection(ForgeDirection d, boolean desperate) {
-        if (d == ForgeDirection.UNKNOWN) {
-            return false;
-        }
-        return validDirection(d, desperate);
-    }
-    
-    static int similarity(FzOrientation base, FzOrientation novel) {
-        int score = 0;
-        //if pointing in plane, we want them to face the same direction
-        
-        return score;
-    }
-    
-    
-    boolean pickNextOrientation() {
-        boolean ret = pickNextOrientation_impl();
-        pos_next = pos_prev.add(orientation.facing);
-        return ret;
-    }
-    
-    public void changeOrientation(ForgeDirection dir) {
-        ForgeDirection orig_direction = orientation.facing;
-        ForgeDirection orig_top = orientation.top;
-        FzOrientation start = FzOrientation.fromDirection(dir);
-        FzOrientation perfect = start.pointTopTo(orig_top);
-        if (perfect == FzOrientation.UNKNOWN) {
-            if (dir == orig_top) {
-                //convex turn
-                perfect = start.pointTopTo(orig_direction.getOpposite());
-            } else if (dir == orig_top.getOpposite()) {
-                //concave turn
-                perfect = start.pointTopTo(orig_direction);
-            }
-            if (perfect == FzOrientation.UNKNOWN) {
-                perfect = start; //Might be impossible?
-            }
-        }
-        orientation = perfect;
-        lastDirection = orig_direction;
-        if (orientation.facing == nextDirection) {
-            nextDirection = ForgeDirection.UNKNOWN;
-        }
-    }
-
-    boolean pickNextOrientation_impl() {
-        ArrayList<ForgeDirection> dirs = FzUtil.getRandomDirections(worldObj.rand);
-        int available_nonbackwards_directions = 0;
-        Coord look = pos_next.copy();
-        int all_count = 0;
-        for (int i = 0; i < dirs.size(); i++) {
-            ForgeDirection fd = dirs.get(i);
-            look.set(pos_next);
-            look.adjust(fd);
-            TileEntityServoRail sr = look.getTE(TileEntityServoRail.class);
-            if (sr == null) {
-                continue;
-            }
-            all_count++;
-            if (fd == orientation.facing.getOpposite()) {
-                continue;
-            }
-            if (sr.priority > 0) {
-                changeOrientation(fd);
-                return true;
-            }
-            if (sr.priority == 0) {
-                available_nonbackwards_directions++;
-            }
-        }
-        
-        if (all_count == 0) {
-            //Sadness
-            speed_b = 0;
-            return false;
-        }
-        
-        final boolean desperate = available_nonbackwards_directions < 1;
-        final ForgeDirection direction = orientation.facing;
-        final ForgeDirection opposite = direction.getOpposite();
-        
-        if (nextDirection != opposite && testDirection(nextDirection, desperate)) {
-            // We can go the way we were told to go next
-            changeOrientation(nextDirection);
-            return true;
-        }
-        if (testDirection(direction, desperate)) {
-            // Our course is fine.
-            return true;
-        }
-        if (lastDirection != opposite && testDirection(lastDirection, desperate)) {
-            // Try the direction we were going before (this makes us go in zig-zags)
-            changeOrientation(lastDirection);
-            return true;
-        }
-        final ForgeDirection top = orientation.top;
-        if (testDirection(top, desperate) /* top being opposite won't be an issue because of Geometry */ ) {
-            // We'll turn upwards.
-            changeOrientation(top);
-            return true;
-        }
-        
-        // We'll pick a random direction; we're re-using the list from before, should be fine.
-        // Going backwards is our last resort.
-        for (int i = 0; i < 6; i++) {
-            ForgeDirection d = dirs.get(i);
-            if (d == nextDirection || d == direction || d == opposite || d == lastDirection || d == top) {
-                continue;
-            }
-            if (validDirection(d, desperate)) {
-                changeOrientation(d);
-                return true;
-            }
-        }
-        if (validDirection(opposite, true)) {
-            orientation = FzOrientation.fromDirection(opposite).pointTopTo(top);
-            if (orientation != FzOrientation.UNKNOWN) {
-                return true;
-            }
-        }
-        orientation = FzOrientation.UNKNOWN;
-        return false;
-    }
-
-    void accelerate() {
-        speed_b += 1;
-        speed_b = (byte) Math.min(speed_b, max_speed_b);
-    }
-
-    void broadcast(int message_type, Object... msg) {
-        Packet p = Core.network.entityPacket(this, message_type, msg);
-        Core.network.broadcastPacket(worldObj, (int) posX, (int) posY, (int) posZ, p);
-    }
-    
-    public void broadcastBriefUpdate() {
-        Coord a = getCurrentPos();
-        Coord b = getNextPos();
-        broadcast(MessageType.servo_brief, (byte) orientation.ordinal(), speed_b,
-                a.x, a.y, a.z,
-                b.x, b.y, b.z,
-                pos_progress);
-    }
-
-    void moveMotor() {
-        if (accumulated_motion == 0) {
-            return;
-        }
-        double move = Math.min(accumulated_motion, 1 - pos_progress);
-        accumulated_motion -= move;
-        pos_progress += move;
-        if (worldObj.isRemote) {
-            sprocket_rotation += move;
-            
-            if (orientation != prevOrientation) {
-                servo_reorient += move;
-                if (servo_reorient >= 1) {
-                    servo_reorient -= 1;
-                    prev_servo_reorient = servo_reorient;
-                    prevOrientation = orientation;
-                }
-            } else {
-                servo_reorient = 0;
-            }
-        }
-    }
-    
-    public Coord getCurrentPos() {
-        return pos_prev;
-    }
-    
-    public Coord getNextPos() {
-        return pos_next;
-    }
-
     void onEnterNewBlock() {
         if (worldObj.isRemote) {
             return;
         }
-        final int m = target_speed_index + 1;
-        if (!extractCharge(m*2)) {
-            speed_b = (byte) Math.max(0, speed_b*3/4 - 1);
-        }
+        motionHandler.onEnterNewBlock();
         TileEntityServoRail rail = getCurrentPos().getTE(TileEntityServoRail.class);
         if (rail != null && rail.decoration != null) {
             if (rail.decoration.preMotorHit(this)) {
@@ -539,7 +300,73 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
         executioner.onEnterNewBlock(rail);
     }
+    
+    
+    
+    
+    
+    // Utility functions for client code
+    
+    public ServoStack getServoStack(int stackId) {
+        return executioner.getServoStack(stackId);
+    }
+    
+    public ServoStack getArgStack() {
+        return executioner.getServoStack(Executioner.STACK_ARGUMENT);
+    }
+    
+    public void putError(Object error) {
+        executioner.putError(error);
+    }
 
+    public Coord getCurrentPos() {
+        return motionHandler.pos_prev;
+    }
+    
+    public Coord getNextPos() {
+        return motionHandler.pos_next;
+    }
+
+    public FzOrientation getOrientation() {
+        return motionHandler.orientation;
+    }
+    
+    public void setOrientation(FzOrientation orientation) {
+        motionHandler.orientation = orientation;
+    }
+    
+    public void changeOrientation(ForgeDirection fd) {
+        motionHandler.changeOrientation(fd);
+    }
+    
+    public void setNextDirection(ForgeDirection direction) {
+        motionHandler.nextDirection = direction;
+    }
+    
+    public void setTargetSpeed(byte newTarget) {
+        motionHandler.target_speed_index = newTarget;
+    }
+    
+    public void penalizeSpeed() {
+        motionHandler.penalizeSpeed();
+    }
+    
+    public void setStopped(boolean stop) {
+        motionHandler.setStopped(stop);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    // Entity behavior
+    
+    @Override
+    protected void entityInit() { }
+    
     @Override
     public boolean interactFirst(EntityPlayer player) {
         executioner.stacks_changed = true;
@@ -635,15 +462,16 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
         dropItemStacks(toDrop);
     }
+    
+    public void dropItemStacks(Iterable<ItemStack> toDrop) {
+        for (ItemStack is : toDrop) {
+            FzUtil.spawnItemStack(this, is);
+        }
+    }
 
     @Override
     public boolean canBeCollidedWith() {
         return true;
-    }
-
-    @Override
-    public String toString() {
-        return super.toString() + (worldObj.isRemote ? " client" : " server") + " " + getProperSpeed();
     }
 
     @Override
@@ -670,96 +498,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         super.setPositionAndRotation(x, y, z, yaw, pitch);
     }
     
-    @Override
-    public boolean handleMessageFromClient(short messageType, DataInputStream input) throws IOException {
-        if (messageType == MessageType.DataHelperEdit) {
-            DataInPacketClientEdited di = new DataInPacketClientEdited(input);
-            socket.serialize("", di);
-            onInventoryChanged();
-            return true;
-        }
-        return false;
-    }
-    
-    @Override
-    @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(short messageType, DataInputStream input) throws IOException {
-        switch (messageType) {
-        case MessageType.OpenDataHelperGui:
-            if (!worldObj.isRemote) {
-                return false;
-            } else {
-                DataInPacket dip = new DataInPacket(input, Side.CLIENT);
-                socket.serialize("", dip);
-                Minecraft.getMinecraft().displayGuiScreen(new GuiDataConfig(socket, this));
-            }
-            return true;
-        case MessageType.servo_item:
-            while (true) {
-                byte index = input.readByte();
-                if (index < 0) {
-                    break;
-                }
-                inv[index] = FzUtil.readStack(input);
-            }
-            return true;
-        case MessageType.servo_brief:
-            Coord a = getCurrentPos();
-            Coord b = getNextPos();
-            FzOrientation no = FzOrientation.getOrientation(input.readByte());
-            if (no != prevOrientation) {
-                orientation = no;
-            }
-            speed_b = input.readByte();
-            a.x = input.readInt();
-            a.y = input.readInt();
-            a.z = input.readInt();
-            b.x = input.readInt();
-            b.y = input.readInt();
-            b.z = input.readInt();
-            pos_progress = input.readFloat();
-            if (speed_b > 0) {
-                stopped = false;
-            }
-            return true;
-        case MessageType.servo_complete:
-            try {
-                DataHelper data = new DataInPacket(input, Side.CLIENT);
-                putData(data);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return true;
-        case MessageType.servo_stopped:
-            stopped = input.readBoolean();
-            return true;
-        }
-        return socket.handleMessageFromServer(messageType, input);
-    }
 
-    public double getProperSpeed() {
-        double perc = speed_b/(double)(max_speed_b);
-        return max_speed_double*perc;
-    }
     
-    public void dropItemStacks(Iterable<ItemStack> toDrop) {
-        for (ItemStack is : toDrop) {
-            FzUtil.spawnItemStack(this, is);
-        }
-    }
     
-    public ServoStack getServoStack(int stackId) {
-        return executioner.getServoStack(stackId);
-    }
     
-    public ServoStack getArgStack() {
-        return executioner.getServoStack(Executioner.STACK_ARGUMENT);
-    }
-    
-    public void putError(Object error) {
-        executioner.putError(error);
-    }
-
     
     // IInventory implementation
     
@@ -860,8 +602,8 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     ArrayList<MovingObjectPosition> rayTrace() {
         ret.clear();
         final Coord c = getCurrentPos();
-        final ForgeDirection top = orientation.top;
-        final ForgeDirection face = orientation.facing;
+        final ForgeDirection top = motionHandler.orientation.top;
+        final ForgeDirection face = motionHandler.orientation.facing;
         final ForgeDirection right = face.getRotation(top);
         
         AxisAlignedBB ab = AxisAlignedBB.getAABBPool().getAABB(
@@ -931,14 +673,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     public void sendMessage(int msgType, Object... msg) {
         Packet toSend = Core.network.entityPacket(this, msgType, msg);
         Core.network.broadcastPacket(worldObj, (int) posX, (int) posY, (int) posZ, toSend); 
-    }
-    
-    public void setStopped(boolean newState) {
-        if (stopped == newState) return;
-        stopped = newState;
-        if (!worldObj.isRemote) {
-            //sendMessage(MessageType.servo_stopped, stopped);
-        }
     }
     
 }

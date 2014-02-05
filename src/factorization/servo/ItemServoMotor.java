@@ -41,11 +41,11 @@ public class ItemServoMotor extends ItemCraftingComponent {
         //w.spawnEntityInWorld(motor);
         motor.spawnServoMotor();
         ForgeDirection face = ForgeDirection.getOrientation(FzUtil.determineOrientation(player));
-        if (motor.validDirection(face, true)) {
-            motor.orientation = FzOrientation.fromDirection(face);
-            FzOrientation perfect = motor.orientation.pointTopTo(ForgeDirection.getOrientation(side));
+        if (motor.motionHandler.validDirection(face, true)) {
+            motor.motionHandler.orientation = FzOrientation.fromDirection(face);
+            FzOrientation perfect = motor.motionHandler.orientation.pointTopTo(ForgeDirection.getOrientation(side));
             if (perfect != FzOrientation.UNKNOWN) {
-                motor.orientation = perfect;
+                motor.motionHandler.orientation = perfect;
             }
         }
         if (!player.capabilities.isCreativeMode) {

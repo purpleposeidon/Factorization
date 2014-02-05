@@ -33,8 +33,8 @@ public class ServoEquipmentBay extends Decorator {
             return;
         }
         final Coord c = motor.getCurrentPos();
-        final ForgeDirection facing = motor.orientation.facing;
-        final ForgeDirection top = motor.orientation.top;
+        final ForgeDirection facing = motor.getOrientation().facing;
+        final ForgeDirection top = motor.getOrientation().top;
         if (facing == ForgeDirection.DOWN) {
             return;
         }
@@ -65,7 +65,7 @@ public class ServoEquipmentBay extends Decorator {
             error = "Not facing an inventory";
             return false;
         }
-        ForgeDirection direwolf20 = motor.orientation.facing;
+        ForgeDirection direwolf20 = motor.getOrientation().facing;
         if (direwolf20 == ForgeDirection.UP) {
             // Unequip
             if (!motor.getInv().transfer(inv, 1, null)) {

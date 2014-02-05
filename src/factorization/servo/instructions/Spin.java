@@ -44,13 +44,13 @@ public class Spin extends Instruction {
 
     @Override
     public void motorHit(ServoMotor motor) {
-        ForgeDirection newTop = motor.orientation.top;
+        ForgeDirection newTop = motor.getOrientation().top;
         for (int i = cc ? 3 : 1; i > 0; i--) {
-            newTop = newTop.getRotation(motor.orientation.facing);
+            newTop = newTop.getRotation(motor.getOrientation().facing);
         }
-        FzOrientation next = motor.orientation.pointTopTo(newTop);
+        FzOrientation next = motor.getOrientation().pointTopTo(newTop);
         if (next != FzOrientation.UNKNOWN) {
-            motor.orientation = next;
+            motor.setOrientation(next);
         }
     }
 
