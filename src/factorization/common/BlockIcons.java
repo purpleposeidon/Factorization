@@ -102,7 +102,6 @@ public class BlockIcons {
     
     
     public static ArrowyBox servo$set_direction, servo$set_facing;
-    public static Icon servo$bay, servo$bay_bottom, servo$bay_top;
     public static Icon servo$one, servo$zero, servo$number, servo$sum, servo$product, servo$dup, servo$drop, servo$true, servo$false;
     public static Icon servo$pulse;
     public static Icon servo$spin_cc, servo$spin_ccc;
