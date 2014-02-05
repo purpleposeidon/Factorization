@@ -12,6 +12,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
 import factorization.servo.EntryAction;
+import factorization.servo.Executioner;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 
@@ -35,13 +36,13 @@ public class SetEntryAction extends Instruction {
     @Override
     public boolean preMotorHit(ServoMotor motor) {
         if (mode == EntryAction.ENTRY_WRITE) {
-            if (motor.getServoStack(ServoMotor.STACK_IO).getSize() > 0) {
-                motor.entry_action = mode;
+            if (motor.getServoStack(Executioner.STACK_IO).getSize() > 0) {
+                motor.executioner.entry_action = mode;
             } else {
-                motor.entry_action = EntryAction.ENTRY_EXECUTE;
+                motor.executioner.entry_action = EntryAction.ENTRY_EXECUTE;
             }
         } else {
-            motor.entry_action = mode;
+            motor.executioner.entry_action = mode;
         }
         return true;
     }

@@ -12,6 +12,7 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
+import factorization.servo.Executioner;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.ServoStack;
@@ -53,7 +54,7 @@ public class ShifterControl extends Instruction {
         case PULSE_SOME: shifter.mode = SocketShifter.ShifterMode.MODE_PULSE_SOME; return;
         case TRANSFER_LIMIT:
         case TARGET_SLOT:
-            ServoStack ss = motor.getServoStack(ServoMotor.STACK_ARGUMENT);
+            ServoStack ss = motor.getArgStack();
             Integer the_val = ss.popType(Integer.class);
             if (the_val == null) {
                 motor.putError("Stack underflow");

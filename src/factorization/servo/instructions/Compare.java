@@ -12,6 +12,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
+import factorization.servo.Executioner;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.ServoStack;
@@ -60,7 +61,7 @@ public class Compare extends Instruction {
 
     @Override
     public void motorHit(ServoMotor motor) {
-        ServoStack ss = motor.getServoStack(ServoMotor.STACK_ARGUMENT);
+        ServoStack ss = motor.getArgStack();
         Object a = ss.pop();
         if (a == null) {
             motor.putError("CMP: Stack underflow");

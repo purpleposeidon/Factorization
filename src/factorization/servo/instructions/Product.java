@@ -9,6 +9,7 @@ import net.minecraftforge.common.ForgeDirection;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
+import factorization.servo.Executioner;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.ServoStack;
@@ -31,7 +32,7 @@ public class Product extends Instruction {
 
     @Override
     public void motorHit(ServoMotor motor) {
-        ServoStack stack = motor.getServoStack(ServoMotor.STACK_ARGUMENT);
+        ServoStack stack = motor.getArgStack();
         Integer a = stack.popType(Integer.class);
         Integer b = stack.popType(Integer.class);
         if (a == null) a = 0;

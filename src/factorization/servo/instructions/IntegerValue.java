@@ -11,6 +11,7 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
+import factorization.servo.Executioner;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 
@@ -30,7 +31,7 @@ public class IntegerValue extends Instruction {
 
     @Override
     public void motorHit(ServoMotor motor) {
-        motor.getServoStack(ServoMotor.STACK_ARGUMENT).push(getVal());
+        motor.getArgStack().push(getVal());
     }
 
     @Override

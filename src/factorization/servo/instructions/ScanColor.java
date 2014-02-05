@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
@@ -14,8 +13,8 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.servo.Decorator;
+import factorization.servo.Executioner;
 import factorization.servo.ServoMotor;
-import factorization.servo.TileEntityServoRail;
 import factorization.shared.Core;
 
 public class ScanColor extends Decorator {
@@ -28,7 +27,7 @@ public class ScanColor extends Decorator {
     public void motorHit(ServoMotor motor) {
         Coord at = motor.getCurrentPos();
         at = at.add(motor.orientation.top);
-        motor.getServoStack(ServoMotor.STACK_ARGUMENT).push(FzColor.readColor(at));
+        motor.getArgStack().push(FzColor.readColor(at));
     }
 
     @Override

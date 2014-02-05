@@ -30,7 +30,7 @@ public class SetSpeed extends Instruction {
     @Override
     public void motorHit(ServoMotor motor) {
         motor.target_speed_index = (byte) (speed - 1);
-        motor.stacks_changed = true;
+        motor.executioner.stacks_changed = true;
     }
 
     @Override

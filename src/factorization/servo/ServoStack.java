@@ -15,10 +15,10 @@ import factorization.shared.Core;
 public class ServoStack implements IDataSerializable, Iterable {
     private ArrayDeque<Object> contents = new ArrayDeque<Object>();
     private final int maxSize = 16;
-    private final ServoMotor motor;
+    private final Executioner executioner;
     
-    public ServoStack(ServoMotor motor) {
-        this.motor = motor;
+    public ServoStack(Executioner executioner) {
+        this.executioner = executioner;
     }
 
     public void setContentsList(Collection<Object> obj) {
@@ -36,7 +36,7 @@ public class ServoStack implements IDataSerializable, Iterable {
             return false;
         }
         contents.addFirst(o);
-        motor.stacks_changed = true;
+        executioner.stacks_changed = true;
         return true;
     }
 
@@ -50,20 +50,20 @@ public class ServoStack implements IDataSerializable, Iterable {
             return false;
         }
         contents.add(o);
-        motor.stacks_changed = true;
+        executioner.stacks_changed = true;
         return true;
     }
 
     public void forceAppend(Object o) {
         contents.add(o);
-        motor.stacks_changed = true;
+        executioner.stacks_changed = true;
     }
 
     public Object pop() {
         if (contents.isEmpty()) {
             return null;
         }
-        motor.stacks_changed = true;
+        executioner.stacks_changed = true;
         return contents.removeFirst();
     }
 
@@ -71,7 +71,7 @@ public class ServoStack implements IDataSerializable, Iterable {
         if (contents.isEmpty()) {
             return null;
         }
-        motor.stacks_changed = true;
+        executioner.stacks_changed = true;
         return contents.removeLast();
     }
 
@@ -100,7 +100,7 @@ public class ServoStack implements IDataSerializable, Iterable {
             }
             if (o.getClass() == eClass) {
                 if (remove) {
-                    motor.stacks_changed = true;
+                    executioner.stacks_changed = true;
                     it.remove();
                 }
                 return (E) o;

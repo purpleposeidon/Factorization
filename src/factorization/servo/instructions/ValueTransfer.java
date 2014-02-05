@@ -12,6 +12,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
+import factorization.servo.Executioner;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.ServoStack;
@@ -32,14 +33,14 @@ public class ValueTransfer extends Instruction {
 
     @Override
     public void motorHit(ServoMotor motor) {
-        final ServoStack io = motor.getServoStack(motor.STACK_ARGUMENT);
-        final FzColor color = io.popType(FzColor.class);
+        final ServoStack io = motor.getServoStack(Executioner.STACK_IO);
+        final FzColor color = motor.getArgStack().popType(FzColor.class);
         if (color == null) {
             motor.putError("No color");
             return;
         }
         int sid = color.ordinal();
-        if (sid == motor.STACK_IO) {
+        if (sid == Executioner.STACK_IO) {
             return; // Hmm?
         }
         final ServoStack target = motor.getServoStack(sid);

@@ -49,6 +49,8 @@ import factorization.notify.Notify;
 import factorization.servo.instructions.IntegerValue;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
+import factorization.shared.Sound;
+import factorization.shared.TileEntityCommon;
 import factorization.shared.FzUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.sockets.GuiDataConfig;
@@ -58,27 +60,16 @@ import factorization.sockets.TileEntitySocketBase;
 
 public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IEntityMessage, IInventory, ISocketHolder {
     //NOTE: If there's issues with servos getting lost/duped; we could have the TE save the servo. (Would have to be a list tho)
-    public static final int STACKS = 16;
-    public static final int STACK_EQUIPMENT = 0, STACK_ARGUMENT = 4, STACK_IO = 2, STACK_CONFIG = 3, STACK_ERRNO = 15;
-    private ServoStack[] stacks = new ServoStack[STACKS];
-    {
-        for (int i = 0; i < stacks.length; i++) {
-            stacks[i] = new ServoStack(this);
-        }
-    }
-    public boolean stacks_changed = false;
+    public final Executioner executioner = new Executioner(this);
+    
     private ItemStack[] inv = new ItemStack[1], inv_last_sent = new ItemStack[inv.length];
-    public byte jmp = JMP_NONE;
-    public EntryAction entry_action = EntryAction.ENTRY_EXECUTE;
-    boolean cpu_blocked = false;
-    public static final byte JMP_NONE = 0, JMP_NEXT_INSTRUCTION = 1, JMP_NEXT_TILE = 2;
-
+    public TileEntitySocketBase socket = new SocketEmpty();
+    public boolean isSocketActive = false;
+    public boolean isSocketPulsed = false;
+    
+    
     Coord pos_prev, pos_next;
     float pos_progress;
-    
-    public TileEntitySocketBase socket = new SocketEmpty();
-    public boolean isSocketActive = false, isSocketPulsed = false;
-    
     public FzOrientation prevOrientation = FzOrientation.UNKNOWN, orientation = FzOrientation.UNKNOWN;
     public FzOrientation pendingClientOrientation = FzOrientation.UNKNOWN;
     public ForgeDirection nextDirection = ForgeDirection.UNKNOWN, lastDirection = ForgeDirection.UNKNOWN;
@@ -167,27 +158,19 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     void putData(DataHelper data) throws IOException {
-        data.as(Share.VISIBLE, "controller");
         orientation = data.as(Share.VISIBLE, "Orient").putFzOrientation(orientation);
         nextDirection = data.as(Share.VISIBLE, "nextDir").putEnum(nextDirection);
         lastDirection = data.as(Share.VISIBLE, "lastDir").putEnum(lastDirection);
         speed_b = data.as(Share.VISIBLE, "speedb").putByte(speed_b);
         target_speed_index = data.as(Share.VISIBLE, "speedt").putByte(target_speed_index);
         accumulated_motion = data.as(Share.VISIBLE, "accumulated_motion").putDouble(accumulated_motion);
+        stopped = data.as(Share.VISIBLE, "stop").putBoolean(stopped);
         pos_next = data.as(Share.VISIBLE, "pos_next").put(pos_next);
         pos_prev = data.as(Share.VISIBLE, "pos_prev").put(pos_prev);
         pos_progress = data.as(Share.VISIBLE, "pos_progress").putFloat(pos_progress);
-        if (data.hasLegacy("skip")) {
-            jmp = data.as(Share.VISIBLE, "skip").putBoolean(jmp == 0) == true ? JMP_NEXT_INSTRUCTION : JMP_NONE;
-        } else {
-            jmp = data.as(Share.VISIBLE, "jmp").putByte(jmp);
-        }
-        entry_action = data.as(Share.VISIBLE, "entryAction").putEnum(entry_action);
-        cpu_blocked = data.as(Share.VISIBLE, "cpuBlock").putBoolean(cpu_blocked);
-        for (int i = 0; i < STACKS; i++) {
-            String name = "stack" + i;
-            stacks[i] = data.as(Share.VISIBLE, name).put(stacks[i]);
-        }
+        
+        executioner.serialize("", data);
+        
         for (int i = 0; i < inv.length; i++) {
             ItemStack is = inv[i] == null ? EMPTY_ITEM : inv[i];
             is = data.as(Share.VISIBLE, "inv" + i).putItemStack(is);
@@ -213,7 +196,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
         isSocketActive = data.as(Share.VISIBLE, "sockon").putBoolean(isSocketActive);
         isSocketPulsed = data.as(Share.VISIBLE, "sockpl").putBoolean(isSocketPulsed);
-        stopped = data.as(Share.VISIBLE, "stop").putBoolean(stopped);
     }
     
     boolean validPosition(Coord c, boolean desperate) {
@@ -251,9 +233,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 broadcastBriefUpdate();
                 //NOTE: Could be spammy. Speed might be too important to not send tho.
             }
-            if (stacks_changed) {
+            if (executioner.stacks_changed) {
                 try {
-                    stacks_changed = false;
+                    executioner.stacks_changed = false;
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     DataOutputStream dos = new DataOutputStream(baos);
                     Core.network.prefixEntityPacket(dos, this, MessageType.servo_complete);
@@ -500,6 +482,15 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         Packet p = Core.network.entityPacket(this, message_type, msg);
         Core.network.broadcastPacket(worldObj, (int) posX, (int) posY, (int) posZ, p);
     }
+    
+    public void broadcastBriefUpdate() {
+        Coord a = getCurrentPos();
+        Coord b = getNextPos();
+        broadcast(MessageType.servo_brief, (byte) orientation.ordinal(), speed_b,
+                a.x, a.y, a.z,
+                b.x, b.y, b.z,
+                pos_progress);
+    }
 
     void moveMotor() {
         if (accumulated_motion == 0) {
@@ -536,7 +527,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         if (worldObj.isRemote) {
             return;
         }
-        cpu_blocked = false;
         final int m = target_speed_index + 1;
         if (!extractCharge(m*2)) {
             speed_b = (byte) Math.max(0, speed_b*3/4 - 1);
@@ -547,64 +537,12 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 return;
             }
         }
-        
-        switch (entry_action) {
-        default:
-        case ENTRY_EXECUTE:
-            if (rail == null /* :| */ || rail.decoration == null) {
-                if (jmp == JMP_NEXT_TILE) {
-                    jmp = JMP_NONE;
-                }
-                return;
-            }
-            if (getCurrentPos().isWeaklyPowered()) {
-                if (jmp == JMP_NEXT_TILE) {
-                    jmp = JMP_NONE;
-                }
-                return;
-            }
-            if (jmp != JMP_NONE) {
-                jmp = JMP_NONE;
-                return;
-            }
-            rail.decoration.motorHit(this);
-            break;
-        case ENTRY_LOAD:
-            if (rail.decoration != null) {
-                getServoStack(STACK_IO).push(rail.decoration.copyComponent());
-            }
-            break;
-        case ENTRY_WRITE:
-            ServoStack ss = getServoStack(STACK_IO);
-            if (ss.getSize() == 0) {
-                putError("IO stack is emtpy!");
-                break;
-            }
-            Object o = ss.pop();
-            if (o instanceof Instruction) {
-                rail.decoration = (Instruction) ((Instruction) o).copyComponent();
-                rail.sendDescriptionPacket();
-            } else if (o instanceof Integer) {
-                int val = (Integer) o;
-                IntegerValue iv = new IntegerValue();
-                iv.setVal(val);
-                rail.decoration = iv;
-                rail.sendDescriptionPacket();
-            } else {
-                putError("Can't write " + o + ", sorry!");
-            }
-            if (ss.getSize() == 0) {
-                entry_action = EntryAction.ENTRY_EXECUTE;
-            }
-            break;
-        case ENTRY_IGNORE:
-            break;
-        }
+        executioner.onEnterNewBlock(rail);
     }
 
     @Override
     public boolean interactFirst(EntityPlayer player) {
-        stacks_changed = true;
+        executioner.stacks_changed = true;
         ItemStack is = FzUtil.normalize(player.getHeldItem());
         if (is == null) {
             return false;
@@ -619,6 +557,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             }
         }
         if (socket instanceof SocketEmpty && is.getItem() == Core.registry.socket_part) {
+            // We want this code path to not be used in favor of the other one.
             int md = is.getItemDamage();
             if (md > 0 && md < FactoryType.MAX_ID) {
                 try {
@@ -632,7 +571,24 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 is.stackSize--;
             }
         } else if (socket != null) {
-            return socket.activateOnServo(player, this);
+            if (!socket.activateOnServo(player, this)) {
+                for (FactoryType ft : FactoryType.values()) {
+                    TileEntityCommon tec = ft.getRepresentative();
+                    if (tec == null) continue;
+                    if (!(tec instanceof TileEntitySocketBase)) continue;
+                    TileEntitySocketBase rep = (TileEntitySocketBase) tec;
+                    if (rep.getParentFactoryType() != socket.getFactoryType()) continue;
+                    if (FzUtil.couldMerge(is, rep.getCreatingItem())) {
+                        TileEntityCommon upgrade = ft.makeTileEntity();
+                        if (upgrade != null) {
+                            socket = (TileEntitySocketBase) upgrade;
+                            if (!player.capabilities.isCreativeMode) is.stackSize--;
+                            if (worldObj.isRemote) Sound.servoInstall.playAt(new Coord(this));
+                            return true;
+                        }
+                    }
+                }
+            }
         }
         return false;
     }
@@ -667,9 +623,15 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         for (ItemStack is : inv) {
             toDrop.add(is);
         }
-        if (socket != null && !(socket instanceof SocketEmpty)) {
+        if (socket != null) {
             socket.uninstall();
-            toDrop.add(new ItemStack(Core.registry.socket_part, 1, socket.getFactoryType().md));
+            FactoryType ft = socket.getFactoryType();
+            while (ft != null) {
+                TileEntitySocketBase sb = (TileEntitySocketBase) ft.getRepresentative();
+                final ItemStack is = sb.getCreatingItem();
+                if (is != null) toDrop.add(is);
+                ft = sb.getParentFactoryType();
+            }
         }
         dropItemStacks(toDrop);
     }
@@ -787,22 +749,20 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
     
     public ServoStack getServoStack(int stackId) {
-        stackId = Math.max(0, stackId);
-        stackId = Math.min(stackId, STACKS);
-        return stacks[stackId];
+        return executioner.getServoStack(stackId);
+    }
+    
+    public ServoStack getArgStack() {
+        return executioner.getServoStack(Executioner.STACK_ARGUMENT);
     }
     
     public void putError(Object error) {
-        if (!worldObj.isRemote) {
-            Notify.send(getCurrentPos(), "%s", error.toString());
-        }
-        ServoStack ss = getServoStack(STACK_ERRNO);
-        if (ss.getFreeSpace() <= 0) {
-            ss.popEnd();
-        }
-        ss.push(error);
+        executioner.putError(error);
     }
 
+    
+    // IInventory implementation
+    
     @Override
     public int getSizeInventory() {
         return inv.length;
@@ -883,22 +843,20 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         return true;
     }
     
-    private FzInv my_fz_inv = FzUtil.openInventory(this, 0);
+    private FzInv my_fz_inv = FzUtil.openInventory(this, 0); //NORELEASE: Not needed anymore, hmm?
     public FzInv getInv() {
         return my_fz_inv;
     }
-    
-    public ItemStack getHeldItem() {
-        for (int i = 0; i < inv.length; i++) {
-            ItemStack is = inv[i];
-            if (is != null) {
-                return is;
-            }
-        }
-        return null;
-    }
 
+    
+    
+    
+    
+    
+    // ISocketHolder implementation
+    
     private final ArrayList<MovingObjectPosition> ret = new ArrayList<MovingObjectPosition>();
+    
     ArrayList<MovingObjectPosition> rayTrace() {
         ret.clear();
         final Coord c = getCurrentPos();
@@ -937,10 +895,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         if (target.isAir()) {
             return;
         }
-        /*AxisAlignedBB aabb = target.getCollisionBoundingBoxFromPool();
-        if (aabb == null) {
-            return;
-        }*/
         list.add(target.createMop(side, nullVec));
     }
     
@@ -987,12 +941,4 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
     }
     
-    public void broadcastBriefUpdate() {
-        Coord a = getCurrentPos();
-        Coord b = getNextPos();
-        broadcast(MessageType.servo_brief, (byte) orientation.ordinal(), speed_b,
-                a.x, a.y, a.z,
-                b.x, b.y, b.z,
-                pos_progress);
-    }
 }

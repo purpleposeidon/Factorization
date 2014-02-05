@@ -143,6 +143,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
     public ItemServoRailWidget servo_widget_instruction, servo_widget_decor;
     public ItemStack dark_iron_sprocket, servo_motor;
     public ItemDayBarrel daybarrel;
+    @Deprecated
     public ItemSocketPart socket_part;
     public ItemCraftingComponent instruction_plate;
     public ItemCommenter servo_rail_comment_editor;

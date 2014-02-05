@@ -16,6 +16,7 @@ import factorization.common.FactoryType;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemFactorization;
 
+@Deprecated
 public class ItemSocketPart extends ItemFactorization {
 
     public ItemSocketPart(int itemId, String name, TabType tabType) {

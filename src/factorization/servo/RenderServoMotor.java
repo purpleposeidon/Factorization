@@ -1,7 +1,5 @@
 package factorization.servo;
 
-import static org.lwjgl.opengl.GL11.GL_LIGHTING;
-
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -21,7 +19,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
@@ -456,7 +453,7 @@ public class RenderServoMotor extends RenderEntity {
         
         float s = 1F/128F;
         GL11.glScalef(s, s, s);
-        for (int i = 0; i < ServoMotor.STACKS; i++) {
+        for (int i = 0; i < Executioner.STACKS; i++) {
             GL11.glPushMatrix();
             ServoStack ss = motor.getServoStack(i);
             GL11.glRotatef(180/16*(8.5F + i), 0, 0, 1);
