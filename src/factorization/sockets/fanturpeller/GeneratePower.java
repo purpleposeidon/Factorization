@@ -22,7 +22,7 @@ public class GeneratePower extends BufferedFanturpeller {
     FluidStack handled;
     
     float getPowerMultiplier(FluidStack fs) {
-        return 0.1F;
+        return 0.3F;
     }
     
     @Override
@@ -110,7 +110,7 @@ public class GeneratePower extends BufferedFanturpeller {
     
     @Override
     protected float scaleRotation(float rotation) {
-        return rotation;
+        return rotation/5;
     }
     
     @Override

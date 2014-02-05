@@ -14,7 +14,7 @@ templates = [
 }""",
     "if (need_X && this instanceof X) return false;",
     """if (need_X) {
-    replace(coord, new X());
+    replaceWith(new X());
     return true;
 }"""
 ]

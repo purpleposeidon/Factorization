@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.util.Icon;
 import net.minecraftforge.fluids.IFluidBlock;
@@ -27,7 +28,6 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
-import factorization.oreprocessing.TileEntityGrinderRender;
 import factorization.servo.ServoMotor;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
@@ -60,7 +60,17 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
     public FactoryType getFactoryType() {
         return FactoryType.SOCKET_FANTURPELLER;
     }
-
+    
+    @Override
+    public ItemStack getCreatingItem() {
+        return new ItemStack(Core.registry.fan);
+    }
+    
+    @Override
+    public FactoryType getParentFactoryType() {
+        return FactoryType.SOCKET_BARE_MOTOR;
+    }
+    
     @Override
     public boolean canUpdate() {
         return true;
@@ -125,19 +135,19 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         if (need_BlowEntities && this instanceof BlowEntities) return false;
         if (need_MixCrafting && this instanceof MixCrafting) return false;
         if (need_PumpLiquids) {
-            replace(coord, new PumpLiquids());
+            replaceWith(new PumpLiquids());
             return true;
         }
         if (need_GeneratePower) {
-            replace(coord, new GeneratePower());
+            replaceWith(new GeneratePower());
             return true;
         }
         if (need_BlowEntities) {
-            replace(coord, new BlowEntities());
+            replaceWith(new BlowEntities());
             return true;
         }
         if (need_MixCrafting) {
-            replace(coord, new MixCrafting());
+            replaceWith(new MixCrafting());
             return true;
         }
         // END MACRO-GENERATED CODE
@@ -164,25 +174,27 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         return at.isReplacable() && !isLiquid(at);
     }
     
-    void replace(Coord at, SocketFanturpeller replacement) {
-        if (!isSafeToDiscard()) {
-            if (replacement instanceof BufferedFanturpeller && this instanceof BufferedFanturpeller) {
-                BufferedFanturpeller old = (BufferedFanturpeller) this;
-                BufferedFanturpeller rep = (BufferedFanturpeller) replacement;
-                rep.buffer = old.buffer;
-            } else {
-                return;
+    @Override
+    protected void replaceWith(TileEntitySocketBase baseReplacement) {
+        if (baseReplacement instanceof SocketFanturpeller) {
+            SocketFanturpeller replacement = (SocketFanturpeller) baseReplacement;
+            if (!isSafeToDiscard()) {
+                if (replacement instanceof BufferedFanturpeller && this instanceof BufferedFanturpeller) {
+                    BufferedFanturpeller old = (BufferedFanturpeller) this;
+                    BufferedFanturpeller rep = (BufferedFanturpeller) replacement;
+                    rep.buffer = old.buffer;
+                } else {
+                    return;
+                }
             }
+            replacement.isSucking = isSucking;
+            replacement.target_speed = target_speed;
+            replacement.fanω = fanω;
+            replacement.fanRotation = fanRotation;
+            replacement.prevFanRotation = prevFanRotation;
+            replacement.charge = charge;
         }
-        replacement.facing = facing;
-        replacement.isSucking = isSucking;
-        replacement.target_speed = target_speed;
-        replacement.fanω = fanω;
-        replacement.fanRotation = fanRotation;
-        replacement.prevFanRotation = prevFanRotation;
-        replacement.charge = charge;
-        
-        at.setTE(replacement);
+        super.replaceWith(baseReplacement);
     }
 
     transient boolean needActionCheck = true;
@@ -203,8 +215,9 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         if (Math.signum(fanω) != direction) return false;
         float ω = Math.abs(fanω);
         if (ω >= ts) return true;
-        if (ts > ω + 10) return false;
-        return (ts - ω)/10.0F > rand.nextFloat(); 
+        return false;
+        /*if (ts > ω + 10) return false;
+        return (ts - ω)/10.0F > rand.nextFloat(); */
     }
     
     int getRequiredCharge() {
@@ -269,20 +282,23 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
             TextureManager tex = Minecraft.getMinecraft().renderEngine;
             tex.bindTexture(Core.blockAtlas);
         }
-        Icon metal = BlockIcons.motor_texture;
-        float d = 4.0F / 16.0F;
-        float yd = -d + 0.003F;
         BlockRenderHelper block = BlockRenderHelper.instance;
-        block.useTextures(metal, null,
-                metal, metal,
-                metal, metal);
-        float yoffset = 5F/16F;
-        float sd = motor == null ? 0 : 2F/16F;
         Quaternion rotation = Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite()));
-        block.setBlockBounds(d, d + yd + yoffset + 2F/16F + sd, d, 1 - d, 1 - (d + 0F/16F) + yd + yoffset, 1 - d);
-        block.begin();
-        block.rotateCenter(rotation);
-        block.renderRotated(tess, xCoord, yCoord, zCoord);
+        {
+            Icon metal = BlockIcons.motor_texture;
+            float d = 4.0F / 16.0F;
+            float yd = -d + 0.003F;
+    
+            block.useTextures(metal, null,
+                    metal, metal,
+                    metal, metal);
+            float yoffset = 5F/16F;
+            float sd = motor == null ? 0 : 2F/16F;
+            block.setBlockBounds(d, d + yd + yoffset + 2F/16F + sd, d, 1 - d, 1 - (d + 0F/16F) + yd + yoffset, 1 - d);
+            block.begin();
+            block.rotateCenter(rotation);
+            block.renderRotated(tess, xCoord, yCoord, zCoord);
+        }
         
         Icon glass = Block.glass.getIcon(0, 0);
         Icon hole = Block.fenceIron.getIcon(0, 0);
@@ -310,7 +326,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         float d = 0.5F;
         GL11.glTranslatef(d, d, d);
         Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())).glRotate();
-        float turn = FzUtil.interp(prevFanRotation, fanRotation, partial);
+        float turn = scaleRotation(FzUtil.interp(prevFanRotation, fanRotation, partial));
         GL11.glRotatef(turn, 0, 1, 0);
         float sd = motor == null ? -2F/16F : 3F/16F;
         GL11.glTranslatef(0, sd, 0);
