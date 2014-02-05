@@ -1149,13 +1149,12 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 'L', "ingotLead");
         oreRecipe(new ItemStack(servo_placer),
                 "M#P",
-                " SC",
+                " S ",
                 "M#P",
                 'M', servo_motor,
                 '#', logicMatrix,
                 'P', logicMatrixProgrammer,
-                'S', empty_socket_item,
-                'C', Block.chest);
+                'S', empty_socket_item);
         ServoComponent.setupRecipes();
         oreRecipe(parasieve_item,
                 "C#C",

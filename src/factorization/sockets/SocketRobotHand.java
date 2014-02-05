@@ -28,6 +28,7 @@ import factorization.common.FactoryType;
 import factorization.notify.Notify;
 import factorization.servo.ServoMotor;
 import factorization.shared.BlockRenderHelper;
+import factorization.shared.Core;
 import factorization.shared.FzUtil;
 import factorization.shared.FzUtil.FzInv;
 
@@ -37,6 +38,16 @@ public class SocketRobotHand extends TileEntitySocketBase {
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.SOCKET_ROBOTHAND;
+    }
+    
+    @Override
+    public FactoryType getParentFactoryType() {
+        return FactoryType.SOCKET_EMPTY;
+    }
+    
+    @Override
+    public ItemStack getCreatingItem() {
+        return Core.registry.socket_robot_hand;
     }
     
     @Override

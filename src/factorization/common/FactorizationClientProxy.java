@@ -87,6 +87,7 @@ import factorization.shared.FactorizationRender;
 import factorization.shared.ItemRenderCapture;
 import factorization.shared.TileEntityFactorization;
 import factorization.sockets.BlockRenderSocketBase;
+import factorization.sockets.SocketBareMotor;
 import factorization.sockets.SocketLacerator;
 import factorization.sockets.TileEntitySocketRenderer;
 import factorization.sockets.fanturpeller.SocketFanturpeller;
@@ -453,7 +454,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 FactoryType.SOCKET_BLOWER,
                 FactoryType.SOCKET_PUMP,
                 FactoryType.SOCKET_POWERGEN,
-                FactoryType.SOCKET_MIXER
+                FactoryType.SOCKET_MIXER,
+                FactoryType.SOCKET_BARE_MOTOR
         }) {
             new BlockRenderSocketBase(ft);
         }

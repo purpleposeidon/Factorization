@@ -1,8 +1,9 @@
 package factorization.servo;
 
 import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 
 import net.minecraft.nbt.NBTTagCompound;
 import factorization.api.FzColor;
@@ -12,7 +13,7 @@ import factorization.api.datahelpers.Share;
 import factorization.shared.Core;
 
 public class ServoStack implements IDataSerializable, Iterable {
-    private LinkedList<Object> contents = new LinkedList<Object>();
+    private ArrayDeque<Object> contents = new ArrayDeque<Object>();
     private final int maxSize = 16;
     private final ServoMotor motor;
     
@@ -20,8 +21,9 @@ public class ServoStack implements IDataSerializable, Iterable {
         this.motor = motor;
     }
 
-    public void setContentsList(LinkedList<Object> obj) {
-        contents = obj;
+    public void setContentsList(Collection<Object> obj) {
+        contents.clear();
+        contents.addAll(obj);
     }
 
     public boolean push(Object o) {

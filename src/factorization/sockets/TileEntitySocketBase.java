@@ -43,7 +43,10 @@ import factorization.servo.ServoMotor;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
+import factorization.shared.NetworkFactorization;
+import factorization.shared.Sound;
 import factorization.shared.TileEntityCommon;
+import factorization.shared.TileEntityFactorization;
 import factorization.shared.FzUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
 
@@ -260,8 +263,15 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     protected void onRemove() {
         super.onRemove();
         uninstall();
-        if (!(this instanceof SocketEmpty)) {
-            getCoord().spawnItem(new ItemStack(Core.registry.socket_part, 1, getFactoryType().md));
+        FactoryType ft = getFactoryType();
+        Coord at = getCoord();
+        while (ft != null) {
+            TileEntitySocketBase sb = (TileEntitySocketBase) ft.getRepresentative();
+            ItemStack is = sb.getCreatingItem();
+            if (is != null) {
+                at.spawnItem(ItemStack.copyItemStack(is));
+            }
+            ft = sb.getParentFactoryType();
         }
     }
     
@@ -270,7 +280,8 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         if (this instanceof SocketEmpty) {
             return FactoryType.SOCKET_EMPTY.itemStack();
         }
-        return new ItemStack(Core.registry.socket_part, 1, getFactoryType().md);
+        ItemStack is = getCreatingItem();
+        return is == null ? null : ItemStack.copyItemStack(is);
     }
     
     @Override
@@ -326,6 +337,8 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     @Override
     public abstract FactoryType getFactoryType();
+    public abstract ItemStack getCreatingItem();
+    public abstract FactoryType getParentFactoryType();
     
     @Override
     public abstract boolean canUpdate();
@@ -376,28 +389,57 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     @Override
     public boolean activate(EntityPlayer player, ForgeDirection side) {
-        if (worldObj.isRemote) {
-            return false;
-        }
         ItemStack held = player.getHeldItem();
         if (held == null) {
             return false;
         }
-        if (held.getItem() != Core.registry.logicMatrixProgrammer) {
+        if (held.getItem() == Core.registry.logicMatrixProgrammer) {
+            if (!getFactoryType().hasGui) {
+                return false;
+            }
+            if (worldObj.isRemote) {
+                return true;
+            }
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(baos);
+            DataOutPacket dop = new DataOutPacket(dos, Side.SERVER);
+            try {
+                Coord coord = getCoord();
+                Core.network.prefixTePacket(dos, coord, MessageType.OpenDataHelperGui);
+                serialize("", dop);
+                Core.network.broadcastPacket(player, coord, Core.network.TEmessagePacket(baos));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             return false;
-        }
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(baos);
-        DataOutPacket dop = new DataOutPacket(dos, Side.SERVER);
-        try {
-            Coord coord = getCoord();
-            Core.network.prefixTePacket(dos, coord, MessageType.OpenDataHelperGui);
-            serialize("", dop);
-            Core.network.broadcastPacket(player, coord, Core.network.TEmessagePacket(baos));
-        } catch (IOException e) {
-            e.printStackTrace();
+        } else {
+            for (FactoryType ft : FactoryType.values()) {
+                TileEntityCommon tec = ft.getRepresentative();
+                if (tec == null) continue;
+                if (!(tec instanceof TileEntitySocketBase)) continue;
+                TileEntitySocketBase rep = (TileEntitySocketBase) tec;
+                if (rep.getParentFactoryType() != getFactoryType()) continue;
+                if (FzUtil.couldMerge(held, rep.getCreatingItem())) {
+                    TileEntityCommon upgrade = ft.makeTileEntity();
+                    if (upgrade != null) {
+                        replaceWith((TileEntitySocketBase) upgrade);
+                        if (!player.capabilities.isCreativeMode) held.stackSize--;
+                        if (worldObj.isRemote) Sound.socketInstall.playAt(this);
+                        return true;
+                    }
+                }
+            }
         }
         return false;
+    }
+    
+    protected void replaceWith(TileEntitySocketBase replacement) {
+        replacement.facing = facing;
+        Coord at = getCoord();
+        at.setTE(replacement);
+        replacement.getBlockClass().enforce(at);
+        at.markBlockForUpdate();
+        //Core.network.broadcastPacket(null, at, replacement.getDescriptionPacket());
     }
     
     public boolean activateOnServo(EntityPlayer player, ServoMotor motor) {

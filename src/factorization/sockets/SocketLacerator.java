@@ -10,7 +10,6 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.particle.EntityFX;
-import net.minecraft.client.renderer.DestroyBlockProgress;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.enchantment.Enchantment;
@@ -53,8 +52,8 @@ import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.notify.Notify;
 import factorization.oreprocessing.TileEntityGrinder;
-import factorization.oreprocessing.TileEntityGrinderRender;
 import factorization.oreprocessing.TileEntityGrinder.GrinderRecipe;
+import factorization.oreprocessing.TileEntityGrinderRender;
 import factorization.servo.ServoMotor;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
@@ -92,6 +91,15 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         return FactoryType.SOCKET_LACERATOR;
     }
     
+    @Override
+    public ItemStack getCreatingItem() {
+        return new ItemStack(Core.registry.diamond_cutting_head);
+    }
+    
+    @Override
+    public FactoryType getParentFactoryType() {
+        return FactoryType.SOCKET_BARE_MOTOR;
+    }
     
     @Override
     public boolean canUpdate() {

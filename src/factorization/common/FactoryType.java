@@ -25,6 +25,7 @@ import factorization.shared.Core;
 import factorization.shared.TileEntityCommon;
 import factorization.shared.TileEntityExtension;
 import factorization.shared.TileEntityFactorization;
+import factorization.sockets.SocketBareMotor;
 import factorization.sockets.SocketEmpty;
 import factorization.sockets.SocketLacerator;
 import factorization.sockets.SocketRobotHand;
@@ -83,6 +84,7 @@ public enum FactoryType {
     SOCKET_POWERGEN(38, false, GeneratePower.class, "fzsock_gen"),
     SOCKET_BLOWER(39, true, BlowEntities.class, "fzsock_blow"),
     SOCKET_MIXER(40, false, MixCrafting.class, "fzsock_mix"),
+    SOCKET_BARE_MOTOR(41, false, SocketBareMotor.class, "fzsock_motor"),
     
 
     POCKETCRAFTGUI(101, true)

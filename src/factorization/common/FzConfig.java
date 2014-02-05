@@ -58,6 +58,7 @@ public class FzConfig {
     public static boolean fix_middle_click = true;
     public static boolean embarken_wood = true;
     public static boolean proper_projectile_physics = true;
+    public static boolean buffed_nametags = true;
     public static boolean invasiveCharge = false;
     public static boolean enable_solar_steam = true;
     public static boolean large_servo_instructions = false;
@@ -200,6 +201,7 @@ public class FzConfig {
         equal_opportunities_for_mobs = getBoolConfig("equalOpportunitiesForMobs", "server", equal_opportunities_for_mobs, "Causes some mobs to rarely spawn wearing your armor");
         embarken_wood = getBoolConfig("barkRecipes", "server", embarken_wood, "Adds recipes for bark variants of logs");
         proper_projectile_physics = getBoolConfig("properProjectilePhysics", "server", proper_projectile_physics, "Makes projectiles start with the velocity of the thrower");
+        buffed_nametags = getBoolConfig("buffedNametags", "server", buffed_nametags, "Naming entities gives them +5 hearts");
         //invasiveCharge = getBoolConfig("invasiveCharge", "server", invasiveCharge, "Set to true to prevent charge from connecting over metal blocks.");
         //Broken. Doesn't work.
         enable_solar_steam = getBoolConfig("enableSolarSteam", "server", enable_solar_steam, "Set to false to disable the crafting recipe for solar2steam machines");

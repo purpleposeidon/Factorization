@@ -27,7 +27,9 @@ public enum Sound {
     acidBurn("random.fizz", 1, 1, true),
     caliometricDigest("random.burp", 1, 0.5, true),
     barrelPunt("mob.zombie.infect", 0.9, 1.5, true),
-    barrelPunt2("mob.zombie.infect", 0.9, 3.5, true)
+    barrelPunt2("mob.zombie.infect", 0.9, 3.5, true),
+    socketInstall("dig.wood", 1.0, 1.0, true),
+    servoInstall("mob.slime.attack", 1.0, 1.0, true),
     
     ;
     String src;
@@ -86,6 +88,7 @@ public enum Sound {
         playAt(c.w, c.x, c.y, c.z);
     }
 
+    @Deprecated // Doesn't work.
     public void playAt(Entity ent) {
         ent.worldObj.playSoundAtEntity(ent, src, volume, pitch);
         share(ent.worldObj, (int) ent.posX, (int) (ent.posY - ent.yOffset), (int) ent.posZ);

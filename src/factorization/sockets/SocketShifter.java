@@ -2,13 +2,10 @@ package factorization.sockets;
 
 import java.io.IOException;
 
-import javax.swing.text.StyledEditorKit.ForegroundAction;
-
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -22,6 +19,7 @@ import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.servo.ServoMotor;
 import factorization.shared.BlockRenderHelper;
+import factorization.shared.Core;
 import factorization.shared.FzUtil;
 import factorization.shared.FzUtil.FzInv;
 
@@ -39,6 +37,16 @@ public class SocketShifter extends TileEntitySocketBase {
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.SOCKET_SHIFTER;
+    }
+    
+    @Override
+    public FactoryType getParentFactoryType() {
+        return FactoryType.SOCKET_EMPTY;
+    }
+    
+    @Override
+    public ItemStack getCreatingItem() {
+        return Core.registry.socket_shifter;
     }
     
     @Override
