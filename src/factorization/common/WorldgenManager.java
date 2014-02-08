@@ -36,7 +36,7 @@ public class WorldgenManager {
                     if (!world.provider.isSurfaceWorld()) {
                         return;
                     }
-                    int count = 1 + (rand.nextBoolean() && rand.nextBoolean() && rand.nextBoolean() ? 1 : 0);
+                    int count = 1; // + (rand.nextBoolean() && rand.nextBoolean() && rand.nextBoolean() ? 1 : 0);
                     for (int i = 0; i < count; i++) {
                         int x = chunkX*16 + rand.nextInt(16);
                         int z = chunkZ*16 + rand.nextInt(16);
