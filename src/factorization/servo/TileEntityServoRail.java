@@ -298,6 +298,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             }
             decoration = (Decorator) sc;
             comment = input.readBoolean() ? "x" : null;
+            decoration.afterClientLoad(this);
             return true;
         }
         if (messageType == MessageType.ServoRailEditComment) {

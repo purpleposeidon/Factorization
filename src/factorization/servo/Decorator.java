@@ -147,4 +147,6 @@ public abstract class Decorator extends ServoComponent {
     public boolean collides() {
         return true;
     }
+    
+    public void afterClientLoad(TileEntityServoRail rail) { }
 }

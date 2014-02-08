@@ -63,4 +63,9 @@ public class EntryControl extends Instruction {
     public String getName() {
         return "fz.instruction.entryControl";
     }
+    
+    @Override
+    public void afterClientLoad(TileEntityServoRail rail) {
+        rail.priority = (byte) (blocking ? -1 : 1);
+    }
 }
