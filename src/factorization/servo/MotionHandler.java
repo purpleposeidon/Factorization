@@ -113,7 +113,13 @@ public class MotionHandler {
     }
 
     boolean validDirection(ForgeDirection dir, boolean desperate) {
-        return validPosition(motor.getCurrentPos().add(dir), desperate);
+        Coord at = motor.getCurrentPos();
+        at.adjust(dir);
+        try {
+            return validPosition(at, desperate);
+        } finally {
+            at.adjust(dir.getOpposite());
+        }
     }
 
     public boolean testDirection(ForgeDirection d, boolean desperate) {
