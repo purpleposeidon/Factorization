@@ -443,7 +443,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
     
     public boolean activateOnServo(EntityPlayer player, ServoMotor motor) {
-        if (worldObj.isRemote) {
+        if (worldObj == null /* wtf? */ || worldObj.isRemote) {
             return false;
         }
         ItemStack held = player.getHeldItem();
