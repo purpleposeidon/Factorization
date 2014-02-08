@@ -25,19 +25,19 @@ public enum FzColor {
     
     public static FzColor readColor(Coord c) {
         if (c == null || c.w == null) {
-            return BLACK;
+            return null;
         }
         Block b = c.getBlock();
         if (b == null) {
-            return BLACK;
+            return null;
         }
         if (b instanceof BlockColored) {
             int md = c.getMd();
             if (md < 0 || md >= 16) {
-                return BLACK;
+                return null;
             }
             return cache[md];
         }
-        return BLACK;
+        return null;
     }
 }
