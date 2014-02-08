@@ -118,7 +118,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
             if (!worldObj.isRemote && getFacing() != ForgeDirection.UNKNOWN && isCrafterRoot) {
                 getStateHelper().craft(false, this);
                 isCrafterRoot = false;
-                boolean signal = worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0;
+                boolean signal = worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord);
                 if (!signal) {
                     powered = false;
                 }
@@ -188,7 +188,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
         if (worldObj.isRemote) {
             return;
         }
-        boolean signal = worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0;
+        boolean signal = worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord);
         if (signal != powered && signal && progress == 0) {
             getStateHelper().craft(true, this);
             isCrafterRoot = true;
