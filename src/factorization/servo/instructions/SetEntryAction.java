@@ -11,6 +11,7 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
+import factorization.servo.CpuBlocking;
 import factorization.servo.EntryAction;
 import factorization.servo.Executioner;
 import factorization.servo.Instruction;
@@ -87,5 +88,9 @@ public class SetEntryAction extends Instruction {
         case ENTRY_IGNORE: return "Ignore Instructions"; //excepting this one
         }
     }
-
+    
+    @Override
+    public CpuBlocking getBlockingBehavior() {
+        return CpuBlocking.BLOCK_FOR_TICK;
+    }
 }

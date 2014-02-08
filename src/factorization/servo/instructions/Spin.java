@@ -13,6 +13,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
+import factorization.servo.CpuBlocking;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 
@@ -62,5 +63,10 @@ public class Spin extends Instruction {
     @Override
     public String getName() {
         return "fz.instruction.spin";
+    }
+    
+    @Override
+    public CpuBlocking getBlockingBehavior() {
+        return CpuBlocking.BLOCK_UNTIL_NEXT_ENTRY;
     }
 }

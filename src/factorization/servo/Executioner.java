@@ -1,9 +1,9 @@
 package factorization.servo;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.notify.Notify;
 import factorization.servo.instructions.IntegerValue;
@@ -16,6 +16,8 @@ public class Executioner {
     public static final byte JMP_NONE = 0, JMP_NEXT_INSTRUCTION = 1, JMP_NEXT_TILE = 2;
     
     public ServoStack[] stacks = new ServoStack[STACKS];
+    private ServoStack buffer;
+    private boolean is_running = false;
     public boolean stacks_changed = false;
     public byte jmp = JMP_NONE;
     public EntryAction entry_action = EntryAction.ENTRY_EXECUTE;
@@ -29,11 +31,13 @@ public class Executioner {
         for (int i = 0; i < stacks.length; i++) {
             stacks[i] = new ServoStack(this);
         }
+        buffer = new ServoStack(this);
     }
     
     public ServoStack getServoStack(int stackId) {
         if (stackId < 0) stackId = 0;
         if (stackId >= STACKS) stackId = STACKS - 1;
+        if (is_running && stackId == seg) return buffer;
         return stacks[stackId];
     }
     
@@ -49,11 +53,66 @@ public class Executioner {
     }
     
     public void tick() {
-        
+        if (cpu_blocked) return;
+        if (pc == -1) return;
+        if (seg == -1) return;
+        ServoStack ss = getServoStack(seg);
+        if (ss == null) return;
+        if (pc >= ss.getSize()) {
+            pc = -1;
+            return;
+        }
+        int i = 0;
+        byte orig_seg = seg;
+        is_running = true;
+        boolean found_blocking_instruction = false;
+        TICK: for (Object obj : ss) {
+            if (i++ != pc) continue;
+            if (obj instanceof Instruction) {
+                Instruction insn = (Instruction) obj;
+                switch (insn.getBlockingBehavior()) {
+                case BLOCK_FOR_TICK:
+                    if (found_blocking_instruction) {
+                        break TICK;
+                    }
+                    found_blocking_instruction = true;
+                    break;
+                case BLOCK_UNTIL_NEXT_ENTRY:
+                    if (found_blocking_instruction) {
+                        break TICK;
+                    }
+                    cpu_blocked = true;
+                    found_blocking_instruction = true;
+                    break;
+                default:
+                case NO_BLOCKING:
+                    break;
+                }
+                pc++;
+                insn.motorHit(motor);
+            } else {
+                pc++;
+                motor.getArgStack().push(obj);
+            }
+            if (orig_seg != seg) break TICK;
+        }
+        is_running = false;
+        if (buffer.getSize() > 0) {
+            //Should we stay silent? -- motor.putError("Lost instructions: " + buffer.getSize());
+            buffer.clear();
+        }
+        if (pc >= ss.getSize()) {
+            pc = -1;
+            return;
+        }
     }
     
     public void onEnterNewBlock(TileEntityServoRail rail) {
         cpu_blocked = false;
+        if (pc == -1) {
+            seg = STACK_ENTER;
+            pc = 0;
+        }
         switch (entry_action) {
         default:
         case ENTRY_EXECUTE:

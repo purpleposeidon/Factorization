@@ -87,7 +87,10 @@ public abstract class ServoComponent implements IDataSerializable {
         String componentName = tag.getString(componentTagKey);
         Class<? extends ServoComponent> componentClass = getComponent(componentName);
         if (componentClass == null) {
-            Core.logWarning("Unknown servo component with ID %s", componentName);
+            Core.logWarning("Unknown servo component with ID %s. Removing tag info!", componentName);
+            Core.logWarning("The tag: %s", tag);
+            Thread.dumpStack();
+            tag.removeTag(componentTagKey);
             return null;
         }
         try {
@@ -247,7 +250,9 @@ public abstract class ServoComponent implements IDataSerializable {
                 ShifterControl.class,
                 
                 ScanColor.class,
-                SetEntryAction.class
+                SetEntryAction.class,
+                ValueTransfer.class,
+                SetSegment.class,
         }) {
             register(cl);
         }

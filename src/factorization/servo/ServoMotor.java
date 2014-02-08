@@ -59,14 +59,13 @@ import factorization.sockets.SocketEmpty;
 import factorization.sockets.TileEntitySocketBase;
 
 public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IEntityMessage, IInventory, ISocketHolder {
-    //NOTE: If there's issues with servos getting lost/duped; we could have the TE save the servo. (Would have to be a list tho)
     public final MotionHandler motionHandler = new MotionHandler(this);
     public final Executioner executioner = new Executioner(this);
     public TileEntitySocketBase socket = new SocketEmpty();
     public boolean isSocketActive = false;
     public boolean isSocketPulsed = false;
     
-    private ItemStack[] inv = new ItemStack[1], inv_last_sent = new ItemStack[inv.length];
+    ItemStack[] inv = new ItemStack[1], inv_last_sent = new ItemStack[inv.length];
     
     public ServoMotor(World world) {
         super(world);
@@ -163,6 +162,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     
     // Networking
+    
     void broadcast(int message_type, Object... msg) {
         Packet p = Core.network.entityPacket(this, message_type, msg);
         Core.network.broadcastPacket(worldObj, (int) posX, (int) posY, (int) posZ, p);
@@ -259,9 +259,17 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
         if (worldObj.isRemote) {
             motionHandler.updateServoMotion();
+            executioner.tick();
         } else {
-            
+            byte orig_speed = motionHandler.speed_b;
+            FzOrientation orig_or = motionHandler.orientation;
             motionHandler.updateServoMotion();
+            executioner.tick();
+            if (orig_speed != motionHandler.speed_b || orig_or != motionHandler.orientation) {
+                broadcastBriefUpdate();
+                //NOTE: Could be spammy. Speed might be too important to not send tho.
+            }
+            
             if (executioner.stacks_changed) {
                 try {
                     executioner.stacks_changed = false;
@@ -353,6 +361,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     public void setStopped(boolean stop) {
         motionHandler.setStopped(stop);
+    }
+    
+    public boolean isStopped() {
+        return motionHandler.stopped;
     }
     
     
@@ -583,11 +595,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     @Override
     public boolean isItemValidForSlot(int i, ItemStack itemstack) {
         return true;
-    }
-    
-    private FzInv my_fz_inv = FzUtil.openInventory(this, 0); //NORELEASE: Not needed anymore, hmm?
-    public FzInv getInv() {
-        return my_fz_inv;
     }
 
     

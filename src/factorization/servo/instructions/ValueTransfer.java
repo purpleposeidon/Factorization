@@ -4,25 +4,28 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
+import factorization.api.Coord;
 import factorization.api.FzColor;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
+import factorization.servo.CpuBlocking;
 import factorization.servo.Executioner;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.ServoStack;
 
 public class ValueTransfer extends Instruction {
-    private static final byte MOVE_VALUE = 0, TAKE_VALUE = 1, MOVE_STACK = 2, TAKE_STACK = 3;
+    private static final byte MOVE_VALUE = 0, TAKE_VALUE = 1, MOVE_STACK = 2, TAKE_STACK = 3, ACTION_COUNT = 4;
     byte action = MOVE_VALUE;
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        data.as(Share.PRIVATE, "action").putByte(action);
+        action = data.as(Share.VISIBLE, "action").putByte(action);
         return this;
     }
 
@@ -69,7 +72,7 @@ public class ValueTransfer extends Instruction {
             for (Object val : src) {
                 dst.push(val);
             }
-            src.setContentsList(Arrays.asList());
+            src.clear();
             break;
         }
     }
@@ -98,7 +101,19 @@ public class ValueTransfer extends Instruction {
 
     @Override
     public String getName() {
-        return "fz.instructions.valuetransfer";
+        return "fz.instruction.valuetransfer";
     }
-
+    
+    @Override
+    public CpuBlocking getBlockingBehavior() {
+        return CpuBlocking.BLOCK_FOR_TICK;
+    }
+    
+    @Override
+    public boolean onClick(EntityPlayer player, Coord block, ForgeDirection side) {
+        if (!playerHasProgrammer(player)) return false;
+        action++;
+        if (action == ACTION_COUNT) action = 0;
+        return true;
+    }
 }

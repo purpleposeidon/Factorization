@@ -22,8 +22,13 @@ public class ServoStack implements IDataSerializable, Iterable {
     }
 
     public void setContentsList(Collection<Object> obj) {
-        contents.clear();
+        clear();
         contents.addAll(obj);
+    }
+    
+    public void clear() {
+        contents.clear();
+        executioner.stacks_changed = true;
     }
 
     public boolean push(Object o) {
@@ -207,6 +212,9 @@ public class ServoStack implements IDataSerializable, Iterable {
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
         int length = data.asSameShare(prefix + "_size").putInt(contents.size());
         if (length == 0) {
+            if (data.isReader()) {
+                contents.clear();
+            }
             return this;
         }
         prefix = prefix + "#";
@@ -267,4 +275,6 @@ public class ServoStack implements IDataSerializable, Iterable {
     public String toString() {
         return contents.toString();
     }
+    
+    
 }

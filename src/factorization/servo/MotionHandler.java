@@ -279,19 +279,9 @@ public class MotionHandler {
     }
     
     void updateServoMotion() {
-        if (motor.worldObj.isRemote) {
-            prev_sprocket_rotation = sprocket_rotation;
-            prev_servo_reorient = servo_reorient;
-            doMotionLogic();
-        } else {
-            byte orig_speed = speed_b;
-            FzOrientation orig_or = orientation;
-            doMotionLogic();
-            if (orig_speed != speed_b || orig_or != orientation) {
-                motor.broadcastBriefUpdate();
-                //NOTE: Could be spammy. Speed might be too important to not send tho.
-            }
-        }
+        prev_sprocket_rotation = sprocket_rotation;
+        prev_servo_reorient = servo_reorient;
+        doMotionLogic();
         interpolatePosition(pos_progress);
         if (stopped && motor.getCurrentPos().isWeaklyPowered()) {
             setStopped(false);

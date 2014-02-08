@@ -2,18 +2,18 @@ package factorization.servo.instructions;
 
 import java.io.IOException;
 
-import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
+import factorization.api.FzColor;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
-import factorization.servo.CpuBlocking;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
+import factorization.shared.Core;
 
-public class Trap extends Instruction {
+public class SetSegment extends Instruction {
 
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
@@ -22,32 +22,27 @@ public class Trap extends Instruction {
 
     @Override
     protected ItemStack getRecipeItem() {
-        return new ItemStack(Block.chestTrapped);
+        return Core.registry.dark_iron_sprocket;
     }
 
     @Override
     public void motorHit(ServoMotor motor) {
-        if (motor.isStopped()) {
-            motor.setStopped(false);
+        FzColor color = motor.getArgStack().popType(FzColor.class);
+        if (color == null) {
+            motor.putError("Stack underflow: no color");
             return;
         }
-        if (!motor.getCurrentPos().isWeaklyPowered()) {
-            motor.setStopped(true);
-        }
+        motor.executioner.seg = (byte) color.ordinal();
     }
 
     @Override
     public Icon getIcon(ForgeDirection side) {
-        return BlockIcons.servo$trap;
+        return BlockIcons.servo$set_segment;
     }
 
     @Override
     public String getName() {
-        return "fz.instruction.trap";
+        return "fz.instruction.setsegment";
     }
-    
-    @Override
-    public CpuBlocking getBlockingBehavior() {
-        return CpuBlocking.BLOCK_UNTIL_NEXT_ENTRY;
-    }
+
 }

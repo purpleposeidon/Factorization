@@ -11,6 +11,7 @@ import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
+import factorization.servo.CpuBlocking;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.shared.TileEntityCommon;
@@ -57,5 +58,10 @@ public class RedstonePulse extends Instruction {
     @Override
     protected ItemStack getRecipeItem() {
         return new ItemStack(Block.pressurePlateStone);
+    }
+    
+    @Override
+    public CpuBlocking getBlockingBehavior() {
+        return CpuBlocking.BLOCK_FOR_TICK;
     }
 }

@@ -38,7 +38,6 @@ import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
-import factorization.shared.FzUtil.FzInv;
 import factorization.sockets.TileEntitySocketBase;
 
 public class RenderServoMotor extends RenderEntity {
@@ -285,13 +284,12 @@ public class RenderServoMotor extends RenderEntity {
         GL11.glPushMatrix();
         GL11.glRotatef(90, 1, 0, 0);
         float s = 0.75F;
-        FzInv inv = motor.getInv();
         final Minecraft mc = Minecraft.getMinecraft();
         long range = 9*20;
         double d = motor.worldObj.getTotalWorldTime() + partial;
         float now = (float) ((d % range)/(double)range);
-        for (int i = 0; i < inv.size(); i++) {
-            ItemStack is = inv.get(i);
+        for (int i = 0; i < motor.inv.length; i++) {
+            ItemStack is = motor.inv[i];
             if (is == null) {
                 continue;
             }
@@ -306,7 +304,7 @@ public class RenderServoMotor extends RenderEntity {
             } catch (Exception e) {
                 System.err.println("Error rendering item: " + is);
                 e.printStackTrace();
-                inv.set(i, null);
+                motor.inv[i] = null;
             }
             GL11.glPopMatrix();
         }

@@ -12,6 +12,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
+import factorization.servo.CpuBlocking;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.shared.Core;
@@ -60,5 +61,9 @@ public class RotateTop extends Instruction {
     protected ItemStack getRecipeItem() {
         return new ItemStack(Core.registry.fan);
     }
-
+    
+    @Override
+    public CpuBlocking getBlockingBehavior() {
+        return CpuBlocking.BLOCK_UNTIL_NEXT_ENTRY;
+    }
 }

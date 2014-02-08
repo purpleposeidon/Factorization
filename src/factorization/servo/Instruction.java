@@ -39,9 +39,9 @@ public abstract class Instruction extends Decorator {
     
     protected abstract ItemStack getRecipeItem();
     
-    /** @return true if calling this instruction should stop execution for the tick. Things that might cause world-interaction should do this. */
-    public boolean interrupts() {
-        return false;
+    /** returns for how long the instruction should block for. */
+    public CpuBlocking getBlockingBehavior() {
+        return CpuBlocking.NO_BLOCKING;
     }
     
     @Override
@@ -55,5 +55,13 @@ public abstract class Instruction extends Decorator {
     @Override
     public boolean collides() {
         return false;
+    }
+    
+    public String toString() {
+        String info = getInfo();
+        if (info == null) {
+            return getClass().getSimpleName();
+        }
+        return info;
     }
 }

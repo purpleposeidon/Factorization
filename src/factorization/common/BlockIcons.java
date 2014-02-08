@@ -116,6 +116,7 @@ public class BlockIcons {
     public static Icon servo$entry_execute, servo$entry_load, servo$entry_write, servo$entry_ignore;
     public static Icon servo$move_value, servo$move_stack, servo$take_value, servo$take_stack;
     public static Icon servo$scan_color;
+    public static Icon servo$set_segment;
     
     public static class ActivatingMachineIcon extends IconGroup {
         public Icon top, bottom, side, side_on;

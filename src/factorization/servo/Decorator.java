@@ -19,9 +19,6 @@ public abstract class Decorator extends ServoComponent {
     public boolean preMotorHit(ServoMotor motor) {
         return false;
     }
-    public CpuBlocking getBlockingBehavior() {
-        return CpuBlocking.NO_BLOCKING;
-    }
     
     @SideOnly(Side.CLIENT)
     private static class StretchedIcon implements Icon {
