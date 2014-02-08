@@ -89,7 +89,7 @@ public class CompressionState {
         }
         right = getRightDirection();
         if (right == ForgeDirection.UNKNOWN) {
-            error(root, "No right");
+            error(root, "No friendly compressors");
             return false;
         }
         height = checkPairs(foundWalls, root, up, right);
