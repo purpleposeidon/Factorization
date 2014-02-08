@@ -51,11 +51,6 @@ public class ScanColor extends Decorator {
             motor.getArgStack().push(colorArray[md]);
             return;
         }
-        if (block instanceof BlockCrops || block instanceof BlockStem) {
-            int md = at.getMd();
-            motor.getArgStack().push(colorArray[md]);
-            return;
-        }
     }
 
     @Override
