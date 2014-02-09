@@ -61,7 +61,7 @@ import factorization.shared.FzUtil;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.weird.TileEntityDayBarrel;
 
-public class SocketLacerator extends TileEntitySocketBase implements IChargeConductor, ISidedInventory {
+public class SocketLacerator extends TileEntitySocketBase implements IChargeConductor {
     Charge charge = new Charge(this);
     @Override public String getInfo() {
         int s = speed*100/max_speed;
@@ -481,66 +481,6 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         targetHash = data.as(Share.PRIVATE, "hsh").putLong(targetHash);
         grind_items = data.as(Share.PRIVATE, "grn").putBoolean(grind_items);
         return this;
-    }
-    
-    
-    
-    //Inventory stuff
-    @Override public boolean canExtractItem(int i, ItemStack itemstack, int j) { return true; }
-    @Override public boolean canInsertItem(int i, ItemStack itemstack, int j) { return false; }
-    @Override public void closeChest() { }
-    @Override public void openChest() { }
-    @Override public String getInvName() { return "lacerator"; }
-    @Override public int getSizeInventory() { return 1; }
-    @Override public ItemStack getStackInSlotOnClosing(int i) { return null; }
-    @Override public boolean isInvNameLocalized() { return false; }
-    @Override public boolean isUseableByPlayer(EntityPlayer entityplayer) { return false; }
-    @Override public boolean isItemValidForSlot(int i, ItemStack itemstack) { return false; }
-    
-    @Override
-    public ItemStack decrStackSize(int slot, int count) {
-        if (slot != 0 || buffer.isEmpty()) {
-            return null;
-        }
-        ItemStack it = buffer.get(0);
-        ItemStack is = it.splitStack(count);
-        if (it.stackSize <= 0) {
-            buffer.remove(0);
-        }
-        return is;
-    }
-    
-    private static int[] back = new int[] {0}, none = new int[0];
-    @Override
-    public int[] getAccessibleSlotsFromSide(int side) {
-        if (side == facing.getOpposite().ordinal()) {
-            return back;
-        }
-        return none;
-    }
-    
-    @Override
-    public int getInventoryStackLimit() {
-        return 64; //could be 0, but too weird.
-    }
-    
-    @Override
-    public ItemStack getStackInSlot(int i) {
-        if (i != 0 || buffer.isEmpty()) {
-            return null;
-        }
-        return buffer.get(0);
-    }
-    
-    @Override
-    public void setInventorySlotContents(int i, ItemStack itemstack) {
-        if (buffer.isEmpty()) {
-            Core.logSevere("Someone's doing stupid things to %s with a %s", getCoord(), itemstack);
-            Thread.dumpStack();
-            buffer.add(itemstack);
-        } else {
-            buffer.set(0, itemstack);
-        }
     }
     
     @Override
