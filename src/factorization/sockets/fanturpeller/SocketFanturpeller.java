@@ -63,7 +63,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
     
     @Override
     public ItemStack getCreatingItem() {
-        return new ItemStack(Core.registry.fan);
+        return null; // NORELEASE: keep this off until we're done! //return new ItemStack(Core.registry.fan);
     }
     
     @Override
@@ -92,16 +92,20 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         super.updateEntity();
     }
     
+    /**
+     * Possible actions:
+     * <ul>
+     * <li>move liquids (IFluidContainers/world). Source and destination
+     * must be able to hold liquids (or have liquids spilled into them, in
+     * the case of air)</li>
+     * <li>suck in entities; or blow out items and entities. Front must be
+     * clear. Back may have an inventory.</li>
+     * <li>mix shapeless recipes. Must have an inventory, front and back.</li>
+     * <li>generate power. Must have a redstone signal, and front must be
+     * clear, and back must contain a gas as a block or as an inventory
+     * </ul>
+     */
     boolean pickFanAction(Coord coord, boolean powered, boolean onServo) {
-        /*
-         * Possible actions: - move liquids (IFluidContainers/world). Source and
-         * destination must be able to hold liquids (or have liquids spilled
-         * into them, in the case of air) - suck in entities; or blow out items
-         * and entities. Front must be clear. Back may have an inventory. - mix
-         * shapeless recipes. Must have an inventory, front and back. - generate
-         * power. Must have a redstone signal, and front must be clear, and back
-         * must contain a gas as a block or as an inventory
-         */
         final Coord front = coord.add(facing);
         final Coord back = coord.add(facing.getOpposite());
 
