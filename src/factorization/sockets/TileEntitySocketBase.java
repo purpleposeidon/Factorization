@@ -43,12 +43,10 @@ import factorization.servo.ServoMotor;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
-import factorization.shared.NetworkFactorization;
-import factorization.shared.Sound;
-import factorization.shared.TileEntityCommon;
-import factorization.shared.TileEntityFactorization;
 import factorization.shared.FzUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.Sound;
+import factorization.shared.TileEntityCommon;
 
 public abstract class TileEntitySocketBase extends TileEntityCommon implements ISocketHolder, IDataSerializable {
     /*
@@ -422,7 +420,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
                 if (FzUtil.couldMerge(held, rep.getCreatingItem())) {
                     TileEntityCommon upgrade = ft.makeTileEntity();
                     if (upgrade != null) {
-                        replaceWith((TileEntitySocketBase) upgrade);
+                        replaceWith((TileEntitySocketBase) upgrade, this);
                         if (!player.capabilities.isCreativeMode) held.stackSize--;
                         if (worldObj.isRemote) Sound.socketInstall.playAt(this);
                         return true;
@@ -433,12 +431,17 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         return false;
     }
     
-    protected void replaceWith(TileEntitySocketBase replacement) {
+    protected void replaceWith(TileEntitySocketBase replacement, ISocketHolder socket) {
         replacement.facing = facing;
-        Coord at = getCoord();
-        at.setTE(replacement);
-        replacement.getBlockClass().enforce(at);
-        at.markBlockForUpdate();
+        if (socket == this) {
+            Coord at = getCoord();
+            at.setTE(replacement);
+            replacement.getBlockClass().enforce(at);
+            at.markBlockForUpdate();
+        } else if (socket instanceof ServoMotor) {
+            ServoMotor motor = (ServoMotor) socket;
+            motor.socket = replacement;
+        }
         //Core.network.broadcastPacket(null, at, replacement.getDescriptionPacket());
     }
     
@@ -469,6 +472,8 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         }
         return false;
     }
+    
+    public void onEnterNewBlock() { }
     
     @SideOnly(Side.CLIENT)
     public void renderTesr(ServoMotor motor, float partial) {}
