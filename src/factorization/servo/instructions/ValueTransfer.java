@@ -92,10 +92,10 @@ public class ValueTransfer extends Instruction {
     public String getInfo() {
         switch (action) {
         default:
-        case MOVE_VALUE: return "Pop from IO";
-        case TAKE_VALUE: return "Push to IO";
-        case MOVE_STACK: return "Bulk move all to IO";
-        case TAKE_STACK: return "Bulk take entire IO";
+        case MOVE_VALUE: return "Push to IO";
+        case TAKE_VALUE: return "Pop from IO";
+        case MOVE_STACK: return "Move stack to IO";
+        case TAKE_STACK: return "Take IO stack";
         }
     }
 

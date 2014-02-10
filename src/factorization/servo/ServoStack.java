@@ -118,6 +118,10 @@ public class ServoStack implements IDataSerializable, Iterable {
     public Iterator<Object> iterator() {
         return contents.iterator();
     }
+    
+    public Iterator<Object> descendingIterator() {
+        return contents.descendingIterator();
+    }
 
     public int getMaxSize() {
         return maxSize;

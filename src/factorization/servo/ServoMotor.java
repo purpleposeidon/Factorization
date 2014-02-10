@@ -299,6 +299,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         if (worldObj.isRemote) {
             return;
         }
+        socket.onEnterNewBlock();
         motionHandler.onEnterNewBlock();
         TileEntityServoRail rail = getCurrentPos().getTE(TileEntityServoRail.class);
         if (rail != null && rail.decoration != null) {

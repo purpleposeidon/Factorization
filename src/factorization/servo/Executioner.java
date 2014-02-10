@@ -1,7 +1,7 @@
 package factorization.servo;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Iterator;
 
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
@@ -66,7 +66,9 @@ public class Executioner {
         byte orig_seg = seg;
         is_running = true;
         boolean found_blocking_instruction = false;
-        TICK: for (Object obj : ss) {
+        Iterator<Object> it = ss.descendingIterator();
+        TICK: while (it.hasNext()) {
+            Object obj = it.next();
             if (i++ != pc) continue;
             if (obj instanceof Instruction) {
                 Instruction insn = (Instruction) obj;
