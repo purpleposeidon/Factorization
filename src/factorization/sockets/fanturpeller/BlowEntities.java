@@ -3,13 +3,12 @@ package factorization.sockets.fanturpeller;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.IProjectile;
-import net.minecraft.entity.item.EntityFallingSand;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.monster.EntityGhast;
 import net.minecraft.entity.passive.EntityChicken;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,6 +18,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.common.ForgeDirection;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -31,7 +32,16 @@ import factorization.sockets.ISocketHolder;
 
 public class BlowEntities extends SocketFanturpeller implements IEntitySelector {
     short dropDelay = 0;
-    ArrayList<ItemStack> buffer = new ArrayList<ItemStack>(1);
+    ArrayList<ItemStack> buffer = new ArrayList<ItemStack>(1); //NORELEASE: info, that shows this. And for lacerators. And CompACT. That all? Check dumpbuffer at least. Maybe ack for buffer arraylist/putItemArray
+    
+    @Override
+    public String getInfo() {
+        String msg = (isSucking ? "Suck " : "Blow") + " entities";
+        if (!buffer.isEmpty()) {
+            msg += "\nBuffered output";
+        }
+        return msg;
+    }
     
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
@@ -73,7 +83,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
         //We can't do an isRemote check because position doesn't get synced enough.
         if (!shouldDoWork()) return;
         if (!isSucking && !worldObj.isRemote) {
-            dropItems(coord);
+            dropItems(coord, socket);
         }
         if (socket.dumpBuffer(buffer)) {
             return;
@@ -111,6 +121,29 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
                 ent.onGround = true;
             }
         }
+        if (worldObj.isRemote) {
+            s *= 8;
+            if (isSucking) s *= -1;
+            int count = target_speed - 1;
+            if (count <= 0) {
+                count = 1;
+                if (rand.nextBoolean()) {
+                    return;
+                }
+            }
+            for (int i = 0; i < count; i++) {
+                double x = pick(area.minX, area.maxX);
+                double y = pick(area.minY, area.maxY);
+                double z = pick(area.minZ, area.maxZ);
+                //Good ones: explode, cloud, smoke, snowshovel
+                worldObj.spawnParticle("cloud", x, y, z, facing.offsetX*s, facing.offsetY*s, facing.offsetZ*s);
+            }
+        }
+    }
+    
+    double pick(double min, double max) {
+        double d = max - min;
+        return min + d*rand.nextDouble();
     }
     
     void suckEntity(Entity ent, int front_range, ForgeDirection dir, double s) {
@@ -205,15 +238,23 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
         // Let's try to keep this method light, hmm?
     }
 
-    private void dropItems(Coord coord) {
+    private void dropItems(Coord coord, ISocketHolder socket) {
         if (dropDelay > 0) {
             dropDelay--;
             return;
         }
         dropDelay = 20*2;
-        coord.adjust(facing.getOpposite());
-        FzInv back = FzUtil.openInventory(coord.getTE(IInventory.class), facing.getOpposite());
-        coord.adjust(facing);
+        FzInv back = null;
+        if (socket == this) {
+            coord.adjust(facing.getOpposite());
+            back = FzUtil.openInventory(coord.getTE(IInventory.class), facing.getOpposite());
+            coord.adjust(facing);
+        } else {
+            back = FzUtil.openInventory((Entity) socket, false);
+        }
+        if (back == null) {
+            return;
+        }
         ItemStack is = back.pullWithLimit(1);
         if (is == null) {
             dropDelay = 20*6;

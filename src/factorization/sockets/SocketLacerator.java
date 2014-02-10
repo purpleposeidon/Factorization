@@ -65,7 +65,11 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     Charge charge = new Charge(this);
     @Override public String getInfo() {
         int s = speed*100/max_speed;
-        return s + "% speed";
+        String msg = s + "% speed";
+        if (!buffer.isEmpty()) {
+            msg += "\nBuffered Output";
+        }
+        return msg;
     }
     @Override public Charge getCharge() { return charge; }
     

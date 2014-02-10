@@ -105,57 +105,63 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
      * clear, and back must contain a gas as a block or as an inventory
      * </ul>
      */
-    boolean pickFanAction(Coord coord, boolean powered, boolean onServo) {
+    boolean pickFanAction(Coord coord, boolean powered, ISocketHolder socket) {
         final Coord front = coord.add(facing);
         final Coord back = coord.add(facing.getOpposite());
 
         if (!front.blockExists() || !back.blockExists()) {
             return false;
         }
+        
+        boolean onServo = socket != this;
 
         final Coord source = isSucking ? front : back;
         final Coord destination = isSucking ? back : front;
-
+        
+        boolean sourceIsLiquid = isLiquid(source) || hasTank(source);
+        
         // BEGIN MACRO-GENERATED CODE
         // The real source for this is in fanmacro.py, which should be located in the same folder as this file.
+        // Executing it will update this code.
         boolean need_PumpLiquids = false;
         boolean need_GeneratePower = false;
-        boolean need_BlowEntities = false;
         boolean need_MixCrafting = false;
-        if (!powered && !onServo && (isLiquid(source) || hasTank(source)) && (isLiquid(destination) || hasTank(destination) || isClear(destination))) {
+        boolean need_BlowEntities = false;
+        if (!onServo && !powered && sourceIsLiquid && (isLiquid(destination) || hasTank(destination) || isClear(destination))) {
             need_PumpLiquids = true;
         }
-        if (powered && (isLiquid(source) || hasTank(source)) && isClear(destination)) {
+        if (!onServo && powered && sourceIsLiquid && isClear(destination)) {
             need_GeneratePower = true;
         }
-        if (isClear(front) && (isClear(back) || hasInv(back))) {
-            need_BlowEntities = true;
-        }
-        if (hasInv(front) && hasInv(back)) {
+        if (!onServo && hasInv(front) && hasInv(back)) {
             need_MixCrafting = true;
+        }
+        if (!sourceIsLiquid && noCollision(front)) {
+            need_BlowEntities = true;
         }
         if (need_PumpLiquids && this instanceof PumpLiquids) return false;
         if (need_GeneratePower && this instanceof GeneratePower) return false;
-        if (need_BlowEntities && this instanceof BlowEntities) return false;
         if (need_MixCrafting && this instanceof MixCrafting) return false;
+        if (need_BlowEntities && this instanceof BlowEntities) return false;
         if (need_PumpLiquids) {
-            replaceWith(new PumpLiquids());
+            replaceWith(new PumpLiquids(), socket);
             return true;
         }
         if (need_GeneratePower) {
-            replaceWith(new GeneratePower());
-            return true;
-        }
-        if (need_BlowEntities) {
-            replaceWith(new BlowEntities());
+            replaceWith(new GeneratePower(), socket);
             return true;
         }
         if (need_MixCrafting) {
-            replaceWith(new MixCrafting());
+            replaceWith(new MixCrafting(), socket);
+            return true;
+        }
+        if (need_BlowEntities) {
+            replaceWith(new BlowEntities(), socket);
             return true;
         }
         // END MACRO-GENERATED CODE
-        return false;
+        replaceWith(new SocketFanturpeller(), socket);
+        return true;
     }
 
     boolean isLiquid(Coord at) {
@@ -163,7 +169,11 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         if (block == Block.waterStill || block == Block.waterMoving || block == Block.lavaStill || block == Block.lavaMoving) {
             return at.getMd() == 0;
         }
-        return block instanceof IFluidBlock;
+        if (block instanceof IFluidBlock) {
+            IFluidBlock ifb = (IFluidBlock) block;
+            return ifb.canDrain(worldObj, at.x, at.y, at.z);
+        }
+        return false;
     }
 
     boolean hasTank(Coord at) {
@@ -178,8 +188,12 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         return at.isReplacable() && !isLiquid(at);
     }
     
+    boolean noCollision(Coord at) {
+        return at.getCollisionBoundingBoxFromPool() == null;
+    }
+    
     @Override
-    protected void replaceWith(TileEntitySocketBase baseReplacement) {
+    protected void replaceWith(TileEntitySocketBase baseReplacement, ISocketHolder socket) {
         if (baseReplacement instanceof SocketFanturpeller) {
             SocketFanturpeller replacement = (SocketFanturpeller) baseReplacement;
             if (!isSafeToDiscard()) {
@@ -198,7 +212,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
             replacement.prevFanRotation = prevFanRotation;
             replacement.charge = charge;
         }
-        super.replaceWith(baseReplacement);
+        super.replaceWith(baseReplacement, socket);
     }
 
     transient boolean needActionCheck = true;
@@ -229,11 +243,16 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
     }
     
     @Override
+    public void onEnterNewBlock() {
+        needActionCheck = true;
+    }
+    
+    @Override
     public final void genericUpdate(ISocketHolder socket, Coord coord, boolean powered) {
         boolean neighbor_changed = false;
         if (needActionCheck && !worldObj.isRemote) {
             needActionCheck = false;
-            if (pickFanAction(coord, powered, socket != this)) {
+            if (pickFanAction(coord, powered, socket)) {
                 return;
             }
             neighbor_changed = true;
@@ -244,7 +263,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
             final int need = getRequiredCharge();
             if (need > 0) {
                 final float ts = getTargetSpeed() * (isSucking ? -1 : 1);
-                if (charge.deplete(need) < need) {
+                if (!socket.extractCharge(need)) {
                     fanω *= 0.9;
                 } else if (Math.abs(fanω) > Math.abs(ts)) { // we've been switched to a slower speed
                     fanω = (fanω*9 + ts)/10;
@@ -259,10 +278,10 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
                 }
             }
             
-            if (FzUtil.significantChange(fanω, lastfanω)) {
-                broadcastMessage(null, MessageType.FanturpellerSpeed, fanω);
+            if (fanω != lastfanω /*FzUtil.significantChange(fanω, lastfanω)*/) {
+                socket.sendMessage(MessageType.FanturpellerSpeed, fanω);
+                lastfanω = fanω;
             }
-            lastfanω = fanω;
         }
         fanRotation += fanω;
     }
@@ -339,6 +358,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         float s = 12F/16F;
         if (motor != null) {
             s = 10F/16F;
+            GL11.glTranslatef(0, -3F/16F, 0);
         }
         GL11.glScalef(s, 1, s);
         //TileEntityGrinderRender.renderGrindHead();

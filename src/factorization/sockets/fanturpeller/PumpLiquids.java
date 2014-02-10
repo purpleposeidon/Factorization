@@ -1,7 +1,5 @@
 package factorization.sockets.fanturpeller;
 
-import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -12,15 +10,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.BlockFluidFinite;
 import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
-import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.IFluidHandler;
 import factorization.api.Coord;
-import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.FactoryType;
+import factorization.notify.Notify;
 import factorization.shared.FzUtil;
 import factorization.sockets.ISocketHolder;
 
@@ -204,9 +199,6 @@ public class PumpLiquids extends BufferedFanturpeller {
                 @Override
                 public int compare(PumpCoord a, PumpCoord b) {
                     // If we're flooding, we want the furthest & lowest liquid
-                    System.out.println("cm " + a.pathDistance + ":" + a.y + ", " + b.pathDistance + ":" + b.y);
-                    //return (a.pathDistance + a.y * 1024) - (b.pathDistance + b.y * 1024);
-                    //return b.y - a.y;
                     if (a.y == b.y) {
                         if (a.pathDistance == b.pathDistance) {
                             return 0;
@@ -260,7 +252,7 @@ public class PumpLiquids extends BufferedFanturpeller {
                 return;
             }
             if (updateFrontier()) return;
-            System.out.println("Frontier: " + frontier.size()); //NORELEASE
+            System.out.println("Queue: " + queue.size()); //NORELEASE
             for (int i = 0; i < 16; i++) {
                 PumpCoord pc = queue.poll();
                 if (pc == null || !pc.verifyConnection(this, worldObj)) {
@@ -277,13 +269,17 @@ public class PumpLiquids extends BufferedFanturpeller {
         
         private Coord at = new Coord(worldObj, 0, 0, 0);
         boolean placeFluid(PumpCoord pc, Fluid fluid) {
-            at.set(worldObj, pc.x, pc.y, pc.z);
+            at.w = worldObj;
+            at.x = pc.x;
+            at.y = pc.y;
+            at.z = pc.z;
             if (!at.isReplacable()) return false;
             Block block = Block.blocksList[fluid.getBlockID()];
             if (block == null) return false;
             if (drainBlock(pc, false) != null) return false;
             at.setIdMd(block.blockID, block instanceof BlockFluidFinite ? 0xF : 0, true);
             buffer.setFluid(null);
+            Notify.send(at, "x");
             return true;
         }
         
@@ -412,9 +408,9 @@ public class PumpLiquids extends BufferedFanturpeller {
             coord.adjust(facing);
             if (hasTank(coord)) {
                 destinationAction = new TankPumper();
-            } else if (isLiquid(coord) || coord.isReplacable()) {
+            } else if ((isLiquid(coord) || coord.isReplacable()) && buffer.getFluidAmount() > 0) {
                 final Coord c = new Coord(this).add(destinationDirection);
-                destinationAction = new Flooder(c, c.getFluid());
+                destinationAction = new Flooder(c, buffer.getFluid().getFluid());
             }
             coord.adjust(facing.getOpposite());
         } else {
@@ -441,8 +437,7 @@ public class PumpLiquids extends BufferedFanturpeller {
         } else {
             fluid = "\n" + fs.amount + "mB of " + fs.getFluid().getName();
         }
-        return "Pump Liquids\n" + 
-                easyName(sourceAction) + 
+        return easyName(sourceAction) + 
                 " -> " + easyName(destinationAction) +
                 fluid;
     }
