@@ -105,7 +105,6 @@ public class PumpLiquids extends BufferedFanturpeller {
         }
         
         void reset() {
-            System.out.println("RESET"); //NORELEASE
             visited.clear();
             queue.clear();
             frontier.clear();
@@ -124,8 +123,6 @@ public class PumpLiquids extends BufferedFanturpeller {
             Coord probe = new Coord(worldObj, 0, 0, 0);
             int maxHeight = getMaxHeight();
             int maxDistance = getMaxDistance();
-            System.out.println("updateFrontier: " + frontier.size()); //NORELEASE
-            int NORELEASE = 0;
             for (int amount = frontier.size(); amount > 0; amount--) {
                 PumpCoord pc = frontier.poll();
                 if (pc == null) return true;
@@ -145,11 +142,9 @@ public class PumpLiquids extends BufferedFanturpeller {
                     if (!is_liquid && !replaceable) continue;
                     if (!is_liquid && replaceable && isLiquid(probe)) continue; // It's a different liquid.
                     visited.add(at); // Don't revisit this place.
-                    NORELEASE++;
                     found(replaceable, is_liquid, at);
                 }
             }
-            System.out.println("NORELEASE: Found " + NORELEASE); //NORELEASE
             return true;
         }
         
@@ -252,7 +247,6 @@ public class PumpLiquids extends BufferedFanturpeller {
                 return;
             }
             if (updateFrontier()) return;
-            System.out.println("Queue: " + queue.size()); //NORELEASE
             for (int i = 0; i < 16; i++) {
                 PumpCoord pc = queue.poll();
                 if (pc == null || !pc.verifyConnection(this, worldObj)) {

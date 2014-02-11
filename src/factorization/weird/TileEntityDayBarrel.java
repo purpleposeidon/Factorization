@@ -1225,7 +1225,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         super.finalize();
         if (display_list != -1) {
             if (Core.dev_environ) {
-                System.out.println("Barrel finalized"); //NORELEASE? Nah.
+                System.out.println("Barrel finalized"); // dev environ, it's fine!
             }
             synchronized (finalizedDisplayLists) {
                     finalizedDisplayLists.add(display_list);

@@ -27,6 +27,14 @@ public class ScanColor extends Decorator {
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
         return this;
     }
+    
+    static final FzColor[] colorArray = new FzColor[] {
+            FzColor.LIME, FzColor.LIME, FzColor.LIME,
+            FzColor.GREEN, FzColor.GREEN, FzColor.GREEN, FzColor.GREEN, 
+            FzColor.YELLOW, FzColor.YELLOW, FzColor.YELLOW, FzColor.YELLOW, 
+            FzColor.ORANGE, FzColor.ORANGE, FzColor.ORANGE, FzColor.ORANGE, 
+            FzColor.RED
+    };
 
     @Override
     public void motorHit(ServoMotor motor) {
@@ -37,13 +45,6 @@ public class ScanColor extends Decorator {
             motor.getArgStack().push(col);
             return;
         }
-        final FzColor[] colorArray = new FzColor[] {
-                FzColor.LIME, FzColor.LIME, FzColor.LIME,
-                FzColor.GREEN, FzColor.GREEN, FzColor.GREEN, FzColor.GREEN, 
-                FzColor.YELLOW, FzColor.YELLOW, FzColor.YELLOW, FzColor.YELLOW, 
-                FzColor.ORANGE, FzColor.ORANGE, FzColor.ORANGE, FzColor.ORANGE, 
-                FzColor.RED
-        }; //NORELEASE: static
         Block block = at.getBlock();
         if (block instanceof BlockReed || block instanceof BlockCactus) return; // Colors don't change, so give nothing.
         if (block instanceof IPlantable) {
