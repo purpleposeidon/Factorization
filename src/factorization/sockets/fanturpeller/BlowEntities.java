@@ -3,13 +3,13 @@ package factorization.sockets.fanturpeller;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityGhast;
+import net.minecraft.entity.passive.EntityBat;
 import net.minecraft.entity.passive.EntityChicken;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -18,8 +18,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.common.ForgeDirection;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -192,7 +190,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
             return;
         }
         if (ent instanceof EntityGhast) {
-            if (ent.getClass() != EntityGhast.class) return;
+            if (ent.getClass() != EntityGhast.class) return; //I'm thinking of Twilight Forest's Ur-Ghast here.
             EntityGhast ghast = (EntityGhast) ent;
             if (worldObj.getTotalWorldTime() % 30 == 0) {
                 ghast.attackEntityFrom(DamageSource.generic, 1);
@@ -210,7 +208,6 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
             }
             
         } else if (ent instanceof EntityChicken) {
-            if (ent.getClass() != EntityChicken.class) return;
             EntityChicken chicken = (EntityChicken) ent;
             if (chicken.getHealth() <= 1) {
                 chicken.setDead();
@@ -218,13 +215,22 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
             } else {
                 chicken.attackEntityFrom(DamageSource.generic, 1);
             }
+        } else if (ent instanceof EntityBat) {
+            EntityBat bat = (EntityBat) ent;
+            bat.attackEntityFrom(DamageSource.generic, 1);
         }
     }
     
     boolean found_player = false;
     @Override
     public boolean isEntityApplicable(Entity entity) {
-        if (entity instanceof EntityItem || entity instanceof EntityLiving || entity instanceof IProjectile) {
+        if (entity instanceof EntityItem) {
+            return true;
+        }
+        if (target_speed <= 1) {
+            return false;
+        }
+        if (entity instanceof EntityLiving || entity instanceof IProjectile) {
             return true;
         }
         if (FzConfig.fanturpeller_works_on_players && entity instanceof EntityPlayer) {
