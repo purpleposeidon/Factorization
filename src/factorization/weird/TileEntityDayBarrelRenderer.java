@@ -7,9 +7,11 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.resources.ResourceManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
@@ -26,6 +28,7 @@ import factorization.shared.FzUtil;
 import factorization.weird.TileEntityDayBarrel.Type;
 
 public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
+
     void doDraw(TileEntityDayBarrel barrel, ItemStack is) {
         FzOrientation bo = barrel.orientation;
         ForgeDirection face = bo.facing;
@@ -199,30 +202,39 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         tess.xOffset = tess.yOffset = tess.zOffset = 0;
         GL11.glRotatef(180, 0, 0, 1);
     }
-    
-    void old_renderItemCount(ItemStack item, TileEntityDayBarrel barrel) {
-        FontRenderer fontRender = getFontRenderer();
-        if (fontRender == null) {
-            return;
-        }
-        GL11.glPushMatrix();
-        GL11.glTranslated(-0.25, 0.125, 0);
 
-        float scale = 0.01F;
-        GL11.glScalef(scale, scale, scale);
-        GL11.glRotatef(180, 0, 0, 1);
-
-        String t = getCountLabel(item, barrel);
-        int color = 0xbbbbbb;
-        fontRender.drawString(t, -fontRender.getStringWidth(t) / 2, 0, color);
-        
-        GL11.glPopMatrix();
-    }
-
-    RenderItem renderItem = new RenderItem() {
-        protected void renderEffect(TextureManager manager, int x, int y) {};
+    Tessellator voidTessellator = new Tessellator() {
+        public void addVertex(double par1, double par3, double par5) {}
+        public void startDrawing(int par1) {}
+        public int draw() { return 0; }
     };
+    
+    private static final ResourceLocation RES_ITEM_GLINT = new ResourceLocation("textures/misc/enchanted_item_glint.png");
+    
+    RenderItem renderItem = new RenderItem();
 
+    
+    class Intercepter extends TextureManager {
+        TextureManager realGuy = Minecraft.getMinecraft().renderEngine;
+        public Intercepter(ResourceManager par1ResourceManager) {
+            super(par1ResourceManager);
+        }
+        
+        public ResourceLocation getResourceLocation(int par1) {
+            return realGuy.getResourceLocation(par1);
+        }
+        
+        public void bindTexture(ResourceLocation res) {
+            if (RES_ITEM_GLINT.equals(res)) {
+                Tessellator.instance = voidTessellator;
+            } else {
+                //Minecraft.getMinecraft().renderEngine.bindTexture(res);
+                realGuy.bindTexture(res);
+            }
+        }
+    }
+    TextureManager interception = null;
+    
     public void handleRenderItem(ItemStack is) {
         //Got problems? Consider looking at ForgeHooksClient.renderInventoryItem, that might be better than this here.
         GL11.glPushMatrix();
@@ -234,14 +246,15 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         {
             TextureManager re = Minecraft.getMinecraft().renderEngine;
             FontRenderer fr = getFontRenderer();
-            //this draws the sparkly effect, which causes problems.
-            if (is.hasEffect(0)) {
-                float orig_z = renderItem.zLevel;
-                renderItem.zLevel = 23;
+            if (!is.hasEffect(0)) {
                 renderItem.renderItemAndEffectIntoGUI(fr, re, is, 0, 0);
-                renderItem.zLevel = orig_z;
             } else {
-                renderItem.renderItemAndEffectIntoGUI(fr, re, is, 0, 0);
+                if (interception == null) {
+                    interception = new Intercepter(Minecraft.getMinecraft().getResourceManager());
+                }
+                Tessellator orig = Tessellator.instance;
+                renderItem.renderItemAndEffectIntoGUI(fr, interception, is, 0, 0);
+                Tessellator.instance = orig;
             }
         }
         GL11.glPopMatrix();
