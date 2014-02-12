@@ -304,6 +304,41 @@ public class SocketShifter extends TileEntitySocketBase {
         return count;
     }
     
+    public void probe(ServoMotor motor) {
+        Coord at = motor.getCurrentPos();
+        ForgeDirection fd = motor.getOrientation().top;
+        final ForgeDirection fdOp = fd.getOpposite();
+        at.adjust(fd);
+        FzInv target = FzUtil.openInventory(at.getTE(IInventory.class), fdOp);
+        at.adjust(fdOp);
+        if (target == null) {
+            motor.putError("Not pointing at an inventory!");
+            return;
+        }
+        FzInv backInv = FzUtil.openInventory(motor, false);
+        
+        int targetStart, targetEnd;
+        if (foreignSlot == -1) {
+            targetStart = 0;
+            targetEnd = target.size() - 1;
+        } else {
+            targetStart = targetEnd = foreignSlot;
+        }
+        
+        int count = 0;
+        for (int backIndex = 0; backIndex < backInv.size(); backIndex++) {
+            ItemStack is = backInv.get(backIndex);
+            for (int i = targetStart; i < targetEnd; i++) {
+                ItemStack it = target.get(i);
+                if (it != null && FzUtil.couldMerge(is, it)) {
+                    count += it.stackSize;
+                }
+            }
+        }
+        
+        motor.getArgStack().push(count);
+    }
+    
     @Override
     @SideOnly(Side.CLIENT)
     public void renderStatic(ServoMotor motor, Tessellator tess) {

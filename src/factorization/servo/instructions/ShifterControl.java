@@ -12,21 +12,30 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
-import factorization.servo.Executioner;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.ServoStack;
 import factorization.sockets.SocketShifter;
 import factorization.sockets.TileEntitySocketBase;
+import static factorization.servo.instructions.ShifterControl.ShifterModes.*;
 
 public class ShifterControl extends Instruction {
-    static final byte EXPORT_MODE = 0, IMPORT_MODE = 1, TRANSFER_LIMIT = 2, TARGET_SLOT = 3, STREAM = 4, PULSE_EXACT = 5, PULSE_SOME = 6;
-    static final byte MODE_MAX = PULSE_SOME + 1;
-    byte mode = EXPORT_MODE;
+    static enum ShifterModes {
+        EXPORT_MODE,
+        IMPORT_MODE,
+        TRANSFER_LIMIT,
+        TARGET_SLOT,
+        STREAM,
+        PULSE_EXACT,
+        PULSE_SOME,
+        PROBE;
+        static final ShifterModes[] values = values();
+    }
+    ShifterModes mode = ShifterModes.EXPORT_MODE;
     
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        mode = data.as(Share.VISIBLE, "mode").putByte(mode);
+        mode = ShifterModes.values[data.as(Share.VISIBLE, "mode").putByte((byte) mode.ordinal())];
         return this;
     }
 
@@ -68,6 +77,9 @@ public class ShifterControl extends Instruction {
             }
             shifter.sanitize(motor);
             return;
+        case PROBE:
+            shifter.probe(motor);
+            return;
         }
     }
 
@@ -76,10 +88,12 @@ public class ShifterControl extends Instruction {
         if (!playerHasProgrammer(player)) {
             return false;
         }
-        mode++;
-        if (mode == MODE_MAX) {
-            mode = 0;
+        int i = mode.ordinal();
+        i++;
+        if (i == ShifterModes.values.length) {
+            i = 0;
         }
+        mode = ShifterModes.values[i];
         return true;
     }
     
@@ -94,6 +108,7 @@ public class ShifterControl extends Instruction {
         case STREAM: return "Stream Transfer";
         case PULSE_EXACT: return "Pulse Transfer Exact";
         case PULSE_SOME: return "Pulse Transfer Some";
+        case PROBE: return "Probe";
         }
     }
     
@@ -108,6 +123,7 @@ public class ShifterControl extends Instruction {
         case PULSE_EXACT: return BlockIcons.servo$ctrl$shift_pulse_exact;
         case PULSE_SOME: return BlockIcons.servo$ctrl$shift_pulse_some;
         case STREAM: return BlockIcons.servo$ctrl$shift_stream;
+        case PROBE: return BlockIcons.servo$ctrl$shift_probe;
         }
     }
 
