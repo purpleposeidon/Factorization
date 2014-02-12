@@ -219,7 +219,9 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         GL11.glPopMatrix();
     }
 
-    RenderItem renderItem = new RenderItem();
+    RenderItem renderItem = new RenderItem() {
+        protected void renderEffect(TextureManager manager, int x, int y) {};
+    };
 
     public void handleRenderItem(ItemStack is) {
         //Got problems? Consider looking at ForgeHooksClient.renderInventoryItem, that might be better than this here.
