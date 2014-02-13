@@ -322,6 +322,10 @@ public class SocketShifter extends TileEntitySocketBase {
             targetStart = 0;
             targetEnd = target.size() - 1;
         } else {
+            if (foreignSlot >= target.size()) {
+                motor.getArgStack().push(-1); // Sure?
+                return;
+            }
             targetStart = targetEnd = foreignSlot;
         }
         
