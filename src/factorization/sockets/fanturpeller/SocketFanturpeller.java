@@ -63,7 +63,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
     
     @Override
     public ItemStack getCreatingItem() {
-        return null; // NORELEASE: keep this off until we're done! //return new ItemStack(Core.registry.fan);
+        return new ItemStack(Core.registry.fan);
     }
     
     @Override
@@ -322,21 +322,6 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
             block.rotateCenter(rotation);
             block.renderRotated(tess, xCoord, yCoord, zCoord);
         }
-        
-        Icon glass = Block.glass.getIcon(0, 0);
-        Icon hole = Block.fenceIron.getIcon(0, 0);
-        block.useTextures(hole, null,
-                glass, glass,
-                glass, glass);
-        if (motor == null) {
-            block.setBlockBounds(0, 0, 0, 1, 12F/16F, 1);
-        } else {
-            float s = 1.5F/16F;
-            block.setBlockBounds(s, 0, s, 1 - s, 12F/16F, 1 - s);
-        }
-        block.begin();
-        block.rotateCenter(rotation);
-        block.renderRotated(tess, xCoord, yCoord, zCoord);
     }
     
     protected float scaleRotation(float rotation) {
