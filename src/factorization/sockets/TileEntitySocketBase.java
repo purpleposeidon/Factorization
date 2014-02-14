@@ -432,6 +432,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
     
     protected void replaceWith(TileEntitySocketBase replacement, ISocketHolder socket) {
+        invalidate();
         replacement.facing = facing;
         if (socket == this) {
             Coord at = getCoord();
