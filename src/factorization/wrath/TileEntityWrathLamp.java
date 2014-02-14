@@ -91,7 +91,6 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         if (lamp == null) {
             update_count += 1;
             w.setBlock(x, y, z, 0, 0, UPDATE_CLIENT);
-            //w.setBlock(x, y, z, 0, 0, NOTIFY_NEIGHBORS | UPDATE_CLIENT); //NORELEASE: This seems to cause recursion deapth. Test the above change to see if this works.
         }
         else {
             lamp.activate(y);
