@@ -155,7 +155,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
         onInventoryChanged();
         Sound.caliometricDigest.playAt(this);
         ticksUntilNextDigestion = 20*10*noms;
-        return 8;
+        return 16;
     }
     
     int getFoodValue(ItemStack is) {
@@ -175,7 +175,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
         }
         heal += Math.min(0, heal*2*sat);
         int r = (int)(heal*(heal/4F));
-        return Math.max(heal, r);
+        return Math.max(heal, r)/2;
     }
     
     @Override
