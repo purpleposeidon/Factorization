@@ -108,7 +108,8 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
         super.onPlacedBy(player, is, side);
-        b_facing = (byte) side;
+        b_facing = (byte) FzUtil.determineOrientation(player);
+        b_facing = (byte) ForgeDirection.getOrientation(b_facing).getOpposite().ordinal();
     }
     
     @Override
