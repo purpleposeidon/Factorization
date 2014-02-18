@@ -330,6 +330,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     private static final IEntitySelector excludeDseRelatedEntities = new IEntitySelector() {
         @Override
         public boolean isEntityApplicable(Entity entity) {
+            if (entity instanceof EntityPlayer) {
+                return entity.worldObj.isRemote;
+            }
             return !(entity.getClass() == DseCollider.class || entity.boundingBox == null);
         }
     };
@@ -383,7 +386,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             List ents = worldObj.getEntitiesWithinAABBExcludingEntity(this, metaAABB, excludeDseRelatedEntities);
             for (int i = 0; i < ents.size(); i++) {
                 Entity e = (Entity) ents.get(i);
-                double friction_expansion = -0.01;
+                double friction_expansion = -0.05*Math.sqrt(motionX*motionX + motionY*motionY + motionZ*motionZ);
                 AxisAlignedBB ebb = e.boundingBox;
                 if (ebb == null) {
                     continue;
@@ -399,10 +402,16 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                     //NORELEASE: metaAABB.intersectsWith is very slow, especially with lots of entities
                     continue;
                 }
+                
+                double d = 1.01;
+                //e.moveEntity(motionX*d, motionY*d, motionZ*d);
+                e.onGround = true;
+                //e.motionY = (e.motionY + motionY)/2;
                 e.setPosition(e.posX + motionX, e.posY + motionY, e.posZ + motionZ);
                 e.prevPosX += motionX;
                 e.prevPosY += motionY;
                 e.prevPosZ += motionZ;
+                
                 
                 if (motionY > 0 && e.motionY < motionY) {
                     e.motionY = motionY;
