@@ -17,7 +17,6 @@ public class Page {
         this.font = font;
         lineHeight = font.FONT_HEIGHT + 2;
         nl();
-        add(new Word("\t", null));
     }
     
     void add(Word word) {
@@ -36,10 +35,10 @@ public class Page {
     }
     
     Word click(int relativeX, int relativeY) {
-        int y = -lineHeight;
+        int y = 0;
         for (ArrayList<Object> line : text) {
             y += lineHeight;
-            if (y < relativeY) continue;
+            if (y < relativeY || line.isEmpty()) continue;
             int x = 0;
             if ("    ".equals(line.get(0))) {
                 y += 20;
@@ -60,14 +59,14 @@ public class Page {
         return null;
     }
     
-    void draw() {
+    void draw(int ox, int oy) {
         int y = 0;
         for (ArrayList<Object> line : text) {
             int x = 0;
             for (Object obj : line) {
                 if (obj instanceof Word) {
                     Word word = (Word) obj;
-                    font.drawString(word.text, x, y, 0xFFFFFF);
+                    font.drawString(word.text, ox + x, oy + y, 0xEEEEEE);
                     x += font.getStringWidth(word.text);
                 } else if (obj instanceof ItemStack) {
                     

@@ -1,51 +1,32 @@
-Hello, world! 
-\link:stuff Yep\endlink, that-there be a link! Uhm huhm! MMMhMMM..
+\title The Factorization Manual
+\nl
 
-This should be a lonely line.
+\link:about About\endlink
 
-We need to test the line-breaking algo. We sure do, yes!  We need to test the line-breaking algo. We sure do, yes!  We need to test the line-breaking algo. We sure do, yes!  We need to test the line-breaking algo. We sure do, yes!  We need to test the line-breaking algo. We sure do, yes!  We need to test the line-breaking algo. We sure do, yes!  We need to test the line-breaking algo. We sure do, yes!  We need to test the line-breaking algo. We sure do, yes!  We need to test the line-breaking algo. We sure do, yes!  We need to test the line-breaking algo. We sure do, yes!  
-
-Okay, let's test the newlines now.
-
-Finally, we need to test page-wrapping.
-
-Let's try it with this!
-
-Let's try it with this!
-
-Let's try it with this!
-
-Let's try it with this!
-
-Let's try it with this!
-
-Let's try it with this!
-
-Let's try it with this!
-
-Let's try it with this!
-
-Let's try it with this!
-
-Let's try it with this!
-
-Let's try it with this!
-
-Let's try it with this!
-
-Let's try it with this!
-
-Let's try it with this!
-
-Let's try it with this!
-
-Let's try it with this!
-
-Let's try it with this!
-
-Let's try it with this!
-
-
+\link:ores Ores\endlink
 
 \newpage
-And this should be on a different page! (You can't see it yet tho.)
+
+System Parts
+\-\link:parasieve Parasieve\endlink
+\-\link:barrel Barrels\endlink
+\-\link:compact Compression Crafting\endlink
+
+\newpage
+
+\link:sockets Sockets\endlink
+
+\link:servos Servos\endlink
+\-\link:servomotion Motion\endlink
+\-\link:servoinstructions Instructions\endlink
+
+\newpage
+
+\link:cookbook Designs\endlink
+
+\link:building Building\endlink
+
+\link:misc Miscellaneous Nonsense\endlink
+
+\nl\nl
+\link:test [Test Page]\endlink

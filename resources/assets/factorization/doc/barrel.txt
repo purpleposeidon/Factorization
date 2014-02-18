@@ -1,0 +1,32 @@
+\title Barrels
+
+Barrels can store up to 64 stacks of a single item.
+So, one of them can store 64 * 64 = 4096 sticks,
+64 swords, or 64 * 16 = 1024 eggs.
+
+The barrel has no GUI.
+Right click with an item to insert an item,
+and left click to remove a stack.
+Shift left clicking will remove a single item.
+Double right-clicking will insert all the matching items in your inventory into the barrel.
+
+Barrels can have any direction and orientation.
+Clicking near the side edge of a block will place the barrel
+with its top pointing to that side.
+
+\newpage
+There are a few important varieties of barrel.
+
+The hopping barrel will pull one item from its above into it,
+and push one item out its bottom, at the same speed as a
+vanilla hopper. It also hops.
+
+The silky barrel will hold its contents if broken with
+a silk-touch axe.
+
+
+\newpage
+
+If you're strong enough, you can push barrels with a knockback sword.
+Be wary when pushing them up stairs, as they can slip.
+
