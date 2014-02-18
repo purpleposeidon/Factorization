@@ -887,7 +887,6 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         next.setId(Core.registry.factory_block);
         next.setTE(this);
         last_hit_side = -1;
-        Coord spillAt = getCoord();
         player.addExhaustion(0.5F);
         ItemStack is = player.getHeldItem();
         if (is != null && is.isItemStackDamageable()) {
@@ -896,7 +895,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
                 player.destroyCurrentEquippedItem();
             }
         }
-        spillItems(spillage);
+        //spillItems(spillage); // Meh!
         return true;
     }
     
