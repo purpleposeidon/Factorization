@@ -110,7 +110,7 @@ public class GeneratePower extends BufferedFanturpeller {
     
     @Override
     protected float scaleRotation(float rotation) {
-        return rotation/5;
+        return rotation*0.5F;
     }
     
     @Override
