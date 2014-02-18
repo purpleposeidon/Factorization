@@ -1,0 +1,3 @@
+The logic matrix programmer is the primary tool for Factorization.
+It is used to adjust sockets, and servo instructions.
+

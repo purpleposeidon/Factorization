@@ -1,0 +1,38 @@
+\u Parasieve\r
+
+The parasieve is a powerful device for filtering items into and out of inventories.
+Place the parasieve against an inventory.
+Any machine that attempts to access the parasieve will access that inventory through it.
+
+The parasieve's GUI will allow you to define up to 4 classes of items.
+Items that do not fit in one of the classes can not be inserted or extracted through the parasieve.
+The upper slot is used with bottom slot to determine the class.
+
+\newpage
+If no item classes are defined, then anything can pass the filter.
+
+If an item is alone, it will be matched exactly as it is.
+
+If two items with different levels of damage are compared,
+then items within that quality may pass.
+
+If two items with text written on them are compared, then all texts may pass.
+
+The parasieve may offer further discrimination based on characteristics invisible to the unaided eye.
+
+\newpage
+The parasieve can be used with comparators.
+They will count only items that can pass through the filter.
+
+Comparators can give more precise counts of items if a range is defined.
+
+For example, suppose a chest has a parasieve with 16 cobble in the 1st top slot, and 32 cobble in the 2nd bottom slot.
+16 and fewer cobble in the chest will cause a signal of strength 1,
+and more than 32 cobble will output the strongest signal.
+
+\newpage
+Parasieves can be chained, up to a point.
+
+Applying a redstone signal will invert the filter.
+
+
