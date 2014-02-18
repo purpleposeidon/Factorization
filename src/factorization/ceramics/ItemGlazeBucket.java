@@ -25,7 +25,7 @@ import factorization.shared.FzUtil;
 import factorization.shared.ItemFactorization;
 
 public class ItemGlazeBucket extends ItemFactorization {
-    public static final int MAX_CHARGES = 32;
+    public static final int MAX_CHARGES = 64;
     
     public ItemGlazeBucket(int itemId) {
         super(itemId, "ceramics/glaze_bucket", TabType.ART);
