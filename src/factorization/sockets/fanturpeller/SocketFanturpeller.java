@@ -335,6 +335,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         GL11.glTranslatef(d, d, d);
         Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())).glRotate();
         float turn = scaleRotation(FzUtil.interp(prevFanRotation, fanRotation, partial));
+        float dr = Math.abs(scaleRotation(fanRotation) - scaleRotation(prevFanRotation));
         GL11.glRotatef(turn, 0, 1, 0);
         float sd = motor == null ? -2F/16F : 3F/16F;
         GL11.glTranslatef(0, sd, 0);
@@ -346,10 +347,25 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
             GL11.glTranslatef(0, -3F/16F, 0);
         }
         GL11.glScalef(s, 1, s);
+        float count = dr/60;
+        if (count > 2) {
+            count = 2;
+        }
+        if (count < 1) {
+            count = 1;
+        }
         //TileEntityGrinderRender.renderGrindHead();
-        GL11.glRotatef(90, 1, 0, 0);
-        GL11.glTranslatef(-0.5F, -0.5F, 0);
-        FactorizationBlockRender.renderItemIcon(Core.registry.fan.getIconFromDamage(0));
+        for (float i = 0; i < count; i++) {
+            if (i > 0) {
+                GL11.glRotatef(45F, 0, 1, 0);
+                GL11.glTranslatef(0, -1F/64F, 0);
+            }
+            GL11.glPushMatrix();
+            GL11.glRotatef(90, 1, 0, 0);
+            GL11.glTranslatef(-0.5F, -0.5F, 0);
+            FactorizationBlockRender.renderItemIcon(Core.registry.fan.getIconFromDamage(0));
+            GL11.glPopMatrix();
+        }
     }
     
     @Override
