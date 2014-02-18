@@ -56,10 +56,8 @@ public abstract class TileEntityFactorization extends TileEntityCommon
             return;
         }
         super.onPlacedBy(player, is, side);
-        setFacingDirectionFromEntity(player);
+        facing_direction = (byte) side;
     }
-
-    //few of the stuff below would be overridden
 
     void setFacingDirectionFromEntity(Entity player) {
         float yaw = player.rotationYaw % 360F;
