@@ -83,7 +83,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
         if (!isSucking && !worldObj.isRemote) {
             dropItems(coord, socket);
         }
-        if (socket.dumpBuffer(buffer)) {
+        if (!worldObj.isRemote && socket.dumpBuffer(buffer)) {
             return;
         }
         coord.adjust(facing);
@@ -96,6 +96,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
         coord.adjust(facing.getOpposite());
         int side_range = target_speed;
         int front_range = 3 + target_speed*target_speed;
+        if (isSucking) front_range++;
         for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
             if (dir == facing) {
                 addCoord(dir.offsetX*front_range, dir.offsetY*front_range, dir.offsetZ*front_range);
@@ -111,7 +112,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
                 waftEntity(ent);
             }
             suckEntity(ent, front_range, dir, s);
-            if (isSucking && ent.boundingBox != null && ent.boundingBox.intersectsWith(death_area)) {
+            if (!worldObj.isRemote && isSucking && ent.boundingBox != null && ent.boundingBox.intersectsWith(death_area)) {
                 murderEntity(ent);
             }
             ent.fallDistance *= 0.8F;
@@ -129,10 +130,12 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
                     return;
                 }
             }
+            ForgeDirection d = facing;
+            float ds = isSucking ? 3 : 0;
             for (int i = 0; i < count; i++) {
-                double x = pick(area.minX, area.maxX);
-                double y = pick(area.minY, area.maxY);
-                double z = pick(area.minZ, area.maxZ);
+                double x = pick(area.minX, area.maxX) + d.offsetX*ds;
+                double y = pick(area.minY, area.maxY) + d.offsetY*ds;
+                double z = pick(area.minZ, area.maxZ) + d.offsetZ*ds;
                 //Good ones: explode, cloud, smoke, snowshovel
                 worldObj.spawnParticle("cloud", x, y, z, facing.offsetX*s, facing.offsetY*s, facing.offsetZ*s);
             }

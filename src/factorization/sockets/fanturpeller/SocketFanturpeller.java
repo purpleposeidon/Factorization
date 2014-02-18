@@ -160,7 +160,9 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
             return true;
         }
         // END MACRO-GENERATED CODE
-        replaceWith(new SocketFanturpeller(), socket);
+        if (this.getRequiredCharge() != 0 /* As a proxy for checking the class */) {
+            replaceWith(new SocketFanturpeller(), socket);
+        }
         return true;
     }
 
@@ -270,7 +272,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
                     if (Math.abs(fanω) < Math.abs(ts)) {
                         fanω = ts;
                     }
-                } else if (Math.abs(fanω) < Math.abs(ts)) {
+                } else if ((isSucking && ts < fanω) || (!isSucking && ts > fanω)) {
                     fanω += Math.signum(ts);
                     if (fanω > Math.abs(ts)) {
                         fanω = ts;
@@ -376,6 +378,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         }
         if (messageType == MessageType.FanturpellerSpeed) {
             fanω = input.readFloat();
+            isSucking = input.readBoolean();
             return true;
         }
         return false;
@@ -383,6 +386,6 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
     
     @Override
     public Packet getDescriptionPacket() {
-        return getDescriptionPacketWith(MessageType.FanturpellerSpeed, fanω);
+        return getDescriptionPacketWith(MessageType.FanturpellerSpeed, fanω, isSucking);
     }
 }

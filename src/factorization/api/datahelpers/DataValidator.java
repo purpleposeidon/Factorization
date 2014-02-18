@@ -6,7 +6,6 @@ import java.util.Map;
 
 public class DataValidator extends DataHelper {
     Map<String, Object> fields;
-    int fieldIndex = 0;
     
     public DataValidator(Map<String, Object> fields) {
         this.fields = fields;
