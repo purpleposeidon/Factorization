@@ -14,6 +14,9 @@ Barrels can have any direction and orientation.
 Clicking near the side edge of a block will place the barrel
 with its top pointing to that side.
 
+Items can only be extracted from the bottom of the barrel.
+Insertion is done from the top, or the back.
+
 \newpage
 There are a few important varieties of barrel.
 
