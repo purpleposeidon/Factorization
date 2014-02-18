@@ -54,6 +54,7 @@ import factorization.charge.ItemBattery;
 import factorization.charge.ItemChargeMeter;
 import factorization.charge.TileEntityLeydenJar;
 import factorization.darkiron.BlockDarkIronOre;
+import factorization.docs.ItemDocBook;
 import factorization.oreprocessing.BlockOreStorageShatterable;
 import factorization.oreprocessing.ItemOreProcessing;
 import factorization.oreprocessing.ItemOreProcessing.OreType;
@@ -147,6 +148,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
     public ItemSocketPart socket_part;
     public ItemCraftingComponent instruction_plate;
     public ItemCommenter servo_rail_comment_editor;
+    public ItemDocBook docbook;
 
     public Material materialMachine = new Material(MapColor.ironColor);
     
@@ -373,6 +375,9 @@ public class Registry implements ICraftingHandler, ITickHandler {
         
         //Barrels
         daybarrel = new ItemDayBarrel(itemID("daybarrelItem", 9062), "daybarrel");
+        
+        docbook = new ItemDocBook(itemID("docbook", 9067), "docbook", TabType.TOOLS);
+        
         postMakeItems();
     }
 
