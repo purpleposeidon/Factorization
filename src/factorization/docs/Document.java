@@ -9,11 +9,9 @@ import net.minecraft.client.resources.Resource;
 import factorization.shared.Core;
 
 public class Document {
-    String name;
     ArrayList<Page> pages;
     
-    public Document(String name, ArrayList<Page> pages) {
-        this.name = name;
+    public Document(ArrayList<Page> pages) {
         this.pages = pages;
     }
 }

@@ -1,10 +1,9 @@
 Hello, world! 
-
-\link:stuff Yep\endlink , that-there be a link! Uhm huhm! MMMhMMM..
+\link:stuff Yep\endlink, that-there be a link! Uhm huhm! MMMhMMM..
 
 This should be a lonely line.
 
-We need to test the line breaking algo. We sure do, yes!  We need to test the line breaking algo. We sure do, yes!  We need to test the line breaking algo. We sure do, yes!  We need to test the line breaking algo. We sure do, yes!  We need to test the line breaking algo. We sure do, yes!  We need to test the line breaking algo. We sure do, yes!  We need to test the line breaking algo. We sure do, yes!  We need to test the line breaking algo. We sure do, yes!  We need to test the line breaking algo. We sure do, yes!  We need to test the line breaking algo. We sure do, yes!  
+We need to test the line-breaking algo. We sure do, yes!  We need to test the line-breaking algo. We sure do, yes!  We need to test the line-breaking algo. We sure do, yes!  We need to test the line-breaking algo. We sure do, yes!  We need to test the line-breaking algo. We sure do, yes!  We need to test the line-breaking algo. We sure do, yes!  We need to test the line-breaking algo. We sure do, yes!  We need to test the line-breaking algo. We sure do, yes!  We need to test the line-breaking algo. We sure do, yes!  We need to test the line-breaking algo. We sure do, yes!  
 
 Okay, let's test the newlines now.
 
@@ -48,8 +47,5 @@ Let's try it with this!
 
 
 
-\newpage And this should be on a different page! And you can totally see it now!
-\newpage This'll be a third new page. Hmm!
-\newpage This'll be a foruth page. Oh my!
-\newpage Giggle, Takei. Just... giggle.
-
+\newpage
+And this should be on a different page! (You can't see it yet tho.)

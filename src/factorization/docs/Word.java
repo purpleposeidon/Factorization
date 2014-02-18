@@ -4,19 +4,14 @@ import net.minecraft.util.EnumChatFormatting;
 
 public class Word {
     final String text;
-    final String hyperlink; //NORELEASE: str
+    final Object hyperlink;
     
-    public Word(String text, String hyperlink) {
-        this.hyperlink = hyperlink;
+    public Word(String text, Object hyperlink) {
         if (hyperlink == null) {
             this.text = text;
         } else {
             this.text = "" + EnumChatFormatting.AQUA  + EnumChatFormatting.UNDERLINE+ text;
         }
-    }
-    
-    @Override
-    public String toString() {
-        return text + " ==> " + hyperlink;
+        this.hyperlink = hyperlink;
     }
 }
