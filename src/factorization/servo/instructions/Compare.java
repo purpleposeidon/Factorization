@@ -16,6 +16,7 @@ import factorization.servo.Executioner;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.ServoStack;
+import factorization.shared.FzUtil;
 
 public class Compare extends Instruction {
     static enum CmpType {
@@ -100,12 +101,7 @@ public class Compare extends Instruction {
         if (!playerHasProgrammer(player)) {
             return false;
         }
-        int i = cmp.ordinal() + 1;
-        CmpType[] cmps = CmpType.values();
-        if (i == cmps.length) {
-            i = 0;
-        }
-        cmp = cmps[i];
+        cmp = FzUtil.shiftEnum(cmp, CmpType.values(), 1);
         return false;
     }
 }

@@ -16,6 +16,7 @@ import factorization.servo.EntryAction;
 import factorization.servo.Executioner;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
+import factorization.shared.FzUtil;
 
 public class SetEntryAction extends Instruction {
     EntryAction mode = EntryAction.ENTRY_EXECUTE;
@@ -69,12 +70,7 @@ public class SetEntryAction extends Instruction {
         if (!playerHasProgrammer(player)) {
             return false;
         }
-        int i = mode.ordinal() + 1;
-        EntryAction values[] = mode.values();
-        if (i >= values.length) {
-            i = 0;
-        }
-        mode = values[i];
+        mode = FzUtil.shiftEnum(mode, mode.values(), 1);
         return true;
     }
     
