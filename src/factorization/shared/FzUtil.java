@@ -1026,6 +1026,10 @@ public class FzUtil {
         return new DeltaCoord(dx, 0, dz);
     }
     
+    public static byte getOpposite(int dir) {
+        return (byte) ForgeDirection.getOrientation(dir).getOpposite().ordinal();
+    }
+    
     public static <E extends Enum> E shiftEnum(E current, E values[], int delta) {
         int next = current.ordinal() + delta;
         if (next < 0) {

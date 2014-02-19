@@ -36,8 +36,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
         super.onPlacedBy(player, is, side);
-        ForgeDirection fd = ForgeDirection.getOrientation(FzUtil.determineFlatOrientation(player));
-        facing_direction = (byte) fd.getOpposite().ordinal();
+        facing_direction = FzUtil.getOpposite(FzUtil.determineFlatOrientation(player));
     }
 
     @Override
