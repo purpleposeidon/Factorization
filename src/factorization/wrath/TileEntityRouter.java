@@ -14,9 +14,9 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
@@ -77,7 +77,7 @@ public class TileEntityRouter extends TileEntityFactorization {
     }
     
     @Override
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIIcon(ForgeDirection dir) {
         switch (dir) {
         case UP: return BlockIcons.router$top;
         case DOWN: return BlockIcons.router$bottom;
@@ -85,7 +85,7 @@ public class TileEntityRouter extends TileEntityFactorization {
         case SOUTH: return BlockIcons.router$south.get(this);
         case EAST: return BlockIcons.router$east.get(this);
         case WEST: return BlockIcons.router$west.get(this);
-        default: return super.getIcon(dir);
+        default: return super.getIIcon(dir);
         }
     }
 

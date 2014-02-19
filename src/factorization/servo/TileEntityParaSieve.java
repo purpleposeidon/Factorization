@@ -13,9 +13,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import org.bouncycastle.util.Arrays;
 
@@ -412,7 +412,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
 
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIIcon(ForgeDirection dir) {
         ForgeDirection face = getFacing();
         if (dir == face) {
             return BlockIcons.parasieve_front;

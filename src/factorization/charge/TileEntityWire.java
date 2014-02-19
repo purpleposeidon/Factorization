@@ -8,10 +8,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Charge;
@@ -251,7 +251,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIIcon(ForgeDirection dir) {
         return BlockIcons.wire;
     }
 }

@@ -5,8 +5,8 @@ import java.io.IOException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -35,7 +35,7 @@ public class SetSpeed extends Instruction {
     }
 
     @Override
-    public Icon getIcon(ForgeDirection side) {
+    public IIcon getIIcon(ForgeDirection side) {
         switch (speed) {
         default:
         case 1: return BlockIcons.servo$speed1;

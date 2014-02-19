@@ -5,7 +5,7 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
@@ -155,12 +155,12 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
                     block.useTexture(BlockIcons.error);
                 } else {
                     for (int i = 0; i < 6; i++) {
-                        int useIcon = i;
+                        int useIIcon = i;
                         if (rc.icon_side == -1) {
-                            block.setTexture(i, it.getIcon(useIcon, rc.icon_md));
+                            block.setTexture(i, it.getIIcon(useIIcon, rc.icon_md));
                         } else {
-                            useIcon = rc.icon_side;
-                            block.useTexture(it.getIcon(useIcon, rc.icon_md));
+                            useIIcon = rc.icon_side;
+                            block.useTexture(it.getIIcon(useIIcon, rc.icon_md));
                         }
                         int color = 0xFFFFFF; 
                         if (greenware.worldObj != null) {
@@ -174,7 +174,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
                                 }
                             }
                         } else {
-                            color = it.getRenderColor(useIcon);
+                            color = it.getRenderColor(useIIcon);
                         }
                         if (color != 0xFFFFFF) {
                             colors_changed = true;

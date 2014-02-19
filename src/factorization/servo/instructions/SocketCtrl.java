@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -42,7 +42,7 @@ public class SocketCtrl extends Instruction {
     }
 
     @Override
-    public Icon getIcon(ForgeDirection side) {
+    public IIcon getIIcon(ForgeDirection side) {
         if (mode == 1) {
             return BlockIcons.servo$socket_on;
         } else if (mode == 2) {

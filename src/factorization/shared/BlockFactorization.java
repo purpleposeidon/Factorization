@@ -11,19 +11,19 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.particle.EntityDiggingFX;
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -153,33 +153,33 @@ public class BlockFactorization extends BlockContainer {
     }
     
     @Override
-    public void registerIcons(IconRegister reg) {
+    public void registerIIcons(IIconRegister reg) {
         FactorizationTextureLoader.register(reg, BlockIcons.class, null, "factorization:");
         Core.proxy.texturepackChanged();
     }
     
-    static public Icon force_texture = null;
+    static public IIcon force_texture = null;
 
     @Override
-    public Icon getBlockTexture(IBlockAccess w, int x, int y, int z, int side) {
+    public IIcon getBlockTexture(IBlockAccess w, int x, int y, int z, int side) {
         // Used for in-world rendering. Takes 'active' into consideration.
         if (force_texture != null) {
             return force_texture;
         }
         TileEntity t = w.getBlockTileEntity(x, y, z);
         if (t instanceof TileEntityCommon) {
-            return ((TileEntityCommon) t).getIcon(ForgeDirection.getOrientation(side));
+            return ((TileEntityCommon) t).getIIcon(ForgeDirection.getOrientation(side));
         }
         return BlockIcons.error;
     }
 
-    private Icon tempParticleIcon = null;
+    private IIcon tempParticleIIcon = null;
     
     @Override
-    public Icon getIcon(int side, int md) {
-        if (tempParticleIcon != null) {
-            Icon ret = tempParticleIcon;
-            tempParticleIcon = null;
+    public IIcon getIIcon(int side, int md) {
+        if (tempParticleIIcon != null) {
+            IIcon ret = tempParticleIIcon;
+            tempParticleIIcon = null;
             return ret;
         }
         // This shouldn't be called when rendering in the world.
@@ -193,7 +193,7 @@ public class BlockFactorization extends BlockContainer {
         if (rep == null) {
             return BlockIcons.error;
         }
-        return rep.getIcon(ForgeDirection.getOrientation(side));
+        return rep.getIIcon(ForgeDirection.getOrientation(side));
     }
     
     @Override
@@ -557,7 +557,7 @@ public class BlockFactorization extends BlockContainer {
     public boolean addBlockHitEffects(World worldObj, MovingObjectPosition target, EffectRenderer effectRenderer) {
         Coord here = new Coord(worldObj, target.blockX, target.blockY, target.blockZ);
         TileEntityCommon tec = here.getTE(TileEntityCommon.class);
-        tempParticleIcon = (tec == null) ? BlockIcons.default_icon : tec.getIcon(ForgeDirection.getOrientation(target.sideHit));
+        tempParticleIIcon = (tec == null) ? BlockIcons.default_icon : tec.getIIcon(ForgeDirection.getOrientation(target.sideHit));
         return false;
     }
     
@@ -571,7 +571,7 @@ public class BlockFactorization extends BlockContainer {
             return false;
         }
         TileEntityCommon tec = (TileEntityCommon) te;
-        Icon theIcon = (tec == null) ? BlockIcons.default_icon : tec.getIcon(ForgeDirection.DOWN);
+        IIcon theIIcon = (tec == null) ? BlockIcons.default_icon : tec.getIIcon(ForgeDirection.DOWN);
         
         //copied & modified from EffectRenderer.addBlockDestroyEffects
         byte b0 = 4;
@@ -585,7 +585,7 @@ public class BlockFactorization extends BlockContainer {
                     double d1 = (double)y + ((double)k1 + 0.5D) / (double)b0;
                     double d2 = (double)z + ((double)l1 + 0.5D) / (double)b0;
                     EntityDiggingFX fx = (new EntityDiggingFX(world, d0, d1, d2, d0 - (double)x - 0.5D, d1 - (double)y - 0.5D, d2 - (double)z - 0.5D, this, meta)).applyColourMultiplier(x, y, z);
-                    fx.setParticleIcon(theIcon);
+                    fx.setParticleIIcon(theIIcon);
                     effectRenderer.addEffect(fx);
                 }
             }

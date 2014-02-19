@@ -5,7 +5,7 @@ import static factorization.ceramics.GlazeTypes.COMMON;
 import static factorization.ceramics.GlazeTypes.MATTE;
 import static factorization.ceramics.GlazeTypes.SHINY;
 import static factorization.ceramics.GlazeTypes.TRANSLUCENT;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import factorization.common.BlockResource;
 import factorization.shared.Core;
 
@@ -29,7 +29,7 @@ public enum BasicGlazes {
     
     public GlazeTypes type;
     public int metadata;
-    public Icon icon;
+    public IIcon icon;
     public int raw_color;
     
     public static BasicGlazes[] values = values();

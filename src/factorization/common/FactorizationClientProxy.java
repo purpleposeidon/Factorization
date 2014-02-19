@@ -522,9 +522,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
     public void onStitch(TextureStitchEvent.Post event) {
         int t = event.map.textureType;
         if (t == 0 /* terrain */) {
-            Core.blockMissingIcon = event.map.getAtlasSprite("this code for getting the missing Icon brought to you by LexManos");
+            Core.blockMissingIIcon = event.map.getAtlasSprite("this code for getting the missing IIcon brought to you by LexManos");
         } else if (t == 1 /* items */) {
-            Core.itemMissingIcon = event.map.getAtlasSprite("this code for getting the missing Icon brought to you by Tahg");
+            Core.itemMissingIIcon = event.map.getAtlasSprite("this code for getting the missing IIcon brought to you by Tahg");
         }
     }
 }

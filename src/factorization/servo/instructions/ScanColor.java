@@ -9,8 +9,8 @@ import net.minecraft.block.BlockReed;
 import net.minecraft.block.BlockStem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.common.IPlantable;
 import factorization.api.Coord;
 import factorization.api.FzColor;
@@ -55,7 +55,7 @@ public class ScanColor extends Decorator {
     }
 
     @Override
-    public Icon getIcon(ForgeDirection side) {
+    public IIcon getIIcon(ForgeDirection side) {
         return BlockIcons.servo$scan_color;
     }
 

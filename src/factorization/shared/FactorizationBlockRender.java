@@ -8,10 +8,10 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.IItemRenderer.ItemRenderType;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -135,11 +135,11 @@ abstract public class FactorizationBlockRender implements ICoord {
         }
     }
     
-    protected void renderCauldron(RenderBlocks rb, Icon lid, Icon metal) {
+    protected void renderCauldron(RenderBlocks rb, IIcon lid, IIcon metal) {
         renderCauldron(rb, lid, metal, 1);
     }
     
-    protected void renderCauldron(RenderBlocks rb, Icon lid, Icon metal, float height) {
+    protected void renderCauldron(RenderBlocks rb, IIcon lid, IIcon metal, float height) {
         Tessellator tessellator = Tessellator.instance;
         BlockRenderHelper block = BlockRenderHelper.instance;
         block.setBlockBounds(0, 0, 0, 1, height, 1);
@@ -166,7 +166,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         }
     }
     
-    protected void renderPart(RenderBlocks rb, Icon texture, float b1, float b2, float b3, float b4, float b5, float b6) {
+    protected void renderPart(RenderBlocks rb, IIcon texture, float b1, float b2, float b3, float b4, float b5, float b6) {
         BlockFactorization block = Core.registry.factory_rendering_block;
         rb.setRenderBounds(b1, b2, b3, b4, b5, b6);
         block.setBlockBounds(b1, b2, b3, b4, b5, b6);
@@ -183,7 +183,7 @@ abstract public class FactorizationBlockRender implements ICoord {
     }
 
     private void renderPartInvTexture(RenderBlocks renderblocks,
-            Block block, Icon texture) {
+            Block block, IIcon texture) {
         // This originally copied from RenderBlocks.renderBlockAsItem
         Tessellator tessellator = Tessellator.instance;
 
@@ -284,7 +284,7 @@ abstract public class FactorizationBlockRender implements ICoord {
     protected void vertex(WireRenderingCube rc, float x, float y, float z, float u, float v) {
         //all units are in texels; center of the cube is the origin. Or, like... not the center but the texel that's (8,8,8) away from the corner is.
         //u & v are in texels
-        Icon wire = BlockIcons.wire;
+        IIcon wire = BlockIcons.wire;
         Tessellator.instance.addVertexWithUV(
                 this.x + 0.5 + x / 16F,
                 this.y + 0.5 + y / 16F,
@@ -292,7 +292,7 @@ abstract public class FactorizationBlockRender implements ICoord {
                 wire.getInterpolatedU(u), wire.getInterpolatedV(v));
     }
     
-    public static void renderItemIcon(Icon icon) {
+    public static void renderItemIIcon(IIcon icon) {
         //Extracted from ItemRenderer.renderItem
         if (icon == null) {
             return;
@@ -316,11 +316,11 @@ abstract public class FactorizationBlockRender implements ICoord {
         //GL11.glRotatef(50.0F, 0.0F, 1.0F, 0.0F);
         //GL11.glRotatef(335.0F, 0.0F, 0.0F, 1.0F);
         //GL11.glTranslatef(-0.9375F, -0.0625F, 0.0F);
-        ItemRenderer.renderItemIn2D(tessellator, f1, f2, f, f3, icon.getIconWidth(), icon.getIconHeight(), 0.0625F);
+        ItemRenderer.renderItemIn2D(tessellator, f1, f2, f, f3, icon.getIIconWidth(), icon.getIIconHeight(), 0.0625F);
     }
 
     public void renderMotor(RenderBlocks rb, float yoffset) {
-        Icon metal = BlockIcons.motor_texture;
+        IIcon metal = BlockIcons.motor_texture;
         //metal = 11;
         float d = 4.0F / 16.0F;
         float yd = -d + 0.003F;

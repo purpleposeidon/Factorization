@@ -6,8 +6,8 @@ import java.util.List;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
@@ -28,7 +28,7 @@ public class TileEntityStamper extends TileEntityFactorization {
     }
     
     @Override
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIIcon(ForgeDirection dir) {
         return BlockIcons.stamper.get(this, dir);
     }
 

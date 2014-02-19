@@ -2,8 +2,8 @@ package factorization.crafting;
 
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
@@ -17,7 +17,7 @@ public class BlockRenderCompressionCrafter extends FactorizationBlockRender {
     @Override
     public void render(RenderBlocks rb) {
         BlockRenderHelper block = Core.registry.blockRender;
-        Icon side = BlockIcons.compactSide;
+        IIcon side = BlockIcons.compactSide;
         block.useTextures(
                 BlockIcons.compactBack, BlockIcons.compactFace,
                 side, side,
@@ -53,7 +53,7 @@ public class BlockRenderCompressionCrafter extends FactorizationBlockRender {
             block.renderForInventory(rb);
             final float d = 1F/64F;
             block.setBlockBoundsOffset(d, 0, d);
-            Icon s = BlockIcons.compactSideSlide;
+            IIcon s = BlockIcons.compactSideSlide;
             block.useTextures(null, null, s, s, s, s);
             block.renderForInventory(rb);
         }

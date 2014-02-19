@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.datahelpers.DataHelper;
@@ -21,7 +21,7 @@ public class RotateTop extends Instruction {
     ForgeDirection top = ForgeDirection.UP;
     
     @Override
-    public Icon getIcon(ForgeDirection side) {
+    public IIcon getIIcon(ForgeDirection side) {
         if (side == ForgeDirection.UNKNOWN) {
             return BlockIcons.servo$set_facing.side_W;
         }

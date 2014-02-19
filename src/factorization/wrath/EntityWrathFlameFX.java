@@ -4,7 +4,7 @@ import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.World;
 import factorization.api.Coord;
-import factorization.common.ItemIcons;
+import factorization.common.ItemIIcons;
 
 public class EntityWrathFlameFX extends EntityFX {
     double defaultY = 0;
@@ -15,7 +15,7 @@ public class EntityWrathFlameFX extends EntityFX {
         this.particleTextureJitterX = 0;
         this.particleTextureJitterY = 0;
         this.particleScale = 2;
-        particleIcon = ItemIcons.wrath_particle;
+        particleIIcon = ItemIIcons.wrath_particle;
         this.particleGravity = 0;
 
         this.motionX = vx;

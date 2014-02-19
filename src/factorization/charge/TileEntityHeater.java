@@ -10,8 +10,8 @@ import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Charge;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
@@ -38,7 +38,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
     }
     
     @Override
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIIcon(ForgeDirection dir) {
         return BlockIcons.heater_spiral;
     }
 

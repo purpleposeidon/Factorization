@@ -20,12 +20,12 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.util.Vec3Pool;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.ForgeSubscribe;
 
 import org.lwjgl.opengl.GL11;
@@ -179,13 +179,13 @@ public class TileEntityGreenware extends TileEntityCommon {
 
         public void toRotatedBlockBounds(TileEntityGreenware gw, BlockRenderHelper b) {
             toBlockBounds(b);
-            b.beginNoIcons();
+            b.beginNoIIcons();
             b.rotateMiddle(quat);
             b.rotateCenter(gw.rotation_quat);
             b.setBlockBoundsBasedOnRotation();
             
             // TODO: This doesn't work! Lame!
-            /*b.beginNoIcons();
+            /*b.beginNoIIcons();
             b.rotateMiddle(quat);
             b.rotateCenter(gw.rotation_quat);
             b.setBlockBoundsBasedOnRotation();
@@ -249,7 +249,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         return ClayState.WET;
     }
 
-    public Icon getIcon(ClayLump lump, int side) {
+    public IIcon getIIcon(ClayLump lump, int side) {
         //NOTE: This isn't what's actually used for rendering.
         switch (getState()) {
         case WET:
@@ -264,7 +264,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             if (it == null) {
                 return BlockIcons.error;
             }
-            return it.getIconFromDamage(lump.icon_md);
+            return it.getIIconFromDamage(lump.icon_md);
         default:
             return BlockIcons.error;
         }
@@ -932,11 +932,11 @@ public class TileEntityGreenware extends TileEntityCommon {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIIcon(ForgeDirection dir) {
         if (parts.size() == 0) {
             return Block.blockClay.getBlockTextureFromSide(0);
         }
-        return getIcon(parts.get(0), dir.ordinal());
+        return getIIcon(parts.get(0), dir.ordinal());
     }
     
     @Override

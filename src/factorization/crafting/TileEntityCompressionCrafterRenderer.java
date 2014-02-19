@@ -11,7 +11,7 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
@@ -21,13 +21,13 @@ import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
-import factorization.common.BlockIcons.ExtendedIcon;
+import factorization.common.BlockIcons.ExtendedIIcon;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 
 public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRenderer {
     float textureOffset;
-    ExtendedIcon interp_side = new ExtendedIcon(BlockIcons.compactSideSlide) {
+    ExtendedIIcon interp_side = new ExtendedIIcon(BlockIcons.compactSideSlide) {
         @Override
         @SideOnly(Side.CLIENT)
         public float getInterpolatedU(double d0) {

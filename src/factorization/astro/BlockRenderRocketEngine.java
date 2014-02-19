@@ -2,8 +2,8 @@ package factorization.astro;
 
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
@@ -15,8 +15,8 @@ public class BlockRenderRocketEngine extends FactorizationBlockRender {
 
     @Override
     public void render(RenderBlocks rb) {
-        Icon body = BlockIcons.rocket_engine_invalid;
-        Icon nozzle = BlockIcons.rocket_engine_nozzle, bottom = BlockIcons.rocket_engine_bottom_hole, top = BlockIcons.rocket_engine_top;
+        IIcon body = BlockIcons.rocket_engine_invalid;
+        IIcon nozzle = BlockIcons.rocket_engine_nozzle, bottom = BlockIcons.rocket_engine_bottom_hole, top = BlockIcons.rocket_engine_top;
         final Coord here = getCoord();
         if (world_mode) { //Really, it should be...
             TileEntityRocketEngine rocket = here.getTE(TileEntityRocketEngine.class);

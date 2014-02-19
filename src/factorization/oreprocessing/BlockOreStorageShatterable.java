@@ -4,10 +4,10 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockOreStorage;
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import factorization.api.Coord;
@@ -69,13 +69,13 @@ public class BlockOreStorageShatterable extends BlockOreStorage {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerIcons(IconRegister register) {
-        original.registerIcons(register);
+    public void registerIIcons(IIconRegister register) {
+        original.registerIIcons(register);
     }
     
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIcon(int side, int md) {
-        return original.getIcon(side, md);
+    public IIcon getIIcon(int side, int md) {
+        return original.getIIcon(side, md);
     }
 }

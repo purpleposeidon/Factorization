@@ -3,7 +3,7 @@ package factorization.charge;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 
 import org.lwjgl.opengl.GL11;
 
@@ -41,7 +41,7 @@ public class BlockRenderSteamTurbine extends FactorizationBlockRender {
             Block b = Core.registry.factory_rendering_block;
             float f = 1F - (3F/16F);
             
-            Icon side = BlockIcons.turbine_side;
+            IIcon side = BlockIcons.turbine_side;
             
             Tessellator.instance.zOffset += f;
             rb.renderFaceZNeg(b, x, y, z, side);
@@ -70,7 +70,7 @@ public class BlockRenderSteamTurbine extends FactorizationBlockRender {
             GL11.glScalef(s, s, s);
             GL11.glTranslatef(-0.5F, 0.1F, -0.5F);
             GL11.glRotatef(90, 1, 0, 0);
-            renderItemIcon(Core.registry.fan.getIconFromDamage(0));
+            renderItemIIcon(Core.registry.fan.getIIconFromDamage(0));
             GL11.glPopMatrix();
         }
     }

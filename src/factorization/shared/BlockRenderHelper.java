@@ -4,10 +4,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
@@ -66,11 +66,11 @@ public class BlockRenderHelper extends Block {
         return this;
     }
     
-    public Icon[] textures;
-    private Icon[] repetitionCache = new Icon[6];
+    public IIcon[] textures;
+    private IIcon[] repetitionCache = new IIcon[6];
     
     @SideOnly(Side.CLIENT)
-    public BlockRenderHelper useTexture(Icon texture) {
+    public BlockRenderHelper useTexture(IIcon texture) {
         textures = repetitionCache;
         for (int i = 0; i < textures.length; i++) {
             textures[i] = texture;
@@ -79,13 +79,13 @@ public class BlockRenderHelper extends Block {
     }
     
     @SideOnly(Side.CLIENT)
-    public BlockRenderHelper useTextures(Icon ...textures) {
+    public BlockRenderHelper useTextures(IIcon ...textures) {
         this.textures = textures;
         return this;
     }
     
     @SideOnly(Side.CLIENT)
-    public BlockRenderHelper setTexture(int i, Icon texture) {
+    public BlockRenderHelper setTexture(int i, IIcon texture) {
         textures = repetitionCache;
         textures[i] = texture;
         return this;
@@ -99,12 +99,12 @@ public class BlockRenderHelper extends Block {
     
     @SideOnly(Side.CLIENT)
     @Override
-    public Icon getIcon(int side, int md) {
-        Icon ret;
+    public IIcon getIIcon(int side, int md) {
+        IIcon ret;
         try {
             ret = textures[side];
         } catch (NullPointerException e) {
-            textures = new Icon[6];
+            textures = new IIcon[6];
             return textures[side] = BlockIcons.error;
         }
         if (ret == null) {
@@ -125,7 +125,7 @@ public class BlockRenderHelper extends Block {
     @SideOnly(Side.CLIENT)
     public void renderForInventory(RenderBlocks renderblocks) {
         // This originally copied from RenderBlocks.renderBlockAsItem
-        Icon texture;
+        IIcon texture;
         Tessellator tessellator = Tessellator.instance;
         tessellator.startDrawingQuads();
         renderblocks.setRenderBoundsFromBlock(this);
@@ -183,16 +183,16 @@ public class BlockRenderHelper extends Block {
     @SideOnly(Side.CLIENT)
     public BlockRenderHelper begin() {
         for (int i = 0; i < 6; i++) {
-            Icon faceIcon = textures[i];
-            if (faceIcon == null) {
+            IIcon faceIIcon = textures[i];
+            if (faceIIcon == null) {
                 continue;
             }
             currentFace = faceCache[i];
             faceVerts(i);
             for (int f = 0; f < currentFace.length; f++) {
                 VectorUV vert = currentFace[f];
-                vert.u = faceIcon.getInterpolatedU(vert.u*16);
-                vert.v = faceIcon.getInterpolatedV(vert.v*16);
+                vert.u = faceIIcon.getInterpolatedU(vert.u*16);
+                vert.v = faceIIcon.getInterpolatedV(vert.v*16);
             }
         }
         center.x = (minX + maxX)/2;
@@ -201,7 +201,7 @@ public class BlockRenderHelper extends Block {
         return this;
     }
     
-    public BlockRenderHelper beginNoIcons() {
+    public BlockRenderHelper beginNoIIcons() {
         for (int i = 0; i < 6; i++) {
             currentFace = faceCache[i]; //fullCache isn't static; we'll have two instances for server thread & client thread
             faceVerts(i);

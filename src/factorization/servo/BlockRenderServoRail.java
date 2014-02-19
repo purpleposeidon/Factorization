@@ -4,8 +4,8 @@ import java.util.Arrays;
 
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockRenderHelper;
@@ -13,7 +13,7 @@ import factorization.shared.FactorizationBlockRender;
 
 public class BlockRenderServoRail extends FactorizationBlockRender {
 
-    Icon[] central = new Icon[6];
+    IIcon[] central = new IIcon[6];
     boolean[] sides = new boolean[6];
     BlockRenderHelper block;
     
@@ -30,7 +30,7 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
     }
     
     void restoreTextures(int a, int b) {
-        Icon icon = BlockIcons.servo$rail;
+        IIcon icon = BlockIcons.servo$rail;
         block.setTexture(a, icon);
         block.setTexture(b, icon);
     }
@@ -62,7 +62,7 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
                 sides[i] = true;
             }
         }
-        Icon icon = has_comment ? BlockIcons.servo$rail_comment : BlockIcons.servo$rail;
+        IIcon icon = has_comment ? BlockIcons.servo$rail_comment : BlockIcons.servo$rail;
         block = BlockRenderHelper.instance;
         
         final float fL = TileEntityServoRail.width;

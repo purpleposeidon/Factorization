@@ -10,9 +10,9 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.resources.ResourceManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
@@ -22,7 +22,7 @@ import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
-import factorization.common.ItemIcons;
+import factorization.common.ItemIIcons;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 import factorization.weird.TileEntityDayBarrel.Type;
@@ -152,13 +152,13 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
             return;
         }
         GL11.glRotatef(180, 0, 0, 1);
-        final Icon font;
+        final IIcon font;
         final Minecraft mc = Minecraft.getMinecraft();
         if (item.getItemSpriteNumber() == 1) {
             font = BlockIcons.barrel_font;
             mc.renderEngine.bindTexture(Core.blockAtlas);
         } else {
-            font = ItemIcons.barrel_font;
+            font = ItemIIcons.barrel_font;
             mc.renderEngine.bindTexture(Core.itemAtlas);
         }
         final int len = t.length();

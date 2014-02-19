@@ -21,8 +21,8 @@ import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import factorization.api.Charge;
@@ -49,7 +49,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     Charge charge = new Charge(this);
     
     @Override
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIIcon(ForgeDirection dir) {
         switch (dir) {
         case UP: return BlockIcons.cauldron_top;
         default: return BlockIcons.cauldron_side;

@@ -3,22 +3,22 @@ package factorization.ceramics;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.ceramics.TileEntityGreenware.ClayLump;
 import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.common.FactoryType;
-import factorization.common.ItemIcons;
+import factorization.common.ItemIIcons;
 import factorization.notify.Notify;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
@@ -56,7 +56,7 @@ public class ItemSculptingTool extends ItemFactorization {
     }
     
     @Override
-    public void registerIcons(IconRegister reg) { }
+    public void registerIIcons(IIconRegister reg) { }
 
     static enum ToolMode {
         MOVER("move", true),
@@ -107,16 +107,16 @@ public class ItemSculptingTool extends ItemFactorization {
     }
     
     @Override
-    public Icon getIconFromDamage(int damage) {
+    public IIcon getIIconFromDamage(int damage) {
         //A bit lame. Lame.
         switch (getMode(damage)) {
         default:
-        case MOVER: return ItemIcons.move;
-        case RESETTER: return ItemIcons.reset;
-        case ROTATE_LOCAL: return ItemIcons.rotate_local;
-        case ROTATE_GLOBAL: return ItemIcons.rotate_global;
-        case STRETCHER: return ItemIcons.stretch;
-        case MOLD: return ItemIcons.mold;
+        case MOVER: return ItemIIcons.move;
+        case RESETTER: return ItemIIcons.reset;
+        case ROTATE_LOCAL: return ItemIIcons.rotate_local;
+        case ROTATE_GLOBAL: return ItemIIcons.rotate_global;
+        case STRETCHER: return ItemIIcons.stretch;
+        case MOLD: return ItemIIcons.mold;
         }
     }
     

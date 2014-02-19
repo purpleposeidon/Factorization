@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.IFluidHandler;
 
@@ -311,7 +311,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         BlockRenderHelper block = BlockRenderHelper.instance;
         Quaternion rotation = Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite()));
         {
-            Icon metal = BlockIcons.motor_texture;
+            IIcon metal = BlockIcons.motor_texture;
             float d = 4.0F / 16.0F;
             float yd = -d + 0.003F;
     
@@ -366,7 +366,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
             GL11.glPushMatrix();
             GL11.glRotatef(90, 1, 0, 0);
             GL11.glTranslatef(-0.5F, -0.5F, 0);
-            FactorizationBlockRender.renderItemIcon(Core.registry.fan.getIconFromDamage(0));
+            FactorizationBlockRender.renderItemIIcon(Core.registry.fan.getIIconFromDamage(0));
             GL11.glPopMatrix();
         }
     }

@@ -3,13 +3,13 @@ package factorization.servo;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -133,20 +133,20 @@ public class ItemServoRailWidget extends ItemFactorization {
     }
     
     @Override
-    public Icon getIcon(ItemStack stack, int renderPass, EntityPlayer player, ItemStack usingItem, int useRemaining) {
-        return getIcon(stack, renderPass);
+    public IIcon getIIcon(ItemStack stack, int renderPass, EntityPlayer player, ItemStack usingItem, int useRemaining) {
+        return getIIcon(stack, renderPass);
     }
     
     @Override
-    public Icon getIcon(ItemStack stack, int pass) {
+    public IIcon getIIcon(ItemStack stack, int pass) {
         if (pass == 0) {
             return BlockIcons.servo$instruction_plate;
         }
         if (pass == 1) {
             ServoComponent sc = get(stack);
-            Icon ret = null;
+            IIcon ret = null;
             if (sc instanceof Decorator) {
-                ret = ((Decorator) sc).getIcon(ForgeDirection.UNKNOWN);
+                ret = ((Decorator) sc).getIIcon(ForgeDirection.UNKNOWN);
             }
             if (ret == null) {
                 ret = BlockIcons.uv_test;
@@ -176,5 +176,5 @@ public class ItemServoRailWidget extends ItemFactorization {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerIcons(IconRegister par1IconRegister) { }
+    public void registerIIcons(IIconRegister par1IIconRegister) { }
 }

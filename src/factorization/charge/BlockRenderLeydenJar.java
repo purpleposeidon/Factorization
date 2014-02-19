@@ -9,7 +9,7 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraftforge.client.IItemRenderer.ItemRenderType;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
@@ -20,8 +20,8 @@ public class BlockRenderLeydenJar extends FactorizationBlockRender {
 
     @Override
     public void render(RenderBlocks rb) {
-        Icon glass = BlockIcons.leyden_glass_side;
-        Icon knob = BlockIcons.leyden_knob;
+        IIcon glass = BlockIcons.leyden_glass_side;
+        IIcon knob = BlockIcons.leyden_knob;
         BlockRenderHelper block = BlockRenderHelper.instance;
         float inset = 1F/16F;
         float jarHeight = 16F/16F; //13
@@ -52,7 +52,7 @@ public class BlockRenderLeydenJar extends FactorizationBlockRender {
         }
         
         
-        Icon leyden_metal = BlockIcons.leyden_metal;
+        IIcon leyden_metal = BlockIcons.leyden_metal;
         renderCauldron(rb, BlockIcons.leyden_rim, leyden_metal, metal_height);
         block.useTextures(null, null, leyden_metal, leyden_metal, leyden_metal, leyden_metal);
         block.setBlockBounds(post_in, 1F/16F, post_in, 1 - post_in, jarHeight, 1 - post_in);

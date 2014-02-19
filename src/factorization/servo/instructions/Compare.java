@@ -5,8 +5,8 @@ import java.io.IOException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -21,7 +21,7 @@ import factorization.shared.FzUtil;
 public class Compare extends Instruction {
     static enum CmpType {
         LT, LE, EQ, NE, GE, GT;
-        Icon getIcon() {
+        IIcon getIIcon() {
             switch (this) {
             default:
             case EQ: return BlockIcons.servo$cmp_eq;
@@ -81,8 +81,8 @@ public class Compare extends Instruction {
     }
 
     @Override
-    public Icon getIcon(ForgeDirection side) {
-        return cmp.getIcon();
+    public IIcon getIIcon(ForgeDirection side) {
+        return cmp.getIIcon();
     }
 
     @Override

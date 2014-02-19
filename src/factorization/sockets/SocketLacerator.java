@@ -24,12 +24,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatMessageComponent;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumMovingObjectType;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.StatCollector;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.EventPriority;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.world.BlockEvent;
@@ -521,7 +521,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     @Override
     @SideOnly(Side.CLIENT)
     public void renderStatic(ServoMotor motor, Tessellator tess) {
-        Icon metal = BlockIcons.motor_texture;
+        IIcon metal = BlockIcons.motor_texture;
         float d = 4.0F / 16.0F;
         float yd = -d + 0.003F;
         BlockRenderHelper block = BlockRenderHelper.instance;

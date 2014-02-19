@@ -1,7 +1,7 @@
 package factorization.oreprocessing;
 
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 
 import org.lwjgl.opengl.GL11;
 
@@ -16,7 +16,7 @@ public class BlockRenderGrinder extends FactorizationBlockRender {
         renderMotor(rb, 8F/16F);
         float p = 1F/16F;
         float p2 = 2*p, p3 = 3*p;
-        Icon metal = BlockIcons.generic_metal, lead = BlockIcons.motor_texture;
+        IIcon metal = BlockIcons.generic_metal, lead = BlockIcons.motor_texture;
         //bottom plate
         //renderPart(rb, metal, 2*p, 0, 2*p, 1-2*p, 2*p, 1-2*p);
         renderPart(rb, metal, 0, 0, 0, 1, 2*p, 1);

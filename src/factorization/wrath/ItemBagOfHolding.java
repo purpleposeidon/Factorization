@@ -221,7 +221,7 @@ public class ItemBagOfHolding extends ItemFactorization implements IActOnCraft {
         return true;
     }
 
-//	public int getIconFromDamage(int damage) {
+//	public int getIIconFromDamage(int damage) {
 //		return 16 + ((int) (System.currentTimeMillis() / 50000) % 5);
 //	}
 

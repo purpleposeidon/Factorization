@@ -12,10 +12,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumMovingObjectType;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.DeltaCoord;
@@ -182,12 +182,12 @@ public class TileEntityExtension extends TileEntityCommon {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIIcon(ForgeDirection dir) {
         TileEntityCommon p = getParent();
         if (p == null) {
-            return super.getIcon(dir);
+            return super.getIIcon(dir);
         }
-        return p.getIcon(dir);
+        return p.getIIcon(dir);
     }
     
     @Override

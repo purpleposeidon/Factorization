@@ -9,7 +9,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumMovingObjectType;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import cpw.mods.fml.relauncher.Side;
@@ -36,9 +36,9 @@ public class ItemGlazeBucket extends ItemFactorization {
     }
     
     @Override
-    public Icon getIcon(ItemStack is, int renderPass, EntityPlayer player, ItemStack usingItem, int useRemaining) {
+    public IIcon getIIcon(ItemStack is, int renderPass, EntityPlayer player, ItemStack usingItem, int useRemaining) {
         if (renderPass == 0) {
-            return getIconFromDamage(0);
+            return getIIconFromDamage(0);
         }
         int id = getBlockId(is);
         Block block = Block.blocksList[id];
@@ -47,7 +47,7 @@ public class ItemGlazeBucket extends ItemFactorization {
             //Or could return the error icon.
             //But I think this'll look less terribly awful if a block goes away.
         }
-        return block.getIcon(getBlockSide(is), getBlockMd(is));
+        return block.getIIcon(getBlockSide(is), getBlockMd(is));
     }
     
     @Override

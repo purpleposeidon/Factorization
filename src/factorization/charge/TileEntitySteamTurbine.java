@@ -4,8 +4,8 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
@@ -33,7 +33,7 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
     }
     
     @Override
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIIcon(ForgeDirection dir) {
         switch (dir) {
         case UP: return BlockIcons.turbine_top;
         case DOWN: return BlockIcons.turbine_bottom;

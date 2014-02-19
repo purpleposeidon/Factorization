@@ -7,14 +7,14 @@ import factorization.shared.ItemFactorization;
 import factorization.shared.Sound;
 import factorization.shared.Core.TabType;
 
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
 public class ItemAcidBottle extends ItemFactorization {
@@ -31,13 +31,13 @@ public class ItemAcidBottle extends ItemFactorization {
     }
     
     @Override
-    public void registerIcons(IconRegister par1IconRegister) {
+    public void registerIIcons(IIconRegister par1IIconRegister) {
         // Nada
     }
     
     @Override
-    public Icon getIconFromDamageForRenderPass(int damage, int renderPass) {
-        return Item.potion.getIconFromDamageForRenderPass(damage, renderPass);
+    public IIcon getIIconFromDamageForRenderPass(int damage, int renderPass) {
+        return Item.potion.getIIconFromDamageForRenderPass(damage, renderPass);
     }
     
     @Override

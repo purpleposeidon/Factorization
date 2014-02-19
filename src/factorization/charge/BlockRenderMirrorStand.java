@@ -2,8 +2,8 @@ package factorization.charge;
 
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
@@ -28,7 +28,7 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
         float height = 7.25F / 16F;
         float radius = 1F / 16F;
         float c = 0.5F;
-        Icon silver = Core.registry.resource_block.getIcon(0, ResourceType.SILVERBLOCK.md);
+        IIcon silver = Core.registry.resource_block.getIIcon(0, ResourceType.SILVERBLOCK.md);
         
         //Pole
         BlockRenderHelper block = Core.registry.blockRender;
@@ -46,8 +46,8 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
         block.setBlockBoundsOffset(2F/16F, 7.5F/16F, 2F/16F);
         //block.setBlockBoundsOffset(0, 0, 0);
         //block.setBlockBounds(0, 0, 0, 1, 1F/16F, 1);
-        Icon side = BlockIcons.mirror_side;
-        Icon face = BlockIcons.mirror_front;
+        IIcon side = BlockIcons.mirror_side;
+        IIcon face = BlockIcons.mirror_front;
         block.useTextures(face, face, side, side, side, side);
         
         block.begin();

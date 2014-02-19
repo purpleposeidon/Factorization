@@ -23,9 +23,9 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraftforge.common.FakePlayer;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -1017,20 +1017,20 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIIcon(ForgeDirection dir) {
         if (dir.offsetY != 0) {
             if (woodSlab.itemID < Block.blocksList.length && Block.blocksList[woodSlab.itemID] != null) {
                 Block b = Block.blocksList[woodSlab.itemID];
-                return b.getIcon(0, woodSlab.getItemDamage());
+                return b.getIIcon(0, woodSlab.getItemDamage());
             }
-            return woodSlab.getItem().getIcon(woodSlab, 0);
+            return woodSlab.getItem().getIIcon(woodSlab, 0);
         }
         Item theItem = woodLog.getItem();
         if (theItem instanceof ItemBlock) {
             Block b = Block.blocksList[((ItemBlock) theItem).getBlockID()];
-            return b.getIcon(2, woodLog.getItemDamage());
+            return b.getIIcon(2, woodLog.getItemDamage());
         }
-        return theItem.getIcon(woodLog, 2);
+        return theItem.getIIcon(woodLog, 2);
     }
     
     @Override

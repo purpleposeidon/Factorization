@@ -23,12 +23,12 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.obj.WavefrontObject;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -44,15 +44,15 @@ public class RenderServoMotor extends RenderEntity {
     static int both_lists = -1, sprocket_display_list = -1, chasis_display_list = -1;
     boolean loaded_models = false;
     
-    private static Icon subsetIcon;
+    private static IIcon subsetIIcon;
     private static Tessellator subsetTessellator = new Tessellator() {
         @Override
         public void setTextureUV(double u, double v) {
-            super.setTextureUV(subsetIcon.getInterpolatedU(u*16), subsetIcon.getInterpolatedV(v*16));
+            super.setTextureUV(subsetIIcon.getInterpolatedU(u*16), subsetIIcon.getInterpolatedV(v*16));
         }
     };
     
-    static void loadModel(int displayList, String modelName, Icon icon) {
+    static void loadModel(int displayList, String modelName, IIcon icon) {
         try {
             WavefrontObject sprocket = null;
             InputStream input = null;
@@ -75,7 +75,7 @@ public class RenderServoMotor extends RenderEntity {
             GL11.glNewList(displayList, GL11.GL_COMPILE);
             double modelScale = 1.0/16.0;
             GL11.glScaled(modelScale, modelScale, modelScale);
-            subsetIcon = icon;
+            subsetIIcon = icon;
             subsetTessellator.startDrawingQuads();
             sprocket.tessellateAll(subsetTessellator);
             subsetTessellator.draw();

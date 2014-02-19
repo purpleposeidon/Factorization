@@ -5,17 +5,17 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.ceramics.BasicGlazes;
 import factorization.shared.Core;
 
 public class BlockResource extends Block {
-    public Icon[] icons = new Icon[ResourceType.values().length];
+    public IIcon[] icons = new IIcon[ResourceType.values().length];
     protected BlockResource(int id) {
         super(id, Material.rock);
         setHardness(2.0F);
@@ -25,7 +25,7 @@ public class BlockResource extends Block {
     public static final int glaze_md_start = 17; 
     
     @Override
-    public void registerIcons(IconRegister reg) {
+    public void registerIIcons(IIconRegister reg) {
         for (ResourceType rt : ResourceType.values()) {
             if (rt.texture == null) {
                 continue;
@@ -35,13 +35,13 @@ public class BlockResource extends Block {
         for (BasicGlazes glaze : BasicGlazes.values()) {
             glaze.icon = Core.texture(reg, "ceramics/glaze/" + glaze.name());
         }
-        Core.registry.steamFluid.setIcons(BlockIcons.steam);
+        Core.registry.steamFluid.setIIcons(BlockIcons.steam);
     }
 
     
     boolean done_spam = false;
     @Override
-    public Icon getIcon(int side, int md) {
+    public IIcon getIIcon(int side, int md) {
         if (md >= glaze_md_start) {
             int off = md - glaze_md_start;
             if (off < BasicGlazes.values.length) {

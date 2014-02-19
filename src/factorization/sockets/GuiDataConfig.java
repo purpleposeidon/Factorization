@@ -14,7 +14,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 
 import org.lwjgl.input.Keyboard;
 
@@ -365,14 +365,14 @@ public class GuiDataConfig extends GuiScreen {
         TextureManager tex = Minecraft.getMinecraft().renderEngine;
         tex.bindTexture(Core.itemAtlas);
         
-        Icon lmp = Core.registry.logicMatrixProgrammer.getIconFromDamage(0);
+        IIcon lmp = Core.registry.logicMatrixProgrammer.getIIconFromDamage(0);
         
         int w = 256;
         int xSize = w, ySize = xSize;
         int left = (width - 6) / 2;
         int top = (height - ySize) / 2;
         
-        drawTexturedModelRectFromIcon(left, top, lmp, xSize, ySize);
+        drawTexturedModelRectFromIIcon(left, top, lmp, xSize, ySize);
         
         for (Field field : fields) {
             field.render(mouseX, mouseY);

@@ -7,10 +7,10 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.astro.TileEntityRocketEngine;
 import factorization.ceramics.TileEntityGreenware;
@@ -64,8 +64,8 @@ public class ItemFactorizationBlock extends ItemBlock {
     }
 
     @Override
-    public Icon getIconFromDamage(int damage) {
-        return Core.registry.factory_block.getIcon(0, damage);
+    public IIcon getIIconFromDamage(int damage) {
+        return Core.registry.factory_block.getIIcon(0, damage);
     }
 
     @Override

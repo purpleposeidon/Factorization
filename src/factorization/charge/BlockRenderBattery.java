@@ -3,7 +3,7 @@ package factorization.charge;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraftforge.client.IItemRenderer.ItemRenderType;
 
 import org.lwjgl.opengl.GL11;
@@ -68,8 +68,8 @@ public class BlockRenderBattery extends FactorizationBlockRender {
         tes.setColorOpaque_F(color, fullness, fullness);
         
         BlockRenderHelper block = BlockRenderHelper.instance;
-        //Icon meter = BlockIcons.battery_meter;
-        Icon meter = BlockIcons.battery_meter;
+        //IIcon meter = BlockIcons.battery_meter;
+        IIcon meter = BlockIcons.battery_meter;
         block.useTextures(null, null, meter, meter, meter, meter);
         block.setBlockBounds(0 - d, 0, 0 - d, 1 + d, h, 1 + d);
         if (world_mode) {

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.datahelpers.DataHelper;

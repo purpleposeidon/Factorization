@@ -3,11 +3,11 @@ package factorization.sockets;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -64,16 +64,16 @@ public class ItemSocketPart extends ItemFactorization {
     }
     
     @SideOnly(Side.CLIENT)
-    Icon[] socketIcons;
+    IIcon[] socketIIcons;
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerIcons(IconRegister register) {
-        socketIcons = new Icon[FactoryType.MAX_ID];
+    public void registerIIcons(IIconRegister register) {
+        socketIIcons = new IIcon[FactoryType.MAX_ID];
         ItemStack me = new ItemStack(this);
         for (FactoryType ft : getSockets()) {
             me.setItemDamage(ft.md);
-            socketIcons[ft.md] = register.registerIcon(getUnlocalizedName(me).replace("item.", ""));
+            socketIIcons[ft.md] = register.registerIIcon(getUnlocalizedName(me).replace("item.", ""));
         }
     }
     
@@ -96,11 +96,11 @@ public class ItemSocketPart extends ItemFactorization {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIconFromDamage(int md) {
-        if (md > 0 && md < socketIcons.length) {
-            return socketIcons[md];
+    public IIcon getIIconFromDamage(int md) {
+        if (md > 0 && md < socketIIcons.length) {
+            return socketIIcons[md];
         }
-        return super.getIconFromDamage(md);
+        return super.getIIconFromDamage(md);
     }
     
     @Override

@@ -9,7 +9,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiErrorScreen;
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.creativetab.CreativeTabs;
@@ -18,7 +18,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatMessageComponent;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.ForgeVersion;
@@ -300,7 +300,7 @@ public class Core {
     
     public static CreativeTabs tabFactorization = new CreativeTabs("factorizationTab") {
         @Override
-        public Item getTabIconItem() {
+        public Item getTabIIconItem() {
             return registry.logicMatrixProgrammer;
         }
     };
@@ -408,9 +408,9 @@ public class Core {
     }
     
     @SideOnly(Side.CLIENT)
-    public static Icon texture(IconRegister reg, String name) {
+    public static IIcon texture(IIconRegister reg, String name) {
         name = name.replace('.', '/');
-        return reg.registerIcon(texture_dir + name);
+        return reg.registerIIcon(texture_dir + name);
     }
     
     public final static String texture_dir = "factorization:";
@@ -423,7 +423,7 @@ public class Core {
     
     public static final ResourceLocation blockAtlas = new ResourceLocation("textures/atlas/blocks.png");
     public static final ResourceLocation itemAtlas = new ResourceLocation("textures/atlas/items.png");
-    public static Icon blockMissingIcon, itemMissingIcon;
+    public static IIcon blockMissingIIcon, itemMissingIIcon;
     
     public static ResourceLocation getResource(String name) {
         return new ResourceLocation("factorization", name);

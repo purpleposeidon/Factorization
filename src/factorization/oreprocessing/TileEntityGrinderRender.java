@@ -16,7 +16,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
 
 import org.lwjgl.opengl.GL11;
@@ -27,7 +27,7 @@ import factorization.shared.Core;
 public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
     public static class DiamondModel {
         TexturedQuad quads[] = new TexturedQuad[4];
-        Icon diamond = Block.blockDiamond.getBlockTextureFromSide(0);
+        IIcon diamond = Block.blockDiamond.getBlockTextureFromSide(0);
         
         float near = 2F / 32F, far = 5F / 32F, point = -18F / 32F;
         float u_edge = 0; //diamond.getWidth()/16;

@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 
 import org.lwjgl.opengl.GL11;
 
@@ -57,7 +57,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             float g = (float) (var18 >> 8 & 255) / 255.0F;
             float b = (float) (var18 & 255) / 255.0F;
             GL11.glColor4f(r, g, b, 1.0F);
-            FactorizationBlockRender.renderItemIcon(crys.growing_crystal.getIconIndex());
+            FactorizationBlockRender.renderItemIIcon(crys.growing_crystal.getIIconIndex());
             glPopMatrix();
         }
 
@@ -66,7 +66,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             glEnable(GL_BLEND);
             ItemStack sol = crys.solution;
             Tessellator tess = Tessellator.instance;
-            Icon tex = Block.waterMoving.getBlockTextureFromSide(1);
+            IIcon tex = Block.waterMoving.getBlockTextureFromSide(1);
             if (sol.getItem() == Core.registry.acid) {
                 if (sol.getItemDamage() > 0) {
                     tex = Block.lavaMoving.getBlockTextureFromSide(0);

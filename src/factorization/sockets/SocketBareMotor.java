@@ -7,7 +7,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
@@ -52,7 +52,7 @@ public class SocketBareMotor extends TileEntitySocketBase {
         BlockRenderHelper block = BlockRenderHelper.instance;
         Quaternion rotation = Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite()));
         {
-            Icon metal = BlockIcons.motor_texture;
+            IIcon metal = BlockIcons.motor_texture;
             float d = 4.0F / 16.0F;
             float yd = -d + 0.003F;
     

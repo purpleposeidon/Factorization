@@ -6,8 +6,8 @@ import java.io.IOException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Charge;
 import factorization.api.IChargeConductor;
 import factorization.common.BlockIcons;
@@ -34,7 +34,7 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     }
     
     @Override
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIIcon(ForgeDirection dir) {
         switch (dir) {
         case UP: return BlockIcons.battery_top;
         case DOWN: return BlockIcons.battery_bottom;

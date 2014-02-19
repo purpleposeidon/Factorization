@@ -5,10 +5,10 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialTransparent;
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import factorization.api.Coord;
@@ -61,10 +61,10 @@ public class BlockLightAir extends Block {
     }
     
     @Override
-    public void registerIcons(IconRegister reg) { }
+    public void registerIIcons(IIconRegister reg) { }
     
     @Override
-    public Icon getIcon(int side, int md) {
+    public IIcon getIIcon(int side, int md) {
         if (FzConfig.debug_light_air) {
             return Block.glowStone.getBlockTextureFromSide(0);
         }

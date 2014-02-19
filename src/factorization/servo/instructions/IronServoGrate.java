@@ -1,8 +1,8 @@
 package factorization.servo.instructions;
 
 import net.minecraft.block.Block;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.shared.Core;
 
 public class IronServoGrate extends WoodenServoGrate {
@@ -12,7 +12,7 @@ public class IronServoGrate extends WoodenServoGrate {
     }
     
     @Override
-    public Icon getIcon(ForgeDirection side) {
+    public IIcon getIIcon(ForgeDirection side) {
         return Block.fenceIron.getBlockTextureFromSide(2);
     }
     

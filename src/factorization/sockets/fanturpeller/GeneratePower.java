@@ -3,7 +3,7 @@ package factorization.sockets.fanturpeller;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.BlockFluidFinite;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;

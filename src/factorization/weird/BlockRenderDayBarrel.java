@@ -4,8 +4,8 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
@@ -41,7 +41,7 @@ public class BlockRenderDayBarrel extends FactorizationBlockRender {
     
     void doRender(RenderBlocks rb, int pass) {
         BlockRenderHelper block = Core.registry.blockRender;
-        Icon plank, log;
+        IIcon plank, log;
         TileEntityDayBarrel barrel;
         if (world_mode) {
             barrel = getCoord().getTE(TileEntityDayBarrel.class);
@@ -54,7 +54,7 @@ public class BlockRenderDayBarrel extends FactorizationBlockRender {
         }
         if (pass == 0) {
             for (int i = 0; i < 6; i++) {
-                block.setTexture(i, barrel.getIcon(ForgeDirection.getOrientation(i)));
+                block.setTexture(i, barrel.getIIcon(ForgeDirection.getOrientation(i)));
             }
         } else {
             BlockIcons.BarrelTextureset set;
