@@ -265,6 +265,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
             return;
         }
         ItemStack is = back.pullWithLimit(1);
+        back.onInvChanged();
         if (is == null) {
             dropDelay = 20*6;
             return;

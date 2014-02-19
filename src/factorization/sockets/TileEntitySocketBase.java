@@ -16,6 +16,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Icon;
@@ -25,6 +26,7 @@ import net.minecraftforge.common.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.common.network.FMLNetworkHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -39,6 +41,7 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.servo.LoggerDataHelper;
+import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
@@ -442,6 +445,8 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         } else if (socket instanceof ServoMotor) {
             ServoMotor motor = (ServoMotor) socket;
             motor.socket = replacement;
+            Packet p = FMLNetworkHandler.getEntitySpawningPacket((ServoMotor) socket);
+            Core.network.broadcastPacket(worldObj, xCoord, yCoord, zCoord, p);
         }
         //Core.network.broadcastPacket(null, at, replacement.getDescriptionPacket());
     }
@@ -501,5 +506,14 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         tess.draw();
         GL11.glTranslatef(-d, -y, -d);
         GL11.glEnable(GL_LIGHTING);
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public void renderItemOnServo(RenderServoMotor render, ServoMotor motor, ItemStack is, float partial) {
+        GL11.glPushMatrix();
+        GL11.glTranslatef(6.5F/16F, 4.5F/16F, 0);
+        GL11.glRotatef(90, 0, 1, 0);
+        render.renderItem(is);
+        GL11.glPopMatrix();
     }
 }

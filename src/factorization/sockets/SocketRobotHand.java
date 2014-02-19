@@ -2,6 +2,8 @@ package factorization.sockets;
 
 import java.io.IOException;
 
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.EntityLiving;
@@ -26,6 +28,7 @@ import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.notify.Notify;
+import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
@@ -257,5 +260,16 @@ public class SocketRobotHand extends TileEntitySocketBase {
             Notify.send(this, "Missing inventory block");
         }
         return false;
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void renderItemOnServo(RenderServoMotor render, ServoMotor motor, ItemStack is, float partial) {
+        GL11.glPushMatrix();
+        GL11.glTranslatef(-1F/16F, 12F/16F, 0);
+        GL11.glRotatef(90, 0, 1, 0);
+        GL11.glRotatef(45, 1, 0, 0);
+        render.renderItem(is);
+        GL11.glPopMatrix();
     }
 }

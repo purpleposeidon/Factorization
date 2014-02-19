@@ -28,6 +28,7 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
+import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
@@ -281,7 +282,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
             }
             
             if (fanω != lastfanω /*FzUtil.significantChange(fanω, lastfanω)*/) {
-                socket.sendMessage(MessageType.FanturpellerSpeed, fanω);
+                socket.sendMessage(MessageType.FanturpellerSpeed, fanω, isSucking);
                 lastfanω = fanω;
             }
         }
@@ -387,5 +388,17 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
     @Override
     public Packet getDescriptionPacket() {
         return getDescriptionPacketWith(MessageType.FanturpellerSpeed, fanω, isSucking);
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void renderItemOnServo(RenderServoMotor render, ServoMotor motor, ItemStack is, float partial) {
+        GL11.glPushMatrix();
+        
+        GL11.glTranslatef(8F/16F, 1F/16F, 0);
+        GL11.glRotatef(90, 0, 1, 0);
+        
+        render.renderItem(is);
+        GL11.glPopMatrix();
     }
 }
