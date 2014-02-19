@@ -142,7 +142,7 @@ public class MiscClientProxy extends MiscProxy {
             @Override
             public void tickStart(EnumSet<TickType> type, Object... tickData) {
                 MiscClientCommands.tick();
-                if (!mc.gameSettings.keyBindPickBlock.pressed) {
+                if (!mc.gameSettings.keyBindPickBlocks.pressed) {
                     wasClicked = false;
                     return;
                 }

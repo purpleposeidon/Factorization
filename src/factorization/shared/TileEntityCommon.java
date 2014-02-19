@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -130,7 +131,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     }
 
     public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {
-        return Block.stone.collisionRayTrace(worldObj, xCoord, yCoord, zCoord, startVec, endVec);
+        return Blocks.stone.collisionRayTrace(worldObj, xCoord, yCoord, zCoord, startVec, endVec);
     }
 
     public void setBlockBounds(Block b) {

@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.world.ChunkDataEvent;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -50,22 +51,23 @@ public class WorldgenManager {
         if (FzConfig.gen_dark_iron_ore) {
             darkIronGen = new IWorldGenerator() {
                 int x, z;
-                int stoneId, stoneMd;
+                Block stoneId;
+                int stoneMd;
                 int setBlockFlags = 0;
                 
                 void set(World world, int dx, int y, int dz) {
-                    world.setBlock(x + dx, y, z + dz, Core.registry.dark_iron_ore.blockID, 0, setBlockFlags);
+                    world.setBlock(x + dx, y, z + dz, Core.registry.dark_iron_ore, 0, setBlockFlags);
                 }
                 
                 void clear(World world, int dx, int y, int dz) {
-                    if (world.getBlockId(x + dx, y, z + dz) == Block.bedrock.blockID) {
+                    if (world.getBlock(x + dx, y, z + dz) == Blocks.bedrock) {
                         world.setBlock(x + dx, y, z + dz, stoneId, stoneMd, setBlockFlags);
                     }
                 }
                 
                 void fracture(World world, int dx, int y, int dz) {
-                    if (world.getBlockId(x + dx, y, z + dz) == Block.bedrock.blockID) {
-                        world.setBlock(x + dx, y, z + dz, Core.registry.fractured_bedrock_block.blockID, 0, setBlockFlags);
+                    if (world.getBlock(x + dx, y, z + dz) == Blocks.bedrock) {
+                        world.setBlock(x + dx, y, z + dz, Core.registry.fractured_bedrock_block, 0, setBlockFlags);
                     }
                 }
                 
@@ -118,17 +120,17 @@ public class WorldgenManager {
                         x = chunkX*16 + random.nextInt(16);
                         z = chunkZ*16 + random.nextInt(16);
                     }
-                    if (world.getBlockId(x, 0, z) != Block.bedrock.blockID) {
+                    if (world.getBlockId(x, 0, z) != Blocks.bedrock.blockID) {
                         return;
                     }
-                    Block stoneBlock = Block.blocksList[world.getBlockId(x, 1, z)];
+                    Block stoneBlock = Blocks.blocksList[world.getBlockId(x, 1, z)];
                     if (stoneBlock == null) {
                         return;
                     }
-                    if (!stoneBlock.isGenMineableReplaceable(world, x, 1, z, Block.stone.blockID)) {
+                    if (!stoneBlocks.isGenMineableReplaceable(world, x, 1, z, Blocks.stone.blockID)) {
                         return;
                     }
-                    stoneId = stoneBlock.blockID;
+                    stoneId = stoneBlocks.blockID;
                     stoneMd = world.getBlockMetadata(x, 1, z);
                     
                     //The spike

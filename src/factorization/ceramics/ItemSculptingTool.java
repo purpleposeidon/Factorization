@@ -3,6 +3,7 @@ package factorization.ceramics;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -187,7 +188,7 @@ public class ItemSculptingTool extends ItemFactorization {
                     if (it.getItem() == Item.clay) {
                         materialCount += it.stackSize;
                     }
-                    if (it.itemID == Block.woodSingleSlab.blockID) {
+                    if (it.itemID == Blocks.woodSingleSlab.blockID) {
                         hasSlab = true;
                     }
                 }
@@ -195,7 +196,7 @@ public class ItemSculptingTool extends ItemFactorization {
                     Notify.send(player, here, "Need wood slab\nAnd %s clay", "" + neededClay); //TODO: Localize properly
                     return false;
                 }
-                inv.pull(FzUtil.makeWildcard(Block.woodSingleSlab), 1, false);
+                inv.pull(FzUtil.makeWildcard(Blocks.woodSingleSlab), 1, false);
                 inv.pull(new ItemStack(Item.clay), gw.parts.size(), false);
             }
             TileEntityGreenware rep = (TileEntityGreenware) FactoryType.CERAMIC.getRepresentative();

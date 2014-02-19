@@ -3,6 +3,7 @@ package factorization.servo.instructions;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -25,7 +26,7 @@ public class WoodenServoGrate extends Decorator {
 
     @Override
     public IIcon getIIcon(ForgeDirection side) {
-        return Block.trapdoor.getBlockTextureFromSide(0);
+        return Blocks.trapdoor.getBlockTextureFromSide(0);
     }
 
     @Override
@@ -55,6 +56,6 @@ public class WoodenServoGrate extends Decorator {
                 "#-#",
                 " # ",
                 '-', Core.registry.servorail_item,
-                '#', Block.trapdoor);
+                '#', Blocks.trapdoor);
     }
 }

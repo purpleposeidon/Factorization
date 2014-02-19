@@ -3,6 +3,7 @@ package factorization.shared;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
@@ -39,12 +40,12 @@ public class ItemBlockProxy extends ItemFactorization {
     {
         int var11 = par3World.getBlockId(par4, par5, par6);
 
-        if (var11 == Block.snow.blockID)
+        if (var11 == Blocks.snow.blockID)
         {
             par7 = 1;
         }
-        else if (var11 != Block.vine.blockID && var11 != Block.tallGrass.blockID && var11 != Block.deadBush.blockID
-                && (Block.blocksList[var11] == null || !Block.blocksList[var11].isBlockReplaceable(par3World, par4, par5, par6)))
+        else if (var11 != Blocks.vine.blockID && var11 != Blocks.tallGrass.blockID && var11 != Blocks.deadBush.blockID
+                && (Blocks.blocksList[var11] == null || !Blocks.blocksList[var11].isBlockReplaceable(par3World, par4, par5, par6)))
         {
             if (par7 == 0)
             {
@@ -85,15 +86,15 @@ public class ItemBlockProxy extends ItemFactorization {
         {
             return false;
         }
-        else if (par5 == 255 && Block.blocksList[this.blockID].blockMaterial.isSolid())
+        else if (par5 == 255 && Blocks.blocksList[this.blockID].blockMaterial.isSolid())
         {
             return false;
         }
         else if (par3World.canPlaceEntityOnSide(this.blockID, par4, par5, par6, false, par7, /*par2EntityPlayer*/ null /* Changed to null in 1.6.2. Was previously the player. And sometime before that was null. Like, seriously, wtf? */, par1ItemStack))
         {
-            Block block = Block.blocksList[this.blockID];
+            Block block = Blocks.blocksList[this.blockID];
             int j1 = this.getMetadata(par1ItemStack.getItemDamage());
-            int k1 = Block.blocksList[this.blockID].onBlockPlaced(par3World, par4, par5, par6, par7, par8, par9, par10, j1);
+            int k1 = Blocks.blocksList[this.blockID].onBlockPlaced(par3World, par4, par5, par6, par7, par8, par9, par10, j1);
 
             if (placeBlockAt(par1ItemStack, par2EntityPlayer, par3World, par4, par5, par6, par7, par8, par9, par10, k1))
             {

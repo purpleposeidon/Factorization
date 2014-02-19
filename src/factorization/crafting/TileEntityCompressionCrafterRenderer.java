@@ -3,6 +3,7 @@ package factorization.crafting;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
@@ -202,7 +203,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
             for (int x = lowerCorner.x; x <= upperCorner.x; x++) {
                 for (int y = lowerCorner.y; y <= upperCorner.y; y++) {
                     for (int z = lowerCorner.z; z <= upperCorner.z; z++) {
-                        Block b = Block.blocksList[w.getBlockId(x, y, z)];
+                        Block b = w.getBlock(x, y, z);
                         if (b == null) {
                             if (renderPass == 3) {
                                 if (contentSize == null) {

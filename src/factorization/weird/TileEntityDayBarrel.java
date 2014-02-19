@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.enchantment.Enchantment;
@@ -54,8 +55,8 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     private ItemStack topStack;
     private int middleCount;
     private ItemStack bottomStack;
-    private static final ItemStack DEFAULT_LOG = new ItemStack(Block.wood);
-    private static final ItemStack DEFAULT_SLAB = new ItemStack(Block.planks);
+    private static final ItemStack DEFAULT_LOG = new ItemStack(Blocks.wood);
+    private static final ItemStack DEFAULT_SLAB = new ItemStack(Blocks.planks);
     public ItemStack woodLog = DEFAULT_LOG.copy(), woodSlab = DEFAULT_SLAB.copy();
     int display_list = -1;
     boolean should_use_display_list = true;
@@ -952,7 +953,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             info(entityplayer);
             return;
         }
-        if (ForgeHooks.canToolHarvestBlock(Block.wood, 0, entityplayer.getHeldItem())) {
+        if (ForgeHooks.canToolHarvestBlock(Blocks.wood, 0, entityplayer.getHeldItem())) {
             return;
         }
         
@@ -1019,15 +1020,15 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     @SideOnly(Side.CLIENT)
     public IIcon getIIcon(ForgeDirection dir) {
         if (dir.offsetY != 0) {
-            if (woodSlab.itemID < Block.blocksList.length && Block.blocksList[woodSlab.itemID] != null) {
-                Block b = Block.blocksList[woodSlab.itemID];
+            if (woodSlab.itemID < Blocks.blocksList.length && Blocks.blocksList[woodSlab.itemID] != null) {
+                Block b = Blocks.blocksList[woodSlab.itemID];
                 return b.getIIcon(0, woodSlab.getItemDamage());
             }
             return woodSlab.getItem().getIIcon(woodSlab, 0);
         }
         Item theItem = woodLog.getItem();
         if (theItem instanceof ItemBlock) {
-            Block b = Block.blocksList[((ItemBlock) theItem).getBlockID()];
+            Block b = Blocks.blocksList[((ItemBlock) theItem).getBlockID()];
             return b.getIIcon(2, woodLog.getItemDamage());
         }
         return theItem.getIIcon(woodLog, 2);
@@ -1082,7 +1083,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     static {
-        make(Type.CREATIVE, new ItemStack(Block.bedrock), new ItemStack(Block.blockDiamond));
+        make(Type.CREATIVE, new ItemStack(Blocks.bedrock), new ItemStack(Blocks.blockDiamond));
     }
     
     static ItemStack silkTouch = Item.enchantedBook.getEnchantedItemStack(new EnchantmentData(Enchantment.silkTouch, 1));
@@ -1100,20 +1101,20 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
                 "XXX",
                 "XOX",
                 "XXX",
-                'X', Block.web,
+                'X', Blocks.web,
                 'O', normal);
         Core.registry.recipe(make(Type.HOPPING, log, slab),
                 "Y",
                 "0",
                 "Y",
-                'Y', Block.hopperBlock,
+                'Y', Blocks.hopperBlock,
                 '0', normal);
         Core.registry.recipe(make(Type.LARGER, log, slab),
                 "0",
                 "Y",
                 "0",
                 '0', normal,
-                'Y', Block.hopperBlock);
+                'Y', Blocks.hopperBlock);
         Core.registry.recipe(make(Type.STICKY, log, slab),
                 "*",
                 "0",

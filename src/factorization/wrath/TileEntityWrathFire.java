@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.block.material.Material;
 import net.minecraft.nbt.NBTTagCompound;
@@ -106,13 +107,13 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
     }
 
     static BlockMatch air = new BlockMatch(0, -1);
-    static BlockMatch fire = new BlockMatch(Block.fire);
-    static BlockMatch netherBrick = new BlockMatch(Block.netherBrick);
-    static BlockMatch netherFence = new BlockMatch(Block.netherFence);
-    static BlockMatch netherStair = new BlockMatch(Block.stairsNetherBrick);
-    static BlockMatch netherSlab = new BlockMatch(Block.stoneSingleSlab, 6);
-    static BlockMatch netherSlabUp = new BlockMatch(Block.stoneSingleSlab, 0x8 | 6);
-    static BlockMatch netherDoubleSlab = new BlockMatch(Block.stoneDoubleSlab, 6);
+    static BlockMatch fire = new BlockMatch(Blocks.fire);
+    static BlockMatch netherBrick = new BlockMatch(Blocks.netherBrick);
+    static BlockMatch netherFence = new BlockMatch(Blocks.netherFence);
+    static BlockMatch netherStair = new BlockMatch(Blocks.stairsNetherBrick);
+    static BlockMatch netherSlab = new BlockMatch(Blocks.stoneSingleSlab, 6);
+    static BlockMatch netherSlabUp = new BlockMatch(Blocks.stoneSingleSlab, 0x8 | 6);
+    static BlockMatch netherDoubleSlab = new BlockMatch(Blocks.stoneDoubleSlab, 6);
 
     public static void burn(Object key) {
         burn(key, air);
@@ -120,8 +121,8 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
 
     public static void setupBurning() {
         //removals
-        for (int i = 0; i < Block.blocksList.length; i++) {
-            Block block = Block.blocksList[i];
+        for (int i = 0; i < Blocks.blocksList.length; i++) {
+            Block block = Blocks.blocksList[i];
             if (block == null) {
                 continue;
             }
@@ -139,25 +140,25 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
 
         //TODO: Netherrack should be a special case...
         //And maybe netherbrick for that matter...? Brick decrease generation count, rack decreases age...?
-        //burn(Block.netherrack);
-        burn(Block.ice);
-        burn(Block.netherBrick, Block.netherBrick);
+        //burn(Blocks.netherrack);
+        burn(Blocks.ice);
+        burn(Blocks.netherBrick, Blocks.netherBrick);
 
         //reversibles
-        burn(Block.sand, Block.glass);
-        burn(Block.glass, Block.sand);
-        burn(Block.grass, Block.dirt);
-        burn(Block.obsidian, Block.lavaMoving); //undo with water bucket or Wand of Cooling
-        burn(Block.cobblestone, Block.stone);
-        burn(Block.stone, Block.cobblestone);
-        burn(new BlockMatch(Block.stoneBrick, 0x0), new BlockMatch(Block.stoneBrick, 0x2)); //normal to cracked
-        burn(new BlockMatch(Block.stoneBrick, 0x2), new BlockMatch(Block.stoneBrick, 0x0)); //cracked to normal
+        burn(Blocks.sand, Blocks.glass);
+        burn(Blocks.glass, Blocks.sand);
+        burn(Blocks.grass, Blocks.dirt);
+        burn(Blocks.obsidian, Blocks.lavaMoving); //undo with water bucket or Wand of Cooling
+        burn(Blocks.cobblestone, Blocks.stone);
+        burn(Blocks.stone, Blocks.cobblestone);
+        burn(new BlockMatch(Blocks.stoneBrick, 0x0), new BlockMatch(Blocks.stoneBrick, 0x2)); //normal to cracked
+        burn(new BlockMatch(Blocks.stoneBrick, 0x2), new BlockMatch(Blocks.stoneBrick, 0x0)); //cracked to normal
 
         //demossing
-        burn(new BlockMatch(Block.stoneBrick, 0x1), new BlockMatch(Block.stoneBrick, 0x0)); //mossy to normal
-        burn(Block.cobblestoneMossy, Block.cobblestone);
+        burn(new BlockMatch(Blocks.stoneBrick, 0x1), new BlockMatch(Blocks.stoneBrick, 0x0)); //mossy to normal
+        burn(Blocks.cobblestoneMossy, Blocks.cobblestone);
 
-        burn(Block.blockIron, new BlockMatch(Core.registry.resource_block, ResourceType.DARKIRONBLOCK.md));
+        burn(Blocks.blockIron, new BlockMatch(Core.registry.resource_block, ResourceType.DARKIRONBLOCK.md));
         //burn(new BlockMatch(Core.registry.resource_block, ResourceType.SILVERBLOCK.md), new BlockMatch(Core.registry.resource_block, ResourceType.LEADBLOCK.md));
 
     }
@@ -298,7 +299,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
         }
         Coord here = getCoord();
 
-        //if (host.id == Block.netherBrick.blockID) {
+        //if (host.id == Blocks.netherBrick.blockID) {
         if (netherBrick.equals(host) || netherStair.equals(host) || netherFence.equals(host) || netherSlab.equals(host) || netherSlabUp.equals(host) || netherDoubleSlab.equals(host)) {
             //wrath forge
             int furnace_size = 13;
@@ -320,7 +321,7 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
             //burn neighbors
             ArrayList<Coord> n = here.getRandomNeighborsAdjacent();
             for (Coord c : n) {
-                if (c.is(Block.netherBrick)) {
+                if (c.is(Blocks.netherBrick)) {
                     continue;
                 }
                 for (BlockMatch match : transforms.keySet()) {
@@ -392,8 +393,8 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
     }
 
     public static void ignite(Coord baseBlock, Coord fireBlock, EntityPlayer player) {
-        fireBlock.setIdMd(Core.registry.lightair_block.blockID, BlockLightAir.fire_md);
-        TileEntityWrathFire fire = fireBlock.getTE(TileEntityWrathFire.class);
+        fireBlocks.setIdMd(Core.registry.lightair_block.blockID, BlockLightAir.fire_md);
+        TileEntityWrathFire fire = fireBlocks.getTE(TileEntityWrathFire.class);
         if (fire == null) {
             return;
         }
@@ -401,10 +402,10 @@ public class TileEntityWrathFire extends TileEntity implements ICoord {
             //This doesn't need to be logged.
         }
         else {
-            if (!fireBlock.w.isRemote) {
+            if (!fireBlocks.w.isRemote) {
                 Core.logInfo("Wrath Igniter used at " + fireBlock + " by '" + player.username + "'");
             }
         }
-        fire.setTarget(baseBlock.getId(), baseBlock.getMd());
+        fire.setTarget(baseBlocks.getId(), baseBlocks.getMd());
     }
 }

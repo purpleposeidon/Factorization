@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
@@ -70,7 +71,7 @@ public class FactorizationOreProcessingHandler {
             FurnaceRecipes.smelting().addSmelting(is.itemID, is.getItemDamage(), ingot, xp);
         }
         if (oreType != OreType.SILVER) {
-            TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.1F, ingot, 0.2F, Block.dirt);
+            TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.1F, ingot, 0.2F, Blocks.dirt);
             //Or it could output reduced chunks instead.
         }
     }

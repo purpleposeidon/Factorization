@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.particle.EntityFX;
@@ -373,9 +374,8 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             progress = 0;
             return true;
         } else if (mop.typeOfHit == EnumMovingObjectType.TILE) {
-            int id = worldObj.getBlockId(mop.blockX, mop.blockY, mop.blockZ);
-            Block block = Block.blocksList[id];
-            if (block == null || block.isAirBlock(worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
+            Block block = worldObj.getBlock(mop.blockX, mop.blockY, mop.blockZ);
+            if (block == null || block.isAir(worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
                 return false;
             }
             TileEntity te = null;
@@ -442,7 +442,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
 
                         boolean didRemove = removeBlock(player, block, md, mop.blockX, mop.blockY, mop.blockZ);
                         if (didRemove && canHarvest) {
-                            Block.blocksList[id].harvestBlock(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, md);
+                            Blocks.blocksList[id].harvestBlock(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, md);
                         }
                     }
                     block.onBlockHarvested(worldObj, mop.blockX, mop.blockY, mop.blockZ, md, player);
@@ -564,9 +564,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         facey = py + 0.5 + 0.5*op.offsetY;
         facez = pz + 0.5 + 0.5*op.offsetZ;
         
-        int id = worldObj.getBlockId(px, py, pz);
-        
-        Block b = Block.blocksList[id];
+        Block b = worldObj.getBlock(px, py, pz);
         if (b == null) {
             return;
         }

@@ -2,6 +2,7 @@ package factorization.oreprocessing;
 
 import static org.lwjgl.opengl.GL11.*;
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -66,10 +67,10 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             glEnable(GL_BLEND);
             ItemStack sol = crys.solution;
             Tessellator tess = Tessellator.instance;
-            IIcon tex = Block.waterMoving.getBlockTextureFromSide(1);
+            IIcon tex = Blocks.waterMoving.getBlockTextureFromSide(1);
             if (sol.getItem() == Core.registry.acid) {
                 if (sol.getItemDamage() > 0) {
-                    tex = Block.lavaMoving.getBlockTextureFromSide(0);
+                    tex = Blocks.lavaMoving.getBlockTextureFromSide(0);
                     glColor4f(0.5F, 0.7F, 0F, 0.25F);
                 } else {
                     glColor4f(1F, 0.7F, 0F, 0.5F);

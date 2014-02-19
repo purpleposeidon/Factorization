@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -169,7 +170,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
 
     boolean isLiquid(Coord at) {
         final Block block = at.getBlock();
-        if (block == Block.waterStill || block == Block.waterMoving || block == Block.lavaStill || block == Block.lavaMoving) {
+        if (block == Blocks.waterStill || block == Blocks.waterMoving || block == Blocks.lavaStill || block == Blocks.lavaMoving) {
             return at.getMd() == 0;
         }
         if (block instanceof IFluidBlock) {

@@ -78,7 +78,7 @@ public class ItemFactorizationBlock extends ItemBlock {
     public String getUnlocalizedName(ItemStack is) {
         int md = is.getItemDamage();
         FactoryType ft = FactoryType.fromMd(md);
-        return "factorization.factoryBlock." + ft;
+        return "factorization.factoryBlocks." + ft;
     }
 
     @Override
@@ -102,7 +102,7 @@ public class ItemFactorizationBlock extends ItemBlock {
                 perc = (int)(jar.getLevel()*100);
                 //infoList.add(( + "% charged"));
             }
-            infoList.add(StatCollector.translateToLocalFormatted("factorization.factoryBlock.LEYDENJAR.perc", perc));
+            infoList.add(StatCollector.translateToLocalFormatted("factorization.factoryBlocks.LEYDENJAR.perc", perc));
         }
         Core.brand(is, player, infoList, verbose);
     }

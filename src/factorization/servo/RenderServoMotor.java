@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.model.ModelBiped;
@@ -388,8 +389,8 @@ public class RenderServoMotor extends RenderEntity {
         // Pre-emptively undo transformations that the item renderer does so
         // that we don't get a stupid angle. Minecraft render code is terrible.
         boolean needRotationFix = true;
-        if (is.getItem() instanceof ItemBlock && is.itemID < Block.blocksList.length) {
-            Block block = Block.blocksList[is.itemID];
+        if (is.getItem() instanceof ItemBlock && is.itemID < Blocks.blocksList.length) {
+            Block block = Blocks.blocksList[is.itemID];
             if (block != null && RenderBlocks.renderItemIn3d(block.getRenderType())) {
                 needRotationFix = false;
             }

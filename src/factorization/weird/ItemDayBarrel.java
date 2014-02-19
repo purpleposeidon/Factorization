@@ -34,11 +34,11 @@ public class ItemDayBarrel extends ItemBlockProxy {
     @Override
     public String getItemDisplayName(ItemStack is) {
         Type upgrade = TileEntityDayBarrel.getUpgrade(is);
-        String lookup = "factorization.factoryBlock.DAYBARREL.format";
+        String lookup = "factorization.factoryBlocks.DAYBARREL.format";
         if (upgrade != Type.NORMAL) {
-            lookup = "factorization.factoryBlock.DAYBARREL.format2";
+            lookup = "factorization.factoryBlocks.DAYBARREL.format2";
         }
-        String type = Core.translate("factorization.factoryBlock.DAYBARREL." + upgrade);
+        String type = Core.translate("factorization.factoryBlocks.DAYBARREL." + upgrade);
         return Core.translateWithCorrectableFormat(lookup, type, TileEntityDayBarrel.getLog(is).getDisplayName());
     }
     
@@ -46,7 +46,7 @@ public class ItemDayBarrel extends ItemBlockProxy {
     protected void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         Type upgrade = TileEntityDayBarrel.getUpgrade(is);
         if (upgrade == Type.SILKY) {
-            list.add(Core.translateThis("factorization.factoryBlock.DAYBARREL.SILKY.silkhint"));
+            list.add(Core.translateThis("factorization.factoryBlocks.DAYBARREL.SILKY.silkhint"));
         }
     }
     

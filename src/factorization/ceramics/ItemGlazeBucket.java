@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -41,7 +42,7 @@ public class ItemGlazeBucket extends ItemFactorization {
             return getIIconFromDamage(0);
         }
         int id = getBlockId(is);
-        Block block = Block.blocksList[id];
+        Block block = Blocks.blocksList[id];
         if (block == null) {
             return BlockIcons.uv_test;
             //Or could return the error icon.
@@ -188,11 +189,11 @@ public class ItemGlazeBucket extends ItemFactorization {
         if (FzUtil.getTag(is).getBoolean("fake")) {
             return false;
         }
-        return Block.blocksList[getBlockId(is)] != null;
+        return Blocks.blocksList[getBlockId(is)] != null;
     }
     
     ItemStack getSource(ItemStack is) {
-        Block b = Block.blocksList[getBlockId(is)];
+        Block b = Blocks.blocksList[getBlockId(is)];
         if (b ==  null) {
             return null;
         }

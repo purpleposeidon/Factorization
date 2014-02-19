@@ -17,11 +17,11 @@ public class BlockHelper
         UNDECIDED,
         // Do not return an ItemStack.
         NOTHING,
-        // Call Block.getDamageValue to get the ItemStack
+        // Call Blocks.getDamageValue to get the ItemStack
         USE_GET_DAMAGE_VALUE,
-        // Call Block.idDropped to get the ItemStack
+        // Call Blocks.idDropped to get the ItemStack
         USE_ID_DROPPED,
-        // Return the first thing from Block.getBlockDropped.
+        // Return the first thing from Blocks.getBlockDropped.
         USE_GET_BLOCK_DROPPED,
         // Return the block with its metadata
         CLONE_MD,
@@ -46,19 +46,19 @@ public class BlockHelper
     {
         // These blocks don't have a good way of extracting the item,
         // so no instanceof.
-        if (block == Block.cake)
+        if (block == Blocks.cake)
         {
             return CAKE;
         }
-        if (block == Block.oreRedstone || block == Block.oreRedstoneGlowing)
+        if (block == Blocks.oreRedstone || block == Blocks.oreRedstoneGlowing)
         {
             return REDSTONE_ORE;
         }
-        if (block == Block.pistonExtension)
+        if (block == Blocks.pistonExtension)
         {
             return PISTON_EXTENSION;
         }
-        if (block == Block.melonStem || block == Block.pumpkinStem)
+        if (block == Blocks.melonStem || block == Blocks.pumpkinStem)
         {
             return STEM;
         }
@@ -139,11 +139,11 @@ public class BlockHelper
                 md = world.getBlockMetadata(x, y, z);
                 return new ItemStack(block, 1, md);
             case STEM:
-                if (block == Block.pumpkinStem)
+                if (block == Blocks.pumpkinStem)
                 {
                     return new ItemStack(Item.pumpkinSeeds);
                 }
-                else if (block == Block.melonStem)
+                else if (block == Blocks.melonStem)
                 {
                     return new ItemStack(Item.melonSeeds);
                 }
@@ -170,7 +170,7 @@ public class BlockHelper
                 }
                 return new ItemStack(doorId, 1, 0);
             case REDSTONE_ORE:
-                return new ItemStack(Block.oreRedstone);
+                return new ItemStack(Blocks.oreRedstone);
         }
     }
 }

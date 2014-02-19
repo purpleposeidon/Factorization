@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.block.BlockLog;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
@@ -30,7 +31,7 @@ public class Embarkener implements ITickHandler {
         }
     }
 
-    int wood_rendertype = Block.wood.getRenderType();
+    int wood_rendertype = Blocks.wood.getRenderType();
     boolean isWoodish(Block block) {
         if (block == null) return false;
         return block.blockMaterial == Material.wood && block instanceof BlockLog && block.getRenderType() == wood_rendertype;
@@ -38,7 +39,7 @@ public class Embarkener implements ITickHandler {
     
     void addLogBarkRecipes() {
         int count = 0;
-        for (Block block : Block.blocksList) {
+        for (Block block : Blocks.blocksList) {
             if (isWoodish(block)) {
                 for (int md = 0; md < 4; md++) {
                     count++;
@@ -85,10 +86,10 @@ public class Embarkener implements ITickHandler {
         if (event.entityPlayer == null) return;
         ItemStack is = event.entityPlayer.getHeldItem();
         if (is == null) return;
-        if (is.itemID >= Block.blocksList.length) return;
+        if (is.itemID >= Blocks.blocksList.length) return;
         if ((is.getItemDamage() & 0xC) != 0xC) return;
         if (!(is.getItem() instanceof ItemBlock)) return;
-        Block theBlock = Block.blocksList[is.itemID];
+        Block theBlock = Blocks.blocksList[is.itemID];
         if (!isWoodish(theBlock)) return;
         Coord target = new Coord(event.entityPlayer.worldObj, event.x, event.y, event.z);
         target.adjust(ForgeDirection.getOrientation(event.face));

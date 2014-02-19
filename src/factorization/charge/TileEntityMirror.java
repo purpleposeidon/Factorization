@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -283,12 +284,12 @@ public class TileEntityMirror extends TileEntityCommon {
                 return true;
             }
             int id = worldObj.getBlockId(bx, yCoord, bz);
-            Block b = Block.blocksList[id];
+            Block b = Blocks.blocksList[id];
             boolean air_like = false;
             if (b == null) {
                 air_like = true;
             } else {
-                air_like = b.isAirBlock(worldObj, bx, yCoord, bz);
+                air_like = b.isAir(worldObj, bx, yCoord, bz);
                 air_like |= b.getCollisionBoundingBoxFromPool(worldObj, bx, yCoord, bz) == null;
             }
             if (!air_like) {

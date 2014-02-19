@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityCreeper;

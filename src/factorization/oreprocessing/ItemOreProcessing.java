@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -33,8 +34,8 @@ public class ItemOreProcessing extends ItemFactorization implements IActOnCraft 
         DARKIRON(10, 0x5000D4, "Dark Iron", "oreFzDarkIron", "ingotFzDarkIron")
         ;
         static {
-            COBALT.surounding_medium = new ItemStack(Block.netherrack);
-            ARDITE.surounding_medium = new ItemStack(Block.netherrack);
+            COBALT.surounding_medium = new ItemStack(Blocks.netherrack);
+            ARDITE.surounding_medium = new ItemStack(Blocks.netherrack);
         }
         
         public int ID;
@@ -43,7 +44,7 @@ public class ItemOreProcessing extends ItemFactorization implements IActOnCraft 
         String OD_ore, OD_ingot;
         public boolean enabled = false;
         ItemStack processingResult = null;
-        ItemStack surounding_medium = new ItemStack(Block.stone);
+        ItemStack surounding_medium = new ItemStack(Blocks.stone);
         private OreType(int ID, int color, String en_name, String OD_ore, String OD_ingot) {
             this.ID = ID;
             this.color = color;

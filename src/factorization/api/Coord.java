@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
@@ -450,7 +451,7 @@ public class Coord implements IDataSerializable {
     }
     
     public void updateBlockLight() {
-        w.updateLightByType(EnumSkyBlock.Block, x, y, z);
+        w.updateLightByType(EnumSkyBlocks.Block, x, y, z);
     }
 
     public void setTE(TileEntity te) {
@@ -485,7 +486,7 @@ public class Coord implements IDataSerializable {
     }
 
     public Block getBlock() {
-        return Block.blocksList[getId()];
+        return Blocks.blocksList[getId()];
     }
 
     @Deprecated //1.7'll be making this not a thing
@@ -535,7 +536,7 @@ public class Coord implements IDataSerializable {
         if (b == null) {
             return false;
         }
-        return b == Block.fire || b.isBlockBurning(w, x, y, z);
+        return b == Blocks.fire || b.isBlockBurning(w, x, y, z);
     }
 
     public boolean blockExists() {
@@ -564,7 +565,7 @@ public class Coord implements IDataSerializable {
         if (w.isAirBlock(x, y, z)) {
             return true;
         }
-        return Block.lightOpacity[getId()] == 0;
+        return Blocks.lightOpacity[getId()] == 0;
     }
 
     public boolean canSeeSky() {
@@ -819,7 +820,7 @@ public class Coord implements IDataSerializable {
             return b.getPickBlock(mop, w, x, y, z);
         } catch (NoSuchMethodError t) {
             if (!spam) {
-                /*Core.logWarning("Block.getPickBlock is unusable on the server." +
+                /*Core.logWarning("Blocks.getPickBlock is unusable on the server." +
             " A workaround prevents crashes, but may possibly allow dupe bugs." +
             " The developer is no longer interested in wasting his time, energy, and vitality on this matter." +
             " This is not a bug, it is a fact of life." +
@@ -865,10 +866,10 @@ public class Coord implements IDataSerializable {
         if (b instanceof IFluidBlock) {
             return ((IFluidBlock) b).getFluid();
         }
-        if (b == Block.waterStill || b == Block.waterMoving) {
+        if (b == Blocks.waterStill || b == Blocks.waterMoving) {
             return FluidRegistry.WATER;
         }
-        if (b == Block.lavaStill || b == Block.lavaMoving) {
+        if (b == Blocks.lavaStill || b == Blocks.lavaMoving) {
             return FluidRegistry.LAVA;
         }
         return null;

@@ -1,6 +1,7 @@
 package factorization.fzds;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.ChunkPosition;
@@ -30,15 +31,15 @@ public class TransferLib {
         default:
             Chunk chunk = c.w.getChunkFromBlockCoords(c.x, c.z);
             int old_id = c.getId();
-            Block origOldBlock = Block.blocksList[old_id];
-            Block origNewBlock = Block.blocksList[id];
-            Block.blocksList[old_id] = Block.stone;
-            Block.blocksList[id] = Block.stone;
+            Block origOldBlock = Blocks.blocksList[old_id];
+            Block origNewBlock = Blocks.blocksList[id];
+            Blocks.blocksList[old_id] = Blocks.stone;
+            Blocks.blocksList[id] = Blocks.stone;
             try {
                 chunk.setBlockIDWithMetadata(c.x & 15, c.y, c.z & 15, id, md);
             } finally {
-                Block.blocksList[old_id] = origOldBlock;
-                Block.blocksList[id] = origNewBlock;
+                Blocks.blocksList[old_id] = origOldBlock;
+                Blocks.blocksList[id] = origNewBlock;
             }
             c.markBlockForUpdate();
             break;

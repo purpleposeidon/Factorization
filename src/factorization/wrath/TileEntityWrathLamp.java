@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.PriorityQueue;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -216,7 +217,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                 return true;
             }
             int id = worldObj.getBlockId(x, yCoord, z);
-            if (Block.blocksList[id] != null && Block.blocksList[id].isOpaqueCube() && Block.lightOpacity[id] != 0) {
+            if (Blocks.blocksList[id] != null && Blocks.blocksList[id].isOpaqueCube() && Blocks.lightOpacity[id] != 0) {
                 return false;
             }
             dx = x - xCoord;
@@ -323,7 +324,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                         beamDepths[index] = (short) height;
                         continue;
                     }
-                    if (block == 0 && worldObj.getBlockId(x, height - 1, z) == Block.cobblestoneWall.blockID) {
+                    if (block == 0 && worldObj.getBlockId(x, height - 1, z) == Blocks.cobblestoneWall.blockID) {
                         block = -1;
                     }
                     if (block == 0) {

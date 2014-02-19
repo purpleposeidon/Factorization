@@ -165,13 +165,13 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         Coord targetBlock = coord.add(top);
         if (mopBlock(targetBlock, top.getOpposite(), socket, false, powered)) return true; //nose-to-nose with the servo
         if (onlyFirst) return false;
-        if (mopBlock(targetBlock.add(top), top.getOpposite(), socket, false, powered)) return true; //a block away
+        if (mopBlock(targetBlocks.add(top), top.getOpposite(), socket, false, powered)) return true; //a block away
         if (mopBlock(coord, top, socket, true, powered)) return true;
         if (!lookAround) return false;
-        if (mopBlock(targetBlock.add(face), face.getOpposite(), socket, false, powered)) return true; //running forward
-        if (mopBlock(targetBlock.add(face.getOpposite()), face, socket, false, powered)) return true; //running backward
-        if (mopBlock(targetBlock.add(right), right.getOpposite(), socket, false, powered)) return true; //to the servo's right
-        if (mopBlock(targetBlock.add(right.getOpposite()), right, socket, false, powered)) return true; //to the servo's left
+        if (mopBlock(targetBlocks.add(face), face.getOpposite(), socket, false, powered)) return true; //running forward
+        if (mopBlock(targetBlocks.add(face.getOpposite()), face, socket, false, powered)) return true; //running backward
+        if (mopBlock(targetBlocks.add(right), right.getOpposite(), socket, false, powered)) return true; //to the servo's right
+        if (mopBlock(targetBlocks.add(right.getOpposite()), right, socket, false, powered)) return true; //to the servo's left
         return false;
     }
     

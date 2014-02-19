@@ -3,6 +3,7 @@ package factorization.servo.instructions;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.block.BlockCactus;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.BlockReed;

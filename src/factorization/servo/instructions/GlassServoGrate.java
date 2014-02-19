@@ -1,6 +1,7 @@
 package factorization.servo.instructions;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
 import factorization.shared.Core;
@@ -13,7 +14,7 @@ public class GlassServoGrate extends WoodenServoGrate {
     
     @Override
     public IIcon getIIcon(ForgeDirection side) {
-        return Block.thinGlass.getBlockTextureFromSide(2);
+        return Blocks.thinGlass.getBlockTextureFromSide(2);
     }
     
     @Override
@@ -23,6 +24,6 @@ public class GlassServoGrate extends WoodenServoGrate {
                 "#-#",
                 " # ",
                 '-', Core.registry.servorail_item,
-                '#', Block.thinGlass);
+                '#', Blocks.thinGlass);
     }
 }

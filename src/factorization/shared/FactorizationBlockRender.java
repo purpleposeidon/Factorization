@@ -1,6 +1,7 @@
 package factorization.shared;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -25,8 +26,8 @@ import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 
 abstract public class FactorizationBlockRender implements ICoord {
-    static Block metal = Block.obsidian;
-    static Block glass = Block.glowStone;
+    static Block metal = Blocks.obsidian;
+    static Block glass = Blocks.glowStone;
 
     public boolean world_mode, use_vertex_offset;
     public IBlockAccess w;
@@ -211,8 +212,8 @@ abstract public class FactorizationBlockRender implements ICoord {
 
 
     private int getMixedBrightnessForBlock(IBlockAccess w, int x, int y, int z) {
-        return w.getLightBrightnessForSkyBlocks(x, y, z, Block.lightValue[w.getBlockId(x, y, z)]);
-        //Block b = Block.blocksList[w.getBlockId(x, y, z)];
+        return w.getLightBrightnessForSkyBlocks(x, y, z, Blocks.lightValue[w.getBlockId(x, y, z)]);
+        //Block b = Blocks.blocksList[w.getBlockId(x, y, z)];
         //return w.getLightBrightnessForSkyBlocks(x, y, z, b.getLightValue(w, x, y, z));
         //return par1IBlockAccess.getLightBrightnessForSkyBlocks(par2, par3, par4, getLightValue(par1IBlockAccess, par2, par3, par4));
     }
@@ -222,7 +223,7 @@ abstract public class FactorizationBlockRender implements ICoord {
     }
     
     private float getAmbientOcclusionLightValue(IBlockAccess w, int x, int y, int z) {
-        return Block.stone.getAmbientOcclusionLightValue(w, x, y, z);
+        return Blocks.stone.getAmbientOcclusionLightValue(w, x, y, z);
     }
     
     static private ForgeDirection getFaceDirection(VectorUV[] vecs, VectorUV center) {

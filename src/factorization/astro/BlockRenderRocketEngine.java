@@ -28,7 +28,7 @@ public class BlockRenderRocketEngine extends FactorizationBlockRender {
         Tessellator tess = Tessellator.instance;
         {
             tess.setBrightness(block.getMixedBrightnessForBlock(w, x, y, z));
-            //tess.setBrightness(this.renderMinY > 0.0D ? l : par1Block.getMixedBrightnessForBlock(this.blockAccess, par2, par3 - 1, par4));
+            //tess.setBrightness(this.renderMinY > 0.0D ? l : par1Blocks.getMixedBrightnessForBlock(this.blockAccess, par2, par3 - 1, par4));
             tess.setColorOpaque_F(1, 1, 1);
         }
         float d = 2F/16F;

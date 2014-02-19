@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
@@ -202,7 +203,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
             if (!player.isSneaking() || itemstack == null || item.shouldPassSneakingClickToBlock(world, x, y, z)) {
                 int blockId = world.getBlockId(x, y, z);
             
-                if (blockId > 0 && Block.blocksList[blockId].onBlockActivated(world, x, y, z, player, side, dx, dy, dz)) {
+                if (blockId > 0 && Blocks.blocksList[blockId].onBlockActivated(world, x, y, z, player, side, dx, dy, dz)) {
                     ret = true;
                     break;
                 }

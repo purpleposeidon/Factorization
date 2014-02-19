@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -253,7 +254,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         //NOTE: This isn't what's actually used for rendering.
         switch (getState()) {
         case WET:
-            return Block.blockClay.getBlockTextureFromSide(side);
+            return Blocks.blockClay.getBlockTextureFromSide(side);
         case DRY:
             return BlockIcons.ceramics$dry;
         case BISQUED:
@@ -463,7 +464,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             player.inventory.mainInventory[ci] = new ItemStack(Item.bucketEmpty);
             return true;
         }
-        if (heldId == Block.cloth.blockID) {
+        if (heldId == Blocks.cloth.blockID) {
             lastTouched = dryTime + 1;
             return true;
         }
@@ -934,7 +935,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     @SideOnly(Side.CLIENT)
     public IIcon getIIcon(ForgeDirection dir) {
         if (parts.size() == 0) {
-            return Block.blockClay.getBlockTextureFromSide(0);
+            return Blocks.blockClay.getBlockTextureFromSide(0);
         }
         return getIIcon(parts.get(0), dir.ordinal());
     }

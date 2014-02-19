@@ -1,6 +1,7 @@
 package factorization.wrath;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.IIcon;
 import factorization.common.FactoryType;
@@ -22,7 +23,7 @@ public class BlockRenderLamp extends FactorizationBlockRender {
         float panel = trim_out + s; //trim_in + s * 0;
         BlockFactorization block = Core.registry.factory_block;
         IIcon metal = Core.registry.resource_block.getIIcon(0, ResourceType.DARKIRONBLOCK.md);
-        IIcon glass = Block.glass.getBlockTextureFromSide(0);
+        IIcon glass = Blocks.glass.getBlockTextureFromSide(0);
         //glass
         renderPart(rb, glass, glass_mid, glass_ver, glass_mid, 1 - glass_mid, 1 - glass_ver, 1 - glass_mid);
         //corners

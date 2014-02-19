@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -263,7 +264,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         for (int x = c.x; x <= d.x; x++) {
             for (int y = c.y; y <= d.y; y++) {
                 for (int z = c.z; z <= d.z; z++) {
-                    Block block = Block.blocksList[c.w.getBlockId(x, y, z)];
+                    Block block = Blocks.blocksList[c.w.getBlockId(x, y, z)];
                     if (block == null) {
                         continue;
                     }

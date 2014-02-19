@@ -13,6 +13,7 @@ import java.util.Random;
 import java.util.WeakHashMap;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.entity.Entity;
@@ -1579,12 +1580,12 @@ public class FzUtil {
     }
     
     public static FluidStack drainSpecificBlockFluid(World worldObj, int x, int y, int z, boolean doDrain, Fluid targetFluid) {
-        Block b = Block.blocksList[worldObj.getBlockId(x, y, z)];
+        Block b = Blocks.blocksList[worldObj.getBlockId(x, y, z)];
         if (!(b instanceof IFluidBlock)) {
             Fluid vanilla;
-            if (b == Block.waterStill || b == Block.waterMoving) {
+            if (b == Blocks.waterStill || b == Blocks.waterMoving) {
                 vanilla = FluidRegistry.WATER;
-            } else if (b == Block.lavaStill || b == Block.lavaMoving) {
+            } else if (b == Blocks.lavaStill || b == Blocks.lavaMoving) {
                 vanilla = FluidRegistry.LAVA;
             } else {
                 return null;

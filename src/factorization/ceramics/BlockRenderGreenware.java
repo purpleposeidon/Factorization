@@ -3,6 +3,7 @@ package factorization.ceramics;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -135,7 +136,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
         ClayState state = greenware.getState();
         if (state != ClayState.HIGHFIRED) {
             switch (state) {
-            case WET: block.useTexture(Block.blockClay.getBlockTextureFromSide(0)); break;
+            case WET: block.useTexture(Blocks.blockClay.getBlockTextureFromSide(0)); break;
             case DRY: block.useTexture(BlockIcons.ceramics$dry); break;
             case BISQUED: block.useTexture(BlockIcons.ceramics$bisque); break;
             case UNFIRED_GLAZED: block.useTexture(BlockIcons.ceramics$rawglaze); break;
@@ -150,7 +151,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
         for (ClayLump rc : greenware.parts) {
             rci++;
             if (state == ClayState.HIGHFIRED) {
-                Block it = Block.blocksList[rc.icon_id];
+                Block it = Blocks.blocksList[rc.icon_id];
                 if (it == null) {
                     block.useTexture(BlockIcons.error);
                 } else {
@@ -169,7 +170,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
                             } catch (Throwable t) {
                                 if (!spammed) {
                                     spammed = true;
-                                    Core.logWarning("%s: could not get a Block.colorMultiplier from %s", greenware.getCoord(), it);
+                                    Core.logWarning("%s: could not get a Blocks.colorMultiplier from %s", greenware.getCoord(), it);
                                     t.printStackTrace();
                                 }
                             }
@@ -228,7 +229,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
     
     BlockRenderHelper setupRenderGenericLump() {
         BlockRenderHelper block = BlockRenderHelper.instance;
-        block.useTexture(Block.blockClay.getBlockTextureFromSide(0));
+        block.useTexture(Blocks.blockClay.getBlockTextureFromSide(0));
         block.setBlockBounds(3F/16F, 1F/8F, 3F/16F, 13F/16F, 7F/8F, 13F/16F);
         return block;
     }

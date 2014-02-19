@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -244,7 +245,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         info = info == null ? "" : info;
         final Coord here = getCoord();
         if (here.isWeaklyPowered()) {
-            Notify.withItem(new ItemStack(Block.torchRedstoneActive));
+            Notify.withItem(new ItemStack(Blocks.torchRedstoneActive));
             Notify.withStyle(Style.DRAWITEM);
         }
         if (comment.length() > 0) {

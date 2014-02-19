@@ -3,6 +3,7 @@ package factorization.api;
 import java.util.ArrayList;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import factorization.common.FzConfig;
 import factorization.fzds.TransferLib;
@@ -10,7 +11,7 @@ import factorization.shared.Core;
 
 public class ChargeMetalBlockConductance {
     //static HashMap<Integer, ArrayList<Integer>> validBlocks = new HashMap();
-    static boolean[][] validBlocks = new boolean[Block.blocksList.length][];
+    static boolean[][] validBlocks = new boolean[Blocks.blocksList.length][];
     public static ArrayList<ItemStack> excludeOres = new ArrayList<ItemStack>();
     
     public static void setup() {
@@ -30,10 +31,10 @@ public class ChargeMetalBlockConductance {
 //				if (is.hasTagCompound() || metadata < 0 || metadata > 16) {
 //					continue;
 //				}
-//				if (is.itemID >= Block.blocksList.length || is.itemID <= 0) {
+//				if (is.itemID >= Blocks.blocksList.length || is.itemID <= 0) {
 //					continue;
 //				}
-//				Block b = Block.blocksList[is.itemID];
+//				Block b = Blocks.blocksList[is.itemID];
 //				if (b == null) {
 //					continue;
 //				}
@@ -48,7 +49,7 @@ public class ChargeMetalBlockConductance {
 //				put(b.blockID, metadata);
 //			}
 //		}
-//		for (Block block : new Block[] { Block.blockIron, Block.blockGold, Block.blockEmerald }) {
+//		for (Block block : new Block[] { Blocks.blockIron, Blocks.blockGold, Blocks.blockEmerald }) {
 //			put(block.blockID, 0);
 //		}
     }

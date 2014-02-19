@@ -3,6 +3,7 @@ package factorization.servo.instructions;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
@@ -48,7 +49,7 @@ public class EntryControl extends Instruction {
 
     @Override
     protected ItemStack getRecipeItem() {
-        return new ItemStack(Block.fenceGate);
+        return new ItemStack(Blocks.fenceGate);
     }
 
     @Override

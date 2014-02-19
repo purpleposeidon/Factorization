@@ -627,14 +627,14 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         nullVec.xCoord = nullVec.yCoord = nullVec.zCoord = 0;
         Coord targetBlock = c.add(top);
         mopBlock(ret, targetBlock, top.getOpposite()); //nose-to-nose with the servo
-        mopBlock(ret, targetBlock.add(top), top.getOpposite()); //a block away
-        mopBlock(ret, targetBlock.add(top.getOpposite()), top);
+        mopBlock(ret, targetBlocks.add(top), top.getOpposite()); //a block away
+        mopBlock(ret, targetBlocks.add(top.getOpposite()), top);
         if (ret.size() == 0) {
-            mopBlock(ret, targetBlock.add(face), face.getOpposite()); //running forward
-            mopBlock(ret, targetBlock.add(face.getOpposite()), face); //running backward
+            mopBlock(ret, targetBlocks.add(face), face.getOpposite()); //running forward
+            mopBlock(ret, targetBlocks.add(face.getOpposite()), face); //running backward
             if (ret.size() == 0) {
-                mopBlock(ret, targetBlock.add(right), right.getOpposite()); //to the servo's right
-                mopBlock(ret, targetBlock.add(right.getOpposite()), right); //to the servo's left
+                mopBlock(ret, targetBlocks.add(right), right.getOpposite()); //to the servo's right
+                mopBlock(ret, targetBlocks.add(right.getOpposite()), right); //to the servo's left
             }
         }
         return ret;

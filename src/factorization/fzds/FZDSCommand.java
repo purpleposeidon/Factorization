@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -562,7 +563,7 @@ public class FZDSCommand extends CommandBase {
             String details() { return "Places a grass block at the user's feet"; }
             @Override
             void call(String[] args) {
-                user.add(0, -1, 0).setId(Block.grass);
+                user.add(0, -1, 0).setId(Blocks.grass);
             }}, Requires.COORD, Requires.CREATIVE);
         add(new SubCommand("snap") {
             @Override

@@ -3,6 +3,7 @@ package factorization.wrath;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialTransparent;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -53,9 +54,9 @@ public class BlockLightAir extends Block {
                 return;
             }
             TileEntityWrathLamp.doAirCheck(w, x, y, z);
-            int below = w.getBlockId(x, y - 1, z);
-            if (below == blockID) {
-                w.scheduleBlockUpdate(x, y - 1, z, blockID, 1);
+            Block below = w.getBlock(x, y - 1, z);
+            if (below == this) {
+                w.scheduleBlockUpdate(x, y - 1, z, this, 1);
             }
         }
     }
@@ -66,7 +67,7 @@ public class BlockLightAir extends Block {
     @Override
     public IIcon getIIcon(int side, int md) {
         if (FzConfig.debug_light_air) {
-            return Block.glowStone.getBlockTextureFromSide(0);
+            return Blocks.glowStone.getBlockTextureFromSide(0);
         }
         return BlockIcons.transparent;
     }
@@ -78,15 +79,15 @@ public class BlockLightAir extends Block {
         int md = w.getBlockMetadata(x, y, z);
         if (md == air_md) {
             int notifyFlag = Coord.NOTIFY_NEIGHBORS | Coord.UPDATE;
-            if (neighborID == Block.cobblestoneWall.blockID) {
-                if (w.getBlockId(x, y - 1, z) == Block.cobblestoneWall.blockID) {
+            if (neighborID == Blocks.cobblestoneWall.blockID) {
+                if (w.getBlockId(x, y - 1, z) == Blocks.cobblestoneWall.blockID) {
                     w.setBlock(x, y, z, 0, 0, notifyFlag);
                     return;
                 }
             }
             TileEntityWrathLamp.doAirCheck(w, x, y, z);
-            Block b = Block.blocksList[w.getBlockId(x, y + 1, z)];
-            if (b != null && !b.isAirBlock(w, x, y + 1, z)) {
+            Block b = Blocks.blocksList[w.getBlockId(x, y + 1, z)];
+            if (b != null && !b.isAir(w, x, y + 1, z)) {
                 //a li'l hack for sand
                 w.setBlock(x, y, z, 0, 0, 0);
                 b.updateTick(w, x, y + 1, z, rand);

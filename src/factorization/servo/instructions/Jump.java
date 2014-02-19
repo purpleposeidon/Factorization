@@ -3,6 +3,7 @@ package factorization.servo.instructions;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
@@ -27,7 +28,7 @@ public class Jump extends Instruction {
 
     @Override
     protected ItemStack getRecipeItem() {
-        return new ItemStack(Block.pistonBase);
+        return new ItemStack(Blocks.pistonBase);
     }
 
     @Override
