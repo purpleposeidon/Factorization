@@ -28,7 +28,7 @@ import factorization.shared.Core;
 public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
     public static class DiamondModel {
         TexturedQuad quads[] = new TexturedQuad[4];
-        IIcon diamond = Blocks.blockDiamond.getBlockTextureFromSide(0);
+        IIcon diamond = Blocks.diamond_block.getBlockTextureFromSide(0);
         
         float near = 2F / 32F, far = 5F / 32F, point = -18F / 32F;
         float u_edge = 0; //diamond.getWidth()/16;

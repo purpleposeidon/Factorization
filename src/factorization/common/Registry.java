@@ -196,12 +196,12 @@ public class Registry implements ICraftingHandler, ITickHandler {
         
         worldgenManager = new WorldgenManager();
         
-        final Block vanillaDiamond = Blocks.blockDiamond;
+        final Block vanillaDiamond = Blocks.diamond_block;
         final int diamondId = vanillaDiamond.blockID;
         Blocks.blocksList[diamondId] = null;
         BlockOreStorageShatterable newDiamond = new BlockOreStorageShatterable(diamondId, vanillaDiamond);
         newDiamond.setHardness(5.0F).setResistance(10.0F).setStepSound(Blocks.soundMetalFootstep).setUnlocalizedName("blockDiamond");
-        //Blocks.blockDiamond /* blockDiamond */ = newDiamond;
+        //Blocks.diamond_block /* blockDiamond */ = newDiamond;
 //		ReflectionHelper.setPrivateValue(Blocks.class, null, newDiamond, "blockDiamond", "blockDiamond"); TODO: Reflection-set blockDiamond.
     }
 
