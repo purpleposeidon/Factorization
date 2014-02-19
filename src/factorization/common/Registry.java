@@ -884,9 +884,10 @@ public class Registry implements ICraftingHandler, ITickHandler {
         shapelessRecipe(aqua_regia, sulfuric_acid, Item.blazePowder, Item.fireballCharge); //I'd kind of like this to be a recipe for a different — but compatible — aqua regia. 
         recipe(new ItemStack(fan),
                 "I I",
-                " I ",
+                " - ",
                 "I I",
-                'I', Item.ingotIron);
+                'I', Item.ingotIron,
+                '-', Block.pressurePlateIron);
         if (FzConfig.enable_solar_steam) {
             recipe(solarboiler_item,
                     "I#I",
