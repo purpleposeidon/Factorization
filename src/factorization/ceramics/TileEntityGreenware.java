@@ -254,7 +254,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         //NOTE: This isn't what's actually used for rendering.
         switch (getState()) {
         case WET:
-            return Blocks.blockClay.getBlockTextureFromSide(side);
+            return Blocks.clay.getBlockTextureFromSide(side);
         case DRY:
             return BlockIcons.ceramics$dry;
         case BISQUED:
@@ -935,7 +935,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     @SideOnly(Side.CLIENT)
     public IIcon getIIcon(ForgeDirection dir) {
         if (parts.size() == 0) {
-            return Blocks.blockClay.getBlockTextureFromSide(0);
+            return Blocks.clay.getBlockTextureFromSide(0);
         }
         return getIIcon(parts.get(0), dir.ordinal());
     }

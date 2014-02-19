@@ -951,7 +951,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "LCL",
                 "LLL",
                 'L', "ingotLead",
-                'C', Blocks.blockClay);
+                'C', Blocks.clay);
         batteryRecipe(new ItemStack(motor),
                 "CIC",
                 "CIC",
@@ -1018,7 +1018,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
         TileEntityGrinder.addRecipe(Blocks.ladder, new ItemStack(Item.stick), 1.5F);
         TileEntityGrinder.addRecipe(Blocks.snow, new ItemStack(Item.snowball), 0.25F);
         TileEntityGrinder.addRecipe(Blocks.blockSnow, new ItemStack(Item.snowball), 4F);
-        TileEntityGrinder.addRecipe(Blocks.blockClay, new ItemStack(Item.clay), 4F);
+        TileEntityGrinder.addRecipe(Blocks.clay, new ItemStack(Item.clay), 4F);
         TileEntityGrinder.addRecipe(Blocks.fence, new ItemStack(Item.stick), 2.5F);
         //Netherrack dust is handled elsewhere!
         TileEntityGrinder.addRecipe(Blocks.glowStone, new ItemStack(Item.glowstone), 4F);
