@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -30,6 +31,13 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     @Override
     public int getSizeInventory() {
         return 4;
+    }
+    
+    @Override
+    public void onPlacedBy(EntityPlayer player, ItemStack is, int side) {
+        super.onPlacedBy(player, is, side);
+        ForgeDirection fd = ForgeDirection.getOrientation(FzUtil.determineFlatOrientation(player));
+        facing_direction = (byte) fd.getOpposite().ordinal();
     }
 
     @Override
