@@ -1,10 +1,61 @@
+0.8.32
+  Bug fixes & polishing.
+
+0.8.31
+  Added the 'probe' instruction:
+    This is a sub-instruction of Shifter Control.
+    It will push how many items match the item held by the servo.
+    If the servo is holding no items, it should count all the items in the inventory
+  Added the Pressure Generator. Many features!
+    It has two settings: Suck/Blow, and the speed (off, slow, medium, fast)
+    Pumps Liquid:
+      Can drain from tanks and pump from the world, and fill tanks and spill to the world
+    Generate Charge:
+      Have a tank of steam at the back (such as from a Steam Boiler)
+      Have a clear space in front of the Pressure Generator
+      Apply a redstone signal to the generator
+      This may work with other gasses...
+    Blow Entities:
+      If blowing, it can drop items from an inventory behind it.
+      At slow speed, it will only blow items. Faster speeds can move mobs and players!
+      Faster speeds have larger radius & distance.
+    But only BlowEntities works on servos
+  Barrels no longer render the enchantment glint.
+  The caliometric burner now burns food at from ends.
+      
+
+0.8.30
+  fixed apostraphe in license
+  French localizations by WLCD!
+  Changed servo inventory size to 1! It happened!
+  Fixed servo & fan rendering causing signs to flicker
+  Clicking on a servo with an instruction will cause that instruction to be executed immediately.
+  Added instructions (and a decorator) for user-defined procedures.
+    Some stacks have specific uses:
+      White is the IO stack.
+      Black is the error message stack.
+      Yellow is the argument stack.
+      Red is run on block entry if something else isn't already running.
+    "Entry Action" can be used to read/write instructions to the servo rail
+    "Scan Color" is a decorator that will read the color of the block the servo is facing. Works on wool, stained clay, and wheat.
+    "Stack Transfer" pops a color, and moves stuff to/from the IO stack and that colored stack.
+    "Run Stack" pops a color, and moves control to that stack. But there is no RET instruction!
+  Silver ore nodes spawn 1 per chunk instead of 1 with 0.125-chance-for-an-extra per chunk
+
+0.8.29
+  A warning: I am going to reduce the number of inventory slots in a servo to 1 in the next version. This will cause item loss.
+  Barrels render more efficiently. As a side-effect, their fonts can be customized.
+  Recipe changes:
+    Lacerator uses an iron pressure plate instead of an iron bar
+    Got rid of the magnet crafting item. Batteries are used instead.
+    Simplified the servo motor recipe   
+
 0.8.28
   Servos:
     Fix rail renderer UVs; changed its texture
     ShifterControl'll let you access slots as an int instead of a byte
     Made the speed not be twitchy
     Added a Commenter; this tool lets you add comments to servo rails
-    A warning: I am going to reduce the number of inventory slots in a servo to 1.
   Localizations:
     Polish localizations by Szewek!
     Russian localizations by Anton!
