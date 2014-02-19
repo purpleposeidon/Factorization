@@ -13,3 +13,4 @@ NetClientHandler.worldClient
 PlayerControllerMP: All fields
 PlayerControllerMP.sameToolAndBlock
 RenderGlobal.drawOutlinedBoundingBox
+RenderItem.renderEffect
