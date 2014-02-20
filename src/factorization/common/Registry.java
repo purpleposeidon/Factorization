@@ -91,11 +91,11 @@ public class Registry implements ICraftingHandler, ITickHandler {
     public Block dark_iron_ore;
     public Block fractured_bedrock_block;
 
-    public ItemStack router_item, servorail_item;
+    public ItemStack servorail_item;
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
     
     public ItemStack stamper_item, packager_item,
-            barrel_item, daybarrel_item_hidden,
+            daybarrel_item_hidden,
             lamp_item, air_item,
             slagfurnace_item, battery_item_hidden, leydenjar_item, leydenjar_item_full, heater_item, steamturbine_item, solarboiler_item, caliometric_burner_item,
             mirror_item_hidden,
@@ -233,16 +233,14 @@ public class Registry implements ICraftingHandler, ITickHandler {
         sludge = new ItemCraftingComponent(itemID("sludge", 9039), "sludge");
         OreDictionary.registerOre("sludge", sludge);
         //ItemBlocks
-        item_factorization = (ItemFactorizationBlock) Items.itemsList[factory_block];
-        item_resource = (ItemBlockResource) Items.itemsList[resource_block];
+        item_factorization = (ItemFactorizationBlock) Item.getItemFromBlock(factory_block);
+        item_resource = (ItemBlockResource) Item.getItemFromBlock(resource_block);
 
         //BlockFactorization stuff
-        router_item = FactoryType.ROUTER.itemStack();
         servorail_item = FactoryType.SERVORAIL.itemStack();
         empty_socket_item = FactoryType.SOCKET_EMPTY.itemStack();
         parasieve_item = FactoryType.PARASIEVE.itemStack();
         compression_crafter_item = FactoryType.COMPRESSIONCRAFTER.itemStack();
-        barrel_item = FactoryType.BARREL.itemStack();
         daybarrel_item_hidden = FactoryType.DAYBARREL.itemStack();
         stamper_item = FactoryType.STAMPER.itemStack();
         lamp_item = FactoryType.LAMP.itemStack();
@@ -270,7 +268,6 @@ public class Registry implements ICraftingHandler, ITickHandler {
 
 
         diamond_shard = new ItemCraftingComponent(itemID("diamondShard", 9006), "diamond_shard");
-        wrath_igniter = new ItemWrathIgniter(itemID("wrathIgniter", 9007));
         dark_iron = new ItemCraftingComponent(itemID("darkIron", 9008), "dark_iron_ingot");
         
         lead_ingot = new ItemCraftingComponent(itemID("leadIngot", 9014), "lead_ingot");

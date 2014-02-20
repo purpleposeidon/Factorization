@@ -1610,4 +1610,13 @@ public class FzUtil {
         if (fs == null || fs.amount <= 0) return null;
         return fs;
     }
+    
+    public static Block getBlock(ItemStack is) {
+        if (is == null) return null;
+        return Block.getBlockFromItem(is.getItem());
+    }
+    
+    public static Block getBlock(Item it) {
+        return Block.getBlockFromItem(it);
+    }
 }

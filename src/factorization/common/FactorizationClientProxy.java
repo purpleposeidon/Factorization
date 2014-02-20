@@ -375,9 +375,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             new BlockRenderSocketBase(ft);
         }
         for (FactoryType ft : new FactoryType[] {
-                FactoryType.ROUTER,
                 FactoryType.STAMPER,
-                FactoryType.BARREL,
                 FactoryType.PACKAGER,
                 FactoryType.SLAGFURNACE,
                 FactoryType.SOLARBOILER,
