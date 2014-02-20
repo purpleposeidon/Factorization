@@ -10,6 +10,7 @@ import net.minecraft.block.BlockReed;
 import net.minecraft.block.BlockStem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.common.IPlantable;
@@ -56,7 +57,7 @@ public class ScanColor extends Decorator {
     }
 
     @Override
-    public IIcon getIIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         return BlockIcons.servo$scan_color;
     }
 
@@ -82,7 +83,7 @@ public class ScanColor extends Decorator {
                 "Q#Q",
                 "+Q+",
                 '+', FactoryType.SERVORAIL.itemStack(),
-                'Q', Item.netherQuartz,
+                'Q', Items.netherQuartz,
                 '#', Core.registry.logicMatrixIdentifier);
     }
     

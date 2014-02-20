@@ -21,7 +21,7 @@ public class RotateTop extends Instruction {
     ForgeDirection top = ForgeDirection.UP;
     
     @Override
-    public IIcon getIIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         if (side == ForgeDirection.UNKNOWN) {
             return BlockIcons.servo$set_facing.side_W;
         }

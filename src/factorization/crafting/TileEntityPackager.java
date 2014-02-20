@@ -23,7 +23,7 @@ public class TileEntityPackager extends TileEntityStamper {
     }
     
     @Override
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         return BlockIcons.packager.get(this, dir);
     }
     

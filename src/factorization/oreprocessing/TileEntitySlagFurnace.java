@@ -8,6 +8,7 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityFurnace;
@@ -41,7 +42,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     }
 
     @Override
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         if (draw_active > 0 && facing_direction == dir.ordinal()) {
             return BlockIcons.machine$slag_furnace_face_on;
         }
@@ -296,7 +297,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
             }
             if (o instanceof Block) {
                 Block b = (Block) o;
-                return new ItemStack(Item.itemsList[b.blockID]);
+                return new ItemStack(Items.itemsList[b.blockID]);
             }
             if (o instanceof Item) {
                 return new ItemStack((Item) o);

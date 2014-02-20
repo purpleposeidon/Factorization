@@ -220,7 +220,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         return BlockIcons.servo$rail;
     }
     

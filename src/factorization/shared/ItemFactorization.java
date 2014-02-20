@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -20,7 +21,7 @@ public class ItemFactorization extends Item {
     
     @Override
     @SideOnly(Side.CLIENT)
-    protected String getIIconString() {
+    protected String getIconString() {
         return unlocalizedName;
     }
     

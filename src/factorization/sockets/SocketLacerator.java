@@ -20,6 +20,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatMessageComponent;
@@ -429,7 +430,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                     worldObj.playAuxSFX(2001, mop.blockX, mop.blockY, mop.blockZ, id + (md << 12));
                     
                     EntityPlayer player = getFakePlayer();
-                    ItemStack pick = new ItemStack(Item.pickaxeDiamond);
+                    ItemStack pick = new ItemStack(Items.pickaxeDiamond);
                     pick.addEnchantment(Enchantment.silkTouch, 1);
                     player.inventory.mainInventory[0] = pick;
                     {

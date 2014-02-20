@@ -95,7 +95,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         ForgeDirection f = getFacing();
         if (dir == f) {
             return BlockIcons.compactFace;

@@ -13,7 +13,7 @@ public class IronServoGrate extends WoodenServoGrate {
     }
     
     @Override
-    public IIcon getIIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         return Blocks.fenceIron.getBlockTextureFromSide(2);
     }
     

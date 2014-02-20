@@ -50,7 +50,7 @@ public class Jump extends Instruction {
     }
 
     @Override
-    public IIcon getIIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         if (mode == Executioner.JMP_NEXT_INSTRUCTION) {
             return BlockIcons.servo$jmp_instruction;
         } else if (mode == Executioner.JMP_NEXT_TILE) {

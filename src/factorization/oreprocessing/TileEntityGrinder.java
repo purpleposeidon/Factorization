@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
@@ -318,7 +319,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         return BlockIcons.grinder_top;
     }
 }

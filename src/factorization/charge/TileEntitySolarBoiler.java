@@ -49,7 +49,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     }
     
     @Override
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         switch (dir) {
         case UP: return BlockIcons.boiler_top;
         default: return BlockIcons.boiler_side;

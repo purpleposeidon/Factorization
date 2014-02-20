@@ -28,7 +28,7 @@ public class TileEntityStamper extends TileEntityFactorization {
     }
     
     @Override
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         return BlockIcons.stamper.get(this, dir);
     }
 

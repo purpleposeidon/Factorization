@@ -26,7 +26,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     public final static int topHeat = 300;
     
     @Override
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         switch (dir) {
         case UP: return BlockIcons.cauldron_top;
         default: return BlockIcons.cauldron_side;

@@ -1,23 +1,23 @@
 package factorization.oreprocessing;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.block.BlockOreStorage;
+import net.minecraft.block.BlockCompressed;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.shared.Core;
 
-public class BlockOreStorageShatterable extends BlockOreStorage {
+public class BlockOreStorageShatterable extends BlockCompressed {
     private final Block original;
     public BlockOreStorageShatterable(int id, Block original) {
-        super(id);
+        super(Blocks.diamond_block.getMapColor(0));
         this.original = original;
     }
     
@@ -70,13 +70,13 @@ public class BlockOreStorageShatterable extends BlockOreStorage {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerIIcons(IIconRegister register) {
-        original.registerIIcons(register);
+    public void registerBlockIcons(IIconRegister register) {
+        original.registerBlockIcons(register);
     }
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIIcon(int side, int md) {
-        return original.getIIcon(side, md);
+    public IIcon getIcon(int side, int md) {
+        return original.getIcon(side, md);
     }
 }

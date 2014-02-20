@@ -26,14 +26,14 @@ public abstract class Decorator extends ServoComponent {
 
         @Override
         @SideOnly(Side.CLIENT)
-        public int getIIconWidth() {
-            return under.getIIconWidth();
+        public int getIconWidth() {
+            return under.getIconWidth();
         }
 
         @Override
         @SideOnly(Side.CLIENT)
-        public int getIIconHeight() {
-            return under.getIIconHeight();
+        public int getIconHeight() {
+            return under.getIconHeight();
         }
 
         @Override
@@ -74,8 +74,8 @@ public abstract class Decorator extends ServoComponent {
 
         @Override
         @SideOnly(Side.CLIENT)
-        public String getIIconName() {
-            return under.getIIconName();
+        public String getIconName() {
+            return under.getIconName();
         }
     }
     
@@ -96,7 +96,7 @@ public abstract class Decorator extends ServoComponent {
         block.setBlockBoundsOffset(d, d, d);
         for (int i = 0; i < 6; i++) {
             ForgeDirection face = ForgeDirection.getOrientation(i);
-            IIcon icon = getIIcon(face);
+            IIcon icon = getIcon(face);
             if (icon == null) {
                 icon = BlockIcons.uv_test;
             }
@@ -114,7 +114,7 @@ public abstract class Decorator extends ServoComponent {
         }
     }
     
-    public abstract IIcon getIIcon(ForgeDirection side);
+    public abstract IIcon getIcon(ForgeDirection side);
     public float getSize() {
         return TileEntityServoRail.width - 1F/2048F;
         //return 6F/16F;

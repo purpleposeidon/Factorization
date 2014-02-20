@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -113,7 +114,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         if (dir.offsetY != 0) {
             return BlockIcons.caliometric_top;
         }
@@ -169,7 +170,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
             ItemFood nom = (ItemFood) it;
             heal = nom.getHealAmount();
             sat = nom.getSaturationModifier();
-        } else if (it == Item.cake) {
+        } else if (it == Items.cake) {
             heal = 2*6;
             sat = 0.1F;
         }

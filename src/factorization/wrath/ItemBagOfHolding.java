@@ -7,6 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -221,7 +222,7 @@ public class ItemBagOfHolding extends ItemFactorization implements IActOnCraft {
         return true;
     }
 
-//	public int getIIconFromDamage(int damage) {
+//	public int getIconFromDamage(int damage) {
 //		return 16 + ((int) (System.currentTimeMillis() / 50000) % 5);
 //	}
 
@@ -305,7 +306,7 @@ public class ItemBagOfHolding extends ItemFactorization implements IActOnCraft {
                 }
                 bag = true;
             }
-            if (it == Item.enderPearl) {
+            if (it == Items.enderPearl) {
                 if (pearl) {
                     bad = true;
                     break;
@@ -319,7 +320,7 @@ public class ItemBagOfHolding extends ItemFactorization implements IActOnCraft {
                 }
                 dark_iron = true;
             }
-            if (it == Item.leather) {
+            if (it == Items.leather) {
                 if (leather) {
                     bad = true;
                     break;

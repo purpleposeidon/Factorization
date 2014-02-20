@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -25,7 +26,7 @@ public class SetSpeed extends Instruction {
 
     @Override
     protected ItemStack getRecipeItem() {
-        return new ItemStack(Item.sugar);
+        return new ItemStack(Items.sugar);
     }
 
     @Override
@@ -35,7 +36,7 @@ public class SetSpeed extends Instruction {
     }
 
     @Override
-    public IIcon getIIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         switch (speed) {
         default:
         case 1: return BlockIcons.servo$speed1;

@@ -428,7 +428,7 @@ public class HammerClientProxy extends HammerProxy {
                         }
 
                         sendDigPacket(new Packet14BlockDig(0, x, y, z, side));
-                        int i1 = this.mc.theWorld.getBlockId(x, y, z);
+                        int i1 = this.mc.theWorld.getBlock(x, y, z);
 
                         if (i1 > 0 && this.curBlockDamageMP == 0.0F)
                         {

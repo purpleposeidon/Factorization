@@ -158,10 +158,10 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
                     for (int i = 0; i < 6; i++) {
                         int useIIcon = i;
                         if (rc.icon_side == -1) {
-                            block.setTexture(i, it.getIIcon(useIIcon, rc.icon_md));
+                            block.setTexture(i, it.getIcon(useIIcon, rc.icon_md));
                         } else {
                             useIIcon = rc.icon_side;
-                            block.useTexture(it.getIIcon(useIIcon, rc.icon_md));
+                            block.useTexture(it.getIcon(useIIcon, rc.icon_md));
                         }
                         int color = 0xFFFFFF; 
                         if (greenware.worldObj != null) {

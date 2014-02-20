@@ -42,7 +42,7 @@ public class Sum extends Instruction {
     }
 
     @Override
-    public IIcon getIIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         return BlockIcons.servo$sum;
     }
 

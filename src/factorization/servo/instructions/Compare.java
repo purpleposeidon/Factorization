@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -21,7 +22,7 @@ import factorization.shared.FzUtil;
 public class Compare extends Instruction {
     static enum CmpType {
         LT, LE, EQ, NE, GE, GT;
-        IIcon getIIcon() {
+        IIcon getIcon() {
             switch (this) {
             default:
             case EQ: return BlockIcons.servo$cmp_eq;
@@ -57,7 +58,7 @@ public class Compare extends Instruction {
 
     @Override
     protected ItemStack getRecipeItem() {
-        return new ItemStack(Item.comparator);
+        return new ItemStack(Items.comparator);
     }
 
     @Override
@@ -81,8 +82,8 @@ public class Compare extends Instruction {
     }
 
     @Override
-    public IIcon getIIcon(ForgeDirection side) {
-        return cmp.getIIcon();
+    public IIcon getIcon(ForgeDirection side) {
+        return cmp.getIcon();
     }
 
     @Override

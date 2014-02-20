@@ -23,7 +23,7 @@ public class BlockDarkIronOre extends Block {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIIcon(int par1, int par2) {
+    public IIcon getIcon(int par1, int par2) {
         return BlockIcons.ore_dark_iron;
     }
     

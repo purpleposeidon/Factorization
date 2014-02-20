@@ -264,7 +264,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         for (int x = c.x; x <= d.x; x++) {
             for (int y = c.y; y <= d.y; y++) {
                 for (int z = c.z; z <= d.z; z++) {
-                    Block block = Blocks.blocksList[c.w.getBlockId(x, y, z)];
+                    Block block = Blocks.blocksList[c.w.getBlock(x, y, z)];
                     if (block == null) {
                         continue;
                     }

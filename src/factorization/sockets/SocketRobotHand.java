@@ -11,6 +11,7 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumMovingObjectType;
@@ -201,7 +202,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
             }
             
             if (!player.isSneaking() || itemstack == null || item.shouldPassSneakingClickToBlock(world, x, y, z)) {
-                int blockId = world.getBlockId(x, y, z);
+                int blockId = world.getBlock(x, y, z);
             
                 if (blockId > 0 && Blocks.blocksList[blockId].onBlockActivated(world, x, y, z, player, side, dx, dy, dz)) {
                     ret = true;
@@ -227,7 +228,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
         if (!ret && !FzUtil.identical(mutatedItem, itemstack)) {
             ret = true;
         }
-        if (mutatedItem == itemstack && (mutatedItem == null || mutatedItem.stackSize == origSize)) {
+        if (mutatedItem == itemstack && (mutatedItem == null || mutatedItems.stackSize == origSize)) {
             return ret;
         }
         player.inventory.mainInventory[player.inventory.currentItem] = mutatedItem;

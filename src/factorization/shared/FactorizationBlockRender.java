@@ -212,8 +212,8 @@ abstract public class FactorizationBlockRender implements ICoord {
 
 
     private int getMixedBrightnessForBlock(IBlockAccess w, int x, int y, int z) {
-        return w.getLightBrightnessForSkyBlocks(x, y, z, Blocks.lightValue[w.getBlockId(x, y, z)]);
-        //Block b = Blocks.blocksList[w.getBlockId(x, y, z)];
+        return w.getLightBrightnessForSkyBlocks(x, y, z, Blocks.lightValue[w.getBlock(x, y, z)]);
+        //Block b = Blocks.blocksList[w.getBlock(x, y, z)];
         //return w.getLightBrightnessForSkyBlocks(x, y, z, b.getLightValue(w, x, y, z));
         //return par1IBlockAccess.getLightBrightnessForSkyBlocks(par2, par3, par4, getLightValue(par1IBlockAccess, par2, par3, par4));
     }
@@ -317,7 +317,7 @@ abstract public class FactorizationBlockRender implements ICoord {
         //GL11.glRotatef(50.0F, 0.0F, 1.0F, 0.0F);
         //GL11.glRotatef(335.0F, 0.0F, 0.0F, 1.0F);
         //GL11.glTranslatef(-0.9375F, -0.0625F, 0.0F);
-        ItemRenderer.renderItemIn2D(tessellator, f1, f2, f, f3, icon.getIIconWidth(), icon.getIIconHeight(), 0.0625F);
+        ItemRenderer.renderItemIn2D(tessellator, f1, f2, f, f3, icon.getIconWidth(), icon.getIconHeight(), 0.0625F);
     }
 
     public void renderMotor(RenderBlocks rb, float yoffset) {

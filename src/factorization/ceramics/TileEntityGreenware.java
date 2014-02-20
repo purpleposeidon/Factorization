@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -250,7 +251,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         return ClayState.WET;
     }
 
-    public IIcon getIIcon(ClayLump lump, int side) {
+    public IIcon getIcon(ClayLump lump, int side) {
         //NOTE: This isn't what's actually used for rendering.
         switch (getState()) {
         case WET:
@@ -261,11 +262,11 @@ public class TileEntityGreenware extends TileEntityCommon {
         case UNFIRED_GLAZED:
             return BlockIcons.error;
         case HIGHFIRED:
-            Item it = Item.itemsList[lump.icon_id];
+            Item it = Items.itemsList[lump.icon_id];
             if (it == null) {
                 return BlockIcons.error;
             }
-            return it.getIIconFromDamage(lump.icon_md);
+            return it.getIconFromDamage(lump.icon_md);
         default:
             return BlockIcons.error;
         }
@@ -400,7 +401,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         tag.setByte("front", (byte)front.ordinal());
         ret.setTagCompound(tag);
         if (customName != null) {
-            ret.setItemName(customName);
+            ret.setStackDisplayName(customName);
         }
         return ret;
     }
@@ -423,7 +424,7 @@ public class TileEntityGreenware extends TileEntityCommon {
                         lump.asDefault();
                     } else {
                         it.remove();
-                        FzUtil.spawnItemStack(getCoord(), new ItemStack(Item.clay));
+                        FzUtil.spawnItemStack(getCoord(), new ItemStack(Items.clay));
                     }
                 }
             }
@@ -455,20 +456,20 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
         int heldId = held.getItem().itemID;
         boolean creative = player.capabilities.isCreativeMode;
-        if (heldId == Item.bucketWater.itemID && state == ClayState.DRY) {
+        if (heldId == Items.bucketWater.itemID && state == ClayState.DRY) {
             lastTouched = 0;
             if (creative) {
                 return true;
             }
             int ci = player.inventory.currentItem;
-            player.inventory.mainInventory[ci] = new ItemStack(Item.bucketEmpty);
+            player.inventory.mainInventory[ci] = new ItemStack(Items.bucketEmpty);
             return true;
         }
         if (heldId == Blocks.cloth.blockID) {
             lastTouched = dryTime + 1;
             return true;
         }
-        if (held.getItem() != Item.clay || held.stackSize == 0) {
+        if (held.getItem() != Items.clay || held.stackSize == 0) {
             return false;
         }
         if (state != ClayState.WET) {
@@ -756,7 +757,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             here.setId(0);
         } else {
             removeLump(hit.subHit);
-            FzUtil.spawnItemStack(here, new ItemStack(Item.clay));
+            FzUtil.spawnItemStack(here, new ItemStack(Items.clay));
         }
         return false;
     }
@@ -933,11 +934,11 @@ public class TileEntityGreenware extends TileEntityCommon {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         if (parts.size() == 0) {
             return Blocks.clay.getBlockTextureFromSide(0);
         }
-        return getIIcon(parts.get(0), dir.ordinal());
+        return getIcon(parts.get(0), dir.ordinal());
     }
     
     @Override

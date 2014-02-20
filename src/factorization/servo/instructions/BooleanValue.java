@@ -45,7 +45,7 @@ public class BooleanValue extends Instruction {
     }
     
     @Override
-    public IIcon getIIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         return val ? BlockIcons.servo$true : BlockIcons.servo$false;
     }
 

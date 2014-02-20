@@ -36,7 +36,7 @@ public class SetSegment extends Instruction {
     }
 
     @Override
-    public IIcon getIIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         return BlockIcons.servo$set_segment;
     }
 

@@ -19,7 +19,7 @@ public class SetDirection extends Instruction {
     ForgeDirection dir = ForgeDirection.UP;
     
     @Override
-    public IIcon getIIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         if (side == ForgeDirection.UNKNOWN) {
             return BlockIcons.servo$set_direction.side_W;
         }

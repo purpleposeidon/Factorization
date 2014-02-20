@@ -169,7 +169,7 @@ public class BlockFactorization extends BlockContainer {
         }
         TileEntity t = w.getBlockTileEntity(x, y, z);
         if (t instanceof TileEntityCommon) {
-            return ((TileEntityCommon) t).getIIcon(ForgeDirection.getOrientation(side));
+            return ((TileEntityCommon) t).getIcon(ForgeDirection.getOrientation(side));
         }
         return BlockIcons.error;
     }
@@ -177,7 +177,7 @@ public class BlockFactorization extends BlockContainer {
     private IIcon tempParticleIIcon = null;
     
     @Override
-    public IIcon getIIcon(int side, int md) {
+    public IIcon getIcon(int side, int md) {
         if (tempParticleIIcon != null) {
             IIcon ret = tempParticleIIcon;
             tempParticleIIcon = null;
@@ -194,7 +194,7 @@ public class BlockFactorization extends BlockContainer {
         if (rep == null) {
             return BlockIcons.error;
         }
-        return rep.getIIcon(ForgeDirection.getOrientation(side));
+        return rep.getIcon(ForgeDirection.getOrientation(side));
     }
     
     @Override
@@ -558,7 +558,7 @@ public class BlockFactorization extends BlockContainer {
     public boolean addBlockHitEffects(World worldObj, MovingObjectPosition target, EffectRenderer effectRenderer) {
         Coord here = new Coord(worldObj, target.blockX, target.blockY, target.blockZ);
         TileEntityCommon tec = here.getTE(TileEntityCommon.class);
-        tempParticleIIcon = (tec == null) ? BlockIcons.default_icon : tec.getIIcon(ForgeDirection.getOrientation(target.sideHit));
+        tempParticleIIcon = (tec == null) ? BlockIcons.default_icon : tec.getIcon(ForgeDirection.getOrientation(target.sideHit));
         return false;
     }
     
@@ -572,7 +572,7 @@ public class BlockFactorization extends BlockContainer {
             return false;
         }
         TileEntityCommon tec = (TileEntityCommon) te;
-        IIcon theIIcon = (tec == null) ? BlockIcons.default_icon : tec.getIIcon(ForgeDirection.DOWN);
+        IIcon theIIcon = (tec == null) ? BlockIcons.default_icon : tec.getIcon(ForgeDirection.DOWN);
         
         //copied & modified from EffectRenderer.addBlockDestroyEffects
         byte b0 = 4;

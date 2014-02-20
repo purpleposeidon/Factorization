@@ -9,6 +9,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -40,7 +41,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     private boolean putting_nbt = false;
     private byte redstone_cache = -1;
     
-    static short[] itemId2modIndex = new short[Item.itemsList.length];
+    static short[] itemId2modIndex = new short[Items.itemsList.length];
     
     TileEntity cached_te = null;
     Entity cached_ent = null;
@@ -124,7 +125,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             }
             return false;
         }
-        if (a.itemID != b.itemID) {
+        if (a.getItem() != b.getItem()) {
             //Compare on mods
             short aId = itemId2modIndex[a.itemID];
             short bId = itemId2modIndex[b.itemID];
@@ -346,7 +347,8 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             }
             side = facing_direction;
             if (target instanceof ISidedInventory) {
-                int[] ret = Arrays.clone(((ISidedInventory)target).getAccessibleSlotsFromSide(side));
+                int[] slotList = ((ISidedInventory)target).getAccessibleSlotsFromSide(side);
+                int[] ret = java.util.Arrays.copyOf(slotList, slotList.length);
                 for (int i = 0; i < ret.length; i++) {
                     ret[i] += filters.length;
                 }
@@ -412,7 +414,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
 
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         ForgeDirection face = getFacing();
         if (dir == face) {
             return BlockIcons.parasieve_front;
@@ -558,7 +560,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             Core.logFine("[parasieve] Reflection failed!");
             return;
         }
-        for (Item item : Item.itemsList) {
+        for (Item item : Items.itemsList) {
             if (item == null) {
                 continue;
             }

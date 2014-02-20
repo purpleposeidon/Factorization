@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -40,7 +41,7 @@ public class Spin extends Instruction {
 
     @Override
     protected ItemStack getRecipeItem() {
-        return new ItemStack(Item.silk);
+        return new ItemStack(Items.silk);
     }
 
     @Override
@@ -56,7 +57,7 @@ public class Spin extends Instruction {
     }
 
     @Override
-    public IIcon getIIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         return cc ? BlockIcons.servo$spin_cc : BlockIcons.servo$spin_ccc;
     }
 

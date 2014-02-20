@@ -56,7 +56,7 @@ public class EntryControl extends Instruction {
     public void motorHit(ServoMotor motor) { }
 
     @Override
-    public IIcon getIIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         return blocking ? BlockIcons.servo$entry_forbid : BlockIcons.servo$entry_require;
     }
 

@@ -28,6 +28,7 @@ import net.minecraft.inventory.InventoryLargeChest;
 import net.minecraft.inventory.Slot;
 import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
@@ -852,20 +853,20 @@ public class FzUtil {
             return null;
         }
         int chestBlock = cb.blockID;
-        if (world.getBlockId(i - 1, j, k) == chestBlock) {
+        if (world.getBlock(i - 1, j, k) == chestBlock) {
             return new InventoryLargeChest(origChest.getInvName(), (TileEntityChest) world.getBlockTileEntity(i - 1, j, k), origChest);
         }
-        if (world.getBlockId(i, j, k - 1) == chestBlock) {
+        if (world.getBlock(i, j, k - 1) == chestBlock) {
             return new InventoryLargeChest(origChest.getInvName(), (TileEntityChest) world.getBlockTileEntity(i, j, k - 1), origChest);
         }
         // If we're the lower chest, skip ourselves
-        if (world.getBlockId(i + 1, j, k) == chestBlock) {
+        if (world.getBlock(i + 1, j, k) == chestBlock) {
             if (openBothSides) {
                 return new InventoryLargeChest(origChest.getInvName(), origChest, (TileEntityChest) world.getBlockTileEntity(i + 1, j, k));
             }
             return null;
         }
-        if (world.getBlockId(i, j, k + 1) == chestBlock) {
+        if (world.getBlock(i, j, k + 1) == chestBlock) {
             if (openBothSides) {
                 return new InventoryLargeChest(origChest.getInvName(), origChest, (TileEntityChest) world.getBlockTileEntity(i, j, k + 1));
             }
@@ -1366,11 +1367,11 @@ public class FzUtil {
                 }
             }
 
-            if (i == 2 && firstItem.itemID == secondItem.itemID && firstItem.stackSize == 1 && secondItem.stackSize == 1 && Item.itemsList[firstItem.itemID].isRepairable())
+            if (i == 2 && firstItems.itemID == secondItems.itemID && firstItems.stackSize == 1 && secondItems.stackSize == 1 && Items.itemsList[firstItems.itemID].isRepairable())
             {
-                Item item = Item.itemsList[firstItem.itemID];
-                int k = item.getMaxDamage() - firstItem.getItemDamageForDisplay();
-                int l = item.getMaxDamage() - secondItem.getItemDamageForDisplay();
+                Item item = Items.itemsList[firstItems.itemID];
+                int k = item.getMaxDamage() - firstItems.getItemDamageForDisplay();
+                int l = item.getMaxDamage() - secondItems.getItemDamageForDisplay();
                 int i1 = k + l + item.getMaxDamage() * 5 / 100;
                 int j1 = item.getMaxDamage() - i1;
 
@@ -1379,7 +1380,7 @@ public class FzUtil {
                     j1 = 0;
                 }
 
-                result = new ItemStack(firstItem.itemID, 1, j1);
+                result = new ItemStack(firstItems.itemID, 1, j1);
             }
         }
         
@@ -1580,7 +1581,7 @@ public class FzUtil {
     }
     
     public static FluidStack drainSpecificBlockFluid(World worldObj, int x, int y, int z, boolean doDrain, Fluid targetFluid) {
-        Block b = Blocks.blocksList[worldObj.getBlockId(x, y, z)];
+        Block b = Blocks.blocksList[worldObj.getBlock(x, y, z)];
         if (!(b instanceof IFluidBlock)) {
             Fluid vanilla;
             if (b == Blocks.waterStill || b == Blocks.waterMoving) {

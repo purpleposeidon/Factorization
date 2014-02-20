@@ -13,6 +13,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -88,7 +89,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 if (FzUtil.isTagBig(tag, 1024) >= 1024) {
                     is.setTagCompound(null);
                     if (huge_tag_warnings == 0) {
-                        Core.logWarning("FIXME: Need to add in Item.getTagForClient"); //TODO
+                        Core.logWarning("FIXME: Need to add in Items.getTagForClient"); //TODO
                     }
                     if (huge_tag_warnings++ < 10) {
                         Core.logWarning("Item " + is + " has a large NBT tag; it won't be sent over the wire.");

@@ -79,7 +79,7 @@ public class ValueTransfer extends Instruction {
     }
 
     @Override
-    public IIcon getIIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         switch (action) {
         default:
         case MOVE_VALUE: return BlockIcons.servo$move_value;

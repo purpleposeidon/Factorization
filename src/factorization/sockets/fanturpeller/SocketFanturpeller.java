@@ -367,7 +367,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
             GL11.glPushMatrix();
             GL11.glRotatef(90, 1, 0, 0);
             GL11.glTranslatef(-0.5F, -0.5F, 0);
-            FactorizationBlockRender.renderItemIIcon(Core.registry.fan.getIIconFromDamage(0));
+            FactorizationBlockRender.renderItemIIcon(Core.registry.fan.getIconFromDamage(0));
             GL11.glPopMatrix();
         }
     }

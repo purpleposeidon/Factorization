@@ -113,7 +113,7 @@ public class ShifterControl extends Instruction {
     }
     
     @Override
-    public IIcon getIIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         switch (mode) {
         default:
         case EXPORT_MODE: return BlockIcons.servo$ctrl$shift_export;

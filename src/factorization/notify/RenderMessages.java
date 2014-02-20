@@ -200,7 +200,7 @@ public class RenderMessages extends RenderMessagesProxy {
             RenderBlocks rb = mc.renderGlobal.globalRenderBlocks;
             
             GL11.glTranslatef((float) (halfWidth + 4), -lineCount/2, 0);
-            renderItem.renderItemAndEffectIntoGUI(fr, re, m.item, 0, 0);
+            renderItems.renderItemAndEffectIntoGUI(fr, re, m.item, 0, 0);
         }
 
         GL11.glPopMatrix();

@@ -96,11 +96,11 @@ public class ItemSocketPart extends ItemFactorization {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIIconFromDamage(int md) {
+    public IIcon getIconFromDamage(int md) {
         if (md > 0 && md < socketIIcons.length) {
             return socketIIcons[md];
         }
-        return super.getIIconFromDamage(md);
+        return super.getIconFromDamage(md);
     }
     
     @Override

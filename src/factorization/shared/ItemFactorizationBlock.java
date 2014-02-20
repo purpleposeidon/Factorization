@@ -64,8 +64,8 @@ public class ItemFactorizationBlock extends ItemBlock {
     }
 
     @Override
-    public IIcon getIIconFromDamage(int damage) {
-        return Core.registry.factory_block.getIIcon(0, damage);
+    public IIcon getIconFromDamage(int damage) {
+        return Core.registry.factory_block.getIcon(0, damage);
     }
 
     @Override

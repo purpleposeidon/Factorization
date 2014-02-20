@@ -33,7 +33,7 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
     }
     
     @Override
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         switch (dir) {
         case UP: return BlockIcons.turbine_top;
         case DOWN: return BlockIcons.turbine_bottom;

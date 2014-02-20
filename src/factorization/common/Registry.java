@@ -17,6 +17,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
@@ -216,9 +217,9 @@ public class Registry implements ICraftingHandler, ITickHandler {
         if (added_ids.contains(default_id)) {
             throw new RuntimeException("Default ID already used: " + default_id);
         }
-        if (Item.itemsList[id] != null) {
+        if (Items.itemsList[id] != null) {
             throw new RuntimeException("Item ID conflict: " + id + " is already taken by "
-                    + Item.itemsList[id] + "; tried to use it for Factorization " + name);
+                    + Items.itemsList[id] + "; tried to use it for Factorization " + name);
         }
         added_ids.add(default_id);
         return id;
@@ -226,7 +227,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
     
     void postMakeItems() {
         for (int id : added_ids) {
-            Item it = Item.itemsList[id + 256];
+            Item it = Items.itemsList[id + 256];
             if (it == null) {
                 continue; //This is weird.
             }
@@ -243,8 +244,8 @@ public class Registry implements ICraftingHandler, ITickHandler {
         sludge = new ItemCraftingComponent(itemID("sludge", 9039), "sludge");
         OreDictionary.registerOre("sludge", sludge);
         //ItemBlocks
-        item_factorization = (ItemFactorizationBlock) Item.itemsList[factory_block.blockID];
-        item_resource = (ItemBlockResource) Item.itemsList[resource_block.blockID];
+        item_factorization = (ItemFactorizationBlock) Items.itemsList[factory_block.blockID];
+        item_resource = (ItemBlockResource) Items.itemsList[resource_block.blockID];
 
         //BlockFactorization stuff
         router_item = FactoryType.ROUTER.itemStack();
@@ -423,7 +424,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 params[i] = "cobblestone";
             } else if (params[i] == Blocks.stone) {
                 params[i] = "stone";
-            } else if (params[i] == Item.stick) {
+            } else if (params[i] == Items.stick) {
                 params[i] = "stickWood";
             }
         }
@@ -458,21 +459,21 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "ILI",
                 " I ",
                 'I', dark_iron,
-                'O', Item.enderPearl,
-                'L', Item.leather); // LOL!
-        shapelessRecipe(BOH, BOH, dark_iron, Item.enderPearl, Item.leather); //ILI!
-        boh_upgrade_recipe = FzUtil.createShapelessRecipe(BOH, BOH, dark_iron, Item.enderPearl, Item.leather); // I !
+                'O', Items.enderPearl,
+                'L', Items.leather); // LOL!
+        shapelessRecipe(BOH, BOH, dark_iron, Items.enderPearl, Items.leather); //ILI!
+        boh_upgrade_recipe = FzUtil.createShapelessRecipe(BOH, BOH, dark_iron, Items.enderPearl, Items.leather); // I !
         // Pocket Crafting Table (pocket table)
         oreRecipe(new ItemStack(pocket_table),
                 " #",
                 "| ",
                 '#', Blocks.workbench,
-                '|', Item.stick);
+                '|', Items.stick);
 
         recipe(new ItemStack(logicMatrixIdentifier),
                 "MiX",
                 'M', logicMatrix,
-                'i', Item.netherQuartz,
+                'i', Items.netherQuartz,
                 'X', logicMatrixProgrammer);
         oreRecipe(new ItemStack(logicMatrixController),
                 "MiX",
@@ -488,12 +489,12 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "DSI",
                 " #>",
                 "BSI",
-                'D', Item.record13,
-                'B', Item.record11,
+                'D', Items.record13,
+                'B', Items.record11,
                 'S', diamond_shard,
                 'I', dark_iron,
                 '#', logicMatrix,
-                '>', Item.comparator);
+                '>', Items.comparator);
         int librarianVillager = 1;
         VillagerRegistry.instance().registerVillageTradeHandler(librarianVillager, new IVillageTradeHandler() {
             @Override
@@ -516,7 +517,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "D ",
                 " B",
                 'D', diamond_shard,
-                'B', Item.netherrackBrick /* netherbrick */);
+                'B', Items.netherrackBrick /* netherbrick */);
 
         //Resources
         recipe(new ItemStack(lead_ingot, 9), "#", '#', lead_block_item);
@@ -530,8 +531,8 @@ public class Registry implements ICraftingHandler, ITickHandler {
         oreRecipe(new ItemStack(sculpt_tool),
                 " c",
                 "/ ",
-                'c', Item.clay,
-                '/', Item.stick);
+                'c', Items.clay,
+                '/', Items.stick);
         ItemSculptingTool.addModeChangeRecipes();
         oreRecipe(new ItemStack(glaze_bucket),
                 "_ _",
@@ -545,20 +546,20 @@ public class Registry implements ICraftingHandler, ITickHandler {
         
         glaze_bucket.addGlaze(glaze_base_mimicry);
         
-        ItemStack charcoal = new ItemStack(Item.coal, 1, 1);
-        ItemStack bonemeal = new ItemStack(Item.dyePowder, 1, 15);
-        ItemStack lapis = new ItemStack(Item.dyePowder, 1, 4);
+        ItemStack charcoal = new ItemStack(Items.coal, 1, 1);
+        ItemStack bonemeal = new ItemStack(Items.dyePowder, 1, 15);
+        ItemStack lapis = new ItemStack(Items.dyePowder, 1, 4);
         ItemStack lead_chunks = new ItemStack(ore_reduced, 1, ItemOreProcessing.OreType.LEAD.ID);
         ItemStack iron_chunks = new ItemStack(ore_reduced, 1, ItemOreProcessing.OreType.IRON.ID);
-        Item netherquartz = Item.netherQuartz;
-        Item netherbrick = Item.netherrackBrick;
+        Item netherquartz = Items.netherQuartz;
+        Item netherbrick = Items.netherrackBrick;
         Block sand = Blocks.sand;
-        Item redstone=  Item.redstone;
-        Item slimeBall = Item.slimeBall;
+        Item redstone=  Items.redstone;
+        Item slimeBall = Items.slimeBall;
         ItemStack blackWool = new ItemStack(Blocks.cloth, 1, 15);
         
-        shapelessOreRecipe(base_common, new ItemStack(glaze_bucket), Item.bucketWater, Blocks.sand, Item.clay);
-        shapelessOreRecipe(glaze_base_mimicry, base_common, Item.redstone, Item.slimeBall, lapis);
+        shapelessOreRecipe(base_common, new ItemStack(glaze_bucket), Items.bucketWater, Blocks.sand, Items.clay);
+        shapelessOreRecipe(glaze_base_mimicry, base_common, Items.redstone, Items.slimeBall, lapis);
         
         BasicGlazes.ST_VECHS_BLACK.recipe(base_common, blackWool, charcoal);
         BasicGlazes.TEMPLE_WHITE.recipe(base_common, bonemeal, bonemeal);
@@ -578,8 +579,8 @@ public class Registry implements ICraftingHandler, ITickHandler {
         
         ItemStack waterFeature = glaze_bucket.makeMimicingGlaze(Blocks.waterMoving.blockID, 0, -1);
         ItemStack lavaFeature = glaze_bucket.makeMimicingGlaze(Blocks.lavaMoving.blockID, 0, -1);
-        shapelessOreRecipe(waterFeature, base_common, Item.bucketWater);
-        shapelessOreRecipe(lavaFeature, base_common, Item.bucketLava);
+        shapelessOreRecipe(waterFeature, base_common, Items.bucketWater);
+        shapelessOreRecipe(lavaFeature, base_common, Items.bucketLava);
         
         Core.registry.glaze_bucket.doneMakingStandardGlazes();
         
@@ -748,17 +749,17 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "oIO",
                 "MMM",
                 'M', dark_iron,
-                'I', Item.egg,
-                'o', Item.enderPearl,
-                'O', Item.eyeOfEnder);
+                'I', Items.egg,
+                'o', Items.enderPearl,
+                'O', Items.eyeOfEnder);
         recipe(router_item,
                 "MMM",
                 "OIo",
                 "MMM",
                 'M', dark_iron,
-                'I', Item.egg,
-                'o', Item.enderPearl,
-                'O', Item.eyeOfEnder);
+                'I', Items.egg,
+                'o', Items.enderPearl,
+                'O', Items.eyeOfEnder);
         // router upgrades
         recipe(new ItemStack(router_item_filter),
                 "ITI",
@@ -767,7 +768,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 'I', dark_iron,
                 'T', Blocks.torchRedstoneActive,
                 'D', logicMatrixIdentifier,
-                'G', Item.ingotGold,
+                'G', Items.ingotGold,
                 'C', Blocks.chest);
 
         oreRecipe(new ItemStack(router_machine_filter),
@@ -778,15 +779,15 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 'T', Blocks.torchRedstoneActive,
                 'D', logicMatrixIdentifier,
                 'S', "ingotSilver",
-                'B', Item.book);
+                'B', Items.book);
 
         recipe(new ItemStack(router_speed),
                 "ISI",
                 "SCS",
                 "ISI",
                 'I', dark_iron,
-                'S', Item.sugar,
-                'C', Item.cake);
+                'S', Items.sugar,
+                'C', Items.cake);
         recipe(new ItemStack(router_thorough),
                 "ISI",
                 "SSS",
@@ -798,8 +799,8 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "B!B",
                 "IBI",
                 'I', dark_iron,
-                'B', Item.blazePowder,
-                '!', Item.egg);
+                'B', Items.blazePowder,
+                '!', Items.egg);
         oreRecipe(new ItemStack(router_eject),
                 "IWI",
                 "C_C",
@@ -825,7 +826,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "#C#",
                 '#', Blocks.cobblestone,
                 'p', Blocks.pistonBase,
-                'S', Item.stick,
+                'S', Items.stick,
                 'C', Blocks.workbench);
 
         //Packager
@@ -835,7 +836,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "#C#",
                 '#', Blocks.cobblestone,
                 'p', Blocks.pistonBase,
-                'I', Item.ingotIron,
+                'I', Items.ingotIron,
                 'C', Blocks.workbench);
         
         //Compression Crafter
@@ -867,34 +868,34 @@ public class Registry implements ICraftingHandler, ITickHandler {
         
         //most ores give 0.4F stone, but redstone is dense.
         //mining redstone normally gives 4 to 6 ore. 5.8F should get you a slightly better yield.
-        TileEntitySlagFurnace.SlagRecipes.register(Blocks.oreRedstone, 5.8F, Item.redstone, 0.2F, Blocks.stone);
+        TileEntitySlagFurnace.SlagRecipes.register(Blocks.oreRedstone, 5.8F, Items.redstone, 0.2F, Blocks.stone);
         
         
         oreRecipe(greenware_item,
                 "c",
                 "-",
-                'c', Item.clay,
+                'c', Items.clay,
                 '-', "slabWood");
 
         //Electricity
 
         
-        shapelessRecipe(sulfuric_acid, Item.gunpowder, Item.gunpowder, Item.coal, Item.potion);
-        shapelessOreRecipe(sulfuric_acid, "dustSulfur", Item.coal, Item.potion);
-        shapelessRecipe(aqua_regia, sulfuric_acid, nether_powder, Item.fireballCharge);
-        shapelessRecipe(aqua_regia, sulfuric_acid, Item.blazePowder, Item.fireballCharge); //I'd kind of like this to be a recipe for a different — but compatible — aqua regia. 
+        shapelessRecipe(sulfuric_acid, Items.gunpowder, Items.gunpowder, Items.coal, Items.potion);
+        shapelessOreRecipe(sulfuric_acid, "dustSulfur", Items.coal, Items.potion);
+        shapelessRecipe(aqua_regia, sulfuric_acid, nether_powder, Items.fireballCharge);
+        shapelessRecipe(aqua_regia, sulfuric_acid, Items.blazePowder, Items.fireballCharge); //I'd kind of like this to be a recipe for a different — but compatible — aqua regia. 
         recipe(new ItemStack(fan),
                 "I I",
                 " - ",
                 "I I",
-                'I', Item.ingotIron,
+                'I', Items.ingotIron,
                 '-', Blocks.pressurePlateIron);
         if (FzConfig.enable_solar_steam) {
             recipe(solarboiler_item,
                     "I#I",
                     "I I",
                     "III",
-                    'I', Item.ingotIron,
+                    'I', Items.ingotIron,
                     '#', Blocks.fenceIron
                     );
         }
@@ -902,7 +903,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "I#I",
                 "GXG",
                 "LML",
-                'I', Item.ingotIron,
+                'I', Items.ingotIron,
                 '#', Blocks.fenceIron,
                 'G', Blocks.thinGlass,
                 'X', fan,
@@ -912,24 +913,24 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "BPB",
                 "BAB",
                 "BLB",
-                'B', Item.bone,
+                'B', Items.bone,
                 'P', Blocks.pistonStickyBase,
                 'A', sulfuric_acid,
-                'L', Item.leather);
+                'L', Items.leather);
         oreRecipe(new ItemStack(charge_meter),
                 "WSW",
                 "W|W",
                 "LIL",
                 'W', "plankWood",
-                'S', Item.sign,
-                '|', Item.stick,
+                'S', Items.sign,
+                '|', Items.stick,
                 'L', "ingotLead",
-                'I', Item.ingotIron);
+                'I', Items.ingotIron);
         oreRecipe(new ItemStack(battery, 1, 2),
                 "ILI",
                 "LAL",
                 "ILI",
-                'I', Item.ingotIron,
+                'I', Items.ingotIron,
                 'L', "ingotLead",
                 'A', acid);
         oreRecipe(leydenjar_item,
@@ -959,7 +960,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 'C', insulated_coil,
                 'B', battery,
                 'L', "ingotLead",
-                'I', Item.ingotIron);
+                'I', Items.ingotIron);
         if (FzConfig.enable_solar_steam) { //NOTE: This'll probably cause a bug when we use mirrors for other things
             oreRecipe(new ItemStack(mirror),
                     "SSS",
@@ -984,30 +985,30 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "I*I",
                 "IMI",
                 'L', "ingotLead",
-                'I', Item.ingotIron,
+                'I', Items.ingotIron,
                 '*', diamond_cutting_head,
                 'M', motor);*/
         shapelessRecipe(socket_lacerator, grinder_item);
         
         //Values based on Fortune I
-        TileEntityGrinder.addRecipe(new ItemStack(Blocks.oreCoal), new ItemStack(Item.coal), 1.5F);
-        TileEntityGrinder.addRecipe("oreRedstone", new ItemStack(Item.redstone), 5F);
-        TileEntityGrinder.addRecipe("oreDiamond", new ItemStack(Item.diamond), 1.25F);
-        TileEntityGrinder.addRecipe("oreEmerald", new ItemStack(Item.emerald), 1.25F);
-        TileEntityGrinder.addRecipe(new ItemStack(Blocks.oreNetherQuartz), new ItemStack(Item.netherQuartz), 2.5F /* It should actually be 1.25, but I feel like being EXTRA generous here. */);
-        TileEntityGrinder.addRecipe("oreLapis", new ItemStack(Item.dyePowder, 1, 4), 8.5F);
+        TileEntityGrinder.addRecipe(new ItemStack(Blocks.oreCoal), new ItemStack(Items.coal), 1.5F);
+        TileEntityGrinder.addRecipe("oreRedstone", new ItemStack(Items.redstone), 5F);
+        TileEntityGrinder.addRecipe("oreDiamond", new ItemStack(Items.diamond), 1.25F);
+        TileEntityGrinder.addRecipe("oreEmerald", new ItemStack(Items.emerald), 1.25F);
+        TileEntityGrinder.addRecipe(new ItemStack(Blocks.oreNetherQuartz), new ItemStack(Items.netherQuartz), 2.5F /* It should actually be 1.25, but I feel like being EXTRA generous here. */);
+        TileEntityGrinder.addRecipe("oreLapis", new ItemStack(Items.dyePowder, 1, 4), 8.5F);
         
         //VANILLA RECIPES
         //These are based on going through the Search tab in the creative menu
         //When we turn the Grinder into a Lacerator, anything not specified here will be broken in the usual manner.
         TileEntityGrinder.addRecipe(Blocks.stone, new ItemStack(Blocks.cobblestone), 1);
         TileEntityGrinder.addRecipe(Blocks.cobblestone, new ItemStack(Blocks.gravel), 1);
-        TileEntityGrinder.addRecipe("treeSapling", new ItemStack(Item.stick), 1.25F);
+        TileEntityGrinder.addRecipe("treeSapling", new ItemStack(Items.stick), 1.25F);
         TileEntityGrinder.addRecipe(Blocks.gravel, new ItemStack(Blocks.sand), 1);
-        TileEntityGrinder.addRecipe("treeLeaves", new ItemStack(Item.stick), 0.5F);
+        TileEntityGrinder.addRecipe("treeLeaves", new ItemStack(Items.stick), 0.5F);
         TileEntityGrinder.addRecipe(Blocks.glass, new ItemStack(Blocks.sand), 0.1F);
-        TileEntityGrinder.addRecipe(Blocks.web, new ItemStack(Item.silk), 0.25F);
-        TileEntityGrinder.addRecipe(Blocks.brick, new ItemStack(Item.brick), 3.5F);
+        TileEntityGrinder.addRecipe(Blocks.web, new ItemStack(Items.silk), 0.25F);
+        TileEntityGrinder.addRecipe(Blocks.brick, new ItemStack(Items.brick), 3.5F);
         TileEntityGrinder.addRecipe(Blocks.cobblestoneMossy, new ItemStack(Blocks.gravel), 1);
         //Now's a fine time to add the mob spawner
         TileEntityGrinder.addRecipe(Blocks.mobSpawner, new ItemStack(Blocks.fenceIron), 2.5F);
@@ -1015,37 +1016,37 @@ public class Registry implements ICraftingHandler, ITickHandler {
         //Chest, but we don't want to support wood transmutes.
         TileEntityGrinder.addRecipe(Blocks.furnaceIdle, new ItemStack(Blocks.cobblestone), 7F);
         TileEntityGrinder.addRecipe(Blocks.furnaceBurning, new ItemStack(Blocks.stone), 7F);
-        TileEntityGrinder.addRecipe(Blocks.ladder, new ItemStack(Item.stick), 1.5F);
-        TileEntityGrinder.addRecipe(Blocks.snow, new ItemStack(Item.snowball), 0.25F);
-        TileEntityGrinder.addRecipe(Blocks.blockSnow, new ItemStack(Item.snowball), 4F);
-        TileEntityGrinder.addRecipe(Blocks.clay, new ItemStack(Item.clay), 4F);
-        TileEntityGrinder.addRecipe(Blocks.fence, new ItemStack(Item.stick), 2.5F);
+        TileEntityGrinder.addRecipe(Blocks.ladder, new ItemStack(Items.stick), 1.5F);
+        TileEntityGrinder.addRecipe(Blocks.snow, new ItemStack(Items.snowball), 0.25F);
+        TileEntityGrinder.addRecipe(Blocks.blockSnow, new ItemStack(Items.snowball), 4F);
+        TileEntityGrinder.addRecipe(Blocks.clay, new ItemStack(Items.clay), 4F);
+        TileEntityGrinder.addRecipe(Blocks.fence, new ItemStack(Items.stick), 2.5F);
         //Netherrack dust is handled elsewhere!
-        TileEntityGrinder.addRecipe(Blocks.glowStone, new ItemStack(Item.glowstone), 4F);
-        TileEntityGrinder.addRecipe(Blocks.trapdoor, new ItemStack(Item.stick), 3.5F);
+        TileEntityGrinder.addRecipe(Blocks.glowStone, new ItemStack(Items.glowstone), 4F);
+        TileEntityGrinder.addRecipe(Blocks.trapdoor, new ItemStack(Items.stick), 3.5F);
         TileEntityGrinder.addRecipe(Blocks.stoneBrick, new ItemStack(Blocks.cobblestone), 0.75F);
         TileEntityGrinder.addRecipe(Blocks.thinGlass, new ItemStack(Blocks.sand), 0.1F/16F);
-        TileEntityGrinder.addRecipe(Blocks.melon, new ItemStack(Item.melon), 7.75F);
-        TileEntityGrinder.addRecipe(Blocks.fenceGate, new ItemStack(Item.stick), 2.5F);
-        TileEntityGrinder.addRecipe(Blocks.netherBrick, new ItemStack(Item.netherrackBrick), 3.5F);
-        TileEntityGrinder.addRecipe(Blocks.netherFence, new ItemStack(Item.netherrackBrick), 2.5F);
+        TileEntityGrinder.addRecipe(Blocks.melon, new ItemStack(Items.melon), 7.75F);
+        TileEntityGrinder.addRecipe(Blocks.fenceGate, new ItemStack(Items.stick), 2.5F);
+        TileEntityGrinder.addRecipe(Blocks.netherBrick, new ItemStack(Items.netherrackBrick), 3.5F);
+        TileEntityGrinder.addRecipe(Blocks.netherFence, new ItemStack(Items.netherrackBrick), 2.5F);
         //TODO: Asbestos from endstone
-        TileEntityGrinder.addRecipe(Blocks.redstoneLampActive, new ItemStack(Item.glowstone), 4F);
-        TileEntityGrinder.addRecipe(Blocks.redstoneLampIdle, new ItemStack(Item.glowstone), 4F);
+        TileEntityGrinder.addRecipe(Blocks.redstoneLampActive, new ItemStack(Items.glowstone), 4F);
+        TileEntityGrinder.addRecipe(Blocks.redstoneLampIdle, new ItemStack(Items.glowstone), 4F);
         //Don't want to be responsible for some netherstar exploit involving a beacon, so no beacon.
         //Walls have weird geometry
-        TileEntityGrinder.addRecipe(Blocks.blockNetherQuartz, new ItemStack(Item.netherQuartz), 3.5F);
-        TileEntityGrinder.addRecipe(Blocks.hay /* blockHay */, new ItemStack(Item.wheat), 8.25F);
+        TileEntityGrinder.addRecipe(Blocks.blockNetherQuartz, new ItemStack(Items.netherQuartz), 3.5F);
+        TileEntityGrinder.addRecipe(Blocks.hay /* blockHay */, new ItemStack(Items.wheat), 8.25F);
         
         //So, that's blocks. How about items?
-        TileEntityGrinder.addRecipe(Item.book, new ItemStack(Item.leather), 0.75F); //Naughty.
-        TileEntityGrinder.addRecipe(Item.enchantedBook, new ItemStack(Item.leather), 0.9F);
+        TileEntityGrinder.addRecipe(Items.book, new ItemStack(Items.leather), 0.75F); //Naughty.
+        TileEntityGrinder.addRecipe(Items.enchantedBook, new ItemStack(Items.leather), 0.9F);
         //NOTE: We're going to have to do something tricksy for the lacerator...
         //These go to Blocks.skull, but the item damagevalue != block metadata.
-        TileEntityGrinder.addRecipe(new ItemStack(Item.skull, 1, 0 /* skele */), new ItemStack(Item.dyePowder, 1, 15 /* bonemeal */), 6.5F);
-        TileEntityGrinder.addRecipe(new ItemStack(Item.skull, 1, 2 /* zombie */), new ItemStack(Item.rottenFlesh), 2.5F);
-        TileEntityGrinder.addRecipe(new ItemStack(Item.skull, 1, 3 /* player */), new ItemStack(Item.rottenFlesh), 3.5F);
-        TileEntityGrinder.addRecipe(new ItemStack(Item.skull, 1, 4 /* creeper */), new ItemStack(Item.gunpowder), 1.5F);
+        TileEntityGrinder.addRecipe(new ItemStack(Items.skull, 1, 0 /* skele */), new ItemStack(Items.dyePowder, 1, 15 /* bonemeal */), 6.5F);
+        TileEntityGrinder.addRecipe(new ItemStack(Items.skull, 1, 2 /* zombie */), new ItemStack(Items.rottenFlesh), 2.5F);
+        TileEntityGrinder.addRecipe(new ItemStack(Items.skull, 1, 3 /* player */), new ItemStack(Items.rottenFlesh), 3.5F);
+        TileEntityGrinder.addRecipe(new ItemStack(Items.skull, 1, 4 /* creeper */), new ItemStack(Items.gunpowder), 1.5F);
         
         
         
@@ -1056,24 +1057,24 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 'X', fan,
                 'M', motor,
                 'L', "ingotLead",
-                'U', Item.cauldron);
-        FurnaceRecipes.smelting().addSmelting(sludge.itemID, 0, new ItemStack(Item.clay), 0.1F);
+                'U', Items.cauldron);
+        FurnaceRecipes.smelting().addSmelting(sludge.itemID, 0, new ItemStack(Items.clay), 0.1F);
         oreRecipe(crystallizer_item,
                 "-",
                 "S",
                 "U",
-                '-', Item.stick,
-                'S', Item.silk,
-                'U', Item.cauldron);
-        ItemStack lime = new ItemStack(Item.dyePowder, 1, 10);
-        TileEntityCrystallizer.addRecipe(lime, new ItemStack(Item.slimeBall), 1, new ItemStack(Item.bucketMilk));
+                '-', Items.stick,
+                'S', Items.silk,
+                'U', Items.cauldron);
+        ItemStack lime = new ItemStack(Items.dyePowder, 1, 10);
+        TileEntityCrystallizer.addRecipe(lime, new ItemStack(Items.slimeBall), 1, new ItemStack(Items.bucketMilk));
         
         //Rocketry
         TileEntityGrinder.addRecipe(new ItemStack(Blocks.netherrack), new ItemStack(nether_powder, 1), 1);
         if (FzConfig.enable_dimension_slice) {
             shapelessRecipe(new ItemStack(rocket_fuel, 9),
                     nether_powder, nether_powder, nether_powder,
-                    nether_powder, Item.fireballCharge, nether_powder,
+                    nether_powder, Items.fireballCharge, nether_powder,
                     nether_powder, nether_powder, nether_powder);
             recipe(new ItemStack(rocket_engine),
                     "#F#",
@@ -1081,7 +1082,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                     "I I",
                     '#', Blocks.blockIron,
                     'F', rocket_fuel,
-                    'I', Item.ingotIron);
+                    'I', Items.ingotIron);
         }
         
         //Servos
@@ -1122,7 +1123,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "#",
                 "T",
                 '#', instruction_plate,
-                'T', Item.sign);
+                'T', Items.sign);
     }
     
     private void makeServoRecipes() {
@@ -1143,11 +1144,11 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "qCL",
                 "SIB",
                 "rCL",
-                'q', Item.netherQuartz,
-                'r', Item.redstone,
+                'q', Items.netherQuartz,
+                'r', Items.redstone,
                 'S', dark_iron_sprocket,
                 'C', insulated_coil,
-                'I', Item.ingotIron,
+                'I', Items.ingotIron,
                 'B', battery,
                 'L', "ingotLead");
         oreRecipe(new ItemStack(servo_placer),
@@ -1165,7 +1166,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "CvC",
                 'C', Blocks.cobblestone,
                 '#', Blocks.fenceIron,
-                'I', Item.ingotIron,
+                'I', Items.ingotIron,
                 'm', logicMatrixIdentifier,
                 'v', Blocks.dropper);
     }

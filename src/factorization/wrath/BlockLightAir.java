@@ -3,10 +3,10 @@ package factorization.wrath;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialTransparent;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
@@ -19,7 +19,6 @@ import factorization.shared.Core;
 
 public class BlockLightAir extends Block {
     static public final int air_md = 0;
-    static public final int fire_md = 1;
     static MaterialTransparent actuallyTransparentMaterial = new MaterialTransparent(Material.air.materialMapColor) {
         @Override
         public boolean isOpaque() {
@@ -27,12 +26,12 @@ public class BlockLightAir extends Block {
         }
     };
 
-    public BlockLightAir(int id) {
-        super(id, Material.air);
-        setLightValue(1F);
+    public BlockLightAir() {
+        super(Material.air);
+        setLightLevel(1F);
         setHardness(0.1F);
         setResistance(0.1F);
-        setUnlocalizedName("lightair");
+        setBlockName("lightair");
         if (FzConfig.debug_light_air) {
             float r = 0.1F;
             float b = 0.5F;
@@ -44,30 +43,28 @@ public class BlockLightAir extends Block {
     }
 
     @Override
-    public void breakBlock(World w, int x, int y, int z, int id, int md) {
+    public void breakBlock(World w, int x, int y, int z, Block id, int md) {
         //Don't need super calls because we don't carry TEs
         if (w.isRemote) {
             return;
         }
-        if (md == air_md) {
-            if (TileEntityWrathLamp.isUpdating) {
-                return;
-            }
-            TileEntityWrathLamp.doAirCheck(w, x, y, z);
-            Block below = w.getBlock(x, y - 1, z);
-            if (below == this) {
-                w.scheduleBlockUpdate(x, y - 1, z, this, 1);
-            }
+        if (TileEntityWrathLamp.isUpdating) {
+            return;
+        }
+        TileEntityWrathLamp.doAirCheck(w, x, y, z);
+        Block below = w.getBlock(x, y - 1, z);
+        if (below == this) {
+            w.scheduleBlockUpdate(x, y - 1, z, this, 1);
         }
     }
     
     @Override
-    public void registerIIcons(IIconRegister reg) { }
+    public void registerBlockIcons(IIconRegister reg) { }
     
     @Override
-    public IIcon getIIcon(int side, int md) {
+    public IIcon getIcon(int side, int md) {
         if (FzConfig.debug_light_air) {
-            return Blocks.glowStone.getBlockTextureFromSide(0);
+            return Blocks.glowstone.getBlockTextureFromSide(0);
         }
         return BlockIcons.transparent;
     }
@@ -75,29 +72,22 @@ public class BlockLightAir extends Block {
     static Random rand = new Random();
 
     @Override
-    public void onNeighborBlockChange(World w, int x, int y, int z, int neighborID) {
+    public void onNeighborBlockChange(World w, int x, int y, int z, Block neighborID) {
         int md = w.getBlockMetadata(x, y, z);
-        if (md == air_md) {
-            int notifyFlag = Coord.NOTIFY_NEIGHBORS | Coord.UPDATE;
-            if (neighborID == Blocks.cobblestoneWall.blockID) {
-                if (w.getBlockId(x, y - 1, z) == Blocks.cobblestoneWall.blockID) {
-                    w.setBlock(x, y, z, 0, 0, notifyFlag);
-                    return;
-                }
-            }
-            TileEntityWrathLamp.doAirCheck(w, x, y, z);
-            Block b = Blocks.blocksList[w.getBlockId(x, y + 1, z)];
-            if (b != null && !b.isAir(w, x, y + 1, z)) {
-                //a li'l hack for sand
-                w.setBlock(x, y, z, 0, 0, 0);
-                b.updateTick(w, x, y + 1, z, rand);
-                w.setBlock(x, y, z, blockID, air_md, 0);
+        int notifyFlag = Coord.NOTIFY_NEIGHBORS | Coord.UPDATE;
+        if (neighborID == Blocks.cobblestone_wall) {
+            if (w.getBlock(x, y - 1, z) == Blocks.cobblestone_wall) {
+                w.setBlockToAir(x, y, z);
+                return;
             }
         }
-        if (md == fire_md) {
-            if (w.isAirBlock(x - 1, y, z) && w.isAirBlock(x + 1, y, z) && w.isAirBlock(x, y - 1, z) && w.isAirBlock(x, y + 1, z) && w.isAirBlock(x, y, z - 1) && w.isAirBlock(x, y, z + 1)) {
-                w.setBlock(x, y, z, 0, 0, Coord.UPDATE);
-            }
+        TileEntityWrathLamp.doAirCheck(w, x, y, z);
+        Block b = Blocks.blocksList[w.getBlock(x, y + 1, z)];
+        if (b != null && !b.isAir(w, x, y + 1, z)) {
+            //a li'l hack for sand
+            w.setBlock(x, y, z, 0, 0, 0);
+            b.updateTick(w, x, y + 1, z, rand);
+            w.setBlock(x, y, z, blockID, air_md, 0);
         }
     }
 
@@ -121,25 +111,18 @@ public class BlockLightAir extends Block {
     }
 
     @Override
-    public boolean isBlockReplaceable(World world, int x, int y, int z) {
-        //XXX: This doesn't actually work
-        Coord here = new Coord(world, x, y, z);
-        if (here.getMd() == fire_md) {
-            return false;
-        }
+    public boolean isReplaceable(IBlockAccess world, int x, int y, int z) {
         return true;
     }
 
     @Override
-    public boolean isAirBlock(World world, int i, int j, int k) {
+    public boolean isAir(IBlockAccess world, int i, int j, int k) {
         return true;
     }
 
     @Override
-    public boolean isBlockBurning(World world, int x, int y, int z) {
-        int id = world.getBlockId(x, y, z);
-        int md = world.getBlockMetadata(x, y, z);
-        return id == this.blockID && md == fire_md;
+    public boolean isBurning(IBlockAccess world, int x, int y, int z) {
+        return world.getBlock(x, y, z) == this && world.getBlockMetadata(x, y, z) == fire_md;
     }
 
     // Rendering

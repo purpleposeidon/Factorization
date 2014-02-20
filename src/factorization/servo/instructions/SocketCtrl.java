@@ -42,7 +42,7 @@ public class SocketCtrl extends Instruction {
     }
 
     @Override
-    public IIcon getIIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         if (mode == 1) {
             return BlockIcons.servo$socket_on;
         } else if (mode == 2) {

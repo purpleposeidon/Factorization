@@ -14,6 +14,7 @@ import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -91,10 +92,10 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
                     return;
                 }
                 Item item = stack.getItem();
-                if (item == Item.hoeStone || item == Item.hoeIron) {
+                if (item == Items.hoeStone || item == Items.hoeIron) {
                     player.addStat(AchievementList.buildHoe, 1);
                 }
-                if (item == Item.swordStone || item == Item.swordIron) {
+                if (item == Items.swordStone || item == Items.swordIron) {
                     player.addStat(AchievementList.buildSword, 1);
                 }
             }
@@ -265,7 +266,7 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         }
         
         //Make rocket item
-        ItemStack red_is = new ItemStack(Item.firework);
+        ItemStack red_is = new ItemStack(Items.firework);
         NBTTagCompound tag = new NBTTagCompound("Fireworks");
         tag.setByte("Flight", (byte) 3);
         NBTTagList explosions = new NBTTagList("Explosions");

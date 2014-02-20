@@ -12,6 +12,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.IIcon;
@@ -36,8 +37,8 @@ public class ItemAcidBottle extends ItemFactorization {
     }
     
     @Override
-    public IIcon getIIconFromDamageForRenderPass(int damage, int renderPass) {
-        return Item.potion.getIIconFromDamageForRenderPass(damage, renderPass);
+    public IIcon getIconFromDamageForRenderPass(int damage, int renderPass) {
+        return Items.potion.getIconFromDamageForRenderPass(damage, renderPass);
     }
     
     @Override

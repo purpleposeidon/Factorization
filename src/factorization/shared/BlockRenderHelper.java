@@ -100,7 +100,7 @@ public class BlockRenderHelper extends Block {
     
     @SideOnly(Side.CLIENT)
     @Override
-    public IIcon getIIcon(int side, int md) {
+    public IIcon getIcon(int side, int md) {
         IIcon ret;
         try {
             ret = textures[side];

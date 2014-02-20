@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
@@ -58,7 +59,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             float g = (float) (var18 >> 8 & 255) / 255.0F;
             float b = (float) (var18 & 255) / 255.0F;
             GL11.glColor4f(r, g, b, 1.0F);
-            FactorizationBlockRender.renderItemIIcon(crys.growing_crystal.getIIconIndex());
+            FactorizationBlockRender.renderItemIIcon(crys.growing_crystal.getIconIndex());
             glPopMatrix();
         }
 
@@ -76,7 +77,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
                     glColor4f(1F, 0.7F, 0F, 0.5F);
                 }
                 glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-            } else if (sol.getItem() == Item.bucketMilk) {
+            } else if (sol.getItem() == Items.bucketMilk) {
                 float f = 0.9F;
                 glColor4f(f, f, f, 0.2F);
                 //glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_ALPHA);

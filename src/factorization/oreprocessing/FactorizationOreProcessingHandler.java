@@ -7,6 +7,7 @@ import java.util.Iterator;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraftforge.common.MinecraftForge;
@@ -148,7 +149,7 @@ public class FactorizationOreProcessingHandler {
     }
     
     void loadWater() {
-        FluidStack h20 = FluidContainerRegistry.getFluidForFilledItem(new ItemStack(Item.bucketWater));
+        FluidStack h20 = FluidContainerRegistry.getFluidForFilledItem(new ItemStack(Items.bucketWater));
         for (FluidContainerData container : FluidContainerRegistry.getRegisteredFluidContainerData()) {
             FluidStack liq = container.fluid;
             if (h20.isFluidEqual(liq) && liq.amount == FluidContainerRegistry.BUCKET_VOLUME && container.filledContainer != null) {

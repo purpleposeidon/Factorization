@@ -56,7 +56,7 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
         }
 
         double idy = 0.40;
-        itemRender = (RenderItem) RenderManager.instance.getEntityClassRenderObject(EntityItem.class);
+        itemRender = (RenderItem) RenderManager.instance.getEntityClassRenderObject(EntityItems.class);
         final double d = 0.01;
 
         GL11.glDisable(GL11.GL_BLEND);
@@ -176,12 +176,12 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
             FontRenderer fr = getFontRenderer();
             //this draws the sparkly effect, which causes problems.
             if (is.hasEffect(0)) {
-                float orig_z = renderItem.zLevel;
-                renderItem.zLevel = 23;
-                renderItem.renderItemAndEffectIntoGUI(fr, re, is, 0, 0);
-                renderItem.zLevel = orig_z;
+                float orig_z = renderItems.zLevel;
+                renderItems.zLevel = 23;
+                renderItems.renderItemAndEffectIntoGUI(fr, re, is, 0, 0);
+                renderItems.zLevel = orig_z;
             } else {
-                renderItem.renderItemAndEffectIntoGUI(fr, re, is, 0, 0);
+                renderItems.renderItemAndEffectIntoGUI(fr, re, is, 0, 0);
             }
         }
         GL11.glPopMatrix();

@@ -34,7 +34,7 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     }
     
     @Override
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         switch (dir) {
         case UP: return BlockIcons.battery_top;
         case DOWN: return BlockIcons.battery_bottom;

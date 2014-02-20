@@ -283,7 +283,7 @@ public class TileEntityMirror extends TileEntityCommon {
             if (bx == xCoord && bz == zCoord) {
                 return true;
             }
-            int id = worldObj.getBlockId(bx, yCoord, bz);
+            int id = worldObj.getBlock(bx, yCoord, bz);
             Block b = Blocks.blocksList[id];
             boolean air_like = false;
             if (b == null) {
@@ -308,7 +308,7 @@ public class TileEntityMirror extends TileEntityCommon {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         return BlockIcons.mirror_front;
     }
     

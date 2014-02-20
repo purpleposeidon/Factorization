@@ -14,6 +14,7 @@ import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
@@ -49,7 +50,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     Charge charge = new Charge(this);
     
     @Override
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         switch (dir) {
         case UP: return BlockIcons.cauldron_top;
         default: return BlockIcons.cauldron_side;
@@ -405,7 +406,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         if (item == null) {
             return false;
         }
-        if (item == Item.paper || item == Item.book) {
+        if (item == Items.paper || item == Items.book) {
             return false;
         }
         /*if (is.getItemDamage() > 0xFF) {

@@ -252,7 +252,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         return BlockIcons.wire;
     }
 }

@@ -38,7 +38,7 @@ public class Trap extends Instruction {
     }
 
     @Override
-    public IIcon getIIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         return BlockIcons.servo$trap;
     }
 

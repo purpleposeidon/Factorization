@@ -54,7 +54,7 @@ public class TileEntityBarrel extends TileEntityFactorization {
     }
     
     @Override
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         return BlockIcons.error;
     }
     

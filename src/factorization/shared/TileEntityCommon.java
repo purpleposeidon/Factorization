@@ -40,7 +40,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public abstract BlockClass getBlockClass();
     
     @SideOnly(Side.CLIENT)
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         return BlockIcons.error;
     }
 

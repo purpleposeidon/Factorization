@@ -36,7 +36,7 @@ public class IntegerValue extends Instruction {
     }
 
     @Override
-    public IIcon getIIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         if (getVal() == 1) {
             return BlockIcons.servo$one;
         } else if (getVal() == 0) {

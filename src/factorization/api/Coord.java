@@ -491,7 +491,7 @@ public class Coord implements IDataSerializable {
 
     @Deprecated //1.7'll be making this not a thing
     public int getId() {
-        return w.getBlockId(x, y, z);
+        return w.getBlock(x, y, z);
     }
 
     public int getMd() {
@@ -499,7 +499,7 @@ public class Coord implements IDataSerializable {
     }
     
     public int getRawId() {
-        return w.getBlockId(x, y, z);
+        return w.getBlock(x, y, z);
     }
 
     public boolean isAir() {

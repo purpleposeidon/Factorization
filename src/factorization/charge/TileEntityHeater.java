@@ -38,7 +38,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
     }
     
     @Override
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         return BlockIcons.heater_spiral;
     }
 

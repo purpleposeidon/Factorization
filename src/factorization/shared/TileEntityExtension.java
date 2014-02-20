@@ -183,12 +183,12 @@ public class TileEntityExtension extends TileEntityCommon {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         TileEntityCommon p = getParent();
         if (p == null) {
-            return super.getIIcon(dir);
+            return super.getIcon(dir);
         }
-        return p.getIIcon(dir);
+        return p.getIcon(dir);
     }
     
     @Override

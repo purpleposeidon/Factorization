@@ -42,7 +42,7 @@ public class BlockResource extends Block {
     
     boolean done_spam = false;
     @Override
-    public IIcon getIIcon(int side, int md) {
+    public IIcon getIcon(int side, int md) {
         if (md >= glaze_md_start) {
             int off = md - glaze_md_start;
             if (off < BasicGlazes.values.length) {

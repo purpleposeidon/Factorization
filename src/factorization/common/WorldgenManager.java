@@ -120,10 +120,10 @@ public class WorldgenManager {
                         x = chunkX*16 + random.nextInt(16);
                         z = chunkZ*16 + random.nextInt(16);
                     }
-                    if (world.getBlockId(x, 0, z) != Blocks.bedrock.blockID) {
+                    if (world.getBlock(x, 0, z) != Blocks.bedrock.blockID) {
                         return;
                     }
-                    Block stoneBlock = Blocks.blocksList[world.getBlockId(x, 1, z)];
+                    Block stoneBlock = Blocks.blocksList[world.getBlock(x, 1, z)];
                     if (stoneBlock == null) {
                         return;
                     }

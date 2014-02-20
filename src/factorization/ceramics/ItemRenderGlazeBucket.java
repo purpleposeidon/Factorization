@@ -52,7 +52,7 @@ public class ItemRenderGlazeBucket implements IItemRenderer {
         ItemGlazeBucket bucket = (ItemGlazeBucket) is.getItem();
         if (type == ItemRenderType.ENTITY) {
             float s = 1F/16F;
-            if (!RenderItem.renderInFrame) {
+            if (!RenderItems.renderInFrame) {
                 GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
             }
             GL11.glScalef(s, s, s);
@@ -61,8 +61,8 @@ public class ItemRenderGlazeBucket implements IItemRenderer {
             GL11.glDisable(GL11.GL_BLEND);
         }
         if (type == ItemRenderType.EQUIPPED) {
-            IIcon bi = bucket.getIIconFromDamage(0);
-            ItemRenderer.renderItemIn2D(tess, bi.getMinU(), bi.getMinV(), bi.getMaxU(), bi.getMaxV(), bi.getIIconWidth(), bi.getIIconHeight(), 0.0625F);
+            IIcon bi = bucket.getIconFromDamage(0);
+            ItemRenderer.renderItemIn2D(tess, bi.getMinU(), bi.getMinV(), bi.getMaxU(), bi.getMaxV(), bi.getIconWidth(), bi.getIconHeight(), 0.0625F);
             float s = 1F/16F;
             GL11.glScalef(s, s, s);
         } else {
@@ -74,7 +74,7 @@ public class ItemRenderGlazeBucket implements IItemRenderer {
             }
             itemRenderer.renderItemIntoGUI(mc.fontRenderer, re, is, 0, 0);
         }
-        IIcon glaze = bucket.getIIcon(is, 1, null, null, 0);
+        IIcon glaze = bucket.getIcon(is, 1, null, null, 0);
         if (glaze == null) {
             glaze = Core.blockMissingIIcon;
         }

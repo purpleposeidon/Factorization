@@ -192,7 +192,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
     @Override
     public void randomDisplayTickFor(World w, int x, int y, int z, Random rand) {
         Coord here = new Coord(w, x, y, z);
-        int id = w.getBlockId(x, y, z);
+        int id = w.getBlock(x, y, z);
         int md = w.getBlockMetadata(x, y, z);
         if (id == Core.registry.factory_block.blockID) {
             TileEntity te = w.getBlockTileEntity(x, y, z);

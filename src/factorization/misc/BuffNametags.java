@@ -5,6 +5,7 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.Packet;
 import net.minecraftforge.event.EventPriority;
@@ -19,7 +20,7 @@ public class BuffNametags {
     public void buffedNametag(EntityInteractEvent event) {
         ItemStack is = event.entityPlayer.getHeldItem();
         if (is == null) return;
-        if (is.getItem() != Item.nameTag) return;
+        if (is.getItem() != Items.nameTag) return;
         if (!(event.target instanceof EntityLiving)) return;
         final EntityLiving ent = (EntityLiving) event.target;
         final String origName = ent.getCustomNameTag();

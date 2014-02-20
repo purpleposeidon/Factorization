@@ -365,7 +365,7 @@ public class GuiDataConfig extends GuiScreen {
         TextureManager tex = Minecraft.getMinecraft().renderEngine;
         tex.bindTexture(Core.itemAtlas);
         
-        IIcon lmp = Core.registry.logicMatrixProgrammer.getIIconFromDamage(0);
+        IIcon lmp = Core.registry.logicMatrixProgrammer.getIconFromDamage(0);
         
         int w = 256;
         int xSize = w, ySize = xSize;

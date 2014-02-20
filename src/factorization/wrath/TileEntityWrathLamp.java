@@ -174,7 +174,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         Core.profileStart("WrathLamp");
         for (int x = xCoord - radius; x <= xCoord + radius; x++) {
             for (int z = zCoord - radius; z <= zCoord + radius; z++) {
-                int id = worldObj.getBlockId(x, yCoord, z);
+                int id = worldObj.getBlock(x, yCoord, z);
                 if (id == Core.registry.lightair_block.blockID) {
                     if (worldObj.isRemote) {
                         worldObj.setBlock(x, yCoord, z, 0, 0, NOTIFY_NEIGHBORS);
@@ -216,7 +216,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
             if (x == xCoord && z == zCoord) {
                 return true;
             }
-            int id = worldObj.getBlockId(x, yCoord, z);
+            int id = worldObj.getBlock(x, yCoord, z);
             if (Blocks.blocksList[id] != null && Blocks.blocksList[id].isOpaqueCube() && Blocks.lightOpacity[id] != 0) {
                 return false;
             }
@@ -318,13 +318,13 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                     if (beamDepths[index] != 0) {
                         continue;
                     }
-                    int block = worldObj.getBlockId(x, height, z);
-                    int belowBlock = worldObj.getBlockId(x, height - 3, z);
+                    int block = worldObj.getBlock(x, height, z);
+                    int belowBlock = worldObj.getBlock(x, height - 3, z);
                     if (belowBlock != 0 && belowBlock != Core.registry.lightair_block.blockID && height != yCoord) {
                         beamDepths[index] = (short) height;
                         continue;
                     }
-                    if (block == 0 && worldObj.getBlockId(x, height - 1, z) == Blocks.cobblestoneWall.blockID) {
+                    if (block == 0 && worldObj.getBlock(x, height - 1, z) == Blocks.cobblestoneWall.blockID) {
                         block = -1;
                     }
                     if (block == 0) {
@@ -365,7 +365,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
 
     class Idler extends Updater {
         boolean couldUpdate(int dx, int dz) {
-            return worldObj.getBlockId(xCoord + dx, yCoord, zCoord + dz) == 0;
+            return worldObj.getBlock(xCoord + dx, yCoord, zCoord + dz) == 0;
         }
 
         @Override
@@ -439,7 +439,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         return BlockIcons.dark_iron_block;
     }
 }

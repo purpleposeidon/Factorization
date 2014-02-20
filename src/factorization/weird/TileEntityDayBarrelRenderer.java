@@ -247,13 +247,13 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
             TextureManager re = Minecraft.getMinecraft().renderEngine;
             FontRenderer fr = getFontRenderer();
             if (!is.hasEffect(0)) {
-                renderItem.renderItemAndEffectIntoGUI(fr, re, is, 0, 0);
+                renderItems.renderItemAndEffectIntoGUI(fr, re, is, 0, 0);
             } else {
                 if (interception == null) {
                     interception = new Intercepter(Minecraft.getMinecraft().getResourceManager());
                 }
                 Tessellator orig = Tessellator.instance;
-                renderItem.renderItemAndEffectIntoGUI(fr, interception, is, 0, 0);
+                renderItems.renderItemAndEffectIntoGUI(fr, interception, is, 0, 0);
                 Tessellator.instance = orig;
             }
         }

@@ -28,7 +28,7 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
         float height = 7.25F / 16F;
         float radius = 1F / 16F;
         float c = 0.5F;
-        IIcon silver = Core.registry.resource_block.getIIcon(0, ResourceType.SILVERBLOCK.md);
+        IIcon silver = Core.registry.resource_block.getIcon(0, ResourceType.SILVERBLOCK.md);
         
         //Pole
         BlockRenderHelper block = Core.registry.blockRender;

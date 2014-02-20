@@ -210,7 +210,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         if (dir == facing || dir.getOpposite() == facing) {
             return BlockIcons.socket$face;
         }

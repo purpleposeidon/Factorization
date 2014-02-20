@@ -13,7 +13,7 @@ public class GlassServoGrate extends WoodenServoGrate {
     }
     
     @Override
-    public IIcon getIIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         return Blocks.thinGlass.getBlockTextureFromSide(2);
     }
     

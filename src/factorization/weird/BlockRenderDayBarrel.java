@@ -54,7 +54,7 @@ public class BlockRenderDayBarrel extends FactorizationBlockRender {
         }
         if (pass == 0) {
             for (int i = 0; i < 6; i++) {
-                block.setTexture(i, barrel.getIIcon(ForgeDirection.getOrientation(i)));
+                block.setTexture(i, barrel.getIcon(ForgeDirection.getOrientation(i)));
             }
         } else {
             BlockIcons.BarrelTextureset set;

@@ -58,7 +58,7 @@ public class TileEntityMixerRenderer extends TileEntitySpecialRenderer {
     }
 
     static void drawProp() {
-        FactorizationBlockRender.renderItemIIcon(Core.registry.fan.getIIconFromDamage(0));
+        FactorizationBlockRender.renderItemIIcon(Core.registry.fan.getIconFromDamage(0));
     }
 
 }

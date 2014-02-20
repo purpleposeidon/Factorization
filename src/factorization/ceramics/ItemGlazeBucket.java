@@ -37,9 +37,9 @@ public class ItemGlazeBucket extends ItemFactorization {
     }
     
     @Override
-    public IIcon getIIcon(ItemStack is, int renderPass, EntityPlayer player, ItemStack usingItem, int useRemaining) {
+    public IIcon getIcon(ItemStack is, int renderPass, EntityPlayer player, ItemStack usingItem, int useRemaining) {
         if (renderPass == 0) {
-            return getIIconFromDamage(0);
+            return getIconFromDamage(0);
         }
         int id = getBlockId(is);
         Block block = Blocks.blocksList[id];
@@ -48,7 +48,7 @@ public class ItemGlazeBucket extends ItemFactorization {
             //Or could return the error icon.
             //But I think this'll look less terribly awful if a block goes away.
         }
-        return block.getIIcon(getBlockSide(is), getBlockMd(is));
+        return block.getIcon(getBlockSide(is), getBlockMd(is));
     }
     
     @Override

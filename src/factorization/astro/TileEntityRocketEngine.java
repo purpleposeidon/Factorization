@@ -59,7 +59,7 @@ public class TileEntityRocketEngine extends TileEntityCommon {
     }
     
     @Override
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         return lastValidationStatus ? BlockIcons.rocket_engine_valid : BlockIcons.rocket_engine_invalid;
     }
 

@@ -16,6 +16,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -1018,20 +1019,20 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         if (dir.offsetY != 0) {
             if (woodSlab.itemID < Blocks.blocksList.length && Blocks.blocksList[woodSlab.itemID] != null) {
                 Block b = Blocks.blocksList[woodSlab.itemID];
-                return b.getIIcon(0, woodSlab.getItemDamage());
+                return b.getIcon(0, woodSlab.getItemDamage());
             }
-            return woodSlab.getItem().getIIcon(woodSlab, 0);
+            return woodSlab.getItem().getIcon(woodSlab, 0);
         }
         Item theItem = woodLog.getItem();
         if (theItem instanceof ItemBlock) {
             Block b = Blocks.blocksList[((ItemBlock) theItem).getBlockID()];
-            return b.getIIcon(2, woodLog.getItemDamage());
+            return b.getIcon(2, woodLog.getItemDamage());
         }
-        return theItem.getIIcon(woodLog, 2);
+        return theItems.getIcon(woodLog, 2);
     }
     
     @Override
@@ -1086,7 +1087,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         make(Type.CREATIVE, new ItemStack(Blocks.bedrock), new ItemStack(Blocks.diamond_block));
     }
     
-    static ItemStack silkTouch = Item.enchantedBook.getEnchantedItemStack(new EnchantmentData(Enchantment.silkTouch, 1));
+    static ItemStack silkTouch = Items.enchantedBook.getEnchantedItemStack(new EnchantmentData(Enchantment.silkTouch, 1));
     public static void makeRecipe(ItemStack log, ItemStack slab) {
         ItemStack normal = make(Type.NORMAL, log, slab);
         Core.registry.recipe(normal,
@@ -1118,7 +1119,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         Core.registry.recipe(make(Type.STICKY, log, slab),
                 "*",
                 "0",
-                '*', Item.slimeBall,
+                '*', Items.slimeBall,
                 '0', normal);
     }
     
