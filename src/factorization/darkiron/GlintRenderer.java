@@ -34,7 +34,7 @@ public class GlintRenderer extends TileEntitySpecialRenderer {
             distPacity = 1;
         }
         BlockDarkIronOre.Glint te = (Glint) xte;
-        te.lastRenderedTick = te.worldObj.getTotalWorldTime();
+        te.lastRenderedTick = te.getWorldObj().getTotalWorldTime();
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 0, 0xF0);
         bindTexture(Core.blockAtlas);
         GL11.glPushMatrix();

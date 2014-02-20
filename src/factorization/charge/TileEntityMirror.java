@@ -87,7 +87,7 @@ public class TileEntityMirror extends TileEntityCommon {
     }
 
     boolean hasSun() {
-        boolean raining = worldObj.isRaining() && worldObj.getBiomeGenForCoords(xCoord, yCoord).rainfall > 0;
+        boolean raining = getWorldObj().isRaining() && getWorldObj().getBiomeGenForCoords(xCoord, yCoord).rainfall > 0;
         return getCoord().canSeeSky() && worldObj.isDaytime() && !raining;
     }
 

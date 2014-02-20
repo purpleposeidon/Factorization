@@ -164,9 +164,9 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
                             block.useTexture(it.getIcon(useIIcon, rc.icon_md));
                         }
                         int color = 0xFFFFFF; 
-                        if (greenware.worldObj != null) {
+                        if (greenware.getWorldObj() != null) {
                             try {
-                                color = it.colorMultiplier(greenware.worldObj, greenware.xCoord, greenware.yCoord, greenware.zCoord);
+                                color = it.colorMultiplier(greenware.getWorldObj(), greenware.xCoord, greenware.yCoord, greenware.zCoord);
                             } catch (Throwable t) {
                                 if (!spammed) {
                                     spammed = true;

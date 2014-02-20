@@ -84,7 +84,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         block.rotateCenter(q);
         
         Tessellator.instance.startDrawingQuads();
-        Tessellator.instance.setBrightness(block.getMixedBrightnessForBlock(cc.worldObj, cc.xCoord, cc.yCoord, cc.zCoord));
+        Tessellator.instance.setBrightness(block.getMixedBrightnessForBlock(cc.getWorldObj(), cc.xCoord, cc.yCoord, cc.zCoord));
         GL11.glDisable(GL11.GL_LIGHTING);
         block.renderForTileEntity();
         Tessellator.instance.draw();

@@ -88,7 +88,7 @@ public class TransferLib {
         if (wipeSrc) {
             setRaw(src, 0, 0);
         }
-        wiper.worldObj = null; //Don't hold onto a reference
+        wiper.setWorldObj(null); //Don't hold onto a reference
         if (dest.getTE() != null) {
             rawRemoveTE(dest);
         }

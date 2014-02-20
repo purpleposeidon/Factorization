@@ -101,7 +101,7 @@ public class TileEntityBarrelRenderer extends TileEntitySpecialRenderer {
     }
 
     void setupLight(TileEntityBarrel barrel, int dx, int dz) {
-        World w = barrel.worldObj;
+        World w = barrel.getWorldObj();
         if (w.isBlockOpaqueCube(barrel.xCoord + dx, barrel.yCoord, barrel.zCoord + dz)) {
             is_obscured = true;
             return;

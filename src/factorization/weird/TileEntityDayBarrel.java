@@ -456,7 +456,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     void updateClients(int messageType) {
-        if (worldObj == null || worldObj.isRemote) {
+        if (getWorldObj() == null || getWorldObj().isRemote) {
             return;
         }
         broadcastMessage(null, getPacket(messageType));

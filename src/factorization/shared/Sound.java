@@ -102,7 +102,7 @@ public enum Sound {
     }
 
     public void playAt(TileEntity ent) {
-        playAt(ent.worldObj, ent.xCoord, ent.yCoord, ent.zCoord);
+        playAt(ent.getWorldObj(), ent.xCoord, ent.yCoord, ent.zCoord);
     }
 
     public void play() {

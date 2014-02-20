@@ -296,13 +296,13 @@ public class TileEntityBarrel extends TileEntityFactorization {
     }
 
     void broadcastItem() {
-        if (worldObj != null && !worldObj.isRemote) {
+        if (getWorldObj() != null && !getWorldObj().isRemote) {
             Core.network.broadcastMessage(null, getCoord(), MessageType.BarrelItem, item);
         }
     }
 
     void broadcastItemCount() {
-        if (worldObj != null && !worldObj.isRemote) {
+        if (getWorldObj() != null && !getWorldObj().isRemote) {
             lastCount = getItemCount();
             Core.network.broadcastMessage(null, getCoord(), MessageType.BarrelCount, lastCount);
         }

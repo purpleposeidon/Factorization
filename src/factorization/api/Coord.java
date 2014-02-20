@@ -53,7 +53,7 @@ public class Coord implements IDataSerializable {
     }
 
     public Coord(TileEntity te) {
-        this(te.worldObj, te.xCoord, te.yCoord, te.zCoord);
+        this(te.getWorldObj(), te.xCoord, te.yCoord, te.zCoord);
     }
 
     public Coord(Entity ent) {
@@ -156,7 +156,7 @@ public class Coord implements IDataSerializable {
     }
     
     public void set(TileEntity te) {
-        set(te.worldObj, te.xCoord, te.yCoord, te.zCoord);
+        set(te.getWorldObj(), te.xCoord, te.yCoord, te.zCoord);
     }
 
     @Override
@@ -738,7 +738,7 @@ public class Coord implements IDataSerializable {
     }
     
     public void setAsTileEntityLocation(TileEntity te) {
-        te.worldObj = w;
+        te.setWorldObj(w);
         te.xCoord = x;
         te.yCoord = y;
         te.zCoord = z;

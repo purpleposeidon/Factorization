@@ -236,7 +236,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     }
     
     IInventory getRecursiveTarget() {
-        if (_beginRecursion() || putting_nbt || worldObj == null || worldObj.isRemote) {
+        if (_beginRecursion() || putting_nbt || getWorldObj() == null || getWorldObj().isRemote) {
             return null;
         }
         ForgeDirection facing = getFacing();

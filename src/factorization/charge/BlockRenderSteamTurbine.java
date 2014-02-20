@@ -25,7 +25,7 @@ public class BlockRenderSteamTurbine extends FactorizationBlockRender {
         renderMotor(rb, 0);
         if (world_mode) {
             Coord me = getCoord();
-            fake_wire.worldObj = me.w;
+            fake_wire.setWorldObj(me.w);
             fake_wire.xCoord = me.x;
             fake_wire.yCoord = me.y;
             fake_wire.zCoord = me.z;

@@ -395,7 +395,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 }
                 if (spawn == null) {
                     spawn = ft.makeTileEntity();
-                    spawn.worldObj = world;
+                    spawn.setWorldObj(world);
                     world.setBlockTileEntity(x, y, z, spawn);
                 }
 

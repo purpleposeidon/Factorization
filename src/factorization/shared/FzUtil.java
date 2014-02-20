@@ -846,7 +846,7 @@ public class FzUtil {
      */
     public static IInventory openDoubleChest(TileEntityChest chest, boolean openBothSides) {
         IInventory origChest = (TileEntityChest) chest;
-        World world = chest.worldObj;
+        World world = chest.getWorldObj();
         int i = chest.xCoord, j = chest.yCoord, k = chest.zCoord;
         Block cb = chest.getBlockType();
         if (cb == null) {
@@ -1248,7 +1248,7 @@ public class FzUtil {
 
         InventoryCrafting craft = getCrafter(slots);
 
-        IRecipe recipe = findMatchingRecipe(craft, where == null ? null : where.worldObj);
+        IRecipe recipe = findMatchingRecipe(craft, where == null ? null : where.getWorldObj());
         ItemStack result = null;
         if (recipe != null) {
             result = recipe.getCraftingResult(craft);

@@ -605,7 +605,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             double dist = 4.0/16.0;
             
             
-            Vec3 dir = me.worldObj.getWorldVec3Pool().getVecFromPool(0, dist, 0);
+            Vec3 dir = me.getWorldObj().getWorldVec3Pool().getVecFromPool(0, dist, 0);
             
             
             if (fd.offsetX != 0) {
