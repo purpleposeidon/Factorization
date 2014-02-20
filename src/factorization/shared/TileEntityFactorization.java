@@ -259,7 +259,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }*/
     
     @Override
-    public boolean isInvNameLocalized() {
+    public boolean hasCustomInventoryName() {
         return false;
     }
 

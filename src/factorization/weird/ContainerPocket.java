@@ -169,7 +169,7 @@ public class ContainerPocket extends Container {
         }
 
         @Override
-        public boolean isInvNameLocalized() {
+        public boolean hasCustomInventoryName() {
             return false;
         }
 

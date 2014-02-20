@@ -733,7 +733,7 @@ public class FzUtil {
         public String getInventoryName() { return "Container2IInventory wrapper"; }
         
         @Override
-        public boolean isInvNameLocalized() { return false; }
+        public boolean hasCustomInventoryName() { return false; }
         @Override
         public int getInventoryStackLimit() { return 64; }
         @Override
