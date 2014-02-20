@@ -6,7 +6,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.event.EventPriority;
-import net.minecraftforge.event.ForgeSubscribe;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -40,12 +40,12 @@ public class DseRayTarget extends Entity {
     public static class ClickHandler {
         //Note that these events will be triggered client-side only, as this entity is only used client-side.
         //(And this object will not be registered server-side)
-        @ForgeSubscribe(priority = EventPriority.HIGHEST)
+        @SubscribeEvent(priority = EventPriority.HIGHEST)
         public void leftClick(AttackEntityEvent event) {
             handle(event, event.target, false);
         }
         
-        @ForgeSubscribe(priority = EventPriority.HIGHEST)
+        @SubscribeEvent(priority = EventPriority.HIGHEST)
         public void rightClick(EntityInteractEvent event) {
             handle(event, event.target, true);
         }

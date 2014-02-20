@@ -1114,7 +1114,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
         return "FZ_registry";
     }
 
-    @ForgeSubscribe
+    @SubscribeEvent
     public boolean onItemPickup(EntityItemPickupEvent event) {
         EntityPlayer player = event.entityPlayer;
         EntityItem item = event.item;

@@ -29,7 +29,7 @@ import net.minecraft.util.IIcon;
 import net.minecraftforge.common.FakePlayer;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.event.ForgeSubscribe;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import cpw.mods.fml.relauncher.Side;
@@ -766,7 +766,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     
     private static int last_hit_side = -1;
-    @ForgeSubscribe
+    @SubscribeEvent
     public void clickEvent(PlayerInteractEvent event) {
         if (event.entityPlayer.worldObj.isRemote) {
             return;
@@ -1244,7 +1244,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         display_list = -1;
     }
     
-    @ForgeSubscribe
+    @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void removeUnloadedDisplayLists(ChunkEvent.Unload event) {
         if (!event.world.isRemote) return;

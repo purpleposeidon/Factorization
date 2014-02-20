@@ -9,14 +9,14 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.Packet;
 import net.minecraftforge.event.EventPriority;
-import net.minecraftforge.event.ForgeSubscribe;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import factorization.api.Coord;
 import factorization.shared.Core;
 import factorization.shared.NetworkFactorization.MessageType;
 
 public class BuffNametags {
-    @ForgeSubscribe(priority = EventPriority.LOW)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void buffedNametag(EntityInteractEvent event) {
         ItemStack is = event.entityPlayer.getHeldItem();
         if (is == null) return;

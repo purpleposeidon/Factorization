@@ -20,7 +20,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ForgeSubscribe;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
@@ -495,7 +495,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         //return !mc.gameSettings.keyBindSneak.pressed;
     }
     
-    @ForgeSubscribe
+    @SubscribeEvent
     public void onStitch(TextureStitchEvent.Post event) {
         int t = event.map.textureType;
         if (t == 0 /* terrain */) {

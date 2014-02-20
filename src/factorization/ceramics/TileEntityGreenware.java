@@ -28,7 +28,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.util.Vec3Pool;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.event.ForgeSubscribe;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 import org.lwjgl.opengl.GL11;
 
@@ -817,7 +817,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         v.zCoord -= player.zCoord;
     }
 
-    @ForgeSubscribe
+    @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void renderCeramicsSelection(DrawBlockHighlightEvent event) {
         if (event.target.subHit == -1) {

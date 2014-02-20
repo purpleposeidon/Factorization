@@ -201,7 +201,7 @@ public class WorldgenManager {
     
     private static ArrayList<Chunk> retrogenQueue = new ArrayList();
     
-    @ForgeSubscribe
+    @SubscribeEvent
     public void enqueueRetrogen(ChunkDataEvent.Load event) {
         if (!FzConfig.enable_retrogen) {
             return;
@@ -217,7 +217,7 @@ public class WorldgenManager {
         }
     }
     
-    @ForgeSubscribe
+    @SubscribeEvent
     public void saveRetroKey(ChunkDataEvent.Save event) {
         final NBTTagCompound data = event.getData();
         data.setString("fzRetro", FzConfig.retrogen_key);

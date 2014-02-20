@@ -25,7 +25,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.event.ForgeSubscribe;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
 import org.lwjgl.opengl.GL11;
@@ -392,7 +392,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         }
     }
     
-    @ForgeSubscribe
+    @SubscribeEvent
     public void worldChanged(WorldEvent.Unload unloadEvent) {
         //This only happens when a local server is unloaded.
         //This probably happens on a different thread, so let the usual tick handler clean it up.

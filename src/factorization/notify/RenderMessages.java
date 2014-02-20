@@ -18,7 +18,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ForgeSubscribe;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 import org.lwjgl.opengl.GL11;
 
@@ -66,7 +66,7 @@ public class RenderMessages extends RenderMessagesProxy {
         messages.add(msg);
     }
 
-    @ForgeSubscribe
+    @SubscribeEvent
     public void renderMessages(RenderWorldLastEvent event) {
         doRenderMessages(event); // Forge events are too hard for eclipse to hot-swap?
     }

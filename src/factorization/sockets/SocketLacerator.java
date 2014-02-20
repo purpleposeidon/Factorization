@@ -33,7 +33,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.EventPriority;
-import net.minecraftforge.event.ForgeSubscribe;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
@@ -316,7 +316,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         }
     }
     
-    @ForgeSubscribe(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public void captureDrops(BlockEvent.HarvestDropsEvent event) {
         if (dropGrabber == null) {
             return;
@@ -638,7 +638,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         }
     }
     
-    @ForgeSubscribe
+    @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void resetEffectRenderer(WorldEvent.Unload loadEvent) {
         particleTweaker = null;

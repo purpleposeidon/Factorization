@@ -12,7 +12,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ForgeSubscribe;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.TickType;
@@ -78,7 +78,7 @@ public class Embarkener implements ITickHandler {
         }
     }
     
-    @ForgeSubscribe
+    @SubscribeEvent
     public void enbarkenWood(PlayerInteractEvent event) {
         //FIXME: A block place event would be nice...
         //Unfortunately it flashes on the client before it gets corrected.

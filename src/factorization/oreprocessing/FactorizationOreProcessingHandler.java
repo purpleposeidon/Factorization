@@ -11,7 +11,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ForgeSubscribe;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidContainerRegistry.FluidContainerData;
 import net.minecraftforge.fluids.FluidStack;
@@ -143,7 +143,7 @@ public class FactorizationOreProcessingHandler {
         }
     }
 
-    @ForgeSubscribe
+    @SubscribeEvent
     public void registerOre(OreRegisterEvent evt) {
         handleNewOre(evt.Name, evt.Ore);
     }

@@ -32,7 +32,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
-import net.minecraftforge.event.ForgeSubscribe;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 import org.lwjgl.opengl.GL11;
 
@@ -233,7 +233,7 @@ public class HammerClientProxy extends HammerProxy {
     DseRayTarget rayTarget = null;
     AxisAlignedBB selectionBlockBounds = null;
     
-    @ForgeSubscribe
+    @SubscribeEvent
     public void renderSelection(DrawBlockHighlightEvent event) {
         //System.out.println(event.target.hitVec);
         if (!(event.target.entityHit instanceof DseRayTarget)) {
