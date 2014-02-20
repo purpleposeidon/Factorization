@@ -117,7 +117,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
                 }
             }
             if (rc.raw_color == -1) {
-                rawMimicRandom.setSeed((rc.icon_id << 16) + rc.icon_md);
+                rawMimicRandom.setSeed((rc.icon_id.getUnlocalizedName().hashCode() << 16) + rc.icon_md);
                 int c = 0;
                 for (int i = 0; i < 3; i++) {
                     c += (rawMimicRandom.nextInt(0xE0) + 10);
