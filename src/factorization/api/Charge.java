@@ -95,7 +95,6 @@ public class Charge implements IDataSerializable {
         }
         Iterable<Coord> neighbors = here.getNeighborsAdjacent();
         for (Coord n : neighbors) {
-            ChargeMetalBlockConductance.taintBlock(n);
             IChargeConductor neighbor = n.getTE(IChargeConductor.class);
             if (neighbor == null) {
                 continue;

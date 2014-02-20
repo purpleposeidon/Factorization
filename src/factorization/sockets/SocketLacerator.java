@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.particle.EntityFX;
@@ -18,27 +17,25 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.Item;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatMessageComponent;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.MovingObjectPosition.MovingObjectType;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.StatCollector;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.common.eventhandler.EventPriority;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -285,7 +282,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     
     public static final DamageSource laceration = new DamageSource("laceration") {
         @Override
-        public ChatMessageComponent getDeathMessage(EntityLivingBase victim) {
+        public IChatComponent func_151519_b(EntityLivingBase victim) {
             String ret = "death.attack.laceration.";
             if (victim.worldObj != null) {
                 long now = victim.worldObj.getTotalWorldTime();
@@ -296,10 +293,10 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             
             EntityLivingBase attacker = victim.func_94060_bK();
             String fightingMessage = ret + ".player";
-            if (attacker != null && StatCollector.func_94522_b(fightingMessage)) {
-                return ChatMessageComponent.createFromTranslationWithSubstitutions(fightingMessage, victim.getTranslatedEntityName(), attacker.getTranslatedEntityName());
+            if (attacker != null && StatCollector.canTranslate(fightingMessage)) {
+                return new ChatComponentTranslation(fightingMessage, victim.func_145748_c_(), attacker.func_145748_c_());
             } else {
-                return ChatMessageComponent.createFromTranslationWithSubstitutions(ret, victim.getTranslatedEntityName());
+                return new ChatComponentTranslation(ret, victim.func_145748_c_());
             }
         }
     };
