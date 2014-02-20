@@ -74,7 +74,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         public byte minX, minY, minZ;
         public byte maxX, maxY, maxZ;
 
-        public short icon_id; // But only for blocks; no items
+        public Block icon_id; // But only for blocks; no items
         public byte icon_md;
         public byte icon_side;
 
@@ -89,7 +89,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             out.writeByte(maxX);
             out.writeByte(maxY);
             out.writeByte(maxZ);
-            out.writeShort(icon_id);
+            out.writeShort(Block.getIdFromBlock(icon_id));
             out.writeByte(icon_md);
             out.writeByte(icon_side);
             quat.write(out);
@@ -128,7 +128,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             maxX = in.readByte();
             maxY = in.readByte();
             maxZ = in.readByte();
-            icon_id = in.readShort();
+            icon_id = Block.getBlockById(in.readShort());
             icon_md = in.readByte();
             icon_side = in.readByte();
             quat = Quaternion.read(in);
