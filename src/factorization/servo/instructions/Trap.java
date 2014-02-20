@@ -23,7 +23,7 @@ public class Trap extends Instruction {
 
     @Override
     protected ItemStack getRecipeItem() {
-        return new ItemStack(Blocks.chestTrapped);
+        return new ItemStack(Blocks.trapped_chest);
     }
 
     @Override

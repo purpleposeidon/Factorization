@@ -14,7 +14,7 @@ public class IronServoGrate extends WoodenServoGrate {
     
     @Override
     public IIcon getIcon(ForgeDirection side) {
-        return Blocks.fenceIron.getBlockTextureFromSide(2);
+        return Blocks.iron_bars.getBlockTextureFromSide(2);
     }
     
     @Override
@@ -24,6 +24,6 @@ public class IronServoGrate extends WoodenServoGrate {
                 "#-#",
                 " # ",
                 '-', Core.registry.servorail_item,
-                '#', Blocks.fenceIron);
+                '#', Blocks.iron_bars);
     }
 }

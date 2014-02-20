@@ -39,17 +39,17 @@ import factorization.weird.TileEntityDayBarrel.Type;
 
 public class BlockFactorization extends BlockContainer {
     public boolean fake_normal_render = false;
-    public BlockFactorization(int id) {
-        super(id, Core.registry.materialMachine);
+    public BlockFactorization() {
+        super(Core.registry.materialMachine);
         setHardness(2.0F);
         setResistance(5);
         setLightOpacity(0);
-        canBlockGrass[id] = true;
+        canBlockGrass = true;
         setTickRandomly(false);
     }
 
     @Override
-    public TileEntity createNewTileEntity(World world) {
+    public TileEntity createNewTileEntity(World world, int metadata) {
         //The TileEntity needs to be set by the item when the block is placed.
         //Originally I returned null here, but we're now returning this handy generic TE.
         //This is because portalgun relies on this to make a TE that won't drop anything when it's moving it.
@@ -154,7 +154,7 @@ public class BlockFactorization extends BlockContainer {
     }
     
     @Override
-    public void registerIIcons(IIconRegister reg) {
+    public void registerIcons(IIconRegister reg) {
         FactorizationTextureLoader.register(reg, BlockIcons.class, null, "factorization:");
         Core.proxy.texturepackChanged();
     }

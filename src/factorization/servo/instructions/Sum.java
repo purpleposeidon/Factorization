@@ -23,7 +23,7 @@ public class Sum extends Instruction {
 
     @Override
     protected ItemStack getRecipeItem() {
-        return new ItemStack(Blocks.fenceIron);
+        return new ItemStack(Blocks.iron_bars);
     }
     
     @Override

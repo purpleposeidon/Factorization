@@ -212,7 +212,7 @@ public class TileEntityRocketEngine extends TileEntityCommon {
         
         for (Coord spot : area) {
             if (!spot.equals(myDestination)) {
-                spot.setId(FzConfig.factory_block_id);
+                spot.setId(Core.registry.factory_block);
                 TileEntityExtension tex = new TileEntityExtension(this);
                 spot.setTE(tex);
                 tex.getBlockClass().enforce(spot);

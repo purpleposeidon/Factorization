@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import net.minecraftforge.common.Configuration;
-import net.minecraftforge.common.Property;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import factorization.shared.Core;
 
@@ -13,11 +13,6 @@ public class FzConfig {
 
     // I'd totally unstatic all these, but bluh
     public static Configuration config;
-    public static int factory_block_id = 1000;
-    public static int lightair_id = 1001;
-    public static int resource_id = 1002;
-    public static int fractured_bedrock_id = 1003;
-    public static int dark_iron_ore_id = 1004;
     public static Pattern routerBan;
     public static boolean render_barrel_item = true;
     public static boolean render_barrel_text = true;
@@ -70,20 +65,6 @@ public class FzConfig {
     public static boolean retrogen_dark_iron = false;
 
     
-
-    private int getBlockConfig(String name, int defaultId, String comment) {
-        Property prop = null;
-        if (Core.dev_environ) {
-            return defaultId;
-        } else {
-            prop = config.getBlock(name, defaultId);
-        }
-        if (comment != null && comment.length() != 0) {
-            prop.comment = comment;
-        }
-        return prop.getInt(defaultId);
-    }
-
     private int getIntConfig(String name, String category, int defaultValue, String comment) {
         Property prop = config.get(category, name, defaultValue);
         if (comment != null && comment.length() != 0) {
@@ -124,11 +105,6 @@ public class FzConfig {
             Core.logWarning("Error loading config: %s", e.toString());
             e.printStackTrace();
         }
-        factory_block_id = getBlockConfig("factoryBlockId", factory_block_id, "Factorization TileEntities");
-        lightair_id = getBlockConfig("lightAirBlockId", lightair_id, "WrathFire and invisible lamp-air made by WrathLamps");
-        resource_id = getBlockConfig("resourceBlockId", resource_id, "Ores and metal blocks mostly");
-        dark_iron_ore_id = getBlockConfig("darkIronOre", dark_iron_ore_id, null);
-        fractured_bedrock_id = getBlockConfig("fracturedBedrockBlockId", fractured_bedrock_id, null);
 
         {
             debug_light_air = getBoolConfig("debugLightAir", "client", debug_light_air, "Show invisible lamp-air");
@@ -166,9 +142,6 @@ public class FzConfig {
         silver_ore_node_new_size = Math.max(5, Math.min(config_silver_size, 35));
         gen_dark_iron_ore = getBoolConfig("generateDarkIronOre", "general", gen_dark_iron_ore, "Set to false to disable dark iron ore generation");
         gen_broken_bedrock = getBoolConfig("generateBrokenBedrock", "general", gen_broken_bedrock, "Set to false to disable broken bedrock spawning around dark iron ore");
-        if (fractured_bedrock_id <= 0) {
-            gen_broken_bedrock = false;
-        }
         
         {
             enable_retrogen = getBoolConfig("enableRetrogen", "retrogen", enable_retrogen, null);

@@ -170,7 +170,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
     int fireParticlesMax = 5;
 
     @Override
-    public void randomDisplayTickFor(World w, int x, int y, int z, Random rand) {
+    public void randomDisplayTickFor(World w, int x, int y, int z, Random rand) { //NORELEASE: This isn't necessary
         Coord here = new Coord(w, x, y, z);
         Block id = w.getBlock(x, y, z);
         int md = w.getBlockMetadata(x, y, z);
@@ -211,58 +211,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
                     w.spawnParticle("flame", (double) (var7 + var11), (double) var8, (double) (var9 + var10), 0.0D, 0.0D, 0.0D);
                 }
 
-            }
-        }
-        if (id == Core.registry.lightair_block) {
-            if (md == BlockLightAir.fire_md) {
-                int to_spawn = 1;
-                EntityPlayer player = Core.proxy.getClientPlayer();
-                boolean force = false;
-                boolean big = true;
-                if (player != null) {
-                    int dx = (int) (player.posX) - x, dy = (int) (player.posY) - y, dz = (int) (player.posZ) - z;
-                    int dist = Math.abs(dx) + Math.abs(dy) + Math.abs(dz);
-                    if (dist < 4) {
-                        to_spawn = 8;
-                        force = true;
-                        big = false;
-                    }
-                    else if (dist <= 12) {
-                        to_spawn = 4;
-                        force = true;
-                    }
-                    else if (dist <= 16) {
-                        to_spawn = 1;
-                    }
-                }
-
-                //				if (to_spawn == 1) {
-                //					if (rand.nextFloat() > 0.2) {
-                //						return;
-                //					}
-                //				}
-                if (fireParticlesSpawned >= fireParticlesMax) {
-                    if (!force) {
-                        return;
-                    }
-                    else {
-                        to_spawn /= 4;
-                    }
-                }
-                if (!force) {
-                    fireParticlesSpawned += to_spawn;
-                }
-                for (int i = 0; i < to_spawn; i++) {
-                    double X = x + .05 + rand.nextFloat() * .95;
-                    double Z = z + .05 + rand.nextFloat() * .95;
-                    EntityWrathFlameFX flame = new EntityWrathFlameFX(w,
-                            X, y + rand.nextFloat() * 0.25, Z,
-                            (rand.nextFloat() - 0.5) * 0.02, 0.05 + rand.nextFloat() * 0.04, (rand.nextFloat() - 0.5) * 0.02);
-                    if (big) {
-                        flame.setScale(4);
-                    }
-                    Minecraft.getMinecraft().effectRenderer.addEffect(flame);
-                }
             }
         }
     }

@@ -6,26 +6,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiErrorScreen;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatMessageComponent;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.ForgeVersion;
 import net.minecraftforge.common.MinecraftForge;
-import cpw.mods.fml.client.CustomModLoadingErrorDisplayException;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
@@ -35,15 +31,12 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import factorization.api.ChargeMetalBlockConductance;
 import factorization.charge.TileEntitySolarBoiler;
 import factorization.common.FactorizationProxy;
 import factorization.common.FactoryType;
@@ -52,9 +45,7 @@ import factorization.common.Registry;
 import factorization.compat.CompatManager;
 import factorization.oreprocessing.FactorizationOreProcessingHandler;
 import factorization.servo.ServoMotor;
-import factorization.wrath.TileEntityWrathFire;
 import factorization.wrath.TileEntityWrathLamp;
-import factorization.wrath.TileEntityWrathLamp.RelightTask;
 
 @Mod(modid = Core.modId, name = Core.name, version = Core.version)
 @NetworkMod(
@@ -154,13 +145,11 @@ public class Core {
 
     @EventHandler
     public void modsLoaded(FMLPostInitializationEvent event) {
-        TileEntityWrathFire.setupBurning();
         TileEntitySolarBoiler.setupSteam();
         foph.addDictOres();
 
         registry.addOtherRecipes();
         (new CompatManager()).loadCompat();
-        ChargeMetalBlockConductance.setup();
         for (FactoryType ft : FactoryType.values()) ft.getRepresentative(); // Make sure everyone's registered to the EVENT_BUS
         finished_loading = true;
     }
@@ -402,17 +391,17 @@ public class Core {
     }
     
     public static void sendChatMessage(boolean raw, ICommandSender sender, String msg) {
-        sender.sendChatToPlayer(raw ? ChatMessageComponent.createFromText(msg) : ChatMessageComponent.createFromTranslationKey(msg));
+        sender.addChatMessage(raw ? new ChatComponentText(msg) : new ChatComponentTranslation(msg));
     }
     
     public static void sendUnlocalizedChatMessage(ICommandSender sender, String format, Object... params) {
-        sender.sendChatToPlayer(ChatMessageComponent.createFromTranslationWithSubstitutions(format, params));
+        sender.addChatMessage(new ChatComponentTranslation(format, params));
     }
     
     @SideOnly(Side.CLIENT)
     public static IIcon texture(IIconRegister reg, String name) {
         name = name.replace('.', '/');
-        return reg.registerIIcon(texture_dir + name);
+        return reg.registerIcon(texture_dir + name);
     }
     
     public final static String texture_dir = "factorization:";

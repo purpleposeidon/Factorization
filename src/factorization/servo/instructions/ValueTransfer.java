@@ -32,7 +32,7 @@ public class ValueTransfer extends Instruction {
 
     @Override
     protected ItemStack getRecipeItem() {
-        return new ItemStack(Blocks.hopperBlock);
+        return new ItemStack(Blocks.hopper);
     }
 
     @Override

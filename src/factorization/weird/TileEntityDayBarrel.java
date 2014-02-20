@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.enchantment.Enchantment;
@@ -14,24 +13,25 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.network.Packet;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.FakePlayer;
-import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.common.ForgeHooks;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.ChunkEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -132,7 +132,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     void putData(DataHelper data) {
         try {
             if (data.isReader()) {
-                item = new ItemStack(0, 0, 0);
+                item = new ItemStack((Item) null);
             }
             item = data.as(Share.VISIBLE, "item").putItemStack(item);
             int count = data.as(Share.VISIBLE, "count").putInt(getItemCount());
@@ -1108,14 +1108,14 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
                 "Y",
                 "0",
                 "Y",
-                'Y', Blocks.hopperBlock,
+                'Y', Blocks.hopper,
                 '0', normal);
         Core.registry.recipe(make(Type.LARGER, log, slab),
                 "0",
                 "Y",
                 "0",
                 '0', normal,
-                'Y', Blocks.hopperBlock);
+                'Y', Blocks.hopper);
         Core.registry.recipe(make(Type.STICKY, log, slab),
                 "*",
                 "0",

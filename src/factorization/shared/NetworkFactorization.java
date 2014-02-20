@@ -436,7 +436,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 Sound.receive(input);
                 break;
             case MessageType.PistonPush:
-                Blocks.pistonBase.onBlockEventReceived(world, x, y, z, 0, input.readInt());
+                Blocks.piston.onBlockEventReceived(world, x, y, z, 0, input.readInt());
                 here.setId(0);
                 break;
             default:

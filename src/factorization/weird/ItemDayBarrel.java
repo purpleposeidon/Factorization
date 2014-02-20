@@ -52,5 +52,5 @@ public class ItemDayBarrel extends ItemBlockProxy {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerIIcons(IIconRegister par1IIconRegister) { }
+    public void registerIcons(IIconRegister par1IIconRegister) { }
 }

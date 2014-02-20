@@ -176,5 +176,5 @@ public class ItemServoRailWidget extends ItemFactorization {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerIIcons(IIconRegister par1IIconRegister) { }
+    public void registerIcons(IIconRegister par1IIconRegister) { }
 }

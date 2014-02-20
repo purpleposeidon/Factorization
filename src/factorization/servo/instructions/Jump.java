@@ -28,7 +28,7 @@ public class Jump extends Instruction {
 
     @Override
     protected ItemStack getRecipeItem() {
-        return new ItemStack(Blocks.pistonBase);
+        return new ItemStack(Blocks.piston);
     }
 
     @Override

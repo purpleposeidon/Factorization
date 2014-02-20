@@ -58,7 +58,7 @@ public class ItemSculptingTool extends ItemFactorization {
     }
     
     @Override
-    public void registerIIcons(IIconRegister reg) { }
+    public void registerIcons(IIconRegister reg) { }
 
     static enum ToolMode {
         MOVER("move", true),

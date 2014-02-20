@@ -389,8 +389,8 @@ public class RenderServoMotor extends RenderEntity {
         // Pre-emptively undo transformations that the item renderer does so
         // that we don't get a stupid angle. Minecraft render code is terrible.
         boolean needRotationFix = true;
-        if (is.getItem() instanceof ItemBlock && is.itemID < Blocks.blocksList.length) {
-            Block block = is.itemID;
+        if (is.getItem() instanceof ItemBlock) {
+            Block block = Block.getBlockFromItem(is.getItem());
             if (block != null && RenderBlocks.renderItemIn3d(block.getRenderType())) {
                 needRotationFix = false;
             }

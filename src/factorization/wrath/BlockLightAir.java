@@ -7,7 +7,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialTransparent;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.init.Blocks;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.item.Item;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
@@ -15,11 +15,10 @@ import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.common.FzConfig;
-import factorization.shared.Core;
 
 public class BlockLightAir extends Block {
     static public final int air_md = 0;
-    static MaterialTransparent actuallyTransparentMaterial = new MaterialTransparent(Material.air.materialMapColor) {
+    static MaterialTransparent actuallyTransparentMaterial = new MaterialTransparent(Material.air.getMaterialMapColor()) {
         @Override
         public boolean isOpaque() {
             return true;
@@ -99,8 +98,8 @@ public class BlockLightAir extends Block {
 
     // Features
     @Override
-    public int idDropped(int i, Random random, int j) {
-        return 0;
+    public Item getItemDropped(int p_149650_1_, Random p_149650_2_, int p_149650_3_) {
+        return null;
     }
 
     @Override
@@ -111,11 +110,6 @@ public class BlockLightAir extends Block {
     @Override
     public boolean isAir(IBlockAccess world, int i, int j, int k) {
         return true;
-    }
-
-    @Override
-    public boolean isBurning(IBlockAccess world, int x, int y, int z) {
-        return world.getBlock(x, y, z) == this && world.getBlockMetadata(x, y, z) == fire_md;
     }
 
     // Rendering
@@ -142,39 +136,5 @@ public class BlockLightAir extends Block {
     @Override
     public int getMobilityFlag() {
         return 1; //can't push, but can overwrite
-    }
-
-    @Override
-    public TileEntity createTileEntity(World world, int md) {
-        if (md == fire_md) {
-            return new TileEntityWrathFire();
-        }
-        return null;
-    }
-
-    @Override
-    public boolean hasTileEntity(int md) {
-        if (md == fire_md) {
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public int getLightValue(IBlockAccess world, int x, int y, int z) {
-        int md = world.getBlockMetadata(x, y, z);
-        if (md == fire_md) {
-            return 7;
-        }
-        if (md == air_md) {
-            return super.getLightValue(world, x, y, z);
-        }
-        return 0;
-    }
-
-    @Override
-    //-- server. I am so sick and tired of your BULLSHIT
-    public void randomDisplayTick(World w, int x, int y, int z, Random rand) {
-        Core.proxy.randomDisplayTickFor(w, x, y, z, rand);
     }
 }

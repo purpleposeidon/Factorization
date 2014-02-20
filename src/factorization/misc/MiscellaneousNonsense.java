@@ -1,5 +1,7 @@
 package factorization.misc;
 
+import ibxm.Player;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -12,17 +14,13 @@ import java.util.List;
 
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.network.INetworkManager;
-import net.minecraft.network.NetLoginHandler;
-import net.minecraft.network.packet.NetHandler;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.Packet1Login;
+import net.minecraft.network.Packet;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.util.MathHelper;
@@ -30,20 +28,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DungeonHooks;
 import net.minecraftforge.common.MinecraftForge;
-import cpw.mods.fml.common.ICraftingHandler;
-import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.network.IConnectionHandler;
-import cpw.mods.fml.common.network.NetworkMod;
-import cpw.mods.fml.common.network.PacketDispatcher;
-import cpw.mods.fml.common.network.Player;
 import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
@@ -266,10 +256,11 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         }
         
         //Make rocket item
-        ItemStack red_is = new ItemStack(Items.firework);
-        NBTTagCompound tag = new NBTTagCompound("Fireworks");
+        //NORELEASE: Check the fireworks!
+        ItemStack red_is = new ItemStack(Items.fireworks);
+        NBTTagCompound tag = new NBTTagCompound(); //("Fireworks")
         tag.setByte("Flight", (byte) 3);
-        NBTTagList explosions = new NBTTagList("Explosions");
+        NBTTagList explosions = new NBTTagList(); //("Explosions")
         {
             NBTTagCompound explo = new NBTTagCompound();
             explo.setBoolean("Trail", true);
@@ -291,7 +282,7 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         }
         tag.setTag("Explosions", explosions);
         
-        NBTTagCompound wrap = new NBTTagCompound("tag");
+        NBTTagCompound wrap = new NBTTagCompound(); //("tag")
         wrap.setTag("Fireworks", tag);
         red_is.setTagCompound(wrap);
         

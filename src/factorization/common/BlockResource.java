@@ -26,7 +26,7 @@ public class BlockResource extends Block {
     public static final int glaze_md_start = 17; 
     
     @Override
-    public void registerIIcons(IIconRegister reg) {
+    public void registerIcons(IIconRegister reg) {
         for (ResourceType rt : ResourceType.values()) {
             if (rt.texture == null) {
                 continue;

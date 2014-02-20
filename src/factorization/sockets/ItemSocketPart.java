@@ -68,12 +68,12 @@ public class ItemSocketPart extends ItemFactorization {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerIIcons(IIconRegister register) {
+    public void registerIcons(IIconRegister register) {
         socketIIcons = new IIcon[FactoryType.MAX_ID];
         ItemStack me = new ItemStack(this);
         for (FactoryType ft : getSockets()) {
             me.setItemDamage(ft.md);
-            socketIIcons[ft.md] = register.registerIIcon(getUnlocalizedName(me).replace("item.", ""));
+            socketIIcons[ft.md] = register.registerIcon(getUnlocalizedName(me).replace("item.", ""));
         }
     }
     

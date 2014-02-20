@@ -32,7 +32,7 @@ public class ItemAcidBottle extends ItemFactorization {
     }
     
     @Override
-    public void registerIIcons(IIconRegister par1IIconRegister) {
+    public void registerIcons(IIconRegister par1IIconRegister) {
         // Nada
     }
     

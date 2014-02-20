@@ -46,7 +46,7 @@ public enum FactoryType {
     //2 -- This used to be MAKER
     STAMPER(3, true, TileEntityStamper.class, "factory_stamper"), // Crafts craft packets, and outputs results
     //4 -- This used to be QUEUE
-    BARREL(5, false, TileEntityBarrel.class, "factory_barrel"), // Store huge quantities of identical items
+    //5 -- This used to be BARREL
     LAMP(6, false, TileEntityWrathLamp.class, "factory_lamp"), //spawn a bunch of AIR blocks around and below
     //7 -- this was the BlockDarkIron, which got moved.
     PACKAGER(8, true, STAMPER.gui, TileEntityPackager.class, "factory_packager"), //crafts its input as a 3x3 or 2x2

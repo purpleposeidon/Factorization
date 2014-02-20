@@ -424,7 +424,7 @@ public class TileEntityGreenware extends TileEntityCommon {
                         lump.asDefault();
                     } else {
                         it.remove();
-                        FzUtil.spawnItemStack(getCoord(), new ItemStack(Items.clay));
+                        FzUtil.spawnItemStack(getCoord(), new ItemStack(Items.clay_ball));
                     }
                 }
             }
@@ -469,7 +469,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             lastTouched = dryTime + 1;
             return true;
         }
-        if (held.getItem() != Items.clay || held.stackSize == 0) {
+        if (held.getItem() != Items.clay_ball || held.stackSize == 0) {
             return false;
         }
         if (state != ClayState.WET) {
@@ -757,7 +757,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             here.setId(0);
         } else {
             removeLump(hit.subHit);
-            FzUtil.spawnItemStack(here, new ItemStack(Items.clay));
+            FzUtil.spawnItemStack(here, new ItemStack(Items.clay_ball));
         }
         return false;
     }

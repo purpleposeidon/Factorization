@@ -14,7 +14,7 @@ public class GlassServoGrate extends WoodenServoGrate {
     
     @Override
     public IIcon getIcon(ForgeDirection side) {
-        return Blocks.thinGlass.getBlockTextureFromSide(2);
+        return Blocks.glass_pane.getBlockTextureFromSide(2);
     }
     
     @Override
@@ -24,6 +24,6 @@ public class GlassServoGrate extends WoodenServoGrate {
                 "#-#",
                 " # ",
                 '-', Core.registry.servorail_item,
-                '#', Blocks.thinGlass);
+                '#', Blocks.glass_pane);
     }
 }
