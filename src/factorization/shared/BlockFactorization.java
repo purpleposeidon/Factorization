@@ -491,7 +491,7 @@ public class BlockFactorization extends BlockContainer {
     
     @Override
     public void updateTick(World w, int x, int y, int z, Random rand) {
-        w.notifyBlockChange(x, y, z, blockID);
+        w.notifyBlockChange(x, y, z, this);
     }
     
     
