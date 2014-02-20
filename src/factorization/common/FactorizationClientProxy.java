@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.tileentity.TileEntity;
@@ -125,7 +126,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             return new GuiPocketTable(new ContainerPocket(player));
         }
         
-        TileEntity te = world.getBlockTileEntity(x, y, z);
+        TileEntity te = world.getTileEntity(x, y, z);
         if (!(te instanceof TileEntityFactorization)) {
             return null;
         }
@@ -143,9 +144,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
             cont = new ContainerFactorization(player, fac);
         }
         GuiScreen gui = null;
-        if (ID == FactoryType.ROUTER.gui) {
-            gui = new GuiRouter(cont);
-        }
         if (ID == FactoryType.STAMPER.gui) {
             gui = new GuiStamper(cont);
         }
@@ -167,15 +165,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         cont.addSlotsForGui(fac, player.inventory);
         return gui;
     }
-
-    @Override
-    public String translateItemStack(ItemStack is) {
-        if (is == null) {
-            return "null";
-        }
-        return is.getItem().getItemDisplayName(is);
-    }
-
+    
     @Override
     public void pokePocketCrafting() {
         // If the player has a pocket crafting table open, have it update
@@ -192,26 +182,16 @@ public class FactorizationClientProxy extends FactorizationProxy {
     @Override
     public void randomDisplayTickFor(World w, int x, int y, int z, Random rand) {
         Coord here = new Coord(w, x, y, z);
-        int id = w.getBlock(x, y, z);
+        Block id = w.getBlock(x, y, z);
         int md = w.getBlockMetadata(x, y, z);
         if (id == Core.registry.factory_block) {
-            TileEntity te = w.getBlockTileEntity(x, y, z);
+            TileEntity te = w.getTileEntity(x, y, z);
             if (!(te instanceof IFactoryType)) {
                 return;
             }
 
             FactoryType ft = ((IFactoryType) te).getFactoryType();
 
-            if (ft == FactoryType.LAMP) {
-                for (int i = 0; i < 3; i++) {
-                    double X = x + 0.4 + rand.nextFloat() * 0.2;
-                    double Z = z + 0.4 + rand.nextFloat() * 0.2;
-                    EntityWrathFlameFX flame = new EntityWrathFlameFX(w,
-                            X, y + 0.2 + rand.nextFloat() * 0.1, Z,
-                            0.001 - rand.nextFloat() * 0.002, 0.01, 0.001 - rand.nextFloat() * 0.002);
-                    Minecraft.getMinecraft().effectRenderer.addEffect(flame);
-                }
-            }
             if (ft == FactoryType.SLAGFURNACE) {
                 TileEntitySlagFurnace slag = (TileEntitySlagFurnace) te;
                 if (slag.draw_active <= 0) {
@@ -307,8 +287,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
         return Minecraft.getMinecraft().thePlayer;
     }
 
-    public static KeyBinding bag_swap_key = new KeyBinding("FZ Bag of Holding", org.lwjgl.input.Keyboard.KEY_GRAVE);
-    public static KeyBinding pocket_key = new KeyBinding("FZ Pocket Crafting Table", org.lwjgl.input.Keyboard.KEY_C);
+    public static KeyBinding bag_swap_key = new KeyBinding("FZ Bag of Holding", org.lwjgl.input.Keyboard.KEY_GRAVE, "Factorization");
+    public static KeyBinding pocket_key = new KeyBinding("FZ Pocket Crafting Table", org.lwjgl.input.Keyboard.KEY_C, "Factorization");
 
     private static class CommandKeySet extends KeyHandler {
         Map<KeyBinding, Command> map;
@@ -406,9 +386,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
     @Override
     public void registerRenderers() {
-        if (FzConfig.render_barrel_item || FzConfig.render_barrel_text) {
-            setTileEntityRenderer(TileEntityBarrel.class, new TileEntityBarrelRenderer(FzConfig.render_barrel_item, FzConfig.render_barrel_text));
-        }
         setTileEntityRenderer(TileEntityDayBarrel.class, new TileEntityDayBarrelRenderer());
         setTileEntityRenderer(TileEntityGreenware.class, new TileEntityGreenwareRender());
         if (FzConfig.renderTEs) {
@@ -474,10 +451,10 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderEmpty(FactoryType.EXTENDED);
 
         ItemRenderCapture capture = new ItemRenderCapture();
-        MinecraftForgeClient.registerItemRenderer(Core.registry.factory_block, capture);
-        MinecraftForgeClient.registerItemRenderer(Core.registry.battery.itemID, new BatteryItemRender(renderBattery));
-        MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket.itemID, new ItemRenderGlazeBucket());
-        MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel.itemID, new DayBarrelItemRenderer(renderBarrel));
+        MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(Core.registry.factory_block), capture);
+        MinecraftForgeClient.registerItemRenderer(Core.registry.battery, new BatteryItemRender(renderBattery));
+        MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket, new ItemRenderGlazeBucket());
+        MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel, new DayBarrelItemRenderer(renderBarrel));
         setTileEntityRenderer(BlockDarkIronOre.Glint.class, new GlintRenderer());
         
         if (Minecraft.getMinecraft().getSession().getUsername().equals("neptunepink")) {

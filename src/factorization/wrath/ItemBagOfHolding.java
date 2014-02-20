@@ -306,7 +306,7 @@ public class ItemBagOfHolding extends ItemFactorization implements IActOnCraft {
                 }
                 bag = true;
             }
-            if (it == Items.enderPearl) {
+            if (it == Items.ender_pearl) {
                 if (pearl) {
                     bad = true;
                     break;

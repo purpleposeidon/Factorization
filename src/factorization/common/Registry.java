@@ -7,17 +7,17 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
@@ -29,7 +29,6 @@ import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -37,9 +36,6 @@ import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.ICraftingHandler;
-import cpw.mods.fml.common.ITickHandler;
-import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.VillagerRegistry;
@@ -83,9 +79,6 @@ import factorization.weird.ItemPocketTable;
 import factorization.weird.TileEntityDayBarrel;
 import factorization.wrath.BlockLightAir;
 import factorization.wrath.ItemBagOfHolding;
-import factorization.wrath.ItemMachineUpgrade;
-import factorization.wrath.ItemWrathIgniter;
-import factorization.wrath.TileEntityWrathFire;
 import factorization.wrath.TileEntityWrathLamp;
 
 public class Registry implements ICraftingHandler, ITickHandler {
@@ -119,12 +112,8 @@ public class Registry implements ICraftingHandler, ITickHandler {
     public ItemCraftingComponent diamond_shard;
     public ItemStack diamond_shard_packet;
     public IRecipe boh_upgrade_recipe;
-    public ItemWrathIgniter wrath_igniter;
     public ItemCraftingComponent silver_ingot, lead_ingot;
     public ItemCraftingComponent dark_iron;
-    public ItemMachineUpgrade router_item_filter, router_machine_filter, router_speed,
-            router_thorough, router_throughput, router_eject;
-    public ItemMachineUpgrade barrel_enlarge;
     public ItemAcidBottle acid;
     public ItemCraftingComponent insulated_coil, motor, fan, diamond_cutting_head;
     public ItemStack sulfuric_acid, aqua_regia;
@@ -311,15 +300,6 @@ public class Registry implements ICraftingHandler, ITickHandler {
         logicMatrixIdentifier = new ItemCraftingComponent(itemID("logicMatrixID", 9045), "logic_matrix_identifier");
         logicMatrixController = new ItemCraftingComponent(itemID("logicMatrixCtrl", 9063), "logic_matrix_controller");
 
-        router_item_filter = new ItemMachineUpgrade(itemID("routerItemFilter", 9016), "router/item_filter", "Router Upgrade", FactoryType.ROUTER, 0);
-        router_machine_filter = new ItemMachineUpgrade(itemID("routerMachineFilter", 9017), "router/machine_filter", "Router Upgrade", FactoryType.ROUTER, 1);
-        router_speed = new ItemMachineUpgrade(itemID("routerSpeed", 9018), "router/speed", "Router Upgrade", FactoryType.ROUTER, 2);
-        router_thorough = new ItemMachineUpgrade(itemID("routerThorough", 9019), "router/thorough", "Router Upgrade", FactoryType.ROUTER, 3);
-        router_throughput = new ItemMachineUpgrade(itemID("routerThroughput", 9020), "router/bandwidth", "Router Upgrade", FactoryType.ROUTER, 4);
-        router_eject = new ItemMachineUpgrade(itemID("routerEject", 9031), "router/eject", "Router Upgrade", FactoryType.ROUTER, 5);
-
-        barrel_enlarge = new ItemMachineUpgrade(itemID("barrelEnlarge", 9032), "barrel_upgrade", "Barrel Upgrade", FactoryType.BARREL, 6);
-
         //Electricity
         acid = new ItemAcidBottle(itemID("acid", 9024));
         sulfuric_acid = new ItemStack(acid, 1);
@@ -454,26 +434,26 @@ public class Registry implements ICraftingHandler, ITickHandler {
         // Bag of holding
 
         ItemStack BOH = new ItemStack(bag_of_holding, 1); //we don't call bag_of_holding.init(BOH) because that would show incorrect info
-        recipe(BOH,
+        recipe(BOH, //NORELEASE: Are we removing the BOH or no?
                 "LOL",
                 "ILI",
                 " I ",
                 'I', dark_iron,
-                'O', Items.enderPearl,
+                'O', Items.ender_pearl,
                 'L', Items.leather); // LOL!
-        shapelessRecipe(BOH, BOH, dark_iron, Items.enderPearl, Items.leather); //ILI!
-        boh_upgrade_recipe = FzUtil.createShapelessRecipe(BOH, BOH, dark_iron, Items.enderPearl, Items.leather); // I !
+        shapelessRecipe(BOH, BOH, dark_iron, Items.ender_pearl, Items.leather); //ILI!
+        boh_upgrade_recipe = FzUtil.createShapelessRecipe(BOH, BOH, dark_iron, Items.ender_pearl, Items.leather); // I !
         // Pocket Crafting Table (pocket table)
         oreRecipe(new ItemStack(pocket_table),
                 " #",
                 "| ",
-                '#', Blocks.workbench,
+                '#', Blocks.crafting_table,
                 '|', Items.stick);
 
         recipe(new ItemStack(logicMatrixIdentifier),
                 "MiX",
                 'M', logicMatrix,
-                'i', Items.netherQuartz,
+                'i', Items.quartz,
                 'X', logicMatrixProgrammer);
         oreRecipe(new ItemStack(logicMatrixController),
                 "MiX",
@@ -489,8 +469,8 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "DSI",
                 " #>",
                 "BSI",
-                'D', Items.record13,
-                'B', Items.record11,
+                'D', Items.record_13,
+                'B', Items.record_11,
                 'S', diamond_shard,
                 'I', dark_iron,
                 '#', logicMatrix,
@@ -510,14 +490,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
             }
         });
         
-        TileEntityCrystallizer.addRecipe(new ItemStack(Blocks.blockRedstone), new ItemStack(logicMatrix), 1, Core.registry.aqua_regia);
-
-        //wrathfire igniter
-        recipe(new ItemStack(wrath_igniter),
-                "D ",
-                " B",
-                'D', diamond_shard,
-                'B', Items.netherrackBrick /* netherbrick */);
+        TileEntityCrystallizer.addRecipe(new ItemStack(Blocks.redstone_block), new ItemStack(logicMatrix), 1, Core.registry.aqua_regia);
 
         //Resources
         recipe(new ItemStack(lead_ingot, 9), "#", '#', lead_block_item);
@@ -547,19 +520,19 @@ public class Registry implements ICraftingHandler, ITickHandler {
         glaze_bucket.addGlaze(glaze_base_mimicry);
         
         ItemStack charcoal = new ItemStack(Items.coal, 1, 1);
-        ItemStack bonemeal = new ItemStack(Items.dyePowder, 1, 15);
-        ItemStack lapis = new ItemStack(Items.dyePowder, 1, 4);
+        ItemStack bonemeal = new ItemStack(Items.dye, 1, 15);
+        ItemStack lapis = new ItemStack(Items.dye, 1, 4);
         ItemStack lead_chunks = new ItemStack(ore_reduced, 1, ItemOreProcessing.OreType.LEAD.ID);
         ItemStack iron_chunks = new ItemStack(ore_reduced, 1, ItemOreProcessing.OreType.IRON.ID);
-        Item netherquartz = Items.netherQuartz;
-        Item netherbrick = Items.netherrackBrick;
+        Item netherquartz = Items.quartz;
+        Item netherbrick = Items.netherbrick;
         Block sand = Blocks.sand;
         Item redstone=  Items.redstone;
-        Item slimeBall = Items.slimeBall;
-        ItemStack blackWool = new ItemStack(Blocks.cloth, 1, 15);
+        Item slimeBall = Items.slime_ball;
+        ItemStack blackWool = new ItemStack(Blocks.wool, 1, 15);
         
-        shapelessOreRecipe(base_common, new ItemStack(glaze_bucket), Items.bucketWater, Blocks.sand, Items.clay);
-        shapelessOreRecipe(glaze_base_mimicry, base_common, Items.redstone, Items.slimeBall, lapis);
+        shapelessOreRecipe(base_common, new ItemStack(glaze_bucket), Items.water_bucket, Blocks.sand, Items.clay_ball);
+        shapelessOreRecipe(glaze_base_mimicry, base_common, Items.redstone, Items.slime_ball, lapis);
         
         BasicGlazes.ST_VECHS_BLACK.recipe(base_common, blackWool, charcoal);
         BasicGlazes.TEMPLE_WHITE.recipe(base_common, bonemeal, bonemeal);
@@ -577,10 +550,10 @@ public class Registry implements ICraftingHandler, ITickHandler {
         BasicGlazes.PEKING_BLUE.recipe(base_common, lapis, netherquartz);
         BasicGlazes.SHINO.recipe(base_common, redstone, netherquartz);
         
-        ItemStack waterFeature = glaze_bucket.makeMimicingGlaze(Blocks.waterMoving, 0, -1);
-        ItemStack lavaFeature = glaze_bucket.makeMimicingGlaze(Blocks.lavaMoving, 0, -1);
-        shapelessOreRecipe(waterFeature, base_common, Items.bucketWater);
-        shapelessOreRecipe(lavaFeature, base_common, Items.bucketLava);
+        ItemStack waterFeature = glaze_bucket.makeMimicingGlaze(Blocks.water, 0, -1);
+        ItemStack lavaFeature = glaze_bucket.makeMimicingGlaze(Blocks.lava, 0, -1);
+        shapelessOreRecipe(waterFeature, base_common, Items.water_bucket);
+        shapelessOreRecipe(lavaFeature, base_common, Items.lava_bucket);
         
         Core.registry.glaze_bucket.doneMakingStandardGlazes();
         
@@ -742,75 +715,6 @@ public class Registry implements ICraftingHandler, ITickHandler {
             }
         });
 
-        // BlockFactorization recipes
-        // router
-        recipe(router_item,
-                "MMM",
-                "oIO",
-                "MMM",
-                'M', dark_iron,
-                'I', Items.egg,
-                'o', Items.enderPearl,
-                'O', Items.eyeOfEnder);
-        recipe(router_item,
-                "MMM",
-                "OIo",
-                "MMM",
-                'M', dark_iron,
-                'I', Items.egg,
-                'o', Items.enderPearl,
-                'O', Items.eyeOfEnder);
-        // router upgrades
-        recipe(new ItemStack(router_item_filter),
-                "ITI",
-                "GDG",
-                "ICI",
-                'I', dark_iron,
-                'T', Blocks.torchRedstoneActive,
-                'D', logicMatrixIdentifier,
-                'G', Items.ingotGold,
-                'C', Blocks.chest);
-
-        oreRecipe(new ItemStack(router_machine_filter),
-                "ITI",
-                "SDS",
-                "IBI",
-                'I', dark_iron,
-                'T', Blocks.torchRedstoneActive,
-                'D', logicMatrixIdentifier,
-                'S', "ingotSilver",
-                'B', Items.book);
-
-        recipe(new ItemStack(router_speed),
-                "ISI",
-                "SCS",
-                "ISI",
-                'I', dark_iron,
-                'S', Items.sugar,
-                'C', Items.cake);
-        recipe(new ItemStack(router_thorough),
-                "ISI",
-                "SSS",
-                "ISI",
-                'I', dark_iron,
-                'S', Blocks.slowSand);
-        recipe(new ItemStack(router_throughput),
-                "IBI",
-                "B!B",
-                "IBI",
-                'I', dark_iron,
-                'B', Items.blazePowder,
-                '!', Items.egg);
-        oreRecipe(new ItemStack(router_eject),
-                "IWI",
-                "C_C",
-                "IPI",
-                'I', dark_iron,
-                'W', "plankWood",
-                'C', Blocks.cobblestone,
-                '_', Blocks.pressurePlatePlanks,
-                'P', Blocks.pistonBase);
-
         // Barrel
         // Add the recipes for vanilla woods.
         for (int i = 0; i < 4; i++) {
@@ -825,9 +729,9 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "#S#",
                 "#C#",
                 '#', Blocks.cobblestone,
-                'p', Blocks.pistonBase,
+                'p', Blocks.piston,
                 'S', Items.stick,
-                'C', Blocks.workbench);
+                'C', Blocks.crafting_table);
 
         //Packager
         oreRecipe(packager_item,
@@ -835,9 +739,9 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "I I",
                 "#C#",
                 '#', Blocks.cobblestone,
-                'p', Blocks.pistonBase,
-                'I', Items.ingotIron,
-                'C', Blocks.workbench);
+                'p', Blocks.piston,
+                'I', Items.iron_ingot,
+                'C', Blocks.crafting_table);
         
         //Compression Crafter
         oreRecipe(compression_crafter_item,
@@ -845,18 +749,18 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "C",
                 "P",
                 'D', dark_iron,
-                'C', Blocks.workbench,
-                'P', Blocks.pistonBase);
+                'C', Blocks.crafting_table,
+                'P', Blocks.piston);
 
         // Wrath lamp
-        oreRecipe(lamp_item,
-                "ISI",
-                "GWG",
-                "ISI",
-                'I', dark_iron,
-                'S', "ingotSilver",
-                'G', Blocks.thinGlass,
-                'W', new ItemStack(wrath_igniter, 1, FzUtil.WILDCARD_DAMAGE));
+//		oreRecipe(lamp_item,
+//				"ISI",
+//				"GWG",
+//				"ISI",
+//				'I', dark_iron,
+//				'S', "ingotSilver",
+//				'G', Blocks.glass_pane,
+//				'W', new ItemStack(wrath_igniter, 1, FzUtil.WILDCARD_DAMAGE));
 
         //Slag furnace
         recipe(slagfurnace_item,

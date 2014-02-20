@@ -37,13 +37,11 @@ import factorization.sockets.fanturpeller.PumpLiquids;
 import factorization.sockets.fanturpeller.SocketFanturpeller;
 import factorization.weird.TileEntityBarrel;
 import factorization.weird.TileEntityDayBarrel;
-import factorization.wrath.TileEntityRouter;
-import factorization.wrath.TileEntityWrathFire;
 import factorization.wrath.TileEntityWrathLamp;
 
 public enum FactoryType {
     //Traced here is the history of Factorization.
-    ROUTER(0, true, TileEntityRouter.class, "factory_router"), // Send/retrieve items from connected inventories
+    //0 -- This used to be ROUTER
     //1 -- This used to be CUTTER
     //2 -- This used to be MAKER
     STAMPER(3, true, TileEntityStamper.class, "factory_stamper"), // Crafts craft packets, and outputs results
@@ -53,7 +51,7 @@ public enum FactoryType {
     //7 -- this was the BlockDarkIron, which got moved.
     PACKAGER(8, true, STAMPER.gui, TileEntityPackager.class, "factory_packager"), //crafts its input as a 3x3 or 2x2
     //9 -- This used to be SENTRYDEMON
-    WRATHFIRE(10, false, TileEntityWrathFire.class, "factory_fire"), //burn things
+    //10 -- This used to be WRATHFIRE
     SLAGFURNACE(11, true, TileEntitySlagFurnace.class, "factory_slag"), //get extra ore output
     BATTERY(12, false, TileEntityBattery.class, "factory_battery"),
     //13 -- This used to be SOLARTURBINE
@@ -220,7 +218,7 @@ public enum FactoryType {
     }
 
     public boolean connectRedstone() {
-        return this == ROUTER || this == STAMPER || this == PACKAGER;
+        return this == STAMPER || this == PACKAGER;
     }
     
     public ItemStack asSocketItem() {

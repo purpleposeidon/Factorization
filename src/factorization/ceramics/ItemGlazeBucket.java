@@ -156,7 +156,7 @@ public class ItemGlazeBucket extends ItemFactorization {
         return is;
     }
     
-    private ItemStack makeGlazeWith(int id, int md, int side) {
+    private ItemStack makeGlazeWith(Block id, int md, int side) {
         ItemStack is = new ItemStack(this);
         NBTTagCompound tag = FzUtil.getTag(is);
         tag.setShort("bid", (short)id);
@@ -167,7 +167,7 @@ public class ItemGlazeBucket extends ItemFactorization {
         return is;
     }
     
-    public ItemStack makeMimicingGlaze(int id, int md, int side) {
+    public ItemStack makeMimicingGlaze(Block id, int md, int side) {
         ItemStack is = makeGlazeWith(id, md, side);
         setMimicry(is);
         return is;
