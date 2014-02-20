@@ -31,15 +31,15 @@ public class Embarkener implements ITickHandler {
         }
     }
 
-    int wood_rendertype = Blocks.wood.getRenderType();
+    int wood_rendertype = Blocks.log.getRenderType();
     boolean isWoodish(Block block) {
         if (block == null) return false;
-        return block.blockMaterial == Material.wood && block instanceof BlockLog && block.getRenderType() == wood_rendertype;
+        return block.getMaterial() == Material.wood && block instanceof BlockLog && block.getRenderType() == wood_rendertype;
     }
     
     void addLogBarkRecipes() {
         int count = 0;
-        for (Block block : Blocks.blocksList) {
+        for (Block block : (Iterable<Block>) Block.blockRegistry) {
             if (isWoodish(block)) {
                 for (int md = 0; md < 4; md++) {
                     count++;
@@ -86,10 +86,9 @@ public class Embarkener implements ITickHandler {
         if (event.entityPlayer == null) return;
         ItemStack is = event.entityPlayer.getHeldItem();
         if (is == null) return;
-        if (is.itemID >= Blocks.blocksList.length) return;
         if ((is.getItemDamage() & 0xC) != 0xC) return;
         if (!(is.getItem() instanceof ItemBlock)) return;
-        Block theBlock = is.itemID;
+        Block theBlock = Block.getBlockFromItem(is.getItem());
         if (!isWoodish(theBlock)) return;
         Coord target = new Coord(event.entityPlayer.worldObj, event.x, event.y, event.z);
         target.adjust(ForgeDirection.getOrientation(event.face));

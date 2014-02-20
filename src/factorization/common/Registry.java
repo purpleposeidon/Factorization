@@ -784,16 +784,16 @@ public class Registry implements ICraftingHandler, ITickHandler {
         //Electricity
 
         
-        shapelessRecipe(sulfuric_acid, Items.gunpowder, Items.gunpowder, Items.coal, Items.potion);
-        shapelessOreRecipe(sulfuric_acid, "dustSulfur", Items.coal, Items.potion);
-        shapelessRecipe(aqua_regia, sulfuric_acid, nether_powder, Items.fireballCharge);
-        shapelessRecipe(aqua_regia, sulfuric_acid, Items.blazePowder, Items.fireballCharge); //I'd kind of like this to be a recipe for a different — but compatible — aqua regia. 
+        shapelessRecipe(sulfuric_acid, Items.gunpowder, Items.gunpowder, Items.coal, Items.potionitem);
+        shapelessOreRecipe(sulfuric_acid, "dustSulfur", Items.coal, Items.potionitem);
+        shapelessRecipe(aqua_regia, sulfuric_acid, nether_powder, Items.fire_charge);
+        shapelessRecipe(aqua_regia, sulfuric_acid, Items.blaze_powder, Items.fire_charge); //I'd kind of like this to be a recipe for a different — but compatible — aqua regia. 
         recipe(new ItemStack(fan),
                 "I I",
                 " - ",
                 "I I",
-                'I', Items.ingotIron,
-                '-', Blocks.pressurePlateIron);
+                'I', Items.iron_ingot,
+                '-', Blocks.light);
         if (FzConfig.enable_solar_steam) {
             recipe(solarboiler_item,
                     "I#I",
@@ -883,7 +883,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "S-S",
                 "SSS",
                 'S', diamond_shard,
-                '-', Blocks.pressurePlateIron);
+                '-', Blocks.light_weighted_pressure_plate);
         /* oreRecipe(grinder_item,
                 "LIL",
                 "I*I",
