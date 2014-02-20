@@ -75,7 +75,7 @@ public class BlockFactorization extends BlockContainer {
 
     @Override
     public boolean isBlockSolid(IBlockAccess world, int x, int y, int z, int side) {
-        TileEntity t = world.getBlockTileEntity(x, y, z);
+        TileEntity t = world.getTileEntity(x, y, z);
         if (t == null || !(t instanceof TileEntityCommon)) {
             return false;
         }
@@ -91,7 +91,7 @@ public class BlockFactorization extends BlockContainer {
     @Override
     public void onNeighborBlockChange(World w, int x, int y, int z, int l) {
         int md = w.getBlockMetadata(x, y, z);
-        TileEntity ent = w.getBlockTileEntity(x, y, z);
+        TileEntity ent = w.getTileEntity(x, y, z);
         if (ent == null) {
             return;
         }
@@ -147,7 +147,7 @@ public class BlockFactorization extends BlockContainer {
             return;
         }
 
-        TileEntity t = world.getBlockTileEntity(x, y, z);
+        TileEntity t = world.getTileEntity(x, y, z);
         if (t instanceof TileEntityFactorization) {
             ((TileEntityFactorization) t).click(entityplayer);
         }
@@ -167,7 +167,7 @@ public class BlockFactorization extends BlockContainer {
         if (force_texture != null) {
             return force_texture;
         }
-        TileEntity t = w.getBlockTileEntity(x, y, z);
+        TileEntity t = w.getTileEntity(x, y, z);
         if (t instanceof TileEntityCommon) {
             return ((TileEntityCommon) t).getIcon(ForgeDirection.getOrientation(side));
         }
@@ -350,7 +350,7 @@ public class BlockFactorization extends BlockContainer {
 
     @Override
     public boolean canConnectRedstone(IBlockAccess world, int x, int y, int z, int dir) {
-        TileEntity te = world.getBlockTileEntity(x, y, z);
+        TileEntity te = world.getTileEntity(x, y, z);
         if (te instanceof TileEntityCommon) {
             TileEntityCommon tec = (TileEntityCommon) te;
             return tec.getFactoryType().connectRedstone();
@@ -386,7 +386,7 @@ public class BlockFactorization extends BlockContainer {
         int md = world.getBlockMetadata(x, y, z);
         BlockClass c = BlockClass.get(md);
         if (c == BlockClass.MachineLightable) {
-            TileEntity te = world.getBlockTileEntity(x, y, z);
+            TileEntity te = world.getTileEntity(x, y, z);
             if (te instanceof TileEntityFactorization) {
                 if (((TileEntityFactorization) te).draw_active == 0) {
                     return BlockClass.Machine.lightValue;
@@ -395,7 +395,7 @@ public class BlockFactorization extends BlockContainer {
             }
         }
         if (c == BlockClass.MachineDynamicLightable) {
-            TileEntity te = world.getBlockTileEntity(x, y, z);
+            TileEntity te = world.getTileEntity(x, y, z);
             if (te instanceof TileEntityCommon) {
                 return ((TileEntityCommon) te).getDynamicLight();
             }
@@ -441,7 +441,7 @@ public class BlockFactorization extends BlockContainer {
     
     @Override
     public AxisAlignedBB getSelectedBoundingBoxFromPool(World w, int x, int y, int z) {
-        TileEntity te = w.getBlockTileEntity(x, y, z);
+        TileEntity te = w.getTileEntity(x, y, z);
         if (te instanceof TileEntityCommon) {
             TileEntityCommon tec = (TileEntityCommon) te;
             if (tec.getFactoryType() == FactoryType.EXTENDED) {
@@ -456,7 +456,7 @@ public class BlockFactorization extends BlockContainer {
 
     @Override
     public void setBlockBoundsBasedOnState(IBlockAccess w, int x, int y, int z) {
-        TileEntity te = w.getBlockTileEntity(x, y, z);
+        TileEntity te = w.getTileEntity(x, y, z);
         if (te == null || !(te instanceof TileEntityCommon)) {
             setBlockBounds(0, 0, 0, 1, 1, 1);
             return;
@@ -501,7 +501,7 @@ public class BlockFactorization extends BlockContainer {
         /*if (side < 2) {
             return 0;
         }
-        TileEntity te = w.getBlockTileEntity(x, y, z);
+        TileEntity te = w.getTileEntity(x, y, z);
         if (te instanceof TileEntityCommon) {
             return ((TileEntityCommon) te).power() ? 15 : 0;
         }*/
@@ -510,7 +510,7 @@ public class BlockFactorization extends BlockContainer {
     
     @Override
     public int isProvidingWeakPower(IBlockAccess w, int x, int y, int z, int side) {
-        TileEntity te = w.getBlockTileEntity(x, y, z);
+        TileEntity te = w.getTileEntity(x, y, z);
         if (te instanceof TileEntityCommon) {
             return ((TileEntityCommon) te).power() ? 15 : 0;
         }
@@ -567,7 +567,7 @@ public class BlockFactorization extends BlockContainer {
     @Override
     @SideOnly(Side.CLIENT)
     public boolean addBlockDestroyEffects(World world, int x, int y, int z, int meta, EffectRenderer effectRenderer) {
-        TileEntity te = world.getBlockTileEntity(x, y, z);
+        TileEntity te = world.getTileEntity(x, y, z);
         if (!(te instanceof TileEntityCommon)) {
             return false;
         }
@@ -644,7 +644,7 @@ public class BlockFactorization extends BlockContainer {
     @Override
     public void onNeighborTileChange(World world, int x, int y, int z,
             int tilex, int tiley, int tilez) {
-        TileEntity te = world.getBlockTileEntity(x, y, z);
+        TileEntity te = world.getTileEntity(x, y, z);
         if (te instanceof TileEntityCommon) {
             ((TileEntityCommon) te).onNeighborTileChanged(tilex, tiley, tilez);
         }

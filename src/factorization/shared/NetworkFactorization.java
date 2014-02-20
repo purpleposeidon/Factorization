@@ -510,7 +510,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                     x = input.readInt();
                     y = input.readInt();
                     z = input.readInt();
-                    target = me.worldObj.getBlockTileEntity(x, y, z);
+                    target = me.worldObj.getTileEntity(x, y, z);
                     break;
                 case NotifyMessageType.VEC3:
                     target = Vec3.createVectorHelper(input.readDouble(), input.readDouble(), input.readDouble());

@@ -32,7 +32,7 @@ public class FactorizationRender implements ISimpleBlockRenderingHandler {
         try {
             int md = world.getBlockMetadata(x, y, z);
             int renderPass = BlockFactorization.CURRENT_PASS; //MinecraftForgeClient.getRenderPass(); //Bluh
-            TileEntity te = world.getBlockTileEntity(x, y, z);
+            TileEntity te = world.getTileEntity(x, y, z);
             if (te instanceof TileEntityCommon) {
                 TileEntityCommon tec = (TileEntityCommon) te;
                 int fmd = tec.getFactoryType().md;

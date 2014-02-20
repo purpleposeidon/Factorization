@@ -312,7 +312,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     protected IInventory getBackingInventory(ISocketHolder socket) {
         if (socket == this) {
-            TileEntity te = worldObj.getBlockTileEntity(xCoord - facing.offsetX,yCoord - facing.offsetY,zCoord - facing.offsetZ);
+            TileEntity te = worldObj.getTileEntity(xCoord - facing.offsetX,yCoord - facing.offsetY,zCoord - facing.offsetZ);
             if (te instanceof IInventory) {
                 return (IInventory) te;
             }

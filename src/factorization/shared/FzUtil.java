@@ -854,21 +854,21 @@ public class FzUtil {
         }
         int chestBlock = cb;
         if (world.getBlock(i - 1, j, k) == chestBlock) {
-            return new InventoryLargeChest(origChest.getInvName(), (TileEntityChest) world.getBlockTileEntity(i - 1, j, k), origChest);
+            return new InventoryLargeChest(origChest.getInvName(), (TileEntityChest) world.getTileEntity(i - 1, j, k), origChest);
         }
         if (world.getBlock(i, j, k - 1) == chestBlock) {
-            return new InventoryLargeChest(origChest.getInvName(), (TileEntityChest) world.getBlockTileEntity(i, j, k - 1), origChest);
+            return new InventoryLargeChest(origChest.getInvName(), (TileEntityChest) world.getTileEntity(i, j, k - 1), origChest);
         }
         // If we're the lower chest, skip ourselves
         if (world.getBlock(i + 1, j, k) == chestBlock) {
             if (openBothSides) {
-                return new InventoryLargeChest(origChest.getInvName(), origChest, (TileEntityChest) world.getBlockTileEntity(i + 1, j, k));
+                return new InventoryLargeChest(origChest.getInvName(), origChest, (TileEntityChest) world.getTileEntity(i + 1, j, k));
             }
             return null;
         }
         if (world.getBlock(i, j, k + 1) == chestBlock) {
             if (openBothSides) {
-                return new InventoryLargeChest(origChest.getInvName(), origChest, (TileEntityChest) world.getBlockTileEntity(i, j, k + 1));
+                return new InventoryLargeChest(origChest.getInvName(), origChest, (TileEntityChest) world.getTileEntity(i, j, k + 1));
             }
             return null;
         }

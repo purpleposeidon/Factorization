@@ -200,7 +200,7 @@ public class ItemBagOfHolding extends ItemFactorization implements IActOnCraft {
             return false;
         }
 
-        TileEntity te = world.getBlockTileEntity(x, y, z);
+        TileEntity te = world.getTileEntity(x, y, z);
         if (!(te instanceof IInventory)) {
             return false;
         }

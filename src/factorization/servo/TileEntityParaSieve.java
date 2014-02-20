@@ -254,7 +254,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             }
             cached_ent = null;
         }
-        TileEntity te = worldObj.getBlockTileEntity(xCoord + facing.offsetX, yCoord + facing.offsetY, zCoord + facing.offsetZ);
+        TileEntity te = worldObj.getTileEntity(xCoord + facing.offsetX, yCoord + facing.offsetY, zCoord + facing.offsetZ);
         if (te instanceof IInventory) {
             cached_te = te;
             return FzUtil.openDoubleChest((IInventory) te, true);

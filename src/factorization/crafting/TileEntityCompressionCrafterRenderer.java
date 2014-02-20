@@ -234,7 +234,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
                                 }
                             }
                             TileEntity te;
-                            if ((te = w.getBlockTileEntity(x, y, z)) != null) {
+                            if ((te = w.getTileEntity(x, y, z)) != null) {
                                 Tessellator.instance = tesrator;
                                 TileEntityRenderer.instance.renderTileEntity(te, partial);
                                 Tessellator.instance = tess;

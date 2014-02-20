@@ -104,7 +104,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     }
     
     boolean has(ForgeDirection dir) {
-        TileEntity te = worldObj.getBlockTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
+        TileEntity te = worldObj.getTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
         if (te instanceof TileEntityServoRail) {
             return true;
         }

@@ -41,7 +41,7 @@ public class BlockDarkIronOre extends Block {
         if (!inRange(x, y, z, Minecraft.getMinecraft().thePlayer)) {
             return;
         }
-        if (world.getBlockTileEntity(x, y, z) != null) {
+        if (world.getTileEntity(x, y, z) != null) {
             return;
         }
         for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {

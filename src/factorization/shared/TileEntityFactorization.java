@@ -239,7 +239,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
 
     @Override
     public boolean isUseableByPlayer(EntityPlayer player) {
-        if (worldObj.getBlockTileEntity(xCoord, yCoord, zCoord) != this) {
+        if (worldObj.getTileEntity(xCoord, yCoord, zCoord) != this) {
             return false;
         }
         return 8 * 8 >= player.getDistanceSq(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);

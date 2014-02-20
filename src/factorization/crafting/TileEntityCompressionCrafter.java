@@ -238,7 +238,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     }
     
     TileEntityCompressionCrafter look(ForgeDirection d) {
-        TileEntity te = worldObj.getBlockTileEntity(xCoord + d.offsetX, yCoord + d.offsetY, zCoord + d.offsetZ);
+        TileEntity te = worldObj.getTileEntity(xCoord + d.offsetX, yCoord + d.offsetY, zCoord + d.offsetZ);
         if (te instanceof TileEntityCompressionCrafter) {
             return (TileEntityCompressionCrafter) te;
         }

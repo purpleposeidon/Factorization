@@ -465,7 +465,7 @@ public class Coord implements IDataSerializable {
         if (!blockExists()) {
             return null;
         }
-        return w.getBlockTileEntity(x, y, z);
+        return w.getTileEntity(x, y, z);
     }
 
     @SuppressWarnings("unchecked")
