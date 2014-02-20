@@ -123,7 +123,7 @@ public class WorldgenManager {
                     if (world.getBlock(x, 0, z) != Blocks.bedrock.blockID) {
                         return;
                     }
-                    Block stoneBlock = Blocks.blocksList[world.getBlock(x, 1, z)];
+                    Block stoneBlock = world.getBlock(x, 1, z);
                     if (stoneBlock == null) {
                         return;
                     }

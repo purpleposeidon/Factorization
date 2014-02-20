@@ -86,15 +86,15 @@ public class ItemBlockProxy extends ItemFactorization {
         {
             return false;
         }
-        else if (par5 == 255 && Blocks.blocksList[this.blockID].blockMaterial.isSolid())
+        else if (par5 == 255 && this.blockID.blockMaterial.isSolid())
         {
             return false;
         }
         else if (par3World.canPlaceEntityOnSide(this.blockID, par4, par5, par6, false, par7, /*par2EntityPlayer*/ null /* Changed to null in 1.6.2. Was previously the player. And sometime before that was null. Like, seriously, wtf? */, par1ItemStack))
         {
-            Block block = Blocks.blocksList[this.blockID];
+            Block block = this.blockID;
             int j1 = this.getMetadata(par1ItemStack.getItemDamage());
-            int k1 = Blocks.blocksList[this.blockID].onBlockPlaced(par3World, par4, par5, par6, par7, par8, par9, par10, j1);
+            int k1 = this.blockID.onBlockPlaced(par3World, par4, par5, par6, par7, par8, par9, par10, j1);
 
             if (placeBlockAt(par1ItemStack, par2EntityPlayer, par3World, par4, par5, par6, par7, par8, par9, par10, k1))
             {

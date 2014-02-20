@@ -34,7 +34,7 @@ public class ChargeMetalBlockConductance {
 //				if (is.itemID >= Blocks.blocksList.length || is.itemID <= 0) {
 //					continue;
 //				}
-//				Block b = Blocks.blocksList[is.itemID];
+//				Block b = is.itemID;
 //				if (b == null) {
 //					continue;
 //				}

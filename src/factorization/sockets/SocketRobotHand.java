@@ -204,7 +204,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
             if (!player.isSneaking() || itemstack == null || item.shouldPassSneakingClickToBlock(world, x, y, z)) {
                 int blockId = world.getBlock(x, y, z);
             
-                if (blockId > 0 && Blocks.blocksList[blockId].onBlockActivated(world, x, y, z, player, side, dx, dy, dz)) {
+                if (blockId > 0 && blockId.onBlockActivated(world, x, y, z, player, side, dx, dy, dz)) {
                     ret = true;
                     break;
                 }

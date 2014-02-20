@@ -269,7 +269,7 @@ public class PumpLiquids extends BufferedFanturpeller {
             at.y = pc.y;
             at.z = pc.z;
             if (!at.isReplacable()) return false;
-            Block block = Blocks.blocksList[fluid.getBlockID()];
+            Block block = fluid.getBlockID();
             if (block == null) return false;
             if (drainBlock(pc, false) != null) return false;
             at.setIdMd(block.blockID, block instanceof BlockFluidFinite ? 0xF : 0, true);

@@ -390,7 +390,7 @@ public class RenderServoMotor extends RenderEntity {
         // that we don't get a stupid angle. Minecraft render code is terrible.
         boolean needRotationFix = true;
         if (is.getItem() instanceof ItemBlock && is.itemID < Blocks.blocksList.length) {
-            Block block = Blocks.blocksList[is.itemID];
+            Block block = is.itemID;
             if (block != null && RenderBlocks.renderItemIn3d(block.getRenderType())) {
                 needRotationFix = false;
             }

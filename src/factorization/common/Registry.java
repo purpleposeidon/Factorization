@@ -167,7 +167,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
             //Theoretically, not necessary. I bet BUKKIT would flip its shit tho.
             blockRender = new BlockRenderHelper();
             factory_rendering_block = new BlockFactorization(FzConfig.factory_block_id);
-            Blocks.blocksList[factory_rendering_block.blockID] = null;
+            factory_rendering_block.blockID = null;
         }
         serverTraceHelper = new BlockRenderHelper();
         clientTraceHelper = new BlockRenderHelper();
@@ -199,7 +199,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
         
         final Block vanillaDiamond = Blocks.diamond_block;
         final int diamondId = vanillaDiamond.blockID;
-        Blocks.blocksList[diamondId] = null;
+        diamondId = null;
         BlockOreStorageShatterable newDiamond = new BlockOreStorageShatterable(diamondId, vanillaDiamond);
         newDiamond.setHardness(5.0F).setResistance(10.0F).setStepSound(Blocks.soundMetalFootstep).setUnlocalizedName("blockDiamond");
         //Blocks.diamond_block /* blockDiamond */ = newDiamond;
@@ -675,7 +675,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                         if (d < 0 || d > 16) {
                             return false;
                         }
-                        Block b = Blocks.blocksList[is.itemID];
+                        Block b = is.itemID;
                         if (b == null || b.getUnlocalizedName().equals("tile.ForgeFiller")) {
                             return false;
                         }
@@ -720,7 +720,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                     if (d < 0 || d > 16) {
                         continue;
                     }
-                    Block b = Blocks.blocksList[is.itemID];
+                    Block b = is.itemID;
                     if (b == null || b.getUnlocalizedName().equals("tile.ForgeFiller")) {
                         continue;
                     }
@@ -1315,7 +1315,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 continue;
             }
             if (log.getItemDamage() == FzUtil.WILDCARD_DAMAGE && log.itemID < Blocks.blocksList.length) {
-                Block b = Blocks.blocksList[log.itemID];
+                Block b = log.itemID;
                 if (b == null) {
                     continue;
                 }

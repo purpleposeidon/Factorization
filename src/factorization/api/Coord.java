@@ -486,7 +486,7 @@ public class Coord implements IDataSerializable {
     }
 
     public Block getBlock() {
-        return Blocks.blocksList[getId()];
+        return getId();
     }
 
     @Deprecated //1.7'll be making this not a thing

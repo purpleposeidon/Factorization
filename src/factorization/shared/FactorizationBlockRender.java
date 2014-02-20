@@ -213,7 +213,7 @@ abstract public class FactorizationBlockRender implements ICoord {
 
     private int getMixedBrightnessForBlock(IBlockAccess w, int x, int y, int z) {
         return w.getLightBrightnessForSkyBlocks(x, y, z, Blocks.lightValue[w.getBlock(x, y, z)]);
-        //Block b = Blocks.blocksList[w.getBlock(x, y, z)];
+        //Block b = w.getBlock(x, y, z);
         //return w.getLightBrightnessForSkyBlocks(x, y, z, b.getLightValue(w, x, y, z));
         //return par1IBlockAccess.getLightBrightnessForSkyBlocks(par2, par3, par4, getLightValue(par1IBlockAccess, par2, par3, par4));
     }

@@ -31,15 +31,15 @@ public class TransferLib {
         default:
             Chunk chunk = c.w.getChunkFromBlockCoords(c.x, c.z);
             int old_id = c.getId();
-            Block origOldBlock = Blocks.blocksList[old_id];
-            Block origNewBlock = Blocks.blocksList[id];
-            Blocks.blocksList[old_id] = Blocks.stone;
-            Blocks.blocksList[id] = Blocks.stone;
+            Block origOldBlock = old_id;
+            Block origNewBlock = id;
+            old_id = Blocks.stone;
+            id = Blocks.stone;
             try {
                 chunk.setBlockIDWithMetadata(c.x & 15, c.y, c.z & 15, id, md);
             } finally {
-                Blocks.blocksList[old_id] = origOldBlock;
-                Blocks.blocksList[id] = origNewBlock;
+                old_id = origOldBlock;
+                id = origNewBlock;
             }
             c.markBlockForUpdate();
             break;

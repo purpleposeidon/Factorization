@@ -89,7 +89,7 @@ public class Embarkener implements ITickHandler {
         if (is.itemID >= Blocks.blocksList.length) return;
         if ((is.getItemDamage() & 0xC) != 0xC) return;
         if (!(is.getItem() instanceof ItemBlock)) return;
-        Block theBlock = Blocks.blocksList[is.itemID];
+        Block theBlock = is.itemID;
         if (!isWoodish(theBlock)) return;
         Coord target = new Coord(event.entityPlayer.worldObj, event.x, event.y, event.z);
         target.adjust(ForgeDirection.getOrientation(event.face));

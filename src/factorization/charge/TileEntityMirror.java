@@ -284,7 +284,7 @@ public class TileEntityMirror extends TileEntityCommon {
                 return true;
             }
             int id = worldObj.getBlock(bx, yCoord, bz);
-            Block b = Blocks.blocksList[id];
+            Block b = id;
             boolean air_like = false;
             if (b == null) {
                 air_like = true;

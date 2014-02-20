@@ -1581,7 +1581,7 @@ public class FzUtil {
     }
     
     public static FluidStack drainSpecificBlockFluid(World worldObj, int x, int y, int z, boolean doDrain, Fluid targetFluid) {
-        Block b = Blocks.blocksList[worldObj.getBlock(x, y, z)];
+        Block b = worldObj.getBlock(x, y, z);
         if (!(b instanceof IFluidBlock)) {
             Fluid vanilla;
             if (b == Blocks.waterStill || b == Blocks.waterMoving) {

@@ -69,7 +69,7 @@ public class GeneratePower extends BufferedFanturpeller {
         if (otherFluid != null && otherFluid != fluid) {
             return true;
         }
-        final Block block = Blocks.blocksList[fid];
+        final Block block = fid;
         if (otherFluid == fluid) {
             if (block instanceof BlockFluidFinite) {
                 if (at.getMd() == 0xF) return true;

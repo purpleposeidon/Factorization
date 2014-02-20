@@ -443,7 +443,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
 
                         boolean didRemove = removeBlock(player, block, md, mop.blockX, mop.blockY, mop.blockZ);
                         if (didRemove && canHarvest) {
-                            Blocks.blocksList[id].harvestBlock(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, md);
+                            id.harvestBlock(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, md);
                         }
                     }
                     block.onBlockHarvested(worldObj, mop.blockX, mop.blockY, mop.blockZ, md, player);

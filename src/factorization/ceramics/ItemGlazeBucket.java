@@ -42,7 +42,7 @@ public class ItemGlazeBucket extends ItemFactorization {
             return getIconFromDamage(0);
         }
         int id = getBlockId(is);
-        Block block = Blocks.blocksList[id];
+        Block block = id;
         if (block == null) {
             return BlockIcons.uv_test;
             //Or could return the error icon.
@@ -189,11 +189,11 @@ public class ItemGlazeBucket extends ItemFactorization {
         if (FzUtil.getTag(is).getBoolean("fake")) {
             return false;
         }
-        return Blocks.blocksList[getBlockId(is)] != null;
+        return getBlockId(is) != null;
     }
     
     ItemStack getSource(ItemStack is) {
-        Block b = Blocks.blocksList[getBlockId(is)];
+        Block b = getBlockId(is);
         if (b ==  null) {
             return null;
         }

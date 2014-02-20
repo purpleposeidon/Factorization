@@ -432,10 +432,10 @@ public class HammerClientProxy extends HammerProxy {
 
                         if (i1 > 0 && this.curBlockDamageMP == 0.0F)
                         {
-                            Blocks.blocksList[i1].onBlockClicked(this.mc.theWorld, x, y, z, this.mc.thePlayer);
+                            i1.onBlockClicked(this.mc.theWorld, x, y, z, this.mc.thePlayer);
                         }
 
-                        if (i1 > 0 && Blocks.blocksList[i1].getPlayerRelativeBlockHardness(this.mc.thePlayer, this.mc.thePlayer.worldObj, x, y, z) >= 1.0F)
+                        if (i1 > 0 && i1.getPlayerRelativeBlockHardness(this.mc.thePlayer, this.mc.thePlayer.worldObj, x, y, z) >= 1.0F)
                         {
                             this.onPlayerDestroyBlock(x, y, z, side);
                             resetController();

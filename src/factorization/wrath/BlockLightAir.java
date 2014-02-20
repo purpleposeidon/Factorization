@@ -82,7 +82,7 @@ public class BlockLightAir extends Block {
             }
         }
         TileEntityWrathLamp.doAirCheck(w, x, y, z);
-        Block b = Blocks.blocksList[w.getBlock(x, y + 1, z)];
+        Block b = w.getBlock(x, y + 1, z);
         if (b != null && !b.isAir(w, x, y + 1, z)) {
             //a li'l hack for sand
             w.setBlock(x, y, z, 0, 0, 0);
