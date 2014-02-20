@@ -52,7 +52,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     
     public Packet getAuxillaryInfoPacket() {
         Packet p = Core.network.TEmessagePacket(getCoord(), MessageType.FactoryType, getFactoryType().md, getExtraInfo(), getExtraInfo2());
-        p.isChunkDataPacket = true;
+        //p.isChunkDataPacket = true; NORELEASE? Needed?
         return p;
     }
 

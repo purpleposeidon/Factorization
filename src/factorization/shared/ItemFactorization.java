@@ -13,16 +13,23 @@ import factorization.shared.Core.TabType;
 public class ItemFactorization extends Item {
     private int spriteNumber = 1;
 
-    public ItemFactorization(int itemId, String name, TabType tabType) {
-        super(itemId);
-        setBlockName("factorization:" + name.replace('.', '/'));
+    public ItemFactorization(String name, TabType tabType) {
+        setUnlocalizedName("factorization:" + name.replace('.', '/'));
         Core.tab(this, tabType);
+    }
+    
+    String accessableUnlocalizedName;
+    
+    @Override
+    public Item setUnlocalizedName(String name) {
+        accessableUnlocalizedName = name;
+        return super.setUnlocalizedName(name);
     }
     
     @Override
     @SideOnly(Side.CLIENT)
     protected String getIconString() {
-        return unlocalizedName;
+        return accessableUnlocalizedName;
     }
     
     @Override

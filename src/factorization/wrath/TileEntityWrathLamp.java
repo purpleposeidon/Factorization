@@ -324,7 +324,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                         beamDepths[index] = (short) height;
                         continue;
                     }
-                    if (block == 0 && worldObj.getBlock(x, height - 1, z) == Blocks.cobblestoneWall) {
+                    if (block == 0 && worldObj.getBlock(x, height - 1, z) == Blocks.cobblestone_wall) {
                         block = -1;
                     }
                     if (block == 0) {

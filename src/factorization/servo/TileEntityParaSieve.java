@@ -1,15 +1,11 @@
 package factorization.servo;
 
-import static factorization.shared.TileEntityCommon.full_rotation_array;
-
 import java.util.HashMap;
-import java.util.Map;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -17,14 +13,8 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.util.ForgeDirection;
-
-import org.bouncycastle.util.Arrays;
-
-import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
-import cpw.mods.fml.common.registry.ItemData;
-import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -41,7 +31,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     private boolean putting_nbt = false;
     private byte redstone_cache = -1;
     
-    static short[] itemId2modIndex = new short[Items.itemsList.length];
+    static short[] itemId2modIndex = new short[32000 /* NORELEASE this the right way to store stuff? Items.itemsList.length */];
     
     TileEntity cached_te = null;
     Entity cached_ent = null;
@@ -127,10 +117,10 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         }
         if (a.getItem() != b.getItem()) {
             //Compare on mods
-            short aId = itemId2modIndex[a.itemID];
-            short bId = itemId2modIndex[b.itemID];
+            short aId = itemId2modIndex[FzUtil.getId(a)];
+            short bId = itemId2modIndex[FzUtil.getId(b)];
             if (aId == bId && aId != 0) {
-                return itemId2modIndex[stranger.itemID] == aId;
+                return itemId2modIndex[FzUtil.getId(stranger)] == aId;
             }
             //Compare on Item class
             Class ca = a.getItem().getClass(), cb = b.getItem().getClass();
@@ -157,7 +147,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             }
             return true; //all 3 names were identical
         }
-        if (a.itemID != stranger.itemID) {
+        if (a != stranger) {
             return false; //It doesn't match! How could we have been so silly as to not notice?
         }
         int mda = a.getItemDamage(), mdb = b.getItemDamage(), md_stranger = stranger.getItemDamage();
@@ -552,15 +542,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         Core.logFine("[parasieve] Classifying items");
         HashMap<String, Short> modMap = new HashMap();
         short seen = 1;
-        Map<Integer, ItemData> dataMap = null;
-        try {
-            dataMap = (Map<Integer, ItemData>) ReflectionHelper.getPrivateValue(GameData.class, null, "idMap");
-        } catch (Throwable e) {
-            e.printStackTrace();
-            Core.logFine("[parasieve] Reflection failed!");
-            return;
-        }
-        for (Item item : Items.itemsList) {
+        for (Item item : (Iterable<Item>) Item.itemRegistry) {
             if (item == null) {
                 continue;
             }
@@ -568,10 +550,6 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             String modName = null;
             if (ui != null) {
                 modName = ui.modId;
-            }
-            if (modName == null && dataMap != null) {
-                ItemData id = dataMap.get(item.itemID);
-                modName = id.getModId();
             }
             if (modName == null) {
                 modName = "vanilla?";
@@ -582,7 +560,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
                 val = seen;
                 seen++;
             }
-            itemId2modIndex[item.itemID] = val;
+            itemId2modIndex[FzUtil.getId(item)] = val;
         }
         Core.logFine("[parasieve] Done");
     }

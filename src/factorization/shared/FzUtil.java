@@ -1626,4 +1626,17 @@ public class FzUtil {
     public static Block getBlock(Item it) {
         return Block.getBlockFromItem(it);
     }
+    
+    public static int getId(Block block) {
+        return Block.getIdFromBlock(block);
+    }
+    
+    public static int getId(Item it) {
+        return Item.getIdFromItem(it);
+    }
+    
+    public static int getId(ItemStack is) {
+        if (is == null) return 0;
+        return Item.getIdFromItem(is.getItem());
+    }
 }

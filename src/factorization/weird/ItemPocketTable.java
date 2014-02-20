@@ -18,8 +18,8 @@ import factorization.shared.Core.TabType;
 
 public class ItemPocketTable extends ItemFactorization {
 
-    public ItemPocketTable(int id) {
-        super(id, "tool/pocket_crafting_table", TabType.TOOLS);
+    public ItemPocketTable() {
+        super("tool/pocket_crafting_table", TabType.TOOLS);
         setMaxStackSize(1);
         setFull3D();
     }
