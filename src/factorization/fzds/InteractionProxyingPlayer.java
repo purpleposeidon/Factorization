@@ -2,7 +2,7 @@ package factorization.fzds;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemInWorldManager;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.network.Packet;
 import net.minecraft.server.MinecraftServer;
 
 public class InteractionProxyingPlayer extends GenericProxyPlayer {

@@ -1,5 +1,7 @@
 package factorization.shared;
 
+import ibxm.Player;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -7,29 +9,21 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Random;
 
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.packet.NetHandler;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.Packet131MapData;
-import net.minecraft.server.management.PlayerInstance;
+import net.minecraft.network.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.network.ITinyPacketHandler;
-import cpw.mods.fml.common.network.PacketDispatcher;
-import cpw.mods.fml.common.network.Player;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
@@ -39,7 +33,6 @@ import factorization.api.VectorUV;
 import factorization.common.Command;
 import factorization.common.FactoryType;
 import factorization.notify.NotifyImplementation;
-import factorization.weird.TileEntityBarrel;
 
 public class NetworkFactorization implements ITinyPacketHandler {
     protected final static short factorizeTEChannel = 0; //used for tile entities
@@ -166,7 +159,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
             } else if (where instanceof Entity) {
                 output.writeByte(NotifyMessageType.ENTITY);
                 Entity ent = (Entity) where;
-                output.writeInt(ent.entityId);
+                output.writeInt(ent.getEntityId());
             } else if (where instanceof TileEntity) {
                 output.writeByte(NotifyMessageType.TILEENTITY);
                 TileEntity te = (TileEntity) where;

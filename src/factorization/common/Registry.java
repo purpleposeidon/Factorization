@@ -1039,7 +1039,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "qCL",
                 "SIB",
                 "rCL",
-                'q', Items.netherQuartz,
+                'q', Items.quartz,
                 'r', Items.redstone,
                 'S', dark_iron_sprocket,
                 'C', insulated_coil,

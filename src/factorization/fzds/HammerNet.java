@@ -14,7 +14,7 @@ import net.minecraft.item.ItemInWorldManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetServerHandler;
 import net.minecraft.network.packet.NetHandler;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.network.Packet;
 import net.minecraft.network.packet.Packet131MapData;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;

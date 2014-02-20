@@ -6,7 +6,7 @@ import net.minecraft.item.ItemInWorldManager;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.NetServerHandler;
 import net.minecraft.network.packet.NetHandler;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.network.Packet;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 

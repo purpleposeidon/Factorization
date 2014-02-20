@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,7 +15,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
@@ -1086,7 +1083,6 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         make(Type.CREATIVE, new ItemStack(Blocks.bedrock), new ItemStack(Blocks.diamond_block));
     }
     
-    static ItemStack silkTouch = Items.enchantedBook.getEnchantedItemStack(new EnchantmentData(Enchantment.silkTouch, 1));
     public static void makeRecipe(ItemStack log, ItemStack slab) {
         ItemStack normal = make(Type.NORMAL, log, slab);
         Core.registry.recipe(normal,

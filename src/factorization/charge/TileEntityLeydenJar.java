@@ -7,7 +7,7 @@ import java.util.Random;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.network.Packet;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -25,8 +25,8 @@ import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
-import factorization.shared.TileEntityCommon;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityCommon;
 
 public class TileEntityLeydenJar extends TileEntityCommon implements IChargeConductor {
     private Charge charge = new Charge(this);
