@@ -74,7 +74,7 @@ public class TileEntityStamper extends TileEntityFactorization {
     }
     
     @Override
-    public String getInvName() {
+    public String getInventoryName() {
         return "Stamper";
     }
 
@@ -147,7 +147,7 @@ public class TileEntityStamper extends TileEntityFactorization {
             }
         }
         if (any) {
-            onInventoryChanged();
+            markDirty();
         }
     }
     
@@ -171,7 +171,7 @@ public class TileEntityStamper extends TileEntityFactorization {
             List<ItemStack> craft = tryCrafting();
             if (craft != null) {
                 outputBuffer.addAll(craft);
-                onInventoryChanged();
+                markDirty();
                 drawActive(3);
             }
         }

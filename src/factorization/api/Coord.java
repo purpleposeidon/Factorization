@@ -6,12 +6,11 @@ import java.util.Collections;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.management.PlayerInstance;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChunkCoordinates;
@@ -19,7 +18,6 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
@@ -34,7 +32,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.shared.BlockHelper;
-import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
 // Note: The rules for holding on to references to Coord are the same as for holding on to World.
@@ -437,25 +434,28 @@ public class Coord implements IDataSerializable {
 
     public void redraw() {
         if (w.isRemote) {
-            w.markBlockForRenderUpdate(x, y, z);
+            w.markBlockForUpdate(x, y, z);
         }
     }
     
     public void notifyNeighbors() {
-        //this will probably take care of our redstone issues
-        w.notifyBlocksOfNeighborChange(x, y, z, getId());
+        w.notifyBlocksOfNeighborChange(x, y, z, getBlock());
     }
 
     public void updateLight() {
-        w.updateAllLightTypes(x, y, z);
+        w.func_147451_t(x, y, z); //w.updateAllLightTypes(x, y, z);
     }
     
     public void updateBlockLight() {
-        w.updateLightByType(EnumSkyBlocks.Block, x, y, z);
+        w.updateLightByType(EnumSkyBlock.Block, x, y, z);
     }
 
     public void setTE(TileEntity te) {
-        w.setBlockTileEntity(x, y, z, te);
+        w.setTileEntity(x, y, z, te);
+    }
+    
+    public void rmTE() {
+        w.removeTileEntity(x, y, z);
     }
 
     public TileEntity getTE() {
@@ -477,10 +477,6 @@ public class Coord implements IDataSerializable {
         return null;
     }
     
-    public void rmTE() {
-        w.removeBlockTileEntity(x, y, z);
-    }
-    
     public Chunk getChunk() {
         return w.getChunkFromBlockCoords(x, z);
     }
@@ -489,8 +485,7 @@ public class Coord implements IDataSerializable {
         return getId();
     }
 
-    @Deprecated //1.7'll be making this not a thing
-    public int getId() {
+    public Block getId() {
         return w.getBlock(x, y, z);
     }
 
@@ -499,7 +494,7 @@ public class Coord implements IDataSerializable {
     }
     
     public int getRawId() {
-        return w.getBlock(x, y, z);
+        return Block.getIdFromBlock(w.getBlock(x, y, z));
     }
 
     public boolean isAir() {
@@ -511,7 +506,7 @@ public class Coord implements IDataSerializable {
         if (b == null) {
             return false;
         }
-        return b.isBlockNormalCube(w, x, y, z);
+        return b.isNormalCube(w, x, y, z);
     }
     
     public float getHardness() {
@@ -524,11 +519,11 @@ public class Coord implements IDataSerializable {
 
     /** Let's try to use Orientation */
     public boolean isSolidOnSide(int side) {
-        return w.isBlockSolidOnSide(x, y, z, ForgeDirection.getOrientation(side));
+        return w.isSideSolid(x, y, z, ForgeDirection.getOrientation(side));
     }
     
     public boolean isSolidOnSide(ForgeDirection side) {
-        return w.isBlockSolidOnSide(x, y, z, side);
+        return w.isSideSolid(x, y, z, side);
     }
     
     public boolean isBlockBurning() {
@@ -536,7 +531,7 @@ public class Coord implements IDataSerializable {
         if (b == null) {
             return false;
         }
-        return b == Blocks.fire || b.isBlockBurning(w, x, y, z);
+        return b == Blocks.fire || b.isBurning(w, x, y, z);
     }
 
     public boolean blockExists() {
@@ -551,10 +546,10 @@ public class Coord implements IDataSerializable {
         if (b == null) {
             return true;
         }
-        if (b.blockMaterial.isReplaceable()) {
+        if (b.getMaterial().isReplaceable()) {
             return true;
         }
-        return b.isBlockReplaceable(w, x, y, z);
+        return b.isReplaceable(w, x, y, z);
     }
 
     public boolean isTop() {
@@ -562,10 +557,7 @@ public class Coord implements IDataSerializable {
     }
 
     public boolean canBeSeenThrough() {
-        if (w.isAirBlock(x, y, z)) {
-            return true;
-        }
-        return Blocks.lightOpacity[getId()] == 0;
+        return getBlock().getLightOpacity() == 0;
     }
 
     public boolean canSeeSky() {
@@ -599,12 +591,6 @@ public class Coord implements IDataSerializable {
     }
     
     public static final int NOTIFY_NEIGHBORS = 1, UPDATE = 2, ONLY_UPDATE_SERVERSIDE = 4; //TODO, this'll end up in Forge probably
-
-    @Deprecated
-    public boolean setId(int id, boolean notify) {
-        int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
-        return w.setBlock(x, y, z, id, 0, notifyFlag);
-    }
     
     public boolean setId(Block block, boolean notify) {
         int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
@@ -615,34 +601,18 @@ public class Coord implements IDataSerializable {
         int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
         return w.setBlockMetadataWithNotify(x, y, z, md, notifyFlag);
     }
-
-    @Deprecated
-    public boolean setIdMd(int id, int md, boolean notify) {
-        int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
-        return w.setBlock(x, y, z, id, md, notifyFlag);
-    }
     
     public boolean setIdMd(Block block, int md, boolean notify) {
         int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
         return w.setBlock(x, y, z, block, md, notifyFlag);
     }
 
-    @Deprecated
-    public boolean setId(int id) {
+    public boolean setId(Block id) {
         return setId(id, true);
     }
 
     public boolean setMd(int md) {
         return setMd(md, true);
-    }
-
-    @Deprecated
-    public boolean setIdMd(int id, int md) {
-        return setIdMd(id, md, true);
-    }
-
-    public boolean setId(Block block) {
-        return setId(block);
     }
     
     public void notifyBlockChange() {
@@ -717,10 +687,6 @@ public class Coord implements IDataSerializable {
         return b.getSelectedBoundingBoxFromPool(w, x, y, z);
     }
     
-    public void notifyOfNeighborChange(int neighborId) {
-        w.notifyBlocksOfNeighborChange(x, y, z, neighborId);
-    }
-    
     public void scheduleUpdate(int delay) {
         w.scheduleBlockUpdate(x, y, z, getId(), delay);
     }
@@ -767,10 +733,6 @@ public class Coord implements IDataSerializable {
                 y = Math.max(y,  w.getTopSolidOrLiquidBlock(x + dx, z + dz));
             }
         }
-    }
-
-    public void removeTE() {
-        w.removeBlockTileEntity(x, y, z);
     }
     
     public boolean isPowered() {
@@ -846,7 +808,7 @@ public class Coord implements IDataSerializable {
         if (b == null) {
             return null;
         }
-        ArrayList<ItemStack> dropped = b.getBlockDropped(w, x, y, z, getMd(), 0);
+        ArrayList<ItemStack> dropped = b.getDrops(w, x, y, z, getMd(), 0);
         if (dropped == null || dropped.isEmpty()) {
             return null;
         }

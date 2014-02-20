@@ -318,7 +318,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     }
 
     @Override
-    public String getInvName() {
+    public String getInventoryName() {
         return "Parasieve";
     }
 
@@ -513,14 +513,14 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     }
     
     @Override
-    public void onInventoryChanged() {
-        super.onInventoryChanged();
+    public void markDirty() {
+        super.markDirty();
         try {
             IInventory inv = getRecursiveTarget();
             if (inv == null) {
                 return;
             }
-            inv.onInventoryChanged();
+            inv.markDirty();
         } finally {
             endRecursion();
         }
@@ -540,7 +540,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             if (inv == null) {
                 return;
             }
-            super.onInventoryChanged();
+            super.markDirty();
         } finally {
             endRecursion();
         }

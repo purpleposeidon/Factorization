@@ -183,7 +183,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         if (messageType == MessageType.DataHelperEdit) {
             DataInPacketClientEdited di = new DataInPacketClientEdited(input);
             socket.serialize("", di);
-            onInventoryChanged();
+            markDirty();
             return true;
         }
         return false;
@@ -547,7 +547,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     @Override
-    public String getInvName() {
+    public String getInventoryName() {
         return "Servo Motor Inventory";
     }
 
@@ -564,7 +564,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     private static final ItemStack EMPTY_ITEM = new ItemStack(0, 0, 0);
     
     @Override
-    public void onInventoryChanged() {
+    public void markDirty() {
         ArrayList<Object> toSend = new ArrayList(inv.length*2);
         for (byte i = 0; i < inv.length; i++) {
             if (FzUtil.identical(inv[i], inv_last_sent[i])) {
@@ -589,10 +589,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     @Override
-    public void openChest() { }
+    public void openInventory() { }
 
     @Override
-    public void closeChest() { }
+    public void closeInventory() { }
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack itemstack) {

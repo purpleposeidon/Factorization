@@ -37,7 +37,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
     }
 
     @Override
-    public String getInvName() {
+    public String getInventoryName() {
         return "Caliometric Burner";
     }
     
@@ -153,7 +153,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
         }
         int noms = getFoodValue(stomache);
         stomache = FzUtil.normalDecr(stomache);
-        onInventoryChanged();
+        markDirty();
         Sound.caliometricDigest.playAt(this);
         ticksUntilNextDigestion = 20*10*noms;
         return 16;
@@ -192,7 +192,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
         is = FzUtil.openInventory(this, ForgeDirection.NORTH).push(is);
         entityplayer.setCurrentItemOrArmor(0, is);
         info(entityplayer);
-        onInventoryChanged();
+        markDirty();
         return true;
     }
     

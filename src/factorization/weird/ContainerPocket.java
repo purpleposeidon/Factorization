@@ -138,8 +138,8 @@ public class ContainerPocket extends Container {
         }
 
         @Override
-        public String getInvName() {
-            return src.getInvName();
+        public String getInventoryName() {
+            return src.getInventoryName();
         }
 
         @Override
@@ -148,8 +148,8 @@ public class ContainerPocket extends Container {
         }
 
         @Override
-        public void onInventoryChanged() {
-            src.onInventoryChanged();
+        public void markDirty() {
+            src.markDirty();
             updateCraft();
         }
 
@@ -159,13 +159,13 @@ public class ContainerPocket extends Container {
         }
 
         @Override
-        public void openChest() {
-            src.openChest();
+        public void openInventory() {
+            src.openInventory();
         }
 
         @Override
-        public void closeChest() {
-            src.closeChest();
+        public void closeInventory() {
+            src.closeInventory();
         }
 
         @Override

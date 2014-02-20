@@ -106,7 +106,7 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
             storage += store_delta;
         }
         if (tier != storage * 32 / max_storage) {
-            onInventoryChanged();
+            markDirty();
             updateMeter();
         }
     }

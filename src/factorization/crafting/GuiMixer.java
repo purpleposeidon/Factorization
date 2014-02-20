@@ -14,7 +14,7 @@ public class GuiMixer extends FactorizationGui {
     }
 
     protected void drawGuiContainerForegroundLayer() {
-        fontRendererObj.drawString(mixer.getInvName(), 60, 6, 0x404040);
+        fontRendererObj.drawString(mixer.getInventoryName(), 60, 6, 0x404040);
     }
 
     @Override

@@ -50,6 +50,7 @@ import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChatMessageComponent;
 import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -65,6 +66,8 @@ import net.minecraftforge.oredict.OreDictionary;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
+
+import com.mojang.authlib.GameProfile;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -109,8 +112,6 @@ public class FzUtil {
         if (a.stackTagCompound == null || b.stackTagCompound == null) {
             return a.stackTagCompound == b.stackTagCompound;
         }
-        a.stackTagCompound.setName("tag"); //Notch.
-        b.stackTagCompound.setName("tag"); //Notch.
         return a.stackTagCompound.equals(b.stackTagCompound);
     }
     
@@ -121,7 +122,7 @@ public class FzUtil {
         if (a == null || b == null) {
             return a == b;
         }
-        return a.itemID == b.itemID && a.getItemDamage() == b.getItemDamage();
+        return a.getItem() == b.getItem() && a.getItemDamage() == b.getItemDamage();
     }
     
     /**
@@ -132,7 +133,7 @@ public class FzUtil {
             return template == stranger;
         }
         if (template.getItemDamage() == WILDCARD_DAMAGE) {
-            return template.itemID == stranger.itemID;
+            return template.getItem() == stranger.getItem();
         }
         return similar(template, stranger);
     }
@@ -351,9 +352,9 @@ public class FzUtil {
             callInvChanged = b;
         }
         
-        public void onInvChanged() {
+        public void onInvChanged() { //NORELEASE: Rename?
             if (callInvChanged) {
-                under.onInventoryChanged();
+                under.markDirty();
             }
         }
         
@@ -526,8 +527,8 @@ public class FzUtil {
             dest_inv.set(dest_i, dest);
             set(i, src);
             if (callInvChanged) {
-                dest_inv.under.onInventoryChanged();
-                under.onInventoryChanged();
+                dest_inv.under.markDirty();
+                under.markDirty();
             }
             return delta;
         }
@@ -729,20 +730,20 @@ public class FzUtil {
         }
         
         @Override
-        public String getInvName() { return "Container2IInventory wrapper"; }
+        public String getInventoryName() { return "Container2IInventory wrapper"; }
         
         @Override
         public boolean isInvNameLocalized() { return false; }
         @Override
         public int getInventoryStackLimit() { return 64; }
         @Override
-        public void onInventoryChanged() { }
+        public void markDirty() { }
         @Override
         public boolean isUseableByPlayer(EntityPlayer entityplayer) { return false; }
         @Override
-        public void openChest() { }
+        public void openInventory() { }
         @Override
-        public void closeChest() { }
+        public void closeInventory() { }
     }
     
     public static FzInv openInventory(IInventory orig_inv, ForgeDirection side) {
@@ -852,23 +853,23 @@ public class FzUtil {
         if (cb == null) {
             return null;
         }
-        int chestBlock = cb;
+        Block chestBlock = Blocks.chest;
         if (world.getBlock(i - 1, j, k) == chestBlock) {
-            return new InventoryLargeChest(origChest.getInvName(), (TileEntityChest) world.getTileEntity(i - 1, j, k), origChest);
+            return new InventoryLargeChest(origChest.getInventoryName(), (TileEntityChest) world.getTileEntity(i - 1, j, k), origChest);
         }
         if (world.getBlock(i, j, k - 1) == chestBlock) {
-            return new InventoryLargeChest(origChest.getInvName(), (TileEntityChest) world.getTileEntity(i, j, k - 1), origChest);
+            return new InventoryLargeChest(origChest.getInventoryName(), (TileEntityChest) world.getTileEntity(i, j, k - 1), origChest);
         }
         // If we're the lower chest, skip ourselves
         if (world.getBlock(i + 1, j, k) == chestBlock) {
             if (openBothSides) {
-                return new InventoryLargeChest(origChest.getInvName(), origChest, (TileEntityChest) world.getTileEntity(i + 1, j, k));
+                return new InventoryLargeChest(origChest.getInventoryName(), origChest, (TileEntityChest) world.getTileEntity(i + 1, j, k));
             }
             return null;
         }
         if (world.getBlock(i, j, k + 1) == chestBlock) {
             if (openBothSides) {
-                return new InventoryLargeChest(origChest.getInvName(), origChest, (TileEntityChest) world.getTileEntity(i, j, k + 1));
+                return new InventoryLargeChest(origChest.getInventoryName(), origChest, (TileEntityChest) world.getTileEntity(i, j, k + 1));
             }
             return null;
         }
@@ -1119,17 +1120,17 @@ public class FzUtil {
         Coord where;
 
         private FzFakePlayer(World par1World, String par2Str, Coord where) {
-            super(par1World, par2Str);
+            super(par1World, new GameProfile(null, par2Str));
             this.where = where;
         }
 
         //TODO: Forge'll probably have this working properly by the time I catch up to it.
         public void sendChatToPlayer(String s) {}
-        @Override public void sendChatToPlayer(ChatMessageComponent chatmessagecomponent) { }
         public boolean canCommandSenderUseCommand(int i, String s) { return false; }
         @Override public ChunkCoordinates getPlayerCoordinates() { return new ChunkCoordinates(where.x, where.y, where.z); }
         @Override public void addStat(StatBase par1StatBase, int par2) { }
         @Override public void openGui(Object mod, int modGuiId, World world, int x, int y, int z) { }
+        @Override public void addChatMessage(IChatComponent var1) { }
     }
     
     private static HashMap<String, WeakHashMap<World, FzFakePlayer>> usedPlayerCache = new HashMap();

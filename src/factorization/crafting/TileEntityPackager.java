@@ -13,7 +13,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 public class TileEntityPackager extends TileEntityStamper {
     @Override
-    public String getInvName() {
+    public String getInventoryName() {
         return "Packager";
     }
 

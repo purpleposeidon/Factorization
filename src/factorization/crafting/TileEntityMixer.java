@@ -95,8 +95,8 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
     
     @Override
-    public void onInventoryChanged() {
-        super.onInventoryChanged();
+    public void markDirty() {
+        super.markDirty();
         if (getWorldObj() != null && getWorldObj().isRemote) {
             return;
         }
@@ -111,7 +111,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         for (ItemStack is : outputBuffer) {
             FzUtil.spawnItemStack(here, is);
         }
-        onInventoryChanged();
+        markDirty();
     }
 
     @Override
@@ -150,7 +150,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
 
     @Override
-    public String getInvName() {
+    public String getInventoryName() {
         return "Mixer";
     }
 
@@ -605,7 +605,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         outputBuffer.add(out);
         FzUtil.addInventoryToArray(craft, outputBuffer);
         FzUtil.addInventoryToArray(fakePlayer.inventory, outputBuffer);
-        onInventoryChanged();
+        markDirty();
     }
     
     boolean dumpBuffer() {
@@ -649,7 +649,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         progress += speed;
         if (getRemainingProgress() <= 0 || Core.cheat) {
             if (!recipeMatches(mr.inputs)) {
-                onInventoryChanged();
+                markDirty();
                 dirty = true;
                 progress = 0;
                 return;

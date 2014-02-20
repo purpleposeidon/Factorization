@@ -250,7 +250,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
             newSize = is.stackSize;
         }
         if (origSize != newSize) {
-            onInventoryChanged();
+            markDirty();
         }
         return !buffer.isEmpty();
     }
@@ -370,7 +370,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         if (messageType == MessageType.DataHelperEdit) {
             DataInPacketClientEdited di = new DataInPacketClientEdited(input);
             this.serialize("", di);
-            onInventoryChanged();
+            markDirty();
             return true;
         }
         return false;

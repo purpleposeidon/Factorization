@@ -227,8 +227,8 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }
 
     @Override
-    public void onInventoryChanged() {
-        super.onInventoryChanged();
+    public void markDirty() {
+        super.markDirty();
         needLogic();
     }
 
@@ -246,11 +246,11 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }
 
     @Override
-    public final void openChest() {
+    public final void openInventory() {
     }
 
     @Override
-    public final void closeChest() {
+    public final void closeInventory() {
     }
     
     /*@Override

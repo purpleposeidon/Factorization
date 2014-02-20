@@ -70,11 +70,11 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         } else {
             inputs[slot] = is;
         }
-        onInventoryChanged();
+        markDirty();
     }
 
     @Override
-    public String getInvName() {
+    public String getInventoryName() {
         return "Crystallizer";
     }
 

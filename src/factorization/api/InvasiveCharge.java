@@ -45,7 +45,7 @@ public class InvasiveCharge extends TileEntity implements IChargeConductor {
         super.updateEntity();
         if (getWorldObj().getBlock(xCoord, yCoord, zCoord) != id || getWorldObj().getBlockMetadata(xCoord, yCoord, zCoord) != md) {
             Coord me = getCoord();
-            worldObj.removeBlockTileEntity(xCoord, yCoord, zCoord);
+            worldObj.removeTileEntity(xCoord, yCoord, zCoord);
             return;
         }
         charge.update();

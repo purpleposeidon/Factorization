@@ -229,7 +229,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         if (decoration != null) {
             decoration.onPlacedOnRail(this);
         }
-        onInventoryChanged();
+        markDirty();
     }
     
     public Decorator getDecoration() {

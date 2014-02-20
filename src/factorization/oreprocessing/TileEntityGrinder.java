@@ -57,7 +57,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         if (slot == 1) {
             output = is;
         }
-        onInventoryChanged();
+        markDirty();
     }
 
     @Override
@@ -81,7 +81,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     }
 
     @Override
-    public String getInvName() {
+    public String getInventoryName() {
         return "Grinder";
     }
     

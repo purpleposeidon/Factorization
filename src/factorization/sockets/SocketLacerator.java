@@ -138,9 +138,6 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     
     void destroyPartially(MovingObjectPosition mop, int amount) {
         if (mop == null) return;
-        int blockId = mop.subHit; //We abuse this to store the block ID!
-        //This is necessary because vanilla seems to key things by the block ID.
-        //Otherwise we'd have partial breaks floating around...
         worldObj.destroyBlockInWorldPartially(hashCode(), mop.blockX, mop.blockY, mop.blockZ, amount);
     }
     
@@ -398,9 +395,9 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                 speed -= max_speed/5;
                 return true;
             }
-            foundHash = (foundHash << 4) + id*16 + md;
+            foundHash = (foundHash << 4) + block.hashCode() + md;
             if (barrel != null) {
-                foundHash += barrel.item.itemID*5 + barrel.item.getItemDamage()*10;
+                foundHash += barrel.item.hashCode()*5 + barrel.item.getItemDamage()*10;
             }
             if (foundHash != targetHash) {
                 targetHash = foundHash;
@@ -409,7 +406,6 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                 progress++;
             }
             boolean doBreak = progress >= grind_time*hardness || Core.cheat;
-            mop.subHit = id; //We abuse this to store the block ID!
             if (barrel == null && !doBreak) {
                 float perc = progress/((float)grind_time*hardness);
                 int breakage = (int) (perc*10);
@@ -422,12 +418,11 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                 grab_items = true;
                 grind_items = true;
                 if (barrel == null) {
-                    int l = id;
                     int i1 = md;
-                    worldObj.playAuxSFX(2001, mop.blockX, mop.blockY, mop.blockZ, id + (md << 12));
+                    worldObj.playAuxSFX(2001, mop.blockX, mop.blockY, mop.blockZ, Block.getIdFromBlock(block) + md << 12);
                     
                     EntityPlayer player = getFakePlayer();
-                    ItemStack pick = new ItemStack(Items.pickaxeDiamond);
+                    ItemStack pick = new ItemStack(Items.diamond_pickaxe);
                     pick.addEnchantment(Enchantment.silkTouch, 1);
                     player.inventory.mainInventory[0] = pick;
                     {
@@ -440,11 +435,11 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
 
                         boolean didRemove = removeBlock(player, block, md, mop.blockX, mop.blockY, mop.blockZ);
                         if (didRemove && canHarvest) {
-                            id.harvestBlock(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, md);
+                            block.harvestBlock(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, md);
                         }
                     }
                     block.onBlockHarvested(worldObj, mop.blockX, mop.blockY, mop.blockZ, md, player);
-                    if (block.removeBlockByPlayer(worldObj, player, mop.blockX, mop.blockY, mop.blockZ)) {
+                    if (block.removedByPlayer(worldObj, player, mop.blockX, mop.blockY, mop.blockZ)) {
                         block.onBlockDestroyedByPlayer(worldObj, mop.blockX, mop.blockY, mop.blockZ, md);
                         block.harvestBlock(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, 0);
                     }
@@ -467,7 +462,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     private boolean removeBlock(EntityPlayer thisPlayerMP, Block block, int md, int x, int y, int z) {
         if (block == null) return false;
         block.onBlockHarvested(worldObj, x, y, z, md, thisPlayerMP);
-        if (block.removeBlockByPlayer(worldObj, thisPlayerMP, x, y, z)) {
+        if (block.removedByPlayer(worldObj, thisPlayerMP, x, y, z)) {
             block.onBlockDestroyedByPlayer(worldObj, x, y, z, md);
             return true;
         }

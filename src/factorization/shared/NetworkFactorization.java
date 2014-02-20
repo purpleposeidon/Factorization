@@ -390,7 +390,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 }
                 TileEntityCommon spawn = here.getTE(TileEntityCommon.class);
                 if (spawn != null && spawn.getFactoryType() != ft) {
-                    world.removeBlockTileEntity(x, y, z);
+                    world.removeTileEntity(x, y, z);
                     spawn = null;
                 }
                 if (spawn == null) {

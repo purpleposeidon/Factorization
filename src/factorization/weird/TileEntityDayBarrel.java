@@ -186,7 +186,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             if (upinv != null) {
                 ItemStack got = upinv.pull(item, 1, true);
                 if (got != null) {
-                    upi.onInventoryChanged();
+                    upi.markDirty();
                     taint(got);
                     changeItemCount(1);
                     updateStacks();
@@ -206,7 +206,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
                     ItemStack toPush = bottom_item.splitStack(1);
                     ItemStack got = downinv.push(toPush);
                     if (got == null) {
-                        downi.onInventoryChanged();
+                        downi.markDirty();
                         updateStacks();
                         cleanBarrel();
                         youve_changed_jim = true;
@@ -217,7 +217,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             }
         }
         if (youve_changed_jim) {
-            onInventoryChanged();
+            markDirty();
         }
     }
     
@@ -323,7 +323,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         if (middleCount == 0) {
             topStack = bottomStack = item = null;
             updateClients(MessageType.BarrelCount);
-            onInventoryChanged();
+            markDirty();
             return;
         }
         if (middleCount > getMaxSize() && !spammed && worldObj != null) {
@@ -341,7 +341,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         topStack.stackSize = bottomStack.stackSize = 0;
         updateStacks();
         updateClients(MessageType.BarrelCount);
-        onInventoryChanged();
+        markDirty();
     }
     
     @Override
@@ -514,8 +514,8 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     //Inventory code
     
     @Override
-    public void onInventoryChanged() {
-        super.onInventoryChanged();
+    public void markDirty() {
+        super.markDirty();
         cleanBarrel();
         updateStacks();
         int c = getItemCount();
@@ -615,7 +615,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
 
     @Override
-    public String getInvName() {
+    public String getInventoryName() {
         return "Barrel";
     }
 
@@ -880,7 +880,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         } else {
             Sound.barrelPunt.playAt(src);
         }
-        src.removeTE();
+        src.rmTE();
         src.setId(0);
         if (newOrientation != FzOrientation.UNKNOWN) {
             this.orientation = newOrientation;

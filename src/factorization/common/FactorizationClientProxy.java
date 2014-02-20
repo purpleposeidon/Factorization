@@ -358,7 +358,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderCrystallizer();
         new BlockRenderCompressionCrafter();
         new BlockRenderGreenware().setup();
-        new BlockRenderRocketEngine();
+        //NORELEASE new BlockRenderRocketEngine();
         new BlockRenderServoRail();
         for (FactoryType ft : new FactoryType[] {
                 FactoryType.SOCKET_EMPTY,

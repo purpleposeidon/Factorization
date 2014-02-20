@@ -140,7 +140,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
             }
         }
         if (change) {
-            onInventoryChanged();
+            markDirty();
             updateClients();
         }
     }

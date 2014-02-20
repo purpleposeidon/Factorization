@@ -17,8 +17,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.common.BlockIcons;
 
 public class BlockDarkIronOre extends Block {
-    public BlockDarkIronOre(int blockId) {
-        super(blockId, Material.rock);
+    public BlockDarkIronOre() {
+        super(Material.rock);
     }
     
     @Override
@@ -45,12 +45,12 @@ public class BlockDarkIronOre extends Block {
             return;
         }
         for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-            if (world.isBlockNormalCube(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ)) {
+            if (world.isBlockNormalCubeDefault(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ, true)) {
                 continue;
             }
             TileEntity te = new Glint();
-            world.setBlockTileEntity(x, y, z, te);
-            world.markBlockForRenderUpdate(x, y, z);
+            world.setTileEntity(x, y, z, te);
+            world.markBlockForUpdate(x, y, z);
             return;
         }
     }
@@ -83,7 +83,7 @@ public class BlockDarkIronOre extends Block {
             age++;
             EntityPlayer player = Minecraft.getMinecraft().thePlayer;
             if (lastRenderedTick + 60 < worldObj.getTotalWorldTime() && !inRange(age, age, age, player)) {
-                worldObj.removeBlockTileEntity(xCoord, yCoord, zCoord);
+                worldObj.removeTileEntity(xCoord, yCoord, zCoord);
             }
         }
         
