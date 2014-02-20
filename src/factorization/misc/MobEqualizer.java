@@ -8,21 +8,21 @@ import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.event.EventPriority;
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 
 public class MobEqualizer {
     @SubscribeEvent(priority = EventPriority.LOW)
     public void upgradeMob(LivingSpawnEvent.SpecialSpawn event) {
-        if (event.world.difficultySetting <= 1) {
+        if (event.world.difficultySetting.getDifficultyId() <= 1) {
             return;
         }
         if (!(event.entityLiving instanceof EntityMob)) {
             return;
         }
         EntityMob ent = (EntityMob) event.entityLiving;
-        if (event.world.rand.nextInt(400) > event.world.difficultySetting) {
+        if (event.world.rand.nextInt(400) > event.world.difficultySetting.getDifficultyId()) {
             return;
         }
         EntityPlayer template = pickNearPlayer(event);
@@ -59,7 +59,7 @@ public class MobEqualizer {
                 if (act != EnumAction.block && act != EnumAction.none && act != EnumAction.bow) {
                     continue;
                 }
-                ItemStack orig_weapon = ent.getCurrentItemOrArmor(0);
+                ItemStack orig_weapon = ent.getHeldItem();
                 ent.setCurrentItemOrArmor(0, is);
                 //float f = (float)ent.getAttributeInstanceForAttributeType__getEntityAttribute(SharedMonsterAttributes.attackDamage__attackDamage).getDamage__getAttributeValue();
                 float f = (float)ent.getEntityAttribute(SharedMonsterAttributes.attackDamage).getAttributeValue();
@@ -92,7 +92,7 @@ public class MobEqualizer {
             ent.setCurrentItemOrArmor(i + 1, armorCopies[i]);
         }
         for (int i = 0; i < 5; i++) {
-            ent.equipmentDropChances[i] = 0;
+            ent.setEquipmentDropChance(i, 0);
         }
     }
 

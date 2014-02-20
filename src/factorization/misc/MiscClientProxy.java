@@ -32,7 +32,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatFileWriter;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.EnumMovingObjectType;
+import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderHell;
@@ -161,7 +161,7 @@ public class MiscClientProxy extends MiscProxy {
                 }
                 wasClicked = true;
                 MovingObjectPosition mop = mc.objectMouseOver;
-                if (mop == null || mop.typeOfHit != EnumMovingObjectType.TILE) {
+                if (mop == null || mop.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
                     return;
                 }
                 Coord here = new Coord(player.worldObj, mop);

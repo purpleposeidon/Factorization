@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -17,16 +16,16 @@ import factorization.shared.Core;
 
 public class BlockResource extends Block {
     public IIcon[] icons = new IIcon[ResourceType.values().length];
-    protected BlockResource(int id) {
-        super(id, Material.rock);
+    protected BlockResource() {
+        super(Material.rock);
         setHardness(2.0F);
-        setUnlocalizedName("factorization.ResourceBlock");
+        setBlockName("factorization.ResourceBlock");
     }
     
-    public static final int glaze_md_start = 17; 
+    public static final int glaze_md_start = 17;
     
     @Override
-    public void registerIcons(IIconRegister reg) {
+    public void registerBlockIcons(IIconRegister reg) {
         for (ResourceType rt : ResourceType.values()) {
             if (rt.texture == null) {
                 continue;

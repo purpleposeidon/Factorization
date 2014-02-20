@@ -866,10 +866,10 @@ public class Coord implements IDataSerializable {
         if (b instanceof IFluidBlock) {
             return ((IFluidBlock) b).getFluid();
         }
-        if (b == Blocks.waterStill || b == Blocks.waterMoving) {
+        if (b == Blocks.water || b == Blocks.flowing_water) {
             return FluidRegistry.WATER;
         }
-        if (b == Blocks.lavaStill || b == Blocks.lavaMoving) {
+        if (b == Blocks.lava || b == Blocks.flowing_lava) {
             return FluidRegistry.LAVA;
         }
         return null;

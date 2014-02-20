@@ -82,7 +82,7 @@ public class GuiDataConfig extends GuiScreen {
         UsefulButton button(int delta, String text) {
             UsefulButton button = new UsefulButton(delta, buttonPos, posY - 2, text);
             buttons.add(button);
-            buttonPos += fontRenderer.getStringWidth(button.displayString + 10);
+            buttonPos += fontRendererObj.getStringWidth(button.displayString + 10);
             return button;
         }
         
@@ -95,13 +95,13 @@ public class GuiDataConfig extends GuiScreen {
         }
         
         void renderLabel() {
-            drawString(fontRenderer, label, posLabel, posY, color);
+            drawString(fontRendererObj, label, posLabel, posY, color);
         }
         
         void renderControl(int mouseX, int mouseY) { }
         
         int getLabelWidth() {
-            return fontRenderer.getStringWidth(label) + 80;
+            return fontRendererObj.getStringWidth(label) + 80;
         }
         
         void mouseClick(int mouseX, int mouseY, boolean rightClick) {
@@ -163,14 +163,14 @@ public class GuiDataConfig extends GuiScreen {
             button(-10, "-10");
             button(-1, "-");
             labelPos = buttonPos;
-            buttonPos += fontRenderer.getStringWidth(transVal()) + 5;
+            buttonPos += fontRendererObj.getStringWidth(transVal()) + 5;
             button(1, "+");
             button(10, "+10");
         }
         
         @Override
         void renderControl(int mouseX, int mouseY) {
-            fontRenderer.drawString(transVal(), this.labelPos, posY, color);
+            fontRendererObj.drawString(transVal(), this.labelPos, posY, color);
         }
         
         @Override

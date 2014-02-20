@@ -204,7 +204,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
                 ghast.courseChangeCooldown = 40;
                 if (ghast.isDead) {
                     //NOTE: Potential for bonus ghast tears here. I'm okay with this?
-                    buffer.add(new ItemStack(Items.ghastTear));
+                    buffer.add(new ItemStack(Items.ghast_tear));
                 }
             }
             if (!worldObj.isRemote && ghast.getHealth() > 0) {

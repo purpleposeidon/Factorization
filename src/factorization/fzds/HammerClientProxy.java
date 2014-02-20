@@ -25,7 +25,7 @@ import net.minecraft.network.packet.Packet14BlockDig;
 import net.minecraft.network.packet.Packet1Login;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.EnumMovingObjectType;
+import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -242,7 +242,7 @@ public class HammerClientProxy extends HammerProxy {
         if (shadowSelected == null) {
             return;
         }
-        if (shadowSelected.typeOfHit != EnumMovingObjectType.TILE) {
+        if (shadowSelected.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
             return;
         }
         if (event.isCanceled()) {
@@ -254,7 +254,7 @@ public class HammerClientProxy extends HammerProxy {
         float partialTicks = event.partialTicks;
         DimensionSliceEntity dse = rayTarget.parent;
         Coord here = null;
-        if (selectionBlockBounds != null && shadowSelected.typeOfHit == EnumMovingObjectType.TILE) {
+        if (selectionBlockBounds != null && shadowSelected.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
             here = new Coord(DeltaChunk.getClientShadowWorld(), shadowSelected.blockX, shadowSelected.blockY, shadowSelected.blockZ);
             here.getBlock().setBlockBounds(
                     (float)(selectionBlockBounds.minX - here.x), (float)(selectionBlockBounds.minY - here.y), (float)(selectionBlockBounds.minZ - here.z),
@@ -322,7 +322,7 @@ public class HammerClientProxy extends HammerProxy {
                     bb = shadowSelected.entityHit.boundingBox;
                     selectionBlockBounds = null;
                     break;
-                case TILE:
+                case BLOCK:
                     Coord hit = new Coord(DeltaChunk.getClientShadowWorld(), shadowSelected.blockX, shadowSelected.blockY, shadowSelected.blockZ);
                     Block block = hit.getBlock();
                     bb = block.getSelectedBoundingBoxFromPool(hit.w, hit.x, hit.y, hit.z);

@@ -216,8 +216,8 @@ public class TileEntityWrathLamp extends TileEntityCommon {
             if (x == xCoord && z == zCoord) {
                 return true;
             }
-            int id = worldObj.getBlock(x, yCoord, z);
-            if (Blocks.blocksList[id] != null && Blocks.blocksList[id].isOpaqueCube() && Blocks.lightOpacity[id] != 0) {
+            Block id = worldObj.getBlock(x, yCoord, z);
+            if (id != null && id.isOpaqueCube() && id.getLightOpacity() != 0) {
                 return false;
             }
             dx = x - xCoord;

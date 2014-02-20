@@ -8,7 +8,7 @@ import net.minecraft.item.Item;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.Packet;
-import net.minecraftforge.event.EventPriority;
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import factorization.api.Coord;

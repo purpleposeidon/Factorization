@@ -9,7 +9,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumMovingObjectType;
+import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
@@ -212,7 +212,7 @@ public class ItemGlazeBucket extends ItemFactorization {
         if (mop == null) {
             return is;
         }
-        if (mop.typeOfHit != EnumMovingObjectType.TILE || mop.subHit == -1) {
+        if (mop.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || mop.subHit == -1) {
             return is;
         }
         TileEntityGreenware clay = (new Coord(w, mop.blockX, mop.blockY, mop.blockZ)).getTE(TileEntityGreenware.class);

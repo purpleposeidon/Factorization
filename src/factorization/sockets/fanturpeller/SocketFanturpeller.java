@@ -170,7 +170,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
 
     boolean isLiquid(Coord at) {
         final Block block = at.getBlock();
-        if (block == Blocks.waterStill || block == Blocks.waterMoving || block == Blocks.lavaStill || block == Blocks.lavaMoving) {
+        if (block == Blocks.water || block == Blocks.flowing_water || block == Blocks.lava || block == Blocks.flowing_lava) {
             return at.getMd() == 0;
         }
         if (block instanceof IFluidBlock) {

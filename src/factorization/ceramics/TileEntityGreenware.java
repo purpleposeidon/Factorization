@@ -444,6 +444,8 @@ public class TileEntityGreenware extends TileEntityCommon {
         }
     }
 
+    Item woolItem = Item.getItemFromBlock(Blocks.wool);
+    
     @Override
     public boolean activate(EntityPlayer player, ForgeDirection side) {
         ClayState state = getState();
@@ -454,18 +456,18 @@ public class TileEntityGreenware extends TileEntityCommon {
         if (held == null) {
             return false;
         }
-        int heldId = held.getItem().itemID;
+        Item heldId = held.getItem();
         boolean creative = player.capabilities.isCreativeMode;
-        if (heldId == Items.bucketWater.itemID && state == ClayState.DRY) {
+        if (heldId == Items.water_bucket && state == ClayState.DRY) {
             lastTouched = 0;
             if (creative) {
                 return true;
             }
             int ci = player.inventory.currentItem;
-            player.inventory.mainInventory[ci] = new ItemStack(Items.bucketEmpty);
+            player.inventory.mainInventory[ci] = new ItemStack(Items.bucket);
             return true;
         }
-        if (heldId == Blocks.cloth) {
+        if (heldId == woolItem) {
             lastTouched = dryTime + 1;
             return true;
         }

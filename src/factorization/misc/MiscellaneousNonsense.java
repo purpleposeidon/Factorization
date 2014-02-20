@@ -73,7 +73,7 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         };
         
         proxy.initializeClient();
-        GameRegistry.registerCraftingHandler(new ICraftingHandler() {
+        GameRegistry.registerCraftingHandler(new ICraftingHandler() { //NORELEASE: Check if these achievements have been de-stupidified.
             @Override public void onSmelting(EntityPlayer player, ItemStack item) { }
             
             @Override
@@ -82,10 +82,10 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
                     return;
                 }
                 Item item = stack.getItem();
-                if (item == Items.hoeStone || item == Items.hoeIron) {
+                if (item == Items.stone_hoe || item == Items.iron_hoe) {
                     player.addStat(AchievementList.buildHoe, 1);
                 }
-                if (item == Items.swordStone || item == Items.swordIron) {
+                if (item == Items.stone_sword || item == Items.iron_sword) {
                     player.addStat(AchievementList.buildSword, 1);
                 }
             }

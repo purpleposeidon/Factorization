@@ -1021,18 +1021,17 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(ForgeDirection dir) {
         if (dir.offsetY != 0) {
-            if (woodSlab.itemID < Blocks.blocksList.length && woodSlab.itemID != null) {
-                Block b = woodSlab.itemID;
-                return b.getIcon(0, woodSlab.getItemDamage());
+            Block ws = FzUtil.getBlock(woodSlab);
+            if (ws != null) {
+                return ws.getIcon(0, woodSlab.getItemDamage());
             }
             return woodSlab.getItem().getIcon(woodSlab, 0);
         }
-        Item theItem = woodLog.getItem();
-        if (theItem instanceof ItemBlock) {
-            Block b = ((ItemBlock) theItem).getBlockID();
-            return b.getIcon(2, woodLog.getItemDamage());
+        Block wl = FzUtil.getBlock(woodLog);
+        if (wl != null) {
+            return wl.getIcon(2, woodLog.getItemDamage());
         }
-        return theItems.getIcon(woodLog, 2);
+        return woodLog.getItem().getIcon(woodLog, 0);
     }
     
     @Override

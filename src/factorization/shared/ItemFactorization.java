@@ -15,7 +15,7 @@ public class ItemFactorization extends Item {
 
     public ItemFactorization(int itemId, String name, TabType tabType) {
         super(itemId);
-        setUnlocalizedName("factorization:" + name.replace('.', '/'));
+        setBlockName("factorization:" + name.replace('.', '/'));
         Core.tab(this, tabType);
     }
     

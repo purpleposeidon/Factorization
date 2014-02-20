@@ -180,7 +180,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
             //pull water from below
             Coord below = here.add(0, -1, 0);
             IFluidHandler tc = below.getTE(IFluidHandler.class);
-            boolean water_below = (below.is(Blocks.waterMoving) || below.is(Blocks.waterStill));
+            boolean water_below = (below.is(Blocks.flowing_water) || below.is(Blocks.water));
             water_below &= !here.isPowered();
             if (water_below && FzConfig.boilers_suck_water) {
                 if (below.getMd() == 0) {

@@ -16,6 +16,7 @@ import factorization.common.BlockIcons;
 import factorization.darkiron.BlockDarkIronOre.Glint;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
+import factorization.shared.FzUtil;
 
 public class GlintRenderer extends TileEntitySpecialRenderer {
     
@@ -44,7 +45,7 @@ public class GlintRenderer extends TileEntitySpecialRenderer {
         
         Tessellator tess = Tessellator.instance;
         BlockRenderHelper block = BlockRenderHelper.instance;
-        RenderBlocks rb = mc.renderGlobal.globalRenderBlocks;
+        RenderBlocks rb = FzUtil.getRB();
         EntityPlayer player = mc.thePlayer;
         
         Vec3 lookVec = player.getLook(partial).normalize();

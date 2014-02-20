@@ -49,7 +49,7 @@ public class EntryControl extends Instruction {
 
     @Override
     protected ItemStack getRecipeItem() {
-        return new ItemStack(Blocks.fenceGate);
+        return new ItemStack(Blocks.fence_gate);
     }
 
     @Override

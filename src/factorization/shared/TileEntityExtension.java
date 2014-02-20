@@ -12,7 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.EnumMovingObjectType;
+import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
@@ -170,7 +170,7 @@ public class TileEntityExtension extends TileEntityCommon {
             MovingObjectPosition ret = p.collisionRayTrace(startVec, endVec);
             if (!(p instanceof TileEntityGreenware)) {
                 //hax
-                if (ret != null && ret.typeOfHit == EnumMovingObjectType.TILE) {
+                if (ret != null && ret.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                     ret.blockX = xCoord;
                     ret.blockY = yCoord;
                     ret.blockZ = zCoord;

@@ -24,6 +24,7 @@ import org.lwjgl.opengl.GL11;
 
 import factorization.api.Coord;
 import factorization.notify.Notify.Style;
+import factorization.shared.FzUtil;
 
 public class RenderMessages extends RenderMessagesProxy {
     static ArrayList<Message> messages = new ArrayList();
@@ -197,7 +198,7 @@ public class RenderMessages extends RenderMessagesProxy {
 
         if (m.show_item) {
             TextureManager re = mc.renderEngine;
-            RenderBlocks rb = mc.renderGlobal.globalRenderBlocks;
+            RenderBlocks rb = FzUtil.getRB();
             
             GL11.glTranslatef((float) (halfWidth + 4), -lineCount/2, 0);
             renderItems.renderItemAndEffectIntoGUI(fr, re, m.item, 0, 0);

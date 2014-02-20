@@ -162,13 +162,13 @@ public class Registry implements ICraftingHandler, ITickHandler {
         clientTraceHelper = new BlockRenderHelper();
         factory_block = new BlockFactorization();
         lightair_block = new BlockLightAir();
-        resource_block = new BlockResource(FzConfig.resource_id);
+        resource_block = new BlockResource();
         is_factory = new ItemStack(factory_block);
         is_lightair = new ItemStack(lightair_block);
-        dark_iron_ore = new BlockDarkIronOre(FzConfig.dark_iron_ore_id).setUnlocalizedName("factorization:darkIronOre").setTextureName("stone").setCreativeTab(Core.tabFactorization).setHardness(3.0F).setResistance(5.0F);
-        fractured_bedrock_block = new Block(FzConfig.fractured_bedrock_id, Material.rock).setBlockUnbreakable().setResistance(6000000).setUnlocalizedName("bedrock").setTextureName("bedrock").setCreativeTab(Core.tabFactorization);
-        ItemBlock itemDarkIronOre = new ItemBlock(FzConfig.dark_iron_ore_id - 256); //&lookofdisapproval;
-        ItemBlock itemFracturedBedrock = new ItemBlock(FzConfig.fractured_bedrock_id - 256); //&lookofdisapproval;
+        dark_iron_ore = new BlockDarkIronOre().setBlockName("factorization:darkIronOre").setTextureName("stone").setCreativeTab(Core.tabFactorization).setHardness(3.0F).setResistance(5.0F);
+        fractured_bedrock_block = new Block(Material.rock).setBlockUnbreakable().setResistance(6000000).setBlockName("bedrock").setTextureName("bedrock").setCreativeTab(Core.tabFactorization);
+        ItemBlock itemDarkIronOre = new ItemBlock();
+        ItemBlock itemFracturedBedrock = new ItemBlock();
 
         GameRegistry.registerBlock(factory_block, ItemFactorizationBlocks.class, "FZ factory");
         GameRegistry.registerBlock(lightair_block, "FZ Lightair");
@@ -190,7 +190,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
         final int diamondId = vanillaDiamond;
         diamondId = null;
         BlockOreStorageShatterable newDiamond = new BlockOreStorageShatterable(diamondId, vanillaDiamond);
-        newDiamond.setHardness(5.0F).setResistance(10.0F).setStepSound(Blocks.soundMetalFootstep).setUnlocalizedName("blockDiamond");
+        newDiamond.setHardness(5.0F).setResistance(10.0F).setStepSound(Blocks.soundMetalFootstep).setBlockName("blockDiamond");
         //Blocks.diamond_block /* blockDiamond */ = newDiamond;
 //		ReflectionHelper.setPrivateValue(Blocks.class, null, newDiamond, "blockDiamond", "blockDiamond"); TODO: Reflection-set blockDiamond.
     }
@@ -322,7 +322,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
 
         //Misc
         pocket_table = new ItemPocketTable(itemID("pocketCraftingTable", 9002));
-        steamFluid = new Fluid("steam").setDensity(-500).setGaseous(true).setViscosity(100).setUnlocalizedName("factorization:fluid/steam").setTemperature(273 + 110);
+        steamFluid = new Fluid("steam").setDensity(-500).setGaseous(true).setViscosity(100).setBlockName("factorization:fluid/steam").setTemperature(273 + 110);
         FluidRegistry.registerFluid(steamFluid);
         
         //Rocketry
@@ -759,7 +759,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "C C",
                 "CFC",
                 'C', Blocks.cobblestone,
-                'F', Blocks.furnaceIdle);
+                'F', Blocks.furnace);
         
         //most ores give 0.4F stone, but redstone is dense.
         //mining redstone normally gives 4 to 6 ore. 5.8F should get you a slightly better yield.

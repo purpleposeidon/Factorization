@@ -15,7 +15,7 @@ public class GuiSlag extends FactorizationGui {
     }
 
     protected void drawGuiContainerForegroundLayer() {
-        fontRenderer.drawString(factContainer.factory.getInvName(), 60, 6, 0x404040);
+        fontRendererObj.drawString(factContainer.factory.getInvName(), 60, 6, 0x404040);
     }
 
     @Override

@@ -25,14 +25,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatMessageComponent;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumMovingObjectType;
+import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.StatCollector;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.event.EventPriority;
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -348,7 +348,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         if (mop == null) return false;
         if (mopIsThis) return false;
         
-        if (mop.typeOfHit == EnumMovingObjectType.ENTITY) {
+        if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
             if (!(mop.entityHit instanceof EntityLivingBase)) {
                 return false;
             }
@@ -374,7 +374,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             }
             progress = 0;
             return true;
-        } else if (mop.typeOfHit == EnumMovingObjectType.TILE) {
+        } else if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
             Block block = worldObj.getBlock(mop.blockX, mop.blockY, mop.blockZ);
             if (block == null || block.isAir(worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
                 return false;

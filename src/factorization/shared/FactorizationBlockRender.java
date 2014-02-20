@@ -26,8 +26,6 @@ import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 
 abstract public class FactorizationBlockRender implements ICoord {
-    static Block metal = Blocks.obsidian;
-    static Block glass = Blocks.glowStone;
 
     public boolean world_mode, use_vertex_offset;
     public IBlockAccess w;

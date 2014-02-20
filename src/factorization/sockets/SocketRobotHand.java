@@ -14,7 +14,7 @@ import net.minecraft.item.Item;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumMovingObjectType;
+import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -158,9 +158,9 @@ public class SocketRobotHand extends TileEntitySocketBase {
     }
     
     boolean clickItem(EntityPlayer player, ItemStack is, MovingObjectPosition mop) {
-        if (mop.typeOfHit == EnumMovingObjectType.TILE) {
+        if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
             return mcClick(player, mop, is);
-        } else if (mop.typeOfHit == EnumMovingObjectType.ENTITY) {
+        } else if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
             if (mop.entityHit.interactFirst(player)) {
                 return true;
             }

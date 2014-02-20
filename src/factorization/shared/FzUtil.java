@@ -1187,9 +1187,15 @@ public class FzUtil {
         return ret;
     }
     
+    
+    @SideOnly(Side.CLIENT)
+    private static RenderBlocks rb;
     @SideOnly(Side.CLIENT)
     public static RenderBlocks getRB() {
-        return Minecraft.getMinecraft().renderGlobal.globalRenderBlocks;
+        if (rb == null) {
+            rb = new RenderBlocks();
+        }
+        return rb;
     }
     
     static InventoryCrafting getCrafter(ItemStack...slots) {
@@ -1342,7 +1348,7 @@ public class FzUtil {
         ItemStack firstItem, secondItem, result;
         
         void update(IInventory par1InventoryCrafting) {
-            //This is copied from CraftingManager.findMatchingRecipe
+            //This is copied from CraftingManager.findMatchingRecipe; with a few tweaks
             firstItem = secondItem = result = null;
             int i = 0;
             int j;
@@ -1367,20 +1373,20 @@ public class FzUtil {
                 }
             }
 
-            if (i == 2 && firstItems.itemID == secondItems.itemID && firstItems.stackSize == 1 && secondItems.stackSize == 1 && Items.itemsList[firstItems.itemID].isRepairable())
+            if (i == 2 && firstItem.getItem() == secondItem.getItem() && firstItem.stackSize == 1 && secondItem.stackSize == 1 && firstItem.getItem().isRepairable())
             {
-                Item item = Items.itemsList[firstItems.itemID];
-                int k = item.getMaxDamage() - firstItems.getItemDamageForDisplay();
-                int l = item.getMaxDamage() - secondItems.getItemDamageForDisplay();
-                int i1 = k + l + item.getMaxDamage() * 5 / 100;
-                int j1 = item.getMaxDamage() - i1;
+                Item item = firstItem.getItem();
+                int j1 = item.getMaxDamage() - firstItem.getItemDamageForDisplay();
+                int k = item.getMaxDamage() - secondItem.getItemDamageForDisplay();
+                int l = j1 + k + item.getMaxDamage() * 5 / 100;
+                int i1 = item.getMaxDamage() - l;
 
-                if (j1 < 0)
+                if (i1 < 0)
                 {
-                    j1 = 0;
+                    i1 = 0;
                 }
 
-                result = new ItemStack(firstItems.itemID, 1, j1);
+                result = new ItemStack(firstItem.getItem(), 1, i1);
             }
         }
         
@@ -1584,9 +1590,9 @@ public class FzUtil {
         Block b = worldObj.getBlock(x, y, z);
         if (!(b instanceof IFluidBlock)) {
             Fluid vanilla;
-            if (b == Blocks.waterStill || b == Blocks.waterMoving) {
+            if (b == Blocks.water || b == Blocks.flowing_water) {
                 vanilla = FluidRegistry.WATER;
-            } else if (b == Blocks.lavaStill || b == Blocks.lavaMoving) {
+            } else if (b == Blocks.lava || b == Blocks.flowing_lava) {
                 vanilla = FluidRegistry.LAVA;
             } else {
                 return null;
