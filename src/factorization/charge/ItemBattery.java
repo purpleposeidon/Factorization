@@ -17,8 +17,8 @@ import factorization.shared.Core.TabType;
 
 public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     //3 States: Empty. Enough for 1 magnet. Enough for 2 magnets.
-    public ItemBattery(int id) {
-        super(id, Core.registry.battery_item_hidden, "charge_battery", TabType.CHARGE);
+    public ItemBattery() {
+        super(Core.registry.battery_item_hidden, "charge_battery", TabType.CHARGE);
         setMaxStackSize(1);
         setMaxDamage(0); //'2' is not the number for this.
         setNoRepair();
@@ -77,7 +77,7 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     }
     
     @Override
-    public ItemStack getContainerItemStack(ItemStack is) {
+    public ItemStack getContainerItem(ItemStack is) {
         is = is.copy();
         normalizeDamage(is);
         int d = is.getItemDamage();
@@ -93,9 +93,10 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     @Override
     public void onCraft(ItemStack is, IInventory craftMatrix, int craftSlot, ItemStack result, EntityPlayer player) {
         normalizeDamage(is);
+        //NORELEASE: test this stuff; might be lame
         if (result.getItem() == Core.registry.battery) {
             is.stackSize--;
-            result.itemID = is.itemID;
+            result.func_150996_a(result.getItem());
             result.stackSize = is.stackSize;
             result.setTagCompound(is.getTagCompound());
         }

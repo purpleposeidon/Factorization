@@ -1,9 +1,11 @@
 package factorization.charge;
 
+import io.netty.util.internal.StringUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.StringUtils;
 import net.minecraft.world.World;
 import factorization.api.Charge;
 import factorization.api.Charge.ChargeDensityReading;
@@ -17,8 +19,8 @@ import factorization.shared.ItemFactorization;
 
 public class ItemChargeMeter extends ItemFactorization {
 
-    public ItemChargeMeter(int par1) {
-        super(par1, "tool/charge_meter", TabType.TOOLS);
+    public ItemChargeMeter() {
+        super("tool/charge_meter", TabType.TOOLS);
         setMaxStackSize(1);
     }
     
@@ -64,7 +66,7 @@ public class ItemChargeMeter extends ItemFactorization {
          * Conductors:
          */
         EntityPlayer toNotify = player;
-        if (player.getClass() != EntityPlayerMP.class || player.username == null || player.username.length() == 0 || player.username.startsWith("[")) {
+        if (player.getClass() != EntityPlayerMP.class || StringUtils.isNullOrEmpty(player.getCommandSenderName()) || player.getCommandSenderName().startsWith("[")) {
             toNotify = null;
         }
         String msg;

@@ -19,8 +19,8 @@ public class ItemBlockProxy extends ItemFactorization {
     ItemStack proxy;
     Block theBlock;
 
-    public ItemBlockProxy(int id, ItemStack proxy, String name, TabType tabType) {
-        super(id, name, tabType);
+    public ItemBlockProxy(ItemStack proxy, String name, TabType tabType) {
+        super(name, tabType);
         this.proxy = proxy.copy();
         theBlock = Block.getBlockFromItem(proxy.getItem());
     }

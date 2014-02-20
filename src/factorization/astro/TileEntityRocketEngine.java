@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityCreeper;
@@ -29,10 +28,6 @@ import factorization.api.DeltaCoord;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
-import factorization.fzds.DeltaChunk;
-import factorization.fzds.TransferLib;
-import factorization.fzds.api.DeltaCapability;
-import factorization.fzds.api.IDeltaChunk;
 import factorization.notify.Notify;
 import factorization.notify.Notify.Style;
 import factorization.shared.BlockClass;
@@ -235,12 +230,12 @@ public class TileEntityRocketEngine extends TileEntityCommon {
                         continue;
                     }
                     if (tex.getParent() == this) {
-                        c.setId(0);
+                        c.setAir();
                     }
                 }
             }
         }
-        here.setId(0);
+        here.setAir();
     }
     
     @Override
@@ -362,6 +357,7 @@ for x in range(0, len(d[0])):
         DeltaCoord size = max.difference(min);
         DeltaCoord half = size.scale(0.5);
         Coord center = min.add(half);
+        /* NORELEASE
         IDeltaChunk dse = DeltaChunk.allocateSlice(worldObj, -1, new DeltaCoord(0, 0, 0));
         center.setAsEntityLocation(dse);
         dse.posX += 0.5;
@@ -380,6 +376,7 @@ for x in range(0, len(d[0])):
         dse.permit(DeltaCapability.INTERACT);
         dse.permit(DeltaCapability.MOVE);
         worldObj.spawnEntityInWorld(dse);
+        */
     }
     
     void broadcastState(EntityPlayer who) {

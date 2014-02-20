@@ -416,7 +416,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
             //We're going to filter out items like:
             //  Logic matrix programmers
             //  Diamond drawplates
-            ItemStack container = FzUtil.normalize(item.getContainerItemStack(is));
+            ItemStack container = FzUtil.normalize(item.getContainerItem(is));
             if (container == null) {
                 return true;
             }

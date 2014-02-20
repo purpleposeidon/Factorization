@@ -1,5 +1,13 @@
 package factorization.shared;
 
+import factorization.api.Coord;
+import factorization.api.DeltaCoord;
+import factorization.api.IEntityMessage;
+import factorization.api.Quaternion;
+import factorization.api.VectorUV;
+import factorization.common.Command;
+import factorization.common.FactoryType;
+import factorization.notify.NotifyImplementation;
 import ibxm.Player;
 
 import java.io.ByteArrayInputStream;
@@ -13,8 +21,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
@@ -25,14 +33,6 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
-import factorization.api.Coord;
-import factorization.api.DeltaCoord;
-import factorization.api.IEntityMessage;
-import factorization.api.Quaternion;
-import factorization.api.VectorUV;
-import factorization.common.Command;
-import factorization.common.FactoryType;
-import factorization.notify.NotifyImplementation;
 
 public class NetworkFactorization implements ITinyPacketHandler {
     protected final static short factorizeTEChannel = 0; //used for tile entities
@@ -77,23 +77,8 @@ public class NetworkFactorization implements ITinyPacketHandler {
             } else if (item instanceof ItemStack) {
                 ItemStack is = (ItemStack) item;
                 NBTTagCompound tag = new NBTTagCompound();
-                final Item is_item = is.getItem();
-                NBTTagCompound orig_tag = is.getTagCompound();
-                if (FzUtil.isTagBig(tag, 1024) >= 1024) {
-                    is.setTagCompound(null);
-                    if (huge_tag_warnings == 0) {
-                        Core.logWarning("FIXME: Need to add in Items.getTagForClient"); //TODO
-                    }
-                    if (huge_tag_warnings++ < 10) {
-                        Core.logWarning("Item " + is + " has a large NBT tag; it won't be sent over the wire.");
-                        if (huge_tag_warnings == 10) {
-                            Core.logWarning("(This will no longer be logged)");
-                        }
-                    }
-                }
                 is.writeToNBT(tag);
-                NBTBase.writeNamedTag(tag, output);
-                is.setTagCompound(orig_tag);
+                CompressedStreamTools.write(tag, output); //NORELEASE: Compress!
             } else if (item instanceof VectorUV) {
                 VectorUV v = (VectorUV) item;
                 output.writeFloat((float) v.x);

@@ -14,8 +14,8 @@ import factorization.weird.TileEntityDayBarrel.Type;
 
 public class ItemDayBarrel extends ItemBlockProxy {
 
-    public ItemDayBarrel(int id, String name) {
-        super(id, Core.registry.daybarrel_item_hidden, name, TabType.BLOCKS);
+    public ItemDayBarrel(String name) {
+        super(Core.registry.daybarrel_item_hidden, name, TabType.BLOCKS);
         setMaxDamage(0);
         setNoRepair();
     }
@@ -32,7 +32,7 @@ public class ItemDayBarrel extends ItemBlockProxy {
     }
     
     @Override
-    public String getItemDisplayName(ItemStack is) {
+    public String getItemStackDisplayName(ItemStack is) {
         Type upgrade = TileEntityDayBarrel.getUpgrade(is);
         String lookup = "factorization.factoryBlocks.DAYBARREL.format";
         if (upgrade != Type.NORMAL) {

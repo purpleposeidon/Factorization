@@ -606,6 +606,10 @@ public class Coord implements IDataSerializable {
         int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
         return w.setBlock(x, y, z, block, md, notifyFlag);
     }
+    
+    public void setAir() {
+        w.setBlockToAir(x, y, z);
+    }
 
     public boolean setId(Block id) {
         return setId(id, true);

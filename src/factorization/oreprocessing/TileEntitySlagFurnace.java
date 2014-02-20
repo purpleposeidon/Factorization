@@ -147,7 +147,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
                     --this.furnaceItemStacks[fuel].stackSize;
 
                     if (this.furnaceItemStacks[fuel].stackSize == 0) {
-                        this.furnaceItemStacks[fuel] = this.furnaceItemStacks[fuel].getItem().getContainerItemStack(furnaceItemStacks[fuel]);
+                        this.furnaceItemStacks[fuel] = this.furnaceItemStacks[fuel].getItem().getContainerItem(furnaceItemStacks[fuel]);
                     }
                 }
             }

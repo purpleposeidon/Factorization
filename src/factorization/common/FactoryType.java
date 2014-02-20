@@ -35,7 +35,6 @@ import factorization.sockets.fanturpeller.GeneratePower;
 import factorization.sockets.fanturpeller.MixCrafting;
 import factorization.sockets.fanturpeller.PumpLiquids;
 import factorization.sockets.fanturpeller.SocketFanturpeller;
-import factorization.weird.TileEntityBarrel;
 import factorization.weird.TileEntityDayBarrel;
 import factorization.wrath.TileEntityWrathLamp;
 

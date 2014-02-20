@@ -13,8 +13,8 @@ import factorization.shared.Core.TabType;
 
 public class ItemServoMotor extends ItemCraftingComponent {
 
-    public ItemServoMotor(int par1) {
-        super(par1, "servo/servo");
+    public ItemServoMotor() {
+        super("servo/servo");
         Core.tab(this, TabType.SERVOS);
         setMaxStackSize(16);
     }

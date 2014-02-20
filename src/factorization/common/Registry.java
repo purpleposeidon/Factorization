@@ -481,9 +481,10 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 float chance = 1;
                 
                 if (min > 0 && max > 0) {
-                    EntityVillager.blacksmithSellingList.put(item.itemID, new Tuple(min, max));
+                    EntityVillager.blacksmithSellingList.put(item, new Tuple(min, max));
                 }
-                EntityVillager.addBlacksmithItem(recipeList, item.itemID, random, chance);
+                //NORELEASE, test 1.6: EntityVillager.addBlacksmithItem(recipeList, item, random, chance);
+                EntityVillager.func_146089_b(recipeList, item, random, chance);
             }
         });
         
@@ -494,8 +495,8 @@ public class Registry implements ICraftingHandler, ITickHandler {
         recipe(new ItemStack(silver_ingot, 9), "#", '#', silver_block_item);
         oreRecipe(lead_block_item, "###", "###", "###", '#', "ingotLead");
         oreRecipe(silver_block_item, "###", "###", "###", '#', "ingotSilver");
-        FurnaceRecipes.smelting().addSmelting(resource_block, ResourceType.SILVERORE.md, new ItemStack(silver_ingot), 0.3F);
-        FurnaceRecipes.smelting().addSmelting(dark_iron_ore, 0, new ItemStack(dark_iron), 0.5F);
+        FurnaceRecipes.smelting().func_151394_a(new ItemStack(resource_block, 1, ResourceType.SILVERORE.md), new ItemStack(silver_ingot), 0.3F);
+        FurnaceRecipes.smelting().func_151394_a(new ItemStack(dark_iron_ore), new ItemStack(dark_iron), 0.5F);
 
         //ceramics
         oreRecipe(new ItemStack(sculpt_tool),
@@ -953,7 +954,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 'M', motor,
                 'L', "ingotLead",
                 'U', Items.cauldron);
-        FurnaceRecipes.smelting().addSmelting(sludge.itemID, 0, new ItemStack(Items.clay_ball), 0.1F);
+        FurnaceRecipes.smelting().func_151394_a(new ItemStack(sludge), new ItemStack(Items.clay_ball), 0.1F);
         oreRecipe(crystallizer_item,
                 "-",
                 "S",

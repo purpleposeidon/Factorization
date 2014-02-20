@@ -13,13 +13,12 @@ import java.util.Random;
 import java.util.WeakHashMap;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCraftResult;
@@ -28,27 +27,17 @@ import net.minecraft.inventory.InventoryLargeChest;
 import net.minecraft.inventory.Slot;
 import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.Item;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagByte;
-import net.minecraft.nbt.NBTTagByteArray;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagDouble;
-import net.minecraft.nbt.NBTTagFloat;
-import net.minecraft.nbt.NBTTagInt;
-import net.minecraft.nbt.NBTTagIntArray;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagLong;
 import net.minecraft.stats.StatBase;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChatMessageComponent;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MathHelper;
@@ -105,7 +94,7 @@ public class FzUtil {
         if (a == null || b == null) {
             return true;
         }
-        return a.itemID == b.itemID && a.getItemDamage() == b.getItemDamage() && sameItemTags(a, b);
+        return a.getItem() == b.getItem() && a.getItemDamage() == b.getItemDamage() && sameItemTags(a, b);
     }
     
     public static boolean sameItemTags(ItemStack a, ItemStack b) {
@@ -1052,7 +1041,7 @@ public class FzUtil {
         if (ls == null) {
             return;
         }
-        NBTTagCompound liquid_tag = new NBTTagCompound(name);
+        NBTTagCompound liquid_tag = new NBTTagCompound();
         ls.writeToNBT(liquid_tag);
         tag.setTag(name, liquid_tag);
     }
@@ -1415,58 +1404,9 @@ public class FzUtil {
         
     };
     
-    //Returns the (approximate) size of an NBT tag.
-    public static int isTagBig(NBTBase tag, int bignessThreshold) {
-        if (tag == null) {
-            return 0;
-        }
-        if (tag instanceof NBTTagByte) {
-            return 1;
-        }
-        if (tag instanceof NBTTagByteArray) {
-            return 4 + 1*((NBTTagByteArray) tag).byteArray.length;
-        }
-        if (tag instanceof NBTTagDouble) {
-            return 8;
-        }
-        if (tag instanceof NBTTagCompound || tag instanceof NBTTagList) {
-            int sum_size = 1;
-            Iterable<NBTBase> collection;
-            if (tag instanceof NBTTagCompound) {
-                NBTTagCompound tc = (NBTTagCompound) tag;
-                collection = tc.getTags();
-            } else {
-                NBTTagList tl = (NBTTagList) tag;
-                collection = tl.tagList;
-            }
-            for (NBTBase sub : collection) {
-                sum_size += 1 + isTagBig(sub, bignessThreshold - sum_size);
-                String s = sub.getName();
-                sum_size += s == null ? 0 : s.length();
-                if (sum_size > bignessThreshold) {
-                    return sum_size;
-                }
-            }
-            return sum_size;
-        }
-        if (tag instanceof NBTTagFloat) {
-            return 4;
-        }
-        if (tag instanceof NBTTagInt) {
-            return 4;
-        }
-        if (tag instanceof NBTTagIntArray) {
-            return 4 + 4*((NBTTagIntArray) tag).intArray.length;
-        }
-        if (tag instanceof NBTTagLong) {
-            return 4;
-        }
-        return 1;
-    }
-    
     static public ItemStack readStack(DataInput input) throws IOException {
-        ItemStack is = ItemStack.loadItemStackFromNBT((NBTTagCompound) NBTBase.readNamedTag(input));
-        if (is == null || is.itemID == 0) {
+        ItemStack is = ItemStack.loadItemStackFromNBT(CompressedStreamTools.read(input));
+        if (is == null || is.getItem() == null) {
             return null;
         }
         return is;
@@ -1625,6 +1565,14 @@ public class FzUtil {
     
     public static Block getBlock(Item it) {
         return Block.getBlockFromItem(it);
+    }
+    
+    public static Block getBlock(int id) {
+        return Block.getBlockById(id);
+    }
+    
+    public static Item getItem(int id) {
+        return Item.getItemById(id);
     }
     
     public static int getId(Block block) {

@@ -6,6 +6,7 @@ import java.util.List;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
@@ -19,8 +20,8 @@ import factorization.shared.ItemFactorization;
 @Deprecated
 public class ItemSocketPart extends ItemFactorization {
 
-    public ItemSocketPart(int itemId, String name, TabType tabType) {
-        super(itemId, name, tabType);
+    public ItemSocketPart(String name, TabType tabType) {
+        super(name, tabType);
         setHasSubtypes(true);
         setMaxDamage(0);
     }
@@ -86,7 +87,7 @@ public class ItemSocketPart extends ItemFactorization {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void getSubItems(int itemId, CreativeTabs tab, List list) {
+    public void getSubItems(Item itemId, CreativeTabs tab, List list) {
         FactoryType[] ss = getSockets();
         for (int i = 0; i < ss.length; i++) {
             FactoryType ft = ss[i];

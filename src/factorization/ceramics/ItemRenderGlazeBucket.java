@@ -52,7 +52,7 @@ public class ItemRenderGlazeBucket implements IItemRenderer {
         ItemGlazeBucket bucket = (ItemGlazeBucket) is.getItem();
         if (type == ItemRenderType.ENTITY) {
             float s = 1F/16F;
-            if (!RenderItems.renderInFrame) {
+            if (!RenderItem.renderInFrame) {
                 GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
             }
             GL11.glScalef(s, s, s);

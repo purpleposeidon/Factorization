@@ -496,7 +496,7 @@ public class CompressionState {
                         if (is.getItemDamage() > is.getMaxDamage()) {
                             break;
                         }
-                        is = it.getContainerItemStack(is);
+                        is = it.getContainerItem(is);
                         if (is == null || is.stackSize == 0 || is.getItemDamage() == origDamage || is.getItem() != it) {
                             break;
                         }
@@ -544,7 +544,7 @@ public class CompressionState {
                     if (containerItem[i]) {
                         ItemStack got = craftingGrid[i];
                         if (got != null) {
-                            craftingGrid[i] = got.getItem().getContainerItemStack(got);
+                            craftingGrid[i] = got.getItem().getContainerItem(got);
                         }
                     }
                 }

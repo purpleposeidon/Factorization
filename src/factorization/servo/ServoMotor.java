@@ -138,7 +138,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             if (is == null) {
                 inv[i] = is;
             } else {
-                inv[i] = is.itemID == 0 ? null : is;
+                inv[i] = is.getItem() == null ? null : is;
             }
         }
         data.as(Share.VISIBLE, "sock");
@@ -561,7 +561,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         return 64;
     }
 
-    private static final ItemStack EMPTY_ITEM = new ItemStack(0, 0, 0);
+    private static final ItemStack EMPTY_ITEM = new ItemStack((Item)null);
     
     @Override
     public void markDirty() {
@@ -628,14 +628,14 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         nullVec.xCoord = nullVec.yCoord = nullVec.zCoord = 0;
         Coord targetBlock = c.add(top);
         mopBlock(ret, targetBlock, top.getOpposite()); //nose-to-nose with the servo
-        mopBlock(ret, targetBlocks.add(top), top.getOpposite()); //a block away
-        mopBlock(ret, targetBlocks.add(top.getOpposite()), top);
+        mopBlock(ret, targetBlock.add(top), top.getOpposite()); //a block away
+        mopBlock(ret, targetBlock.add(top.getOpposite()), top);
         if (ret.size() == 0) {
-            mopBlock(ret, targetBlocks.add(face), face.getOpposite()); //running forward
-            mopBlock(ret, targetBlocks.add(face.getOpposite()), face); //running backward
+            mopBlock(ret, targetBlock.add(face), face.getOpposite()); //running forward
+            mopBlock(ret, targetBlock.add(face.getOpposite()), face); //running backward
             if (ret.size() == 0) {
-                mopBlock(ret, targetBlocks.add(right), right.getOpposite()); //to the servo's right
-                mopBlock(ret, targetBlocks.add(right.getOpposite()), right); //to the servo's left
+                mopBlock(ret, targetBlock.add(right), right.getOpposite()); //to the servo's right
+                mopBlock(ret, targetBlock.add(right.getOpposite()), right); //to the servo's left
             }
         }
         return ret;

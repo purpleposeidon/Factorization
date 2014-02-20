@@ -878,7 +878,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             Sound.barrelPunt.playAt(src);
         }
         src.rmTE();
-        src.setId(0);
+        src.setAir();
         if (newOrientation != FzOrientation.UNKNOWN) {
             this.orientation = newOrientation;
         }
@@ -930,9 +930,6 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
                 break;
             }
             EntityItem ei = at.spawnItem(is);
-            /*ei.motionX = orientation.top.offsetX * motion;
-            ei.motionY = orientation.top.offsetY * motion;
-            ei.motionZ = orientation.top.offsetZ * motion;*/
             spillage -= maxStackSize;
         }
         me.onInvChanged();
@@ -951,7 +948,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             info(entityplayer);
             return;
         }
-        if (ForgeHooks.canToolHarvestBlock(Blocks.wood, 0, entityplayer.getHeldItem())) {
+        if (ForgeHooks.canToolHarvestBlock(Blocks.log, 0, entityplayer.getHeldItem())) {
             return;
         }
         
@@ -1064,7 +1061,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         NBTTagCompound tag = FzUtil.getTag(barrel_item);
         tag.setTag("log", FzUtil.item2tag(log));
         tag.setTag("slab", FzUtil.item2tag(slab));
-        int dmg = log.itemID*16 + log.getItemDamage();
+        int dmg = FzUtil.getId(log)*16 + log.getItemDamage();
         dmg %= 1000;
         dmg *= 10;
         dmg += type.ordinal();
@@ -1114,7 +1111,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         Core.registry.recipe(make(Type.STICKY, log, slab),
                 "*",
                 "0",
-                '*', Items.slimeBall,
+                '*', Items.slime_ball,
                 '0', normal);
     }
     

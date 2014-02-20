@@ -285,7 +285,7 @@ public class ContainerPocket extends Container {
                     }
                 }
                 if (held != null && held.stackSize > 0 && !player.worldObj.isRemote) {
-                    player.dropPlayerItem(held);
+                    player.dropPlayerItemWithRandomChoice(held, false);
                 }
             }
             detectAndSendChanges();

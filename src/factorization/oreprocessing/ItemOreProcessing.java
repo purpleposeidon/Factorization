@@ -3,19 +3,19 @@ package factorization.oreprocessing;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
 import factorization.shared.Core;
-import factorization.shared.ItemFactorization;
 import factorization.shared.Core.TabType;
+import factorization.shared.ItemFactorization;
 
 public class ItemOreProcessing extends ItemFactorization implements IActOnCraft {
     public static ArrayList<String> OD_ores = new ArrayList(), OD_ingots = new ArrayList();
@@ -27,8 +27,7 @@ public class ItemOreProcessing extends ItemFactorization implements IActOnCraft 
         COPPER(4, 0xD68C39, "Copper", "oreCopper", "ingotCopper"),
         SILVER(5, 0x7B96B9, "Silver", null, "ingotSilver"),
         GALENA(6, 0x687B99, "Galena", "oreSilver", null),
-        //FOR MDIYOOO!!!!!
-        NATURAL_ALUMINUM(7, 0xF6F6F6, "Aluminum", "oreNaturalAluminum", "ingotNaturalAluminum"), //NORELEASE: Is it time to remove this?
+        //no more aluminum. Bye-bye, aluminum.
         COBALT(8, 0x2376DD, "Cobalt", "oreCobalt", "ingotCobalt"),
         ARDITE(9, 0xF48A00, "Ardite", "oreArdite", "ingotArdite"),
         DARKIRON(10, 0x5000D4, "Dark Iron", "oreFzDarkIron", "ingotFzDarkIron")
@@ -88,8 +87,8 @@ public class ItemOreProcessing extends ItemFactorization implements IActOnCraft 
     
     String stateName;
 
-    public ItemOreProcessing(int itemID, int icon, String stateName) {
-        super(itemID, "ore/" + stateName, TabType.MATERIALS);
+    public ItemOreProcessing(int icon, String stateName) {
+        super("ore/" + stateName, TabType.MATERIALS);
         setHasSubtypes(true);
         this.stateName = stateName;
     }
@@ -109,7 +108,7 @@ public class ItemOreProcessing extends ItemFactorization implements IActOnCraft 
     }
 
     @Override
-    public void getSubItems(int id, CreativeTabs tab, List list) {
+    public void getSubItems(Item id, CreativeTabs tab, List list) {
         for (OreType oreType : OreType.values()) {
             if (oreType.enabled) {
                 boolean show = true;
@@ -157,7 +156,7 @@ public class ItemOreProcessing extends ItemFactorization implements IActOnCraft 
         any = true;
         ItemStack toAdd = new ItemStack(Core.registry.sludge);
         if (!player.inventory.addItemStackToInventory(toAdd)) {
-            player.dropPlayerItem(new ItemStack(Core.registry.sludge, 1));
+            player.dropPlayerItemWithRandomChoice(new ItemStack(Core.registry.sludge, 1), false);
         }
     }
 }

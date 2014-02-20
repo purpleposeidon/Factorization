@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
@@ -28,8 +27,8 @@ import factorization.shared.ItemFactorization;
 public class ItemGlazeBucket extends ItemFactorization {
     public static final int MAX_CHARGES = 64;
     
-    public ItemGlazeBucket(int itemId) {
-        super(itemId, "ceramics/glaze_bucket", TabType.ART);
+    public ItemGlazeBucket() {
+        super("ceramics/glaze_bucket", TabType.ART);
         setMaxStackSize(1);
         setMaxDamage(0);
         setNoRepair();
@@ -41,8 +40,7 @@ public class ItemGlazeBucket extends ItemFactorization {
         if (renderPass == 0) {
             return getIconFromDamage(0);
         }
-        int id = getBlockId(is);
-        Block block = id;
+        Block block = getBlockId(is);
         if (block == null) {
             return BlockIcons.uv_test;
             //Or could return the error icon.
@@ -63,8 +61,8 @@ public class ItemGlazeBucket extends ItemFactorization {
     }
     
     @Override
-    public String getItemDisplayName(ItemStack is) {
-        String base = super.getItemDisplayName(is);
+    public String getItemStackDisplayName(ItemStack is) {
+        String base = super.getItemStackDisplayName(is);
         if (isMimic(is)) {
             ItemStack hint = getSource(is);
             if (hint != null) {
@@ -101,8 +99,8 @@ public class ItemGlazeBucket extends ItemFactorization {
         return remaining > 0;
     }
     
-    private short getBlockId(ItemStack is) {
-        return FzUtil.getTag(is).getShort("bid");
+    private Block getBlockId(ItemStack is) {
+        return FzUtil.getBlock(FzUtil.getTag(is).getShort("bid"));
     }
     
     private byte getBlockMd(ItemStack is) {
@@ -122,7 +120,7 @@ public class ItemGlazeBucket extends ItemFactorization {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void getSubItems(int itemId, CreativeTabs tab, List list) {
+    public void getSubItems(Item itemId, CreativeTabs tab, List list) {
         list.addAll(subItems);
     }
     
@@ -159,7 +157,7 @@ public class ItemGlazeBucket extends ItemFactorization {
     private ItemStack makeGlazeWith(Block id, int md, int side) {
         ItemStack is = new ItemStack(this);
         NBTTagCompound tag = FzUtil.getTag(is);
-        tag.setShort("bid", (short)id);
+        tag.setShort("bid", (short)FzUtil.getId(id));
         tag.setByte("bmd", (byte)md);
         tag.setByte("bsd", (byte)side);
         tag.setInteger("remaining", MAX_CHARGES);
@@ -238,7 +236,7 @@ public class ItemGlazeBucket extends ItemFactorization {
             }
         }
         ClayLump part = clay.parts.get(mop.subHit);
-        short id = getBlockId(is);
+        Block id = getBlockId(is);
         byte md = getBlockMd(is);
         byte sd = getBlockSide(is);
         if (part.icon_id == id && part.icon_md == md && part.icon_side == sd) {

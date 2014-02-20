@@ -2,12 +2,11 @@ package factorization.ceramics;
 
 import java.util.List;
 
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IIcon;
@@ -31,8 +30,8 @@ import factorization.shared.ItemFactorization;
 
 public class ItemSculptingTool extends ItemFactorization {
 
-    public ItemSculptingTool(int id) {
-        super(id, "sculptTool", TabType.ART);
+    public ItemSculptingTool() {
+        super("sculptTool", TabType.ART);
         setNoRepair();
         setMaxDamage(0);
         setMaxStackSize(4);
@@ -208,7 +207,7 @@ public class ItemSculptingTool extends ItemFactorization {
             rep.glazesApplied = false;
             rep.lastTouched = 0;
             for (ClayLump part : rep.parts) {
-                part.icon_id = 0;
+                part.icon_id = null;
                 part.icon_md = 0;
                 part.icon_side = -1;
             }
@@ -217,7 +216,7 @@ public class ItemSculptingTool extends ItemFactorization {
                 toDrop.setStackDisplayName(gw.customName);
             }
             if (inv.push(toDrop) != null) {
-                player.dropPlayerItem(toDrop);
+                player.dropPlayerItemWithRandomChoice(toDrop, false);
             }
             Core.proxy.updatePlayerInventory(player);
             return true;

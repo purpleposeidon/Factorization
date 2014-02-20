@@ -9,8 +9,8 @@ import factorization.shared.ItemFactorization;
 import factorization.shared.Core.TabType;
 
 public class ItemMatrixProgrammer extends ItemFactorization {
-    public ItemMatrixProgrammer(int id) {
-        super(id, "tool.matrix_programmer", TabType.TOOLS);
+    public ItemMatrixProgrammer() {
+        super("tool.matrix_programmer", TabType.TOOLS);
         setMaxStackSize(1);
         setContainerItem(this);
     }
@@ -24,10 +24,6 @@ public class ItemMatrixProgrammer extends ItemFactorization {
     public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
         if (!player.isSneaking()) {
             if (Core.dev_environ && !world.isRemote) {
-                Coord c = new Coord(world, x, y, z);
-                player.addChatMessage("" + c);
-                player.addChatMessage("id: " + c.getId() + " md: " + c.getMd());
-                c.scheduleUpdate(1);
             }
             return false;
         }

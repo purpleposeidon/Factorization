@@ -4,21 +4,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraftforge.common.MinecraftForge;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidContainerRegistry.FluidContainerData;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.OreDictionary.OreRegisterEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import factorization.oreprocessing.ItemOreProcessing.OreType;
-import factorization.oreprocessing.TileEntitySlagFurnace.SlagRecipes;
 import factorization.shared.Core;
 
 public class FactorizationOreProcessingHandler {
@@ -68,8 +65,8 @@ public class FactorizationOreProcessingHandler {
             smeltable = new ItemStack[] { dirty, clean, reduced, crystal };
         }
         for (ItemStack is : smeltable) {
-            float xp = FurnaceRecipes.smelting().getExperience(ore);
-            FurnaceRecipes.smelting().addSmelting(is.itemID, is.getItemDamage(), ingot, xp);
+            float xp = FurnaceRecipes.smelting().func_151398_b(ore);
+            FurnaceRecipes.smelting().func_151394_a(is, ingot, xp);
         }
         if (oreType != OreType.SILVER) {
             TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.1F, ingot, 0.2F, Blocks.dirt);

@@ -6,6 +6,7 @@ import java.util.List;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
@@ -15,13 +16,13 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.shared.Core;
+import factorization.shared.Core.TabType;
 import factorization.shared.FzUtil;
 import factorization.shared.ItemFactorization;
-import factorization.shared.Core.TabType;
 
 public class ItemServoRailWidget extends ItemFactorization {
-    public ItemServoRailWidget(int itemId, String name) {
-        super(itemId, name, TabType.SERVOS);
+    public ItemServoRailWidget(String name) {
+        super(name, TabType.SERVOS);
     }
     
     @Override
@@ -34,8 +35,8 @@ public class ItemServoRailWidget extends ItemFactorization {
     }
     
     @Override
-    public String getItemDisplayName(ItemStack is) {
-        String s = super.getItemDisplayName(is);
+    public String getItemStackDisplayName(ItemStack is) {
+        String s = super.getItemStackDisplayName(is);
         if (s == null || s.length() == 0) {
             s = getUnlocalizedName(is);
         }
@@ -127,7 +128,7 @@ public class ItemServoRailWidget extends ItemFactorization {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void getSubItems(int id, CreativeTabs tab, List list) {
+    public void getSubItems(Item id, CreativeTabs tab, List list) {
         loadSubItems();
         list.addAll(subItemsCache);
     }
