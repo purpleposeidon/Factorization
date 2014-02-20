@@ -28,7 +28,7 @@ public class WorldgenManager {
     void setupWorldGenerators() {
         if (FzConfig.gen_silver_ore) {
             silverGen = new IWorldGenerator() {
-                WorldGenMinable gen = new WorldGenMinable(Core.registry.resource_block.blockID, FzConfig.silver_ore_node_new_size);
+                WorldGenMinable gen = new WorldGenMinable(Core.registry.resource_block, FzConfig.silver_ore_node_new_size);
                 @Override
                 public void generate(Random rand, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
                     if (!FzConfig.gen_silver_ore) {
@@ -120,17 +120,17 @@ public class WorldgenManager {
                         x = chunkX*16 + random.nextInt(16);
                         z = chunkZ*16 + random.nextInt(16);
                     }
-                    if (world.getBlock(x, 0, z) != Blocks.bedrock.blockID) {
+                    if (world.getBlock(x, 0, z) != Blocks.bedrock) {
                         return;
                     }
                     Block stoneBlock = world.getBlock(x, 1, z);
                     if (stoneBlock == null) {
                         return;
                     }
-                    if (!stoneBlocks.isGenMineableReplaceable(world, x, 1, z, Blocks.stone.blockID)) {
+                    if (!stoneBlocks.isGenMineableReplaceable(world, x, 1, z, Blocks.stone)) {
                         return;
                     }
-                    stoneId = stoneBlocks.blockID;
+                    stoneId = stoneBlocks;
                     stoneMd = world.getBlockMetadata(x, 1, z);
                     
                     //The spike

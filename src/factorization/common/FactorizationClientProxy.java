@@ -194,7 +194,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         Coord here = new Coord(w, x, y, z);
         int id = w.getBlock(x, y, z);
         int md = w.getBlockMetadata(x, y, z);
-        if (id == Core.registry.factory_block.blockID) {
+        if (id == Core.registry.factory_block) {
             TileEntity te = w.getBlockTileEntity(x, y, z);
             if (!(te instanceof IFactoryType)) {
                 return;
@@ -243,7 +243,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
             }
         }
-        if (id == Core.registry.lightair_block.blockID) {
+        if (id == Core.registry.lightair_block) {
             if (md == BlockLightAir.fire_md) {
                 int to_spawn = 1;
                 EntityPlayer player = Core.proxy.getClientPlayer();
@@ -474,7 +474,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderEmpty(FactoryType.EXTENDED);
 
         ItemRenderCapture capture = new ItemRenderCapture();
-        MinecraftForgeClient.registerItemRenderer(Core.registry.factory_block.blockID, capture);
+        MinecraftForgeClient.registerItemRenderer(Core.registry.factory_block, capture);
         MinecraftForgeClient.registerItemRenderer(Core.registry.battery.itemID, new BatteryItemRender(renderBattery));
         MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket.itemID, new ItemRenderGlazeBucket());
         MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel.itemID, new DayBarrelItemRenderer(renderBarrel));

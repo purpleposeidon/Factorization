@@ -21,7 +21,7 @@ public class ItemBlockProxy extends ItemFactorization {
     public ItemBlockProxy(int id, ItemStack proxy, String name, TabType tabType) {
         super(id, name, tabType);
         this.proxy = proxy.copy();
-        this.blockID = ((ItemBlock) proxy.getItem()).getBlockID();
+        this = ((ItemBlock) proxy.getItem()).getBlockID();
     }
 
     public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side,
@@ -40,11 +40,11 @@ public class ItemBlockProxy extends ItemFactorization {
     {
         int var11 = par3World.getBlock(par4, par5, par6);
 
-        if (var11 == Blocks.snow.blockID)
+        if (var11 == Blocks.snow)
         {
             par7 = 1;
         }
-        else if (var11 != Blocks.vine.blockID && var11 != Blocks.tallGrass.blockID && var11 != Blocks.deadBush.blockID
+        else if (var11 != Blocks.vine && var11 != Blocks.tallGrass && var11 != Blocks.deadBush
                 && (Blocks.blocksList[var11] == null || !Blocks.blocksList[var11].isBlockReplaceable(par3World, par4, par5, par6)))
         {
             if (par7 == 0)
@@ -86,15 +86,15 @@ public class ItemBlockProxy extends ItemFactorization {
         {
             return false;
         }
-        else if (par5 == 255 && this.blockID.blockMaterial.isSolid())
+        else if (par5 == 255 && this.blockMaterial.isSolid())
         {
             return false;
         }
-        else if (par3World.canPlaceEntityOnSide(this.blockID, par4, par5, par6, false, par7, /*par2EntityPlayer*/ null /* Changed to null in 1.6.2. Was previously the player. And sometime before that was null. Like, seriously, wtf? */, par1ItemStack))
+        else if (par3World.canPlaceEntityOnSide(this, par4, par5, par6, false, par7, /*par2EntityPlayer*/ null /* Changed to null in 1.6.2. Was previously the player. And sometime before that was null. Like, seriously, wtf? */, par1ItemStack))
         {
-            Block block = this.blockID;
+            Block block = this;
             int j1 = this.getMetadata(par1ItemStack.getItemDamage());
-            int k1 = this.blockID.onBlockPlaced(par3World, par4, par5, par6, par7, par8, par9, par10, j1);
+            int k1 = this.onBlockPlaced(par3World, par4, par5, par6, par7, par8, par9, par10, j1);
 
             if (placeBlockAt(par1ItemStack, par2EntityPlayer, par3World, par4, par5, par6, par7, par8, par9, par10, k1))
             {

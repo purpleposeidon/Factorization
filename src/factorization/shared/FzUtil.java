@@ -852,7 +852,7 @@ public class FzUtil {
         if (cb == null) {
             return null;
         }
-        int chestBlock = cb.blockID;
+        int chestBlock = cb;
         if (world.getBlock(i - 1, j, k) == chestBlock) {
             return new InventoryLargeChest(origChest.getInvName(), (TileEntityChest) world.getBlockTileEntity(i - 1, j, k), origChest);
         }

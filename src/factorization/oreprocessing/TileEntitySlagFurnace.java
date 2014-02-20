@@ -297,7 +297,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
             }
             if (o instanceof Block) {
                 Block b = (Block) o;
-                return new ItemStack(Items.itemsList[b.blockID]);
+                return new ItemStack(Items.itemsList[b]);
             }
             if (o instanceof Item) {
                 return new ItemStack((Item) o);

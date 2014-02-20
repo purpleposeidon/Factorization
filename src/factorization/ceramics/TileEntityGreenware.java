@@ -465,7 +465,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             player.inventory.mainInventory[ci] = new ItemStack(Items.bucketEmpty);
             return true;
         }
-        if (heldId == Blocks.cloth.blockID) {
+        if (heldId == Blocks.cloth) {
             lastTouched = dryTime + 1;
             return true;
         }

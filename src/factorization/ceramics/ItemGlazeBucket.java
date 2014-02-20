@@ -174,7 +174,7 @@ public class ItemGlazeBucket extends ItemFactorization {
     }
     
     public ItemStack make(BasicGlazes glaze) {
-        ItemStack is = makeGlazeWith(Core.registry.resource_block.blockID, glaze.metadata, 0);
+        ItemStack is = makeGlazeWith(Core.registry.resource_block, glaze.metadata, 0);
         setGid(is, glaze.name());
         is.setItemDamage(md_for_nei++);
         return is;

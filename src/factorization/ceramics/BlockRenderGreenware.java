@@ -105,7 +105,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
     int getColor(ClayLump rc) {
         if (rc.raw_color == -1) {
             //Get the raw color, possibly making something up
-            if (rc.icon_id == Core.registry.resource_block.blockID && rc.icon_md > 16) {
+            if (rc.icon_id == Core.registry.resource_block && rc.icon_md > 16) {
                 for (BasicGlazes bg : BasicGlazes.values()) {
                     if (bg.metadata == rc.icon_md) {
                         if (bg.raw_color == -1) {

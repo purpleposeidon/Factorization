@@ -591,11 +591,11 @@ public class Coord implements IDataSerializable {
     }
 
     public boolean is(Block b) {
-        return getId() == b.blockID;
+        return getId() == b;
     }
 
     public boolean is(Block b, int md) {
-        return getId() == b.blockID && getMd() == md;
+        return getId() == b && getMd() == md;
     }
     
     public static final int NOTIFY_NEIGHBORS = 1, UPDATE = 2, ONLY_UPDATE_SERVERSIDE = 4; //TODO, this'll end up in Forge probably
@@ -608,7 +608,7 @@ public class Coord implements IDataSerializable {
     
     public boolean setId(Block block, boolean notify) {
         int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
-        return w.setBlock(x, y, z, block.blockID, 0, notifyFlag);
+        return w.setBlock(x, y, z, block, 0, notifyFlag);
     }
 
     public boolean setMd(int md, boolean notify) {
@@ -624,7 +624,7 @@ public class Coord implements IDataSerializable {
     
     public boolean setIdMd(Block block, int md, boolean notify) {
         int notifyFlag = notify ? NOTIFY_NEIGHBORS | UPDATE : 0;
-        return w.setBlock(x, y, z, block.blockID, md, notifyFlag);
+        return w.setBlock(x, y, z, block, md, notifyFlag);
     }
 
     @Deprecated
@@ -642,7 +642,7 @@ public class Coord implements IDataSerializable {
     }
 
     public boolean setId(Block block) {
-        return setId(block.blockID);
+        return setId(block);
     }
     
     public void notifyBlockChange() {

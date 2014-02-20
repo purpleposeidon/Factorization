@@ -46,11 +46,11 @@ public class ChargeMetalBlockConductance {
 //						continue subIngots;
 //					}
 //				}
-//				put(b.blockID, metadata);
+//				put(b, metadata);
 //			}
 //		}
 //		for (Block block : new Block[] { Blocks.blockIron, Blocks.blockGold, Blocks.blockEmerald }) {
-//			put(block.blockID, 0);
+//			put(block, 0);
 //		}
     }
     
@@ -74,7 +74,7 @@ public class ChargeMetalBlockConductance {
         te.validate();
         te.initialize(blockID, md);
         int orig_id = c.getId(), orig_md = c.getMd();
-        TransferLib.setRaw(c, Core.registry.factory_block.blockID, 0);
+        TransferLib.setRaw(c, Core.registry.factory_block, 0);
         c.setTE(te);
         TransferLib.setRaw(c, orig_id, orig_md, 0);
     }

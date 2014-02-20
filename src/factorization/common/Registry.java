@@ -167,7 +167,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
             //Theoretically, not necessary. I bet BUKKIT would flip its shit tho.
             blockRender = new BlockRenderHelper();
             factory_rendering_block = new BlockFactorization(FzConfig.factory_block_id);
-            factory_rendering_block.blockID = null;
+            factory_rendering_block = null;
         }
         serverTraceHelper = new BlockRenderHelper();
         clientTraceHelper = new BlockRenderHelper();
@@ -198,7 +198,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
         worldgenManager = new WorldgenManager();
         
         final Block vanillaDiamond = Blocks.diamond_block;
-        final int diamondId = vanillaDiamond.blockID;
+        final int diamondId = vanillaDiamond;
         diamondId = null;
         BlockOreStorageShatterable newDiamond = new BlockOreStorageShatterable(diamondId, vanillaDiamond);
         newDiamond.setHardness(5.0F).setResistance(10.0F).setStepSound(Blocks.soundMetalFootstep).setUnlocalizedName("blockDiamond");
@@ -244,8 +244,8 @@ public class Registry implements ICraftingHandler, ITickHandler {
         sludge = new ItemCraftingComponent(itemID("sludge", 9039), "sludge");
         OreDictionary.registerOre("sludge", sludge);
         //ItemBlocks
-        item_factorization = (ItemFactorizationBlock) Items.itemsList[factory_block.blockID];
-        item_resource = (ItemBlockResource) Items.itemsList[resource_block.blockID];
+        item_factorization = (ItemFactorizationBlock) Items.itemsList[factory_block];
+        item_resource = (ItemBlockResource) Items.itemsList[resource_block];
 
         //BlockFactorization stuff
         router_item = FactoryType.ROUTER.itemStack();
@@ -524,8 +524,8 @@ public class Registry implements ICraftingHandler, ITickHandler {
         recipe(new ItemStack(silver_ingot, 9), "#", '#', silver_block_item);
         oreRecipe(lead_block_item, "###", "###", "###", '#', "ingotLead");
         oreRecipe(silver_block_item, "###", "###", "###", '#', "ingotSilver");
-        FurnaceRecipes.smelting().addSmelting(resource_block.blockID, ResourceType.SILVERORE.md, new ItemStack(silver_ingot), 0.3F);
-        FurnaceRecipes.smelting().addSmelting(dark_iron_ore.blockID, 0, new ItemStack(dark_iron), 0.5F);
+        FurnaceRecipes.smelting().addSmelting(resource_block, ResourceType.SILVERORE.md, new ItemStack(silver_ingot), 0.3F);
+        FurnaceRecipes.smelting().addSmelting(dark_iron_ore, 0, new ItemStack(dark_iron), 0.5F);
 
         //ceramics
         oreRecipe(new ItemStack(sculpt_tool),
@@ -577,8 +577,8 @@ public class Registry implements ICraftingHandler, ITickHandler {
         BasicGlazes.PEKING_BLUE.recipe(base_common, lapis, netherquartz);
         BasicGlazes.SHINO.recipe(base_common, redstone, netherquartz);
         
-        ItemStack waterFeature = glaze_bucket.makeMimicingGlaze(Blocks.waterMoving.blockID, 0, -1);
-        ItemStack lavaFeature = glaze_bucket.makeMimicingGlaze(Blocks.lavaMoving.blockID, 0, -1);
+        ItemStack waterFeature = glaze_bucket.makeMimicingGlaze(Blocks.waterMoving, 0, -1);
+        ItemStack lavaFeature = glaze_bucket.makeMimicingGlaze(Blocks.lavaMoving, 0, -1);
         shapelessOreRecipe(waterFeature, base_common, Items.bucketWater);
         shapelessOreRecipe(lavaFeature, base_common, Items.bucketLava);
         
@@ -1310,7 +1310,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
     public void addOtherRecipes() {
         ArrayList<ItemStack> theLogs = new ArrayList();
         for (ItemStack log : OreDictionary.getOres("logWood")) {
-            if (log.itemID == Blocks.wood.blockID) {
+            if (log.itemID == Blocks.wood) {
                 //Skip vanilla; NORELEASE: 1.7, check the new woods
                 continue;
             }
@@ -1353,8 +1353,8 @@ public class Registry implements ICraftingHandler, ITickHandler {
             // Some modwoods have planks, but no slabs, and their planks convert to vanilla slabs.
             // In this case we're going to want to use the plank.
             // But if the plank is also vanilla, then keep the vanilla slab!
-            if (slab.itemID == Blocks.woodSingleSlab.blockID) {
-                if (plank.itemID != Blocks.planks.blockID /* NORELEASE: 1.7, new planks */) {
+            if (slab.itemID == Blocks.woodSingleSlab) {
+                if (plank.itemID != Blocks.planks /* NORELEASE: 1.7, new planks */) {
                     slab = plank;
                 }
             }
