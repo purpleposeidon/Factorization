@@ -26,7 +26,7 @@ public class WoodenServoGrate extends Decorator {
 
     @Override
     public IIcon getIcon(ForgeDirection side) {
-        return Blocks.trapdoor.getBlockTextureFromSide(0);
+        return Blocks.trapdoor.getIconFromSide(0);
     }
 
     @Override

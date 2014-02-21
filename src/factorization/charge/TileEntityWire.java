@@ -151,7 +151,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
         if (!is_supported() /*&& !find_support()*/ ) {
             Core.registry.factory_block.dropBlockAsItem(worldObj, xCoord, yCoord, zCoord, BlockClass.Wire.md, 0);
             Coord here = getCoord();
-            here.setId(0);
+            here.setAir();
             here.rmTE();
         }
     }

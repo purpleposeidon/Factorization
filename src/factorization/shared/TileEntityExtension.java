@@ -63,7 +63,7 @@ public class TileEntityExtension extends TileEntityCommon {
         if (_parent != null && _parent.isInvalid()) {
             setParent(null);
             _parent = null;
-            getCoord().setId(0);
+            getCoord().setAir();
         }
         if (_parent == null && pc != null) {
             _parent = getCoord().add(pc).getTE(TileEntityCommon.class);

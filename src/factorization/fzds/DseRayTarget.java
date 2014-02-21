@@ -68,7 +68,7 @@ public class DseRayTarget extends Entity {
             Packet toSend = null;
             switch (hit.typeOfHit) {
             case ENTITY:
-                toSend = HammerNet.makePacket(rightClick ? HammerNetType.rightClickEntity : HammerNetType.leftClickEntity, ray.parent.entityId);
+                toSend = HammerNet.makePacket(rightClick ? HammerNetType.rightClickEntity : HammerNetType.leftClickEntity, ray.parent.getEntityId());
                 break;
             case TILE:
                 if (rightClick) {

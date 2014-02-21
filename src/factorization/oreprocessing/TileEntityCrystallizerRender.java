@@ -68,10 +68,10 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             glEnable(GL_BLEND);
             ItemStack sol = crys.solution;
             Tessellator tess = Tessellator.instance;
-            IIcon tex = Blocks.flowing_water.getBlockTextureFromSide(1);
+            IIcon tex = Blocks.flowing_water.getIconFromSide(1);
             if (sol.getItem() == Core.registry.acid) {
                 if (sol.getItemDamage() > 0) {
-                    tex = Blocks.flowing_lava.getBlockTextureFromSide(0);
+                    tex = Blocks.flowing_lava.getIconFromSide(0);
                     glColor4f(0.5F, 0.7F, 0F, 0.25F);
                 } else {
                     glColor4f(1F, 0.7F, 0F, 0.5F);
@@ -94,12 +94,12 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             float u1 = tex.getMaxU();
             float v1 = tex.getMaxV();
             tess.startDrawingQuads();
-            tess.yOffset = 9F / 16F;
+            tess.setTranslation(0, 9F/16F, 0);
             tess.addVertexWithUV(0, 0, 0, u0, v0);
             tess.addVertexWithUV(0, 0, 1, u0, v1);
             tess.addVertexWithUV(1, 0, 1, u1, v1);
             tess.addVertexWithUV(1, 0, 0, u1, v0);
-            tess.yOffset = 0;
+            tess.setTranslation(0, 0, 0);
             tess.draw();
             glDisable(GL_BLEND);
         }

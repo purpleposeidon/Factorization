@@ -1,6 +1,5 @@
 package factorization.common;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.block.Block;
@@ -8,6 +7,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import factorization.api.Coord;
@@ -61,16 +61,9 @@ public class BlockResource extends Block {
         itemList.add(Core.registry.lead_block_item);
         itemList.add(Core.registry.dark_iron_block_item);
     }
-    
     @Override
-    public void addCreativeItems(ArrayList itemList) {
+    public void getSubBlocks(Item par1, CreativeTabs par2CreativeTabs, List itemList) {
         addCreativeItems((List) itemList);
-    }
-
-    @Override
-    public void getSubBlocks(int par1, CreativeTabs par2CreativeTabs, List par3List) {
-        //addCreativeItems(par3List);
-        Core.addBlockToCreativeList(par3List, this);
     }
 
     @Override

@@ -1575,6 +1575,10 @@ public class FzUtil {
         return Item.getItemById(id);
     }
     
+    public static Item getItem(Block block) {
+        return Item.getItemFromBlock(block);
+    }
+    
     public static int getId(Block block) {
         return Block.getIdFromBlock(block);
     }

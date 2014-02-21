@@ -95,8 +95,8 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         customName = FzUtil.getCustomItemName(is);
     }
     
-    protected boolean removeBlockByPlayer(EntityPlayer player) {
-        return Core.registry.resource_block.removeBlockByPlayer(worldObj, player, xCoord, yCoord, zCoord);
+    protected boolean removedByPlayer(EntityPlayer player) {
+        return Core.registry.resource_block.removedByPlayer(worldObj, player, xCoord, yCoord, zCoord);
     }
 
     /** Called when there's a block update. */

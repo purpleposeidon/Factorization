@@ -86,7 +86,7 @@ public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdd
             setDead();
             return;
         }
-        data.writeInt(parent.entityId);
+        data.writeInt(parent.getEntityId());
         data.writeDouble(offset.xCoord);
         data.writeDouble(offset.yCoord);
         data.writeDouble(offset.zCoord);

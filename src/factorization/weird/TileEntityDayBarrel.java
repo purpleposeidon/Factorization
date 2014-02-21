@@ -53,7 +53,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     private ItemStack topStack;
     private int middleCount;
     private ItemStack bottomStack;
-    private static final ItemStack DEFAULT_LOG = new ItemStack(Blocks.wood);
+    private static final ItemStack DEFAULT_LOG = new ItemStack(Blocks.log);
     private static final ItemStack DEFAULT_SLAB = new ItemStack(Blocks.planks);
     public ItemStack woodLog = DEFAULT_LOG.copy(), woodSlab = DEFAULT_SLAB.copy();
     int display_list = -1;
@@ -1205,9 +1205,9 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     boolean broken_with_silk_touch = false;
     
     @Override
-    protected boolean removeBlockByPlayer(EntityPlayer player) {
+    protected boolean removedByPlayer(EntityPlayer player) {
         broken_with_silk_touch = EnchantmentHelper.getSilkTouchModifier(player);
-        return super.removeBlockByPlayer(player);
+        return super.removedByPlayer(player);
     }
     
     static ArrayList<Integer> finalizedDisplayLists = new ArrayList();

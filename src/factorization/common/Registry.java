@@ -37,6 +37,7 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLInterModComms;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.VillagerRegistry;
 import cpw.mods.fml.common.registry.VillagerRegistry.IVillageTradeHandler;
@@ -165,10 +166,11 @@ public class Registry implements ICraftingHandler, ITickHandler {
         resource_block = new BlockResource();
         is_factory = new ItemStack(factory_block);
         is_lightair = new ItemStack(lightair_block);
-        dark_iron_ore = new BlockDarkIronOre().setBlockName("factorization:darkIronOre").setTextureName("stone").setCreativeTab(Core.tabFactorization).setHardness(3.0F).setResistance(5.0F);
-        fractured_bedrock_block = new Block(Material.rock).setBlockUnbreakable().setResistance(6000000).setBlockName("bedrock").setTextureName("bedrock").setCreativeTab(Core.tabFactorization);
-        ItemBlock itemDarkIronOre = new ItemBlock();
-        ItemBlock itemFracturedBedrock = new ItemBlock();
+        dark_iron_ore = new BlockDarkIronOre().setBlockName("factorization:darkIronOre").setBlockTextureName("stone").setCreativeTab(Core.tabFactorization).setHardness(3.0F).setResistance(5.0F);
+        class NotchBlock extends Block { public NotchBlock(Material honestly) { super(honestly); } }
+        fractured_bedrock_block = new NotchBlock(Material.rock).setBlockUnbreakable().setResistance(6000000).setBlockName("bedrock").setBlockTextureName("bedrock").setCreativeTab(Core.tabFactorization);
+        ItemBlock itemDarkIronOre = new ItemBlock(dark_iron_ore);
+        ItemBlock itemFracturedBedrock = new ItemBlock(fractured_bedrock_block);
 
         GameRegistry.registerBlock(factory_block, ItemFactorizationBlocks.class, "FZ factory");
         GameRegistry.registerBlock(lightair_block, "FZ Lightair");
@@ -187,10 +189,8 @@ public class Registry implements ICraftingHandler, ITickHandler {
         worldgenManager = new WorldgenManager();
         
         final Block vanillaDiamond = Blocks.diamond_block;
-        final int diamondId = vanillaDiamond;
-        diamondId = null;
-        BlockOreStorageShatterable newDiamond = new BlockOreStorageShatterable(diamondId, vanillaDiamond);
-        newDiamond.setHardness(5.0F).setResistance(10.0F).setStepSound(Blocks.soundMetalFootstep).setBlockName("blockDiamond");
+        BlockOreStorageShatterable newDiamond = new BlockOreStorageShatterable(vanillaDiamond);
+        newDiamond.setHardness(5.0F).setResistance(10.0F).setStepSound(Block.soundTypeMetal).setBlockName("blockDiamond");
         //Blocks.diamond_block /* blockDiamond */ = newDiamond;
 //		ReflectionHelper.setPrivateValue(Blocks.class, null, newDiamond, "blockDiamond", "blockDiamond"); TODO: Reflection-set blockDiamond.
     }
@@ -198,21 +198,6 @@ public class Registry implements ICraftingHandler, ITickHandler {
     /*private void addName(Object what, String name) {
         Core.proxy.addName(what, name);
     }*/
-
-    HashSet<Integer> added_ids = new HashSet<Integer>();
-
-    public int itemID(String name, int default_id) {
-        int id = FzConfig.config.getItem("item", name, default_id).getInt();
-        if (added_ids.contains(default_id)) {
-            throw new RuntimeException("Default ID already used: " + default_id);
-        }
-        if (Items.itemsList[id] != null) {
-            throw new RuntimeException("Item ID conflict: " + id + " is already taken by "
-                    + Items.itemsList[id] + "; tried to use it for Factorization " + name);
-        }
-        added_ids.add(default_id);
-        return id;
-    }
     
     void postMakeItems() {
         for (int id : added_ids) {
@@ -226,11 +211,11 @@ public class Registry implements ICraftingHandler, ITickHandler {
     }
 
     public void makeItems() {
-        ore_dirty_gravel = new ItemOreProcessing(itemID("oreDirtyGravel", 9034), 2 * 16 + 4, "gravel");
-        ore_clean_gravel = new ItemOreProcessing(itemID("oreCleanGravel", 9035), 2 * 16 + 5, "clean");
-        ore_reduced = new ItemOreProcessing(itemID("oreReduced", 9036), 2 * 16 + 6, "reduced");
-        ore_crystal = new ItemOreProcessing(itemID("oreCrystal", 9037), 2 * 16 + 7, "crystal");
-        sludge = new ItemCraftingComponent(itemID("sludge", 9039), "sludge");
+        ore_dirty_gravel = new ItemOreProcessing("gravel");
+        ore_clean_gravel = new ItemOreProcessing("clean");
+        ore_reduced = new ItemOreProcessing("reduced");
+        ore_crystal = new ItemOreProcessing("crystal");
+        sludge = new ItemCraftingComponent("sludge");
         OreDictionary.registerOre("sludge", sludge);
         //ItemBlocks
         item_factorization = (ItemFactorizationBlock) Item.getItemFromBlock(factory_block);
@@ -267,11 +252,11 @@ public class Registry implements ICraftingHandler, ITickHandler {
         dark_iron_block_item = ResourceType.DARKIRONBLOCK.itemStack("Block of Dark Iron");
 
 
-        diamond_shard = new ItemCraftingComponent(itemID("diamondShard", 9006), "diamond_shard");
-        dark_iron = new ItemCraftingComponent(itemID("darkIron", 9008), "dark_iron_ingot");
+        diamond_shard = new ItemCraftingComponent("diamond_shard");
+        dark_iron = new ItemCraftingComponent("dark_iron_ingot");
         
-        lead_ingot = new ItemCraftingComponent(itemID("leadIngot", 9014), "lead_ingot");
-        silver_ingot = new ItemCraftingComponent(itemID("silverIngot", 9015), "silver_ingot");
+        lead_ingot = new ItemCraftingComponent("lead_ingot");
+        silver_ingot = new ItemCraftingComponent("silver_ingot");
         OreDictionary.registerOre("oreSilver", silver_ore_item);
         OreDictionary.registerOre("ingotSilver", new ItemStack(silver_ingot));
         OreDictionary.registerOre("ingotLead", new ItemStack(lead_ingot));
@@ -282,9 +267,9 @@ public class Registry implements ICraftingHandler, ITickHandler {
         OreDictionary.registerOre("blockFzDarkIron", dark_iron_block_item);
 
 
-        bag_of_holding = new ItemBagOfHolding(itemID("bagOfHolding", 9001));
+        bag_of_holding = new ItemBagOfHolding();
         
-        logicMatrixProgrammer = new ItemMatrixProgrammer(itemID("logicMatrixProgrammer", 9043));
+        logicMatrixProgrammer = new ItemMatrixProgrammer();
         for (String chestName : new String[] {
                 ChestGenHooks.STRONGHOLD_LIBRARY,
                 ChestGenHooks.DUNGEON_CHEST,
@@ -293,65 +278,65 @@ public class Registry implements ICraftingHandler, ITickHandler {
             ChestGenHooks dungeon = ChestGenHooks.getInfo(chestName);
             dungeon.addItem(new WeightedRandomChestContent(new ItemStack(logicMatrixProgrammer), 1, 1, 35)); //XXX TODO: Temporary, put these on asteroids.
         }
-        logicMatrix = new ItemCraftingComponent(itemID("logicMatrix", 9044), "logic_matrix");
-        logicMatrixIdentifier = new ItemCraftingComponent(itemID("logicMatrixID", 9045), "logic_matrix_identifier");
-        logicMatrixController = new ItemCraftingComponent(itemID("logicMatrixCtrl", 9063), "logic_matrix_controller");
+        logicMatrix = new ItemCraftingComponent("logic_matrix");
+        logicMatrixIdentifier = new ItemCraftingComponent("logic_matrix_identifier");
+        logicMatrixController = new ItemCraftingComponent("logic_matrix_controller");
 
         //Electricity
-        acid = new ItemAcidBottle(itemID("acid", 9024));
+        acid = new ItemAcidBottle();
         sulfuric_acid = new ItemStack(acid, 1);
         aqua_regia = new ItemStack(acid, 1, 1);
         OreDictionary.registerOre("sulfuricAcid", sulfuric_acid);
         OreDictionary.registerOre("bottleSulfuricAcid", sulfuric_acid);
         OreDictionary.registerOre("aquaRegia", aqua_regia);
-        insulated_coil = new ItemCraftingComponent(itemID("coil", 9026), "insulated_coil");
-        motor = new ItemCraftingComponent(itemID("motor", 9027), "motor");
-        fan = new ItemCraftingComponent(itemID("fan", 9028), "fan");
-        diamond_cutting_head = new ItemCraftingComponent(itemID("diamondCuttingHead", 9038), "diamond_cutting_head");
-        charge_meter = new ItemChargeMeter(itemID("chargemeter", 9029));
-        mirror = new ItemBlockProxy(itemID("mirror", 9030), mirror_item_hidden, "mirror", TabType.CHARGE);
-        battery = new ItemBattery(itemID("battery", 9033));
+        insulated_coil = new ItemCraftingComponent("insulated_coil");
+        motor = new ItemCraftingComponent("motor");
+        fan = new ItemCraftingComponent("fan");
+        diamond_cutting_head = new ItemCraftingComponent("diamond_cutting_head");
+        charge_meter = new ItemChargeMeter();
+        mirror = new ItemBlockProxy(mirror_item_hidden, "mirror", TabType.CHARGE);
+        battery = new ItemBattery();
         leydenjar_item_full = ItemStack.copyItemStack(leydenjar_item);
         NBTTagCompound tag = new NBTTagCompound();
         tag.setInteger("storage", TileEntityLeydenJar.max_storage);
         leydenjar_item_full.setTagCompound(tag);
         
         //ceramics
-        sculpt_tool = new ItemSculptingTool(itemID("sculptTool", 9041));
-        glaze_bucket = new ItemGlazeBucket(itemID("glazeBucket", 9055));
+        sculpt_tool = new ItemSculptingTool();
+        glaze_bucket = new ItemGlazeBucket();
 
         //Misc
-        pocket_table = new ItemPocketTable(itemID("pocketCraftingTable", 9002));
+        pocket_table = new ItemPocketTable();
         steamFluid = new Fluid("steam").setDensity(-500).setGaseous(true).setViscosity(100).setBlockName("factorization:fluid/steam").setTemperature(273 + 110);
         FluidRegistry.registerFluid(steamFluid);
         
         //Rocketry
-        nether_powder = new ItemCraftingComponent(itemID("netherPowder", 9050), "nether_powder");
+        nether_powder = new ItemCraftingComponent("nether_powder");
         if (FzConfig.enable_dimension_slice) {
-            rocket_fuel = new ItemCraftingComponent(itemID("heldRocketFuel", 9051), "rocket/rocket_fuel");
-            rocket_engine = new ItemBlockProxy(itemID("rocketEngine", 9053), rocket_engine_item_hidden, "rocket/rocket_engine", TabType.ROCKETRY);
+            rocket_fuel = new ItemCraftingComponent("rocket/rocket_fuel");
+            rocket_engine = new ItemBlockProxy(rocket_engine_item_hidden, "rocket/rocket_engine", TabType.ROCKETRY);
             rocket_engine.setMaxStackSize(1);
         }
         
         //Servos
-        servo_placer = new ItemServoMotor(itemID("servoMotorPlacer", 9056));
-        servo_widget_decor = new ItemServoRailWidget(itemID("servoWidgetDecor", 9057), "servo/decorator");
-        servo_widget_instruction = new ItemServoRailWidget(itemID("servoWidgetInstruction", 9061), "servo/component");
+        servo_placer = new ItemServoMotor();
+        servo_widget_decor = new ItemServoRailWidget("servo/decorator");
+        servo_widget_instruction = new ItemServoRailWidget("servo/component");
         servo_widget_decor.setMaxStackSize(16);
         servo_widget_instruction.setMaxStackSize(1);
-        dark_iron_sprocket = new ItemStack(new ItemCraftingComponent(itemID("darkIronSprocket", 9059), "servo/sprocket"));
-        servo_motor = new ItemStack(new ItemCraftingComponent(itemID("servoMotor", 9060), "servo/servo_motor"));
-        socket_part = new ItemSocketPart(itemID("socketPart", 9064), "socket/", TabType.SERVOS);
-        instruction_plate = new ItemCraftingComponent(itemID("instructionPlate", 9065), "servo/instruction_plate", TabType.SERVOS);
+        dark_iron_sprocket = new ItemStack(new ItemCraftingComponent("servo/sprocket"));
+        servo_motor = new ItemStack(new ItemCraftingComponent("servo/servo_motor"));
+        socket_part = new ItemSocketPart("socket/", TabType.SERVOS);
+        instruction_plate = new ItemCraftingComponent("servo/instruction_plate", TabType.SERVOS);
         instruction_plate.setSpriteNumber(0);
-        servo_rail_comment_editor = new ItemCommenter(itemID("servoCommenter", 9066), "servo/commenter");
+        servo_rail_comment_editor = new ItemCommenter("servo/commenter");
         
         socket_lacerator = FactoryType.SOCKET_LACERATOR.asSocketItem();
         socket_robot_hand = FactoryType.SOCKET_ROBOTHAND.asSocketItem();
         socket_shifter = FactoryType.SOCKET_SHIFTER.asSocketItem();
         
         //Barrels
-        daybarrel = new ItemDayBarrel(itemID("daybarrelItem", 9062), "daybarrel");
+        daybarrel = new ItemDayBarrel("daybarrel");
         postMakeItems();
     }
 
@@ -408,18 +393,18 @@ public class Registry implements ICraftingHandler, ITickHandler {
     }
 
     public void makeRecipes() {
-        recipe(new ItemStack(Blocks.stoneDoubleSlab),
+        recipe(new ItemStack(Blocks.double_stone_slab),
                 "-",
                 "-",
-                '-', new ItemStack(Blocks.stoneSingleSlab));
-        recipe(new ItemStack(Blocks.stoneDoubleSlab, 4, 8),
+                '-', new ItemStack(Blocks.stone_slab));
+        recipe(new ItemStack(Blocks.double_stone_slab, 4, 8),
                 "##",
                 "##",
-                '#', new ItemStack(Blocks.stoneDoubleSlab));
-        recipe(new ItemStack(Blocks.stoneDoubleSlab, 2, 9),
+                '#', new ItemStack(Blocks.stone_slab));
+        recipe(new ItemStack(Blocks.double_stone_slab, 2, 9),
                 "#",
                 "#",
-                '#', new ItemStack(Blocks.sandStone, 1, 2));
+                '#', new ItemStack(Blocks.sandstone, 1, 2));
         
         shapelessRecipe(new ItemStack(dark_iron, 9), dark_iron_block_item);
         recipe(dark_iron_block_item,
@@ -710,8 +695,8 @@ public class Registry implements ICraftingHandler, ITickHandler {
         // Barrel
         // Add the recipes for vanilla woods.
         for (int i = 0; i < 4; i++) {
-            ItemStack log = new ItemStack(Blocks.wood, 1, i);
-            ItemStack slab = new ItemStack(Blocks.woodSingleSlab, 1, i);
+            ItemStack log = new ItemStack(Blocks.log, 1, i);
+            ItemStack slab = new ItemStack(Blocks.wooden_slab, 1, i);
             TileEntityDayBarrel.makeRecipe(log, slab);
         }
         
@@ -764,7 +749,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
         
         //most ores give 0.4F stone, but redstone is dense.
         //mining redstone normally gives 4 to 6 ore. 5.8F should get you a slightly better yield.
-        TileEntitySlagFurnace.SlagRecipes.register(Blocks.oreRedstone, 5.8F, Items.redstone, 0.2F, Blocks.stone);
+        TileEntitySlagFurnace.SlagRecipes.register(Blocks.redstone_ore, 5.8F, Items.redstone, 0.2F, Blocks.stone);
         
         
         oreRecipe(greenware_item,
@@ -785,7 +770,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 " - ",
                 "I I",
                 'I', Items.iron_ingot,
-                '-', Blocks.light);
+                '-', Blocks.light_weighted_pressure_plate);
         if (FzConfig.enable_solar_steam) {
             recipe(solarboiler_item,
                     "I#I",
@@ -1087,7 +1072,6 @@ public class Registry implements ICraftingHandler, ITickHandler {
     @Override
     public void tickStart(EnumSet<TickType> type, Object... tickData) {
         TileEntityWrathLamp.handleAirUpdates();
-        TileEntityWrathFire.updateCount = 0;
     }
     
     @Override

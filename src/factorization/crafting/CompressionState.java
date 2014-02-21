@@ -323,11 +323,11 @@ public class CompressionState {
             }
             switch (mode) {
             case PICKED:
-                cell.setId(0);
+                cell.setAir();
                 break;
             case BREAK:
                 leftOvers.stackSize--;
-                cell.setId(0);
+                cell.setAir();
                 break;
             case BARREL:
                 //leftOvers.stackSize = 0;
@@ -345,7 +345,7 @@ public class CompressionState {
                         break;
                     }
                 }
-                cell.setId(0);
+                cell.setAir();
                 return craftRes;
             }
             List<ItemStack> ret = new ArrayList(1);

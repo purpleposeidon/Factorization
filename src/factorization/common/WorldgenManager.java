@@ -5,7 +5,6 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -14,6 +13,7 @@ import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.ChunkDataEvent;
 import cpw.mods.fml.common.IWorldGenerator;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.shared.Core;
 
@@ -46,7 +46,7 @@ public class WorldgenManager {
                     }
                 }
             };
-            GameRegistry.registerWorldGenerator(silverGen);
+            GameRegistry.registerWorldGenerator(silverGen, 0);
         }
         if (FzConfig.gen_dark_iron_ore) {
             darkIronGen = new IWorldGenerator() {
@@ -127,10 +127,10 @@ public class WorldgenManager {
                     if (stoneBlock == null) {
                         return;
                     }
-                    if (!stoneBlocks.isGenMineableReplaceable(world, x, 1, z, Blocks.stone)) {
+                    if (!stoneBlock.isReplaceableOreGen(world, x, 1, z, Blocks.stone)) {
                         return;
                     }
-                    stoneId = stoneBlocks;
+                    stoneId = stoneBlock;
                     stoneMd = world.getBlockMetadata(x, 1, z);
                     
                     //The spike
@@ -195,7 +195,7 @@ public class WorldgenManager {
                     }
                 }
             };
-            GameRegistry.registerWorldGenerator(darkIronGen);
+            GameRegistry.registerWorldGenerator(darkIronGen, 0);
         }
     }
     

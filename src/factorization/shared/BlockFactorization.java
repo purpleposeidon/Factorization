@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.particle.EntityDiggingFX;
@@ -16,9 +15,11 @@ import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
@@ -35,7 +36,6 @@ import factorization.common.Registry;
 import factorization.notify.Notify;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.weird.TileEntityDayBarrel;
-import factorization.weird.TileEntityDayBarrel.Type;
 
 public class BlockFactorization extends BlockContainer {
     public boolean fake_normal_render = false;
@@ -84,12 +84,12 @@ public class BlockFactorization extends BlockContainer {
     }
     
     @Override
-    public boolean isBlockSolidOnSide(World world, int x, int y, int z, ForgeDirection side) {
+    public boolean isSideSolid(IBlockAccess world, int x, int y, int z, ForgeDirection side) {
         return isBlockSolid(world, x, y, z, side.ordinal());
     }
-
+    
     @Override
-    public void onNeighborBlockChange(World w, int x, int y, int z, int l) {
+    public void onNeighborBlockChange(World w, int x, int y, int z, Block l) {
         int md = w.getBlockMetadata(x, y, z);
         TileEntity ent = w.getTileEntity(x, y, z);
         if (ent == null) {
@@ -132,8 +132,8 @@ public class BlockFactorization extends BlockContainer {
                 }
                 return false; //...?
             }
-            entityplayer.addChatMessage("This block is missing its TileEntity, possibly due to a bug in Factorization.");
-            entityplayer.addChatMessage("The block and its contents can not be recovered without cheating.");
+            entityplayer.addChatMessage(new ChatComponentText("This block is missing its TileEntity, possibly due to a bug in Factorization."));
+            entityplayer.addChatMessage(new ChatComponentText("The block and its contents can not be recovered without cheating."));
             return true;
         }
     }
@@ -154,15 +154,15 @@ public class BlockFactorization extends BlockContainer {
     }
     
     @Override
-    public void registerIcons(IIconRegister reg) {
+    public void registerBlockIcons(IIconRegister reg) {
         FactorizationTextureLoader.register(reg, BlockIcons.class, null, "factorization:");
         Core.proxy.texturepackChanged();
     }
     
     static public IIcon force_texture = null;
-
+    
     @Override
-    public IIcon getBlockTexture(IBlockAccess w, int x, int y, int z, int side) {
+    public IIcon getIcon(IBlockAccess w, int x, int y, int z, int side) {
         // Used for in-world rendering. Takes 'active' into consideration.
         if (force_texture != null) {
             return force_texture;
@@ -210,7 +210,7 @@ public class BlockFactorization extends BlockContainer {
     LinkedList<TileEntityCommon> destroyed_tes = new LinkedList<TileEntityCommon>();
     
     @Override
-    public void breakBlock(World w, int x, int y, int z, int id, int md) {
+    public void breakBlock(World w, int x, int y, int z, Block id, int md) {
         Coord here = new Coord(w, x, y, z);
         TileEntityCommon te = here.getTE(TileEntityCommon.class);
         if (te != null) {
@@ -221,19 +221,18 @@ public class BlockFactorization extends BlockContainer {
     }
     
     @Override
-    public boolean removeBlockByPlayer(World world, EntityPlayer player, int x, int y, int z) {
+    public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z) {
         Coord here = new Coord(world, x, y, z);
         TileEntityCommon tec = here.getTE(TileEntityCommon.class);
         if (tec == null) {
             Notify.send(player, here, "No TileEntity!");
-            return super.removeBlockByPlayer(world, player, x, y, z);
+            return super.removedByPlayer(world, player, x, y, z);
         }
-        return tec.removeBlockByPlayer(player);
+        return tec.removedByPlayer(player);
     }
-    
 
     @Override
-    public ArrayList<ItemStack> getBlockDropped(World world, int X, int Y, int Z, int md, int fortune) {
+    public ArrayList<ItemStack> getDrops(World world, int X, int Y, int Z, int md, int fortune) {
         ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
         Coord here = new Coord(world, X, Y, Z);
         TileEntityCommon f = here.getTE(TileEntityCommon.class);
@@ -271,7 +270,10 @@ public class BlockFactorization extends BlockContainer {
     }
 
     @Override
-    public void addCreativeItems(ArrayList itemList) {
+    public void getSubBlocks(Item me, CreativeTabs tab, List itemList) {
+        if (this != Core.registry.factory_block) {
+            return;
+        }
         if (this != Core.registry.factory_block) {
             return;
         }
@@ -313,7 +315,6 @@ public class BlockFactorization extends BlockContainer {
         }
         
         //dark
-        itemList.add(reg.router_item);
         itemList.add(reg.empty_socket_item);
         itemList.add(reg.servorail_item);
         itemList.add(reg.lamp_item);
@@ -341,14 +342,6 @@ public class BlockFactorization extends BlockContainer {
     }
 
     @Override
-    public void getSubBlocks(int par1, CreativeTabs par2CreativeTabs, List par3List) {
-        if (this != Core.registry.factory_block) {
-            return;
-        }
-        Core.addBlockToCreativeList(par3List, this);
-    }
-
-    @Override
     public boolean canConnectRedstone(IBlockAccess world, int x, int y, int z, int dir) {
         TileEntity te = world.getTileEntity(x, y, z);
         if (te instanceof TileEntityCommon) {
@@ -359,24 +352,23 @@ public class BlockFactorization extends BlockContainer {
     }
 
     @Override
-    public boolean isBlockNormalCube(World world, int i, int j, int k) {
+    public boolean isNormalCube(IBlockAccess world, int i, int j, int k) {
         return BlockClass.get(world.getBlockMetadata(i, j, k)).isNormal();
     }
 
     @Override
-    public int getFlammability(IBlockAccess world, int x, int y, int z,
-            int md, ForgeDirection face) {
+    public int getFlammability(IBlockAccess world, int x, int y, int z, ForgeDirection face) {
+        int md = world.getBlockMetadata(x, y, z);
         if (BlockClass.Barrel.md == md) {
             return 20;
         }
         return 0;
     }
-
+    
     @Override
-    public boolean isFlammable(IBlockAccess world, int x, int y, int z, int metadata, ForgeDirection face) {
+    public boolean isFlammable(IBlockAccess world, int x, int y, int z, ForgeDirection face) {
         //Not really. But this keeps fire rendering.
-        //return true;
-        return BlockClass.Barrel.md == metadata;
+        return getFlammability(world, x, y, z, face) > 0;
     }
 
     //Lightair/lamp stuff
@@ -537,11 +529,6 @@ public class BlockFactorization extends BlockContainer {
     public int getRenderBlockPass() {
         return 1;
     }
-
-    @Override
-    public boolean isAirBlock(World world, int x, int y, int z) {
-        return false;
-    }
     
     public static int sideDisable = 0;
     
@@ -555,7 +542,7 @@ public class BlockFactorization extends BlockContainer {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean addBlockHitEffects(World worldObj, MovingObjectPosition target, EffectRenderer effectRenderer) {
+    public boolean addHitEffects(World worldObj, MovingObjectPosition target, EffectRenderer effectRenderer) {
         Coord here = new Coord(worldObj, target.blockX, target.blockY, target.blockZ);
         TileEntityCommon tec = here.getTE(TileEntityCommon.class);
         tempParticleIIcon = (tec == null) ? BlockIcons.default_icon : tec.getIcon(ForgeDirection.getOrientation(target.sideHit));
@@ -566,7 +553,7 @@ public class BlockFactorization extends BlockContainer {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean addBlockDestroyEffects(World world, int x, int y, int z, int meta, EffectRenderer effectRenderer) {
+    public boolean addDestroyEffects(World world, int x, int y, int z, int meta, EffectRenderer effectRenderer) {
         TileEntity te = world.getTileEntity(x, y, z);
         if (!(te instanceof TileEntityCommon)) {
             return false;
@@ -574,7 +561,7 @@ public class BlockFactorization extends BlockContainer {
         TileEntityCommon tec = (TileEntityCommon) te;
         IIcon theIIcon = (tec == null) ? BlockIcons.default_icon : tec.getIcon(ForgeDirection.DOWN);
         
-        //copied & modified from EffectRenderer.addBlockDestroyEffects
+        //copied & modified from EffectRenderer.addDestroyEffects
         byte b0 = 4;
         for (int j1 = 0; j1 < b0; ++j1)
         {
@@ -586,7 +573,7 @@ public class BlockFactorization extends BlockContainer {
                     double d1 = (double)y + ((double)k1 + 0.5D) / (double)b0;
                     double d2 = (double)z + ((double)l1 + 0.5D) / (double)b0;
                     EntityDiggingFX fx = (new EntityDiggingFX(world, d0, d1, d2, d0 - (double)x - 0.5D, d1 - (double)y - 0.5D, d2 - (double)z - 0.5D, this, meta)).applyColourMultiplier(x, y, z);
-                    fx.setParticleIIcon(theIIcon);
+                    fx.setParticleIcon(theIIcon);
                     effectRenderer.addEffect(fx);
                 }
             }
@@ -642,8 +629,7 @@ public class BlockFactorization extends BlockContainer {
     }
     
     @Override
-    public void onNeighborTileChange(World world, int x, int y, int z,
-            int tilex, int tiley, int tilez) {
+    public void onNeighborChange(IBlockAccess world, int x, int y, int z, int tilex, int tiley, int tilez) {
         TileEntity te = world.getTileEntity(x, y, z);
         if (te instanceof TileEntityCommon) {
             ((TileEntityCommon) te).onNeighborTileChanged(tilex, tiley, tilez);

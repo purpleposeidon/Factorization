@@ -184,7 +184,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
             water_below &= !here.isPowered();
             if (water_below && FzConfig.boilers_suck_water) {
                 if (below.getMd() == 0) {
-                    below.setId(0);
+                    below.setAir();
                     water.amount += 1000;
                     water.amount = Math.min(water.amount, waterTank.getCapacity());
                 }

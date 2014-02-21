@@ -4,18 +4,16 @@ import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -27,19 +25,18 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.util.Vec3Pool;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
-import factorization.api.DeltaCoord;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
@@ -102,7 +99,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             tag.setByte("hx", maxX);
             tag.setByte("hy", maxY);
             tag.setByte("hz", maxZ);
-            tag.setShort("icon_id", icon_id);
+            tag.setShort("icon_id", (short) FzUtil.getId(icon_id));
             tag.setByte("icon_md", icon_md);
             tag.setByte("icon_sd", icon_side);
             quat.writeToTag(tag, "r");
@@ -142,7 +139,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             maxX = tag.getByte("hx");
             maxY = tag.getByte("hy");
             maxZ = tag.getByte("hz");
-            icon_id = tag.getShort("icon_id");
+            icon_id = FzUtil.getBlock(tag.getShort("icon_id"));
             icon_md = tag.getByte("icon_md");
             if (tag.hasKey("icon_sd")) {
                 icon_side = tag.getByte("icon_sd");
@@ -168,7 +165,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             maxX = maxZ = 16 - 4;
             maxY = 10;
             offset(16, 16 + 1, 16);
-            icon_id = (short) FzConfig.resource_id;
+            icon_id = Core.registry.resource_block;
             icon_md = (byte) ResourceType.BISQUE.md;
             icon_side = -1;
             quat = new Quaternion();
@@ -255,14 +252,14 @@ public class TileEntityGreenware extends TileEntityCommon {
         //NOTE: This isn't what's actually used for rendering.
         switch (getState()) {
         case WET:
-            return Blocks.clay.getBlockTextureFromSide(side);
+            return Blocks.clay.getIconFromSide(side);
         case DRY:
             return BlockIcons.ceramics$dry;
         case BISQUED:
         case UNFIRED_GLAZED:
             return BlockIcons.error;
         case HIGHFIRED:
-            Item it = Items.itemsList[lump.icon_id];
+            Item it = FzUtil.getItem(lump.icon_id);
             if (it == null) {
                 return BlockIcons.error;
             }
@@ -312,7 +309,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         super.writeToNBT(tag);
         writeParts(tag);
         if (parts.size() == 0) {
-            getCoord().setId(0);
+            getCoord().setAir();
         }
     }
 
@@ -321,7 +318,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             initialize();
             return;
         }
-        NBTTagList partList = tag.getTagList("parts");
+        NBTTagList partList = tag.getTagList("parts", Constants.NBT.TAG_COMPOUND);
         if (partList == null) {
             initialize();
             return;
@@ -329,7 +326,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         int tagCount = partList.tagCount();
         parts = new ArrayList<ClayLump>(tagCount);
         for (int i = 0; i < tagCount; i++) {
-            NBTTagCompound rc_tag = (NBTTagCompound) partList.tagAt(i);
+            NBTTagCompound rc_tag = partList.getCompoundTagAt(i);
             parts.add(new ClayLump().read(rc_tag));
         }
         lastTouched = tag.getInteger("touch");
@@ -625,7 +622,7 @@ public class TileEntityGreenware extends TileEntityCommon {
                     Coord c = getCoord().add(x, y, z);
                     TileEntityExtension tex = c.getTE(TileEntityExtension.class);
                     if (tex != null && tex.getParent() == this) {
-                        c.setId(0);
+                        c.setAir();
                     }
                 }
             }
@@ -732,13 +729,13 @@ public class TileEntityGreenware extends TileEntityCommon {
     private static final Vec3 zeroVec = Vec3.createVectorHelper(0, 0, 0);
 
     @Override
-    protected boolean removeBlockByPlayer(EntityPlayer player) {
+    protected boolean removedByPlayer(EntityPlayer player) {
         if (player.worldObj.isRemote) {
             return false;
         }
         MovingObjectPosition hit = ItemSculptingTool.doRayTrace(player);
         if (hit == null || hit.subHit == -1 || parts.size() < 1) {
-            return super.removeBlockByPlayer(player);
+            return super.removedByPlayer(player);
         }
         Coord here = getCoord();
         ClayState state = getState();
@@ -747,7 +744,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         boolean shouldDestroy = player.isSneaking() || parts.size() == 1;
         if (player.capabilities.isCreativeMode) {
             if (shouldDestroy) {
-                return super.removeBlockByPlayer(player);
+                return super.removedByPlayer(player);
             } else {
                 removeLump(hit.subHit);
                 return true;
@@ -756,7 +753,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         shouldDestroy |= state != ClayState.WET;
         if (shouldDestroy) {
             FzUtil.spawnItemStack(here, getItem());
-            here.setId(0);
+            here.setAir();
         } else {
             removeLump(hit.subHit);
             FzUtil.spawnItemStack(here, new ItemStack(Items.clay_ball));
@@ -938,7 +935,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(ForgeDirection dir) {
         if (parts.size() == 0) {
-            return Blocks.clay.getBlockTextureFromSide(0);
+            return Blocks.clay.getIconFromSide(0);
         }
         return getIcon(parts.get(0), dir.ordinal());
     }

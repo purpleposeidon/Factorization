@@ -47,7 +47,6 @@ import net.minecraft.block.BlockTripWire;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
@@ -63,7 +62,7 @@ public class BlockHelper
         USE_GET_DAMAGE_VALUE,
         // Call Blocks.idDropped to get the ItemStack
         USE_ID_DROPPED,
-        // Return the first thing from Blocks.getBlockDropped.
+        // Return the first thing from Blocks.getDrops.
         USE_GET_BLOCK_DROPPED,
         // Return the block with its metadata
         CLONE_MD,
@@ -195,18 +194,17 @@ public class BlockHelper
                 }
             case SLAB:
                 md = world.getBlockMetadata(x, y, z);
-                int slabId = block.idDropped(md, world.rand, 0);
                 int dropped = block.quantityDropped(world.rand);
-                return makeItemStack(slabId, dropped, block.damageDropped(md));
+                return makeItemStack(block.getItemDropped(md, world.rand, 0), dropped, block.damageDropped(md));
             case CAKE:
                 md = world.getBlockMetadata(x, y, z);
                 return md == 0 ? new ItemStack(Items.cake) : null;
             case CROP:
-                return new ItemStack(block.idDropped(0, world.rand, 0), 1, block.getDamageValue(world, x, y, z));
+                return new ItemStack(block.getItemDropped(0, world.rand, 0), 1, block.getDamageValue(world, x, y, z));
             case DOOR:
                 md = world.getBlockMetadata(x, y, z);
-                int doorId = block.idDropped(md, world.rand, 0);
-                if (doorId == 0)
+                Item doorId = block.getItemDropped(md, world.rand, 0);
+                if (doorId == null)
                 {
                     return null;
                 }

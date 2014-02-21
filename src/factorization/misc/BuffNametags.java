@@ -20,7 +20,7 @@ public class BuffNametags {
     public void buffedNametag(EntityInteractEvent event) {
         ItemStack is = event.entityPlayer.getHeldItem();
         if (is == null) return;
-        if (is.getItem() != Items.nameTag) return;
+        if (is.getItem() != Items.name_tag) return;
         if (!(event.target instanceof EntityLiving)) return;
         final EntityLiving ent = (EntityLiving) event.target;
         final String origName = ent.getCustomNameTag();
@@ -35,7 +35,7 @@ public class BuffNametags {
                 float delta = 2*5;
                 float origHealth = ent.getMaxHealth();
                 float newMaxHealth = origHealth + delta;
-                ent.getEntityAttribute(SharedMonsterAttributes.maxHealth).setAttribute(newMaxHealth);
+                ent.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(newMaxHealth);
                 ent.heal(delta);
                 
                 String particleType = "heart";

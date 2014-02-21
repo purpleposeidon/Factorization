@@ -16,7 +16,7 @@ import factorization.shared.Core;
 
 public class BlockOreStorageShatterable extends BlockCompressed {
     private final Block original;
-    public BlockOreStorageShatterable(int id, Block original) {
+    public BlockOreStorageShatterable(Block original) {
         super(Blocks.diamond_block.getMapColor(0));
         this.original = original;
     }
@@ -38,7 +38,7 @@ public class BlockOreStorageShatterable extends BlockCompressed {
             return;
         }
         Coord c = new Coord(world, x, y, z);
-        c.setId(0);
+        c.setAir();
         int i = 18;
         while (i > 0) {
             int spawn = world.rand.nextInt(3) + 2;

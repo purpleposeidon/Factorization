@@ -87,7 +87,7 @@ public class ItemOreProcessing extends ItemFactorization implements IActOnCraft 
     
     String stateName;
 
-    public ItemOreProcessing(int icon, String stateName) {
+    public ItemOreProcessing(String stateName) {
         super("ore/" + stateName, TabType.MATERIALS);
         setHasSubtypes(true);
         this.stateName = stateName;

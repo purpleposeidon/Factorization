@@ -63,7 +63,7 @@ public class BlockLightAir extends Block {
     @Override
     public IIcon getIcon(int side, int md) {
         if (FzConfig.debug_light_air) {
-            return Blocks.glowstone.getBlockTextureFromSide(0);
+            return Blocks.glowstone.getIconFromSide(0);
         }
         return BlockIcons.transparent;
     }

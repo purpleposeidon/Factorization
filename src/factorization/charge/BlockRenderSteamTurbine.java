@@ -43,27 +43,24 @@ public class BlockRenderSteamTurbine extends FactorizationBlockRender {
             float f = 1F - (3F/16F);
             
             IIcon side = BlockIcons.turbine_side;
-            
-            Tessellator.instance.zOffset += f;
+            //NORELEASE: this is ass; de-ass
+            Tessellator.instance.addTranslation(0, 0, f);
             rb.renderFaceZNeg(b, x, y, z, side);
-            Tessellator.instance.zOffset -= f;
-            Tessellator.instance.zOffset -= f;
+            Tessellator.instance.addTranslation(0, 0, -2*f);
             rb.renderFaceZPos(b, x, y, z, side);
-            Tessellator.instance.zOffset += f;
+            Tessellator.instance.addTranslation(0, 0, f);
             
-            Tessellator.instance.xOffset += f;
+            Tessellator.instance.addTranslation(f, 0, 0);
             rb.renderFaceXNeg(b, x, y, z, side);
-            Tessellator.instance.xOffset -= f;
-            Tessellator.instance.xOffset -= f;
+            Tessellator.instance.addTranslation(-2*f, 0, 0);
             rb.renderFaceXPos(b, x, y, z, side);
-            Tessellator.instance.xOffset += f;
+            Tessellator.instance.addTranslation(f, 0, 0);
             
-            Tessellator.instance.yOffset += f;
+            Tessellator.instance.addTranslation(0, f, 0);
             rb.renderFaceYNeg(b, x, y, z, BlockIcons.turbine_bottom);
-            Tessellator.instance.yOffset -= f;
-            Tessellator.instance.yOffset -= f;
+            Tessellator.instance.addTranslation(0, -2*f, 0);
             rb.renderFaceYPos(b, x, y, z, BlockIcons.turbine_bottom);
-            Tessellator.instance.yOffset += f;
+            Tessellator.instance.addTranslation(0, f, 0);
         } else {
             //render fan
             GL11.glPushMatrix();

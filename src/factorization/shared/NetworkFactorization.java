@@ -17,6 +17,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Random;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -45,7 +46,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
         Core.network = this;
     }
     
-    public static final ItemStack EMPTY_ITEMSTACK = new ItemStack(0, 0, 0);
+    public static final ItemStack EMPTY_ITEMSTACK = new ItemStack((Block)null);
     
     int huge_tag_warnings = 0;
 
@@ -160,7 +161,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
             }
             NBTTagCompound tag = new NBTTagCompound();
             item.writeToNBT(tag);
-            NBTBase.writeNamedTag(tag, output);
+            CompressedStreamTools.write(tag, output); //NORELEASE: Compress?
             
             output.writeUTF(format);
             output.writeInt(args.length);
@@ -176,7 +177,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
     }
     
     public void prefixEntityPacket(DataOutputStream output, Entity to, int messageType) throws IOException {
-        output.writeInt(to.entityId);
+        output.writeInt(to.getEntityId());
         output.writeShort(messageType);
     }
     
@@ -374,7 +375,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 if (spawn == null) {
                     spawn = ft.makeTileEntity();
                     spawn.setWorldObj(world);
-                    world.setBlockTileEntity(x, y, z, spawn);
+                    world.setTileEntity(x, y, z, spawn);
                 }
 
                 spawn.useExtraInfo(extraData);
@@ -415,10 +416,10 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 break;
             case MessageType.PistonPush:
                 Blocks.piston.onBlockEventReceived(world, x, y, z, 0, input.readInt());
-                here.setId(0);
+                here.setAir();
                 break;
             default:
-                if (here.blockExists() && here.getId() != 0) {
+                if (here.blockExists()) {
                     Core.logFine("Got unhandled message: " + messageType + " for " + here);
                 } else {
                     //XXX: Need to figure out how to keep the server from sending these things!
@@ -478,7 +479,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                     break;
                 case NotifyMessageType.ENTITY:
                     int id = input.readInt();
-                    if (id == me.entityId) {
+                    if (id == me.getEntityId()) {
                         target = me; //bebna
                     } else {
                         target = me.worldObj.getEntityByID(id);
@@ -499,7 +500,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                     return;
                 }
                 
-                NBTTagCompound tag = (NBTTagCompound) NBTBase.readNamedTag(input);
+                NBTTagCompound tag = CompressedStreamTools.read(input); //NORELEASE: Compress?
                 ItemStack item = ItemStack.loadItemStackFromNBT(tag);
                 if (item != null && EMPTY_ITEMSTACK.isItemEqual(item)) {
                     item = null;

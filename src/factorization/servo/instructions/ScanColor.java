@@ -3,17 +3,13 @@ package factorization.servo.instructions;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.block.BlockCactus;
-import net.minecraft.block.BlockCrops;
 import net.minecraft.block.BlockReed;
-import net.minecraft.block.BlockStem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.init.Items;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.common.IPlantable;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.FzColor;
 import factorization.api.datahelpers.DataHelper;
@@ -83,7 +79,7 @@ public class ScanColor extends Decorator {
                 "Q#Q",
                 "+Q+",
                 '+', FactoryType.SERVORAIL.itemStack(),
-                'Q', Items.netherQuartz,
+                'Q', Items.quartz,
                 '#', Core.registry.logicMatrixIdentifier);
     }
     

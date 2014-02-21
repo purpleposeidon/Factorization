@@ -15,16 +15,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Joiner;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import cpw.mods.fml.client.GuiModList;
 import cpw.mods.fml.relauncher.ReflectionHelper;
@@ -105,8 +104,8 @@ public class MiscClientCommands implements ICommand {
         
         @alias({"help", "?"})
         public static void about() {
-            player.addChatMessage("Miscellaneous Client Commands; from Factorization, by neptunepink");
-            player.addChatMessage("Use /f list go see the sub-commands.");
+            player.addChatMessage(new ChatComponentText("Miscellaneous Client Commands; from Factorization, by neptunepink"));
+            player.addChatMessage(new ChatComponentText("Use /f list go see the sub-commands."));
         }
         
         @help("Lists available subcommands. Can also search the list.")
@@ -135,7 +134,7 @@ public class MiscClientCommands implements ICommand {
                     msg += EnumChatFormatting.RED + " [CHEATY]";
                 }
                 if (arg1 == null || arg1.length() == 0 || msg.contains(arg1)) {
-                    player.addChatMessage(msg);
+                    player.addChatMessage(new ChatComponentText(msg));
                 }
             }
             String msg = "";
@@ -149,7 +148,7 @@ public class MiscClientCommands implements ICommand {
             }
             msg += ": " + "Changes the fog";
             if (arg1 == null || arg1.length() == 0 || msg.contains(arg1)) {
-                player.addChatMessage(msg);
+                player.addChatMessage(new ChatComponentText(msg));
             }
         }
         
@@ -179,7 +178,7 @@ public class MiscClientCommands implements ICommand {
         public static void render_above() {
             Object wr_list = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, "field_72768_k", "sortedWorldRenderers");
             if (!(wr_list instanceof WorldRenderer[])) {
-                mc.thePlayer.addChatMessage("Reflection failed");
+                mc.thePlayer.addChatMessage(new ChatComponentText("Reflection failed"));
                 return;
             }
             WorldRenderer[] lizt = (WorldRenderer[]) wr_list;
@@ -190,13 +189,13 @@ public class MiscClientCommands implements ICommand {
                 total++;
                 if (wr.needsUpdate) {
                     if (wr.posY - 16*3 > mc.thePlayer.posY && wr.posY < mc.thePlayer.posY + 16*8 || lagfest) {
-                        wr.updateRenderer();
+                        wr.updateRenderer(mc.thePlayer);
                         wr.needsUpdate = false;
                         did++;
                     }
                 }
             }
-            player.addChatMessage("Rendered " + did + " chunks out of " + total);
+            player.addChatMessage(new ChatComponentText("Rendered " + did + " chunks out of " + total));
         }
         
         @alias("c")
@@ -325,7 +324,7 @@ public class MiscClientCommands implements ICommand {
                         ExporterTessellator ex = new ExporterTessellator(output);
                         Tessellator.instance = ex;
                         wr.markDirty();
-                        wr.updateRenderer();
+                        wr.updateRenderer(mc.thePlayer);
                         ex.doneDumping();
                     } finally {
                         Tessellator.instance = real_tess;
@@ -369,7 +368,7 @@ public class MiscClientCommands implements ICommand {
                     }
                     System.out.println("Writing chunk " + i + "/" + total + " at " + wr.posX + " " + wr.posY + " " + wr.posZ);
                     wr.markDirty();
-                    wr.updateRenderer();
+                    wr.updateRenderer(mc.thePlayer);
                 }
                 System.out.println("Skipped " + skipped + " chunks");
                 ex.doneDumping();
@@ -395,7 +394,7 @@ public class MiscClientCommands implements ICommand {
                     Tessellator real_tess = Tessellator.instance;
                     Tessellator.instance = new WireframeTessellator();
                     wr.markDirty();
-                    wr.updateRenderer();
+                    wr.updateRenderer(mc.thePlayer);
                     Tessellator.instance = real_tess;
                     return null;
                 }
@@ -423,15 +422,15 @@ public class MiscClientCommands implements ICommand {
         @help("Disable or enable TileEntity special renderers")
         public static String tesrtoggle() {
             if (backup == null) {
-                if (TileEntityRenderer.instance.specialRendererMap == null) {
+                if (TileEntityRendererDispatcher.instance.mapSpecialRenderers == null) {
                     return "no TESRs!";
                 }
-                backup = TileEntityRenderer.instance.specialRendererMap;
-                TileEntityRenderer.instance.specialRendererMap = empty;
+                backup = TileEntityRendererDispatcher.instance.mapSpecialRenderers;
+                TileEntityRendererDispatcher.instance.mapSpecialRenderers = empty;
                 return "TESRs disabled";
             } else {
                 empty.clear();
-                TileEntityRenderer.instance.specialRendererMap = backup;
+                TileEntityRendererDispatcher.instance.mapSpecialRenderers = backup;
                 backup = null;
                 return "TESRs enabled; requires chunk update to restart drawing";
             }
@@ -537,7 +536,7 @@ public class MiscClientCommands implements ICommand {
             } else {
                 n = args.get(0);
             }
-            int i = mc.gameSettings.renderDistance;
+            int i = mc.gameSettings.renderDistanceChunks;
             boolean found_number = true;
             if (n.equalsIgnoreCase("+")) {
                 i++;
@@ -562,7 +561,7 @@ public class MiscClientCommands implements ICommand {
                 if (i > 8) {
                     i = 8; //seems to have started crashing. Lame.
                 }
-                mc.gameSettings.renderDistance = i;
+                mc.gameSettings.renderDistanceChunks = i; //NORELEASE: Test new ranges
                 return;
             }
             
@@ -585,9 +584,9 @@ public class MiscClientCommands implements ICommand {
                     }
                 }
             }
-            mc.thePlayer.addChatMessage("Unknown command. Try /f list.");
+            mc.thePlayer.addChatMessage(new ChatComponentText("Unknown command. Try /f list."));
         } catch (Exception e) {
-            mc.thePlayer.addChatMessage("Command failed; see console");
+            mc.thePlayer.addChatMessage(new ChatComponentText("Command failed; see console"));
             e.printStackTrace();
         }
     }
@@ -611,7 +610,7 @@ public class MiscClientCommands implements ICommand {
     
     void tryCall(Method method, List<String> args) {
         if (!commandAllowed(method)) {
-            mc.thePlayer.addChatMessage("That command is disabled");
+            mc.thePlayer.addChatMessage(new ChatComponentText("That command is disabled"));
             return;
         }
         try {
@@ -624,10 +623,10 @@ public class MiscClientCommands implements ICommand {
             
             Object ret = method.invoke(null);
             if (ret != null) {
-                mc.thePlayer.addChatMessage(ret.toString());
+                mc.thePlayer.addChatMessage(new ChatComponentText(ret.toString()));
             }
         } catch (Exception e) {
-            mc.thePlayer.addChatMessage("Caught an exception from command; see console");
+            mc.thePlayer.addChatMessage(new ChatComponentText("Caught an exception from command; see console"));
             e.printStackTrace();
         } finally {
             miscCommands.player = null;
