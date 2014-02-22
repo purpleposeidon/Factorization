@@ -429,7 +429,7 @@ public class RenderServoMotor extends RenderEntity {
             ServoStack ss = motor.getServoStack(i);
             GL11.glRotatef(180/16*(8.5F + i), 0, 0, 1);
             GL11.glTranslatef(0, -(0.9F)/s, 0);
-            if (renderStack(ss, ItemDye.dyeColors[15 - i])) {
+            if (renderStack(ss, ItemDye.field_150922_c[15 - i])) {
             }
             GL11.glPopMatrix();
         }
