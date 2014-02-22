@@ -99,7 +99,8 @@ public class TileEntityGreenware extends TileEntityCommon {
             tag.setByte("hx", maxX);
             tag.setByte("hy", maxY);
             tag.setByte("hz", maxZ);
-            tag.setShort("icon_id", (short) FzUtil.getId(icon_id));
+            //tag.setShort("icon_id", (short) FzUtil.getId(icon_id));
+            tag.setString("icon_idC", FzUtil.getName(icon_id));
             tag.setByte("icon_md", icon_md);
             tag.setByte("icon_sd", icon_side);
             quat.writeToTag(tag, "r");
@@ -139,7 +140,11 @@ public class TileEntityGreenware extends TileEntityCommon {
             maxX = tag.getByte("hx");
             maxY = tag.getByte("hy");
             maxZ = tag.getByte("hz");
-            icon_id = FzUtil.getBlock(tag.getShort("icon_id"));
+            if (tag.hasKey("icon_id")) {
+                icon_id = FzUtil.getBlock(tag.getShort("icon_id"));
+            } else {
+                icon_id = FzUtil.getBlockFromName(tag.getString("icon_idC"));
+            }
             icon_md = tag.getByte("icon_md");
             if (tag.hasKey("icon_sd")) {
                 icon_side = tag.getByte("icon_sd");
@@ -252,7 +257,7 @@ public class TileEntityGreenware extends TileEntityCommon {
         //NOTE: This isn't what's actually used for rendering.
         switch (getState()) {
         case WET:
-            return Blocks.clay.getIconFromSide(side);
+            return Blocks.clay.getBlockTextureFromSide(side);
         case DRY:
             return BlockIcons.ceramics$dry;
         case BISQUED:

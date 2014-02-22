@@ -1591,4 +1591,24 @@ public class FzUtil {
         if (is == null) return 0;
         return Item.getIdFromItem(is.getItem());
     }
+    
+    public static String getName(Item it) {
+        return Item.itemRegistry.getNameForObject(it);
+    }
+    
+    public static String getName(ItemStack is) {
+        return getName(is == null ? null : is.getItem());
+    }
+    
+    public static String getName(Block b) {
+        return Block.blockRegistry.getNameForObject(b);
+    }
+    
+    public static Block getBlockFromName(String blockName) {
+        return (Block) Block.blockRegistry.getObject(blockName);
+    }
+    
+    public static Item getItemFromName(String itemName) {
+        return (Item) Item.itemRegistry.getObject(itemName);
+    }
 }
