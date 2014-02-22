@@ -3,9 +3,9 @@ package factorization.api.datahelpers;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import factorization.api.FzColor;
 import factorization.api.FzOrientation;
 
 public abstract class DataHelper {
@@ -118,7 +118,7 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
     public final FzOrientation putFzOrientation(FzOrientation value) throws IOException { return (FzOrientation)put(value); }
     public final ItemStack putItemStack(ItemStack value) throws IOException {
         if (isReader() && value == null) {
-            value = new ItemStack(0, 0, 0);
+            value = new ItemStack((Item)null);
         }
         return (ItemStack)put(value);
     }

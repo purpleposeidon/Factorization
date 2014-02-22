@@ -107,8 +107,5 @@ public enum Sound {
 
     public void play() {
         Core.proxy.playSoundFX(src, volume, pitch);
-        if (share) {
-            throw new RuntimeException("sharing simple play() not implemented");
-        }
     }
 }

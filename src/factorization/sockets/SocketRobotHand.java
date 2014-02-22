@@ -165,7 +165,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
                 return true;
             }
             if (mop.entityHit instanceof EntityLiving) {
-                if (is.func_111282_a(player, (EntityLiving)mop.entityHit)) {
+                if (is.interactWithEntity(player, (EntityLiving)mop.entityHit)) {
                     return true;
                 }
             }
@@ -201,10 +201,10 @@ public class SocketRobotHand extends TileEntitySocketBase {
                 }
             }
             
-            if (!player.isSneaking() || itemstack == null || item.shouldPassSneakingClickToBlock(world, x, y, z)) {
-                int blockId = world.getBlock(x, y, z);
+            if (!player.isSneaking() || itemstack == null || item.doesSneakBypassUse(world, x, y, z, player)) {
+                Block blockId = world.getBlock(x, y, z);
             
-                if (blockId > 0 && blockId.onBlockActivated(world, x, y, z, player, side, dx, dy, dz)) {
+                if (blockId != null && blockId.onBlockActivated(world, x, y, z, player, side, dx, dy, dz)) {
                     ret = true;
                     break;
                 }
@@ -213,13 +213,13 @@ public class SocketRobotHand extends TileEntitySocketBase {
                 ret = false;
                 break;
             }
-            if (item instanceof ItemBlock) {
+            /*if (item instanceof ItemBlock) {
                 ItemBlock itemblock = (ItemBlock)item;
                 if (!itemblock.canPlaceItemBlockOnSide(world, x, y, z, side, player, itemstack)) {
                     ret = false;
                     break;
                 }
-            }
+            }*/ //NORELEASE, test; but that method's Client-only!?!?
             ret = itemstack.tryPlaceItemIntoWorld(player, world, x, y, z, side, dx, dy, dz);
             break;
         } while (false);
@@ -228,7 +228,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
         if (!ret && !FzUtil.identical(mutatedItem, itemstack)) {
             ret = true;
         }
-        if (mutatedItem == itemstack && (mutatedItem == null || mutatedItems.stackSize == origSize)) {
+        if (mutatedItem == itemstack && (mutatedItem == null || mutatedItem.stackSize == origSize)) {
             return ret;
         }
         player.inventory.mainInventory[player.inventory.currentItem] = mutatedItem;

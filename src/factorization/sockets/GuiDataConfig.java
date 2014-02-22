@@ -45,7 +45,7 @@ public class GuiDataConfig extends GuiScreen {
             super(id, xPos, yPos - 4, fontRenderer.getStringWidth(text) + 8, 20, text);
         }
 
-        public boolean isHovered() { return field_82253_i; }
+        public boolean isHovered() { return field_146123_n; }
     }
     
     class Field {

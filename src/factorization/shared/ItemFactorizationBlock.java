@@ -2,6 +2,7 @@ package factorization.shared;
 
 import java.util.List;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -19,7 +20,7 @@ import factorization.charge.TileEntityLeydenJar;
 import factorization.common.FactoryType;
 
 public class ItemFactorizationBlock extends ItemBlock {
-    public ItemFactorizationBlock(int id) {
+    public ItemFactorizationBlock(Block id) {
         super(id);
         setMaxDamage(0);
         setHasSubtypes(true);
