@@ -372,7 +372,7 @@ public class GuiDataConfig extends GuiScreen {
         int left = (width - 6) / 2;
         int top = (height - ySize) / 2;
         
-        drawTexturedModelRectFromIIcon(left, top, lmp, xSize, ySize);
+        drawTexturedModelRectFromIcon(left, top, lmp, xSize, ySize);
         
         for (Field field : fields) {
             field.render(mouseX, mouseY);

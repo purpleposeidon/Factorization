@@ -45,7 +45,7 @@ public class BlockRenderLeydenJar extends FactorizationBlockRender {
             GL11.glTranslatef(0, -1, 0);
         } else {
             y++;
-            if (!w.isBlockOpaqueCube(x, y, z)) {
+            if (!w.getBlock(x, y, z).isOpaqueCube()) {
                 renderBlock(rb, block);
             }
             y--;

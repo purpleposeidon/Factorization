@@ -20,7 +20,7 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcherDispatcher;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
@@ -422,15 +422,15 @@ public class MiscClientCommands implements ICommand {
         @help("Disable or enable TileEntity special renderers")
         public static String tesrtoggle() {
             if (backup == null) {
-                if (TileEntityRendererDispatcher.instance.mapSpecialRenderers == null) {
+                if (TileEntityRendererDispatcherDispatcher.instance.mapSpecialRenderers == null) {
                     return "no TESRs!";
                 }
-                backup = TileEntityRendererDispatcher.instance.mapSpecialRenderers;
-                TileEntityRendererDispatcher.instance.mapSpecialRenderers = empty;
+                backup = TileEntityRendererDispatcherDispatcher.instance.mapSpecialRenderers;
+                TileEntityRendererDispatcherDispatcher.instance.mapSpecialRenderers = empty;
                 return "TESRs disabled";
             } else {
                 empty.clear();
-                TileEntityRendererDispatcher.instance.mapSpecialRenderers = backup;
+                TileEntityRendererDispatcherDispatcher.instance.mapSpecialRenderers = backup;
                 backup = null;
                 return "TESRs enabled; requires chunk update to restart drawing";
             }

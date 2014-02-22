@@ -1,12 +1,8 @@
 package factorization.misc;
 
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.minecraft.client.Minecraft;
-
-import cpw.mods.fml.common.FMLLog;
 
 public class LagssieWatchDog implements Runnable {
     static int ticks = 0;
@@ -68,13 +64,8 @@ public class LagssieWatchDog implements Runnable {
             last_tick = ticks;
         }
     }
-    
-    public static Logger logger = Logger.getLogger("LAG");
-    static {
-        logger.setParent(FMLLog.getLogger());
-    }
 
     void log(String msg) {
-        logger.log(Level.INFO, msg);
+        System.out.println("[LAG] " + msg); //NORELEASE: This used to be cool
     }
 }

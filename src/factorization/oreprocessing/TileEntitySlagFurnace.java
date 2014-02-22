@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityFurnace;
@@ -19,8 +17,8 @@ import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
-import factorization.shared.TileEntityFactorization;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityFactorization;
 
 public class TileEntitySlagFurnace extends TileEntityFactorization {
     ItemStack furnaceItemStacks[] = new ItemStack[4];
@@ -297,7 +295,9 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
             }
             if (o instanceof Block) {
                 Block b = (Block) o;
-                return new ItemStack(Items.itemsList[b]);
+                Item it = FzUtil.getItem(b);
+                if (it == null) return null;
+                return new ItemStack(it);
             }
             if (o instanceof Item) {
                 return new ItemStack((Item) o);

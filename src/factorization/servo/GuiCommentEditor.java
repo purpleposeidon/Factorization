@@ -22,7 +22,7 @@ public class GuiCommentEditor extends GuiScreen {
     public void initGui() {
         Keyboard.enableRepeatEvents(true);
         buttonList.clear();
-        buttonList.add(new GuiButton(0, width / 2 - 100, height / 4 + 96 + 12, I18n.getString("gui.done")));
+        buttonList.add(new GuiButton(0, width / 2 - 100, height / 4 + 96 + 12, I18n.format("gui.done")));
         rem = new GuiTextField(this.fontRendererObj, this.width / 2 - 150, 60, 300, 20);
         rem.setMaxStringLength(200);
         rem.setFocused(true);

@@ -19,7 +19,7 @@ import factorization.api.Quaternion;
 import factorization.ceramics.TileEntityGreenware.ClayLump;
 import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.common.FactoryType;
-import factorization.common.ItemIIcons;
+import factorization.common.ItemIcons;
 import factorization.notify.Notify;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
@@ -112,12 +112,12 @@ public class ItemSculptingTool extends ItemFactorization {
         //A bit lame. Lame.
         switch (getMode(damage)) {
         default:
-        case MOVER: return ItemIIcons.move;
-        case RESETTER: return ItemIIcons.reset;
-        case ROTATE_LOCAL: return ItemIIcons.rotate_local;
-        case ROTATE_GLOBAL: return ItemIIcons.rotate_global;
-        case STRETCHER: return ItemIIcons.stretch;
-        case MOLD: return ItemIIcons.mold;
+        case MOVER: return ItemIcons.move;
+        case RESETTER: return ItemIcons.reset;
+        case ROTATE_LOCAL: return ItemIcons.rotate_local;
+        case ROTATE_GLOBAL: return ItemIcons.rotate_global;
+        case STRETCHER: return ItemIcons.stretch;
+        case MOLD: return ItemIcons.mold;
         }
     }
     

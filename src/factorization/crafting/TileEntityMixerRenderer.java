@@ -7,7 +7,7 @@ import net.minecraft.util.IIcon;
 
 import org.lwjgl.opengl.GL11;
 
-import factorization.common.ItemIIcons;
+import factorization.common.ItemIcons;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 import factorization.shared.FactorizationBlockRender;
@@ -46,7 +46,7 @@ public class TileEntityMixerRenderer extends TileEntitySpecialRenderer {
         tess.startDrawingQuads();
         tess.setColorOpaque_F(1, 1, 1);
         BlockRenderHelper block = BlockRenderHelper.instance;
-        IIcon crank = ItemIIcons.charge$crankshaft;
+        IIcon crank = ItemIcons.charge$crankshaft;
         IIcon top = render_top ? crank : null;
         block.useTextures(top, null, crank, crank, crank, crank);
         float d = 3F/8F;

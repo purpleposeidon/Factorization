@@ -3,7 +3,7 @@ package factorization.common;
 import factorization.shared.FactorizationTextureLoader.Directory;
 import net.minecraft.util.IIcon;
 
-public class ItemIIcons {
+public class ItemIcons {
     public static IIcon charge$crankshaft;
     
     public static IIcon wrath_particle;

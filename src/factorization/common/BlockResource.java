@@ -9,6 +9,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.ceramics.BasicGlazes;
@@ -35,7 +36,7 @@ public class BlockResource extends Block {
         for (BasicGlazes glaze : BasicGlazes.values()) {
             glaze.icon = Core.texture(reg, "ceramics/glaze/" + glaze.name());
         }
-        Core.registry.steamFluid.setIIcons(BlockIcons.steam);
+        Core.registry.steamFluid.setIcons(BlockIcons.steam);
     }
 
     
@@ -82,10 +83,9 @@ public class BlockResource extends Block {
     }
     
     @Override
-    public boolean isBeaconBase(World worldObj, int x, int y, int z,
+    public boolean isBeaconBase(IBlockAccess worldObj, int x, int y, int z,
             int beaconX, int beaconY, int beaconZ) {
-        Coord here = new Coord(worldObj, x, y, z);
-        int md = here.getMd();
+        int md = worldObj.getBlockMetadata(x, y, z);
         return md == Core.registry.silver_block_item.getItemDamage()
                 || md == Core.registry.lead_block_item.getItemDamage()
                 || md == Core.registry.dark_iron_block_item.getItemDamage();

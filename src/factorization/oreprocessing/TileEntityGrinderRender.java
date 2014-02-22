@@ -28,7 +28,7 @@ import factorization.shared.Core;
 public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
     public static class DiamondModel {
         TexturedQuad quads[] = new TexturedQuad[4];
-        IIcon diamond = Blocks.diamond_block.getIconFromSide(0);
+        IIcon diamond = Blocks.diamond_block.getBlockTextureFromSide(0);
         
         float near = 2F / 32F, far = 5F / 32F, point = -18F / 32F;
         float u_edge = 0; //diamond.getWidth()/16;
@@ -116,7 +116,7 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
         
         GL11.glTranslatef(0, 2F / 16F, 0);
         BlockRenderHelper block = BlockRenderHelper.instance;
-        block.useTexture(Blocks.iron_block.getIconFromSide(0));
+        block.useTexture(Blocks.iron_block.getBlockTextureFromSide(0));
         float e = 1F/8F;
         block.setBlockBounds(e, 7F/16F, e, 1 - e, 8F/16F, 1 - e);
         //block.setBlockBoundsOffset(1F/8F, 7F/16F, 1F/8F);

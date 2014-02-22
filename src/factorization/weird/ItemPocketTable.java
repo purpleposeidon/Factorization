@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import factorization.common.FactoryType;
-import factorization.common.ItemIIcons;
+import factorization.common.ItemIcons;
 import factorization.shared.Core;
 import factorization.shared.FactorizationTextureLoader;
 import factorization.shared.ItemFactorization;
@@ -27,7 +27,7 @@ public class ItemPocketTable extends ItemFactorization {
     @Override
     public void registerIcons(IIconRegister reg) {
         super.registerIcons(reg);
-        FactorizationTextureLoader.register(reg, ItemIIcons.class, null, "factorization:");
+        FactorizationTextureLoader.register(reg, ItemIcons.class, null, "factorization:");
     }
 
     @Override

@@ -1060,10 +1060,10 @@ public class Registry implements ICraftingHandler, ITickHandler {
     }
 
     public void setToolEffectiveness() {
-        for (String tool : new String[] { "pickaxe", "axe", "shovel" }) {
+        /*NORELEASE: Is this actually even needed? for (String tool : new String[] { "pickaxe", "axe", "shovel" }) {
             MinecraftForge.removeBlockEffectiveness(factory_block, tool);
             MinecraftForge.removeBlockEffectiveness(resource_block, tool);
-        }
+        }*/
         BlockClass.DarkIron.harvest("pickaxe", 2);
         BlockClass.Barrel.harvest("axe", 1);
         BlockClass.Machine.harvest("pickaxe", 1);
@@ -1071,8 +1071,8 @@ public class Registry implements ICraftingHandler, ITickHandler {
         BlockClass.MachineDynamicLightable.harvest("pickaxe", 1);
         BlockClass.Socket.harvest("axe", 1);
         BlockClass.Socket.harvest("pickaxe", 1);
-        MinecraftForge.setBlockHarvestLevel(resource_block, "pickaxe", 2);
-        MinecraftForge.setBlockHarvestLevel(dark_iron_ore, "pickaxe", 2);
+        resource_block.setHarvestLevel("pickaxe", 2);
+        dark_iron_ore.setHarvestLevel("pickaxe", 2);
     }
     
     

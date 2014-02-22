@@ -3,7 +3,7 @@ package factorization.api.datahelpers;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import cpw.mods.fml.relauncher.Side;
 
@@ -45,7 +45,7 @@ public class DataOutPacket extends DataHelper {
         } else if (value instanceof String) {
             dos.writeUTF((String)value);
         } else if (value instanceof NBTTagCompound) {
-            NBTBase.writeNamedTag((NBTBase)value, dos);
+            CompressedStreamTools.write((NBTTagCompound) value, dos);
         }
         return value;
     }

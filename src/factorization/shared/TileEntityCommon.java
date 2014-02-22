@@ -22,6 +22,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -219,11 +220,11 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     protected final void readBuffer(String bufferName, NBTTagCompound tag, ArrayList<ItemStack> outputBuffer) {
         outputBuffer.clear();
         if (tag.hasKey(bufferName)) {
-            NBTTagList buffer = tag.getTagList(bufferName);
+            NBTTagList buffer = tag.getTagList(bufferName, Constants.NBT.TAG_COMPOUND);
             int bufferSize = buffer.tagCount();
             if (bufferSize > 0) {
                 for (int i = 0; i < bufferSize; i++) {
-                    final NBTTagCompound it = (NBTTagCompound) buffer.tagAt(i);
+                    final NBTTagCompound it = buffer.getCompoundTagAt(i);
                     outputBuffer.add(ItemStack.loadItemStackFromNBT(it));
                 }
             }

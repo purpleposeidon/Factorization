@@ -318,25 +318,25 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }, Side.CLIENT);
     }
 
-    private void setTileEntityRenderer(Class clazz, TileEntitySpecialRenderer r) {
+    private void setTileEntityRendererDispatcher(Class clazz, TileEntitySpecialRenderer r) {
         ClientRegistry.bindTileEntitySpecialRenderer(clazz, r);
     }
 
     @Override
     public void registerRenderers() {
-        setTileEntityRenderer(TileEntityDayBarrel.class, new TileEntityDayBarrelRenderer());
-        setTileEntityRenderer(TileEntityGreenware.class, new TileEntityGreenwareRender());
+        setTileEntityRendererDispatcher(TileEntityDayBarrel.class, new TileEntityDayBarrelRenderer());
+        setTileEntityRendererDispatcher(TileEntityGreenware.class, new TileEntityGreenwareRender());
         if (FzConfig.renderTEs) {
             // This is entirely Azanor's fault.
-            setTileEntityRenderer(TileEntityHeater.class, new TileEntityHeaterRenderer());
-            setTileEntityRenderer(TileEntityGrinder.class, new TileEntityGrinderRender());
-            setTileEntityRenderer(TileEntityMixer.class, new TileEntityMixerRenderer());
-            setTileEntityRenderer(TileEntityCrystallizer.class, new TileEntityCrystallizerRender());
-            setTileEntityRenderer(TileEntitySteamTurbine.class, new TileEntitySteamTurbineRender());
-            setTileEntityRenderer(TileEntityLeydenJar.class, new TileEntityLeydenJarRender());
-            setTileEntityRenderer(TileEntityCompressionCrafter.class, new TileEntityCompressionCrafterRenderer());
-            setTileEntityRenderer(SocketLacerator.class, new TileEntitySocketRenderer());
-            setTileEntityRenderer(SocketFanturpeller.class, new TileEntitySocketRenderer());
+            setTileEntityRendererDispatcher(TileEntityHeater.class, new TileEntityHeaterRenderer());
+            setTileEntityRendererDispatcher(TileEntityGrinder.class, new TileEntityGrinderRender());
+            setTileEntityRendererDispatcher(TileEntityMixer.class, new TileEntityMixerRenderer());
+            setTileEntityRendererDispatcher(TileEntityCrystallizer.class, new TileEntityCrystallizerRender());
+            setTileEntityRendererDispatcher(TileEntitySteamTurbine.class, new TileEntitySteamTurbineRender());
+            setTileEntityRendererDispatcher(TileEntityLeydenJar.class, new TileEntityLeydenJarRender());
+            setTileEntityRendererDispatcher(TileEntityCompressionCrafter.class, new TileEntityCompressionCrafterRenderer());
+            setTileEntityRendererDispatcher(SocketLacerator.class, new TileEntitySocketRenderer());
+            setTileEntityRendererDispatcher(SocketFanturpeller.class, new TileEntitySocketRenderer());
             // End section that is azanor's fault
         }
 
@@ -391,7 +391,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         MinecraftForgeClient.registerItemRenderer(Core.registry.battery, new BatteryItemRender(renderBattery));
         MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket, new ItemRenderGlazeBucket());
         MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel, new DayBarrelItemRenderer(renderBarrel));
-        setTileEntityRenderer(BlockDarkIronOre.Glint.class, new GlintRenderer());
+        setTileEntityRendererDispatcher(BlockDarkIronOre.Glint.class, new GlintRenderer());
         
         if (Minecraft.getMinecraft().getSession().getUsername().equals("neptunepink")) {
             Core.FZLogger.setLevel(Level.FINE);

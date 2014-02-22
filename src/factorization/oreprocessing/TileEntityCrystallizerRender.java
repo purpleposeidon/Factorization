@@ -68,10 +68,10 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             glEnable(GL_BLEND);
             ItemStack sol = crys.solution;
             Tessellator tess = Tessellator.instance;
-            IIcon tex = Blocks.flowing_water.getIconFromSide(1);
+            IIcon tex = Blocks.flowing_water.getBlockTextureFromSide(1);
             if (sol.getItem() == Core.registry.acid) {
                 if (sol.getItemDamage() > 0) {
-                    tex = Blocks.flowing_lava.getIconFromSide(0);
+                    tex = Blocks.flowing_lava.getBlockTextureFromSide(0);
                     glColor4f(0.5F, 0.7F, 0F, 0.25F);
                 } else {
                     glColor4f(1F, 0.7F, 0F, 0.5F);

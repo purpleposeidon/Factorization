@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -20,8 +19,8 @@ import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
-import factorization.shared.TileEntityCommon;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityCommon;
 
 public class TileEntityMirror extends TileEntityCommon {
     Coord reflection_target = null;
@@ -283,8 +282,7 @@ public class TileEntityMirror extends TileEntityCommon {
             if (bx == xCoord && bz == zCoord) {
                 return true;
             }
-            int id = worldObj.getBlock(bx, yCoord, bz);
-            Block b = id;
+            final Block b = worldObj.getBlock(bx, yCoord, bz);
             boolean air_like = false;
             if (b == null) {
                 air_like = true;

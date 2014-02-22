@@ -13,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.Vec3;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.ICoord;
@@ -278,9 +279,9 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     }
 
     public final void readSlotsFromNBT(NBTTagCompound tag) {
-        NBTTagList invlist = tag.getTagList("Items");
+        NBTTagList invlist = tag.getTagList("Items", Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < invlist.tagCount(); i++) {
-            NBTTagCompound comp = (NBTTagCompound) invlist.tagAt(i);
+            NBTTagCompound comp = invlist.getCompoundTagAt(i);
             setInventorySlotContents(comp.getInteger("Slot"), ItemStack.loadItemStackFromNBT(comp));
         }
     }
@@ -307,7 +308,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         }
         NBTTagCompound itag = new NBTTagCompound();
         is.writeToNBT(itag);
-        tag.setCompoundTag(name, itag);
+        tag.setTag(name, itag);
     }
 
     protected static ItemStack readItem(String name, NBTTagCompound tag) {
@@ -353,7 +354,8 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         if (worldObj.isRemote) {
             if (draw_active > 0) {
                 makeNoise();
-                worldObj.markBlockForRenderUpdate(xCoord, yCoord, zCoord);
+                worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord); //NORELEASE
+                //In 1.6, was worldObj.markBlockForRenderUpdate(xCoord, yCoord, zCoord);
                 draw_active--;
             }
         } else {

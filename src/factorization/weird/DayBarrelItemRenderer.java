@@ -1,7 +1,7 @@
 package factorization.weird;
 
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.IItemRenderer;
@@ -49,7 +49,7 @@ public class DayBarrelItemRenderer implements IItemRenderer {
         ItemStack silk = TileEntityDayBarrel.getSilkedItem(is);
         if (silk != null) {
             if (tesr == null) {
-                tesr = TileEntityRenderer.instance.getSpecialRendererForClass(TileEntityDayBarrel.class);
+                tesr = TileEntityRendererDispatcher.instance.getSpecialRendererByClass(TileEntityDayBarrel.class);
             }
             GL11.glRotatef(180, 0, 1, 0);
             TileEntityCommon tec = FactoryType.DAYBARREL.getRepresentative();

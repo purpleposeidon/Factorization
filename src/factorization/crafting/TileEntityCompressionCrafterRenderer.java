@@ -7,7 +7,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
@@ -171,18 +171,18 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
             return; //Oh boy!
         }
         double spx, spy, spz;
-        spx = TileEntityRenderer.staticPlayerX;
-        spy = TileEntityRenderer.staticPlayerY;
-        spz = TileEntityRenderer.staticPlayerZ;
-        TileEntityRenderer.staticPlayerX = TileEntityRenderer.staticPlayerY = TileEntityRenderer.staticPlayerZ = 0;
+        spx = TileEntityRendererDispatcher.staticPlayerX;
+        spy = TileEntityRendererDispatcher.staticPlayerY;
+        spz = TileEntityRendererDispatcher.staticPlayerZ;
+        TileEntityRendererDispatcher.staticPlayerX = TileEntityRendererDispatcher.staticPlayerY = TileEntityRendererDispatcher.staticPlayerZ = 0;
         try {
             Tessellator.instance = tess;
             _drawSquishingBlocks(upperCorner, lowerCorner, partial);
         } finally {
             Tessellator.instance = real;
-            TileEntityRenderer.staticPlayerX = spx;
-            TileEntityRenderer.staticPlayerY = spy;
-            TileEntityRenderer.staticPlayerZ = spz;
+            TileEntityRendererDispatcher.staticPlayerX = spx;
+            TileEntityRendererDispatcher.staticPlayerY = spy;
+            TileEntityRendererDispatcher.staticPlayerZ = spz;
         }
     }
     
@@ -236,7 +236,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
                             TileEntity te;
                             if ((te = w.getTileEntity(x, y, z)) != null) {
                                 Tessellator.instance = tesrator;
-                                TileEntityRenderer.instance.renderTileEntity(te, partial);
+                                TileEntityRendererDispatcher.instance.renderTileEntity(te, partial);
                                 Tessellator.instance = tess;
                             }
                             continue;

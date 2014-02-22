@@ -940,7 +940,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(ForgeDirection dir) {
         if (parts.size() == 0) {
-            return Blocks.clay.getIconFromSide(0);
+            return Blocks.clay.getBlockTextureFromSide(0);
         }
         return getIcon(parts.get(0), dir.ordinal());
     }

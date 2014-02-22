@@ -566,7 +566,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         mc.effectRenderer = particleTweaker;
         try {
             for (int i = 0; i < 1; i++) {
-                particleTweaker.addHitEffects(px, py, pz, op.ordinal());
+                particleTweaker.addBlockHitEffects(px, py, pz, op.ordinal());
             }
         } finally {
             me = null;

@@ -45,7 +45,7 @@ public class BlockDarkIronOre extends Block {
             return;
         }
         for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-            if (world.isNormalCubeDefault(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ, true)) {
+            if (world.isBlockNormalCubeDefault(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ, true)) {
                 continue;
             }
             TileEntity te = new Glint();

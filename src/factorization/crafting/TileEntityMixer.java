@@ -9,20 +9,20 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.Item;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapelessRecipes;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
@@ -81,10 +81,10 @@ public class TileEntityMixer extends TileEntityFactorization implements
         progress = tag.getInteger("progress");
         speed = tag.getInteger("speed");
         readSlotsFromNBT(tag);
-        NBTTagList outBuffer = tag.getTagList("outBuffer");
+        NBTTagList outBuffer = tag.getTagList("outBuffer", Constants.NBT.TAG_COMPOUND);
         if (outBuffer != null) {
             for (int i = 0; i < outBuffer.tagCount(); i++) {
-                NBTBase base = outBuffer.tagAt(i);
+                NBTTagCompound base = outBuffer.getCompoundTagAt(i);
                 if (!(base instanceof NBTTagCompound)) {
                     continue;
                 }

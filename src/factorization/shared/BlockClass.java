@@ -94,7 +94,7 @@ public enum BlockClass {
     }
 
     public BlockClass harvest(String tool, int level) {
-        MinecraftForge.setBlockHarvestLevel(this.block, this.md, tool, level);
+        this.block.setHarvestLevel(tool, level, this.md);
         return this;
     }
 

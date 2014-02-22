@@ -22,7 +22,7 @@ import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
-import factorization.common.ItemIIcons;
+import factorization.common.ItemIcons;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 import factorization.weird.TileEntityDayBarrel.Type;
@@ -158,7 +158,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
             font = BlockIcons.barrel_font;
             mc.renderEngine.bindTexture(Core.blockAtlas);
         } else {
-            font = ItemIIcons.barrel_font;
+            font = ItemIcons.barrel_font;
             mc.renderEngine.bindTexture(Core.itemAtlas);
         }
         final int len = t.length();
@@ -246,13 +246,13 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
             TextureManager re = Minecraft.getMinecraft().renderEngine;
             FontRenderer fr = func_147498_b();
             if (!is.hasEffect(0)) {
-                renderItems.renderItemAndEffectIntoGUI(fr, re, is, 0, 0);
+                renderItem.renderItemAndEffectIntoGUI(fr, re, is, 0, 0);
             } else {
                 if (interception == null) {
                     interception = new Intercepter(Minecraft.getMinecraft().getResourceManager());
                 }
                 Tessellator orig = Tessellator.instance;
-                renderItems.renderItemAndEffectIntoGUI(fr, interception, is, 0, 0);
+                renderItem.renderItemAndEffectIntoGUI(fr, interception, is, 0, 0);
                 Tessellator.instance = orig;
             }
         }

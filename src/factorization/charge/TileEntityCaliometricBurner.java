@@ -3,8 +3,8 @@ package factorization.charge;
 import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -168,8 +168,8 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
         double sat = 0;
         if (it instanceof ItemFood) {
             ItemFood nom = (ItemFood) it;
-            heal = nom.getHealAmount();
-            sat = nom.getSaturationModifier();
+            heal = nom.func_150905_g(is);
+            sat = nom.func_150906_h(is);
         } else if (it == Items.cake) {
             heal = 2*6;
             sat = 0.1F;

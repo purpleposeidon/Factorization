@@ -245,7 +245,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         info = info == null ? "" : info;
         final Coord here = getCoord();
         if (here.isWeaklyPowered()) {
-            Notify.withItem(new ItemStack(Blocks.torchRedstoneActive));
+            Notify.withItem(new ItemStack(Blocks.redstone_torch));
             Notify.withStyle(Style.DRAWITEM);
         }
         if (comment.length() > 0) {

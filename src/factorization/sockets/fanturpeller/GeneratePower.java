@@ -3,7 +3,6 @@ package factorization.sockets.fanturpeller;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.BlockFluidFinite;
 import net.minecraftforge.fluids.Fluid;
@@ -61,7 +60,7 @@ public class GeneratePower extends BufferedFanturpeller {
         if (!isClogged()) return true;
         final Fluid fluid = handled.getFluid();
         Coord at = coord.add(facing);
-        final int fid = fluid.getBlockID();
+        final Block block = fluid.getBlock();
         if (!at.isReplacable()) {
             return true;
         }
@@ -69,13 +68,12 @@ public class GeneratePower extends BufferedFanturpeller {
         if (otherFluid != null && otherFluid != fluid) {
             return true;
         }
-        final Block block = fid;
         if (otherFluid == fluid) {
             if (block instanceof BlockFluidFinite) {
                 if (at.getMd() == 0xF) return true;
             } else if (at.getMd() == 0) return true;
         }
-        at.setIdMd(fid, block instanceof BlockFluidFinite ? 0xF : 0, true);
+        at.setIdMd(block, block instanceof BlockFluidFinite ? 0xF : 0, true);
         handled = null;
         return false;
     }

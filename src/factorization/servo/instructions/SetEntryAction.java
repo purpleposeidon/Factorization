@@ -30,7 +30,7 @@ public class SetEntryAction extends Instruction {
 
     @Override
     protected ItemStack getRecipeItem() {
-        return new ItemStack(Items.writableBook);
+        return new ItemStack(Items.writable_book);
     }
 
     @Override

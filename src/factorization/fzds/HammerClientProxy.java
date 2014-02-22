@@ -14,7 +14,7 @@ import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -146,8 +146,8 @@ public class HammerClientProxy extends HammerProxy {
         
         //For rendering
         mc.renderViewEntity = player; //TODO NOTE: This make mess up in third person!
-        if (TileEntityRenderer.instance.worldObj != null) {
-            TileEntityRenderer.instance.worldObj = wc;
+        if (TileEntityRendererDispatcher.instance.worldObj != null) {
+            TileEntityRendererDispatcher.instance.worldObj = wc;
         }
         if (RenderManager.instance.worldObj != null) {
             RenderManager.instance.worldObj = wc;

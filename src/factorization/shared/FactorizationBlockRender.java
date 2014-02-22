@@ -120,7 +120,7 @@ abstract public class FactorizationBlockRender implements ICoord {
     }
     
     protected void renderNormalBlock(RenderBlocks rb, int md) {
-//		renderPart(rb, Core.registry.factory_block.getIconFromSideAndMetadata(0, md), 0, 0, 0, 1, 1, 1);
+//		renderPart(rb, Core.registry.factory_block.getBlockTextureFromSideAndMetadata(0, md), 0, 0, 0, 1, 1, 1);
         Block b = Core.registry.factory_rendering_block;
         rb.setRenderBounds(0, 0, 0, 1, 1, 1);
         //b.setBlockBounds(0, 0, 0, 1, 1, 1);

@@ -3,14 +3,14 @@ package factorization.ceramics;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
-import factorization.api.Quaternion;
 import factorization.ceramics.TileEntityGreenware.ClayLump;
 import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.common.BlockIcons;
@@ -136,7 +136,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
         ClayState state = greenware.getState();
         if (state != ClayState.HIGHFIRED) {
             switch (state) {
-            case WET: block.useTexture(Blocks.clay.getIconFromSide(0)); break;
+            case WET: block.useTexture(Blocks.clay.getBlockTextureFromSide(0)); break;
             case DRY: block.useTexture(BlockIcons.ceramics$dry); break;
             case BISQUED: block.useTexture(BlockIcons.ceramics$bisque); break;
             case UNFIRED_GLAZED: block.useTexture(BlockIcons.ceramics$rawglaze); break;
@@ -229,7 +229,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
     
     BlockRenderHelper setupRenderGenericLump() {
         BlockRenderHelper block = BlockRenderHelper.instance;
-        block.useTexture(Blocks.clay.getIconFromSide(0));
+        block.useTexture(Blocks.clay.getBlockTextureFromSide(0));
         block.setBlockBounds(3F/16F, 1F/8F, 3F/16F, 13F/16F, 7F/8F, 13F/16F);
         return block;
     }

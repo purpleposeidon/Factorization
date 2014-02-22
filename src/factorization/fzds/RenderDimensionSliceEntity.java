@@ -18,7 +18,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -173,9 +173,9 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         void renderEntities(float partialTicks) {
             RenderHelper.enableStandardItemLighting();
             //Maybe we should use RenderGlobal.renderEntities ???
-            double sx = TileEntityRenderer.instance.playerX;
-            double sy = TileEntityRenderer.instance.playerY;
-            double sz = TileEntityRenderer.instance.playerZ;
+            double sx = TileEntityRendererDispatcher.instance.playerX;
+            double sy = TileEntityRendererDispatcher.instance.playerY;
+            double sz = TileEntityRendererDispatcher.instance.playerZ;
             try {
                 int xwidth = far.x - corner.x;
                 int height = far.y - corner.y;
@@ -209,18 +209,18 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
                             
                             //Since we don't know the actual distance from the player to the TE, we need to cheat.
                             //(We *could* calculate it, I suppose... Or maybe just not render entities when the player's far away)
-                            TileEntityRenderer.instance.playerX = te.xCoord;
-                            TileEntityRenderer.instance.playerY = te.yCoord;
-                            TileEntityRenderer.instance.playerZ = te.zCoord;
-                            TileEntityRenderer.instance.renderTileEntity(te, partialTicks);
+                            TileEntityRendererDispatcher.instance.playerX = te.xCoord;
+                            TileEntityRendererDispatcher.instance.playerY = te.yCoord;
+                            TileEntityRendererDispatcher.instance.playerZ = te.zCoord;
+                            TileEntityRendererDispatcher.instance.renderTileEntity(te, partialTicks);
                         }
                         Core.profileEnd();
                     }
                 }
             } finally {
-                TileEntityRenderer.instance.playerX = sx;
-                TileEntityRenderer.instance.playerY = sy;
-                TileEntityRenderer.instance.playerZ = sz;
+                TileEntityRendererDispatcher.instance.playerX = sx;
+                TileEntityRendererDispatcher.instance.playerY = sy;
+                TileEntityRendererDispatcher.instance.playerZ = sz;
             }
         }
         
