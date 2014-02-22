@@ -170,7 +170,7 @@ public class GuiDataConfig extends GuiScreen {
         
         @Override
         void renderControl(int mouseX, int mouseY) {
-            fontRenderer.drawString(transVal(), this.labelPos, posY, color);
+            fontRenderer.drawStringWithShadow(transVal(), this.labelPos, posY, color);
         }
         
         @Override
