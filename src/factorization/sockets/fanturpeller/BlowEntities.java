@@ -34,7 +34,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
     
     @Override
     public String getInfo() {
-        String msg = (isSucking ? "Suck " : "Blow") + " entities";
+        String msg = (isSucking ? "Suck" : "Blow") + " entities";
         if (!buffer.isEmpty()) {
             msg += "\nBuffered output";
         }
