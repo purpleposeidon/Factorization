@@ -469,7 +469,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             while (ft != null) {
                 TileEntitySocketBase sb = (TileEntitySocketBase) ft.getRepresentative();
                 final ItemStack is = sb.getCreatingItem();
-                if (is != null) toDrop.add(is);
+                if (is != null) toDrop.add(is.copy());
                 ft = sb.getParentFactoryType();
             }
         }
