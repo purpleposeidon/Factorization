@@ -32,10 +32,10 @@ public class SocketShifter extends TileEntitySocketBase {
         MODE_STREAM, MODE_PULSE_EXACT, MODE_PULSE_SOME;
     }
     //public boolean streamMode = true; // be like a hopper or a filter
-    public ShifterMode mode = ShifterMode.MODE_STREAM;
+    public ShifterMode mode = ShifterMode.MODE_PULSE_SOME;
     public int foreignSlot = -1;
     public boolean exporting = true;
-    public byte transferLimit = 1;
+    public byte transferLimit = 64;
     byte cooldown = 0;
     
     @Override
