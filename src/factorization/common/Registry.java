@@ -1,5 +1,6 @@
 package factorization.common;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -200,11 +201,17 @@ public class Registry implements ICraftingHandler, ITickHandler {
     }*/
     
     void postMakeItems() {
-        for (int id : added_ids) {
-            Item it = Items.itemsList[id + 256];
-            if (it == null) {
-                continue; //This is weird.
+        HashSet<Item> foundItems = new HashSet();
+        for (Field field : this.getClass().getFields()) {
+            Object obj = field.get(this);
+            if (obj instanceof ItemStack) {
+                foundItems.add(((ItemStack) obj).getItem());
+            } else if (obj instanceof Item) {
+                foundItems.add((Item) obj);
             }
+        }
+        
+        for (Item it : foundItems) {
             it.setTextureName(it.getUnlocalizedName());
             registerItem(it);
         }
