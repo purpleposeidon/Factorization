@@ -16,6 +16,7 @@ import net.minecraftforge.common.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
+import factorization.api.IMeterInfo;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
@@ -25,7 +26,7 @@ import factorization.shared.TileEntityCommon;
 import factorization.shared.FzUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
 
-public class TileEntityCompressionCrafter extends TileEntityCommon {
+public class TileEntityCompressionCrafter extends TileEntityCommon implements IMeterInfo {
     static ThreadLocal<CompressionState> states = new ThreadLocal();
     
     ArrayList<ItemStack> buffer = new ArrayList();
@@ -216,7 +217,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
             craftingAxis = ForgeDirection.getOrientation(input.readByte());
             Coord.sort(lowerCorner, upperCorner);
             if (lowerCorner.distanceSq(upperCorner) > 25) {
-                Core.logFine("Server wanted us to render a large area!");
+                Core.logWarning("Server wanted us to render a large area!?");
                 lowerCorner = upperCorner = null;
             } else {
                 isCrafterRoot = true;
@@ -310,5 +311,11 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
             return ab;
         }
         return super.getRenderBoundingBox();
+    }
+
+    @Override
+    public String getInfo() {
+        if (!buffer.isEmpty()) return "Buffered output";
+        return null;
     }
 }

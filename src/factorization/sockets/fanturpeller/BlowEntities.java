@@ -30,7 +30,7 @@ import factorization.sockets.ISocketHolder;
 
 public class BlowEntities extends SocketFanturpeller implements IEntitySelector {
     short dropDelay = 0;
-    ArrayList<ItemStack> buffer = new ArrayList<ItemStack>(1); //NORELEASE: info, that shows this. And for lacerators. And CompACT. That all? Check dumpbuffer at least. Maybe ack for buffer arraylist/putItemArray
+    ArrayList<ItemStack> buffer = new ArrayList<ItemStack>(1);
     
     @Override
     public String getInfo() {

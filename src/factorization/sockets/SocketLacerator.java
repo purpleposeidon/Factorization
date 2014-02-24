@@ -68,7 +68,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         int s = speed*100/max_speed;
         String msg = s + "% speed";
         if (!buffer.isEmpty()) {
-            msg += "\nBuffered Output";
+            msg += "\nBuffered output";
         }
         return msg;
     }
