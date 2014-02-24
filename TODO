@@ -104,9 +104,6 @@ test:
     writing instructions
 [prooobably fixed. Yep. Definitely.] (It does now?) servos not syncing stacks to players holding LMPs like they should...
 more creative tabs?
-Check if dark iron retrogen works?
-compression crafter; items that don't get used up (liiike LMP's) stay in the world?
-    and also put in a temp recipe that uses wires; test that the CompACT doesn't destroy them
 
 
 FZDOCS
@@ -146,6 +143,7 @@ Add pressure generator:
         What about the filling algorithm? A pain, eh? Just something kinda randomish maybe?
     - Oh, also, it can get power from steam. (Well, any hot gas.)
 An upgraded bonemeal. Acts as bonemeal, & schedules a block tick even if the bonemeal'd thing isn't bonemealable. 2 bonemeal + 4 nether wart -> 2 Nether Bone Meal. "It's Super-Effective!"
+Check for calls we make to Tessellator.setBrightness. We may be able to replace them with a BlockRenderHelper helper function.
 
 BEFORE 0.9
 ----------
@@ -165,6 +163,10 @@ Back to FZDS
 
 LESS SOON
 ---------
+Check if dark iron retrogen works?
+compression crafter; items that don't get used up (liiike LMP's) stay in the world?
+    and also put in a temp recipe that uses wires; test that the CompACT doesn't destroy them
+    crafting recipes that use the battery block?
 
 AFTER 1.7 PORT
 --------------
@@ -199,6 +201,7 @@ Church Organ
 instructions mess up servo rail tessellator shading?
 add an LMP instruction (recipe may be difficult!). Clicks the instruction with an LMP.
 FZ notify item kept? [might be fixed? Weirdness.]
+wires get messed up?
 
 
 NEVER/POSTPONED
