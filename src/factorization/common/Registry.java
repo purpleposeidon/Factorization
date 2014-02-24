@@ -1091,11 +1091,6 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "#",
                 '#', Block.fenceIron,
                 '-', "slabWood");
-        oreRecipe(FactoryType.SOCKET_LACERATOR.asSocketItem(),
-                "*",
-                "M",
-                '*', diamond_cutting_head,
-                'M', motor);
         oreRecipe(FactoryType.SOCKET_SHIFTER.asSocketItem(),
                 "V",
                 "@",
