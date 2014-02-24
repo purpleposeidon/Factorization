@@ -1,3 +1,8 @@
+0.8.33
+  Servos weren't dropping their socket tool correctly
+  Item Shifter defaults to moving some 64 items instead of hoppering 1 item at a time
+  Added english localizations to the pressure generator setting config
+
 0.8.32
   Bug fixes & polishing.
 
