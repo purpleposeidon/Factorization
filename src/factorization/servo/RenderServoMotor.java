@@ -219,7 +219,10 @@ public class RenderServoMotor extends RenderEntity {
     
     void orientMotor(ServoMotor motor, float partial, float reorientInterpolation) {
         final FzOrientation orientation = motor.motionHandler.orientation;
-        final FzOrientation prevOrientation = motor.motionHandler.prevOrientation;
+        FzOrientation prevOrientation = motor.motionHandler.prevOrientation;
+        if (prevOrientation == FzOrientation.UNKNOWN) {
+            prevOrientation = orientation;
+        }
         
         if (debug_servo_orientation) {
             GL11.glDisable(GL11.GL_LIGHTING);
@@ -322,7 +325,7 @@ public class RenderServoMotor extends RenderEntity {
         radius = -4.0/16.0;
 
         float rd = (float) (radius + rail_width);
-        if (motor.motionHandler.orientation != motor.motionHandler.prevOrientation) {
+        if (motor.motionHandler.orientation != motor.motionHandler.prevOrientation && motor.motionHandler.prevOrientation != FzOrientation.UNKNOWN) {
             double stretch_interp = ro * 2;
             if (stretch_interp < 1) {
                 if (stretch_interp > 0.5) {

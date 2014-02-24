@@ -1,15 +1,20 @@
 package factorization.servo;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.shared.Core;
+import factorization.shared.Core.TabType;
 import factorization.shared.FzUtil;
 import factorization.shared.ItemCraftingComponent;
-import factorization.shared.Core.TabType;
 
 public class ItemServoMotor extends ItemCraftingComponent {
 
@@ -39,18 +44,54 @@ public class ItemServoMotor extends ItemCraftingComponent {
         motor.posZ = c.z;
         //c.setAsEntityLocation(motor);
         //w.spawnEntityInWorld(motor);
-        motor.spawnServoMotor();
-        ForgeDirection face = ForgeDirection.getOrientation(FzUtil.determineOrientation(player));
-        if (motor.motionHandler.validDirection(face, true)) {
-            motor.motionHandler.orientation = FzOrientation.fromDirection(face);
-            FzOrientation perfect = motor.motionHandler.orientation.pointTopTo(ForgeDirection.getOrientation(side));
-            if (perfect != FzOrientation.UNKNOWN) {
-                motor.motionHandler.orientation = perfect;
+        ForgeDirection top = ForgeDirection.getOrientation(side);
+        
+        ArrayList<FzOrientation> valid = new ArrayList();
+        motor.motionHandler.beforeSpawn();
+        
+        ForgeDirection playerAngle = ForgeDirection.getOrientation(FzUtil.determineOrientation(player));
+        
+        for (ForgeDirection fd : ForgeDirection.VALID_DIRECTIONS) {
+            if (top == fd || top.getOpposite() == fd) {
+                continue;
+            }
+            if (motor.motionHandler.validDirection(fd, false)) {
+                FzOrientation t = FzOrientation.fromDirection(fd).pointTopTo(top);
+                if (t != FzOrientation.UNKNOWN) {
+                    if (fd == playerAngle) {
+                        valid.clear();
+                        valid.add(t);
+                        break;
+                    }
+                    valid.add(t);
+                }
             }
         }
+        final Vec3 vP = Vec3.createVectorHelper(hitX, hitY, hitZ).normalize();
+        Collections.sort(valid, new Comparator<FzOrientation>() {
+            @Override
+            public int compare(FzOrientation a, FzOrientation b) {
+                double dpA = vP.dotProduct(Vec3.createVectorHelper(a.facing.offsetX, a.facing.offsetY, a.facing.offsetZ));
+                double dpB = vP.dotProduct(Vec3.createVectorHelper(b.facing.offsetX, b.facing.offsetY, b.facing.offsetZ));
+                double theta_a = Math.acos(dpA);
+                double theta_b = Math.acos(dpB);
+                if (theta_a > theta_b) {
+                    return 1;
+                } else if (theta_a < theta_b) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        });
+        if (!valid.isEmpty()) {
+            motor.motionHandler.orientation = valid.get(0);
+        }
+        motor.motionHandler.prevOrientation = motor.motionHandler.orientation;
         if (!player.capabilities.isCreativeMode) {
             is.stackSize--;
         }
+        motor.spawnServoMotor();
         return true;
     }
 }
