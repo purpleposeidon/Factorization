@@ -54,16 +54,16 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
                 return;
             }
         }
-        
+        block = BlockRenderHelper.instance;
         if (rail != null) {
             rail.fillSideInfo(sides);
+            block.setupBrightness(Tessellator.instance, w, x, y, z);
         } else {
             for (int i = 0; i < 6; i++) {
                 sides[i] = true;
             }
         }
         Icon icon = has_comment ? BlockIcons.servo$rail_comment : BlockIcons.servo$rail;
-        block = BlockRenderHelper.instance;
         
         final float fL = TileEntityServoRail.width;
         final float fH = 1 - fL;
@@ -93,7 +93,6 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
 
             //renderBlock(rb, block);
             if (world_mode) {
-                block.setupBrightness(Tessellator.instance, w, i, i, i);
                 block.begin();
                 block.renderRotated(Tessellator.instance, x, y, z);
             } else {

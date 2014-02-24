@@ -543,10 +543,12 @@ public class BlockRenderHelper extends Block {
     }
     
     public void setupBrightness(Tessellator tess, IBlockAccess w, int x, int y, int z) {
+        if (w == null) return; // Is that cool?
         tess.instance.setBrightness(getMixedBrightnessForBlock(w, x, y, z));
     }
     
     public void setupBrightness(Tessellator tess, Coord c) {
+        if (c.w == null) return; // Is that cool?
         tess.instance.setBrightness(getMixedBrightnessForBlock(c.w, c.x, c.y, c.z));
     }
 
