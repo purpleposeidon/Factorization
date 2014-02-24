@@ -26,7 +26,7 @@ public class ItemSocketPart extends ItemFactorization {
     }
     
     
-    static ArrayList<FactoryType> loadSockets() {
+    ArrayList<FactoryType> loadSockets() {
         ArrayList<FactoryType> ret = new ArrayList();
         for (FactoryType ft : FactoryType.values()) {
             if (ft == FactoryType.SOCKET_EMPTY) {
@@ -36,8 +36,15 @@ public class ItemSocketPart extends ItemFactorization {
             while (theClass != null) {
                 theClass = theClass.getSuperclass();
                 if (theClass == TileEntitySocketBase.class) {
-                    ret.add(ft);
-                    break;
+                    TileEntitySocketBase ts = (TileEntitySocketBase) ft.getRepresentative();
+                    ItemStack is = ts.getCreatingItem();
+                    if (is == null) {
+                        break;
+                    }
+                    if (is.getItem() == this) {
+                        ret.add(ft);
+                        break;
+                    }
                 }
             }
         }

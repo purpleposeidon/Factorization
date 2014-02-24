@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.Icon;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
@@ -539,6 +540,14 @@ public class BlockRenderHelper extends Block {
         normal_uv.z = normal.z;
         ForgeDirection dir = getDirectionFromVector(normal_uv);
         return directionLighting[dir.ordinal()];
+    }
+    
+    public void setupBrightness(Tessellator tess, IBlockAccess w, int x, int y, int z) {
+        tess.instance.setBrightness(getMixedBrightnessForBlock(w, x, y, z));
+    }
+    
+    public void setupBrightness(Tessellator tess, Coord c) {
+        tess.instance.setBrightness(getMixedBrightnessForBlock(c.w, c.x, c.y, c.z));
     }
 
 }

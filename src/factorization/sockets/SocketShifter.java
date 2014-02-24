@@ -7,6 +7,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.ForgeDirection;
+
+import org.lwjgl.opengl.GL11;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -17,6 +20,7 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
+import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
@@ -28,10 +32,10 @@ public class SocketShifter extends TileEntitySocketBase {
         MODE_STREAM, MODE_PULSE_EXACT, MODE_PULSE_SOME;
     }
     //public boolean streamMode = true; // be like a hopper or a filter
-    public ShifterMode mode = ShifterMode.MODE_STREAM;
+    public ShifterMode mode = ShifterMode.MODE_PULSE_SOME;
     public int foreignSlot = -1;
     public boolean exporting = true;
-    public byte transferLimit = 1;
+    public byte transferLimit = 64;
     byte cooldown = 0;
     
     @Override
@@ -363,5 +367,20 @@ public class SocketShifter extends TileEntitySocketBase {
             block.rotateCenter(Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())));
             block.renderRotated(tess, xCoord, yCoord, zCoord);
         }
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void renderItemOnServo(RenderServoMotor render, ServoMotor motor, ItemStack is, float partial) {
+        //super.renderItemOnServo(render, motor, is, partial);
+        GL11.glPushMatrix();
+        GL11.glTranslatef(0, 0.7F, 0);
+        GL11.glRotatef(90, 1, 0, 0);
+        GL11.glRotatef(-90, 0, 0, 1);
+        //GL11.glTranslatef(0, -2F/16F, 0);
+        float s = 15F/16F;
+        GL11.glScalef(s, s, s);
+        render.renderItem(is);
+        GL11.glPopMatrix();
     }
 }

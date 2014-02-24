@@ -219,7 +219,10 @@ public class RenderServoMotor extends RenderEntity {
     
     void orientMotor(ServoMotor motor, float partial, float reorientInterpolation) {
         final FzOrientation orientation = motor.motionHandler.orientation;
-        final FzOrientation prevOrientation = motor.motionHandler.prevOrientation;
+        FzOrientation prevOrientation = motor.motionHandler.prevOrientation;
+        if (prevOrientation == FzOrientation.UNKNOWN) {
+            prevOrientation = orientation;
+        }
         
         if (debug_servo_orientation) {
             GL11.glDisable(GL11.GL_LIGHTING);
@@ -281,34 +284,13 @@ public class RenderServoMotor extends RenderEntity {
     RenderItem renderItem = new RenderItem();
 
     void renderInventory(ServoMotor motor, float partial) {
-        GL11.glPushMatrix();
-        GL11.glRotatef(90, 1, 0, 0);
-        float s = 0.75F;
-        final Minecraft mc = Minecraft.getMinecraft();
-        long range = 9*20;
-        double d = motor.worldObj.getTotalWorldTime() + partial;
-        float now = (float) ((d % range)/(double)range);
-        for (int i = 0; i < motor.inv.length; i++) {
-            ItemStack is = motor.inv[i];
-            if (is == null) {
-                continue;
-            }
-            GL11.glPushMatrix();
-            GL11.glTranslatef(0, 0, -0.25F);
-            GL11.glRotatef(-90*i, 0, 0, 1);
-            GL11.glTranslatef(0, 0.4F, 0);
-            GL11.glRotatef(-90, 1, 0, 0);
-            GL11.glScalef(s, s, s);
-            try {
-                renderItem(motor, is, partial);
-            } catch (Exception e) {
-                System.err.println("Error rendering item: " + is);
-                e.printStackTrace();
-                motor.inv[i] = null;
-            }
-            GL11.glPopMatrix();
+        ItemStack is = motor.inv[0];
+        if (is == null) {
+            return;
         }
-        GL11.glPopMatrix();
+        dummy_entity.worldObj = motor.worldObj;
+        holder_render.setRenderManager(renderManager);
+        motor.socket.renderItemOnServo(this, motor, is, partial);
     }
     
     
@@ -343,7 +325,7 @@ public class RenderServoMotor extends RenderEntity {
         radius = -4.0/16.0;
 
         float rd = (float) (radius + rail_width);
-        if (motor.motionHandler.orientation != motor.motionHandler.prevOrientation) {
+        if (motor.motionHandler.orientation != motor.motionHandler.prevOrientation && motor.motionHandler.prevOrientation != FzOrientation.UNKNOWN) {
             double stretch_interp = ro * 2;
             if (stretch_interp < 1) {
                 if (stretch_interp > 0.5) {
@@ -390,34 +372,27 @@ public class RenderServoMotor extends RenderEntity {
 
         public void renderItem(float partial) {
             renderEquippedItems(item_holder, partial);
-            // renderModel(item_holder, 0, 0, 0, 0, 0, 0);
         }
     }
 
     static HolderRenderer holder_render = new HolderRenderer(new ModelZombie(), 1);
     static EntityLiving dummy_entity = new EntityEnderman(null);
 
-    void renderItem(ServoMotor motor, ItemStack is, float partial) {
+    public void renderItem(ItemStack is) {
         equiped_item = is;
-        if (equiped_item == null) {
-            return;
-        }
-        dummy_entity.worldObj = motor.worldObj;
-        holder_render.setRenderManager(renderManager);
-        do_renderItem(equiped_item);
-    }
-
-    public void do_renderItem(ItemStack itemstack) {
         // Copied from RenderBiped.renderEquippedItems
         GL11.glPushMatrix();
-        float s = 1F / 4F;
+        //float s = 0.75F;
+        //GL11.glScalef(s, s, s);
+        float s = 1 / 4F;
+        //s *= 0.75F;
         GL11.glScalef(s, s, s);
         
         // Pre-emptively undo transformations that the item renderer does so
         // that we don't get a stupid angle. Minecraft render code is terrible.
         boolean needRotationFix = true;
-        if (itemstack.getItem() instanceof ItemBlock && itemstack.itemID < Block.blocksList.length) {
-            Block block = Block.blocksList[itemstack.itemID];
+        if (is.getItem() instanceof ItemBlock && is.itemID < Block.blocksList.length) {
+            Block block = Block.blocksList[is.itemID];
             if (block != null && RenderBlocks.renderItemIn3d(block.getRenderType())) {
                 needRotationFix = false;
             }
@@ -431,11 +406,11 @@ public class RenderServoMotor extends RenderEntity {
         float f6 = 1.5F;
         GL11.glScalef(f6, f6, f6);
         
-        this.renderManager.itemRenderer.renderItem(dummy_entity, itemstack, 0);
+        this.renderManager.itemRenderer.renderItem(dummy_entity, is, 0);
 
-        if (itemstack.getItem().requiresMultipleRenderPasses()) {
-            for (int x = 1; x < itemstack.getItem().getRenderPasses(itemstack.getItemDamage()); x++) {
-                this.renderManager.itemRenderer.renderItem(dummy_entity, itemstack, x);
+        if (is.getItem().requiresMultipleRenderPasses()) {
+            for (int x = 1; x < is.getItem().getRenderPasses(is.getItemDamage()); x++) {
+                this.renderManager.itemRenderer.renderItem(dummy_entity, is, x);
             }
         }
         GL11.glPopMatrix();

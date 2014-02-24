@@ -19,6 +19,7 @@ import net.minecraft.util.Icon;
 import org.lwjgl.input.Keyboard;
 
 import factorization.api.Coord;
+import factorization.api.datahelpers.DataBackup;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.DataOutPacketClientEdited;
@@ -169,7 +170,7 @@ public class GuiDataConfig extends GuiScreen {
         
         @Override
         void renderControl(int mouseX, int mouseY) {
-            fontRenderer.drawString(transVal(), this.labelPos, posY, color);
+            fontRenderer.drawStringWithShadow(transVal(), this.labelPos, posY, color);
         }
         
         @Override
@@ -388,11 +389,32 @@ public class GuiDataConfig extends GuiScreen {
     }
     
     void valueChanged() {
+        DataBackup origValues = new DataBackup();
+        try {
+            ids.serialize("", origValues);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+        
+        applyChangesToEntity();
+        
+        origValues.restoring();
+        try {
+            ids.serialize("", origValues);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+    }
+    
+    void applyChangesToEntity() {
         if (validate(fields)) {
             fields_valid = true;
         } else {
             fields_valid = false;
         }
+        
         fields_initialized = false;
         initGui();
         changed = true;
@@ -418,6 +440,7 @@ public class GuiDataConfig extends GuiScreen {
         if (!fields_valid || !changed) {
             return;
         }
+        applyChangesToEntity();
         try {
             sendPacket();
         } catch (IOException e) {

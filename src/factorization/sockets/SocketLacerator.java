@@ -54,6 +54,7 @@ import factorization.notify.Notify;
 import factorization.oreprocessing.TileEntityGrinder;
 import factorization.oreprocessing.TileEntityGrinder.GrinderRecipe;
 import factorization.oreprocessing.TileEntityGrinderRender;
+import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
@@ -67,7 +68,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         int s = speed*100/max_speed;
         String msg = s + "% speed";
         if (!buffer.isEmpty()) {
-            msg += "\nBuffered Output";
+            msg += "\nBuffered output";
         }
         return msg;
     }
@@ -650,5 +651,20 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             destroyPartially(present_breaking_target, 99);
             destroyPartially(previous_breaking_target, 99);
         }
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void renderItemOnServo(RenderServoMotor render, ServoMotor motor, ItemStack is, float partial) {
+        //super.renderItemOnServo(render, motor, is, partial);
+        GL11.glPushMatrix();
+        GL11.glTranslatef(0, 6F/16F, 0);
+        float turn = FzUtil.interp(prev_rotation, rotation, partial) / 5.0F;
+        GL11.glRotatef(-turn, 0, 1, 0);
+        //GL11.glRotatef(90, 0, 1, 0);
+        float s = 12F/16F;
+        GL11.glScalef(s, s, s);
+        render.renderItem(is);
+        GL11.glPopMatrix();
     }
 }

@@ -28,6 +28,7 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
+import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
@@ -160,7 +161,9 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
             return true;
         }
         // END MACRO-GENERATED CODE
-        replaceWith(new SocketFanturpeller(), socket);
+        if (this.getRequiredCharge() != 0 /* As a proxy for checking the class */) {
+            replaceWith(new SocketFanturpeller(), socket);
+        }
         return true;
     }
 
@@ -270,7 +273,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
                     if (Math.abs(fanω) < Math.abs(ts)) {
                         fanω = ts;
                     }
-                } else if (Math.abs(fanω) < Math.abs(ts)) {
+                } else if ((isSucking && ts < fanω) || (!isSucking && ts > fanω)) {
                     fanω += Math.signum(ts);
                     if (fanω > Math.abs(ts)) {
                         fanω = ts;
@@ -279,7 +282,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
             }
             
             if (fanω != lastfanω /*FzUtil.significantChange(fanω, lastfanω)*/) {
-                socket.sendMessage(MessageType.FanturpellerSpeed, fanω);
+                socket.sendMessage(MessageType.FanturpellerSpeed, fanω, isSucking);
                 lastfanω = fanω;
             }
         }
@@ -335,6 +338,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         GL11.glTranslatef(d, d, d);
         Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())).glRotate();
         float turn = scaleRotation(FzUtil.interp(prevFanRotation, fanRotation, partial));
+        float dr = Math.abs(scaleRotation(fanRotation) - scaleRotation(prevFanRotation));
         GL11.glRotatef(turn, 0, 1, 0);
         float sd = motor == null ? -2F/16F : 3F/16F;
         GL11.glTranslatef(0, sd, 0);
@@ -346,10 +350,25 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
             GL11.glTranslatef(0, -3F/16F, 0);
         }
         GL11.glScalef(s, 1, s);
+        float count = dr/60;
+        if (count > 2) {
+            count = 2;
+        }
+        if (count < 1) {
+            count = 1;
+        }
         //TileEntityGrinderRender.renderGrindHead();
-        GL11.glRotatef(90, 1, 0, 0);
-        GL11.glTranslatef(-0.5F, -0.5F, 0);
-        FactorizationBlockRender.renderItemIcon(Core.registry.fan.getIconFromDamage(0));
+        for (float i = 0; i < count; i++) {
+            if (i > 0) {
+                GL11.glRotatef(45F, 0, 1, 0);
+                GL11.glTranslatef(0, -1F/64F, 0);
+            }
+            GL11.glPushMatrix();
+            GL11.glRotatef(90, 1, 0, 0);
+            GL11.glTranslatef(-0.5F, -0.5F, 0);
+            FactorizationBlockRender.renderItemIcon(Core.registry.fan.getIconFromDamage(0));
+            GL11.glPopMatrix();
+        }
     }
     
     @Override
@@ -360,6 +379,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         }
         if (messageType == MessageType.FanturpellerSpeed) {
             fanω = input.readFloat();
+            isSucking = input.readBoolean();
             return true;
         }
         return false;
@@ -367,6 +387,18 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
     
     @Override
     public Packet getDescriptionPacket() {
-        return getDescriptionPacketWith(MessageType.FanturpellerSpeed, fanω);
+        return getDescriptionPacketWith(MessageType.FanturpellerSpeed, fanω, isSucking);
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void renderItemOnServo(RenderServoMotor render, ServoMotor motor, ItemStack is, float partial) {
+        GL11.glPushMatrix();
+        
+        GL11.glTranslatef(8F/16F, 1F/16F, 0);
+        GL11.glRotatef(90, 0, 1, 0);
+        
+        render.renderItem(is);
+        GL11.glPopMatrix();
     }
 }
