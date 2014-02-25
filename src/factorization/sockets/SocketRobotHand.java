@@ -183,6 +183,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
         final float dy = (float)hitVec.yCoord - (float)y;
         final float dz = (float)hitVec.zCoord - (float)z;
         final Item item = itemstack == null ? null : itemstack.getItem();
+        final long origItemHash = FzUtil.getItemHash(itemstack);
         
         boolean ret = false;
         do {
@@ -211,27 +212,21 @@ public class SocketRobotHand extends TileEntitySocketBase {
                 ret = false;
                 break;
             }
-            if (item instanceof ItemBlock) {
-                ItemBlock itemblock = (ItemBlock)item;
-                if (!itemblock.canPlaceItemBlockOnSide(world, x, y, z, side, player, itemstack)) {
-                    ret = false;
-                    break;
-                }
-            }
             ret = itemstack.tryPlaceItemIntoWorld(player, world, x, y, z, side, dx, dy, dz);
             break;
         } while (false);
         int origSize = itemstack.stackSize;
         ItemStack mutatedItem = itemstack.useItemRightClick(world, player);
-        if (!ret && !FzUtil.identical(mutatedItem, itemstack)) {
+        if (mutatedItem != itemstack) {
+            ret = true;
+        } else if (!ret && !FzUtil.identical(mutatedItem, itemstack)) {
             ret = true;
         }
-        if (mutatedItem == itemstack && (mutatedItem == null || mutatedItem.stackSize == origSize)) {
-            return ret;
+        if (!ret) {
+            ret = origItemHash != FzUtil.getItemHash(mutatedItem);
         }
         player.inventory.mainInventory[player.inventory.currentItem] = mutatedItem;
-
-        return true;
+        return ret;
     }
     
     @Override
