@@ -10,9 +10,9 @@ import factorization.shared.Core;
 
 public class Document {
     String name;
-    ArrayList<Page> pages;
+    ArrayList<AbstractPage> pages;
     
-    public Document(String name, ArrayList<Page> pages) {
+    public Document(String name, ArrayList<AbstractPage> pages) {
         this.name = name;
         this.pages = pages;
     }

@@ -2,6 +2,9 @@ package factorization.shared;
 
 import static org.lwjgl.opengl.GL11.glGetError;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
 import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -173,6 +176,19 @@ public class FzUtil {
             is.setTagCompound(ret);
         }
         return ret;
+    }
+    
+    public static long getItemHash(ItemStack is) {
+        if (is == null) {
+            return Long.MIN_VALUE;
+        }
+        long ih = is.itemID;
+        long md = is.getItemDamage();
+        long tg = 0;
+        if (is.hasTagCompound()) {
+            tg = is.getTagCompound().hashCode();
+        }
+        return (ih << 48) + (md << 32) + tg + is.stackSize*100;
     }
     
     public static String getCustomItemName(ItemStack is) {
@@ -1607,5 +1623,17 @@ public class FzUtil {
         }
         if (fs == null || fs.amount <= 0) return null;
         return fs;
+    }
+    
+    public static TileEntity cloneTileEntity(TileEntity orig) {
+        NBTTagCompound tag = new NBTTagCompound();
+        orig.writeToNBT(tag);
+        return TileEntity.createAndLoadEntity(tag);
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public static void copyStringToClipboard(String text) {
+        StringSelection stringselection = new StringSelection(text);
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringselection, (ClipboardOwner)null);
     }
 }

@@ -29,7 +29,7 @@ public class ItemDocBook extends ItemFactorization {
     public ItemStack onItemRightClick(ItemStack is, World world, EntityPlayer player) {
         if (!world.isRemote) return is;
         Minecraft mc = Minecraft.getMinecraft();
-        mc.displayGuiScreen(new DocViewer(DocViewer.getLatestPage()));
+        mc.displayGuiScreen(new DocViewer(DocViewer.current_page));
         return is;
     }
     

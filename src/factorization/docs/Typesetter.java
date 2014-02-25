@@ -1,10 +1,9 @@
 package factorization.docs;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 
 public class Typesetter {
@@ -13,7 +12,8 @@ public class Typesetter {
     final FontRenderer font;
     final int pageWidth, pageHeight;
     
-    ArrayList<Page> pages = new ArrayList();
+    private ArrayList<AbstractPage> pages = new ArrayList();
+    private ArrayList<AbstractPage> afterBuffer = new ArrayList();
     
     public Typesetter(FontRenderer font, int pageWidth, int pageHeight, String text) {
         this.font = font;
@@ -67,19 +67,32 @@ public class Typesetter {
         int i;
         for (i = scan + 1; i < text.length(); i++) {
             char c = text.charAt(i);
-            if (Character.isAlphabetic(c) || c == ':' || c == '-') {
+            if (Character.isAlphabetic(c) || Character.isDigit(c) || c == ':' || c == '-' || c == '_' || c == '.' || c == '/' || c == '#') {
                 continue;
             }
             String s = text.substring(scan, i);
             scan = i;
+            if (i < text.length() && text.charAt(i) == ' ') {
+                scan++;
+            }
             return s;
         }
-        String s =  text.substring(scan);
+        String s = text.substring(scan);
         scan = text.length();
         return s;
     }
     
-    ArrayList<Page> process(final String text) {
+    String scanFor(String sentinel) {
+        int end = text.indexOf(sentinel, scan);
+        if (end == -1) {
+            return "";
+        }
+        String s = text.substring(scan, end);
+        scan = end + sentinel.length();
+        return s;
+    }
+    
+    ArrayList<AbstractPage> process(final String text) {
         startScanning(text);
         
         String link = null;
@@ -93,7 +106,7 @@ public class Typesetter {
                 contigLines++;
                 if (contigLines == 2) {
                     getCurrentPage().nl();
-                    getCurrentPage().add(new Word("\t", null));
+                    getCurrentPage().add(new TextWord("\t", null));
                     contigSpaces = 1;
                 }
                 contigSpaces++;
@@ -123,20 +136,22 @@ public class Typesetter {
                     style += EnumChatFormatting.UNDERLINE;
                 } else if (word.equalsIgnoreCase("\\i")) {
                     style += EnumChatFormatting.ITALIC;
+                } else if (word.equalsIgnoreCase("\\obf")) {
+                    style += EnumChatFormatting.OBFUSCATED;
                 } else if (word.equalsIgnoreCase("\\r")) {
                     style = "";
                 } else if (word.equalsIgnoreCase("\\-")) {
-                    Page page = getCurrentPage();
+                    WordPage page = getCurrentPage();
                     page.nl();
-                    page.add(new Word("        -", null));
+                    page.add(new TextWord("        -", null));
                 } else if (word.equalsIgnoreCase("\\:")) {
-                    Page page = getCurrentPage();
+                    WordPage page = getCurrentPage();
                     page.nl();
-                    page.add(new Word("  -", null));
+                    page.add(new TextWord("  -", null));
                 } else if (word.equalsIgnoreCase("\\t")) {
                     emit("\t", null);
                 } else if (word.equalsIgnoreCase("\\p")) {
-                    Page page = getCurrentPage();
+                    WordPage page = getCurrentPage();
                     page.nl();
                     emit("\t", null);
                 } else if (word.equalsIgnoreCase("\\title")) {
@@ -156,9 +171,37 @@ public class Typesetter {
                     emit(v + s + t, link);
                     getCurrentPage().nl();
                     emit("\t", null);
-                } else if (word.startsWith("\\icon:")) {
-                    String icon = word.substring("\\icon:".length());
+                } else if (word.startsWith("\\#")) {
+                    String itemName = word.substring("\\#".length());
+                    ItemStack is = DocumentationModule.lookup(itemName);
+                    if (is == null) {
+                        emit("" + EnumChatFormatting.RED + EnumChatFormatting.BOLD + itemName, null);
+                        continue;
+                    }
+                    emitWord(new ItemWord(is, link));
                     
+                } else if (word.equalsIgnoreCase("\\figure")) {
+                    DocWorld figure = null;
+                    try {
+                        String fig = scanFor("\\endfig").trim().replace(" ", "").replace("\n", "").replace("\r", "");
+                        figure = DocumentationModule.loadWorld(fig);
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                        emit("" + EnumChatFormatting.RED + EnumChatFormatting.BOLD + "[figure is corrupt; see console]", null);
+                        continue;
+                    }
+                    if (figure == null) {
+                        emit("" + EnumChatFormatting.RED + EnumChatFormatting.BOLD + "[figure failed to load]", null);
+                        continue;
+                    }
+                    WordPage wp = getCurrentPage();
+                    if (wp.text.size() > 1) {
+                        afterBuffer.add(new FigurePage(figure));
+                    } else {
+                        pages.add(pages.size() - 1, new FigurePage(figure));
+                    }
+                } else if (word.equalsIgnoreCase("\\\\")) {
+                    emit("\\", link);
                 } else {
                     emit("" + EnumChatFormatting.RED + EnumChatFormatting.BOLD + word, null);
                 }
@@ -175,10 +218,9 @@ public class Typesetter {
         return font.getStringWidth(word);
     }
     
-    Word emit(String word, String link) {
-        Word w = new Word(word, link);
-        Page page = getCurrentPage();
-        int len = font.getStringWidth(word);
+    void emitWord(Word w) {
+        WordPage page = getCurrentPage();
+        int len = w.getWidth(font);
         if (len + page.lineLen > pageWidth) {
             page.nl();
         }
@@ -187,18 +229,34 @@ public class Typesetter {
             //page.add(new Word("\t", link));
         }
         page.add(w);
+    }
+    
+    TextWord emit(String text, String link) {
+        TextWord w = new TextWord(text, link);
+        emitWord(w);
         return w;
     }
     
-    Page current;
+    WordPage current;
     
-    Page newPage() {
-        current = new Page(font);
+    void emptyBuffer() {
+        pages.addAll(afterBuffer);
+        afterBuffer.clear();
+    }
+    
+    WordPage newPage() {
+        emptyBuffer();
+        current = new WordPage(font);
         pages.add(current);
         return current;
     }
     
-    Page getCurrentPage() {
+    WordPage getCurrentPage() {
         return current;
+    }
+    
+    ArrayList<AbstractPage> getPages() {
+        emptyBuffer();
+        return pages;
     }
 }

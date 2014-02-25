@@ -1,22 +1,14 @@
 package factorization.docs;
 
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.client.gui.FontRenderer;
 
-public class Word {
-    final String text;
-    final String hyperlink; //NORELEASE: str
+public abstract class Word {
+    final String hyperlink;
     
-    public Word(String text, String hyperlink) {
+    public Word(String hyperlink) {
         this.hyperlink = hyperlink;
-        if (hyperlink == null) {
-            this.text = text;
-        } else {
-            this.text = "" + EnumChatFormatting.AQUA  + EnumChatFormatting.UNDERLINE+ text;
-        }
     }
     
-    @Override
-    public String toString() {
-        return text + " ==> " + hyperlink;
-    }
+    public abstract int getWidth(FontRenderer font);
+    public abstract int draw(DocViewer doc, int x, int y);
 }

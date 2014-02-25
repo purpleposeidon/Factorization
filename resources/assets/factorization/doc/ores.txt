@@ -11,4 +11,4 @@ Dark iron ore is an unusual metal.
 It is found in craters in the bedrock;
 its origin is unknown,
 tho clearly not formed by any natural process.
-It is the primary material for \link:servo servos\endlink.
+It is the primary material for \link:servo servos\endlink .

@@ -5,16 +5,20 @@ import java.io.InputStream;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.Resource;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.io.Closeables;
+import com.jcraft.jogg.Page;
 
 import factorization.shared.Core;
 
@@ -22,14 +26,14 @@ public class DocViewer extends GuiScreen {
     //NORELEASE! Uh. Don't release a release with this user-accessible, I guess, unless the docs are slightly useful
     final String name;
     Document doc;
-    Page page;
+    AbstractPage page;
     GuiButton nextPage;
     GuiButton prevPage;
     GuiButton backButton;
     
     
-    private static Deque<String> pageHistory = new ArrayDeque<String>();
-    
+    private static Deque<String> the_pageHistory = new ArrayDeque<String>();
+    public static String current_page = "index";
     
     
     
@@ -54,18 +58,18 @@ public class DocViewer extends GuiScreen {
         return height*90/100;
     }
     
-    
-    
-    public static String getLatestPage() {
-        if (pageHistory.isEmpty()) {
+    public static String popLastPage() {
+        if (the_pageHistory.isEmpty()) {
             return "index";
         }
-        return pageHistory.getLast();
+        return the_pageHistory.pollLast();
     }
     
     public static void addNewHistoryEntry(String name) {
-        pageHistory.add(name);
+        the_pageHistory.add(name);
     }
+    
+    int orig_scale = -1;
     
     public DocViewer(String name) {
         this.name = name;
@@ -74,6 +78,18 @@ public class DocViewer extends GuiScreen {
     @Override
     public void initGui() {
         super.initGui();
+        
+        if (orig_scale == -1) {
+            mc = Minecraft.getMinecraft();
+            orig_scale = mc.gameSettings.guiScale;
+            if (orig_scale != 1 && orig_scale != 2) {
+                // We should choose either 1 or 2, for 'tiny' or 'normal'.
+                mc.gameSettings.guiScale = 2;
+            }
+            mc.displayGuiScreen(this);
+            return;
+        }
+        
         this.doc = getDocument(name); // Rebuilds the entire document from scratch. Super-inefficient!
         if (doc == null || doc.pages.size() == 0) {
             mc.displayGuiScreen(null);
@@ -81,15 +97,21 @@ public class DocViewer extends GuiScreen {
         page = doc.pages.get(0);
         
         int row = getPageHeight(0);
+        int arrow_half = 8;
         
-        buttonList.add(prevPage = new GuiButtonNextPage(2, getPageLeft(0) - 12, row, false));
-        buttonList.add(nextPage = new GuiButtonNextPage(1, getPageLeft(1) + getPageWidth(1) - 23 /* 23 is the button width */ + 12, row, true));
-        buttonList.add(backButton = new GuiButton(3, (120 + 38)/2, row, 50, 20, "Back"));
+        buttonList.add(prevPage = new GuiButtonNextPage(2, getPageLeft(0) - 12, row - arrow_half, false));
+        buttonList.add(nextPage = new GuiButtonNextPage(1, getPageLeft(1) + getPageWidth(1) - 23 /* 23 is the button width */ + 12, row - arrow_half, true));
+        buttonList.add(backButton = new GuiButton(3, (120 + 38)/2, row, 50, 20, "←"));
+        current_page = doc.name;
+    }
+    
+    protected ResourceLocation getResourceForName(String name) {
+        return Core.getResource("doc/" + name + ".txt");
     }
     
     InputStream getDocumentResource(String name) {
         try {
-            Resource src = mc.getResourceManager().getResource(Core.getResource("doc/" + name + ".txt"));
+            Resource src = mc.getResourceManager().getResource(getResourceForName(name));
             return src.getInputStream();
         } catch (IOException e) {
             return null;
@@ -100,7 +122,7 @@ public class DocViewer extends GuiScreen {
         InputStream is = getDocumentResource(name);
         try {
             Typesetter ts = new Typesetter(mc.fontRenderer, getPageWidth(0), getPageHeight(0), readContents(is));
-            return new Document(name, ts.pages);
+            return new Document(name, ts.getPages());
         } finally {
             Closeables.closeQuietly(is);
         }
@@ -108,10 +130,7 @@ public class DocViewer extends GuiScreen {
     
     String readContents(InputStream is) {
         if (is == null) {
-            return EnumChatFormatting.OBFUSCATED + "101*2*2 "
-                    + EnumChatFormatting.OBFUSCATED + "Not "
-                    + EnumChatFormatting.OBFUSCATED + "Found: "
-                    + EnumChatFormatting.RESET + name;
+            return "\\obf 101*2*2 Not Found: \\r " + name;
         }
         try {
             StringBuilder build = new StringBuilder();
@@ -126,11 +145,11 @@ public class DocViewer extends GuiScreen {
             for (StackTraceElement ste : e.getStackTrace()) {
                 txt += "\n\n    at " + ste.getFileName() + "(" + ste.getFileName() + ":" + ste.getLineNumber() + ")";
             }
-            return EnumChatFormatting.OBFUSCATED + "5*5*5*2*2 Internal Server Error\n\nAn error was encountered while trying to execute your request.\n\n" + txt;
+            return "\\obf 5*5*5*2*2 Internal Server Error\n\nAn error was encountered while trying to execute your request.\\r\n\n" + txt;
         }
     }
     
-    Page getPage(int d) {
+    AbstractPage getPage(int d) {
         if (doc == null) return null;
         if (d == 0) return page;
         int i = doc.pages.indexOf(page) + d;
@@ -141,10 +160,12 @@ public class DocViewer extends GuiScreen {
     
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        GL11.glPushMatrix();
+        GL11.glTranslatef(0, 0, 100);
         hot = false;
         drawDefaultBackground();
         
-        backButton.drawButton = !pageHistory.isEmpty();
+        backButton.drawButton = !the_pageHistory.isEmpty();
         prevPage.drawButton = doc.pages.indexOf(page) > 0;
         nextPage.drawButton = doc.pages.indexOf(page) + 2 < doc.pages.size();
         
@@ -184,13 +205,19 @@ public class DocViewer extends GuiScreen {
         
         
         if (page != null) {
-            page.draw(getPageLeft(0), getPageTop(0));
+            page.draw(this, getPageLeft(0), getPageTop(0));
         }
-        Page snd = getPage(1);
+        AbstractPage snd = getPage(1);
         if (snd != null) {
-            snd.draw(getPageLeft(1), getPageTop(1));
+            snd.draw(this, getPageLeft(1), getPageTop(1));
         }
         
+        GL11.glPopMatrix();
+    }
+    
+    void drawItem(ItemStack is, int x, int y) {
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GuiContainer.itemRenderer.renderItemAndEffectIntoGUI(this.fontRenderer, this.mc.getTextureManager(), is, x, y);
     }
     
     boolean hot = true;
@@ -201,12 +228,13 @@ public class DocViewer extends GuiScreen {
         super.mouseClicked(mouseX, mouseY, button);
         
         for (int i = 0; i <= 1; i++) {
-            Page p = getPage(i);
-            if (p == null) continue;
+            AbstractPage thisPage = getPage(i);
+            if (!(thisPage instanceof WordPage)) continue;
+            WordPage p = (WordPage) thisPage;
             Word link = p.click(mouseX - getPageLeft(i), mouseY - getPageTop(i));
             if (link != null && link.hyperlink != null) {
                 DocViewer newDoc = new DocViewer(link.hyperlink);
-                addNewHistoryEntry(doc.name);
+                addNewHistoryEntry(name);
                 mc.displayGuiScreen(newDoc);
                 return;
             }
@@ -228,25 +256,17 @@ public class DocViewer extends GuiScreen {
     @Override
     protected void actionPerformed(GuiButton button) {
         if (button == nextPage) {
-            Page n = getPage(2);
+            AbstractPage n = getPage(2);
             if (n != null) {
                 page = n;
             }
         } else if (button == prevPage) {
-            Page n = getPage(-2);
+            AbstractPage n = getPage(-2);
             if (n != null) {
                 page = n;
             }
         } else if (button == backButton) {
-            while (!pageHistory.isEmpty() && pageHistory.getLast().equalsIgnoreCase(name)) {
-                pageHistory.removeLast();
-            }
-            String name = "index";
-            if (pageHistory.size() > 0) {
-                name = pageHistory.removeLast();
-            }
-            System.out.println("Back to " + name);
-            DocViewer newDoc = new DocViewer(name);
+            DocViewer newDoc = new DocViewer(popLastPage());
             mc.displayGuiScreen(newDoc);
         }
     }
@@ -266,16 +286,41 @@ public class DocViewer extends GuiScreen {
         }
     }
     
+    
+    int startMouseX, startMouseY;
+    long last_delay = Long.MAX_VALUE;
     @Override
     protected void mouseClickMove(int mouseX, int mouseY, int button, long heldTime) {
-        super.mouseClickMove(mouseX, mouseY, button, heldTime);
+        if (heldTime < last_delay) {
+            startMouseX = mouseX;
+            startMouseY = mouseY;
+        }
+        for (int i = 0; i <= 1; i++) {
+            AbstractPage p = getPage(i);
+            if (p == null) {
+                continue;
+            }
+            if (getPageLeft(i) <= startMouseX && getPageLeft(i) + getPageWidth(i) >= startMouseX
+                    && getPageTop(i) < startMouseY && getPageTop(i) + getPageHeight(i) > startMouseY) {
+                if (heldTime < last_delay) {
+                    p.mouseDragStart();
+                }
+                p.mouseDrag(startMouseX - mouseX, startMouseY - mouseY);
+            }
+        }
+        last_delay = heldTime;
+        
     }
     
     @Override
     public void onGuiClosed() {
-        /*if (doc != null && doc.name != null && !getLatestPage().equals(doc.name)) {
-            addNewHistoryEntry(doc.name);	
-        }*/
+        if (orig_scale != -1) {
+            mc.gameSettings.guiScale = orig_scale;
+            orig_scale = -1;
+        }
+        for (AbstractPage page : doc.pages) {
+            page.closed();
+        }
     }
     
     @Override

@@ -1218,6 +1218,13 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     static ArrayList<Integer> finalizedDisplayLists = new ArrayList();
     
+    public static void addFinalizedDisplayList(int display_list) {
+        if (display_list <= 0) return;
+        synchronized (finalizedDisplayLists) {
+            finalizedDisplayLists.add(display_list);
+        }
+    }
+    
     @Override
     @SideOnly(Side.CLIENT)
     protected void finalize() throws Throwable {
@@ -1226,9 +1233,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             if (Core.dev_environ) {
                 System.out.println("Barrel finalized"); // dev environ, it's fine!
             }
-            synchronized (finalizedDisplayLists) {
-                    finalizedDisplayLists.add(display_list);
-            }
+            addFinalizedDisplayList(display_list);
             display_list = -1;
         }
     }

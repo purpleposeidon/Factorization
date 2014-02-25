@@ -44,8 +44,9 @@ public class BlockRenderDayBarrel extends FactorizationBlockRender {
         Icon plank, log;
         TileEntityDayBarrel barrel;
         if (world_mode) {
-            barrel = getCoord().getTE(TileEntityDayBarrel.class);
-            if (barrel == null) {
+            if (te instanceof TileEntityDayBarrel) {
+                barrel = (TileEntityDayBarrel) te;
+            } else {
                 return;
             }
         } else {

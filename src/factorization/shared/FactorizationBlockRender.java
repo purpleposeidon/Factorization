@@ -89,6 +89,9 @@ abstract public class FactorizationBlockRender implements ICoord {
             }
             return null;
         }
+        if (te != null && te.worldObj != null) {
+            return new Coord(te);
+        }
         return new Coord(Minecraft.getMinecraft().theWorld, x, y, z);
     }
 

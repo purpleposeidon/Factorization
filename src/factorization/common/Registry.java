@@ -1,5 +1,6 @@
 package factorization.common;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -54,6 +55,7 @@ import factorization.charge.ItemBattery;
 import factorization.charge.ItemChargeMeter;
 import factorization.charge.TileEntityLeydenJar;
 import factorization.darkiron.BlockDarkIronOre;
+import factorization.docs.DocumentationModule;
 import factorization.docs.ItemDocBook;
 import factorization.oreprocessing.BlockOreStorageShatterable;
 import factorization.oreprocessing.ItemOreProcessing;

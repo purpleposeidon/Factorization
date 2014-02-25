@@ -1,18 +1,32 @@
 \title The Factorization Manual
-\nl
+\nl\nl
+
 
 \link:about About\endlink
 
-\link:ores Ores\endlink
+\link:parts Parts & Machines\endlink
+(parts; ore processing; heaters)
 
-\newpage
+\link:building Building\endlink
+(embarkening; middle clicking; sculpture)
 
-System Parts
+\link:cookbook Designs\endlink
+
+\link:servos Servos\endlink
+
+\link:charge Energy\endlink
+
+\link:ores Ores and Materials\endlink
+
+\link:misc Miscellaneous Nonsense\endlink
+
+
+These guys go elsewhere:
+
+\b Parts \r
 \-\link:parasieve Parasieve\endlink
 \-\link:barrel Barrels\endlink
 \-\link:compact Compression Crafting\endlink
-
-\newpage
 
 \link:sockets Sockets\endlink
 
@@ -20,13 +34,7 @@ System Parts
 \-\link:servomotion Motion\endlink
 \-\link:servoinstructions Instructions\endlink
 
+
 \newpage
 
-\link:cookbook Designs\endlink
-
-\link:building Building\endlink
-
-\link:misc Miscellaneous Nonsense\endlink
-
-\nl\nl
 \link:test [Test Page]\endlink

@@ -3,6 +3,9 @@ package factorization.misc;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -15,8 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Joiner;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -25,6 +26,7 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import cpw.mods.fml.client.GuiModList;
 import cpw.mods.fml.relauncher.ReflectionHelper;
@@ -32,6 +34,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
+import factorization.shared.FzUtil;
 
 public class MiscClientCommands implements ICommand {
     static final Minecraft mc = Minecraft.getMinecraft();
@@ -467,7 +470,25 @@ public class MiscClientCommands implements ICommand {
             player.sendChatMessage(cmd);
         }
         
-        //Remember to include 'public static' for anything added here.
+        @help("Copy the unlocalized name of the held item to the clipboard")
+        public static String copylocalkey() {
+            ItemStack is = mc.thePlayer.getHeldItem();
+            if (is == null) {
+                return "Not holding anything";
+            }
+            String name = is.getUnlocalizedName();
+            if (name == null) {
+                return "Item has no localization key!";
+            }
+            if (name.isEmpty()) {
+                return "Item's localization key is empty!";
+            }
+            FzUtil.copyStringToClipboard(name);
+            return "Copied to clipboard: " + name;
+        }
+        
+        // Remember to include 'public static' for anything added here.
+        // And also to put the command in this nested class, not the wrong one. :P
     }
     
     @Override

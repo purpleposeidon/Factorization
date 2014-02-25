@@ -192,4 +192,8 @@ public class DeltaCoord implements IDataSerializable {
         z = data.asSameShare(prefix + "dz").put(z);
         return this;
     }
+    
+    public double magnitude() {
+        return Math.sqrt(x*x + y*y + z*z);
+    }
 }

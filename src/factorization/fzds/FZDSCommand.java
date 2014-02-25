@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.concurrent.Callable;
 
 import net.minecraft.block.Block;
 import net.minecraft.command.CommandBase;
@@ -844,8 +843,8 @@ public class FZDSCommand extends CommandBase {
             @Override
             void call(String[] args) {
                 int mode = Integer.parseInt(args[0]);
-                sendChat("setBlockMethod was " + TransferLib.set_method + ", is now " + mode);
-                TransferLib.set_method = mode;
+                sendChat("setBlockMethod was " + TransferLib.default_set_method + ", is now " + mode);
+                TransferLib.default_set_method = mode;
             }}, Requires.OP, Requires.CREATIVE);
         add(new SubCommand("@", "name [position|'unset']") {
             @Override

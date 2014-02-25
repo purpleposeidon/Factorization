@@ -48,6 +48,7 @@ import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.common.Registry;
 import factorization.compat.CompatManager;
+import factorization.docs.DocumentationModule;
 import factorization.oreprocessing.FactorizationOreProcessingHandler;
 import factorization.servo.ServoMotor;
 import factorization.wrath.TileEntityWrathFire;
@@ -167,6 +168,7 @@ public class Core {
     public void registerServerCommands(FMLServerStartingEvent event) {
         isMainServerThread.set(true);
         serverStarted = true;
+        DocumentationModule.instance.serverStarts(event);
     }
 
     ItemStack getExternalItem(String className, String classField, String description) {
