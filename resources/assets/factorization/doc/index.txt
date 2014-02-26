@@ -1,40 +1,40 @@
-\title The Factorization Manual
+\title{The Factorization Manual}
 \nl\nl
 
 
-\link:about About\endlink
+\link{about}{About}
 
-\link:parts Parts & Machines\endlink
+\link{parts}{Parts & Machines}
 (parts; ore processing; heaters)
 
-\link:building Building\endlink
+\link{building}{Building}
 (embarkening; middle clicking; sculpture)
 
-\link:cookbook Designs\endlink
+\link{cookbook}{Designs}
 
-\link:servos Servos\endlink
+\link{servos}{Servos}
 
-\link:charge Energy\endlink
+\link{charge}{Energy}
 
-\link:ores Ores and Materials\endlink
+\link{ores}{Ores and Materials}
 
-\link:misc Miscellaneous Nonsense\endlink
+\link{misc}{Miscellaneous Nonsense}
 
 
 These guys go elsewhere:
 
-\b Parts \r
-\-\link:parasieve Parasieve\endlink
-\-\link:barrel Barrels\endlink
-\-\link:compact Compression Crafting\endlink
+\b{Parts}
+-\link{parasieve}{Parasieve}
+-\link{barrel}{Barrels}
+-\link{compact}{Compression Crafting}
 
-\link:sockets Sockets\endlink
+\link{sockets}{Sockets}
 
-\link:servos Servos\endlink
-\-\link:servomotion Motion\endlink
-\-\link:servoinstructions Instructions\endlink
+\link{servos}{Servos}
+-\link{servomotion}{Motion}
+-\link{servoinstructions}{Instructions}
 
 
 \newpage
 
-\link:test [Test Page]\endlink
+\link{test}{[Test Page]}

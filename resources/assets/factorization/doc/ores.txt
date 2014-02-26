@@ -8,7 +8,6 @@ Silver is used as a reflecter, and lead is used as a conductor.
 \p
 
 Dark iron ore is an unusual metal.
-It is found in craters in the bedrock;
-its origin is unknown,
-tho clearly not formed by any natural process.
-It is the primary material for \link:servo servos\endlink .
+It is found in craters in the bedrock,
+and is clearly not the product of any natural process.
+This material is uniquely suitable for for \link:servo servos\endlink and other automata.
