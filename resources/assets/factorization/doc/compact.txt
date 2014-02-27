@@ -1,6 +1,8 @@
-\title Compression Crafter
+\title{The Compression Crafter}
 
-This machine crafts using blocks.
+The compression crafter is a powerful crafting machine.
+
+It crafts using blocks.
 It is built like a ring,
 with an inner area ranging from 3x3 to 1x1.
 The crafting table faces must point inwards.
@@ -11,6 +13,12 @@ There must be an inventory for the results of crafting
 to be output to.
 The side that recieves the redstone signal defines
 the bottom of the crafting grid.
+
+\figure{H4sIAAAAAAAAAO3cwU7CQBCA4ZndSrAexMQYn4IY9eDNg159BlKgkiZAyVJRPPjYXnGLwkERlY1pxP+77B5mZ2c72fbWWMSKdkUk2hVN1U/ET4rYj3FdTNaV/dukU+Ru2monzqX9Uys7nfxuWPgItWK7mfOzo1iicT9pm/mSJyO162SQ9FIfIztXZbiKD8mKdDAP0caKkHJW87tlw55VaXRdct/ye2eTtNWeFqnUxU5SJ7WT5kXz7NxKVExHaVlxLLaf9173Pli5tz/kYxnpx+nb+FCO8u6MnXww8lOVaOTynk8QuTwv/FieU1WMG38oY55ZgzLbeWZdmXlRs36W+WNfLpd9OfxpX44r6Yt+dca1T8+seXomKLNd0/FFX0xAzaszm6DM36nZ/lrNm2WWb9ysaJl5T3Qg0iinRsLoH18P/GcqYXco9P1RNd4fwOaq/n5zfwEAAAAAAAAAAAAAAAAAAAAAAAAAW2dPNCv/AzCbzZ5D8vz19cB/9nZ/bgLXh4iqXM/7A9hc1d9v7i8AAAAAAAAAAAAAAAAAAAAAAAAAYCu9AB1V7f3GhAAA}
+
+\figure{H4sIAAAAAAAAAO3cy07CQBiG4X96IFhixI2XQYy6cONKt14DKbQ2TSglQ0Xrwst2i1PBpCmHpAGE2PdJJjNDhm/+NEybbvBEbFGBiLTPRIXKDMQMMs/0522x4kAuXvxhluq8P0yTiRkqcSY6jcT0Ok0z09tBrF0llp5KW+xZqKV13bvv3d6Z6A8TpEyfF8mmfy/msq9k62DJ9k7J9pZkqSRbtZKtLcnOTsl1arYPVnO95Do1OwereSV54Gsdjm5scYfp6zhbHIEi1YyuPHGmI39g/Xzl05LWk5/4UVj8xNzHYrkSsyTOwmSx5GHNkmLUMrvF48hcgm6g/be+2Tuehf1BnoUrZTtZPgmLij2xR2m0CL5cu/eGq+fWunpOjbvB/pKrd4P9JVfvBq50RCUiXSlRpWYJgKZQa+bVzwD8T+vOP4Bm4PwDzVZ+/wcAAAAAAAAAAAAAAAAAAAAAACekIyou/w/AfD7/KrcjlgbgDy3Pu/PblvPn41YF4C+Uzn/B4fkPNMeG5z+AhuDdHwAAAAAAAAAAAAAAAAAAAACAE/YNB6WfBkqFAAA=}
+
+\newpage
 
 Blocks can be converted to item form in different ways.
 The contents of barrels will be used as-is.
@@ -25,6 +33,10 @@ but a 2x2 of smoothstone will make stone bricks.
 Finally, the block can be broken, and then uncrafted.
 Two wooden logs can be used to make 4 wooden pressure plates.
 
-\p
+\newpage
+
 To craft a piston, three wooden logs, 4 smoothstone, a block of iron, and a block of redstone
 will make 1 piston, 9 planks, 8 iron, and 8 redstone.
+
+\figure{H4sIAAAAAAAAAO3cz0rDQBDH8ZlsImmLqK/hoQiKeBcEn0KkidpDSUmCWJ/EJ/UatyAqCiXNbtnGfD+X2cv8OjlM/lw6FjGimYgkI9Fc7UHsoR7bephKNM/k6OF+Vhfl6m5WLJb2qBIvy+JRbC2LorbVZPNSVaKyklTMc17Kwdn0anp+YaNfbZDaulon2/qyruIrOdpZsnFKNhuS5TNZOyVHG5Jjp+Q2M0c7m7lbcpuZzc5m7pYsLTYl3i5Zfybrxk3ZMrnFzOZP8kiS2zpfVPr9M8n1U17Vv2ZJvjomoguRY/FAe94PDJnr/qRepgiH+weGjP13k3iZAgiD/QfQVejvd/YXAAAAAAAAAAAAAAAAAAAAAPDvTUTnPv4HoGma9z73A0PmYX9OHPvjkP3cPzBke7D/p479by7NHq7/0rEfCGYP9r/vz/8bx36gt0J/v/P+DgAAAAAAAAAAAAAAAAAAAAAYhA9fAWELmIQAAA==}
+

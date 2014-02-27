@@ -84,7 +84,7 @@ public class DocumentationModule implements ICommand {
 
     @Override
     public String getCommandName() {
-        return "fzdoc-serialize";
+        return "fzdoc-figure";
     }
 
     @Override
@@ -176,7 +176,7 @@ public class DocumentationModule implements ICommand {
             String encoded = encodeNBT(worldTag);
             ByteArrayInputStream bais = new ByteArrayInputStream(encoded.getBytes());
             NBTTagCompound it = decodeNBT(encoded);
-            String cmd = "\\figure " + encoded + " \\endfig";
+            String cmd = "\\figure{" + encoded + "}";
             System.out.println(cmd);
             FzUtil.copyStringToClipboard(cmd);
             msg(player, "\\figure command copied to the clipboard");
@@ -196,7 +196,9 @@ public class DocumentationModule implements ICommand {
             DeltaCoord dc = here.difference(min).add(start);
             w.setIdMdTe(dc, here.getId(), here.getMd(), here.getTE());
         }});
-        w.diagonal = (int) (max.difference(min).magnitude() + 1);
+        DeltaCoord d = max.difference(min);
+        d.y /= 2; // The top always points up, so it can be pretty tall
+        w.diagonal = (int) (d.magnitude() + 1);
         return w;
     }
     

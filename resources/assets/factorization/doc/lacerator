@@ -1,0 +1,32 @@
+\title{The Lacerator}
+
+The lacerator is a \link{socket}{Socket Tool} that
+grinds and destroys anything that is placed in front of it.
+
+It requires \link{charge}{charge} to power its motor,
+and it must have a backing inventory to drop the items
+it collects.
+
+If a mob or player steps in front of the spinning blades,
+they will get hurt.
+Mobs killed in this way have a small chance to drop XP.
+
+The lacerator will break blocks that are in front of it.
+How long it takes to break the block depends on that block's hardness.
+
+Many blocks will be broken down when mined by the lacerator.
+For example, smoothstone becomes cobblestone,
+and iron ore becomes dirty iron gravel.
+
+The lacerator can not break barrels.
+Instead, it will process the contents of the barrel.
+
+Items dropped by killed entities and broken blocks will
+be put into an internal buffer, which will be drained
+into the backing inventory.
+If the buffer can't be emptied, then the lacerator will
+become clogged and will stop operating.
+
+A redstone signal will disable the lacerator.
+
+

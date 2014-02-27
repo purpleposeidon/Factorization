@@ -1,10 +1,10 @@
 Hello, world! 
 
-\link:item_test we need an item\endlink .
+\link{item_test}{we need an item}.
 
-\link:stuff Yep\endlink , that-there be a link! Uhm huhm! MMMhMMM..
+\link{stuff}{Yep}, that-there be a link! Uhm huhm! MMMhMMM..
 
-\link:figures We also need figures.\endlink
+\link{figures}{We also need figures.}
 
 This should be a lonely line.
 

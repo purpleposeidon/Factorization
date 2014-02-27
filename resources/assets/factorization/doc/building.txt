@@ -1,0 +1,30 @@
+\title{Building}
+
+Factorization makes a few extra vanilla building blocks available for crafting.
+
+Firstly, the all-bark forms of certain woods are available.
+Crafting four logs in a shapeless recipe will create them.
+
+Non-vanilla logs may occasionally have all-bark recipes available.
+
+\figure{H4sIAAAAAAAAAO3cOw6DUAwEwH2hgkA+dyQFBV3ur0CUGxiJFDPVNmu5cesh6dLmJJc+7dW2kC28v+GatiaPPd5SMxX7wHnuxf54yBYAAAAAAAAAAAAAAAAAAMD+B2D5/QF4FkdV+8B53D8AAAAAAAAAAAAAAAAAAPyLD1cOaMsugAAA}
+
+\newpage
+
+Flat sandstone can be made out of 2 sandstone pillars.
+
+Two stone slabs can be crafted together to make double half slabs,
+and four double half-slabs can make flat stone slabs.
+
+\figure{H4sIAAAAAAAAAO3cOwqAQAwE0Flt/DTew2tpYWHn/VEX76DgexAYUqVJO0PSpixJmj5lLVfIFY4axpQ9me7Y1T3wR/fvd28fAQAAAAAAAAAAAAAAAAAA1B6A7ekBmJ8B/sf/AwAAAAAAAAAAAAAAAADAV5z21X/+LoAAAA==}
+
+\newpage
+Middle clicking has been made more useful.
+If you middle click on a block that is not on your hotbar,
+your inventory will be searched for that block.
+
+Additionally, if you middle click smooth stone,
+and you have smooth stone in your inventory,
+then it will pull that block up if you have
+no cobblestone.
+This also applies to similar blocks.

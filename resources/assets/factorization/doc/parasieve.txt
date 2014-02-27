@@ -1,4 +1,4 @@
-\u Parasieve\r
+\title{Parasieve}
 
 The parasieve is a powerful device for filtering items into and out of inventories.
 Place the parasieve against an inventory.
@@ -12,7 +12,8 @@ The upper slot is used with bottom slot to determine the class.
 \- If an item is alone, it will be matched exactly.
 \- If two items with different levels of damage are compared,
 then items within that quality may pass.
-\- If two items with text written on them are compared, then all texts may pass.
+\- If two items with text written on them are compared,
+then all similar items, with or without matching text, may pass.
 \- The parasieve may offer further discrimination based on characteristics invisible to the unaided eye.
 
 \newpage

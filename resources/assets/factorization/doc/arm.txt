@@ -1,0 +1,15 @@
+\title{The Robotic Arm}
+
+The robotic arm is a \link{socket}{Socket Tool} that
+right clicks from the backing inventory.
+It can click on blocks and entities.
+
+If the item doesn't seem to do anything,
+the arm will try clicking from various angles.
+It will continue through each item in its
+backing inventory until it is able to use
+something.
+
+If it is unable to put an item back into its inventory,
+it will drop it on the ground.
+

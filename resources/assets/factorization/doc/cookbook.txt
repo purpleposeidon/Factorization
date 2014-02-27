@@ -1,10 +1,11 @@
-This section gives examples of things that can be built using Vanilla Minecraft and Factorization. \nl
+This section gives examples of things that can be built using Vanilla Minecraft and Factorization.
 
 
-\u Logic Gates\r
-\-\link:gate/not NOT\endlink
-\-\link:gate/or OR\endlink
-\-\link:gate/and AND\endlink
-\-\link:gate/xor XOR\endlink
-\-\link:gate/latch Toggle Latch\endlink
-\-\link:gate/pulse Pulse Limiter\endlink
+\h1{Logic Gates}
+\nl Built using traditional and FZ-powered designs.
+\- \link{gate/not}{NOT}
+\- \link{gate/or}{OR}
+\- \link{gate/and}{AND}
+\- \link{gate/xor}{XOR}
+\- \link{gate/latch}{Toggle Latch}
+\- \link{gate/pulse}{Pulse Limiter}

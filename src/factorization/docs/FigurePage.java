@@ -42,11 +42,13 @@ public class FigurePage extends AbstractPage {
     
     @Override
     void draw(DocViewer doc, int ox, int oy) {
+        FzUtil.checkGLError("FigurePage -- before render");
         if (wr == null) {
-            FzUtil.checkGLError("FigurePage -- before update");
+            GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
             wr = new WorldRenderer(figure, new ArrayList(), 0, 0, 0, getRenderList());
             wr.needsUpdate = true;
             wr.updateRenderer();
+            GL11.glPopAttrib();
             FzUtil.checkGLError("FigurePage -- update worldrenderer");
         }
         wr.isInFrustum = true;
@@ -74,7 +76,7 @@ public class FigurePage extends AbstractPage {
             GL11.glShadeModel(GL11.GL_SMOOTH);
         }
         
-        GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT);
+        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
         for (int i = 0; i < 2; i++) {
             if (i == 1) {
                 GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -83,13 +85,14 @@ public class FigurePage extends AbstractPage {
             GL11.glCallList(wr.getGLCallListForPass(i));
         }
         GL11.glPopAttrib();
-        
+        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
         TileEntityRenderer ter = TileEntityRenderer.instance;
         for (TileEntity te : figure.tileEntities) {
             ter.renderTileEntityAt(te, te.xCoord, te.yCoord, te.zCoord, 0);
         }
-        
+        GL11.glPopAttrib();
         GL11.glPopMatrix();
+        FzUtil.checkGLError("FigurePage -- after rendering everything");
     }
     
     int getRenderList() {

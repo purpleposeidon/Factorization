@@ -1124,6 +1124,11 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "T",
                 '#', instruction_plate,
                 'T', Item.sign);
+        recipe(new ItemStack(docbook),
+                "B~>",
+                'B', Item.book,
+                '~', new ItemStack(Item.dyePowder, 1, 0), // The book says "ink sac", so you'll have to use an actual ink sac.
+                '>', logicMatrixProgrammer);
     }
     
     private void makeServoRecipes() {

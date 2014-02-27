@@ -1,22 +1,14 @@
-Squeezing an ink sac between a book and your \link:lmp Logic Matrix Programmer\endlink
+Squeezing an ink sac between a book and your \link{lmp}{Logic Matrix Programmer}
 has printed its internal encyclopedia to this convenient analog format.
 
-By learning its contents, you will be able to employ our tools to their full potential.
+By learning its contents, you will be able to employ our parts to their full potential.
 
-This kit (hopefully) emphasizes design and creation, rather than crafting and clicking buttons.
+This kit emphasizes design and creation, rather than crafting and clicking buttons in GUIs.
 
 \newpage
-\u Navigation\r
+\h1{Navigation}
 
-\nl space, mouse scroll down:
-
-    next page
-\nl mouse scroll up:
-
-    previous page
-\nl backspace, z:
-
-    go back
-\nl escape:
-    
-    Close manual
+scrollwheel down: next page \nl
+scrollwheel up: previous page \nl
+z: go back \nl
+escape: close manual \nl

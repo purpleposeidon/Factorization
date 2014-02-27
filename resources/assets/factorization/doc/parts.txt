@@ -1,0 +1,32 @@
+\title{Parts and Machines}
+
+\index{stamper}{Stamper}
+\index{packager}{Packager}
+\index{mixer}{Mixer}
+\index{compact}{Compression Crafter}
+\index{parasieve}{Parasieve}
+\index{barrel}{Barrel}
+
+\newpage \h1{\b{\link{socket}{Socket}} Parts}
+
+\index{arm}{Robotic Arm}
+\index{lacerator}{Lacerator}
+\index{itemshifter}{Item Shifter}
+\index{pressurizer}{Pressurizer}
+
+
+\newpage \h1{\b{\link{servo}{Servo}}s} (NORELEASE: the 's' gets cut off!)
+
+\index{servomotion}{Motion}
+\index{servologic}{Computation Instructions}
+\index{servointeract}{Interaction}
+
+
+
+\newpage \h1{Vanilla Parts}
+
+\index{piston}{Piston}
+\index{repeater}{Repeater}
+\index{comparator}{Comparator}
+\index{hopper}{Hopper}
+

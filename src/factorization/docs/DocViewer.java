@@ -13,6 +13,7 @@ import net.minecraft.client.resources.Resource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
+import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -130,7 +131,7 @@ public class DocViewer extends GuiScreen {
     
     String readContents(InputStream is) {
         if (is == null) {
-            return "\\obf 101*2*2 Not Found: \\r " + name;
+            return "\\obf{101*2*2 Not Found:} " + name;
         }
         try {
             StringBuilder build = new StringBuilder();
@@ -141,11 +142,12 @@ public class DocViewer extends GuiScreen {
             }
             return build.toString();
         } catch (Throwable e) {
+            e.printStackTrace();
             String txt = e.getMessage();
             for (StackTraceElement ste : e.getStackTrace()) {
                 txt += "\n\n    at " + ste.getFileName() + "(" + ste.getFileName() + ":" + ste.getLineNumber() + ")";
             }
-            return "\\obf 5*5*5*2*2 Internal Server Error\n\nAn error was encountered while trying to execute your request.\\r\n\n" + txt;
+            return "\\obf{5*5*5*2*2 Internal Server Error\n\nAn error was encountered while trying to execute your request.}\n\n" + txt;
         }
     }
     

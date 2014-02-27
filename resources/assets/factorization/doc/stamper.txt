@@ -1,0 +1,8 @@
+\title{The Stamper}
+
+The stamper is a simple crafting machine.
+Any item that is inserted into the stamper will be crafted by itself.
+
+Items can be inserted into the top and sides of the stamper,
+and removed from the bottom.
+After it crafts, it emits a redstone pulse  to aid extraction.

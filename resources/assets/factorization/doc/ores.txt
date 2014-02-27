@@ -1,13 +1,24 @@
-\title Ores
+\figure{H4sIAAAAAAAAAO3cu04CQRQG4DMQEC8FT0JMtLCx0cTE3p4grGSjQIJ4wedWWxwvwcLO3Wg039fM5Oz8Z08z2W63IpqRRpGXzUhFypvIm8VWXhub0TpdFJPrt2onGuUoNk5u5tPBsGhE5yjvzspJ8dbhIZ9IuXg8m12ui8vXXF7v473tl247F4PhYjZf9q+vBuNmdM7XLXO3aOen5XTcStEdzQd3/Xy2vC3658tFkfPN22Ie7d3eQW9vP0eH6xd/zvMxQlqPsB1pEtGNGqSK+UYdQwDf0qqY79QyBfAXNX97AAAAAAAAAAAAAAAAAAD4b7Yjla//AVitVk9V+vx2HqjksEo439/nugYBfla+v48V877fAAAAAAAAAAAAAAAAAFC3F78AjkL/gAAA}
+\title{Ores and Materials}
 
-Silver can be found in largish clumps below Y=46.
+Galena can be found in largish clumps no higher than 46 meters above bedrock.
 Both silver and lead can be extracted from it.
-(It's actually Galena.) 
-Silver is used as a reflecter, and lead is used as a conductor.
-
-\p
+Silver is used to reflect light, and lead is used as a conductor.
+Furnaces smelt galena into only silver.
+However, if smelted in a \link{slagfurnace}{Slag Furnace},
+it will produce both silver and lead ingots.
 
 Dark iron ore is an unusual metal.
 It is found in craters in the bedrock,
 and is clearly not the product of any natural process.
-This material is uniquely suitable for for \link:servo servos\endlink and other automata.
+This material is uniquely suitable for for \link{servo}{servos} and other automata.
+
+
+\newpage
+
+Diamond Shards are produced by exploding blocks
+of diamond with TNT.
+This produces 18 shards.
+They are used to make \link{lacerator}{Lacerators}.
+
+\figure{H4sIAAAAAAAAAO3cP0/bQBjH8d/ZTgSOBBT1BXjoiCL+De3UoaydYI8cfDgHjo1sQ3CHvuyu6YW4EkMWFKRI1fcjnZ5H58f3PDd4dSyFMpmkaF/GGp/IJ23sY7CnwGWKrl1e7mlwY1/aMx3ezFyTLKr6oUnun5q2f3Cu+M6V9iRZzNJ/exc6uK2eiix5rJrGTYuu37/Ufl4li7oq8++++S/fyvjY9fFlNYPWvQ/v0tu2qrvJNK1rW5yHGvgjy9YXHIcKM1f77HOsqCnSafD6yu9Aw6t0nubWH6fBj1W5kS9xrZ2/lnwZbyhZZUPfzZV5aHSU1eli4nu7ZzuZdq3184TPttbwdPx1fHEZKmq7R7saNFZYVPm696eNvfs7qr+j+jsGGsnMpSO9EQgA3ifqo9npFAAAAAAAAAAAAAAAAAAAAAAAAAAAAMB/YCTj3v4HYLlc/tniuPH2EwHYkW2+3yu/vvn1c0f9AewW3y8AAAAAAAAAAAAAAAAAAAAAAAAAAB/pLzhWik6OgQAA}

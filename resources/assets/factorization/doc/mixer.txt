@@ -1,0 +1,16 @@
+\title{The Mixer}
+
+The mixer is an electrically powered machine that crafts shapeless recipes.
+It has 4 input slots, and 4 outputs slots.
+
+When mixing, items are allowed to be spread out
+in ways that would not work in normal crafting tables.
+For example, 1 stack of bowls, 2 stacks of red mushrooms,
+and 1 stack of brown mushrooms will successfully craft mushroom stew.
+
+It requires \link{charge}{charge} to operate.
+If kept stocked with a sufficient supply of crafting materials,
+its crafting speed will slowly accelerate.
+
+Crafting ingredients are inserted into the top and sides of the machine,
+and crafting results are extracted from the bottom.

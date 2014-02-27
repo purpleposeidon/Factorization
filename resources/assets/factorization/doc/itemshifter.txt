@@ -1,0 +1,35 @@
+\title{The Item Shifter}
+
+The item shifter is a \link{socket}{socket tool}
+that moves items to and from its backing inventory
+into an inventory in front of it.
+
+The item shifter has a few settings, which can be configured
+with a \lmp.
+
+The direction that it moves items can be controlled.
+By default, items are moved from the exporting inventory
+into the other.
+
+The operating mode of the shifter can be changed.
+There are three modes:
+\- Stream Items. In this mode, it behaves like a hopper,
+except that it requires a redstone signal to operate.
+\- Pulse Exact. The number of items to be moved can be specified.
+In this mode, if it can not move exactly that many items,
+then it will move no items.
+It will attempt to move items each time it gets a redstone pulse.
+\- Pulse Some. In this mode, it will transer up to the specified
+number of items per redstone pulse.
+
+The transfer limit is how many items will be moved.
+In Stream Items mode, only 1 item will be moved at a time.
+
+The target slot controls which slot the item shifter will
+put items into.
+This only applies to the inventory in front of it,
+it does nothing to the backing inventory.
+It can be set to target either the entire inventory,
+or a specific slot.
+
+

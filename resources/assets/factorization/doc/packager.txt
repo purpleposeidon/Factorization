@@ -1,0 +1,15 @@
+\title{The Packager}
+
+The packager is only slightly more complicated than \link{stamper}{the stamper}.
+When 9 or 4 items have been inserted into it, it tries to craft them.
+First it will try to craft the items in a 3x3 grid,
+and if there is no recipe,
+it will try crafting them in a 2x2 grid.
+
+Like the stamper, its inputs are the top and sides,
+its output is the bottom,
+and it will emit a redstone signal when crafting.
+
+If an item can be crafted as both a 3x3 and a 2x2,
+then an \link{shifter}{item shifter} can be used to
+insert the appropriate number of items for it to use.

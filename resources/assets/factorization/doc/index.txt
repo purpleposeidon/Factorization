@@ -2,39 +2,16 @@
 \nl\nl
 
 
-\link{about}{About}
-
-\link{parts}{Parts & Machines}
-(parts; ore processing; heaters)
-
-\link{building}{Building}
-(embarkening; middle clicking; sculpture)
-
-\link{cookbook}{Designs}
-
-\link{servos}{Servos}
-
-\link{charge}{Energy}
-
-\link{ores}{Ores and Materials}
-
-\link{misc}{Miscellaneous Nonsense}
-
-
-These guys go elsewhere:
-
-\b{Parts}
--\link{parasieve}{Parasieve}
--\link{barrel}{Barrels}
--\link{compact}{Compression Crafting}
-
-\link{sockets}{Sockets}
-
-\link{servos}{Servos}
--\link{servomotion}{Motion}
--\link{servoinstructions}{Instructions}
+\index{about}{About}
+\index{ores}{Ores and Materials}
+\index{parts}{Parts and Machines}
+\index{building}{Building} (embarkening; middle clicking; sculpture)
+\index{cookbook}{Designs}
+\index{charge}{Energy}
+\index{oreprocessing}{Ore Processing}
+\index{misc}{Miscellaneous Nonsense}
 
 
 \newpage
 
-\link{test}{[Test Page]}
+\link{test}{[Test Page]} NORELEASE

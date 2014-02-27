@@ -102,6 +102,8 @@ public class DocWorld extends WorldClient {
             return Core.registry.factory_block.blockID;
         } else if (id == -11) {
             return Core.registry.resource_block.blockID;
+        } else if (id == -12) {
+            return Core.registry.dark_iron_ore.blockID;
         } else {
             return id;
         }
@@ -142,6 +144,8 @@ public class DocWorld extends WorldClient {
             id = -10;
         } else if (id == Core.registry.resource_block.blockID) {
             id = -11;
+        } else if (id == Core.registry.dark_iron_ore.blockID) {
+            id = -12;
         }
         blockIds[i] = id;
         blockMetadatas[i] = md;

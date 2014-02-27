@@ -1,6 +1,10 @@
-\u The Pocket Crafting Table\r
-\nl It's awesome. You should use it, altho it does need a clean inventory.
+\u{The Pocket Crafting Table}
+
+It's awesome. You should use it, altho it does need a clean inventory.
+
 \nl
 
-\u The '/f' client-side commands\r
-\nl I must refer you to '/f list' for more information. Popular /f's include 'now', 'saycoords', and 'cl'.
+\u{The '/f' client-side commands}
+
+Popular /f's include 'now', 'cl', and 'ss'.
+Run '/f list' for more information.

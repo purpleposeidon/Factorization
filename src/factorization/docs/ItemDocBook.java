@@ -36,7 +36,7 @@ public class ItemDocBook extends ItemFactorization {
     @Override
     @SideOnly(Side.CLIENT)
     public Icon getIconFromDamage(int par1) {
-        return Item.book.getIconFromDamage(0);
+        return Item.enchantedBook.getIconFromDamage(0);
     }
     
     @Override
