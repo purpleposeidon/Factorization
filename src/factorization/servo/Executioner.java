@@ -137,7 +137,7 @@ public class Executioner {
             rail.decoration.motorHit(motor);
             break;
         case ENTRY_LOAD:
-            if (rail.decoration != null) {
+            if (rail.decoration instanceof Instruction) {
                 getServoStack(STACK_IO).push(rail.decoration.copyComponent());
             }
             break;
