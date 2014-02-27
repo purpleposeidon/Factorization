@@ -440,9 +440,9 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 "-",
                 "-",
                 '-', new ItemStack(Block.stoneSingleSlab));
-        recipe(new ItemStack(Block.stoneDoubleSlab, 4, 8),
-                "##",
-                "##",
+        recipe(new ItemStack(Block.stoneDoubleSlab, 2, 8),
+                "#",
+                "#",
                 '#', new ItemStack(Block.stoneDoubleSlab));
         recipe(new ItemStack(Block.stoneDoubleSlab, 2, 9),
                 "#",
