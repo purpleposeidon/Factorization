@@ -40,6 +40,7 @@ import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
+import factorization.notify.Notify;
 import factorization.servo.LoggerDataHelper;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
@@ -419,8 +420,12 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
                 if (tec == null) continue;
                 if (!(tec instanceof TileEntitySocketBase)) continue;
                 TileEntitySocketBase rep = (TileEntitySocketBase) tec;
-                if (rep.getParentFactoryType() != getFactoryType()) continue;
-                if (FzUtil.couldMerge(held, rep.getCreatingItem())) {
+                final ItemStack creator = rep.getCreatingItem();
+                if (creator != null && FzUtil.couldMerge(held, creator)) {
+                    if (rep.getParentFactoryType() != getFactoryType()) {
+                        rep.mentionPrereq(this);
+                        return false;
+                    }
                     TileEntityCommon upgrade = ft.makeTileEntity();
                     if (upgrade != null) {
                         replaceWith((TileEntitySocketBase) upgrade, this);
@@ -432,6 +437,21 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
             }
         }
         return false;
+    }
+    
+    public void mentionPrereq(ISocketHolder holder) {
+        FactoryType pft = getParentFactoryType();
+        if (pft == null) return;
+        TileEntityCommon tec = pft.getRepresentative();
+        if (!(tec instanceof TileEntitySocketBase)) return;
+        ItemStack is = ((TileEntitySocketBase) tec).getCreatingItem();
+        Notify.withItem(is);
+        String msg = "Needs {ITEM_NAME}";
+        if (holder instanceof Entity) {
+            Notify.send((Entity) holder, msg);
+        } else {
+            Notify.send((TileEntity) holder, msg);
+        }
     }
     
     protected void replaceWith(TileEntitySocketBase replacement, ISocketHolder socket) {
@@ -516,4 +536,6 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         render.renderItem(is);
         GL11.glPopMatrix();
     }
+
+    public void installedOnServo(ServoMotor servoMotor) { }
 }

@@ -661,10 +661,25 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         GL11.glTranslatef(0, 6F/16F, 0);
         float turn = FzUtil.interp(prev_rotation, rotation, partial) / 5.0F;
         GL11.glRotatef(-turn, 0, 1, 0);
-        //GL11.glRotatef(90, 0, 1, 0);
         float s = 12F/16F;
         GL11.glScalef(s, s, s);
-        render.renderItem(is);
+        int count = 6;
+
+        for (int i = 0; i < motor.getSizeInventory(); i++) {
+            is = motor.getStackInSlot(i);
+            if (is == null) continue;
+            GL11.glPushMatrix();
+            GL11.glRotatef(360*i/4, 0, 1, 0);
+            GL11.glTranslatef(0, count--/16F, 5F/16F);
+            render.renderItem(is);
+            GL11.glPopMatrix();
+        }
         GL11.glPopMatrix();
+    }
+    
+    @Override
+    public void installedOnServo(ServoMotor servoMotor) {
+        super.installedOnServo(servoMotor);
+        servoMotor.resizeInventory(4);
     }
 }

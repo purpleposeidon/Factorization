@@ -9,6 +9,7 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -1635,5 +1636,14 @@ public class FzUtil {
     public static void copyStringToClipboard(String text) {
         StringSelection stringselection = new StringSelection(text);
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringselection, (ClipboardOwner)null);
+    }
+    
+    public static <E> ArrayList<E> copyWithoutNull(Collection<E> orig) {
+        ArrayList<E> ret = new ArrayList();
+        if (orig == null) return ret;
+        for (E e : orig) {
+            if (e != null) ret.add(e);
+        }
+        return ret;
     }
 }

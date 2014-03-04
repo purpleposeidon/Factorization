@@ -6,7 +6,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -23,7 +22,6 @@ import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.ForgeDirection;
 
 import com.google.common.io.ByteArrayDataInput;
@@ -36,7 +34,6 @@ import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.IChargeConductor;
 import factorization.api.IEntityMessage;
-import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataInPacket;
@@ -46,13 +43,12 @@ import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.notify.Notify;
-import factorization.servo.instructions.IntegerValue;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
-import factorization.shared.Sound;
-import factorization.shared.TileEntityCommon;
 import factorization.shared.FzUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.Sound;
+import factorization.shared.TileEntityCommon;
 import factorization.sockets.GuiDataConfig;
 import factorization.sockets.ISocketHolder;
 import factorization.sockets.SocketEmpty;
@@ -131,7 +127,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         executioner.putData(data);
         motionHandler.putData(data);
         
-        for (int i = 0; i < inv.length; i++) {
+        final byte invSize = data.as(Share.VISIBLE, "inv#").putByte((byte) inv.length);
+        resizeInventory(invSize);
+        for (int i = 0; i < invSize; i++) {
             ItemStack is = inv[i] == null ? EMPTY_ITEM : inv[i];
             is = data.as(Share.VISIBLE, "inv" + i).putItemStack(is);
             if (is == null) {
@@ -396,37 +394,26 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 return true;
             }
         }
-        if (socket instanceof SocketEmpty && is.getItem() == Core.registry.socket_part) {
-            // We want this code path to not be used in favor of the other one.
-            int md = is.getItemDamage();
-            if (md > 0 && md < FactoryType.MAX_ID) {
-                try {
-                    socket = (TileEntitySocketBase) FactoryType.fromMd(md).getFactoryTypeClass().newInstance();
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    Notify.send(null, this, "Exception; see console log\n" + e.getMessage());
+        if (socket == null) return false;
+        if (socket.activateOnServo(player, this)) return false;
+        for (FactoryType ft : FactoryType.values()) {
+            TileEntityCommon tec = ft.getRepresentative();
+            if (tec == null) continue;
+            if (!(tec instanceof TileEntitySocketBase)) continue;
+            TileEntitySocketBase rep = (TileEntitySocketBase) tec;
+            ItemStack creator = rep.getCreatingItem();
+            if (creator != null && FzUtil.couldMerge(is, creator)) {
+                if (rep.getParentFactoryType() != socket.getFactoryType()) {
+                    rep.mentionPrereq(this);
+                    return false;
                 }
-            }
-            if (!player.capabilities.isCreativeMode) {
-                is.stackSize--;
-            }
-        } else if (socket != null) {
-            if (!socket.activateOnServo(player, this)) {
-                for (FactoryType ft : FactoryType.values()) {
-                    TileEntityCommon tec = ft.getRepresentative();
-                    if (tec == null) continue;
-                    if (!(tec instanceof TileEntitySocketBase)) continue;
-                    TileEntitySocketBase rep = (TileEntitySocketBase) tec;
-                    if (rep.getParentFactoryType() != socket.getFactoryType()) continue;
-                    if (FzUtil.couldMerge(is, rep.getCreatingItem())) {
-                        TileEntityCommon upgrade = ft.makeTileEntity();
-                        if (upgrade != null) {
-                            socket = (TileEntitySocketBase) upgrade;
-                            if (!player.capabilities.isCreativeMode) is.stackSize--;
-                            if (worldObj.isRemote) Sound.servoInstall.playAt(new Coord(this));
-                            return true;
-                        }
-                    }
+                TileEntityCommon upgrade = ft.makeTileEntity();
+                if (upgrade != null) {
+                    socket = (TileEntitySocketBase) upgrade;
+                    if (!player.capabilities.isCreativeMode) is.stackSize--;
+                    if (worldObj.isRemote) Sound.servoInstall.playAt(new Coord(this));
+                    socket.installedOnServo(this);
+                    return true;
                 }
             }
         }
@@ -511,6 +498,22 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         super.setPositionAndRotation(x, y, z, yaw, pitch);
     }
     
+    public void resizeInventory(int newSize) {
+        if (newSize == inv.length) return;
+        ItemStack[] origInv = inv;
+        int min = Math.min(newSize, origInv.length);
+        inv = new ItemStack[newSize];
+        for (int i = 0; i < min; i++) {
+            inv[i] = origInv[i];
+            origInv[i] = null;
+        }
+        for (ItemStack is : origInv) {
+            if (is != null) {
+                getCurrentPos().spawnItem(is);
+            }
+        }
+        inv_last_sent = new ItemStack[newSize];
+    }
 
     
     
