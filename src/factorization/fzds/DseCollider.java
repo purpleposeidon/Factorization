@@ -106,4 +106,9 @@ public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdd
     public Entity[] getParts() {
         return parent == null ? null : parent.getParts();
     }
+    
+    @Override
+    public boolean writeToNBTOptional(NBTTagCompound par1nbtTagCompound) {
+        return false;
+    }
 }
