@@ -1,5 +1,6 @@
 package factorization.weird;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.client.renderer.texture.IconRegister;
@@ -7,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.common.FactoryType;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemBlockProxy;
@@ -47,6 +49,18 @@ public class ItemDayBarrel extends ItemBlockProxy {
         Type upgrade = TileEntityDayBarrel.getUpgrade(is);
         if (upgrade == Type.SILKY) {
             list.add(Core.translateThis("factorization.factoryBlock.DAYBARREL.SILKY.silkhint"));
+            TileEntityDayBarrel db = (TileEntityDayBarrel) FactoryType.DAYBARREL.getRepresentative();
+            db.loadFromStack(is);
+            int count = db.getItemCount();
+            if (count > 0 && db.item != null) {
+                ArrayList sub = new ArrayList();
+                db.item.getItem().addInformation(db.item, player, sub, verbose);
+                if (!sub.isEmpty()) {
+                    Object first = sub.get(0);
+                    sub.set(0, count + " " + first);
+                    list.addAll(sub);
+                }
+            }
         }
     }
     
