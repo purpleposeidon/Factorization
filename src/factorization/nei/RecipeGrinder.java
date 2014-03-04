@@ -4,9 +4,8 @@ import java.awt.Rectangle;
 import java.util.Arrays;
 import java.util.List;
 
-import net.minecraft.block.Block;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.recipe.GuiRecipe;
@@ -40,10 +39,17 @@ public class RecipeGrinder extends TemplateRecipeHandler {
     @Override
     public void loadUsageRecipes(ItemStack ingredient) {
         //XXX NOTE: This is probably a lame implementation of this function.
+        Item ingredientItem = ingredient == null ? null : ingredient.getItem();
         if (FzUtil.couldMerge(ingredient, Core.registry.socket_lacerator)) {
             ingredient = null;
         }
         if (FzUtil.couldMerge(ingredient, Core.registry.empty_socket_item)) {
+            ingredient = null;
+        }
+        if (ingredientItem == Core.registry.motor) {
+            ingredient = null;
+        }
+        if (ingredientItem == Core.registry.diamond_cutting_head) {
             ingredient = null;
         }
         for (GrinderRecipe gr : TileEntityGrinder.recipes) {
@@ -61,8 +67,9 @@ public class RecipeGrinder extends TemplateRecipeHandler {
     }
 
     static final List<PositionedStack> socketBits = Arrays.asList(
-            new PositionedStack(Core.registry.socket_lacerator.copy(), 51+18, 24),
-            new PositionedStack(Core.registry.empty_socket_item, 51+18*2, 24)
+            new PositionedStack(new ItemStack(Core.registry.diamond_cutting_head), 78, 24 - 18),
+            new PositionedStack(new ItemStack(Core.registry.motor), 78, 24),
+            new PositionedStack(Core.registry.empty_socket_item.copy(), 78, 24 + 18)
             );
     
     class CachedGrinderRecipe extends CachedRecipe {

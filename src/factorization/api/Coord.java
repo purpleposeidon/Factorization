@@ -716,6 +716,11 @@ public class Coord implements IDataSerializable {
         return b.getSelectedBoundingBoxFromPool(w, x, y, z);
     }
     
+    public static AxisAlignedBB aabbFromRange(Coord min, Coord max) {
+        Coord.sort(min, max);
+        return AxisAlignedBB.getBoundingBox(min.x, min.y, min.z, max.x, max.y, max.z);
+    }
+    
     public void notifyOfNeighborChange(int neighborId) {
         w.notifyBlocksOfNeighborChange(x, y, z, neighborId);
     }
