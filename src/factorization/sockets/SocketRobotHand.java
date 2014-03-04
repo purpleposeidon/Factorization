@@ -2,21 +2,20 @@ package factorization.sockets;
 
 import java.io.IOException;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumMovingObjectType;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
+
+import org.lwjgl.opengl.GL11;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -74,10 +73,6 @@ public class SocketRobotHand extends TileEntitySocketBase {
             return;
         }
         wasPowered = true;
-        IInventory back = getBackingInventory(socket);
-        if (back == null) {
-            return;
-        }
         firstTry = true;
         FzOrientation orientation = FzOrientation.fromDirection(facing).getSwapped();
         fakePlayer = null;
@@ -94,14 +89,13 @@ public class SocketRobotHand extends TileEntitySocketBase {
         }
         EntityPlayer player = fakePlayer;
         FzInv inv = FzUtil.openInventory(getBackingInventory(socket), facing);
+        if (inv == null) {
+            return clickWithoutInventory(player, mop);
+        }
         boolean foundAny = false;
-        int anEmpty = -1;
         for (int i = 0; i < inv.size(); i++) {
             ItemStack is = inv.get(i);
             if (is == null || is.stackSize <= 0 || !inv.canExtract(i, is)) {
-                if (anEmpty != -1) {
-                    anEmpty = i;
-                }
                 continue;
             }
             player.inventory.mainInventory[0] = is;
@@ -110,12 +104,16 @@ public class SocketRobotHand extends TileEntitySocketBase {
                 return true;
             }
         }
-        if (!foundAny && anEmpty != -1) {
-            return clickWithInventory(anEmpty, inv, player, null, mop);
+        if (!foundAny) {
+            return clickWithoutInventory(player, mop);
         }
         return false;
     }
     
+    private boolean clickWithoutInventory(EntityPlayer player, MovingObjectPosition mop) {
+        return clickItem(player, null, mop);
+    }
+
     boolean clickWithInventory(int i, FzInv inv, EntityPlayer player, ItemStack is, MovingObjectPosition mop) {
         ItemStack orig = is == null ? null : is.copy();
         boolean result = clickItem(player, is, mop);
@@ -215,7 +213,10 @@ public class SocketRobotHand extends TileEntitySocketBase {
             ret = itemstack.tryPlaceItemIntoWorld(player, world, x, y, z, side, dx, dy, dz);
             break;
         } while (false);
-        int origSize = itemstack.stackSize;
+        if (itemstack == null) {
+            return ret;
+        }
+        int origSize = FzUtil.getStackSize(itemstack);
         ItemStack mutatedItem = itemstack.useItemRightClick(world, player);
         if (mutatedItem != itemstack) {
             ret = true;
@@ -251,9 +252,9 @@ public class SocketRobotHand extends TileEntitySocketBase {
         if (worldObj.isRemote) {
             return false;
         }
-        if (getBackingInventory(this) == null) {
+        /*if (getBackingInventory(this) == null) {
             Notify.send(this, "Missing inventory block");
-        }
+        }*/
         return false;
     }
     
