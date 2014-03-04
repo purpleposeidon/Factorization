@@ -207,6 +207,17 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
             }
             append += s;
         }
+        boolean any = false;
+        for (Coord c : getCoord().getRandomNeighborsAdjacent()) {
+            TileEntitySolarBoiler boiler = c.getTE(TileEntitySolarBoiler.class);
+            if (boiler != null) {
+                any = true;
+                break;
+            }
+        }
+        if (!any) {
+            append += "\n" + "No adjacent boiler!";
+        }
         if (stomache == null || stomache.stackSize == 0) {
             Notify.send(entityplayer, this, "Empty" + append);
             return;
