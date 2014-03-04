@@ -2,8 +2,8 @@
 
 logic = [
     ("PumpLiquids", "!onServo && !powered && sourceIsLiquid && (isLiquid(destination) || hasTank(destination) || isClear(destination))"),
-    ("GeneratePower", "!onServo && powered && sourceIsLiquid && isClear(destination)"),
-    ("MixCrafting", "!onServo && hasInv(front) && hasInv(back)"),
+    #("GeneratePower", "!onServo && powered && sourceIsLiquid && isClear(destination)"),
+    #("MixCrafting", "!onServo && hasInv(front) && hasInv(back)"),
     ("BlowEntities", "!sourceIsLiquid && noCollision(front)"),
 ]
 

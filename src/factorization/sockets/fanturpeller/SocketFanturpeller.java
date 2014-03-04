@@ -93,19 +93,6 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         super.updateEntity();
     }
     
-    /**
-     * Possible actions:
-     * <ul>
-     * <li>move liquids (IFluidContainers/world). Source and destination
-     * must be able to hold liquids (or have liquids spilled into them, in
-     * the case of air)</li>
-     * <li>suck in entities; or blow out items and entities. Front must be
-     * clear. Back may have an inventory.</li>
-     * <li>mix shapeless recipes. Must have an inventory, front and back.</li>
-     * <li>generate power. Must have a redstone signal, and front must be
-     * clear, and back must contain a gas as a block or as an inventory
-     * </ul>
-     */
     boolean pickFanAction(Coord coord, boolean powered, ISocketHolder socket) {
         final Coord front = coord.add(facing);
         final Coord back = coord.add(facing.getOpposite());
@@ -125,35 +112,17 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         // The real source for this is in fanmacro.py, which should be located in the same folder as this file.
         // Executing it will update this code.
         boolean need_PumpLiquids = false;
-        boolean need_GeneratePower = false;
-        boolean need_MixCrafting = false;
         boolean need_BlowEntities = false;
         if (!onServo && !powered && sourceIsLiquid && (isLiquid(destination) || hasTank(destination) || isClear(destination))) {
             need_PumpLiquids = true;
-        }
-        if (!onServo && powered && sourceIsLiquid && isClear(destination)) {
-            need_GeneratePower = true;
-        }
-        if (!onServo && hasInv(front) && hasInv(back)) {
-            need_MixCrafting = true;
         }
         if (!sourceIsLiquid && noCollision(front)) {
             need_BlowEntities = true;
         }
         if (need_PumpLiquids && this instanceof PumpLiquids) return false;
-        if (need_GeneratePower && this instanceof GeneratePower) return false;
-        if (need_MixCrafting && this instanceof MixCrafting) return false;
         if (need_BlowEntities && this instanceof BlowEntities) return false;
         if (need_PumpLiquids) {
             replaceWith(new PumpLiquids(), socket);
-            return true;
-        }
-        if (need_GeneratePower) {
-            replaceWith(new GeneratePower(), socket);
-            return true;
-        }
-        if (need_MixCrafting) {
-            replaceWith(new MixCrafting(), socket);
             return true;
         }
         if (need_BlowEntities) {
@@ -264,7 +233,9 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         fanturpellerUpdate(socket, coord, powered, neighbor_changed);
         if (!worldObj.isRemote) {
             final int need = getRequiredCharge();
-            if (need > 0) {
+            if (powered) {
+                fanω *= 0.95;
+            } else if (need > 0) {
                 final float ts = getTargetSpeed() * (isSucking ? -1 : 1);
                 if (!socket.extractCharge(need)) {
                     fanω *= 0.9;
