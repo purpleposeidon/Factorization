@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -1335,17 +1336,17 @@ public class Registry implements ICraftingHandler, ITickHandler {
         }
         for (ItemStack log : theLogs) {
             log = log.copy();
-            List<ItemStack> planks = FzUtil.craft1x1(null, true, log.copy());
-            if (planks == null || planks.size() != 1) {
+            List<ItemStack> planks = FzUtil.copyWithoutNull(FzUtil.craft1x1(null, true, log.copy()));
+            if (planks.size() != 1 || !FzUtil.craft_succeeded) {
                 continue;
             }
             ItemStack plank = planks.get(0).copy();
             plank.stackSize = 1;
-            List<ItemStack> slabs = FzUtil.craft3x3(null, true, true, new ItemStack[] {
+            List<ItemStack> slabs = FzUtil.copyWithoutNull(FzUtil.craft3x3(null, true, true, new ItemStack[] {
                     plank.copy(), plank.copy(), plank.copy(),
                     null, null, null,
                     null, null, null
-            });
+            }));
             ItemStack slab;
             String odType;
             if (slabs.size() != 1 || !FzUtil.craft_succeeded) {
@@ -1363,7 +1364,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
                     slab = plank;
                 }
             }
-            TileEntityDayBarrel.makeRecipe(log, slab);
+            TileEntityDayBarrel.makeRecipe(log, slab.copy());
         }
     }
     
