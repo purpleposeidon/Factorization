@@ -5,13 +5,8 @@
 \index{about}{About}
 \index{ores}{Ores and Materials}
 \index{parts}{Parts and Machines}
-\index{building}{Building} (embarkening; middle clicking; sculpture)
+\index{building}{Building}
 \index{cookbook}{Designs}
 \index{charge}{Energy}
-\index{oreprocessing}{Ore Processing}
+% \index{oreprocessing}{Ore Processing}
 \index{misc}{Miscellaneous Nonsense}
-
-
-\newpage
-
-\link{test}{[Test Page]} NORELEASE

@@ -1,0 +1,8 @@
+\title{Set Direction\#{item.factorization:servo/component.fz.instruction.setdirection}}
+
+When a servo hits this instruction,
+it will attempt to go in the direction it is pointing.
+
+If it can not actually go that way,
+it will at the next opportunity.
+(Unless it is later told to go in a different direction.)

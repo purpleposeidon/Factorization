@@ -1,0 +1,24 @@
+\title{The Pressurizer}
+
+The pressurizer is a \link{socket}{socket tool}.
+It blows entities, and pumps fluids.
+
+An \lmp\ can configure whether it sucks or blows,
+and how fast it operates.
+Faster speeds require more \link{charge}{charge} to operate.
+
+It can transfer liquids between the tanks,
+and liquids can be drained from, and flooded into, the world.
+Higher speeds increase the water pressure when flooding.
+However, draining and flooding only work when blowing,
+not with sucking.
+
+\newpage
+
+The pressurizer can also be used to blow entities around.
+If it is blowing, it can drops items from a backing inventory,
+and if it is sucking, it will suck items into the inventory.
+
+It is able to move players at higher speeds.
+
+A redstone signal will disable the pressurizer.

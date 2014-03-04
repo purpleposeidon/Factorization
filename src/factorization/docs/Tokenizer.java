@@ -24,8 +24,8 @@ public class Tokenizer {
     private int contigSpaces = 0;
     
     public boolean nextToken() {
-        while (true) {
-            if (scan + 1 >= src.length()) return false;
+        mainloop: while (true) {
+            if (scan >= src.length()) return false;
             char c = src.charAt(scan);
             if (c == '\n') {
                 scan++;
@@ -52,6 +52,13 @@ public class Tokenizer {
                     return true;
                 }
                 continue;
+            } else if (c == '%') {
+                while (scan < src.length()) {
+                    c = src.charAt(scan++);
+                    if (c == '\n') {
+                        continue mainloop;
+                    }
+                }
             } else if (c == '\\') {
                 readCommand();
             } else if (c == '{') {

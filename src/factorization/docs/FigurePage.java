@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 
 import org.lwjgl.opengl.GL11;
@@ -53,6 +55,7 @@ public class FigurePage extends AbstractPage {
         }
         wr.isInFrustum = true;
         doc.mc.renderEngine.bindTexture(Core.blockAtlas);
+        GL11.glColor4f(1, 1, 1, 1);
         GL11.glPushMatrix();
         GL11.glTranslatef(ox, oy, 200);
         
@@ -87,8 +90,26 @@ public class FigurePage extends AbstractPage {
         GL11.glPopAttrib();
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
         TileEntityRenderer ter = TileEntityRenderer.instance;
+        ter.staticPlayerX = ter.staticPlayerY = ter.staticPlayerZ = 0;
         for (TileEntity te : figure.tileEntities) {
             ter.renderTileEntityAt(te, te.xCoord, te.yCoord, te.zCoord, 0);
+        }
+        GL11.glPopAttrib();
+        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+        RenderManager rm = RenderManager.instance;
+        //rm.renderPosX = rm.renderPosY = rm.renderPosZ = 0;
+        for (Entity ent : figure.entities) {
+            double x = ent.posX - figure.orig.x;
+            double y = ent.posY - figure.orig.y;
+            double z = ent.posZ - figure.orig.z;
+            rm.renderPosX = ent.posX;
+            rm.renderPosY = ent.posY;
+            rm.renderPosZ = ent.posZ;
+            GL11.glPushMatrix();
+            GL11.glTranslated(x, y, z);
+            //GL11.glTranslated(ent.posX, ent.posY, ent.posZ);
+            rm.renderEntity(ent, 0);
+            GL11.glPopMatrix();
         }
         GL11.glPopAttrib();
         GL11.glPopMatrix();

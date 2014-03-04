@@ -1,0 +1,17 @@
+\title{The Hopper}
+
+The hopper is a simple item mover.
+Every few ticks, it will move 1 item from an inventory above itself into its buffer,
+and 1 item from its buffer into another inventory.
+It can output items either down, or sideways.
+Item entities that fall on top of it will be sucked into the buffer.
+
+A redstone signal will disable the hopper's operation,
+so it will neither move items nor suck them into its buffer.
+
+Unlike every other item transport mechanism in existence,
+hoppers will fill the first available slot of an inventory,
+even if there is another stack where an item would fit.
+
+
+\figure{H4sIAAAAAAAAAO3cMW7CQBAF0FlbRAk0XIQ+fZqkzwUi2ZGQgEUGKcBRcrRcxnjBVco0TvFeM6PR6murKWceUUdqIqJ6itSmoYmhOc7vk9nbsd0ebtPHqNZNPLzm/b7t6li+dx+7w2fbveS8afLXrrwZoi5jPY/1FPfIvyWlX0kpFpG2EcsymwUAAAAAAAAAAAAAAAAAAAAwqTqqXC4CrEpz6fv+ZxFpPV4G+J74c8C07AAAAAAAAAAAAAAAAAAAAPgHykGA81Cf4wrQ0ZST3YAAAA==}

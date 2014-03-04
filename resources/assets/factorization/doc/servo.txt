@@ -1,0 +1,14 @@
+\title{Servos}
+
+The servo is a mobile \link{socket}{socket}.
+Any tool that can be equipped on a socket
+can be equipped on a servo.
+
+Servos ride on \link{servorail}{servo rail}.
+A servo that is moving in a direction is facing that direction,
+and its top can point at any of the 4 directions that aren't
+parallel to its facing direction.
+
+Servos require \link{charge}{charge} to operate.
+
+They are controlled by \link{servorail}{instructions}.

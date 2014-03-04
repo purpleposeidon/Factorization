@@ -31,6 +31,19 @@ public class WordPage extends AbstractPage {
     }
     
     void nl() {
+        if (!text.isEmpty()) {
+            ArrayList<Word> last = text.get(text.size() - 1);
+            while (!last.isEmpty()) {
+                Word l = last.get(last.size() - 1);
+                if (l instanceof TextWord) {
+                    TextWord tw = (TextWord) l;
+                    if (tw.text.trim().length() == 0) {
+                        last.remove(last.size() - 1);
+                    }
+                }
+                break;
+            }
+        }
         text.add(new ArrayList());
         lineLen = 0;
     }

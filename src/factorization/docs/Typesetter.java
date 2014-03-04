@@ -2,11 +2,14 @@ package factorization.docs;
 
 import java.util.ArrayList;
 
-import com.google.common.base.Strings;
-
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.resources.Resource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.ResourceLocation;
+
+import com.google.common.base.Strings;
 
 public class Typesetter {
     // Super-awesome typesetter version π², by neptunepink
@@ -77,7 +80,7 @@ public class Typesetter {
                 } else if (cmd.equals("\\-")) {
                     getCurrentPage().nl();
                     emit(" - ", null);
-                } else if (cmd.equals("\\ ")) {
+                } else if (cmd.equals("\\") || cmd.equals("\\ ")) {
                     emit(style + " ", link);
                 } else if (cmd.equalsIgnoreCase("\\\\")) {
                     emit("\\", link);
@@ -133,13 +136,58 @@ public class Typesetter {
                     }
                 } else if (cmd.equals("\\#")) {
                     String itemName = getParameter(cmd, tokenizer);
-                    if (itemName == null) continue;
+                    if (itemName == null) {
+                        error("No item specified");
+                        continue;
+                    }
                     ItemStack is = DocumentationModule.lookup(itemName);
                     if (is == null) {
                         error(itemName);
                         continue;
                     }
                     emitWord(new ItemWord(is, link));
+                } else if (cmd.equals("\\img")) {
+                    String imgName = getParameter(cmd, tokenizer);
+                    if (imgName == null) {
+                        error("No img specified");
+                        continue;
+                    }
+                    ResourceLocation rl = new ResourceLocation(imgName);
+                    Minecraft mc = Minecraft.getMinecraft();
+                    try {
+                        Resource r = mc.getResourceManager().getResource(rl);
+                        if (r == null) {
+                            error("Not found: " + imgName);
+                            continue;
+                        }
+                    } catch (Throwable e) {
+                        error(e.getMessage());
+                        e.printStackTrace();
+                        continue;
+                    }
+                    emitWord(new ImgWord(rl, link));
+                } else if (cmd.equals("\\imgx")) {
+                    int width = Integer.parseInt(getParameter(cmd, tokenizer));
+                    int height = Integer.parseInt(getParameter(cmd, tokenizer));
+                    String imgName = getParameter(cmd, tokenizer);
+                    if (imgName == null) {
+                        error("No img specified");
+                        continue;
+                    }
+                    ResourceLocation rl = new ResourceLocation(imgName);
+                    Minecraft mc = Minecraft.getMinecraft();
+                    try {
+                        Resource r = mc.getResourceManager().getResource(rl);
+                        if (r == null) {
+                            error("Not found: " + imgName);
+                            continue;
+                        }
+                    } catch (Throwable e) {
+                        error(e.getMessage());
+                        e.printStackTrace();
+                        continue;
+                    }
+                    emitWord(new ImgWord(rl, link, width, height));
                 } else if (cmd.equals("\\figure")) {
                     DocWorld figure = null;
                     try {
@@ -156,6 +204,8 @@ public class Typesetter {
                         continue;
                     }
                     pages.add(new FigurePage(figure));
+                } else if (cmd.equals("\\lmp")) {
+                    process("\\link{lmp}{LMP}", link, style);
                 } else {
                     error(cmd);
                 }

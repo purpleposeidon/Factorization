@@ -8,11 +8,7 @@ public class TextWord extends Word {
     
     public TextWord(String text, String hyperlink) {
         super(hyperlink);
-        if (hyperlink == null) {
-            this.text = text;
-        } else {
-            this.text = "" + EnumChatFormatting.AQUA  + EnumChatFormatting.UNDERLINE+ text;
-        }
+        this.text = text;
     }
     
     @Override
@@ -27,7 +23,11 @@ public class TextWord extends Word {
     
     @Override
     public int draw(DocViewer page, int x, int y) {
-        page.fontRenderer.drawString(text, x, y, 0xEEEEEE); // The return value of drawString isn't helpful.
+        String t = text;
+        if (hyperlink != null) {
+            t = "" + EnumChatFormatting.AQUA + EnumChatFormatting.UNDERLINE + text;
+        }
+        page.fontRenderer.drawString(t, x, y, 0xEEEEEE); // The return value of drawString isn't helpful.
         return page.fontRenderer.getStringWidth(text);
     }
 }

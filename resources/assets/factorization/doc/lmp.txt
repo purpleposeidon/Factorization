@@ -1,5 +1,19 @@
-Blah
-bluh
+\title{The Logic Matrix Programmer}
+
 The logic matrix programmer is the primary tool for Factorization.
-It is used to adjust sockets, and servo instructions.
+Since its name is a bit long, it is often abbreviated to LMP.
+
+It contains a repository of software,
+and the data it caries is important and ubiquitous.
+
+Cloning an LMP is fairly simple,
+however, obtaining the first one is not.
+They can be found in dungeon chests and stronghold libraries.
+Certain villagers have been known
+to be willing to part with them for a modest fee.
+
+If you are far from civilization, know the data can be
+stenographically derived from the music disks
+“11” and “13”, which may be dropped by creepers when
+they are shot by skeletons.
 

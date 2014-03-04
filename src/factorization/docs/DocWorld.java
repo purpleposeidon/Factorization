@@ -14,7 +14,9 @@ import net.minecraft.world.WorldSettings;
 import net.minecraft.world.chunk.Chunk;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.Coord;
 import factorization.api.DeltaCoord;
+import factorization.servo.ServoMotor;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
@@ -26,6 +28,7 @@ public class DocWorld extends WorldClient {
     ArrayList<TileEntity> tileEntities = new ArrayList();
     ArrayList<Entity> entities = new ArrayList();
     public int diagonal = 32;
+    Coord orig = new Coord(this, 0, 0, 0);
     
     public DocWorld() {
         super(mc.getNetHandler(), new WorldSettings(mc.theWorld.getWorldInfo()), 0, 0, mc.mcProfiler, mc.getLogAgent());
@@ -33,10 +36,11 @@ public class DocWorld extends WorldClient {
         blockMetadatas = new int[LEN];
     }
     
-    private static final String BLOCK_IDS = "i", BLOCK_METADATA = "m", TE_LIST = "t", ENTITY_LIST = "e", DIAGONAL = "d";
+    private static final String BLOCK_IDS = "i", BLOCK_METADATA = "m", TE_LIST = "t", ENTITY_LIST = "e", DIAGONAL = "d", ORIG_ENT_POS = "o";
     
     public DocWorld(NBTTagCompound tag) {
         this();
+        orig.readFromNBT(ORIG_ENT_POS, tag);
         blockIds = tag.getIntArray(BLOCK_IDS);
         blockMetadatas = tag.getIntArray(BLOCK_METADATA);
         NBTTagList teList = tag.getTagList(TE_LIST);
@@ -63,6 +67,7 @@ public class DocWorld extends WorldClient {
     }
     
     void writeToTag(NBTTagCompound tag) {
+        orig.writeToNBT(ORIG_ENT_POS, tag);
         tag.setIntArray(BLOCK_IDS, blockIds);
         tag.setIntArray(BLOCK_METADATA, blockMetadatas);
         NBTTagList teList = new NBTTagList();
@@ -75,7 +80,7 @@ public class DocWorld extends WorldClient {
         NBTTagList entList = new NBTTagList();
         for (Entity ent : entities) {
             NBTTagCompound tc = new NBTTagCompound();
-            ent.writeToNBT(tc);
+            ent.writeToNBTOptional(tc);
             entList.appendTag(tc);
         }
         tag.setTag(ENTITY_LIST, entList);
@@ -159,6 +164,7 @@ public class DocWorld extends WorldClient {
     }
     
     void addEntity(Entity ent) {
+        if (ent == null) return;
         entities.add(ent);
     }
     

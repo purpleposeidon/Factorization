@@ -1,0 +1,25 @@
+\title{Servo Stacks}
+
+Servos have 16 stacks of memory, one for each color.
+A stack is a list of values.
+Only the top value is immediately accessible,
+and other values can be put above it.
+
+Each stack can hold 16 items.
+They can hold text,
+numbers,
+booleans ('True' or 'False'),
+\link{colorscanner}{colors},
+and servo instructions.
+
+
+
+Some of the stacks have particular uses:
+
+WHITE: This stack is used as a staging area for moving items between other stacks.
+
+BLACK: Any error messages are written to this stack.
+
+YELLOW: This is the parameter stack. When an instruction does something to "the stack", it means this one.
+
+RED: The contents of this stack get executed whenever the servo entres a block.

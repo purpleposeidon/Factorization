@@ -1,0 +1,38 @@
+\title{Servo Motion}
+
+When confronted with a rail junction, the servo has a choice of which direction to go. 
+
+If there is an
+\link{entrycontrol}{\#{item.factorization:servo/component.fz.instruction.entryControl}entry control}
+instruction, it will go that way.
+
+%  ![](screen/move_require.png)
+
+It will try to go in the direction pointed by 
+\link{setdirection}{\#{item.factorization:servo/component.fz.instruction.setdirection}set direction}.
+
+%  ![](screen/move_pacman.png)
+
+It prefers to go straight.
+
+%  ![](screen/move_straight.png)
+
+It tries to go in the direction it was moving previously (this makes it zig-zag).
+For example, if it reaches a T intersection after a left turn, it will go right.
+
+%  ![](screen/move_zig_zag.png)
+
+If it can not go straight, then it will try to go up (relative to the servo).
+
+%  ![](screen/move_up.png)
+
+Failing that, it will go randomly choose right, left, or down (again, relative to the servo).
+
+%  ![](screen/move_random.png)
+
+It avoids going through a \link{entrycontrol}{\img{factorization:textures/blocks/servo/entry_forbid.png}forbidding entry control};
+this is the second-to-last resort.
+
+%  ![](screen/move_forbid.png)
+
+It won't go backwards unless it is at a dead-end.

@@ -1,7 +1,7 @@
 Squeezing an ink sac between a book and your \link{lmp}{Logic Matrix Programmer}
 has printed its internal encyclopedia to this convenient analog format.
 
-By learning its contents, you will be able to employ our parts to their full potential.
+By learning its contents, you will be able to employ our recipes to their full potential.
 
 This kit emphasizes design and creation, rather than crafting and clicking buttons in GUIs.
 

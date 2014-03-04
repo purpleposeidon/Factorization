@@ -1,0 +1,25 @@
+\title{The Piston}
+
+The piston is a redstone contraption that, when powered, pushes blocks.
+They can push lines of blocks, but no more than 12 blocks, and not obsidian,
+nor tile entities, nor extended pistons.
+
+A variety of piston is the sticky piston.
+When a sticky piston retracts,
+it will bring the block in front of it along with it.
+If it recieves a 1-tick pulse,
+such as from a \link{gate/pulse}{Pulse Limiter},
+it will not pull a block when it retracts if it has just pushed it.
+
+Pistons are infamous for recieving power diagonally.
+If they stop being powered diagonally,
+they will not retract until they recieve a block update.
+This can be exploited to create a block update detector.
+% We could do an article on BUDs.
+
+
+
+
+\figure{H4sIAAAAAAAAAO3csQnCQBQG4HeKRQyCC1gkrQu4gJtoYSE2Fuoy7uUy8SJZwCBcwO+Dx/ub4/7m2ltGzCMdIq8q0jHlEDlcP6GOdI5Y93ERZa2GGdujGgb43hTef+kOAAAAAAAAAAAAAAAAAAAwCfOYXW55N314dF33qiOdhp8BNoXL9fe3eZ4jz2/z7H9XB/5KM4H728IdAAAAAAAAAAAAAAAAAABgEvoPAe557+IN318G4EmAAAA=}
+
+\figure{H4sIAAAAAAAAAO3cPU7EMBAG0PGGHy1bQEnDCfYAnIBjbAcFBaKhAC7DrbhOiFlX220cKbL8njSKFemTphnZiiLfRAyRniPiehvpJU2LmBYf/4tdpLeIu+O7Y801lForX9s/9Gx7Uue6LDV3BmvztbN/UZmHltXO/9qW6P225NMiHUE7zD/0q/fz/1VlHlpWu3duSq2Vt/cDAAAAAAAAAAAA0I0hNu+f0/M+L77HcfzdRXotNwPsS831UGqtfG3/j6WgR/uTOlee3Z+Z2SXyNbOfHSrz0LLa+V9bbe957z+U/NNSTUEjzD/0y/kf+uX7nzMAAAAAAAAAAAAAAI3IFwJ8Rf4B9g+aW0ZtSYAAAA==}

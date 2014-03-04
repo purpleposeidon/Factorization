@@ -14,11 +14,13 @@ import java.util.zip.GZIPOutputStream;
 import net.minecraft.block.Block;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChatMessageComponent;
 import net.minecraftforge.common.ForgeDirection;
 
@@ -30,7 +32,6 @@ import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
-import factorization.fzds.TransferLib;
 import factorization.notify.Notify;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
@@ -89,7 +90,7 @@ public class DocumentationModule implements ICommand {
 
     @Override
     public String getCommandUsage(ICommandSender icommandsender) {
-        return "/fzdoc-serialize while standing on a golden axis";
+        return "/fzdoc-serialize generates an FZDoc \\figure command";
     }
 
     @Override
@@ -199,7 +200,20 @@ public class DocumentationModule implements ICommand {
         DeltaCoord d = max.difference(min);
         d.y /= 2; // The top always points up, so it can be pretty tall
         w.diagonal = (int) (d.magnitude() + 1);
+        copyEntities(w, min, max);
+        w.orig.set(min);
         return w;
+    }
+    
+    void copyEntities(DocWorld dw20, Coord min, Coord max) {
+        AxisAlignedBB ab = Coord.aabbFromRange(min, max);
+        List<Entity> ents = min.w.getEntitiesWithinAABBExcludingEntity(null, ab);
+        for (Entity ent : ents) {
+            if (ent instanceof EntityPlayer) {
+                continue; //??? We probably could get away with it...
+            }
+            dw20.addEntity(ent);
+        }
     }
     
     static void debugBytes(String header, byte[] d) {
