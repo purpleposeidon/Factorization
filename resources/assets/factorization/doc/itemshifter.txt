@@ -5,7 +5,7 @@ that moves items to and from its backing inventory
 into an inventory in front of it.
 
 The item shifter has a few settings, which can be configured
-with a \lmp.
+with an \lmp .
 
 The direction that it moves items can be controlled.
 By default, items are moved from the exporting inventory

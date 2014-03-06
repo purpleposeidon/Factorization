@@ -3,7 +3,7 @@ This section gives examples of things that can be built using Vanilla Minecraft 
 
 \h1{Logic Gates}
 \nl Built using traditional and FZ-powered designs.
-\- \link{gate/not}{NOT}
+% Yeah, no. \- \link{gate/not}{NOT}
 \- \link{gate/or}{OR}
 \- \link{gate/and}{AND}
 \- \link{gate/xor}{XOR}

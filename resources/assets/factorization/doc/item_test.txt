@@ -1,9 +1,0 @@
-We need an item. Hmm. [\#{item.factorization:tool/matrix_programmer}] and there's our item! We need a bit more text so that we can see how badly it messes with the line height. Also why is this text purple.
-
-
-Here's another item: \#{item.factorization:servo/component.fz.instruction.entryControl}
-
-And another one! \#{tile.clayHardenedStained.gray}
-
-This one is a link. \link{index}{{item.factorization:tool/matrix_programmer}}
-This one is a link. \link{index}{\#{item.factorization:tool/matrix_programmer}}

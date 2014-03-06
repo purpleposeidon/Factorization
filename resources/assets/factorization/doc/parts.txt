@@ -3,7 +3,7 @@
 \index{stamper}{Stamper}
 \index{packager}{Packager}
 \index{mixer}{Mixer}
-\index{compact}{Compression Crafter}
+\index{compact}{Compression Crafting}
 \index{parasieve}{Parasieve}
 \index{barrel}{Barrel}
 
@@ -17,6 +17,7 @@
 
 \newpage \h1{\b{\link{servo}{Servos}}}
 
+\index{servorail}{Servo Rail}
 \index{servomotion}{Motion}
 \index{servologic}{Computation}
 \index{servointeract}{Interaction}

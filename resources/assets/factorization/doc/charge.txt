@@ -1,0 +1,72 @@
+\title{Charge}
+
+Water boilers will suck of water from source blocks beneath them,
+or it can be pumped into them from other means.
+It will output steam to steam turbines above it,
+and the turbine will generate the charge.
+It will also move steam and water upwards through other water boilers.
+There are two ways to heat the water into steam.
+
+
+Mirrors can be placed in a circle around the water boiler.
+Ten mirrors will be sufficient to generate a small
+amount of charge.
+This method does require quite a bit of silver.
+% (Luckily silver has few other uses.)
+
+\figure{H4sIAAAAAAAAAO3cwWrbMBjA8c9W4iYpjEF77rH0VAYbrNdddtwL7DC8RFld4hhUZ2v2AHuKwd5y10wqTfDUpcRzrRD8/4GxHUv+JMefhH3wSERJNBGR4VAiHYnbkqgc2fXJQOJsIi+m6bgszPJTnhlTGCVHZWq+6HJpi1xt9r7bPbXZu3N7A1FftZHk1eXV5es3NowrE9u1qxnZtSsl0kYUFSRKL0iUyIsStRKlHySKeFHiVqIkQaL4fVEykv63tNT2xMm7vFjMS5Gz2UCG72eLbPIhzfXD8YfmnK6bc1vMUjNdmHk61k/fzjbCbanTvBJBfv4d4f64bNoU4vqqRx1ybSgX5nM217ap42t3Qlvwwj+dmqZz+/u518/4H/3sfazTz5le3qS2n7ZYYbSc/Dh78sKqVq+Xf6f0gvwr7UTxR6N+kNGonSj+XJQEmYvaieLPRYkcS5SLvJSKo8ryP5rWB7Affs7WzeGm9QHsx7Zc3TWHm9YHsD/Pmf/btpu2ZVdJw/pA1zD/A93G8z/Qbbz/BwAAAAAAAAAAAAAAAADgQCiJi7v1xv3nKI4lyrwvA/yqLLWtVqvf66VpawEE5XJ+WFlqjQF+zjMGAAfDz/1aY8C2XGcMAA7Cs+X/tu1dNR0zGHOA2pj/gW7j+R/oNt7/AwAAAAAAAAAAAAAAAABwINwHAZZ2/Vb+AMnWuLgHiAAA}
+% NOTE: Bug here. The boiler has to be located at X=3, Y=3 to get the mirrors to render pointing at it.
+
+\newpage
+The other way is to use a caliometric burner.
+The caliometric burner will digest the food fed to it,
+and convert it into heat.
+
+More than one caliometric burner can be used against
+a water boiler.
+
+\figure{H4sIAAAAAAAAAO3cTW7TQBTA8Td2viuVVmLDhiNUCJBAYoVALAs3CBN7klqyY+RM2roLrsKFOAYHYMWCTfomdUQbpQWRSgjl/5OsGcWeeW/eZLz0QCQWk4o2fTHOaEe04wfatgfSPrPeVbF0XhflfOpFHn/tSf9dPs/SY1u45r70JMpSeTi2iS+rejgrc1uN59XUJq4n8ak+0Xly9PLo2XONdaEzG23r0GqEmXe2uBZBPt6MsLwfkjwPuTWh9lehEptrE0trXJZhFQdGOnovm040RifNJm6mc5pvRg7Syp4NdVh26oaj2ju5mdpAejNfFjY5cVGIYfJIOm9tYSdOJ5D2m5BeS5oVRKsVrCX2qwYhbT+vRtnUaSbJia3CRPJhvSDx2E719+O10kQbSmNaf1CaB6sMRtbr3tTXg7+/czfiWLpagmq54kd3zFtVLn8aSztpduyVriLNKu3tD6Q1y+1oWUH5vKGCRvSRzLvi9iKHXrOJ8e/3Tffe15/cVcnivJxcxT7cGPuW3TOyJ6bQf48AwBa6//l4YJd1ZbszFMZG95QLAAAAAAAAAAAAAAAAAAAAAAAAAACQ8DGMqDxfLBY/Q+dCO9/3xGTNlwH6zQVg92x1/vVd8mOb4P96PLDjvjTXXwnnjzMIAAAAAAAAAAAAAAAAAAAAAAAAAMD9Ch8EqLV9IZfd+pujNIMAAA==}
+% NORELEASE: Battery block doesn't render
+
+\newpage
+\title{Transfer}
+
+Charge is transfered using lead wiring.
+It can also be transfered amongst other blocks that use charge.
+
+\title{Measuring}
+
+The charge meter is a hand-held device that will measure
+the amount of charge in a conductive block.
+
+Many blocks have other measurable properties
+that this item is able to measure.
+
+\newpage
+\title{Storage}
+
+There are a few ways of storing charge.
+
+One way is to simply have a lot of wiring.
+Of course, this requires more space,
+can not be measured by a comparator,
+and can not be moved by hand.
+
+The battery block stores a relatively small
+amount of power,
+but they come pre-charged.
+It is used in the crafting of motors.
+A comparator can measure how full it is.
+When broken, it will keep its charge.
+
+The leyden can store a large amount of power.
+It is quite cheap to craft,
+but is extremely inefficient.
+It also requires a large amount of power before
+it can even start charging.
+Like the battery,
+a comparator will measure how full it is,
+and it will retain its storage when broken.
+
+
+

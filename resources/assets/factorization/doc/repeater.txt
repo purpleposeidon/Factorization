@@ -1,0 +1,16 @@
+\title{The Repeater}
+
+The repeater is a vanilla redstone component
+that propagates a signal fed in through its back.
+When it does this, it introduces a 1-tick delay.
+Clicking on the repeater will adjust the delay,
+which can last for up to 4 ticks.
+
+A repeater can be "locked" by placing another
+powered repeater outputting directly to its side.
+When locked, a repeater will not change
+its output.
+
+NORELEASE: \\ figure of a locked repeater.
+
+

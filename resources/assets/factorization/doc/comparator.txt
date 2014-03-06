@@ -1,0 +1,20 @@
+\title{The Comparator}
+
+The comparator has a number of uses.
+It deals with signals of varying strength.
+
+% a + b = -(-a - b)
+
+It can be used to measure the fullness of a block.
+When used with inventories,
+the strength of its output will be proportional
+to the fullness of the inventory.
+This also applies to many other blocks that are
+not inventories.
+When measuring an inventory in this way,
+it can have a solid block between it
+and the inventory.
+
+NORELEASE subtraction stuff
+
+

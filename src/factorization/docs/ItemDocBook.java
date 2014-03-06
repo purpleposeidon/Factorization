@@ -15,6 +15,7 @@ public class ItemDocBook extends ItemFactorization {
 
     public ItemDocBook(int itemId, String name, TabType tabType) {
         super(itemId, name, tabType);
+        setMaxStackSize(1);
     }
     
     @Override
