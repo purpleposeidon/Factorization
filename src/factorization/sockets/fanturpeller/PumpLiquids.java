@@ -108,7 +108,10 @@ public class PumpLiquids extends BufferedFanturpeller {
             visited.clear();
             queue.clear();
             frontier.clear();
-            frontier.add(new PumpCoord(start, null, 0));
+            PumpCoord seed = new PumpCoord(start, null, 0);
+            frontier.add(seed);
+            visited.add(seed);
+            queue.add(seed);
             delay = 20*3;
         }
         
@@ -164,6 +167,7 @@ public class PumpLiquids extends BufferedFanturpeller {
                 delay--;
                 return;
             }
+            delay = 20;
             PumpCoord pc = queue.poll();
             if (pc == null || !pc.verifyConnection(this, worldObj)) {
                 reset();
@@ -246,6 +250,7 @@ public class PumpLiquids extends BufferedFanturpeller {
                 delay--;
                 return;
             }
+            delay = 20;
             if (updateFrontier()) return;
             for (int i = 0; i < 16; i++) {
                 PumpCoord pc = queue.poll();
@@ -273,7 +278,7 @@ public class PumpLiquids extends BufferedFanturpeller {
             if (drainBlock(pc, false) != null) return false;
             at.setIdMd(block.blockID, block instanceof BlockFluidFinite ? 0xF : 0, true);
             buffer.setFluid(null);
-            Notify.send(at, "x");
+            at.notifyBlockChange();
             return true;
         }
         
