@@ -10,9 +10,8 @@ import factorization.common.FactoryType;
 import factorization.notify.NotifyImplementation;
 import ibxm.Player;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Random;
@@ -24,7 +23,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.tileentity.TileEntity;
@@ -35,12 +33,7 @@ import net.minecraft.world.chunk.Chunk;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 
-public class NetworkFactorization implements ITinyPacketHandler {
-    protected final static short factorizeTEChannel = 0; //used for tile entities
-    
-    protected final static short factorizeCmdChannel = 2; //used for player keys
-    protected final static short factorizeNtfyChannel = 3; //used to show messages in-world
-    protected final static short factorizeEntityChannel = 4; //used for entities
+public class NetworkFactorization {
 
     public NetworkFactorization() {
         Core.network = this;
@@ -299,43 +292,12 @@ public class NetworkFactorization implements ITinyPacketHandler {
         }
     }
 
-    static final private ThreadLocal<EntityPlayer> currentPlayer = new ThreadLocal<EntityPlayer>();
-
-    public EntityPlayer getCurrentPlayer() {
-        EntityPlayer ret = currentPlayer.get();
-        if (ret == null) {
-            throw new NullPointerException("currentPlayer wasn't set");
-        }
-        return ret;
-    }
-    
-    @Override
-    public void handle(NetHandler handler, Packet131MapData mapData) {
-        handlePacketData(handler, mapData.uniqueID, mapData.itemData, handler.getPlayer());
-    }
-    
-    void handlePacketData(NetHandler handler, int channel, byte[] data, EntityPlayer me) {
-        currentPlayer.set(me);
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
-        DataInputStream input = new DataInputStream(inputStream);
-        switch (channel) {
-        case factorizeTEChannel: handleTE(input); break;
-        case factorizeCmdChannel: handleCmd(data); break;
-        case factorizeNtfyChannel: handleNtfy(input); break;
-        case factorizeEntityChannel: handleEntity(input); break;
-        default: Core.logWarning("Got packet with invalid channel %s with player = %s ", channel, me); break;
-        }
-
-        currentPlayer.set(null);
-    }
-
-    void handleTE(DataInputStream input) {
+    void handleTE(DataInput input, MessageType messageType, EntityPlayer player) {
         try {
-            World world = getCurrentPlayer().worldObj;
+            World world = player.worldObj;
             int x = input.readInt();
             int y = input.readInt();
             int z = input.readInt();
-            int messageType = input.readShort();
             Coord here = new Coord(world, x, y, z);
             
             if (Core.debug_network) {
@@ -351,7 +313,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
             if (messageType == MessageType.DescriptionRequest && !world.isRemote) {
                 TileEntityCommon tec = here.getTE(TileEntityCommon.class);
                 if (tec != null) {
-                    broadcastPacket(getCurrentPlayer(), here, tec.getDescriptionPacket());
+                    broadcastPacket(player, here, tec.getDescriptionPacket());
                 }
                 return;
             }
@@ -363,9 +325,9 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 byte extraData2 = input.readByte();
                 //There may be additional description data following this
                 try {
-                    messageType = input.readInt();
+                    messageType = MessageType.fromId(input.readByte());
                 } catch (IOException e) {
-                    messageType = -1;
+                    messageType = null;
                 }
                 TileEntityCommon spawn = here.getTE(TileEntityCommon.class);
                 if (spawn != null && spawn.getFactoryType() != ft) {
@@ -382,7 +344,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
                 spawn.useExtraInfo2(extraData2);
             }
 
-            if (messageType == -1) {
+            if (messageType == null) {
                 return;
             }
 
@@ -405,18 +367,14 @@ public class NetworkFactorization implements ITinyPacketHandler {
         }
     }
 
-    void handleForeignMessage(World world, int x, int y, int z, TileEntity ent, int messageType, DataInputStream input) throws IOException {
+    void handleForeignMessage(World world, int x, int y, int z, TileEntity ent, MessageType messageType, DataInput input) throws IOException {
         if (!world.isRemote) {
             //Nothing for the server to deal with
         } else {
             Coord here = new Coord(world, x, y, z);
             switch (messageType) {
-            case MessageType.PlaySound:
+            case PlaySound:
                 Sound.receive(input);
-                break;
-            case MessageType.PistonPush:
-                Blocks.piston.onBlockEventReceived(world, x, y, z, 0, input.readInt());
-                here.setAir();
                 break;
             default:
                 if (here.blockExists()) {
@@ -431,7 +389,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
 
     }
     
-    boolean handleForeignEntityMessage(Entity ent, int messageType, DataInputStream input) throws IOException {
+    boolean handleForeignEntityMessage(Entity ent, int messageType, DataInput input) throws IOException {
         if (messageType == MessageType.EntityParticles) {
             Random rand = new Random();
             double px = rand.nextGaussian() * 0.02;
@@ -452,16 +410,14 @@ public class NetworkFactorization implements ITinyPacketHandler {
         return false;
     }
     
-    void handleCmd(byte[] data) {
-        if (data == null || data.length < 2) {
-            return;
-        }
-        byte s = data[0];
-        byte arg = data[1];
+    void handleCmd(DataInput data) throws IOException {
+        byte s = data.readByte();
+        byte arg = data.readByte();
         Command.fromNetwork(getCurrentPlayer(), s, arg);
     }
 
-    void handleNtfy(DataInputStream input) {
+    void handleNtfy(DataInput input) {
+        //NORELEASE: Move out to Notify
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             EntityPlayer me = getCurrentPlayer();
             if (!me.worldObj.isRemote) {
@@ -519,7 +475,7 @@ public class NetworkFactorization implements ITinyPacketHandler {
         }
     }
     
-    void handleEntity(DataInputStream input) {
+    void handleEntity(DataInput input) {
         try {
             World world = getCurrentPlayer().worldObj;
             int entityId = input.readInt();
@@ -560,46 +516,49 @@ public class NetworkFactorization implements ITinyPacketHandler {
         }
     }
     
-    static public class MessageType {
-        //Non TEF messages
-        public final static int ShareAll = -1;
-        public final static int PlaySound = 11, PistonPush = 12;
-        //TEF messages
-        public final static int
-                DrawActive = 0, FactoryType = 1, DescriptionRequest = 2, DataHelperEdit = 3, OpenDataHelperGui = 4, EntityParticles = 5,
-                //
-                RouterSlot = 20, RouterTargetSide = 21, RouterMatch = 22, RouterIsInput = 23,
-                RouterLastSeen = 24, RouterMatchToVisit = 25, RouterDowngrade = 26,
-                RouterUpgradeState = 27, RouterEjectDirection = 28,
-                //
-                BarrelDescription = 40, BarrelItem = 41, BarrelCount = 42,
-                //
-                BatteryLevel = 50, LeydenjarLevel = 51,
-                //
-                MirrorDescription = 60,
-                //
-                TurbineWater = 70, TurbineSpeed = 71,
-                //
-                HeaterHeat = 80,
-                //
-                GrinderSpeed = 90, LaceratorSpeed = 91,
-                //
-                MixerSpeed = 100, FanturpellerSpeed = 101,
-                //
-                CrystallizerInfo = 110,
-                //
-                WireFace = 121,
-                //
-                SculptDescription = 130, SculptNew = 132, SculptMove = 133, SculptRemove = 134, SculptState = 135,
-                //
-                ExtensionInfo = 150, RocketState = 151,
-                //
-                ServoRailDecor = 161, ServoRailDecorUpdate = 162, ServoRailEditComment = 163,
-                //
-                CompressionCrafter = 163, CompressionCrafterBeginCrafting = 164, CompressionCrafterBounds = 165,
-                //
-                //motor_description = 170, motor_direction = 171, motor_speed = 172, motor_inventory = 173,
-                servo_brief = 174, servo_item = 175, servo_complete = 176, servo_stopped = 177;
+    
+    private static byte message_type_count = 0;
+    static public enum MessageType {
+        factorizeCmdChannel,
+        factorizeNtfyChannel,
+        factorizeEntityChannel,
+        PlaySound,
+        
+        DrawActive, FactoryType, DescriptionRequest, DataHelperEdit, OpenDataHelperGui, EntityParticles,
+        BarrelDescription, BarrelItem, BarrelCount,
+        BatteryLevel, LeydenjarLevel,
+        MirrorDescription,
+        TurbineWater, TurbineSpeed,
+        HeaterHeat,
+        LaceratorSpeed,
+        MixerSpeed, FanturpellerSpeed,
+        CrystallizerInfo,
+        WireFace,
+        SculptDescription, SculptNew, SculptMove, SculptRemove, SculptState,
+        ExtensionInfo, RocketState,
+        ServoRailDecor, ServoRailDecorUpdate, ServoRailEditComment,
+        CompressionCrafter, CompressionCrafterBeginCrafting, CompressionCrafterBounds,
+        
+        servo_brief, servo_item, servo_complete, servo_stopped;
+        
+        private static final MessageType[] valuesCache = values();
+        
+        private final byte id;
+        MessageType() {
+            id = message_type_count++;
+            if (id < 0) {
+                throw new IllegalArgumentException("Too many message types!");
+            }
+        }
+        
+        public static MessageType fromId(byte id) {
+            return valuesCache[id]; // we'd crash anyways.
+        }
+        
+        public byte getId() {
+            return id;
+        }
+        
     }
     
     static public class NotifyMessageType {

@@ -1,0 +1,48 @@
+[19:32:58] <Player> import cpw.mods.fml.common.FMLCommonHandler;
+[19:32:58] <Player> import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+[19:32:58] <Player> import cpw.mods.fml.common.network.FMLEventChannel;
+[19:32:58] <Player> import cpw.mods.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
+[19:32:59] <Player> import cpw.mods.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
+[19:33:00] <Player> import cpw.mods.fml.common.network.NetworkRegistry;
+[19:33:01] <Player> import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+
+
+public class PacketHandler {
+	public PacketHandler() {
+		channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(ForestryPacket.channel);
+		channel.register(this);
+	}
+
+	@SubscribeEvent
+	public void onPacket(ServerCustomPacketEvent event) {
+		byte[] data = new byte[event.packet.payload().readableBytes()];
+		event.packet.payload().readBytes(data);
+
+		onPacketData(data, ((NetHandlerPlayServer) event.handler).playerEntity);
+	}
+
+	@SubscribeEvent
+	public void onPacket(ClientCustomPacketEvent event) {
+		byte[] data = new byte[event.packet.payload().readableBytes()];
+		event.packet.payload().readBytes(data);
+
+		onPacketData(data, null);
+	}
+
+	public void onPacketData(byte[] bData, EntityPlayer player) {
+		DataInputStream data = new DataInputStream(new ByteArrayInputStream(bData));
+		... as usual...
+	}
+	
+	public void sendPacket(FMLProxyPacket packet) {
+		if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
+			channel.sendToServer(packet);
+		} else {
+			channel.sendToAll(packet);
+		}
+	}
+
+	public void sendPacket(FMLProxyPacket packet, EntityPlayerMP player) {
+		channel.sendTo(packet, player);
+	}
+}

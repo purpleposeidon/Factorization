@@ -1,7 +1,7 @@
 package factorization.servo;
 
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -179,7 +179,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
     
     @Override
-    public boolean handleMessageFromClient(short messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromClient(short messageType, DataInput input) throws IOException {
         if (messageType == MessageType.DataHelperEdit) {
             DataInPacketClientEdited di = new DataInPacketClientEdited(input);
             socket.serialize("", di);
@@ -191,7 +191,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(short messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(short messageType, DataInput input) throws IOException {
         switch (messageType) {
         case MessageType.OpenDataHelperGui:
             if (!worldObj.isRemote) {

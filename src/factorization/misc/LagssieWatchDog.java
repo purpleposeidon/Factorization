@@ -3,6 +3,7 @@ package factorization.misc;
 import java.util.Random;
 
 import net.minecraft.client.Minecraft;
+import factorization.common.FzConfig;
 
 public class LagssieWatchDog implements Runnable {
     static int ticks = 0;
@@ -67,5 +68,16 @@ public class LagssieWatchDog implements Runnable {
 
     void log(String msg) {
         System.out.println("[LAG] " + msg); //NORELEASE: This used to be cool
+    }
+    
+    
+    static LagssieWatchDog instance;
+    static void start() {
+        if (FzConfig.lagssie_watcher) {
+            instance = new LagssieWatchDog(Thread.currentThread(), FzConfig.lagssie_interval);
+            Thread dog = new Thread(instance);
+            dog.setDaemon(true);
+            dog.start();
+        }
     }
 }

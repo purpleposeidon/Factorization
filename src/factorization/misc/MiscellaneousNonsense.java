@@ -1,21 +1,17 @@
 package factorization.misc;
 
-import ibxm.Player;
-
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -23,25 +19,26 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.Packet;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.stats.AchievementList;
+import net.minecraft.stats.StatisticsFile;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DungeonHooks;
 import net.minecraftforge.common.MinecraftForge;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.common.gameevent.PlayerEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
 
 @Mod(modid = MiscellaneousNonsense.modId, name = MiscellaneousNonsense.name, version = Core.version, dependencies = "required-after: " + Core.modId)
-@NetworkMod(clientSideRequired = true, packetHandler = MiscNet.class, channels = {MiscNet.tpsChannel}, connectionHandler = MiscellaneousNonsense.class)
-public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
+public class MiscellaneousNonsense {
     public static final String modId = Core.modId + ".misc";
     public static final String name = "Factorization Miscellaneous Nonsense";
     public static MiscNet net;
@@ -62,8 +59,10 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
     
     @EventHandler
     public void modsLoaded(FMLPostInitializationEvent event) {
-        //Fixes lack of creeper dungeons
-        DungeonHooks.addDungeonMob("Creeper", 1); //Etho, of all people, found one. It'd be nice if they were just a bit rarer. Scaling everything else up seems like a poor solution tho.
+        // Fixes lack of creeper dungeons
+        DungeonHooks.addDungeonMob("Creeper", 1);
+        // Etho, of all people, found one. It'd be nice if they were just a bit rarer.
+        // Scaling everything else up seems like a poor solution tho.
         String THATS_SOME_VERY_NICE_SOURCE_CODE_YOU_HAVE_THERE[] = {
                 "##  ##",
                 "##  ##",
@@ -73,27 +72,9 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         };
         
         proxy.initializeClient();
-        GameRegistry.registerCraftingHandler(new ICraftingHandler() { //NORELEASE: Check if these achievements have been de-stupidified.
-            @Override public void onSmelting(EntityPlayer player, ItemStack item) { }
-            
-            @Override
-            public void onCrafting(EntityPlayer player, ItemStack stack, IInventory craftMatrix) {
-                if (player == null) {
-                    return;
-                }
-                Item item = stack.getItem();
-                if (item == Items.stone_hoe || item == Items.iron_hoe) {
-                    player.addStat(AchievementList.buildHoe, 1);
-                }
-                if (item == Items.stone_sword || item == Items.iron_sword) {
-                    player.addStat(AchievementList.buildSword, 1);
-                }
-            }
-        });
         proxy.registerLoadAlert();
         proxy.registerSprintKey();
-        TickRegistry.registerTickHandler(this, Side.SERVER);
-        TickRegistry.registerTickHandler(this, Side.CLIENT);
+        FMLCommonHandler.instance().bus().register(this);
         if (FzConfig.equal_opportunities_for_mobs) {
             MinecraftForge.EVENT_BUS.register(new MobEqualizer());
         }
@@ -105,6 +86,25 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
         }
         if (FzConfig.buffed_nametags) {
             MinecraftForge.EVENT_BUS.register(new BuffNametags());
+        }
+    }
+    
+    @EventHandler
+    public void fixHoesAndSwordsAchievement(PlayerEvent.ItemCraftedEvent event) {
+        //NORELEASE: Check if these achievements have been de-stupidified.
+        EntityPlayer player = event.player;
+        if (player == null) {
+            return;
+        }
+        if (event.crafting == null) {
+            return;
+        }
+        Item item = event.crafting.getItem();
+        if (item == Items.stone_hoe || item == Items.iron_hoe) {
+            player.addStat(AchievementList.buildHoe, 1);
+        }
+        if (item == Items.stone_sword || item == Items.iron_sword) {
+            player.addStat(AchievementList.buildSword, 1);
         }
     }
     
@@ -132,74 +132,53 @@ public class MiscellaneousNonsense implements ITickHandler, IConnectionHandler {
     
     private float last_tps = -1;
     private int measurements = 0;
-    @Override
-    public void tickStart(EnumSet<TickType> type, Object... tickData) {
-        //lag();
-        if (type.contains(TickType.SERVER)) {
-            MinecraftServer ms = MinecraftServer.getServer();
-            try { rockets(ms); } finally { /* What could I say? */ }
-            if (ms.getTickCounter() < ms.tickTimeArray.length) {
-                //Ignore startup
-                return;
-            }
-            if (measurements++ != FzConfig.tps_reporting_interval) {
-                return;
-            }
-            measurements = 0;
-            float tps = getTpsRatio();
-            if (tps != last_tps) {
-                PacketDispatcher.sendPacketToAllPlayers(makeTpsReportPacket(getTpsRatio()));
-                last_tps = tps;
-            }
-            return;
-        } else {
-            LagssieWatchDog.ticks++;
-        }
-    }
-    
-    @Override
-    public void tickEnd(EnumSet<TickType> type, Object... tickData) { }
-    
-    private static EnumSet<TickType> serverTicks = EnumSet.of(TickType.SERVER, TickType.CLIENT, TickType.RENDER);
-
-    @Override
-    public EnumSet<TickType> ticks() {
-        return serverTicks;
-    }
-
-    @Override
-    public String getLabel() {
-        return "fz.misc";
-    }
-
-    @Override
-    public void playerLoggedIn(Player player, NetHandler netHandler, INetworkManager manager) {
+    @EventHandler
+    public void tickServer(TickEvent.ServerTickEvent event) {
+        if (event.phase != TickEvent.Phase.START) return;
         MinecraftServer ms = MinecraftServer.getServer();
+        try { rockets(ms); } finally { /* What could I say? */ }
         if (ms.getTickCounter() < ms.tickTimeArray.length) {
             //Ignore startup
             return;
         }
-        PacketDispatcher.sendPacketToPlayer(makeTpsReportPacket(getTpsRatio()), player);
+        if (measurements++ != FzConfig.tps_reporting_interval) {
+            return;
+        }
+        measurements = 0;
+        float tps = getTpsRatio();
+        if (tps != last_tps) {
+            PacketDispatcher.sendPacketToAllPlayers(makeTpsReportPacket(getTpsRatio()));
+            last_tps = tps;
+        }
     }
-
-    @Override
-    public String connectionReceived(NetLoginHandler netHandler, INetworkManager manager) {
-        return null;
+    
+    @EventHandler
+    public void patLagssie(TickEvent.ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.START) return;
+        LagssieWatchDog.ticks++;
     }
-
-    @Override
-    public void connectionOpened(NetHandler netClientHandler, String server, int port, INetworkManager manager) { }
-
-    @Override
-    public void connectionOpened(NetHandler netClientHandler, MinecraftServer server, INetworkManager manager) { }
-
-    @Override
-    public void connectionClosed(INetworkManager manager) {
-        proxy.handleTpsReport(1);
+    
+    @EventHandler
+    public void playerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        MinecraftServer ms = MinecraftServer.getServer();
+        {
+            //NORELEASE: Test 'opening inventory' achievement
+            // Give the first achievement, because it is stupid and nobody cares.
+            // If you're using this mod, you've probably opened your inventory before anyways.
+            StatisticsFile sfw = ms.getConfigurationManager().func_148538_i(event.player.getCommandSenderName());
+            if (sfw != null && !sfw.hasAchievementUnlocked(AchievementList.openInventory) && !FzConfig.add_branding) {
+                sfw.func_150873_a(event.player, AchievementList.openInventory, 1);
+                Core.logInfo("Achievement Get! %s, you've opened your inventory hundreds of times already! Yes! You're welcome!", event.player.getCommandSenderName());
+            }
+        }
+        {
+            if (ms.getTickCounter() >= ms.tickTimeArray.length) {
+                //Startup time is ignored; early birds will get a TPS packet soon enough
+                PacketDispatcher.sendPacketToPlayer(makeTpsReportPacket(getTpsRatio()), event.player);
+            }
+        }
     }
-
-    @Override
-    public void clientLoggedIn(NetHandler clientHandler, INetworkManager manager, Packet1Login login) {}
+    
     
     public static void lag() {
         try {
