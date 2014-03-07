@@ -93,7 +93,7 @@ public class NetworkFactorization {
         }
     }
     
-    public void prefixTePacket(DataOutputStream output, Coord src, int messageType) throws IOException {
+    public void prefixTePacket(DataOutputStream output, Coord src, MessageType messageType) throws IOException {
         output.writeInt(src.x);
         output.writeInt(src.y);
         output.writeInt(src.z);
@@ -105,7 +105,7 @@ public class NetworkFactorization {
         return PacketDispatcher.getTinyPacket(Core.instance, factorizeTEChannel, outputStream.toByteArray());
     }
     
-    public Packet TEmessagePacket(Coord src, int messageType, Object... items) { //TODO: messageType should be a short
+    public Packet TEmessagePacket(Coord src, MessageType messageType, Object... items) { //TODO: messageType should be a short
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream output = new DataOutputStream(outputStream);
@@ -169,7 +169,7 @@ public class NetworkFactorization {
         }
     }
     
-    public void prefixEntityPacket(DataOutputStream output, Entity to, int messageType) throws IOException {
+    public void prefixEntityPacket(DataOutputStream output, Entity to, MessageType messageType) throws IOException {
         output.writeInt(to.getEntityId());
         output.writeShort(messageType);
     }
@@ -179,7 +179,7 @@ public class NetworkFactorization {
         return PacketDispatcher.getTinyPacket(Core.instance, factorizeEntityChannel, outputStream.toByteArray());
     }
     
-    public Packet entityPacket(Entity to, int messageType, Object ...items) { //TODO: messageType should be short
+    public Packet entityPacket(Entity to, MessageType messageType, Object ...items) { //TODO: messageType should be short
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream output = new DataOutputStream(outputStream);
@@ -200,7 +200,7 @@ public class NetworkFactorization {
         addPacket(player, packet);
     }
 
-    public void broadcastMessage(EntityPlayer who, Coord src, int messageType, Object... msg) {
+    public void broadcastMessage(EntityPlayer who, Coord src, MessageType messageType, Object... msg) {
         //		// who is ignored
         //		if (!Core.proxy.isServer() && who == null) {
         //			return;
@@ -389,7 +389,7 @@ public class NetworkFactorization {
 
     }
     
-    boolean handleForeignEntityMessage(Entity ent, int messageType, DataInput input) throws IOException {
+    boolean handleForeignEntityMessage(Entity ent, MessageType messageType, DataInput input) throws IOException {
         if (messageType == MessageType.EntityParticles) {
             Random rand = new Random();
             double px = rand.nextGaussian() * 0.02;

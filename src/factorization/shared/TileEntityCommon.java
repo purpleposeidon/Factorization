@@ -231,16 +231,16 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         }
     }
     
-    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInputStream input) throws IOException {
         return false;
     }
 
-    public boolean handleMessageFromClient(int messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromClient(MessageType messageType, DataInputStream input) throws IOException {
         // There are no base attributes a client can edit
         return false;
     }
 
-    public void broadcastMessage(EntityPlayer who, int messageType, Object... msg) {
+    public void broadcastMessage(EntityPlayer who, MessageType messageType, Object... msg) {
         Core.network.broadcastMessage(who, getCoord(), messageType, msg);
     }
     

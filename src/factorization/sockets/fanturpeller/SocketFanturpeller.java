@@ -374,7 +374,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
     
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInputStream input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

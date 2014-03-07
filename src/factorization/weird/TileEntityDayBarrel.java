@@ -441,7 +441,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     //Network stuff
     
-    Packet getPacket(int messageType) {
+    Packet getPacket(MessageType messageType) {
         if (messageType == NetworkFactorization.MessageType.BarrelItem) {
             return Core.network.TEmessagePacket(getCoord(), messageType, NetworkFactorization.nullItem(item), getItemCount());
         } else if (messageType == NetworkFactorization.MessageType.BarrelCount) {
@@ -452,7 +452,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         }
     }
     
-    void updateClients(int messageType) {
+    void updateClients(MessageType messageType) {
         if (getWorldObj() == null || getWorldObj().isRemote) {
             return;
         }
@@ -473,7 +473,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     @Override
-    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInputStream input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
