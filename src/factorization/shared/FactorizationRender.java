@@ -1,7 +1,6 @@
 package factorization.shared;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
@@ -58,7 +57,7 @@ public class FactorizationRender implements ISimpleBlockRenderingHandler {
     }
 
     @Override
-    public boolean shouldRender3DInInventory() {
+    public boolean shouldRender3DInInventory(int modelId) {
         return true;
     }
 

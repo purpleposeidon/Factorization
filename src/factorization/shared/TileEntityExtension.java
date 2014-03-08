@@ -1,6 +1,6 @@
 package factorization.shared;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.List;
 
@@ -9,12 +9,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.Packet;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.DeltaCoord;
@@ -125,7 +125,7 @@ public class TileEntityExtension extends TileEntityCommon {
     }
     
     @Override
-    public Packet getAuxillaryInfoPacket() {
+    public FMLProxyPacket getAuxillaryInfoPacket() {
         if (pc == null) {
             return super.getAuxillaryInfoPacket();
         }
@@ -133,7 +133,7 @@ public class TileEntityExtension extends TileEntityCommon {
     }
     
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

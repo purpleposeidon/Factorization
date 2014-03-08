@@ -1,6 +1,6 @@
 package factorization.astro;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -16,7 +18,6 @@ import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
@@ -440,12 +441,12 @@ for x in range(0, len(d[0])):
     }
     
     @Override
-    public Packet getAuxillaryInfoPacket() {
+    public FMLProxyPacket getAuxillaryInfoPacket() {
         return getDescriptionPacketWith(MessageType.RocketState, lastValidationStatus, isFiring);
     }
     
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

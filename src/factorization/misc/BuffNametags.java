@@ -4,13 +4,12 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.monster.IMob;
-import net.minecraft.item.Item;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.Packet;
+import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.event.entity.player.EntityInteractEvent;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import factorization.api.Coord;
 import factorization.shared.Core;
 import factorization.shared.NetworkFactorization.MessageType;
@@ -42,7 +41,7 @@ public class BuffNametags {
                 if (ent instanceof IMob) {
                     particleType = "smoke";
                 }
-                Packet packet = Core.network.entityPacket(ent, MessageType.EntityParticles, (byte) 8, particleType);
+                FMLProxyPacket packet = Core.network.entityPacket(ent, MessageType.EntityParticles, (byte) 8, particleType);
                 Core.network.broadcastPacket(null, new Coord(ent), packet);
                 
                 return false;

@@ -1,6 +1,6 @@
 package factorization.charge;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
@@ -235,7 +235,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     }
 
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

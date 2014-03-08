@@ -1,6 +1,6 @@
 package factorization.crafting;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -8,11 +8,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -21,9 +21,9 @@ import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
-import factorization.shared.TileEntityCommon;
 import factorization.shared.FzUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityCommon;
 
 public class TileEntityCompressionCrafter extends TileEntityCommon {
     static ThreadLocal<CompressionState> states = new ThreadLocal();
@@ -197,7 +197,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     
     
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -227,7 +227,7 @@ public class TileEntityCompressionCrafter extends TileEntityCommon {
     }
     
     @Override
-    public Packet getDescriptionPacket() {
+    public FMLProxyPacket getDescriptionPacket() {
         return getDescriptionPacketWith(MessageType.CompressionCrafter, b_facing, progress);
     }
     

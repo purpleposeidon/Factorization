@@ -3,7 +3,7 @@ package factorization.sockets;
 import static org.lwjgl.opengl.GL11.GL_LIGHTING;
 
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -16,7 +16,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
@@ -26,7 +25,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -45,6 +43,7 @@ import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
+import factorization.shared.FzNetDispatch;
 import factorization.shared.FzUtil;
 import factorization.shared.FzUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
@@ -204,7 +203,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
     
     @Override
-    public final void sendMessage(int msgType, Object ...msg) {
+    public final void sendMessage(MessageType msgType, Object ...msg) {
         broadcastMessage(null, msgType, msg);
     }
     
@@ -346,7 +345,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     @SideOnly(Side.CLIENT)
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -363,7 +362,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
     
     @Override
-    public boolean handleMessageFromClient(MessageType messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromClient(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromClient(messageType, input)) {
             return true;
         }
@@ -408,7 +407,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
                 Coord coord = getCoord();
                 Core.network.prefixTePacket(dos, coord, MessageType.OpenDataHelperGui);
                 serialize("", dop);
-                Core.network.broadcastPacket(player, coord, Core.network.TEmessagePacket(baos));
+                Core.network.broadcastPacket(player, coord, FzNetDispatch.generate(baos));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -445,8 +444,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         } else if (socket instanceof ServoMotor) {
             ServoMotor motor = (ServoMotor) socket;
             motor.socket = replacement;
-            Packet p = FMLNetworkHandler.getEntitySpawningPacket((ServoMotor) socket);
-            Core.network.broadcastPacket(worldObj, xCoord, yCoord, zCoord, p);
+            motor.syncWithSpawnPacket();
         }
         //Core.network.broadcastPacket(null, at, replacement.getDescriptionPacket());
     }

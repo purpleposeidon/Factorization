@@ -1,15 +1,15 @@
 package factorization.charge;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.Packet;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -110,17 +110,16 @@ public class TileEntityMirror extends TileEntityCommon {
     }
 
     @Override
-    public Packet getAuxillaryInfoPacket() {
+    public FMLProxyPacket getAuxillaryInfoPacket() {
         return getDescriptionPacketWith(MessageType.MirrorDescription, target_rotation, getTargetInfo());
     }
 
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        switch (messageType) {
-        case MessageType.MirrorDescription:
+        if (messageType == MessageType.MirrorDescription) {
             target_rotation = input.readInt();
             getCoord().redraw();
             gotten_info_packet = true;

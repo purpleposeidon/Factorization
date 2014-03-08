@@ -1,6 +1,6 @@
 package factorization.crafting;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -201,7 +201,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
 
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

@@ -1,12 +1,12 @@
 package factorization.shared;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
@@ -15,10 +15,8 @@ import net.minecraftforge.client.IItemRenderer.ItemRenderType;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import factorization.api.Coord;
-import factorization.api.DeltaCoord;
 import factorization.api.ICoord;
 import factorization.api.VectorUV;
 import factorization.charge.WireRenderingCube;
@@ -208,21 +206,6 @@ abstract public class FactorizationBlockRender implements ICoord {
     
     static private RenderBlocks rb = new RenderBlocks();
 
-
-    private int getMixedBrightnessForBlock(IBlockAccess w, int x, int y, int z) {
-        return w.getLightBrightnessForSkyBlocks(x, y, z, Blocks.lightValue[w.getBlock(x, y, z)]);
-        //Block b = w.getBlock(x, y, z);
-        //return w.getLightBrightnessForSkyBlocks(x, y, z, b.getLightValue(w, x, y, z));
-        //return par1IBlockAccess.getLightBrightnessForSkyBlocks(par2, par3, par4, getLightValue(par1IBlockAccess, par2, par3, par4));
-    }
-    
-    private int getAoBrightness(int a, int b, int c, int d) {
-        return rb.getAoBrightness(a, b, c, d);
-    }
-    
-    private float getAmbientOcclusionLightValue(IBlockAccess w, int x, int y, int z) {
-        return Blocks.stone.getAmbientOcclusionLightValue(w, x, y, z);
-    }
     
     static private ForgeDirection getFaceDirection(VectorUV[] vecs, VectorUV center) {
         VectorUV here = vecs[0].add(vecs[2]);

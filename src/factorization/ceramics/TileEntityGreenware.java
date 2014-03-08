@@ -1,7 +1,6 @@
 package factorization.ceramics;
 
 import java.io.DataInput;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,7 +16,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.network.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
@@ -34,6 +32,7 @@ import com.google.common.io.ByteArrayDataOutput;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -355,7 +354,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     }
 
     @Override
-    public Packet getAuxillaryInfoPacket() {
+    public FMLProxyPacket getAuxillaryInfoPacket() {
         ArrayList<Object> args = new ArrayList(2 + parts.size() * 9);
         args.add(MessageType.SculptDescription);
         args.add(getState().ordinal());
@@ -668,12 +667,12 @@ public class TileEntityGreenware extends TileEntityCommon {
     }
 
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
         switch (messageType) {
-        case MessageType.SculptDescription:
+        case SculptDescription:
             readStateChange(input);
             front = ForgeDirection.getOrientation(input.readByte());
             setRotation(input.readByte());
@@ -688,16 +687,16 @@ public class TileEntityGreenware extends TileEntityCommon {
             }
             shouldRenderTesr = getState() == ClayState.WET;
             break;
-        case MessageType.SculptMove:
+        case SculptMove:
             updateLump(input.readInt(), new ClayLump().read(input));
             break;
-        case MessageType.SculptNew:
+        case SculptNew:
             addLump();
             break;
-        case MessageType.SculptRemove:
+        case SculptRemove:
             removeLump(input.readInt());
             break;
-        case MessageType.SculptState:
+        case SculptState:
             readStateChange(input);
             break;
         default:

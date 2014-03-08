@@ -1,12 +1,11 @@
 package factorization.servo;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 import net.minecraft.client.renderer.RenderBlocks;
@@ -117,7 +116,7 @@ public abstract class ServoComponent implements IDataSerializable {
         (new DataOutPacket(dos, Side.SERVER)).as(Share.VISIBLE, "sc").put(this);
     }
     
-    static ServoComponent readFromPacket(DataInputStream dis) throws IOException {
+    static ServoComponent readFromPacket(DataInput dis) throws IOException {
         short id = dis.readShort();
         Class<? extends ServoComponent> componentClass = getPacketIdMap().get(id);
         if (componentClass == null) {

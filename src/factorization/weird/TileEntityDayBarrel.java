@@ -1,6 +1,6 @@
 package factorization.weird;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -17,7 +17,6 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.Packet;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
@@ -29,6 +28,9 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -441,7 +443,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     //Network stuff
     
-    Packet getPacket(MessageType messageType) {
+    FMLProxyPacket getPacket(MessageType messageType) {
         if (messageType == NetworkFactorization.MessageType.BarrelItem) {
             return Core.network.TEmessagePacket(getCoord(), messageType, NetworkFactorization.nullItem(item), getItemCount());
         } else if (messageType == NetworkFactorization.MessageType.BarrelCount) {
@@ -460,7 +462,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     @Override
-    public Packet getDescriptionPacket() {
+    public FMLProxyPacket getDescriptionPacket() {
         int count = getItemCount();
         ItemStack theItem = item;
         return getDescriptionPacketWith(MessageType.BarrelDescription,
@@ -473,7 +475,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -1250,8 +1252,16 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         }
     }
     
+    private static int iterateDelay = 0;
+    @SubscribeEvent
     @SideOnly(Side.CLIENT)
-    public static void iterateForFinalizedBarrels() {
+    public void iterateForFinalizedBarrels(ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) return;
+        if (iterateDelay > 0) {
+            iterateDelay--;
+            return;
+        }
+        iterateDelay = 60*20;
         synchronized (finalizedDisplayLists) {
             for (Integer i : finalizedDisplayLists) {
                 if (i == null) continue;

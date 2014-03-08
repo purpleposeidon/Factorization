@@ -1,17 +1,8 @@
 package factorization.shared;
 
-import factorization.api.Coord;
-import factorization.api.DeltaCoord;
-import factorization.api.IEntityMessage;
-import factorization.api.Quaternion;
-import factorization.api.VectorUV;
-import factorization.common.Command;
-import factorization.common.FactoryType;
-import factorization.notify.NotifyImplementation;
-import ibxm.Player;
-
 import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Random;
@@ -20,18 +11,23 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraft.world.chunk.Chunk;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
+import factorization.api.Coord;
+import factorization.api.DeltaCoord;
+import factorization.api.IEntityMessage;
+import factorization.api.Quaternion;
+import factorization.api.VectorUV;
+import factorization.common.Command;
+import factorization.common.FactoryType;
+import factorization.notify.NotifyImplementation;
 
 public class NetworkFactorization {
 
@@ -40,16 +36,6 @@ public class NetworkFactorization {
     }
     
     public static final ItemStack EMPTY_ITEMSTACK = new ItemStack((Block)null);
-    
-    int huge_tag_warnings = 0;
-
-    void addPacket(EntityPlayer player, Packet packet) {
-        if (player.worldObj.isRemote) {
-            PacketDispatcher.sendPacketToServer(packet);
-        } else {
-            PacketDispatcher.sendPacketToPlayer(packet, (Player) player);
-        }
-    }
     
     private void writeObjects(ByteArrayOutputStream outputStream, DataOutputStream output, Object... items) throws IOException {
         for (Object item : items) {
@@ -94,31 +80,26 @@ public class NetworkFactorization {
     }
     
     public void prefixTePacket(DataOutputStream output, Coord src, MessageType messageType) throws IOException {
+        messageType.write(output);
         output.writeInt(src.x);
         output.writeInt(src.y);
         output.writeInt(src.z);
-        output.writeShort(messageType);
     }
     
-    public Packet TEmessagePacket(ByteArrayOutputStream outputStream) throws IOException {
-        outputStream.flush();
-        return PacketDispatcher.getTinyPacket(Core.instance, factorizeTEChannel, outputStream.toByteArray());
-    }
-    
-    public Packet TEmessagePacket(Coord src, MessageType messageType, Object... items) { //TODO: messageType should be a short
+    public FMLProxyPacket TEmessagePacket(Coord src, MessageType messageType, Object... items) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream output = new DataOutputStream(outputStream);
             prefixTePacket(output, src, messageType);
             writeObjects(outputStream, output, items);
-            return TEmessagePacket(outputStream);
+            return FzNetDispatch.generate(outputStream);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
     }
     
-    public Packet notifyPacket(Object where, ItemStack item, String format, String ...args) {
+    public FMLProxyPacket notifyPacket(Object where, ItemStack item, String format, String ...args) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream output = new DataOutputStream(outputStream);
@@ -162,7 +143,7 @@ public class NetworkFactorization {
                 output.writeUTF(a);
             }
             output.flush();
-            return PacketDispatcher.getTinyPacket(Core.instance, factorizeNtfyChannel, outputStream.toByteArray());
+            return FzNetDispatch.generate(outputStream);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -171,15 +152,15 @@ public class NetworkFactorization {
     
     public void prefixEntityPacket(DataOutputStream output, Entity to, MessageType messageType) throws IOException {
         output.writeInt(to.getEntityId());
-        output.writeShort(messageType);
+        messageType.write(output);
     }
     
-    public Packet entityPacket(ByteArrayOutputStream outputStream) throws IOException {
+    public FMLProxyPacket entityPacket(ByteArrayOutputStream outputStream) throws IOException {
         outputStream.flush();
-        return PacketDispatcher.getTinyPacket(Core.instance, factorizeEntityChannel, outputStream.toByteArray());
+        return FzNetDispatch.generate(outputStream);
     }
     
-    public Packet entityPacket(Entity to, MessageType messageType, Object ...items) { //TODO: messageType should be short
+    public FMLProxyPacket entityPacket(Entity to, MessageType messageType, Object ...items) { //TODO: messageType should be short
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream output = new DataOutputStream(outputStream);
@@ -196,103 +177,28 @@ public class NetworkFactorization {
         byte data[] = new byte[2];
         data[0] = cmd.id;
         data[1] = arg;
-        Packet packet = PacketDispatcher.getTinyPacket(Core.instance, factorizeCmdChannel, data);
-        addPacket(player, packet);
+        FzNetDispatch.addPacket(FzNetDispatch.generate(data), player);
     }
 
     public void broadcastMessage(EntityPlayer who, Coord src, MessageType messageType, Object... msg) {
-        //		// who is ignored
-        //		if (!Core.proxy.isServer() && who == null) {
-        //			return;
-        //		}
-        Packet toSend = TEmessagePacket(src, messageType, msg);
         if (who == null || !who.worldObj.isRemote) {
-            broadcastPacket(who, src, toSend);
-        }
-        else {
-            addPacket(who, toSend);
-        }
-    }
-
-    private double maxBroadcastDistSq = 2 * Math.pow(64, 2);
-    /**
-     * @param who
-     *            Player to send packet to; if null, send to everyone in range.
-     * @param src
-     *            Where the packet originated from. Ignored of player != null
-     * @param toSend
-     */
-    public void broadcastPacket(EntityPlayer who, Coord src, Packet toSend) {
-        if (src.w == null) {
-            new NullPointerException("Coord is null").printStackTrace();
-            return;
-        }
-        if (who == null) {
-            //send to everyone in range
-            Chunk srcChunk = src.getChunk();
-            for (EntityPlayer player : (Iterable<EntityPlayer>) src.w.playerEntities) {
-                //XXX TODO: Make this not lame!
-                double x = src.x - player.posX;
-                double z = src.z - player.posZ;
-                if (x*x + z*z > maxBroadcastDistSq) {
-                    continue;
-                }
-                if (!Core.proxy.playerListensToCoord(player, src)) {
-                    continue;
-                }
-                addPacket(player, toSend);
-            }
-        }
-        else {
-            addPacket(who, toSend);
-        }
-    }
-    
-    public void broadcastPacket(World world, int xCoord, int yCoord, int zCoord, Packet toSend) {
-        if (toSend == null) {
-            return;
-        }
-        if (world.isRemote) {
-            return;
-        }
-        WorldServer w = (WorldServer) world;
-        PlayerInstance pi = w.getPlayerManager().getOrCreateChunkWatcher(xCoord >> 4, zCoord >> 4, false);
-        if (pi == null) {
-            return;
-        }
-        pi.sendToAllPlayersWatchingChunk(toSend);
-    }
-    
-    public void broadcastPacketToLMPers(Entity servo, Packet toSend) {
-        if (toSend == null) {
-            return;
-        }
-        World world = servo.worldObj;
-        int xCoord = (int) servo.posX;
-        int zCoord = (int) servo.posZ;
-        if (world.isRemote) {
-            return;
-        }
-        WorldServer w = (WorldServer) world;
-        PlayerInstance pi = w.getPlayerManager().getOrCreateChunkWatcher(xCoord >> 4, zCoord >> 4, false);
-        if (pi == null) {
-            return;
-        }
-        //Yoinked from pi.sendToAllPlayersWatchingChunk(toSend) to optimize packet sending
-        for (int i = 0; i < pi.playersInChunk.size(); ++i) {
-            EntityPlayerMP entityplayermp = (EntityPlayerMP) pi.playersInChunk.get(i);
-            ItemStack held = entityplayermp.getHeldItem();
-            if (held == null || held.getItem() != Core.registry.logicMatrixProgrammer) {
-                continue;
-            }
-            
-            if (!entityplayermp.loadedChunks.contains(pi.chunkLocation)) {
-                entityplayermp.playerNetServerHandler.sendPacketToPlayer(toSend);
-            }
+            FMLProxyPacket toSend = TEmessagePacket(src, messageType, msg);
+            FzNetDispatch.addPacketFrom(toSend, src);
+        } else if (who instanceof EntityPlayerMP) {
+            FMLProxyPacket toSend = TEmessagePacket(src, messageType, msg);
+            FzNetDispatch.addPacket(toSend, (EntityPlayerMP) who);
         }
     }
 
-    void handleTE(DataInput input, MessageType messageType, EntityPlayer player) {
+    public void broadcastPacket(EntityPlayer who, Coord coord, FMLProxyPacket toSend) {
+        if (who == null || !who.worldObj.isRemote) {
+            FzNetDispatch.addPacketFrom(toSend, coord);
+        } else if (who instanceof EntityPlayerMP) {
+            FzNetDispatch.addPacket(toSend, (EntityPlayerMP) who);
+        }
+    }
+
+    void handleTE(DataInput input, MessageType messageType, EntityPlayerMP player) {
         try {
             World world = player.worldObj;
             int x = input.readInt();
@@ -313,7 +219,7 @@ public class NetworkFactorization {
             if (messageType == MessageType.DescriptionRequest && !world.isRemote) {
                 TileEntityCommon tec = here.getTE(TileEntityCommon.class);
                 if (tec != null) {
-                    broadcastPacket(player, here, tec.getDescriptionPacket());
+                    FzNetDispatch.addPacket(tec.getDescriptionPacket(), player);
                 }
                 return;
             }
@@ -410,16 +316,15 @@ public class NetworkFactorization {
         return false;
     }
     
-    void handleCmd(DataInput data) throws IOException {
+    void handleCmd(DataInput data, EntityPlayer player) throws IOException {
         byte s = data.readByte();
         byte arg = data.readByte();
-        Command.fromNetwork(getCurrentPlayer(), s, arg);
+        Command.fromNetwork(player, s, arg);
     }
 
-    void handleNtfy(DataInput input) {
+    void handleNtfy(DataInput input, EntityPlayer me) {
         //NORELEASE: Move out to Notify
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            EntityPlayer me = getCurrentPlayer();
             if (!me.worldObj.isRemote) {
                 return;
             }
@@ -475,11 +380,11 @@ public class NetworkFactorization {
         }
     }
     
-    void handleEntity(DataInput input) {
+    void handleEntity(DataInput input, EntityPlayer player) {
         try {
-            World world = getCurrentPlayer().worldObj;
+            World world = player.worldObj;
             int entityId = input.readInt();
-            short messageType = input.readShort();
+            MessageType messageType = MessageType.fromId(input.readByte());
             Entity to = world.getEntityByID(entityId);
             if (to == null) {
                 if (Core.dev_environ) {
@@ -536,7 +441,7 @@ public class NetworkFactorization {
         WireFace,
         SculptDescription, SculptNew, SculptMove, SculptRemove, SculptState,
         ExtensionInfo, RocketState,
-        ServoRailDecor, ServoRailDecorUpdate, ServoRailEditComment,
+        ServoRailDecor, ServoRailEditComment,
         CompressionCrafter, CompressionCrafterBeginCrafting, CompressionCrafterBounds,
         
         servo_brief, servo_item, servo_complete, servo_stopped;
@@ -551,12 +456,24 @@ public class NetworkFactorization {
             }
         }
         
-        public static MessageType fromId(byte id) {
-            return valuesCache[id]; // we'd crash anyways.
+        private static MessageType fromId(byte id) {
+            if (id < 0 || id >= valuesCache.length) {
+                return null;
+            }
+            return valuesCache[id];
         }
         
-        public byte getId() {
-            return id;
+        public static MessageType read(DataInput in) throws IOException {
+            byte b = in.readByte();
+            MessageType mt = fromId(b);
+            if (mt == null) {
+                throw new IOException("Unknown type: " + b);
+            }
+            return mt;
+        }
+        
+        public void write(DataOutput out) throws IOException {
+            out.writeByte(id);
         }
         
     }

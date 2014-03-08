@@ -1,6 +1,6 @@
 package factorization.charge;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 
 import net.minecraft.nbt.NBTTagCompound;
@@ -164,7 +164,7 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
     }
     
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

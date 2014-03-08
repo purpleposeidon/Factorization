@@ -23,7 +23,6 @@ import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.ForgeVersion;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
@@ -48,10 +47,6 @@ import factorization.servo.ServoMotor;
 import factorization.wrath.TileEntityWrathLamp;
 
 @Mod(modid = Core.modId, name = Core.name, version = Core.version)
-@NetworkMod(
-        clientSideRequired = true,
-        tinyPacketHandler = NetworkFactorization.class
-        )
 public class Core {
     //We should repackage stuff. And rename the API package possibly.
     public static final String modId = "factorization";
@@ -111,9 +106,8 @@ public class Core {
         checkForge();
         fzconfig.loadConfig(event.getSuggestedConfigurationFile());
         registry.makeBlocks();
-        TickRegistry.registerTickHandler(registry, Side.SERVER);
         
-        NetworkRegistry.instance().registerGuiHandler(this, proxy);
+        NetworkRegistry.INSTANCE.registerGuiHandler(this, proxy);
 
         registerSimpleTileEntities();
         registry.makeItems();
@@ -173,7 +167,7 @@ public class Core {
     
     public static Logger FZLogger = Logger.getLogger("FZ");
     static {
-        FZLogger.setParent(FMLLog.getLogger());
+        //FZLogger.setParent(FMLLog.getLogger());
         logInfo("This is Factorization " + version);
     }
     
@@ -191,16 +185,6 @@ public class Core {
     
     public static void logSevere(String format, Object... formatParameters) {
         FZLogger.log(Level.SEVERE, String.format(format, formatParameters));
-    }
-
-    public static void addBlockToCreativeList(List tab, Block block) {
-        ArrayList a = new ArrayList<Object>();
-        block.addCreativeItems(a);
-        for (Object o : a) {
-            if (o != null) {
-                tab.add(o);
-            }
-        }
     }
     
     static ThreadLocal<Boolean> isMainClientThread = new ThreadLocal<Boolean>() {
@@ -238,7 +222,7 @@ public class Core {
     }
     
     private static void addTranslationHints(String hint_key, List list, String prefix) {
-        if (StatCollector.func_94522_b(hint_key)) {
+        if (StatCollector.canTranslate(hint_key)) {
             //if (st.containsTranslateKey(hint_key) /* containsTranslateKey = containsTranslateKey */ ) {
             String hint = StatCollector.translateToLocal(hint_key);
             if (hint != null) {
@@ -291,7 +275,7 @@ public class Core {
     
     public static CreativeTabs tabFactorization = new CreativeTabs("factorizationTab") {
         @Override
-        public Item getTabIIconItem() {
+        public Item getTabIconItem() {
             return registry.logicMatrixProgrammer;
         }
     };

@@ -1,6 +1,6 @@
 package factorization.shared;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,6 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.network.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
@@ -24,6 +23,7 @@ import net.minecraft.util.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -46,14 +46,14 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     }
 
     @Override
-    public Packet getDescriptionPacket() {
-        //Scar tissue. Lazy.
+    public FMLProxyPacket getDescriptionPacket() {
+        //NORELEASE Scar tissue. Lazy.
         return getAuxillaryInfoPacket();
     }
     
-    public Packet getAuxillaryInfoPacket() {
-        Packet p = Core.network.TEmessagePacket(getCoord(), MessageType.FactoryType, getFactoryType().md, getExtraInfo(), getExtraInfo2());
-        //p.isChunkDataPacket = true; NORELEASE? Needed?
+    public FMLProxyPacket getAuxillaryInfoPacket() {
+        FMLProxyPacket p = Core.network.TEmessagePacket(getCoord(), MessageType.FactoryType, getFactoryType().md, getExtraInfo(), getExtraInfo2());
+        //p.isChunkDataPacket = true; NORELEASE? Needed? Would take work?
         return p;
     }
 
@@ -139,7 +139,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         b.setBlockBounds(0, 0, 0, 1, 1, 1);
     }
 
-    protected Packet getDescriptionPacketWith(Object... args) {
+    protected FMLProxyPacket getDescriptionPacketWith(Object... args) {
         Object[] suffix = new Object[args.length + 3];
         suffix[0] = getFactoryType().md;
         suffix[1] = getExtraInfo();
@@ -147,8 +147,8 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         for (int i = 0; i < args.length; i++) {
             suffix[i + 3] = args[i];
         }
-        Packet p = Core.network.TEmessagePacket(getCoord(), MessageType.FactoryType, suffix);
-        p.isChunkDataPacket = true;
+        FMLProxyPacket p = Core.network.TEmessagePacket(getCoord(), MessageType.FactoryType, suffix);
+        //p.isChunkDataPacket = true; NORELEASE: Is this needed? I'm thinking it isn't.
         return p;
     }
 
@@ -231,11 +231,11 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         }
     }
     
-    public boolean handleMessageFromServer(MessageType messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         return false;
     }
 
-    public boolean handleMessageFromClient(MessageType messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromClient(MessageType messageType, DataInput input) throws IOException {
         // There are no base attributes a client can edit
         return false;
     }
@@ -244,7 +244,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         Core.network.broadcastMessage(who, getCoord(), messageType, msg);
     }
     
-    public void broadcastMessage(EntityPlayer who, Packet toSend) {
+    public void broadcastMessage(EntityPlayer who, FMLProxyPacket toSend) {
         Core.network.broadcastPacket(who, getCoord(), toSend);
     }
     

@@ -1,22 +1,22 @@
 package factorization.sockets.fanturpeller;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.Packet;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.IFluidHandler;
 
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Charge;
@@ -374,7 +374,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
     
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(MessageType messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -387,7 +387,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
     }
     
     @Override
-    public Packet getDescriptionPacket() {
+    public FMLProxyPacket getDescriptionPacket() {
         return getDescriptionPacketWith(MessageType.FanturpellerSpeed, fanω, isSucking);
     }
     

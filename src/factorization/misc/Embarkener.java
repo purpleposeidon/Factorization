@@ -1,33 +1,32 @@
 package factorization.misc;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.block.BlockLog;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.common.MinecraftForge;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import cpw.mods.fml.common.ITickHandler;
-import cpw.mods.fml.common.TickType;
-import cpw.mods.fml.common.registry.TickRegistry;
-import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Mod.EventHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
+import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
 
-public class Embarkener implements ITickHandler {
+public class Embarkener {
     public Embarkener() {
         if (FzConfig.embarken_wood) {
             addLogBarkRecipes();
             MinecraftForge.EVENT_BUS.register(this);
-            TickRegistry.registerTickHandler(this, Side.SERVER);
+            FMLCommonHandler.instance().bus().register(this);
         }
     }
 
@@ -95,28 +94,14 @@ public class Embarkener implements ITickHandler {
         if (!target.isReplacable()) return;
         embarkenQueue.add(new EmbarkenEvent(target, is.stackSize, is, event.entityPlayer, (BlockLog) theBlock));
     }
-
-    @Override
-    public void tickStart(EnumSet<TickType> type, Object... tickData) {}
-
-    @Override
-    public void tickEnd(EnumSet<TickType> type, Object... tickData) {
+    
+    @EventHandler
+    public void tickEnd(ServerTickEvent event) {
+        if (event.phase != Phase.END) return;
         for (EmbarkenEvent e : embarkenQueue) {
             e.handle();
         }
         embarkenQueue.clear();
-    }
-
-    EnumSet<TickType> myTicks = EnumSet.of(TickType.SERVER);
-    
-    @Override
-    public EnumSet<TickType> ticks() {
-        return myTicks;
-    }
-
-    @Override
-    public String getLabel() {
-        return "fz.misc.embarken";
     }
     
     

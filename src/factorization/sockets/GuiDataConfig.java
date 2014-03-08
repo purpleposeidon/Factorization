@@ -27,6 +27,7 @@ import factorization.api.datahelpers.DataValidator;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.shared.Core;
+import factorization.shared.FzNetDispatch;
 import factorization.shared.NetworkFactorization.MessageType;
 
 public class GuiDataConfig extends GuiScreen {
@@ -457,7 +458,7 @@ public class GuiDataConfig extends GuiScreen {
         if (containingEntity == null) {
             Core.network.prefixTePacket(dos, here, MessageType.DataHelperEdit);
             ids.serialize("", dop);
-            Core.network.broadcastPacket(mc.thePlayer, here, Core.network.TEmessagePacket(baos));
+            Core.network.broadcastPacket(mc.thePlayer, here, FzNetDispatch.generate(baos));
         } else {
             Core.network.prefixEntityPacket(dos, containingEntity, MessageType.DataHelperEdit);
             ids.serialize("", dop);

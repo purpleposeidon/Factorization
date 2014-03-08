@@ -1,6 +1,6 @@
 package factorization.oreprocessing;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -316,7 +316,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     }
 
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             if (messageType == MessageType.DrawActive) {
                 getCoord().updateLight();

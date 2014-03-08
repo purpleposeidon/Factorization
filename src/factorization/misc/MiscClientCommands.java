@@ -20,7 +20,7 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcherDispatcher;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
@@ -255,22 +255,22 @@ public class MiscClientCommands implements ICommand {
         
         @help("Sets the watchdog waitInterval")
         public static String watchdog() {
-            if (MiscClientProxy.watch_dog == null) {
+            if (LagssieWatchDog.instance == null) {
                 return "Watchdog disabled. Enable in config, or use /f startwatchdog";
             }
             
             if (arg1 == null) {
-                return "Usage: /f watchdog [waitInterval=" + MiscClientProxy.watch_dog.sleep_time + "]";
+                return "Usage: /f watchdog [waitInterval=" + LagssieWatchDog.instance.sleep_time + "]";
             }
-            MiscClientProxy.watch_dog.sleep_time = Double.parseDouble(arg1);
-            return "Set waitInterval to " + MiscClientProxy.watch_dog.sleep_time;
+            LagssieWatchDog.instance.sleep_time = Double.parseDouble(arg1);
+            return "Set waitInterval to " + LagssieWatchDog.instance.sleep_time;
         }
         
         @help("Starts the watchdog")
         public static String startwatchdog() {
-            if (MiscClientProxy.watch_dog == null) {
+            if (LagssieWatchDog.instance == null) {
                 FzConfig.lagssie_watcher = true;
-                MiscClientProxy.startLagWatchDog();
+                LagssieWatchDog.start();
                 return "Started watchdog.";
             } else {
                 return "Watchdog already running.";
@@ -422,15 +422,15 @@ public class MiscClientCommands implements ICommand {
         @help("Disable or enable TileEntity special renderers")
         public static String tesrtoggle() {
             if (backup == null) {
-                if (TileEntityRendererDispatcherDispatcher.instance.mapSpecialRenderers == null) {
+                if (TileEntityRendererDispatcher.instance.mapSpecialRenderers == null) {
                     return "no TESRs!";
                 }
-                backup = TileEntityRendererDispatcherDispatcher.instance.mapSpecialRenderers;
-                TileEntityRendererDispatcherDispatcher.instance.mapSpecialRenderers = empty;
+                backup = TileEntityRendererDispatcher.instance.mapSpecialRenderers;
+                TileEntityRendererDispatcher.instance.mapSpecialRenderers = empty;
                 return "TESRs disabled";
             } else {
                 empty.clear();
-                TileEntityRendererDispatcherDispatcher.instance.mapSpecialRenderers = backup;
+                TileEntityRendererDispatcher.instance.mapSpecialRenderers = backup;
                 backup = null;
                 return "TESRs enabled; requires chunk update to restart drawing";
             }

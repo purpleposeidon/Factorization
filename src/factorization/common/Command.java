@@ -1,14 +1,10 @@
 package factorization.common;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.minecraft.entity.player.EntityPlayer;
 import factorization.shared.Core;
 import factorization.weird.ContainerPocket;
-
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.ItemStack;
 
 public enum Command {
     bagShuffle(1), craftClear(2, true), craftSwirl(3, true), craftBalance(4, true), craftOpen(5, true),

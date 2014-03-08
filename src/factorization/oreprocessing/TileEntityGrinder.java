@@ -1,6 +1,6 @@
 package factorization.oreprocessing;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -25,7 +25,8 @@ import factorization.shared.FzUtil;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.shared.TileEntityFactorization;
 
-public class TileEntityGrinder extends TileEntityFactorization implements IChargeConductor { //NORELEASE: Remove when 1.7. If doing another 1.6 release, kill the textures/renderer?
+public class TileEntityGrinder extends TileEntityFactorization implements IChargeConductor {
+    //NORELEASE: Remove when 1.7. If doing another 1.6 release, kill the textures/renderer?
     ItemStack input, output;
     Charge charge = new Charge(this);
     int progress = 0;
@@ -126,19 +127,12 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     int last_speed = 0;
 
     void shareSpeed() {
-        if (speed != last_speed) {
-            last_speed = speed;
-            broadcastMessage(null, MessageType.GrinderSpeed, speed);
-        }
+        
     }
 
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
-            return true;
-        }
-        if (messageType == MessageType.GrinderSpeed) {
-            speed = input.readInt();
             return true;
         }
         return false;

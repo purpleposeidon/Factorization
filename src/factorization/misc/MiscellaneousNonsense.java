@@ -1,8 +1,5 @@
 package factorization.misc;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -11,12 +8,12 @@ import java.util.List;
 
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.network.Packet;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatisticsFile;
@@ -33,6 +30,7 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
@@ -108,18 +106,7 @@ public class MiscellaneousNonsense {
         }
     }
     
-    public Packet makeTpsReportPacket(float tps) {
-        try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            DataOutputStream output = new DataOutputStream(outputStream);
-            output.writeFloat(tps);
-            output.flush();
-            return PacketDispatcher.getPacket(MiscNet.tpsChannel, outputStream.toByteArray());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+
     
     
     private final double expected_tick_time_ms = 1000D/20D; //20 ticks/second = 20 ticks/1000 ms
@@ -147,7 +134,8 @@ public class MiscellaneousNonsense {
         measurements = 0;
         float tps = getTpsRatio();
         if (tps != last_tps) {
-            PacketDispatcher.sendPacketToAllPlayers(makeTpsReportPacket(getTpsRatio()));
+            FMLProxyPacket packet = MiscellaneousNonsense.net.makeTpsReportPacket(getTpsRatio());
+            MiscNet.channel.sendToAll(packet);
             last_tps = tps;
         }
     }
@@ -174,7 +162,7 @@ public class MiscellaneousNonsense {
         {
             if (ms.getTickCounter() >= ms.tickTimeArray.length) {
                 //Startup time is ignored; early birds will get a TPS packet soon enough
-                PacketDispatcher.sendPacketToPlayer(makeTpsReportPacket(getTpsRatio()), event.player);
+                MiscNet.channel.sendTo(MiscNet.makeTpsReportPacket(getTpsRatio()), (EntityPlayerMP) event.player);
             }
         }
     }

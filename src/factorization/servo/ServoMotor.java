@@ -1,19 +1,21 @@
 package factorization.servo;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.ByteBufOutputStream;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
@@ -24,12 +26,9 @@ import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.ForgeDirection;
-
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteArrayDataOutput;
-
+import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -37,7 +36,6 @@ import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.IChargeConductor;
 import factorization.api.IEntityMessage;
-import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataInPacket;
@@ -47,13 +45,13 @@ import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.notify.Notify;
-import factorization.servo.instructions.IntegerValue;
 import factorization.shared.Core;
+import factorization.shared.FzNetDispatch;
 import factorization.shared.FzUtil;
-import factorization.shared.Sound;
-import factorization.shared.TileEntityCommon;
 import factorization.shared.FzUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.Sound;
+import factorization.shared.TileEntityCommon;
 import factorization.sockets.GuiDataConfig;
 import factorization.sockets.ISocketHolder;
 import factorization.sockets.SocketEmpty;
@@ -82,7 +80,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         worldObj.spawnEntityInWorld(this);
     }
 
-    
+    public void syncWithSpawnPacket() {
+        if (worldObj.isRemote) return;
+        Packet p = FMLNetworkHandler.getEntitySpawningPacket(this);
+        FzNetDispatch.addPacketFrom(p, this);
+    }
     
     
     
@@ -107,9 +109,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     @Override
-    public void readSpawnData(ByteArrayDataInput data) {
+    public void readSpawnData(ByteBuf data) {
         try {
-            putData(new DataInPacket(data, Side.CLIENT));
+            putData(new DataInPacket(new ByteBufInputStream(data), Side.CLIENT));
         } catch (IOException e) {
             e.printStackTrace();
         } catch (IllegalStateException e) {
@@ -118,9 +120,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     @Override
-    public void writeSpawnData(ByteArrayDataOutput data) {
+    public void writeSpawnData(ByteBuf data) {
         try {
-            putData(new DataOutPacket(data, Side.SERVER));
+            putData(new DataOutPacket(new ByteBufOutputStream(data), Side.SERVER));
         } catch (IOException e) {
             e.printStackTrace();
         } catch (IllegalStateException e) {
@@ -164,9 +166,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     // Networking
     
-    void broadcast(int message_type, Object... msg) {
-        Packet p = Core.network.entityPacket(this, message_type, msg);
-        Core.network.broadcastPacket(worldObj, (int) posX, (int) posY, (int) posZ, p);
+    void broadcast(MessageType message_type, Object... msg) {
+        FMLProxyPacket p = Core.network.entityPacket(this, message_type, msg);
+        Core.network.broadcastPacket(null, getCurrentPos(), p);
     }
     
     public void broadcastBriefUpdate() {
@@ -179,7 +181,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
     
     @Override
-    public boolean handleMessageFromClient(short messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromClient(MessageType messageType, DataInput input) throws IOException {
         if (messageType == MessageType.DataHelperEdit) {
             DataInPacketClientEdited di = new DataInPacketClientEdited(input);
             socket.serialize("", di);
@@ -191,9 +193,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(short messageType, DataInput input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         switch (messageType) {
-        case MessageType.OpenDataHelperGui:
+        case OpenDataHelperGui:
             if (!worldObj.isRemote) {
                 return false;
             } else {
@@ -202,7 +204,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 Minecraft.getMinecraft().displayGuiScreen(new GuiDataConfig(socket, this));
             }
             return true;
-        case MessageType.servo_item:
+        case servo_item:
             while (true) {
                 byte index = input.readByte();
                 if (index < 0) {
@@ -211,7 +213,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 inv[index] = FzUtil.readStack(input);
             }
             return true;
-        case MessageType.servo_brief:
+        case servo_brief:
             Coord a = getCurrentPos();
             Coord b = getNextPos();
             FzOrientation no = FzOrientation.getOrientation(input.readByte());
@@ -230,7 +232,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 motionHandler.stopped = false;
             }
             return true;
-        case MessageType.servo_complete:
+        case servo_complete:
             try {
                 DataHelper data = new DataInPacket(input, Side.CLIENT);
                 putData(data);
@@ -238,11 +240,12 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 e.printStackTrace();
             }
             return true;
-        case MessageType.servo_stopped:
+        case servo_stopped:
             motionHandler.stopped = input.readBoolean();
             return true;
+        default:
+            return socket.handleMessageFromServer(messageType, input);
         }
-        return socket.handleMessageFromServer(messageType, input);
     }
     
     
@@ -279,8 +282,8 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                     Core.network.prefixEntityPacket(dos, this, MessageType.servo_complete);
                     DataHelper data = new DataOutPacket(dos, Side.SERVER);
                     putData(data);
-                    Packet toSend = Core.network.entityPacket(baos);
-                    Core.network.broadcastPacketToLMPers(this, toSend);
+                    FMLProxyPacket toSend = Core.network.entityPacket(baos);
+                    Core.network.broadcastPacket(null, getCurrentPos(), toSend);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -679,9 +682,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
     
     @Override
-    public void sendMessage(int msgType, Object... msg) {
-        Packet toSend = Core.network.entityPacket(this, msgType, msg);
-        Core.network.broadcastPacket(worldObj, (int) posX, (int) posY, (int) posZ, toSend); 
+    public void sendMessage(MessageType msgType, Object... msg) {
+        FMLProxyPacket toSend = Core.network.entityPacket(this, msgType, msg);
+        Core.network.broadcastPacket(null, getCurrentPos(), toSend); 
     }
     
 }

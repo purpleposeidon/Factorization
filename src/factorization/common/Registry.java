@@ -2,7 +2,6 @@ package factorization.common;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -29,7 +28,6 @@ import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -37,8 +35,12 @@ import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
+import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.VillagerRegistry;
 import cpw.mods.fml.common.registry.VillagerRegistry.IVillageTradeHandler;
@@ -83,7 +85,7 @@ import factorization.wrath.BlockLightAir;
 import factorization.wrath.ItemBagOfHolding;
 import factorization.wrath.TileEntityWrathLamp;
 
-public class Registry implements ICraftingHandler, ITickHandler {
+public class Registry {
     public ItemFactorizationBlock item_factorization;
     public ItemBlockResource item_resource;
     public BlockFactorization factory_block, factory_rendering_block = null;
@@ -173,10 +175,9 @@ public class Registry implements ICraftingHandler, ITickHandler {
         ItemBlock itemDarkIronOre = new ItemBlock(dark_iron_ore);
         ItemBlock itemFracturedBedrock = new ItemBlock(fractured_bedrock_block);
 
-        GameRegistry.registerBlock(factory_block, ItemFactorizationBlocks.class, "FZ factory");
+        GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FZ factory");
         GameRegistry.registerBlock(lightair_block, "FZ Lightair");
         GameRegistry.registerBlock(resource_block, ItemBlockResource.class, "FZ resource");
-        GameRegistry.registerCraftingHandler(this);
         
         registerItem(factory_block);
         registerItem(lightair_block);
@@ -203,7 +204,13 @@ public class Registry implements ICraftingHandler, ITickHandler {
     void postMakeItems() {
         HashSet<Item> foundItems = new HashSet();
         for (Field field : this.getClass().getFields()) {
-            Object obj = field.get(this);
+            Object obj;
+            try {
+                obj = field.get(this);
+            } catch (Throwable e) {
+                e.printStackTrace();
+                continue;
+            }
             if (obj instanceof ItemStack) {
                 foundItems.add(((ItemStack) obj).getItem());
             } else if (obj instanceof Item) {
@@ -314,7 +321,7 @@ public class Registry implements ICraftingHandler, ITickHandler {
 
         //Misc
         pocket_table = new ItemPocketTable();
-        steamFluid = new Fluid("steam").setDensity(-500).setGaseous(true).setViscosity(100).setBlockName("factorization:fluid/steam").setTemperature(273 + 110);
+        steamFluid = new Fluid("steam").setDensity(-500).setGaseous(true).setViscosity(100).setUnlocalizedName("factorization:fluid/steam").setTemperature(273 + 110);
         FluidRegistry.registerFluid(steamFluid);
         
         //Rocketry
@@ -1075,30 +1082,18 @@ public class Registry implements ICraftingHandler, ITickHandler {
         dark_iron_ore.setHarvestLevel("pickaxe", 2);
     }
     
-    
-    @Override
-    public void tickStart(EnumSet<TickType> type, Object... tickData) {
-        TileEntityWrathLamp.handleAirUpdates();
-    }
-    
-    @Override
-    public void tickEnd(EnumSet<TickType> type, Object... tickData) {
-        worldgenManager.tickRetrogenQueue();
-    }
-
-    private EnumSet<TickType> serverTicks = EnumSet.of(TickType.SERVER);
-    @Override
-    public EnumSet<TickType> ticks() {
-        return serverTicks;
-    }
-
-    @Override
-    public String getLabel() {
-        return "FZ_registry";
+    @EventHandler
+    public void tick(ServerTickEvent event) {
+        if (event.phase == Phase.START) {
+            TileEntityWrathLamp.handleAirUpdates();
+        } else {
+            worldgenManager.tickRetrogenQueue();
+        }
     }
 
     @SubscribeEvent
     public boolean onItemPickup(EntityItemPickupEvent event) {
+        //NORELEASE: Extractify. This goes in BoH, no?
         EntityPlayer player = event.entityPlayer;
         EntityItem item = event.item;
         if (item == null) {
@@ -1155,9 +1150,12 @@ public class Registry implements ICraftingHandler, ITickHandler {
         return true;
     }
 
-    @Override
-    public void onCrafting(EntityPlayer player, ItemStack stack, IInventory craftMatrix) {
-        //our regular programming
+    @EventHandler
+    public void onCrafting(PlayerEvent.ItemCraftedEvent event) {
+        //NORELEASE: Extractify
+        EntityPlayer player = event.player;
+        ItemStack stack = event.crafting;
+        IInventory craftMatrix = event.craftMatrix;
         for (int i = 0; i < craftMatrix.getSizeInventory(); i++) {
             ItemStack here = craftMatrix.getStackInSlot(i);
             if (here == null) {
@@ -1168,10 +1166,6 @@ public class Registry implements ICraftingHandler, ITickHandler {
                 ((IActOnCraft) item).onCraft(here, craftMatrix, i, stack, player);
             }
         }
-    }
-
-    @Override
-    public void onSmelting(EntityPlayer player, ItemStack item) {
     }
 
     public void sendIMC() {

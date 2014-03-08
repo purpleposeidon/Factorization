@@ -57,7 +57,7 @@ public enum FactoryType {
     LEADWIRE(14, false, TileEntityWire.class, "factory_solder"),
     HEATER(15, false, TileEntityHeater.class, "factory_heater"), //work furnaces without fuel
     MIRROR(16, false, TileEntityMirror.class, "factory_mirror"), //reflect sunlight onto IReflectionTargets
-    GRINDER(17, true, TileEntityGrinder.class, "factory_grinder"), //grind
+    GRINDER(17, true, TileEntityGrinder.class, "factory_grinder"), //grind.
     MIXER(18, true, TileEntityMixer.class, "factory_mixer"), //crafts its input as shapeless recipes of 2-4 ingredients
     CRYSTALLIZER(19, true, TileEntityCrystallizer.class, "factory_crystal"), //grow metallic crystals
     //20 -- Used to be GREENWARE
@@ -73,7 +73,7 @@ public enum FactoryType {
     DAYBARREL(30, false, TileEntityDayBarrel.class, "factory_barrel2"),
     CALIOMETRIC_BURNER(31, false, TileEntityCaliometricBurner.class, "factory_calory"),
     SOCKET_EMPTY(32, false, SocketEmpty.class, "fzsock_empty"),
-    SOCKET_LACERATOR(33, false, SocketLacerator.class, "fzsock_lacerate"),
+    SOCKET_LACERATOR(33, false, SocketLacerator.class, "fzsock_lacerate"), //NORELEASE: Needs to load the old Grinder TE name
     SOCKET_ROBOTHAND(34, false, SocketRobotHand.class, "fzsock_hand"),
     SOCKET_SHIFTER(35, true, SocketShifter.class, "fzsock_shift"),
     SOCKET_FANTURPELLER(36, true, SocketFanturpeller.class, "fzsock_fanturpeller"),

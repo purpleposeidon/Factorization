@@ -1,12 +1,13 @@
 package factorization.oreprocessing;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.Packet;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
 import factorization.common.BlockIcons;
@@ -305,12 +306,12 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     }
 
     @Override
-    public Packet getAuxillaryInfoPacket() {
+    public FMLProxyPacket getAuxillaryInfoPacket() {
         return getDescriptionPacketWith(MessageType.CrystallizerInfo, null2fake(growing_crystal), null2fake(solution), progress);
     }
 
     @Override
-    public boolean handleMessageFromServer(MessageType messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

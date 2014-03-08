@@ -1,21 +1,20 @@
 package factorization.common;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.ISound;
+import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.settings.GameSettings;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -27,7 +26,6 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
-import factorization.astro.BlockRenderRocketEngine;
 import factorization.ceramics.BlockRenderGreenware;
 import factorization.ceramics.ItemRenderGlazeBucket;
 import factorization.ceramics.TileEntityGreenware;
@@ -92,7 +90,6 @@ import factorization.weird.DayBarrelItemRenderer;
 import factorization.weird.GuiPocketTable;
 import factorization.weird.TileEntityDayBarrel;
 import factorization.weird.TileEntityDayBarrelRenderer;
-import factorization.wrath.BlockLightAir;
 import factorization.wrath.BlockRenderLamp;
 import factorization.wrath.TileEntityWrathLamp;
 
@@ -217,7 +214,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
     @Override
     public void playSoundFX(String src, float volume, float pitch) {
-        Minecraft.getMinecraft().sndManager.playSoundFX(src, volume, pitch);
+        ISound sound = new PositionedSoundRecord(new ResourceLocation(src), volume, pitch, 0, 0, 0);
+        Minecraft.getMinecraft().getSoundHandler().playSound(sound);
     }
 
     @Override
@@ -225,98 +223,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
         return Minecraft.getMinecraft().thePlayer;
     }
 
-    public static KeyBinding bag_swap_key = new KeyBinding("FZ Bag of Holding", org.lwjgl.input.Keyboard.KEY_GRAVE, "Factorization");
-    public static KeyBinding pocket_key = new KeyBinding("FZ Pocket Crafting Table", org.lwjgl.input.Keyboard.KEY_C, "Factorization");
 
-    private static class CommandKeySet extends KeyHandler {
-        Map<KeyBinding, Command> map;
 
-        static CommandKeySet create(Object... args) {
-            KeyBinding bindings[] = new KeyBinding[args.length / 2];
-            boolean repeatings[] = new boolean[args.length / 2];
-            Map<KeyBinding, Command> map = new HashMap();
-            for (int i = 0; i < args.length; i += 2) {
-                KeyBinding key = (KeyBinding) args[i];
-                Command cmd = (Command) args[i + 1];
-                map.put(key, cmd);
-                bindings[i / 2] = key;
-                repeatings[i / 2] = false;
-            }
-            CommandKeySet ret = new CommandKeySet(bindings, repeatings);
-            ret.map = map;
-            return ret;
-        }
 
-        private CommandKeySet(KeyBinding[] keyBindings, boolean[] repeatings) {
-            super(keyBindings, repeatings);
-        }
-
-        @Override
-        public EnumSet<TickType> ticks() {
-            return EnumSet.of(TickType.CLIENT);
-        }
-
-        @Override
-        public String getLabel() {
-            return "CommandKeys";
-        }
-
-        @Override
-        public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd,
-                boolean isRepeat) {
-            if (tickEnd) {
-                return;
-            }
-            GuiScreen gui = Minecraft.getMinecraft().currentScreen;
-            if (gui != null) {
-                return;
-            }
-            Command command = map.get(kb);
-            EntityPlayer player = Core.proxy.getClientPlayer();
-            if (player == null) {
-                return;
-            }
-            if (player.isSneaking()) {
-                command = command.reverse;
-            }
-            command.call(Core.proxy.getClientPlayer());
-        }
-
-        @Override
-        public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd) {
-        }
-    }
-    @Override
-    public void registerKeys() {
-        KeyBindingRegistry.registerKeyBinding(CommandKeySet.create(
-                bag_swap_key, Command.bagShuffle,
-                pocket_key, Command.craftOpen));
-        TickRegistry.registerScheduledTickHandler(new IScheduledTickHandler() {
-            @Override
-            public void tickStart(EnumSet<TickType> type, Object... tickData) {}
-
-            @Override
-            public void tickEnd(EnumSet<TickType> type, Object... tickData) {
-                TileEntityDayBarrel.iterateForFinalizedBarrels();
-            }
-
-            @Override
-            public EnumSet<TickType> ticks() {
-                return EnumSet.of(TickType.CLIENT);
-            }
-
-            @Override
-            public String getLabel() {
-                return "fz.barrel_display_list_finalizer";
-            }
-
-            @Override
-            public int nextTickSpacing() {
-                return 20*30; //Every 30 seconds
-            }
-            
-        }, Side.CLIENT);
-    }
 
     private void setTileEntityRendererDispatcher(Class clazz, TileEntitySpecialRenderer r) {
         ClientRegistry.bindTileEntitySpecialRenderer(clazz, r);
@@ -418,7 +327,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
     
     @Override
     public String getPocketCraftingTableKey() {
-        return GameSettings.getKeyDisplayString(pocket_key.keyCode);
+        return GameSettings.getKeyDisplayString(FactorizationKeyHandler.pocket_key.getKeyCode());
     }
     
     @Override
