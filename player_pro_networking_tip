@@ -17,6 +17,7 @@ public class PacketHandler {
 	public void onPacket(ServerCustomPacketEvent event) {
 		byte[] data = new byte[event.packet.payload().readableBytes()];
 		event.packet.payload().readBytes(data);
+        // Actually: ByteBufInputStream input = new ByteBufInputStream(event.packet.payload());
 
 		onPacketData(data, ((NetHandlerPlayServer) event.handler).playerEntity);
 	}
@@ -25,6 +26,7 @@ public class PacketHandler {
 	public void onPacket(ClientCustomPacketEvent event) {
 		byte[] data = new byte[event.packet.payload().readableBytes()];
 		event.packet.payload().readBytes(data);
+        // Actually: ByteBufInputStream input = new ByteBufInputStream(event.packet.payload());
 
 		onPacketData(data, null);
 	}
@@ -46,3 +48,4 @@ public class PacketHandler {
 		channel.sendTo(packet, player);
 	}
 }
+

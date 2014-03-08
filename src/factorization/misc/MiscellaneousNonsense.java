@@ -72,7 +72,6 @@ public class MiscellaneousNonsense {
         
         proxy.initializeClient();
         proxy.registerLoadAlert();
-        proxy.registerSprintKey();
         FMLCommonHandler.instance().bus().register(this);
         if (FzConfig.equal_opportunities_for_mobs) {
             MinecraftForge.EVENT_BUS.register(new MobEqualizer());

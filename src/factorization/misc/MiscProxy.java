@@ -6,8 +6,6 @@ public class MiscProxy {
     void initializeClient() { }
     
     void registerLoadAlert() { }
-
-    void registerSprintKey() { }
     
     void handleTpsReport(float newTps) { }
 }

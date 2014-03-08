@@ -11,11 +11,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
+import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import factorization.api.Coord;
+import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
 public class ClientTickHandler {
@@ -27,6 +29,7 @@ public class ClientTickHandler {
         if (event.type != TickEvent.Type.CLIENT) return;
         emitLoadAlert();
         checkPickBlockKey();
+        checkSprintKey();
         MiscClientCommands.tick();
     }
     
@@ -118,12 +121,13 @@ public class ClientTickHandler {
         return false;
     }
     
-    private void handleSprinting() {
-        
+    KeyBinding sprint = new KeyBinding("Sprint (FZ)", 0, "key.categories.gameplay");
+    {
+        ClientRegistry.registerKeyBinding(sprint);
     }
     
-    KeyBinding sprint = new KeyBinding("FZ vanilla sprint", 0, "key.categories.movement");
-    private void sprint(boolean state) {
+    boolean prevState = false;
+    private void checkSprintKey() {
         if (mc.currentScreen != null) {
             return;
         }
@@ -133,9 +137,19 @@ public class ClientTickHandler {
         if (sprint.getKeyCode() == 0) {
             return;
         }
-        if (!mc.thePlayer.isSneaking() && mc.thePlayer.isSprinting() != state) {
-            mc.thePlayer.setSprinting(state);
+        final boolean state = sprint.isPressed();
+        Core.logInfo("%s", state);
+        final int forwardCode = mc.gameSettings.keyBindForward.getKeyCode();
+        if (state) {
+            if (!mc.thePlayer.isSneaking()) {
+                KeyBinding.setKeyBindState(forwardCode, true);
+                KeyBinding.onTick(forwardCode);
+                //mc.thePlayer.setSprinting(true);
+            }
+        } else if (prevState) {
+            KeyBinding.setKeyBindState(forwardCode, false);
+            mc.thePlayer.setSprinting(false);
         }
-        KeyBinding.setKeyBindState(sprint.getKeyCode(), state);
+        prevState = state;
     }
 }

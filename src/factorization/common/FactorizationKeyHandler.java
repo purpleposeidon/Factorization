@@ -2,15 +2,20 @@ package factorization.common;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
+import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 
 public class FactorizationKeyHandler {
-    public static final FactorizationKeyHandler instance = new FactorizationKeyHandler();
-    public static final KeyBinding bag_swap_key = new KeyBinding("FZ Bag of Holding", org.lwjgl.input.Keyboard.KEY_GRAVE, "Item");
-    public static final KeyBinding pocket_key = new KeyBinding("FZ Pocket Crafting Table", org.lwjgl.input.Keyboard.KEY_C, "Item");
+    public static final KeyBinding bag_swap_key = new KeyBinding("BoH Shift (FZ)", org.lwjgl.input.Keyboard.KEY_GRAVE, "key.categories.item");
+    public static final KeyBinding pocket_key = new KeyBinding("PcktCrft Open (FZ)", org.lwjgl.input.Keyboard.KEY_C, "key.categories.item");
+    
+    static {
+        ClientRegistry.registerKeyBinding(bag_swap_key);
+        ClientRegistry.registerKeyBinding(pocket_key);
+    }
     
     {
         FMLCommonHandler.instance().bus().register(this);

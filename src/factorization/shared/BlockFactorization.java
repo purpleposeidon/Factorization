@@ -519,9 +519,9 @@ public class BlockFactorization extends BlockContainer {
     public static int CURRENT_PASS = 0;
     @Override
     public boolean canRenderInPass(int pass) {
-        //return pass == 0;
         CURRENT_PASS = pass;
         return pass == 0 || pass == 1;
+        // TODO: This is a bit lame. A bit of overhead just for barrels and mixers... 
     }
 
     @Override

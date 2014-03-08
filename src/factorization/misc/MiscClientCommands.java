@@ -29,6 +29,7 @@ import cpw.mods.fml.client.GuiModList;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.common.FactorizationKeyHandler;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
 
@@ -550,16 +551,11 @@ public class MiscClientCommands implements ICommand {
                 }
             }
             if (found_number) {
-                if (!mc.isSingleplayer() || !FzConfig.enable_sketchy_client_commands) {
-                    if (i < 0) {
-                        i = 0;
-                    }
+                if (i < 0) {
+                    i = 0;
                 }
-                if (i > 3) {
-                    Minecraft.getMinecraft().gameSettings.fancyGraphics = false; //avoid a forge crash
-                }
-                if (i > 8) {
-                    i = 8; //seems to have started crashing. Lame.
+                if (i > 16) {
+                    i = 16; //seems to have started crashing. Lame.
                 }
                 mc.gameSettings.renderDistanceChunks = i; //NORELEASE: Test new ranges
                 return;

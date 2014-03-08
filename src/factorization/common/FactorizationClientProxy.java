@@ -94,6 +94,7 @@ import factorization.wrath.BlockRenderLamp;
 import factorization.wrath.TileEntityWrathLamp;
 
 public class FactorizationClientProxy extends FactorizationProxy {
+    public FactorizationKeyHandler keyHandler = new FactorizationKeyHandler();
     public FactorizationClientProxy() {
         MinecraftForge.EVENT_BUS.register(this);
     }
@@ -301,10 +302,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket, new ItemRenderGlazeBucket());
         MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel, new DayBarrelItemRenderer(renderBarrel));
         setTileEntityRendererDispatcher(BlockDarkIronOre.Glint.class, new GlintRenderer());
-        
-        if (Minecraft.getMinecraft().getSession().getUsername().equals("neptunepink")) {
-            Core.FZLogger.setLevel(Level.FINE);
-        }
     }
     
     @Override

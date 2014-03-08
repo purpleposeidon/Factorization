@@ -2,8 +2,6 @@ package factorization.shared;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -20,8 +18,10 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
-import net.minecraftforge.common.ForgeVersion;
 import net.minecraftforge.common.MinecraftForge;
+
+import org.apache.logging.log4j.Logger;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -85,26 +85,13 @@ public class Core {
     }
     static public boolean serverStarted = false;
 
-    void checkForge() {
-        int maxForge = 953;
-        if (ForgeVersion.getBuildVersion() > maxForge && ForgeVersion.getBuildVersion() != 965) {
-            //This needs to go away in 1.7.
-            if (System.getProperty("factorization.ignoreForgeVersion", "").equalsIgnoreCase("true")) {
-                Core.logSevere("Loading despite scary-looking forge version > " + maxForge);
-            } else {
-                String msg = "This forge is for pre-1.7 use only! The Forge version must be <= " + maxForge + ".\n" +
-                        "Get a compatible forge from http://files.minecraftforge.net/minecraftforge/index_legacy.html\n" +
-                        "You can force loading to continue by passing -Dfactorization.ignoreForgeVersion=true to the JVM.";
-                Core.logSevere(msg);
-                throw new RuntimeException(msg);
-            }
-        }
-    }
+    void checkForge() { }
 
     @EventHandler
     public void load(FMLPreInitializationEvent event) {
-        MinecraftForge.EVENT_BUS.register(registry);
+        initializeLogging(event.getModLog());
         checkForge();
+        MinecraftForge.EVENT_BUS.register(registry);
         fzconfig.loadConfig(event.getSuggestedConfigurationFile());
         registry.makeBlocks();
         
@@ -166,26 +153,34 @@ public class Core {
 
     }
     
-    public static Logger FZLogger = Logger.getLogger("FZ");
-    static {
-        //FZLogger.setParent(FMLLog.getLogger());
-        logInfo("This is Factorization " + version);
-    }
-    
-    public static void logWarning(String format, Object... formatParameters) {
-        FZLogger.log(Level.WARNING, String.format(format,  formatParameters));
-    }
-    
-    public static void logInfo(String format, Object... formatParameters) {
-        FZLogger.log(Level.INFO, String.format(format, formatParameters));
-    }
-    
-    public static void logFine(String format, Object... formatParameters) {
-        FZLogger.log(dev_environ ? Level.INFO : Level.FINE, String.format(format, formatParameters));
+    private static Logger FZLogger;
+    private void initializeLogging(Logger logger) {
+        Core.FZLogger = logger;
+        logInfo("This is Factorization %s", version);
+        logSevere("Test severe");
+        logWarning("Test warning");
+        logInfo("Test info");
+        logFine("Test fine (more or less)");
     }
     
     public static void logSevere(String format, Object... formatParameters) {
-        FZLogger.log(Level.SEVERE, String.format(format, formatParameters));
+        FZLogger.error(String.format(format, formatParameters));
+    }
+    
+    public static void logWarning(String format, Object... formatParameters) {
+        FZLogger.warn(String.format(format, formatParameters));
+    }
+    
+    public static void logInfo(String format, Object... formatParameters) {
+        FZLogger.info(String.format(format, formatParameters));
+    }
+    
+    public static void logFine(String format, Object... formatParameters) {
+        if (dev_environ) {
+            FZLogger.info(String.format(format, formatParameters));
+        } else {
+            FZLogger.debug(String.format(format, formatParameters));
+        }
     }
     
     static ThreadLocal<Boolean> isMainClientThread = new ThreadLocal<Boolean>() {

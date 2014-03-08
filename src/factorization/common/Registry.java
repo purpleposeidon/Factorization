@@ -213,12 +213,18 @@ public class Registry {
             }
         }
         
+        Block invalid = FzUtil.getBlock((Item) null);
+        int i = 0;
         for (Item it : foundItems) {
-            if (FzUtil.getBlock(it) == null) {
+            if (FzUtil.getBlock(it) == invalid) {
                 it.setTextureName(it.getUnlocalizedName());
                 registerItem(it);
+                i++;
             }
         }
+        Core.logInfo("NORELEASE: Registered " + i + " items");
+        
+        
     }
 
     public void makeItems() {

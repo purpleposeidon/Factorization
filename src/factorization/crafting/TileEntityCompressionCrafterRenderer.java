@@ -47,7 +47,6 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
     }
     
     Random rand = new Random();
-    static boolean NORELEASE = true;
     
     @Override
     public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
@@ -55,7 +54,6 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         if (cc == null) {
             return;
         }
-        if (NORELEASE) return;
         interp_side.under = BlockIcons.compactSideSlide;
         bindTexture(Core.blockAtlas);
         final float squishy = 3F/16F;
