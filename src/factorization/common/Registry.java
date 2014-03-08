@@ -88,7 +88,7 @@ import factorization.wrath.TileEntityWrathLamp;
 public class Registry {
     public ItemFactorizationBlock item_factorization;
     public ItemBlockResource item_resource;
-    public BlockFactorization factory_block, factory_rendering_block = null;
+    public BlockFactorization factory_block, factory_rendering_block = new BlockFactorization();
     public BlockRenderHelper blockRender = null, serverTraceHelper = null, clientTraceHelper = null;
     public BlockLightAir lightair_block;
     public BlockResource resource_block;
@@ -151,10 +151,6 @@ public class Registry {
         GameRegistry.registerItem(item, item.getUnlocalizedName(), Core.modId);
     }
     
-    static void registerItem(Block block) {
-        registerItem(new ItemStack(block).getItem());
-    }
-    
     public void makeBlocks() {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             //Theoretically, not necessary. I bet BUKKIT would flip its shit tho.
@@ -167,23 +163,21 @@ public class Registry {
         factory_block = new BlockFactorization();
         lightair_block = new BlockLightAir();
         resource_block = new BlockResource();
+        GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FZ factory");
+        GameRegistry.registerBlock(lightair_block, "FZ Lightair");
+        GameRegistry.registerBlock(resource_block, ItemBlockResource.class, "FZ resource");
         is_factory = new ItemStack(factory_block);
         is_lightair = new ItemStack(lightair_block);
         dark_iron_ore = new BlockDarkIronOre().setBlockName("factorization:darkIronOre").setBlockTextureName("stone").setCreativeTab(Core.tabFactorization).setHardness(3.0F).setResistance(5.0F);
         class NotchBlock extends Block { public NotchBlock(Material honestly) { super(honestly); } }
         fractured_bedrock_block = new NotchBlock(Material.rock).setBlockUnbreakable().setResistance(6000000).setBlockName("bedrock").setBlockTextureName("bedrock").setCreativeTab(Core.tabFactorization);
+        
+        GameRegistry.registerBlock(dark_iron_ore, "FZ dark iron ore");
+        GameRegistry.registerBlock(fractured_bedrock_block, "FZ fractured bedrock"); //NORELEASE: Oops! Forgot to register these in 1.6! Go back & fix!
+        
         ItemBlock itemDarkIronOre = new ItemBlock(dark_iron_ore);
         ItemBlock itemFracturedBedrock = new ItemBlock(fractured_bedrock_block);
-
-        GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FZ factory");
-        GameRegistry.registerBlock(lightair_block, "FZ Lightair");
-        GameRegistry.registerBlock(resource_block, ItemBlockResource.class, "FZ resource");
         
-        registerItem(factory_block);
-        registerItem(lightair_block);
-        registerItem(resource_block);
-        registerItem(dark_iron_ore);
-        registerItem(fractured_bedrock_block);
 
         Core.tab(factory_block, Core.TabType.BLOCKS);
         Core.tab(resource_block, TabType.BLOCKS);
@@ -194,7 +188,7 @@ public class Registry {
         BlockOreStorageShatterable newDiamond = new BlockOreStorageShatterable(vanillaDiamond);
         newDiamond.setHardness(5.0F).setResistance(10.0F).setStepSound(Block.soundTypeMetal).setBlockName("blockDiamond");
         //Blocks.diamond_block /* blockDiamond */ = newDiamond;
-//		ReflectionHelper.setPrivateValue(Blocks.class, null, newDiamond, "blockDiamond", "blockDiamond"); TODO: Reflection-set blockDiamond.
+//		ReflectionHelper.setPrivateValue(Blocks.class, null, newDiamond, "blockDiamond", "blockDiamond"); TODO NORELEASE: Reflection-set blockDiamond.
     }
 
     /*private void addName(Object what, String name) {
@@ -212,15 +206,18 @@ public class Registry {
                 continue;
             }
             if (obj instanceof ItemStack) {
-                foundItems.add(((ItemStack) obj).getItem());
-            } else if (obj instanceof Item) {
+                obj = ((ItemStack) obj).getItem();
+            }
+            if (obj instanceof Item) {
                 foundItems.add((Item) obj);
             }
         }
         
         for (Item it : foundItems) {
-            it.setTextureName(it.getUnlocalizedName());
-            registerItem(it);
+            if (FzUtil.getBlock(it) == null) {
+                it.setTextureName(it.getUnlocalizedName());
+                registerItem(it);
+            }
         }
     }
 
@@ -927,7 +924,6 @@ public class Registry {
         TileEntityGrinder.addRecipe(Blocks.nether_brick_fence, new ItemStack(Items.netherbrick), 2.5F);
         //TODO: Asbestos from endstone
         TileEntityGrinder.addRecipe(Blocks.redstone_lamp, new ItemStack(Items.glowstone_dust), 4F);
-        TileEntityGrinder.addRecipe(Blocks.lit_redstone_lamp, new ItemStack(Items.glowstone_dust), 4F);
         //Don't want to be responsible for some netherstar exploit involving a beacon, so no beacon.
         //Walls have weird geometry
         TileEntityGrinder.addRecipe(Blocks.quartz_ore, new ItemStack(Items.quartz), 3.5F);

@@ -146,10 +146,13 @@ public class FactorizationOreProcessingHandler {
     }
     
     void loadWater() {
-        FluidStack h20 = FluidContainerRegistry.getFluidForFilledItem(new ItemStack(Items.water_bucket));
+        FluidStack h2o = FluidContainerRegistry.getFluidForFilledItem(new ItemStack(Items.water_bucket));
+        if (h2o == null) {
+            return; //NORELEASE: Wat
+        }
         for (FluidContainerData container : FluidContainerRegistry.getRegisteredFluidContainerData()) {
             FluidStack liq = container.fluid;
-            if (h20.isFluidEqual(liq) && liq.amount == FluidContainerRegistry.BUCKET_VOLUME && container.filledContainer != null) {
+            if (h2o.isFluidEqual(liq) && liq.amount == FluidContainerRegistry.BUCKET_VOLUME && container.filledContainer != null) {
                 OreDictionary.registerOre(waterBucket, container.filledContainer);
             }
         }
