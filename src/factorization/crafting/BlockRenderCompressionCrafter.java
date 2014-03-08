@@ -14,8 +14,9 @@ import factorization.shared.FactorizationBlockRender;
 
 public class BlockRenderCompressionCrafter extends FactorizationBlockRender {
 
+    
     @Override
-    public void render(RenderBlocks rb) {
+    public boolean render(RenderBlocks rb) {
         BlockRenderHelper block = Core.registry.blockRender;
         IIcon side = BlockIcons.compactSide;
         block.useTextures(
@@ -27,7 +28,7 @@ public class BlockRenderCompressionCrafter extends FactorizationBlockRender {
         if (world_mode) {
             TileEntityCompressionCrafter cc = (TileEntityCompressionCrafter) te;
             if (cc == null) {
-                return;
+                return false;
             }
             dir = cc.getFacing();
         }
@@ -57,6 +58,7 @@ public class BlockRenderCompressionCrafter extends FactorizationBlockRender {
             block.useTextures(null, null, s, s, s, s);
             block.renderForInventory(rb);
         }
+        return true;
     }
 
     @Override

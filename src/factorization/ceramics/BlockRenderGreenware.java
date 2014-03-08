@@ -37,10 +37,10 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
     private static TileEntityGreenware loader = new TileEntityGreenware();
     
     @Override
-    public void render(RenderBlocks rb) {
+    public boolean render(RenderBlocks rb) {
         if (!world_mode) {
             if (is == null) {
-                return;
+                return false;
             }
             BlockRenderHelper block = BlockRenderHelper.instance;
             boolean stand = true;
@@ -80,11 +80,11 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
             if (rescale) {
                 GL11.glPopMatrix();
             }
-            return;
+            return false;
         }
         TileEntityGreenware gw = (TileEntityGreenware) te;
         if (gw == null) {
-            return;
+            return false;
         }
         if (world_mode) {
             Tessellator.instance.setBrightness(Core.registry.factory_block.getMixedBrightnessForBlock(w, x, y, z));
@@ -98,6 +98,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
             renderStatic(gw);
         }
         gw.shouldRenderTesr = state == ClayState.WET;
+        return true;
     }
     
     private static Random rawMimicRandom = new Random();

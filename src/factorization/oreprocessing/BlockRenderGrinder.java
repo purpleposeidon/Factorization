@@ -11,7 +11,7 @@ import factorization.shared.FactorizationBlockRender;
 
 public class BlockRenderGrinder extends FactorizationBlockRender {
     @Override
-    public void render(RenderBlocks rb) {
+    public boolean render(RenderBlocks rb) {
         //TODO: Optimize this!
         renderMotor(rb, 8F/16F);
         float p = 1F/16F;
@@ -40,6 +40,7 @@ public class BlockRenderGrinder extends FactorizationBlockRender {
             TileEntityGrinderRender.renderGrindHead();
             GL11.glPopMatrix();
         }
+        return true;
     }
 
     @Override

@@ -19,7 +19,7 @@ import factorization.shared.FactorizationBlockRender;
 public class BlockRenderLeydenJar extends FactorizationBlockRender {
 
     @Override
-    public void render(RenderBlocks rb) {
+    public boolean render(RenderBlocks rb) {
         IIcon glass = BlockIcons.leyden_glass_side;
         IIcon knob = BlockIcons.leyden_knob;
         BlockRenderHelper block = BlockRenderHelper.instance;
@@ -87,6 +87,7 @@ public class BlockRenderLeydenJar extends FactorizationBlockRender {
                 sparks.render();
             }
         }
+        return true;
     }
     
     private WeakHashMap<ItemStack, ChargeSparks> sparkMap = new WeakHashMap<ItemStack, ChargeSparks>();

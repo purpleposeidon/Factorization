@@ -3,7 +3,7 @@ package factorization.common;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Mod.EventHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 
@@ -16,7 +16,7 @@ public class FactorizationKeyHandler {
         FMLCommonHandler.instance().bus().register(this);
     }
     
-    @EventHandler
+    @SubscribeEvent
     public void checkKeys(ClientTickEvent event) {
         if (event.phase != Phase.START) return;
         cmdKey(Command.bagShuffle, bag_swap_key);

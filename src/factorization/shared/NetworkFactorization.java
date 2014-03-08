@@ -7,10 +7,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Random;
 
-import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
@@ -30,12 +30,7 @@ import factorization.common.FactoryType;
 import factorization.notify.NotifyImplementation;
 
 public class NetworkFactorization {
-
-    public NetworkFactorization() {
-        Core.network = this;
-    }
-    
-    public static final ItemStack EMPTY_ITEMSTACK = new ItemStack((Block)null);
+    public static final ItemStack EMPTY_ITEMSTACK = new ItemStack(Blocks.air);
     
     private void writeObjects(ByteArrayOutputStream outputStream, DataOutputStream output, Object... items) throws IOException {
         for (Object item : items) {
@@ -73,6 +68,9 @@ public class NetworkFactorization {
             } else if (item instanceof byte[]) {
                 byte[] b = (byte[]) item;
                 output.write(b, 0, b.length);
+            } else if (item instanceof MessageType) {
+                MessageType mt = (MessageType) item;
+                mt.write(output);
             } else {
                 throw new RuntimeException("Don't know how to serialize " + item.getClass() + " (" + item + ")");
             }
@@ -231,7 +229,7 @@ public class NetworkFactorization {
                 byte extraData2 = input.readByte();
                 //There may be additional description data following this
                 try {
-                    messageType = MessageType.fromId(input.readByte());
+                    messageType = MessageType.read(input);
                 } catch (IOException e) {
                     messageType = null;
                 }
@@ -384,7 +382,7 @@ public class NetworkFactorization {
         try {
             World world = player.worldObj;
             int entityId = input.readInt();
-            MessageType messageType = MessageType.fromId(input.readByte());
+            MessageType messageType = MessageType.read(input);
             Entity to = world.getEntityByID(entityId);
             if (to == null) {
                 if (Core.dev_environ) {

@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;
-import cpw.mods.fml.common.Mod.EventHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.CustomPacketEvent;
@@ -24,12 +24,12 @@ public class FzNetEventHandler {
         channel.register(this);
     }
     
-    @EventHandler
+    @SubscribeEvent
     public void onPacket(ServerCustomPacketEvent event) {
         handlePacket(event, true, ((NetHandlerPlayServer) event.handler).playerEntity);
     }
     
-    @EventHandler
+    @SubscribeEvent
     public void onPacket(ClientCustomPacketEvent event) {
         handlePacket(event, false, (EntityPlayerMP) Core.proxy.getClientPlayer());
     }

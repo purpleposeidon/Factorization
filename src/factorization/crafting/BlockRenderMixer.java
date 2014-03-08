@@ -10,7 +10,7 @@ import factorization.shared.FactorizationBlockRender;
 public class BlockRenderMixer extends FactorizationBlockRender {
 
     @Override
-    public void render(RenderBlocks rb) {
+    public boolean render(RenderBlocks rb) {
         if (world_mode) {
             renderMotor(rb, 1F / 16F);
         }
@@ -21,6 +21,7 @@ public class BlockRenderMixer extends FactorizationBlockRender {
             TileEntityMixerRenderer.renderWithRotation(0);
             GL11.glPopMatrix();
         }
+        return true;
     }
 
     @Override

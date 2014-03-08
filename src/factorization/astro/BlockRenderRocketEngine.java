@@ -14,7 +14,7 @@ import factorization.shared.FactorizationBlockRender;
 public class BlockRenderRocketEngine extends FactorizationBlockRender {
 
     @Override
-    public void render(RenderBlocks rb) {
+    public boolean render(RenderBlocks rb) {
         IIcon body = BlockIcons.rocket_engine_invalid;
         IIcon nozzle = BlockIcons.rocket_engine_nozzle, bottom = BlockIcons.rocket_engine_bottom_hole, top = BlockIcons.rocket_engine_top;
         final Coord here = getCoord();
@@ -53,6 +53,7 @@ public class BlockRenderRocketEngine extends FactorizationBlockRender {
                 2, 3, 2);
         block.begin();
         block.renderRotated(tess, here);
+        return true;
     }
 
     @Override

@@ -28,6 +28,7 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
@@ -87,7 +88,7 @@ public class MiscellaneousNonsense {
         }
     }
     
-    @EventHandler
+    @SubscribeEvent
     public void fixHoesAndSwordsAchievement(PlayerEvent.ItemCraftedEvent event) {
         //NORELEASE: Check if these achievements have been de-stupidified.
         EntityPlayer player = event.player;
@@ -119,7 +120,7 @@ public class MiscellaneousNonsense {
     
     private float last_tps = -1;
     private int measurements = 0;
-    @EventHandler
+    @SubscribeEvent
     public void tickServer(TickEvent.ServerTickEvent event) {
         if (event.phase != TickEvent.Phase.START) return;
         MinecraftServer ms = MinecraftServer.getServer();
@@ -140,13 +141,13 @@ public class MiscellaneousNonsense {
         }
     }
     
-    @EventHandler
+    @SubscribeEvent
     public void patLagssie(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.START) return;
         LagssieWatchDog.ticks++;
     }
     
-    @EventHandler
+    @SubscribeEvent
     public void playerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         MinecraftServer ms = MinecraftServer.getServer();
         {

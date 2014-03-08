@@ -74,9 +74,9 @@ abstract public class FactorizationBlockRender implements ICoord {
         }
     }
     
-    public abstract void render(RenderBlocks rb);
+    public abstract boolean render(RenderBlocks rb);
     public abstract FactoryType getFactoryType();
-    public void renderSecondPass(RenderBlocks rb) {}
+    public boolean renderSecondPass(RenderBlocks rb) { return false; }
     
     @Override
     public Coord getCoord() {

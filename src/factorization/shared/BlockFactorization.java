@@ -525,7 +525,6 @@ public class BlockFactorization extends BlockContainer {
     }
 
     @Override
-    // -- hello server asshole
     public int getRenderBlockPass() {
         return 1;
     }

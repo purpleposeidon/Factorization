@@ -7,7 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import cpw.mods.fml.common.Mod.EventHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -23,7 +23,7 @@ public class MiscNet {
     }
     
     
-    @EventHandler
+    @SubscribeEvent
     public void onPacketData(ClientCustomPacketEvent event) {
         FMLProxyPacket packet = event.packet;
         packet.payload().array();

@@ -21,7 +21,7 @@ public class BlockRenderSocketBase extends FactorizationBlockRender {
     }
 
     @Override
-    public void render(RenderBlocks rb) {
+    public boolean render(RenderBlocks rb) {
         ForgeDirection dir = ForgeDirection.EAST;
         TileEntitySocketBase socket;
         BlockRenderHelper block = BlockRenderHelper.instance;
@@ -46,6 +46,7 @@ public class BlockRenderSocketBase extends FactorizationBlockRender {
             block.renderForInventory(rb);
             GL11.glPopMatrix();
         }
+        return true;
     }
 
     @Override

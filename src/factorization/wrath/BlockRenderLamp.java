@@ -13,7 +13,7 @@ import factorization.shared.FactorizationBlockRender;
 public class BlockRenderLamp extends FactorizationBlockRender {
 
     @Override
-    public void render(RenderBlocks rb) {
+    public boolean render(RenderBlocks rb) {
         float s = 1F / 16F;
         float p = 1F / 64F;
         float trim_out = BlockFactorization.lamp_pad;
@@ -37,8 +37,9 @@ public class BlockRenderLamp extends FactorizationBlockRender {
         //knob
         renderPart(rb, metal, panel, 1 - trim_out, panel, 1 - panel, 1 - trim_out + s * 1, 1 - panel);
         renderPart(rb, metal, panel, trim_out - s * 1, panel, 1 - panel, trim_out, 1 - panel);
-
+        
         //TODO: Handle. From the top, a side, or the ground.
+        return true;
     }
     
     @Override

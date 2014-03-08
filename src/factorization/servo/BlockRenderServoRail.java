@@ -37,7 +37,7 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
     
     boolean[] extend = new boolean[6];
     @Override
-    public void render(RenderBlocks rb) {
+    public boolean render(RenderBlocks rb) {
         TileEntityServoRail rail = null;
         boolean has_comment = false;
         if (world_mode) {
@@ -51,7 +51,7 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
                     has_comment = true;
                 }
             } else {
-                return;
+                return false;
             }
         }
         
@@ -102,6 +102,7 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
             Arrays.fill(extend, false);
             block.setTexture(i, null);
         }
+        return true;
     }
 
     @Override

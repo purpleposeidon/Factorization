@@ -32,10 +32,11 @@ import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.oredict.RecipeSorter;
+import net.minecraftforge.oredict.RecipeSorter.Category;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
@@ -88,7 +89,7 @@ import factorization.wrath.TileEntityWrathLamp;
 public class Registry {
     public ItemFactorizationBlock item_factorization;
     public ItemBlockResource item_resource;
-    public BlockFactorization factory_block, factory_rendering_block = new BlockFactorization();
+    public BlockFactorization factory_block, factory_rendering_block;
     public BlockRenderHelper blockRender = null, serverTraceHelper = null, clientTraceHelper = null;
     public BlockLightAir lightair_block;
     public BlockResource resource_block;
@@ -156,7 +157,6 @@ public class Registry {
             //Theoretically, not necessary. I bet BUKKIT would flip its shit tho.
             blockRender = new BlockRenderHelper();
             factory_rendering_block = new BlockFactorization();
-            factory_rendering_block = null;
         }
         serverTraceHelper = new BlockRenderHelper();
         clientTraceHelper = new BlockRenderHelper();
@@ -552,7 +552,7 @@ public class Registry {
         Core.registry.glaze_bucket.doneMakingStandardGlazes();
         
         //Sculpture combiniation recipe
-        GameRegistry.addRecipe(new IRecipe() {
+        IRecipe sculptureMergeRecipe = new IRecipe() {
             ArrayList<ItemStack> merge(InventoryCrafting inv) {
                 ArrayList<ItemStack> match = new ArrayList<ItemStack>(2);
                 int part_count = 0;
@@ -619,10 +619,10 @@ public class Registry {
                 }
                 return target.getItem();
             }
-        });
+        };
+        GameRegistry.addRecipe(sculptureMergeRecipe);
         
-        //Mimicry glaze recipe
-        GameRegistry.addRecipe(new IRecipe() {			
+        IRecipe mimicryGlazeRecipe = new IRecipe() {           
             @Override
             public boolean matches(InventoryCrafting inventorycrafting, World world) {
                 int mimic_items = 0;
@@ -701,7 +701,10 @@ public class Registry {
                 ItemStack is = inventorycrafting.getStackInSlot(block_slot);
                 return glaze_bucket.makeMimicingGlaze(Block.getBlockFromItem(is.getItem()), is.getItemDamage(), side);
             }
-        });
+        };
+        GameRegistry.addRecipe(mimicryGlazeRecipe);
+        RecipeSorter.register("factorization:sculptureMerge", sculptureMergeRecipe.getClass(), Category.SHAPELESS, "");
+        RecipeSorter.register("factorization:mimicryGlaze", mimicryGlazeRecipe.getClass(), Category.SHAPELESS, "");
 
         // Barrel
         // Add the recipes for vanilla woods.
@@ -1078,7 +1081,7 @@ public class Registry {
         dark_iron_ore.setHarvestLevel("pickaxe", 2);
     }
     
-    @EventHandler
+    @SubscribeEvent
     public void tick(ServerTickEvent event) {
         if (event.phase == Phase.START) {
             TileEntityWrathLamp.handleAirUpdates();
@@ -1146,7 +1149,7 @@ public class Registry {
         return true;
     }
 
-    @EventHandler
+    @SubscribeEvent
     public void onCrafting(PlayerEvent.ItemCraftedEvent event) {
         //NORELEASE: Extractify
         EntityPlayer player = event.player;

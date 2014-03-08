@@ -18,7 +18,7 @@ public class BlockRenderSteamTurbine extends FactorizationBlockRender {
 
     TileEntityWire fake_wire = new TileEntityWire();
     @Override
-    public void render(RenderBlocks rb) {
+    public boolean render(RenderBlocks rb) {
         float m = 0.0001F;
         renderNormalBlock(rb, getFactoryType().md);
         
@@ -71,6 +71,7 @@ public class BlockRenderSteamTurbine extends FactorizationBlockRender {
             renderItemIIcon(Core.registry.fan.getIconFromDamage(0));
             GL11.glPopMatrix();
         }
+        return true;
     }
 
     @Override

@@ -20,9 +20,9 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
     
     private static Quaternion mirrorTilt = Quaternion.getRotationQuaternionRadians(Math.toRadians(-45), 1, 0, 0);
     @Override
-    public void render(RenderBlocks rb) {
+    public boolean render(RenderBlocks rb) {
         if (!world_mode) {
-            return;
+            return false;
         }
         Core.profileStart("mirror");
         float height = 7.25F / 16F;
@@ -71,6 +71,7 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
             Tessellator.instance.draw();
         }
         Core.profileEnd();
+        return true;
     }
     
     @Override

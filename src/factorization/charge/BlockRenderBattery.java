@@ -19,7 +19,7 @@ import factorization.shared.FactorizationBlockRender;
 public class BlockRenderBattery extends FactorizationBlockRender {
     float item_fullness = 0;
     @Override
-    public void render(RenderBlocks rb) {
+    public boolean render(RenderBlocks rb) {
         TileEntityBattery bat;
         if (world_mode) {
             bat = new Coord(Minecraft.getMinecraft().theWorld, x, y, z).getTE(TileEntityBattery.class);
@@ -28,10 +28,11 @@ public class BlockRenderBattery extends FactorizationBlockRender {
             bat.onPlacedBy(null, is, 0);
         }
         if (bat == null) {
-            return;
+            return false;
         }
         renderBatteryDisplay(rb, bat.getFullness());
         renderNormalBlock(rb, FactoryType.BATTERY.md);
+        return true;
     }
     
     void renderInventoryMode(RenderBlocks rb, ItemRenderType type) {

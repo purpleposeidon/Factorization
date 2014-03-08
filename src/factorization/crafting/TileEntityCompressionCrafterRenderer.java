@@ -3,7 +3,6 @@ package factorization.crafting;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
@@ -48,6 +47,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
     }
     
     Random rand = new Random();
+    static boolean NORELEASE = true;
     
     @Override
     public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
@@ -55,6 +55,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         if (cc == null) {
             return;
         }
+        if (NORELEASE) return;
         interp_side.under = BlockIcons.compactSideSlide;
         bindTexture(Core.blockAtlas);
         final float squishy = 3F/16F;

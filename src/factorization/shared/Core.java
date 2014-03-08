@@ -58,6 +58,7 @@ public class Core {
         fzconfig = new FzConfig();
         registry = new Registry();
         foph = new FactorizationOreProcessingHandler();
+        network = new NetworkFactorization();
     }
     
     // runtime storage
