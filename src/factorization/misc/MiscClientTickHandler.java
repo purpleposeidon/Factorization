@@ -20,7 +20,7 @@ import factorization.api.Coord;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
-public class ClientTickHandler {
+public class MiscClientTickHandler {
     private final Minecraft mc = Minecraft.getMinecraft();
     
     @SubscribeEvent
