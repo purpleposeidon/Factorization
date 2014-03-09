@@ -96,6 +96,7 @@ public class ItemOreProcessing extends ItemFactorization implements IActOnCraft 
                 vals = new OreType[max + 1];
                 Arrays.fill(vals, INVALID);
                 for (OreType ot : OreType.values()) {
+                    if (ot == INVALID) continue;
                     vals[ot.ID] = ot;
                 }
             }
