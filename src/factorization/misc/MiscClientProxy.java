@@ -29,13 +29,13 @@ import factorization.shared.FzUtil;
 
 public class MiscClientProxy extends MiscProxy {
     static final Minecraft mc = Minecraft.getMinecraft();
+    MiscClientTickHandler cth = new MiscClientTickHandler();
     
     @Override
     void initializeClient() {
         Minecraft.memoryReserve = new byte[0]; // Free up this unused memory. The OOM screen *never* happens.
         FMLCommonHandler.instance().bus().register(this);
         ClientCommandHandler.instance.registerCommand(new MiscClientCommands());
-        MiscClientTickHandler cth = new MiscClientTickHandler();
         FMLCommonHandler.instance().bus().register(cth);
     }
     

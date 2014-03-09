@@ -20,6 +20,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.MinecraftForge;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -102,7 +103,6 @@ public class Core {
         FzConfig.config.save();
         registry.makeRecipes();
         registry.setToolEffectiveness();
-        proxy.registerKeys();
         proxy.registerRenderers();
         
         FzConfig.config.save();
@@ -133,6 +133,7 @@ public class Core {
         registry.addOtherRecipes();
         (new CompatManager()).loadCompat();
         for (FactoryType ft : FactoryType.values()) ft.getRepresentative(); // Make sure everyone's registered to the EVENT_BUS
+        proxy.afterLoad();
         finished_loading = true;
     }
     
@@ -153,14 +154,10 @@ public class Core {
 
     }
     
-    private static Logger FZLogger;
+    private static Logger FZLogger = LogManager.getLogger("FZ-init");;
     private void initializeLogging(Logger logger) {
         Core.FZLogger = logger;
         logInfo("This is Factorization %s", version);
-        logSevere("Test severe");
-        logWarning("Test warning");
-        logInfo("Test info");
-        logFine("Test fine (more or less)");
     }
     
     public static void logSevere(String format, Object... formatParameters) {

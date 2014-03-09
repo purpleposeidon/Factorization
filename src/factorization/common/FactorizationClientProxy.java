@@ -346,4 +346,10 @@ public class FactorizationClientProxy extends FactorizationProxy {
             Core.itemMissingIIcon = event.map.getAtlasSprite("this code for getting the missing IIcon brought to you by Tahg");
         }
     }
+    
+    @Override
+    public void afterLoad() {
+        Core.logInfo("Reloading game settings");
+        Minecraft.getMinecraft().gameSettings.loadOptions();
+    }
 }

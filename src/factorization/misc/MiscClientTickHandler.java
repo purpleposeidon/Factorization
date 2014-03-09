@@ -121,8 +121,8 @@ public class MiscClientTickHandler {
         return false;
     }
     
-    KeyBinding sprint = new KeyBinding("Sprint (FZ)", 0, "key.categories.gameplay");
-    {
+    static KeyBinding sprint = new KeyBinding("Sprint (FZ)", 0, "key.categories.gameplay");
+    static {
         ClientRegistry.registerKeyBinding(sprint);
     }
     
@@ -137,14 +137,12 @@ public class MiscClientTickHandler {
         if (sprint.getKeyCode() == 0) {
             return;
         }
-        final boolean state = sprint.isPressed();
-        Core.logInfo("%s", state);
+        final boolean state = sprint.getIsKeyPressed();
         final int forwardCode = mc.gameSettings.keyBindForward.getKeyCode();
         if (state) {
             if (!mc.thePlayer.isSneaking()) {
                 KeyBinding.setKeyBindState(forwardCode, true);
-                KeyBinding.onTick(forwardCode);
-                //mc.thePlayer.setSprinting(true);
+                mc.thePlayer.setSprinting(true);
             }
         } else if (prevState) {
             KeyBinding.setKeyBindState(forwardCode, false);

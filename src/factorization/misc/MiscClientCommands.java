@@ -29,7 +29,6 @@ import cpw.mods.fml.client.GuiModList;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import factorization.common.FactorizationKeyHandler;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
 

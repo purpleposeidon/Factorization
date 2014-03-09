@@ -76,9 +76,6 @@ public class FactorizationProxy implements IGuiHandler {
         return null;
     }
 
-    public void registerKeys() {
-    }
-
     public void registerRenderers() {
     }
 
@@ -104,4 +101,6 @@ public class FactorizationProxy implements IGuiHandler {
     public String getPocketCraftingTableKey() { return null; }
     
     public boolean isClientHoldingShift() { return false; }
+    
+    public void afterLoad() { }
 }
