@@ -47,7 +47,9 @@ public class FzNetDispatch {
         }
         WorldServer w = (WorldServer) chunk.worldObj;
         PlayerManager.PlayerInstance pi = w.getPlayerManager().getOrCreateChunkWatcher(chunk.xPosition, chunk.zPosition, false);
-        pi.sendToAllPlayersWatchingChunk(packet);
+        if (pi != null) {
+            pi.sendToAllPlayersWatchingChunk(packet);
+        }
     }
     
     public static void addPacketFrom(Packet packet, World world, double x, double z) {
