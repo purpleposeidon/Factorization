@@ -1,6 +1,7 @@
 package factorization.oreprocessing;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.minecraft.creativetab.CreativeTabs;
@@ -30,7 +31,8 @@ public class ItemOreProcessing extends ItemFactorization implements IActOnCraft 
         //no more aluminum. Bye-bye, aluminum.
         COBALT(8, 0x2376DD, "Cobalt", "oreCobalt", "ingotCobalt"),
         ARDITE(9, 0xF48A00, "Ardite", "oreArdite", "ingotArdite"),
-        DARKIRON(10, 0x5000D4, "Dark Iron", "oreFzDarkIron", "ingotFzDarkIron")
+        DARKIRON(10, 0x5000D4, "Dark Iron", "oreFzDarkIron", "ingotFzDarkIron"),
+        INVALID(0, 0xFFFFFF, "Invalid", null, null);
         ;
         static {
             COBALT.surounding_medium = new ItemStack(Blocks.netherrack);
@@ -83,6 +85,32 @@ public class ItemOreProcessing extends ItemFactorization implements IActOnCraft 
             }
             return null;
         }
+        
+        static OreType[] vals = null;
+        public static OreType fromID(int id) {
+            if (vals == null) {
+                int max = 0;
+                for (OreType ot : OreType.values()) {
+                    max = Math.max(max, ot.ID);
+                }
+                vals = new OreType[max + 1];
+                Arrays.fill(vals, INVALID);
+                for (OreType ot : OreType.values()) {
+                    vals[ot.ID] = ot;
+                }
+            }
+            if (id < 0 || id >= vals.length) {
+                return INVALID;
+            }
+            return vals[id];
+        }
+        
+        public static OreType fromIS(ItemStack is) {
+            if (is == null) {
+                return INVALID;
+            }
+            return fromID(is.getItemDamage());
+        }
     }
     
     String stateName;
@@ -95,16 +123,12 @@ public class ItemOreProcessing extends ItemFactorization implements IActOnCraft 
 
     @Override
     public int getColorFromItemStack(ItemStack is, int renderPass) {
-        try {
-            return OreType.values()[is.getItemDamage()].color;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            return 0xFFFF00;
-        }
+        return OreType.fromIS(is).color;
     }
     
     @Override
     public String getUnlocalizedName(ItemStack is) {
-        return "item.factorization:ore/" + stateName + "/" + OreType.values()[is.getItemDamage()];
+        return "item.factorization:ore/" + stateName + "/" + OreType.fromIS(is);
     }
 
     @Override
