@@ -1,5 +1,9 @@
 package factorization.shared;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufOutputStream;
+import io.netty.buffer.Unpooled;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -98,9 +102,11 @@ public class NetworkFactorization {
     }
     
     public FMLProxyPacket notifyPacket(Object where, ItemStack item, String format, String ...args) {
+        // NORELEASE: Belongs in the notify implementation!
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream output = new DataOutputStream(outputStream);
+            MessageType.factorizeNtfyChannel.write(output);
             
             if (where instanceof Vec3) {
                 output.writeByte(NotifyMessageType.VEC3);
@@ -172,10 +178,16 @@ public class NetworkFactorization {
     }
     
     public void sendCommand(EntityPlayer player, Command cmd, byte arg) {
-        byte data[] = new byte[2];
-        data[0] = cmd.id;
-        data[1] = arg;
-        FzNetDispatch.addPacket(FzNetDispatch.generate(data), player);
+        try {
+            ByteBuf buf = Unpooled.buffer();
+            ByteBufOutputStream bo = new ByteBufOutputStream(buf);
+            MessageType.factorizeCmdChannel.write(bo);
+            bo.writeByte(cmd.id);
+            bo.writeByte(arg);
+            FzNetDispatch.addPacket(FzNetDispatch.generate(bo), player);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void broadcastMessage(EntityPlayer who, Coord src, MessageType messageType, Object... msg) {
@@ -196,7 +208,7 @@ public class NetworkFactorization {
         }
     }
 
-    void handleTE(DataInput input, MessageType messageType, EntityPlayerMP player) {
+    void handleTE(DataInput input, MessageType messageType, EntityPlayer player) {
         try {
             World world = player.worldObj;
             int x = input.readInt();
@@ -278,7 +290,7 @@ public class NetworkFactorization {
             Coord here = new Coord(world, x, y, z);
             switch (messageType) {
             case PlaySound:
-                Sound.receive(input);
+                Sound.receive(here, input);
                 break;
             default:
                 if (here.blockExists()) {

@@ -194,7 +194,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         share_delay--;
         if (share_delay <= 0 || current_state != last_state) {
             share_delay = 20 * 15;
-            broadcastMessage(null, getAuxillaryInfoPacket());
+            broadcastMessage(null, getDescriptionPacket());
             last_state = current_state;
         }
     }
@@ -306,7 +306,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     }
 
     @Override
-    public FMLProxyPacket getAuxillaryInfoPacket() {
+    public FMLProxyPacket getDescriptionPacket() {
         return getDescriptionPacketWith(MessageType.CrystallizerInfo, null2fake(growing_crystal), null2fake(solution), progress);
     }
 

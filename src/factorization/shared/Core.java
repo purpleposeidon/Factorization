@@ -60,6 +60,7 @@ public class Core {
         registry = new Registry();
         foph = new FactorizationOreProcessingHandler();
         network = new NetworkFactorization();
+        netevent = new FzNetEventHandler();
     }
     
     // runtime storage
@@ -70,6 +71,7 @@ public class Core {
     @SidedProxy(clientSide = "factorization.common.FactorizationClientProxy", serverSide = "factorization.common.FactorizationProxy")
     public static FactorizationProxy proxy;
     public static NetworkFactorization network;
+    public static FzNetEventHandler netevent;
     public static int factory_rendertype = -1;
     public static boolean finished_loading = false;
 

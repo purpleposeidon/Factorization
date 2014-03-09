@@ -441,7 +441,7 @@ for x in range(0, len(d[0])):
     }
     
     @Override
-    public FMLProxyPacket getAuxillaryInfoPacket() {
+    public FMLProxyPacket getDescriptionPacket() {
         return getDescriptionPacketWith(MessageType.RocketState, lastValidationStatus, isFiring);
     }
     

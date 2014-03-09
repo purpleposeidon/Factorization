@@ -110,7 +110,7 @@ public class TileEntityMirror extends TileEntityCommon {
     }
 
     @Override
-    public FMLProxyPacket getAuxillaryInfoPacket() {
+    public FMLProxyPacket getDescriptionPacket() {
         return getDescriptionPacketWith(MessageType.MirrorDescription, target_rotation, getTargetInfo());
     }
 

@@ -550,8 +550,8 @@ public class MiscClientCommands implements ICommand {
                 }
             }
             if (found_number) {
-                if (i < 0) {
-                    i = 0;
+                if (i < 1) {
+                    i = 1;
                 }
                 if (i > 16) {
                     i = 16; //seems to have started crashing. Lame.

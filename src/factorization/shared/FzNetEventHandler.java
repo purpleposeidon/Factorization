@@ -5,7 +5,7 @@ import io.netty.buffer.ByteBufInputStream;
 
 import java.io.IOException;
 
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.NetHandlerPlayServer;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
@@ -31,10 +31,10 @@ public class FzNetEventHandler {
     
     @SubscribeEvent
     public void onPacket(ClientCustomPacketEvent event) {
-        handlePacket(event, false, (EntityPlayerMP) Core.proxy.getClientPlayer());
+        handlePacket(event, false, Core.proxy.getClientPlayer());
     }
     
-    private void handlePacket(CustomPacketEvent event, boolean isServer, EntityPlayerMP player) {
+    private void handlePacket(CustomPacketEvent event, boolean isServer, EntityPlayer player) {
         ByteBufInputStream input = new ByteBufInputStream(event.packet.payload());
         try {
             MessageType mt = MessageType.read(input);

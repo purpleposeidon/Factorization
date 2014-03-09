@@ -125,9 +125,9 @@ public class TileEntityExtension extends TileEntityCommon {
     }
     
     @Override
-    public FMLProxyPacket getAuxillaryInfoPacket() {
+    public FMLProxyPacket getDescriptionPacket() {
         if (pc == null) {
-            return super.getAuxillaryInfoPacket();
+            return super.getDescriptionPacket();
         }
         return getDescriptionPacketWith(MessageType.ExtensionInfo, pc);
     }

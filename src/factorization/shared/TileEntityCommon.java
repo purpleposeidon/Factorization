@@ -48,13 +48,7 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
 
     @Override
     public FMLProxyPacket getDescriptionPacket() {
-        //NORELEASE Scar tissue. Lazy.
-        return getAuxillaryInfoPacket();
-    }
-    
-    public FMLProxyPacket getAuxillaryInfoPacket() {
         FMLProxyPacket p = Core.network.TEmessagePacket(getCoord(), MessageType.FactoryType, getFactoryType().md, getExtraInfo(), getExtraInfo2());
-        //p.isChunkDataPacket = true; NORELEASE? Needed? Would take work?
         return p;
     }
 

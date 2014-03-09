@@ -112,7 +112,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             out.add(maxX);
             out.add(maxY);
             out.add(maxZ);
-            out.add(icon_id);
+            out.add((short) FzUtil.getId(icon_id));
             out.add(icon_md);
             out.add(icon_side);
             out.add(quat);
@@ -125,7 +125,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             maxX = in.readByte();
             maxY = in.readByte();
             maxZ = in.readByte();
-            icon_id = Block.getBlockById(in.readShort());
+            icon_id = FzUtil.getBlock(in.readShort());
             icon_md = in.readByte();
             icon_side = in.readByte();
             quat = Quaternion.read(in);
@@ -354,7 +354,7 @@ public class TileEntityGreenware extends TileEntityCommon {
     }
 
     @Override
-    public FMLProxyPacket getAuxillaryInfoPacket() {
+    public FMLProxyPacket getDescriptionPacket() {
         ArrayList<Object> args = new ArrayList(2 + parts.size() * 9);
         args.add(MessageType.SculptDescription);
         args.add(getState().ordinal());

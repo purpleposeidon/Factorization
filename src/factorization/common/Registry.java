@@ -628,7 +628,7 @@ public class Registry {
         };
         GameRegistry.addRecipe(sculptureMergeRecipe);
         
-        IRecipe mimicryGlazeRecipe = new IRecipe() {           
+        IRecipe mimicryGlazeRecipe = new IRecipe() {
             @Override
             public boolean matches(InventoryCrafting inventorycrafting, World world) {
                 int mimic_items = 0;
@@ -717,6 +717,11 @@ public class Registry {
         for (int i = 0; i < 4; i++) {
             ItemStack log = new ItemStack(Blocks.log, 1, i);
             ItemStack slab = new ItemStack(Blocks.wooden_slab, 1, i);
+            TileEntityDayBarrel.makeRecipe(log, slab);
+        }
+        for (int i = 0; i < 2; i++) {
+            ItemStack log = new ItemStack(Blocks.log2, 1, i);
+            ItemStack slab = new ItemStack(Blocks.wooden_slab, 1, 4 + i);
             TileEntityDayBarrel.makeRecipe(log, slab);
         }
         

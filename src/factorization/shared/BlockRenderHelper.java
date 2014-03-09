@@ -120,7 +120,7 @@ public class BlockRenderHelper extends Block {
     
     @SideOnly(Side.CLIENT)
     public void renderForInventory(RenderBlocks renderblocks) {
-        // This originally copied from RenderBlocks.renderBlockAsItem
+        // This originally copied from RenderBlocks.renderBlockAsItem (near the bottom)
         IIcon texture;
         Tessellator tessellator = Tessellator.instance;
         tessellator.startDrawingQuads();
@@ -310,6 +310,8 @@ public class BlockRenderHelper extends Block {
         return B;
     }
     
+    public float alpha = 1F;
+    
     @SideOnly(Side.CLIENT)
     public void renderRotated(Tessellator tess, int x, int y, int z) {
         for (int f = 0; f < faceCache.length; f++) {
@@ -323,7 +325,7 @@ public class BlockRenderHelper extends Block {
             float color_g = (color & 0x00FF00) >> 8;
             float color_b = (color & 0x0000FF);
             lighting /= 255F; /* because the colors go from 0x00 to 0xFF*/
-            tess.setColorOpaque_F(lighting*color_r, lighting*color_g, lighting*color_b);
+            tess.setColorRGBA_F(lighting*color_r, lighting*color_g, lighting*color_b, alpha);
             
             
             for (int i = 0; i < face.length; i++) {
@@ -434,6 +436,8 @@ public class BlockRenderHelper extends Block {
                 vert.v = vert.z;
             }
             break;
+            // In 1.7, MC side faces mirror each-other as well.
+            /*
         case 2: //-z
             for (int i = 0; i < currentFace.length; i++) {
                 VectorUV vert = currentFace[i];
@@ -441,6 +445,8 @@ public class BlockRenderHelper extends Block {
                 vert.v = 1 - vert.y;
             }
             break;
+            */
+        case 2:
         case 3: //+z
             for (int i = 0; i < currentFace.length; i++) {
                 VectorUV vert = currentFace[i];
@@ -449,12 +455,14 @@ public class BlockRenderHelper extends Block {
             }
             break;
         case 4: //-x
+        case 5:
             for (int i = 0; i < currentFace.length; i++) {
                 VectorUV vert = currentFace[i];
                 vert.u = vert.z;
                 vert.v = 1 - vert.y;
             }
             break;
+            /*
         case 5: //+x
             for (int i = 0; i < currentFace.length; i++) {
                 VectorUV vert = currentFace[i];
@@ -462,6 +470,7 @@ public class BlockRenderHelper extends Block {
                 vert.v = 1 - vert.y;
             }
             break;
+            */
         default:
             throw new RuntimeException("Invalid face number");
         }

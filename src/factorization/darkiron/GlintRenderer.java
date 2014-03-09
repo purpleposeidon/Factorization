@@ -71,9 +71,6 @@ public class GlintRenderer extends TileEntitySpecialRenderer {
             opacity += (light/16F)*0.2F;
             
             block.alpha = opacity;
-            if (dir == ForgeDirection.NORTH) {
-                Core.logSevere("NORELEASE " + dir + " " + block.alpha + " ");
-            }
             block.useTexture(null);
             block.setTexture(dir.ordinal(), BlockIcons.ore_dark_iron_glint);
             float d = 1F/512F;
