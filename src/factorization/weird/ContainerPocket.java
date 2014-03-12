@@ -178,15 +178,24 @@ public class ContainerPocket extends Container {
             return true;
         }
     }
-
+    
+    boolean isWorking = false;
+    
     void updateMatrix() {
+        //NORELEASE: Was using an AT to access net.minecraft.inventory.InventoryCrafting.stackList directly.
+        //Test if we still work this way!
+        isWorking = true;
         int i = 0;
         for (Slot slot : craftingSlots) {
-            craftMatrix.stackList[i++] = slot.getStack();
+            craftMatrix.setInventorySlotContents(i++, slot.getStack());
         }
+        isWorking = false;
     }
 
     public void updateCraft() {
+        if (isWorking) {
+            return;
+        }
         updateMatrix();
         ItemStack result = CraftingManager.getInstance().findMatchingRecipe(craftMatrix, world);
         craftResult.setInventorySlotContents(0, result);
