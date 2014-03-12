@@ -13,6 +13,7 @@ import net.minecraftforge.client.IItemRenderer;
 
 import org.lwjgl.opengl.GL11;
 
+import factorization.common.BlockIcons;
 import factorization.shared.Core;
 
 
@@ -76,7 +77,7 @@ public class ItemRenderGlazeBucket implements IItemRenderer {
         }
         IIcon glaze = bucket.getIcon(is, 1, null, null, 0);
         if (glaze == null) {
-            glaze = Core.blockMissingIIcon;
+            glaze = BlockIcons.error;
         }
         re.bindTexture(Core.blockAtlas);
         

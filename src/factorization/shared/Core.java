@@ -393,7 +393,6 @@ public class Core {
     
     public static final ResourceLocation blockAtlas = new ResourceLocation("textures/atlas/blocks.png");
     public static final ResourceLocation itemAtlas = new ResourceLocation("textures/atlas/items.png");
-    public static IIcon blockMissingIIcon, itemMissingIIcon;
     
     public static ResourceLocation getResource(String name) {
         return new ResourceLocation("factorization", name);
