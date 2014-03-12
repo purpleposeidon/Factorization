@@ -110,7 +110,7 @@ public abstract class Decorator extends ServoComponent {
         if (where == null) {
             block.renderForTileEntity();
         } else {
-            block.render(FzUtil.getRB(), where);
+            block.render(rb, where);
         }
     }
     

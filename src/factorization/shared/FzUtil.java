@@ -14,6 +14,7 @@ import java.util.Random;
 import java.util.WeakHashMap;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
@@ -1190,6 +1191,7 @@ public class FzUtil {
         if (rb == null) {
             rb = new RenderBlocks();
         }
+        rb.blockAccess = Minecraft.getMinecraft().theWorld;
         return rb;
     }
     
