@@ -460,7 +460,7 @@ public class GuiDataConfig extends GuiScreen {
             ids.serialize("", dop);
             Core.network.broadcastPacket(mc.thePlayer, here, FzNetDispatch.generate(baos));
         } else {
-            Core.network.prefixEntityPacket(dos, containingEntity, MessageType.DataHelperEdit);
+            Core.network.prefixEntityPacket(dos, containingEntity, MessageType.DataHelperEditOnEntity);
             ids.serialize("", dop);
             Core.network.broadcastPacket(mc.thePlayer, here, Core.network.entityPacket(baos));
         }

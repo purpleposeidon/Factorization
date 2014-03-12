@@ -468,7 +468,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         DataOutPacket dop = new DataOutPacket(dos, Side.SERVER);
         try {
             Coord coord = getCoord();
-            Core.network.prefixEntityPacket(dos, motor, MessageType.OpenDataHelperGui);
+            Core.network.prefixEntityPacket(dos, motor, MessageType.OpenDataHelperGuiOnEntity);
             serialize("", dop);
             Core.network.broadcastPacket(player, coord, Core.network.entityPacket(baos));
         } catch (IOException e) {

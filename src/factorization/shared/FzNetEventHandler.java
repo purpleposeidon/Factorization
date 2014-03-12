@@ -38,17 +38,20 @@ public class FzNetEventHandler {
         ByteBufInputStream input = new ByteBufInputStream(event.packet.payload());
         try {
             MessageType mt = MessageType.read(input);
-            switch (mt) {
-            case factorizeCmdChannel:
-                Core.network.handleCmd(input, player);
-                break;
-            case factorizeNtfyChannel:
-                Core.network.handleNtfy(input, player);
-                break;
-            case factorizeEntityChannel:
-                Core.network.handleEntity(input, player);
-            default:
-                Core.network.handleTE(input, mt, player);
+            if (mt.isEntityMessage) {
+                Core.network.handleEntity(mt, input, player);
+            } else {
+                switch (mt) {
+                case factorizeCmdChannel:
+                    Core.network.handleCmd(input, player);
+                    break;
+                case factorizeNtfyChannel:
+                    Core.network.handleNtfy(input, player);
+                    break;
+                default:
+                    Core.network.handleTE(input, mt, player);
+                    break;
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

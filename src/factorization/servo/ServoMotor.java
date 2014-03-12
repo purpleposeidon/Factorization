@@ -182,7 +182,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     @Override
     public boolean handleMessageFromClient(MessageType messageType, DataInput input) throws IOException {
-        if (messageType == MessageType.DataHelperEdit) {
+        if (messageType == MessageType.DataHelperEditOnEntity) {
             DataInPacketClientEdited di = new DataInPacketClientEdited(input);
             socket.serialize("", di);
             markDirty();
@@ -195,7 +195,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     @SideOnly(Side.CLIENT)
     public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         switch (messageType) {
-        case OpenDataHelperGui:
+        case OpenDataHelperGuiOnEntity:
             if (!worldObj.isRemote) {
                 return false;
             } else {

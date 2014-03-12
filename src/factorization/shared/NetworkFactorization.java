@@ -155,8 +155,8 @@ public class NetworkFactorization {
     }
     
     public void prefixEntityPacket(DataOutputStream output, Entity to, MessageType messageType) throws IOException {
-        output.writeInt(to.getEntityId());
         messageType.write(output);
+        output.writeInt(to.getEntityId());
     }
     
     public FMLProxyPacket entityPacket(ByteArrayOutputStream outputStream) throws IOException {
@@ -203,8 +203,8 @@ public class NetworkFactorization {
     public void broadcastPacket(EntityPlayer who, Coord coord, FMLProxyPacket toSend) {
         if (who == null || !who.worldObj.isRemote) {
             FzNetDispatch.addPacketFrom(toSend, coord);
-        } else if (who instanceof EntityPlayerMP) {
-            FzNetDispatch.addPacket(toSend, (EntityPlayerMP) who);
+        } else if (who.worldObj.isRemote) {
+            FzNetDispatch.addPacket(toSend, who);
         }
     }
 
@@ -390,11 +390,10 @@ public class NetworkFactorization {
         }
     }
     
-    void handleEntity(DataInput input, EntityPlayer player) {
+    void handleEntity(MessageType messageType, DataInput input, EntityPlayer player) {
         try {
             World world = player.worldObj;
             int entityId = input.readInt();
-            MessageType messageType = MessageType.read(input);
             Entity to = world.getEntityByID(entityId);
             if (to == null) {
                 if (Core.dev_environ) {
@@ -436,10 +435,9 @@ public class NetworkFactorization {
     static public enum MessageType {
         factorizeCmdChannel,
         factorizeNtfyChannel,
-        factorizeEntityChannel,
-        PlaySound,
+        PlaySound, EntityParticles(true),
         
-        DrawActive, FactoryType, DescriptionRequest, DataHelperEdit, OpenDataHelperGui, EntityParticles,
+        DrawActive, FactoryType, DescriptionRequest, DataHelperEdit, DataHelperEditOnEntity(true), OpenDataHelperGui, OpenDataHelperGuiOnEntity(true),
         BarrelDescription, BarrelItem, BarrelCount,
         BatteryLevel, LeydenjarLevel,
         MirrorDescription,
@@ -454,16 +452,22 @@ public class NetworkFactorization {
         ServoRailDecor, ServoRailEditComment,
         CompressionCrafter, CompressionCrafterBeginCrafting, CompressionCrafterBounds,
         
-        servo_brief, servo_item, servo_complete, servo_stopped;
+        servo_brief(true), servo_item(true), servo_complete(true), servo_stopped(true);
         
+        public boolean isEntityMessage;
         private static final MessageType[] valuesCache = values();
         
         private final byte id;
         MessageType() {
+            this(false);
+        }
+        
+        MessageType(boolean isEntity) {
             id = message_type_count++;
             if (id < 0) {
                 throw new IllegalArgumentException("Too many message types!");
             }
+            isEntityMessage = isEntity;
         }
         
         private static MessageType fromId(byte id) {
