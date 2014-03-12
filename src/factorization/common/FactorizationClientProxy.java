@@ -337,6 +337,16 @@ public class FactorizationClientProxy extends FactorizationProxy {
         //return !mc.gameSettings.keyBindSneak.pressed;
     }
     
+    @SubscribeEvent
+    public void onStitch(TextureStitchEvent.Post event) {
+        int t = event.map.textureType;
+        if (t == 0 /* terrain */) {
+            Core.blockMissingIIcon = event.map.getAtlasSprite("this code for getting the missing IIcon brought to you by LexManos");
+        } else if (t == 1 /* items */) {
+            Core.itemMissingIIcon = event.map.getAtlasSprite("this code for getting the missing IIcon brought to you by Tahg");
+        }
+    }
+    
     @Override
     public void afterLoad() {
         Core.logInfo("Reloading game settings");
