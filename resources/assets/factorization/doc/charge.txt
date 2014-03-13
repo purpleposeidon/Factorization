@@ -21,6 +21,7 @@ This method does require quite a bit of silver.
 The other way is to use a caliometric burner.
 The caliometric burner will digest the food fed to it,
 and convert it into heat.
+Better quality food lasts longer.
 
 More than one caliometric burner can be used against
 a water boiler.
