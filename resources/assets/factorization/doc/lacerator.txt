@@ -3,6 +3,16 @@
 The lacerator is a \link{socket}{Socket Tool} that
 grinds and destroys anything that is placed in front of it.
 
+It is built by placing a
+\#{item.factorization:motor}
+Motor
+on a 
+\#{factorization.factoryBlock.SOCKET_EMPTY}
+Socket Block,
+followed by a
+\#{item.factorization:diamond_cutting_head}
+Diamond Cutting Head.
+
 It requires \link{charge}{charge} to power its motor,
 and it must have a backing inventory to drop the items
 it collects.

@@ -1,0 +1,56 @@
+\title{The Furnace Heater}
+
+The furnace heater simply heats up adjacent blocks.
+It can heat:
+\- Furnaces
+\- Slag Furnaces
+\- Crystallizers
+
+Multiple heaters can be used to decrease the time
+it takes to heat up
+and smelt faster.
+
+\figure{H4sIAAAAAAAAAO3cvU7jQBDA8Vk7CeZDXCQegIaCAiEkrqBBQsfpJGroo8VZgkUSn9YGzjwJb8Pb8AjXhtmQGEFS0BmJ/6/Z9Xp2PLNSUu6aSCymLzqsinFGJ6KTck3H1qq0z0o3KqariURZX1b+3PqxTV0kyS+dXWQjN83wEEJ08TTPb+rFKizq+E/eEmxe2bTMfdW7drZ0PpZOem39QDfIbiLxnfPSOdg/2j/8aaQVYrZn2c1CwiXlbcyzF0M7iCW5rGvUBNLRt9l40DbS7Xt739PY7M71LqvSyftv69a07qRuMFooQeP++nzgXVHo0/O8onB6UTSt6DGSzm87sqFDI+3T/HZcaiut82FeyuuhadjOyVuYWRIWz/r7Me8v9VVR2mHdk/lMT9Pz1DL2PhypqftZFzMS6YZpWwB8VysN7wfQnKTpAgAAAAAAAAAAAAAAAAAAAAAAAAAAwHuxRHm4EWArTB4mk8nTuphsdjPAccPFAWiI/hf8b3I/gObw+wUAAAAAAAAAAAAAAAAAAAAAAAAA4OsJFwJUOh7JCyfMk4c7ggAA}
+
+\figure{H4sIAAAAAAAAAO3cwWrbMBzH8b/kJm2TsYWlO++w02CUwQbbLj20Y9Bzey8mVddsTQ2uO5a+wA59nsIeYU9Udsv+Wp1DlZiCFPCh3w8YyUb+WUr4Wzf3RDIxx6LNphhntCPaqXravtgQOz6Wpyf5qCrK6dGpyytXZtIdneblV6cjXm1I9sOV0n27/XH73Xsja37MS0288kHaTuv2p28lMtDWgWZVgfMZ2lUFrgVLNqmBz4IlJweaYMnJgeG/bFMDh8GSkwPDf7kx8MxNv+Ua2LnQUyfPf72+nxdMLEudWL+hQExs4KChQKID+w0FkjzDsECMvm06+5WbXPg3jrV36Va6n/NJ7vOMdPaKy/PqjQYdnBWVDvJjTG/JmK16jK1nuf7lsjzPR07Pd7V3OJ44+TP/qfTiXlF8/3/xw8KsEpcZVll04LChypIDwyqLDnzSUGULgUGVDa7/Lq0yCarswZyb5dVqF3L6YiYiA/+M9fqI1fb9XjfxfuCxWkX9dlp8PrUPxGt7/2b/BwAAAAAAAAAAAAAAAAAAAAAAAAAgkIkt/BcBhr5zNZvNfvfFjP2XAbR/64/Y5Lbvn2ek3A88VquoX212Wn4+gAht79/s/wAAAAAAAAAAAAAAAAAAAAAAAAAALPIfBJhq+0n+AT6/qIkYhwAA}
+
+\newpage
+\title{The Slag Furnace}
+The slag furnace is a furnace specialized for producing slightly more output than a regular furnace.
+It has two output slots,
+and consumes twice as much fuel as a normal furnace.
+
+It is necessary for extracting both silver and lead from galena ore.
+
+
+\newpage
+\title{The Cystallizer}
+
+This is a simple container in which crystals are grown.
+
+First, a solution is required;
+aqua regia is typically used here.
+Next, the material to be crystallized must be added.
+Then it must be heated up with a furnace heater,
+and then be left undisturbed
+for 20 minutes to allow
+the crystals to grow.
+
+It has six slots,
+one of which must contain the solution,
+which leaves 5 other slots availabe,
+which will be consumed in parallel.
+
+An important crystalline component is
+the
+\#{item.factorization:logic_matrix}
+Logic Matrix,
+which are crystallized blocks of redstone.
+It would be wise to keep a stock of them
+prepared at all times.
+
+
+\newpage
+\include{lacerator}
+
+

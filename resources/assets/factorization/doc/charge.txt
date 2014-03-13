@@ -1,5 +1,7 @@
 \title{Charge}
 
+Charge is used to generate power, and the power is consumed by \link{processing}{processing machines}, some \link{socket}{socket tools}, and \link{servo}{servos}.
+
 Water boilers will suck of water from source blocks beneath them,
 or it can be pumped into them from other means.
 It will output steam to steam turbines above it,
@@ -27,7 +29,7 @@ More than one caliometric burner can be used against
 a water boiler.
 
 \figure{H4sIAAAAAAAAAO3cTW7TQBTA8Td2viuVVmLDhiNUCJBAYoVALAs3CBN7klqyY+RM2roLrsKFOAYHYMWCTfomdUQbpQWRSgjl/5OsGcWeeW/eZLz0QCQWk4o2fTHOaEe04wfatgfSPrPeVbF0XhflfOpFHn/tSf9dPs/SY1u45r70JMpSeTi2iS+rejgrc1uN59XUJq4n8ak+0Xly9PLo2XONdaEzG23r0GqEmXe2uBZBPt6MsLwfkjwPuTWh9lehEptrE0trXJZhFQdGOnovm040RifNJm6mc5pvRg7Syp4NdVh26oaj2ju5mdpAejNfFjY5cVGIYfJIOm9tYSdOJ5D2m5BeS5oVRKsVrCX2qwYhbT+vRtnUaSbJia3CRPJhvSDx2E719+O10kQbSmNaf1CaB6sMRtbr3tTXg7+/czfiWLpagmq54kd3zFtVLn8aSztpduyVriLNKu3tD6Q1y+1oWUH5vKGCRvSRzLvi9iKHXrOJ8e/3Tffe15/cVcnivJxcxT7cGPuW3TOyJ6bQf48AwBa6//l4YJd1ZbszFMZG95QLAAAAAAAAAAAAAAAAAAAAAAAAAACQ8DGMqDxfLBY/Q+dCO9/3xGTNlwH6zQVg92x1/vVd8mOb4P96PLDjvjTXXwnnjzMIAAAAAAAAAAAAAAAAAAAAAAAAAMD9Ch8EqLV9IZfd+pujNIMAAA==}
-% NORELEASE: Battery block doesn't render
+% FIXME: Battery block doesn't render. NORELEASE: Examine!
 
 \newpage
 \title{Transfer}
