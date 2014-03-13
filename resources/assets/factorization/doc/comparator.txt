@@ -1,19 +1,44 @@
 \title{The Comparator}
 
-The comparator has a number of uses.
-It deals with signals of varying strength.
-
-It can be used to measure the fullness of a block.
+The comparator can be used to measure the fullness of a block.
 When used with inventories,
 the strength of its output will be proportional
 to the fullness of the inventory.
+
 This also applies to many other blocks that are
 not inventories.
+
 When measuring an inventory in this way,
 it can have a solid block between it
 and the inventory.
 
+\figure{H4sIAAAAAAAAAO3czUrDQBDA8dlsv0wFK/gWhSKK2Hu9e/AByrZdQyBpSkyr8eBbePI9vdZdU/GgtxRCy/93mYXM7MwG9rqhiBa1EBdORFnlFuIWRehi0JMgXkg4ydKVyU2R5VpO79fFal08xNHSJC6n66pfXVQulrv44jeRqvjs0cxdYTmdmTy3yZWW9jxbLwv/XYtexLlLvQil9ZSYWfBd8hZI586kJrJuO2lPfLoSlxIXNq1SPn5T1E+KT+64bvEy0koGi9w8T13veGOns7Kwvt/G5tK5HI1H1zdaWkW5sn7QUHSSRdXG5//23p0x+HPGvqhUZFD9tHq6NesBNKfu/e/tZQoAhyhoegAAAAAAAAAAAAAAAAAAAAAAAAAAAI6NliDzLwIM/cI/FdDqi4p3LwMMa25+W3s8AE2pe//f9zIFgIOz3W4/m54BAAAAAAAAAAAAAAAAAAAAAAAAAIBj4x8EKF0cyxcjxMy6aoEAAA==}
 
-NORELEASE subtraction stuff
+\newpage
+It can also be used to manipulate the strength
+of a redstone signal.
+It can do this with two inputs.
+The primary input is from the back,
+and the secondary input is from the sides.
+(If there are two signals coming in from the sides,
+then the strongest signal will be used.)
 
+It has two modes. In the default mode,
+it will output the primary signal
+only if it is stronger than the secondary signal.
+Otherwise, it will output no signal.
+
+\figure{H4sIAAAAAAAAAO3cwUoCURQG4DNa0Whlb9HCB/AB2gYtegKhCCEzwqB8jx437F50QMxFjpMSfB/8nLuYA2czHoThdiLaUdxHxEkZxUORDpEO006qrdNoje6jcz0Zvwxfh9PJazvObt+mL2/Tu9Hj8/ApPdNL3bPclOpHKkWq77k3ftFcLpuPfjR3oxhHXMZSuZI6eindlOOa/cBh1X33K+eNTAHsU7kh28g7P+//i1j8Bpw1Oh2wD+Va3Va1/7sNzALszy77v9Je9naaGgoAAAAAAAAAAAAAAFhoR2uSbwS4yofZfD7/6kYxWrkZoL+SOgYpnyk3u88KHEDdd78yaGQKYJ/6G7KNvPMHawH+l/5a3dZgrQL/wy77P6v+/9v/AAAAAAAAAAAAAADwB/KFAB+RP9r/BhL9YCnDgAAA}
+
+\figure{H4sIAAAAAAAAAO3cwUoCURQG4DOKkaNlL+HKB/AB2gYtegLBCCFTZITsPXrf7q0JanajkkjfB4f/LubM3M2Fu5lTRnSjmEdErx/FY5EWkRZVmbK4jM5iHuXtarmebWbVatON4f22Wm+rh8XTy+w5PTNK3W+5KeUu96R8TdmJQRTLiJuvF/6utnr5Q3XvaI9+4HT6jWzr+8zv2w+czqHn/7rO8gh7Af7WIXf/7CrVMNXgaDsCAAAAAAAAAAAAAAAAPnWjs8oTAcZ5kUcFXAyiWNSTASaNausu1TTVe53A+Zg0sq1pI4Hz4fzD/3XI3T+b/igAAAAAAAAAAAAAAADgiPJAgF3kn3c+ADNL0auGgAAA}
+
+The second mode is subtraction mode,
+which is switched by clicking on the comparator.
+This will enable the redstone torch.
+
+In this mode,
+the strength output is the strength of the back signal
+minus the strength of the side signal.
+If the back signal is not stronger than the side signal,
+then no signal will be output.
 
