@@ -22,3 +22,6 @@ This produces 18 shards.
 They are used to make \link{lacerator}{Lacerators}.
 
 \figure{H4sIAAAAAAAAAO3cP0/bQBjH8d/ZTgSOBBT1BXjoiCL+De3UoaydYI8cfDgHjo1sQ3CHvuyu6YW4EkMWFKRI1fcjnZ5H58f3PDd4dSyFMpmkaF/GGp/IJ23sY7CnwGWKrl1e7mlwY1/aMx3ezFyTLKr6oUnun5q2f3Cu+M6V9iRZzNJ/exc6uK2eiix5rJrGTYuu37/Ufl4li7oq8++++S/fyvjY9fFlNYPWvQ/v0tu2qrvJNK1rW5yHGvgjy9YXHIcKM1f77HOsqCnSafD6yu9Aw6t0nubWH6fBj1W5kS9xrZ2/lnwZbyhZZUPfzZV5aHSU1eli4nu7ZzuZdq3184TPttbwdPx1fHEZKmq7R7saNFZYVPm696eNvfs7qr+j+jsGGsnMpSO9EQgA3ifqo9npFAAAAAAAAAAAAAAAAAAAAAAAAAAAAMB/YCTj3v4HYLlc/tniuPH2EwHYkW2+3yu/vvn1c0f9AewW3y8AAAAAAAAAAAAAAAAAAAAAAAAAAB/pLzhWik6OgQAA}
+
+\leftpage
+\include{lmp}
