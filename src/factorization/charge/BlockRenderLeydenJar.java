@@ -31,6 +31,11 @@ public class BlockRenderLeydenJar extends FactorizationBlockRender {
         float post_in = 7F/16F;
         float dz = 1F/64F;
         
+        boolean airAbove = true;
+        if (world_mode) {
+            airAbove = w.isAirBlock(x, y + 1, z);
+        }
+        
         block.setBlockBounds(inset, 0, inset, 1 - inset, jarHeight, 1 - inset);
         block.useTextures(null, BlockIcons.leyden_glass, glass, glass, glass, glass);
         renderBlock(rb, block);
@@ -45,7 +50,7 @@ public class BlockRenderLeydenJar extends FactorizationBlockRender {
             GL11.glTranslatef(0, -1, 0);
         } else {
             y++;
-            if (!w.isBlockOpaqueCube(x, y, z)) {
+            if (airAbove) {
                 renderBlock(rb, block);
             }
             y--;
@@ -54,7 +59,7 @@ public class BlockRenderLeydenJar extends FactorizationBlockRender {
         
         Icon leyden_metal = BlockIcons.leyden_metal;
         renderCauldron(rb, BlockIcons.leyden_rim, leyden_metal, metal_height);
-        block.useTextures(null, null, leyden_metal, leyden_metal, leyden_metal, leyden_metal);
+        block.useTextures(null, airAbove ? null : leyden_metal, leyden_metal, leyden_metal, leyden_metal, leyden_metal);
         block.setBlockBounds(post_in, 1F/16F, post_in, 1 - post_in, jarHeight, 1 - post_in);
         renderBlock(rb, block);
         if (!world_mode && is != null && is.hasTagCompound()) {
