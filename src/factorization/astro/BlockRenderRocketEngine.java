@@ -17,9 +17,8 @@ public class BlockRenderRocketEngine extends FactorizationBlockRender {
     public void render(RenderBlocks rb) {
         Icon body = BlockIcons.rocket_engine_invalid;
         Icon nozzle = BlockIcons.rocket_engine_nozzle, bottom = BlockIcons.rocket_engine_bottom_hole, top = BlockIcons.rocket_engine_top;
-        final Coord here = getCoord();
         if (world_mode) { //Really, it should be...
-            TileEntityRocketEngine rocket = here.getTE(TileEntityRocketEngine.class);
+            TileEntityRocketEngine rocket = (TileEntityRocketEngine) te;
             if (rocket != null && rocket.lastValidationStatus) {
                 body = BlockIcons.rocket_engine_valid;
             }
@@ -35,6 +34,7 @@ public class BlockRenderRocketEngine extends FactorizationBlockRender {
         float height = 6F/16F;
         float b = height*3 - 3F/16F;
         //The nozzle
+        final Coord here = getCoord();
         for (int i = 1; i < 4; i++) {
             if (i == 1) {
                 block.useTextures(bottom, nozzle, nozzle, nozzle, nozzle, nozzle);

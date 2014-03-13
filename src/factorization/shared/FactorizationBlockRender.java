@@ -24,7 +24,7 @@ import factorization.charge.WireRenderingCube;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 
-abstract public class FactorizationBlockRender implements ICoord {
+abstract public class FactorizationBlockRender /*implements ICoord*/ {
     static Block metal = Block.obsidian;
     static Block glass = Block.glowStone;
 
@@ -81,7 +81,7 @@ abstract public class FactorizationBlockRender implements ICoord {
     public abstract FactoryType getFactoryType();
     public void renderSecondPass(RenderBlocks rb) {}
     
-    @Override
+    //@Override
     public Coord getCoord() {
         if (!world_mode) {
             if (te != null) {

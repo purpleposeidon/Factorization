@@ -54,7 +54,7 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
         Coord here = getCoord();
         
         if (world_mode) {
-            TileEntityMirror tem = here.getTE(TileEntityMirror.class);
+            TileEntityMirror tem = (TileEntityMirror) te;
             if (tem != null && tem.target_rotation >= 0) {
                 block.translate(-0.5F, 0F, 0F);
                 Quaternion trans = Quaternion.getRotationQuaternionRadians(Math.toRadians(tem.target_rotation - 90), ForgeDirection.UP);

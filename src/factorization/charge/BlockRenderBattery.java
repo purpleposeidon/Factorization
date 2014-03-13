@@ -22,7 +22,7 @@ public class BlockRenderBattery extends FactorizationBlockRender {
     public void render(RenderBlocks rb) {
         TileEntityBattery bat;
         if (world_mode) {
-            bat = new Coord(Minecraft.getMinecraft().theWorld, x, y, z).getTE(TileEntityBattery.class);
+            bat = (TileEntityBattery) te;
         } else {
             bat = (TileEntityBattery) FactoryType.BATTERY.getRepresentative();
             bat.onPlacedBy(null, is, 0);
@@ -39,9 +39,6 @@ public class BlockRenderBattery extends FactorizationBlockRender {
         mc.renderEngine.bindTexture(Core.blockAtlas);
         renderNormalBlock(rb, FactoryType.BATTERY.md);
         GL11.glPushMatrix();
-        //TODO: Need to render with the correct positioning for the hand
-        //if (type == = ENTITY) 
-        //TextureUtil.bindTexture(Core.texture_file_block);
         renderBatteryDisplay(rb, item_fullness);
         GL11.glPopMatrix();
     }
