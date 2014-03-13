@@ -1,5 +1,6 @@
 package factorization.docs;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import net.minecraft.client.Minecraft;
@@ -10,6 +11,7 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 
 import com.google.common.base.Strings;
+import com.google.common.io.Closeables;
 
 public class Typesetter {
     // Super-awesome typesetter version π², by neptunepink
@@ -86,6 +88,11 @@ public class Typesetter {
                     emit("\\", link);
                 } else if (cmd.equals("\\newpage")) {
                     newPage();
+                } else if (cmd.equals("\\leftpage")) {
+                    int need = 1 + (pages.size() % 2);
+                    for (int i = 0; i < need; i++) {
+                        newPage();
+                    }
                 } else if (cmd.equals("\\b") || cmd.equals("\\i") || cmd.equals("\\u") || cmd.equals("\\obf")) {
                     char mode = cmd.charAt(1);
                     String content = getParameter(cmd, tokenizer);
@@ -204,6 +211,23 @@ public class Typesetter {
                         continue;
                     }
                     pages.add(new FigurePage(figure));
+                } else if (cmd.equals("\\include")) {
+                    String name = getParameter(cmd, tokenizer);
+                    if (name == null) {
+                        error("No page name specified");
+                        continue;
+                    }
+                    InputStream is = DocumentationModule.getDocumentResource(name);
+                    try {
+                        if (is == null) {
+                            error("Not found: " + name);
+                            continue;
+                        }
+                        String subtext = DocumentationModule.readContents(name, is);
+                        process(subtext, link, style);
+                    } finally {
+                        Closeables.closeQuietly(is);
+                    }
                 } else if (cmd.equals("\\lmp")) {
                     process("\\link{lmp}{LMP}", link, style);
                 } else {

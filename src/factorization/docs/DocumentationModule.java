@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,8 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.Resource;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
@@ -22,6 +25,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChatMessageComponent;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeDirection;
 
 import org.bouncycastle.util.encoders.Base64;
@@ -253,4 +257,39 @@ public class DocumentationModule implements ICommand {
         }
     }
     
+    public static ResourceLocation getResourceForName(String name) {
+        return Core.getResource("doc/" + name + ".txt");
+    }
+    
+    public static InputStream getDocumentResource(String name) {
+        try {
+            Minecraft mc = Minecraft.getMinecraft();
+            Resource src = mc.getResourceManager().getResource(getResourceForName(name));
+            return src.getInputStream();
+        } catch (IOException e) {
+            return null;
+        }
+    }
+    
+    public static String readContents(String name, InputStream is) {
+        if (is == null) {
+            return "\\obf{101*2*2 Not Found:} " + name;
+        }
+        try {
+            StringBuilder build = new StringBuilder();
+            byte[] buf = new byte[1024];
+            int length;
+            while ((length = is.read(buf)) != -1) {
+                build.append(new String(buf, 0, length));
+            }
+            return build.toString();
+        } catch (Throwable e) {
+            e.printStackTrace();
+            String txt = e.getMessage();
+            for (StackTraceElement ste : e.getStackTrace()) {
+                txt += "\n\n    at " + ste.getFileName() + "(" + ste.getFileName() + ":" + ste.getLineNumber() + ")";
+            }
+            return "\\obf{5*5*5*2*2 Internal Server Error\n\nAn error was encountered while trying to execute your request.}\n\n" + txt;
+        }
+    }
 }

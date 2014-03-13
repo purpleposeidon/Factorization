@@ -1,6 +1,5 @@
 package factorization.docs;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -9,31 +8,34 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.resources.Resource;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 
-import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.io.Closeables;
-import com.jcraft.jogg.Page;
-
-import factorization.shared.Core;
 
 public class DocViewer extends GuiScreen {
-    //NORELEASE! Uh. Don't release a release with this user-accessible, I guess, unless the docs are slightly useful
     final String name;
+    int startPageIndex;
     Document doc;
     AbstractPage page;
     GuiButton nextPage;
     GuiButton prevPage;
     GuiButton backButton;
     
+    public static class HistoryPage {
+        String docName;
+        int offset;
+        
+        public HistoryPage(String docName, int offset) {
+            this.docName = docName;
+            this.offset = offset;
+        }
+    }
     
-    private static Deque<String> the_pageHistory = new ArrayDeque<String>();
+    private static Deque<HistoryPage> the_pageHistory = new ArrayDeque<HistoryPage>();
     public static String current_page = "index";
     
     
@@ -59,21 +61,27 @@ public class DocViewer extends GuiScreen {
         return height*90/100;
     }
     
-    public static String popLastPage() {
+    public static HistoryPage popLastPage() {
         if (the_pageHistory.isEmpty()) {
-            return "index";
+            return new HistoryPage("index", 0);
         }
         return the_pageHistory.pollLast();
     }
     
-    public static void addNewHistoryEntry(String name) {
-        the_pageHistory.add(name);
+    public static void addNewHistoryEntry(String name, int page) {
+        the_pageHistory.add(new HistoryPage(name, page));
     }
     
     int orig_scale = -1;
     
+    public DocViewer(HistoryPage hist) {
+        this.name = hist.docName;
+        this.startPageIndex = hist.offset;
+    }
+    
     public DocViewer(String name) {
         this.name = name;
+        this.startPageIndex = -1;
     }
     
     @Override
@@ -96,6 +104,12 @@ public class DocViewer extends GuiScreen {
             mc.displayGuiScreen(null);
         }
         page = doc.pages.get(0);
+        if (startPageIndex != -1) {
+            if (startPageIndex < doc.pages.size()) {
+                page = doc.pages.get(startPageIndex);
+            }
+            startPageIndex = 0;
+        }
         
         int row = getPageHeight(0);
         int arrow_half = 8;
@@ -106,48 +120,13 @@ public class DocViewer extends GuiScreen {
         current_page = doc.name;
     }
     
-    protected ResourceLocation getResourceForName(String name) {
-        return Core.getResource("doc/" + name + ".txt");
-    }
-    
-    InputStream getDocumentResource(String name) {
-        try {
-            Resource src = mc.getResourceManager().getResource(getResourceForName(name));
-            return src.getInputStream();
-        } catch (IOException e) {
-            return null;
-        }
-    }
-    
     Document getDocument(String name) {
-        InputStream is = getDocumentResource(name);
+        InputStream is = DocumentationModule.getDocumentResource(name);
         try {
-            Typesetter ts = new Typesetter(mc.fontRenderer, getPageWidth(0), getPageHeight(0), readContents(is));
+            Typesetter ts = new Typesetter(mc.fontRenderer, getPageWidth(0), getPageHeight(0), DocumentationModule.readContents(name, is));
             return new Document(name, ts.getPages());
         } finally {
             Closeables.closeQuietly(is);
-        }
-    }
-    
-    String readContents(InputStream is) {
-        if (is == null) {
-            return "\\obf{101*2*2 Not Found:} " + name;
-        }
-        try {
-            StringBuilder build = new StringBuilder();
-            byte[] buf = new byte[1024];
-            int length;
-            while ((length = is.read(buf)) != -1) {
-                build.append(new String(buf, 0, length));
-            }
-            return build.toString();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            String txt = e.getMessage();
-            for (StackTraceElement ste : e.getStackTrace()) {
-                txt += "\n\n    at " + ste.getFileName() + "(" + ste.getFileName() + ":" + ste.getLineNumber() + ")";
-            }
-            return "\\obf{5*5*5*2*2 Internal Server Error\n\nAn error was encountered while trying to execute your request.}\n\n" + txt;
         }
     }
     
@@ -158,6 +137,15 @@ public class DocViewer extends GuiScreen {
         if (i < 0) return null;
         if (i >= doc.pages.size()) return null;
         return doc.pages.get(i);
+    }
+    
+    int getCurrentPageIndex() {
+        int i = 0;
+        for (AbstractPage pg : doc.pages) {
+            if (pg == page) return i;
+            i++;
+        }
+        return 0;
     }
     
     @Override
@@ -236,7 +224,7 @@ public class DocViewer extends GuiScreen {
             Word link = p.click(mouseX - getPageLeft(i), mouseY - getPageTop(i));
             if (link != null && link.hyperlink != null) {
                 DocViewer newDoc = new DocViewer(link.hyperlink);
-                addNewHistoryEntry(name);
+                addNewHistoryEntry(name, getCurrentPageIndex());
                 mc.displayGuiScreen(newDoc);
                 return;
             }
