@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.PriorityQueue;
 
 import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBucket;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.BlockFluidFinite;
@@ -15,7 +17,6 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 import factorization.api.Coord;
 import factorization.common.FactoryType;
-import factorization.notify.Notify;
 import factorization.shared.FzUtil;
 import factorization.sockets.ISocketHolder;
 
@@ -85,10 +86,10 @@ public class PumpLiquids extends BufferedFanturpeller {
                 @Override
                 public int compare(PumpCoord a, PumpCoord b) {
                     // If we're draining, we want the furthest & highest liquid
-                    if (a.pathDistance == b.pathDistance) {
-                        return b.y - a.y;
+                    if (a.y == b.y) { 
+                        return b.pathDistance - a.pathDistance;
                     }
-                    return b.pathDistance - a.pathDistance;
+                    return b.y - a.y;
                 }
             };
         }
@@ -120,13 +121,17 @@ public class PumpLiquids extends BufferedFanturpeller {
             return FzUtil.drainSpecificBlockFluid(worldObj, probe.x, probe.y, probe.z, doDrain, targetFluid);
         }
         
+        FluidStack probeAbove(PumpCoord probe) {
+            return FzUtil.drainSpecificBlockFluid(worldObj, probe.x, probe.y + 1, probe.z, false, targetFluid);
+        }
+        
         boolean updateFrontier() {
             if (visited.size() > max_pool) return false;
             if (frontier.isEmpty()) return false;
             Coord probe = new Coord(worldObj, 0, 0, 0);
             int maxHeight = getMaxHeight();
             int maxDistance = getMaxDistance();
-            for (int amount = frontier.size(); amount > 0; amount--) {
+            for (int amount = Math.max(frontier.size(), 1024); amount > 0; amount--) {
                 PumpCoord pc = frontier.poll();
                 if (pc == null) return true;
                 if (pc.y >= maxHeight) continue;
@@ -173,7 +178,12 @@ public class PumpLiquids extends BufferedFanturpeller {
                 reset();
                 return;
             }
-            buffer.setFluid(drainBlock(pc, true));
+            if (probeAbove(pc) != null) {
+                // Fluid (likely water) has refilled in above us
+                reset();
+            } else {
+                buffer.setFluid(drainBlock(pc, true));
+            }
         }
 
         @Override
@@ -276,7 +286,14 @@ public class PumpLiquids extends BufferedFanturpeller {
             Block block = Block.blocksList[fluid.getBlockID()];
             if (block == null) return false;
             if (drainBlock(pc, false) != null) return false;
-            at.setIdMd(block.blockID, block instanceof BlockFluidFinite ? 0xF : 0, true);
+            if (block == Block.waterStill) block = Block.waterMoving;
+            else if (block == Block.lavaStill) block = Block.lavaMoving;
+            
+            if (block == Block.waterMoving) {
+                ((ItemBucket) Item.bucketWater).tryPlaceContainedLiquid(at.w, at.x, at.y, at.z);
+            } else {
+                at.setIdMd(block.blockID, block instanceof BlockFluidFinite ? 0xF : 0, true);
+            }
             buffer.setFluid(null);
             at.notifyBlockChange();
             return true;
@@ -436,14 +453,19 @@ public class PumpLiquids extends BufferedFanturpeller {
         } else {
             fluid = "\n" + fs.amount + "mB of " + fs.getFluid().getName();
         }
+        float targetSpeed = getTargetSpeed();
+        String speed = "";
+        if (Math.abs(targetSpeed) > 1) {
+            speed = "\nSpeed: " + (int)(100*fanω/targetSpeed) + "%";
+        }
         return easyName(sourceAction) + 
                 " -> " + easyName(destinationAction) +
-                fluid;
+                fluid + speed;
     }
     
     @Override
     protected boolean shouldFeedJuice() {
-        return sourceAction != null && destinationAction != null;
+        return sourceAction != null || destinationAction != null;
     }
 
     @Override
