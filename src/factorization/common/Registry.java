@@ -187,6 +187,8 @@ public class Registry implements ICraftingHandler, ITickHandler {
         GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FZ factory");
         GameRegistry.registerBlock(lightair_block, "FZ Lightair");
         GameRegistry.registerBlock(resource_block, ItemBlockResource.class, "FZ resource");
+        GameRegistry.registerBlock(dark_iron_ore, "FZ dark iron ore");
+        GameRegistry.registerBlock(fractured_bedrock_block, "FZ fractured bedrock");
         GameRegistry.registerCraftingHandler(this);
         
         registerItem(factory_block);
