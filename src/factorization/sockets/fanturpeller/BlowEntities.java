@@ -240,7 +240,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
         if (FzConfig.fanturpeller_works_on_players && entity instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) entity;
             found_player = true;
-            return !player.capabilities.isCreativeMode;
+            return !player.capabilities.isCreativeMode && !player.isSneaking();
         }
         return false;
         // Falling sand doesn't work too well with this
