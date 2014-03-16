@@ -3,6 +3,7 @@ package factorization.notify;
 import java.util.EnumSet;
 
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -88,6 +89,15 @@ public class NotifyImplementation extends Notify {
             @Override
             public int getRequiredPermissionLevel() {
                 return 0;
+            }
+            
+            // o_ó eclipse has no trouble compiling without these two methods...
+            public int compareTo(ICommand otherCmd) {
+                return this.getCommandName().compareTo(otherCmd.getCommandName());
+            }
+
+            public int compareTo(Object obj) {
+                return this.compareTo((ICommand)obj);
             }
         });
     }
