@@ -1,4 +1,5 @@
 http://www.minecraftforum.net/topic/1351802-factorization/
+Factorization: Engineering, Architecture, and Commerce
 
 
 HAMMER
@@ -92,31 +93,22 @@ Lower barriers to entry for servos:
   Make dark iron an ore found at bedrock level
   Have a stack that's a "reaction" stack. So when the 'status' stack gets updated (this would be typical of a socket command), this stack could be triggered.
 
-PRESSURE GENERATOR
-------------------
-mixer? We'd need a buffer. Yeah, we can go ahead with it.
-FluidPump should do a simple spouting if on a servo
-
 IMMEDIATE (for next public release)
 ---------
-test:
-    infinite loops
-    writing instructions
-[prooobably fixed. Yep. Definitely.] (It does now?) servos not syncing stacks to players holding LMPs like they should...
-more creative tabs?
-
-
-FZDOCS
-------
-Add stuff to document to this list!
-well, what are the new instructions?
-    set stack
-    color
-    item shifter control
+servos:
+    servo upgrading doesn't get synced to other players! (? how not?) Test it...
+    test writing instructions
+FZDocs! Yes!
+    pretty up the doc's back button
+    also have our history stack be List<Pair<Document, PageNumber>> instead of List<String>
+Pressurizer:
+    pressurizer doesn't drop buffered items! Weren't we supposed to have checked this!? >:|
+    pressurizer doesn't seem to actually be working properly with flooding/draining? Test like our SSP world.
 
 
 SOON
 ----
+sancho
 servos:
   2 consecutive turns doesn't show the 2nd turn nicely -- No, that's not the behavior. -- Yes it is?
   refactor tool
@@ -202,6 +194,7 @@ instructions mess up servo rail tessellator shading?
 add an LMP instruction (recipe may be difficult!). Clicks the instruction with an LMP.
 FZ notify item kept? [might be fixed? Weirdness.]
 wires get messed up?
+pressure gen on servo holding bucket pumps out the servo's bucket?
 
 
 NEVER/POSTPONED

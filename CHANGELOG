@@ -1,3 +1,17 @@
+0.8.35
+  Fix pressurizer draining & flooding
+
+0.8.34
+  Documentation! Not yet finished.
+  The pressurizer can no longer be used to generate power, and has been renamed from "Pressure Generator"
+  Pressurizer entity-blowing can be disabled with a RS signal
+  Lacerators on servos can now hold FOUR items. Opulent luxury!
+  Robotic arm:
+      now less likely to crash servers
+      now less likely to use certain items multiple times at once
+      if the inventory is empty, or it doesn't have an inventory, it'll click w/ nothing
+  Also other bug fixes
+
 0.8.33
   Servos weren't dropping their socket tool correctly
   Item Shifter defaults to moving some 64 items instead of hoppering 1 item at a time

@@ -1,5 +1,12 @@
 [u][b][size=6][anchor=ABOUT]Factorization[/anchor][/size][/b][/u]
-This mod adds many machines for processing ore and crafting. It also has a few other useful things. The documentation in this post is super-seriously out of date; I should update it sometime. Documentation for some newer things, such as servos, can be found [url="http://purpleposeidon.github.io/FzDocs/html/"]here[/url]. It's github, so please help me with documentation by sending PRs.
+This mod adds minimalist parts for expanding vanilla redstone automation, along with many other things.
+
+[img]http://i.imgur.com/16winQQ.png[/img]
+This is the recipe for creating The Factorization Manual. You should read it. (But it isn't finished yet.) That strange item on the right is a Logic Matrix Programmer, and it can be obtained by trading with a librarian villager.
+
+[u]Surpassingly Ancient And Out Of Date Information[/u]
+[spoiler]
+Documentation for some newer things, such as servos, can be found [url="http://purpleposeidon.github.io/FzDocs/html/"]here[/url]
 
 Direwolf20 has made a mod spotlight! (For 0.6.6)
 [youtube]http://www.youtube.com/watch?v=syVswXHTGBg[/youtube]
@@ -250,10 +257,11 @@ Each Servo has 16 stacks, which can each hold 16 integers, booleans, strings, or
 
 
 [/spoiler]
+[/spoiler]
 
 [u]Other Stuff/Future Plans[/u]
 [spoiler]
-Finish Servos
+Finish Docs
 ?
 ?
 ?
@@ -262,7 +270,7 @@ Finish Servos
 
 
 [u][b][size=6][anchor=INSTALL]Installation[/anchor][/size][/b][/u]
-This is a [url="http://files.minecraftforge.net/"]Minecraft Forge[/url] mod. It uses 3 block IDs, and a bunch of item IDs.
+This is a [url="http://files.minecraftforge.net/"]Minecraft Forge[/url] mod.
 
 1. Download and run the [url="http://files.minecraftforge.net/"]Minecraft Forge Installer[/url]. The version of Forge that I'm using is given by the download link. Anything newer will usually work, and sometimes older versions will work as well.
 2. Check that the forge install worked by running the client (or the server). Forge information should be on the title screen (or in the server's logs). Stop minecraft.
@@ -272,15 +280,21 @@ This is a [url="http://files.minecraftforge.net/"]Minecraft Forge[/url] mod. It 
 
 
 [u][b][size=6][anchor=DOWNLOAD]Download[/anchor][/size][/b][/u]
-[b]Use forge version 965[/b]. There is updated-documentation-in-sort-of-progress [url="http://purpleposeidon.github.io/FzDocs/html/"]here[/url].
+[b]Use forge version 965[/b].
 
+Factorization 0.8.34 (MC 1.6.4)
+[url="http://adf.ly/2137658/https://www.mediafire.com/?1l6clzu485jt789"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-0.8.34.jar"]adfly + DropBox[/url]
+Built on 2014-03-03 against Minecraft Forge 9.11.1.953
+[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-0.8.34.txt"]Changelog[/url]
+
+Old versions [spoiler]
 Factorization 0.8.33 (MC 1.6.4)
 [url="http://adf.ly/2137658/https://www.mediafire.com/?e33u18ydqko7kjl"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-0.8.33.jar"]adfly + DropBox[/url]
 Built on 2014-02-22 against Minecraft Forge 9.11.1.953
 [url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-0.8.33.txt"]Changelog[/url]
 
-Old versions [spoiler]
 Factorization 0.8.32 (MC 1.6.4)
 [url="http://adf.ly/2137658/https://www.mediafire.com/?03j9c7v7jd926u4"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-0.8.32.jar"]adfly + DropBox[/url]
@@ -488,7 +502,7 @@ This mod may be used in modpacks under the following conditions:
 
 (end license)
 
-The license has been very carefully designed to give me a slight burst of pleasure whenever I read a post saying that they are using my mod in a pack, and also to spare me from having to deal with people asking for permission. If you have any questions regarding the license or distribution, you may direct them at your nearest lawyer. I am not a lawyer, and do not give legal advice.
+The license has been very carefully designed to give me a slight burst of pleasure whenever I read a post saying that they are using my mod in a pack, and also to spare me from having to deal with people asking for permission. If you have any questions regarding the license or distribution, you may direct them at your nearest lawyer, and you may not direct them at me. I am not a lawyer, and do not give legal advice.
 
 [u][b][size=6][anchor=BUGS]Bugs & Other Problems[/anchor][/size][/b][/u]
 For faster customer service, please report bugs & other problems to me in #factorization on irc.esper.net; I don't make a habit of reading this thread.
