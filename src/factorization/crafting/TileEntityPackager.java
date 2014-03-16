@@ -8,12 +8,12 @@ import factorization.common.FactoryType;
 import factorization.shared.FzUtil;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 
 public class TileEntityPackager extends TileEntityStamper {
     @Override
-    public String getInvName() {
+    public String getInventoryName() {
         return "Packager";
     }
 
@@ -23,7 +23,7 @@ public class TileEntityPackager extends TileEntityStamper {
     }
     
     @Override
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         return BlockIcons.packager.get(this, dir);
     }
     

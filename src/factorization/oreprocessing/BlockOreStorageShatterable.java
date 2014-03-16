@@ -1,22 +1,23 @@
 package factorization.oreprocessing;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockOreStorage;
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.block.BlockCompressed;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.shared.Core;
 
-public class BlockOreStorageShatterable extends BlockOreStorage {
+public class BlockOreStorageShatterable extends BlockCompressed {
     private final Block original;
-    public BlockOreStorageShatterable(int id, Block original) {
-        super(id);
+    public BlockOreStorageShatterable(Block original) {
+        super(Blocks.diamond_block.getMapColor(0));
         this.original = original;
     }
     
@@ -37,7 +38,7 @@ public class BlockOreStorageShatterable extends BlockOreStorage {
             return;
         }
         Coord c = new Coord(world, x, y, z);
-        c.setId(0);
+        c.setAir();
         int i = 18;
         while (i > 0) {
             int spawn = world.rand.nextInt(3) + 2;
@@ -69,13 +70,13 @@ public class BlockOreStorageShatterable extends BlockOreStorage {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerIcons(IconRegister register) {
-        original.registerIcons(register);
+    public void registerBlockIcons(IIconRegister register) {
+        original.registerBlockIcons(register);
     }
     
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIcon(int side, int md) {
+    public IIcon getIcon(int side, int md) {
         return original.getIcon(side, md);
     }
 }

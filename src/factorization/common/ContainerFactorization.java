@@ -3,6 +3,15 @@ package factorization.common;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.SlotFurnace;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntityFurnace;
 import factorization.crafting.TileEntityMixer;
 import factorization.crafting.TileEntityStamper;
 import factorization.oreprocessing.TileEntityCrystallizer;
@@ -11,16 +20,6 @@ import factorization.oreprocessing.TileEntitySlagFurnace;
 import factorization.servo.TileEntityParaSieve;
 import factorization.shared.FzUtil;
 import factorization.shared.TileEntityFactorization;
-import factorization.wrath.TileEntityRouter;
-
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
-import net.minecraft.inventory.SlotFurnace;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntityFurnace;
 
 public class ContainerFactorization extends Container {
     public TileEntityFactorization factory;
@@ -37,10 +36,10 @@ public class ContainerFactorization extends Container {
     }
 
     class FactorySlot extends Slot {
-        int[] allowed;
-        int[] forbidden;
+        Item[] allowed;
+        Item[] forbidden;
 
-        public FactorySlot(IInventory iinventory, int slotNumber, int posX, int posY, int[] a, int[] f) {
+        public FactorySlot(IInventory iinventory, int slotNumber, int posX, int posY, Item[] a, Item[] f) {
             super(iinventory, slotNumber, posX, posY);
             allowed = a;
             forbidden = f;
@@ -52,16 +51,16 @@ public class ContainerFactorization extends Container {
                 return false;
             }
             if (allowed != null) {
-                for (int a : allowed) {
-                    if (itemstack.getItem().itemID == a) {
+                for (Item a : allowed) {
+                    if (itemstack.getItem() == a) {
                         return true;
                     }
                 }
                 return false;
             }
             if (forbidden != null) {
-                for (int f : forbidden) {
-                    if (itemstack.getItem().itemID == f) {
+                for (Item f : forbidden) {
+                    if (itemstack.getItem() == f) {
                         return false;
                     }
                 }
@@ -91,13 +90,6 @@ public class ContainerFactorization extends Container {
         FactoryType type = ent.getFactoryType();
         EntityPlayer player = inventoryplayer.player;
         switch (type) {
-        case ROUTER:
-            TileEntityRouter router = (TileEntityRouter) ent;
-            addSlotToContainer(new Slot(router, 0, 62, 22));
-            for (int i = 0; i < 9; i++) {
-                addSlotToContainer(new StackLimitedSlot(64, router, 1 + i, 8 + i * 18, 44 - 0xFFFFFF));
-            }
-            break;
         case STAMPER:
         case PACKAGER:
             TileEntityStamper stamper = (TileEntityStamper) ent;
@@ -155,9 +147,6 @@ public class ContainerFactorization extends Container {
             break;
         }
         addPlayerSlots(inventoryplayer);
-        if (type == FactoryType.ROUTER) {
-            slot_end = 1;
-        }
     }
 
     void addPlayerSlots(InventoryPlayer inventoryplayer) {

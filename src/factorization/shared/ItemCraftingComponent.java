@@ -5,11 +5,11 @@ import factorization.shared.Core.TabType;
 
 
 public class ItemCraftingComponent extends ItemFactorization {
-    public ItemCraftingComponent(int id, String name) {
-        super(id, name, TabType.MATERIALS);
+    public ItemCraftingComponent(String name) {
+        super(name, TabType.MATERIALS);
     }
     
-    public ItemCraftingComponent(int id, String name, TabType type) {
-        super(id, name, type);
+    public ItemCraftingComponent(String name, TabType type) {
+        super(name, type);
     }
 }

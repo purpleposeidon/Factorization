@@ -2,7 +2,7 @@ package factorization.sockets;
 
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
@@ -21,7 +21,7 @@ public class BlockRenderSocketBase extends FactorizationBlockRender {
     }
 
     @Override
-    public void render(RenderBlocks rb) {
+    public boolean render(RenderBlocks rb) {
         ForgeDirection dir = ForgeDirection.EAST;
         TileEntitySocketBase socket;
         BlockRenderHelper block = BlockRenderHelper.instance;
@@ -46,6 +46,7 @@ public class BlockRenderSocketBase extends FactorizationBlockRender {
             block.renderForInventory(rb);
             GL11.glPopMatrix();
         }
+        return true;
     }
 
     @Override

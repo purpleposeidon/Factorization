@@ -1,6 +1,6 @@
 package factorization.crafting;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.inventory.InventoryCrafting;
@@ -18,11 +19,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapelessRecipes;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import factorization.api.Charge;
@@ -49,7 +50,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     Charge charge = new Charge(this);
     
     @Override
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         switch (dir) {
         case UP: return BlockIcons.cauldron_top;
         default: return BlockIcons.cauldron_side;
@@ -80,10 +81,10 @@ public class TileEntityMixer extends TileEntityFactorization implements
         progress = tag.getInteger("progress");
         speed = tag.getInteger("speed");
         readSlotsFromNBT(tag);
-        NBTTagList outBuffer = tag.getTagList("outBuffer");
+        NBTTagList outBuffer = tag.getTagList("outBuffer", Constants.NBT.TAG_COMPOUND);
         if (outBuffer != null) {
             for (int i = 0; i < outBuffer.tagCount(); i++) {
-                NBTBase base = outBuffer.tagAt(i);
+                NBTTagCompound base = outBuffer.getCompoundTagAt(i);
                 if (!(base instanceof NBTTagCompound)) {
                     continue;
                 }
@@ -94,9 +95,9 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
     
     @Override
-    public void onInventoryChanged() {
-        super.onInventoryChanged();
-        if (worldObj != null && worldObj.isRemote) {
+    public void markDirty() {
+        super.markDirty();
+        if (getWorldObj() != null && getWorldObj().isRemote) {
             return;
         }
         dirty = true;
@@ -110,7 +111,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         for (ItemStack is : outputBuffer) {
             FzUtil.spawnItemStack(here, is);
         }
-        onInventoryChanged();
+        markDirty();
     }
 
     @Override
@@ -149,7 +150,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
 
     @Override
-    public String getInvName() {
+    public String getInventoryName() {
         return "Mixer";
     }
 
@@ -200,7 +201,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     }
 
     @Override
-    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -405,7 +406,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         if (item == null) {
             return false;
         }
-        if (item == Item.paper || item == Item.book) {
+        if (item == Items.paper || item == Items.book) {
             return false;
         }
         /*if (is.getItemDamage() > 0xFF) {
@@ -415,7 +416,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
             //We're going to filter out items like:
             //  Logic matrix programmers
             //  Diamond drawplates
-            ItemStack container = FzUtil.normalize(item.getContainerItemStack(is));
+            ItemStack container = FzUtil.normalize(item.getContainerItem(is));
             if (container == null) {
                 return true;
             }
@@ -604,7 +605,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         outputBuffer.add(out);
         FzUtil.addInventoryToArray(craft, outputBuffer);
         FzUtil.addInventoryToArray(fakePlayer.inventory, outputBuffer);
-        onInventoryChanged();
+        markDirty();
     }
     
     boolean dumpBuffer() {
@@ -648,7 +649,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         progress += speed;
         if (getRemainingProgress() <= 0 || Core.cheat) {
             if (!recipeMatches(mr.inputs)) {
-                onInventoryChanged();
+                markDirty();
                 dirty = true;
                 progress = 0;
                 return;

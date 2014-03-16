@@ -1,38 +1,52 @@
 package factorization.misc;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.Unpooled;
+
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.INetworkManager;
-import net.minecraft.network.packet.Packet250CustomPayload;
-import cpw.mods.fml.common.network.IPacketHandler;
-import cpw.mods.fml.common.network.Player;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.FMLEventChannel;
+import cpw.mods.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 
-public class MiscNet implements IPacketHandler {
+public class MiscNet {
     public static final String tpsChannel = "fzmsc.tps";
+    public static final FMLEventChannel channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(tpsChannel);
     
     public MiscNet() {
         MiscellaneousNonsense.net = this;
+        channel.register(this);
     }
     
-    @Override
-    public void onPacketData(INetworkManager manager, Packet250CustomPayload packet, Player _player) {
-        EntityPlayer player = (EntityPlayer) _player;
-        if (!player.worldObj.isRemote) {
-            return;
-        }
-        if (tpsChannel.equals(packet.channel)) {
-            try {
-                ByteArrayInputStream bais = new ByteArrayInputStream(packet.data);
-                DataInputStream input = new DataInputStream(bais);
-                MiscellaneousNonsense.proxy.handleTpsReport(input.readFloat());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    
+    @SubscribeEvent
+    public void onPacketData(ClientCustomPacketEvent event) {
+        FMLProxyPacket packet = event.packet;
+        packet.payload().array();
+        try {
+            ByteBufInputStream input = new ByteBufInputStream(event.packet.payload());
+            MiscellaneousNonsense.proxy.handleTpsReport(input.readFloat());
+            input.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return;
     }
 
+   public static FMLProxyPacket makeTpsReportPacket(float tps) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            DataOutputStream output = new DataOutputStream(outputStream);
+            output.writeFloat(tps);
+            output.flush();
+            return new FMLProxyPacket(Unpooled.wrappedBuffer(outputStream.toByteArray()), tpsChannel);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

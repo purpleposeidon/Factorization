@@ -6,27 +6,24 @@ import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.IItemRenderer.ItemRenderType;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import factorization.api.Coord;
-import factorization.api.DeltaCoord;
 import factorization.api.ICoord;
 import factorization.api.VectorUV;
 import factorization.charge.WireRenderingCube;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 
-abstract public class FactorizationBlockRender /*implements ICoord*/ {
-    static Block metal = Block.obsidian;
-    static Block glass = Block.glowStone;
+abstract public class FactorizationBlockRender implements ICoord {
 
     public boolean world_mode, use_vertex_offset;
     public IBlockAccess w;
@@ -77,9 +74,9 @@ abstract public class FactorizationBlockRender /*implements ICoord*/ {
         }
     }
     
-    public abstract void render(RenderBlocks rb);
+    public abstract boolean render(RenderBlocks rb);
     public abstract FactoryType getFactoryType();
-    public void renderSecondPass(RenderBlocks rb) {}
+    public boolean renderSecondPass(RenderBlocks rb) { return false; }
     
     //@Override
     public Coord getCoord() {
@@ -138,11 +135,11 @@ abstract public class FactorizationBlockRender /*implements ICoord*/ {
         }
     }
     
-    protected void renderCauldron(RenderBlocks rb, Icon lid, Icon metal) {
+    protected void renderCauldron(RenderBlocks rb, IIcon lid, IIcon metal) {
         renderCauldron(rb, lid, metal, 1);
     }
     
-    protected void renderCauldron(RenderBlocks rb, Icon lid, Icon metal, float height) {
+    protected void renderCauldron(RenderBlocks rb, IIcon lid, IIcon metal, float height) {
         Tessellator tessellator = Tessellator.instance;
         BlockRenderHelper block = BlockRenderHelper.instance;
         block.setBlockBounds(0, 0, 0, 1, height, 1);
@@ -169,7 +166,7 @@ abstract public class FactorizationBlockRender /*implements ICoord*/ {
         }
     }
     
-    protected void renderPart(RenderBlocks rb, Icon texture, float b1, float b2, float b3, float b4, float b5, float b6) {
+    protected void renderPart(RenderBlocks rb, IIcon texture, float b1, float b2, float b3, float b4, float b5, float b6) {
         BlockFactorization block = Core.registry.factory_rendering_block;
         rb.setRenderBounds(b1, b2, b3, b4, b5, b6);
         block.setBlockBounds(b1, b2, b3, b4, b5, b6);
@@ -186,7 +183,7 @@ abstract public class FactorizationBlockRender /*implements ICoord*/ {
     }
 
     private void renderPartInvTexture(RenderBlocks renderblocks,
-            Block block, Icon texture) {
+            Block block, IIcon texture) {
         // This originally copied from RenderBlocks.renderBlockAsItem
         Tessellator tessellator = Tessellator.instance;
 
@@ -212,21 +209,6 @@ abstract public class FactorizationBlockRender /*implements ICoord*/ {
     
     static private RenderBlocks rb = new RenderBlocks();
 
-
-    private int getMixedBrightnessForBlock(IBlockAccess w, int x, int y, int z) {
-        return w.getLightBrightnessForSkyBlocks(x, y, z, Block.lightValue[w.getBlockId(x, y, z)]);
-        //Block b = Block.blocksList[w.getBlockId(x, y, z)];
-        //return w.getLightBrightnessForSkyBlocks(x, y, z, b.getLightValue(w, x, y, z));
-        //return par1IBlockAccess.getLightBrightnessForSkyBlocks(par2, par3, par4, getLightValue(par1IBlockAccess, par2, par3, par4));
-    }
-    
-    private int getAoBrightness(int a, int b, int c, int d) {
-        return rb.getAoBrightness(a, b, c, d);
-    }
-    
-    private float getAmbientOcclusionLightValue(IBlockAccess w, int x, int y, int z) {
-        return Block.stone.getAmbientOcclusionLightValue(w, x, y, z);
-    }
     
     static private ForgeDirection getFaceDirection(VectorUV[] vecs, VectorUV center) {
         VectorUV here = vecs[0].add(vecs[2]);
@@ -287,7 +269,7 @@ abstract public class FactorizationBlockRender /*implements ICoord*/ {
     protected void vertex(WireRenderingCube rc, float x, float y, float z, float u, float v) {
         //all units are in texels; center of the cube is the origin. Or, like... not the center but the texel that's (8,8,8) away from the corner is.
         //u & v are in texels
-        Icon wire = BlockIcons.wire;
+        IIcon wire = BlockIcons.wire;
         Tessellator.instance.addVertexWithUV(
                 this.x + 0.5 + x / 16F,
                 this.y + 0.5 + y / 16F,
@@ -295,7 +277,7 @@ abstract public class FactorizationBlockRender /*implements ICoord*/ {
                 wire.getInterpolatedU(u), wire.getInterpolatedV(v));
     }
     
-    public static void renderItemIcon(Icon icon) {
+    public static void renderItemIIcon(IIcon icon) {
         //Extracted from ItemRenderer.renderItem
         if (icon == null) {
             return;
@@ -323,7 +305,7 @@ abstract public class FactorizationBlockRender /*implements ICoord*/ {
     }
 
     public void renderMotor(RenderBlocks rb, float yoffset) {
-        Icon metal = BlockIcons.motor_texture;
+        IIcon metal = BlockIcons.motor_texture;
         //metal = 11;
         float d = 4.0F / 16.0F;
         float yd = -d + 0.003F;

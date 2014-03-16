@@ -138,8 +138,8 @@ public class ContainerPocket extends Container {
         }
 
         @Override
-        public String getInvName() {
-            return src.getInvName();
+        public String getInventoryName() {
+            return src.getInventoryName();
         }
 
         @Override
@@ -148,8 +148,8 @@ public class ContainerPocket extends Container {
         }
 
         @Override
-        public void onInventoryChanged() {
-            src.onInventoryChanged();
+        public void markDirty() {
+            src.markDirty();
             updateCraft();
         }
 
@@ -159,17 +159,17 @@ public class ContainerPocket extends Container {
         }
 
         @Override
-        public void openChest() {
-            src.openChest();
+        public void openInventory() {
+            src.openInventory();
         }
 
         @Override
-        public void closeChest() {
-            src.closeChest();
+        public void closeInventory() {
+            src.closeInventory();
         }
 
         @Override
-        public boolean isInvNameLocalized() {
+        public boolean hasCustomInventoryName() {
             return false;
         }
 
@@ -178,15 +178,24 @@ public class ContainerPocket extends Container {
             return true;
         }
     }
-
+    
+    boolean isWorking = false;
+    
     void updateMatrix() {
+        //NORELEASE: Was using an AT to access net.minecraft.inventory.InventoryCrafting.stackList directly.
+        //Test if we still work this way!
+        isWorking = true;
         int i = 0;
         for (Slot slot : craftingSlots) {
-            craftMatrix.stackList[i++] = slot.getStack();
+            craftMatrix.setInventorySlotContents(i++, slot.getStack());
         }
+        isWorking = false;
     }
 
     public void updateCraft() {
+        if (isWorking) {
+            return;
+        }
         updateMatrix();
         ItemStack result = CraftingManager.getInstance().findMatchingRecipe(craftMatrix, world);
         craftResult.setInventorySlotContents(0, result);
@@ -285,7 +294,7 @@ public class ContainerPocket extends Container {
                     }
                 }
                 if (held != null && held.stackSize > 0 && !player.worldObj.isRemote) {
-                    player.dropPlayerItem(held);
+                    player.dropPlayerItemWithRandomChoice(held, false);
                 }
             }
             detectAndSendChanges();

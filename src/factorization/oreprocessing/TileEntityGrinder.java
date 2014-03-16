@@ -1,15 +1,17 @@
 package factorization.oreprocessing;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.oredict.OreDictionary;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -23,7 +25,8 @@ import factorization.shared.FzUtil;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.shared.TileEntityFactorization;
 
-public class TileEntityGrinder extends TileEntityFactorization implements IChargeConductor { //NORELEASE: Remove when 1.7. If doing another 1.6 release, kill the textures/renderer?
+public class TileEntityGrinder extends TileEntityFactorization implements IChargeConductor {
+    //NORELEASE: Remove when 1.7. If doing another 1.6 release, kill the textures/renderer?
     ItemStack input, output;
     Charge charge = new Charge(this);
     int progress = 0;
@@ -55,7 +58,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
         if (slot == 1) {
             output = is;
         }
-        onInventoryChanged();
+        markDirty();
     }
 
     @Override
@@ -79,7 +82,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     }
 
     @Override
-    public String getInvName() {
+    public String getInventoryName() {
         return "Grinder";
     }
     
@@ -124,19 +127,12 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     int last_speed = 0;
 
     void shareSpeed() {
-        if (speed != last_speed) {
-            last_speed = speed;
-            broadcastMessage(null, MessageType.GrinderSpeed, speed);
-        }
+        
     }
 
     @Override
-    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
-            return true;
-        }
-        if (messageType == MessageType.GrinderSpeed) {
-            speed = input.readInt();
             return true;
         }
         return false;
@@ -317,7 +313,7 @@ public class TileEntityGrinder extends TileEntityFactorization implements ICharg
     
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         return BlockIcons.grinder_top;
     }
 }

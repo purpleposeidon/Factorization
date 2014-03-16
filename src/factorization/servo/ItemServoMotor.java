@@ -8,7 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.shared.Core;
@@ -18,8 +18,8 @@ import factorization.shared.ItemCraftingComponent;
 
 public class ItemServoMotor extends ItemCraftingComponent {
 
-    public ItemServoMotor(int par1) {
-        super(par1, "servo/servo");
+    public ItemServoMotor() {
+        super("servo/servo");
         Core.tab(this, TabType.SERVOS);
         setMaxStackSize(16);
     }

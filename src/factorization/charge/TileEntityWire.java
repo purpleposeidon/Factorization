@@ -1,17 +1,18 @@
 package factorization.charge;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Charge;
@@ -150,7 +151,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
         if (!is_supported() /*&& !find_support()*/ ) {
             Core.registry.factory_block.dropBlockAsItem(worldObj, xCoord, yCoord, zCoord, BlockClass.Wire.md, 0);
             Coord here = getCoord();
-            here.setId(0);
+            here.setAir();
             here.rmTE();
         }
     }
@@ -234,7 +235,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     }
 
     @Override
-    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -251,7 +252,7 @@ public class TileEntityWire extends TileEntityCommon implements IChargeConductor
     
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         return BlockIcons.wire;
     }
 }

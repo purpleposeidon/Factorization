@@ -9,8 +9,9 @@ import java.util.List;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.notify.Notify;
 import factorization.notify.Notify.Style;
@@ -322,11 +323,11 @@ public class CompressionState {
             }
             switch (mode) {
             case PICKED:
-                cell.setId(0);
+                cell.setAir();
                 break;
             case BREAK:
                 leftOvers.stackSize--;
-                cell.setId(0);
+                cell.setAir();
                 break;
             case BARREL:
                 //leftOvers.stackSize = 0;
@@ -344,7 +345,7 @@ public class CompressionState {
                         break;
                     }
                 }
-                cell.setId(0);
+                cell.setAir();
                 return craftRes;
             }
             List<ItemStack> ret = new ArrayList(1);
@@ -495,7 +496,7 @@ public class CompressionState {
                         if (is.getItemDamage() > is.getMaxDamage()) {
                             break;
                         }
-                        is = it.getContainerItemStack(is);
+                        is = it.getContainerItem(is);
                         if (is == null || is.stackSize == 0 || is.getItemDamage() == origDamage || is.getItem() != it) {
                             break;
                         }
@@ -543,7 +544,7 @@ public class CompressionState {
                     if (containerItem[i]) {
                         ItemStack got = craftingGrid[i];
                         if (got != null) {
-                            craftingGrid[i] = got.getItem().getContainerItemStack(got);
+                            craftingGrid[i] = got.getItem().getContainerItem(got);
                         }
                     }
                 }

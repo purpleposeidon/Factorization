@@ -1,15 +1,15 @@
 package factorization.charge;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -19,8 +19,8 @@ import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
-import factorization.shared.TileEntityCommon;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityCommon;
 
 public class TileEntityMirror extends TileEntityCommon {
     Coord reflection_target = null;
@@ -86,7 +86,7 @@ public class TileEntityMirror extends TileEntityCommon {
     }
 
     boolean hasSun() {
-        boolean raining = worldObj.isRaining() && worldObj.getBiomeGenForCoords(xCoord, yCoord).rainfall > 0;
+        boolean raining = getWorldObj().isRaining() && getWorldObj().getBiomeGenForCoords(xCoord, yCoord).rainfall > 0;
         return getCoord().canSeeSky() && worldObj.isDaytime() && !raining;
     }
 
@@ -110,17 +110,16 @@ public class TileEntityMirror extends TileEntityCommon {
     }
 
     @Override
-    public Packet getAuxillaryInfoPacket() {
+    public FMLProxyPacket getDescriptionPacket() {
         return getDescriptionPacketWith(MessageType.MirrorDescription, target_rotation, getTargetInfo());
     }
 
     @Override
-    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        switch (messageType) {
-        case MessageType.MirrorDescription:
+        if (messageType == MessageType.MirrorDescription) {
             target_rotation = input.readInt();
             getCoord().redraw();
             gotten_info_packet = true;
@@ -282,13 +281,12 @@ public class TileEntityMirror extends TileEntityCommon {
             if (bx == xCoord && bz == zCoord) {
                 return true;
             }
-            int id = worldObj.getBlockId(bx, yCoord, bz);
-            Block b = Block.blocksList[id];
+            final Block b = worldObj.getBlock(bx, yCoord, bz);
             boolean air_like = false;
             if (b == null) {
                 air_like = true;
             } else {
-                air_like = b.isAirBlock(worldObj, bx, yCoord, bz);
+                air_like = b.isAir(worldObj, bx, yCoord, bz);
                 air_like |= b.getCollisionBoundingBoxFromPool(worldObj, bx, yCoord, bz) == null;
             }
             if (!air_like) {
@@ -307,7 +305,7 @@ public class TileEntityMirror extends TileEntityCommon {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         return BlockIcons.mirror_front;
     }
     

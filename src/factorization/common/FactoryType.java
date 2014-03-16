@@ -35,32 +35,29 @@ import factorization.sockets.fanturpeller.GeneratePower;
 import factorization.sockets.fanturpeller.MixCrafting;
 import factorization.sockets.fanturpeller.PumpLiquids;
 import factorization.sockets.fanturpeller.SocketFanturpeller;
-import factorization.weird.TileEntityBarrel;
 import factorization.weird.TileEntityDayBarrel;
-import factorization.wrath.TileEntityRouter;
-import factorization.wrath.TileEntityWrathFire;
 import factorization.wrath.TileEntityWrathLamp;
 
 public enum FactoryType {
     //Traced here is the history of Factorization.
-    ROUTER(0, true, TileEntityRouter.class, "factory_router"), // Send/retrieve items from connected inventories
+    //0 -- This used to be ROUTER
     //1 -- This used to be CUTTER
     //2 -- This used to be MAKER
     STAMPER(3, true, TileEntityStamper.class, "factory_stamper"), // Crafts craft packets, and outputs results
     //4 -- This used to be QUEUE
-    BARREL(5, false, TileEntityBarrel.class, "factory_barrel"), // Store huge quantities of identical items
+    //5 -- This used to be BARREL
     LAMP(6, false, TileEntityWrathLamp.class, "factory_lamp"), //spawn a bunch of AIR blocks around and below
     //7 -- this was the BlockDarkIron, which got moved.
     PACKAGER(8, true, STAMPER.gui, TileEntityPackager.class, "factory_packager"), //crafts its input as a 3x3 or 2x2
     //9 -- This used to be SENTRYDEMON
-    WRATHFIRE(10, false, TileEntityWrathFire.class, "factory_fire"), //burn things
+    //10 -- This used to be WRATHFIRE
     SLAGFURNACE(11, true, TileEntitySlagFurnace.class, "factory_slag"), //get extra ore output
     BATTERY(12, false, TileEntityBattery.class, "factory_battery"),
     //13 -- This used to be SOLARTURBINE
     LEADWIRE(14, false, TileEntityWire.class, "factory_solder"),
     HEATER(15, false, TileEntityHeater.class, "factory_heater"), //work furnaces without fuel
     MIRROR(16, false, TileEntityMirror.class, "factory_mirror"), //reflect sunlight onto IReflectionTargets
-    GRINDER(17, true, TileEntityGrinder.class, "factory_grinder"), //grind
+    GRINDER(17, true, TileEntityGrinder.class, "factory_grinder"), //grind.
     MIXER(18, true, TileEntityMixer.class, "factory_mixer"), //crafts its input as shapeless recipes of 2-4 ingredients
     CRYSTALLIZER(19, true, TileEntityCrystallizer.class, "factory_crystal"), //grow metallic crystals
     //20 -- Used to be GREENWARE
@@ -76,7 +73,7 @@ public enum FactoryType {
     DAYBARREL(30, false, TileEntityDayBarrel.class, "factory_barrel2"),
     CALIOMETRIC_BURNER(31, false, TileEntityCaliometricBurner.class, "factory_calory"),
     SOCKET_EMPTY(32, false, SocketEmpty.class, "fzsock_empty"),
-    SOCKET_LACERATOR(33, false, SocketLacerator.class, "fzsock_lacerate"),
+    SOCKET_LACERATOR(33, false, SocketLacerator.class, "fzsock_lacerate"), //NORELEASE: Needs to load the old Grinder TE name
     SOCKET_ROBOTHAND(34, false, SocketRobotHand.class, "fzsock_hand"),
     SOCKET_SHIFTER(35, true, SocketShifter.class, "fzsock_shift"),
     SOCKET_FANTURPELLER(36, true, SocketFanturpeller.class, "fzsock_fanturpeller"),
@@ -220,7 +217,7 @@ public enum FactoryType {
     }
 
     public boolean connectRedstone() {
-        return this == ROUTER || this == STAMPER || this == PACKAGER;
+        return this == STAMPER || this == PACKAGER;
     }
     
     public ItemStack asSocketItem() {

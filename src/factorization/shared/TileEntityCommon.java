@@ -1,6 +1,6 @@
 package factorization.shared;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,19 +9,22 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.network.packet.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.common.util.ForgeDirection;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -39,19 +42,13 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public abstract BlockClass getBlockClass();
     
     @SideOnly(Side.CLIENT)
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         return BlockIcons.error;
     }
 
     @Override
-    public Packet getDescriptionPacket() {
-        //Scar tissue. Lazy.
-        return getAuxillaryInfoPacket();
-    }
-    
-    public Packet getAuxillaryInfoPacket() {
-        Packet p = Core.network.TEmessagePacket(getCoord(), MessageType.FactoryType, getFactoryType().md, getExtraInfo(), getExtraInfo2());
-        p.isChunkDataPacket = true;
+    public FMLProxyPacket getDescriptionPacket() {
+        FMLProxyPacket p = Core.network.TEmessagePacket(getCoord(), MessageType.FactoryType, getFactoryType().md, getExtraInfo(), getExtraInfo2());
         return p;
     }
 
@@ -94,8 +91,8 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         customName = FzUtil.getCustomItemName(is);
     }
     
-    protected boolean removeBlockByPlayer(EntityPlayer player) {
-        return Core.registry.resource_block.removeBlockByPlayer(worldObj, player, xCoord, yCoord, zCoord);
+    protected boolean removedByPlayer(EntityPlayer player) {
+        return Core.registry.resource_block.removedByPlayer(worldObj, player, xCoord, yCoord, zCoord);
     }
 
     /** Called when there's a block update. */
@@ -130,14 +127,14 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     }
 
     public MovingObjectPosition collisionRayTrace(Vec3 startVec, Vec3 endVec) {
-        return Block.stone.collisionRayTrace(worldObj, xCoord, yCoord, zCoord, startVec, endVec);
+        return Blocks.stone.collisionRayTrace(worldObj, xCoord, yCoord, zCoord, startVec, endVec);
     }
 
     public void setBlockBounds(Block b) {
         b.setBlockBounds(0, 0, 0, 1, 1, 1);
     }
 
-    protected Packet getDescriptionPacketWith(Object... args) {
+    protected FMLProxyPacket getDescriptionPacketWith(Object... args) {
         Object[] suffix = new Object[args.length + 3];
         suffix[0] = getFactoryType().md;
         suffix[1] = getExtraInfo();
@@ -145,8 +142,8 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         for (int i = 0; i < args.length; i++) {
             suffix[i + 3] = args[i];
         }
-        Packet p = Core.network.TEmessagePacket(getCoord(), MessageType.FactoryType, suffix);
-        p.isChunkDataPacket = true;
+        FMLProxyPacket p = Core.network.TEmessagePacket(getCoord(), MessageType.FactoryType, suffix);
+        //p.isChunkDataPacket = true; NORELEASE: Is this needed? I'm thinking it isn't.
         return p;
     }
 
@@ -218,31 +215,31 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     protected final void readBuffer(String bufferName, NBTTagCompound tag, ArrayList<ItemStack> outputBuffer) {
         outputBuffer.clear();
         if (tag.hasKey(bufferName)) {
-            NBTTagList buffer = tag.getTagList(bufferName);
+            NBTTagList buffer = tag.getTagList(bufferName, Constants.NBT.TAG_COMPOUND);
             int bufferSize = buffer.tagCount();
             if (bufferSize > 0) {
                 for (int i = 0; i < bufferSize; i++) {
-                    final NBTTagCompound it = (NBTTagCompound) buffer.tagAt(i);
+                    final NBTTagCompound it = buffer.getCompoundTagAt(i);
                     outputBuffer.add(ItemStack.loadItemStackFromNBT(it));
                 }
             }
         }
     }
     
-    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         return false;
     }
 
-    public boolean handleMessageFromClient(int messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromClient(MessageType messageType, DataInput input) throws IOException {
         // There are no base attributes a client can edit
         return false;
     }
 
-    public void broadcastMessage(EntityPlayer who, int messageType, Object... msg) {
+    public void broadcastMessage(EntityPlayer who, MessageType messageType, Object... msg) {
         Core.network.broadcastMessage(who, getCoord(), messageType, msg);
     }
     
-    public void broadcastMessage(EntityPlayer who, Packet toSend) {
+    public void broadcastMessage(EntityPlayer who, FMLProxyPacket toSend) {
         Core.network.broadcastPacket(who, getCoord(), toSend);
     }
     
@@ -305,5 +302,6 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     
     public void representYoSelf() {
         MinecraftForge.EVENT_BUS.register(this);
+        FMLCommonHandler.instance().bus().register(this);
     }
 }

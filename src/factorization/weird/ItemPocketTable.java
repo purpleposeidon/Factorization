@@ -2,7 +2,7 @@ package factorization.weird;
 
 import java.util.List;
 
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -18,14 +18,14 @@ import factorization.shared.Core.TabType;
 
 public class ItemPocketTable extends ItemFactorization {
 
-    public ItemPocketTable(int id) {
-        super(id, "tool/pocket_crafting_table", TabType.TOOLS);
+    public ItemPocketTable() {
+        super("tool/pocket_crafting_table", TabType.TOOLS);
         setMaxStackSize(1);
         setFull3D();
     }
     
     @Override
-    public void registerIcons(IconRegister reg) {
+    public void registerIcons(IIconRegister reg) {
         super.registerIcons(reg);
         FactorizationTextureLoader.register(reg, ItemIcons.class, null, "factorization:");
     }

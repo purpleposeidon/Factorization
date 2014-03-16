@@ -8,11 +8,11 @@ import factorization.shared.FactorizationBlockRender;
 
 public class BlockRenderWire extends FactorizationBlockRender {
     @Override
-    public void render(RenderBlocks rb) {
+    public boolean render(RenderBlocks rb) {
         if (world_mode) {
             Tessellator.instance.setBrightness(Core.registry.factory_block.getMixedBrightnessForBlock(w, x, y, z));
             if (te == null) {
-                return;
+                return false;
             }
             for (WireRenderingCube rc : new WireConnections((TileEntityWire) te).getParts()) {
                 renderCube(rc);
@@ -22,6 +22,7 @@ public class BlockRenderWire extends FactorizationBlockRender {
                 renderCube(rc);
             }
         }
+        return true;
     }
 
     @Override

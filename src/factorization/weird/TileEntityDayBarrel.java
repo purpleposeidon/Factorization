@@ -1,35 +1,36 @@
 package factorization.weird;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.packet.Packet;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.FakePlayer;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.event.ForgeSubscribe;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.ChunkEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -54,8 +55,8 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     private ItemStack topStack;
     private int middleCount;
     private ItemStack bottomStack;
-    private static final ItemStack DEFAULT_LOG = new ItemStack(Block.wood);
-    private static final ItemStack DEFAULT_SLAB = new ItemStack(Block.planks);
+    private static final ItemStack DEFAULT_LOG = new ItemStack(Blocks.log);
+    private static final ItemStack DEFAULT_SLAB = new ItemStack(Blocks.planks);
     public ItemStack woodLog = DEFAULT_LOG.copy(), woodSlab = DEFAULT_SLAB.copy();
     int display_list = -1;
     boolean should_use_display_list = true;
@@ -130,7 +131,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     void putData(DataHelper data) {
         try {
             if (data.isReader()) {
-                item = new ItemStack(0, 0, 0);
+                item = new ItemStack((Item) null);
             }
             item = data.as(Share.VISIBLE, "item").putItemStack(item);
             int count = data.as(Share.VISIBLE, "count").putInt(getItemCount());
@@ -184,7 +185,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             if (upinv != null) {
                 ItemStack got = upinv.pull(item, 1, true);
                 if (got != null) {
-                    upi.onInventoryChanged();
+                    upi.markDirty();
                     taint(got);
                     changeItemCount(1);
                     updateStacks();
@@ -204,7 +205,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
                     ItemStack toPush = bottom_item.splitStack(1);
                     ItemStack got = downinv.push(toPush);
                     if (got == null) {
-                        downi.onInventoryChanged();
+                        downi.markDirty();
                         updateStacks();
                         cleanBarrel();
                         youve_changed_jim = true;
@@ -215,7 +216,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             }
         }
         if (youve_changed_jim) {
-            onInventoryChanged();
+            markDirty();
         }
     }
     
@@ -321,7 +322,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         if (middleCount == 0) {
             topStack = bottomStack = item = null;
             updateClients(MessageType.BarrelCount);
-            onInventoryChanged();
+            markDirty();
             return;
         }
         if (middleCount > getMaxSize() && !spammed && worldObj != null) {
@@ -339,7 +340,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         topStack.stackSize = bottomStack.stackSize = 0;
         updateStacks();
         updateClients(MessageType.BarrelCount);
-        onInventoryChanged();
+        markDirty();
     }
     
     @Override
@@ -442,7 +443,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     //Network stuff
     
-    Packet getPacket(int messageType) {
+    FMLProxyPacket getPacket(MessageType messageType) {
         if (messageType == NetworkFactorization.MessageType.BarrelItem) {
             return Core.network.TEmessagePacket(getCoord(), messageType, NetworkFactorization.nullItem(item), getItemCount());
         } else if (messageType == NetworkFactorization.MessageType.BarrelCount) {
@@ -453,15 +454,15 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         }
     }
     
-    void updateClients(int messageType) {
-        if (worldObj == null || worldObj.isRemote) {
+    void updateClients(MessageType messageType) {
+        if (getWorldObj() == null || getWorldObj().isRemote) {
             return;
         }
         broadcastMessage(null, getPacket(messageType));
     }
     
     @Override
-    public Packet getDescriptionPacket() {
+    public FMLProxyPacket getDescriptionPacket() {
         int count = getItemCount();
         ItemStack theItem = item;
         return getDescriptionPacketWith(MessageType.BarrelDescription,
@@ -474,7 +475,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     @Override
-    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -512,8 +513,8 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     //Inventory code
     
     @Override
-    public void onInventoryChanged() {
-        super.onInventoryChanged();
+    public void markDirty() {
+        super.markDirty();
         cleanBarrel();
         updateStacks();
         int c = getItemCount();
@@ -613,7 +614,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
 
     @Override
-    public String getInvName() {
+    public String getInventoryName() {
         return "Barrel";
     }
 
@@ -764,7 +765,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     
     private static int last_hit_side = -1;
-    @ForgeSubscribe
+    @SubscribeEvent
     public void clickEvent(PlayerInteractEvent event) {
         if (event.entityPlayer.worldObj.isRemote) {
             return;
@@ -878,8 +879,8 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         } else {
             Sound.barrelPunt.playAt(src);
         }
-        src.removeTE();
-        src.setId(0);
+        src.rmTE();
+        src.setAir();
         if (newOrientation != FzOrientation.UNKNOWN) {
             this.orientation = newOrientation;
         }
@@ -931,9 +932,6 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
                 break;
             }
             EntityItem ei = at.spawnItem(is);
-            /*ei.motionX = orientation.top.offsetX * motion;
-            ei.motionY = orientation.top.offsetY * motion;
-            ei.motionZ = orientation.top.offsetZ * motion;*/
             spillage -= maxStackSize;
         }
         me.onInvChanged();
@@ -952,7 +950,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             info(entityplayer);
             return;
         }
-        if (ForgeHooks.canToolHarvestBlock(Block.wood, 0, entityplayer.getHeldItem())) {
+        if (ForgeHooks.canToolHarvestBlock(Blocks.log, 0, entityplayer.getHeldItem())) {
             return;
         }
         
@@ -1017,20 +1015,19 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         if (dir.offsetY != 0) {
-            if (woodSlab.itemID < Block.blocksList.length && Block.blocksList[woodSlab.itemID] != null) {
-                Block b = Block.blocksList[woodSlab.itemID];
-                return b.getIcon(0, woodSlab.getItemDamage());
+            Block ws = FzUtil.getBlock(woodSlab);
+            if (ws != null) {
+                return ws.getIcon(0, woodSlab.getItemDamage());
             }
             return woodSlab.getItem().getIcon(woodSlab, 0);
         }
-        Item theItem = woodLog.getItem();
-        if (theItem instanceof ItemBlock) {
-            Block b = Block.blocksList[((ItemBlock) theItem).getBlockID()];
-            return b.getIcon(2, woodLog.getItemDamage());
+        Block wl = FzUtil.getBlock(woodLog);
+        if (wl != null) {
+            return wl.getIcon(2, woodLog.getItemDamage());
         }
-        return theItem.getIcon(woodLog, 2);
+        return woodLog.getItem().getIcon(woodLog, 0);
     }
     
     @Override
@@ -1066,7 +1063,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         NBTTagCompound tag = FzUtil.getTag(barrel_item);
         tag.setTag("log", FzUtil.item2tag(log));
         tag.setTag("slab", FzUtil.item2tag(slab));
-        int dmg = log.itemID*16 + log.getItemDamage();
+        int dmg = FzUtil.getId(log)*16 + log.getItemDamage();
         dmg %= 1000;
         dmg *= 10;
         dmg += type.ordinal();
@@ -1082,10 +1079,9 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     static {
-        make(Type.CREATIVE, new ItemStack(Block.bedrock), new ItemStack(Block.blockDiamond));
+        make(Type.CREATIVE, new ItemStack(Blocks.bedrock), new ItemStack(Blocks.diamond_block));
     }
     
-    static ItemStack silkTouch = Item.enchantedBook.getEnchantedItemStack(new EnchantmentData(Enchantment.silkTouch, 1));
     public static void makeRecipe(ItemStack log, ItemStack slab) {
         ItemStack normal = make(Type.NORMAL, log, slab);
         Core.registry.recipe(normal,
@@ -1100,24 +1096,24 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
                 "XXX",
                 "XOX",
                 "XXX",
-                'X', Block.web,
+                'X', Blocks.web,
                 'O', normal);
         Core.registry.recipe(make(Type.HOPPING, log, slab),
                 "Y",
                 "0",
                 "Y",
-                'Y', Block.hopperBlock,
+                'Y', Blocks.hopper,
                 '0', normal);
         Core.registry.recipe(make(Type.LARGER, log, slab),
                 "0",
                 "Y",
                 "0",
                 '0', normal,
-                'Y', Block.hopperBlock);
+                'Y', Blocks.hopper);
         Core.registry.recipe(make(Type.STICKY, log, slab),
                 "*",
                 "0",
-                '*', Item.slimeBall,
+                '*', Items.slime_ball,
                 '0', normal);
     }
     
@@ -1211,9 +1207,9 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     boolean broken_with_silk_touch = false;
     
     @Override
-    protected boolean removeBlockByPlayer(EntityPlayer player) {
+    protected boolean removedByPlayer(EntityPlayer player) {
         broken_with_silk_touch = EnchantmentHelper.getSilkTouchModifier(player);
-        return super.removeBlockByPlayer(player);
+        return super.removedByPlayer(player);
     }
     
     static ArrayList<Integer> finalizedDisplayLists = new ArrayList();
@@ -1247,7 +1243,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         display_list = -1;
     }
     
-    @ForgeSubscribe
+    @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void removeUnloadedDisplayLists(ChunkEvent.Unload event) {
         if (!event.world.isRemote) return;
@@ -1261,8 +1257,16 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         }
     }
     
+    private static int iterateDelay = 0;
+    @SubscribeEvent
     @SideOnly(Side.CLIENT)
-    public static void iterateForFinalizedBarrels() {
+    public void iterateForFinalizedBarrels(ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) return;
+        if (iterateDelay > 0) {
+            iterateDelay--;
+            return;
+        }
+        iterateDelay = 60*20;
         synchronized (finalizedDisplayLists) {
             for (Integer i : finalizedDisplayLists) {
                 if (i == null) continue;

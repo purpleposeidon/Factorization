@@ -3,9 +3,10 @@ package factorization.servo.instructions;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
@@ -22,7 +23,7 @@ public class Trap extends Instruction {
 
     @Override
     protected ItemStack getRecipeItem() {
-        return new ItemStack(Block.chestTrapped);
+        return new ItemStack(Blocks.trapped_chest);
     }
 
     @Override
@@ -37,7 +38,7 @@ public class Trap extends Instruction {
     }
 
     @Override
-    public Icon getIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         return BlockIcons.servo$trap;
     }
 

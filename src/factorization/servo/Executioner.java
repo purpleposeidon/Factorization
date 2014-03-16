@@ -3,6 +3,7 @@ package factorization.servo;
 import java.io.IOException;
 import java.util.Iterator;
 
+import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.notify.Notify;
@@ -150,13 +151,13 @@ public class Executioner {
             Object o = ss.pop();
             if (o instanceof Instruction) {
                 rail.decoration = (Instruction) ((Instruction) o).copyComponent();
-                rail.sendDescriptionPacket();
+                new Coord(rail).markBlockForUpdate();
             } else if (o instanceof Integer) {
                 int val = (Integer) o;
                 IntegerValue iv = new IntegerValue();
                 iv.setVal(val);
                 rail.decoration = iv;
-                rail.sendDescriptionPacket();
+                new Coord(rail).markBlockForUpdate();
             } else {
                 motor.putError("Can't write " + o + ", sorry!");
             }

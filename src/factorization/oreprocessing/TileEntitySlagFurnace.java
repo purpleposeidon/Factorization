@@ -1,6 +1,6 @@
 package factorization.oreprocessing;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -10,15 +10,15 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityFurnace;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
-import factorization.shared.TileEntityFactorization;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityFactorization;
 
 public class TileEntitySlagFurnace extends TileEntityFactorization {
     ItemStack furnaceItemStacks[] = new ItemStack[4];
@@ -40,7 +40,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     }
 
     @Override
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         if (draw_active > 0 && facing_direction == dir.ordinal()) {
             return BlockIcons.machine$slag_furnace_face_on;
         }
@@ -55,11 +55,11 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     @Override
     public void setInventorySlotContents(int i, ItemStack is) {
         furnaceItemStacks[i] = is;
-        onInventoryChanged();
+        markDirty();
     }
 
     @Override
-    public String getInvName() {
+    public String getInventoryName() {
         return "Slag Furnace";
     }
 
@@ -145,7 +145,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
                     --this.furnaceItemStacks[fuel].stackSize;
 
                     if (this.furnaceItemStacks[fuel].stackSize == 0) {
-                        this.furnaceItemStacks[fuel] = this.furnaceItemStacks[fuel].getItem().getContainerItemStack(furnaceItemStacks[fuel]);
+                        this.furnaceItemStacks[fuel] = this.furnaceItemStacks[fuel].getItem().getContainerItem(furnaceItemStacks[fuel]);
                     }
                 }
             }
@@ -172,7 +172,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
         }
 
         if (invChanged) {
-            onInventoryChanged();
+            markDirty();
         }
     }
 
@@ -295,7 +295,9 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
             }
             if (o instanceof Block) {
                 Block b = (Block) o;
-                return new ItemStack(Item.itemsList[b.blockID]);
+                Item it = FzUtil.getItem(b);
+                if (it == null) return null;
+                return new ItemStack(it);
             }
             if (o instanceof Item) {
                 return new ItemStack((Item) o);
@@ -314,7 +316,7 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
     }
 
     @Override
-    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             if (messageType == MessageType.DrawActive) {
                 getCoord().updateLight();

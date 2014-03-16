@@ -1,9 +1,6 @@
 package factorization.servo;
 
-import static factorization.shared.TileEntityCommon.full_rotation_array;
-
 import java.util.HashMap;
-import java.util.Map;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.IInventory;
@@ -13,17 +10,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
-import net.minecraftforge.common.ForgeDirection;
-
-import org.bouncycastle.util.Arrays;
-
-import cpw.mods.fml.common.registry.GameData;
+import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
-import cpw.mods.fml.common.registry.ItemData;
-import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -40,7 +31,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     private boolean putting_nbt = false;
     private byte redstone_cache = -1;
     
-    static short[] itemId2modIndex = new short[Item.itemsList.length];
+    static short[] itemId2modIndex = new short[32000 /* NORELEASE this the right way to store stuff? Items.itemsList.length */];
     
     TileEntity cached_te = null;
     Entity cached_ent = null;
@@ -124,12 +115,12 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             }
             return false;
         }
-        if (a.itemID != b.itemID) {
+        if (a.getItem() != b.getItem()) {
             //Compare on mods
-            short aId = itemId2modIndex[a.itemID];
-            short bId = itemId2modIndex[b.itemID];
+            short aId = itemId2modIndex[FzUtil.getId(a)];
+            short bId = itemId2modIndex[FzUtil.getId(b)];
             if (aId == bId && aId != 0) {
-                return itemId2modIndex[stranger.itemID] == aId;
+                return itemId2modIndex[FzUtil.getId(stranger)] == aId;
             }
             //Compare on Item class
             Class ca = a.getItem().getClass(), cb = b.getItem().getClass();
@@ -156,7 +147,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             }
             return true; //all 3 names were identical
         }
-        if (a.itemID != stranger.itemID) {
+        if (a != stranger) {
             return false; //It doesn't match! How could we have been so silly as to not notice?
         }
         int mda = a.getItemDamage(), mdb = b.getItemDamage(), md_stranger = stranger.getItemDamage();
@@ -235,7 +226,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     }
     
     IInventory getRecursiveTarget() {
-        if (_beginRecursion() || putting_nbt || worldObj == null || worldObj.isRemote) {
+        if (_beginRecursion() || putting_nbt || getWorldObj() == null || getWorldObj().isRemote) {
             return null;
         }
         ForgeDirection facing = getFacing();
@@ -253,7 +244,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             }
             cached_ent = null;
         }
-        TileEntity te = worldObj.getBlockTileEntity(xCoord + facing.offsetX, yCoord + facing.offsetY, zCoord + facing.offsetZ);
+        TileEntity te = worldObj.getTileEntity(xCoord + facing.offsetX, yCoord + facing.offsetY, zCoord + facing.offsetZ);
         if (te instanceof IInventory) {
             cached_te = te;
             return FzUtil.openDoubleChest((IInventory) te, true);
@@ -317,7 +308,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     }
 
     @Override
-    public String getInvName() {
+    public String getInventoryName() {
         return "Parasieve";
     }
 
@@ -346,7 +337,8 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             }
             side = facing_direction;
             if (target instanceof ISidedInventory) {
-                int[] ret = Arrays.clone(((ISidedInventory)target).getAccessibleSlotsFromSide(side));
+                int[] slotList = ((ISidedInventory)target).getAccessibleSlotsFromSide(side);
+                int[] ret = java.util.Arrays.copyOf(slotList, slotList.length);
                 for (int i = 0; i < ret.length; i++) {
                     ret[i] += filters.length;
                 }
@@ -412,7 +404,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
 
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         ForgeDirection face = getFacing();
         if (dir == face) {
             return BlockIcons.parasieve_front;
@@ -511,14 +503,14 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     }
     
     @Override
-    public void onInventoryChanged() {
-        super.onInventoryChanged();
+    public void markDirty() {
+        super.markDirty();
         try {
             IInventory inv = getRecursiveTarget();
             if (inv == null) {
                 return;
             }
-            inv.onInventoryChanged();
+            inv.markDirty();
         } finally {
             endRecursion();
         }
@@ -538,7 +530,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             if (inv == null) {
                 return;
             }
-            super.onInventoryChanged();
+            super.markDirty();
         } finally {
             endRecursion();
         }
@@ -550,15 +542,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
         Core.logFine("[parasieve] Classifying items");
         HashMap<String, Short> modMap = new HashMap();
         short seen = 1;
-        Map<Integer, ItemData> dataMap = null;
-        try {
-            dataMap = (Map<Integer, ItemData>) ReflectionHelper.getPrivateValue(GameData.class, null, "idMap");
-        } catch (Throwable e) {
-            e.printStackTrace();
-            Core.logFine("[parasieve] Reflection failed!");
-            return;
-        }
-        for (Item item : Item.itemsList) {
+        for (Item item : (Iterable<Item>) Item.itemRegistry) {
             if (item == null) {
                 continue;
             }
@@ -566,10 +550,6 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             String modName = null;
             if (ui != null) {
                 modName = ui.modId;
-            }
-            if (modName == null && dataMap != null) {
-                ItemData id = dataMap.get(item.itemID);
-                modName = id.getModId();
             }
             if (modName == null) {
                 modName = "vanilla?";
@@ -580,7 +560,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
                 val = seen;
                 seen++;
             }
-            itemId2modIndex[item.itemID] = val;
+            itemId2modIndex[FzUtil.getId(item)] = val;
         }
         Core.logFine("[parasieve] Done");
     }

@@ -1,8 +1,9 @@
 package factorization.wrath;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import factorization.common.FactoryType;
 import factorization.common.ResourceType;
 import factorization.shared.BlockFactorization;
@@ -12,7 +13,7 @@ import factorization.shared.FactorizationBlockRender;
 public class BlockRenderLamp extends FactorizationBlockRender {
 
     @Override
-    public void render(RenderBlocks rb) {
+    public boolean render(RenderBlocks rb) {
         float s = 1F / 16F;
         float p = 1F / 64F;
         float trim_out = BlockFactorization.lamp_pad;
@@ -21,8 +22,8 @@ public class BlockRenderLamp extends FactorizationBlockRender {
         float glass_ver = trim_in; //trim_in + 1F / 128F;
         float panel = trim_out + s; //trim_in + s * 0;
         BlockFactorization block = Core.registry.factory_block;
-        Icon metal = Core.registry.resource_block.getIcon(0, ResourceType.DARKIRONBLOCK.md);
-        Icon glass = Block.glass.getBlockTextureFromSide(0);
+        IIcon metal = Core.registry.resource_block.getIcon(0, ResourceType.DARKIRONBLOCK.md);
+        IIcon glass = Blocks.glass.getBlockTextureFromSide(0);
         //glass
         renderPart(rb, glass, glass_mid, glass_ver, glass_mid, 1 - glass_mid, 1 - glass_ver, 1 - glass_mid);
         //corners
@@ -36,8 +37,9 @@ public class BlockRenderLamp extends FactorizationBlockRender {
         //knob
         renderPart(rb, metal, panel, 1 - trim_out, panel, 1 - panel, 1 - trim_out + s * 1, 1 - panel);
         renderPart(rb, metal, panel, trim_out - s * 1, panel, 1 - panel, trim_out, 1 - panel);
-
+        
         //TODO: Handle. From the top, a side, or the ground.
+        return true;
     }
     
     @Override

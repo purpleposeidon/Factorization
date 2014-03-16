@@ -3,10 +3,10 @@ package factorization.servo.instructions;
 import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -19,7 +19,7 @@ public class SetDirection extends Instruction {
     ForgeDirection dir = ForgeDirection.UP;
     
     @Override
-    public Icon getIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         if (side == ForgeDirection.UNKNOWN) {
             return BlockIcons.servo$set_direction.side_W;
         }
@@ -58,7 +58,7 @@ public class SetDirection extends Instruction {
     
     @Override
     protected ItemStack getRecipeItem() {
-        return new ItemStack(Item.arrow);
+        return new ItemStack(Items.arrow);
     }
 
 }

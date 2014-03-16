@@ -2,30 +2,28 @@ package factorization.shared;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiErrorScreen;
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatMessageComponent;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
-import net.minecraftforge.common.ForgeVersion;
 import net.minecraftforge.common.MinecraftForge;
-import cpw.mods.fml.client.CustomModLoadingErrorDisplayException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
@@ -33,15 +31,12 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import factorization.api.ChargeMetalBlockConductance;
 import factorization.charge.TileEntitySolarBoiler;
 import factorization.common.FactorizationProxy;
 import factorization.common.FactoryType;
@@ -51,15 +46,9 @@ import factorization.compat.CompatManager;
 import factorization.docs.DocumentationModule;
 import factorization.oreprocessing.FactorizationOreProcessingHandler;
 import factorization.servo.ServoMotor;
-import factorization.wrath.TileEntityWrathFire;
 import factorization.wrath.TileEntityWrathLamp;
-import factorization.wrath.TileEntityWrathLamp.RelightTask;
 
 @Mod(modid = Core.modId, name = Core.name, version = Core.version)
-@NetworkMod(
-        clientSideRequired = true,
-        tinyPacketHandler = NetworkFactorization.class
-        )
 public class Core {
     //We should repackage stuff. And rename the API package possibly.
     public static final String modId = "factorization";
@@ -71,6 +60,8 @@ public class Core {
         fzconfig = new FzConfig();
         registry = new Registry();
         foph = new FactorizationOreProcessingHandler();
+        network = new NetworkFactorization();
+        netevent = new FzNetEventHandler();
     }
     
     // runtime storage
@@ -81,6 +72,7 @@ public class Core {
     @SidedProxy(clientSide = "factorization.common.FactorizationClientProxy", serverSide = "factorization.common.FactorizationProxy")
     public static FactorizationProxy proxy;
     public static NetworkFactorization network;
+    public static FzNetEventHandler netevent;
     public static int factory_rendertype = -1;
     public static boolean finished_loading = false;
 
@@ -97,38 +89,23 @@ public class Core {
     }
     static public boolean serverStarted = false;
 
-    void checkForge() {
-        int maxForge = 953;
-        if (ForgeVersion.getBuildVersion() > maxForge && ForgeVersion.getBuildVersion() != 965) {
-            //This needs to go away in 1.7.
-            if (System.getProperty("factorization.ignoreForgeVersion", "").equalsIgnoreCase("true")) {
-                Core.logSevere("Loading despite scary-looking forge version > " + maxForge);
-            } else {
-                String msg = "This forge is for pre-1.7 use only! The Forge version must be <= " + maxForge + ".\n" +
-                        "Get a compatible forge from http://files.minecraftforge.net/minecraftforge/index_legacy.html\n" +
-                        "You can force loading to continue by passing -Dfactorization.ignoreForgeVersion=true to the JVM.";
-                Core.logSevere(msg);
-                throw new RuntimeException(msg);
-            }
-        }
-    }
+    void checkForge() { }
 
     @EventHandler
     public void load(FMLPreInitializationEvent event) {
-        MinecraftForge.EVENT_BUS.register(registry);
+        initializeLogging(event.getModLog());
         checkForge();
+        MinecraftForge.EVENT_BUS.register(registry);
         fzconfig.loadConfig(event.getSuggestedConfigurationFile());
         registry.makeBlocks();
-        TickRegistry.registerTickHandler(registry, Side.SERVER);
         
-        NetworkRegistry.instance().registerGuiHandler(this, proxy);
+        NetworkRegistry.INSTANCE.registerGuiHandler(this, proxy);
 
         registerSimpleTileEntities();
         registry.makeItems();
         FzConfig.config.save();
         registry.makeRecipes();
         registry.setToolEffectiveness();
-        proxy.registerKeys();
         proxy.registerRenderers();
         
         FzConfig.config.save();
@@ -153,14 +130,13 @@ public class Core {
 
     @EventHandler
     public void modsLoaded(FMLPostInitializationEvent event) {
-        TileEntityWrathFire.setupBurning();
         TileEntitySolarBoiler.setupSteam();
         foph.addDictOres();
 
         registry.addOtherRecipes();
         (new CompatManager()).loadCompat();
-        ChargeMetalBlockConductance.setup();
         for (FactoryType ft : FactoryType.values()) ft.getRepresentative(); // Make sure everyone's registered to the EVENT_BUS
+        proxy.afterLoad();
         finished_loading = true;
     }
     
@@ -182,35 +158,29 @@ public class Core {
 
     }
     
-    public static Logger FZLogger = Logger.getLogger("FZ");
-    static {
-        FZLogger.setParent(FMLLog.getLogger());
-        logInfo("This is Factorization " + version);
-    }
-    
-    public static void logWarning(String format, Object... formatParameters) {
-        FZLogger.log(Level.WARNING, String.format(format,  formatParameters));
-    }
-    
-    public static void logInfo(String format, Object... formatParameters) {
-        FZLogger.log(Level.INFO, String.format(format, formatParameters));
-    }
-    
-    public static void logFine(String format, Object... formatParameters) {
-        FZLogger.log(dev_environ ? Level.INFO : Level.FINE, String.format(format, formatParameters));
+    private static Logger FZLogger = LogManager.getLogger("FZ-init");;
+    private void initializeLogging(Logger logger) {
+        Core.FZLogger = logger;
+        logInfo("This is Factorization %s", version);
     }
     
     public static void logSevere(String format, Object... formatParameters) {
-        FZLogger.log(Level.SEVERE, String.format(format, formatParameters));
+        FZLogger.error(String.format(format, formatParameters));
     }
-
-    public static void addBlockToCreativeList(List tab, Block block) {
-        ArrayList a = new ArrayList<Object>();
-        block.addCreativeItems(a);
-        for (Object o : a) {
-            if (o != null) {
-                tab.add(o);
-            }
+    
+    public static void logWarning(String format, Object... formatParameters) {
+        FZLogger.warn(String.format(format, formatParameters));
+    }
+    
+    public static void logInfo(String format, Object... formatParameters) {
+        FZLogger.info(String.format(format, formatParameters));
+    }
+    
+    public static void logFine(String format, Object... formatParameters) {
+        if (dev_environ) {
+            FZLogger.info(String.format(format, formatParameters));
+        } else {
+            FZLogger.debug(String.format(format, formatParameters));
         }
     }
     
@@ -249,7 +219,7 @@ public class Core {
     }
     
     private static void addTranslationHints(String hint_key, List list, String prefix) {
-        if (StatCollector.func_94522_b(hint_key)) {
+        if (StatCollector.canTranslate(hint_key)) {
             //if (st.containsTranslateKey(hint_key) /* containsTranslateKey = containsTranslateKey */ ) {
             String hint = StatCollector.translateToLocal(hint_key);
             if (hint != null) {
@@ -402,15 +372,15 @@ public class Core {
     }
     
     public static void sendChatMessage(boolean raw, ICommandSender sender, String msg) {
-        sender.sendChatToPlayer(raw ? ChatMessageComponent.createFromText(msg) : ChatMessageComponent.createFromTranslationKey(msg));
+        sender.addChatMessage(raw ? new ChatComponentText(msg) : new ChatComponentTranslation(msg));
     }
     
     public static void sendUnlocalizedChatMessage(ICommandSender sender, String format, Object... params) {
-        sender.sendChatToPlayer(ChatMessageComponent.createFromTranslationWithSubstitutions(format, params));
+        sender.addChatMessage(new ChatComponentTranslation(format, params));
     }
     
     @SideOnly(Side.CLIENT)
-    public static Icon texture(IconRegister reg, String name) {
+    public static IIcon texture(IIconRegister reg, String name) {
         name = name.replace('.', '/');
         return reg.registerIcon(texture_dir + name);
     }
@@ -425,7 +395,6 @@ public class Core {
     
     public static final ResourceLocation blockAtlas = new ResourceLocation("textures/atlas/blocks.png");
     public static final ResourceLocation itemAtlas = new ResourceLocation("textures/atlas/items.png");
-    public static Icon blockMissingIcon, itemMissingIcon;
     
     public static ResourceLocation getResource(String name) {
         return new ResourceLocation("factorization", name);

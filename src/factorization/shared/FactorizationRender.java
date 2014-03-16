@@ -31,18 +31,18 @@ public class FactorizationRender implements ISimpleBlockRenderingHandler {
         try {
             int md = world.getBlockMetadata(x, y, z);
             int renderPass = BlockFactorization.CURRENT_PASS; //MinecraftForgeClient.getRenderPass(); //Bluh
-            TileEntity te = world.getBlockTileEntity(x, y, z);
+            TileEntity te = world.getTileEntity(x, y, z);
             if (te instanceof TileEntityCommon) {
                 TileEntityCommon tec = (TileEntityCommon) te;
                 int fmd = tec.getFactoryType().md;
                 FactorizationBlockRender FBR = FactorizationBlockRender.getRenderer(fmd);
                 FBR.renderInWorld(world, x, y, z, fmd, tec);
                 if (renderPass == 0) {
-                    FBR.render(renderBlocks);
+                    return FBR.render(renderBlocks);
                 } else if (renderPass == 1) {
-                    FBR.renderSecondPass(renderBlocks);
+                    return FBR.renderSecondPass(renderBlocks);
                 }
-                return true;
+                return false;
             }
             if (block == Core.registry.lightair_block) {
                 if (md == BlockLightAir.air_md) {
@@ -57,7 +57,7 @@ public class FactorizationRender implements ISimpleBlockRenderingHandler {
     }
 
     @Override
-    public boolean shouldRender3DInInventory() {
+    public boolean shouldRender3DInInventory(int modelId) {
         return true;
     }
 

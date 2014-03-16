@@ -95,7 +95,6 @@ public class Charge implements IDataSerializable {
         }
         Iterable<Coord> neighbors = here.getNeighborsAdjacent();
         for (Coord n : neighbors) {
-            ChargeMetalBlockConductance.taintBlock(n);
             IChargeConductor neighbor = n.getTE(IChargeConductor.class);
             if (neighbor == null) {
                 continue;
@@ -123,7 +122,7 @@ public class Charge implements IDataSerializable {
      */
     public void update() {
         TileEntity te = (TileEntity) conductor;
-        World w = te.worldObj;
+        World w = te.getWorldObj();
         if (w.isRemote) {
             return;
         }

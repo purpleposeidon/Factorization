@@ -1,14 +1,15 @@
 package factorization.shared;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
@@ -25,12 +26,7 @@ public class BlockRenderHelper extends Block {
     public static BlockRenderHelper instance;
 
     public BlockRenderHelper() {
-        super(FzConfig.factory_block_id, Material.grass);
-        blocksList[blockID] = null;
-        // These three shouldn't strictly be necessary
-        opaqueCubeLookup[blockID] = false;
-        lightOpacity[blockID] = 0;
-        canBlockGrass[blockID] = false;
+        super(Material.grass);
         if (instance == null) {
             instance = this;
         }
@@ -67,11 +63,11 @@ public class BlockRenderHelper extends Block {
         return this;
     }
     
-    public Icon[] textures;
-    private Icon[] repetitionCache = new Icon[6];
+    public IIcon[] textures;
+    private IIcon[] repetitionCache = new IIcon[6];
     
     @SideOnly(Side.CLIENT)
-    public BlockRenderHelper useTexture(Icon texture) {
+    public BlockRenderHelper useTexture(IIcon texture) {
         textures = repetitionCache;
         for (int i = 0; i < textures.length; i++) {
             textures[i] = texture;
@@ -80,13 +76,13 @@ public class BlockRenderHelper extends Block {
     }
     
     @SideOnly(Side.CLIENT)
-    public BlockRenderHelper useTextures(Icon ...textures) {
+    public BlockRenderHelper useTextures(IIcon ...textures) {
         this.textures = textures;
         return this;
     }
     
     @SideOnly(Side.CLIENT)
-    public BlockRenderHelper setTexture(int i, Icon texture) {
+    public BlockRenderHelper setTexture(int i, IIcon texture) {
         textures = repetitionCache;
         textures[i] = texture;
         return this;
@@ -100,12 +96,12 @@ public class BlockRenderHelper extends Block {
     
     @SideOnly(Side.CLIENT)
     @Override
-    public Icon getIcon(int side, int md) {
-        Icon ret;
+    public IIcon getIcon(int side, int md) {
+        IIcon ret;
         try {
             ret = textures[side];
         } catch (NullPointerException e) {
-            textures = new Icon[6];
+            textures = new IIcon[6];
             return textures[side] = BlockIcons.error;
         }
         if (ret == null) {
@@ -125,8 +121,8 @@ public class BlockRenderHelper extends Block {
     
     @SideOnly(Side.CLIENT)
     public void renderForInventory(RenderBlocks renderblocks) {
-        // This originally copied from RenderBlocks.renderBlockAsItem
-        Icon texture;
+        // This originally copied from RenderBlocks.renderBlockAsItem (near the bottom)
+        IIcon texture;
         Tessellator tessellator = Tessellator.instance;
         tessellator.startDrawingQuads();
         renderblocks.setRenderBoundsFromBlock(this);
@@ -184,16 +180,16 @@ public class BlockRenderHelper extends Block {
     @SideOnly(Side.CLIENT)
     public BlockRenderHelper begin() {
         for (int i = 0; i < 6; i++) {
-            Icon faceIcon = textures[i];
-            if (faceIcon == null) {
+            IIcon faceIIcon = textures[i];
+            if (faceIIcon == null) {
                 continue;
             }
             currentFace = faceCache[i];
             faceVerts(i);
             for (int f = 0; f < currentFace.length; f++) {
                 VectorUV vert = currentFace[f];
-                vert.u = faceIcon.getInterpolatedU(vert.u*16);
-                vert.v = faceIcon.getInterpolatedV(vert.v*16);
+                vert.u = faceIIcon.getInterpolatedU(vert.u*16);
+                vert.v = faceIIcon.getInterpolatedV(vert.v*16);
             }
         }
         center.x = (minX + maxX)/2;
@@ -202,7 +198,7 @@ public class BlockRenderHelper extends Block {
         return this;
     }
     
-    public BlockRenderHelper beginNoIcons() {
+    public BlockRenderHelper beginNoIIcons() {
         for (int i = 0; i < 6; i++) {
             currentFace = faceCache[i]; //fullCache isn't static; we'll have two instances for server thread & client thread
             faceVerts(i);
@@ -315,6 +311,8 @@ public class BlockRenderHelper extends Block {
         return B;
     }
     
+    public float alpha = 1F;
+    
     @SideOnly(Side.CLIENT)
     public void renderRotated(Tessellator tess, int x, int y, int z) {
         for (int f = 0; f < faceCache.length; f++) {
@@ -328,7 +326,7 @@ public class BlockRenderHelper extends Block {
             float color_g = (color & 0x00FF00) >> 8;
             float color_b = (color & 0x0000FF);
             lighting /= 255F; /* because the colors go from 0x00 to 0xFF*/
-            tess.setColorOpaque_F(lighting*color_r, lighting*color_g, lighting*color_b);
+            tess.setColorRGBA_F(lighting*color_r, lighting*color_g, lighting*color_b, alpha);
             
             
             for (int i = 0; i < face.length; i++) {
@@ -439,6 +437,8 @@ public class BlockRenderHelper extends Block {
                 vert.v = vert.z;
             }
             break;
+            // In 1.7, MC side faces mirror each-other as well.
+            /*
         case 2: //-z
             for (int i = 0; i < currentFace.length; i++) {
                 VectorUV vert = currentFace[i];
@@ -446,6 +446,8 @@ public class BlockRenderHelper extends Block {
                 vert.v = 1 - vert.y;
             }
             break;
+            */
+        case 2:
         case 3: //+z
             for (int i = 0; i < currentFace.length; i++) {
                 VectorUV vert = currentFace[i];
@@ -454,12 +456,14 @@ public class BlockRenderHelper extends Block {
             }
             break;
         case 4: //-x
+        case 5:
             for (int i = 0; i < currentFace.length; i++) {
                 VectorUV vert = currentFace[i];
                 vert.u = vert.z;
                 vert.v = 1 - vert.y;
             }
             break;
+            /*
         case 5: //+x
             for (int i = 0; i < currentFace.length; i++) {
                 VectorUV vert = currentFace[i];
@@ -467,6 +471,7 @@ public class BlockRenderHelper extends Block {
                 vert.v = 1 - vert.y;
             }
             break;
+            */
         default:
             throw new RuntimeException("Invalid face number");
         }

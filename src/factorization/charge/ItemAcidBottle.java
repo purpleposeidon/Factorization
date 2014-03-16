@@ -7,20 +7,21 @@ import factorization.shared.ItemFactorization;
 import factorization.shared.Sound;
 import factorization.shared.Core.TabType;
 
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
 public class ItemAcidBottle extends ItemFactorization {
 
-    public ItemAcidBottle(int id) {
-        super(id, "acid", TabType.CHARGE);
+    public ItemAcidBottle() {
+        super("acid", TabType.CHARGE);
         setMaxStackSize(16);
         setHasSubtypes(true);
     }
@@ -31,13 +32,13 @@ public class ItemAcidBottle extends ItemFactorization {
     }
     
     @Override
-    public void registerIcons(IconRegister par1IconRegister) {
+    public void registerIcons(IIconRegister par1IIconRegister) {
         // Nada
     }
     
     @Override
-    public Icon getIconFromDamageForRenderPass(int damage, int renderPass) {
-        return Item.potion.getIconFromDamageForRenderPass(damage, renderPass);
+    public IIcon getIconFromDamageForRenderPass(int damage, int renderPass) {
+        return Items.potionitem.getIconFromDamageForRenderPass(damage, renderPass);
     }
     
     @Override
@@ -99,7 +100,7 @@ public class ItemAcidBottle extends ItemFactorization {
     }
     
     @Override
-    public void getSubItems(int id, CreativeTabs tab, List list) {
+    public void getSubItems(Item id, CreativeTabs tab, List list) {
         super.getSubItems(id, tab, list);
         list.add(Core.registry.aqua_regia);
     }

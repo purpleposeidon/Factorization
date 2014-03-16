@@ -7,11 +7,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
 import factorization.api.IActOnCraft;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
@@ -21,8 +24,8 @@ import factorization.shared.FzUtil.FzInv;
 
 public class ItemBagOfHolding extends ItemFactorization implements IActOnCraft {
     //XXX: Sending NBT data of all the items might not be a good idea. We might force it to not be shared, and use the damage value for the pearl count.
-    public ItemBagOfHolding(int id) {
-        super(id, "tool/bag_of_holding", TabType.TOOLS);
+    public ItemBagOfHolding() {
+        super("tool/bag_of_holding", TabType.TOOLS);
         setMaxStackSize(1);
     }
 
@@ -71,12 +74,12 @@ public class ItemBagOfHolding extends ItemFactorization implements IActOnCraft {
         if (tag == null) {
             return padRow(ret, colCount);
         }
-        NBTTagList items = tag.getTagList("row" + row);
+        NBTTagList items = tag.getTagList("row" + row, Constants.NBT.TAG_COMPOUND);
         if (items == null || items.tagCount() != colCount) {
             return padRow(ret, colCount);
         }
         for (int i = 0; i < items.tagCount(); i++) {
-            NBTTagCompound item = (NBTTagCompound) items.tagAt(i);
+            NBTTagCompound item = (NBTTagCompound) items.getCompoundTagAt(i);
             ret.add(ItemStack.loadItemStackFromNBT(item));
         }
         return padRow(ret, colCount);
@@ -84,7 +87,7 @@ public class ItemBagOfHolding extends ItemFactorization implements IActOnCraft {
 
     void writeRow(ItemStack is, ArrayList<ItemStack> items, int row) {
         init(is);
-        NBTTagList list = new NBTTagList("row" + row);
+        NBTTagList list = new NBTTagList();
         for (ItemStack i : items) {
             NBTTagCompound add = new NBTTagCompound();
             if (i != null) {
@@ -199,7 +202,7 @@ public class ItemBagOfHolding extends ItemFactorization implements IActOnCraft {
             return false;
         }
 
-        TileEntity te = world.getBlockTileEntity(x, y, z);
+        TileEntity te = world.getTileEntity(x, y, z);
         if (!(te instanceof IInventory)) {
             return false;
         }
@@ -305,7 +308,7 @@ public class ItemBagOfHolding extends ItemFactorization implements IActOnCraft {
                 }
                 bag = true;
             }
-            if (it == Item.enderPearl) {
+            if (it == Items.ender_pearl) {
                 if (pearl) {
                     bad = true;
                     break;
@@ -319,7 +322,7 @@ public class ItemBagOfHolding extends ItemFactorization implements IActOnCraft {
                 }
                 dark_iron = true;
             }
-            if (it == Item.leather) {
+            if (it == Items.leather) {
                 if (leather) {
                     bad = true;
                     break;

@@ -67,18 +67,18 @@ public enum Sound {
         if (w.isRemote) {
             return;
         }
-        Core.network.broadcastMessage(null, new Coord(w, x, y, z), MessageType.PlaySound, index, x, y, z);
+        Core.network.broadcastMessage(null, new Coord(w, x, y, z), MessageType.PlaySound, index);
     }
 
-    public static void receive(DataInput input) {
+    public static void receive(Coord coord, DataInput input) {
         //TODO: We can pass a coord here anyways!
         try {
-            int index = input.readInt(), x = input.readInt(), y = input.readInt(), z = input.readInt();
+            int index = input.readInt();
             EntityPlayer player = Core.proxy.getClientPlayer();
             if (player == null) {
                 return;
             }
-            sound.list.get(index).playAt(player.worldObj, x, y, z);
+            sound.list.get(index).playAt(coord);
         } catch (IOException e) {
             return;
         }
@@ -102,13 +102,10 @@ public enum Sound {
     }
 
     public void playAt(TileEntity ent) {
-        playAt(ent.worldObj, ent.xCoord, ent.yCoord, ent.zCoord);
+        playAt(ent.getWorldObj(), ent.xCoord, ent.yCoord, ent.zCoord);
     }
 
     public void play() {
         Core.proxy.playSoundFX(src, volume, pitch);
-        if (share) {
-            throw new RuntimeException("sharing simple play() not implemented");
-        }
     }
 }

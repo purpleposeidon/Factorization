@@ -3,10 +3,11 @@ package factorization.servo.instructions;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -27,7 +28,7 @@ public class Jump extends Instruction {
 
     @Override
     protected ItemStack getRecipeItem() {
-        return new ItemStack(Block.pistonBase);
+        return new ItemStack(Blocks.piston);
     }
 
     @Override
@@ -49,7 +50,7 @@ public class Jump extends Instruction {
     }
 
     @Override
-    public Icon getIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         if (mode == Executioner.JMP_NEXT_INSTRUCTION) {
             return BlockIcons.servo$jmp_instruction;
         } else if (mode == Executioner.JMP_NEXT_TILE) {

@@ -3,13 +3,14 @@ package factorization.charge;
 import java.util.ArrayList;
 
 import net.minecraft.block.Block;
-import net.minecraft.util.Icon;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.IIcon;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.VectorUV;
 
 public class WireRenderingCube {
-    Icon icon;
+    IIcon icon;
     public VectorUV corner, origin, axis;
     public double ul, vl;
     public float theta;
@@ -18,7 +19,7 @@ public class WireRenderingCube {
      * Creates a lovely cube used to render with. The vectors are in texels with the center of the tile as the origin. The rotations will also be done around
      * the center of the tile.
      */
-    public WireRenderingCube(Icon icon, VectorUV corner, VectorUV origin) {
+    public WireRenderingCube(IIcon icon, VectorUV corner, VectorUV origin) {
         if (origin == null) {
             origin = new VectorUV(0, 0, 0, 0, 0);
         }
@@ -28,7 +29,7 @@ public class WireRenderingCube {
         this.theta = 0;
 
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            setIcon(icon);
+            setIIcon(icon);
         }
     }
     
@@ -87,10 +88,10 @@ public class WireRenderingCube {
         return this;
     }
     
-    public void setIcon(Icon newIcon) {
-        icon = newIcon;
-        ul = newIcon.getMinU();
-        vl = newIcon.getMinV();
+    public void setIIcon(IIcon newIIcon) {
+        icon = newIIcon;
+        ul = newIIcon.getMinU();
+        vl = newIIcon.getMinV();
     }
 
     public VectorUV[] faceVerts(int face) {

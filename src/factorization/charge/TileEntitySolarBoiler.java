@@ -1,9 +1,10 @@
 package factorization.charge;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
@@ -48,7 +49,7 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
     }
     
     @Override
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         switch (dir) {
         case UP: return BlockIcons.boiler_top;
         default: return BlockIcons.boiler_side;
@@ -179,11 +180,11 @@ public class TileEntitySolarBoiler extends TileEntityCommon implements IReflecti
             //pull water from below
             Coord below = here.add(0, -1, 0);
             IFluidHandler tc = below.getTE(IFluidHandler.class);
-            boolean water_below = (below.is(Block.waterMoving) || below.is(Block.waterStill));
+            boolean water_below = (below.is(Blocks.flowing_water) || below.is(Blocks.water));
             water_below &= !here.isPowered();
             if (water_below && FzConfig.boilers_suck_water) {
                 if (below.getMd() == 0) {
-                    below.setId(0);
+                    below.setAir();
                     water.amount += 1000;
                     water.amount = Math.min(water.amount, waterTank.getCapacity());
                 }

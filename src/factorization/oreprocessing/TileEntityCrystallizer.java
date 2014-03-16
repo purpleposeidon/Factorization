@@ -1,14 +1,15 @@
 package factorization.oreprocessing;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
@@ -26,7 +27,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     public final static int topHeat = 300;
     
     @Override
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         switch (dir) {
         case UP: return BlockIcons.cauldron_top;
         default: return BlockIcons.cauldron_side;
@@ -70,11 +71,11 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         } else {
             inputs[slot] = is;
         }
-        onInventoryChanged();
+        markDirty();
     }
 
     @Override
-    public String getInvName() {
+    public String getInventoryName() {
         return "Crystallizer";
     }
 
@@ -193,7 +194,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
         share_delay--;
         if (share_delay <= 0 || current_state != last_state) {
             share_delay = 20 * 15;
-            broadcastMessage(null, getAuxillaryInfoPacket());
+            broadcastMessage(null, getDescriptionPacket());
             last_state = current_state;
         }
     }
@@ -305,12 +306,12 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
     }
 
     @Override
-    public Packet getAuxillaryInfoPacket() {
+    public FMLProxyPacket getDescriptionPacket() {
         return getDescriptionPacketWith(MessageType.CrystallizerInfo, null2fake(growing_crystal), null2fake(solution), progress);
     }
 
     @Override
-    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

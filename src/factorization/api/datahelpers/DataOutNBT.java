@@ -47,7 +47,7 @@ public class DataOutNBT extends DataHelperNBT {
         } else if (value instanceof String) {
             tag.setString(name, (String) value);
         } else if (value instanceof NBTTagCompound) {
-            tag.setCompoundTag(name, (NBTTagCompound)value);
+            tag.setTag(name, (NBTTagCompound) value);
         }
         return value;
     }

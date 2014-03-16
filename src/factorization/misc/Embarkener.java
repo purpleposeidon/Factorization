@@ -1,44 +1,43 @@
 package factorization.misc;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLog;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ForgeSubscribe;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import cpw.mods.fml.common.ITickHandler;
-import cpw.mods.fml.common.TickType;
-import cpw.mods.fml.common.registry.TickRegistry;
-import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
+import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
 
-public class Embarkener implements ITickHandler {
+public class Embarkener {
     public Embarkener() {
         if (FzConfig.embarken_wood) {
             addLogBarkRecipes();
             MinecraftForge.EVENT_BUS.register(this);
-            TickRegistry.registerTickHandler(this, Side.SERVER);
+            FMLCommonHandler.instance().bus().register(this);
         }
     }
 
-    int wood_rendertype = Block.wood.getRenderType();
+    int wood_rendertype = Blocks.log.getRenderType();
     boolean isWoodish(Block block) {
         if (block == null) return false;
-        return block.blockMaterial == Material.wood && block instanceof BlockLog && block.getRenderType() == wood_rendertype;
+        return block.getMaterial() == Material.wood && block instanceof BlockLog && block.getRenderType() == wood_rendertype;
     }
     
     void addLogBarkRecipes() {
         int count = 0;
-        for (Block block : Block.blocksList) {
+        for (Block block : (Iterable<Block>) Block.blockRegistry) {
             if (isWoodish(block)) {
                 for (int md = 0; md < 4; md++) {
                     count++;
@@ -77,7 +76,7 @@ public class Embarkener implements ITickHandler {
         }
     }
     
-    @ForgeSubscribe
+    @SubscribeEvent
     public void enbarkenWood(PlayerInteractEvent event) {
         //FIXME: A block place event would be nice...
         //Unfortunately it flashes on the client before it gets corrected.
@@ -85,38 +84,23 @@ public class Embarkener implements ITickHandler {
         if (event.entityPlayer == null) return;
         ItemStack is = event.entityPlayer.getHeldItem();
         if (is == null) return;
-        if (is.itemID >= Block.blocksList.length) return;
         if ((is.getItemDamage() & 0xC) != 0xC) return;
         if (!(is.getItem() instanceof ItemBlock)) return;
-        Block theBlock = Block.blocksList[is.itemID];
+        Block theBlock = Block.getBlockFromItem(is.getItem());
         if (!isWoodish(theBlock)) return;
         Coord target = new Coord(event.entityPlayer.worldObj, event.x, event.y, event.z);
         target.adjust(ForgeDirection.getOrientation(event.face));
         if (!target.isReplacable()) return;
         embarkenQueue.add(new EmbarkenEvent(target, is.stackSize, is, event.entityPlayer, (BlockLog) theBlock));
     }
-
-    @Override
-    public void tickStart(EnumSet<TickType> type, Object... tickData) {}
-
-    @Override
-    public void tickEnd(EnumSet<TickType> type, Object... tickData) {
+    
+    @SubscribeEvent
+    public void tickEnd(ServerTickEvent event) {
+        if (event.phase != Phase.END) return;
         for (EmbarkenEvent e : embarkenQueue) {
             e.handle();
         }
         embarkenQueue.clear();
-    }
-
-    EnumSet<TickType> myTicks = EnumSet.of(TickType.SERVER);
-    
-    @Override
-    public EnumSet<TickType> ticks() {
-        return myTicks;
-    }
-
-    @Override
-    public String getLabel() {
-        return "fz.misc.embarken";
     }
     
     

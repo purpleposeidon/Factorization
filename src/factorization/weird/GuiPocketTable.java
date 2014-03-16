@@ -38,7 +38,7 @@ public class GuiPocketTable extends GuiContainer {
         // I'd like it to say "Pocket Crafting", but that doesn't fit.
         // Could also make the tab a bit longer...
         // this.fontRenderer.drawString("Crafting", 178, 10, 4210752);
-        this.fontRenderer.drawString("PcktCrftng", 178, 10, 4210752);
+        this.fontRendererObj.drawString("PcktCrftng", 178, 10, 4210752);
         int color = 0xa0a0a0;
         for (int i = 0; i < FzConfig.pocketActions.length(); i++) {
             char key = FzConfig.pocketActions.charAt(i);
@@ -54,7 +54,7 @@ public class GuiPocketTable extends GuiContainer {
             }
             int d = 10;
             int y = -d*FzConfig.pocketActions.length() + d*i;
-            this.fontRenderer.drawString(key + ": " + msg, 8, y, color);
+            this.fontRendererObj.drawString(key + ": " + msg, 8, y, color);
         }
         // this.fontRenderer.drawString("123456789", 178, 10, 4210752);
         // we can fit only that much

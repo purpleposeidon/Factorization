@@ -1,6 +1,7 @@
 package factorization.shared;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraftforge.common.MinecraftForge;
 import factorization.api.Coord;
 
@@ -93,7 +94,7 @@ public enum BlockClass {
     }
 
     public BlockClass harvest(String tool, int level) {
-        MinecraftForge.setBlockHarvestLevel(this.block, this.md, tool, level);
+        this.block.setHarvestLevel(tool, level, this.md);
         return this;
     }
 

@@ -1,16 +1,16 @@
 package factorization.charge;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.Random;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Charge;
@@ -25,8 +25,8 @@ import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
-import factorization.shared.TileEntityCommon;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityCommon;
 
 public class TileEntityLeydenJar extends TileEntityCommon implements IChargeConductor {
     private Charge charge = new Charge(this);
@@ -140,7 +140,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
             }
         }
         if (change) {
-            onInventoryChanged();
+            markDirty();
             updateClients();
         }
     }
@@ -148,14 +148,14 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     int last_storage = -1;
     
     void updateClients() {
-        if (storage != last_storage || storage < 10 || last_storage < 10) {
+        if (storage != last_storage) {
             broadcastMessage(null, MessageType.LeydenjarLevel, storage);
             last_storage = storage;
         }
     }
     
     @Override
-    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -192,7 +192,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         return BlockIcons.leyden_metal;
     }
     
@@ -205,7 +205,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     }
     
     @Override
-    public Packet getDescriptionPacket() {
+    public FMLProxyPacket getDescriptionPacket() {
         return super.getDescriptionPacketWith(MessageType.LeydenjarLevel, storage);
     }
     

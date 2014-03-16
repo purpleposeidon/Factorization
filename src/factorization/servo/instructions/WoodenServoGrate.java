@@ -3,9 +3,10 @@ package factorization.servo.instructions;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -24,8 +25,8 @@ public class WoodenServoGrate extends Decorator {
     public void motorHit(ServoMotor motor) { }
 
     @Override
-    public Icon getIcon(ForgeDirection side) {
-        return Block.trapdoor.getBlockTextureFromSide(0);
+    public IIcon getIcon(ForgeDirection side) {
+        return Blocks.trapdoor.getBlockTextureFromSide(0);
     }
 
     @Override
@@ -55,6 +56,6 @@ public class WoodenServoGrate extends Decorator {
                 "#-#",
                 " # ",
                 '-', Core.registry.servorail_item,
-                '#', Block.trapdoor);
+                '#', Blocks.trapdoor);
     }
 }

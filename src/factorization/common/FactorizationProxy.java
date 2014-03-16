@@ -2,21 +2,15 @@ package factorization.common;
 
 import java.util.Random;
 
-import net.minecraft.inventory.Container;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.NetHandler;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.inventory.Container;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import net.minecraftforge.common.FakePlayer;
+import net.minecraftforge.common.util.FakePlayer;
 import cpw.mods.fml.common.network.IGuiHandler;
-import cpw.mods.fml.common.network.PacketDispatcher;
-import cpw.mods.fml.common.network.Player;
 import factorization.api.Coord;
 import factorization.crafting.ContainerMixer;
 import factorization.oreprocessing.ContainerCrystallizer;
@@ -37,7 +31,7 @@ public class FactorizationProxy implements IGuiHandler {
             return new ContainerPocket(player);
         }
 
-        TileEntity te = world.getBlockTileEntity(x, y, z);
+        TileEntity te = world.getTileEntity(x, y, z);
         if (!(te instanceof TileEntityFactorization)) {
             return null;
         }
@@ -68,20 +62,6 @@ public class FactorizationProxy implements IGuiHandler {
         return getContainer(ID, player, world, x, y, z);
     }
 
-    public String translateItemStack(ItemStack is) {
-        if (is == null) {
-            return "<null itemstack; bug?>";
-        }
-        String n = is.getItem().getItemDisplayName(is);
-        if (n == null) {
-            n = is.getItem().getUnlocalizedName();
-        }
-        if (n == null) {
-            n = "???";
-        }
-        return n;
-    }
-
     /** Tell the pocket crafting table to update the result */
     public void pokePocketCrafting() {
     }
@@ -94,9 +74,6 @@ public class FactorizationProxy implements IGuiHandler {
 
     public EntityPlayer getClientPlayer() {
         return null;
-    }
-
-    public void registerKeys() {
     }
 
     public void registerRenderers() {
@@ -124,4 +101,6 @@ public class FactorizationProxy implements IGuiHandler {
     public String getPocketCraftingTableKey() { return null; }
     
     public boolean isClientHoldingShift() { return false; }
+    
+    public void afterLoad() { }
 }

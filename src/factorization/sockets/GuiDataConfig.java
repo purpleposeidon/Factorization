@@ -14,7 +14,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 
 import org.lwjgl.input.Keyboard;
 
@@ -27,6 +27,7 @@ import factorization.api.datahelpers.DataValidator;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.shared.Core;
+import factorization.shared.FzNetDispatch;
 import factorization.shared.NetworkFactorization.MessageType;
 
 public class GuiDataConfig extends GuiScreen {
@@ -45,7 +46,7 @@ public class GuiDataConfig extends GuiScreen {
             super(id, xPos, yPos - 4, fontRenderer.getStringWidth(text) + 8, 20, text);
         }
 
-        public boolean isHovered() { return field_82253_i; }
+        public boolean isHovered() { return field_146123_n; }
     }
     
     class Field {
@@ -82,7 +83,7 @@ public class GuiDataConfig extends GuiScreen {
         UsefulButton button(int delta, String text) {
             UsefulButton button = new UsefulButton(delta, buttonPos, posY - 2, text);
             buttons.add(button);
-            buttonPos += fontRenderer.getStringWidth(button.displayString + 10);
+            buttonPos += fontRendererObj.getStringWidth(button.displayString + 10);
             return button;
         }
         
@@ -95,13 +96,13 @@ public class GuiDataConfig extends GuiScreen {
         }
         
         void renderLabel() {
-            drawString(fontRenderer, label, posLabel, posY, color);
+            drawString(fontRendererObj, label, posLabel, posY, color);
         }
         
         void renderControl(int mouseX, int mouseY) { }
         
         int getLabelWidth() {
-            return fontRenderer.getStringWidth(label) + 80;
+            return fontRendererObj.getStringWidth(label) + 80;
         }
         
         void mouseClick(int mouseX, int mouseY, boolean rightClick) {
@@ -163,14 +164,14 @@ public class GuiDataConfig extends GuiScreen {
             button(-10, "-10");
             button(-1, "-");
             labelPos = buttonPos;
-            buttonPos += fontRenderer.getStringWidth(transVal()) + 5;
+            buttonPos += fontRendererObj.getStringWidth(transVal()) + 5;
             button(1, "+");
             button(10, "+10");
         }
         
         @Override
         void renderControl(int mouseX, int mouseY) {
-            fontRenderer.drawStringWithShadow(transVal(), this.labelPos, posY, color);
+            fontRendererObj.drawString(transVal(), this.labelPos, posY, color);
         }
         
         @Override
@@ -365,7 +366,7 @@ public class GuiDataConfig extends GuiScreen {
         TextureManager tex = Minecraft.getMinecraft().renderEngine;
         tex.bindTexture(Core.itemAtlas);
         
-        Icon lmp = Core.registry.logicMatrixProgrammer.getIconFromDamage(0);
+        IIcon lmp = Core.registry.logicMatrixProgrammer.getIconFromDamage(0);
         
         int w = 256;
         int xSize = w, ySize = xSize;
@@ -457,9 +458,9 @@ public class GuiDataConfig extends GuiScreen {
         if (containingEntity == null) {
             Core.network.prefixTePacket(dos, here, MessageType.DataHelperEdit);
             ids.serialize("", dop);
-            Core.network.broadcastPacket(mc.thePlayer, here, Core.network.TEmessagePacket(baos));
+            Core.network.broadcastPacket(mc.thePlayer, here, FzNetDispatch.generate(baos));
         } else {
-            Core.network.prefixEntityPacket(dos, containingEntity, MessageType.DataHelperEdit);
+            Core.network.prefixEntityPacket(dos, containingEntity, MessageType.DataHelperEditOnEntity);
             ids.serialize("", dop);
             Core.network.broadcastPacket(mc.thePlayer, here, Core.network.entityPacket(baos));
         }

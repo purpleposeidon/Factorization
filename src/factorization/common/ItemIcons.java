@@ -1,18 +1,18 @@
 package factorization.common;
 
 import factorization.shared.FactorizationTextureLoader.Directory;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 
 public class ItemIcons {
-    public static Icon charge$crankshaft;
+    public static IIcon charge$crankshaft;
     
-    public static Icon wrath_particle;
+    public static IIcon wrath_particle;
     
     @Directory("craft")
-    public static Icon packet_complete, packet_incomplete;
+    public static IIcon packet_complete, packet_incomplete;
     
     @Directory("ceramics")
-    public static Icon move, reset, rotate_local, rotate_global, stretch, mold;
+    public static IIcon move, reset, rotate_local, rotate_global, stretch, mold;
     
-    public static Icon barrel_font;
+    public static IIcon barrel_font;
 }

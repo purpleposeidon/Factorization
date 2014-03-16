@@ -3,9 +3,10 @@ package factorization.servo.instructions;
 import java.io.IOException;
 
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
@@ -22,7 +23,7 @@ public class Dup extends Instruction {
 
     @Override
     protected ItemStack getRecipeItem() {
-        return new ItemStack(Item.egg);
+        return new ItemStack(Items.egg);
     }
 
     @Override
@@ -38,7 +39,7 @@ public class Dup extends Instruction {
     }
 
     @Override
-    public Icon getIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         return BlockIcons.servo$dup;
     }
 

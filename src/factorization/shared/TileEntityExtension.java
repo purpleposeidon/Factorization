@@ -1,6 +1,6 @@
 package factorization.shared;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.List;
 
@@ -9,13 +9,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.packet.Packet;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.EnumMovingObjectType;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.DeltaCoord;
@@ -64,7 +63,7 @@ public class TileEntityExtension extends TileEntityCommon {
         if (_parent != null && _parent.isInvalid()) {
             setParent(null);
             _parent = null;
-            getCoord().setId(0);
+            getCoord().setAir();
         }
         if (_parent == null && pc != null) {
             _parent = getCoord().add(pc).getTE(TileEntityCommon.class);
@@ -126,15 +125,15 @@ public class TileEntityExtension extends TileEntityCommon {
     }
     
     @Override
-    public Packet getAuxillaryInfoPacket() {
+    public FMLProxyPacket getDescriptionPacket() {
         if (pc == null) {
-            return super.getAuxillaryInfoPacket();
+            return super.getDescriptionPacket();
         }
         return getDescriptionPacketWith(MessageType.ExtensionInfo, pc);
     }
     
     @Override
-    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -169,7 +168,7 @@ public class TileEntityExtension extends TileEntityCommon {
             MovingObjectPosition ret = p.collisionRayTrace(startVec, endVec);
             if (!(p instanceof TileEntityGreenware)) {
                 //hax
-                if (ret != null && ret.typeOfHit == EnumMovingObjectType.TILE) {
+                if (ret != null && ret.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                     ret.blockX = xCoord;
                     ret.blockY = yCoord;
                     ret.blockZ = zCoord;
@@ -182,7 +181,7 @@ public class TileEntityExtension extends TileEntityCommon {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         TileEntityCommon p = getParent();
         if (p == null) {
             return super.getIcon(dir);

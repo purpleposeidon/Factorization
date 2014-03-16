@@ -1,6 +1,7 @@
 package factorization.fzds;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.ChunkPosition;
@@ -32,15 +33,15 @@ public class TransferLib {
         case SET_SNEAKY:
             Chunk chunk = c.w.getChunkFromBlockCoords(c.x, c.z);
             int old_id = c.getId();
-            Block origOldBlock = Block.blocksList[old_id];
-            Block origNewBlock = Block.blocksList[id];
-            Block.blocksList[old_id] = Block.stone;
-            Block.blocksList[id] = Block.stone;
+            Block origOldBlock = old_id;
+            Block origNewBlock = id;
+            old_id = Blocks.stone;
+            id = Blocks.stone;
             try {
                 chunk.setBlockIDWithMetadata(c.x & 15, c.y, c.z & 15, id, md);
             } finally {
-                Block.blocksList[old_id] = origOldBlock;
-                Block.blocksList[id] = origNewBlock;
+                old_id = origOldBlock;
+                id = origNewBlock;
             }
             c.markBlockForUpdate();
             break;
@@ -93,7 +94,7 @@ public class TransferLib {
         if (wipeSrc) {
             setRaw(src, 0, 0);
         }
-        wiper.worldObj = null; //Don't hold onto a reference
+        wiper.setWorldObj(null); //Don't hold onto a reference
         if (dest.getTE() != null) {
             rawRemoveTE(dest);
         }

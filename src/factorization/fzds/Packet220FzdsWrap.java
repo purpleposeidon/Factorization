@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 import net.minecraft.network.packet.NetHandler;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.network.Packet;
 
 public class Packet220FzdsWrap extends Packet {
     Packet wrapped = null;

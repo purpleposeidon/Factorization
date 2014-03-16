@@ -8,7 +8,7 @@ import java.util.List;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemInWorldManager;
 import net.minecraft.network.NetServerHandler;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.network.Packet;
 import net.minecraft.network.packet.Packet56MapChunks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerManager;

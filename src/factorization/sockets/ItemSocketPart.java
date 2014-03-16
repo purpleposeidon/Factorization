@@ -3,11 +3,12 @@ package factorization.sockets;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -19,8 +20,8 @@ import factorization.shared.ItemFactorization;
 @Deprecated
 public class ItemSocketPart extends ItemFactorization {
 
-    public ItemSocketPart(int itemId, String name, TabType tabType) {
-        super(itemId, name, tabType);
+    public ItemSocketPart(String name, TabType tabType) {
+        super(name, tabType);
         setHasSubtypes(true);
         setMaxDamage(0);
     }
@@ -64,16 +65,16 @@ public class ItemSocketPart extends ItemFactorization {
     }
     
     @SideOnly(Side.CLIENT)
-    Icon[] socketIcons;
+    IIcon[] socketIIcons;
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerIcons(IconRegister register) {
-        socketIcons = new Icon[FactoryType.MAX_ID];
+    public void registerIcons(IIconRegister register) {
+        socketIIcons = new IIcon[FactoryType.MAX_ID];
         ItemStack me = new ItemStack(this);
         for (FactoryType ft : getSockets()) {
             me.setItemDamage(ft.md);
-            socketIcons[ft.md] = register.registerIcon(getUnlocalizedName(me).replace("item.", ""));
+            socketIIcons[ft.md] = register.registerIcon(getUnlocalizedName(me).replace("item.", ""));
         }
     }
     
@@ -86,7 +87,7 @@ public class ItemSocketPart extends ItemFactorization {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void getSubItems(int itemId, CreativeTabs tab, List list) {
+    public void getSubItems(Item itemId, CreativeTabs tab, List list) {
         FactoryType[] ss = getSockets();
         for (int i = 0; i < ss.length; i++) {
             FactoryType ft = ss[i];
@@ -96,9 +97,9 @@ public class ItemSocketPart extends ItemFactorization {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIconFromDamage(int md) {
-        if (md > 0 && md < socketIcons.length) {
-            return socketIcons[md];
+    public IIcon getIconFromDamage(int md) {
+        if (md > 0 && md < socketIIcons.length) {
+            return socketIIcons[md];
         }
         return super.getIconFromDamage(md);
     }

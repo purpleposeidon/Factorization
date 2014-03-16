@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.model.ModelBiped;
@@ -23,12 +24,12 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.obj.WavefrontObject;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -44,15 +45,15 @@ public class RenderServoMotor extends RenderEntity {
     static int both_lists = -1, sprocket_display_list = -1, chasis_display_list = -1;
     boolean loaded_models = false;
     
-    private static Icon subsetIcon;
+    private static IIcon subsetIIcon;
     private static Tessellator subsetTessellator = new Tessellator() {
         @Override
         public void setTextureUV(double u, double v) {
-            super.setTextureUV(subsetIcon.getInterpolatedU(u*16), subsetIcon.getInterpolatedV(v*16));
+            super.setTextureUV(subsetIIcon.getInterpolatedU(u*16), subsetIIcon.getInterpolatedV(v*16));
         }
     };
     
-    static void loadModel(int displayList, String modelName, Icon icon) {
+    static void loadModel(int displayList, String modelName, IIcon icon) {
         try {
             WavefrontObject sprocket = null;
             InputStream input = null;
@@ -75,7 +76,7 @@ public class RenderServoMotor extends RenderEntity {
             GL11.glNewList(displayList, GL11.GL_COMPILE);
             double modelScale = 1.0/16.0;
             GL11.glScaled(modelScale, modelScale, modelScale);
-            subsetIcon = icon;
+            subsetIIcon = icon;
             subsetTessellator.startDrawingQuads();
             sprocket.tessellateAll(subsetTessellator);
             subsetTessellator.draw();
@@ -391,8 +392,8 @@ public class RenderServoMotor extends RenderEntity {
         // Pre-emptively undo transformations that the item renderer does so
         // that we don't get a stupid angle. Minecraft render code is terrible.
         boolean needRotationFix = true;
-        if (is.getItem() instanceof ItemBlock && is.itemID < Block.blocksList.length) {
-            Block block = Block.blocksList[is.itemID];
+        if (is.getItem() instanceof ItemBlock) {
+            Block block = Block.getBlockFromItem(is.getItem());
             if (block != null && RenderBlocks.renderItemIn3d(block.getRenderType())) {
                 needRotationFix = false;
             }
@@ -431,7 +432,7 @@ public class RenderServoMotor extends RenderEntity {
             ServoStack ss = motor.getServoStack(i);
             GL11.glRotatef(180/16*(8.5F + i), 0, 0, 1);
             GL11.glTranslatef(0, -(0.9F)/s, 0);
-            if (renderStack(ss, ItemDye.dyeColors[15 - i])) {
+            if (renderStack(ss, ItemDye.field_150922_c[15 - i])) {
             }
             GL11.glPopMatrix();
         }

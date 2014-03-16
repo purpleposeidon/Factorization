@@ -1,6 +1,6 @@
 package factorization.astro;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -16,22 +18,17 @@ import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.packet.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
-import factorization.fzds.DeltaChunk;
-import factorization.fzds.TransferLib;
-import factorization.fzds.api.DeltaCapability;
-import factorization.fzds.api.IDeltaChunk;
 import factorization.notify.Notify;
 import factorization.notify.Notify.Style;
 import factorization.shared.BlockClass;
@@ -58,7 +55,7 @@ public class TileEntityRocketEngine extends TileEntityCommon {
     }
     
     @Override
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         return lastValidationStatus ? BlockIcons.rocket_engine_valid : BlockIcons.rocket_engine_invalid;
     }
 
@@ -211,7 +208,7 @@ public class TileEntityRocketEngine extends TileEntityCommon {
         
         for (Coord spot : area) {
             if (!spot.equals(myDestination)) {
-                spot.setId(FzConfig.factory_block_id);
+                spot.setId(Core.registry.factory_block);
                 TileEntityExtension tex = new TileEntityExtension(this);
                 spot.setTE(tex);
                 tex.getBlockClass().enforce(spot);
@@ -234,12 +231,12 @@ public class TileEntityRocketEngine extends TileEntityCommon {
                         continue;
                     }
                     if (tex.getParent() == this) {
-                        c.setId(0);
+                        c.setAir();
                     }
                 }
             }
         }
-        here.setId(0);
+        here.setAir();
     }
     
     @Override
@@ -361,6 +358,7 @@ for x in range(0, len(d[0])):
         DeltaCoord size = max.difference(min);
         DeltaCoord half = size.scale(0.5);
         Coord center = min.add(half);
+        /* NORELEASE
         IDeltaChunk dse = DeltaChunk.allocateSlice(worldObj, -1, new DeltaCoord(0, 0, 0));
         center.setAsEntityLocation(dse);
         dse.posX += 0.5;
@@ -379,6 +377,7 @@ for x in range(0, len(d[0])):
         dse.permit(DeltaCapability.INTERACT);
         dse.permit(DeltaCapability.MOVE);
         worldObj.spawnEntityInWorld(dse);
+        */
     }
     
     void broadcastState(EntityPlayer who) {
@@ -442,12 +441,12 @@ for x in range(0, len(d[0])):
     }
     
     @Override
-    public Packet getAuxillaryInfoPacket() {
+    public FMLProxyPacket getDescriptionPacket() {
         return getDescriptionPacketWith(MessageType.RocketState, lastValidationStatus, isFiring);
     }
     
     @Override
-    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

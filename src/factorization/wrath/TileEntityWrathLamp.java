@@ -5,14 +5,15 @@ import java.util.HashSet;
 import java.util.PriorityQueue;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.common.BlockIcons;
@@ -90,9 +91,8 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         TileEntityWrathLamp lamp = TileEntityWrathLamp.findLightAirParent(w, x, y, z);
         if (lamp == null) {
             update_count += 1;
-            w.setBlock(x, y, z, 0, 0, UPDATE_CLIENT);
-        }
-        else {
+            w.setBlock(x, y, z, Blocks.air, 0, UPDATE_CLIENT);
+        } else {
             lamp.activate(y);
         }
     }
@@ -173,12 +173,12 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         Core.profileStart("WrathLamp");
         for (int x = xCoord - radius; x <= xCoord + radius; x++) {
             for (int z = zCoord - radius; z <= zCoord + radius; z++) {
-                int id = worldObj.getBlockId(x, yCoord, z);
-                if (id == Core.registry.lightair_block.blockID) {
+                Block id = worldObj.getBlock(x, yCoord, z);
+                if (id == Core.registry.lightair_block) {
                     if (worldObj.isRemote) {
-                        worldObj.setBlock(x, yCoord, z, 0, 0, NOTIFY_NEIGHBORS);
+                        worldObj.setBlock(x, yCoord, z, Blocks.air, 0, NOTIFY_NEIGHBORS);
                     } else {
-                        worldObj.setBlock(x, yCoord, z, 0);
+                        worldObj.setBlock(x, yCoord, z, Blocks.air);
                     }
                 }
             }
@@ -215,8 +215,8 @@ public class TileEntityWrathLamp extends TileEntityCommon {
             if (x == xCoord && z == zCoord) {
                 return true;
             }
-            int id = worldObj.getBlockId(x, yCoord, z);
-            if (Block.blocksList[id] != null && Block.blocksList[id].isOpaqueCube() && Block.lightOpacity[id] != 0) {
+            Block id = worldObj.getBlock(x, yCoord, z);
+            if (id != null && id.isOpaqueCube() && id.getLightOpacity() != 0) {
                 return false;
             }
             dx = x - xCoord;
@@ -248,10 +248,6 @@ public class TileEntityWrathLamp extends TileEntityCommon {
 
     boolean clearTo(int x, int y, int z) {
         return myTrace(x, z);
-        //		float a = 0, b = 0;
-        //		Vec3D me = Vec3D.createVector(xCoord + a, yCoord + a, zCoord + a);
-        //		Vec3D other = Vec3D.createVector(x + b, y + b, z + b);
-        //		return trace(other, me);
     }
 
     @Override
@@ -308,6 +304,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                     }
                 }
             }
+            //NORELEASE: I've probably messed this up
             for (int x = xCoord - radius; x <= xCoord + radius; x++) {
                 for (int z = zCoord - radius; z <= zCoord + radius; z++) {
                     // If it is air, make it LightAir™
@@ -317,22 +314,22 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                     if (beamDepths[index] != 0) {
                         continue;
                     }
-                    int block = worldObj.getBlockId(x, height, z);
-                    int belowBlock = worldObj.getBlockId(x, height - 3, z);
-                    if (belowBlock != 0 && belowBlock != Core.registry.lightair_block.blockID && height != yCoord) {
+                    Block block = worldObj.getBlock(x, height, z);
+                    Block belowBlock = worldObj.getBlock(x, height - 3, z);
+                    if (belowBlock != Core.registry.lightair_block && height != yCoord) {
                         beamDepths[index] = (short) height;
                         continue;
                     }
-                    if (block == 0 && worldObj.getBlockId(x, height - 1, z) == Block.cobblestoneWall.blockID) {
+                    /*if (block == 0 && worldObj.getBlock(x, height - 1, z) == Blocks.cobblestone_wall) {
                         block = -1;
-                    }
-                    if (block == 0) {
+                    }*/
+                    if (block.isAir(worldObj, x, height, z)) {
                         //Nice work, Mojang. If we didn't do this the hard way, the client will lag very badly near chunks that are unloaded.
                         //XXX TODO FIXME: Seems a bit difficult. What's the right way to do this?
                         Chunk chunk = worldObj.getChunkFromBlockCoords(x, z);
-                        chunk.setBlockIDWithMetadata(x & 15, height, z & 15, Core.registry.lightair_block.blockID, 0);
-                        worldObj.markBlockForRenderUpdate(x, height, z);
-                    } else if (block == Core.registry.lightair_block.blockID) {
+                        chunk.func_150807_a(x & 15, height, z & 15, Core.registry.lightair_block, 0);
+                        worldObj.markBlockForUpdate(x, height, z);
+                    } else if (block == Core.registry.lightair_block) {
                     } else if (x == xCoord && height == yCoord && z == zCoord) {
                         //this is ourself. Hi, self.
                         //Don't terminate the beamDepth early.
@@ -364,7 +361,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
 
     class Idler extends Updater {
         boolean couldUpdate(int dx, int dz) {
-            return worldObj.getBlockId(xCoord + dx, yCoord, zCoord + dz) == 0;
+            return worldObj.isAirBlock(xCoord + dx, yCoord, zCoord + dz);
         }
 
         @Override
@@ -412,7 +409,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                 for (int x = (int) (posX - r); x <= posX + r; x++) {
                     for (int z = (int) (posZ - r); z <= posZ + r; z++) {
                         for (int y = (int) posY; y >= posY - maxDepth; y--) {
-                            worldObj.updateAllLightTypes(x, y, z);
+                            worldObj.func_147451_t(x, y, z);
                         }
                     }
                 }
@@ -438,7 +435,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         return BlockIcons.dark_iron_block;
     }
 }

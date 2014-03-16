@@ -8,11 +8,12 @@ import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraftforge.client.IItemRenderer;
 
 import org.lwjgl.opengl.GL11;
 
+import factorization.common.BlockIcons;
 import factorization.shared.Core;
 
 
@@ -61,7 +62,7 @@ public class ItemRenderGlazeBucket implements IItemRenderer {
             GL11.glDisable(GL11.GL_BLEND);
         }
         if (type == ItemRenderType.EQUIPPED) {
-            Icon bi = bucket.getIconFromDamage(0);
+            IIcon bi = bucket.getIconFromDamage(0);
             ItemRenderer.renderItemIn2D(tess, bi.getMinU(), bi.getMinV(), bi.getMaxU(), bi.getMaxV(), bi.getIconWidth(), bi.getIconHeight(), 0.0625F);
             float s = 1F/16F;
             GL11.glScalef(s, s, s);
@@ -74,9 +75,9 @@ public class ItemRenderGlazeBucket implements IItemRenderer {
             }
             itemRenderer.renderItemIntoGUI(mc.fontRenderer, re, is, 0, 0);
         }
-        Icon glaze = bucket.getIcon(is, 1, null, null, 0);
+        IIcon glaze = bucket.getIcon(is, 1, null, null, 0);
         if (glaze == null) {
-            glaze = Core.blockMissingIcon;
+            glaze = BlockIcons.error;
         }
         re.bindTexture(Core.blockAtlas);
         

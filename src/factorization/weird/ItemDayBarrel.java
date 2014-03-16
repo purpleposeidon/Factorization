@@ -3,7 +3,7 @@ package factorization.weird;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import cpw.mods.fml.relauncher.Side;
@@ -16,8 +16,8 @@ import factorization.weird.TileEntityDayBarrel.Type;
 
 public class ItemDayBarrel extends ItemBlockProxy {
 
-    public ItemDayBarrel(int id, String name) {
-        super(id, Core.registry.daybarrel_item_hidden, name, TabType.BLOCKS);
+    public ItemDayBarrel(String name) {
+        super(Core.registry.daybarrel_item_hidden, name, TabType.BLOCKS);
         setMaxDamage(0);
         setNoRepair();
     }
@@ -34,13 +34,13 @@ public class ItemDayBarrel extends ItemBlockProxy {
     }
     
     @Override
-    public String getItemDisplayName(ItemStack is) {
+    public String getItemStackDisplayName(ItemStack is) {
         Type upgrade = TileEntityDayBarrel.getUpgrade(is);
-        String lookup = "factorization.factoryBlock.DAYBARREL.format";
+        String lookup = "factorization.factoryBlocks.DAYBARREL.format";
         if (upgrade != Type.NORMAL) {
-            lookup = "factorization.factoryBlock.DAYBARREL.format2";
+            lookup = "factorization.factoryBlocks.DAYBARREL.format2";
         }
-        String type = Core.translate("factorization.factoryBlock.DAYBARREL." + upgrade);
+        String type = Core.translate("factorization.factoryBlocks.DAYBARREL." + upgrade);
         return Core.translateWithCorrectableFormat(lookup, type, TileEntityDayBarrel.getLog(is).getDisplayName());
     }
     
@@ -66,5 +66,5 @@ public class ItemDayBarrel extends ItemBlockProxy {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerIcons(IconRegister par1IconRegister) { }
+    public void registerIcons(IIconRegister par1IIconRegister) { }
 }

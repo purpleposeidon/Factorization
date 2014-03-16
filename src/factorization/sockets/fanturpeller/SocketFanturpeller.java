@@ -1,21 +1,22 @@
 package factorization.sockets.fanturpeller;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.IFluidHandler;
 
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Charge;
@@ -138,7 +139,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
 
     boolean isLiquid(Coord at) {
         final Block block = at.getBlock();
-        if (block == Block.waterStill || block == Block.waterMoving || block == Block.lavaStill || block == Block.lavaMoving) {
+        if (block == Blocks.water || block == Blocks.flowing_water || block == Blocks.lava || block == Blocks.flowing_lava) {
             return at.getMd() == 0;
         }
         if (block instanceof IFluidBlock) {
@@ -282,7 +283,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         BlockRenderHelper block = BlockRenderHelper.instance;
         Quaternion rotation = Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite()));
         {
-            Icon metal = BlockIcons.motor_texture;
+            IIcon metal = BlockIcons.motor_texture;
             float d = 4.0F / 16.0F;
             float yd = -d + 0.003F;
     
@@ -337,14 +338,14 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
             GL11.glPushMatrix();
             GL11.glRotatef(90, 1, 0, 0);
             GL11.glTranslatef(-0.5F, -0.5F, 0);
-            FactorizationBlockRender.renderItemIcon(Core.registry.fan.getIconFromDamage(0));
+            FactorizationBlockRender.renderItemIIcon(Core.registry.fan.getIconFromDamage(0));
             GL11.glPopMatrix();
         }
     }
     
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
@@ -357,7 +358,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
     }
     
     @Override
-    public Packet getDescriptionPacket() {
+    public FMLProxyPacket getDescriptionPacket() {
         return getDescriptionPacketWith(MessageType.FanturpellerSpeed, fanω, isSucking);
     }
     

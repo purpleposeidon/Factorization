@@ -2,14 +2,16 @@ package factorization.oreprocessing;
 
 import static org.lwjgl.opengl.GL11.*;
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 
 import org.lwjgl.opengl.GL11;
 
@@ -57,7 +59,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             float g = (float) (var18 >> 8 & 255) / 255.0F;
             float b = (float) (var18 & 255) / 255.0F;
             GL11.glColor4f(r, g, b, 1.0F);
-            FactorizationBlockRender.renderItemIcon(crys.growing_crystal.getIconIndex());
+            FactorizationBlockRender.renderItemIIcon(crys.growing_crystal.getIconIndex());
             glPopMatrix();
         }
 
@@ -66,16 +68,16 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             glEnable(GL_BLEND);
             ItemStack sol = crys.solution;
             Tessellator tess = Tessellator.instance;
-            Icon tex = Block.waterMoving.getBlockTextureFromSide(1);
+            IIcon tex = Blocks.flowing_water.getBlockTextureFromSide(1);
             if (sol.getItem() == Core.registry.acid) {
                 if (sol.getItemDamage() > 0) {
-                    tex = Block.lavaMoving.getBlockTextureFromSide(0);
+                    tex = Blocks.flowing_lava.getBlockTextureFromSide(0);
                     glColor4f(0.5F, 0.7F, 0F, 0.25F);
                 } else {
                     glColor4f(1F, 0.7F, 0F, 0.5F);
                 }
                 glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-            } else if (sol.getItem() == Item.bucketMilk) {
+            } else if (sol.getItem() == Items.milk_bucket) {
                 float f = 0.9F;
                 glColor4f(f, f, f, 0.2F);
                 //glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_ALPHA);
@@ -92,12 +94,12 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             float u1 = tex.getMaxU();
             float v1 = tex.getMaxV();
             tess.startDrawingQuads();
-            tess.yOffset = 9F / 16F;
+            tess.setTranslation(0, 9F/16F, 0);
             tess.addVertexWithUV(0, 0, 0, u0, v0);
             tess.addVertexWithUV(0, 0, 1, u0, v1);
             tess.addVertexWithUV(1, 0, 1, u1, v1);
             tess.addVertexWithUV(1, 0, 0, u1, v0);
-            tess.yOffset = 0;
+            tess.setTranslation(0, 0, 0);
             tess.draw();
             glDisable(GL_BLEND);
         }

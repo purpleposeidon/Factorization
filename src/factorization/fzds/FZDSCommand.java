@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -24,7 +25,7 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
@@ -561,7 +562,7 @@ public class FZDSCommand extends CommandBase {
             String details() { return "Places a grass block at the user's feet"; }
             @Override
             void call(String[] args) {
-                user.add(0, -1, 0).setId(Block.grass);
+                user.add(0, -1, 0).setId(Blocks.grass);
             }}, Requires.COORD, Requires.CREATIVE);
         add(new SubCommand("snap") {
             @Override

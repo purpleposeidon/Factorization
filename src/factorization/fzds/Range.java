@@ -1,7 +1,7 @@
 package factorization.fzds;
 
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 class Range {
     double lower, upper;

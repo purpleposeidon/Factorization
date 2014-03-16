@@ -1,29 +1,29 @@
 package factorization.common;
 
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.shared.TileEntityFactorization;
 import factorization.shared.FactorizationTextureLoader.Directory;
-import factorization.shared.FactorizationTextureLoader.IconGroup;
+import factorization.shared.FactorizationTextureLoader.IIconGroup;
 import factorization.shared.FactorizationTextureLoader.Ignore;
 
 public class BlockIcons {
-    public static Icon uv_test,
+    public static IIcon uv_test,
         default_icon,
         error;
     
     @Directory("material")
-    public static Icon
+    public static IIcon
         edgeless_glass,
         iron_bar_grid,
         transparent,
         wood;
     
     @Directory("resource")
-    public static Icon
+    public static IIcon
         dark_iron_block,
         galena_ore,
         lead_block,
@@ -32,7 +32,7 @@ public class BlockIcons {
         ore_dark_iron_glint;
     
     @Directory("charge")
-    public static Icon
+    public static IIcon
         motor_texture,
         wire,
         battery_bottom, battery_top, battery_side, battery_meter,
@@ -43,13 +43,13 @@ public class BlockIcons {
         caliometric_side, caliometric_top;
     
     @Directory("craft")
-    public static BlockIcons.ActivatingMachineIcon stamper, packager;
+    public static BlockIcons.ActivatingMachineIIcon stamper, packager;
     
     @Directory("machine")
-    public static Icon compactFace, compactBack, compactSide, compactSideSlide;
+    public static IIcon compactFace, compactBack, compactSide, compactSideSlide;
     
     @Directory("machine")
-    public static Icon
+    public static IIcon
         cauldron_side, cauldron_top,
         generic_metal,
         grinder_bottom, grinder_top, grinder_side, grinder_bottom_top_edge,
@@ -58,43 +58,43 @@ public class BlockIcons {
     
     @Directory("machine")
     public static SimpleMachine slag_furnace;
-    public static Icon machine$slag_furnace_face_on;
+    public static IIcon machine$slag_furnace_face_on;
     
     @Directory("rocket")
-    public static Icon
+    public static IIcon
         rocket_engine_top, rocket_engine_bottom_hole, rocket_engine_nozzle, rocket_engine_valid, rocket_engine_invalid;
     
-    public static Icon servo$rail, servo$rail_comment;
-    public static Icon servo$model$chasis, servo$model$sprocket;
+    public static IIcon servo$rail, servo$rail_comment;
+    public static IIcon servo$model$chasis, servo$model$sprocket;
     
-    public static Icon ceramics$bisque, ceramics$dry, ceramics$stand, ceramics$rawglaze;
+    public static IIcon ceramics$bisque, ceramics$dry, ceramics$stand, ceramics$rawglaze;
     
-    public static Icon socket$face, socket$side;
-    public static Icon socket$hand, socket$arm0, socket$arm1, socket$arm2, socket$arm3;
-    public static Icon socket$shifter_front, socket$shifter_side;
+    public static IIcon socket$face, socket$side;
+    public static IIcon socket$hand, socket$arm0, socket$arm1, socket$arm2, socket$arm3;
+    public static IIcon socket$shifter_front, socket$shifter_side;
     
-    public static class RouterFace extends IconGroup {
-        public Icon on, off;
+    public static class RouterFace extends IIconGroup {
+        public IIcon on, off;
         
-        public Icon get(TileEntityFactorization tef) {
+        public IIcon get(TileEntityFactorization tef) {
             return tef.draw_active > 0 ? on : off;
         }
     }
     
     public static RouterFace router$north, router$south, router$east, router$west;
     
-    public static Icon router$top, router$bottom;
+    public static IIcon router$top, router$bottom;
     
     @Directory("storage")
     public static BarrelTextureset normal, silky, hopping, larger, sticky;
     @Directory("storage")
-    public static Icon barrel_font;
+    public static IIcon barrel_font;
     
-    public static class BarrelTextureset extends IconGroup {
-        public Icon side, front, top;
+    public static class BarrelTextureset extends IIconGroup {
+        public IIcon side, front, top;
         
         @Override
-        public IconGroup prefix(String prefix) {
+        public IIconGroup prefix(String prefix) {
             this.group_prefix = prefix + "/";
             return this;
         }
@@ -102,25 +102,25 @@ public class BlockIcons {
     
     
     public static ArrowyBox servo$set_direction, servo$set_facing;
-    public static Icon servo$one, servo$zero, servo$number, servo$sum, servo$product, servo$dup, servo$drop, servo$true, servo$false;
-    public static Icon servo$pulse;
-    public static Icon servo$spin_cc, servo$spin_ccc;
-    public static Icon servo$speed1, servo$speed2, servo$speed3, servo$speed4, servo$speed5;
-    public static Icon servo$cmp_lt, servo$cmp_le, servo$cmp_eq, servo$cmp_ne, servo$cmp_ge, servo$cmp_gt;
-    public static Icon servo$jmp_instruction, servo$jmp_tile;
-    public static Icon servo$entry_require, servo$entry_forbid;
-    public static Icon servo$socket_on, servo$socket_off, servo$socket_pulse;
-    public static Icon servo$ctrl$shift_import, servo$ctrl$shift_export, servo$ctrl$shift_target_slot, servo$ctrl$shift_transfer_limit, servo$ctrl$shift_stream, servo$ctrl$shift_pulse_some, servo$ctrl$shift_pulse_exact, servo$ctrl$shift_probe;
-    public static Icon servo$instruction_plate;
-    public static Icon servo$trap;
-    public static Icon servo$entry_execute, servo$entry_load, servo$entry_write, servo$entry_ignore;
-    public static Icon servo$move_value, servo$move_stack, servo$take_value, servo$take_stack;
-    public static Icon servo$scan_color;
-    public static Icon servo$set_segment;
+    public static IIcon servo$one, servo$zero, servo$number, servo$sum, servo$product, servo$dup, servo$drop, servo$true, servo$false;
+    public static IIcon servo$pulse;
+    public static IIcon servo$spin_cc, servo$spin_ccc;
+    public static IIcon servo$speed1, servo$speed2, servo$speed3, servo$speed4, servo$speed5;
+    public static IIcon servo$cmp_lt, servo$cmp_le, servo$cmp_eq, servo$cmp_ne, servo$cmp_ge, servo$cmp_gt;
+    public static IIcon servo$jmp_instruction, servo$jmp_tile;
+    public static IIcon servo$entry_require, servo$entry_forbid;
+    public static IIcon servo$socket_on, servo$socket_off, servo$socket_pulse;
+    public static IIcon servo$ctrl$shift_import, servo$ctrl$shift_export, servo$ctrl$shift_target_slot, servo$ctrl$shift_transfer_limit, servo$ctrl$shift_stream, servo$ctrl$shift_pulse_some, servo$ctrl$shift_pulse_exact, servo$ctrl$shift_probe;
+    public static IIcon servo$instruction_plate;
+    public static IIcon servo$trap;
+    public static IIcon servo$entry_execute, servo$entry_load, servo$entry_write, servo$entry_ignore;
+    public static IIcon servo$move_value, servo$move_stack, servo$take_value, servo$take_stack;
+    public static IIcon servo$scan_color;
+    public static IIcon servo$set_segment;
     
-    public static class ActivatingMachineIcon extends IconGroup {
-        public Icon top, bottom, side, side_on;
-        public Icon get(TileEntityFactorization tef, ForgeDirection dir) {
+    public static class ActivatingMachineIIcon extends IIconGroup {
+        public IIcon top, bottom, side, side_on;
+        public IIcon get(TileEntityFactorization tef, ForgeDirection dir) {
             switch (dir) {
             case UP: return top;
             case DOWN: return bottom;
@@ -129,10 +129,10 @@ public class BlockIcons {
         }
     }
     
-    public static class SimpleMachine extends IconGroup {
-        public Icon face, side, top, bottom;
+    public static class SimpleMachine extends IIconGroup {
+        public IIcon face, side, top, bottom;
         
-        public Icon get(TileEntityFactorization tef, ForgeDirection dir) {
+        public IIcon get(TileEntityFactorization tef, ForgeDirection dir) {
             switch (dir) {
             case UP: return top;
             case DOWN: return bottom;
@@ -141,10 +141,10 @@ public class BlockIcons {
         }
     }
     
-    public static abstract class ExtendedIcon implements Icon {
-        public Icon under;
+    public static abstract class ExtendedIIcon implements IIcon {
+        public IIcon under;
         
-        public ExtendedIcon(Icon under) {
+        public ExtendedIIcon(IIcon under) {
             this.under = under;
         }
         
@@ -191,14 +191,14 @@ public class BlockIcons {
         }
     }
     
-    public static class ArrowyBox extends IconGroup {
-        public Icon front, side_N, side_E, back;
+    public static class ArrowyBox extends IIconGroup {
+        public IIcon front, side_N, side_E, back;
         @Ignore
-        public Icon side_S, side_W;
+        public IIcon side_S, side_W;
 
         @Override
         public void afterRegister() {
-            side_S = new ExtendedIcon(side_N) {
+            side_S = new ExtendedIIcon(side_N) {
                 @Override
                 @SideOnly(Side.CLIENT)
                 public float getInterpolatedV(double d0) {
@@ -211,7 +211,7 @@ public class BlockIcons {
                     return under.getInterpolatedU(16 - d0);
                 }
             };
-            side_W = new ExtendedIcon(side_E) {
+            side_W = new ExtendedIIcon(side_E) {
                 @Override
                 @SideOnly(Side.CLIENT)
                 public float getInterpolatedV(double d0) {
@@ -226,7 +226,7 @@ public class BlockIcons {
             };
         }
         
-        public Icon get(ForgeDirection arrow_direction, ForgeDirection face) {
+        public IIcon get(ForgeDirection arrow_direction, ForgeDirection face) {
             if (arrow_direction == face) {
                 return front;
             }
@@ -264,5 +264,5 @@ public class BlockIcons {
         }
     }
     
-    public static Icon steam;
+    public static IIcon steam;
 }

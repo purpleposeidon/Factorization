@@ -2,17 +2,18 @@ package factorization.ceramics;
 
 import java.util.List;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.ceramics.TileEntityGreenware.ClayLump;
@@ -29,8 +30,8 @@ import factorization.shared.ItemFactorization;
 
 public class ItemSculptingTool extends ItemFactorization {
 
-    public ItemSculptingTool(int id) {
-        super(id, "sculptTool", TabType.ART);
+    public ItemSculptingTool() {
+        super("sculptTool", TabType.ART);
         setNoRepair();
         setMaxDamage(0);
         setMaxStackSize(4);
@@ -56,7 +57,7 @@ public class ItemSculptingTool extends ItemFactorization {
     }
     
     @Override
-    public void registerIcons(IconRegister reg) { }
+    public void registerIcons(IIconRegister reg) { }
 
     static enum ToolMode {
         MOVER("move", true),
@@ -107,7 +108,7 @@ public class ItemSculptingTool extends ItemFactorization {
     }
     
     @Override
-    public Icon getIconFromDamage(int damage) {
+    public IIcon getIconFromDamage(int damage) {
         //A bit lame. Lame.
         switch (getMode(damage)) {
         default:
@@ -147,6 +148,8 @@ public class ItemSculptingTool extends ItemFactorization {
         return Core.registry.sculpt_tool.getMovingObjectPositionFromPlayer(player.worldObj, player, true);
     }
     
+    private Item slab_item = Item.getItemFromBlock(Blocks.wooden_slab);
+    
     public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player,
             World w, int x, int y, int z, int side,
             float vx, float vy, float vz) {
@@ -184,10 +187,10 @@ public class ItemSculptingTool extends ItemFactorization {
                     if (it == null) {
                         continue;
                     }
-                    if (it.getItem() == Item.clay) {
+                    if (it.getItem() == Items.clay_ball) {
                         materialCount += it.stackSize;
                     }
-                    if (it.itemID == Block.woodSingleSlab.blockID) {
+                    if (it.getItem() == slab_item) {
                         hasSlab = true;
                     }
                 }
@@ -195,8 +198,8 @@ public class ItemSculptingTool extends ItemFactorization {
                     Notify.send(player, here, "Need wood slab\nAnd %s clay", "" + neededClay); //TODO: Localize properly
                     return false;
                 }
-                inv.pull(FzUtil.makeWildcard(Block.woodSingleSlab), 1, false);
-                inv.pull(new ItemStack(Item.clay), gw.parts.size(), false);
+                inv.pull(FzUtil.makeWildcard(slab_item), 1, false);
+                inv.pull(new ItemStack(Items.clay_ball), gw.parts.size(), false);
             }
             TileEntityGreenware rep = (TileEntityGreenware) FactoryType.CERAMIC.getRepresentative();
             rep.loadParts(gw.getItem().getTagCompound());
@@ -204,16 +207,16 @@ public class ItemSculptingTool extends ItemFactorization {
             rep.glazesApplied = false;
             rep.lastTouched = 0;
             for (ClayLump part : rep.parts) {
-                part.icon_id = 0;
+                part.icon_id = null;
                 part.icon_md = 0;
                 part.icon_side = -1;
             }
             ItemStack toDrop = rep.getItem();
             if (gw.customName != null) {
-                toDrop.setItemName(gw.customName);
+                toDrop.setStackDisplayName(gw.customName);
             }
             if (inv.push(toDrop) != null) {
-                player.dropPlayerItem(toDrop);
+                player.dropPlayerItemWithRandomChoice(toDrop, false);
             }
             Core.proxy.updatePlayerInventory(player);
             return true;
@@ -224,7 +227,7 @@ public class ItemSculptingTool extends ItemFactorization {
             }
             switch (state) {
             case DRY:
-                Notify.withItem(new ItemStack(Item.bucketWater));
+                Notify.withItem(new ItemStack(Items.water_bucket));
                 Notify.send(player, gw.getCoord(), "The clay is dry\nUse a {ITEM_NAME}");
                 break;
             case BISQUED:

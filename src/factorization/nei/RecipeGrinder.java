@@ -4,6 +4,8 @@ import java.awt.Rectangle;
 import java.util.Arrays;
 import java.util.List;
 
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

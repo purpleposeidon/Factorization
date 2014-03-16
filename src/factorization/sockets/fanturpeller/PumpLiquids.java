@@ -9,7 +9,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBucket;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.BlockFluidFinite;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
@@ -283,7 +283,7 @@ public class PumpLiquids extends BufferedFanturpeller {
             at.y = pc.y;
             at.z = pc.z;
             if (!at.isReplacable()) return false;
-            Block block = Block.blocksList[fluid.getBlockID()];
+            Block block = fluid.getBlock();
             if (block == null) return false;
             if (drainBlock(pc, false) != null) return false;
             if (block == Block.waterStill) block = Block.waterMoving;

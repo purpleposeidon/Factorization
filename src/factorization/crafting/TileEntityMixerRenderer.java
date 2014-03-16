@@ -3,7 +3,7 @@ package factorization.crafting;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 
 import org.lwjgl.opengl.GL11;
 
@@ -46,8 +46,8 @@ public class TileEntityMixerRenderer extends TileEntitySpecialRenderer {
         tess.startDrawingQuads();
         tess.setColorOpaque_F(1, 1, 1);
         BlockRenderHelper block = BlockRenderHelper.instance;
-        Icon crank = ItemIcons.charge$crankshaft;
-        Icon top = render_top ? crank : null;
+        IIcon crank = ItemIcons.charge$crankshaft;
+        IIcon top = render_top ? crank : null;
         block.useTextures(top, null, crank, crank, crank, crank);
         float d = 3F/8F;
         block.setBlockBoundsOffset(d, 2.5F/8F, d);
@@ -58,7 +58,7 @@ public class TileEntityMixerRenderer extends TileEntitySpecialRenderer {
     }
 
     static void drawProp() {
-        FactorizationBlockRender.renderItemIcon(Core.registry.fan.getIconFromDamage(0));
+        FactorizationBlockRender.renderItemIIcon(Core.registry.fan.getIconFromDamage(0));
     }
 
 }

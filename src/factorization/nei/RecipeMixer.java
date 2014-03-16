@@ -130,7 +130,7 @@ public class RecipeMixer extends TemplateRecipeHandler {
                 if (o instanceof ItemStack) {
                     ItemStack is = (ItemStack) o;
                     if (is.getItem().hasContainerItem()) {
-                        ItemStack cnt = FzUtil.normalize(is.getItem().getContainerItemStack(is));
+                        ItemStack cnt = FzUtil.normalize(is.getItem().getContainerItem(is));
                         if (cnt != null) {
                             output.add(cnt);
                         }

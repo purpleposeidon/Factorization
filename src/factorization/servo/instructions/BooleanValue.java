@@ -3,10 +3,11 @@ package factorization.servo.instructions;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -26,7 +27,7 @@ public class BooleanValue extends Instruction {
 
     @Override
     protected ItemStack getRecipeItem() {
-        return new ItemStack(Block.lever);
+        return new ItemStack(Blocks.lever);
     }
 
     @Override
@@ -44,7 +45,7 @@ public class BooleanValue extends Instruction {
     }
     
     @Override
-    public Icon getIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         return val ? BlockIcons.servo$true : BlockIcons.servo$false;
     }
 

@@ -2,15 +2,16 @@ package factorization.shared;
 
 import java.util.List;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.astro.TileEntityRocketEngine;
 import factorization.ceramics.TileEntityGreenware;
@@ -19,7 +20,7 @@ import factorization.charge.TileEntityLeydenJar;
 import factorization.common.FactoryType;
 
 public class ItemFactorizationBlock extends ItemBlock {
-    public ItemFactorizationBlock(int id) {
+    public ItemFactorizationBlock(Block id) {
         super(id);
         setMaxDamage(0);
         setHasSubtypes(true);
@@ -54,7 +55,7 @@ public class ItemFactorizationBlock extends ItemBlock {
                 tec.getBlockClass().enforce(here);
             }
             if (!(te instanceof TileEntityRocketEngine)) {
-                w.setBlockTileEntity(here.x, here.y, here.z, te);
+                w.setTileEntity(here.x, here.y, here.z, te);
             }
             
             here.markBlockForUpdate();
@@ -64,7 +65,7 @@ public class ItemFactorizationBlock extends ItemBlock {
     }
 
     @Override
-    public Icon getIconFromDamage(int damage) {
+    public IIcon getIconFromDamage(int damage) {
         return Core.registry.factory_block.getIcon(0, damage);
     }
 
@@ -78,7 +79,7 @@ public class ItemFactorizationBlock extends ItemBlock {
     public String getUnlocalizedName(ItemStack is) {
         int md = is.getItemDamage();
         FactoryType ft = FactoryType.fromMd(md);
-        return "factorization.factoryBlock." + ft;
+        return "factorization.factoryBlocks." + ft;
     }
 
     @Override
@@ -102,7 +103,7 @@ public class ItemFactorizationBlock extends ItemBlock {
                 perc = (int)(jar.getLevel()*100);
                 //infoList.add(( + "% charged"));
             }
-            infoList.add(StatCollector.translateToLocalFormatted("factorization.factoryBlock.LEYDENJAR.perc", perc));
+            infoList.add(StatCollector.translateToLocalFormatted("factorization.factoryBlocks.LEYDENJAR.perc", perc));
         }
         Core.brand(is, player, infoList, verbose);
     }

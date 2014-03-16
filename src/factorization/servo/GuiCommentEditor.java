@@ -22,8 +22,8 @@ public class GuiCommentEditor extends GuiScreen {
     public void initGui() {
         Keyboard.enableRepeatEvents(true);
         buttonList.clear();
-        buttonList.add(new GuiButton(0, width / 2 - 100, height / 4 + 96 + 12, I18n.getString("gui.done")));
-        rem = new GuiTextField(this.fontRenderer, this.width / 2 - 150, 60, 300, 20);
+        buttonList.add(new GuiButton(0, width / 2 - 100, height / 4 + 96 + 12, I18n.format("gui.done")));
+        rem = new GuiTextField(this.fontRendererObj, this.width / 2 - 150, 60, 300, 20);
         rem.setMaxStringLength(200);
         rem.setFocused(true);
         rem.setText(rail.comment);
@@ -56,7 +56,7 @@ public class GuiCommentEditor extends GuiScreen {
 
     public void drawScreen(int mouseX, int mouseY, float partial) {
         this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRenderer, "Rail Comment", this.width / 2, 20, 16777215);
+        this.drawCenteredString(this.fontRendererObj, "Rail Comment", this.width / 2, 20, 16777215);
         rem.drawTextBox();
         super.drawScreen(mouseX, mouseY, partial);
     }

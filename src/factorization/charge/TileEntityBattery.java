@@ -1,13 +1,13 @@
 package factorization.charge;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Charge;
 import factorization.api.IChargeConductor;
 import factorization.common.BlockIcons;
@@ -34,7 +34,7 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     }
     
     @Override
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         switch (dir) {
         case UP: return BlockIcons.battery_top;
         case DOWN: return BlockIcons.battery_bottom;
@@ -106,7 +106,7 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
             storage += store_delta;
         }
         if (tier != storage * 32 / max_storage) {
-            onInventoryChanged();
+            markDirty();
             updateMeter();
         }
     }
@@ -116,7 +116,7 @@ public class TileEntityBattery extends TileEntityCommon implements IChargeConduc
     }
 
     @Override
-    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }

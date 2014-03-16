@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.FzColor;
 import factorization.api.datahelpers.DataHelper;
@@ -31,7 +32,7 @@ public class ValueTransfer extends Instruction {
 
     @Override
     protected ItemStack getRecipeItem() {
-        return new ItemStack(Block.hopperBlock);
+        return new ItemStack(Blocks.hopper);
     }
 
     @Override
@@ -78,7 +79,7 @@ public class ValueTransfer extends Instruction {
     }
 
     @Override
-    public Icon getIcon(ForgeDirection side) {
+    public IIcon getIcon(ForgeDirection side) {
         switch (action) {
         default:
         case MOVE_VALUE: return BlockIcons.servo$move_value;

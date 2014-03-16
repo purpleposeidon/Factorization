@@ -4,8 +4,8 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
@@ -16,9 +16,10 @@ import factorization.shared.FactorizationBlockRender;
 public class BlockRenderDayBarrel extends FactorizationBlockRender {
 
     @Override
-    public void render(RenderBlocks rb) {
+    public boolean render(RenderBlocks rb) {
         if (world_mode) {
             doRender(rb, 0);
+            return true;
         }
         if (!world_mode) {
             doRender(rb, 0);
@@ -28,20 +29,22 @@ public class BlockRenderDayBarrel extends FactorizationBlockRender {
             doRender(rb, 1);
             GL11.glPopAttrib();
         }
+        return false;
     }
     
     @Override
-    public void renderSecondPass(RenderBlocks rb) {
+    public boolean renderSecondPass(RenderBlocks rb) {
         //NOTE: We can almost get away with doing this in the first render pass.
         //But GL_BLEND is not consistently enabled.
         doRender(rb, 1);
         //We can also almost get away with enabling GL_BLEND in this ISBRH.
         //But then my conscience attacks.
+        return true;
     }
     
     void doRender(RenderBlocks rb, int pass) {
         BlockRenderHelper block = Core.registry.blockRender;
-        Icon plank, log;
+        IIcon plank, log;
         TileEntityDayBarrel barrel;
         if (world_mode) {
             if (te instanceof TileEntityDayBarrel) {

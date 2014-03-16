@@ -13,7 +13,7 @@ public class NullTileEntity extends TileEntity {
     @Override
     public void updateEntity() {
         if (FMLCommonHandler.instance().getEffectiveSide() != Side.CLIENT) {
-            new Coord(this).removeTE();
+            new Coord(this).rmTE();
         }
         if (description_request_delay-- == 0) {
             Coord here = new Coord(this);

@@ -1,31 +1,32 @@
 package factorization.common;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.Icon;
+import net.minecraft.item.Item;
+import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.ceramics.BasicGlazes;
 import factorization.shared.Core;
 
 public class BlockResource extends Block {
-    public Icon[] icons = new Icon[ResourceType.values().length];
-    protected BlockResource(int id) {
-        super(id, Material.rock);
+    public IIcon[] icons = new IIcon[ResourceType.values().length];
+    protected BlockResource() {
+        super(Material.rock);
         setHardness(2.0F);
-        setUnlocalizedName("factorization.ResourceBlock");
+        setBlockName("factorization.ResourceBlock");
     }
     
-    public static final int glaze_md_start = 17; 
+    public static final int glaze_md_start = 17;
     
     @Override
-    public void registerIcons(IconRegister reg) {
+    public void registerBlockIcons(IIconRegister reg) {
         for (ResourceType rt : ResourceType.values()) {
             if (rt.texture == null) {
                 continue;
@@ -41,7 +42,7 @@ public class BlockResource extends Block {
     
     boolean done_spam = false;
     @Override
-    public Icon getIcon(int side, int md) {
+    public IIcon getIcon(int side, int md) {
         if (md >= glaze_md_start) {
             int off = md - glaze_md_start;
             if (off < BasicGlazes.values.length) {
@@ -61,16 +62,9 @@ public class BlockResource extends Block {
         itemList.add(Core.registry.lead_block_item);
         itemList.add(Core.registry.dark_iron_block_item);
     }
-    
     @Override
-    public void addCreativeItems(ArrayList itemList) {
+    public void getSubBlocks(Item par1, CreativeTabs par2CreativeTabs, List itemList) {
         addCreativeItems((List) itemList);
-    }
-
-    @Override
-    public void getSubBlocks(int par1, CreativeTabs par2CreativeTabs, List par3List) {
-        //addCreativeItems(par3List);
-        Core.addBlockToCreativeList(par3List, this);
     }
 
     @Override
@@ -89,10 +83,9 @@ public class BlockResource extends Block {
     }
     
     @Override
-    public boolean isBeaconBase(World worldObj, int x, int y, int z,
+    public boolean isBeaconBase(IBlockAccess worldObj, int x, int y, int z,
             int beaconX, int beaconY, int beaconZ) {
-        Coord here = new Coord(worldObj, x, y, z);
-        int md = here.getMd();
+        int md = worldObj.getBlockMetadata(x, y, z);
         return md == Core.registry.silver_block_item.getItemDamage()
                 || md == Core.registry.lead_block_item.getItemDamage()
                 || md == Core.registry.dark_iron_block_item.getItemDamage();

@@ -3,25 +3,26 @@ package factorization.servo;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.shared.Core;
+import factorization.shared.Core.TabType;
 import factorization.shared.FzUtil;
 import factorization.shared.ItemFactorization;
-import factorization.shared.Core.TabType;
 
 public class ItemServoRailWidget extends ItemFactorization {
-    public ItemServoRailWidget(int itemId, String name) {
-        super(itemId, name, TabType.SERVOS);
+    public ItemServoRailWidget(String name) {
+        super(name, TabType.SERVOS);
     }
     
     @Override
@@ -34,8 +35,8 @@ public class ItemServoRailWidget extends ItemFactorization {
     }
     
     @Override
-    public String getItemDisplayName(ItemStack is) {
-        String s = super.getItemDisplayName(is);
+    public String getItemStackDisplayName(ItemStack is) {
+        String s = super.getItemStackDisplayName(is);
         if (s == null || s.length() == 0) {
             s = getUnlocalizedName(is);
         }
@@ -127,24 +128,24 @@ public class ItemServoRailWidget extends ItemFactorization {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void getSubItems(int id, CreativeTabs tab, List list) {
+    public void getSubItems(Item id, CreativeTabs tab, List list) {
         loadSubItems();
         list.addAll(subItemsCache);
     }
     
     @Override
-    public Icon getIcon(ItemStack stack, int renderPass, EntityPlayer player, ItemStack usingItem, int useRemaining) {
+    public IIcon getIcon(ItemStack stack, int renderPass, EntityPlayer player, ItemStack usingItem, int useRemaining) {
         return getIcon(stack, renderPass);
     }
     
     @Override
-    public Icon getIcon(ItemStack stack, int pass) {
+    public IIcon getIcon(ItemStack stack, int pass) {
         if (pass == 0) {
             return BlockIcons.servo$instruction_plate;
         }
         if (pass == 1) {
             ServoComponent sc = get(stack);
-            Icon ret = null;
+            IIcon ret = null;
             if (sc instanceof Decorator) {
                 ret = ((Decorator) sc).getIcon(ForgeDirection.UNKNOWN);
             }
@@ -176,5 +177,5 @@ public class ItemServoRailWidget extends ItemFactorization {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerIcons(IconRegister par1IconRegister) { }
+    public void registerIcons(IIconRegister par1IIconRegister) { }
 }

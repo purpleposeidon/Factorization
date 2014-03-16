@@ -3,12 +3,13 @@ package factorization.charge;
 import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -36,7 +37,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
     }
 
     @Override
-    public String getInvName() {
+    public String getInventoryName() {
         return "Caliometric Burner";
     }
     
@@ -113,7 +114,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
     
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         if (dir.offsetY != 0) {
             return BlockIcons.caliometric_top;
         }
@@ -152,7 +153,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
         }
         int noms = getFoodValue(stomache);
         stomache = FzUtil.normalDecr(stomache);
-        onInventoryChanged();
+        markDirty();
         Sound.caliometricDigest.playAt(this);
         ticksUntilNextDigestion = 20*10*noms;
         return 16;
@@ -167,9 +168,9 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
         double sat = 0;
         if (it instanceof ItemFood) {
             ItemFood nom = (ItemFood) it;
-            heal = nom.getHealAmount();
-            sat = nom.getSaturationModifier();
-        } else if (it == Item.cake) {
+            heal = nom.func_150905_g(is);
+            sat = nom.func_150906_h(is);
+        } else if (it == Items.cake) {
             heal = 2*6;
             sat = 0.1F;
         }
@@ -191,7 +192,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
         is = FzUtil.openInventory(this, ForgeDirection.NORTH).push(is);
         entityplayer.setCurrentItemOrArmor(0, is);
         info(entityplayer);
-        onInventoryChanged();
+        markDirty();
         return true;
     }
     

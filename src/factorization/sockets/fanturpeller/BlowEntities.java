@@ -14,10 +14,11 @@ import net.minecraft.entity.passive.EntityChicken;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -204,7 +205,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
                 ghast.courseChangeCooldown = 40;
                 if (ghast.isDead) {
                     //NOTE: Potential for bonus ghast tears here. I'm okay with this?
-                    buffer.add(new ItemStack(Item.ghastTear));
+                    buffer.add(new ItemStack(Items.ghast_tear));
                 }
             }
             if (!worldObj.isRemote && ghast.getHealth() > 0) {
@@ -215,7 +216,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
             EntityChicken chicken = (EntityChicken) ent;
             if (chicken.getHealth() <= 1) {
                 chicken.setDead();
-                buffer.add(new ItemStack(Item.egg));
+                buffer.add(new ItemStack(Items.egg));
             } else {
                 chicken.attackEntityFrom(DamageSource.generic, 1);
             }

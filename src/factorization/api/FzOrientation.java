@@ -1,7 +1,7 @@
 package factorization.api;
 
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 public enum FzOrientation {
     FACE_DOWN_POINT_SOUTH(ForgeDirection.DOWN, ForgeDirection.SOUTH),

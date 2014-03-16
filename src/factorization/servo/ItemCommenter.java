@@ -1,21 +1,17 @@
 package factorization.servo;
 
-import codechicken.nei.WorldOverlayRenderer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import factorization.api.Coord;
-import factorization.common.FactoryType;
 import factorization.shared.Core.TabType;
-import factorization.shared.Core;
 import factorization.shared.ItemFactorization;
-import factorization.shared.NetworkFactorization;
 import factorization.shared.NetworkFactorization.MessageType;
 
 public class ItemCommenter extends ItemFactorization {
 
-    public ItemCommenter(int itemId, String name) {
-        super(itemId, name, TabType.SERVOS);
+    public ItemCommenter(String name) {
+        super(name, TabType.SERVOS);
         setMaxStackSize(1);
     }
 

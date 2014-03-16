@@ -3,19 +3,19 @@ package factorization.sockets;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumMovingObjectType;
+import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
-
-import org.lwjgl.opengl.GL11;
-
+import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -154,14 +154,14 @@ public class SocketRobotHand extends TileEntitySocketBase {
     }
     
     boolean clickItem(EntityPlayer player, ItemStack is, MovingObjectPosition mop) {
-        if (mop.typeOfHit == EnumMovingObjectType.TILE) {
+        if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
             return mcClick(player, mop, is);
-        } else if (mop.typeOfHit == EnumMovingObjectType.ENTITY) {
+        } else if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
             if (mop.entityHit.interactFirst(player)) {
                 return true;
             }
             if (mop.entityHit instanceof EntityLiving) {
-                if (is.func_111282_a(player, (EntityLiving)mop.entityHit)) {
+                if (is.interactWithEntity(player, (EntityLiving)mop.entityHit)) {
                     return true;
                 }
             }
@@ -198,10 +198,10 @@ public class SocketRobotHand extends TileEntitySocketBase {
                 }
             }
             
-            if (!player.isSneaking() || itemstack == null || item.shouldPassSneakingClickToBlock(world, x, y, z)) {
-                int blockId = world.getBlockId(x, y, z);
+            if (!player.isSneaking() || itemstack == null || item.doesSneakBypassUse(world, x, y, z, player)) {
+                Block blockId = world.getBlock(x, y, z);
             
-                if (blockId > 0 && Block.blocksList[blockId].onBlockActivated(world, x, y, z, player, side, dx, dy, dz)) {
+                if (blockId != null && blockId.onBlockActivated(world, x, y, z, player, side, dx, dy, dz)) {
                     ret = true;
                     break;
                 }

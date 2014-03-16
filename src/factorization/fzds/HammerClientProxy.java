@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
@@ -13,25 +14,25 @@ import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.NetHandler;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.network.Packet;
 import net.minecraft.network.packet.Packet14BlockDig;
 import net.minecraft.network.packet.Packet1Login;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.EnumMovingObjectType;
+import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
-import net.minecraftforge.event.ForgeSubscribe;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 import org.lwjgl.opengl.GL11;
 
@@ -145,8 +146,8 @@ public class HammerClientProxy extends HammerProxy {
         
         //For rendering
         mc.renderViewEntity = player; //TODO NOTE: This make mess up in third person!
-        if (TileEntityRenderer.instance.worldObj != null) {
-            TileEntityRenderer.instance.worldObj = wc;
+        if (TileEntityRendererDispatcher.instance.worldObj != null) {
+            TileEntityRendererDispatcher.instance.worldObj = wc;
         }
         if (RenderManager.instance.worldObj != null) {
             RenderManager.instance.worldObj = wc;
@@ -232,7 +233,7 @@ public class HammerClientProxy extends HammerProxy {
     DseRayTarget rayTarget = null;
     AxisAlignedBB selectionBlockBounds = null;
     
-    @ForgeSubscribe
+    @SubscribeEvent
     public void renderSelection(DrawBlockHighlightEvent event) {
         //System.out.println(event.target.hitVec);
         if (!(event.target.entityHit instanceof DseRayTarget)) {
@@ -241,7 +242,7 @@ public class HammerClientProxy extends HammerProxy {
         if (shadowSelected == null) {
             return;
         }
-        if (shadowSelected.typeOfHit != EnumMovingObjectType.TILE) {
+        if (shadowSelected.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
             return;
         }
         if (event.isCanceled()) {
@@ -253,7 +254,7 @@ public class HammerClientProxy extends HammerProxy {
         float partialTicks = event.partialTicks;
         DimensionSliceEntity dse = rayTarget.parent;
         Coord here = null;
-        if (selectionBlockBounds != null && shadowSelected.typeOfHit == EnumMovingObjectType.TILE) {
+        if (selectionBlockBounds != null && shadowSelected.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
             here = new Coord(DeltaChunk.getClientShadowWorld(), shadowSelected.blockX, shadowSelected.blockY, shadowSelected.blockZ);
             here.getBlock().setBlockBounds(
                     (float)(selectionBlockBounds.minX - here.x), (float)(selectionBlockBounds.minY - here.y), (float)(selectionBlockBounds.minZ - here.z),
@@ -321,7 +322,7 @@ public class HammerClientProxy extends HammerProxy {
                     bb = shadowSelected.entityHit.boundingBox;
                     selectionBlockBounds = null;
                     break;
-                case TILE:
+                case BLOCK:
                     Coord hit = new Coord(DeltaChunk.getClientShadowWorld(), shadowSelected.blockX, shadowSelected.blockY, shadowSelected.blockZ);
                     Block block = hit.getBlock();
                     bb = block.getSelectedBoundingBoxFromPool(hit.w, hit.x, hit.y, hit.z);
@@ -427,14 +428,14 @@ public class HammerClientProxy extends HammerProxy {
                         }
 
                         sendDigPacket(new Packet14BlockDig(0, x, y, z, side));
-                        int i1 = this.mc.theWorld.getBlockId(x, y, z);
+                        int i1 = this.mc.theWorld.getBlock(x, y, z);
 
                         if (i1 > 0 && this.curBlockDamageMP == 0.0F)
                         {
-                            Block.blocksList[i1].onBlockClicked(this.mc.theWorld, x, y, z, this.mc.thePlayer);
+                            i1.onBlockClicked(this.mc.theWorld, x, y, z, this.mc.thePlayer);
                         }
 
-                        if (i1 > 0 && Block.blocksList[i1].getPlayerRelativeBlockHardness(this.mc.thePlayer, this.mc.thePlayer.worldObj, x, y, z) >= 1.0F)
+                        if (i1 > 0 && i1.getPlayerRelativeBlockHardness(this.mc.thePlayer, this.mc.thePlayer.worldObj, x, y, z) >= 1.0F)
                         {
                             this.onPlayerDestroyBlock(x, y, z, side);
                             resetController();
@@ -448,7 +449,7 @@ public class HammerClientProxy extends HammerProxy {
                             this.field_85183_f = this.mc.thePlayer.getHeldItem();
                             this.curBlockDamageMP = 0.0F;
                             this.stepSoundTickCounter = 0.0F;
-                            this.mc.theWorld.destroyBlockInWorldPartially(this.mc.thePlayer.entityId, this.currentBlockX, this.currentBlockY, this.currentblockZ, (int)(this.curBlockDamageMP * 10.0F) - 1);
+                            this.mc.theWorld.destroyBlockInWorldPartially(this.mc.thePlayer.getEntityId(), this.currentBlockX, this.currentBlockY, this.currentblockZ, (int)(this.curBlockDamageMP * 10.0F) - 1);
                         }
                     }
                 }

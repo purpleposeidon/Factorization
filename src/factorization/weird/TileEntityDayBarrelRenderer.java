@@ -7,12 +7,12 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.client.resources.ResourceManager;
+import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
@@ -46,17 +46,24 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         GL11.glRotatef(90, 0, 1, 0);
         GL11.glTranslated(0.25, 0.25 - 1.0/16.0, -1.0/128.0);
         if (barrel.type == Type.HOPPING) {
-            double time = barrel.worldObj.getTotalWorldTime();
+            double time = barrel.getWorldObj().getTotalWorldTime();
             if (Math.sin(time/20) > 0) {
                 double delta = Math.max(0, Math.sin(time/2)/16);
                 GL11.glTranslated(0, delta, 0);
             }
         }
         
+        
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glDisable(GL11.GL_LIGHTING);
+        
+        GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT);
+        GL11.glAlphaFunc(GL11.GL_GREATER, 0.0F);
+        
         renderItemCount(is, barrel);
         handleRenderItem(is);
+        
+        GL11.glPopAttrib();
         GL11.glEnable(GL11.GL_LIGHTING);
         
         
@@ -152,7 +159,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
             return;
         }
         GL11.glRotatef(180, 0, 0, 1);
-        final Icon font;
+        final IIcon font;
         final Minecraft mc = Minecraft.getMinecraft();
         if (item.getItemSpriteNumber() == 1) {
             font = BlockIcons.barrel_font;
@@ -165,8 +172,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         final double char_width = 1.0/10.0;
         final double char_height = 1.0/10.0;
         final Tessellator tess = Tessellator.instance;
-        tess.xOffset = -char_width*len/2 + 0.25;
-        tess.yOffset = -char_height;
+        tess.setTranslation(-char_width * len / 2 + 0.25, -char_height, 0);
         tess.startDrawingQuads();
         double du = (font.getMaxU() - font.getMinU()) / 4;
         double dv = (font.getMaxV() - font.getMinV()) / 4;
@@ -199,7 +205,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
             
         }
         tess.draw();
-        tess.xOffset = tess.yOffset = tess.zOffset = 0;
+        tess.setTranslation(0, 0, 0);
         GL11.glRotatef(180, 0, 0, 1);
     }
 
@@ -216,7 +222,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
     
     class Intercepter extends TextureManager {
         TextureManager realGuy = Minecraft.getMinecraft().renderEngine;
-        public Intercepter(ResourceManager par1ResourceManager) {
+        public Intercepter(IResourceManager par1ResourceManager) {
             super(par1ResourceManager);
         }
         
@@ -245,7 +251,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         GL11.glScalef(1, 1, -0.02F);
         {
             TextureManager re = Minecraft.getMinecraft().renderEngine;
-            FontRenderer fr = getFontRenderer();
+            FontRenderer fr = func_147498_b();
             if (!is.hasEffect(0)) {
                 renderItem.renderItemAndEffectIntoGUI(fr, re, is, 0, 0);
             } else {

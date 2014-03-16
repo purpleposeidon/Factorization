@@ -1,37 +1,31 @@
 package factorization.common;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.ISound;
+import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.settings.GameSettings;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.Item;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ForgeSubscribe;
 import cpw.mods.fml.client.registry.ClientRegistry;
-import cpw.mods.fml.client.registry.KeyBindingRegistry;
-import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.IScheduledTickHandler;
-import cpw.mods.fml.common.TickType;
-import cpw.mods.fml.common.registry.TickRegistry;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
-import factorization.astro.BlockRenderRocketEngine;
 import factorization.ceramics.BlockRenderGreenware;
 import factorization.ceramics.ItemRenderGlazeBucket;
 import factorization.ceramics.TileEntityGreenware;
@@ -87,7 +81,6 @@ import factorization.shared.FactorizationRender;
 import factorization.shared.ItemRenderCapture;
 import factorization.shared.TileEntityFactorization;
 import factorization.sockets.BlockRenderSocketBase;
-import factorization.sockets.SocketBareMotor;
 import factorization.sockets.SocketLacerator;
 import factorization.sockets.TileEntitySocketRenderer;
 import factorization.sockets.fanturpeller.SocketFanturpeller;
@@ -95,17 +88,13 @@ import factorization.weird.BlockRenderDayBarrel;
 import factorization.weird.ContainerPocket;
 import factorization.weird.DayBarrelItemRenderer;
 import factorization.weird.GuiPocketTable;
-import factorization.weird.TileEntityBarrel;
-import factorization.weird.TileEntityBarrelRenderer;
 import factorization.weird.TileEntityDayBarrel;
 import factorization.weird.TileEntityDayBarrelRenderer;
-import factorization.wrath.BlockLightAir;
 import factorization.wrath.BlockRenderLamp;
-import factorization.wrath.EntityWrathFlameFX;
-import factorization.wrath.GuiRouter;
 import factorization.wrath.TileEntityWrathLamp;
 
 public class FactorizationClientProxy extends FactorizationProxy {
+    public FactorizationKeyHandler keyHandler = new FactorizationKeyHandler();
     public FactorizationClientProxy() {
         MinecraftForge.EVENT_BUS.register(this);
     }
@@ -125,7 +114,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             return new GuiPocketTable(new ContainerPocket(player));
         }
         
-        TileEntity te = world.getBlockTileEntity(x, y, z);
+        TileEntity te = world.getTileEntity(x, y, z);
         if (!(te instanceof TileEntityFactorization)) {
             return null;
         }
@@ -143,9 +132,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
             cont = new ContainerFactorization(player, fac);
         }
         GuiScreen gui = null;
-        if (ID == FactoryType.ROUTER.gui) {
-            gui = new GuiRouter(cont);
-        }
         if (ID == FactoryType.STAMPER.gui) {
             gui = new GuiStamper(cont);
         }
@@ -167,15 +153,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         cont.addSlotsForGui(fac, player.inventory);
         return gui;
     }
-
-    @Override
-    public String translateItemStack(ItemStack is) {
-        if (is == null) {
-            return "null";
-        }
-        return is.getItem().getItemDisplayName(is);
-    }
-
+    
     @Override
     public void pokePocketCrafting() {
         // If the player has a pocket crafting table open, have it update
@@ -190,28 +168,18 @@ public class FactorizationClientProxy extends FactorizationProxy {
     int fireParticlesMax = 5;
 
     @Override
-    public void randomDisplayTickFor(World w, int x, int y, int z, Random rand) {
+    public void randomDisplayTickFor(World w, int x, int y, int z, Random rand) { //NORELEASE: This isn't necessary
         Coord here = new Coord(w, x, y, z);
-        int id = w.getBlockId(x, y, z);
+        Block id = w.getBlock(x, y, z);
         int md = w.getBlockMetadata(x, y, z);
-        if (id == Core.registry.factory_block.blockID) {
-            TileEntity te = w.getBlockTileEntity(x, y, z);
+        if (id == Core.registry.factory_block) {
+            TileEntity te = w.getTileEntity(x, y, z);
             if (!(te instanceof IFactoryType)) {
                 return;
             }
 
             FactoryType ft = ((IFactoryType) te).getFactoryType();
 
-            if (ft == FactoryType.LAMP) {
-                for (int i = 0; i < 3; i++) {
-                    double X = x + 0.4 + rand.nextFloat() * 0.2;
-                    double Z = z + 0.4 + rand.nextFloat() * 0.2;
-                    EntityWrathFlameFX flame = new EntityWrathFlameFX(w,
-                            X, y + 0.2 + rand.nextFloat() * 0.1, Z,
-                            0.001 - rand.nextFloat() * 0.002, 0.01, 0.001 - rand.nextFloat() * 0.002);
-                    Minecraft.getMinecraft().effectRenderer.addEffect(flame);
-                }
-            }
             if (ft == FactoryType.SLAGFURNACE) {
                 TileEntitySlagFurnace slag = (TileEntitySlagFurnace) te;
                 if (slag.draw_active <= 0) {
@@ -243,63 +211,12 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
             }
         }
-        if (id == Core.registry.lightair_block.blockID) {
-            if (md == BlockLightAir.fire_md) {
-                int to_spawn = 1;
-                EntityPlayer player = Core.proxy.getClientPlayer();
-                boolean force = false;
-                boolean big = true;
-                if (player != null) {
-                    int dx = (int) (player.posX) - x, dy = (int) (player.posY) - y, dz = (int) (player.posZ) - z;
-                    int dist = Math.abs(dx) + Math.abs(dy) + Math.abs(dz);
-                    if (dist < 4) {
-                        to_spawn = 8;
-                        force = true;
-                        big = false;
-                    }
-                    else if (dist <= 12) {
-                        to_spawn = 4;
-                        force = true;
-                    }
-                    else if (dist <= 16) {
-                        to_spawn = 1;
-                    }
-                }
-
-                //				if (to_spawn == 1) {
-                //					if (rand.nextFloat() > 0.2) {
-                //						return;
-                //					}
-                //				}
-                if (fireParticlesSpawned >= fireParticlesMax) {
-                    if (!force) {
-                        return;
-                    }
-                    else {
-                        to_spawn /= 4;
-                    }
-                }
-                if (!force) {
-                    fireParticlesSpawned += to_spawn;
-                }
-                for (int i = 0; i < to_spawn; i++) {
-                    double X = x + .05 + rand.nextFloat() * .95;
-                    double Z = z + .05 + rand.nextFloat() * .95;
-                    EntityWrathFlameFX flame = new EntityWrathFlameFX(w,
-                            X, y + rand.nextFloat() * 0.25, Z,
-                            (rand.nextFloat() - 0.5) * 0.02, 0.05 + rand.nextFloat() * 0.04, (rand.nextFloat() - 0.5) * 0.02);
-                    if (big) {
-                        flame.setScale(4);
-                    }
-                    Minecraft.getMinecraft().effectRenderer.addEffect(flame);
-                }
-            }
-        }
     }
 
     @Override
     public void playSoundFX(String src, float volume, float pitch) {
-        Minecraft.getMinecraft().sndManager.playSoundFX(src, volume, pitch);
+        ISound sound = new PositionedSoundRecord(new ResourceLocation(src), volume, pitch, 0, 0, 0);
+        Minecraft.getMinecraft().getSoundHandler().playSound(sound);
     }
 
     @Override
@@ -307,121 +224,29 @@ public class FactorizationClientProxy extends FactorizationProxy {
         return Minecraft.getMinecraft().thePlayer;
     }
 
-    public static KeyBinding bag_swap_key = new KeyBinding("FZ Bag of Holding", org.lwjgl.input.Keyboard.KEY_GRAVE);
-    public static KeyBinding pocket_key = new KeyBinding("FZ Pocket Crafting Table", org.lwjgl.input.Keyboard.KEY_C);
 
-    private static class CommandKeySet extends KeyHandler {
-        Map<KeyBinding, Command> map;
 
-        static CommandKeySet create(Object... args) {
-            KeyBinding bindings[] = new KeyBinding[args.length / 2];
-            boolean repeatings[] = new boolean[args.length / 2];
-            Map<KeyBinding, Command> map = new HashMap();
-            for (int i = 0; i < args.length; i += 2) {
-                KeyBinding key = (KeyBinding) args[i];
-                Command cmd = (Command) args[i + 1];
-                map.put(key, cmd);
-                bindings[i / 2] = key;
-                repeatings[i / 2] = false;
-            }
-            CommandKeySet ret = new CommandKeySet(bindings, repeatings);
-            ret.map = map;
-            return ret;
-        }
 
-        private CommandKeySet(KeyBinding[] keyBindings, boolean[] repeatings) {
-            super(keyBindings, repeatings);
-        }
 
-        @Override
-        public EnumSet<TickType> ticks() {
-            return EnumSet.of(TickType.CLIENT);
-        }
-
-        @Override
-        public String getLabel() {
-            return "CommandKeys";
-        }
-
-        @Override
-        public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd,
-                boolean isRepeat) {
-            if (tickEnd) {
-                return;
-            }
-            GuiScreen gui = Minecraft.getMinecraft().currentScreen;
-            if (gui != null) {
-                return;
-            }
-            Command command = map.get(kb);
-            EntityPlayer player = Core.proxy.getClientPlayer();
-            if (player == null) {
-                return;
-            }
-            if (player.isSneaking()) {
-                command = command.reverse;
-            }
-            command.call(Core.proxy.getClientPlayer());
-        }
-
-        @Override
-        public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd) {
-        }
-    }
-    @Override
-    public void registerKeys() {
-        KeyBindingRegistry.registerKeyBinding(CommandKeySet.create(
-                bag_swap_key, Command.bagShuffle,
-                pocket_key, Command.craftOpen));
-        TickRegistry.registerScheduledTickHandler(new IScheduledTickHandler() {
-            @Override
-            public void tickStart(EnumSet<TickType> type, Object... tickData) {}
-
-            @Override
-            public void tickEnd(EnumSet<TickType> type, Object... tickData) {
-                TileEntityDayBarrel.iterateForFinalizedBarrels();
-            }
-
-            @Override
-            public EnumSet<TickType> ticks() {
-                return EnumSet.of(TickType.CLIENT);
-            }
-
-            @Override
-            public String getLabel() {
-                return "fz.barrel_display_list_finalizer";
-            }
-
-            @Override
-            public int nextTickSpacing() {
-                return 20*30; //Every 30 seconds
-            }
-            
-        }, Side.CLIENT);
-    }
-
-    private void setTileEntityRenderer(Class clazz, TileEntitySpecialRenderer r) {
+    private void setTileEntityRendererDispatcher(Class clazz, TileEntitySpecialRenderer r) {
         ClientRegistry.bindTileEntitySpecialRenderer(clazz, r);
     }
 
     @Override
     public void registerRenderers() {
-        if (FzConfig.render_barrel_item || FzConfig.render_barrel_text) {
-            setTileEntityRenderer(TileEntityBarrel.class, new TileEntityBarrelRenderer(FzConfig.render_barrel_item, FzConfig.render_barrel_text));
-        }
-        setTileEntityRenderer(TileEntityDayBarrel.class, new TileEntityDayBarrelRenderer());
-        setTileEntityRenderer(TileEntityGreenware.class, new TileEntityGreenwareRender());
+        setTileEntityRendererDispatcher(TileEntityDayBarrel.class, new TileEntityDayBarrelRenderer());
+        setTileEntityRendererDispatcher(TileEntityGreenware.class, new TileEntityGreenwareRender());
         if (FzConfig.renderTEs) {
             // This is entirely Azanor's fault.
-            setTileEntityRenderer(TileEntityHeater.class, new TileEntityHeaterRenderer());
-            setTileEntityRenderer(TileEntityGrinder.class, new TileEntityGrinderRender());
-            setTileEntityRenderer(TileEntityMixer.class, new TileEntityMixerRenderer());
-            setTileEntityRenderer(TileEntityCrystallizer.class, new TileEntityCrystallizerRender());
-            setTileEntityRenderer(TileEntitySteamTurbine.class, new TileEntitySteamTurbineRender());
-            setTileEntityRenderer(TileEntityLeydenJar.class, new TileEntityLeydenJarRender());
-            setTileEntityRenderer(TileEntityCompressionCrafter.class, new TileEntityCompressionCrafterRenderer());
-            setTileEntityRenderer(SocketLacerator.class, new TileEntitySocketRenderer());
-            setTileEntityRenderer(SocketFanturpeller.class, new TileEntitySocketRenderer());
+            setTileEntityRendererDispatcher(TileEntityHeater.class, new TileEntityHeaterRenderer());
+            setTileEntityRendererDispatcher(TileEntityGrinder.class, new TileEntityGrinderRender());
+            setTileEntityRendererDispatcher(TileEntityMixer.class, new TileEntityMixerRenderer());
+            setTileEntityRendererDispatcher(TileEntityCrystallizer.class, new TileEntityCrystallizerRender());
+            setTileEntityRendererDispatcher(TileEntitySteamTurbine.class, new TileEntitySteamTurbineRender());
+            setTileEntityRendererDispatcher(TileEntityLeydenJar.class, new TileEntityLeydenJarRender());
+            setTileEntityRendererDispatcher(TileEntityCompressionCrafter.class, new TileEntityCompressionCrafterRenderer());
+            setTileEntityRendererDispatcher(SocketLacerator.class, new TileEntitySocketRenderer());
+            setTileEntityRendererDispatcher(SocketFanturpeller.class, new TileEntitySocketRenderer());
             // End section that is azanor's fault
         }
 
@@ -443,7 +268,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderCrystallizer();
         new BlockRenderCompressionCrafter();
         new BlockRenderGreenware().setup();
-        new BlockRenderRocketEngine();
+        //NORELEASE new BlockRenderRocketEngine();
         new BlockRenderServoRail();
         for (FactoryType ft : new FactoryType[] {
                 FactoryType.SOCKET_EMPTY,
@@ -460,9 +285,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             new BlockRenderSocketBase(ft);
         }
         for (FactoryType ft : new FactoryType[] {
-                FactoryType.ROUTER,
                 FactoryType.STAMPER,
-                FactoryType.BARREL,
                 FactoryType.PACKAGER,
                 FactoryType.SLAGFURNACE,
                 FactoryType.SOLARBOILER,
@@ -474,15 +297,11 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderEmpty(FactoryType.EXTENDED);
 
         ItemRenderCapture capture = new ItemRenderCapture();
-        MinecraftForgeClient.registerItemRenderer(Core.registry.factory_block.blockID, capture);
-        MinecraftForgeClient.registerItemRenderer(Core.registry.battery.itemID, new BatteryItemRender(renderBattery));
-        MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket.itemID, new ItemRenderGlazeBucket());
-        MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel.itemID, new DayBarrelItemRenderer(renderBarrel));
-        setTileEntityRenderer(BlockDarkIronOre.Glint.class, new GlintRenderer());
-        
-        if (Minecraft.getMinecraft().getSession().getUsername().equals("neptunepink")) {
-            Core.FZLogger.setLevel(Level.FINE);
-        }
+        MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(Core.registry.factory_block), capture);
+        MinecraftForgeClient.registerItemRenderer(Core.registry.battery, new BatteryItemRender(renderBattery));
+        MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket, new ItemRenderGlazeBucket());
+        MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel, new DayBarrelItemRenderer(renderBarrel));
+        setTileEntityRendererDispatcher(BlockDarkIronOre.Glint.class, new GlintRenderer());
     }
     
     @Override
@@ -505,7 +324,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
     
     @Override
     public String getPocketCraftingTableKey() {
-        return GameSettings.getKeyDisplayString(pocket_key.keyCode);
+        return GameSettings.getKeyDisplayString(FactorizationKeyHandler.pocket_key.getKeyCode());
     }
     
     @Override
@@ -518,13 +337,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
         //return !mc.gameSettings.keyBindSneak.pressed;
     }
     
-    @ForgeSubscribe
-    public void onStitch(TextureStitchEvent.Post event) {
-        int t = event.map.textureType;
-        if (t == 0 /* terrain */) {
-            Core.blockMissingIcon = event.map.getAtlasSprite("this code for getting the missing Icon brought to you by LexManos");
-        } else if (t == 1 /* items */) {
-            Core.itemMissingIcon = event.map.getAtlasSprite("this code for getting the missing Icon brought to you by Tahg");
-        }
+    @Override
+    public void afterLoad() {
+        Core.logInfo("Reloading game settings");
+        Minecraft.getMinecraft().gameSettings.loadOptions();
     }
 }

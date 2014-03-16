@@ -3,8 +3,8 @@ package factorization.servo;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -21,8 +21,8 @@ public abstract class Decorator extends ServoComponent {
     }
     
     @SideOnly(Side.CLIENT)
-    private static class StretchedIcon implements Icon {
-        public Icon under;
+    private static class StretchedIIcon implements IIcon {
+        public IIcon under;
 
         @Override
         @SideOnly(Side.CLIENT)
@@ -80,15 +80,15 @@ public abstract class Decorator extends ServoComponent {
     }
     
     @SideOnly(Side.CLIENT)
-    private static StretchedIcon[] stretcher;
+    private static StretchedIIcon[] stretcher;
     
     @Override
     @SideOnly(Side.CLIENT)
     public void renderStatic(Coord where, RenderBlocks rb) {
         if (stretcher == null) {
-            stretcher = new StretchedIcon[6];
+            stretcher = new StretchedIIcon[6];
             for (int i = 0; i < stretcher.length; i++) {
-                stretcher[i] = new StretchedIcon();
+                stretcher[i] = new StretchedIIcon();
             }
         }
         BlockRenderHelper block = BlockRenderHelper.instance;
@@ -96,11 +96,11 @@ public abstract class Decorator extends ServoComponent {
         block.setBlockBoundsOffset(d, d, d);
         for (int i = 0; i < 6; i++) {
             ForgeDirection face = ForgeDirection.getOrientation(i);
-            Icon icon = getIcon(face);
+            IIcon icon = getIcon(face);
             if (icon == null) {
                 icon = BlockIcons.uv_test;
             }
-            if (stretchIcon()) {
+            if (stretchIIcon()) {
                 stretcher[i].under = icon;
                 block.setTexture(i, stretcher[i]);
             } else {
@@ -110,16 +110,16 @@ public abstract class Decorator extends ServoComponent {
         if (where == null) {
             block.renderForTileEntity();
         } else {
-            block.render(FzUtil.getRB(), where);
+            block.render(rb, where);
         }
     }
     
-    public abstract Icon getIcon(ForgeDirection side);
+    public abstract IIcon getIcon(ForgeDirection side);
     public float getSize() {
         return TileEntityServoRail.width - 1F/2048F;
         //return 6F/16F;
     }
-    public boolean stretchIcon() {
+    public boolean stretchIIcon() {
         return true;
     }
     

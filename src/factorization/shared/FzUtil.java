@@ -7,6 +7,7 @@ import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
 import java.io.DataInput;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,6 +24,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCraftResult;
@@ -36,26 +38,18 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagByte;
-import net.minecraft.nbt.NBTTagByteArray;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagDouble;
-import net.minecraft.nbt.NBTTagFloat;
-import net.minecraft.nbt.NBTTagInt;
-import net.minecraft.nbt.NBTTagIntArray;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagLong;
 import net.minecraft.stats.StatBase;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChatMessageComponent;
 import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidEvent;
@@ -67,6 +61,8 @@ import net.minecraftforge.oredict.OreDictionary;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
+
+import com.mojang.authlib.GameProfile;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -104,15 +100,13 @@ public class FzUtil {
         if (a == null || b == null) {
             return true;
         }
-        return a.itemID == b.itemID && a.getItemDamage() == b.getItemDamage() && sameItemTags(a, b);
+        return a.getItem() == b.getItem() && a.getItemDamage() == b.getItemDamage() && sameItemTags(a, b);
     }
     
     public static boolean sameItemTags(ItemStack a, ItemStack b) {
         if (a.stackTagCompound == null || b.stackTagCompound == null) {
             return a.stackTagCompound == b.stackTagCompound;
         }
-        a.stackTagCompound.setName("tag"); //Notch.
-        b.stackTagCompound.setName("tag"); //Notch.
         return a.stackTagCompound.equals(b.stackTagCompound);
     }
     
@@ -123,7 +117,7 @@ public class FzUtil {
         if (a == null || b == null) {
             return a == b;
         }
-        return a.itemID == b.itemID && a.getItemDamage() == b.getItemDamage();
+        return a.getItem() == b.getItem() && a.getItemDamage() == b.getItemDamage();
     }
     
     /**
@@ -134,7 +128,7 @@ public class FzUtil {
             return template == stranger;
         }
         if (template.getItemDamage() == WILDCARD_DAMAGE) {
-            return template.itemID == stranger.itemID;
+            return template.getItem() == stranger.getItem();
         }
         return similar(template, stranger);
     }
@@ -366,9 +360,9 @@ public class FzUtil {
             callInvChanged = b;
         }
         
-        public void onInvChanged() {
+        public void onInvChanged() { //NORELEASE: Rename?
             if (callInvChanged) {
-                under.onInventoryChanged();
+                under.markDirty();
             }
         }
         
@@ -541,8 +535,8 @@ public class FzUtil {
             dest_inv.set(dest_i, dest);
             set(i, src);
             if (callInvChanged) {
-                dest_inv.under.onInventoryChanged();
-                under.onInventoryChanged();
+                dest_inv.under.markDirty();
+                under.markDirty();
             }
             return delta;
         }
@@ -744,20 +738,20 @@ public class FzUtil {
         }
         
         @Override
-        public String getInvName() { return "Container2IInventory wrapper"; }
+        public String getInventoryName() { return "Container2IInventory wrapper"; }
         
         @Override
-        public boolean isInvNameLocalized() { return false; }
+        public boolean hasCustomInventoryName() { return false; }
         @Override
         public int getInventoryStackLimit() { return 64; }
         @Override
-        public void onInventoryChanged() { }
+        public void markDirty() { }
         @Override
         public boolean isUseableByPlayer(EntityPlayer entityplayer) { return false; }
         @Override
-        public void openChest() { }
+        public void openInventory() { }
         @Override
-        public void closeChest() { }
+        public void closeInventory() { }
     }
     
     public static FzInv openInventory(IInventory orig_inv, ForgeDirection side) {
@@ -861,29 +855,29 @@ public class FzUtil {
      */
     public static IInventory openDoubleChest(TileEntityChest chest, boolean openBothSides) {
         IInventory origChest = (TileEntityChest) chest;
-        World world = chest.worldObj;
+        World world = chest.getWorldObj();
         int i = chest.xCoord, j = chest.yCoord, k = chest.zCoord;
         Block cb = chest.getBlockType();
         if (cb == null) {
             return null;
         }
-        int chestBlock = cb.blockID;
-        if (world.getBlockId(i - 1, j, k) == chestBlock) {
-            return new InventoryLargeChest(origChest.getInvName(), (TileEntityChest) world.getBlockTileEntity(i - 1, j, k), origChest);
+        Block chestBlock = Blocks.chest;
+        if (world.getBlock(i - 1, j, k) == chestBlock) {
+            return new InventoryLargeChest(origChest.getInventoryName(), (TileEntityChest) world.getTileEntity(i - 1, j, k), origChest);
         }
-        if (world.getBlockId(i, j, k - 1) == chestBlock) {
-            return new InventoryLargeChest(origChest.getInvName(), (TileEntityChest) world.getBlockTileEntity(i, j, k - 1), origChest);
+        if (world.getBlock(i, j, k - 1) == chestBlock) {
+            return new InventoryLargeChest(origChest.getInventoryName(), (TileEntityChest) world.getTileEntity(i, j, k - 1), origChest);
         }
         // If we're the lower chest, skip ourselves
-        if (world.getBlockId(i + 1, j, k) == chestBlock) {
+        if (world.getBlock(i + 1, j, k) == chestBlock) {
             if (openBothSides) {
-                return new InventoryLargeChest(origChest.getInvName(), origChest, (TileEntityChest) world.getBlockTileEntity(i + 1, j, k));
+                return new InventoryLargeChest(origChest.getInventoryName(), origChest, (TileEntityChest) world.getTileEntity(i + 1, j, k));
             }
             return null;
         }
-        if (world.getBlockId(i, j, k + 1) == chestBlock) {
+        if (world.getBlock(i, j, k + 1) == chestBlock) {
             if (openBothSides) {
-                return new InventoryLargeChest(origChest.getInvName(), origChest, (TileEntityChest) world.getBlockTileEntity(i, j, k + 1));
+                return new InventoryLargeChest(origChest.getInventoryName(), origChest, (TileEntityChest) world.getTileEntity(i, j, k + 1));
             }
             return null;
         }
@@ -1066,7 +1060,7 @@ public class FzUtil {
         if (ls == null) {
             return;
         }
-        NBTTagCompound liquid_tag = new NBTTagCompound(name);
+        NBTTagCompound liquid_tag = new NBTTagCompound();
         ls.writeToNBT(liquid_tag);
         tag.setTag(name, liquid_tag);
     }
@@ -1134,17 +1128,17 @@ public class FzUtil {
         Coord where;
 
         private FzFakePlayer(World par1World, String par2Str, Coord where) {
-            super(par1World, par2Str);
+            super(par1World, new GameProfile(null, par2Str));
             this.where = where;
         }
 
         //TODO: Forge'll probably have this working properly by the time I catch up to it.
         public void sendChatToPlayer(String s) {}
-        @Override public void sendChatToPlayer(ChatMessageComponent chatmessagecomponent) { }
         public boolean canCommandSenderUseCommand(int i, String s) { return false; }
         @Override public ChunkCoordinates getPlayerCoordinates() { return new ChunkCoordinates(where.x, where.y, where.z); }
         @Override public void addStat(StatBase par1StatBase, int par2) { }
         @Override public void openGui(Object mod, int modGuiId, World world, int x, int y, int z) { }
+        @Override public void addChatMessage(IChatComponent var1) { }
     }
     
     private static HashMap<String, WeakHashMap<World, FzFakePlayer>> usedPlayerCache = new HashMap();
@@ -1202,9 +1196,20 @@ public class FzUtil {
         return ret;
     }
     
+    
     @SideOnly(Side.CLIENT)
+    private static RenderBlocks rb;
+    /**
+     * This isn't very good. It's better to have a RB that points at the current world.
+     */
+    @SideOnly(Side.CLIENT)
+    @Deprecated
     public static RenderBlocks getRB() {
-        return Minecraft.getMinecraft().renderGlobal.globalRenderBlocks;
+        if (rb == null) {
+            rb = new RenderBlocks();
+        }
+        rb.blockAccess = Minecraft.getMinecraft().theWorld;
+        return rb;
     }
     
     static InventoryCrafting getCrafter(ItemStack...slots) {
@@ -1263,7 +1268,7 @@ public class FzUtil {
 
         InventoryCrafting craft = getCrafter(slots);
 
-        IRecipe recipe = findMatchingRecipe(craft, where == null ? null : where.worldObj);
+        IRecipe recipe = findMatchingRecipe(craft, where == null ? null : where.getWorldObj());
         ItemStack result = null;
         if (recipe != null) {
             result = recipe.getCraftingResult(craft);
@@ -1357,7 +1362,7 @@ public class FzUtil {
         ItemStack firstItem, secondItem, result;
         
         void update(IInventory par1InventoryCrafting) {
-            //This is copied from CraftingManager.findMatchingRecipe
+            //This is copied from CraftingManager.findMatchingRecipe; with a few tweaks
             firstItem = secondItem = result = null;
             int i = 0;
             int j;
@@ -1382,20 +1387,20 @@ public class FzUtil {
                 }
             }
 
-            if (i == 2 && firstItem.itemID == secondItem.itemID && firstItem.stackSize == 1 && secondItem.stackSize == 1 && Item.itemsList[firstItem.itemID].isRepairable())
+            if (i == 2 && firstItem.getItem() == secondItem.getItem() && firstItem.stackSize == 1 && secondItem.stackSize == 1 && firstItem.getItem().isRepairable())
             {
-                Item item = Item.itemsList[firstItem.itemID];
-                int k = item.getMaxDamage() - firstItem.getItemDamageForDisplay();
-                int l = item.getMaxDamage() - secondItem.getItemDamageForDisplay();
-                int i1 = k + l + item.getMaxDamage() * 5 / 100;
-                int j1 = item.getMaxDamage() - i1;
+                Item item = firstItem.getItem();
+                int j1 = item.getMaxDamage() - firstItem.getItemDamageForDisplay();
+                int k = item.getMaxDamage() - secondItem.getItemDamageForDisplay();
+                int l = j1 + k + item.getMaxDamage() * 5 / 100;
+                int i1 = item.getMaxDamage() - l;
 
-                if (j1 < 0)
+                if (i1 < 0)
                 {
-                    j1 = 0;
+                    i1 = 0;
                 }
 
-                result = new ItemStack(firstItem.itemID, 1, j1);
+                result = new ItemStack(firstItem.getItem(), 1, i1);
             }
         }
         
@@ -1423,58 +1428,9 @@ public class FzUtil {
         
     };
     
-    //Returns the (approximate) size of an NBT tag.
-    public static int isTagBig(NBTBase tag, int bignessThreshold) {
-        if (tag == null) {
-            return 0;
-        }
-        if (tag instanceof NBTTagByte) {
-            return 1;
-        }
-        if (tag instanceof NBTTagByteArray) {
-            return 4 + 1*((NBTTagByteArray) tag).byteArray.length;
-        }
-        if (tag instanceof NBTTagDouble) {
-            return 8;
-        }
-        if (tag instanceof NBTTagCompound || tag instanceof NBTTagList) {
-            int sum_size = 1;
-            Iterable<NBTBase> collection;
-            if (tag instanceof NBTTagCompound) {
-                NBTTagCompound tc = (NBTTagCompound) tag;
-                collection = tc.getTags();
-            } else {
-                NBTTagList tl = (NBTTagList) tag;
-                collection = tl.tagList;
-            }
-            for (NBTBase sub : collection) {
-                sum_size += 1 + isTagBig(sub, bignessThreshold - sum_size);
-                String s = sub.getName();
-                sum_size += s == null ? 0 : s.length();
-                if (sum_size > bignessThreshold) {
-                    return sum_size;
-                }
-            }
-            return sum_size;
-        }
-        if (tag instanceof NBTTagFloat) {
-            return 4;
-        }
-        if (tag instanceof NBTTagInt) {
-            return 4;
-        }
-        if (tag instanceof NBTTagIntArray) {
-            return 4 + 4*((NBTTagIntArray) tag).intArray.length;
-        }
-        if (tag instanceof NBTTagLong) {
-            return 4;
-        }
-        return 1;
-    }
-    
     static public ItemStack readStack(DataInput input) throws IOException {
-        ItemStack is = ItemStack.loadItemStackFromNBT((NBTTagCompound) NBTBase.readNamedTag(input));
-        if (is == null || is.itemID == 0) {
+        ItemStack is = ItemStack.loadItemStackFromNBT(CompressedStreamTools.read(input));
+        if (is == null || is.getItem() == null) {
             return null;
         }
         return is;
@@ -1596,12 +1552,12 @@ public class FzUtil {
     }
     
     public static FluidStack drainSpecificBlockFluid(World worldObj, int x, int y, int z, boolean doDrain, Fluid targetFluid) {
-        Block b = Block.blocksList[worldObj.getBlockId(x, y, z)];
+        Block b = worldObj.getBlock(x, y, z);
         if (!(b instanceof IFluidBlock)) {
             Fluid vanilla;
-            if (b == Block.waterStill || b == Block.waterMoving) {
+            if (b == Blocks.water || b == Blocks.flowing_water) {
                 vanilla = FluidRegistry.WATER;
-            } else if (b == Block.lavaStill || b == Block.lavaMoving) {
+            } else if (b == Blocks.lava || b == Blocks.flowing_lava) {
                 vanilla = FluidRegistry.LAVA;
             } else {
                 return null;
@@ -1645,5 +1601,58 @@ public class FzUtil {
             if (e != null) ret.add(e);
         }
         return ret;
+
+    public static Block getBlock(ItemStack is) {
+        if (is == null) return null;
+        return Block.getBlockFromItem(is.getItem());
+    }
+    
+    public static Block getBlock(Item it) {
+        return Block.getBlockFromItem(it);
+    }
+    
+    public static Block getBlock(int id) {
+        return Block.getBlockById(id);
+    }
+    
+    public static Item getItem(int id) {
+        return Item.getItemById(id);
+    }
+    
+    public static Item getItem(Block block) {
+        return Item.getItemFromBlock(block);
+    }
+    
+    public static int getId(Block block) {
+        return Block.getIdFromBlock(block);
+    }
+    
+    public static int getId(Item it) {
+        return Item.getIdFromItem(it);
+    }
+    
+    public static int getId(ItemStack is) {
+        if (is == null) return 0;
+        return Item.getIdFromItem(is.getItem());
+    }
+    
+    public static String getName(Item it) {
+        return Item.itemRegistry.getNameForObject(it);
+    }
+    
+    public static String getName(ItemStack is) {
+        return getName(is == null ? null : is.getItem());
+    }
+    
+    public static String getName(Block b) {
+        return Block.blockRegistry.getNameForObject(b);
+    }
+    
+    public static Block getBlockFromName(String blockName) {
+        return (Block) Block.blockRegistry.getObject(blockName);
+    }
+    
+    public static Item getItemFromName(String itemName) {
+        return (Item) Item.itemRegistry.getObject(itemName);
     }
 }

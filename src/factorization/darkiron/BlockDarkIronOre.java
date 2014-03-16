@@ -3,26 +3,27 @@ package factorization.darkiron;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.common.BlockIcons;
 
 public class BlockDarkIronOre extends Block {
-    public BlockDarkIronOre(int blockId) {
-        super(blockId, Material.rock);
+    public BlockDarkIronOre() {
+        super(Material.rock);
     }
     
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIcon(int par1, int par2) {
+    public IIcon getIcon(int par1, int par2) {
         return BlockIcons.ore_dark_iron;
     }
     
@@ -40,16 +41,16 @@ public class BlockDarkIronOre extends Block {
         if (!inRange(x, y, z, Minecraft.getMinecraft().thePlayer)) {
             return;
         }
-        if (world.getBlockTileEntity(x, y, z) != null) {
+        if (world.getTileEntity(x, y, z) != null) {
             return;
         }
         for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-            if (world.isBlockNormalCube(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ)) {
+            if (world.isBlockNormalCubeDefault(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ, true)) {
                 continue;
             }
             TileEntity te = new Glint();
-            world.setBlockTileEntity(x, y, z, te);
-            world.markBlockForRenderUpdate(x, y, z);
+            world.setTileEntity(x, y, z, te);
+            world.markBlockForUpdate(x, y, z);
             return;
         }
     }
@@ -82,7 +83,7 @@ public class BlockDarkIronOre extends Block {
             age++;
             EntityPlayer player = Minecraft.getMinecraft().thePlayer;
             if (lastRenderedTick + 60 < worldObj.getTotalWorldTime() && !inRange(age, age, age, player)) {
-                worldObj.removeBlockTileEntity(xCoord, yCoord, zCoord);
+                worldObj.removeTileEntity(xCoord, yCoord, zCoord);
             }
         }
         

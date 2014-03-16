@@ -6,12 +6,12 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
@@ -21,13 +21,13 @@ import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
-import factorization.common.BlockIcons.ExtendedIcon;
+import factorization.common.BlockIcons.ExtendedIIcon;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 
 public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRenderer {
     float textureOffset;
-    ExtendedIcon interp_side = new ExtendedIcon(BlockIcons.compactSideSlide) {
+    ExtendedIIcon interp_side = new ExtendedIIcon(BlockIcons.compactSideSlide) {
         @Override
         @SideOnly(Side.CLIENT)
         public float getInterpolatedU(double d0) {
@@ -83,7 +83,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         block.rotateCenter(q);
         
         Tessellator.instance.startDrawingQuads();
-        Tessellator.instance.setBrightness(block.getMixedBrightnessForBlock(cc.worldObj, cc.xCoord, cc.yCoord, cc.zCoord));
+        Tessellator.instance.setBrightness(block.getMixedBrightnessForBlock(cc.getWorldObj(), cc.xCoord, cc.yCoord, cc.zCoord));
         GL11.glDisable(GL11.GL_LIGHTING);
         block.renderForTileEntity();
         Tessellator.instance.draw();
@@ -170,18 +170,18 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
             return; //Oh boy!
         }
         double spx, spy, spz;
-        spx = TileEntityRenderer.staticPlayerX;
-        spy = TileEntityRenderer.staticPlayerY;
-        spz = TileEntityRenderer.staticPlayerZ;
-        TileEntityRenderer.staticPlayerX = TileEntityRenderer.staticPlayerY = TileEntityRenderer.staticPlayerZ = 0;
+        spx = TileEntityRendererDispatcher.staticPlayerX;
+        spy = TileEntityRendererDispatcher.staticPlayerY;
+        spz = TileEntityRendererDispatcher.staticPlayerZ;
+        TileEntityRendererDispatcher.staticPlayerX = TileEntityRendererDispatcher.staticPlayerY = TileEntityRendererDispatcher.staticPlayerZ = 0;
         try {
             Tessellator.instance = tess;
             _drawSquishingBlocks(upperCorner, lowerCorner, partial);
         } finally {
             Tessellator.instance = real;
-            TileEntityRenderer.staticPlayerX = spx;
-            TileEntityRenderer.staticPlayerY = spy;
-            TileEntityRenderer.staticPlayerZ = spz;
+            TileEntityRendererDispatcher.staticPlayerX = spx;
+            TileEntityRendererDispatcher.staticPlayerY = spy;
+            TileEntityRendererDispatcher.staticPlayerZ = spz;
         }
     }
     
@@ -202,7 +202,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
             for (int x = lowerCorner.x; x <= upperCorner.x; x++) {
                 for (int y = lowerCorner.y; y <= upperCorner.y; y++) {
                     for (int z = lowerCorner.z; z <= upperCorner.z; z++) {
-                        Block b = Block.blocksList[w.getBlockId(x, y, z)];
+                        Block b = w.getBlock(x, y, z);
                         if (b == null) {
                             if (renderPass == 3) {
                                 if (contentSize == null) {
@@ -233,9 +233,9 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
                                 }
                             }
                             TileEntity te;
-                            if ((te = w.getBlockTileEntity(x, y, z)) != null) {
+                            if ((te = w.getTileEntity(x, y, z)) != null) {
                                 Tessellator.instance = tesrator;
-                                TileEntityRenderer.instance.renderTileEntity(te, partial);
+                                TileEntityRendererDispatcher.instance.renderTileEntity(te, partial);
                                 Tessellator.instance = tess;
                             }
                             continue;

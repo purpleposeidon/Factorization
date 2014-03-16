@@ -1,7 +1,11 @@
 package factorization.servo;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.ByteBufOutputStream;
+
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,7 +18,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.network.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
@@ -27,6 +31,9 @@ import net.minecraftforge.common.ForgeDirection;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 
+import net.minecraftforge.common.util.ForgeDirection;
+import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -44,6 +51,7 @@ import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.notify.Notify;
 import factorization.shared.Core;
+import factorization.shared.FzNetDispatch;
 import factorization.shared.FzUtil;
 import factorization.shared.FzUtil.FzInv;
 import factorization.shared.NetworkFactorization.MessageType;
@@ -77,7 +85,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         worldObj.spawnEntityInWorld(this);
     }
 
-    
+    public void syncWithSpawnPacket() {
+        if (worldObj.isRemote) return;
+        Packet p = FMLNetworkHandler.getEntitySpawningPacket(this);
+        FzNetDispatch.addPacketFrom(p, this);
+    }
     
     
     
@@ -102,9 +114,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     @Override
-    public void readSpawnData(ByteArrayDataInput data) {
+    public void readSpawnData(ByteBuf data) {
         try {
-            putData(new DataInPacket(data, Side.CLIENT));
+            putData(new DataInPacket(new ByteBufInputStream(data), Side.CLIENT));
         } catch (IOException e) {
             e.printStackTrace();
         } catch (IllegalStateException e) {
@@ -113,9 +125,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     @Override
-    public void writeSpawnData(ByteArrayDataOutput data) {
+    public void writeSpawnData(ByteBuf data) {
         try {
-            putData(new DataOutPacket(data, Side.SERVER));
+            putData(new DataOutPacket(new ByteBufOutputStream(data), Side.SERVER));
         } catch (IOException e) {
             e.printStackTrace();
         } catch (IllegalStateException e) {
@@ -135,7 +147,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             if (is == null) {
                 inv[i] = is;
             } else {
-                inv[i] = is.itemID == 0 ? null : is;
+                inv[i] = is.getItem() == null ? null : is;
             }
         }
         data.as(Share.VISIBLE, "sock");
@@ -161,9 +173,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     // Networking
     
-    void broadcast(int message_type, Object... msg) {
-        Packet p = Core.network.entityPacket(this, message_type, msg);
-        Core.network.broadcastPacket(worldObj, (int) posX, (int) posY, (int) posZ, p);
+    void broadcast(MessageType message_type, Object... msg) {
+        FMLProxyPacket p = Core.network.entityPacket(this, message_type, msg);
+        Core.network.broadcastPacket(null, getCurrentPos(), p);
     }
     
     public void broadcastBriefUpdate() {
@@ -176,11 +188,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
     
     @Override
-    public boolean handleMessageFromClient(short messageType, DataInputStream input) throws IOException {
-        if (messageType == MessageType.DataHelperEdit) {
+    public boolean handleMessageFromClient(MessageType messageType, DataInput input) throws IOException {
+        if (messageType == MessageType.DataHelperEditOnEntity) {
             DataInPacketClientEdited di = new DataInPacketClientEdited(input);
             socket.serialize("", di);
-            onInventoryChanged();
+            markDirty();
             return true;
         }
         return false;
@@ -188,9 +200,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(short messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         switch (messageType) {
-        case MessageType.OpenDataHelperGui:
+        case OpenDataHelperGuiOnEntity:
             if (!worldObj.isRemote) {
                 return false;
             } else {
@@ -199,7 +211,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 Minecraft.getMinecraft().displayGuiScreen(new GuiDataConfig(socket, this));
             }
             return true;
-        case MessageType.servo_item:
+        case servo_item:
             while (true) {
                 byte index = input.readByte();
                 if (index < 0) {
@@ -208,7 +220,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 inv[index] = FzUtil.readStack(input);
             }
             return true;
-        case MessageType.servo_brief:
+        case servo_brief:
             Coord a = getCurrentPos();
             Coord b = getNextPos();
             FzOrientation no = FzOrientation.getOrientation(input.readByte());
@@ -227,7 +239,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 motionHandler.stopped = false;
             }
             return true;
-        case MessageType.servo_complete:
+        case servo_complete:
             try {
                 DataHelper data = new DataInPacket(input, Side.CLIENT);
                 putData(data);
@@ -235,11 +247,12 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 e.printStackTrace();
             }
             return true;
-        case MessageType.servo_stopped:
+        case servo_stopped:
             motionHandler.stopped = input.readBoolean();
             return true;
+        default:
+            return socket.handleMessageFromServer(messageType, input);
         }
-        return socket.handleMessageFromServer(messageType, input);
     }
     
     
@@ -276,8 +289,8 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                     Core.network.prefixEntityPacket(dos, this, MessageType.servo_complete);
                     DataHelper data = new DataOutPacket(dos, Side.SERVER);
                     putData(data);
-                    Packet toSend = Core.network.entityPacket(baos);
-                    Core.network.broadcastPacketToLMPers(this, toSend);
+                    FMLProxyPacket toSend = Core.network.entityPacket(baos);
+                    Core.network.broadcastPacket(null, getCurrentPos(), toSend);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -549,12 +562,12 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     @Override
-    public String getInvName() {
+    public String getInventoryName() {
         return "Servo Motor Inventory";
     }
 
     @Override
-    public boolean isInvNameLocalized() {
+    public boolean hasCustomInventoryName() {
         return true;
     }
 
@@ -563,10 +576,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         return 64;
     }
 
-    private static final ItemStack EMPTY_ITEM = new ItemStack(0, 0, 0);
+    private static final ItemStack EMPTY_ITEM = new ItemStack((Item)null);
     
     @Override
-    public void onInventoryChanged() {
+    public void markDirty() {
         ArrayList<Object> toSend = new ArrayList(inv.length*2);
         for (byte i = 0; i < inv.length; i++) {
             if (FzUtil.identical(inv[i], inv_last_sent[i])) {
@@ -591,10 +604,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
 
     @Override
-    public void openChest() { }
+    public void openInventory() { }
 
     @Override
-    public void closeChest() { }
+    public void closeInventory() { }
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack itemstack) {
@@ -681,9 +694,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
     
     @Override
-    public void sendMessage(int msgType, Object... msg) {
-        Packet toSend = Core.network.entityPacket(this, msgType, msg);
-        Core.network.broadcastPacket(worldObj, (int) posX, (int) posY, (int) posZ, toSend); 
+    public void sendMessage(MessageType msgType, Object... msg) {
+        FMLProxyPacket toSend = Core.network.entityPacket(this, msgType, msg);
+        Core.network.broadcastPacket(null, getCurrentPos(), toSend); 
     }
     
 }

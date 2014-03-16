@@ -1,7 +1,7 @@
 package factorization.servo;
 
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,19 +10,18 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.server.management.PlayerInstance;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Charge;
@@ -35,8 +34,8 @@ import factorization.notify.Notify.Style;
 import factorization.shared.BlockClass;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
-import factorization.shared.TileEntityCommon;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityCommon;
 
 public class TileEntityServoRail extends TileEntityCommon implements IChargeConductor {
     public static final float width = 7F/16F;
@@ -103,7 +102,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     }
     
     boolean has(ForgeDirection dir) {
-        TileEntity te = worldObj.getBlockTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
+        TileEntity te = worldObj.getTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
         if (te instanceof TileEntityServoRail) {
             return true;
         }
@@ -219,7 +218,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIcon(ForgeDirection dir) {
+    public IIcon getIcon(ForgeDirection dir) {
         return BlockIcons.servo$rail;
     }
     
@@ -228,7 +227,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         if (decoration != null) {
             decoration.onPlacedOnRail(this);
         }
-        onInventoryChanged();
+        markDirty();
     }
     
     public Decorator getDecoration() {
@@ -244,7 +243,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         info = info == null ? "" : info;
         final Coord here = getCoord();
         if (here.isWeaklyPowered()) {
-            Notify.withItem(new ItemStack(Block.torchRedstoneActive));
+            Notify.withItem(new ItemStack(Blocks.redstone_torch));
             Notify.withStyle(Style.DRAWITEM);
         }
         if (comment.length() > 0) {
@@ -268,30 +267,19 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         if (decoration != null) {
             ret = decoration.onClick(entityplayer, here, side);
         }
-        sendDescriptionPacket();
+        here.markBlockForUpdate();
         showDecorNotification(entityplayer);
         return ret;
     }
     
-    public void sendDescriptionPacket() {
-        WorldServer world = (WorldServer) worldObj;
-        PlayerInstance playerInstance = world.getPlayerManager().getOrCreateChunkWatcher(xCoord >> 4, zCoord >> 4, false);
-        if (playerInstance != null) {
-            playerInstance.sendToAllPlayersWatchingChunk(_getDescriptionPacket(true));
-        }
-    }
-    
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(int messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
         }
-        if (messageType == MessageType.ServoRailDecor || messageType == MessageType.ServoRailDecorUpdate) {
-            if (messageType == MessageType.ServoRailDecorUpdate) {
-                getCoord().redraw();
-            }
-            DataInputStream dis = new DataInputStream(input);
+        if (messageType == MessageType.ServoRailDecor) {
+            //getCoord().redraw(); //NORELEASE: Test
             ServoComponent sc = ServoComponent.readFromPacket(input);
             if (!(sc instanceof Decorator)) {
                 return false;
@@ -310,7 +298,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     }
     
     @Override
-    public boolean handleMessageFromClient(int messageType, DataInputStream input) throws IOException {
+    public boolean handleMessageFromClient(MessageType messageType, DataInput input) throws IOException {
         if (messageType == MessageType.ServoRailEditComment) {
             comment = input.readUTF();
             return true;
@@ -319,11 +307,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     }
     
     @Override
-    public Packet getDescriptionPacket() {
-        return _getDescriptionPacket(false);
-    }
-    
-    public Packet _getDescriptionPacket(boolean with_update) {
+    public FMLProxyPacket getDescriptionPacket() {
         if (decoration == null) {
             return super.getDescriptionPacket();
         } else {
@@ -340,7 +324,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
                 Notify.send(null, getCoord(), "Component packet error!\nSee console log.");
                 return super.getDescriptionPacket();
             }
-            return getDescriptionPacketWith(with_update ? MessageType.ServoRailDecorUpdate : MessageType.ServoRailDecor, baos.toByteArray());
+            return getDescriptionPacketWith(MessageType.ServoRailDecor, baos.toByteArray());
         }
     }
     

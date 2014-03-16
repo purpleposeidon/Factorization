@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Vec3;
@@ -75,7 +76,7 @@ public abstract class Notify {
      *            "{ITEM_INFOS}", or "{ITEM_INFOS_NEWLINE}". ITEM_NAME will be
      *            replaced with the name of the item, and is gotten by calling
      *            {@link ItemStack.getDisplayName}. ITEM_INFOS and
-     *            ITEM_INFOS_NEWLINE are gotten via {@link Item.addInformation}.
+     *            ITEM_INFOS_NEWLINE are gotten via {@link Items.addInformation}.
      *            ITEM_INFOS_NEWLINE is prefixed with a newline, unless the
      *            information list is empty.
      *            </p>

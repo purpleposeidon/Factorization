@@ -1,12 +1,9 @@
 package factorization.misc;
 
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.minecraft.client.Minecraft;
-
-import cpw.mods.fml.common.FMLLog;
+import factorization.common.FzConfig;
 
 public class LagssieWatchDog implements Runnable {
     static int ticks = 0;
@@ -56,9 +53,10 @@ public class LagssieWatchDog implements Runnable {
                 } else {
                     log("");
                 }
-                if (!Minecraft.getMinecraft().running) {
-                    return;
-                }
+                //NORELEASE: We're a daemon thread, so this shouldn't be needed. Test!
+                //if (!Minecraft.getMinecraft().running) {
+                //	return;
+                //}
                 for (StackTraceElement ste : watch_thread.getStackTrace()) {
                     log("   " + ste.toString());
                 }
@@ -68,13 +66,19 @@ public class LagssieWatchDog implements Runnable {
             last_tick = ticks;
         }
     }
-    
-    public static Logger logger = Logger.getLogger("LAG");
-    static {
-        logger.setParent(FMLLog.getLogger());
-    }
 
     void log(String msg) {
-        logger.log(Level.INFO, msg);
+        System.out.println("[LAG] " + msg); //NORELEASE: This used to be cool
+    }
+    
+    
+    static LagssieWatchDog instance;
+    static void start() {
+        if (FzConfig.lagssie_watcher) {
+            instance = new LagssieWatchDog(Thread.currentThread(), FzConfig.lagssie_interval);
+            Thread dog = new Thread(instance);
+            dog.setDaemon(true);
+            dog.start();
+        }
     }
 }

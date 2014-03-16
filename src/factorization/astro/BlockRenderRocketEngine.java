@@ -2,8 +2,8 @@ package factorization.astro;
 
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
@@ -14,9 +14,10 @@ import factorization.shared.FactorizationBlockRender;
 public class BlockRenderRocketEngine extends FactorizationBlockRender {
 
     @Override
-    public void render(RenderBlocks rb) {
-        Icon body = BlockIcons.rocket_engine_invalid;
-        Icon nozzle = BlockIcons.rocket_engine_nozzle, bottom = BlockIcons.rocket_engine_bottom_hole, top = BlockIcons.rocket_engine_top;
+    public boolean render(RenderBlocks rb) {
+        IIcon body = BlockIcons.rocket_engine_invalid;
+        IIcon nozzle = BlockIcons.rocket_engine_nozzle, bottom = BlockIcons.rocket_engine_bottom_hole, top = BlockIcons.rocket_engine_top;
+        final Coord here = getCoord();
         if (world_mode) { //Really, it should be...
             TileEntityRocketEngine rocket = (TileEntityRocketEngine) te;
             if (rocket != null && rocket.lastValidationStatus) {
@@ -27,7 +28,7 @@ public class BlockRenderRocketEngine extends FactorizationBlockRender {
         Tessellator tess = Tessellator.instance;
         {
             tess.setBrightness(block.getMixedBrightnessForBlock(w, x, y, z));
-            //tess.setBrightness(this.renderMinY > 0.0D ? l : par1Block.getMixedBrightnessForBlock(this.blockAccess, par2, par3 - 1, par4));
+            //tess.setBrightness(this.renderMinY > 0.0D ? l : par1Blocks.getMixedBrightnessForBlock(this.blockAccess, par2, par3 - 1, par4));
             tess.setColorOpaque_F(1, 1, 1);
         }
         float d = 2F/16F;
@@ -53,6 +54,7 @@ public class BlockRenderRocketEngine extends FactorizationBlockRender {
                 2, 3, 2);
         block.begin();
         block.renderRotated(tess, here);
+        return true;
     }
 
     @Override

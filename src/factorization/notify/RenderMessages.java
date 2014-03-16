@@ -18,12 +18,13 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ForgeSubscribe;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 import org.lwjgl.opengl.GL11;
 
 import factorization.api.Coord;
 import factorization.notify.Notify.Style;
+import factorization.shared.FzUtil;
 
 public class RenderMessages extends RenderMessagesProxy {
     static ArrayList<Message> messages = new ArrayList();
@@ -66,7 +67,7 @@ public class RenderMessages extends RenderMessagesProxy {
         messages.add(msg);
     }
 
-    @ForgeSubscribe
+    @SubscribeEvent
     public void renderMessages(RenderWorldLastEvent event) {
         doRenderMessages(event); // Forge events are too hard for eclipse to hot-swap?
     }
@@ -197,7 +198,7 @@ public class RenderMessages extends RenderMessagesProxy {
 
         if (m.show_item) {
             TextureManager re = mc.renderEngine;
-            RenderBlocks rb = mc.renderGlobal.globalRenderBlocks;
+            RenderBlocks rb = FzUtil.getRB();
             
             GL11.glTranslatef((float) (halfWidth + 4), -lineCount/2, 0);
             renderItem.renderItemAndEffectIntoGUI(fr, re, m.item, 0, 0);
