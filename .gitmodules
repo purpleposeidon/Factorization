@@ -1,3 +1,6 @@
 [submodule "resources/assets/factorization/lang"]
 	path = resources/assets/factorization/lang
 	url = git@github.com:purpleposeidon/FactorizationLocalizations.git
+[submodule "src/main/resources/assets/factorization/lang"]
+	path = src/main/resources/assets/factorization/lang
+	url = git@github.com:purpleposeidon/FactorizationLocalizations.git
