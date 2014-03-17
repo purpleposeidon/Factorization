@@ -49,7 +49,7 @@ public class MiscClientTickHandler {
     
     boolean wasClicked = false;
     private void checkPickBlockKey() {
-        if (!mc.gameSettings.keyBindPickBlock.isPressed()) {
+        if (!mc.gameSettings.keyBindPickBlock.getIsKeyPressed()) {
             wasClicked = false;
             return;
         }
