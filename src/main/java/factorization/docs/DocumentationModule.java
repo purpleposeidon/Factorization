@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import javax.management.RuntimeErrorException;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
@@ -270,7 +272,12 @@ public class DocumentationModule implements ICommand {
             Minecraft mc = Minecraft.getMinecraft();
             IResource src = mc.getResourceManager().getResource(getResourceForName(name));
             return src.getInputStream();
-        } catch (IOException e) {
+        } catch (Throwable e) {
+            //FIXME: Compiler disagrees with eclipse!
+            if (e instanceof IOException) {
+                return null;
+            }
+            e.printStackTrace();
             return null;
         }
     }
