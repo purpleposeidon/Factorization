@@ -13,7 +13,6 @@ public class FzConfig {
 
     // I'd totally unstatic all these, but bluh
     public static Configuration config;
-    public static Pattern routerBan;
     public static boolean render_barrel_item = true;
     public static boolean render_barrel_text = true;
     public static boolean render_barrel_use_displaylists = true;
@@ -26,7 +25,6 @@ public class FzConfig {
     public static boolean enable_dimension_slice = Core.dev_environ;
     public static int dimension_slice_dimid = -7;
     public static int force_max_entity_radius = -1;
-    public static boolean spread_wrathfire = true;
     public static boolean pocket_craft_anywhere = true;
     public static boolean bag_swap_anywhere = true;
     public static String pocketActions = "xcbf";
@@ -49,12 +47,10 @@ public class FzConfig {
     public static int max_rocket_height = 64;
     public static boolean stretchy_clay = true;
     public static boolean equal_opportunities_for_mobs = true;
-    public static boolean fix_nether_fog = true;
     public static boolean fix_middle_click = true;
     public static boolean embarken_wood = true;
     public static boolean proper_projectile_physics = true;
     public static boolean buffed_nametags = true;
-    public static boolean invasiveCharge = false;
     public static boolean enable_solar_steam = true;
     public static boolean fanturpeller_works_on_players = true;
     public static boolean large_servo_instructions = false;
@@ -129,13 +125,12 @@ public class FzConfig {
             lowest_dilation = Math.max(1, Math.min(0, lowest_dilation));
             lagssie_watcher = getBoolConfig("enableLagWatchDog", "client", lagssie_watcher, "If true, enables a thread that dumps a stack trace of Minecraft if it is paused for longer than lagWatchDogInterval");
             lagssie_interval = getDoubleConfig("lagWatchDogInterval", "client", lagssie_interval, "If the game is stuck for longer than this amount of time (in seconds), dump a stacktrace of what it is doing.");
-            fix_nether_fog = getBoolConfig("fixNetherFog", "client", fix_nether_fog, "Remove nether fog at short render distances");
             fix_middle_click = getBoolConfig("fixPickBlock", "client", fix_middle_click, "Make middle clicking more useful");
             large_servo_instructions = getBoolConfig("largeServoInstructions", "client", large_servo_instructions, "Render servo instructions extra-large. This can also be toggled on and off using '/f servoInstructionSize'.");
         }
 
         
-        add_branding = getBoolConfig("addBranding", "general", add_branding, null); //For our Tekkit friends
+        add_branding = getBoolConfig("addBranding", "general", add_branding, null);
         
         gen_silver_ore = getBoolConfig("generateSilverOre", "general", gen_silver_ore, "Set to false to disable silver ore generation");
         int config_silver_size = getIntConfig("silverOreNodeNewSize", "general", silver_ore_node_new_size, "The size of silver ore nodes. Between 5 & 35. Default is " + silver_ore_node_new_size);
@@ -151,16 +146,6 @@ public class FzConfig {
         }
         
         enable_dimension_slice = getBoolConfig("enableDimensionSlices", "dimensionSlices", enable_dimension_slice, "work in progress; may be unstable");
-        spread_wrathfire = getBoolConfig("spreadWrathFire", "server", spread_wrathfire, null);
-        String p = getStringConfig("bannedRouterInventoriesRegex", "server", "", "This is a Java Regex to blacklist router access");
-        if (p != null && p.length() != 0) {
-            try {
-                routerBan = Pattern.compile(p);
-            } catch (PatternSyntaxException e) {
-                e.printStackTrace();
-                Core.logWarning("Factorization: config has invalid Java Regex for banned_router_inventories: " + p);
-            }
-        }
         entity_relight_task_id = config.get("general", "entityRelightTask", -1).getInt();
         if (entity_relight_task_id == -1) {
             entity_relight_task_id = EntityRegistry.findGlobalUniqueEntityId();
