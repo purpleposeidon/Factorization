@@ -5,6 +5,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -155,9 +156,9 @@ public class DocViewer extends GuiScreen {
         hot = false;
         drawDefaultBackground();
         
-        backButton.drawButton = !the_pageHistory.isEmpty();
-        prevPage.drawButton = doc.pages.indexOf(page) > 0;
-        nextPage.drawButton = doc.pages.indexOf(page) + 2 < doc.pages.size();
+        backButton.visible = !the_pageHistory.isEmpty();
+        prevPage.visible = doc.pages.indexOf(page) > 0;
+        nextPage.visible = doc.pages.indexOf(page) + 2 < doc.pages.size();
         
         {
             int paddingVert = 8, paddingHoriz = 12;
@@ -207,7 +208,7 @@ public class DocViewer extends GuiScreen {
     
     void drawItem(ItemStack is, int x, int y) {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GuiContainer.itemRenderer.renderItemAndEffectIntoGUI(this.fontRenderer, this.mc.getTextureManager(), is, x, y);
+        GuiContainer.itemRender.renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), is, x, y);
     }
     
     boolean hot = true;
@@ -316,5 +317,9 @@ public class DocViewer extends GuiScreen {
     @Override
     public boolean doesGuiPauseGame() {
         return false;
+    }
+    
+    FontRenderer getFont() {
+        return fontRendererObj;
     }
 }

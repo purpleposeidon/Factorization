@@ -6,12 +6,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.tileentity.TileEntity;
 
 import org.lwjgl.opengl.GL11;
 
+import factorization.api.Coord;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 import factorization.weird.TileEntityDayBarrel;
@@ -23,6 +25,7 @@ public class FigurePage extends AbstractPage {
     
     FigurePage(DocWorld figure) {
         this.figure = figure;
+        eyeball = FzUtil.makePlayer(new Coord(figure, 0, 0, 0), "drawFigurePage");
     }
 
     double origRotationX, origRotationY;
@@ -42,6 +45,8 @@ public class FigurePage extends AbstractPage {
     
     WorldRenderer wr = null;
     
+    EntityLivingBase eyeball;
+    
     @Override
     void draw(DocViewer doc, int ox, int oy) {
         FzUtil.checkGLError("FigurePage -- before render");
@@ -49,7 +54,7 @@ public class FigurePage extends AbstractPage {
             GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
             wr = new WorldRenderer(figure, new ArrayList(), 0, 0, 0, getRenderList());
             wr.needsUpdate = true;
-            wr.updateRenderer();
+            wr.updateRenderer(eyeball);
             GL11.glPopAttrib();
             FzUtil.checkGLError("FigurePage -- update worldrenderer");
         }
@@ -89,7 +94,7 @@ public class FigurePage extends AbstractPage {
         }
         GL11.glPopAttrib();
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
-        TileEntityRenderer ter = TileEntityRenderer.instance;
+        TileEntityRendererDispatcher ter = TileEntityRendererDispatcher.instance;
         ter.staticPlayerX = ter.staticPlayerY = ter.staticPlayerZ = 0;
         for (TileEntity te : figure.tileEntities) {
             ter.renderTileEntityAt(te, te.xCoord, te.yCoord, te.zCoord, 0);
@@ -108,7 +113,7 @@ public class FigurePage extends AbstractPage {
             GL11.glPushMatrix();
             GL11.glTranslated(x, y, z);
             //GL11.glTranslated(ent.posX, ent.posY, ent.posZ);
-            rm.renderEntity(ent, 0);
+            rm.renderEntitySimple(ent, 0);
             GL11.glPopMatrix();
         }
         GL11.glPopAttrib();

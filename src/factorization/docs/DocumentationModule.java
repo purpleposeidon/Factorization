@@ -1,5 +1,10 @@
 package factorization.docs;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.base64.Base64;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -14,22 +19,21 @@ import java.util.zip.GZIPOutputStream;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.Resource;
+import net.minecraft.client.resources.IResource;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChatMessageComponent;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.ForgeDirection;
-
-import org.bouncycastle.util.encoders.Base64;
-
+import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.relauncher.Side;
@@ -54,10 +58,10 @@ public class DocumentationModule implements ICommand {
 
     private static void loadCache() {
         ArrayList<ItemStack> items = new ArrayList();
-        for (Item it : Item.itemsList) {
+        for (Item it : (Iterable<Item>) Item.itemRegistry) {
             if (it == null) continue;
             try {
-                it.getSubItems(it.itemID, null, items);
+                it.getSubItems(it, null, items);
             } catch (Throwable t) {
                 Core.logWarning("Error getting sub-items from item: " + it);
                 t.printStackTrace();
@@ -112,7 +116,7 @@ public class DocumentationModule implements ICommand {
     public boolean isUsernameIndex(String[] astring, int i) { return false; }
     
     void msg(ICommandSender player, String msg) {
-        player.sendChatToPlayer(ChatMessageComponent.createFromText(msg));
+        player.addChatMessage(new ChatComponentText(msg));
     }
     
     int measure(Coord bottom, ForgeDirection east, ForgeDirection west, Block gold) {
@@ -131,7 +135,7 @@ public class DocumentationModule implements ICommand {
         if (!(icommandsender instanceof EntityPlayer)) return;
         EntityPlayer player = (EntityPlayer) icommandsender;
         Coord peak = new Coord(player).add(ForgeDirection.DOWN);
-        Block gold = Block.blockGold;
+        Block gold = Blocks.gold_block;
         if (!peak.is(gold)) {
             msg(player, "Not on a gold block");
             return;
@@ -234,17 +238,17 @@ public class DocumentationModule implements ICommand {
     static String encodeNBT(NBTTagCompound tag) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(baos));
-        tag.writeNamedTag(tag, dos);
+        CompressedStreamTools.write(tag, dos);
         dos.close();
         byte[] compressedData = baos.toByteArray();
-        byte[] enc = Base64.encode(compressedData);
-        return new String(enc);
+        ByteBuf enc = Base64.encode(Unpooled.copiedBuffer(compressedData));
+        return new String(enc.array());
     }
     
     static NBTTagCompound decodeNBT(String contents) throws IOException {
-        byte[] decoded = Base64.decode(contents);
-        ByteArrayInputStream bais = new ByteArrayInputStream(decoded);
-        return (NBTTagCompound) NBTTagCompound.readNamedTag(new DataInputStream(new GZIPInputStream(bais)));
+        ByteBuf decoded = Base64.decode(Unpooled.copiedBuffer(contents.getBytes()));
+        ByteBufInputStream bais = new ByteBufInputStream(decoded);
+        return CompressedStreamTools.read(new DataInputStream(new GZIPInputStream(bais)));
     }
     
     public static DocWorld loadWorld(String text) {
@@ -264,7 +268,7 @@ public class DocumentationModule implements ICommand {
     public static InputStream getDocumentResource(String name) {
         try {
             Minecraft mc = Minecraft.getMinecraft();
-            Resource src = mc.getResourceManager().getResource(getResourceForName(name));
+            IResource src = mc.getResourceManager().getResource(getResourceForName(name));
             return src.getInputStream();
         } catch (IOException e) {
             return null;

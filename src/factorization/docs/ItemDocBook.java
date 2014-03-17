@@ -1,20 +1,20 @@
 package factorization.docs;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemFactorization;
 
 public class ItemDocBook extends ItemFactorization {
 
-    public ItemDocBook(int itemId, String name, TabType tabType) {
-        super(itemId, name, tabType);
+    public ItemDocBook(String name, TabType tabType) {
+        super(name, tabType);
         setMaxStackSize(1);
     }
     
@@ -36,8 +36,8 @@ public class ItemDocBook extends ItemFactorization {
     
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getIconFromDamage(int par1) {
-        return Item.enchantedBook.getIconFromDamage(0);
+    public IIcon getIconFromDamage(int par1) {
+        return Items.enchanted_book.getIconFromDamage(0);
     }
     
     @Override

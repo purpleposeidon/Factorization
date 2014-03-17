@@ -2,21 +2,23 @@ package factorization.docs;
 
 import java.util.ArrayList;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.common.util.Constants;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
-import factorization.servo.ServoMotor;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
@@ -31,7 +33,7 @@ public class DocWorld extends WorldClient {
     Coord orig = new Coord(this, 0, 0, 0);
     
     public DocWorld() {
-        super(mc.getNetHandler(), new WorldSettings(mc.theWorld.getWorldInfo()), 0, 0, mc.mcProfiler, mc.getLogAgent());
+        super(mc.getNetHandler(), new WorldSettings(mc.theWorld.getWorldInfo()), 0, mc.theWorld.difficultySetting, mc.mcProfiler);
         blockIds = new int[LEN];
         blockMetadatas = new int[LEN];
     }
@@ -43,20 +45,20 @@ public class DocWorld extends WorldClient {
         orig.readFromNBT(ORIG_ENT_POS, tag);
         blockIds = tag.getIntArray(BLOCK_IDS);
         blockMetadatas = tag.getIntArray(BLOCK_METADATA);
-        NBTTagList teList = tag.getTagList(TE_LIST);
+        NBTTagList teList = tag.getTagList(TE_LIST, Constants.NBT.TAG_COMPOUND);
         tileEntities.clear();
         for (int i = 0; i < teList.tagCount(); i++) {
-            NBTTagCompound tc = (NBTTagCompound) teList.tagAt(i);
+            NBTTagCompound tc = (NBTTagCompound) teList.getCompoundTagAt(i);
             TileEntity te = TileEntity.createAndLoadEntity(tc);
             if (te != null) {
-                te.worldObj = this;
+                te.setWorldObj(this);
                 tileEntities.add(te);
             }
         }
         entities.clear();
-        NBTTagList entList = tag.getTagList(ENTITY_LIST);
+        NBTTagList entList = tag.getTagList(ENTITY_LIST, Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < entList.tagCount(); i++) {
-            NBTTagCompound tc = (NBTTagCompound) entList.tagAt(i);
+            NBTTagCompound tc = (NBTTagCompound) entList.getCompoundTagAt(i);
             Entity e = EntityList.createEntityFromNBT(tc, this);
             if (e != null) {
                 e.worldObj = this;
@@ -99,18 +101,18 @@ public class DocWorld extends WorldClient {
     }
     
     @Override
-    public int getBlockId(int x, int y, int z) {
+    public Block getBlock(int x, int y, int z) {
         int i = getIndex(x, y, z);
-        if (i == -1) return 0;
+        if (i == -1) return Blocks.air;
         int id = blockIds[i];
         if (id == -10) {
-            return Core.registry.factory_block.blockID;
+            return Core.registry.factory_block;
         } else if (id == -11) {
-            return Core.registry.resource_block.blockID;
+            return Core.registry.resource_block;
         } else if (id == -12) {
-            return Core.registry.dark_iron_ore.blockID;
+            return Core.registry.dark_iron_ore;
         } else {
-            return id;
+            return FzUtil.getBlock(id);
         }
     }
     
@@ -122,7 +124,7 @@ public class DocWorld extends WorldClient {
     }
     
     @Override
-    public TileEntity getBlockTileEntity(int x, int y, int z) {
+    public TileEntity getTileEntity(int x, int y, int z) {
         for (TileEntity te : tileEntities) {
             if (te.xCoord == x && te.yCoord == y && te.zCoord == z) {
                 return te;
@@ -142,17 +144,18 @@ public class DocWorld extends WorldClient {
         return 0xF;
     }
     
-    void setIdMdTe(DeltaCoord dc, int id, int md, TileEntity te) {
+    void setIdMdTe(DeltaCoord dc, Block block, int md, TileEntity te) {
         int i = getIndex(dc.x, dc.y, dc.z);
         if (i == -1) return;
-        if (id == Core.registry.factory_block.blockID) {
-            id = -10;
-        } else if (id == Core.registry.resource_block.blockID) {
-            id = -11;
-        } else if (id == Core.registry.dark_iron_ore.blockID) {
-            id = -12;
+        int useId = FzUtil.getId(block);
+        if (block == Core.registry.factory_block) {
+            useId = -10;
+        } else if (block == Core.registry.resource_block) {
+            useId = -11;
+        } else if (block == Core.registry.dark_iron_ore) {
+            useId = -12;
         }
-        blockIds[i] = id;
+        blockIds[i] = useId;
         blockMetadatas[i] = md;
         
         if (te == null) return;
@@ -170,24 +173,29 @@ public class DocWorld extends WorldClient {
     
     Chunk myChunk = new Chunk(this, 0, 0) {
         @Override
-        public int getBlockID(int x, int y, int z) {
-            return DocWorld.this.getBlockId(x, y, z);
+        public Block getBlock(int x, int y, int z) {
+            return DocWorld.this.getBlock(x, y, z);
         }
         
         @Override
-        public int getBlockMetadata(int x, int y, int z) {
-            return DocWorld.this.getBlockMetadata(x, y, z);
+        public TileEntity func_150806_e(int x, int y, int z) {
+            return DocWorld.this.getTileEntity(x, y, z);
         }
         
         @Override
-        public TileEntity getChunkBlockTileEntity(int x, int y, int z) {
-            return DocWorld.this.getBlockTileEntity(x, y, z);
+        public TileEntity getTileEntityUnsafe(int x, int y, int z) {
+            return DocWorld.this.getTileEntity(x, y, z);
         }
         
         @Override
         public boolean getAreLevelsEmpty(int par1, int par2) {
             return false;
         }
+        
+        @Override
+        public int getBlockMetadata(int x, int y, int z) {
+            return DocWorld.this.getBlockMetadata(x, y, z);
+        }		
         
     };
     

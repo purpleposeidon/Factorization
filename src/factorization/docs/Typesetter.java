@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.resources.Resource;
+import net.minecraft.client.resources.IResource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
@@ -162,7 +162,7 @@ public class Typesetter {
                     ResourceLocation rl = new ResourceLocation(imgName);
                     Minecraft mc = Minecraft.getMinecraft();
                     try {
-                        Resource r = mc.getResourceManager().getResource(rl);
+                        IResource r = mc.getResourceManager().getResource(rl);
                         if (r == null) {
                             error("Not found: " + imgName);
                             continue;
@@ -184,7 +184,7 @@ public class Typesetter {
                     ResourceLocation rl = new ResourceLocation(imgName);
                     Minecraft mc = Minecraft.getMinecraft();
                     try {
-                        Resource r = mc.getResourceManager().getResource(rl);
+                        IResource r = mc.getResourceManager().getResource(rl);
                         if (r == null) {
                             error("Not found: " + imgName);
                             continue;

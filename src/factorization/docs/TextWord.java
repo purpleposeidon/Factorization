@@ -27,7 +27,7 @@ public class TextWord extends Word {
         if (hyperlink != null) {
             t = "" + EnumChatFormatting.AQUA + EnumChatFormatting.UNDERLINE + text;
         }
-        page.fontRenderer.drawString(t, x, y, 0xEEEEEE); // The return value of drawString isn't helpful.
-        return page.fontRenderer.getStringWidth(text);
+        page.getFont().drawString(t, x, y, 0xEEEEEE); // The return value of drawString isn't helpful.
+        return page.getFont().getStringWidth(text);
     }
 }
