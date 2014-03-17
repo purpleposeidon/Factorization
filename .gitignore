@@ -1,19 +1,11 @@
-backup/
-OLD/
 *~
 .*.swp
 *.pyo
 *.pyc
-src.ohfuck
-cb
-cb.old
-Skin Guides/
-Skin Guides.zip
-texture/ignore
 *.blend1
 *.blend2
 .*
 eclipse/
 DeSrg/fields.csv
 DeSrg/methods.csv
-build/Factorization-dev.jar
+build/
