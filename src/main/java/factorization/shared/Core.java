@@ -70,6 +70,8 @@ public class Core {
     public static Registry registry;
     public static FactorizationOreProcessingHandler foph;
     @SidedProxy(clientSide = "factorization.common.FactorizationClientProxy", serverSide = "factorization.common.FactorizationProxy")
+    //TODO: Server proxy should extend clientproxy for sanity.
+    //(Have to be sure that the server overrides everything tho!) 
     public static FactorizationProxy proxy;
     public static NetworkFactorization network;
     public static FzNetEventHandler netevent;
