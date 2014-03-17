@@ -16,7 +16,7 @@ public class CompatManager {
             }
             try {
                 cl.loadClass(base_name + "Compat_" + mod).newInstance();
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 // Err, strange
                 Core.logWarning("Failed to load compatability module for " + mod);
                 e.printStackTrace();
