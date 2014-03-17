@@ -6,7 +6,8 @@ import java.util.HashSet;
 import java.util.PriorityQueue;
 
 import net.minecraft.block.Block;
-import net.minecraft.item.Item;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemBucket;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -286,13 +287,13 @@ public class PumpLiquids extends BufferedFanturpeller {
             Block block = fluid.getBlock();
             if (block == null) return false;
             if (drainBlock(pc, false) != null) return false;
-            if (block == Block.waterStill) block = Block.waterMoving;
-            else if (block == Block.lavaStill) block = Block.lavaMoving;
+            if (block == Blocks.water) block = Blocks.flowing_water;
+            else if (block == Blocks.lava) block = Blocks.flowing_lava;
             
-            if (block == Block.waterMoving) {
-                ((ItemBucket) Item.bucketWater).tryPlaceContainedLiquid(at.w, at.x, at.y, at.z);
+            if (block == Blocks.flowing_water) {
+                ((ItemBucket) Items.water_bucket).tryPlaceContainedLiquid(at.w, at.x, at.y, at.z);
             } else {
-                at.setIdMd(block.blockID, block instanceof BlockFluidFinite ? 0xF : 0, true);
+                at.setIdMd(block, block instanceof BlockFluidFinite ? 0xF : 0, true);
             }
             buffer.setFluid(null);
             at.notifyBlockChange();

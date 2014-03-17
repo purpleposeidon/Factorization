@@ -26,11 +26,6 @@ import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
-
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteArrayDataOutput;
-
 import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
@@ -49,7 +44,6 @@ import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
-import factorization.notify.Notify;
 import factorization.shared.Core;
 import factorization.shared.FzNetDispatch;
 import factorization.shared.FzUtil;

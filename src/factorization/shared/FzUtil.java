@@ -177,7 +177,7 @@ public class FzUtil {
         if (is == null) {
             return Long.MIN_VALUE;
         }
-        long ih = is.itemID;
+        long ih = FzUtil.getId(is);
         long md = is.getItemDamage();
         long tg = 0;
         if (is.hasTagCompound()) {
@@ -1601,6 +1601,7 @@ public class FzUtil {
             if (e != null) ret.add(e);
         }
         return ret;
+    }
 
     public static Block getBlock(ItemStack is) {
         if (is == null) return null;

@@ -41,14 +41,23 @@ public class FzNetDispatch {
     }
     
     public static void addPacketFrom(Packet packet, Chunk chunk) {
-        World world = chunk.worldObj;
-        if (world.isRemote) {
-            return;
-        }
-        WorldServer w = (WorldServer) chunk.worldObj;
-        PlayerManager.PlayerInstance pi = w.getPlayerManager().getOrCreateChunkWatcher(chunk.xPosition, chunk.zPosition, false);
-        if (pi != null) {
-            pi.sendToAllPlayersWatchingChunk(packet);
+        final WorldServer world = (WorldServer) chunk.worldObj;
+        if (world.isRemote) return;
+        final PlayerManager pm = world.getPlayerManager();
+        final int near = 10;
+        final int far = 16;
+        final int sufficientlyClose = (near*16)*(near*16);
+        final int superlativelyFar = (far*16)*(far*16);
+        final int chunkBlockX = chunk.xPosition*16 + 8;
+        final int chunkBlockZ = chunk.zPosition*16 + 8;
+        for (EntityPlayerMP player : (Iterable<EntityPlayerMP>) world.playerEntities) {
+            double dx = player.posX - chunkBlockX;
+            double dz = player.posZ - chunkBlockZ;
+            double dist = dx*dx + dz*dz;
+            if (dist > superlativelyFar) continue;
+            if (dist < sufficientlyClose || pm.isPlayerWatchingChunk(player, chunk.xPosition, chunk.zPosition)) {
+                player.playerNetServerHandler.sendPacket(packet);
+            }
         }
     }
     

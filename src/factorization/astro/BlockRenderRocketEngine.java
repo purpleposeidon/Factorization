@@ -3,11 +3,9 @@ package factorization.astro;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
-import factorization.shared.BlockFactorization;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.FactorizationBlockRender;
 
@@ -35,7 +33,6 @@ public class BlockRenderRocketEngine extends FactorizationBlockRender {
         float height = 6F/16F;
         float b = height*3 - 3F/16F;
         //The nozzle
-        final Coord here = getCoord();
         for (int i = 1; i < 4; i++) {
             if (i == 1) {
                 block.useTextures(bottom, nozzle, nozzle, nozzle, nozzle, nozzle);

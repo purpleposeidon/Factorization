@@ -35,25 +35,6 @@ import factorization.notify.NotifyImplementation;
 
 public class NetworkFactorization {
     public static final ItemStack EMPTY_ITEMSTACK = new ItemStack(Blocks.air);
-    static boolean addPacketNPE_spam = false;
-    void addPacket(EntityPlayer player, Packet packet) {
-        if (player.worldObj.isRemote) {
-            PacketDispatcher.sendPacketToServer(packet);
-        } else {
-            if (player instanceof EntityPlayerMP) {
-                EntityPlayerMP epmp = (EntityPlayerMP) player;
-                if (epmp.playerNetServerHandler == null) {
-                    if (addPacketNPE_spam == false) {
-                        Core.logSevere("Don't use a FakePlayer that extends EntityPlayerMP");
-                        Thread.dumpStack();
-                        addPacketNPE_spam = true;
-                    }
-                    return;
-                }
-            }
-            PacketDispatcher.sendPacketToPlayer(packet, (Player) player);
-        }
-    }
     
     private void writeObjects(ByteArrayOutputStream outputStream, DataOutputStream output, Object... items) throws IOException {
         for (Object item : items) {

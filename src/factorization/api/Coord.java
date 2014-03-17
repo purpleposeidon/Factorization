@@ -696,10 +696,6 @@ public class Coord implements IDataSerializable {
         return AxisAlignedBB.getBoundingBox(min.x, min.y, min.z, max.x, max.y, max.z);
     }
     
-    public void notifyOfNeighborChange(int neighborId) {
-        w.notifyBlocksOfNeighborChange(x, y, z, neighborId);
-    }
-    
     public void scheduleUpdate(int delay) {
         w.scheduleBlockUpdate(x, y, z, getId(), delay);
     }

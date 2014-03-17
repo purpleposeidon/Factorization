@@ -3,7 +3,6 @@ package factorization.common;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -58,7 +57,6 @@ import factorization.charge.ItemBattery;
 import factorization.charge.ItemChargeMeter;
 import factorization.charge.TileEntityLeydenJar;
 import factorization.darkiron.BlockDarkIronOre;
-import factorization.docs.DocumentationModule;
 import factorization.docs.ItemDocBook;
 import factorization.oreprocessing.BlockOreStorageShatterable;
 import factorization.oreprocessing.ItemOreProcessing;
@@ -167,29 +165,20 @@ public class Registry {
         factory_block = new BlockFactorization();
         lightair_block = new BlockLightAir();
         resource_block = new BlockResource();
-        GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FZ factory");
-        GameRegistry.registerBlock(lightair_block, "FZ Lightair");
-        GameRegistry.registerBlock(resource_block, ItemBlockResource.class, "FZ resource");
-        is_factory = new ItemStack(factory_block);
-        is_lightair = new ItemStack(lightair_block);
-/*<<<<<<< HEAD
-        dark_iron_ore = new BlockDarkIronOre(FzConfig.dark_iron_ore_id).setUnlocalizedName("factorization:darkIronOre").setTextureName("stone").setCreativeTab(Core.tabFactorization).setHardness(3.0F).setResistance(5.0F);
-        fractured_bedrock_block = new Block(FzConfig.fractured_bedrock_id, Material.rock).setBlockUnbreakable().setResistance(6000000).setUnlocalizedName("bedrock").setTextureName("bedrock").setCreativeTab(Core.tabFactorization);
-        ItemBlock itemDarkIronOre = new ItemBlock(FzConfig.dark_iron_ore_id - 256); //&lookofdisapproval;
-        ItemBlock itemFracturedBedrock = new ItemBlock(FzConfig.fractured_bedrock_id - 256); //&lookofdisapproval;
-
+        dark_iron_ore = new BlockDarkIronOre().setBlockName("factorization:darkIronOre").setBlockTextureName("stone").setCreativeTab(Core.tabFactorization).setHardness(3.0F).setResistance(5.0F);
+        class NotchBlock extends Block { public NotchBlock(Material honestly) { super(honestly); } }
+        fractured_bedrock_block = new NotchBlock(Material.rock).setBlockUnbreakable().setResistance(6000000).setBlockName("bedrock").setBlockTextureName("bedrock").setCreativeTab(Core.tabFactorization);
+        
         GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FZ factory");
         GameRegistry.registerBlock(lightair_block, "FZ Lightair");
         GameRegistry.registerBlock(resource_block, ItemBlockResource.class, "FZ resource");
         GameRegistry.registerBlock(dark_iron_ore, "FZ dark iron ore");
         GameRegistry.registerBlock(fractured_bedrock_block, "FZ fractured bedrock");
-        GameRegistry.registerCraftingHandler(this);
-======= */ //NORELEASE: Merge; inspect!
-        class NotchBlock extends Block { public NotchBlock(Material honestly) { super(honestly); } }
-        fractured_bedrock_block = new NotchBlock(Material.rock).setBlockUnbreakable().setResistance(6000000).setBlockName("bedrock").setBlockTextureName("bedrock").setCreativeTab(Core.tabFactorization);
         
-        GameRegistry.registerBlock(dark_iron_ore, "FZ dark iron ore");
-        GameRegistry.registerBlock(fractured_bedrock_block, "FZ fractured bedrock"); //NORELEASE: Oops! Forgot to register these in 1.6! Go back & fix!
+        
+        is_factory = new ItemStack(factory_block);
+        is_lightair = new ItemStack(lightair_block);
+        
         
         ItemBlock itemDarkIronOre = new ItemBlock(dark_iron_ore);
         ItemBlock itemFracturedBedrock = new ItemBlock(fractured_bedrock_block);
@@ -1044,7 +1033,7 @@ public class Registry {
         recipe(new ItemStack(docbook),
                 "B~>",
                 'B', Items.book,
-                '~', new ItemStack(Items.dyePowder, 1, 0), // The book says "ink sac", so you'll have to use an actual ink sac.
+                '~', new ItemStack(Items.dye, 1, 0), // The book says "ink sac", so you'll have to use an actual ink sac.
                 '>', logicMatrixProgrammer);
     }
     
