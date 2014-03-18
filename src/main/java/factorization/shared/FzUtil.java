@@ -1656,4 +1656,10 @@ public class FzUtil {
     public static Item getItemFromName(String itemName) {
         return (Item) Item.itemRegistry.getObject(itemName);
     }
+    
+    public static ItemStack nameItemStack(ItemStack is, String name) {
+        is = is.copy();
+        is.setStackDisplayName(name);
+        return is;
+    }
 }

@@ -416,18 +416,23 @@ public class Registry {
     }
 
     public void makeRecipes() {
-        recipe(new ItemStack(Blocks.double_stone_slab),
+        recipe(FzUtil.nameItemStack(new ItemStack(Blocks.double_stone_slab), "Double Half Slab"),
                 "-",
                 "-",
                 '-', new ItemStack(Blocks.stone_slab));
-        recipe(new ItemStack(Blocks.double_stone_slab, 2, 8),
+        recipe(FzUtil.nameItemStack(new ItemStack(Blocks.double_stone_slab, 2, 8), "Flat Stone"),
                 "#",
                 "#",
                 '#', new ItemStack(Blocks.stone_slab));
-        recipe(new ItemStack(Blocks.double_stone_slab, 2, 9),
+        recipe(FzUtil.nameItemStack(new ItemStack(Blocks.double_stone_slab, 2, 9), "Flat Sandstone"),
                 "#",
                 "#",
                 '#', new ItemStack(Blocks.sandstone, 1, 2));
+        shapelessRecipe(FzUtil.nameItemStack(new ItemStack(Blocks.dirt, 4, 1), "Dry Dirt"),
+                Blocks.dirt,
+                Blocks.dirt,
+                Blocks.dirt,
+                Blocks.dirt);
         
         shapelessRecipe(new ItemStack(dark_iron, 9), dark_iron_block_item);
         recipe(dark_iron_block_item,
@@ -892,14 +897,6 @@ public class Registry {
                 "SSS",
                 'S', diamond_shard,
                 '-', Blocks.light_weighted_pressure_plate);
-        /* oreRecipe(grinder_item,
-                "LIL",
-                "I*I",
-                "IMI",
-                'L', "ingotLead",
-                'I', Items.iron_ingot,
-                '*', diamond_cutting_head,
-                'M', motor);*/
         shapelessRecipe(socket_lacerator, grinder_item);
         
         //Values based on Fortune I
