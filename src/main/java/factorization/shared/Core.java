@@ -97,6 +97,7 @@ public class Core {
     public void load(FMLPreInitializationEvent event) {
         initializeLogging(event.getModLog());
         checkForge();
+        FMLCommonHandler.instance().bus().register(registry);
         MinecraftForge.EVENT_BUS.register(registry);
         fzconfig.loadConfig(event.getSuggestedConfigurationFile());
         registry.makeBlocks();
