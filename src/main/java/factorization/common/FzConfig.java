@@ -33,7 +33,6 @@ public class FzConfig {
     public static boolean add_branding = false;
     public static boolean debug_light_air = false;
     public static boolean dimension_slice_allow_smooth = true;
-    public static boolean serverside_translate = true;
     public static boolean boilers_suck_water = true;
     public static double steam_output_adjust = 1.0;
     public static boolean enable_cheat_commands = Core.dev_environ;
@@ -152,7 +151,6 @@ public class FzConfig {
             Property prop = config.get("general", "entityRelightTask", entity_relight_task_id);
             prop.set(entity_relight_task_id);
         }
-        serverside_translate = getBoolConfig("serversideTranslate", "server", serverside_translate, "If false, notifications will be translated by the client");
         boilers_suck_water = getBoolConfig("boilersSuckWater", "server", boilers_suck_water, "If false, water must be piped in");
         steam_output_adjust = getDoubleConfig("steamOutputAdjustment", "server", steam_output_adjust, "Scale how much steam is produced by the solar boiler");
         stretchy_clay = getBoolConfig("stretchyClay", "server", stretchy_clay, "If true, maximum clay lump volume is 1 m³ instead of (1 m³)/4");
