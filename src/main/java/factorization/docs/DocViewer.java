@@ -1,6 +1,5 @@
 package factorization.docs;
 
-import java.io.InputStream;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -14,8 +13,6 @@ import net.minecraft.item.ItemStack;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-
-import com.google.common.io.Closeables;
 
 public class DocViewer extends GuiScreen {
     final String name;
@@ -122,13 +119,8 @@ public class DocViewer extends GuiScreen {
     }
     
     Document getDocument(String name) {
-        InputStream is = DocumentationModule.getDocumentResource(name);
-        try {
-            Typesetter ts = new Typesetter(mc.fontRenderer, getPageWidth(0), getPageHeight(0), DocumentationModule.readContents(name, is));
-            return new Document(name, ts.getPages());
-        } finally {
-            Closeables.closeQuietly(is);
-        }
+        Typesetter ts = new Typesetter(mc.fontRenderer, getPageWidth(0), getPageHeight(0), DocumentationModule.readDocument(name));
+        return new Document(name, ts.getPages());
     }
     
     AbstractPage getPage(int d) {
@@ -194,21 +186,31 @@ public class DocViewer extends GuiScreen {
         
         super.drawScreen(mouseX, mouseY, partialTicks);
         
-        
-        if (page != null) {
-            page.draw(this, getPageLeft(0), getPageTop(0));
-        }
-        AbstractPage snd = getPage(1);
-        if (snd != null) {
-            snd.draw(this, getPageLeft(1), getPageTop(1));
-        }
-        
+        drawPage(0, mouseX, mouseY);
+        drawPage(1, mouseX, mouseY);
         GL11.glPopMatrix();
+    }
+    
+    void drawPage(int id, int mouseX, int mouseY) {
+        AbstractPage page = getPage(id);
+        if (page == null) return;
+        page.draw(this, getPageLeft(id), getPageTop(id));
+        if (page instanceof WordPage) {
+            WordPage p = (WordPage) page;
+            Word link = p.click(mouseX - getPageLeft(id), mouseY - getPageTop(id));
+            if (link != null) {
+                link.drawHover(this, mouseX, mouseY);
+            }
+        }
     }
     
     void drawItem(ItemStack is, int x, int y) {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GuiContainer.itemRender.renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), is, x, y);
+    }
+    
+    void drawItemTip(ItemStack is, int x, int y) {
+        renderToolTip(is, x, y);
     }
     
     boolean hot = true;

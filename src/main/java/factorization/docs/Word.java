@@ -11,4 +11,6 @@ public abstract class Word {
     
     public abstract int getWidth(FontRenderer font);
     public abstract int draw(DocViewer doc, int x, int y);
+
+    public void drawHover(DocViewer doc, int mouseX, int mouseY) { }
 }

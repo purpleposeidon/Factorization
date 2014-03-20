@@ -1,6 +1,5 @@
 package factorization.docs;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 
 import net.minecraft.client.Minecraft;
@@ -11,7 +10,6 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 
 import com.google.common.base.Strings;
-import com.google.common.io.Closeables;
 
 public class Typesetter {
     // Super-awesome typesetter version π², by neptunepink
@@ -48,6 +46,10 @@ public class Typesetter {
             return null;
         }
         return tokenizer.token;
+    }
+    
+    void append(final String text) {
+        process(text, null, "");
     }
     
     void process(final String text, final String link, final String style) {
@@ -217,19 +219,20 @@ public class Typesetter {
                         error("No page name specified");
                         continue;
                     }
-                    InputStream is = DocumentationModule.getDocumentResource(name);
-                    try {
-                        if (is == null) {
-                            error("Not found: " + name);
-                            continue;
-                        }
-                        String subtext = DocumentationModule.readContents(name, is);
-                        process(subtext, link, style);
-                    } finally {
-                        Closeables.closeQuietly(is);
-                    }
+                    String subtext = DocumentationModule.readDocument(name);
+                    process(subtext, link, style);
                 } else if (cmd.equals("\\lmp")) {
                     process("\\link{lmp}{LMP}", link, style);
+                } else if (cmd.equals("\\generate")) {
+                    String arg = getParameter(cmd, tokenizer);
+                    String args[] = arg.split("/", 1);
+                    IDocGenerator gen = DocumentationModule.generators.get(args[0]);
+                    if (gen == null) {
+                        error("\\gen{" + arg + "}");
+                        return;
+                    }
+                    String rest = args.length > 1 ? args[1] : "";
+                    gen.process(this, rest);
                 } else {
                     error(cmd);
                 }

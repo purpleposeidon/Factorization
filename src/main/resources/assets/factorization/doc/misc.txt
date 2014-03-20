@@ -8,3 +8,10 @@ It's awesome. You should use it, altho it does need a clean inventory.
 
 Popular /f's include 'now', 'cl', and 'ss'.
 Run '/f list' for more information.
+
+\nl
+
+\link{cgi/recipes}{Recipes}
+
+\link{cgi/items}{Items}
+

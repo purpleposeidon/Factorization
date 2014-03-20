@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import javax.management.RuntimeErrorException;
-
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
@@ -36,6 +34,9 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.ForgeDirection;
+
+import com.google.common.io.Closeables;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.relauncher.Side;
@@ -47,15 +48,20 @@ import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
 public class DocumentationModule implements ICommand {
-    public static final DocumentationModule instance = new DocumentationModule(); 
+    public static final DocumentationModule instance = new DocumentationModule();
+    static HashMap<String, IDocGenerator> generators = new HashMap();
     
     static HashMap<String, ItemStack> nameCache = null;
     
     public static ItemStack lookup(String name) {
+        return getNameItemCache().get(name);
+    }
+    
+    public static HashMap<String, ItemStack> getNameItemCache() {
         if (nameCache == null) {
             loadCache();
         }
-        return nameCache.get(name);
+        return nameCache;
     }
 
     private static void loadCache() {
@@ -76,8 +82,10 @@ public class DocumentationModule implements ICommand {
         }
     }
     
+    public static void registerGenerator(String name, IDocGenerator gen) {
+        generators.put(name, gen);
+    }
     
-    //@EventHandler TODO?
     public void serverStarts(FMLServerStartingEvent event) {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             event.registerServerCommand(this);
@@ -282,18 +290,9 @@ public class DocumentationModule implements ICommand {
         }
     }
     
-    public static String readContents(String name, InputStream is) {
-        if (is == null) {
-            return "\\obf{101*2*2 Not Found:} " + name;
-        }
+    public static String readDocument(String name) {
         try {
-            StringBuilder build = new StringBuilder();
-            byte[] buf = new byte[1024];
-            int length;
-            while ((length = is.read(buf)) != -1) {
-                build.append(new String(buf, 0, length));
-            }
-            return build.toString();
+            return dispatchDocument(name);
         } catch (Throwable e) {
             e.printStackTrace();
             String txt = e.getMessage();
@@ -302,5 +301,43 @@ public class DocumentationModule implements ICommand {
             }
             return "\\obf{5*5*5*2*2 Internal Server Error\n\nAn error was encountered while trying to execute your request.}\n\n" + txt;
         }
+    }
+    
+    private static String readContents(String name, InputStream is) throws IOException {
+        if (is == null) {
+            return "\\obf{101*2*2 Not Found:} " + name;
+        }
+        StringBuilder build = new StringBuilder();
+        byte[] buf = new byte[1024];
+        int length;
+        while ((length = is.read(buf)) != -1) {
+            build.append(new String(buf, 0, length));
+        }
+        return build.toString();
+    }
+    
+    private static String dispatchDocument(String name) throws IOException {
+        //NORELEASE: Okay. The document *really* needs to be cached. Things are getting expensive...
+        if (name.startsWith("cgi/")) {
+            return "\\generate{" + name.replace("cgi/", "") + "}";
+        } else {
+            InputStream is = null;
+            try {
+                is = DocumentationModule.getDocumentResource(name);
+                return DocumentationModule.readContents(name, is);
+            } finally {
+                Closeables.close(is, false);
+            }
+        }
+    }
+    
+    public static String textifyItem(ItemStack is) {
+        String name = is.getUnlocalizedName();
+        return "\\#{" + name + "} " + is.getDisplayName();
+    }
+    
+    static {
+        registerGenerator("items", new ItemListViewer());
+        registerGenerator("recipes", new RecipeViewer());
     }
 }
