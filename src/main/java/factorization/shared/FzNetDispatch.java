@@ -41,8 +41,8 @@ public class FzNetDispatch {
     }
     
     public static void addPacketFrom(Packet packet, Chunk chunk) {
+        if (chunk.worldObj.isRemote) return;
         final WorldServer world = (WorldServer) chunk.worldObj;
-        if (world.isRemote) return;
         final PlayerManager pm = world.getPlayerManager();
         final int near = 10;
         final int far = 16;
