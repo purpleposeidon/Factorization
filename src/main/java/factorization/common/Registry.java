@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockCompressed;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
@@ -180,8 +181,8 @@ public class Registry {
         is_lightair = new ItemStack(lightair_block);
         
         
-        ItemBlock itemDarkIronOre = new ItemBlock(dark_iron_ore);
-        ItemBlock itemFracturedBedrock = new ItemBlock(fractured_bedrock_block);
+        //ItemBlock itemDarkIronOre = new ItemBlock(dark_iron_ore); //NORELEASE: Wait, what? This isn't necessary, right? HuH? TODO XXX FIXME
+        //ItemBlock itemFracturedBedrock = new ItemBlock(fractured_bedrock_block);
         
 
         Core.tab(factory_block, Core.TabType.BLOCKS);
@@ -189,16 +190,37 @@ public class Registry {
         
         worldgenManager = new WorldgenManager();
         
+        replaceDiamondBlock();
+    }
+    
+    void replaceDiamondBlock() {
         final Block vanillaDiamond = Blocks.diamond_block;
         BlockOreStorageShatterable newDiamond = new BlockOreStorageShatterable(vanillaDiamond);
-        newDiamond.setHardness(5.0F).setResistance(10.0F).setStepSound(Block.soundTypeMetal).setBlockName("blockDiamond");
-        //Blocks.diamond_block /* blockDiamond */ = newDiamond;
-//		ReflectionHelper.setPrivateValue(Blocks.class, null, newDiamond, "blockDiamond", "blockDiamond"); TODO NORELEASE: Reflection-set blockDiamond.
+        newDiamond.setHardness(5.0F).setResistance(10.0F).setStepSound(Block.soundTypeMetal).setBlockName("blockDiamond").setBlockTextureName("diamond_block");
+        //blockRegistry.addObject(57, "diamond_block", (new BlockCompressed(MapColor.diamondColor)).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypeMetal).setBlockName("blockDiamond").setBlockTextureName("diamond_block"));
+        // Why can't we have newDiamond copy these settings in its constructor!?
+        Blocks.diamond_block = newDiamond;
+        
+        // Yeah. And it gets even better!
+        //    Block.blockRegistry.addObject(FzUtil.getId(vanillaDiamond), "minecraft:diamond_block", newDiamond);
+        // That would be the *sensible* way of doing this.
+        // What would actually end up with "factorization:minecraft:diamond_block" registered as a new block.
+        // To get this actually working, we replicate the behavior of RegistryNamespaced.addObject.
+        
+        final int diamond_id = FzUtil.getId(vanillaDiamond);
+        
+        Block.blockRegistry.underlyingIntegerMap.func_148746_a(newDiamond, diamond_id);
+        Block.blockRegistry.putObject("minecraft:diamond_block", newDiamond);
+        
+        // Can't really replace the Item tho, since it's probably referenced in tons of ItemStacks by this point.
+        ItemBlock itemBlock = (ItemBlock) FzUtil.getItem(newDiamond);
+        itemBlock.field_150939_a = newDiamond;
+        
+        if (Block.getBlockById(diamond_id) != newDiamond) throw new RuntimeException("Failed to replace diamond block: id2block didn't match");
+        Item it = FzUtil.getItem(newDiamond);
+        if (it == null) throw new RuntimeException("Failed to replace diamond block: block2item gave null");
+        if (FzUtil.getBlock(it) != newDiamond) throw new RuntimeException("Failed to replace diamond block: item2block didn't match");
     }
-
-    /*private void addName(Object what, String name) {
-        Core.proxy.addName(what, name);
-    }*/
     
     void postMakeItems() {
         HashSet<Item> foundItems = new HashSet();
@@ -227,9 +249,6 @@ public class Registry {
                 i++;
             }
         }
-        Core.logInfo("NORELEASE: Registered " + i + " items");
-        
-        
     }
 
     public void makeItems() {

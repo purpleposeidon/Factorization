@@ -17,7 +17,7 @@ import factorization.shared.Core;
 public class BlockOreStorageShatterable extends BlockCompressed {
     private final Block original;
     public BlockOreStorageShatterable(Block original) {
-        super(Blocks.diamond_block.getMapColor(0));
+        super(original.getMapColor(0));
         this.original = original;
     }
     
