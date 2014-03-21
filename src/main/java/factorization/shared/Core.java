@@ -43,6 +43,7 @@ import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.common.Registry;
 import factorization.compat.CompatManager;
+import factorization.docs.DistributeDocs;
 import factorization.docs.DocumentationModule;
 import factorization.oreprocessing.FactorizationOreProcessingHandler;
 import factorization.servo.ServoMotor;
@@ -54,7 +55,7 @@ public class Core {
     public static final String modId = "factorization";
     public static final String name = "Factorization";
     //The comment below is a marker used by the build script.
-    public static final String version = "0.8.35"; //@VERSION@
+    public static final String version = "0.8.40"; //@VERSION@
     public Core() {
         instance = this;
         fzconfig = new FzConfig();
@@ -97,8 +98,7 @@ public class Core {
     public void load(FMLPreInitializationEvent event) {
         initializeLogging(event.getModLog());
         checkForge();
-        FMLCommonHandler.instance().bus().register(registry);
-        MinecraftForge.EVENT_BUS.register(registry);
+        Core.loadBus(registry);
         fzconfig.loadConfig(event.getSuggestedConfigurationFile());
         registry.makeBlocks();
         
@@ -110,6 +110,12 @@ public class Core {
         registry.makeRecipes();
         registry.setToolEffectiveness();
         proxy.registerRenderers();
+        
+        if (FzConfig.players_discover_docbooks) {
+            DistributeDocs dd = new DistributeDocs();
+            MinecraftForge.EVENT_BUS.register(dd);
+            FMLCommonHandler.instance().bus().register(dd);
+        }
         
         FzConfig.config.save();
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
@@ -408,5 +414,10 @@ public class Core {
         //bad design; should have a GuiFz. meh.
         TextureManager tex = Minecraft.getMinecraft().renderEngine;
         tex.bindTexture(getResource("textures/gui/" + name + ".png"));
+    }
+    
+    public static void loadBus(Object obj) {
+        FMLCommonHandler.instance().bus().register(obj);
+        MinecraftForge.EVENT_BUS.register(obj);
     }
 }

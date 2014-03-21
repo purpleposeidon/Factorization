@@ -45,5 +45,10 @@ public class ItemDocBook extends ItemFactorization {
     public int getColorFromItemStack(ItemStack is, int pass) {
         return 0xFF40FF;
     }
+    
+    @Override
+    public void onCreated(ItemStack is, World world, EntityPlayer player) {
+        DistributeDocs.setGivenBook(player);
+    }
 
 }

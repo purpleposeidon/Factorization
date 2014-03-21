@@ -104,6 +104,16 @@ FZDocs! Yes!
 Pressurizer:
     pressurizer doesn't drop buffered items! Weren't we supposed to have checked this!? >:|
     pressurizer doesn't seem to actually be working properly with flooding/draining? Test like our SSP world.
+    Have a decent way of giving them to newly logged in players...
+        We can't do it when they first login. Since there's already other books that show up.
+        So it should show up... like fall on their head during midday after they've been playing for at least 5 days, or something, and there aren't other players nearby, *AND*, of course, they don't have one in their inventory... and they haven't crafted one.
+        Could be:
+            They are outside
+            They've crafted a chest OR something with diamond OR something with redstone OR something with dark iron(?) OR something with gold... or they have, say, 8 achievements.
+            They haven't already crafted a book.
+            They haven't already got one in their inventory.
+            They haven't already gotten a book given to them this way.
+            They are not in any gamemode other than survival mode
 test:
     infinite loops
     writing instructions
@@ -408,4 +418,34 @@ https://en.wikipedia.org/wiki/Astra_(weapon)
 
 History speaks of "World Holes" as terrifying patches of void that ripped away entire chunks of land. Nowdays, world holes have been mostly tamed for practical use.
 
+
+Some new stuff:
+    Cushions. Simple entities. "I can sit anywhere!"
+        Position snapping. This may be more difficult. But you ought to be able to place them on stairs & sculptures.
+    Block... extender/retracter thingie.
+        If an item enters it, it gets pushed in front of it.
+        When it receives a redstone signal, it breaks a block and outputs it behind it?
+            Like a block breaker? Erm. Hrm. Mmmm. Hmm.
+        Maybe we should just add frame motors?
+
+So, yeah. Frame motors. Vehicles. These will all have the same way of determining what is connected. 
+    The block material. Yes.
+    ...or something like that.
+    Contiguous sets of iron blocks should connect.
+    Contiguous sets of wooden materials should connect.
+Yes, we use FZDS for all of them.
+We might say this:
+    Movement can only be 1 operation at a time.
+    Only one velocity axis can be non-zero for XYZ translation + rotation.
+    Additionally, it should snap to the nearest block after each translation.
+    And rotations are limited to 90° turns.
+
+So, the things:
+    Frame Motors. ;_;
+    ...and Frame Rotors. x_x
+    Grabber Socket Part
+        (Doesn't move what it's grabbed precisely tho? This can not cope with the limits set above. Or we could just, like... go with it. Maybe cause some trouble if there's a collision at each onBlockEnter)
+    Wheels?
+    Nebula Balloons
+    Propellers. Weeeelllll....
 

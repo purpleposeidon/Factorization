@@ -53,6 +53,7 @@ public class FzConfig {
     public static boolean enable_solar_steam = true;
     public static boolean fanturpeller_works_on_players = true;
     public static boolean large_servo_instructions = false;
+    public static boolean players_discover_docbooks = true;
     
     public static boolean enable_retrogen = false;
     public static String retrogen_key = "DEFAULT";
@@ -159,6 +160,7 @@ public class FzConfig {
         embarken_wood = getBoolConfig("barkRecipes", "server", embarken_wood, "Adds recipes for bark variants of logs");
         proper_projectile_physics = getBoolConfig("properProjectilePhysics", "server", proper_projectile_physics, "Makes projectiles start with the velocity of the thrower");
         buffed_nametags = getBoolConfig("buffedNametags", "server", buffed_nametags, "Naming entities gives them +5 hearts");
+        players_discover_docbooks = getBoolConfig("playersDiscoverDocBooks", "server", players_discover_docbooks, "If set to true, players will find a docbook after getting iron");
         //invasiveCharge = getBoolConfig("invasiveCharge", "server", invasiveCharge, "Set to true to prevent charge from connecting over metal blocks.");
         //Broken. Doesn't work.
         enable_solar_steam = getBoolConfig("enableSolarSteam", "server", enable_solar_steam, "Set to false to disable the crafting recipe for solar2steam machines");

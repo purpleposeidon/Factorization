@@ -194,6 +194,7 @@ public class Registry {
     }
     
     void replaceDiamondBlock() {
+        Core.logInfo("Pre-cracking diamonds");
         final Block vanillaDiamond = Blocks.diamond_block;
         BlockOreStorageShatterable newDiamond = new BlockOreStorageShatterable(vanillaDiamond);
         newDiamond.setHardness(5.0F).setResistance(10.0F).setStepSound(Block.soundTypeMetal).setBlockName("blockDiamond").setBlockTextureName("diamond_block");
