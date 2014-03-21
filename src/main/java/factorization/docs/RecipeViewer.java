@@ -3,6 +3,7 @@ package factorization.docs;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map.Entry;
 
 import net.minecraft.block.Block;
@@ -18,7 +19,7 @@ import net.minecraftforge.oredict.ShapelessOreRecipe;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 
 public class RecipeViewer implements IDocGenerator {
-
+    int recursion;
     @Override
     public void process(Typesetter out, String arg) {
         addAll(out, "Workbench Recipes", CraftingManager.getInstance().getRecipeList());
@@ -28,10 +29,21 @@ public class RecipeViewer implements IDocGenerator {
     void addAll(Typesetter sb, String label, Iterable list) {
         sb.append("\\title{" + label + "}\n\n");
         for (Object obj : list) {
+            recursion = 0;
             addRecipe(sb, obj);
             sb.append("\\nl\n");
         }
         sb.append("\\newpage\n");
+    }
+    
+    static String getDisplayName(ItemStack is) {
+        if (is == null) return "null";
+        try {
+            return is.getDisplayName();
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return "ERROR";
+        }
     }
     
     void addRecipe(Typesetter sb, Object obj) {
@@ -57,7 +69,7 @@ public class RecipeViewer implements IDocGenerator {
         ItemStack output = ((IRecipe) recipe).getRecipeOutput();
         if (output == null) return null;
         sb.emitWord(new ItemWord(output, null));
-        sb.append(" \\b{" + output.getDisplayName() + "}\n\n");
+        sb.append(" \\b{" + getDisplayName(output) + "}\n\n");
         return output;
     }
     
@@ -68,11 +80,16 @@ public class RecipeViewer implements IDocGenerator {
         Object[] input = recipe.getInput();
         int i = 0;
         for (Object in : input) {
-            if (in instanceof ItemStack) {
+            if (in instanceof ItemStack || in == null) {
                 ItemStack is = (ItemStack) in;
-                sb.append("\\#{" + is.getUnlocalizedName() + "}");
-            } else if (in == null) {
-                sb.emitWord(new ItemWord(null, null));
+                sb.emitWord(new ItemWord(is, null));
+            } else if (in instanceof Iterable) {
+                Iterator<Object> it = ((Iterable)in).iterator();
+                if (it.hasNext()) {
+                    convertObject(sb, it.next());
+                } else {
+                    convertObject(sb, null);
+                }
             } else {
                 convertObject(sb, in);
             }
@@ -102,7 +119,16 @@ public class RecipeViewer implements IDocGenerator {
         genericRecipePrefix(sb, recipe);
         sb.append("Shapeless: ");
         for (Object obj : recipe.getInput()) {
-            convertObject(sb, obj);
+            if (obj instanceof Object[]) {
+                Object[] objs = (Object[]) obj;
+                if (objs.length > 0) {
+                    convertObject(sb, objs[0]);
+                } else {
+                    convertObject(sb, null);
+                }
+            } else {
+                convertObject(sb, obj);
+            }
         }
     }
     
@@ -137,7 +163,7 @@ public class RecipeViewer implements IDocGenerator {
             int modifiers = f.getModifiers();
             if ((modifiers & Modifier.STATIC) != 0) continue;
             Object v = f.get(recipe);
-            if (v == output) continue;
+            if (v == output || v == null) continue;
             if (v instanceof String || v instanceof ItemStack || v instanceof Collection || v.getClass().isArray()) {
                 sb.append(f.getName() + ": ");
                 convertObject(sb, v);
@@ -150,29 +176,51 @@ public class RecipeViewer implements IDocGenerator {
         if (obj == null) {
             return;
         }
+        if (recursion > 4) {
+            return;
+        }
         if (obj instanceof Item) {
             obj = new ItemStack((Item) obj);
         } else if (obj instanceof Block) {
             obj = new ItemStack((Block) obj);
         }
         
-        if (obj instanceof ItemStack) {
-            sb.emitWord(new ItemWord((ItemStack) obj, null));
-        } else if (obj instanceof String) {
-            sb.append(obj.toString());
-        } else if (obj.getClass().isArray() && obj.getClass().getComponentType().isInstance(Object.class)) {
-            Object[] listy = (Object[]) obj;
-            String ret = "";
-            for (Object o : listy) {
-                convertObject(sb, o);
+        recursion++;
+        try {
+            if (obj instanceof ItemStack) {
+                sb.emitWord(new ItemWord((ItemStack) obj, null));
+            } else if (obj instanceof String) {
+                sb.append(obj.toString());
+            } else if (obj.getClass().isArray()) {
+                Class<?> component = obj.getClass().getComponentType();
+                if (component == Object.class) {
+                    Object[] listy = (Object[]) obj;
+                    for (Object o : listy) {
+                        convertObject(sb, o);
+                    }
+                } else if (component == ItemStack.class) {
+                    ItemStack[] listy = (ItemStack[]) obj;
+                    for (ItemStack is : listy) {
+                        sb.emitWord(new ItemWord(is, null));
+                    }
+                }
+            } else if (obj instanceof Collection) {
+                String ret = "";
+                for (Object o : (Collection) obj) {
+                    convertObject(sb, o);
+                }
+            } else if (obj instanceof IRecipe) {
+                sb.append("Embedded Recipe:\n\n");
+                addRecipe(sb, obj);
+            } else {
+                try {
+                    addRecipeWithReflection(sb, obj);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
             }
-        } else if (obj instanceof Collection) {
-            String ret = "";
-            for (Object o : (Collection) obj) {
-                convertObject(sb, o);
-            }
-        } else {
-            sb.append(obj.toString());
+        } finally {
+            recursion--;
         }
     }
 
