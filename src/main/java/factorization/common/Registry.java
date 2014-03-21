@@ -189,40 +189,8 @@ public class Registry {
         Core.tab(resource_block, TabType.BLOCKS);
         
         worldgenManager = new WorldgenManager();
-        
-        replaceDiamondBlock();
     }
-    
-    void replaceDiamondBlock() {
-        Core.logInfo("Pre-cracking diamonds");
-        final Block vanillaDiamond = Blocks.diamond_block;
-        BlockOreStorageShatterable newDiamond = new BlockOreStorageShatterable(vanillaDiamond);
-        newDiamond.setHardness(5.0F).setResistance(10.0F).setStepSound(Block.soundTypeMetal).setBlockName("blockDiamond").setBlockTextureName("diamond_block");
-        //blockRegistry.addObject(57, "diamond_block", (new BlockCompressed(MapColor.diamondColor)).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypeMetal).setBlockName("blockDiamond").setBlockTextureName("diamond_block"));
-        // Why can't we have newDiamond copy these settings in its constructor!?
-        Blocks.diamond_block = newDiamond;
-        
-        // Yeah. And it gets even better!
-        //    Block.blockRegistry.addObject(FzUtil.getId(vanillaDiamond), "minecraft:diamond_block", newDiamond);
-        // That would be the *sensible* way of doing this.
-        // What would actually end up with "factorization:minecraft:diamond_block" registered as a new block.
-        // To get this actually working, we replicate the behavior of RegistryNamespaced.addObject.
-        
-        final int diamond_id = FzUtil.getId(vanillaDiamond);
-        
-        Block.blockRegistry.underlyingIntegerMap.func_148746_a(newDiamond, diamond_id);
-        Block.blockRegistry.putObject("minecraft:diamond_block", newDiamond);
-        
-        // Can't really replace the Item tho, since it's probably referenced in tons of ItemStacks by this point.
-        ItemBlock itemBlock = (ItemBlock) FzUtil.getItem(newDiamond);
-        itemBlock.field_150939_a = newDiamond;
-        
-        if (Block.getBlockById(diamond_id) != newDiamond) throw new RuntimeException("Failed to replace diamond block: id2block didn't match");
-        Item it = FzUtil.getItem(newDiamond);
-        if (it == null) throw new RuntimeException("Failed to replace diamond block: block2item gave null");
-        if (FzUtil.getBlock(it) != newDiamond) throw new RuntimeException("Failed to replace diamond block: item2block didn't match");
-    }
-    
+
     void postMakeItems() {
         HashSet<Item> foundItems = new HashSet();
         for (Field field : this.getClass().getFields()) {
