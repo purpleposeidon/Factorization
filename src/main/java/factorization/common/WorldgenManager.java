@@ -19,7 +19,7 @@ import factorization.shared.Core;
 
 public class WorldgenManager {
     {
-        MinecraftForge.EVENT_BUS.register(this);
+        Core.loadBus(this);
         setupWorldGenerators();
     }
     

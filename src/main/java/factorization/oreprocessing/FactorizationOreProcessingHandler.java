@@ -203,7 +203,7 @@ public class FactorizationOreProcessingHandler {
                 handleNewOre(oreClass, ore);
             }
         }
-        MinecraftForge.EVENT_BUS.register(this);
+        Core.loadBus(this);
     }
     
 }

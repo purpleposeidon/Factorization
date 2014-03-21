@@ -301,7 +301,6 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public void onNeighborTileChanged(int tilex, int tiley, int tilez) {}
     
     public void representYoSelf() {
-        MinecraftForge.EVENT_BUS.register(this);
-        FMLCommonHandler.instance().bus().register(this);
+        Core.loadBus(this);
     }
 }

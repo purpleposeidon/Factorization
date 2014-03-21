@@ -96,7 +96,7 @@ import factorization.wrath.TileEntityWrathLamp;
 public class FactorizationClientProxy extends FactorizationProxy {
     public FactorizationKeyHandler keyHandler = new FactorizationKeyHandler();
     public FactorizationClientProxy() {
-        MinecraftForge.EVENT_BUS.register(this);
+        Core.loadBus(this);
     }
 
     @Override

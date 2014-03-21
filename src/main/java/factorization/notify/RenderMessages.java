@@ -24,13 +24,14 @@ import org.lwjgl.opengl.GL11;
 
 import factorization.api.Coord;
 import factorization.notify.Notify.Style;
+import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
 public class RenderMessages extends RenderMessagesProxy {
     static ArrayList<Message> messages = new ArrayList();
     
     {
-        MinecraftForge.EVENT_BUS.register(this);
+        Core.loadBus(this);
     }
     
     @Override

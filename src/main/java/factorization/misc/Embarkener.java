@@ -24,8 +24,7 @@ public class Embarkener {
     public Embarkener() {
         if (FzConfig.embarken_wood) {
             addLogBarkRecipes();
-            MinecraftForge.EVENT_BUS.register(this);
-            FMLCommonHandler.instance().bus().register(this);
+            Core.loadBus(this);
         }
     }
 

@@ -34,7 +34,7 @@ public class MiscClientProxy extends MiscProxy {
     @Override
     void initializeClient() {
         Minecraft.memoryReserve = new byte[0]; // Free up this unused memory. The OOM screen *never* happens.
-        FMLCommonHandler.instance().bus().register(this);
+        Core.loadBus(this);
         ClientCommandHandler.instance.registerCommand(new MiscClientCommands());
         FMLCommonHandler.instance().bus().register(cth);
     }

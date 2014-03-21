@@ -7,6 +7,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
+import factorization.shared.Core;
 
 public class FactorizationKeyHandler {
     public static final KeyBinding bag_swap_key = new KeyBinding("BoH Shift (FZ)", org.lwjgl.input.Keyboard.KEY_GRAVE, "key.categories.item");
@@ -18,7 +19,7 @@ public class FactorizationKeyHandler {
     }
     
     {
-        FMLCommonHandler.instance().bus().register(this);
+        Core.loadBus(this);
     }
     
     @SubscribeEvent
