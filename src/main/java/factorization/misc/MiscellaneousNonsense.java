@@ -32,6 +32,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
@@ -150,12 +151,12 @@ public class MiscellaneousNonsense {
     public void playerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         MinecraftServer ms = MinecraftServer.getServer();
         {
-            //NORELEASE: Test 'opening inventory' achievement
             // Give the first achievement, because it is stupid and nobody cares.
             // If you're using this mod, you've probably opened your inventory before anyways.
             StatisticsFile sfw = ms.getConfigurationManager().func_148538_i(event.player.getCommandSenderName());
-            if (sfw != null && !sfw.hasAchievementUnlocked(AchievementList.openInventory) && !FzConfig.add_branding) {
-                sfw.func_150873_a(event.player, AchievementList.openInventory, 1);
+            if (sfw != null && !sfw.hasAchievementUnlocked(AchievementList.openInventory) && FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+                sfw.func_150873_a(event.player, AchievementList.openInventory, -1);
+                sfw.func_150873_a(event.player, AchievementList.openInventory, 300); // Literally, hundreds of times. :D
                 Core.logInfo("Achievement Get! %s, you've opened your inventory hundreds of times already! Yes! You're welcome!", event.player.getCommandSenderName());
             }
         }
