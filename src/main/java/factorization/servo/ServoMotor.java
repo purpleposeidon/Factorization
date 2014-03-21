@@ -244,6 +244,9 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         case servo_stopped:
             motionHandler.stopped = input.readBoolean();
             return true;
+        case TileEntityMessageOnEntity:
+            MessageType subMsg = MessageType.read(input);
+            return socket.handleMessageFromServer(subMsg, input);
         default:
             return socket.handleMessageFromServer(messageType, input);
         }
@@ -689,7 +692,10 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     @Override
     public void sendMessage(MessageType msgType, Object... msg) {
-        FMLProxyPacket toSend = Core.network.entityPacket(this, msgType, msg);
+        Object[] buff = new Object[msg.length + 1];
+        System.arraycopy(msg, 0, buff, 1, msg.length);
+        buff[0] = msgType;
+        FMLProxyPacket toSend = Core.network.entityPacket(this, MessageType.TileEntityMessageOnEntity, buff);
         Core.network.broadcastPacket(null, getCurrentPos(), toSend); 
     }
     

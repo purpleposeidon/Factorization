@@ -164,7 +164,7 @@ public class NetworkFactorization {
         return FzNetDispatch.generate(outputStream);
     }
     
-    public FMLProxyPacket entityPacket(Entity to, MessageType messageType, Object ...items) { //TODO: messageType should be short
+    public FMLProxyPacket entityPacket(Entity to, MessageType messageType, Object ...items) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DataOutputStream output = new DataOutputStream(outputStream);
@@ -438,6 +438,7 @@ public class NetworkFactorization {
         PlaySound, EntityParticles(true),
         
         DrawActive, FactoryType, DescriptionRequest, DataHelperEdit, DataHelperEditOnEntity(true), OpenDataHelperGui, OpenDataHelperGuiOnEntity(true),
+        TileEntityMessageOnEntity(true),
         BarrelDescription, BarrelItem, BarrelCount,
         BatteryLevel, LeydenjarLevel,
         MirrorDescription,
