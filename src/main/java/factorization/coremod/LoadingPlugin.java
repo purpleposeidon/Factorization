@@ -5,8 +5,8 @@ import java.util.Map;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
 public class LoadingPlugin implements IFMLLoadingPlugin {
+    public static boolean deobfuscatedEnvironment = true;
     @Override public String getSetupClass() { return null; }
-    @Override public void injectData(Map<String, Object> data) { }
     @Override public String getModContainerClass() { return null; } // We use the FMLCorePluginContainsFMLMod manifest attribute
     
     @Override
@@ -14,7 +14,13 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
         return "factorization.coremod.FzAccessTransformer";
     }
 
-    @Override public String[] getASMTransformerClass() {
+    @Override
+    public String[] getASMTransformerClass() {
         return new String[] { "factorization.coremod.ASMTransformer" };
+    }
+    
+    @Override
+    public void injectData(Map<String, Object> data) {
+        deobfuscatedEnvironment = !(Boolean) data.get("runtimeDeobfuscationEnabled");
     }
 }

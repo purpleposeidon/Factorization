@@ -16,22 +16,34 @@ import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 import cpw.mods.fml.relauncher.FMLRelaunchLog;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
+import static cpw.mods.fml.relauncher.IFMLLoadingPlugin.*;
 
-@IFMLLoadingPlugin.TransformerExclusions("factorization.coremod.")
+@TransformerExclusions("factorization.coremod.")
+@MCVersion("1.7.2")
+@DependsOn("cpw.mods.fml.common.asm.transformers.DeobfuscationTransformer")
 public class ASMTransformer implements IClassTransformer {
     
     static class Append {
-        String srgName, mcpName;
+        String srgName, mcpName, obfDescr;
         boolean satisfied = false;
-        Append(String srgName, String mcpName) {
+        Append(String className, String obfDescr, String srgName, String mcpName) {
+            //<Player> you'll want to check the srg name against mapper.mapMethodName(className.replace('.', '/'), methodName, methodDesc)
+            //and the deobf name against the raw methodName
+            //FMLDeobfuscatingRemapper.INSTANCE.unmap(typeName)
+            FMLDeobfuscatingRemapper mapper = FMLDeobfuscatingRemapper.INSTANCE;
+            this.obfDescr = obfDescr;
             this.srgName = srgName;
             this.mcpName = mcpName;
         }
         
-        boolean applies(String name) {
-            return name.equals(srgName) || name.equals(mcpName);
+        boolean applies(MethodNode method) {
+            String mDescr = method.name + method.desc;
+            String name = method.name;
+            return mDescr.equals(obfDescr) || name.equals(srgName) || name.equals(mcpName);
         }
     }
     
@@ -39,13 +51,15 @@ public class ASMTransformer implements IClassTransformer {
     public byte[] transform(String name, String transformedName, byte[] basicClass) {
         if (transformedName.equals("net.minecraft.block.Block")) {
             return applyTransform(basicClass,
-                    new Append("func_149723_a", "onBlockDestroyedByExplosion"),
-                    new Append("func_149659_a", "canDropFromExplosion")
+                    //NORELEASE TODO: We either need to convert srg names into the descripter form below,
+                    //or we need to convert notch names to srg names.
+                    new Append(transformedName, "a(Lafn;IIILafi;)V", "func_149723_a", "onBlockDestroyedByExplosion"),
+                    new Append(transformedName, "a(Lafi;)Z", "func_149659_a", "canDropFromExplosion")
             );
         }
         if (transformedName.equals("net.minecraft.client.gui.inventory.GuiContainer")) {
             return applyTransform(basicClass,
-                    new Append("func_73869_a", "keyTyped")
+                    new Append(transformedName, "a(CI)V", "func_73869_a", "keyTyped")
             );
         }
         return basicClass;
@@ -59,7 +73,7 @@ public class ASMTransformer implements IClassTransformer {
         boolean found = false;
         for (MethodNode m : cn.methods) {
             for (Append change : changes) {
-                if (change.applies(m.name)) {
+                if (change.applies(m)) {
                     MethodNode method = getMethod(change.srgName);
                     appendMethod(m, method);
                     change.satisfied = true;
@@ -73,7 +87,7 @@ public class ASMTransformer implements IClassTransformer {
             }
         }
 
-        ClassWriter cw = new ClassWriter(3);
+        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
         cn.accept(cw);
         return cw.toByteArray();
     }
@@ -106,8 +120,6 @@ public class ASMTransformer implements IClassTransformer {
     
     void appendMethod(MethodNode base, MethodNode toAppend) {
         AbstractInsnNode base_end = base.instructions.getLast();
-        printInstructions(base.instructions.getFirst());
-        printInstructions(toAppend.instructions.getFirst());
         while (!isReturn(base_end.getOpcode())) {
             base_end = base_end.getPrevious();
         }
