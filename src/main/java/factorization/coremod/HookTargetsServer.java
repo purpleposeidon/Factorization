@@ -10,18 +10,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-public class HookTargets {
-    public static void keyTyped(char chr, int keysym) {
-        //Core.logInfo("KeyTyped: %s %s", chr, keysym); //NORELEASE
-        Minecraft mc = Minecraft.getMinecraft();
-        if (mc == null || mc.thePlayer == null) return;
-        if (FzConfig.pocket_craft_anywhere) {
-            if (FactorizationKeyHandler.pocket_key.getKeyCode() == keysym) {
-                Core.registry.pocket_table.tryOpen(mc.thePlayer);
-            }
-        }
-    }
-    
+public class HookTargetsServer {
     public static void diamondExploded(Object dis, World world, int x, int y, int z) {
         if (dis != Blocks.diamond_block) return;
         if (world.isRemote) {

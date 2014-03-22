@@ -6,11 +6,11 @@ import net.minecraft.world.World;
 
 public class MethodAppends {
     public void func_149723_a(World world, int x, int y, int z, Explosion explosion) {
-        HookTargets.diamondExploded(this, world, x, y, z);
+        HookTargetsServer.diamondExploded(this, world, x, y, z);
     }
     
     public void func_73869_a(char chr, int keysym) {
-        HookTargets.keyTyped(chr, keysym);
+        HookTargetsClient.keyTyped(chr, keysym);
     }
     
     public boolean func_149659_a(Explosion p_149659_1_) {
