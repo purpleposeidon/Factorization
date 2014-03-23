@@ -107,7 +107,7 @@ public class ItemPocketTable extends ItemFactorization {
             if (key != null && key != "") {
                 final String prefix = "item.factorization:tool/pocket_crafting_table.";
                 if (NEI_status != -1) {
-                    infoList.add(StatCollector.translateToLocalFormatted(prefix + "yesNEI", key));
+                    infoList.add(StatCollector.translateToLocalFormatted(prefix + "yesNEI", key)); //NORELEASE: :D (tho we'll need to test our coremod w/ NEI...)
                 } else {
                     infoList.add(StatCollector.translateToLocalFormatted(prefix + "noNEI", key));
                 }
