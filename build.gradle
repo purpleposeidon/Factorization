@@ -17,13 +17,14 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "0.8.40"
-group= "factorization"
+version = "0.8.42"
+group = "factorization"
 archivesBaseName = "Factorization"
 
 minecraft {
     version = "1.7.2-10.12.0.1046"
     assetDir = "eclipse/assets"
+    replace '@FZVERSION@', project.version
 }
 
 processResources {
@@ -43,7 +44,7 @@ processResources {
 
 jar {
     manifest {
-        attributes("FMLCorePlugin": "factorization.fwappadurp.LoadingPlugin",
+        attributes("FMLCorePlugin": "factorization.coremod.LoadingPlugin",
                    "FMLCorePluginContainsFMLMod": "true")
     }
 }
