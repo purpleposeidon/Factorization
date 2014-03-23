@@ -9,9 +9,10 @@ import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.stats.AchievementList;
+import net.minecraft.stats.StatBase;
 import net.minecraft.stats.StatisticsFile;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.WorldSettings;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.world.BlockEvent;
@@ -25,13 +26,18 @@ import factorization.shared.FzUtil.FzInv;
 public class DistributeDocs {
     static HashSet<String> needyPlayers = new HashSet();
     
+    static StatisticsFile getFile(EntityPlayer player) {
+        MinecraftServer server = MinecraftServer.getServer();
+        return server.getConfigurationManager().func_148538_i(player.getCommandSenderName());
+    }
+    
     static boolean givenBook(EntityPlayer player) {
-        return player.getEntityData().hasKey("fzDocd");
+        return getFile(player).writeStat(bookGet) > 0;
     }
     
     static void setGivenBook(EntityPlayer player) {
         needyPlayers.remove(player.getCommandSenderName());
-        player.getEntityData().setBoolean("fzDocd", true);
+        getFile(player).func_150873_a(player, bookGet, 1);
     }
     
     @SubscribeEvent
@@ -43,10 +49,12 @@ public class DistributeDocs {
     }
     
     Random rand = new Random();
+    static StatBase bookGet = new StatBase("factorization.dropdocbook", new ChatComponentText("docbook dropper!")).registerStat();
+    
     
     @SubscribeEvent
     public void breakBlock(BlockEvent.BreakEvent event) {
-        if (rand.nextInt(32) != 0) return;
+        if (rand.nextInt(32) != 0 && !Core.dev_environ) return;
         EntityPlayer ply = event.getPlayer();
         if (!(ply instanceof EntityPlayerMP)) {
             return;
@@ -57,8 +65,7 @@ public class DistributeDocs {
         if (!needyPlayers.contains(name)) {
             return;
         }
-        MinecraftServer server = MinecraftServer.getServer();
-        StatisticsFile sfw = server.getConfigurationManager().func_148538_i(name);
+        StatisticsFile sfw = getFile(player);
         if (!sfw.hasAchievementUnlocked(AchievementList.acquireIron)) {
             return;
         }
@@ -75,7 +82,7 @@ public class DistributeDocs {
         for (ForgeDirection fd : ForgeDirection.VALID_DIRECTIONS) {
             if (fd.offsetY != 0) continue;
             broke.adjust(fd);
-            boolean cool = isCoolPlace(broke);
+            boolean cool = isCoolPlace(broke, broke);
             broke.adjust(fd.getOpposite());
             if (cool) {
                 Core.logInfo("Giving %s a book", name);
@@ -87,13 +94,12 @@ public class DistributeDocs {
         }
     }
     
-    boolean isCoolPlace(Coord at) {
+    boolean isCoolPlace(Coord at, Coord orig) {
         if (!at.isSolid()) return false;
-        int count = 0;
-        for (Coord c : at.getNeighborsAdjacent()) {
+        for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+            Coord c = at.add(dir);
             if (!c.isSolid()) {
-                count++;
-                if (count > 1) return false;
+                if (!c.equals(orig)) return false;
             }
         }
         return at.getBlock().isReplaceableOreGen(at.w, at.x, at.y, at.z, Blocks.stone);
