@@ -57,7 +57,7 @@ public enum FactoryType {
     LEADWIRE(14, false, TileEntityWire.class, "factory_solder"),
     HEATER(15, false, TileEntityHeater.class, "factory_heater"), //work furnaces without fuel
     MIRROR(16, false, TileEntityMirror.class, "factory_mirror"), //reflect sunlight onto IReflectionTargets
-    GRINDER(17, true, TileEntityGrinder.class, "factory_grinder"), //grind.
+    GRINDER(17, true, TileEntityGrinder.class, "factory_grinder"), //grind. NORELEASE: Remove!
     MIXER(18, true, TileEntityMixer.class, "factory_mixer"), //crafts its input as shapeless recipes of 2-4 ingredients
     CRYSTALLIZER(19, true, TileEntityCrystallizer.class, "factory_crystal"), //grow metallic crystals
     //20 -- Used to be GREENWARE
