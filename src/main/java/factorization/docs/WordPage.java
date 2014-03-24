@@ -51,15 +51,15 @@ public class WordPage extends AbstractPage {
     Word click(int relativeX, int relativeY) {
         int y = 0;
         for (ArrayList<Word> line : text) {
+            if (y > relativeY) break;
             y += lineHeight;
             if (y < relativeY || line.isEmpty()) continue;
             int x = 0;
-            if ("    ".equals(line.get(0))) {
-                y += 20; //NORELEASE: wat
-            }
             for (Word word : line) {
                 int width = word.getWidth(font);
-                if (x <= relativeX && relativeX <= x + width) return word;
+                if (x <= relativeX && relativeX <= x + width) {
+                    return word;
+                }
                 x += width;
                 if (x > relativeX) break;
             }
