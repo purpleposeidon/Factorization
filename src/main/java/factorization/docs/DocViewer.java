@@ -186,20 +186,25 @@ public class DocViewer extends GuiScreen {
         
         super.drawScreen(mouseX, mouseY, partialTicks);
         
-        drawPage(0, mouseX, mouseY);
-        drawPage(1, mouseX, mouseY);
+        for (int pass = 0; pass <= 1; pass++) {
+            drawPage(0, mouseX, mouseY, pass);
+            drawPage(1, mouseX, mouseY, pass);
+        }
         GL11.glPopMatrix();
     }
     
-    void drawPage(int id, int mouseX, int mouseY) {
+    void drawPage(int id, int mouseX, int mouseY, int pass) {
         AbstractPage page = getPage(id);
         if (page == null) return;
-        page.draw(this, getPageLeft(id), getPageTop(id));
-        if (page instanceof WordPage) {
-            WordPage p = (WordPage) page;
-            Word link = p.click(mouseX - getPageLeft(id), mouseY - getPageTop(id));
-            if (link != null) {
-                link.drawHover(this, mouseX, mouseY);
+        if (pass == 0) {
+            page.draw(this, getPageLeft(id), getPageTop(id));
+        } else if (pass == 1) {
+            if (page instanceof WordPage) {
+                WordPage p = (WordPage) page;
+                Word link = p.click(mouseX - getPageLeft(id), mouseY - getPageTop(id));
+                if (link != null) {
+                    link.drawHover(this, mouseX, mouseY);
+                }
             }
         }
     }
