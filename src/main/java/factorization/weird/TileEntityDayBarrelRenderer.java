@@ -245,7 +245,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         //Got problems? Consider looking at ForgeHooksClient.renderInventoryItem, that might be better than this here.
         GL11.glPushMatrix();
         GL11.glRotatef(180, 0, 0, 1);
-        //GL11.glTranslatef(-0.5F, -0.5F, 0);
+        GL11.glTranslatef(0, 0, 1F/32F);
         float scale = 1F/32F;
         GL11.glScalef(scale, scale, scale);
         GL11.glScalef(1, 1, -0.02F);
