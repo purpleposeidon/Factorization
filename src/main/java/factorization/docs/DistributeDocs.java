@@ -13,6 +13,7 @@ import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatBase;
 import net.minecraft.stats.StatisticsFile;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.world.WorldSettings;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.world.BlockEvent;
@@ -32,24 +33,28 @@ public class DistributeDocs {
     }
     
     static boolean givenBook(EntityPlayer player) {
-        return getFile(player).writeStat(bookGet) > 0;
+        return getFile(player).writeStat(bookGet) > 0 || player.getEntityData().hasKey("fzDocd");
     }
     
     static void setGivenBook(EntityPlayer player) {
         needyPlayers.remove(player.getCommandSenderName());
         getFile(player).func_150873_a(player, bookGet, 1);
+        player.getEntityData().setBoolean("fzDocd", true);
     }
     
     @SubscribeEvent
     public void onPlayerLogon(PlayerLoggedInEvent event) {
-        if (givenBook(event.player)) return;
+        if (givenBook(event.player)) {
+            setGivenBook(event.player);
+            return;
+        }
         if (!(event.player instanceof EntityPlayerMP)) return;
         EntityPlayerMP player = (EntityPlayerMP) event.player;
         needyPlayers.add(player.getCommandSenderName());
     }
     
     Random rand = new Random();
-    static StatBase bookGet = new StatBase("factorization.dropdocbook", new ChatComponentText("docbook dropper!")).registerStat();
+    static StatBase bookGet = new StatBase("factorization.dropdocbook", new ChatComponentTranslation("factorization.dropdocbook")).registerStat();
     
     
     @SubscribeEvent
