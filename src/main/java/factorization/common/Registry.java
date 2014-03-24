@@ -794,7 +794,7 @@ public class Registry {
                 " - ",
                 "I I",
                 'I', Items.iron_ingot,
-                '-', Blocks.light_weighted_pressure_plate);
+                '-', Blocks.heavy_weighted_pressure_plate);
         if (FzConfig.enable_solar_steam) {
             recipe(solarboiler_item,
                     "I#I",
@@ -884,7 +884,7 @@ public class Registry {
                 "S-S",
                 "SSS",
                 'S', diamond_shard,
-                '-', Blocks.light_weighted_pressure_plate);
+                '-', Blocks.heavy_weighted_pressure_plate);
         shapelessRecipe(socket_lacerator, grinder_item);
         
         //Values based on Fortune I
