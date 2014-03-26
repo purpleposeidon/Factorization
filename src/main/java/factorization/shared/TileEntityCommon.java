@@ -24,6 +24,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.event.FMLModIdMappingEvent;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -303,4 +304,6 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public void representYoSelf() {
         Core.loadBus(this);
     }
+
+    public void mappingsChanged(FMLModIdMappingEvent event) { }
 }
