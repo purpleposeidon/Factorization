@@ -279,7 +279,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             return true;
         }
         if (messageType == MessageType.ServoRailDecor) {
-            //getCoord().redraw(); //NORELEASE: Test
+            getCoord().redraw();
             ServoComponent sc = ServoComponent.readFromPacket(input);
             if (!(sc instanceof Decorator)) {
                 return false;
