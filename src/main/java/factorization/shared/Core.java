@@ -1,7 +1,15 @@
 package factorization.shared;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -23,11 +31,18 @@ import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.google.common.io.Closeables;
+import com.sun.xml.internal.ws.Closeable;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLMissingMappingsEvent;
+import cpw.mods.fml.common.event.FMLMissingMappingsEvent.Action;
+import cpw.mods.fml.common.event.FMLMissingMappingsEvent.MissingMapping;
+import cpw.mods.fml.common.event.FMLModIdMappingEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
@@ -154,6 +169,48 @@ public class Core {
         isMainServerThread.set(true);
         serverStarted = true;
         DocumentationModule.instance.serverStarts(event);
+    }
+    
+    @EventHandler
+    public void mappingsChanged(FMLModIdMappingEvent event) {
+        for (FactoryType ft : FactoryType.values()) {
+            ft.getRepresentative().mappingsChanged(event);
+        }
+    }
+    
+    private Set<String> getDeadItems() {
+        InputStream is = null;
+        final String dead_list = "factorization_dead_items";
+        try {
+            HashSet<String> found = new HashSet();
+            URL url = getClass().getResource(dead_list);
+            is = url.openStream();
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            while (true) {
+                String line = br.readLine();
+                if (line == null) {
+                    break;
+                }
+                found.add(line);
+            }
+            return found;
+        } catch (IOException e) {
+            Core.logSevere("Failed to load " + dead_list);
+            e.printStackTrace();
+            return new HashSet();
+        } finally {
+            FzUtil.closeNoisily("closing " + dead_list, is);
+        }
+    }
+    
+    @EventHandler
+    public void missingMappings(FMLMissingMappingsEvent event) {
+        Set<String> theDead = getDeadItems();
+        for (MissingMapping missed : event.get()) {
+            if (theDead.contains(missed.name)) {
+                missed.setAction(Action.IGNORE);
+            }
+        }
     }
 
     ItemStack getExternalItem(String className, String classField, String description) {
