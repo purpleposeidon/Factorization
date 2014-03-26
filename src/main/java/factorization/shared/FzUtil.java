@@ -1662,4 +1662,14 @@ public class FzUtil {
         is.setStackDisplayName(name);
         return is;
     }
+    
+    public static void closeNoisily(String msg, InputStream is) {
+        if (is == null) return;
+        try {
+            is.close();
+        } catch (IOException e) {
+            Core.logSevere(msg);
+            e.printStackTrace();
+        }
+    }
 }
