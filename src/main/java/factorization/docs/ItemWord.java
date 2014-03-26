@@ -9,9 +9,19 @@ import org.lwjgl.opengl.GL11;
 public class ItemWord extends Word {
     ItemStack is;
     
+    public ItemWord(ItemStack is) {
+        super(getDefaultHyperlink(is));
+        this.is = is;
+    }
+    
     public ItemWord(ItemStack is, String hyperlink) {
         super(hyperlink);
         this.is = is;
+    }
+    
+    static String getDefaultHyperlink(ItemStack is) {
+        if (is == null) return null;
+        return "cgi/recipes/" + is.getUnlocalizedName();
     }
 
     @Override

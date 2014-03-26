@@ -2,8 +2,11 @@ package factorization.docs;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 
 import net.minecraft.block.Block;
@@ -17,23 +20,129 @@ import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import factorization.oreprocessing.TileEntityCrystallizer;
+import factorization.oreprocessing.TileEntityGrinder;
+import factorization.oreprocessing.TileEntitySlagFurnace;
+import factorization.shared.Core;
+import factorization.shared.FzUtil;
 
 public class RecipeViewer implements IDocGenerator {
-    int recursion;
+    HashMap<String, ArrayList<ArrayList>> recipeCategories = null;
+    ArrayList<String> categoryOrder = new ArrayList();
+    
     @Override
     public void process(Typesetter out, String arg) {
-        addAll(out, "Workbench Recipes", CraftingManager.getInstance().getRecipeList());
-        addAll(out, "Furnace Recipes", FurnaceRecipes.smelting().getSmeltingList().entrySet());
+        if (recipeCategories == null) {
+            recipeCategories = new HashMap();
+            Core.logInfo("Loading recipe list");
+            loadRecipes();
+            Core.logInfo("Done");
+        }
+        if (arg == null || arg.equalsIgnoreCase("categories") || arg.isEmpty()) {
+            out.append("\\title{Recipe Categories}\n\n");
+            for (String cat : categoryOrder) {
+                out.append(String.format("\\link{cgi/recipes/category/%s}{%s}\\nl", cat, cat));
+            }
+        } else if (arg.startsWith("category/")) {
+            String cat = arg.replace("category/", "");
+            if (recipeCategories.containsKey(cat)) {
+                ArrayList<ArrayList> recipeList = recipeCategories.get(cat);
+                writeRecipes(out, null, cat, recipeList);
+            } else {
+                out.error("Category not found: " + arg);
+            }
+        } else {
+            ItemStack matching = null;
+            if (!arg.equalsIgnoreCase("all")) {
+                ArrayList<ItemStack> matchers = DocumentationModule.getNameItemCache().get(arg);
+                if (!matchers.isEmpty()) {
+                    matching = matchers.get(0);
+                }
+                if (matching == null) {
+                    out.error("Couldn't find item: " + arg);
+                    return;
+                }
+                out.emitWord(new ItemWord(matching));
+                out.append("\n\n");
+            }
+            
+            for (String cat : categoryOrder) {
+                ArrayList<ArrayList> recipeList = recipeCategories.get(cat);
+                writeRecipes(out, matching, cat, recipeList);
+            }
+            
+        }
     }
     
-    void addAll(Typesetter sb, String label, Iterable list) {
-        sb.append("\\title{" + label + "}\n\n");
-        for (Object obj : list) {
-            recursion = 0;
-            addRecipe(sb, obj);
-            sb.append("\\nl\n");
+    void writeRecipes(Typesetter out, ItemStack matching, String categoryName, ArrayList<ArrayList> recipes) {
+        if (matching == null) {
+            for (ArrayList recipe : recipes) {
+                writeRecipe(out, recipe);
+            }
+        } else {
+            boolean first = true;
+            for (ArrayList recipe : recipes) {
+                if (recipeMatches(recipe, matching)) {
+                    if (first) {
+                        first = false;
+                        if (categoryName != null) {
+                            out.append("\\u{" + categoryName + "}\n\n");
+                        }
+                    }
+                    writeRecipe(out, recipe);
+                }
+            }
         }
-        sb.append("\\newpage\n");
+    }
+    
+    boolean recipeMatches(ArrayList recipe, ItemStack matching) {
+        for (Object part : recipe) {
+            if (part instanceof ItemWord) {
+                ItemWord iw = (ItemWord) part;
+                if (iw.is == null) continue;
+                if (FzUtil.identical(iw.is, matching) || FzUtil.wildcardSimilar(iw.is, matching)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    void writeRecipe(Typesetter out, ArrayList parts) {
+        for (Object part : parts) {
+            if (part instanceof String) {
+                out.append((String) part);
+            } else {
+                out.emitWord((Word) part);
+            }
+        }
+    }
+    
+    void loadRecipes() {
+        putCategory("Workbench", CraftingManager.getInstance().getRecipeList());
+        putCategory("Furnace", FurnaceRecipes.smelting().getSmeltingList().entrySet());
+        putCategory("Slag Furnace", TileEntitySlagFurnace.SlagRecipes.smeltingResults);
+        putCategory("Lacerator", TileEntityGrinder.recipes);
+        putCategory("Crystallizer", TileEntityCrystallizer.recipes);
+    }
+    
+    void putCategory(String label, Iterable list) {
+        recipeCategories.put(label, addAll(list));
+        categoryOrder.add(label);
+    }
+    
+    int recursion;
+    ArrayList<ArrayList> addAll(Iterable list) {
+        ArrayList<ArrayList> generated = new ArrayList();
+        for (Object obj : list) {
+            ArrayList entry = new ArrayList();
+            recursion = 0;
+            addRecipe(entry, obj);
+            if (!entry.isEmpty()) {
+                generated.add(entry);
+            }
+        }
+        return generated;
     }
     
     static String getDisplayName(ItemStack is) {
@@ -46,7 +155,8 @@ public class RecipeViewer implements IDocGenerator {
         }
     }
     
-    void addRecipe(Typesetter sb, Object obj) {
+    void addRecipe(List sb, Object obj) {
+        sb.add("\\seg");
         if (obj instanceof ShapedOreRecipe) {
             addShapedOreRecipe(sb, (ShapedOreRecipe) obj);
         } else if (obj instanceof ShapedRecipes) {
@@ -62,18 +172,19 @@ public class RecipeViewer implements IDocGenerator {
                 t.printStackTrace();
             }
         }
-        sb.append("\n\n");
+        sb.add("\\endseg");
+        sb.add("\n\n");
     }
     
-    Object genericRecipePrefix(Typesetter sb, IRecipe recipe) {
+    Object genericRecipePrefix(List sb, IRecipe recipe) {
         ItemStack output = ((IRecipe) recipe).getRecipeOutput();
         if (output == null) return null;
-        sb.emitWord(new ItemWord(output, null));
-        sb.append(" \\b{" + getDisplayName(output) + "}\n\n");
+        sb.add(new ItemWord(output));
+        sb.add(" \\b{" + getDisplayName(output) + "}\n\n");
         return output;
     }
     
-    void addShapedOreRecipe(Typesetter sb, ShapedOreRecipe recipe) {
+    void addShapedOreRecipe(List sb, ShapedOreRecipe recipe) {
         genericRecipePrefix(sb, recipe);
         int width = ReflectionHelper.getPrivateValue(ShapedOreRecipe.class, recipe, "width");
         int height = ReflectionHelper.getPrivateValue(ShapedOreRecipe.class, recipe, "height");
@@ -82,7 +193,7 @@ public class RecipeViewer implements IDocGenerator {
         for (Object in : input) {
             if (in instanceof ItemStack || in == null) {
                 ItemStack is = (ItemStack) in;
-                sb.emitWord(new ItemWord(is, null));
+                sb.add(new ItemWord(is));
             } else if (in instanceof Iterable) {
                 Iterator<Object> it = ((Iterable)in).iterator();
                 if (it.hasNext()) {
@@ -95,29 +206,29 @@ public class RecipeViewer implements IDocGenerator {
             }
             i++;
             if (i % width == 0) {
-                sb.append("\n\n");
+                sb.add("\n\n");
             } else {
-                sb.append(" ");
+                sb.add(" ");
             }
         }
     }
     
-    void addShapedRecipes(Typesetter sb, ShapedRecipes recipe) {
+    void addShapedRecipes(List sb, ShapedRecipes recipe) {
         genericRecipePrefix(sb, recipe);
         int width = recipe.recipeWidth;
         for (int i = 0; i < recipe.recipeItems.length; i++) {
-            sb.emitWord(new ItemWord(recipe.recipeItems[i], null));
+            sb.add(new ItemWord(recipe.recipeItems[i]));
             if (i % width == 2) {
-                sb.append("\n\n");
+                sb.add("\n\n");
             } else {
-                sb.append(" ");
+                sb.add(" ");
             }
         }
     }
     
-    void addShapelessOreRecipe(Typesetter sb, ShapelessOreRecipe recipe) {
+    void addShapelessOreRecipe(List sb, ShapelessOreRecipe recipe) {
         genericRecipePrefix(sb, recipe);
-        sb.append("Shapeless: ");
+        sb.add("Shapeless: ");
         for (Object obj : recipe.getInput()) {
             if (obj instanceof Object[]) {
                 Object[] objs = (Object[]) obj;
@@ -132,15 +243,15 @@ public class RecipeViewer implements IDocGenerator {
         }
     }
     
-    void addShapelessRecipes(Typesetter sb, ShapelessRecipes recipe) {
+    void addShapelessRecipes(List sb, ShapelessRecipes recipe) {
         genericRecipePrefix(sb, recipe);
-        sb.append("Shapeless: ");
+        sb.add("Shapeless: ");
         for (Object obj : recipe.recipeItems) {
             convertObject(sb, obj);
         }
     }
     
-    void addRecipeWithReflection(Typesetter sb, Object recipe) throws IllegalArgumentException, IllegalAccessException {
+    void addRecipeWithReflection(List sb, Object recipe) throws IllegalArgumentException, IllegalAccessException {
         if (recipe instanceof ItemStack || recipe instanceof String || recipe.getClass().isArray() || recipe instanceof Collection) {
             convertObject(sb, recipe);
             return;
@@ -151,7 +262,7 @@ public class RecipeViewer implements IDocGenerator {
         } else if (recipe instanceof Entry) {
             Entry ent = (Entry) recipe;
             addRecipeWithReflection(sb, ent.getKey());
-            sb.append(" ==> ");
+            sb.add(" ==> ");
             addRecipeWithReflection(sb, ent.getValue());
             return;
         }
@@ -165,14 +276,14 @@ public class RecipeViewer implements IDocGenerator {
             Object v = f.get(recipe);
             if (v == output || v == null) continue;
             if (v instanceof String || v instanceof ItemStack || v instanceof Collection || v.getClass().isArray()) {
-                sb.append(f.getName() + ": ");
+                sb.add(f.getName() + ": ");
                 convertObject(sb, v);
-                sb.append("\\nl ");
+                sb.add("\\nl ");
             }
         }
     }
     
-    void convertObject(Typesetter sb, Object obj) {
+    void convertObject(List sb, Object obj) {
         if (obj == null) {
             return;
         }
@@ -188,9 +299,9 @@ public class RecipeViewer implements IDocGenerator {
         recursion++;
         try {
             if (obj instanceof ItemStack) {
-                sb.emitWord(new ItemWord((ItemStack) obj, null));
+                sb.add(new ItemWord((ItemStack) obj));
             } else if (obj instanceof String) {
-                sb.append(obj.toString());
+                sb.add(obj.toString());
             } else if (obj.getClass().isArray()) {
                 Class<?> component = obj.getClass().getComponentType();
                 if (component == Object.class) {
@@ -201,7 +312,7 @@ public class RecipeViewer implements IDocGenerator {
                 } else if (component == ItemStack.class) {
                     ItemStack[] listy = (ItemStack[]) obj;
                     for (ItemStack is : listy) {
-                        sb.emitWord(new ItemWord(is, null));
+                        sb.add(new ItemWord(is));
                     }
                 }
             } else if (obj instanceof Collection) {
@@ -210,7 +321,7 @@ public class RecipeViewer implements IDocGenerator {
                     convertObject(sb, o);
                 }
             } else if (obj instanceof IRecipe) {
-                sb.append("Embedded Recipe:\n\n");
+                sb.add("Embedded Recipe:\n\n");
                 addRecipe(sb, obj);
             } else {
                 try {

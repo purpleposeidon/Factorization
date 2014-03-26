@@ -17,8 +17,11 @@ public class Typesetter {
     final FontRenderer font;
     final int pageWidth, pageHeight;
     
+    ArrayList<String> topics = new ArrayList();
+    
     private ArrayList<AbstractPage> pages = new ArrayList();
     private ArrayList<AbstractPage> afterBuffer = new ArrayList();
+    private ArrayList<Word> segmentStart = null;
     
     public Typesetter(FontRenderer font, int pageWidth, int pageHeight, String text) {
         this.font = font;
@@ -149,12 +152,13 @@ public class Typesetter {
                         error("No item specified");
                         continue;
                     }
-                    ItemStack is = DocumentationModule.lookup(itemName);
-                    if (is == null) {
-                        error(itemName);
+                    ArrayList<ItemStack> items = DocumentationModule.lookup(itemName);
+                    if (items == null) {
+                        error(itemName + " no such item");
                         continue;
                     }
-                    emitWord(new ItemWord(is, link));
+                    // NOTE: This could miss items. Hrm.
+                    emitWord(new ItemWord(items.get(0), link));
                 } else if (cmd.equals("\\img")) {
                     String imgName = getParameter(cmd, tokenizer);
                     if (imgName == null) {
@@ -225,14 +229,28 @@ public class Typesetter {
                     process("\\link{lmp}{LMP}", link, style);
                 } else if (cmd.equals("\\generate")) {
                     String arg = getParameter(cmd, tokenizer);
-                    String args[] = arg.split("/", 1);
+                    String args[] = arg.split("/", 2);
                     IDocGenerator gen = DocumentationModule.generators.get(args[0]);
                     if (gen == null) {
-                        error("\\gen{" + arg + "}");
+                        error("\\generate{" + arg + "}: Not found: " + args[0]);
                         return;
                     }
                     String rest = args.length > 1 ? args[1] : "";
                     gen.process(this, rest);
+                } else if (cmd.equals("\\seg")) {
+                    ArrayList<ArrayList<Word>> lines = getCurrentPage().text;
+                    if (!lines.isEmpty()) {
+                        segmentStart = lines.get(lines.size() - 1);
+                    }
+                } else if (cmd.equals("\\endseg")) {
+                    segmentStart = null;
+                } else if (cmd.equals("\\topic")) {
+                    String topic = getParameter(cmd, tokenizer);
+                    if (topic == null) {
+                        error("\\topic missing parameter");
+                        continue;
+                    }
+                    topics.add(topic);
                 } else {
                     error(cmd);
                 }
@@ -252,7 +270,16 @@ public class Typesetter {
             page.nl();
         }
         if ((2 + page.text.size())*page.lineHeight > pageHeight) {
+            WordPage oldPage = page;
+            ArrayList<Word> oldSeg = segmentStart;
             page = newPage();
+            if (oldSeg != null) {
+                int n = oldPage.text.lastIndexOf(oldSeg);
+                ArrayList<ArrayList<Word>> got = new ArrayList();
+                while (oldPage.text.size() > n) {
+                    page.text.add(oldPage.text.remove(n));
+                }
+            }
         }
         page.add(w);
     }
@@ -274,6 +301,7 @@ public class Typesetter {
         emptyBuffer();
         current = new WordPage(font);
         pages.add(current);
+        segmentStart = null;
         return current;
     }
     

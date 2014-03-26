@@ -98,8 +98,9 @@ public class DocViewer extends GuiScreen {
         }
         
         this.doc = getDocument(name); // Rebuilds the entire document from scratch. Super-inefficient!
-        if (doc == null || doc.pages.size() == 0) {
+        if (doc == null || doc.pages.isEmpty()) {
             mc.displayGuiScreen(null);
+            return;
         }
         page = doc.pages.get(0);
         if (startPageIndex != -1) {

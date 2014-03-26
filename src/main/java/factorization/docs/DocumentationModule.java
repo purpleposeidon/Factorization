@@ -51,13 +51,13 @@ public class DocumentationModule implements ICommand {
     public static final DocumentationModule instance = new DocumentationModule();
     static HashMap<String, IDocGenerator> generators = new HashMap();
     
-    static HashMap<String, ItemStack> nameCache = null;
+    static HashMap<String, ArrayList<ItemStack>> nameCache = null;
     
-    public static ItemStack lookup(String name) {
+    public static ArrayList<ItemStack> lookup(String name) {
         return getNameItemCache().get(name);
     }
     
-    public static HashMap<String, ItemStack> getNameItemCache() {
+    public static HashMap<String, ArrayList<ItemStack>> getNameItemCache() {
         if (nameCache == null) {
             loadCache();
         }
@@ -75,10 +75,16 @@ public class DocumentationModule implements ICommand {
                 t.printStackTrace();
             }
         }
-        nameCache = new HashMap<String, ItemStack>(items.size());
+        nameCache = new HashMap<String, ArrayList<ItemStack>>(items.size());
         for (ItemStack is : items) {
             if (is == null) continue;
-            nameCache.put(is.getUnlocalizedName(), is);
+            String itemName = is.getUnlocalizedName();
+            ArrayList<ItemStack> list = nameCache.get(itemName);
+            if (list == null) {
+                list = new ArrayList();
+                nameCache.put(itemName, list);
+            }
+            list.add(is);
         }
     }
     
