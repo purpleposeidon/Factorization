@@ -7,7 +7,6 @@ import factorization.common.FzConfig;
 
 public class HookTargetsClient {
     public static void keyTyped(char chr, int keysym) {
-        //Core.logInfo("KeyTyped: %s %s", chr, keysym); //NORELEASE
         Minecraft mc = Minecraft.getMinecraft();
         if (mc == null || mc.thePlayer == null) return;
         if (FzConfig.pocket_craft_anywhere) {
