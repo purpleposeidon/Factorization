@@ -1,5 +1,6 @@
 package factorization.servo;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 import net.minecraft.entity.Entity;
@@ -13,6 +14,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.util.ForgeDirection;
+import cpw.mods.fml.common.event.FMLModIdMappingEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 import cpw.mods.fml.relauncher.Side;
@@ -31,7 +33,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     private boolean putting_nbt = false;
     private byte redstone_cache = -1;
     
-    static short[] itemId2modIndex = new short[32000 /* NORELEASE this the right way to store stuff? Items.itemsList.length */];
+    static short[] itemId2modIndex = new short[1024*2];
     
     TileEntity cached_te = null;
     Entity cached_ent = null;
@@ -539,9 +541,19 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     @Override
     public void representYoSelf() {
         super.representYoSelf();
+        classifyItems();
+    }
+    
+    @Override
+    public void mappingsChanged(FMLModIdMappingEvent event) {
+        classifyItems();
+    }
+    
+    void classifyItems() {
         Core.logFine("[parasieve] Classifying items");
         HashMap<String, Short> modMap = new HashMap();
         short seen = 1;
+        Arrays.fill(itemId2modIndex, (short) 0);
         for (Item item : (Iterable<Item>) Item.itemRegistry) {
             if (item == null) {
                 continue;
@@ -560,7 +572,11 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
                 val = seen;
                 seen++;
             }
-            itemId2modIndex[FzUtil.getId(item)] = val;
+            int id = FzUtil.getId(item);
+            if (id >= itemId2modIndex.length) {
+                itemId2modIndex = Arrays.copyOf(itemId2modIndex, id + 1024);
+            }
+            itemId2modIndex[id] = val;
         }
         Core.logFine("[parasieve] Done");
     }
