@@ -30,20 +30,18 @@ public class FactorizationOreProcessingHandler {
     public static final float REDUCE = REDUCE_MULTIPLY/GRIND_MULTIPLY;
     public static final float CRYSTALLIZE = CRYSTALLIZE_MULTIPLY/REDUCE_MULTIPLY;
     
-    /** This adds an ore to the processing chain: Grinds the ore into gravel */
     void addProcessingFront(OreType oreType, ItemStack ore) {
         ItemStack dirty = Core.registry.ore_dirty_gravel.makeStack(oreType);
         TileEntityGrinder.addRecipe(ore, dirty, GRIND);
     }
     
-    /** This (maybe) adds an ore to the processing ends (converting anything to ingots). It only does this if the ingot is better. */
     void addProcessingEnds(OreType oreType, ItemStack ore, ItemStack ingot) {
         //Everything can be slagged
         oreType.enable();
         if (oreType != OreType.SILVER && oreType != OreType.GALENA) {
             TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, ingot, 0.4F, oreType.surounding_medium);
         } else if (oreType == OreType.SILVER) {
-            //TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, new ItemStack(Core.registry.lead_ingot), 1F, ingot);
+            TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, new ItemStack(Core.registry.lead_ingot), 1F, ingot);
         }
         if (oreType.processingResult != null) {
             return;
@@ -129,6 +127,7 @@ public class FactorizationOreProcessingHandler {
             }
             if (ingot != null) {
                 if (oreType == OreType.GALENA) {
+                    //NORELEASE: Test this. Uhm. Bluh?
                     addProcessingEnds(OreType.LEAD, ore, new ItemStack(Core.registry.lead_ingot));
                     addProcessingEnds(OreType.SILVER, ore, new ItemStack(Core.registry.silver_ingot));
                     addProcessingEnds(OreType.GALENA, ore, new ItemStack(Core.registry.silver_ingot));
