@@ -354,8 +354,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         if (worldObj.isRemote) {
             if (draw_active > 0) {
                 makeNoise();
-                worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord); //NORELEASE
-                //In 1.6, was worldObj.markBlockForRenderUpdate(xCoord, yCoord, zCoord);
+                worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
                 draw_active--;
             }
         } else {
