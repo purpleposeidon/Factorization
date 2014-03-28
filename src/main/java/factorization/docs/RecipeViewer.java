@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
@@ -63,7 +64,7 @@ public class RecipeViewer implements IDocGenerator {
                     return;
                 }
                 out.emitWord(new ItemWord(matching));
-                out.append("\n\n");
+                out.append("\\nl");
             }
             
             for (String cat : categoryOrder) {
@@ -218,7 +219,7 @@ public class RecipeViewer implements IDocGenerator {
         int width = recipe.recipeWidth;
         for (int i = 0; i < recipe.recipeItems.length; i++) {
             sb.add(new ItemWord(recipe.recipeItems[i]));
-            if (i % width == 2) {
+            if ((i + 1) % width == 0) {
                 sb.add("\n\n");
             } else {
                 sb.add(" ");
