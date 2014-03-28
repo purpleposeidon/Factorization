@@ -10,11 +10,9 @@ import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import factorization.shared.Core;
 
 public class FactorizationKeyHandler {
-    public static final KeyBinding bag_swap_key = new KeyBinding("BoH Shift (FZ)", org.lwjgl.input.Keyboard.KEY_GRAVE, "key.categories.item");
     public static final KeyBinding pocket_key = new KeyBinding("PcktCrft Open (FZ)", org.lwjgl.input.Keyboard.KEY_C, "key.categories.item");
     
     static {
-        ClientRegistry.registerKeyBinding(bag_swap_key);
         ClientRegistry.registerKeyBinding(pocket_key);
     }
     
@@ -25,7 +23,6 @@ public class FactorizationKeyHandler {
     @SubscribeEvent
     public void checkKeys(ClientTickEvent event) {
         if (event.phase != Phase.START) return;
-        cmdKey(Command.bagShuffle, bag_swap_key);
         cmdKey(Command.craftOpen, pocket_key);
     }
     

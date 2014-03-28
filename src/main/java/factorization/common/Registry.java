@@ -7,19 +7,15 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockCompressed;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
@@ -59,7 +55,6 @@ import factorization.charge.ItemChargeMeter;
 import factorization.charge.TileEntityLeydenJar;
 import factorization.darkiron.BlockDarkIronOre;
 import factorization.docs.ItemDocBook;
-import factorization.oreprocessing.BlockOreStorageShatterable;
 import factorization.oreprocessing.ItemOreProcessing;
 import factorization.oreprocessing.ItemOreProcessing.OreType;
 import factorization.oreprocessing.TileEntityCrystallizer;
@@ -79,13 +74,11 @@ import factorization.shared.FzUtil;
 import factorization.shared.ItemBlockProxy;
 import factorization.shared.ItemCraftingComponent;
 import factorization.shared.ItemFactorizationBlock;
-import factorization.shared.Sound;
 import factorization.sockets.ItemSocketPart;
 import factorization.weird.ItemDayBarrel;
 import factorization.weird.ItemPocketTable;
 import factorization.weird.TileEntityDayBarrel;
 import factorization.wrath.BlockLightAir;
-import factorization.wrath.ItemBagOfHolding;
 import factorization.wrath.TileEntityWrathLamp;
 
 public class Registry {
@@ -114,7 +107,6 @@ public class Registry {
     public ItemStack silver_ore_item, silver_block_item, lead_block_item,
             dark_iron_block_item;
     public ItemStack is_factory, is_lamp, is_lightair;
-    public ItemBagOfHolding bag_of_holding;
     public ItemPocketTable pocket_table;
     public ItemCraftingComponent diamond_shard;
     public ItemStack diamond_shard_packet;
@@ -276,8 +268,6 @@ public class Registry {
         OreDictionary.registerOre("ingotFzDarkIron", dark_iron);
         OreDictionary.registerOre("blockFzDarkIron", dark_iron_block_item);
 
-
-        bag_of_holding = new ItemBagOfHolding();
         
         logicMatrixProgrammer = new ItemMatrixProgrammer();
         for (String chestName : new String[] {
@@ -428,19 +418,7 @@ public class Registry {
                 "III",
                 "III",
                 'I', dark_iron);
-
-        // Bag of holding
-
-        ItemStack BOH = new ItemStack(bag_of_holding, 1); //we don't call bag_of_holding.init(BOH) because that would show incorrect info
-        recipe(BOH, //NORELEASE: Are we removing the BOH or no?
-                "LOL",
-                "ILI",
-                " I ",
-                'I', dark_iron,
-                'O', Items.ender_pearl,
-                'L', Items.leather); // LOL!
-        shapelessRecipe(BOH, BOH, dark_iron, Items.ender_pearl, Items.leather); //ILI!
-        boh_upgrade_recipe = FzUtil.createShapelessRecipe(BOH, BOH, dark_iron, Items.ender_pearl, Items.leather); // I !
+        
         // Pocket Crafting Table (pocket table)
         oreRecipe(new ItemStack(pocket_table),
                 " #",
@@ -1094,59 +1072,7 @@ public class Registry {
 
     @SubscribeEvent
     public boolean onItemPickup(EntityItemPickupEvent event) {
-        //NORELEASE: Extractify. This goes in BoH, no?
-        EntityPlayer player = event.entityPlayer;
-        EntityItem item = event.item;
-        if (item == null) {
-            return true;
-        }
-        ItemStack is = item.getEntityItem();
-        if (is == null || is.stackSize == 0) {
-            return true;
-        }
-        if (player.isDead) {
-            return true;
-        }
-        InventoryPlayer inv = player.inventory;
-        // If the item would take a new slot in our inventory, look for bags of
-        // holding to put it into
-        int remaining_size = is.stackSize;
-        int free_slots = 0;
-        for (int i = 0; i < inv.getSizeInventory(); i++) {
-            ItemStack here = inv.getStackInSlot(i);
-            if (here == null) {
-                free_slots += 1;
-                continue;
-            }
-            if (FzUtil.couldMerge(is, here)) {
-                int free = here.getMaxStackSize() - here.stackSize;
-                remaining_size -= free;
-                if (remaining_size <= 0) {
-                    break;
-                }
-            }
-        }
-        if (remaining_size > 0) {
-            // find the BOHs
-            ArrayList<ItemStack> bags = new ArrayList<ItemStack>();
-            for (int i = 0; i < inv.getSizeInventory(); i++) {
-                ItemStack here = inv.getStackInSlot(i);
-                if (here != null && here.getItem() == bag_of_holding) {
-                    bags.add(here);
-                }
-            }
-            // For each row
-            boolean success = false;
-            for (ItemStack bag : bags) {
-                if (is.stackSize < 0) {
-                    break;
-                }
-                success = bag_of_holding.insertItem(bag, is);
-            }
-            if (success) {
-                Sound.bagSlurp.playAt(player);
-            }
-        }
+        //NORELEASE: Extractify?
         Core.proxy.pokePocketCrafting();
         return true;
     }

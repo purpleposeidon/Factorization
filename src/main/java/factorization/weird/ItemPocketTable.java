@@ -17,7 +17,7 @@ import factorization.shared.ItemFactorization;
 import factorization.shared.Core.TabType;
 
 public class ItemPocketTable extends ItemFactorization {
-
+    
     public ItemPocketTable() {
         super("tool/pocket_crafting_table", TabType.TOOLS);
         setMaxStackSize(1);
@@ -42,7 +42,7 @@ public class ItemPocketTable extends ItemFactorization {
         }
         player.openGui(Core.instance, FactoryType.POCKETCRAFTGUI.gui, player.worldObj, 0, 0, 0);
         if (save != null) {
-            player.inventory.setItemStack(save);
+            player.inventory.setItemStack(save); // NORELEASE: This doesn't work properly! Client doesn't know it's holding it...
             if (!player.worldObj.isRemote) {
                 ((EntityPlayerMP) player).updateHeldItem();
             }

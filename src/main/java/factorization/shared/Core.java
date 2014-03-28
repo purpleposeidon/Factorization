@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -174,13 +175,14 @@ public class Core {
     @EventHandler
     public void mappingsChanged(FMLModIdMappingEvent event) {
         for (FactoryType ft : FactoryType.values()) {
-            ft.getRepresentative().mappingsChanged(event);
+            TileEntityCommon tec = ft.getRepresentative();
+            if (tec != null) tec.mappingsChanged(event);
         }
     }
     
     private Set<String> getDeadItems() {
         InputStream is = null;
-        final String dead_list = "factorization_dead_items";
+        final String dead_list = "/factorization_dead_items";
         try {
             HashSet<String> found = new HashSet();
             URL url = getClass().getResource(dead_list);
@@ -207,8 +209,12 @@ public class Core {
     public void missingMappings(FMLMissingMappingsEvent event) {
         Set<String> theDead = getDeadItems();
         for (MissingMapping missed : event.get()) {
-            if (theDead.contains(missed.name)) {
-                missed.setAction(Action.IGNORE);
+            if (missed.name.startsWith("factorization:")) {
+                if (theDead.contains(missed.name)) {
+                    missed.setAction(Action.IGNORE);
+                } else if (missed.getAction() != Action.IGNORE) {
+                    Core.logSevere("Missing mapping: " + missed.name);
+                }
             }
         }
     }

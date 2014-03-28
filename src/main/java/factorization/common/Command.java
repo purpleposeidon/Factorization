@@ -7,15 +7,11 @@ import factorization.shared.Core;
 import factorization.weird.ContainerPocket;
 
 public enum Command {
-    bagShuffle(1), craftClear(2, true), craftSwirl(3, true), craftBalance(4, true), craftOpen(5, true),
-    bagShuffleReverse(6), craftFill(11, true);
+    craftClear(2, true), craftSwirl(3, true), craftBalance(4, true), craftOpen(5, true),
+    craftFill(11, true);
 
     static class name {
         static HashMap<Byte, Command> map = new HashMap<Byte, Command>();
-    }
-    
-    static {
-        bagShuffle.setReverse(bagShuffleReverse);
     }
 
     public byte id;
@@ -61,12 +57,6 @@ public enum Command {
             }
         }
         switch (this) {
-        case bagShuffle:
-            Core.registry.bag_of_holding.useBag(player, false);
-            break;
-        case bagShuffleReverse:
-            Core.registry.bag_of_holding.useBag(player, true);
-            break;
         case craftClear:
         case craftSwirl:
         case craftBalance:
