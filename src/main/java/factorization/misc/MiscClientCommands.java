@@ -386,6 +386,7 @@ public class MiscClientCommands implements ICommand {
         @cheaty
         @help("Re-renders the chunk as a wireframe")
         public static String wireframe() {
+            //NORELEASE: We can get rid of ReflectionHelpers now. Be sure to check for getters/work arounds tho.
             Object wr_list = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, "sortedWorldRenderers", "sortedWorldRenderers");
             if (!(wr_list instanceof WorldRenderer[])) {
                 return "Reflection failed";
