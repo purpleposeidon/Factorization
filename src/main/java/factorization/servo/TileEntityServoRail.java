@@ -10,6 +10,7 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -267,8 +268,12 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         if (decoration != null) {
             ret = decoration.onClick(entityplayer, here, side);
         }
-        here.markBlockForUpdate();
-        showDecorNotification(entityplayer);
+        if (ret) {
+            here.markBlockForUpdate();
+        }
+        if (entityplayer instanceof EntityPlayerMP) {
+            showDecorNotification(entityplayer);
+        }
         return ret;
     }
     
