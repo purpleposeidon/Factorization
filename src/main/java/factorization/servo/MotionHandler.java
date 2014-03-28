@@ -84,15 +84,10 @@ public class MotionHandler {
             speed_b = (byte)Math.max(target_speed_b, speed_b*3/4 - 1);
             return;
         }
-        if (Core.cheat_servo_energy) {
-            if (should_accelerate) {
-                accelerate();
-            }
-        }
         long now = motor.worldObj.getTotalWorldTime();
         int m = 1 + target_speed_index;
         if (should_accelerate && now % 3 == 0) {
-            if (motor.extractCharge(8)) {
+            if (Core.cheat_servo_energy || motor.extractCharge(2)) {
                 accelerate();
             }
         }
