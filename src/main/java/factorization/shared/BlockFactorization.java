@@ -108,7 +108,8 @@ public class BlockFactorization extends BlockContainer {
             int side, float vecx, float vecy, float vecz) {
         // right click
         Coord here = new Coord(world, x, y, z);
-        if (here.getTE() == null && world.isRemote) {
+        TileEntityCommon t = here.getTE(TileEntityCommon.class);
+        if (t == null && world.isRemote) {
             Core.network.broadcastMessage(null, here, MessageType.DescriptionRequest);
         }
         if (entityplayer.isSneaking()) {
@@ -118,7 +119,7 @@ public class BlockFactorization extends BlockContainer {
             }
         }
 
-        TileEntityCommon t = here.getTE(TileEntityCommon.class);
+        
 
         if (t != null) {
             return t.activate(entityplayer, ForgeDirection.getOrientation(side));
