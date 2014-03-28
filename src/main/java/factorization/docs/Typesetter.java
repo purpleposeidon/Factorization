@@ -250,7 +250,8 @@ public class Typesetter {
                         error("\\topic missing parameter");
                         continue;
                     }
-                    topics.add(topic);
+                    append(String.format("\\newpage \\generate{recipes/%s}", topic));
+                    //topics.add(topic);
                 } else {
                     error(cmd);
                 }
