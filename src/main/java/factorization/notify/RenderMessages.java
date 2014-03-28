@@ -104,6 +104,11 @@ public class RenderMessages extends RenderMessagesProxy {
                 it.remove();
                 continue;
             }
+            Vec3 pos = m.getPosition(event.partialTicks);
+            double dist = camera.getDistance(pos.xCoord, pos.yCoord, pos.zCoord);
+            if (dist > 5) {
+                continue;
+            }
             GL11.glDisable(GL11.GL_LIGHTING);
             if (m.style.contains(Style.FADE)) {
                 float opacity = timeExisted / (float) m.lifeTime;
