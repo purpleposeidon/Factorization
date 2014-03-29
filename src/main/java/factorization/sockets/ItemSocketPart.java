@@ -108,23 +108,6 @@ public class ItemSocketPart extends ItemFactorization {
     public boolean onItemUse(ItemStack is, EntityPlayer player,
             World world, int x, int y, int z, int side,
             float hitX, float hitY, float hitZ) {
-        int md = is.getItemDamage();
-        Coord here = new Coord(world, x, y, z);
-        is.stackSize--;
-        SocketEmpty se = here.getTE(SocketEmpty.class);
-        if (se == null) {
-            return super.onItemUse(is, player, world, x, y, z, side, hitX, hitY, hitZ);
-        }
-        if (md > 0 && md < FactoryType.MAX_ID) {
-            try {
-                TileEntitySocketBase socket = (TileEntitySocketBase) FactoryType.fromMd(md).getFactoryTypeClass().newInstance();
-                here.setTE(socket);
-                socket.facing = se.facing;
-                here.markBlockForUpdate();
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-        }
         return true;
     }
     
