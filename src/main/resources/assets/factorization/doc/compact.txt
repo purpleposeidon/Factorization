@@ -40,3 +40,4 @@ will make 1 piston, 9 planks, 8 iron, and 8 redstone.
 
 \figure{H4sIAAAAAAAAAO3cz0rDQBDH8ZlsImmLqK/hoQiKeBcEn0KkidpDSUmCWJ/EJ/UatyAqCiXNbtnGfD+X2cv8OjlM/lw6FjGimYgkI9Fc7UHsoR7bephKNM/k6OF+Vhfl6m5WLJb2qBIvy+JRbC2LorbVZPNSVaKyklTMc17Kwdn0anp+YaNfbZDaulon2/qyruIrOdpZsnFKNhuS5TNZOyVHG5Jjp+Q2M0c7m7lbcpuZzc5m7pYsLTYl3i5Zfybrxk3ZMrnFzOZP8kiS2zpfVPr9M8n1U17Vv2ZJvjomoguRY/FAe94PDJnr/qRepgiH+weGjP13k3iZAgiD/QfQVejvd/YXAAAAAAAAAAAAAAAAAAAAAPDvTUTnPv4HoGma9z73A0PmYX9OHPvjkP3cPzBke7D/p479by7NHq7/0rEfCGYP9r/vz/8bx36gt0J/v/P+DgAAAAAAAAAAAAAAAAAAAAAYhA9fAWELmIQAAA==}
 
+\topic{factorization.factoryBlock.COMPRESSIONCRAFTER}

@@ -5,15 +5,6 @@ that a servo's sprockets can mesh with.
 
 Servos extract the power that they need from the servo rail that they are riding on.
 
-\newpage\title{Instructions and Decorations}
+\link{servodecor}{Instructions and decorations} can be placed on servo rail.
 
-A length of servo rail can also hold either an instruction or a decoration.
-These things are placed on the rail by right-clicking,
-and can be removed by shift right-clicking with an \lmp .
-If the servo rail containg an instruction is recieving a redstone signal,
-then the instruction will be disabled.
-
-An instruction is simply data, so it can be placed infinitely.
-Servos are able to copy them off the rail.
-Decorations, on the other hand, are physical objects.
-
+\topic{factorization.factoryBlock.SERVORAIL}

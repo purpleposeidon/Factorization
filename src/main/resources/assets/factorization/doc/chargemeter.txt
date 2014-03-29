@@ -1,0 +1,9 @@
+\title{Measuring Charge}
+
+The charge meter is a hand-held device that will measure
+the amount of charge in a conductive block.
+
+Many blocks have other properties
+that the charge meter can read.
+
+\topic{item.factorization:tool/charge_meter}

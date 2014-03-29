@@ -1,0 +1,31 @@
+\title{Charge Storage}
+
+There are a few ways of storing charge.
+
+One way is to simply have a lot of wiring.
+Of course, this requires more space,
+can not be measured by a comparator,
+and can not be moved by hand.
+
+\leftpage
+The battery block stores a relatively small
+amount of power,
+and they come pre-charged.
+It is used in the crafting of motors.
+A comparator can measure how full it is.
+When broken, it will keep its charge.
+
+\topic{item.factorization:charge_battery}
+
+\leftpage
+The leyden can store a large amount of power.
+It is quite cheap to craft,
+but is extremely inefficient.
+It also requires a large amount of power before
+it can even start charging.
+Like the battery,
+a comparator will measure how full it is,
+and it will retain its storage when broken.
+
+
+\topic{factorization.factoryBlock.LEYDENJAR}

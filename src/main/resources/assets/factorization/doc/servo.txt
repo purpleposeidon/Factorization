@@ -11,4 +11,6 @@ parallel to its facing direction.
 
 Servos require \link{charge}{charge} to operate.
 
-They are controlled by \link{servorail}{instructions}.
+They are controlled by \link{servodecor}{instructions}.
+
+\topic{item.factorization:servo/servo}

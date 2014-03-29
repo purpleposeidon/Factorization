@@ -25,5 +25,3 @@ They are used to make \link{lacerator}{Lacerators}.
 % The \figure above includes a sign, in English. The one below does not have that sign.
 % \figure{H4sIAAAAAAAAAO3csU/CUBDH8d/rA4JlEI2Lu3Nj1AFnXf0bSKFP0gSoqRUtg3+ff5ErXtGBgUlMGpPvJ2nu0lzfXYe3Xix5uUxS50guOEtkSRVbdH1Feabjx3RaFWU9nqRlGeZXXt1p8bKsrOLUy2d5adlZrM7zPJ1E20/eI/Xu00U6C3aKundNuZOV5FVYbEsukj0lTdazbvly5p2GWZm+jq13vgrjSV0F9eVXoVTvMhkl1zdenap+Cs3Esfy8mH33Ptnb235y3VRarH/im4VIA7mFNNSOSADwO67tAQAAAAAAAAAAAAAAAAAAAAAAAAAAAID/zisqmo0A502y3mw2HwO5fHczgL37PKBBcvCIANpy6P29teehxf4A2sP9BQAAAAAAAAAAAAAAAAAAAAAAAADgDzULAWqLI30B03IVJC2BAAA=}
 
-\leftpage
-\include{lmp}

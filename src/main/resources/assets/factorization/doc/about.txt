@@ -1,9 +1,17 @@
-Squeezing an ink sac between a book and your \link{lmp}{Logic Matrix Programmer}
-has printed its internal encyclopedia to this convenient analog format.
+% NORELEASE review
+Squeezing an ink sac between a book and your \lmp\ has
+printed its internal encyclopedia to this convenient analog format.
 
-By learning its contents, you will be able to employ our recipes to their full potential.
+This kit emphasizes design and creation,
+rather than crafting and clicking buttons in GUIs.
+This is about engineering.
+We are focused on making everything possible,
+not on making things easy.
 
-This kit emphasizes design and creation, rather than crafting and clicking buttons in GUIs.
+\nl\nl
+
+May you employ our parts to their full potential.
+
 
 \newpage
 \h1{Navigation}

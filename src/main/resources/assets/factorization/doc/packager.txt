@@ -13,3 +13,5 @@ and it will emit a redstone signal when crafting.
 If an item can be crafted as both a 3x3 and a 2x2,
 then an \link{itemshifter}{item shifter} can be used to
 insert the appropriate number of items for it to use.
+
+\topic{factorization.factoryBlock.PACKAGER}

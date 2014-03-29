@@ -14,3 +14,5 @@ its crafting speed will slowly accelerate.
 
 Crafting ingredients are inserted into the top and sides of the machine,
 and crafting results are extracted from the bottom.
+
+\topic{factorization.factoryBlock.MIXER}

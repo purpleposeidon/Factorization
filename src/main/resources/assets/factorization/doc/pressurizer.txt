@@ -19,6 +19,9 @@ The pressurizer can also be used to blow entities around.
 If it is blowing, it can drops items from a backing inventory,
 and if it is sucking, it will suck items into the inventory.
 
-It is able to move players at higher speeds.
+When spinning at high speeds,
+it is able to move players.
 
 A redstone signal will disable the pressurizer.
+
+\topic{item.factorization:fan}

@@ -15,3 +15,20 @@ Run '/f list' for more information.
 
 \link{cgi/items}{Items}
 
+\nl
+
+\u{Improved Projectile Physics}
+
+Projectiles now keep the velocity of their thrower,
+allowing them to conform to Newton's
+-- well-known and highly publicized --
+First Law of Motion.
+(Implementation of the Third Law is still under construction.)
+
+This applies to snowballs, arrows, splash potions, and enderpearls.
+
+An important consequence of this is that you can survive
+a fall from a high place by throwing an enderpearl at the right time.
+
+
+

@@ -32,3 +32,4 @@ Parasieves can be chained, up to a point.
 Applying a redstone signal will invert the filter.
 
 
+\topic{factorization.factoryBlock.PARASIEVE}

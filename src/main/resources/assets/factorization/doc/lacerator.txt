@@ -40,3 +40,4 @@ become clogged and will stop operating.
 A redstone signal will disable the lacerator.
 
 
+\topic{item.factorization:diamond_cutting_head}

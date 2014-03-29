@@ -42,3 +42,4 @@ minus the strength of the side signal.
 If the back signal is not stronger than the side signal,
 then no signal will be output.
 
+\topic{item.comparator}

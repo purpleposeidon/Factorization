@@ -4,9 +4,10 @@
 
 \index{about}{About}
 \index{ores}{Ores and Materials}
+\index{lmp}{Logic Matrix Programmer}
 \index{parts}{Parts and Machines}
 \index{building}{Building}
 \index{cookbook}{Designs}
-\index{charge}{Energy}
+\index{charge}{Charge Energy}
 % \index{oreprocessing}{Ore Processing}
 \index{misc}{Miscellaneous Nonsense}

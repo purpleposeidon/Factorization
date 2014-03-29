@@ -10,4 +10,7 @@ This inventory is called the "backing inventory".
 
 Certain socket tools can have their settings adjusted using a \lmp
 
-\figure{H4sIAAAAAAAAAO3cO4oCURAF0PtaFH+BK5EBDdzNBNqCiCiOiLpw057XzCIM5pzkVkEV1ApqmgxSdkmaSUpbapFa3KY1yzjNYZf5/vVz3h6/29Pl9hxncG+vGX0tN8vVuq6++o2azz5Lmv12WLtH32WWckoWfxMAAAAAAAAAAAAAAAAAAADAR81SDv0fgK7r3p++BQAAAAAAAAAAAAAAAAAAAP69X8pHZvpugAAA}
+% This figure is pretty pointless.
+% \figure{H4sIAAAAAAAAAO3cO4oCURAF0PtaFH+BK5EBDdzNBNqCiCiOiLpw057XzCIM5pzkVkEV1ApqmgxSdkmaSUpbapFa3KY1yzjNYZf5/vVz3h6/29Pl9hxncG+vGX0tN8vVuq6++o2azz5Lmv12WLtH32WWckoWfxMAAAAAAAAAAAAAAAAAAADAR81SDv0fgK7r3p++BQAAAAAAAAAAAAAAAAAAAP69X8pHZvpugAAA}
+
+\topic{factorization.factoryBlock.SOCKET_EMPTY}

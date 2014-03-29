@@ -32,6 +32,12 @@ if it is broken with a silk-touch axe.
 
 \newpage
 
-If you're strong enough, you can push barrels with a knockback sword.
+If you are under the influence of a Strength Potion,
+you can push barrels with a knockback sword.
 Be wary when pushing them up stairs, as they can slip.
 
+% \topic{item.factorization:daybarrel}
+% Doesn't show the variations recipes, so we do this the ugly way.
+% Oh well.
+\newpage
+\generate{recipes/item.factorization:daybarrel}
