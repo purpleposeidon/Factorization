@@ -492,8 +492,19 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
 
     @Override
     public void setPosition(double x, double y, double z) {
-        double d = 1;
-        this.boundingBox.setBounds(posX - d, posY - d, posZ - d, posX + d, posY + d, posZ + d);
+        // super.setPosition(x, y, z); //Super does some stupid shit to the bounding box.
+        this.posX = x;
+        this.posY = y;
+        this.posZ = z;
+        double dp = 1;
+        this.boundingBox.setBounds(x, y, z, x + dp, y + dp, z + dp);
+        /*
+        double neg_size = -0.25;
+        double pos_size = 0.75;
+        double height = 2F/16F;
+        double dy = 0.5;
+        this.boundingBox.setBounds(x - neg_size, dy + y - height, z - neg_size, x + pos_size, dy + y + height, z + pos_size);
+        */
     }
 
     @Override
