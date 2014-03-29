@@ -36,7 +36,7 @@ public class ItemBlockProxy extends ItemFactorization {
 
     //NOTE: Copied from ItemBlock, *EXCEPT* that in the final check, I've changed the AABB check is done w/ null instead of the player.
     //Why is that even necessary...?
-    //NORELEASE: Check that note above; use battery blocks
+    //TODO: Fix this stupidity. Seems like every other release it gets messed up.
     @Override
     public boolean onItemUse(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, World par3World, int par4, int par5, int par6, int par7, float par8, float par9, float par10)
     {
@@ -91,7 +91,7 @@ public class ItemBlockProxy extends ItemFactorization {
         {
             return false;
         }
-        else if (par3World.canPlaceEntityOnSide(this.theBlock, par4, par5, par6, false, par7, par2EntityPlayer, par1ItemStack))
+        else if (par3World.canPlaceEntityOnSide(this.theBlock, par4, par5, par6, false, par7, null, par1ItemStack))
         {
             int i1 = this.getMetadata(par1ItemStack.getItemDamage());
             int j1 = this.theBlock.onBlockPlaced(par3World, par4, par5, par6, par7, par8, par9, par10, i1);
