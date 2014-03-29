@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -31,9 +29,6 @@ import net.minecraftforge.common.MinecraftForge;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.google.common.io.Closeables;
-import com.sun.xml.internal.ws.Closeable;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
@@ -214,6 +209,27 @@ public class Core {
                     missed.setAction(Action.IGNORE);
                 } else if (missed.getAction() != Action.IGNORE) {
                     Core.logSevere("Missing mapping: " + missed.name);
+                }
+            }
+        }
+    }
+    
+    @EventHandler
+    public void fix_derpy_16_names(FMLMissingMappingsEvent event) { //NORELEASE: Implement.
+        String[] corrections = new String[] {
+                "factorization:tile.null→factorization:FZ factory",
+                "factorization:tile.factorization.ResourceBlock→factorization:FZ resource",
+                "factorization:tile.lightair→factorization:tile.lightair",
+                "factorization:tile.factorization:darkIronOre→factorization:FZ dark iron ore",
+                "factorization:tile.bedrock→factorization:FZ fractured bedrock"
+        };
+        for (String pair : corrections) {
+            String[] ab = pair.split("→");
+            String key = ab[0];
+            String value = ab[1];
+            for (MissingMapping missed : event.get()) {
+                if (missed.name.equals(key)) {
+                    //missed.setAction(target)
                 }
             }
         }
