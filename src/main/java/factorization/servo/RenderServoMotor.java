@@ -292,6 +292,7 @@ public class RenderServoMotor extends RenderEntity {
         dummy_entity.worldObj = motor.worldObj;
         holder_render.setRenderManager(renderManager);
         motor.socket.renderItemOnServo(this, motor, is, partial);
+        dummy_entity.worldObj = null;
     }
     
     
