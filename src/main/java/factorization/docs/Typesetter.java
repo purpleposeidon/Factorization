@@ -158,7 +158,11 @@ public class Typesetter {
                         continue;
                     }
                     // NOTE: This could miss items. Hrm.
-                    emitWord(new ItemWord(items.get(0), link));
+                    if (link == null) {
+                        emitWord(new ItemWord(items.get(0)));
+                    } else {
+                        emitWord(new ItemWord(items.get(0), link));
+                    }
                 } else if (cmd.equals("\\img")) {
                     String imgName = getParameter(cmd, tokenizer);
                     if (imgName == null) {
@@ -250,7 +254,7 @@ public class Typesetter {
                         error("\\topic missing parameter");
                         continue;
                     }
-                    append(String.format("\\newpage \\generate{recipes/%s}", topic));
+                    append(String.format("\\newpage \\generate{recipes/for/%s}", topic));
                     //topics.add(topic);
                 } else {
                     error(cmd);

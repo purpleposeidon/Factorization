@@ -31,6 +31,23 @@ public class RecipeViewer implements IDocGenerator {
     HashMap<String, ArrayList<ArrayList>> recipeCategories = null;
     ArrayList<String> categoryOrder = new ArrayList();
     
+    /** USAGE
+     * recipe/
+     * recipe/categories
+     * 		Lists available recipe categories
+     * 
+     * recipe/category/CATEGORY
+     * 		Lists recipes of that category
+     * 
+     * recipe/all
+     * 		Lists all recipes
+     * 
+     * recipe/itemName
+     * 		Lists recipes that use the itemName.
+     * 
+     * recipe/for/itemName
+     * 		Lists recipes whose output is the itemName
+     */
     @Override
     public void process(Typesetter out, String arg) {
         if (recipeCategories == null) {
@@ -48,13 +65,18 @@ public class RecipeViewer implements IDocGenerator {
             String cat = arg.replace("category/", "");
             if (recipeCategories.containsKey(cat)) {
                 ArrayList<ArrayList> recipeList = recipeCategories.get(cat);
-                writeRecipes(out, null, cat, recipeList);
+                writeRecipes(out, null, false, cat, recipeList);
             } else {
                 out.error("Category not found: " + arg);
             }
         } else {
             ItemStack matching = null;
+            boolean mustBeResult = false;
             if (!arg.equalsIgnoreCase("all")) {
+                if (arg.startsWith("for/")) {
+                    mustBeResult = true;
+                    arg = arg.replace("for/", "");
+                }
                 ArrayList<ItemStack> matchers = DocumentationModule.getNameItemCache().get(arg);
                 if (!matchers.isEmpty()) {
                     matching = matchers.get(0);
@@ -63,19 +85,19 @@ public class RecipeViewer implements IDocGenerator {
                     out.error("Couldn't find item: " + arg);
                     return;
                 }
-                out.emitWord(new ItemWord(matching));
+                //out.emitWord(new ItemWord(matching));
                 out.append("\\nl");
             }
             
             for (String cat : categoryOrder) {
                 ArrayList<ArrayList> recipeList = recipeCategories.get(cat);
-                writeRecipes(out, matching, cat, recipeList);
+                writeRecipes(out, matching, mustBeResult, cat, recipeList);
             }
             
         }
     }
     
-    void writeRecipes(Typesetter out, ItemStack matching, String categoryName, ArrayList<ArrayList> recipes) {
+    void writeRecipes(Typesetter out, ItemStack matching, boolean mustBeResult, String categoryName, ArrayList<ArrayList> recipes) {
         if (matching == null) {
             for (ArrayList recipe : recipes) {
                 writeRecipe(out, recipe);
@@ -83,7 +105,7 @@ public class RecipeViewer implements IDocGenerator {
         } else {
             boolean first = true;
             for (ArrayList recipe : recipes) {
-                if (recipeMatches(recipe, matching)) {
+                if (recipeMatches(recipe, matching, mustBeResult)) {
                     if (first) {
                         first = false;
                         if (categoryName != null) {
@@ -96,13 +118,16 @@ public class RecipeViewer implements IDocGenerator {
         }
     }
     
-    boolean recipeMatches(ArrayList recipe, ItemStack matching) {
+    boolean recipeMatches(ArrayList recipe, ItemStack matching, boolean mustBeResult) {
         for (Object part : recipe) {
             if (part instanceof ItemWord) {
                 ItemWord iw = (ItemWord) part;
                 if (iw.is == null) continue;
                 if (FzUtil.identical(iw.is, matching) || FzUtil.wildcardSimilar(iw.is, matching)) {
                     return true;
+                }
+                if (mustBeResult) {
+                    return false;
                 }
             }
         }
