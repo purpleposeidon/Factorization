@@ -35,7 +35,7 @@ public class FzNetDispatch {
     public static void addPacket(FMLProxyPacket packet, EntityPlayer player) {
         if (player.worldObj.isRemote) {
             FzNetEventHandler.channel.sendToServer(packet);
-        } else {
+        } else if (player instanceof EntityPlayerMP) {
             FzNetEventHandler.channel.sendTo(packet, (EntityPlayerMP) player);
         }
     }
