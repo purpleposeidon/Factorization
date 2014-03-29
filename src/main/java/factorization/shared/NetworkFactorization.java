@@ -191,20 +191,24 @@ public class NetworkFactorization {
     }
 
     public void broadcastMessage(EntityPlayer who, Coord src, MessageType messageType, Object... msg) {
-        if (who == null || !who.worldObj.isRemote) {
+        if (who != null) {
+            if (who instanceof EntityPlayerMP) {
+                FMLProxyPacket toSend = TEmessagePacket(src, messageType, msg);
+                FzNetDispatch.addPacket(toSend, who);
+            }
+        } else {
             FMLProxyPacket toSend = TEmessagePacket(src, messageType, msg);
             FzNetDispatch.addPacketFrom(toSend, src);
-        } else if (who instanceof EntityPlayerMP) {
-            FMLProxyPacket toSend = TEmessagePacket(src, messageType, msg);
-            FzNetDispatch.addPacket(toSend, (EntityPlayerMP) who);
         }
     }
 
-    public void broadcastPacket(EntityPlayer who, Coord coord, FMLProxyPacket toSend) {
-        if (who == null || !who.worldObj.isRemote) {
-            FzNetDispatch.addPacketFrom(toSend, coord);
-        } else if (who.worldObj.isRemote) {
-            FzNetDispatch.addPacket(toSend, who);
+    public void broadcastPacket(EntityPlayer who, Coord src, FMLProxyPacket toSend) {
+        if (who != null) {
+            if (who instanceof EntityPlayerMP) {
+                FzNetDispatch.addPacket(toSend, who);
+            }
+        } else {
+            FzNetDispatch.addPacketFrom(toSend, src);
         }
     }
 
