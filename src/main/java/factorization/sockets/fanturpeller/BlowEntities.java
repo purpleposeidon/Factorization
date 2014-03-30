@@ -7,14 +7,15 @@ import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.IProjectile;
+import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.EntityTNTPrimed;
 import net.minecraft.entity.monster.EntityGhast;
 import net.minecraft.entity.passive.EntityBat;
 import net.minecraft.entity.passive.EntityChicken;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
@@ -235,7 +236,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
         if (target_speed <= 1) {
             return false;
         }
-        if (entity instanceof EntityLiving || entity instanceof IProjectile) {
+        if (entity instanceof EntityLiving || entity instanceof IProjectile || entity instanceof EntityTNTPrimed || entity instanceof EntityFallingBlock) {
             return true;
         }
         if (FzConfig.fanturpeller_works_on_players && entity instanceof EntityPlayer) {
