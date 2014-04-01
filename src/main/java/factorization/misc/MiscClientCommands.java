@@ -3,10 +3,10 @@ package factorization.misc;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.StringSelection;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
@@ -583,7 +583,10 @@ public class MiscClientCommands implements ICommand {
                 mc.gameSettings.renderDistanceChunks = i; //NORELEASE: Test new ranges
                 return;
             }
-            
+            if (n.equalsIgnoreCase("bug")) {
+                addBugReport(args);
+                return;
+            }
             for (Method method : miscCommands.class.getMethods()) {
                 if (method.getDeclaringClass() == Object.class || method.getParameterTypes().length != 0) {
                     continue;
@@ -607,6 +610,24 @@ public class MiscClientCommands implements ICommand {
         } catch (Exception e) {
             mc.thePlayer.addChatMessage(new ChatComponentText("Command failed; see console"));
             e.printStackTrace();
+        }
+    }
+    
+    private void addBugReport(List<String> args) {
+        String msg = "[" + Calendar.getInstance().getTime().toString() + "]";
+        for (String arg : args) {
+            if (arg == args.get(0)) continue;
+            msg += " " + arg;
+        }
+        if (msg.isEmpty()) return;
+        try {
+            File target = new File("/media/media/fbugs");
+            Writer out = new BufferedWriter(new FileWriter(target, true));
+            out.append(msg + "\n");
+            out.flush();
+            out.close();
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
     
