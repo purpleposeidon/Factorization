@@ -43,7 +43,8 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
     Charge charge = new Charge(this);
     boolean isSucking = false;
     byte target_speed = 1;
-    float fanω, lastfanω; // because I can.
+    float fanω;
+    boolean dirty = false;
 
     transient float fanRotation, prevFanRotation;
 
@@ -234,6 +235,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         fanturpellerUpdate(socket, coord, powered, neighbor_changed);
         if (!worldObj.isRemote) {
             final int need = getRequiredCharge();
+            float orig_speed = fanω;
             if (powered) {
                 fanω *= 0.95;
             } else if (need > 0) {
@@ -252,10 +254,9 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
                     }
                 }
             }
-            
-            if (fanω != lastfanω /*FzUtil.significantChange(fanω, lastfanω)*/) {
-                socket.sendMessage(MessageType.FanturpellerSpeed, fanω, isSucking);
-                lastfanω = fanω;
+            if (dirty || orig_speed != fanω) {
+                socket.sendMessage(MessageType.FanturpellerSpeed, fanω, isSucking, target_speed);
+                dirty = false;
             }
         }
         fanRotation += fanω;
@@ -352,6 +353,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         if (messageType == MessageType.FanturpellerSpeed) {
             fanω = input.readFloat();
             isSucking = input.readBoolean();
+            target_speed = input.readByte();
             return true;
         }
         return false;
@@ -359,7 +361,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
     
     @Override
     public FMLProxyPacket getDescriptionPacket() {
-        return getDescriptionPacketWith(MessageType.FanturpellerSpeed, fanω, isSucking);
+        return getDescriptionPacketWith(MessageType.FanturpellerSpeed, fanω, isSucking, target_speed);
     }
     
     @Override
