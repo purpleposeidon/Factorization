@@ -89,14 +89,20 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
         if (!worldObj.isRemote && socket.dumpBuffer(buffer)) {
             return;
         }
-        coord.adjust(facing);
+        if (socket == this) {
+            // If we're on a servo, we want to include the servo's block in the sucking.
+            coord.adjust(facing);
+            // Since that var isn't a copy, we need to adjust it back as well.
+        }
         area.minX = death_area.minX = coord.x;
         area.minY = death_area.minY = coord.y;
         area.minZ = death_area.minZ = coord.z;
         area.maxX = death_area.maxX = coord.x + 1;
         area.maxY = death_area.maxY = coord.y + 1;
         area.maxZ = death_area.maxZ = coord.z + 1;
-        coord.adjust(facing.getOpposite());
+        if (socket == this) {
+            coord.adjust(facing.getOpposite());
+        }
         int side_range = target_speed;
         int front_range = 3 + target_speed*target_speed;
         if (isSucking) front_range++;
