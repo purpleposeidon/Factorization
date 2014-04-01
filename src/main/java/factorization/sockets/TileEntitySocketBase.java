@@ -414,6 +414,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
             }
             return false;
         } else {
+            if (worldObj.isRemote) return true;
             for (FactoryType ft : FactoryType.values()) {
                 TileEntityCommon tec = ft.getRepresentative();
                 if (tec == null) continue;
@@ -429,7 +430,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
                     if (upgrade != null) {
                         replaceWith((TileEntitySocketBase) upgrade, this);
                         if (!player.capabilities.isCreativeMode) held.stackSize--;
-                        if (worldObj.isRemote) Sound.socketInstall.playAt(this);
+                        Sound.socketInstall.playAt(this);
                         return true;
                     }
                 }
@@ -444,6 +445,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         TileEntityCommon tec = pft.getRepresentative();
         if (!(tec instanceof TileEntitySocketBase)) return;
         ItemStack is = ((TileEntitySocketBase) tec).getCreatingItem();
+        if (is == null) return;
         Notify.withItem(is);
         String msg = "Needs {ITEM_NAME}";
         if (holder instanceof Entity) {

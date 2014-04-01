@@ -390,6 +390,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     @Override
     public boolean interactFirst(EntityPlayer player) {
+        if (worldObj.isRemote) return true;
         executioner.stacks_changed = true;
         ItemStack is = FzUtil.normalize(player.getHeldItem());
         if (is == null) {
@@ -421,7 +422,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                 if (upgrade != null) {
                     socket = (TileEntitySocketBase) upgrade;
                     if (!player.capabilities.isCreativeMode) is.stackSize--;
-                    if (worldObj.isRemote) Sound.servoInstall.playAt(new Coord(this));
+                    Sound.servoInstall.playAt(new Coord(this));
                     socket.installedOnServo(this);
                     return true;
                 }
