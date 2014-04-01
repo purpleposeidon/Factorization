@@ -39,74 +39,12 @@ import factorization.api.Quaternion;
 import factorization.common.BlockIcons;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
+import factorization.shared.ObjectModel;
 import factorization.sockets.TileEntitySocketBase;
 
 public class RenderServoMotor extends RenderEntity {
-    static int both_lists = -1, sprocket_display_list = -1, chasis_display_list = -1;
-    boolean loaded_models = false;
-    
-    private static IIcon subsetIIcon;
-    private static Tessellator subsetTessellator = new Tessellator() {
-        @Override
-        public void setTextureUV(double u, double v) {
-            super.setTextureUV(subsetIIcon.getInterpolatedU(u*16), subsetIIcon.getInterpolatedV(v*16));
-        }
-    };
-    
-    static void loadModel(int displayList, String modelName, IIcon icon) {
-        try {
-            WavefrontObject sprocket = null;
-            InputStream input = null;
-            try {
-                ResourceLocation rl = Core.getResource(modelName);
-                input = Minecraft.getMinecraft().getResourceManager().getResource(rl).getInputStream();
-                if (input == null) {
-                    Core.logWarning("Missing 3D model: " + rl);
-                    return;
-                }
-                sprocket = new WavefrontObject(rl.toString(), input);
-                input.close();
-                input = null;
-            } finally {
-                if (input != null) {
-                    input.close();
-                }
-            }
-            
-            GL11.glNewList(displayList, GL11.GL_COMPILE);
-            double modelScale = 1.0/16.0;
-            GL11.glScaled(modelScale, modelScale, modelScale);
-            subsetIIcon = icon;
-            subsetTessellator.startDrawingQuads();
-            sprocket.tessellateAll(subsetTessellator);
-            subsetTessellator.draw();
-            modelScale = 1/modelScale;
-            GL11.glScaled(modelScale, modelScale, modelScale);
-            GL11.glEndList();
-        } catch (IOException e) {
-            Core.logWarning("Failed to load model %s", modelName);
-            e.printStackTrace();
-        }
-    }
-    
-    void loadModels() {
-        if (both_lists != -1) {
-            GLAllocation.deleteDisplayLists(both_lists);
-        }
-        both_lists = GLAllocation.generateDisplayLists(3);
-        sprocket_display_list = both_lists + 0;
-        chasis_display_list = both_lists + 1;
-        loadModel(sprocket_display_list, "models/servo/sprocket.obj", BlockIcons.servo$model$sprocket);
-        loadModel(chasis_display_list, "models/servo/chasis.obj", BlockIcons.servo$model$chasis);
-    }
-
-    void renderSprocket() {
-        GL11.glCallList(sprocket_display_list);
-    }
-    
-    void renderChasis() {
-        GL11.glCallList(chasis_display_list);
-    }
+    ObjectModel sprocket = new ObjectModel(Core.getResource("models/servo/sprocket.obj"));
+    ObjectModel chasis = new ObjectModel(Core.getResource("models/servo/chasis.obj"));
 
     ForgeDirection getPerpendicular(ForgeDirection a, ForgeDirection b) {
         return a.getRotation(b);
@@ -304,16 +242,7 @@ public class RenderServoMotor extends RenderEntity {
     void renderMainModel(ServoMotor motor, float partial, double ro, boolean hilighting) {
         GL11.glPushMatrix();
         bindTexture(Core.blockAtlas);
-        if (!loaded_models) {
-            try {
-                loadModels();
-            } catch (Throwable e) {
-                Core.logWarning("Failed to load servo sprocket model");
-                e.printStackTrace();
-            }
-            loaded_models = true;
-        }
-        renderChasis();
+        chasis.render(BlockIcons.servo$model$chasis);
 
         // Determine the sprocket location & rotation
         double rail_width = TileEntityServoRail.width;
@@ -343,14 +272,14 @@ public class RenderServoMotor extends RenderEntity {
             GL11.glPushMatrix();
             GL11.glTranslatef(0, height_d, rd);
             GL11.glRotatef((float) Math.toDegrees(angle), 0, 1, 0);
-            renderSprocket();
+            sprocket.render(BlockIcons.servo$model$sprocket);
             GL11.glPopMatrix();
         }
         {
             GL11.glPushMatrix();
             GL11.glTranslatef(0, height_d, -rd);
             GL11.glRotatef((float) Math.toDegrees(-angle) + 360F / 9F, 0, 1, 0);
-            renderSprocket();
+            sprocket.render(BlockIcons.servo$model$sprocket);
             GL11.glPopMatrix();
         }
         
