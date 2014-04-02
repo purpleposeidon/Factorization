@@ -106,26 +106,13 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
     int getColor(ClayLump rc) {
         if (rc.raw_color == -1) {
             //Get the raw color, possibly making something up
-            if (rc.icon_id == Core.registry.resource_block && rc.icon_md > 16) {
-                for (BasicGlazes bg : BasicGlazes.values()) {
-                    if (bg.metadata == rc.icon_md) {
-                        if (bg.raw_color == -1) {
-                            bg.raw_color = 0xFF00FF;
-                        }
-                        rc.raw_color = bg.raw_color;
-                        break;
-                    }
-                }
+            rawMimicRandom.setSeed((rc.icon_id.getUnlocalizedName().hashCode() << 16) + rc.icon_md);
+            int c = 0;
+            for (int i = 0; i < 3; i++) {
+                c += (rawMimicRandom.nextInt(0xE0) + 10);
+                c <<= 16;
             }
-            if (rc.raw_color == -1) {
-                rawMimicRandom.setSeed((rc.icon_id.getUnlocalizedName().hashCode() << 16) + rc.icon_md);
-                int c = 0;
-                for (int i = 0; i < 3; i++) {
-                    c += (rawMimicRandom.nextInt(0xE0) + 10);
-                    c <<= 16;
-                }
-                rc.raw_color = c;
-            }
+            rc.raw_color = c;
         }
         return rc.raw_color;
     }

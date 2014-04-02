@@ -171,13 +171,6 @@ public class ItemGlazeBucket extends ItemFactorization {
         return is;
     }
     
-    public ItemStack make(BasicGlazes glaze) {
-        ItemStack is = makeGlazeWith(Core.registry.resource_block, glaze.metadata, 0);
-        setGid(is, glaze.name());
-        is.setItemDamage(md_for_nei++);
-        return is;
-    }
-    
     public void setMimicry(ItemStack is) {
         NBTTagCompound tag = FzUtil.getTag(is);
         tag.setBoolean("mimic", true);

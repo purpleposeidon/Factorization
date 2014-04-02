@@ -44,7 +44,6 @@ import cpw.mods.fml.common.registry.VillagerRegistry;
 import cpw.mods.fml.common.registry.VillagerRegistry.IVillageTradeHandler;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
-import factorization.ceramics.BasicGlazes;
 import factorization.ceramics.ItemGlazeBucket;
 import factorization.ceramics.ItemSculptingTool;
 import factorization.ceramics.TileEntityGreenware;
@@ -510,22 +509,6 @@ public class Registry {
         
         shapelessOreRecipe(base_common, new ItemStack(glaze_bucket), Items.water_bucket, Blocks.sand, Items.clay_ball);
         shapelessOreRecipe(glaze_base_mimicry, base_common, Items.redstone, Items.slime_ball, lapis);
-        
-        BasicGlazes.ST_VECHS_BLACK.recipe(base_common, blackWool, charcoal);
-        BasicGlazes.TEMPLE_WHITE.recipe(base_common, bonemeal, bonemeal);
-        BasicGlazes.SALLYS_WHITE.recipe(base_common, netherquartz, netherquartz);
-        BasicGlazes.CLEAR.recipe(base_common, sand, sand);
-        BasicGlazes.REDSTONE_OXIDE.recipe(base_common, redstone);
-        BasicGlazes.LAPIS_OXIDE.recipe(base_common, lapis);
-        BasicGlazes.PURPLE_OXIDE.recipe(base_common, redstone, lapis);
-        BasicGlazes.LEAD_OXIDE.recipe(base_common, lead_chunks);
-        BasicGlazes.FIRE_ENGINE_RED.recipe(base_common, redstone, redstone);
-        BasicGlazes.CELEDON.recipe(base_common, sand, slimeBall);
-        BasicGlazes.IRON_BLUE.recipe(base_common, lapis, iron_chunks);
-        BasicGlazes.STONEWARE_SLIP.recipe(base_common, sludge, sludge);
-        BasicGlazes.TENMOKU.recipe(base_common, netherbrick, netherbrick);
-        BasicGlazes.PEKING_BLUE.recipe(base_common, lapis, netherquartz);
-        BasicGlazes.SHINO.recipe(base_common, redstone, netherquartz);
         
         ItemStack waterFeature = glaze_bucket.makeMimicingGlaze(Blocks.water, 0, -1);
         ItemStack lavaFeature = glaze_bucket.makeMimicingGlaze(Blocks.lava, 0, -1);

@@ -12,7 +12,6 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import factorization.api.Coord;
-import factorization.ceramics.BasicGlazes;
 import factorization.shared.Core;
 
 public class BlockResource extends Block {
@@ -23,8 +22,6 @@ public class BlockResource extends Block {
         setBlockName("factorization.ResourceBlock");
     }
     
-    public static final int glaze_md_start = 17;
-    
     @Override
     public void registerBlockIcons(IIconRegister reg) {
         for (ResourceType rt : ResourceType.values()) {
@@ -33,9 +30,6 @@ public class BlockResource extends Block {
             }
             icons[rt.md] = Core.texture(reg, rt.texture);
         }
-        for (BasicGlazes glaze : BasicGlazes.values()) {
-            glaze.icon = Core.texture(reg, "ceramics/glaze/" + glaze.name());
-        }
         Core.registry.steamFluid.setIcons(BlockIcons.steam);
     }
 
@@ -43,17 +37,10 @@ public class BlockResource extends Block {
     boolean done_spam = false;
     @Override
     public IIcon getIcon(int side, int md) {
-        if (md >= glaze_md_start) {
-            int off = md - glaze_md_start;
-            if (off < BasicGlazes.values.length) {
-                return BasicGlazes.values[off].icon;
-            }
-            return BlockIcons.error;
-        }
         if (md < icons.length && md >= 0) {
             return icons[md];
         }
-        return null;
+        return BlockIcons.error;
     }
     
     public void addCreativeItems(List itemList) {
