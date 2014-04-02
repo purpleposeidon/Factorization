@@ -88,25 +88,6 @@ public class MiscellaneousNonsense {
         }
     }
     
-    @SubscribeEvent
-    public void fixHoesAndSwordsAchievement(PlayerEvent.ItemCraftedEvent event) {
-        //NORELEASE: Check if these achievements have been de-stupidified.
-        EntityPlayer player = event.player;
-        if (player == null) {
-            return;
-        }
-        if (event.crafting == null) {
-            return;
-        }
-        Item item = event.crafting.getItem();
-        if (item == Items.stone_hoe || item == Items.iron_hoe) {
-            player.addStat(AchievementList.buildHoe, 1);
-        }
-        if (item == Items.stone_sword || item == Items.iron_sword) {
-            player.addStat(AchievementList.buildSword, 1);
-        }
-    }
-    
 
     
     
