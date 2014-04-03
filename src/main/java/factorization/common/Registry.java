@@ -398,8 +398,8 @@ public class Registry {
                 "-",
                 '-', new ItemStack(Blocks.stone_slab));
         recipe(FzUtil.nameItemStack(new ItemStack(Blocks.double_stone_slab, 2, 8), "Flat Stone"),
-                "#",
-                "#",
+                "##",
+                "##",
                 '#', new ItemStack(Blocks.stone_slab));
         recipe(FzUtil.nameItemStack(new ItemStack(Blocks.double_stone_slab, 2, 9), "Flat Sandstone"),
                 "#",
