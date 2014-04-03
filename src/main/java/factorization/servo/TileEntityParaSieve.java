@@ -149,7 +149,7 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
             }
             return true; //all 3 names were identical
         }
-        if (a != stranger) {
+        if (a.getItem() != stranger.getItem()) {
             return false; //It doesn't match! How could we have been so silly as to not notice?
         }
         int mda = a.getItemDamage(), mdb = b.getItemDamage(), md_stranger = stranger.getItemDamage();
