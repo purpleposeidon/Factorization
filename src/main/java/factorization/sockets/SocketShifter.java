@@ -186,8 +186,12 @@ public class SocketShifter extends TileEntitySocketBase {
         if (mode == ShifterMode.MODE_PULSE_SOME) {
             int toMove = transferLimit;
             out: for (int pull = pullStart; pull <= pullEnd; pull++) {
-                for (int push = 0; push < pushInv.size(); push++) {
+                int firstEmptySlot = -1;
+                for (int push = pushStart; push <= pushEnd; push++) {
                     if (pushInv.get(push) == null) {
+                        if (firstEmptySlot == -1) {
+                            firstEmptySlot = push;
+                        }
                         continue;
                     }
                     int delta = pullInv.transfer(pull, pushInv, push, toMove);
@@ -202,7 +206,10 @@ public class SocketShifter extends TileEntitySocketBase {
                 if (toMove <= 0) {
                     break out;
                 }
-                for (int push = 0; push < pushInv.size(); push++) {
+                if (firstEmptySlot == -1) {
+                    firstEmptySlot = pushStart;
+                }
+                for (int push = firstEmptySlot; push <= pushEnd; push++) {
                     if (pushInv.get(push) != null) {
                         continue;
                     }
