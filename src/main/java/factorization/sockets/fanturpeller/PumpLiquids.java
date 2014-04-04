@@ -1,11 +1,18 @@
 package factorization.sockets.fanturpeller;
 
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_LIGHTING;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+
 import java.util.ArrayDeque;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBucket;
@@ -16,9 +23,21 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
+
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
+import factorization.api.FzOrientation;
+import factorization.api.Quaternion;
+import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
+import factorization.servo.ServoMotor;
+import factorization.shared.Core;
 import factorization.shared.FzUtil;
+import factorization.shared.ObjectModel;
 import factorization.sockets.ISocketHolder;
 
 public class PumpLiquids extends BufferedFanturpeller {
@@ -472,5 +491,46 @@ public class PumpLiquids extends BufferedFanturpeller {
     @Override
     int getRequiredCharge() {
         return (int)getTargetSpeed();
+    }
+    
+    @SideOnly(Side.CLIENT)
+    private static ObjectModel corkscrew;
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void representYoSelf() {
+        super.representYoSelf();
+        corkscrew = new ObjectModel(Core.getResource("models/corkscrew.obj"));
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void renderTesr(ServoMotor motor, float partial) {
+        float d = 0.5F;
+        GL11.glTranslatef(d, d, d);
+        Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())).glRotate();
+        float turn = scaleRotation(FzUtil.interp(prevFanRotation, fanRotation, partial));
+        float dr = Math.abs(scaleRotation(fanRotation) - scaleRotation(prevFanRotation));
+        GL11.glRotatef(turn, 0, 1, 0);
+        float sd = motor == null ? -2F/16F : 3F/16F;
+        sd += -9F/16F;
+        GL11.glTranslatef(0, sd, 0);
+        
+        
+        float s = 12F/16F;
+        if (motor != null) {
+            s = 10F/16F;
+            GL11.glTranslatef(0, -3F/16F, 0);
+        }
+        GL11.glScalef(s, 1, s);
+        
+        TextureManager tex = Minecraft.getMinecraft().renderEngine;
+        tex.bindTexture(Core.blockAtlas);
+        glEnable(GL_LIGHTING);
+        glDisable(GL11.GL_CULL_FACE);
+        glEnable(GL12.GL_RESCALE_NORMAL);
+        corkscrew.render(Blocks.iron_block.getIcon(0, 0));
+        glEnable(GL11.GL_CULL_FACE);
+        glEnable(GL_LIGHTING);
     }
 }
