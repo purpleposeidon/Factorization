@@ -900,43 +900,6 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         return true;
     }
     
-    void spillItems(int spillage) {
-        if (type == Type.STICKY || type == Type.CREATIVE) {
-            return;
-        }
-        if (rand.nextInt(4) > 0) {
-            return;
-        }
-        if (type == Type.HOPPING) {
-            spillage *= 1.5;
-        }
-        //TODO: If player has silk touch, and it's silky, then no spilling
-        int itemCount = getItemCount();
-        spillage += spillage*5*itemCount/getMaxSize();
-        if (item == null || spillage <= 0) {
-            return;
-        }
-        int maxStackSize = item.getMaxStackSize();
-        spillage = Math.min(spillage, maxStackSize*8);
-        spillage = rand.nextInt(spillage + 1);
-        spillage = Math.min(itemCount, spillage);
-        if (spillage <= 0 || maxStackSize <= 0) {
-            return;
-        }
-        FzInv me = FzUtil.openInventory(this, orientation.top.getOpposite());
-        Coord at = getCoord();
-        double motion = 0.125;
-        while (spillage > 0) {
-            ItemStack is = me.pullWithLimit(spillage);
-            if (is == null) {
-                break;
-            }
-            EntityItem ei = at.spawnItem(is);
-            spillage -= maxStackSize;
-        }
-        me.onInvChanged();
-    }
-
     @Override
     public void click(EntityPlayer entityplayer) {
         // left click: remove a stack, or punt if properly equipped
@@ -1104,12 +1067,6 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
                 "Y",
                 'Y', Blocks.hopper,
                 '0', normal);
-        Core.registry.recipe(make(Type.LARGER, log, slab),
-                "0",
-                "Y",
-                "0",
-                '0', normal,
-                'Y', Blocks.hopper);
         Core.registry.recipe(make(Type.STICKY, log, slab),
                 "*",
                 "0",

@@ -86,7 +86,7 @@ public class BlockIcons {
     public static IIcon router$top, router$bottom;
     
     @Directory("storage")
-    public static BarrelTextureset normal, silky, hopping, larger, sticky;
+    public static BarrelTextureset normal, silky, hopping, sticky;
     @Directory("storage")
     public static IIcon barrel_font;
     

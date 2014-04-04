@@ -64,7 +64,6 @@ public class BlockRenderDayBarrel extends FactorizationBlockRender {
             BlockIcons.BarrelTextureset set;
             switch (barrel.type) {
             case HOPPING: set = BlockIcons.hopping; break;
-            case LARGER: set = BlockIcons.larger; break;
             case SILKY: set = BlockIcons.silky; break;
             case STICKY: set = BlockIcons.sticky; break;
             default: set = BlockIcons.normal; break;
