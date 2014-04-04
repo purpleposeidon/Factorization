@@ -103,11 +103,6 @@ public class ContainerFactorization extends Container {
             addSlotToContainer(new SlotFurnace(player, furnace, 2, 114, 22));
             addSlotToContainer(new SlotFurnace(player, furnace, 3, 114, 48));
             break;
-        case GRINDER:
-            TileEntityGrinder grinder = (TileEntityGrinder) ent;
-            addSlotToContainer(new Slot(grinder, 0, 56, 35));
-            addSlotToContainer(new SlotFurnace(player, grinder, 1, 116, 35));
-            break;
         case MIXER:
             TileEntityMixer mixer = (TileEntityMixer) ent;
             //inputs
@@ -196,7 +191,6 @@ public class ContainerFactorization extends Container {
             break;
         case STAMPER:
         case PACKAGER:
-        case GRINDER:
             if (i >= 2) {
                 return FzUtil.transferSlotToSlots(player, slot, Arrays.asList((Slot) inventorySlots.get(0)));
             }

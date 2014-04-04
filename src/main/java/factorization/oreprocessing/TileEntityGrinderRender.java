@@ -25,7 +25,7 @@ import org.lwjgl.opengl.GL11;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 
-public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
+public class TileEntityGrinderRender {
     public static class DiamondModel {
         TexturedQuad quads[] = new TexturedQuad[4];
         IIcon diamond = Blocks.diamond_block.getBlockTextureFromSide(0);
@@ -77,18 +77,6 @@ public class TileEntityGrinderRender extends TileEntitySpecialRenderer {
     
     public float interp(float oldValue, float newValue, float partial) {
         return oldValue*(1 - partial) + newValue*partial;
-    }
-
-    @Override
-    public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partial) {
-        Core.profileStartRender("grinder");
-        TileEntityGrinder grinder = (TileEntityGrinder) te;
-        GL11.glPushMatrix();
-        GL11.glTranslatef((float) (x + 0.5), (float) (y + 5F / 16F), (float) (z + 0.5));
-        GL11.glRotatef(interp(grinder.prev_rotation, grinder.rotation, partial) / 5.0F, 0, 1, 0);
-        renderGrindHead();
-        GL11.glPopMatrix();
-        Core.profileEndRender();
     }
 
     public static void renderGrindHead() {

@@ -14,7 +14,6 @@ import cpw.mods.fml.common.network.IGuiHandler;
 import factorization.api.Coord;
 import factorization.crafting.ContainerMixer;
 import factorization.oreprocessing.ContainerCrystallizer;
-import factorization.oreprocessing.ContainerGrinder;
 import factorization.oreprocessing.ContainerSlagFurnace;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.TileEntityFactorization;
@@ -39,8 +38,6 @@ public class FactorizationProxy implements IGuiHandler {
         ContainerFactorization cont;
         if (ID == FactoryType.SLAGFURNACE.gui) {
             cont = new ContainerSlagFurnace(player, fac);
-        } else if (ID == FactoryType.GRINDER.gui) {
-            cont = new ContainerGrinder(player, fac);
         } else if (ID == FactoryType.MIXER.gui) {
             cont = new ContainerMixer(player, fac);
         } else if (ID == FactoryType.CRYSTALLIZER.gui) {

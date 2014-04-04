@@ -98,7 +98,7 @@ public class Registry {
             lamp_item, air_item,
             slagfurnace_item, battery_item_hidden, leydenjar_item, leydenjar_item_full, heater_item, steamturbine_item, solarboiler_item, caliometric_burner_item,
             mirror_item_hidden,
-            leadwire_item, grinder_item, mixer_item, crystallizer_item,
+            leadwire_item, mixer_item, crystallizer_item,
             greenware_item,
             rocket_engine_item_hidden,
             parasieve_item,
@@ -240,7 +240,6 @@ public class Registry {
         heater_item = FactoryType.HEATER.itemStack();
         mirror_item_hidden = FactoryType.MIRROR.itemStack();
         leadwire_item = FactoryType.LEADWIRE.itemStack();
-        grinder_item = FactoryType.GRINDER.itemStack();
         mixer_item = FactoryType.MIXER.itemStack();
         crystallizer_item = FactoryType.CRYSTALLIZER.itemStack();
         greenware_item = FactoryType.CERAMIC.itemStack();
@@ -846,7 +845,6 @@ public class Registry {
                 "SSS",
                 'S', diamond_shard,
                 '-', Blocks.heavy_weighted_pressure_plate);
-        shapelessRecipe(socket_lacerator, grinder_item);
         
         //Values based on Fortune I
         TileEntityGrinder.addRecipe(new ItemStack(Blocks.coal_ore), new ItemStack(Items.coal), 1.5F);

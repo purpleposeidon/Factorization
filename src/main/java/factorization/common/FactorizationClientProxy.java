@@ -1,7 +1,6 @@
 package factorization.common;
 
 import java.util.Random;
-import java.util.logging.Level;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -17,12 +16,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
-import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.IFactoryType;
@@ -55,16 +51,12 @@ import factorization.crafting.TileEntityMixerRenderer;
 import factorization.darkiron.BlockDarkIronOre;
 import factorization.darkiron.GlintRenderer;
 import factorization.oreprocessing.BlockRenderCrystallizer;
-import factorization.oreprocessing.BlockRenderGrinder;
 import factorization.oreprocessing.ContainerCrystallizer;
-import factorization.oreprocessing.ContainerGrinder;
 import factorization.oreprocessing.ContainerSlagFurnace;
 import factorization.oreprocessing.GuiCrystallizer;
-import factorization.oreprocessing.GuiGrinder;
 import factorization.oreprocessing.GuiSlag;
 import factorization.oreprocessing.TileEntityCrystallizer;
 import factorization.oreprocessing.TileEntityCrystallizerRender;
-import factorization.oreprocessing.TileEntityGrinder;
 import factorization.oreprocessing.TileEntityGrinderRender;
 import factorization.oreprocessing.TileEntitySlagFurnace;
 import factorization.servo.BlockRenderServoRail;
@@ -122,8 +114,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         ContainerFactorization cont;
         if (ID == FactoryType.SLAGFURNACE.gui) {
             cont = new ContainerSlagFurnace(player, fac);
-        } else if (ID == FactoryType.GRINDER.gui) {
-            cont = new ContainerGrinder(player, fac);
         } else if (ID == FactoryType.MIXER.gui) {
             cont = new ContainerMixer(player, fac);
         } else if (ID == FactoryType.CRYSTALLIZER.gui) {
@@ -137,9 +127,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         }
         if (ID == FactoryType.SLAGFURNACE.gui) {
             gui = new GuiSlag(cont);
-        }
-        if (ID == FactoryType.GRINDER.gui) {
-            gui = new GuiGrinder(cont);
         }
         if (ID == FactoryType.MIXER.gui) {
             gui = new GuiMixer((ContainerMixer)cont);
@@ -239,7 +226,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         if (FzConfig.renderTEs) {
             // This is entirely Azanor's fault.
             setTileEntityRendererDispatcher(TileEntityHeater.class, new TileEntityHeaterRenderer());
-            setTileEntityRendererDispatcher(TileEntityGrinder.class, new TileEntityGrinderRender());
             setTileEntityRendererDispatcher(TileEntityMixer.class, new TileEntityMixerRenderer());
             setTileEntityRendererDispatcher(TileEntityCrystallizer.class, new TileEntityCrystallizerRender());
             setTileEntityRendererDispatcher(TileEntitySteamTurbine.class, new TileEntitySteamTurbineRender());
@@ -263,7 +249,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
         new BlockRenderMirrorStand();
         new BlockRenderSteamTurbine();
         new BlockRenderWire();
-        new BlockRenderGrinder();
         new BlockRenderMixer();
         new BlockRenderCrystallizer();
         new BlockRenderCompressionCrafter();
