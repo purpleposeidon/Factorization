@@ -20,7 +20,6 @@ import java.util.Map;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
@@ -30,7 +29,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import cpw.mods.fml.client.GuiModList;
-import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.common.FzConfig;
@@ -181,12 +179,7 @@ public class MiscClientCommands implements ICommand {
         @alias({"render_everything_lagfest"})
         @help("Render a ton of terrain at once (may lock your game up for a while)")
         public static void render_above() {
-            Object wr_list = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, "field_72768_k", "sortedWorldRenderers");
-            if (!(wr_list instanceof WorldRenderer[])) {
-                mc.thePlayer.addChatMessage(new ChatComponentText("Reflection failed"));
-                return;
-            }
-            WorldRenderer[] lizt = (WorldRenderer[]) wr_list;
+            WorldRenderer[] lizt = mc.renderGlobal.sortedWorldRenderers;
             int did = 0;
             int total = 0;
             boolean lagfest = arg0.contains("lagfest");
@@ -313,11 +306,7 @@ public class MiscClientCommands implements ICommand {
         @SideOnly(Side.CLIENT)
         @help("Dump chunk to .obj")
         public static String exportChunk() {
-            Object wr_list = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, "sortedWorldRenderers", "sortedWorldRenderers");
-            if (!(wr_list instanceof WorldRenderer[])) {
-                return "Reflection failed";
-            }
-            WorldRenderer[] lizt = (WorldRenderer[]) wr_list;
+            WorldRenderer[] lizt = mc.renderGlobal.sortedWorldRenderers;
             double px = mc.thePlayer.posX, py = mc.thePlayer.posY, pz = mc.thePlayer.posZ;
             for (WorldRenderer wr : lizt) {
                 if (wr.posXMinus < px && px < wr.posXPlus
@@ -343,15 +332,11 @@ public class MiscClientCommands implements ICommand {
         @cheaty
         @help("Dump all terrain to a .obj. This can take a while! Watch the console.")
         public static String exportWorld() {
-            Object wr_list = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, "sortedWorldRenderers", "sortedWorldRenderers");
-            if (!(wr_list instanceof WorldRenderer[])) {
-                return "Reflection failed";
-            }
             double maxDist = 256;
             if (arg1 != null && arg1 != "") {
                 maxDist = Double.parseDouble(arg1);
             }
-            WorldRenderer[] lizt = (WorldRenderer[]) wr_list;
+            WorldRenderer[] lizt = mc.renderGlobal.sortedWorldRenderers;
             Tessellator real_tess = Tessellator.instance;
             File output = new File("./worldExport.obj");
             
@@ -386,12 +371,7 @@ public class MiscClientCommands implements ICommand {
         @cheaty
         @help("Re-renders the chunk as a wireframe")
         public static String wireframe() {
-            //NORELEASE: We can get rid of ReflectionHelpers now. Be sure to check for getters/work arounds tho.
-            Object wr_list = ReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, "sortedWorldRenderers", "sortedWorldRenderers");
-            if (!(wr_list instanceof WorldRenderer[])) {
-                return "Reflection failed";
-            }
-            WorldRenderer[] lizt = (WorldRenderer[]) wr_list;
+            WorldRenderer[] lizt = mc.renderGlobal.sortedWorldRenderers;
             double px = mc.thePlayer.posX, py = mc.thePlayer.posY, pz = mc.thePlayer.posZ;
             for (WorldRenderer wr : lizt) {
                 if (wr.posXMinus < px && px < wr.posXPlus
