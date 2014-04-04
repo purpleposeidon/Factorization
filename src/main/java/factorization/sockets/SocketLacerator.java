@@ -2,7 +2,6 @@ package factorization.sockets;
 
 import java.io.DataInput;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -36,7 +35,6 @@ import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Charge;
@@ -332,12 +330,6 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         drops.clear();
     }
     
-    private static Field hitField = ReflectionHelper.findField(EntityLivingBase.class, "field_70718_bc", "recentlyHit");
-    static {
-        if (hitField == null) {
-            Core.logSevere("SocketLacerator didn't find field for EntityLivingBase.recentlyHit!");
-        }
-    }
     private boolean _handleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
         if (mop == null) return false;
         if (mopIsThis) return false;
@@ -352,13 +344,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             socket.extractCharge(1); //It's fine if it fails
             float damage = 4F*speed/max_speed;
             if (elb.getHealth() <= damage && rand.nextInt(20) == 1) { 
-                if (hitField != null) {
-                    try {
-                        hitField.set(elb, 100);
-                    } catch (Throwable e) {
-                        e.printStackTrace();
-                    }
-                }
+                elb.recentlyHit = 100;
             }
             if (elb.attackEntityFrom(laceration, damage)) {
                 if (elb.getHealth() <= 0) {
