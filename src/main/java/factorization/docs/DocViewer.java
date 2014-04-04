@@ -213,6 +213,7 @@ public class DocViewer extends GuiScreen {
     void drawItem(ItemStack is, int x, int y) {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GuiContainer.itemRender.renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), is, x, y);
+        GuiContainer.itemRender.renderItemOverlayIntoGUI(fontRendererObj, this.mc.getTextureManager(), is, x, y);
     }
     
     void drawItemTip(ItemStack is, int x, int y) {
@@ -231,8 +232,8 @@ public class DocViewer extends GuiScreen {
             if (!(thisPage instanceof WordPage)) continue;
             WordPage p = (WordPage) thisPage;
             Word link = p.click(mouseX - getPageLeft(i), mouseY - getPageTop(i));
-            if (link != null && link.hyperlink != null) {
-                DocViewer newDoc = new DocViewer(link.hyperlink);
+            if (link != null && link.getLink() != null) {
+                DocViewer newDoc = new DocViewer(link.getLink());
                 addNewHistoryEntry(name, getCurrentPageIndex());
                 mc.displayGuiScreen(newDoc);
                 return;

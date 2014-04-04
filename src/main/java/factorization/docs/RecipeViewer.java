@@ -8,9 +8,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
@@ -18,8 +18,10 @@ import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
+import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
+import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.oreprocessing.TileEntityCrystallizer;
 import factorization.oreprocessing.TileEntityGrinder;
@@ -144,17 +146,41 @@ public class RecipeViewer implements IDocGenerator {
         }
     }
     
+    static TreeMap<String, Iterable> customRecipes = new TreeMap();
+    public static void handleImc(IMCMessage message) throws ReflectiveOperationException {
+        if (!message.key.equals("AddRecipeCategory")) return;
+        String[] cmd = message.getStringValue().split("\\|");
+        String key = cmd[0];
+        String className = cmd[1];
+        String fieldName = cmd[2];
+        Class kl = RecipeViewer.class.getClassLoader().loadClass(className);
+        Field field = kl.getField(fieldName);
+        Object obj = field.get(null);
+        customRecipes.put(key, (Iterable) obj);
+    }
+    
     void loadRecipes() {
         putCategory("Workbench", CraftingManager.getInstance().getRecipeList());
         putCategory("Furnace", FurnaceRecipes.smelting().getSmeltingList().entrySet());
         putCategory("Slag Furnace", TileEntitySlagFurnace.SlagRecipes.smeltingResults);
-        putCategory("Lacerator", TileEntityGrinder.recipes);
-        putCategory("Crystallizer", TileEntityCrystallizer.recipes);
+        HashMap ores = new HashMap();
+        for (String name : OreDictionary.getOreNames()) {
+            ores.put(name, OreDictionary.getOres(name));
+        }
+        putCategory("Ore Dictionary", ores.entrySet());
+        
+        for (Entry<String, Iterable> entry : customRecipes.entrySet()) {
+            putCategory(entry.getKey(), entry.getValue());
+        }
     }
     
     void putCategory(String label, Iterable list) {
-        recipeCategories.put(label, addAll(list));
-        categoryOrder.add(label);
+        try {
+            recipeCategories.put(label, addAll(list));
+            categoryOrder.add(label);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
     }
     
     int recursion;
@@ -210,6 +236,15 @@ public class RecipeViewer implements IDocGenerator {
         return output;
     }
     
+    static ItemStack fixMojangRecipes(ItemStack is) {
+        if (is == null) return null;
+        if (is.stackSize > 1) {
+            is = is.copy();
+            is.stackSize = 1;
+        }
+        return is;
+    }
+    
     void addShapedOreRecipe(List sb, ShapedOreRecipe recipe) {
         genericRecipePrefix(sb, recipe);
         int width = ReflectionHelper.getPrivateValue(ShapedOreRecipe.class, recipe, "width");
@@ -219,7 +254,7 @@ public class RecipeViewer implements IDocGenerator {
         for (Object in : input) {
             if (in instanceof ItemStack || in == null) {
                 ItemStack is = (ItemStack) in;
-                sb.add(new ItemWord(is));
+                sb.add(new ItemWord(fixMojangRecipes(is)));
             } else if (in instanceof Iterable) {
                 Iterator<Object> it = ((Iterable)in).iterator();
                 if (it.hasNext()) {
@@ -243,7 +278,7 @@ public class RecipeViewer implements IDocGenerator {
         genericRecipePrefix(sb, recipe);
         int width = recipe.recipeWidth;
         for (int i = 0; i < recipe.recipeItems.length; i++) {
-            sb.add(new ItemWord(recipe.recipeItems[i]));
+            sb.add(new ItemWord(fixMojangRecipes(recipe.recipeItems[i])));
             if ((i + 1) % width == 0) {
                 sb.add("\n\n");
             } else {
@@ -316,6 +351,7 @@ public class RecipeViewer implements IDocGenerator {
         if (recursion > 4) {
             return;
         }
+        boolean probableOreDictionary = recursion >= 1;
         if (obj instanceof Item) {
             obj = new ItemStack((Item) obj);
         } else if (obj instanceof Block) {
@@ -330,19 +366,48 @@ public class RecipeViewer implements IDocGenerator {
                 sb.add(obj.toString());
             } else if (obj.getClass().isArray()) {
                 Class<?> component = obj.getClass().getComponentType();
-                if (component == Object.class) {
-                    Object[] listy = (Object[]) obj;
-                    for (Object o : listy) {
-                        convertObject(sb, o);
-                    }
-                } else if (component == ItemStack.class) {
-                    ItemStack[] listy = (ItemStack[]) obj;
-                    for (ItemStack is : listy) {
-                        sb.add(new ItemWord(is));
+                if (probableOreDictionary && component == ItemStack.class) {
+                    sb.add(new ItemWord((ItemStack[]) obj));
+                } else {
+                    if (component == Object.class) {
+                        Object[] listy = (Object[]) obj;
+                        for (Object o : listy) {
+                            if (o == null) {
+                                sb.add("-");
+                            } else {
+                                convertObject(sb, o);
+                            }
+                        }
+                    } else if (component == ItemStack.class) {
+                        ItemStack[] listy = (ItemStack[]) obj;
+                        for (ItemStack is : listy) {
+                            if (is == null) {
+                                sb.add("-");
+                            } else {
+                                sb.add(new ItemWord(is));
+                            }
+                        }
                     }
                 }
             } else if (obj instanceof Collection) {
-                String ret = "";
+                if (probableOreDictionary) {
+                    boolean bad = false;
+                    for (Object o : (Collection) obj) {
+                        if (!(o instanceof ItemStack)) {
+                            bad = true;
+                        }
+                    }
+                    if (!bad) {
+                        Collection col = (Collection) obj;
+                        ItemStack[] items = new ItemStack[col.size()];
+                        int i = 0;
+                        for (Object o : col) {
+                            items[i++] = (ItemStack) o;
+                        }
+                        sb.add(new ItemWord(items));
+                        return;
+                    }
+                }
                 for (Object o : (Collection) obj) {
                     convertObject(sb, o);
                 }

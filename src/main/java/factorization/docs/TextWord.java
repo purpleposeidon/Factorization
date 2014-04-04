@@ -13,7 +13,7 @@ public class TextWord extends Word {
     
     @Override
     public String toString() {
-        return text + " ==> " + hyperlink;
+        return text + " ==> " + getLink();
     }
     
     @Override
@@ -24,7 +24,7 @@ public class TextWord extends Word {
     @Override
     public int draw(DocViewer page, int x, int y) {
         String t = text;
-        if (hyperlink != null) {
+        if (getLink() != null) {
             t = "" + EnumChatFormatting.AQUA + EnumChatFormatting.UNDERLINE + text;
         }
         page.getFont().drawString(t, x, y, 0xEEEEEE); // The return value of drawString isn't helpful.

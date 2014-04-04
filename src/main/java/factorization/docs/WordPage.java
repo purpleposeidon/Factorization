@@ -21,7 +21,7 @@ public class WordPage extends AbstractPage {
         if (word instanceof TextWord) {
             TextWord tw = (TextWord) word;
             if (tw.text == "\t") {
-                word = new TextWord("    ", word.hyperlink);
+                word = new TextWord("    ", word.getLink());
             } else if (lineLen == 0 && tw.text.trim().isEmpty()) {
                 return;
             }

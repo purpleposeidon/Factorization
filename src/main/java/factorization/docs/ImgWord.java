@@ -22,7 +22,7 @@ public class ImgWord extends Word {
 
     @Override
     public String toString() {
-        return resource + " ==> " + hyperlink;
+        return resource + " ==> " + getLink();
     }
     
     @Override

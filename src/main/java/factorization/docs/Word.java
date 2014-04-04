@@ -3,10 +3,14 @@ package factorization.docs;
 import net.minecraft.client.gui.FontRenderer;
 
 public abstract class Word {
-    final String hyperlink;
+    private final String hyperlink;
     
     public Word(String hyperlink) {
         this.hyperlink = hyperlink;
+    }
+    
+    public String getLink() {
+        return hyperlink;
     }
     
     public abstract int getWidth(FontRenderer font);

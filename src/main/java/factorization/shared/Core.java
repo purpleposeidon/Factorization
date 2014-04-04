@@ -35,6 +35,8 @@ import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLInterModComms;
+import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
 import cpw.mods.fml.common.event.FMLMissingMappingsEvent;
 import cpw.mods.fml.common.event.FMLMissingMappingsEvent.Action;
 import cpw.mods.fml.common.event.FMLMissingMappingsEvent.MissingMapping;
@@ -56,6 +58,7 @@ import factorization.common.Registry;
 import factorization.compat.CompatManager;
 import factorization.docs.DistributeDocs;
 import factorization.docs.DocumentationModule;
+import factorization.docs.RecipeViewer;
 import factorization.oreprocessing.FactorizationOreProcessingHandler;
 import factorization.servo.ServoMotor;
 import factorization.wrath.TileEntityWrathLamp;
@@ -132,6 +135,9 @@ public class Core {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             isMainClientThread.set(true);
         }
+        FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Lacerator|factorization.oreprocessing.TileEntityGrinder|recipes");
+        FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Crystallizer|factorization.oreprocessing.TileEntityCrystallizer|recipes");
+        FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Slag Furnace|factorization.oreprocessing.TileEntitySlagFurnace$SlagRecipes|smeltingResults");
     }
     
     void registerSimpleTileEntities() {
@@ -146,6 +152,17 @@ public class Core {
     @EventHandler
     public void handleInteractions(FMLInitializationEvent event) {
         registry.sendIMC();
+    }
+    
+    @EventHandler
+    public void handleIMC(FMLInterModComms.IMCEvent event) {
+        for (IMCMessage message : event.getMessages()) {
+            try {
+                RecipeViewer.handleImc(message);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
     }
 
     @EventHandler

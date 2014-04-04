@@ -7,11 +7,17 @@ import net.minecraft.item.ItemStack;
 import org.lwjgl.opengl.GL11;
 
 public class ItemWord extends Word {
-    ItemStack is;
+    ItemStack is = null;
+    ItemStack[] entries = null;
     
     public ItemWord(ItemStack is) {
         super(getDefaultHyperlink(is));
         this.is = is;
+    }
+    
+    public ItemWord(ItemStack[] entries) {
+        super(getDefaultHyperlink(entries));
+        this.entries = entries;
     }
     
     public ItemWord(ItemStack is, String hyperlink) {
@@ -23,23 +29,43 @@ public class ItemWord extends Word {
         if (is == null) return null;
         return "cgi/recipes/" + is.getUnlocalizedName();
     }
+    
+    static String getDefaultHyperlink(ItemStack[] items) {
+        if (items == null || items.length == 0) return null;
+        if (items.length == 1) return getDefaultHyperlink(items[0]);
+        return null;
+    }
+    
+    @Override
+    public String getLink() {
+        return getDefaultHyperlink(getItem());
+    }
 
     @Override
     public String toString() {
-        return is + " ==> " + hyperlink;
+        return is + " ==> " + getLink();
     }
     
     @Override
     public int getWidth(FontRenderer font) {
         return 16;
     }
+    
+    ItemStack getItem() {
+        if (is != null) return is;
+        if (entries == null) return null;
+        long now = System.currentTimeMillis() / 1000;
+        now %= entries.length;
+        return entries[(int) now];
+    }
 
     @Override
     public int draw(DocViewer doc, int x, int y) {
-        if (is == null) return 16;
+        ItemStack toDraw = getItem();
+        if (toDraw == null) return 16;
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
         try {
-            doc.drawItem(is, x, y - 4);
+            doc.drawItem(toDraw, x, y - 4);
         } catch (Throwable t) {
             t.printStackTrace();
             is = null;
@@ -55,9 +81,10 @@ public class ItemWord extends Word {
     
     @Override
     public void drawHover(DocViewer doc, int mouseX, int mouseY) {
-        if (is == null) return;
+        ItemStack toDraw = getItem();
+        if (toDraw == null) return;
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
-        doc.drawItemTip(is, mouseX, mouseY);
+        doc.drawItemTip(toDraw, mouseX, mouseY);
         GL11.glPopAttrib();
     }
 }
