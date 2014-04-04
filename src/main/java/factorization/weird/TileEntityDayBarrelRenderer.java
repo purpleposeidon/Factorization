@@ -252,6 +252,12 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         {
             TextureManager re = Minecraft.getMinecraft().renderEngine;
             FontRenderer fr = func_147498_b();
+            // Let's wait for 1.7.6, or something, to figure this out. Maybe things'll be fixed by then...
+            boolean multi = is.getItem().requiresMultipleRenderPasses();
+            float d = 0;
+            if (multi) {
+                renderItem.zLevel += d;
+            }
             if (!is.hasEffect(0)) {
                 renderItem.renderItemAndEffectIntoGUI(fr, re, is, 0, 0);
             } else {
@@ -261,6 +267,9 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
                 Tessellator orig = Tessellator.instance;
                 renderItem.renderItemAndEffectIntoGUI(fr, interception, is, 0, 0);
                 Tessellator.instance = orig;
+            }
+            if (multi) {
+                renderItem.zLevel -= d;
             }
         }
         GL11.glPopMatrix();
