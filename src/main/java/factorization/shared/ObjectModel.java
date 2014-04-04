@@ -3,15 +3,17 @@ package factorization.shared;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.model.ModelFormatException;
 import net.minecraftforge.client.model.obj.WavefrontObject;
+
+import org.lwjgl.opengl.GL11;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class ObjectModel {
@@ -61,6 +63,10 @@ public class ObjectModel {
             Core.logWarning("Failed to load model %s", modelLocation);
             e.printStackTrace();
             return null;
+        } catch (ModelFormatException e) {
+            Core.logWarning("Failed to load model %s", modelLocation);
+            e.printStackTrace();
+            return null;
         }
         return objectModel;
     }
@@ -74,6 +80,7 @@ public class ObjectModel {
             }
         };
         
+        render_list = GLAllocation.generateDisplayLists(1);
         GL11.glNewList(render_list, GL11.GL_COMPILE);
         double modelScale = 1.0/16.0;
         GL11.glScaled(modelScale, modelScale, modelScale);
