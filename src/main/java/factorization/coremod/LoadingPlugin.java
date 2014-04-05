@@ -3,7 +3,9 @@ package factorization.coremod;
 import java.util.Map;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
 
+@SortingIndex(10)
 public class LoadingPlugin implements IFMLLoadingPlugin {
     public static boolean deobfuscatedEnvironment = true;
     @Override public String getSetupClass() { return null; }
