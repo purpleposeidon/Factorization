@@ -469,6 +469,17 @@ public class MiscClientCommands implements ICommand {
             return "Copied to clipboard: " + name;
         }
         
+        /*
+        @help("Change the FOV")
+        public static String fov() {
+            // 70 + fov*40
+            float origFov = 70F + mc.gameSettings.fovSetting*40F;
+            float fov = Float.parseFloat(arg1);
+            mc.gameSettings.fovSetting = (fov - 70F)/40F;
+            return "FOV changed: " + origFov + " -> " + fov;
+        }
+        */
+        
         // Remember to include 'public static' for anything added here.
         // And also to put the command in this nested class, not the wrong one. :P
     }
