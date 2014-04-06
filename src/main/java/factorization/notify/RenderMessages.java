@@ -123,10 +123,12 @@ public class RenderMessages extends RenderMessagesProxy {
                 it.remove();
                 continue;
             }
-            Vec3 pos = m.getPosition(event.partialTicks);
-            double dist = camera.getDistance(pos.xCoord, pos.yCoord, pos.zCoord);
-            if (dist > 5) {
-                continue;
+            if (!m.style.contains(Notify.Style.DRAWFAR)) {
+                Vec3 pos = m.getPosition(event.partialTicks);
+                double dist = camera.getDistance(pos.xCoord, pos.yCoord, pos.zCoord);
+                if (dist > 5) {
+                    continue;
+                }
             }
             GL11.glDisable(GL11.GL_LIGHTING);
             float lifeLeft = (m.lifeTime - timeExisted)/1000F;

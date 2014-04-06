@@ -242,7 +242,7 @@ public class CompressionState {
             return;
         }
         Notify.withItem(Core.registry.compression_crafter_item);
-        Notify.withStyle(Style.FORCE, Style.EXACTPOSITION, Style.DRAWITEM);
+        Notify.withStyle(Style.FORCE, Style.EXACTPOSITION, Style.DRAWITEM, Style.DRAWFAR);
         Notify.send(player, c, "");
     }
     

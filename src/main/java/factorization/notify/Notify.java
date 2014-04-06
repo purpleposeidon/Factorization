@@ -35,10 +35,6 @@ public abstract class Notify {
          */
         DRAWITEM,
         /**
-         * The message will start fading immediately. (Well, it's supposed to. The rendering is broken.)
-         */
-        FADE,
-        /**
          * This will update the message at the target location, if there is one, without changing the despawn time.
          */
         UPDATE,
@@ -46,7 +42,11 @@ public abstract class Notify {
          * This will update the message at the target location, if there is one, without changing the despawn time.
          * The original item will not be changed.
          */
-        UPDATE_SAME_ITEM
+        UPDATE_SAME_ITEM,
+        /**
+         * Normally messages do not render if they're more than a few blocks away. This causes the message to always render.
+         */
+        DRAWFAR
     }
     
     /**
