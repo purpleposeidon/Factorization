@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -23,8 +24,6 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
 import cpw.mods.fml.relauncher.ReflectionHelper;
-import factorization.oreprocessing.TileEntityCrystallizer;
-import factorization.oreprocessing.TileEntityGrinder;
 import factorization.oreprocessing.TileEntitySlagFurnace;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
@@ -344,6 +343,11 @@ public class RecipeViewer implements IDocGenerator {
         }
     }
     
+    HashSet<String> knownOres = new HashSet();
+    {
+        for (String s : OreDictionary.getOreNames()) knownOres.add(s);
+    }
+    
     void convertObject(List sb, Object obj) {
         if (obj == null) {
             return;
@@ -356,6 +360,11 @@ public class RecipeViewer implements IDocGenerator {
             obj = new ItemStack((Item) obj);
         } else if (obj instanceof Block) {
             obj = new ItemStack((Block) obj);
+        } else if (obj instanceof String) {
+            String name = (String) obj;
+            if (knownOres.contains(name)) {
+                obj = OreDictionary.getOres(name);
+            }
         }
         
         recursion++;
