@@ -37,7 +37,16 @@ public abstract class Notify {
         /**
          * The message will start fading immediately. (Well, it's supposed to. The rendering is broken.)
          */
-        FADE
+        FADE,
+        /**
+         * This will update the message at the target location, if there is one, without changing the despawn time.
+         */
+        UPDATE,
+        /**
+         * This will update the message at the target location, if there is one, without changing the despawn time.
+         * The original item will not be changed.
+         */
+        UPDATE_SAME_ITEM
     }
     
     /**
@@ -129,11 +138,29 @@ public abstract class Notify {
         instance.doSend(player, new Coord(player), EnumSet.of(Style.CLEAR), null, "", emptyArray);
     }
     
-    
+    /**
+     * Schedules a recurring notification. updater.update() will be called until:
+     * <ul>
+     * 		<li>An appropriate amount of time has passed</li>
+     * 		<li>If location is an Entity, that entity is dead</li>
+     * 		<li>If location is a TileEntity, that tileentity is invalid</li>
+     * </ul>
+     * @param player
+     * 			Same as in {@link send}
+     * @param where
+     * 			Same as in {@link send}
+     * @param updater
+     * 			A {@link MessageUpdater} instance.
+     */
+    public static void recuring(EntityPlayer player, Object where, MessageUpdater updater) {
+        RecuringNotification rn = new RecuringNotification(player, where, updater);
+        instance.addRecuringNotification(rn);
+    }
     
     
     protected static Notify instance;
     protected abstract void doSend(EntityPlayer player, Object where, EnumSet<Style> style, ItemStack item, String format, String[] args);
+    protected abstract void addRecuringNotification(RecuringNotification rn);
     
     private static EnumSet<Style> noStyle = EnumSet.noneOf(Style.class);
     private static String[] emptyArray = new String[0];

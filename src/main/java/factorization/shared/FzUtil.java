@@ -1672,4 +1672,10 @@ public class FzUtil {
             e.printStackTrace();
         }
     }
+    
+    public static boolean stringsEqual(String a, String b) {
+        if (a == b) return true;
+        if (a == null || b == null) return false;
+        return a.equals(b);
+    }
 }

@@ -1,6 +1,8 @@
 package factorization.notify;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.Iterator;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommand;
@@ -19,6 +21,9 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
+import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.shared.Core;
@@ -33,6 +38,7 @@ public class NotifyImplementation extends Notify {
     
     {
         Notify.instance = this;
+        Core.loadBus(this);
     }
     
     @EventHandler
@@ -144,5 +150,33 @@ public class NotifyImplementation extends Notify {
             } catch (IllegalArgumentException e) {}
         }
         return ret;
+    }
+    
+    static ArrayList<RecuringNotification> recuring_notifications = new ArrayList();
+    @SubscribeEvent
+    public void updateRecuringNotifications(ServerTickEvent event) {
+        if (event.phase != Phase.END) return;
+        for (Iterator<RecuringNotification> iterator = recuring_notifications.iterator(); iterator.hasNext();) {
+            RecuringNotification rn = iterator.next();
+            if (rn.isInvalid()) {
+                iterator.remove();
+                continue;
+            }
+            if (rn.updater.update(rn.first) == false) {
+                iterator.remove();
+            }
+            rn.first = false;
+        }
+    }
+    
+    @Override
+    protected void addRecuringNotification(RecuringNotification newRN) {
+        for (Iterator<RecuringNotification> iterator = recuring_notifications.iterator(); iterator.hasNext();) {
+            RecuringNotification rn = iterator.next();
+            if (rn.where.equals(newRN.where) && (newRN.player == null || newRN.player == rn.player)) {
+                iterator.remove();
+            }
+        }
+        recuring_notifications.add(newRN);
     }
 }

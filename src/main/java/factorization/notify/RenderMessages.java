@@ -45,6 +45,10 @@ public class RenderMessages extends RenderMessagesProxy {
             messages.clear();
             return;
         }
+        if (msg.style.contains(Style.UPDATE) || msg.style.contains(Style.UPDATE_SAME_ITEM)) {
+            updateMessage(msg);
+            return;
+        }
         
         boolean force_position = msg.style.contains(Style.FORCE);
         
@@ -67,6 +71,21 @@ public class RenderMessages extends RenderMessagesProxy {
         }
         messages.add(msg);
     }
+    
+    void updateMessage(Message update) {
+        for (Message msg : messages) {
+            if (!msg.locus.equals(update.locus)) {
+                continue;
+            }
+            if (!update.style.contains(Style.UPDATE_SAME_ITEM)) {
+                msg.item = update.item;
+            }
+            msg.msg = update.msg;
+            return;
+        }
+        // Otherwise it's an UPDATE to a non-existing message.
+        // Presumably it's to a message that's died already.
+    }
 
     @SubscribeEvent
     public void renderMessages(RenderWorldLastEvent event) {
@@ -82,7 +101,7 @@ public class RenderMessages extends RenderMessagesProxy {
             return;
         }
         Iterator<Message> it = messages.iterator();
-        long deathTime = System.currentTimeMillis();
+        long approximateNow = System.currentTimeMillis();
         EntityLivingBase camera = Minecraft.getMinecraft().renderViewEntity;
         double cx = camera.lastTickPosX + (camera.posX - camera.lastTickPosX) * (double) event.partialTicks;
         double cy = camera.lastTickPosY + (camera.posY - camera.lastTickPosY) * (double) event.partialTicks;
@@ -99,7 +118,7 @@ public class RenderMessages extends RenderMessagesProxy {
         
         while (it.hasNext()) {
             Message m = it.next();
-            long timeExisted = deathTime - m.creationTime;
+            long timeExisted = approximateNow - m.creationTime;
             if (timeExisted > m.lifeTime || m.world != w || !m.stillValid()) {
                 it.remove();
                 continue;
