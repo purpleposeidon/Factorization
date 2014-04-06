@@ -139,7 +139,7 @@ public class NetworkFactorization {
             }
             NBTTagCompound tag = new NBTTagCompound();
             item.writeToNBT(tag);
-            CompressedStreamTools.write(tag, output); //NORELEASE: Compress?
+            CompressedStreamTools.write(tag, output);
             
             output.writeUTF(format);
             output.writeInt(args.length);
