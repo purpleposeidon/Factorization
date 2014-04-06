@@ -129,15 +129,17 @@ public class RenderMessages extends RenderMessagesProxy {
                 continue;
             }
             GL11.glDisable(GL11.GL_LIGHTING);
-            if (m.style.contains(Style.FADE)) {
-                float opacity = timeExisted / (float) m.lifeTime;
+            float lifeLeft = (m.lifeTime - timeExisted)/1000F;
+            float opacity = 1F;
+            if (lifeLeft < 1) {
+                opacity = lifeLeft / 1F;
+            }
+            opacity = (float) Math.sin(opacity);
+            if (opacity > 0.12) {
                 renderMessage(m, event.partialTicks, opacity);
-            } else {
-                renderMessage(m, event.partialTicks, 1);
             }
         }
         GL11.glEnable(GL11.GL_LIGHTING);
-        GL11.glDisable(GL11.GL_BLEND);
         GL11.glColor4f(1, 1, 1, 1);
 
         GL11.glPopMatrix();
@@ -156,6 +158,7 @@ public class RenderMessages extends RenderMessagesProxy {
             width = Math.max(width, fr.getStringWidth(line));
         }
         width += 2;
+        int halfWidth = width / 2;
 
         float scaling = 1.6F / 60F;
         scaling *= 2F / 3F;
@@ -194,41 +197,51 @@ public class RenderMessages extends RenderMessagesProxy {
         GL11.glRotatef(pvx, 1.0F, 0.0F, 0.0F);
         GL11.glScalef(-scaling, -scaling, scaling);
         GL11.glTranslatef(0, -10 * lineCount, 0);
+        
+        {
+            Tessellator tess = Tessellator.instance;
+            int var16 = (lineCount - 1) * 10;
 
-        Tessellator tess = Tessellator.instance;
-        int var16 = (lineCount - 1) * 10;
-
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        tess.startDrawingQuads();
-        int halfWidth = width / 2;
-        double item_add = 0;
-        if (m.show_item) {
-            item_add += 24;
-        }
-        tess.setColorRGBA_F(0.0F, 0.0F, 0.0F, 0.125F*opacity);
-        tess.addVertex((double) (-halfWidth - 1), (double) (-1), 0.0D);
-        tess.addVertex((double) (-halfWidth - 1), (double) (8 + var16), 0.0D);
-        tess.addVertex((double) (halfWidth + 1 + item_add), (double) (8 + var16), 0.0D);
-        tess.addVertex((double) (halfWidth + 1 + item_add), (double) (-1), 0.0D);
-        tess.draw();
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        int i = 0;
-        int color = 0xFFFFFFFF;
-        GL11.glTranslatef(0, centeringOffset, 0);
-        for (String line : lines) {
-            fr.drawString(line, -fr.getStringWidth(line) / 2, 10 * i, color);
-            i++;
-        }
-        GL11.glTranslatef(0, -centeringOffset, 0);
-
-        if (m.show_item) {
-            TextureManager re = mc.renderEngine;
-            RenderBlocks rb = FzUtil.getRB();
-            
-            GL11.glTranslatef((float) (halfWidth + 4), -lineCount/2, 0);
-            renderItem.renderItemAndEffectIntoGUI(fr, re, m.item, 0, 0);
+            GL11.glDisable(GL11.GL_TEXTURE_2D);
+            tess.startDrawingQuads();
+            double item_add = 0;
+            if (m.show_item) {
+                item_add += 24;
+            }
+            float c = 0.0F;
+            tess.setColorRGBA_F(c, c, c, Math.min(opacity, 0.2F));
+            tess.addVertex((double) (-halfWidth - 1), (double) (-1), 0.0D);
+            tess.addVertex((double) (-halfWidth - 1), (double) (8 + var16), 0.0D);
+            tess.addVertex((double) (halfWidth + 1 + item_add), (double) (8 + var16), 0.0D);
+            tess.addVertex((double) (halfWidth + 1 + item_add), (double) (-1), 0.0D);
+            tess.draw();
+            GL11.glEnable(GL11.GL_TEXTURE_2D);
         }
 
+        {
+            int i = 0;
+            int B = (int) (0xFF * Math.min(1, 0.5F + opacity));
+            int color = (B << 16) + (B << 8) + B + ((int) (0xFF*opacity) << 24);
+            GL11.glTranslatef(0, centeringOffset, 0);
+            for (String line : lines) {
+                fr.drawString(line, -fr.getStringWidth(line) / 2, 10 * i, color);
+                i++;
+            }
+        }
+        {
+            if (m.show_item) {
+                //GL11.glColor4f(opacity, opacity, opacity, opacity);
+                // :| Friggin' resets the transparency don't it...
+                GL11.glTranslatef(0, -centeringOffset, 0);
+                TextureManager re = mc.renderEngine;
+                RenderBlocks rb = FzUtil.getRB();
+                
+                GL11.glTranslatef((float) (halfWidth + 4), -lineCount/2, 0);
+                renderItem.zLevel -= 50;
+                renderItem.renderItemAndEffectIntoGUI(fr, re, m.item, 0, 0);
+                renderItem.zLevel += 50;
+            }
+        }
         GL11.glPopMatrix();
 
     }
