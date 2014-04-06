@@ -326,15 +326,14 @@ public class BlockFactorization extends BlockContainer {
             int count = 0;
             int added = 0;
             
-            int types = TileEntityDayBarrel.Type.TYPE_COUNT - 1;
+            int types = TileEntityDayBarrel.Type.TYPE_COUNT - 1 /* exclude creative */ - 1 /* exclude larger */;
             Calendar cal = Calendar.getInstance();
             int doy = cal.get(Calendar.DAY_OF_YEAR) - 1 /* start at 0, not 1 */;
-            int wood_of_the_day = doy % (types - 1);
-            for (ItemStack is : TileEntityDayBarrel.barrel_items) {
-                count++;
-                if (count > wood_of_the_day*types + 1 && count <= (wood_of_the_day+1)*types + 1) {
-                    itemList.add(is);
-                }
+            int wood_types = (TileEntityDayBarrel.barrel_items.size() - 1)/types;
+            int wood_of_the_day = doy % wood_types;
+            for (int i = 0; i < types; i++) {
+                ItemStack is = TileEntityDayBarrel.barrel_items.get(1 + /* skip creative barrel */ i + types*wood_of_the_day);
+                itemList.add(is);
             }
             //ugly; the first item in the list is the creative barrel; it oughta be separate
             itemList.add(TileEntityDayBarrel.barrel_items.get(0));
