@@ -12,9 +12,12 @@ import factorization.api.Charge.ChargeDensityReading;
 import factorization.api.Coord;
 import factorization.api.IChargeConductor;
 import factorization.api.IMeterInfo;
+import factorization.notify.MessageUpdater;
 import factorization.notify.Notify;
+import factorization.notify.Notify.Style;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
+import factorization.shared.FzUtil;
 import factorization.shared.ItemFactorization;
 
 public class ItemChargeMeter extends ItemFactorization {
@@ -32,54 +35,75 @@ public class ItemChargeMeter extends ItemFactorization {
                 par6, par7, par8, par9, par10);
     }
 
-    public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player, World w, int x, int y,
+    public boolean tryPlaceIntoWorld(ItemStack is, final EntityPlayer player, World w, int x, int y,
             int z, int side, float vecx, float vecy, float vecz) {
         if (w.isRemote) {
             return true;
         }
         Coord here = new Coord(w, x, y, z);
-        TileEntity te = here.getTE();
-        IChargeConductor ic = here.getTE(IChargeConductor.class);
+        final TileEntity te = here.getTE();
+        if (te == null) return false;
+        final IChargeConductor ic = here.getTE(IChargeConductor.class);
         if (ic == null) {
-            IMeterInfo im = here.getTE(IMeterInfo.class);
+            final IMeterInfo im = here.getTE(IMeterInfo.class);
             if (im == null) {
                 return false;
             }
-            Notify.send(player, here, "%s", im.getInfo());
+            Notify.recuring(player, te, new MessageUpdater() {
+                String origInfo = null;
+                @Override public boolean update(boolean firstMessage) {
+                    String info = im.getInfo();
+                    if (FzUtil.stringsEqual(info, origInfo)) return true;
+                    origInfo = info;
+                    if (!firstMessage) {
+                        Notify.withStyle(Style.UPDATE);
+                    }
+                    Notify.send(player, te, "%s", info);
+                    return true;
+                }});
             return true;
         }
-        if (w.isRemote) {
-            return true;
-        }
-        ChargeDensityReading ret = Charge.getChargeDensity(ic);
-        float density = ret.totalCharge / ((float) ret.conductorCount);
-        String d = String.format("%.1f", density);
-        //TODO: Let's put it somewhere better than the chat log
-        String inf = ic.getInfo();
-        if (inf == null || inf.length() == 0) {
-            inf = "";
-        } else {
-            inf = "\n" + inf;
-        }
-        /*
-         * targetCharge/totalCharge
-         * Conductors:
-         */
-        EntityPlayer toNotify = player;
-        if (player.getClass() != EntityPlayerMP.class || StringUtils.isNullOrEmpty(player.getCommandSenderName()) || player.getCommandSenderName().startsWith("[")) {
-            toNotify = null;
-        }
-        String msg;
-        if (Core.dev_environ) { 
-            msg = "Charge: " + ic.getCharge().getValue() + "/" + ret.totalCharge
-                + "\nConductors: " + ret.conductorCount;
-                //+ "  C: " + ic.getCoord()
-                //+ "  Total: " + ret.totalCharge
-        } else {
-            msg = "Charge: " + ic.getCharge().getValue();
-        }
-        msg += inf;
-        Notify.send(player, ic, "%s", msg, "");
+        Notify.recuring(player, te, new MessageUpdater() {
+            String lastMessage = null;
+            @Override public boolean update(boolean firstMessage) {
+                ChargeDensityReading ret = Charge.getChargeDensity(ic);
+                float density = ret.totalCharge / ((float) ret.conductorCount);
+                String d = String.format("%.1f", density);
+                //TODO: Let's put it somewhere better than the chat log
+                String inf = ic.getInfo();
+                if (inf == null || inf.length() == 0) {
+                    inf = "";
+                } else {
+                    inf = "\n" + inf;
+                }
+                /*
+                 * targetCharge/totalCharge
+                 * Conductors:
+                 */
+                EntityPlayer toNotify = player;
+                if (player.getClass() != EntityPlayerMP.class || StringUtils.isNullOrEmpty(player.getCommandSenderName()) || player.getCommandSenderName().startsWith("[")) {
+                    toNotify = null;
+                }
+                String msg;
+                if (Core.dev_environ) { 
+                    msg = "Charge: " + ic.getCharge().getValue() + "/" + ret.totalCharge
+                        + "\nConductors: " + ret.conductorCount;
+                        //+ "  C: " + ic.getCoord()
+                        //+ "  Total: " + ret.totalCharge
+                } else {
+                    msg = "Charge: " + ic.getCharge().getValue();
+                }
+                msg += inf;
+                if (FzUtil.stringsEqual(lastMessage, msg)) {
+                    return true;
+                }
+                if (!firstMessage) {
+                    Notify.withStyle(Style.UPDATE);
+                }
+                lastMessage = msg;
+                Notify.send(player, ic, "%s", msg, "");
+                return true;
+            }});
         return true;
     }
 }

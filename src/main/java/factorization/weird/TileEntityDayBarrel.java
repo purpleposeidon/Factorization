@@ -40,7 +40,9 @@ import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
+import factorization.notify.MessageUpdater;
 import factorization.notify.Notify;
+import factorization.notify.Notify.Style;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
@@ -933,22 +935,42 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         last_hit_side = -1;
     }
     
-    void info(EntityPlayer entityplayer) {
-        if (item == null && getItemCount() == 0) {
-            Notify.send(entityplayer, this, "Empty");
-        } else if (getItemCount() >= getMaxSize()) {
-            Notify.withItem(item);
-            Notify.send(entityplayer, this, "Full of {ITEM_NAME}{ITEM_INFOS_NEWLINE}");
-        } else {
-            String count = "" + getItemCount();
-            if (type == Type.CREATIVE) {
-                count = "Infinite";
-            }
-            Notify.withItem(item);
-            Notify.send(entityplayer, this, "%s {ITEM_NAME}{ITEM_INFOS_NEWLINE}", count);
-        }
+    void info(final EntityPlayer entityplayer) {
+        Notify.recuring(entityplayer, this, new MessageUpdater() {
+            ItemStack origItem = item;
+            int origCount;
+            @Override public boolean update(boolean firstMessage) {
+                int itemCount = getItemCount();
+                if (!firstMessage && FzUtil.couldMerge(origItem, TileEntityDayBarrel.this.item) && origCount == itemCount) {
+                    return true;
+                }
+                if (!firstMessage) {
+                    if (FzUtil.couldMerge(origItem, TileEntityDayBarrel.this.item)) {
+                        Notify.withStyle(Style.UPDATE_SAME_ITEM);
+                    } else {
+                        Notify.withStyle(Style.UPDATE);
+                    }
+                }
+                origCount = itemCount;
+                origItem = TileEntityDayBarrel.this.item;
+                
+                if (item == null && getItemCount() == 0) {
+                    Notify.send(entityplayer, TileEntityDayBarrel.this, "Empty");
+                } else if (getItemCount() >= getMaxSize()) {
+                    Notify.withItem(item);
+                    Notify.send(entityplayer, TileEntityDayBarrel.this, "Full of {ITEM_NAME}{ITEM_INFOS_NEWLINE}");
+                } else {
+                    String count = "" + getItemCount();
+                    if (type == Type.CREATIVE) {
+                        count = "Infinite";
+                    }
+                    Notify.withItem(item);
+                    Notify.send(entityplayer, TileEntityDayBarrel.this, "%s {ITEM_NAME}{ITEM_INFOS_NEWLINE}", count);
+                }
+                return true;
+            }});
     }
-    
+
     private ItemStack makeStack(int count) {
         if (item == null) {
             return null;
