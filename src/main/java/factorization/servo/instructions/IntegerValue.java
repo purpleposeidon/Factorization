@@ -41,6 +41,8 @@ public class IntegerValue extends Instruction {
             return BlockIcons.servo$one;
         } else if (getVal() == 0) {
             return BlockIcons.servo$zero;
+        } else if (getVal() == -1) {
+            return BlockIcons.servo$negative_one;
         } else {
             return BlockIcons.servo$number;
         }
@@ -54,11 +56,14 @@ public class IntegerValue extends Instruction {
     @Override
     public boolean onClick(EntityPlayer player, Coord block, ForgeDirection side) {
         if (playerHasProgrammer(player)) {
-            if (getVal() == 0) {
+            if (getVal() == -1) {
                 setVal(1);
                 return true;
             } else if (getVal() == 1) {
                 setVal(0);
+                return true;
+            } else if (getVal() == 0) {
+                setVal(-1);
                 return true;
             }
         }
