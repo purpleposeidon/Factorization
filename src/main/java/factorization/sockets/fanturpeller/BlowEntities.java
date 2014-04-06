@@ -283,4 +283,13 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
         coord.spawnItem(is);
         coord.adjust(facing.getOpposite());
     }
+    
+    @Override
+    protected void onRemove() {
+        super.onRemove();
+        Coord here = getCoord();
+        for (ItemStack item : buffer) {
+            FzUtil.spawnItemStack(here, item);
+        }
+    }
 }
