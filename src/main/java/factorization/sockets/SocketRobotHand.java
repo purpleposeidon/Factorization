@@ -158,7 +158,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
             if (mop.entityHit.interactFirst(player)) {
                 return true;
             }
-            if (mop.entityHit instanceof EntityLiving) {
+            if (is != null && mop.entityHit instanceof EntityLiving) {
                 if (is.interactWithEntity(player, (EntityLiving)mop.entityHit)) {
                     return true;
                 }
