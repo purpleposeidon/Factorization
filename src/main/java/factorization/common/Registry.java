@@ -39,8 +39,11 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
+import cpw.mods.fml.common.registry.FMLControlledNamespacedRegistry;
+import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.VillagerRegistry;
+import cpw.mods.fml.common.registry.GameRegistry.Type;
 import cpw.mods.fml.common.registry.VillagerRegistry.IVillageTradeHandler;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
@@ -161,11 +164,12 @@ public class Registry {
         class NotchBlock extends Block { public NotchBlock(Material honestly) { super(honestly); } }
         fractured_bedrock_block = new NotchBlock(Material.rock).setBlockUnbreakable().setResistance(6000000).setBlockName("bedrock").setBlockTextureName("bedrock").setCreativeTab(Core.tabFactorization);
         
-        GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FZ factory");
-        GameRegistry.registerBlock(lightair_block, "FZ Lightair");
-        GameRegistry.registerBlock(resource_block, ItemBlockResource.class, "FZ resource");
-        GameRegistry.registerBlock(dark_iron_ore, "FZ dark iron ore");
-        GameRegistry.registerBlock(fractured_bedrock_block, "FZ fractured bedrock");
+        GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "tile.null"); //NORELEASE: Revert these to their previous mappings.
+        GameRegistry.registerBlock(lightair_block, "tile.lightair");
+        GameRegistry.registerBlock(resource_block, ItemBlockResource.class, "tile.factorization.ResourceBlock");
+        GameRegistry.registerBlock(dark_iron_ore, "tile.factorization:darkIronOre");
+        GameRegistry.registerBlock(fractured_bedrock_block, "tile.bedrock");
+        registerDerpyAliases();
         
         
         is_factory = new ItemStack(factory_block);
@@ -180,6 +184,23 @@ public class Registry {
         Core.tab(resource_block, TabType.BLOCKS);
         
         worldgenManager = new WorldgenManager();
+    }
+    
+    public void registerDerpyAliases() {
+        String[][] aliases = new String[][] {
+                {"factorization:tile.null", "factorization:FZ factory"},
+                {"factorization:tile.factorization.ResourceBlock", "factorization:FZ resource"},
+                {"factorization:tile.lightair", "factorization:tile.lightair"},
+                {"factorization:tile.factorization:darkIronOre", "factorization:FZ dark iron ore"},
+                {"factorization:tile.bedrock", "factorization:FZ fractured bedrock"}
+        };
+        FMLControlledNamespacedRegistry<Block> blockRegistry = GameData.getBlockRegistry();
+        for (String[] pair : aliases) {
+            String proper = pair[0];
+            String derpy = pair[1];
+            GameRegistry.addAlias(derpy, proper, Type.BLOCK);
+            GameRegistry.addAlias(derpy, proper, Type.ITEM);
+        }
     }
 
     void postMakeItems() {

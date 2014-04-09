@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,6 +48,7 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.GameRegistry.Type;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -218,12 +220,12 @@ public class Core {
     }
     
     @EventHandler
-    public void missingMappings(FMLMissingMappingsEvent event) {
+    public void abandonDeadItems(FMLMissingMappingsEvent event) {
         Set<String> theDead = getDeadItems();
         for (MissingMapping missed : event.get()) {
             if (missed.name.startsWith("factorization:")) {
                 if (theDead.contains(missed.name)) {
-                    missed.setAction(Action.IGNORE);
+                    missed.ignore();
                 } else if (missed.getAction() != Action.IGNORE) {
                     Core.logSevere("Missing mapping: " + missed.name);
                 }
@@ -232,22 +234,39 @@ public class Core {
     }
     
     @EventHandler
-    public void fix_derpy_16_names(FMLMissingMappingsEvent event) { //NORELEASE: Implement.
-        String[] corrections = new String[] {
-                "factorization:tile.null→factorization:FZ factory",
-                "factorization:tile.factorization.ResourceBlock→factorization:FZ resource",
-                "factorization:tile.lightair→factorization:tile.lightair",
-                "factorization:tile.factorization:darkIronOre→factorization:FZ dark iron ore",
-                "factorization:tile.bedrock→factorization:FZ fractured bedrock"
+    public void correctDerpy1p7Names(FMLMissingMappingsEvent event) { //NORELEASE: Test.
+        Object[][] corrections = new Object[][] {
+                {"factorization:tile.null", "factorization:FZ factory", Core.registry.factory_block},
+                {"factorization:tile.factorization.ResourceBlock", "factorization:FZ resource", Core.registry.resource_block},
+                {"factorization:tile.lightair", "factorization:FZ Lightair", Core.registry.lightair_block},
+                {"factorization:tile.factorization:darkIronOre", "factorization:FZ dark iron ore", Core.registry.dark_iron_ore},
+                {"factorization:tile.bedrock", "factorization:FZ fractured bedrock", Core.registry.fractured_bedrock_block}
         };
-        for (String pair : corrections) {
-            String[] ab = pair.split("→");
-            String key = ab[0];
-            String value = ab[1];
-            for (MissingMapping missed : event.get()) {
-                if (missed.name.equals(key)) {
-                    //missed.setAction(target)
+        HashMap<String, Block> corr = new HashMap<String, Block>();
+        for (Object[] pair : corrections) {
+            corr.put((String) pair[1], (Block) pair[2]);
+        }
+        for (MissingMapping missed : event.get()) {
+            Block value = corr.get(missed.name);
+            if (value == null) {
+                continue;
+            }
+            if (missed.type == Type.BLOCK) {
+                missed.remap(value);
+            } else if (missed.type == Type.ITEM) {
+                Item it = FzUtil.getItem(value);
+                if (it != null) {
+                    missed.remap(it);
                 }
+            }
+        }
+    }
+    
+    @EventHandler
+    public void alwaysCrash(FMLMissingMappingsEvent event) { // NORELEASE
+        for (MissingMapping missed : event.get()) {
+            if (missed.getAction() != Action.REMAP) {
+                //missed.fail();
             }
         }
     }
