@@ -2,9 +2,11 @@ package factorization.common;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Matcher;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
@@ -42,8 +44,8 @@ import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
 import cpw.mods.fml.common.registry.FMLControlledNamespacedRegistry;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.VillagerRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.Type;
+import cpw.mods.fml.common.registry.VillagerRegistry;
 import cpw.mods.fml.common.registry.VillagerRegistry.IVillageTradeHandler;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.IActOnCraft;
@@ -145,8 +147,14 @@ public class Registry {
     
     WorldgenManager worldgenManager;
 
+    public static HashMap<String, Item> nameCleanup = new HashMap<String, Item>();
+    
     static void registerItem(Item item) {
-        GameRegistry.registerItem(item, item.getUnlocalizedName(), Core.modId);
+        String find = Matcher.quoteReplacement("item.factorization:");
+        String unlocalizedName = item.getUnlocalizedName();
+        String useName = unlocalizedName.replaceFirst(find, "");
+        GameRegistry.registerItem(item, useName, Core.modId);
+        nameCleanup.put("factorization:" + unlocalizedName, item);
     }
     
     public void makeBlocks() {
@@ -164,22 +172,17 @@ public class Registry {
         class NotchBlock extends Block { public NotchBlock(Material honestly) { super(honestly); } }
         fractured_bedrock_block = new NotchBlock(Material.rock).setBlockUnbreakable().setResistance(6000000).setBlockName("bedrock").setBlockTextureName("bedrock").setCreativeTab(Core.tabFactorization);
         
-        GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "tile.null"); //NORELEASE: Revert these to their previous mappings.
-        GameRegistry.registerBlock(lightair_block, "tile.lightair");
-        GameRegistry.registerBlock(resource_block, ItemBlockResource.class, "tile.factorization.ResourceBlock");
-        GameRegistry.registerBlock(dark_iron_ore, "tile.factorization:darkIronOre");
-        GameRegistry.registerBlock(fractured_bedrock_block, "tile.bedrock");
-        registerDerpyAliases();
+        GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FzBlock"); //NORELEASE: Revert these to their previous mappings.
+        GameRegistry.registerBlock(lightair_block, "Lightair");
+        GameRegistry.registerBlock(resource_block, ItemBlockResource.class, "ResourceBlock");
+        GameRegistry.registerBlock(dark_iron_ore, "DarkIronOre");
+        GameRegistry.registerBlock(fractured_bedrock_block, "FracturedBedrock");
         
         
         is_factory = new ItemStack(factory_block);
         is_lightair = new ItemStack(lightair_block);
         
         
-        //ItemBlock itemDarkIronOre = new ItemBlock(dark_iron_ore); //NORELEASE: Wait, what? This isn't necessary, right? HuH? TODO XXX FIXME
-        //ItemBlock itemFracturedBedrock = new ItemBlock(fractured_bedrock_block);
-        
-
         Core.tab(factory_block, Core.TabType.BLOCKS);
         Core.tab(resource_block, TabType.BLOCKS);
         
@@ -204,7 +207,7 @@ public class Registry {
     }
 
     void postMakeItems() {
-        HashSet<Item> foundItems = new HashSet();
+        HashSet<Item> foundItems = new HashSet<Item>();
         for (Field field : this.getClass().getFields()) {
             Object obj;
             try {
@@ -222,12 +225,10 @@ public class Registry {
         }
         
         Block invalid = FzUtil.getBlock((Item) null);
-        int i = 0;
         for (Item it : foundItems) {
             if (FzUtil.getBlock(it) == invalid) {
                 it.setTextureName(it.getUnlocalizedName());
                 registerItem(it);
-                i++;
             }
         }
     }
@@ -381,7 +382,7 @@ public class Registry {
     
     void batteryRecipe(ItemStack res, Object... params) {
         for (int damage : new int[] { 1, 2 }) {
-            ArrayList items = new ArrayList(params.length);
+            ArrayList<Object> items = new ArrayList<Object>(params.length);
             for (Object p : params) {
                 if (p == battery) {
                     p = new ItemStack(battery, 1, damage);
@@ -1118,7 +1119,7 @@ public class Registry {
     }
     
     public void addOtherRecipes() {
-        ArrayList<ItemStack> theLogs = new ArrayList();
+        ArrayList<ItemStack> theLogs = new ArrayList<ItemStack>();
         for (ItemStack is : OreDictionary.getOres("logWood")) {
             Block log = Block.getBlockFromItem(is.getItem());
             if (log == null || log == Blocks.log || log == Blocks.log2) {

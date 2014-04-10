@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.minecraft.block.Block;
@@ -234,17 +235,36 @@ public class Core {
     }
     
     @EventHandler
-    public void correctDerpy1p7Names(FMLMissingMappingsEvent event) { //NORELEASE: Test.
+    public void handleFzPrefixStrip(FMLMissingMappingsEvent event) {
+        Map<String, Item> fixups = Registry.nameCleanup;
+        for (MissingMapping missed : event.get()) {
+            if (missed.type != GameRegistry.Type.ITEM) continue;
+            Item target = fixups.get(missed.name);
+            if (target != null) {
+                missed.remap(target);
+            }
+        }
+    }
+    
+    @EventHandler
+    public void replaceDerpyNames(FMLMissingMappingsEvent event) { //NORELEASE: Test.
         Object[][] corrections = new Object[][] {
-                {"factorization:tile.null", "factorization:FZ factory", Core.registry.factory_block},
-                {"factorization:tile.factorization.ResourceBlock", "factorization:FZ resource", Core.registry.resource_block},
-                {"factorization:tile.lightair", "factorization:FZ Lightair", Core.registry.lightair_block},
-                {"factorization:tile.factorization:darkIronOre", "factorization:FZ dark iron ore", Core.registry.dark_iron_ore},
-                {"factorization:tile.bedrock", "factorization:FZ fractured bedrock", Core.registry.fractured_bedrock_block}
+                {"factorization:tile.null", Core.registry.factory_block},
+                {"factorization:FZ factory", Core.registry.factory_block},
+                {"factorization:tile.factorization.ResourceBlock", Core.registry.resource_block},
+                {"factorization:FZ resource", Core.registry.resource_block},
+                {"factorization:tile.lightair", Core.registry.lightair_block},
+                {"factorization:FZ Lightair", Core.registry.lightair_block},
+                {"factorization:tile.factorization:darkIronOre", Core.registry.dark_iron_ore},
+                {"factorization:FZ dark iron ore", Core.registry.dark_iron_ore},
+                {"factorization:tile.bedrock", Core.registry.fractured_bedrock_block},
+                {"factorization:FZ fractured bedrock", Core.registry.fractured_bedrock_block},
+                {"factorization:tile.factorization:darkIronOre", Core.registry.dark_iron_ore},
+                {"factorization:FZ fractured bedrock", Core.registry.fractured_bedrock_block},
         };
         HashMap<String, Block> corr = new HashMap<String, Block>();
         for (Object[] pair : corrections) {
-            corr.put((String) pair[1], (Block) pair[2]);
+            corr.put((String) pair[0], (Block) pair[1]);
         }
         for (MissingMapping missed : event.get()) {
             Block value = corr.get(missed.name);
@@ -258,15 +278,6 @@ public class Core {
                 if (it != null) {
                     missed.remap(it);
                 }
-            }
-        }
-    }
-    
-    @EventHandler
-    public void alwaysCrash(FMLMissingMappingsEvent event) { // NORELEASE
-        for (MissingMapping missed : event.get()) {
-            if (missed.getAction() != Action.REMAP) {
-                //missed.fail();
             }
         }
     }
