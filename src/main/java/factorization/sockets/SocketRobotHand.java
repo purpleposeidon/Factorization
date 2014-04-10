@@ -237,7 +237,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
         block.useTextures(BlockIcons.socket$hand, null,
                 BlockIcons.socket$arm0, BlockIcons.socket$arm1, 
                 BlockIcons.socket$arm2, BlockIcons.socket$arm3);
-        block.begin();
+        block.beginWithRotatedUVs();
         block.rotateCenter(Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())));
         if (motor != null) {
             block.translate(0, -2F/16F, 0);

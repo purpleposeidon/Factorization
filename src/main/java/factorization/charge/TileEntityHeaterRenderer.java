@@ -33,7 +33,7 @@ public class TileEntityHeaterRenderer extends TileEntitySpecialRenderer {
         float m = 1F/128F;
         block.setBlockBoundsOffset(m, m, m);
         block.useTexture(BlockIcons.heater_heat);
-        block.begin();
+        block.beginWithMirroredUVs();
         int brightness = (int)(color*16) << 4;
         Tessellator.instance.startDrawingQuads();
         Tessellator.instance.setBrightness(brightness);

@@ -41,7 +41,7 @@ public class BlockRenderRocketEngine extends FactorizationBlockRender {
             }
             block.setBlockBounds(d*i, (i-1)*height, d*i,
                     2 - d*i, height*(i), 2 - d*i);
-            block.begin();
+            block.beginWithRotatedUVs();
             block.renderRotated(tess, here);
             //block.render(rb, here);
         }
@@ -49,7 +49,7 @@ public class BlockRenderRocketEngine extends FactorizationBlockRender {
         block.useTextures(nozzle, top, body, body, body, body);
         block.setBlockBounds(0, b, 0,
                 2, 3, 2);
-        block.begin();
+        block.beginWithRotatedUVs();
         block.renderRotated(tess, here);
         return true;
     }

@@ -108,7 +108,7 @@ public class TileEntityGrinderRender {
         float e = 1F/8F;
         block.setBlockBounds(e, 7F/16F, e, 1 - e, 8F/16F, 1 - e);
         //block.setBlockBoundsOffset(1F/8F, 7F/16F, 1F/8F);
-        block.begin();
+        block.beginWithMirroredUVs();
         block.translate(-0.5F, -0.5F, -0.5F);
         block.renderForTileEntity();
         

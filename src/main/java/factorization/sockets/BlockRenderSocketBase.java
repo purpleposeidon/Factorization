@@ -36,7 +36,7 @@ public class BlockRenderSocketBase extends FactorizationBlockRender {
             socket = (TileEntitySocketBase) te;
             dir = socket.facing;
             
-            block.begin();
+            block.beginWithMirroredUVs();
             block.rotateCenter(Quaternion.fromOrientation(FzOrientation.fromDirection(dir.getOpposite())));
             block.renderRotated(Tessellator.instance, x, y, z);
             socket.renderStatic(null, Tessellator.instance);

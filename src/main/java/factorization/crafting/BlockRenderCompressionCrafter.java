@@ -35,7 +35,7 @@ public class BlockRenderCompressionCrafter extends FactorizationBlockRender {
         if (world_mode) {
             Tessellator.instance.setBrightness(block.getMixedBrightnessForBlock(w, x, y, z));
             Quaternion q = Quaternion.fromOrientation(FzOrientation.fromDirection(dir));
-            block.begin();
+            block.beginWithMirroredUVs();
             block.rotateMiddle(q);
             block.renderRotated(Tessellator.instance, x, y, z);
             

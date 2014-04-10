@@ -78,7 +78,7 @@ public class BlockRenderDayBarrel extends FactorizationBlockRender {
         if (world_mode) {
             Tessellator.instance.setBrightness(block.getMixedBrightnessForBlock(w, x, y, z));
             Quaternion q = Quaternion.fromOrientation(barrel.orientation.getSwapped());
-            block.begin();
+            block.beginWithMirroredUVs();
             block.rotateMiddle(q);
             block.renderRotated(Tessellator.instance, x, y, z);
         } else {

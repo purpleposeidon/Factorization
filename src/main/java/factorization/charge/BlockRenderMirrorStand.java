@@ -50,7 +50,7 @@ public class BlockRenderMirrorStand extends FactorizationBlockRender {
         IIcon face = BlockIcons.mirror_front;
         block.useTextures(face, face, side, side, side, side);
         
-        block.begin();
+        block.beginWithMirroredUVs();
         Coord here = getCoord();
         
         if (world_mode) {

@@ -294,7 +294,7 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
             float yoffset = 5F/16F;
             float sd = motor == null ? 0 : 2F/16F;
             block.setBlockBounds(d, d + yd + yoffset + 2F/16F + sd, d, 1 - d, 1 - (d + 0F/16F) + yd + yoffset, 1 - d);
-            block.begin();
+            block.beginWithMirroredUVs();
             block.rotateCenter(rotation);
             block.renderRotated(tess, xCoord, yCoord, zCoord);
         }

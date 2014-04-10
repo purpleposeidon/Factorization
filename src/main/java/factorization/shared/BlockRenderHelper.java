@@ -173,19 +173,29 @@ public class BlockRenderHelper extends Block {
         rb.renderStandardBlock(this, c.x, c.y, c.z);
     }
     
-    //We could add stuff for simple 90 degree rotations
-    private static final int X = 0, Y = 1, Z = 2, U = 3, V = 4;
+    private static final byte UV_NONE = 0, UV_OLD_STYLE_ROTATED = 1, UV_NEW_STYLE_MIRRORED = 2;
+    
     private VectorUV center = new VectorUV();
     
     @SideOnly(Side.CLIENT)
-    public BlockRenderHelper begin() {
+    public BlockRenderHelper beginWithRotatedUVs() {
+        return begin(UV_OLD_STYLE_ROTATED);
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public BlockRenderHelper beginWithMirroredUVs() {
+        return begin(UV_NEW_STYLE_MIRRORED);
+    }
+    
+    @SideOnly(Side.CLIENT)
+    private BlockRenderHelper begin(byte uv_mode) {
         for (int i = 0; i < 6; i++) {
             IIcon faceIIcon = textures[i];
             if (faceIIcon == null) {
                 continue;
             }
             currentFace = faceCache[i];
-            faceVerts(i);
+            faceVerts(i, uv_mode);
             for (int f = 0; f < currentFace.length; f++) {
                 VectorUV vert = currentFace[f];
                 vert.u = faceIIcon.getInterpolatedU(vert.u*16);
@@ -200,8 +210,9 @@ public class BlockRenderHelper extends Block {
     
     public BlockRenderHelper beginNoIIcons() {
         for (int i = 0; i < 6; i++) {
-            currentFace = faceCache[i]; //fullCache isn't static; we'll have two instances for server thread & client thread
-            faceVerts(i);
+            //We'll have multiple instances of BlockRenderHelper for server & client, so that they don't interfere with eachother.
+            currentFace = faceCache[i];
+            faceVerts(i, UV_NONE);
         }
         return this;
     }
@@ -385,9 +396,8 @@ public class BlockRenderHelper extends Block {
             }
         }
     }
-    private void faceVerts(int face) {
-        int c = 8;
-        //Sets up vertex positions
+    
+    private void setVertexPositions(int face) {
         switch (face) {
         case 0: //-y
             set(0, 1, 0, 1);
@@ -426,7 +436,53 @@ public class BlockRenderHelper extends Block {
             set(3, 1, 1, 0);
             break;
         }
-        //Sets up UV data
+    }
+    
+    private void setOldStyleRotatedishUVs(int face) {
+        switch (face) {
+        case 0: //-y
+        case 1: //+y
+            //Mirror these like MC does.
+            for (int i = 0; i < currentFace.length; i++) {
+                VectorUV vert = currentFace[i];
+                vert.u = vert.x;
+                vert.v = vert.z;
+            }
+            break;
+        case 2: //-z
+            for (int i = 0; i < currentFace.length; i++) {
+                VectorUV vert = currentFace[i];
+                vert.u = 1 - vert.x;
+                vert.v = 1 - vert.y;
+            }
+            break;
+        case 3: //+z
+            for (int i = 0; i < currentFace.length; i++) {
+                VectorUV vert = currentFace[i];
+                vert.u = vert.x;
+                vert.v = 1 - vert.y;
+            }
+            break;
+        case 4: //-x
+            for (int i = 0; i < currentFace.length; i++) {
+                VectorUV vert = currentFace[i];
+                vert.u = vert.z;
+                vert.v = 1 - vert.y;
+            }
+            break;
+        case 5: //+x
+            for (int i = 0; i < currentFace.length; i++) {
+                VectorUV vert = currentFace[i];
+                vert.u = 1 - vert.z;
+                vert.v = 1 - vert.y;
+            }
+            break;
+        default:
+            throw new RuntimeException("Invalid face number");
+        }
+    }
+    
+    private void setVanillaStyleMirroredUVs(int face) {
         switch (face) {
         case 0: //-y
         case 1: //+y
@@ -438,16 +494,7 @@ public class BlockRenderHelper extends Block {
             }
             break;
             // In 1.7, MC side faces mirror each-other as well.
-            /*
         case 2: //-z
-            for (int i = 0; i < currentFace.length; i++) {
-                VectorUV vert = currentFace[i];
-                vert.u = 1 - vert.x;
-                vert.v = 1 - vert.y;
-            }
-            break;
-            */
-        case 2:
         case 3: //+z
             for (int i = 0; i < currentFace.length; i++) {
                 VectorUV vert = currentFace[i];
@@ -456,25 +503,19 @@ public class BlockRenderHelper extends Block {
             }
             break;
         case 4: //-x
-        case 5:
+        case 5: //+x
             for (int i = 0; i < currentFace.length; i++) {
                 VectorUV vert = currentFace[i];
                 vert.u = vert.z;
                 vert.v = 1 - vert.y;
             }
             break;
-            /*
-        case 5: //+x
-            for (int i = 0; i < currentFace.length; i++) {
-                VectorUV vert = currentFace[i];
-                vert.u = 1 - vert.z;
-                vert.v = 1 - vert.y;
-            }
-            break;
-            */
         default:
             throw new RuntimeException("Invalid face number");
         }
+    }
+    
+    private void convertUVsForIcon(int face) {
         VectorUV[] cache = currentFace;
         int WIDTH = 1;
         for (int i = 0; i < cache.length; i++) {
@@ -504,12 +545,26 @@ public class BlockRenderHelper extends Block {
                 other.v -= vdelta;
             }
         }
+    }
+    
+    private void clipUVs() {
         for (int i = 0; i < currentFace.length; i++) {
             VectorUV vec = currentFace[i];
             vec.u = clip(vec.u);
             vec.v = clip(vec.v);
         }
-        return;
+    }
+    
+    private void faceVerts(int face, byte uv_mode) {
+        setVertexPositions(face);
+        if (uv_mode == UV_NONE) return;
+        if (uv_mode == UV_NEW_STYLE_MIRRORED) {
+            setVanillaStyleMirroredUVs(face);
+        } else if (uv_mode == UV_OLD_STYLE_ROTATED) {
+            setOldStyleRotatedishUVs(face);
+        }
+        convertUVsForIcon(face);
+        clipUVs();
     }
     
     static double clip(double v) {

@@ -1,6 +1,7 @@
 package factorization.servo;
 
 import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
@@ -11,7 +12,6 @@ import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
 
 
 public abstract class Decorator extends ServoComponent {
@@ -110,7 +110,8 @@ public abstract class Decorator extends ServoComponent {
         if (where == null) {
             block.renderForTileEntity();
         } else {
-            block.render(rb, where);
+            block.beginWithRotatedUVs();
+            block.renderRotated(Tessellator.instance, where);
         }
     }
     

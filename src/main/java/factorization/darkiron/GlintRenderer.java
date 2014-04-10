@@ -76,7 +76,7 @@ public class GlintRenderer extends TileEntitySpecialRenderer {
             float d = 1F/512F;
             float a = -d, b = 1 + d;
             block.setBlockBounds(a, a, a, b, b, b);
-            block.begin();
+            block.beginWithMirroredUVs();
             block.renderForTileEntity();
         }
         tess.draw();

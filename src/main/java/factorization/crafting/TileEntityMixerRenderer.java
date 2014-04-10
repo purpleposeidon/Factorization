@@ -51,7 +51,7 @@ public class TileEntityMixerRenderer extends TileEntitySpecialRenderer {
         block.useTextures(top, null, crank, crank, crank, crank);
         float d = 3F/8F;
         block.setBlockBoundsOffset(d, 2.5F/8F, d);
-        block.begin();
+        block.beginWithMirroredUVs();
         block.renderForTileEntity();
         //GL11.glTranslatef(-1, 0, 0);
         Tessellator.instance.draw();

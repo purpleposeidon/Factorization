@@ -370,7 +370,7 @@ public class SocketShifter extends TileEntitySocketBase {
             float d = ds[i];
             float minY = minYs[i];
             block.setBlockBounds(d, minY, d, 1-d, 12F/16F, 1-d);
-            block.begin();
+            block.beginWithMirroredUVs();
             block.rotateCenter(Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())));
             block.renderRotated(tess, xCoord, yCoord, zCoord);
         }

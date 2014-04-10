@@ -78,7 +78,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         GL11.glPushMatrix();
         GL11.glTranslatef((float) x, (float) y, (float) z);
         
-        block.begin();
+        block.beginWithMirroredUVs();
         
         block.rotateCenter(q);
         
@@ -156,7 +156,7 @@ public class TileEntityCompressionCrafterRenderer extends TileEntitySpecialRende
         contentSize.minZ = 0;
         block.useTexture(BlockIcons.dark_iron_block);
         block.setBlockBounds(0, 0, 0, (float) contentSize.maxX, (float) contentSize.maxY, (float) contentSize.maxZ);
-        block.begin();
+        block.beginWithMirroredUVs();
         Tessellator.instance.startDrawingQuads();
         block.renderForTileEntity();
         Tessellator.instance.draw();

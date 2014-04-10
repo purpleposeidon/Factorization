@@ -184,7 +184,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
                 colors_changed = true;
             }
             rc.toBlockBounds(block);
-            block.begin();
+            block.beginWithMirroredUVs();
             block.rotateMiddle(rc.quat);
             if (greenware.front != ForgeDirection.UNKNOWN && greenware.rotation > 0) {
                 block.rotateCenter(greenware.rotation_quat);

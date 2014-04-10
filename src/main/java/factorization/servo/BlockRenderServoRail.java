@@ -93,7 +93,7 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
 
             //renderBlock(rb, block);
             if (world_mode) {
-                block.begin();
+                block.beginWithMirroredUVs();
                 block.renderRotated(Tessellator.instance, x, y, z);
             } else {
                 block.renderForInventory(rb);
