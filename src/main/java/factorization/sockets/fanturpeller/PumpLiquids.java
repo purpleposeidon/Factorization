@@ -510,10 +510,9 @@ public class PumpLiquids extends BufferedFanturpeller {
         GL11.glTranslatef(d, d, d);
         Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())).glRotate();
         float turn = scaleRotation(FzUtil.interp(prevFanRotation, fanRotation, partial));
-        float dr = Math.abs(scaleRotation(fanRotation) - scaleRotation(prevFanRotation));
         GL11.glRotatef(turn, 0, 1, 0);
         float sd = motor == null ? -2F/16F : 3F/16F;
-        sd += -9F/16F;
+        sd += -7F/16F;
         GL11.glTranslatef(0, sd, 0);
         
         
@@ -529,7 +528,7 @@ public class PumpLiquids extends BufferedFanturpeller {
         glEnable(GL_LIGHTING);
         glDisable(GL11.GL_CULL_FACE);
         glEnable(GL12.GL_RESCALE_NORMAL);
-        corkscrew.render(Blocks.iron_block.getIcon(0, 0));
+        corkscrew.render(BlockIcons.socket$corkscrew);
         glEnable(GL11.GL_CULL_FACE);
         glEnable(GL_LIGHTING);
     }

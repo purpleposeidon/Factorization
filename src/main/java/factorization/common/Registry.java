@@ -118,7 +118,7 @@ public class Registry {
     public ItemCraftingComponent silver_ingot, lead_ingot;
     public ItemCraftingComponent dark_iron;
     public ItemAcidBottle acid;
-    public ItemCraftingComponent insulated_coil, motor, fan, diamond_cutting_head;
+    public ItemCraftingComponent insulated_coil, motor, fan, diamond_cutting_head, corkscrew;
     public ItemStack sulfuric_acid, aqua_regia;
     public ItemChargeMeter charge_meter;
     public ItemBlockProxy mirror;
@@ -312,6 +312,7 @@ public class Registry {
         insulated_coil = new ItemCraftingComponent("insulated_coil");
         motor = new ItemCraftingComponent("motor");
         fan = new ItemCraftingComponent("fan");
+        corkscrew = new ItemCraftingComponent("corkscrew");
         diamond_cutting_head = new ItemCraftingComponent("diamond_cutting_head");
         charge_meter = new ItemChargeMeter();
         mirror = new ItemBlockProxy(mirror_item_hidden, "mirror", TabType.CHARGE);
@@ -776,6 +777,12 @@ public class Registry {
                 " - ",
                 "I I",
                 'I', Items.iron_ingot,
+                '-', Blocks.heavy_weighted_pressure_plate);
+        recipe(new ItemStack(corkscrew),
+                " |-",
+                "-| ",
+                " |-",
+                '|', Items.iron_ingot,
                 '-', Blocks.heavy_weighted_pressure_plate);
         if (FzConfig.enable_solar_steam) {
             recipe(solarboiler_item,
