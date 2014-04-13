@@ -39,7 +39,7 @@ import factorization.shared.NetworkFactorization.MessageType;
 import factorization.sockets.ISocketHolder;
 import factorization.sockets.TileEntitySocketBase;
 
-public class SocketFanturpeller extends TileEntitySocketBase implements IChargeConductor {
+public abstract class SocketFanturpeller extends TileEntitySocketBase implements IChargeConductor {
     Charge charge = new Charge(this);
     boolean isSucking = false;
     byte target_speed = 1;
@@ -57,11 +57,6 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         if (target_speed > 3) target_speed = 3;
         fanω = data.as(Share.VISIBLE, "fanw").putFloat(fanω);
         return this;
-    }
-
-    @Override
-    public FactoryType getFactoryType() {
-        return FactoryType.SOCKET_FANTURPELLER;
     }
     
     @Override
@@ -95,49 +90,6 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         super.updateEntity();
     }
     
-    boolean pickFanAction(Coord coord, boolean powered, ISocketHolder socket) {
-        final Coord front = coord.add(facing);
-        final Coord back = coord.add(facing.getOpposite());
-
-        if (!front.blockExists() || !back.blockExists()) {
-            return false;
-        }
-        
-        boolean onServo = socket != this;
-
-        final Coord source = isSucking ? front : back;
-        final Coord destination = isSucking ? back : front;
-        
-        boolean sourceIsLiquid = isLiquid(source) || hasTank(source);
-        
-        // BEGIN MACRO-GENERATED CODE
-        // The real source for this is in fanmacro.py, which should be located in the same folder as this file.
-        // Executing it will update this code.
-        boolean need_PumpLiquids = false;
-        boolean need_BlowEntities = false;
-        if (!onServo && !powered && sourceIsLiquid && (isLiquid(destination) || hasTank(destination) || isClear(destination))) {
-            need_PumpLiquids = true;
-        }
-        if (!sourceIsLiquid && noCollision(front)) {
-            need_BlowEntities = true;
-        }
-        if (need_PumpLiquids && this instanceof PumpLiquids) return false;
-        if (need_BlowEntities && this instanceof BlowEntities) return false;
-        if (need_PumpLiquids) {
-            replaceWith(new PumpLiquids(), socket);
-            return true;
-        }
-        if (need_BlowEntities) {
-            replaceWith(new BlowEntities(), socket);
-            return true;
-        }
-        // END MACRO-GENERATED CODE
-        if (this.getRequiredCharge() != 0 /* As a proxy for checking the class */) {
-            replaceWith(new SocketFanturpeller(), socket);
-        }
-        return true;
-    }
-
     boolean isLiquid(Coord at) {
         final Block block = at.getBlock();
         if (block == Blocks.water || block == Blocks.flowing_water || block == Blocks.lava || block == Blocks.flowing_lava) {
@@ -188,12 +140,6 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
         }
         super.replaceWith(baseReplacement, socket);
     }
-
-    transient boolean needActionCheck = true;
-    @Override
-    public void neighborChanged() {
-        needActionCheck = true;
-    }
     
     float getTargetSpeed() {
         if (!shouldFeedJuice()) return 0;
@@ -217,20 +163,8 @@ public class SocketFanturpeller extends TileEntitySocketBase implements IChargeC
     }
     
     @Override
-    public void onEnterNewBlock() {
-        needActionCheck = true;
-    }
-    
-    @Override
     public final void genericUpdate(ISocketHolder socket, Coord coord, boolean powered) {
         boolean neighbor_changed = false;
-        if (needActionCheck && !worldObj.isRemote) {
-            needActionCheck = false;
-            if (pickFanAction(coord, powered, socket)) {
-                return;
-            }
-            neighbor_changed = true;
-        }
         prevFanRotation = fanRotation;
         fanturpellerUpdate(socket, coord, powered, neighbor_changed);
         if (!worldObj.isRemote) {

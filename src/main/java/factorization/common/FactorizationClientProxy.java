@@ -260,11 +260,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 FactoryType.SOCKET_LACERATOR,
                 FactoryType.SOCKET_ROBOTHAND,
                 FactoryType.SOCKET_SHIFTER,
-                FactoryType.SOCKET_FANTURPELLER,
                 FactoryType.SOCKET_BLOWER,
                 FactoryType.SOCKET_PUMP,
-                FactoryType.SOCKET_POWERGEN,
-                FactoryType.SOCKET_MIXER,
                 FactoryType.SOCKET_BARE_MOTOR
         }) {
             new BlockRenderSocketBase(ft);

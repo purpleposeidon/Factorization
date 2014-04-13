@@ -17,7 +17,6 @@ import factorization.crafting.TileEntityMixer;
 import factorization.crafting.TileEntityPackager;
 import factorization.crafting.TileEntityStamper;
 import factorization.oreprocessing.TileEntityCrystallizer;
-import factorization.oreprocessing.TileEntityGrinder;
 import factorization.oreprocessing.TileEntitySlagFurnace;
 import factorization.servo.TileEntityParaSieve;
 import factorization.servo.TileEntityServoRail;
@@ -31,8 +30,6 @@ import factorization.sockets.SocketLacerator;
 import factorization.sockets.SocketRobotHand;
 import factorization.sockets.SocketShifter;
 import factorization.sockets.fanturpeller.BlowEntities;
-import factorization.sockets.fanturpeller.GeneratePower;
-import factorization.sockets.fanturpeller.MixCrafting;
 import factorization.sockets.fanturpeller.PumpLiquids;
 import factorization.sockets.fanturpeller.SocketFanturpeller;
 import factorization.weird.TileEntityDayBarrel;
@@ -76,11 +73,11 @@ public enum FactoryType {
     SOCKET_LACERATOR(33, false, SocketLacerator.class, "fzsock_lacerate"), //NORELEASE: Needs to load the old Grinder TE name
     SOCKET_ROBOTHAND(34, false, SocketRobotHand.class, "fzsock_hand"),
     SOCKET_SHIFTER(35, true, SocketShifter.class, "fzsock_shift"),
-    SOCKET_FANTURPELLER(36, true, SocketFanturpeller.class, "fzsock_fanturpeller"),
-    SOCKET_PUMP(37, true, PumpLiquids.class, "fzsock_pump"),
-    SOCKET_POWERGEN(38, false, GeneratePower.class, "fzsock_gen"),
+    // 36 -- Was the short-lived SOCKET_FANTURPELLER; which is now abstract
+    SOCKET_PUMP(37, false, PumpLiquids.class, "fzsock_pump"),
+    //38 -- Was the short-lived SOCKET_POWERGEN
     SOCKET_BLOWER(39, true, BlowEntities.class, "fzsock_blow"),
-    SOCKET_MIXER(40, false, MixCrafting.class, "fzsock_mix"),
+    //40 -- Was the short-lived SOCKET_MIXER
     SOCKET_BARE_MOTOR(41, false, SocketBareMotor.class, "fzsock_motor"),
     
 
@@ -214,6 +211,8 @@ public enum FactoryType {
             }
             if (ft == SOCKET_LACERATOR) {
                 GameRegistry.registerTileEntityWithAlternatives(ft.clazz, ft.te_id, "factory_grinder");
+            } else if (ft == SOCKET_BLOWER) {
+                GameRegistry.registerTileEntityWithAlternatives(ft.clazz, ft.te_id, "fzsock_fanturpeller");
             } else {
                 GameRegistry.registerTileEntity(ft.clazz, ft.te_id);
             }

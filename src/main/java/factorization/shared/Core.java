@@ -543,6 +543,7 @@ public class Core {
     }
     
     public static void loadBus(Object obj) {
+        //@SubscribeEvent is the annotation the eventbus, *NOT* @EventHandler; that one is for mod containers.
         FMLCommonHandler.instance().bus().register(obj);
         MinecraftForge.EVENT_BUS.register(obj);
     }

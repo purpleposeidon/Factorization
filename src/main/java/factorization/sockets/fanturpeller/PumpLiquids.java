@@ -1,10 +1,10 @@
 package factorization.sockets.fanturpeller;
 
-import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_LIGHTING;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
 
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBucket;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.BlockFluidFinite;
@@ -32,6 +33,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
+import factorization.api.datahelpers.DataHelper;
+import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.servo.ServoMotor;
@@ -49,8 +52,8 @@ public class PumpLiquids extends BufferedFanturpeller {
     
     static final class PumpCoord {
         final int x, y, z;
-        final PumpCoord parent;
         final short pathDistance;
+        final PumpCoord parent;
         PumpCoord(Coord at, PumpCoord parent, int pathDistance) {
             x = at.x;
             y = at.y;
@@ -71,11 +74,9 @@ public class PumpLiquids extends BufferedFanturpeller {
         
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof PumpCoord) {
-                PumpCoord o = (PumpCoord) obj;
-                return o.x == x && o.y == y && o.z == z;
-            }
-            return false;
+            // No instanceof for efficiency. Probably safe & worthwhile.
+            PumpCoord o = (PumpCoord) obj;
+            return o.x == x && o.y == y && o.z == z;
         }
         
         @Override
@@ -93,6 +94,15 @@ public class PumpLiquids extends BufferedFanturpeller {
         }
     }
     
+    static final class FoundFluidHandler {
+        final IFluidHandler te;
+        final ForgeDirection dir;
+        public FoundFluidHandler(IFluidHandler te, ForgeDirection dir) {
+            this.te = te;
+            this.dir = dir;
+        }
+    }
+    
     final static int max_pool = (16*16*24)*12*12;
     
     private class Drainer implements PumpAction {
@@ -100,6 +110,7 @@ public class PumpLiquids extends BufferedFanturpeller {
         final ArrayDeque<PumpCoord> frontier = new ArrayDeque();
         final HashSet<PumpCoord> visited = new HashSet();
         final PriorityQueue<PumpCoord> queue = new PriorityQueue<PumpCoord>(128, getComparator());
+        final ArrayDeque<FoundFluidHandler> foundContainers = new ArrayDeque();
         
         Comparator<PumpCoord> getComparator() {
             return new Comparator<PumpCoord>() {
@@ -134,6 +145,7 @@ public class PumpLiquids extends BufferedFanturpeller {
             visited.add(seed);
             queue.add(seed);
             delay = 20*3;
+            foundContainers.clear();
         }
         
         @Override
@@ -167,7 +179,13 @@ public class PumpLiquids extends BufferedFanturpeller {
                     if (visited.contains(at) || !probe.blockExists()) continue;
                     boolean is_liquid = drainBlock(at, false) != null;
                     boolean replaceable = probe.isReplacable();
-                    if (!is_liquid && !replaceable) continue;
+                    if (!is_liquid && !replaceable) {
+                        IFluidHandler ifh = probe.getTE(IFluidHandler.class);
+                        if (ifh != null) {
+                            foundContainers.add(new FoundFluidHandler(ifh, dir));
+                        }
+                        continue;
+                    }
                     if (!is_liquid && replaceable && isLiquid(probe)) continue; // It's a different liquid.
                     visited.add(at); // Don't revisit this place.
                     found(replaceable, is_liquid, at);
@@ -194,7 +212,18 @@ public class PumpLiquids extends BufferedFanturpeller {
             }
             delay = 20;
             PumpCoord pc = queue.poll();
-            if (pc == null || !pc.verifyConnection(this, worldObj)) {
+            if (pc == null) {
+                FoundFluidHandler foundIfh = foundContainers.poll();
+                if (foundIfh == null) {
+                    reset();
+                    return;
+                }
+                FluidStack resource = new FluidStack(targetFluid, buffer.getCapacity() - buffer.getFluidAmount());
+                FluidStack gotten = foundIfh.te.drain(foundIfh.dir, resource, true);
+                buffer.fill(gotten, true);
+                return;
+            }
+            if (!pc.verifyConnection(this, worldObj)) {
                 reset();
                 return;
             }
@@ -285,6 +314,13 @@ public class PumpLiquids extends BufferedFanturpeller {
             for (int i = 0; i < 16; i++) {
                 PumpCoord pc = queue.poll();
                 if (pc == null || !pc.verifyConnection(this, worldObj)) {
+                    FoundFluidHandler foundIfh = foundContainers.poll();
+                    if (foundIfh == null) {
+                        reset();
+                        return;
+                    }
+                    int amount = foundIfh.te.fill(foundIfh.dir, buffer.getFluid(), true);
+                    buffer.drain(amount, true);
                     reset();
                     return;
                 }
@@ -531,5 +567,20 @@ public class PumpLiquids extends BufferedFanturpeller {
         corkscrew.render(BlockIcons.socket$corkscrew);
         glEnable(GL11.GL_CULL_FACE);
         glEnable(GL_LIGHTING);
+    }
+    
+    @Override
+    public ItemStack getCreatingItem() {
+        return new ItemStack(Core.registry.corkscrew);
+    }
+    
+    @Override
+    public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+        IDataSerializable ret = super.serialize(prefix, data);
+        // Ugly. But I'm lazy.
+        // TODO: Pull the base class & this class back together
+        target_speed = 2;
+        isSucking = false;
+        return ret;
     }
 }
