@@ -57,7 +57,7 @@ public class NetworkFactorization {
                 ItemStack is = (ItemStack) item;
                 NBTTagCompound tag = new NBTTagCompound();
                 is.writeToNBT(tag);
-                CompressedStreamTools.write(tag, output); //NORELEASE: Compress!
+                CompressedStreamTools.write(tag, output);
             } else if (item instanceof VectorUV) {
                 VectorUV v = (VectorUV) item;
                 output.writeFloat((float) v.x);
@@ -234,15 +234,14 @@ public class NetworkFactorization {
                 return;
             }
 
-            if (messageType == MessageType.FactoryType && world.isRemote) {
+            if ((messageType == MessageType.FactoryType || messageType == MessageType.FactoryTypeWithSecondMessage) && world.isRemote) {
                 //create a Tile Entity of that type there.
                 FactoryType ft = FactoryType.fromMd(input.readInt());
                 byte extraData = input.readByte();
                 byte extraData2 = input.readByte();
-                //There may be additional description data following this
-                try {
+                if (messageType == MessageType.FactoryTypeWithSecondMessage) {
                     messageType = MessageType.read(input);
-                } catch (IOException e) {
+                } else {
                     messageType = null;
                 }
                 TileEntityCommon spawn = here.getTE(TileEntityCommon.class);
@@ -254,6 +253,7 @@ public class NetworkFactorization {
                     spawn = ft.makeTileEntity();
                     spawn.setWorldObj(world);
                     world.setTileEntity(x, y, z, spawn);
+                    here.redraw();
                 }
 
                 spawn.useExtraInfo(extraData);
@@ -437,7 +437,7 @@ public class NetworkFactorization {
         factorizeNtfyChannel,
         PlaySound, EntityParticles(true),
         
-        DrawActive, FactoryType, DescriptionRequest, DataHelperEdit, DataHelperEditOnEntity(true), OpenDataHelperGui, OpenDataHelperGuiOnEntity(true),
+        DrawActive, FactoryType, FactoryTypeWithSecondMessage, DescriptionRequest, DataHelperEdit, DataHelperEditOnEntity(true), OpenDataHelperGui, OpenDataHelperGuiOnEntity(true),
         TileEntityMessageOnEntity(true),
         BarrelDescription, BarrelItem, BarrelCount,
         BatteryLevel, LeydenjarLevel,
