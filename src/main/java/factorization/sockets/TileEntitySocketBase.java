@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -191,6 +192,9 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     
     @Override
     public final boolean rotate(ForgeDirection axis) {
+        if (getClass() != SocketEmpty.class) {
+            return false;
+        }
         if (axis == facing) {
             return false;
         }
@@ -391,11 +395,15 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     @Override
     public boolean activate(EntityPlayer player, ForgeDirection side) {
         ItemStack held = player.getHeldItem();
-        if (held == null) {
-            return false;
-        }
-        if (held.getItem() == Core.registry.logicMatrixProgrammer) {
+        if (held != null && held.getItem() == Core.registry.logicMatrixProgrammer) {
             if (!getFactoryType().hasGui) {
+                if (getClass() == SocketEmpty.class) {
+                    facing = FzUtil.shiftEnum(facing, ForgeDirection.VALID_DIRECTIONS, 1);
+                    if (worldObj.isRemote) {
+                        new Coord(this).redraw();
+                    }
+                    return true;
+                }
                 return false;
             }
             if (worldObj.isRemote) {
@@ -413,8 +421,8 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
                 e.printStackTrace();
             }
             return false;
-        } else {
-            if (worldObj.isRemote) return true;
+        } else if (held != null) {
+            boolean isValidItem = false;
             for (FactoryType ft : FactoryType.values()) {
                 TileEntityCommon tec = ft.getRepresentative();
                 if (tec == null) continue;
@@ -422,18 +430,25 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
                 TileEntitySocketBase rep = (TileEntitySocketBase) tec;
                 final ItemStack creator = rep.getCreatingItem();
                 if (creator != null && FzUtil.couldMerge(held, creator)) {
+                    isValidItem = true;
+                    if (worldObj.isRemote) {
+                        break;
+                    }
                     if (rep.getParentFactoryType() != getFactoryType()) {
                         rep.mentionPrereq(this);
                         return false;
                     }
                     TileEntityCommon upgrade = ft.makeTileEntity();
-                    if (upgrade != null) {
-                        replaceWith((TileEntitySocketBase) upgrade, this);
-                        if (!player.capabilities.isCreativeMode) held.stackSize--;
-                        Sound.socketInstall.playAt(this);
-                        return true;
-                    }
+                    if (upgrade == null) continue;
+                    
+                    replaceWith((TileEntitySocketBase) upgrade, this);
+                    if (!player.capabilities.isCreativeMode) held.stackSize--;
+                    Sound.socketInstall.playAt(this);
+                    return true;
                 }
+            }
+            if (isValidItem) {
+                return false;
             }
         }
         return false;
@@ -463,12 +478,12 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
             at.setTE(replacement);
             replacement.getBlockClass().enforce(at);
             at.markBlockForUpdate();
+            Core.network.broadcastPacket(null, at, replacement.getDescriptionPacket());
         } else if (socket instanceof ServoMotor) {
             ServoMotor motor = (ServoMotor) socket;
             motor.socket = replacement;
             motor.syncWithSpawnPacket();
         }
-        //Core.network.broadcastPacket(null, at, replacement.getDescriptionPacket());
     }
     
     public boolean activateOnServo(EntityPlayer player, ServoMotor motor) {
