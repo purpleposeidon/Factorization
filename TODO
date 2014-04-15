@@ -2,74 +2,6 @@ http://www.minecraftforum.net/topic/1351802-factorization/
 Factorization: Engineering, Architecture, and Commerce
 
 
-HAMMER
-------
-✓ Step 1 is "create a dimension"
-✓ Step 2 is "give the client an extra world for that dimension"
-  Step 3 is "create pseudoplayer, have packets sent to the pseudoplayer be sent to the real players, and render part of the dimension"
-✓     -    have packets go to all players near the DSE; single PacketProxyingPlayer per DSE
-✓     -    send chunks to players
-      -    Actually update the terrain when it changes
-      -    Actually consistently render the terrain when spawned
-      -    Actually releasing the display list when leaving the dimension
-✓ Step 4 is to make the DSE interact with the real world
-✓     -    DSE persistence
-✓     -    external entity collisions, using custom AABBs
-  Step 5 is to get player interactions working
-✓     -    placing blocks
-✓     -    activating blocks
-      -    GUIs
-      -    breaking blocks
-              - We'll just do everything ourselves; no trying to go through vanilla code
-
-              - Server-side: Client will send packets similar to Packet14BlockDig; we'll bamboozle ItemInWorldManager (Or replace it with our own, possibly temporarily. This might be better, as it'd be very simple to replace it when we're done.)
-              - Client-side: Can we set fields in places to make it do the digging animation?
-              - Do that IWorldAccess partial block breaking rendering on the client; make sure the player packet proxy gets the packets
-X Step 6 is to get rotations working (Maybe later)
-X     -    Get collisions working when rotated
-  Step 7 is rockets & shit.
-      -    Refactor DSE & its rendering for Oracles
-✓     -    Proper command system
-  Step 8 is watch mod interaction burst into flames.
-      -    Put in a whitelist for Blocks, Entities, and TileEntities. (Probably a Object.getClass() mapping)
-  Step 9 is "drop into the pending mods folder; run away giggling."
-
-The hard rendering bit:
-  On server:
-    the player is made frozen/immortal somehow
-    a puppet player is put in hammerspace
-    packets go through frozen player normally
-    puppet player wraps the packets
-  On client:
-    we leave our real player behind for the puppet player...
-    so we change Minecraft.thePlayer to... the puppet player entity that the server's created
-
-So, rewriting it. When the player gets embedded onto a DSE:
-  Create the puppet player, spawn it into hammerspace
-  Change the EntityPlayer that the socket is connected to to the puppet.
-  Make the real EntityPlayer immortal/ghostly somehow. In particular, skeles need to ignore it. But it still needs to receive all other packets.
-  It also needs to stay near the DSE when it moves
-  PacketProxyPlayer needs to (or should) stop sending packets to the puppet-mastering player
-  puppet player needs to wrap its packets
-  Tell the player that they're now controlling the puppet
-
-REARCHITECTING
---------------
-Kill Wrath (This will make the mod so much simpler...):
-  - Wrath lamp will require a ton of nebulae to craft
-  - Dark iron obtained in ore form from asteroids (or if that takes too long, from inverium-ing iron blocks)
-  - Actual wrath fire will be gone. So:
-      - No more wrath forges
-      - No more lighting things on fire
-      - No more terrible particle effects
-  - This will remove a use for diamond shards.
-
-
-KILL
-----
-BOH -- Nah, it could be done better I think.
-WRATH (But this adds rocketry. Ha. Definitely makes the mod smaller.)
-
 SERVOS
 ------
 regarding actuators:
@@ -93,36 +25,52 @@ Lower barriers to entry for servos:
   Make dark iron an ore found at bedrock level
   Have a stack that's a "reaction" stack. So when the 'status' stack gets updated (this would be typical of a socket command), this stack could be triggered.
 
+
 IMMEDIATE (for next public release)
 ---------
+barrels getting rotated by other players doesn't redraw?
+fzdocs:
+    servo instruction documentation
+    Building an index? Hrm. Using \topic.
+    ore dictionary needs better handling:
+        [DEALT WITH?] arrays of stuff need to be rendered nicely
+        [DEALT WITH?] strings need to be converted to OD arrays if possible
+servos draw too much power; a lacerator can run, but a servo can not!?  -- or lacerators draw too little ;)
 servos:
     servo upgrading doesn't get synced to other players! (? how not?) Test it...
     test writing instructions
+    colorizing servos
+    Consider adding 'stupid' servos; ignore non-simple instructions; has easy crafting recipe
+
+
 FZDocs! Yes!
     pretty up the doc's back button
     also have our history stack be List<Pair<Document, PageNumber>> instead of List<String>
+    make sure the docs have all the info that other doc sources do
+
 Pressurizer:
-    pressurizer doesn't drop buffered items! Weren't we supposed to have checked this!? >:|
+    blowentities doesn't sync properly when relogging?
     pressurizer doesn't seem to actually be working properly with flooding/draining? Test like our SSP world.
-    Have a decent way of giving them to newly logged in players...
-        We can't do it when they first login. Since there's already other books that show up.
-        So it should show up... like fall on their head during midday after they've been playing for at least 5 days, or something, and there aren't other players nearby, *AND*, of course, they don't have one in their inventory... and they haven't crafted one.
-        Could be:
-            They are outside
-            They've crafted a chest OR something with diamond OR something with redstone OR something with dark iron(?) OR something with gold... or they have, say, 8 achievements.
-            They haven't already crafted a book.
-            They haven't already got one in their inventory.
-            They haven't already gotten a book given to them this way.
-            They are not in any gamemode other than survival mode
-test:
-    infinite loops
-    writing instructions
+    we should split this up into a fan-thing & a corkscrew thing.
+
+Check bark recipe stuff? Does it get the 'Bark' name actually!? The reconversion recipe works?
+
+
+[Tue Apr 01 23:09:44 PDT 2014] oredictionary lists in fzdocs
+[Tue Apr 01 23:09:52 PDT 2014] We really do need to be able to click on the shuffling items...
+[Wed Apr 02 13:31:40 PDT 2014] screwpump should pump into other inventories...
+
+[Tue Apr 01 23:22:21 PDT 2014] port FZDS. :P
+
+
 [prooobably fixed. Yep. Definitely.] (It does now?) servos not syncing stacks to players holding LMPs like they should...
 more creative tabs?
-Check if dark iron retrogen works?
-compression crafter; items that don't get used up (liiike LMP's) stay in the world?
-    and also put in a temp recipe that uses wires; test that the CompACT doesn't destroy them
 we don't need to reload the keymapping anymore
+
+KILL
+----
+BOH
+WRATH
 
 
 FZDOCS
@@ -136,7 +84,11 @@ well, what are the new instructions?
 
 SOON
 ----
-sancho
+[Tue Apr 01 23:19:40 PDT 2014] colorizing servos
+items getting messed up w/ enchants; item rendering in general:
+    battery renders wonky w/ enchants in front
+    servo rail
+    (May just be 1.7.2; could be fixed in 1.7.5?)
 servos:
   2 consecutive turns doesn't show the 2nd turn nicely -- No, that's not the behavior. -- Yes it is?
   refactor tool
@@ -164,6 +116,7 @@ Add pressure generator:
     - Oh, also, it can get power from steam. (Well, any hot gas.)
 An upgraded bonemeal. Acts as bonemeal, & schedules a block tick even if the bonemeal'd thing isn't bonemealable. 2 bonemeal + 4 nether wart -> 2 Nether Bone Meal. "It's Super-Effective!"
 Check for calls we make to Tessellator.setBrightness. We may be able to replace them with a BlockRenderHelper helper function.
+barrels need to redraw when the resource pack changes
 
 BEFORE 0.9
 ----------
@@ -223,6 +176,7 @@ add an LMP instruction (recipe may be difficult!). Clicks the instruction with a
 FZ notify item kept? [might be fixed? Weirdness.]
 wires get messed up?
 pressure gen on servo holding bucket pumps out the servo's bucket?
+/f for music?
 
 
 NEVER/POSTPONED
@@ -271,6 +225,11 @@ richardG suggests doing world.blockExists to prevent orphaning chunks:
   new socket stufff....
   hopping barrels that are sideways
 glowing glazes
+compression crafter; items that don't get used up (liiike LMP's) stay in the world?
+    and also put in a temp recipe that uses wires; test that the CompACT doesn't destroy them
+Maybe lacerator recipes in the macerator?
+Coocoo clock? :D
+axle thing on the motor when it's by itself in a socket
 
 
 
@@ -288,6 +247,8 @@ Need more uses for diamond shards!
   Shard spear? :o  Something about dark crystals. 
 
 backup occasionally, eh?
+
+make a caving-friendly dark iron ore gen?
 
 
 SPACE
@@ -448,4 +409,31 @@ So, the things:
     Wheels?
     Nebula Balloons
     Propellers. Weeeelllll....
+
+
+Building Tools
+    Building tool: The snapshot
+        When you activate it, it starts recording each block you place.
+        If you revert to the snapshot, then it breaks each block you've placed and puts the drops into your inventory
+
+    The finglonger. Mmmm.
+    Something that lets you place multiple blocks stacked ontop of eachother
+        Auto-extender. Shift click on a side to set which side gets extended.
+        So, we're going to have a general concept of a 'pallete'. This might be a silky barrel? Or it could be an external chest...
+        The auto-extender can be stacked up to, saaaay, 24 items or so.
+        The stack size of the extender is how many times the block will be stacked up.
+        So, yes, shift-clicking the side of a block will specify which direction the blocks get extended.
+    Palettes.
+        (Maybe not the best name for this.)
+    Paying for this stuff:
+        Okay. We'll have two currencies:
+            Novelty/breadth: Each new bucket type gives at least 1 unit of this currency.
+                - Certain items can be graded different qualities... trivial/easy/medium/difficult/epic
+                - There'll be IMC to classify the epicness of various items
+                - The payoff can only happen once.
+            Repetition/consistency: 
+                - Items can be submitted multiple times.
+                - There'll be an "Attack/Sustain/Decay" model
+                    - Higher epiclevels give a longer sustain
+                    - Trivial & Easy levels have no attack ramp-up
 
