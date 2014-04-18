@@ -2,6 +2,9 @@ package factorization.charge;
 
 import java.util.List;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -126,4 +129,8 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     public boolean getShareTag() {
         return true;
     }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(IIconRegister par1IconRegister) { }
 }
