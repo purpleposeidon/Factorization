@@ -1,6 +1,6 @@
 A pulse limiter changes a steady on signal into an on-then-off signal.
 
-The first two designs are equivalent, and the repeaters must be set to at least 3.
+The first two designs are equivalent, and the repeaters must have, at minimum, a 3 tick delay.
 \figure{H4sIAAAAAAAAAO3cMQrCMBSA4RfUoS2o9+gBPIFT79BJBwc3749BMhTp0nQQ6ffBT97yIFPGtBG7SLeIODSR7ikPkYfXZ+giPSPOUTSTauxzx9ypch/4jWamJdqv3bTiLt4PAAAAAAAAAAAAAAAAAAA2rYv0mPwD0E+qMeQuJeB/9DMtcS07YzmHFXfxfgAAAAAAAAAAAAAAAAAAsG1vw3kSrC6AAAA=}
 \figure{H4sIAAAAAAAAAO3cMQrCQBBA0VkkgglE7+EBPIFV7mClhYWd98doxiZVXIs078Eyw8KHPcG2EZso14jY7qLcyrjEuDw/SxflEXGY7ibzuVSbzfeUH/u3Jtt9RRvZ9pUtAAAAAAAAAAAAAAAAAAAArK6Lcs9/AI55NZ9LnbO55BwqnjNke6po488WAAAAAAAAAAAAAAAAAAAA1vcCQcNmBy6AAAA=}
 \figure{H4sIAAAAAAAAAO3csQkCQRAF0BnUQA/UBkxMLcAKLMNMAwMz+7FVB10Dw3Ojg/fgs5+FD1vBriJmkZeImC8jr1klqjzeZYi8R2w/d78Za13ZtG3+sf9adGwBAAAAAAAAAAAAAAAAAABg0obIW/sH4NCya+dYp8qxsq+cO5707NgCAAAAAAAAAAAAAAAAAADAtL0AsWZ/Ay6AAAA=}

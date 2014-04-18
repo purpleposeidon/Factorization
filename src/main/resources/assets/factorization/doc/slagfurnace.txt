@@ -1,0 +1,10 @@
+\title{The Slag Furnace}
+
+The slag furnace is simply a furnace with two output slots.
+It uses twice as much fuel as a regular furnace,
+but, for most ores, outputs a little bit extra,
+and stone.
+
+\link{cgi/recipes/category/Slag Furnace}{Slag Furnace recipes}
+
+\topic{factorization.factoryBlock.SLAGFURNACE}

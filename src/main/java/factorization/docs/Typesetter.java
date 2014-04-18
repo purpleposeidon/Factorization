@@ -36,7 +36,7 @@ public class Typesetter {
     }
     
     void error(String msg) {
-        emit("" + EnumChatFormatting.RED + EnumChatFormatting.BOLD + msg, null);
+        process(msg, null, "" + EnumChatFormatting.RED + EnumChatFormatting.BOLD);
     }
 
     String getParameter(final String cmdName, final Tokenizer tokenizer) {
@@ -129,8 +129,8 @@ public class Typesetter {
                         error("No content");
                         continue;
                     }
+                    process(val, link, style + EnumChatFormatting.BOLD);
                     getCurrentPage().nl();
-                    process(val, link, style + EnumChatFormatting.UNDERLINE);
                 } else if (cmd.equals("\\link") || cmd.equals("\\index")) {
                     String newLink = getParameter(cmd, tokenizer);
                     if (newLink == null) {

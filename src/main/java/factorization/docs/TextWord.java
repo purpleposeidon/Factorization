@@ -25,9 +25,11 @@ public class TextWord extends Word {
     public int draw(DocViewer page, int x, int y) {
         String t = text;
         if (getLink() != null) {
-            t = "" + EnumChatFormatting.AQUA + EnumChatFormatting.UNDERLINE + text;
+            EnumChatFormatting col = DocViewer.dark_color_scheme ? EnumChatFormatting.AQUA : EnumChatFormatting.DARK_BLUE;
+            t = "" + col + EnumChatFormatting.UNDERLINE + text;
         }
-        page.getFont().drawString(t, x, y, 0xEEEEEE); // The return value of drawString isn't helpful.
+        int color = DocViewer.dark_color_scheme ? 0xEEEEEE : 0x111111;
+        page.getFont().drawString(t, x, y, color); // The return value of drawString isn't helpful.
         return page.getFont().getStringWidth(text);
     }
 }

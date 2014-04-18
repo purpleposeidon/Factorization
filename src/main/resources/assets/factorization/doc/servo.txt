@@ -5,9 +5,8 @@ Any tool that can be equipped on a socket
 can be equipped on a servo.
 
 Servos ride on \link{servorail}{servo rail}.
-A servo that is moving in a direction is facing that direction,
-and its top can point at any of the 4 directions that aren't
-parallel to its facing direction.
+They move along this rail in a particular direction,
+and its socket can point perpendicular to the direction of motion.
 
 Servos require \link{charge}{charge} to operate.
 

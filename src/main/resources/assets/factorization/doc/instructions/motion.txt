@@ -1,0 +1,26 @@
+\title{Movement Instructions}
+
+See \link{servomotion}{here} for a complete list of motion behavior.
+
+\u{\#{item.factorization:servo/component.fz.instruction.setdirection} Set Direction}
+tells the servo to move in a particular direction at the earliest possible opportunity.
+
+\u{\#{item.factorization:servo/component.fz.instruction.rotatetop} Point Top}
+makes the servo's socket point in that direction
+
+\u{\#{item.factorization:servo/component.fz.instruction.spin} Spin}
+Rotates the servo clockwise or counter-clockwise.
+
+\u{\#{item.factorization:servo/component.fz.instruction.setspeed} Set Speed}
+Sets the servo's speed.
+There are two slower speeds, the default speed, and two faster speeds.
+The faster a servo moves, the more energy it requires.
+
+\u{\#{item.factorization:servo/component.fz.instruction.trap} Trap}
+This stops the servo.
+When the rail recieves a redstone signal,
+the servo will continue moving.
+(Like all instructions,
+clicking on a servo with the instruction will cause it to be executed immediately.)
+
+

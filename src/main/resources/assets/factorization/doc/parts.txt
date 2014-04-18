@@ -1,33 +1,44 @@
-\title{Parts and Machines}
-
+\seg
+\h1{Parts and Machines}
 \index{stamper}{Stamper}
 \index{packager}{Packager}
 \index{mixer}{Mixer}
 \index{compact}{Compression Crafting}
 \index{parasieve}{Parasieve}
 \index{barrel}{Barrel}
+\endseg
 
-\newpage \h1{\b{\link{socket}{Socket Parts}}}
+\nl\nl
 
+\seg
+\h1{Sockets}
+\index{socket}{The Socket Block}
 \index{arm}{Robotic Arm}
 \index{lacerator}{Lacerator}
 \index{itemshifter}{Item Shifter}
 \index{pressurizer}{Pressurizer}
+\endseg
 
+\nl\nl
 
-\newpage \h1{\b{\link{servo}{Servos}}}
-
+\seg
+\h1{Servos}
+\index{servo}{The Servo}
 \index{servorail}{Servo Rail}
 \index{servomotion}{Motion}
 \index{servologic}{Computation}
 \index{servointeract}{Interaction}
+\index{instructions/motion}{Motion Instructions}
+\index{instructions/compute}{Computation Instructions}
+\endseg
 
+\nl\nl
 
-
-\newpage \h1{Vanilla Parts}
-
+\seg
+\h1{Vanilla Parts}
 \index{piston}{Piston}
 \index{repeater}{Repeater}
 \index{comparator}{Comparator}
 \index{hopper}{Hopper}
+\endseg
 

@@ -22,6 +22,7 @@ public class DocViewer extends GuiScreen {
     GuiButton nextPage;
     GuiButton prevPage;
     GuiButton backButton;
+    public static boolean dark_color_scheme = false;
     
     public static class HistoryPage {
         String docName;
@@ -154,27 +155,44 @@ public class DocViewer extends GuiScreen {
         nextPage.visible = doc.pages.indexOf(page) + 2 < doc.pages.size();
         
         {
-            int paddingVert = 8, paddingHoriz = 12;
+            for (int pass = 1; pass >= 0; pass--) {
+                int paddingVert = 8 + pass, paddingHoriz = 12 + pass;
+                
+                int x0 = getPageLeft(0) - paddingHoriz;
+                int x1 = getPageLeft(1) + getPageWidth(1) + paddingHoriz;
+                int y0 = getPageTop(0) - paddingVert;
+                int y1 = getPageHeight(0) + paddingVert;
+                
+                if (pass == 1) {
+                    GL11.glColor3f(0, 0, 0);
+                } else if (dark_color_scheme) {
+                    GL11.glColor3f(0.075F, 0.075F, 0.1125F);
+                } else {
+                    GL11.glColor3f(1 - 0.075F, 1 - 0.075F, 1 - 0.1125F);
+                }
+                GL11.glDisable(GL11.GL_TEXTURE_2D);
+                GL11.glBegin(GL11.GL_QUADS);
+                GL11.glVertex3f(x0, y0, 0);
+                GL11.glVertex3f(x0, y1, 0);
+                GL11.glVertex3f(x1, y1, 0);
+                GL11.glVertex3f(x1, y0, 0);
+                GL11.glEnd();
+            }
             
-            int x0 = getPageLeft(0) - paddingHoriz;
-            int x1 = getPageLeft(1) + getPageWidth(1) + paddingHoriz;
+            int paddingVert = 8, paddingHoriz = 12;
+            int x0 = getPageLeft(0) + getPageWidth(0) + paddingHoriz;
+            int x1 = getPageLeft(1) - paddingHoriz;
             int y0 = getPageTop(0) - paddingVert;
             int y1 = getPageHeight(0) + paddingVert;
             
-            GL11.glColor3f(0.075F, 0.075F, 0.1125F);
-            GL11.glDisable(GL11.GL_TEXTURE_2D);
-            GL11.glBegin(GL11.GL_QUADS);
-            GL11.glVertex3f(x0, y0, 0);
-            GL11.glVertex3f(x0, y1, 0);
-            GL11.glVertex3f(x1, y1, 0);
-            GL11.glVertex3f(x1, y0, 0);
-            GL11.glEnd();
-            
-            x0 = getPageLeft(0) + getPageWidth(0) + paddingHoriz;
-            x1 = getPageLeft(1) - paddingHoriz;
-            
-            float cs = 0.75F;
-            GL11.glColor3f(0.075F*cs, 0.075F*cs, 0.1125F*cs);
+            float cs;
+            if (dark_color_scheme) {
+                cs = 0.75F;
+                GL11.glColor3f(0.075F*cs, 0.075F*cs, 0.1125F*cs);
+            } else {
+                cs = 1.75F;
+                GL11.glColor3f(1 - (0.075F*cs), 1 - (0.075F*cs), 1 - (0.1125F*cs));
+            }
             GL11.glBegin(GL11.GL_QUADS);
             GL11.glVertex3f(x0, y0, 0);
             GL11.glVertex3f(x0, y1, 0);
@@ -226,6 +244,10 @@ public class DocViewer extends GuiScreen {
     protected void mouseClicked(int mouseX, int mouseY, int button) {
         if (hot) return;
         super.mouseClicked(mouseX, mouseY, button);
+        if (button == 1) {
+            actionPerformed(backButton);
+            return;
+        }
         
         for (int i = 0; i <= 1; i++) {
             AbstractPage thisPage = getPage(i);
@@ -255,6 +277,7 @@ public class DocViewer extends GuiScreen {
     
     @Override
     protected void actionPerformed(GuiButton button) {
+        if (!button.enabled) return;
         if (button == nextPage) {
             AbstractPage n = getPage(2);
             if (n != null) {
@@ -281,6 +304,8 @@ public class DocViewer extends GuiScreen {
             actionPerformed(prevPage);
         } else if (chr == 'r') {
             initGui();
+        } else if (chr == 's') {
+            dark_color_scheme ^= true;
         } else {
             super.keyTyped(chr, keySym);
         }
