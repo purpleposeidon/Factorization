@@ -257,7 +257,8 @@ public class Typesetter {
                     append(String.format("\\newpage \\generate{recipes/for/%s}", topic));
                     //topics.add(topic);
                 } else {
-                    error(cmd);
+                    error("Unknown command: ");
+                    emit(cmd, null);
                 }
                 break;
             }

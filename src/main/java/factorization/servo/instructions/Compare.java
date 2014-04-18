@@ -35,6 +35,7 @@ public class Compare extends Instruction {
         }
         
         boolean apply(Comparable a, Comparable b) {
+            @SuppressWarnings("unchecked")
             int cmp = (int) Math.signum(a.compareTo(b));
             switch (this) {
             default:

@@ -162,7 +162,7 @@ public class Executioner {
                 motor.putError("Can't write " + o + ", sorry!");
             }
             if (ss.getSize() == 0) {
-                entry_action = EntryAction.ENTRY_EXECUTE;
+                entry_action = EntryAction.ENTRY_IGNORE;
             }
             break;
         case ENTRY_IGNORE:
