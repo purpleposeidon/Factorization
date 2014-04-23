@@ -5,12 +5,14 @@ import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.base64.Base64;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,12 +21,15 @@ import java.util.zip.GZIPOutputStream;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.IResource;
+import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -35,11 +40,14 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import org.lwjgl.input.Mouse;
+
 import com.google.common.io.Closeables;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
@@ -281,10 +289,12 @@ public class DocumentationModule implements ICommand {
         return Core.getResource("doc/" + name + ".txt");
     }
     
+    public static IResourceManager overrideResourceManager = null;
+    
     public static InputStream getDocumentResource(String name) {
         try {
-            Minecraft mc = Minecraft.getMinecraft();
-            IResource src = mc.getResourceManager().getResource(getResourceForName(name));
+            IResourceManager irm = overrideResourceManager != null ? overrideResourceManager : Minecraft.getMinecraft().getResourceManager();
+            IResource src = irm.getResource(getResourceForName(name));
             return src.getInputStream();
         } catch (Throwable e) {
             //FIXME: Compiler disagrees with eclipse!
@@ -342,8 +352,53 @@ public class DocumentationModule implements ICommand {
         return "\\#{" + name + "} " + is.getDisplayName();
     }
     
+    @SideOnly(Side.CLIENT)
+    public static void openPageForHilightedItem() {
+        Minecraft mc = Minecraft.getMinecraft();
+        if (!(mc.currentScreen instanceof GuiContainer)) return;
+        GuiContainer screen = (GuiContainer) mc.currentScreen;
+        EntityPlayer player = mc.thePlayer;
+        if (!player.capabilities.isCreativeMode) {
+            ItemStack is = player.getHeldItem();
+            if (is == null) return;
+            if (is.getItem() != Core.registry.docbook) return;
+        }
+        //Copied from GuiScreen.handleMouseInput
+        int mouseX = Mouse.getEventX() * screen.width / mc.displayWidth;
+        int mouseY = screen.height - Mouse.getEventY() * screen.height / mc.displayHeight - 1;
+        Slot slot = screen.getSlotAtPosition(mouseX, mouseY);
+        if (slot == null) return;
+        ItemStack is = slot.getStack();
+        if (is == null) return;
+        String name = is.getUnlocalizedName();
+        InputStream topic_index = getDocumentResource("topic_index");
+        if (topic_index == null) return;
+        BufferedReader br = new BufferedReader(new InputStreamReader(topic_index));
+        try {
+            while (true) {
+                String line = br.readLine();
+                if (line == null) {
+                    break;
+                }
+                String[] bits = line.split("\t");
+                if (bits.length >= 2) {
+                    if (bits[0].equalsIgnoreCase(name)) {
+                        String filename = bits[1];
+                        mc.displayGuiScreen(new DocViewer(filename));
+                        break;
+                    }
+                }
+            }
+            topic_index.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
     static {
-        registerGenerator("items", new ItemListViewer());
-        registerGenerator("recipes", new RecipeViewer());
+        if (!IndexDocumentation.isRunning) {
+            registerGenerator("items", new ItemListViewer());
+            registerGenerator("recipes", new RecipeViewer());
+        }
     }
 }

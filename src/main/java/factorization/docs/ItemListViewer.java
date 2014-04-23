@@ -15,7 +15,7 @@ import factorization.shared.Core;
 
 public class ItemListViewer implements IDocGenerator {
     @Override
-    public void process(Typesetter sb, String arg) {
+    public void process(AbstractTypesetter sb, String arg) {
         if (arg.equalsIgnoreCase("all")) {
             listAll(sb, null);
             return;
@@ -34,7 +34,7 @@ public class ItemListViewer implements IDocGenerator {
         }
     }
     
-    void listTabs(Typesetter sb) {
+    void listTabs(AbstractTypesetter sb) {
         String ret = "";
         ret += "\\title{Item Categories}\n\n";
         ret += "\n\n\\link{cgi/items/all}{All Items}";
@@ -48,7 +48,7 @@ public class ItemListViewer implements IDocGenerator {
         sb.process(ret, null, "");
     }
     
-    void listAll(Typesetter sb, CreativeTabs ct) {
+    void listAll(AbstractTypesetter sb, CreativeTabs ct) {
         if (ct == null) {
             sb.append("\\title{All Items}");
         } else {

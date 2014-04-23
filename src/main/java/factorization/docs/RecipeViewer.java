@@ -50,7 +50,7 @@ public class RecipeViewer implements IDocGenerator {
      * 		Lists recipes whose output is the itemName
      */
     @Override
-    public void process(Typesetter out, String arg) {
+    public void process(AbstractTypesetter out, String arg) {
         if (recipeCategories == null) {
             recipeCategories = new HashMap();
             Core.logInfo("Loading recipe list");
@@ -98,7 +98,7 @@ public class RecipeViewer implements IDocGenerator {
         }
     }
     
-    void writeRecipes(Typesetter out, ItemStack matching, boolean mustBeResult, String categoryName, ArrayList<ArrayList> recipes) {
+    void writeRecipes(AbstractTypesetter out, ItemStack matching, boolean mustBeResult, String categoryName, ArrayList<ArrayList> recipes) {
         if (matching == null) {
             for (ArrayList recipe : recipes) {
                 writeRecipe(out, recipe);
@@ -135,7 +135,7 @@ public class RecipeViewer implements IDocGenerator {
         return false;
     }
     
-    void writeRecipe(Typesetter out, ArrayList parts) {
+    void writeRecipe(AbstractTypesetter out, ArrayList parts) {
         for (Object part : parts) {
             if (part instanceof String) {
                 out.append((String) part);
