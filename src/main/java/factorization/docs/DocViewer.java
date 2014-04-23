@@ -8,6 +8,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.item.ItemStack;
 
 import org.lwjgl.input.Keyboard;
@@ -22,6 +23,8 @@ public class DocViewer extends GuiScreen {
     GuiButton nextPage;
     GuiButton prevPage;
     GuiButton backButton;
+    GuiButton homeButton;
+    
     public static boolean dark_color_scheme = false;
     
     public static class HistoryPage {
@@ -116,12 +119,14 @@ public class DocViewer extends GuiScreen {
         
         buttonList.add(prevPage = new GuiButtonNextPage(2, getPageLeft(0) - 12, row - arrow_half, false));
         buttonList.add(nextPage = new GuiButtonNextPage(1, getPageLeft(1) + getPageWidth(1) - 23 /* 23 is the button width */ + 12, row - arrow_half, true));
-        buttonList.add(backButton = new GuiButton(3, (120 + 38)/2, row, 50, 20, "←"));
+        buttonList.add(backButton = new GuiButton(3, (120 + 38)/2, row, 50, 20, "Back"));
+        buttonList.add(homeButton = new GuiButton(4, (120 + 38), row, 50, 20, "Home"));
         current_page = doc.name;
     }
     
     Document getDocument(String name) {
-        Typesetter ts = new Typesetter(mc.fontRenderer, getPageWidth(0), getPageHeight(0), DocumentationModule.readDocument(name));
+        AbstractTypesetter ts = new ClientTypesetter(mc.fontRenderer, getPageWidth(0), getPageHeight(0));
+        ts.processText(DocumentationModule.readDocument(name));
         return new Document(name, ts.getPages());
     }
     
@@ -151,6 +156,7 @@ public class DocViewer extends GuiScreen {
         drawDefaultBackground();
         
         backButton.visible = !the_pageHistory.isEmpty();
+        homeButton.visible = !name.equals("index");
         prevPage.visible = doc.pages.indexOf(page) > 0;
         nextPage.visible = doc.pages.indexOf(page) + 2 < doc.pages.size();
         
@@ -291,6 +297,11 @@ public class DocViewer extends GuiScreen {
         } else if (button == backButton) {
             DocViewer newDoc = new DocViewer(popLastPage());
             mc.displayGuiScreen(newDoc);
+        } else if (button == homeButton) {
+            if (!name.equals("index")) {
+                addNewHistoryEntry(name, getCurrentPageIndex());
+                mc.displayGuiScreen(new DocViewer("index"));
+            }
         }
     }
     
@@ -302,10 +313,14 @@ public class DocViewer extends GuiScreen {
             actionPerformed(nextPage);
         } else if (keySym == Keyboard.KEY_PRIOR) {
             actionPerformed(prevPage);
+        } else if (keySym == Keyboard.KEY_HOME) {
+            actionPerformed(homeButton);
         } else if (chr == 'r') {
             initGui();
         } else if (chr == 's') {
             dark_color_scheme ^= true;
+        } else if (keySym == mc.gameSettings.keyBindInventory.getKeyCode()) {
+            mc.displayGuiScreen(new GuiInventory(mc.thePlayer));
         } else {
             super.keyTyped(chr, keySym);
         }
