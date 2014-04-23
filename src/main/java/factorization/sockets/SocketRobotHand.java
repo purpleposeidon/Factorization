@@ -145,7 +145,6 @@ public class SocketRobotHand extends TileEntitySocketBase {
             inv.set(i, is);
             player.inventory.mainInventory[0] = null;
         }
-        //NORElEASE: Pull that up
         Coord here = null;
         for (int j = 0; j < player.inventory.getSizeInventory(); j++) {
             ItemStack toPush = player.inventory.getStackInSlot(j);
