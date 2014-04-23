@@ -54,10 +54,6 @@ public class LagssieWatchDog implements Runnable {
                 } else {
                     log("");
                 }
-                //NORELEASE: We're a daemon thread, so this shouldn't be needed. Test!
-                //if (!Minecraft.getMinecraft().running) {
-                //	return;
-                //}
                 for (StackTraceElement ste : watch_thread.getStackTrace()) {
                     log("   " + ste.toString());
                 }
