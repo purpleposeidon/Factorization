@@ -4,6 +4,7 @@ import java.util.Random;
 
 import net.minecraft.client.Minecraft;
 import factorization.common.FzConfig;
+import factorization.shared.Core;
 
 public class LagssieWatchDog implements Runnable {
     static int ticks = 0;
@@ -68,7 +69,7 @@ public class LagssieWatchDog implements Runnable {
     }
 
     void log(String msg) {
-        System.out.println("[LAG] " + msg); //NORELEASE: This used to be cool
+        Core.logInfo("[LAG] " + msg);
     }
     
     
