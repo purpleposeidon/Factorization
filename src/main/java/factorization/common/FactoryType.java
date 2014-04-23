@@ -70,7 +70,7 @@ public enum FactoryType {
     DAYBARREL(30, false, TileEntityDayBarrel.class, "factory_barrel2"),
     CALIOMETRIC_BURNER(31, false, TileEntityCaliometricBurner.class, "factory_calory"),
     SOCKET_EMPTY(32, false, SocketEmpty.class, "fzsock_empty"),
-    SOCKET_LACERATOR(33, false, SocketLacerator.class, "fzsock_lacerate"), //NORELEASE: Needs to load the old Grinder TE name
+    SOCKET_LACERATOR(33, false, SocketLacerator.class, "fzsock_lacerate"),
     SOCKET_ROBOTHAND(34, false, SocketRobotHand.class, "fzsock_hand"),
     SOCKET_SHIFTER(35, true, SocketShifter.class, "fzsock_shift"),
     // 36 -- Was the short-lived SOCKET_FANTURPELLER; which is now abstract
