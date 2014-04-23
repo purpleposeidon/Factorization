@@ -82,6 +82,14 @@ public class SocketRobotHand extends TileEntitySocketBase {
     
     @Override
     public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
+        boolean ret = doHandleRay(socket, mop, mopIsThis, powered);
+        if (!ret) {
+            return !worldObj.isAirBlock(mop.blockX, mop.blockY, mop.blockZ);
+        }
+        return ret;
+    }
+    
+    private boolean doHandleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
         if (fakePlayer == null) {
             fakePlayer = getFakePlayer();
         }
@@ -137,6 +145,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
             inv.set(i, is);
             player.inventory.mainInventory[0] = null;
         }
+        //NORElEASE: Pull that up
         Coord here = null;
         for (int j = 0; j < player.inventory.getSizeInventory(); j++) {
             ItemStack toPush = player.inventory.getStackInSlot(j);
