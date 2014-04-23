@@ -205,7 +205,6 @@ public class MiscellaneousNonsense {
         }
         
         //Make rocket item
-        //NORELEASE: Check the fireworks!
         ItemStack red_is = new ItemStack(Items.fireworks);
         NBTTagCompound tag = new NBTTagCompound(); //("Fireworks")
         tag.setByte("Flight", (byte) 3);
