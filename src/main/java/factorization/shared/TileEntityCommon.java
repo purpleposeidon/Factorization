@@ -144,7 +144,6 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
             suffix[i + 3] = args[i];
         }
         FMLProxyPacket p = Core.network.TEmessagePacket(getCoord(), MessageType.FactoryTypeWithSecondMessage, suffix);
-        //p.isChunkDataPacket = true; NORELEASE: Is this needed? I'm thinking it isn't.
         return p;
     }
 
