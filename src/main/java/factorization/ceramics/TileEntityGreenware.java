@@ -99,7 +99,10 @@ public class TileEntityGreenware extends TileEntityCommon {
             tag.setByte("hy", maxY);
             tag.setByte("hz", maxZ);
             //tag.setShort("icon_id", (short) FzUtil.getId(icon_id));
-            tag.setString("icon_idC", FzUtil.getName(icon_id));
+            String iname = FzUtil.getName(icon_id);
+            if (iname != null) {
+                tag.setString("icon_idC", iname);
+            }
             tag.setByte("icon_md", icon_md);
             tag.setByte("icon_sd", icon_side);
             quat.writeToTag(tag, "r");
