@@ -12,9 +12,9 @@ import net.minecraft.world.World;
 import factorization.common.FactoryType;
 import factorization.common.ItemIcons;
 import factorization.shared.Core;
+import factorization.shared.Core.TabType;
 import factorization.shared.FactorizationTextureLoader;
 import factorization.shared.ItemFactorization;
-import factorization.shared.Core.TabType;
 
 public class ItemPocketTable extends ItemFactorization {
     
@@ -97,20 +97,13 @@ public class ItemPocketTable extends ItemFactorization {
         return true;
     }
     
-    public static int NEI_status = -1;
-    
     @Override
     public void addExtraInformation(ItemStack is, EntityPlayer player, List infoList, boolean verbose) {
         if (player.worldObj.isRemote) {
-            ClassLoader loader = getClass().getClassLoader();
             String key = Core.proxy.getPocketCraftingTableKey();
             if (key != null && key != "") {
                 final String prefix = "item.factorization:tool/pocket_crafting_table.";
-                if (NEI_status != -1) {
-                    infoList.add(StatCollector.translateToLocalFormatted(prefix + "yesNEI", key)); //NORELEASE: :D (tho we'll need to test our coremod w/ NEI...)
-                } else {
-                    infoList.add(StatCollector.translateToLocalFormatted(prefix + "noNEI", key));
-                }
+                infoList.add(StatCollector.translateToLocalFormatted(prefix + "yesNEI", key));
             }
         }
     }
