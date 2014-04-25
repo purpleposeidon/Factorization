@@ -1,14 +1,11 @@
 package factorization.coremod;
 
-import factorization.api.Coord;
-import factorization.common.FactorizationKeyHandler;
-import factorization.common.FzConfig;
-import factorization.shared.Core;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import factorization.api.Coord;
+import factorization.shared.Core;
 
 public class HookTargetsServer {
     public static void diamondExploded(Object dis, World world, int x, int y, int z) {
