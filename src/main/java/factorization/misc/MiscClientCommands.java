@@ -565,13 +565,13 @@ public class MiscClientCommands implements ICommand {
                 }
             }
             if (found_number) {
-                if (i < 1) {
+                if (i < 1) { // 0 crashes
                     i = 1;
                 }
-                if (i > 16) {
-                    i = 16; //seems to have started crashing. Lame.
+                if (i > 16) { // and 17 crashes as well
+                    i = 16;
                 }
-                mc.gameSettings.renderDistanceChunks = i; //NORELEASE: Test new ranges
+                mc.gameSettings.renderDistanceChunks = i;
                 return;
             }
             if (n.equalsIgnoreCase("bug")) {
