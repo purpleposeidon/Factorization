@@ -103,13 +103,6 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
             result.stackSize = is.stackSize;
             result.setTagCompound(is.getTagCompound());
         }
-        // TODO FIXME: Dear gods, no. No. Oh god no.
-        for (int i = 0; i < craftMatrix.getSizeInventory(); i++) {
-            ItemStack wire = craftMatrix.getStackInSlot(i);
-            if (wire != null && wire.isItemEqual(Core.registry.leadwire_item) /* no NBT okay */) {
-                wire.stackSize++;
-            }
-        }
     }
 
     @Override
