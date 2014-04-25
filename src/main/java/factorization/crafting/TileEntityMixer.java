@@ -412,7 +412,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
         /*if (is.getItemDamage() > 0xFF) {
             return false;
         }*/ //??? What was this for?
-        if (item.hasContainerItem()) {
+        if (item.hasContainerItem(is)) {
             //We're going to filter out items like:
             //  Logic matrix programmers
             //  Diamond drawplates

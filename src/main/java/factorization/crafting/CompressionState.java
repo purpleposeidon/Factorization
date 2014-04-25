@@ -7,9 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
@@ -114,7 +112,6 @@ public class CompressionState {
             return false;
         }
         
-        boolean found_inv = false;
         FzInv[] inv = cc.getAdjacentInventories();
         if (inv[0] == null) {
             error(cc, "Need output inventory\n(Like a chest)");
@@ -488,8 +485,7 @@ public class CompressionState {
                 }
                 any = true;
                 Item it = is.getItem();
-                if (is.getMaxStackSize() == 1 && it.hasContainerItem() && it.getMaxDamage() > 1) {
-                    ItemStack testSubject = is.copy();
+                if (is.getMaxStackSize() == 1 && it.hasContainerItem(is) && it.getMaxDamage() > 1) {
                     int useCount = 0;
                     int origDamage = is.getItemDamage();
                     while (useCount < maxCraft) {
