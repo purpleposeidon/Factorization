@@ -43,7 +43,7 @@ public class BlockRenderSteamTurbine extends FactorizationBlockRender {
             float f = 1F - (3F/16F);
             
             IIcon side = BlockIcons.turbine_side;
-            //NORELEASE: this is ass; de-ass
+            //FIXME: This sucks.
             Tessellator.instance.addTranslation(0, 0, f);
             rb.renderFaceZNeg(b, x, y, z, side);
             Tessellator.instance.addTranslation(0, 0, -2*f);

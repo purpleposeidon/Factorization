@@ -360,7 +360,7 @@ public class FzUtil {
             callInvChanged = b;
         }
         
-        public void onInvChanged() { //NORELEASE: Rename?
+        public void onInvChanged() {
             if (callInvChanged) {
                 under.markDirty();
             }

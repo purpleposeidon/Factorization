@@ -1082,14 +1082,14 @@ public class Registry {
 
     @SubscribeEvent
     public boolean onItemPickup(EntityItemPickupEvent event) {
-        //NORELEASE: Extractify?
+        //TODO: Extractify?
         Core.proxy.pokePocketCrafting();
         return true;
     }
 
     @SubscribeEvent
     public void onCrafting(PlayerEvent.ItemCraftedEvent event) {
-        //NORELEASE: Extractify
+        //TODO: Extractify
         EntityPlayer player = event.player;
         ItemStack stack = event.crafting;
         IInventory craftMatrix = event.craftMatrix;
