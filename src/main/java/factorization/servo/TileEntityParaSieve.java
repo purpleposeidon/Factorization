@@ -520,8 +520,6 @@ public class TileEntityParaSieve extends TileEntityFactorization implements ISid
     
     @Override
     public void onNeighborTileChanged(int tilex, int tiley, int tilez) {
-        //NORELEASE [maybe]: seems like sometimes the comparator doesn't update?
-        //Does it happen if the comparator isn't pointing in-line or something?
         ForgeDirection facing = getFacing();
         boolean isOurs = xCoord + facing.offsetX == tilex &&  yCoord + facing.offsetY == tiley &&  zCoord + facing.offsetZ == tilez;
         if (!isOurs) {
