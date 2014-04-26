@@ -172,7 +172,7 @@ public class Registry {
         class NotchBlock extends Block { public NotchBlock(Material honestly) { super(honestly); } }
         fractured_bedrock_block = new NotchBlock(Material.rock).setBlockUnbreakable().setResistance(6000000).setBlockName("bedrock").setBlockTextureName("bedrock").setCreativeTab(Core.tabFactorization);
         
-        GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FzBlock"); //NORELEASE: Revert these to their previous mappings.
+        GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FzBlock");
         GameRegistry.registerBlock(lightair_block, "Lightair");
         GameRegistry.registerBlock(resource_block, ItemBlockResource.class, "ResourceBlock");
         GameRegistry.registerBlock(dark_iron_ore, "DarkIronOre");
@@ -476,14 +476,13 @@ public class Registry {
         VillagerRegistry.instance().registerVillageTradeHandler(librarianVillager, new IVillageTradeHandler() {
             @Override
             public void manipulateTradesForVillager(EntityVillager villager, MerchantRecipeList recipeList, Random random) {
-                int min = 2, max = 3;
+                int min = 2, max = 4;
                 Item item = Core.registry.logicMatrixProgrammer;
                 float chance = 1;
                 
                 if (min > 0 && max > 0) {
                     EntityVillager.blacksmithSellingList.put(item, new Tuple(min, max));
                 }
-                //NORELEASE, test 1.6: EntityVillager.addBlacksmithItem(recipeList, item, random, chance);
                 EntityVillager.func_146089_b(recipeList, item, random, chance);
             }
         });
