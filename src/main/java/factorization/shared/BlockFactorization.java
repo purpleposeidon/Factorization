@@ -34,6 +34,7 @@ import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.common.Registry;
 import factorization.notify.Notify;
+import factorization.oreprocessing.TileEntitySlagFurnace;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.weird.TileEntityDayBarrel;
 
@@ -509,9 +510,13 @@ public class BlockFactorization extends BlockContainer {
     }
 
     @Override
-    //ser-ver ser-ver
+    @SideOnly(Side.CLIENT)
     public void randomDisplayTick(World w, int x, int y, int z, Random rand) {
-        Core.proxy.randomDisplayTickFor(w, x, y, z, rand);
+        TileEntity te = w.getTileEntity(x, y, z);
+        if (te instanceof TileEntityCommon) {
+            TileEntityCommon tec = (TileEntityCommon) te;
+            tec.spawnDisplayTickParticles(rand);
+        }
     }
 
     

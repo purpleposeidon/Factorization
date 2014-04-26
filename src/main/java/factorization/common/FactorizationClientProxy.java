@@ -155,52 +155,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
     int fireParticlesMax = 5;
 
     @Override
-    public void randomDisplayTickFor(World w, int x, int y, int z, Random rand) { //NORELEASE: This isn't necessary
-        Coord here = new Coord(w, x, y, z);
-        Block id = w.getBlock(x, y, z);
-        int md = w.getBlockMetadata(x, y, z);
-        if (id == Core.registry.factory_block) {
-            TileEntity te = w.getTileEntity(x, y, z);
-            if (!(te instanceof IFactoryType)) {
-                return;
-            }
-
-            FactoryType ft = ((IFactoryType) te).getFactoryType();
-
-            if (ft == FactoryType.SLAGFURNACE) {
-                TileEntitySlagFurnace slag = (TileEntitySlagFurnace) te;
-                if (slag.draw_active <= 0) {
-                    return;
-                }
-//				if (!slag.isBurning()) {
-//					return;
-//				}
-                int var6 = slag.facing_direction;
-                float var7 = (float) x + 0.5F;
-                float var8 = (float) y + 0.0F + rand.nextFloat() * 6.0F / 16.0F;
-                float var9 = (float) z + 0.5F;
-                float var10 = 0.52F;
-                float var11 = rand.nextFloat() * 0.6F - 0.3F;
-
-                if (var6 == 4) {
-                    w.spawnParticle("smoke", (double) (var7 - var10), (double) var8, (double) (var9 + var11), 0.0D, 0.0D, 0.0D);
-                    w.spawnParticle("flame", (double) (var7 - var10), (double) var8, (double) (var9 + var11), 0.0D, 0.0D, 0.0D);
-                } else if (var6 == 5) {
-                    w.spawnParticle("smoke", (double) (var7 + var10), (double) var8, (double) (var9 + var11), 0.0D, 0.0D, 0.0D);
-                    w.spawnParticle("flame", (double) (var7 + var10), (double) var8, (double) (var9 + var11), 0.0D, 0.0D, 0.0D);
-                } else if (var6 == 2) {
-                    w.spawnParticle("smoke", (double) (var7 + var11), (double) var8, (double) (var9 - var10), 0.0D, 0.0D, 0.0D);
-                    w.spawnParticle("flame", (double) (var7 + var11), (double) var8, (double) (var9 - var10), 0.0D, 0.0D, 0.0D);
-                } else if (var6 == 3) {
-                    w.spawnParticle("smoke", (double) (var7 + var11), (double) var8, (double) (var9 + var10), 0.0D, 0.0D, 0.0D);
-                    w.spawnParticle("flame", (double) (var7 + var11), (double) var8, (double) (var9 + var10), 0.0D, 0.0D, 0.0D);
-                }
-
-            }
-        }
-    }
-
-    @Override
     public void playSoundFX(String src, float volume, float pitch) {
         ISound sound = new PositionedSoundRecord(new ResourceLocation(src), volume, pitch, 0, 0, 0);
         Minecraft.getMinecraft().getSoundHandler().playSound(sound);

@@ -63,9 +63,6 @@ public class FactorizationProxy implements IGuiHandler {
     public void pokePocketCrafting() {
     }
 
-    public void randomDisplayTickFor(World w, int x, int y, int z, Random rand) {
-    }
-
     public void playSoundFX(String src, float volume, float pitch) {
     }
 

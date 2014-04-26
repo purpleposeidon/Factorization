@@ -305,4 +305,6 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     }
 
     public void mappingsChanged(FMLModIdMappingEvent event) { }
+    
+    public void spawnDisplayTickParticles(Random rand) { }
 }

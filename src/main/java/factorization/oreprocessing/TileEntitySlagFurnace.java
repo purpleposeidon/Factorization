@@ -3,6 +3,7 @@ package factorization.oreprocessing;
 import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.IIcon;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
@@ -337,5 +339,33 @@ public class TileEntitySlagFurnace extends TileEntityFactorization {
             return true;
         }
         return false;
+    }
+    
+    @Override
+    public void spawnDisplayTickParticles(Random rand) {
+        if (draw_active <= 0) {
+            return;
+        }
+        int var6 = facing_direction;
+        World w = worldObj;
+        float var7 = (float) xCoord + 0.5F;
+        float var8 = (float) yCoord + 0.0F + rand.nextFloat() * 6.0F / 16.0F;
+        float var9 = (float) zCoord + 0.5F;
+        float var10 = 0.52F;
+        float var11 = rand.nextFloat() * 0.6F - 0.3F;
+        
+        if (var6 == 4) {
+            w.spawnParticle("smoke", (double) (var7 - var10), (double) var8, (double) (var9 + var11), 0.0D, 0.0D, 0.0D);
+            w.spawnParticle("flame", (double) (var7 - var10), (double) var8, (double) (var9 + var11), 0.0D, 0.0D, 0.0D);
+        } else if (var6 == 5) {
+            w.spawnParticle("smoke", (double) (var7 + var10), (double) var8, (double) (var9 + var11), 0.0D, 0.0D, 0.0D);
+            w.spawnParticle("flame", (double) (var7 + var10), (double) var8, (double) (var9 + var11), 0.0D, 0.0D, 0.0D);
+        } else if (var6 == 2) {
+            w.spawnParticle("smoke", (double) (var7 + var11), (double) var8, (double) (var9 - var10), 0.0D, 0.0D, 0.0D);
+            w.spawnParticle("flame", (double) (var7 + var11), (double) var8, (double) (var9 - var10), 0.0D, 0.0D, 0.0D);
+        } else if (var6 == 3) {
+            w.spawnParticle("smoke", (double) (var7 + var11), (double) var8, (double) (var9 + var10), 0.0D, 0.0D, 0.0D);
+            w.spawnParticle("flame", (double) (var7 + var11), (double) var8, (double) (var9 + var10), 0.0D, 0.0D, 0.0D);
+        }
     }
 }
