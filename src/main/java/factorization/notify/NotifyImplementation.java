@@ -29,10 +29,11 @@ import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 
-@Mod(modid = NotifyImplementation.modId, name = NotifyImplementation.name, version = "1.0")
+@Mod(modid = NotifyImplementation.modId, name = NotifyImplementation.name, version = NotifyImplementation.version)
 public class NotifyImplementation extends Notify {
     public static final String modId = "factorization.notify";
     public static final String name = "Factorization Notification System";
+    public static final String version = "1.0";
     
     @SidedProxy(clientSide = "factorization.notify.RenderMessages", serverSide = "factorization.notify.RenderMessagesProxy")
     public static RenderMessagesProxy proxy;
