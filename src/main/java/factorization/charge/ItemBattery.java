@@ -96,7 +96,6 @@ public class ItemBattery extends ItemBlockProxy implements IActOnCraft {
     @Override
     public void onCraft(ItemStack is, IInventory craftMatrix, int craftSlot, ItemStack result, EntityPlayer player) {
         normalizeDamage(is);
-        //NORELEASE: test this stuff; might be lame
         if (result.getItem() == Core.registry.battery) {
             is.stackSize--;
             result.func_150996_a(result.getItem());
