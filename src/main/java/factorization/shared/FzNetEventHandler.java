@@ -45,9 +45,6 @@ public class FzNetEventHandler {
                 case factorizeCmdChannel:
                     Core.network.handleCmd(input, player);
                     break;
-                case factorizeNtfyChannel:
-                    Core.network.handleNtfy(input, player);
-                    break;
                 default:
                     Core.network.handleTE(input, mt, player);
                     break;

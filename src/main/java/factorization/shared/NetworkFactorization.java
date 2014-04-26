@@ -101,59 +101,6 @@ public class NetworkFactorization {
         }
     }
     
-    public FMLProxyPacket notifyPacket(Object where, ItemStack item, String format, String ...args) {
-        // NORELEASE: Belongs in the notify implementation!
-        try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            DataOutputStream output = new DataOutputStream(outputStream);
-            MessageType.factorizeNtfyChannel.write(output);
-            
-            if (where instanceof Vec3) {
-                output.writeByte(NotifyMessageType.VEC3);
-                Vec3 v = (Vec3) where;
-                output.writeDouble(v.xCoord);
-                output.writeDouble(v.yCoord);
-                output.writeDouble(v.zCoord);
-            } else if (where instanceof Coord) {
-                output.writeByte(NotifyMessageType.COORD);
-                Coord c = (Coord) where;
-                output.writeInt(c.x);
-                output.writeInt(c.y);
-                output.writeInt(c.z);
-            } else if (where instanceof Entity) {
-                output.writeByte(NotifyMessageType.ENTITY);
-                Entity ent = (Entity) where;
-                output.writeInt(ent.getEntityId());
-            } else if (where instanceof TileEntity) {
-                output.writeByte(NotifyMessageType.TILEENTITY);
-                TileEntity te = (TileEntity) where;
-                output.writeInt(te.xCoord);
-                output.writeInt(te.yCoord);
-                output.writeInt(te.zCoord);
-            } else {
-                return null;
-            }
-            
-            if (item == null) {
-                item = EMPTY_ITEMSTACK;
-            }
-            NBTTagCompound tag = new NBTTagCompound();
-            item.writeToNBT(tag);
-            CompressedStreamTools.write(tag, output);
-            
-            output.writeUTF(format);
-            output.writeInt(args.length);
-            for (String a : args) {
-                output.writeUTF(a);
-            }
-            output.flush();
-            return FzNetDispatch.generate(outputStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    
     public void prefixEntityPacket(DataOutputStream output, Entity to, MessageType messageType) throws IOException {
         messageType.write(output);
         output.writeInt(to.getEntityId());
@@ -331,64 +278,6 @@ public class NetworkFactorization {
         byte arg = data.readByte();
         Command.fromNetwork(player, s, arg);
     }
-
-    void handleNtfy(DataInput input, EntityPlayer me) {
-        //NORELEASE: Move out to Notify
-        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            if (!me.worldObj.isRemote) {
-                return;
-            }
-            try {
-                Object target = null;
-                int x, y, z;
-                switch (input.readByte()) {
-                case NotifyMessageType.COORD:
-                    x = input.readInt();
-                    y = input.readInt();
-                    z = input.readInt();
-                    target = new Coord(me.worldObj, x, y, z);
-                    break;
-                case NotifyMessageType.ENTITY:
-                    int id = input.readInt();
-                    if (id == me.getEntityId()) {
-                        target = me; //bebna
-                    } else {
-                        target = me.worldObj.getEntityByID(id);
-                    }
-                    break;
-                case NotifyMessageType.TILEENTITY:
-                    x = input.readInt();
-                    y = input.readInt();
-                    z = input.readInt();
-                    target = me.worldObj.getTileEntity(x, y, z);
-                    break;
-                case NotifyMessageType.VEC3:
-                    target = Vec3.createVectorHelper(input.readDouble(), input.readDouble(), input.readDouble());
-                    break;
-                default: return;
-                }
-                if (target == null) {
-                    return;
-                }
-                
-                NBTTagCompound tag = CompressedStreamTools.read(input); //NORELEASE: Compress?
-                ItemStack item = ItemStack.loadItemStackFromNBT(tag);
-                if (item != null && EMPTY_ITEMSTACK.isItemEqual(item)) {
-                    item = null;
-                }
-                
-                String msg = input.readUTF();
-                int argCount = input.readInt();
-                String args[] = new String[argCount];
-                for (int i = 0; i < argCount; i++) {
-                    args[i] = input.readUTF();
-                }
-                NotifyImplementation.recieve(me, target, item, msg, args);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
     
     void handleEntity(MessageType messageType, DataInput input, EntityPlayer player) {
         try {
@@ -434,7 +323,6 @@ public class NetworkFactorization {
     private static byte message_type_count = 0;
     static public enum MessageType {
         factorizeCmdChannel,
-        factorizeNtfyChannel,
         PlaySound, EntityParticles(true),
         
         DrawActive, FactoryType, FactoryTypeWithSecondMessage, DescriptionRequest, DataHelperEdit, DataHelperEditOnEntity(true), OpenDataHelperGui, OpenDataHelperGuiOnEntity(true),
@@ -491,10 +379,6 @@ public class NetworkFactorization {
             out.writeByte(id);
         }
         
-    }
-    
-    static public class NotifyMessageType {
-        public static final byte COORD = 0, VEC3 = 1, ENTITY = 2, TILEENTITY = 3;
     }
     
     public static ItemStack nullItem(ItemStack is) {

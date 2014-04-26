@@ -5,11 +5,11 @@ import java.util.Iterator;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -18,20 +18,19 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import factorization.api.Coord;
 import factorization.notify.Notify.Style;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
 
 public class RenderMessages extends RenderMessagesProxy {
     static ArrayList<Message> messages = new ArrayList();
     
     {
-        Core.loadBus(this);
+        NotifyImplementation.loadBus(this);
     }
     
     @Override
@@ -152,11 +151,9 @@ public class RenderMessages extends RenderMessagesProxy {
 
     private void renderMessage(Message m, float partial, float opacity) {
         int width = 0;
-        int height = 0;
         String[] lines = m.msg.split("\n");
         FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
         for (String line : lines) {
-            height += fr.FONT_HEIGHT + 2;
             width = Math.max(width, fr.getStringWidth(line));
         }
         width += 2;
@@ -236,7 +233,6 @@ public class RenderMessages extends RenderMessagesProxy {
                 // :| Friggin' resets the transparency don't it...
                 GL11.glTranslatef(0, -centeringOffset, 0);
                 TextureManager re = mc.renderEngine;
-                RenderBlocks rb = FzUtil.getRB();
                 
                 GL11.glTranslatef((float) (halfWidth + 4), -lineCount/2, 0);
                 renderItem.zLevel -= 50;
@@ -246,5 +242,12 @@ public class RenderMessages extends RenderMessagesProxy {
         }
         GL11.glPopMatrix();
 
+    }
+    
+    @Override
+    public void onscreen(String message, String[] formatArgs) {
+        Minecraft mc = Minecraft.getMinecraft();
+        String msg = I18n.format(message, (Object[]) formatArgs);
+        mc.ingameGUI.func_110326_a(msg, false);
     }
 }

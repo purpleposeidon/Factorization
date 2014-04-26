@@ -157,10 +157,26 @@ public abstract class Notify {
         instance.addRecuringNotification(rn);
     }
     
+    /**
+     * Sends an onscreen message, using the same method that Vanilla Minecraft uses
+     * to display the "Press SHIFT to dismount minecart" message.
+     * 
+     * @param player
+     * 			The player to be notified
+     * @param message
+     * 			A string. The client will localize this message prior to displaying it.
+     * @param formatArguments
+     * 			Optional string arguments for a format parameter.
+     */
+    public static void onscreen(EntityPlayer player, String message, String... formatArguments) {
+        instance.doSendOnscreenMessage(player, message, formatArguments);
+    }
+    
     
     protected static Notify instance;
     protected abstract void doSend(EntityPlayer player, Object where, EnumSet<Style> style, ItemStack item, String format, String[] args);
     protected abstract void addRecuringNotification(RecuringNotification rn);
+    protected abstract void doSendOnscreenMessage(EntityPlayer player, String message, String[] formatArgs);
     
     private static EnumSet<Style> noStyle = EnumSet.noneOf(Style.class);
     private static String[] emptyArray = new String[0];

@@ -12,10 +12,12 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.MinecraftForge;
 
 import com.google.common.base.Joiner;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
@@ -24,26 +26,36 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
-import factorization.api.Coord;
-import factorization.shared.Core;
 
-@Mod(modid = NotifyImplementation.modId, name = NotifyImplementation.name, version = Core.version, dependencies = "required-after: " + Core.modId)
+@Mod(modid = NotifyImplementation.modId, name = NotifyImplementation.name, version = "1.0")
 public class NotifyImplementation extends Notify {
-    public static final String modId = Core.modId + ".notify";
+    public static final String modId = "factorization.notify";
     public static final String name = "Factorization Notification System";
     
     @SidedProxy(clientSide = "factorization.notify.RenderMessages", serverSide = "factorization.notify.RenderMessagesProxy")
     public static RenderMessagesProxy proxy;
+    public static NotifyNetwork net = new NotifyNetwork();
+    
     
     {
         Notify.instance = this;
-        Core.loadBus(this);
+        loadBus(this);
+    }
+    
+    static void loadBus(Object obj) {
+        // A copy of Core.loadBus(), for the sake of independence.
+        FMLCommonHandler.instance().bus().register(obj);
+        MinecraftForge.EVENT_BUS.register(obj);
     }
     
     @EventHandler
     public void setParent(FMLPreInitializationEvent event) {
-        event.getModMetadata().parent = Core.modId;
+        final String FZ = "factorization";
+        if (Loader.isModLoaded(FZ)) {
+            event.getModMetadata().parent = FZ;
+        }
     }
     
     @EventHandler
@@ -117,8 +129,8 @@ public class NotifyImplementation extends Notify {
         if ((player != null && player.worldObj.isRemote) || FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
             proxy.addMessage(where, item, format, args);
         } else {
-            Coord target = Coord.tryLoad(player != null ? player.worldObj : null, where);
-            Core.network.broadcastPacket(player, target, Core.network.notifyPacket(where, item, format, args));
+            FMLProxyPacket packet = NotifyNetwork.notifyPacket(where, item, format, args);
+            NotifyNetwork.broadcast(packet, player);
         }
     }
     
@@ -178,5 +190,15 @@ public class NotifyImplementation extends Notify {
             }
         }
         recuring_notifications.add(newRN);
+    }
+    
+    @Override
+    protected void doSendOnscreenMessage(EntityPlayer player, String message, String[] formatArgs) {
+        if (player.worldObj.isRemote) {
+            proxy.onscreen(message, formatArgs);
+        } else {
+            FMLProxyPacket packet = NotifyNetwork.onscreenPacket(message, formatArgs);
+            NotifyNetwork.broadcast(packet, player);
+        }
     }
 }

@@ -69,7 +69,6 @@ class Message {
             }
             item_info_newline = "\n" + item_info;
         }
-        String itemString = item != null ? item.getDisplayName() : "null";
 
         String[] cp = new String[args.length + 3];
         for (int i = 0; i < args.length; i++) {

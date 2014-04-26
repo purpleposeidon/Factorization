@@ -3,6 +3,7 @@ package factorization.notify;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import factorization.api.Coord;
 
 class RecuringNotification {
     EntityPlayer player;
@@ -23,10 +24,19 @@ class RecuringNotification {
         }
         if (where instanceof Entity) {
             Entity ent = (Entity) where;
-            return ent.isDead;
+            if (ent.isDead) {
+                return false;
+            }
         } else if (where instanceof TileEntity) {
             TileEntity te = (TileEntity) where;
-            return te.isInvalid();
+            if (te.isInvalid()) {
+                return false;
+            }
+        } else if (where instanceof Coord) {
+            Coord coord = (Coord) where;
+            if (!coord.blockExists()) {
+                return false;
+            }
         }
         if (player != null) {
             return player.isDead;
