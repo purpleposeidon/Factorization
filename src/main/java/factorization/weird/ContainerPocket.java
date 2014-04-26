@@ -182,8 +182,6 @@ public class ContainerPocket extends Container {
     boolean isWorking = false;
     
     void updateMatrix() {
-        //NORELEASE: Was using an AT to access net.minecraft.inventory.InventoryCrafting.stackList directly.
-        //Test if we still work this way!
         isWorking = true;
         int i = 0;
         for (Slot slot : craftingSlots) {
