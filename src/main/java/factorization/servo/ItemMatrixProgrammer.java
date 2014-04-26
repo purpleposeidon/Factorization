@@ -11,6 +11,7 @@ import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import factorization.api.Coord;
+import factorization.notify.Notify;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.shared.FzUtil;
@@ -28,8 +29,6 @@ public class ItemMatrixProgrammer extends ItemFactorization {
     public boolean doesContainerItemLeaveCraftingGrid(ItemStack par1ItemStack) {
         return false;
     }
-    
-    @EventHandler
     
     @Override
     public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
