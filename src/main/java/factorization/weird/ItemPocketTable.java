@@ -40,10 +40,12 @@ public class ItemPocketTable extends ItemFactorization {
         if (save != null) {
             player.inventory.setItemStack(null);
         }
-        player.openGui(Core.instance, FactoryType.POCKETCRAFTGUI.gui, player.worldObj, 0, 0, 0);
+        if (!world.isRemote){ 
+            player.openGui(Core.instance, FactoryType.POCKETCRAFTGUI.gui, player.worldObj, 0, 0, 0);
+        }
         if (save != null) {
-            player.inventory.setItemStack(save); // NORELEASE: This doesn't work properly! Client doesn't know it's holding it...
-            if (!player.worldObj.isRemote) {
+            player.inventory.setItemStack(save); // NORELEASE: This doesn't work properly! Client doesn't know it's holding it... (may be working now; needs server test)
+            if (!player.worldObj.isRemote && player instanceof EntityPlayerMP) {
                 ((EntityPlayerMP) player).updateHeldItem();
             }
         }
