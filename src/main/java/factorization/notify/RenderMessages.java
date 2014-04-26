@@ -125,7 +125,7 @@ public class RenderMessages extends RenderMessagesProxy {
             if (!m.style.contains(Notify.Style.DRAWFAR)) {
                 Vec3 pos = m.getPosition(event.partialTicks);
                 double dist = camera.getDistance(pos.xCoord, pos.yCoord, pos.zCoord);
-                if (dist > 5) {
+                if (dist > 8) {
                     continue;
                 }
             }
