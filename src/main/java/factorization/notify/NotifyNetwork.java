@@ -75,6 +75,9 @@ public class NotifyNetwork {
             y = input.readInt();
             z = input.readInt();
             target = me.worldObj.getTileEntity(x, y, z);
+            if (target == null) {
+                target = new Coord(me.worldObj, x, y, z);
+            }
             break;
         case VEC3:
             target = Vec3.createVectorHelper(input.readDouble(), input.readDouble(), input.readDouble());
