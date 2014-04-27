@@ -319,12 +319,12 @@ public class Core {
         }
     }
     
-    static ThreadLocal<Boolean> isMainClientThread = new ThreadLocal<Boolean>() {
+    static final ThreadLocal<Boolean> isMainClientThread = new ThreadLocal<Boolean>() {
         @Override
         protected Boolean initialValue() { return false; }
     };
     
-    static ThreadLocal<Boolean> isMainServerThread = new ThreadLocal<Boolean>() {
+    static final ThreadLocal<Boolean> isMainServerThread = new ThreadLocal<Boolean>() {
         @Override
         protected Boolean initialValue() { return false; }
     };
