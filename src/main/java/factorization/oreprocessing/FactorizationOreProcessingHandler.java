@@ -128,7 +128,7 @@ public class FactorizationOreProcessingHandler {
             if (ingot != null) {
                 if (oreType == OreType.GALENA) {
                     //NORELEASE: Test this. Uhm. Bluh?
-                    addProcessingEnds(OreType.LEAD, ore, new ItemStack(Core.registry.lead_ingot));
+                    //addProcessingEnds(OreType.LEAD, ore, new ItemStack(Core.registry.lead_ingot));
                     addProcessingEnds(OreType.SILVER, ore, new ItemStack(Core.registry.silver_ingot));
                     addProcessingEnds(OreType.GALENA, ore, new ItemStack(Core.registry.silver_ingot));
                 } else {
