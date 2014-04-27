@@ -94,7 +94,7 @@ public class ContainerPocket extends Container {
             for (Slot slot : craftingSlots) {
                 ItemStack repl = craftMatrix.getStackInSlot(i++);
                 ItemStack orig = playerInv.getStackInSlot(slot.getSlotIndex());
-                if (repl != orig) {
+                if (repl != null && repl != orig) {
                     dropped_items.add(orig);
                 }
                 playerInv.setInventorySlotContents(slot.getSlotIndex(), repl);
