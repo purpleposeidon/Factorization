@@ -148,8 +148,6 @@ public class ItemSculptingTool extends ItemFactorization {
         return Core.registry.sculpt_tool.getMovingObjectPositionFromPlayer(player.worldObj, player, true);
     }
     
-    private Item slab_item = Item.getItemFromBlock(Blocks.wooden_slab);
-    
     public boolean tryPlaceIntoWorld(ItemStack is, EntityPlayer player,
             World w, int x, int y, int z, int side,
             float vx, float vy, float vz) {
@@ -173,13 +171,13 @@ public class ItemSculptingTool extends ItemFactorization {
         ToolMode mode = getMode(is.getItemDamage());
         if (mode == ToolMode.MOLD) {
             int is_fired = state.compareTo(ClayState.BISQUED);
-            if (is_fired < 0) {
+            if (is_fired < 0 && !player.capabilities.isCreativeMode) {
                 Notify.send(player, here, "Not fired");
                 return true;
             }
             FzInv inv = FzUtil.openInventory(player.inventory, 0);
             if (!player.capabilities.isCreativeMode) {
-                boolean hasSlab = false;
+                ItemStack theSlab = null;
                 int materialCount = 0;
                 int neededClay = gw.parts.size();
                 for (int i = 0; i < inv.size(); i++) {
@@ -190,15 +188,15 @@ public class ItemSculptingTool extends ItemFactorization {
                     if (it.getItem() == Items.clay_ball) {
                         materialCount += it.stackSize;
                     }
-                    if (it.getItem() == slab_item) {
-                        hasSlab = true;
+                    if (theSlab == null && FzUtil.oreDictionarySimilar("slabWood", it)) {
+                        theSlab = it;
                     }
                 }
-                if (!hasSlab || materialCount < neededClay) {
+                if (theSlab == null || materialCount < neededClay) {
                     Notify.send(player, here, "Need wood slab\nAnd %s clay", "" + neededClay); //TODO: Localize properly
                     return false;
                 }
-                inv.pull(FzUtil.makeWildcard(slab_item), 1, false);
+                inv.pull(theSlab, 1, false);
                 inv.pull(new ItemStack(Items.clay_ball), gw.parts.size(), false);
             }
             TileEntityGreenware rep = (TileEntityGreenware) FactoryType.CERAMIC.getRepresentative();
