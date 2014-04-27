@@ -357,22 +357,27 @@ public class DocumentationModule implements ICommand {
         Minecraft mc = Minecraft.getMinecraft();
         if (!(mc.currentScreen instanceof GuiContainer)) return;
         GuiContainer screen = (GuiContainer) mc.currentScreen;
-        EntityPlayer player = mc.thePlayer;
-        if (!player.capabilities.isCreativeMode) {
-            ItemStack is = player.getHeldItem();
-            if (is == null) return;
-            if (is.getItem() != Core.registry.docbook) return;
-        }
         //Copied from GuiScreen.handleMouseInput
         int mouseX = Mouse.getEventX() * screen.width / mc.displayWidth;
         int mouseY = screen.height - Mouse.getEventY() * screen.height / mc.displayHeight - 1;
         Slot slot = screen.getSlotAtPosition(mouseX, mouseY);
         if (slot == null) return;
-        ItemStack is = slot.getStack();
-        if (is == null) return;
+        tryOpenBookForItem(slot.getStack());
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public static boolean tryOpenBookForItem(ItemStack is) {
+        if (is == null) return false;
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityPlayer player = mc.thePlayer;
+        if (!player.capabilities.isCreativeMode) {
+            ItemStack manual = player.getHeldItem();
+            if (manual == null) return false;
+            if (manual.getItem() != Core.registry.docbook) return false;
+        }
         String name = is.getUnlocalizedName();
         InputStream topic_index = getDocumentResource("topic_index");
-        if (topic_index == null) return;
+        if (topic_index == null) return false;
         BufferedReader br = new BufferedReader(new InputStreamReader(topic_index));
         try {
             while (true) {
@@ -385,14 +390,16 @@ public class DocumentationModule implements ICommand {
                     if (bits[0].equalsIgnoreCase(name)) {
                         String filename = bits[1];
                         mc.displayGuiScreen(new DocViewer(filename));
-                        break;
+                        return true;
                     }
                 }
             }
-            topic_index.close();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            FzUtil.closeNoisily("closing topic_index", topic_index);
         }
+        return false;
     }
     
     static {
