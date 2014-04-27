@@ -2,10 +2,6 @@ package factorization.weird;
 
 import java.util.ArrayList;
 
-import factorization.common.Command;
-import factorization.shared.Core;
-import factorization.shared.FzUtil;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -18,6 +14,11 @@ import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+import factorization.common.Command;
+import factorization.shared.Core;
+import factorization.shared.FzUtil;
+import factorization.shared.FzUtil.FzInv;
 
 public class ContainerPocket extends Container {
     final EntityPlayer player;
@@ -88,13 +89,27 @@ public class ContainerPocket extends Container {
         @Override
         public void onPickupFromSlot(EntityPlayer player, ItemStack grabbedStack) {
             super.onPickupFromSlot(player, grabbedStack);
+            ArrayList<ItemStack> dropped_items = new ArrayList();
             int i = 0;
             for (Slot slot : craftingSlots) {
                 ItemStack repl = craftMatrix.getStackInSlot(i++);
+                ItemStack orig = playerInv.getStackInSlot(slot.getSlotIndex());
+                if (repl != orig) {
+                    dropped_items.add(orig);
+                }
                 playerInv.setInventorySlotContents(slot.getSlotIndex(), repl);
             }
             
             updateCraft();
+            
+            if (dropped_items.isEmpty()) return;
+            FzInv inv = FzUtil.openInventory(player.inventory, ForgeDirection.UP);
+            for (ItemStack is : dropped_items) {
+                ItemStack left = inv.push(is);
+                if (left != null) {
+                    player.dropPlayerItemWithRandomChoice(left, true);
+                }
+            }
         }
     }
     
