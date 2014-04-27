@@ -79,7 +79,7 @@ public class RecipeViewer implements IDocGenerator {
                     arg = arg.replace("for/", "");
                 }
                 ArrayList<ItemStack> matchers = DocumentationModule.getNameItemCache().get(arg);
-                if (!matchers.isEmpty()) {
+                if (matchers != null && !matchers.isEmpty()) {
                     matching = matchers.get(0);
                 }
                 if (matching == null) {
@@ -136,12 +136,16 @@ public class RecipeViewer implements IDocGenerator {
     }
     
     void writeRecipe(AbstractTypesetter out, ArrayList parts) {
-        for (Object part : parts) {
-            if (part instanceof String) {
-                out.append((String) part);
-            } else {
-                out.emitWord((Word) part);
+        try {
+            for (Object part : parts) {
+                if (part instanceof String) {
+                    out.append((String) part);
+                } else {
+                    out.emitWord((Word) part);
+                }
             }
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
     
@@ -247,7 +251,7 @@ public class RecipeViewer implements IDocGenerator {
     void addShapedOreRecipe(List sb, ShapedOreRecipe recipe) {
         genericRecipePrefix(sb, recipe);
         int width = ReflectionHelper.getPrivateValue(ShapedOreRecipe.class, recipe, "width");
-        int height = ReflectionHelper.getPrivateValue(ShapedOreRecipe.class, recipe, "height");
+        //int height = ReflectionHelper.getPrivateValue(ShapedOreRecipe.class, recipe, "height");
         Object[] input = recipe.getInput();
         int i = 0;
         for (Object in : input) {
@@ -287,9 +291,11 @@ public class RecipeViewer implements IDocGenerator {
     }
     
     void addShapelessOreRecipe(List sb, ShapelessOreRecipe recipe) {
+        ArrayList<Object> input = recipe.getInput();
+        if (input == null) return;
         genericRecipePrefix(sb, recipe);
         sb.add("Shapeless: ");
-        for (Object obj : recipe.getInput()) {
+        for (Object obj : input) {
             if (obj instanceof Object[]) {
                 Object[] objs = (Object[]) obj;
                 if (objs.length > 0) {
@@ -304,6 +310,7 @@ public class RecipeViewer implements IDocGenerator {
     }
     
     void addShapelessRecipes(List sb, ShapelessRecipes recipe) {
+        if (recipe.recipeItems == null) return;
         genericRecipePrefix(sb, recipe);
         sb.add("Shapeless: ");
         for (Object obj : recipe.recipeItems) {
