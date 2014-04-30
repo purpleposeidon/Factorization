@@ -10,11 +10,11 @@ import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatisticsFile;
 import net.minecraft.util.MathHelper;
@@ -147,6 +147,21 @@ public class MiscellaneousNonsense {
                 MiscNet.channel.sendTo(MiscNet.makeTpsReportPacket(getTpsRatio()), (EntityPlayerMP) event.player);
             }
         }
+        fixReachDistance((EntityPlayerMP)event.player);
+    }
+    
+    @SubscribeEvent
+    public void fixReachDistance(PlayerEvent.PlayerRespawnEvent event) {
+        fixReachDistance((EntityPlayerMP)event.player);
+    }
+    
+    public void fixReachDistance(EntityPlayerMP player) {
+        if (player.worldObj.isRemote) return;
+        double old_rd = player.theItemInWorldManager.getBlockReachDistance();
+        // Place 7 blocks in a tower. On the edge of the top block, place another block.
+        // Place a slab on the ground below it. Look up, try to place a block against the top one.
+        double new_rd = old_rd + 1;
+        player.theItemInWorldManager.setBlockReachDistance(new_rd);
     }
     
     
