@@ -23,6 +23,8 @@ Mobs killed in this way have a small chance to drop XP.
 
 The lacerator will break blocks that are in front of it.
 How long it takes to break the block depends on that block's hardness.
+Two lacerators facing each-other with a block in between them will
+break the block especially quickly.
 
 Many blocks will be broken down when mined by the lacerator.
 For example, smoothstone becomes cobblestone,
@@ -38,6 +40,13 @@ If the buffer can't be emptied, then the lacerator will
 become clogged and will stop operating.
 
 A redstone signal will disable the lacerator.
+
+
+\figure{H4sIAAAAAAAAAO3cS04CQRAG4JoZExFM9CgewY0mbjTR6MIN4TE8IgIOaIRbu3GLNBgvgAmafN+i
+q3sy3fWfoOoRRWTdiMiPIisjWW/m9fQlj2Ja9SNqkQ+7cdJbziadp+ao1Smr1rzMouhX7diUcRxE
+MZgNVt+KOO4MWlW/3K7p1SIO26+95qgcp1Mtireyisb55ePDxe3d1c31+brbbNrd5FluL2SLVLPI
+e51sfXrfpPsTofJNqPgJ1YjsOeJ0+8d+7bs/AAAAAAAAAAAAAAAAAAAA7F0R+SRNBHhJmzQw4KMR
+2TBNBlitVp87Pn62y+Vf6A8AAAAAAAAAAAAAAAAAAAD/XhoIsFjX+/gC3YmnkXOBAAA=}
 
 
 \topic{item.factorization:diamond_cutting_head}

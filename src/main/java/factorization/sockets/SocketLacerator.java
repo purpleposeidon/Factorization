@@ -79,7 +79,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     boolean ticked = false;
     boolean isPowered = false;
     
-    final static byte grind_time = 75;
+    final static byte grind_time = 25;
     final static short max_speed = 400;
     final static short min_speed = max_speed/10;
     ArrayList<ItemStack> buffer = new ArrayList();
@@ -272,7 +272,11 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         } else if (speed > 0) {
             speed--;
         }
-        return !(speed > min_speed && rand.nextInt(max_speed) < speed/4);
+        return !workCheck();
+    }
+    
+    boolean workCheck() {
+        return speed > min_speed && rand.nextInt(max_speed) < speed/4;
     }
     
     public static final DamageSource laceration = new DamageSource("laceration") {
@@ -390,6 +394,16 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                 progress = 0;
             } else {
                 progress++;
+                if (socket == this && rand.nextInt(4) == 0) {
+                    // Torsion!?
+                    TileEntity partner = worldObj.getTileEntity(mop.blockX + facing.offsetX, mop.blockY + facing.offsetY, mop.blockZ + facing.offsetZ);
+                    if (partner instanceof SocketLacerator) {
+                        SocketLacerator pardner = (SocketLacerator) partner;
+                        if (pardner.workCheck()) {
+                            progress += 16;
+                        }
+                    }
+                }
             }
             boolean doBreak = progress >= grind_time*hardness || Core.cheat;
             if (barrel == null && !doBreak) {
