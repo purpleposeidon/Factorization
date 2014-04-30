@@ -79,7 +79,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
     }
 
     @Override
-    protected void fanturpellerUpdate(ISocketHolder socket, Coord coord, boolean powered, boolean neighbor_changed) {
+    protected void fanturpellerUpdate(ISocketHolder socket, Coord coord, boolean powered) {
         if (powered) return;
         //We can't do an isRemote check because position doesn't get synced enough.
         if (!shouldDoWork()) return;

@@ -164,9 +164,8 @@ public abstract class SocketFanturpeller extends TileEntitySocketBase implements
     
     @Override
     public final void genericUpdate(ISocketHolder socket, Coord coord, boolean powered) {
-        boolean neighbor_changed = false;
         prevFanRotation = fanRotation;
-        fanturpellerUpdate(socket, coord, powered, neighbor_changed);
+        fanturpellerUpdate(socket, coord, powered);
         if (!worldObj.isRemote) {
             final int need = getRequiredCharge();
             float orig_speed = fanω;
@@ -200,7 +199,7 @@ public abstract class SocketFanturpeller extends TileEntitySocketBase implements
         return false;
     }
     
-    protected void fanturpellerUpdate(ISocketHolder socket, Coord coord, boolean powered, boolean neighbor_changed) {
+    protected void fanturpellerUpdate(ISocketHolder socket, Coord coord, boolean powered) {
         fanω *= 0.95F;
     }
     

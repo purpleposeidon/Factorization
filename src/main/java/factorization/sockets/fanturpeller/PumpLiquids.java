@@ -181,7 +181,7 @@ public class PumpLiquids extends BufferedFanturpeller {
                     boolean replaceable = probe.isReplacable();
                     if (!is_liquid && !replaceable) {
                         IFluidHandler ifh = probe.getTE(IFluidHandler.class);
-                        if (ifh != null) {
+                        if (ifh != null && ifh != PumpLiquids.this) {
                             foundContainers.add(new FoundFluidHandler(ifh, dir));
                         }
                         continue;
@@ -297,6 +297,22 @@ public class PumpLiquids extends BufferedFanturpeller {
         @Override
         public void pumpOut() {
             if (isSucking) return; //don't run backwards
+            if (!foundContainers.isEmpty()) {
+                FoundFluidHandler foundIfh = foundContainers.poll();
+                FluidStack work = buffer.getFluid().copy(); //TODO NORELEASE: Bugs. Bugs! Thing doesn't work...
+                if (work.amount > 10) {
+                    work.amount = 10;
+                }
+                int amount = foundIfh.te.fill(foundIfh.dir, work, true);
+                buffer.drain(amount, true);
+                if (buffer.getFluidAmount() <= 0) {
+                    reset();
+                } else {
+                    foundContainers.add(foundIfh);
+                    delay = 0;
+                }
+                return;
+            }
             if (buffer.getFluidAmount() < BUCKET) return;
             FluidStack fs = buffer.getFluid();
             if (fs == null) return;
@@ -314,13 +330,6 @@ public class PumpLiquids extends BufferedFanturpeller {
             for (int i = 0; i < 16; i++) {
                 PumpCoord pc = queue.poll();
                 if (pc == null || !pc.verifyConnection(this, worldObj)) {
-                    FoundFluidHandler foundIfh = foundContainers.poll();
-                    if (foundIfh == null) {
-                        reset();
-                        return;
-                    }
-                    int amount = foundIfh.te.fill(foundIfh.dir, buffer.getFluid(), true);
-                    buffer.drain(amount, true);
                     reset();
                     return;
                 }
@@ -399,7 +408,6 @@ public class PumpLiquids extends BufferedFanturpeller {
             if (te == null) {
                 return; //Really, it shoudln't happen.
             }
-            int origSize = buffer.getFluidAmount();
             FluidStack offering = buffer.getFluid().copy();
             offering.amount = Math.min(10, offering.amount);
             int usage = te.fill(sourceDirection, offering, true);
@@ -419,11 +427,19 @@ public class PumpLiquids extends BufferedFanturpeller {
         return FactoryType.SOCKET_PUMP;
     }
     
+    boolean dirty = true;
+    
     @Override
-    protected void fanturpellerUpdate(ISocketHolder socket, Coord coord, boolean powered, boolean neighbor_changed) {
+    public void neighborChanged() {
+        dirty = true;
+    }
+    
+    @Override
+    protected void fanturpellerUpdate(ISocketHolder socket, Coord coord, boolean powered) {
         if (worldObj.isRemote){
             return;
         }
+        boolean on_servo = socket != this;
         if (isSucking) {
             sourceDirection = facing;
             destinationDirection = facing.getOpposite();
@@ -431,7 +447,8 @@ public class PumpLiquids extends BufferedFanturpeller {
             sourceDirection = facing.getOpposite();
             destinationDirection = facing;
         }
-        if (neighbor_changed) {
+        if (dirty) {
+            dirty = false;
             coord.adjust(facing.getOpposite());
             if (sourceAction instanceof TankPumper ^ hasTank(coord)) {
                 sourceAction = null;
