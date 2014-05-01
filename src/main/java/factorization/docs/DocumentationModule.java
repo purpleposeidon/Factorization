@@ -402,10 +402,8 @@ public class DocumentationModule implements ICommand {
         return false;
     }
     
-    static {
-        if (!IndexDocumentation.isRunning) {
-            registerGenerator("items", new ItemListViewer());
-            registerGenerator("recipes", new RecipeViewer());
-        }
+    static void registerGenerators() {
+        registerGenerator("items", new ItemListViewer());
+        registerGenerator("recipes", new RecipeViewer());
     }
 }

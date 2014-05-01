@@ -38,7 +38,6 @@ public class IndexDocumentation {
     static ArrayListMultimap<String, String> index = ArrayListMultimap.create();
     static HashSet<String> foundLinks = new HashSet();
     static ArrayList<String> pendingLinks = new ArrayList();
-    public static boolean isRunning = false;
     
     public static void main(String[] args) throws IOException {
         if (args.length < 2) {
@@ -46,7 +45,6 @@ public class IndexDocumentation {
             System.exit(1);
             return;
         }
-        isRunning = true;
         final HashMap<String, File> domains = new HashMap();
         boolean first = true;
         PrintStream out = null;

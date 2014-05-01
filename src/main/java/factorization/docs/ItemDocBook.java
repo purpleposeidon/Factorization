@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
@@ -16,6 +17,9 @@ public class ItemDocBook extends ItemFactorization {
     public ItemDocBook(String name, TabType tabType) {
         super(name, tabType);
         setMaxStackSize(1);
+        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+            DocumentationModule.registerGenerators();
+        }
     }
     
     @SideOnly(Side.CLIENT)
