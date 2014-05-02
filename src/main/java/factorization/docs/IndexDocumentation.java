@@ -66,7 +66,7 @@ public class IndexDocumentation {
             }
             
             @Override
-            public IResource getResource(final ResourceLocation location) throws IOException {
+            public IResource getResource(final ResourceLocation location) {
                 return new IResource() {
                     @Override public boolean hasMetadata() { return false; }
                     @Override public IMetadataSection getMetadata(String var1) { return null; }
@@ -87,7 +87,7 @@ public class IndexDocumentation {
             }
             
             @Override
-            public List getAllResources(ResourceLocation location) throws IOException {
+            public List getAllResources(ResourceLocation location) {
                 return Arrays.asList(getResource(location));
             }
         };
