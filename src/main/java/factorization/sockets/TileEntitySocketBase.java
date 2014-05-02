@@ -58,7 +58,6 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
      * 		These vars need to be set: worldObj, [xyz]Coord, facing
      * 		Some things might call this's ISocketHolder methods rather than the passed in ISocketHolder's methods
      */
-    public static Random rand = new Random();
     public ForgeDirection facing = ForgeDirection.UP;
 
     @Override
