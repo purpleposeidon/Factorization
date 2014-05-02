@@ -516,17 +516,7 @@ public class Registry {
         
         glaze_bucket.addGlaze(glaze_base_mimicry);
         
-        ItemStack charcoal = new ItemStack(Items.coal, 1, 1);
-        ItemStack bonemeal = new ItemStack(Items.dye, 1, 15);
         ItemStack lapis = new ItemStack(Items.dye, 1, 4);
-        ItemStack lead_chunks = new ItemStack(ore_reduced, 1, ItemOreProcessing.OreType.LEAD.ID);
-        ItemStack iron_chunks = new ItemStack(ore_reduced, 1, ItemOreProcessing.OreType.IRON.ID);
-        Item netherquartz = Items.quartz;
-        Item netherbrick = Items.netherbrick;
-        Block sand = Blocks.sand;
-        Item redstone=  Items.redstone;
-        Item slimeBall = Items.slime_ball;
-        ItemStack blackWool = new ItemStack(Blocks.wool, 1, 15);
         
         shapelessOreRecipe(base_common, new ItemStack(glaze_bucket), Items.water_bucket, Blocks.sand, Items.clay_ball);
         shapelessOreRecipe(glaze_base_mimicry, base_common, Items.redstone, Items.slime_ball, lapis);
