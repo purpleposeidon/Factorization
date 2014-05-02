@@ -6,8 +6,11 @@ import java.util.ArrayList;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GLAllocation;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -22,11 +25,17 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.ChunkEvent;
+
+import org.lwjgl.opengl.GL11;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
@@ -35,6 +44,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
+import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutNBT;
@@ -347,6 +357,12 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     @Override
     public void onPlacedBy(EntityPlayer player, ItemStack is, int side, float hitX, float hitY, float hitZ) {
+        orientation = getOrientation(player, side, hitX, hitY, hitZ);
+        loadFromStack(is);
+        needLogic();
+    }
+    
+    FzOrientation getOrientation(EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
         ForgeDirection facing = ForgeDirection.getOrientation(side);
         double u = 0.5, v = 0.5; //We pick the axiis based on which side gets clicked
         switch (facing) {
@@ -403,9 +419,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
                 fo = perfect;
             }
         }
-        orientation = fo;
-        loadFromStack(is);
-        needLogic();
+        return fo;
     }
     
     @Override
@@ -1253,5 +1267,93 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             }
             finalizedDisplayLists.clear();
         }
+    }
+    
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void renderHilightArrow(RenderWorldLastEvent event) {
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityPlayer player = mc.thePlayer;
+        if (player == null) return;
+        if (!Minecraft.isGuiEnabled()) return;
+        ItemStack is = player.getHeldItem();
+        if (is == null) return;
+        if (is.getItem() != Core.registry.daybarrel) return;
+        MovingObjectPosition mop = mc.objectMouseOver;
+        if (mop == null || mop.hitVec == null || mop.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return;
+        Vec3 vec = mop.hitVec;
+        FzOrientation orientation = getOrientation(player, mop.sideHit, (float) (vec.xCoord - mop.blockX), (float) (vec.yCoord - mop.blockY), (float) (vec.zCoord - mop.blockZ));
+        if (orientation.top.offsetY == 1) {
+            /*
+             * The purpose of this is two-fold:
+             * 		- It renders at the wrong spot when pointing upwards on a vertical face
+             * 		- You totally don't really need it in this case
+             */
+            return;
+        }
+        GL11.glPushMatrix();
+        {
+            EntityLivingBase camera = Minecraft.getMinecraft().renderViewEntity;
+            double cx = camera.lastTickPosX + (camera.posX - camera.lastTickPosX) * (double) event.partialTicks;
+            double cy = camera.lastTickPosY + (camera.posY - camera.lastTickPosY) * (double) event.partialTicks;
+            double cz = camera.lastTickPosZ + (camera.posZ - camera.lastTickPosZ) * (double) event.partialTicks;
+            GL11.glTranslated(-cx, -cy, -cz);
+        }
+        ForgeDirection fd = ForgeDirection.getOrientation(mop.sideHit);
+        GL11.glTranslatef(mop.blockX + fd.offsetX, mop.blockY + fd.offsetY, mop.blockZ + fd.offsetZ);
+        GL11.glColor4f(0.0F, 0.0F, 0.0F, 0.4F);
+        GL11.glDisable(GL11.GL_ALPHA_TEST);
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GL11.glLineWidth(2.0F);
+        
+        {
+            ForgeDirection face = orientation.facing;
+            if (face.offsetX + face.offsetY + face.offsetZ == 1) {
+                GL11.glTranslated(face.offsetX, face.offsetY, face.offsetZ);
+            }
+            float d = -2F;
+            GL11.glTranslatef(d*fd.offsetX, d*fd.offsetY, d*fd.offsetZ);
+            GL11.glTranslated(
+                    0.5*(1 - Math.abs(face.offsetX)), 
+                    0.5*(1 - Math.abs(face.offsetY)), 
+                    0.5*(1 - Math.abs(face.offsetZ))
+                    );
+            
+            GL11.glBegin(GL11.GL_LINE_LOOP);
+            float mid_x = orientation.facing.offsetX;
+            float mid_y = orientation.facing.offsetY;
+            float mid_z = orientation.facing.offsetZ;
+            
+            float top_x = mid_x + orientation.top.offsetX/2F;
+            float top_y = mid_y + orientation.top.offsetY/2F;
+            float top_z = mid_z + orientation.top.offsetZ/2F;
+            
+            float bot_x = mid_x - orientation.top.offsetX/2F;
+            float bot_y = mid_y - orientation.top.offsetY/2F;
+            float bot_z = mid_z - orientation.top.offsetZ/2F;
+            
+            ForgeDirection r = orientation.facing.getRotation(orientation.top);
+            float right_x = r.offsetX/2F;
+            float right_y = r.offsetY/2F;
+            float right_z = r.offsetZ/2F;
+            
+            
+            //GL11.glVertex3f(mid_x, mid_y, mid_z);
+            GL11.glVertex3f(top_x, top_y, top_z);
+            GL11.glVertex3f(mid_x + right_x, mid_y + right_y, mid_z + right_z);
+            d = 0.25F;
+            GL11.glVertex3f(mid_x + right_x*d, mid_y + right_y*d, mid_z + right_z*d);
+            GL11.glVertex3f(bot_x + right_x*d, bot_y + right_y*d, bot_z + right_z*d);
+            d = -0.25F;
+            GL11.glVertex3f(bot_x + right_x*d, bot_y + right_y*d, bot_z + right_z*d);
+            GL11.glVertex3f(mid_x + right_x*d, mid_y + right_y*d, mid_z + right_z*d);
+            GL11.glVertex3f(mid_x - right_x, mid_y - right_y, mid_z - right_z);
+            GL11.glEnd();
+        }
+        
+        GL11.glPopMatrix();
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
     }
 }
