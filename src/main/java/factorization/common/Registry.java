@@ -997,6 +997,15 @@ public class Registry {
                 'B', Items.book,
                 '~', new ItemStack(Items.dye, 1, 0), // The book says "ink sac", so you'll have to use an actual ink sac.
                 '>', logicMatrixProgrammer);
+        ItemStack tons_of_bonemeal = new ItemStack(Items.dye, 12 /* stacksize */, 15 /* damage value for bonemeal */);
+        recipe(tons_of_bonemeal,
+                "MSH",
+                "nXn",
+                'M', Blocks.melon_block,
+                'S', Blocks.sand,
+                'H', Blocks.hay_block,
+                'n', Items.nether_wart,
+                'X', Items.bone);
     }
     
     private void makeServoRecipes() {
