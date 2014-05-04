@@ -9,6 +9,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
+import factorization.notify.Notify;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemFactorization;
 
@@ -33,6 +34,9 @@ public class ItemDocBook extends ItemFactorization {
         Coord at = new Coord(world, x, y, z);
         ItemStack hit = at.getPickBlock(mc.objectMouseOver);
         DocumentationModule.tryOpenBookForItem(hit);
+        if (hit != null) {
+            Notify.onscreen(player, "%s", hit.getDisplayName());
+        }
         return true;
     }
     
