@@ -51,4 +51,5 @@ jar {
         attributes("FMLCorePlugin": "factorization.coremod.LoadingPlugin",
                    "FMLCorePluginContainsFMLMod": "true")
     }
+    exclude "codechicken/**"
 }
