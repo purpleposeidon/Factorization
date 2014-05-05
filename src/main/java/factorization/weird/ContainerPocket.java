@@ -34,6 +34,8 @@ public class ContainerPocket extends Container {
     Slot craftResultSlot;
 
     ItemStack fake_is;
+    
+    boolean isCrafting = false;
 
     public ContainerPocket(EntityPlayer player) {
         this.player = player;
@@ -88,28 +90,19 @@ public class ContainerPocket extends Container {
 
         @Override
         public void onPickupFromSlot(EntityPlayer player, ItemStack grabbedStack) {
+            isCrafting = true;
+            ItemStack faker = new ItemStack(Core.registry.pocket_table, 1, -1);
+            for (Slot slot : craftingSlots) {
+                playerInv.setInventorySlotContents(slot.getSlotIndex(), faker);
+            }
             super.onPickupFromSlot(player, grabbedStack);
-            ArrayList<ItemStack> dropped_items = new ArrayList();
             int i = 0;
             for (Slot slot : craftingSlots) {
                 ItemStack repl = craftMatrix.getStackInSlot(i++);
-                ItemStack orig = playerInv.getStackInSlot(slot.getSlotIndex());
-                if (repl != null && repl != orig) {
-                    dropped_items.add(orig);
-                }
                 playerInv.setInventorySlotContents(slot.getSlotIndex(), repl);
             }
-            
+            isCrafting = false;
             updateCraft();
-            
-            if (dropped_items.isEmpty()) return;
-            FzInv inv = FzUtil.openInventory(player.inventory, ForgeDirection.UP);
-            for (ItemStack is : dropped_items) {
-                ItemStack left = inv.push(is);
-                if (left != null) {
-                    player.dropPlayerItemWithRandomChoice(left, true);
-                }
-            }
         }
     }
     
@@ -149,7 +142,9 @@ public class ContainerPocket extends Container {
         @Override
         public void setInventorySlotContents(int var1, ItemStack var2) {
             src.setInventorySlotContents(remapSlotId(var1), var2);
-            updateCraft();
+            if (!isCrafting) {
+                updateCraft();
+            }
         }
 
         @Override
