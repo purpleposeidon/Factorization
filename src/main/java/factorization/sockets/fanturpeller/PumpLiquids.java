@@ -439,7 +439,7 @@ public class PumpLiquids extends BufferedFanturpeller {
         if (worldObj.isRemote){
             return;
         }
-        boolean on_servo = socket != this;
+        boolean onServo = socket != this;
         if (isSucking) {
             sourceDirection = facing;
             destinationDirection = facing.getOpposite();
@@ -467,22 +467,22 @@ public class PumpLiquids extends BufferedFanturpeller {
             coord.adjust(facing.getOpposite());
         }
         if (!shouldDoWork()) {
-            updateDestination(coord);
+            updateDestination(coord, onServo);
             if (sourceAction == null) {
-                updateSource(coord);
+                updateSource(coord, onServo);
             }
         } else {
-            updateSource(coord);
-            updateDestination(coord);
+            updateSource(coord, onServo);
+            updateDestination(coord, onServo);
         }
     }
 
-    void updateSource(Coord coord) {
+    void updateSource(Coord coord, boolean onServo) {
         if (sourceAction == null) {
             coord.adjust(facing.getOpposite());
             if (hasTank(coord)) {
                 sourceAction = new TankPumper();
-            } else if (isLiquid(coord)) {
+            } else if (!onServo && isLiquid(coord)) {
                 final Coord c = new Coord(this).add(sourceDirection);
                 sourceAction = new Drainer(c, c.getFluid());
             }
@@ -492,11 +492,13 @@ public class PumpLiquids extends BufferedFanturpeller {
         }
     }
 
-    void updateDestination(Coord coord) {
+    void updateDestination(Coord coord, boolean onServo) {
         if (destinationAction == null) {
             coord.adjust(facing);
             if (hasTank(coord)) {
                 destinationAction = new TankPumper();
+            } else if (onServo) {
+                // Wrapping that line below in parens'd suck.
             } else if ((isLiquid(coord) || coord.isReplacable()) && buffer.getFluidAmount() > 0) {
                 final Coord c = new Coord(this).add(destinationDirection);
                 destinationAction = new Flooder(c, buffer.getFluid().getFluid());
