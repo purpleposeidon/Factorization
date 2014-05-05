@@ -363,6 +363,10 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             if (block == null || block.isAir(worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
                 return false;
             }
+            int md = worldObj.getBlockMetadata(mop.blockX, mop.blockY, mop.blockZ);
+            if (!block.canCollideCheck(md, false)) {
+                return false;
+            }
             TileEntity te = null;
             TileEntityDayBarrel barrel = null;
             if (block == Core.registry.factory_block) {
@@ -379,7 +383,6 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             
             //Below: A brief demonstration of why Coord exists
             long foundHash = (mop.blockX) + (mop.blockY << 2) + (mop.blockZ << 4);
-            int md = worldObj.getBlockMetadata(mop.blockX, mop.blockY, mop.blockZ);
             float hardness = block.getBlockHardness(worldObj, mop.blockX, mop.blockY, mop.blockZ);
             if (hardness < 0) {
                 speed -= max_speed/5;
