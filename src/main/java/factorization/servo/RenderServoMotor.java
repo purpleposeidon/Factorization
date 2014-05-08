@@ -1,15 +1,10 @@
 package factorization.servo;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelZombie;
-import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderBiped;
@@ -20,15 +15,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.client.model.obj.WavefrontObject;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
@@ -106,9 +99,13 @@ public class RenderServoMotor extends RenderEntity {
             
             EntityPlayer player = Core.proxy.getClientPlayer();
             if (player != null) {
-                ItemStack is = player.getHeldItem();
-                if (is != null && is.getItem() == Core.registry.logicMatrixProgrammer) {
-                    render_details = true;
+                for (int i = 0; i < 9; i++) {
+                    ItemStack is = player.inventory.getStackInSlot(i);
+                    if (is == null) continue;
+                    if (is.getItem() == Core.registry.logicMatrixProgrammer) {
+                        render_details = true;
+                        break;
+                    }
                 }
             }
         }
@@ -355,33 +352,43 @@ public class RenderServoMotor extends RenderEntity {
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glPushMatrix();
         
-        float s = 1F/128F;
-        GL11.glScalef(s, s, s);
-        for (int i = 0; i < Executioner.STACKS; i++) {
-            GL11.glPushMatrix();
-            ServoStack ss = motor.getServoStack(i);
-            GL11.glRotatef(180/16*(8.5F + i), 0, 0, 1);
-            GL11.glTranslatef(0, -(0.9F)/s, 0);
-            if (renderStack(ss, ItemDye.field_150922_c[15 - i])) {
-            }
-            GL11.glPopMatrix();
-        }
+        float scale = 4F/128F;
+        GL11.glScalef(scale, scale, scale);
+        renderStack(motor.getArgStack(), scale, 0);
+        renderStack(motor.getInstructionsStack(), scale, 1);
         
         GL11.glPopMatrix();
         GL11.glEnable(GL11.GL_LIGHTING);
     }
     
-    boolean renderStack(ServoStack stack, int color) {
+    void renderStack(ServoStack ss, float scale, int i) {
+        //if (stack.getSize() == 0) return;
+        GL11.glPushMatrix();
+        GL11.glRotatef(180, 0, 0, 1);
+        GL11.glTranslatef(0, -(0.9F)/scale, 0);
+        int color = 0xFFFFCF;
+        if (i == 0) {
+            GL11.glTranslatef(-16, 0, 0);
+        } else if (i == 1) {
+            GL11.glTranslatef(16, 8*ss.getSize(), 0);
+            color = 0xCFFFCF;
+        }
+        if (renderStackWithColor(ss, color)) {
+        }
+        GL11.glPopMatrix();
+    }
+    
+    boolean renderStackWithColor(ServoStack stack, int color) {
         int i = 0;
         Minecraft mc = Minecraft.getMinecraft();
         FontRenderer fr = mc.fontRenderer;
-        fr.drawString("䷼", 0, 0, color, false); // All the cool kids use Yijing.
+        fr.drawString("_", 0, 0, color, true); // All the cool kids use Yijing.
         for (Object o : stack) {
             if (i == 0) {
                 GL11.glPushMatrix();
             }
             GL11.glTranslatef(0, -10, 0);;
-            fr.drawString(o != null ? o.toString() : "null", 0, 0, color, false);
+            fr.drawString(o != null ? o.toString() : "null", 0, 0, color, true);
             i++;
         }
         if (i > 0) {

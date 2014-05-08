@@ -62,6 +62,6 @@ public class RedstonePulse extends Instruction {
     
     @Override
     public CpuBlocking getBlockingBehavior() {
-        return CpuBlocking.BLOCK_FOR_TICK;
+        return CpuBlocking.BLOCK_UNTIL_NEXT_ENTRY;
     }
 }

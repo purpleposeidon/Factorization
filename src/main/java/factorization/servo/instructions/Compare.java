@@ -104,6 +104,6 @@ public class Compare extends Instruction {
             return false;
         }
         cmp = FzUtil.shiftEnum(cmp, CmpType.values(), 1);
-        return false;
+        return true;
     }
 }

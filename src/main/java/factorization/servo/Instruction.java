@@ -11,6 +11,7 @@ import factorization.shared.Core;
 public abstract class Instruction extends Decorator {
     @Override
     public boolean onClick(EntityPlayer player, Coord block, ForgeDirection side) {
+        // FIXME: This is lame. Put in a method for cycling through state...
         return false;
     }
     

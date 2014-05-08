@@ -58,7 +58,7 @@ import factorization.sockets.TileEntitySocketBase;
 
 public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IEntityMessage, IInventory, ISocketHolder {
     public final MotionHandler motionHandler = new MotionHandler(this);
-    public final Executioner executioner = new Executioner(this);
+    public Executioner executioner = new Executioner(this);
     public TileEntitySocketBase socket = new SocketEmpty();
     public boolean isSocketActive = false;
     public boolean isSocketPulsed = false;
@@ -324,12 +324,12 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     
     // Utility functions for client code
     
-    public ServoStack getServoStack(int stackId) {
-        return executioner.getServoStack(stackId);
+    public ServoStack getArgStack() {
+        return executioner.getArgStack();
     }
     
-    public ServoStack getArgStack() {
-        return executioner.getServoStack(Executioner.STACK_ARGUMENT);
+    public ServoStack getInstructionsStack() {
+        return executioner.getInstructionStack();
     }
     
     public void putError(Object error) {
@@ -361,7 +361,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
     
     public void setTargetSpeed(byte newTarget) {
-        motionHandler.target_speed_index = newTarget;
+        motionHandler.target_speed_index = (byte) (newTarget + 1);
+    }
+    
+    public byte getTargetSpeed() {
+        return (byte) (motionHandler.target_speed_index - 1);
     }
     
     public void penalizeSpeed() {
@@ -399,10 +403,20 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         Item item = is.getItem();
         if (item instanceof ItemServoRailWidget) {
             ServoComponent sc = ServoComponent.fromItem(is);
-            if (sc instanceof Decorator) {
-                Decorator dec = (Decorator) sc;
-                dec.motorHit(this);
+            if (player.isSneaking()) {
+                if (!sc.onClick(player, this)) {
+                    return false;
+                }
+                ItemStack updated = sc.toItem();
+                is.setItemDamage(updated.getItemDamage());
+                is.setTagCompound(updated.getTagCompound());
                 return true;
+            } else {
+                if (sc instanceof Decorator) {
+                    Decorator dec = (Decorator) sc;
+                    dec.motorHit(this);
+                    return true;
+                }
             }
         }
         if (socket == null) return false;

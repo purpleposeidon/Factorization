@@ -71,6 +71,13 @@ public class ServoStack implements IDataSerializable, Iterable {
         executioner.stacks_changed = true;
         return contents.removeFirst();
     }
+    
+    public Object peek() {
+        if (contents.isEmpty()) {
+            return null;
+        }
+        return contents.getFirst();
+    }
 
     public Object popEnd() {
         if (contents.isEmpty()) {

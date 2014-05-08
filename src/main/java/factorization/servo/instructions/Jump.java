@@ -2,9 +2,8 @@ package factorization.servo.instructions;
 
 import java.io.IOException;
 
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -17,6 +16,7 @@ import factorization.servo.CpuBlocking;
 import factorization.servo.Executioner;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
+import factorization.servo.ServoStack;
 
 public class Jump extends Instruction {
     byte mode = Executioner.JMP_NEXT_INSTRUCTION;
@@ -35,14 +35,18 @@ public class Jump extends Instruction {
     public void motorHit(ServoMotor motor) {
         if (mode == Executioner.JMP_NEXT_INSTRUCTION) {
             Boolean b = motor.getArgStack().popType(Boolean.class);
-            motor.executioner.stacks_changed = true;
+            motor.executioner.markDirty();
             if (b == null) {
                 motor.putError("Jump: Stack Underflow of Boolean");
                 return;
             }
             if (b) {
-                motor.executioner.jmp = mode;
-                motor.penalizeSpeed();
+                ServoStack ss = motor.getInstructionsStack();
+                if (ss.getSize() > 0) {
+                    ss.pop();
+                } else {
+                    motor.executioner.jmp = mode;
+                }
             }
         } else {
             motor.executioner.jmp = mode;

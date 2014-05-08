@@ -27,7 +27,29 @@ import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
-import factorization.servo.instructions.*;
+import factorization.servo.instructions.BooleanValue;
+import factorization.servo.instructions.Compare;
+import factorization.servo.instructions.Drop;
+import factorization.servo.instructions.Dup;
+import factorization.servo.instructions.EntryControl;
+import factorization.servo.instructions.GlassServoGrate;
+import factorization.servo.instructions.InstructionGroup;
+import factorization.servo.instructions.IntegerValue;
+import factorization.servo.instructions.IronServoGrate;
+import factorization.servo.instructions.Jump;
+import factorization.servo.instructions.Product;
+import factorization.servo.instructions.RedstonePulse;
+import factorization.servo.instructions.RotateTop;
+import factorization.servo.instructions.ScanColor;
+import factorization.servo.instructions.SetDirection;
+import factorization.servo.instructions.SetEntryAction;
+import factorization.servo.instructions.SetSpeed;
+import factorization.servo.instructions.ShifterControl;
+import factorization.servo.instructions.SocketCtrl;
+import factorization.servo.instructions.Spin;
+import factorization.servo.instructions.Sum;
+import factorization.servo.instructions.Trap;
+import factorization.servo.instructions.WoodenServoGrate;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
@@ -250,8 +272,7 @@ public abstract class ServoComponent implements IDataSerializable {
                 
                 ScanColor.class,
                 SetEntryAction.class,
-                ValueTransfer.class,
-                SetSegment.class,
+                InstructionGroup.class,
         }) {
             register(cl);
         }

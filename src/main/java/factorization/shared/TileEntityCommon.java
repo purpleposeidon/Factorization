@@ -107,7 +107,11 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
         if (here.w.isRemote) {
             return;
         }
-        pulseTime = worldObj.getTotalWorldTime();
+        long now = worldObj.getTotalWorldTime();
+        if (pulseTime + 4 >= now) {
+            return;
+        }
+        pulseTime = now;
         here.notifyNeighbors();
         here.scheduleUpdate(4);
     }

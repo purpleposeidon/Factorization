@@ -59,15 +59,6 @@ public class ItemServoRailWidget extends ItemFactorization {
     }
     
     @Override
-    public ItemStack onItemRightClick(ItemStack is, World world, EntityPlayer player) {
-        ServoComponent sc = get(is);
-        if (sc == null) {
-            return is;
-        }
-        return is;
-    }
-    
-    @Override
     public boolean onItemUse(ItemStack is, EntityPlayer player, World world, int x, int y, int z, int side, float vx, float vy, float vz) {
         ServoComponent sc = get(is);
         if (sc == null) {
@@ -110,7 +101,6 @@ public class ItemServoRailWidget extends ItemFactorization {
             return;
         }
         subItemsCache = new ArrayList<ItemStack>(100);
-        ArrayList<Object> temp = new ArrayList();
         for (Class<? extends ServoComponent> scClass : ServoComponent.getComponents()) {
             try {
                 ServoComponent sc = scClass.newInstance();

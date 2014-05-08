@@ -31,8 +31,9 @@ public class SetSpeed extends Instruction {
 
     @Override
     public void motorHit(ServoMotor motor) {
-        motor.setTargetSpeed((byte) (speed - 1));
-        motor.executioner.stacks_changed = true;
+        if (motor.getTargetSpeed() == speed) return;
+        motor.setTargetSpeed(speed);
+        motor.markDirty();
     }
 
     @Override

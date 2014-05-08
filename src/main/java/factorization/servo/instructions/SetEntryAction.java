@@ -39,7 +39,7 @@ public class SetEntryAction extends Instruction {
     @Override
     public boolean preMotorHit(ServoMotor motor) {
         if (mode == EntryAction.ENTRY_WRITE) {
-            if (motor.getServoStack(Executioner.STACK_IO).getSize() > 0) {
+            if (motor.getArgStack().getSize() > 0) {
                 motor.executioner.entry_action = mode;
             } else {
                 motor.executioner.entry_action = EntryAction.ENTRY_EXECUTE;
@@ -71,7 +71,7 @@ public class SetEntryAction extends Instruction {
         if (!playerHasProgrammer(player)) {
             return false;
         }
-        mode = FzUtil.shiftEnum(mode, mode.values(), 1);
+        mode = FzUtil.shiftEnum(mode, EntryAction.values(), 1);
         return true;
     }
     
