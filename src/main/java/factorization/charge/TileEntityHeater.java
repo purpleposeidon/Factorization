@@ -2,7 +2,7 @@ package factorization.charge;
 
 import java.io.DataInput;
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 import net.minecraft.block.BlockFurnace;
 import net.minecraft.item.ItemStack;
@@ -22,7 +22,6 @@ import factorization.common.FactoryType;
 import factorization.oreprocessing.TileEntityCrystallizer;
 import factorization.oreprocessing.TileEntitySlagFurnace;
 import factorization.shared.BlockClass;
-import factorization.shared.Core;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.shared.TileEntityCommon;
 import factorization.shared.TileEntityExtension;
@@ -120,7 +119,6 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
         }
         long now = worldObj.getTotalWorldTime() + here.seed();
         int rate = 4;
-        long i = now % rate;
         if (now % rate == 0) {
             int heatToRemove = maxHeat - heat;
             int avail = Math.min(heatToRemove, charge.getValue());
@@ -134,7 +132,8 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
             return;
         }
         int recurs = 0, action = 0;
-        for (Coord c : here.getRandomNeighborsAdjacent()) {
+        ArrayList<Coord> randomNeighbors = here.getRandomNeighborsAdjacent();
+        for (Coord c : randomNeighbors) {
             TileEntity te = c.getTE();
             if (te == null) {
                 continue;
@@ -151,7 +150,7 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
             }
         }
         if (recurs > 0 && action == 0) {
-            for (Coord c : here.getRandomNeighborsAdjacent()) {
+            for (Coord c : randomNeighbors) {
                 TileEntity te = c.getTE();
                 if (te == null) {
                     continue;
@@ -182,6 +181,9 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
             this.burnTime = burnTime;
             this.cookTime = cookTime;
             this.topBurnTime = 200;
+            if (burnTime == 0 && heat < maxHeat*0.95) {
+                return;
+            }
             calculate(furnace);
         }
 
@@ -203,18 +205,6 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
                 }
             }
         }
-    }
-
-    static Class<? extends TileEntity> rpAlloyFurnace = null;
-    static {
-        //Waiting for Elo to set up something on her end so that we can check if it's heatable
-//		try {
-//			rpAlloyFurnace = (Class<? extends TileEntity>) Class.forName("com.eloraam.redpower.base.TileAlloyFurnace");
-//			Core.logInfo("Heaters will work on RedPower Alloy Furnaces");
-//		} catch (ClassNotFoundException e) {
-//			Core.logInfo("Couldn't find AlloyFurnace");
-//			e.printStackTrace();
-//		}
     }
     
     boolean sendHeat(TileEntity te, boolean canRecurse) {
@@ -254,31 +244,6 @@ public class TileEntityHeater extends TileEntityCommon implements IChargeConduct
             crys.heat++;
             heat--;
             return true;
-        } 
-        if (rpAlloyFurnace != null && rpAlloyFurnace.isInstance(te)) {
-            Exception err = null;
-            try {
-                Field burntimeField = rpAlloyFurnace.getField("burntime");
-                //Field totalburnField = rpAlloyFurnace.getField("totalburn");
-                ProxiedHeatingResult pf = new ProxiedHeatingResult(new Coord(te), burntimeField.getInt(te), 0 /* Elo doesn't want speedy. :( */);
-                burntimeField.setInt(te, pf.burnTime);
-                return true;
-            } catch (SecurityException e) {
-                err = e;
-            } catch (NoSuchFieldException e) {
-                err = e;
-            } catch (IllegalArgumentException e) {
-                err = e;
-            } catch (IllegalAccessException e) {
-                err = e;
-            } finally {
-                if (err != null) {
-                    rpAlloyFurnace = null;
-                    Core.logWarning("Failed to reflect into RedPower AlloyFurnace; heating disabled.");
-                    err.printStackTrace();
-                }
-            }
-            return false;
         }
         if (te instanceof TileEntityGreenware) {
             TileEntityGreenware teg = (TileEntityGreenware) te;
