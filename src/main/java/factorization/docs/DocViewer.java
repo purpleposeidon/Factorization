@@ -42,6 +42,7 @@ public class DocViewer extends GuiScreen {
     
     private static Deque<HistoryPage> the_pageHistory = new ArrayDeque<HistoryPage>();
     public static String current_page = "index";
+    public static int current_index = 0;
     
     
     
@@ -371,6 +372,7 @@ public class DocViewer extends GuiScreen {
         for (AbstractPage page : doc.pages) {
             page.closed();
         }
+        current_index = doc.pages.indexOf(getPage(0));
     }
     
     @Override

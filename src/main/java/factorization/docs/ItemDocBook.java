@@ -9,6 +9,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
+import factorization.docs.DocViewer.HistoryPage;
 import factorization.notify.Notify;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemFactorization;
@@ -45,7 +46,8 @@ public class ItemDocBook extends ItemFactorization {
     public ItemStack onItemRightClick(ItemStack is, World world, EntityPlayer player) {
         if (!world.isRemote) return is;
         Minecraft mc = Minecraft.getMinecraft();
-        mc.displayGuiScreen(new DocViewer(DocViewer.current_page));
+        //HistoryPage ap = DocViewer.popLastPage();
+        mc.displayGuiScreen(new DocViewer(new HistoryPage(DocViewer.current_page, DocViewer.current_index)));
         return is;
     }
     
