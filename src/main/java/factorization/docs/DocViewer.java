@@ -9,11 +9,14 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 public class DocViewer extends GuiScreen {
     final String name;
@@ -210,6 +213,13 @@ public class DocViewer extends GuiScreen {
         }
         
         super.drawScreen(mouseX, mouseY, partialTicks);
+        
+        {
+            // Enyoinken from GuiContainer.drawScreen
+            RenderHelper.enableGUIStandardItemLighting();
+            GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
+        }
         
         for (int pass = 0; pass <= 1; pass++) {
             drawPage(0, mouseX, mouseY, pass);
