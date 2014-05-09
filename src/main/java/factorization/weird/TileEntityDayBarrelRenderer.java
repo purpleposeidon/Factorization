@@ -172,7 +172,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         final double char_width = 1.0/10.0;
         final double char_height = 1.0/10.0;
         final Tessellator tess = Tessellator.instance;
-        tess.setTranslation(-char_width * len / 2 + 0.25, -char_height, 0);
+        tess.setTranslation(-char_width * len / 2 + 0.25, -char_height - 1F/32F, 0);
         tess.startDrawingQuads();
         double du = (font.getMaxU() - font.getMinU()) / 4;
         double dv = (font.getMaxV() - font.getMinV()) / 4;
