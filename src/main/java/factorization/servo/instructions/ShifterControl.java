@@ -3,6 +3,7 @@ package factorization.servo.instructions;
 import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -41,7 +42,7 @@ public class ShifterControl extends Instruction {
 
     @Override
     protected ItemStack getRecipeItem() {
-        return FactoryType.SOCKET_SHIFTER.asSocketItem();
+        return new ItemStack(Blocks.hopper);
     }
 
     @Override
