@@ -47,8 +47,10 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.StringUtils;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
@@ -1463,7 +1465,30 @@ public class FzUtil {
     public static NBTTagCompound item2tag(ItemStack is) {
         NBTTagCompound tag = new NBTTagCompound();
         is.writeToNBT(tag);
+        tag.removeTag("id");
+        tag.setString("name", FzUtil.getName(is));
         return tag;
+    }
+    
+    public static ItemStack tag2item(NBTTagCompound tag, ItemStack defaultValue) {
+        if (tag == null || tag.hasNoTags()) return defaultValue.copy();
+        if (tag.hasKey("id")) {
+            // Legacy
+            ItemStack is = ItemStack.loadItemStackFromNBT(tag);
+            if (is == null) return defaultValue.copy();
+            return is;
+        }
+        String itemName = tag.getString("name");
+        if (StringUtils.isNullOrEmpty(itemName)) return defaultValue.copy();
+        byte stackSize = tag.getByte("Count");
+        short itemDamage = tag.getShort("Damage");
+        Item it = FzUtil.getItemFromName(itemName);
+        if (it == null) return defaultValue.copy();
+        ItemStack ret = new ItemStack(it, stackSize, itemDamage);
+        if (tag.hasKey("tag", Constants.NBT.TAG_COMPOUND)) {
+            ret.setTagCompound(tag.getCompoundTag("tag"));
+        }
+        return ret;
     }
     
     public static void collapseItemList(List<ItemStack> total) {

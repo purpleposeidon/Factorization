@@ -1149,11 +1149,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         if (tag == null) {
             return default_.copy();
         }
-        ItemStack ret = ItemStack.loadItemStackFromNBT(tag);
-        if (ret == null) {
-            return default_.copy();
-        }
-        return ret;
+        return FzUtil.tag2item(tag, default_);
     }
     
     static ItemStack addUpgrade(ItemStack barrel, Type upgrade) {
@@ -1220,7 +1216,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         super.finalize();
         if (display_list != -1) {
             if (Core.dev_environ) {
-                System.out.println("Barrel finalized"); // dev environ, it's fine!
+                Core.logFine("Barrel finalized"); // dev environ, it's fine!
             }
             addFinalizedDisplayList(display_list);
             display_list = -1;
@@ -1240,12 +1236,10 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     @SideOnly(Side.CLIENT)
     public void removeUnloadedDisplayLists(ChunkEvent.Unload event) {
         if (!event.world.isRemote) return;
-        int count = 0;
         for (TileEntity te : (Iterable<TileEntity>)event.getChunk().chunkTileEntityMap.values()) {
             if (te instanceof TileEntityDayBarrel) {
                 TileEntityDayBarrel me = (TileEntityDayBarrel) te;
                 me.freeDisplayList();
-                count++;
             }
         }
     }
