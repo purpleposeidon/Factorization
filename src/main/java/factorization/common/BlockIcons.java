@@ -115,9 +115,8 @@ public class BlockIcons {
     public static IIcon servo$instruction_plate;
     public static IIcon servo$trap;
     public static IIcon servo$entry_execute, servo$entry_load, servo$entry_write, servo$entry_ignore;
-    public static IIcon servo$move_value, servo$move_stack, servo$take_value, servo$take_stack;
     public static IIcon servo$scan_color;
-    public static IIcon servo$set_segment;
+    public static IIcon servo$group_empty, servo$group_something;
     
     public static class ActivatingMachineIIcon extends IIconGroup {
         public IIcon top, bottom, side, side_on;
