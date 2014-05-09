@@ -331,8 +331,14 @@ public class RenderServoMotor extends RenderEntity {
             GL11.glRotatef(-50.0F, 0.0F, 1.0F, 0.0F);
         }
         
-        float f6 = 1.5F;
-        GL11.glScalef(f6, f6, f6);
+        float scale = 1.5F;
+        GL11.glScalef(scale, scale, scale);
+        
+        int itemColor = is.getItem().getColorFromItemStack(is, 0);
+        float cr = (float)(itemColor >> 16 & 255) / 255.0F;
+        float cg = (float)(itemColor >> 8 & 255) / 255.0F;
+        float cb = (float)(itemColor & 255) / 255.0F;
+        GL11.glColor4f(cr, cg, cb, 1.0F);
         
         this.renderManager.itemRenderer.renderItem(dummy_entity, is, 0);
 
