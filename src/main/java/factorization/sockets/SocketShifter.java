@@ -323,7 +323,9 @@ public class SocketShifter extends TileEntitySocketBase {
         FzInv target = FzUtil.openInventory(at.getTE(IInventory.class), fdOp);
         at.adjust(fdOp);
         if (target == null) {
-            motor.putError("Not pointing at an inventory!");
+            motor.getArgStack().push(-1);
+            //Instead of:
+            //motor.putError("Not pointing at an inventory!");
             return;
         }
         FzInv backInv = FzUtil.openInventory(motor, false);
