@@ -27,6 +27,7 @@ public class TileEntityGreenwareRender extends TileEntitySpecialRenderer {
         BlockRenderGreenware.instance.renderInInventory();
         BlockRenderGreenware.instance.setTileEntity(gw);
         BlockRenderGreenware.instance.renderDynamic(gw);
+        BlockRenderGreenware.instance.clearWorldReferences();
         GL11.glPopMatrix();
         gw.lastTouched = lt;
         Core.profileEndRender();

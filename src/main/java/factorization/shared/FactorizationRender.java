@@ -37,12 +37,14 @@ public class FactorizationRender implements ISimpleBlockRenderingHandler {
                 int fmd = tec.getFactoryType().md;
                 FactorizationBlockRender FBR = FactorizationBlockRender.getRenderer(fmd);
                 FBR.renderInWorld(world, x, y, z, fmd, tec);
+                boolean ret = false;
                 if (renderPass == 0) {
-                    return FBR.render(renderBlocks);
+                    ret = FBR.render(renderBlocks);
                 } else if (renderPass == 1) {
-                    return FBR.renderSecondPass(renderBlocks);
+                    ret = FBR.renderSecondPass(renderBlocks);
                 }
-                return false;
+                FBR.clearWorldReferences();
+                return ret;
             }
             if (block == Core.registry.lightair_block) {
                 if (md == BlockLightAir.air_md) {

@@ -115,6 +115,12 @@ abstract public class FactorizationBlockRender implements ICoord {
     public final void setTileEntity(TileEntity t) {
         te = t;
     }
+    
+    public final void clearWorldReferences() {
+        te = null;
+        w = null;
+        x = y = z = 0;
+    }
 
     public final void setMetadata(int md) {
         metadata = md;
