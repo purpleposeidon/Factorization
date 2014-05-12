@@ -52,7 +52,11 @@ public class MotionHandler {
         pos_next = data.as(Share.VISIBLE, "pos_next").put(pos_next);
         pos_prev = data.as(Share.VISIBLE, "pos_prev").put(pos_prev);
         pos_progress = data.as(Share.VISIBLE, "pos_progress").putFloat(pos_progress);
-        
+        if (target_speed_index < 0) {
+            target_speed_index = 0;
+        } else if (target_speed_index >= target_speeds_b.length) {
+            target_speed_index = (byte) (target_speeds_b.length - 1);
+        }
     }
     
     void beforeSpawn() {
