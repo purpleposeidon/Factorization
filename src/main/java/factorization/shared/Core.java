@@ -247,7 +247,7 @@ public class Core {
     }
     
     @EventHandler
-    public void replaceDerpyNames(FMLMissingMappingsEvent event) { //NORELEASE: Test.
+    public void replaceDerpyNames(FMLMissingMappingsEvent event) {
         Object[][] corrections = new Object[][] {
                 {"factorization:tile.null", Core.registry.factory_block},
                 {"factorization:FZ factory", Core.registry.factory_block},
