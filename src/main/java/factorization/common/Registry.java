@@ -1054,10 +1054,6 @@ public class Registry {
     }
 
     public void setToolEffectiveness() {
-        /*NORELEASE: Is this actually even needed? for (String tool : new String[] { "pickaxe", "axe", "shovel" }) {
-            MinecraftForge.removeBlockEffectiveness(factory_block, tool);
-            MinecraftForge.removeBlockEffectiveness(resource_block, tool);
-        }*/
         BlockClass.DarkIron.harvest("pickaxe", 2);
         BlockClass.Barrel.harvest("axe", 1);
         BlockClass.Machine.harvest("pickaxe", 1);
@@ -1128,7 +1124,6 @@ public class Registry {
         for (ItemStack is : OreDictionary.getOres("logWood")) {
             Block log = Block.getBlockFromItem(is.getItem());
             if (log == null || log == Blocks.log || log == Blocks.log2) {
-                //Skip vanilla; NORELEASE: 1.7, check the new woods; add to crafting for barrels & embarkening
                 continue;
             }
             if (is.getItemDamage() == FzUtil.WILDCARD_DAMAGE) {
@@ -1168,7 +1163,7 @@ public class Registry {
             // In this case we're going to want to use the plank.
             // But if the plank is also vanilla, then keep the vanilla slab!
             if (Block.getBlockFromItem(slab.getItem()) == Blocks.wooden_slab) {
-                if (Block.getBlockFromItem(plank.getItem()) != Blocks.planks /* NORELEASE: 1.7, new planks -- guess they're packed in the same ID? */) {
+                if (Block.getBlockFromItem(plank.getItem()) != Blocks.planks /* the new-in-1.7 planks are packed in the same ID */) {
                     slab = plank;
                 }
             }
