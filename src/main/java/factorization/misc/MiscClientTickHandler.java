@@ -5,7 +5,9 @@ import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.gui.GuiOptions;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -17,7 +19,6 @@ import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import factorization.api.Coord;
-import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
 public class MiscClientTickHandler {
@@ -31,6 +32,7 @@ public class MiscClientTickHandler {
         checkPickBlockKey();
         checkSprintKey();
         MiscClientCommands.tick();
+        fuckTheSecretButton();
     }
     
     int count = 0;
@@ -121,7 +123,7 @@ public class MiscClientTickHandler {
         return false;
     }
     
-    static KeyBinding sprint = new KeyBinding("Sprint (FZ)", 0, "key.categories.gameplay");
+    static KeyBinding sprint = new KeyBinding("Sprint (FZ)", 0, "key.categories.movement");
     static {
         ClientRegistry.registerKeyBinding(sprint);
     }
@@ -149,5 +151,22 @@ public class MiscClientTickHandler {
             mc.thePlayer.setSprinting(false);
         }
         prevState = state;
+    }
+    
+    private void fuckTheSecretButton() {
+        if (mc.currentScreen == null) return;
+        if (!(mc.currentScreen instanceof GuiOptions)) return;
+        
+        GuiOptions gui = (GuiOptions) mc.currentScreen;
+        for (Object obj : gui.buttonList) {
+            if (obj instanceof GuiButton) {
+                GuiButton button = (GuiButton) obj;
+                if (button.id == 8675309) {
+                    button.displayString = "Shaders; press F4 to reset";
+                    button.xPosition = 0;
+                    button.yPosition = 0;
+                }
+            }
+        }
     }
 }
