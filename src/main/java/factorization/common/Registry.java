@@ -18,6 +18,7 @@ import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
@@ -504,7 +505,8 @@ public class Registry {
                 'c', Items.clay_ball,
                 '/', Items.stick);
         ItemSculptingTool.addModeChangeRecipes();
-        oreRecipe(new ItemStack(glaze_bucket),
+        ItemStack empty_glaze_bucket = new ItemStack(glaze_bucket, 1, 100);
+        oreRecipe(empty_glaze_bucket.copy(),
                 "_ _",
                 "# #",
                 "#_#",
@@ -518,7 +520,7 @@ public class Registry {
         
         ItemStack lapis = new ItemStack(Items.dye, 1, 4);
         
-        shapelessOreRecipe(base_common, new ItemStack(glaze_bucket), Items.water_bucket, Blocks.sand, Items.clay_ball);
+        shapelessOreRecipe(base_common, empty_glaze_bucket.copy(), Items.water_bucket, Blocks.sand, Items.clay_ball);
         shapelessOreRecipe(glaze_base_mimicry, base_common, Items.redstone, Items.slime_ball, lapis);
         
         ItemStack waterFeature = glaze_bucket.makeMimicingGlaze(Blocks.water, 0, -1);
@@ -612,6 +614,7 @@ public class Registry {
                     if (FzUtil.couldMerge(glaze_base_mimicry, is)) {
                         mimic_items++;
                     } else {
+                        if (!(is.getItem() instanceof ItemBlock)) continue;
                         int d = is.getItemDamage();
                         if (d < 0 || d > 16) {
                             return false;
@@ -658,6 +661,7 @@ public class Registry {
                     if (d < 0 || d > 16) {
                         continue;
                     }
+                    if (!(is.getItem() instanceof ItemBlock)) continue;
                     Block b = Block.getBlockFromItem(is.getItem());
                     if (b == null || b.getUnlocalizedName().equals("tile.ForgeFiller")) {
                         continue;
