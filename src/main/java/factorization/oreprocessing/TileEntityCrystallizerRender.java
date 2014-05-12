@@ -1,13 +1,11 @@
 package factorization.oreprocessing;
 
 import static org.lwjgl.opengl.GL11.*;
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.item.Item;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -65,6 +63,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
 
         //render the fluid
         if (crys.solution != null) {
+            glAlphaFunc(GL_GREATER, 0.1F);
             glEnable(GL_BLEND);
             ItemStack sol = crys.solution;
             Tessellator tess = Tessellator.instance;
