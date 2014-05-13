@@ -46,7 +46,7 @@ public class MotionHandler {
         nextDirection = data.as(Share.VISIBLE, "nextDir").putEnum(nextDirection);
         lastDirection = data.as(Share.VISIBLE, "lastDir").putEnum(lastDirection);
         speed_b = data.as(Share.VISIBLE, "speedb").putByte(speed_b);
-        target_speed_index = data.as(Share.VISIBLE, "speedt").putByte(target_speed_index);
+        setTargetSpeed(data.as(Share.VISIBLE, "speedt").putByte(target_speed_index));
         accumulated_motion = data.as(Share.VISIBLE, "accumulated_motion").putDouble(accumulated_motion);
         stopped = data.as(Share.VISIBLE, "stop").putBoolean(stopped);
         pos_next = data.as(Share.VISIBLE, "pos_next").put(pos_next);
@@ -57,6 +57,15 @@ public class MotionHandler {
         } else if (target_speed_index >= target_speeds_b.length) {
             target_speed_index = (byte) (target_speeds_b.length - 1);
         }
+    }
+    
+    public void setTargetSpeed(byte newSpeed) {
+        if (newSpeed < 0) {
+            newSpeed = 0;
+        } else if (newSpeed >= target_speeds_b.length) {
+            newSpeed = (byte) (target_speeds_b.length - 1);
+        }
+        target_speed_index = newSpeed;
     }
     
     void beforeSpawn() {

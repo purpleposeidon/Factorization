@@ -361,11 +361,11 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     }
     
     public void setTargetSpeed(byte newTarget) {
-        motionHandler.target_speed_index = (byte) (newTarget + 1);
+        motionHandler.setTargetSpeed((byte) (newTarget - 1));
     }
     
     public byte getTargetSpeed() {
-        return (byte) (motionHandler.target_speed_index - 1);
+        return (byte) (motionHandler.target_speed_index + 1);
     }
     
     public void penalizeSpeed() {
