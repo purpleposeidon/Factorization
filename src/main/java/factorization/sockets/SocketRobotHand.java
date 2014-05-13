@@ -82,7 +82,11 @@ public class SocketRobotHand extends TileEntitySocketBase {
     
     @Override
     public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
-        return doHandleRay(socket, mop, mopIsThis, powered);
+        boolean ret = doHandleRay(socket, mop, mopIsThis, powered);
+        if (!ret) {
+            return !worldObj.isAirBlock(mop.blockX, mop.blockY, mop.blockZ);
+        }
+        return ret;
     }
     
     private boolean doHandleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
