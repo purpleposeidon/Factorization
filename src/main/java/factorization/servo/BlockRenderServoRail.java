@@ -43,13 +43,6 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
         if (world_mode) {
             if (te instanceof TileEntityServoRail) {
                 rail = (TileEntityServoRail) te;
-                Decorator dec = rail.decoration;
-                if (dec != null) {
-                    dec.renderStatic(rail.getCoord(), rb);
-                }
-                if (rail.comment != null && rail.comment.length() > 0) {
-                    has_comment = true;
-                }
             } else {
                 return false;
             }
@@ -101,6 +94,15 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
             
             Arrays.fill(extend, false);
             block.setTexture(i, null);
+        }
+        if (world_mode && rail != null) {
+            Decorator dec = rail.decoration;
+            if (dec != null) {
+                dec.renderStatic(rail.getCoord(), rb);
+            }
+            if (rail.comment != null && rail.comment.length() > 0) {
+                has_comment = true;
+            }
         }
         return true;
     }
