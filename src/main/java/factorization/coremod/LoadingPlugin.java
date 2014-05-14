@@ -24,7 +24,9 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public String[] getASMTransformerClass() {
-        return new String[] { "factorization.coremod.ASMTransformer" };
+        return new String[] {
+                "factorization.coremod.ASMTransformer",
+                "factorization.coremod.AirInspector"};
     }
     
     @Override
