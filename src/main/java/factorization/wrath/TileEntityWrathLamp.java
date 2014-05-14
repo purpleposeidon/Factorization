@@ -91,7 +91,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
         TileEntityWrathLamp lamp = TileEntityWrathLamp.findLightAirParent(w, x, y, z);
         if (lamp == null) {
             update_count += 1;
-            w.setBlock(x, y, z, Blocks.air, 0, UPDATE_CLIENT);
+            w.setBlockToAir(x, y, z);
         } else {
             lamp.activate(y);
         }
@@ -176,7 +176,7 @@ public class TileEntityWrathLamp extends TileEntityCommon {
                 Block id = worldObj.getBlock(x, yCoord, z);
                 if (id == Core.registry.lightair_block) {
                     if (worldObj.isRemote) {
-                        worldObj.setBlock(x, yCoord, z, Blocks.air, 0, NOTIFY_NEIGHBORS);
+                        worldObj.setBlockToAir(x, yCoord, z);
                     } else {
                         worldObj.setBlock(x, yCoord, z, Blocks.air);
                     }
