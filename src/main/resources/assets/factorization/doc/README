@@ -1,0 +1,57 @@
+This system is TeX-inspired. Commands:
+\p      Starts a new paragraph
+\nl     Emits a newline
+\-      Bulleted list item
+"\ "    Emit a space
+\\      Emit a reverse solidus
+\newpage
+        Emit a new page
+\leftpage
+        Make the following text start at the top of a left page
+\b{content}
+\i{content}
+\u{content}
+\obf{content}
+        Apply text stylings to the content.
+\title  Emit a title
+\h1     Emit a header
+\link{destination}{content}
+        Emits a hyperlink
+\index{destination}{content}
+        Like \link, but emits a following newline.
+\#{item localization key}
+        Embeds an item with that localization key.
+        Use /f copylocalkey to get the localization key of an item.
+\img{domain:path/to/image.png}
+        Embeds an image (untested)
+\imgx{width}{height}{domain:path/to/image.png}
+        Embeds an image, using the provided width and height (untested)
+\figure{<base64-encoded compressed NBT data>}
+        Embeds a figure. The /fzdoc-serialize command will create the command for you.
+        Figures are created by standing on a pillar made of gold blocks, with two gold block extensions at the base of the figure, and running the /fzdoc-serialize command. (This command may only be available in a deobfuscated environment.)
+        Due to block ID issues, only vanilla blocks and items can be safely used.
+        All other items & entities will NOT have their IDs synchronized. (Except for the hard-coded FZ ones...)
+        Entities should work, but are mostly untested.
+        The figure is placed on a separate page, and is scaled to fit.
+\generate{path}
+        Embeds dynamically generated content.
+        But the paths are not documented here!
+\seg
+\endseg
+        deliminates a segment of text; the typesetter will try to prevent pagebreaks in the middle of a segment.
+\topic{item localization key}
+        Emits the recipes for an item.
+        It is also used to index the documentation by item.
+        factorization.docs.IndexDocumentation /path/to/topic_index.txt factorization=./
+\checkmods{all|some|none}{space deliminated list of modIds}{enabled content}{<optional disabled content>}
+        Basically an 'if' statement.
+
+
+A '%' marks a line-comment.
+Multiple spaces are ignored.
+A single newline is ignored.
+Two or more newlines create a real newline.
+Commands swallow following spaces. To actually follow a command with a space, do something like "\this\ " to expressly emit a space.
+
+
+
