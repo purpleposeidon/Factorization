@@ -4,7 +4,6 @@ import java.util.EnumSet;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -172,6 +171,9 @@ public abstract class Notify {
         instance.doSendOnscreenMessage(player, message, formatArguments);
     }
     
+    public static void simpleSend(EntityPlayer player, int blockX, int blockY, int blockZ, String message, String... formatParameters) {
+        Notify.send(player, new Coord(player.worldObj, blockX, blockY, blockZ), message, formatParameters);
+    }
     
     protected static Notify instance;
     protected abstract void doSend(EntityPlayer player, Object where, EnumSet<Style> style, ItemStack item, String format, String[] args);
