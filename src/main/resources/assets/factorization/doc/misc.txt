@@ -11,11 +11,29 @@ Run '/f list' for more information.
 
 \nl
 
+\checkmods{none}{craftguide NotEnoughItems}{
 \link{cgi/recipes}{Recipes}
 
 \link{cgi/items}{Items}
 
+%
+% Dedicated recipe viewer mods do a much much better job.
+% The output of this is pretty ugly, and there's no way to search for items.
+% However, if you would like your machine's custom recipes (not IRecipes!) to be included
+% as a backup way of looking at recipes
+% send factorization an IMC message "AddRecipeCategory"
+% with "Recipe Category Name|path.to.the.ClassHoldingTheRecipes|public_static_field"
+% eg FMLInterModComms.sendMessage("factorization",
+%                                 "AddRecipeCategory",
+%                                 "Lacerator|factorization.oreprocessing.TileEntityGrinder|recipes");
+% It will use reflection to explore the contents of the field.
+% The field can be either an Iterable or a Map.
+%
+% Custom IRecipes will be included naturally as part of the exploration of Workbench recipes.
+%
+
 \nl
+}
 
 \u{Improved Projectile Physics}
 

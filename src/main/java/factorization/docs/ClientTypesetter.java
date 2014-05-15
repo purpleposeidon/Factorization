@@ -2,6 +2,9 @@ package factorization.docs;
 
 import java.util.ArrayList;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.resources.IResource;
@@ -187,6 +190,46 @@ public class ClientTypesetter extends AbstractTypesetter {
             }
             append(String.format("\\newpage \\generate{recipes/for/%s}", topic));
             //topics.add(topic);
+        } else if (cmd.equals("\\checkmods")) {
+            String mode = getParameter(cmd, tokenizer); // all some none
+            if (mode == null) {
+                error("\\checkmods missing parameter");
+                return;
+            }
+            String modList = getParameter(cmd, tokenizer); //craftguide NotEnoughItems
+            if (modList == null) {
+                error("\\checkmods missing parameter");
+                return;
+            }
+            String content = getParameter(cmd, tokenizer);
+            if (content == null) {
+                error("\\checkmods missing parameter");
+                return;
+            }
+            int count = 0;
+            String[] mods = modList.split(" ");
+            for (String modId : mods) {
+                if (Loader.isModLoaded(modId)) {
+                    count++;
+                }
+            }
+            boolean good = false;
+            if (mode.equalsIgnoreCase("all")) {
+                good = count == mods.length;
+            } else if (mode.equalsIgnoreCase("none")) {
+                good = count == 0;
+            } else if (mode.equalsIgnoreCase("some")) {
+                good = count > 1;
+            } else {
+                error("\\checkmods first parameter must be 'all', 'none', or 'some', not " + mode);
+                return;
+            }
+            String other = getParameter(cmd, tokenizer);
+            if (good) {
+                process(content, link, style);
+            } else if (other != null) {
+                process(other, link, style);
+            }
         } else {
             error("Unknown command: ");
             emit(cmd, null);
