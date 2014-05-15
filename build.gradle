@@ -17,15 +17,17 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "0.8.61"
+version = (new File('fzversion').getText('UTF-8').replaceAll("\\s",""))
 group = "factorization"
 archivesBaseName = "Factorization"
+print "\n\n   build/libs/" + archivesBaseName + "-" + version + ".jar\n\n"
 
 minecraft {
     version = "1.7.2-10.12.1.1065"
     assetDir = "eclipse/assets"
     replace '@FZVERSION@', project.version
 }
+
 
 processResources {
     // this will ensure that this task is redone when the versions change.
