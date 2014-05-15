@@ -25,13 +25,17 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import cpw.mods.fml.client.GuiModList;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import factorization.api.Coord;
 import factorization.common.FzConfig;
+import factorization.notify.Notify;
+import factorization.notify.Notify.Style;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
@@ -467,6 +471,23 @@ public class MiscClientCommands implements ICommand {
             }
             FzUtil.copyStringToClipboard(name);
             return "Copied to clipboard: " + name;
+        }
+        
+        @help("Marks nearby fake air blocks")
+        public static void checkFakeAir() {
+            Coord at = new Coord(mc.thePlayer);
+            int d = 3;
+            for (int dz = -d; dz <= d; dz++) {
+                for (int dy = -d; dy <= d; dy++) {
+                    for (int dx = -d; dx <= d; dx++) {
+                        Coord here = at.add(dx, dy, dz);
+                        if (here.isAir() && here.getBlock() != Blocks.air) {
+                            Notify.withStyle(Style.FORCE);
+                            Notify.send(here, "X");
+                        }
+                    }
+                }
+            }
         }
         
         /*
