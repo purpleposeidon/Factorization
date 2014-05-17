@@ -12,6 +12,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.tileentity.TileEntity;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import factorization.api.Coord;
 import factorization.shared.Core;
@@ -84,7 +85,10 @@ public class FigurePage extends AbstractPage {
             GL11.glShadeModel(GL11.GL_SMOOTH);
         }
         
+        
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GL11.glDisable(GL11.GL_LIGHTING);
         for (int i = 0; i < 2; i++) {
             if (i == 1) {
                 GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
