@@ -265,7 +265,7 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
         FzInv back = null;
         if (socket == this) {
             coord.adjust(facing.getOpposite());
-            back = FzUtil.openInventory(coord.getTE(IInventory.class), facing.getOpposite());
+            back = FzUtil.openInventory(coord.getTE(IInventory.class), facing);
             coord.adjust(facing);
         } else {
             back = FzUtil.openInventory((Entity) socket, false);
