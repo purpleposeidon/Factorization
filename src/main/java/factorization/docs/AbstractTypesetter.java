@@ -39,7 +39,7 @@ public abstract class AbstractTypesetter {
     }
     
     void error(String msg) {
-        process(msg, null, "" + EnumChatFormatting.RED + EnumChatFormatting.BOLD);
+        process(msg.replace("\\", "\\\\ "), null, "" + EnumChatFormatting.RED + EnumChatFormatting.BOLD);
     }
 
     String getParameter(final String cmdName, final Tokenizer tokenizer) {
