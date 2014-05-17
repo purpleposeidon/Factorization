@@ -45,6 +45,7 @@ import org.lwjgl.input.Mouse;
 import com.google.common.io.Closeables;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -207,9 +208,8 @@ public class DocumentationModule implements ICommand {
         dw.writeToTag(worldTag);
         try {
             String encoded = encodeNBT(worldTag);
-            ByteArrayInputStream bais = new ByteArrayInputStream(encoded.getBytes());
-            NBTTagCompound it = decodeNBT(encoded);
-            String cmd = "\\figure{" + encoded + "}";
+            String cmd = "\\figure{\n" + encoded + "}";
+            cmd = cmd.replace("\0", "");
             System.out.println(cmd);
             FzUtil.copyStringToClipboard(cmd);
             msg(player, "\\figure command copied to the clipboard");
@@ -399,7 +399,9 @@ public class DocumentationModule implements ICommand {
         } finally {
             FzUtil.closeNoisily("closing topic_index", topic_index);
         }
-        return false;
+        if (Loader.isModLoaded("NotEnoughItems") || Loader.isModLoaded("craftguide")) return false;
+        mc.displayGuiScreen(new DocViewer("cgi/recipes/for/" + name));
+        return true;
     }
     
     static void registerGenerators() {
