@@ -1,0 +1,14 @@
+\title{The Screw Pump}
+
+The screwpump transfers liquids from behind it to in front of it.
+
+If there is a body of liquid behind it,
+it will drain from it.
+
+It can also drain from tanks.
+
+If there's a tank in front of the screwpump,
+then it will fill the tank.
+Otherwise it will flood into empty spaces,
+up to 7 blocks above the screw pump.
+Any tanks that are in the flooding area will be filled.
