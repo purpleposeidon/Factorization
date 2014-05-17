@@ -43,7 +43,7 @@ This system is TeX-inspired. Commands:
         Emits the recipes for an item.
         It is also used to index the documentation by item.
         factorization.docs.IndexDocumentation /path/to/topic_index.txt factorization=./
-\checkmods{all|some|none}{space deliminated list of modIds}{enabled content}{<optional disabled content>}
+\checkmods{all|some|none}{space deliminated list of modIds}{enabled content}{disabled content}
         Basically an 'if' statement.
 
 
