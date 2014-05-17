@@ -1,14 +1,10 @@
 \title{The Socket Block}
 
-Sockets are simply slots that can hold certain specially designed tools.
+The socket is a block that can hold machine parts.
 To equip a socket with a tool, simply right click it with the tool.
 Some tools require that a motor be installed on the socket first.
 
-Whatever tool is placed in it, they usually require that the socket
-be placed against an inventory.
-This inventory is called the "backing inventory".
-
-Certain socket tools can have their settings adjusted using a \lmp
+\include{socket_parts}
 
 % This figure is pretty pointless.
 % \figure{H4sIAAAAAAAAAO3cO4oCURAF0PtaFH+BK5EBDdzNBNqCiCiOiLpw057XzCIM5pzkVkEV1ApqmgxSdkmaSUpbapFa3KY1yzjNYZf5/vVz3h6/29Pl9hxncG+vGX0tN8vVuq6++o2azz5Lmv12WLtH32WWckoWfxMAAAAAAAAAAAAAAAAAAADAR81SDv0fgK7r3p++BQAAAAAAAAAAAAAAAAAAAP69X8pHZvpugAAA}

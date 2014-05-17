@@ -10,7 +10,7 @@ It will continue through each item in its
 backing inventory until it is able to use
 something.
 
-If it is unable to put an item back into its inventory,
-it will drop it on the ground.
+% If it is unable to put an item back into its inventory,
+% it will drop it on the ground.
 
 \topic{item.factorization:socket/SOCKET_ROBOTHAND}

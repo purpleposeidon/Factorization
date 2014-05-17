@@ -1,0 +1,5 @@
+\index{arm}{Robotic Arm}
+\index{itemshifter}{Item Shifter}
+\index{corkscrew}{Screw Pump}
+\index{lacerator}{Lacerator}
+\index{pressurizer}{Pressurizer}

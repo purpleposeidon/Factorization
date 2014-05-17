@@ -1,8 +1,5 @@
-\u{The Pocket Crafting Table}
-
-It's awesome. You should use it, altho it does need a clean inventory.
-
-\nl
+Miscellaneous Nonsense is a sub-mod in Factorization
+that adds various tweaks & polishes to vanilla Minecraft.
 
 \u{The '/f' client-side commands}
 
@@ -10,30 +7,6 @@ Popular /f's include 'now', 'cl', and 'ss'.
 Run '/f list' for more information.
 
 \nl
-
-\checkmods{none}{craftguide NotEnoughItems}{
-\link{cgi/recipes}{Recipes}
-
-\link{cgi/items}{Items}
-
-%
-% Dedicated recipe viewer mods do a much much better job.
-% The output of this is pretty ugly, and there's no way to search for items.
-% However, if you would like your machine's custom recipes (not IRecipes!) to be included
-% as a backup way of looking at recipes
-% send factorization an IMC message "AddRecipeCategory"
-% with "Recipe Category Name|path.to.the.ClassHoldingTheRecipes|public_static_field"
-% eg FMLInterModComms.sendMessage("factorization",
-%                                 "AddRecipeCategory",
-%                                 "Lacerator|factorization.oreprocessing.TileEntityGrinder|recipes");
-% It will use reflection to explore the contents of the field.
-% The field can be either an Iterable or a Map.
-%
-% Custom IRecipes will be included naturally as part of the exploration of Workbench recipes.
-%
-
-\nl
-}
 
 \u{Improved Projectile Physics}
 
@@ -48,5 +21,14 @@ This applies to snowballs, arrows, splash potions, and enderpearls.
 An important consequence of this is that you can survive
 a fall from a high place by throwing an enderpearl at the right time.
 
+
+\u{Buffed Nametags}
+Giving a mob a name with a nametag will buff their health.
+
+\u{Time Dilation}
+This is an optional setting that
+makes the client's tick rate match the server's.
+It can be enabled in the config file,
+or by using /f td.
 
 

@@ -13,10 +13,7 @@
 \seg
 \h1{Sockets}
 \index{socket}{The Socket Block}
-\index{arm}{Robotic Arm}
-\index{lacerator}{Lacerator}
-\index{itemshifter}{Item Shifter}
-\index{pressurizer}{Pressurizer}
+\include{socket_parts}
 \endseg
 
 \nl\nl

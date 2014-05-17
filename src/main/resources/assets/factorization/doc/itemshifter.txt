@@ -32,4 +32,17 @@ not the backing inventory.
 It can be set to target either the entire inventory,
 or a specific slot.
 
+\figure{
+H4sIAAAAAAAAAO3cTWvUQBjA8WeS3WXT1qJn/QKlZRGERbxY3bWl4GpRepa4O2uDSUaS6evJg3cP
+9qx4VHpQjx7Ez+DNryAexYOXdZINBVHBttvi4f+DYTLJzDMvIZnbTIn4ogYi0ghE6Sl3oQKpr1id
+5GXBEy8ayJwnjW6YhA+0uyX1jtlI7ZSS2t3YWJGaBGtrK92bOszt/tP5veev2+8DafSMjUzacFH8
+q5/2ks9PPpx7LL9S0rydLmcu3MBFaRZReia371r7L+ZedX74EnSjRKe5i1NU98S/FmVqoVkO6kwv
+SnU/zGxnXec2EH/V5GVvi8vfXr69cuvZYvKm7OXjpXG/vsyumsyGcceYeGC2qpi1pSjTo1FdZpbC
+OO5GuQ3Tvi6eBdK8Y2xYTKNeVj0Y9sxKurkRpzoL78e6qKhssVzeP65d+2DtxlOpl1Nwb2K3aOfy
+nSrfLvsbV5oZ7uam//Bevh4NrRJfbz9yVfyhyUaOuxFHiXKBt8LIqqb4mzqTxsXW5Va7/XvkWmIG
+xRw9Jd6wX6+6UjItKhE5O579n9NhNcrAR28P4PQd9/v3q9SsyrMTHR2AkzSp/b9ow/4PAAAAAAAA
+AAAAAAAAAAAAAAAAAMAE+OKZ4kSAheJidzQafZkWFVUnA8z/JR3W9SqdP2J7AKfvuN9/2/1Pvrv8
+QlW+MdnhAThB7P8AAAAAAAAAAAAAAAAAAAAAAAAAAPxnigMBdlz+VX4ChaObET2CAAA=
+}
+
 \topic{item.factorization:socket/SOCKET_SHIFTER}

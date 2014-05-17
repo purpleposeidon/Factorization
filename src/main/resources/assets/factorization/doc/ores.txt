@@ -3,18 +3,23 @@
 
 Galena can be found in largish clumps no higher than 46 meters above bedrock.
 Both silver and lead can be extracted from it.
-Silver is used to reflect light, and lead is used as a conductor.
+Silver is used to reflect sunlight, and lead is used as a conductor.
 Furnaces smelt galena into only silver.
 However, if smelted in a \link{slagfurnace}{Slag Furnace},
 it will produce both silver and lead ingots.
+
+\topic{tile.factorization.ResourceBlock.SILVERORE}
+
+\leftpage
 
 Dark iron ore is an unusual metal.
 It is found in craters in the bedrock,
 and is clearly not the product of any natural process.
 This material is uniquely suitable for for \link{servo}{servos} and other automata.
 
+\topic{tile.factorization:darkIronOre}
 
-\newpage
+\leftpage
 
 Diamond Shards are produced by exploding blocks
 of diamond with TNT.
@@ -25,3 +30,5 @@ They are used to make \link{lacerator}{Lacerators}.
 % The \figure above includes a sign, in English. The one below does not have that sign.
 % \figure{H4sIAAAAAAAAAO3csU/CUBDH8d/rA4JlEI2Lu3Nj1AFnXf0bSKFP0gSoqRUtg3+ff5ErXtGBgUlMGpPvJ2nu0lzfXYe3Xix5uUxS50guOEtkSRVbdH1Feabjx3RaFWU9nqRlGeZXXt1p8bKsrOLUy2d5adlZrM7zPJ1E20/eI/Xu00U6C3aKundNuZOV5FVYbEsukj0lTdazbvly5p2GWZm+jq13vgrjSV0F9eVXoVTvMhkl1zdenap+Cs3Esfy8mH33Ptnb235y3VRarH/im4VIA7mFNNSOSADwO67tAQAAAAAAAAAAAAAAAAAAAAAAAAAAAID/zisqmo0A502y3mw2HwO5fHczgL37PKBBcvCIANpy6P29teehxf4A2sP9BQAAAAAAAAAAAAAAAAAAAAAAAADgDzULAWqLI30B03IVJC2BAAA=}
 
+\topic{item.factorization:diamond_shard}
+% Only shows the creation recipes, yes? So nothing here.

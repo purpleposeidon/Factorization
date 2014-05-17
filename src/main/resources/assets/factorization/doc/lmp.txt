@@ -1,7 +1,6 @@
 \title{The Logic Matrix Programmer}
 
-The logic matrix programmer is the primary tool for Factorization.
-Since its name is a bit long, it is often abbreviated to LMP.
+The Logic Matrix Programmer (LMP) is the primary tool for Factorization.
 
 It contains a repository of software,
 and the data it caries is important and ubiquitous.
@@ -9,10 +8,10 @@ and the data it caries is important and ubiquitous.
 Cloning an LMP is fairly simple,
 however, obtaining the first one is not.
 They can be found in dungeon chests and stronghold libraries.
-Village librarians may be willing to part with one for a modest fee.
+Village librarians can be convinced to part with one.
 
 If you are far from civilization, know the data can be
 derived from the music disks “11” and “13” using stenography.
-Creepers drop music disks when they are shot by skeletons.
+Creepers drop music disks when killed by skeletons.
 
 \topic{item.factorization:tool/matrix_programmer}
