@@ -129,7 +129,7 @@ public class DocViewer extends GuiScreen {
     }
     
     Document getDocument(String name) {
-        AbstractTypesetter ts = new ClientTypesetter(mc.fontRenderer, getPageWidth(0), getPageHeight(0));
+        AbstractTypesetter ts = new ClientTypesetter(mc.fontRenderer, getPageWidth(0), getPageHeight(0)); 
         ts.processText(DocumentationModule.readDocument(name));
         return new Document(name, ts.getPages());
     }
@@ -272,6 +272,7 @@ public class DocViewer extends GuiScreen {
             WordPage p = (WordPage) thisPage;
             Word link = p.click(mouseX - getPageLeft(i), mouseY - getPageTop(i));
             if (link != null && link.getLink() != null) {
+                if (link.getLink().equals(name)) return;
                 DocViewer newDoc = new DocViewer(link.getLink());
                 addNewHistoryEntry(name, getCurrentPageIndex());
                 mc.displayGuiScreen(newDoc);
