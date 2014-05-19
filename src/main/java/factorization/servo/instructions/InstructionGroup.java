@@ -5,13 +5,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.google.common.base.Joiner;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
+
+import com.google.common.base.Joiner;
+
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
@@ -20,6 +21,7 @@ import factorization.servo.Executioner;
 import factorization.servo.Instruction;
 import factorization.servo.ServoMotor;
 import factorization.servo.ServoStack;
+import factorization.shared.Core;
 
 public class InstructionGroup extends Instruction {
     ServoStack stuff = new ServoStack(new Executioner(null));
@@ -34,6 +36,12 @@ public class InstructionGroup extends Instruction {
     @Override
     protected ItemStack getRecipeItem() {
         return new ItemStack(Items.slime_ball);
+    }
+    
+    @Override
+    protected void addRecipes() {
+        super.addRecipes();
+        Core.registry.shapelessRecipe(toItem(), toItem()); 
     }
 
     @Override
