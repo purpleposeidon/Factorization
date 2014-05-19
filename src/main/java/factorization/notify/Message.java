@@ -8,6 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -58,7 +59,12 @@ class Message {
             item_name = item.getDisplayName();
             EntityPlayer player = Minecraft.getMinecraft().thePlayer;
             ArrayList<String> bits = new ArrayList();
-            item.getItem().addInformation(item, player, bits, false);
+            try {
+                item.getItem().addInformation(item, player, bits, false);
+            } catch (Throwable t) {
+                t.printStackTrace();
+                bits.add("" + EnumChatFormatting.RED + EnumChatFormatting.BOLD + "ERROR");
+            }
             boolean tail = false;
             for (String s : bits) {
                 if (tail) {
