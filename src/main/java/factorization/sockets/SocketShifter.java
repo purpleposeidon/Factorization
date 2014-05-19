@@ -348,7 +348,9 @@ public class SocketShifter extends TileEntitySocketBase {
             for (int i = targetStart; i < targetEnd; i++) {
                 ItemStack it = target.get(i);
                 if (it != null && FzUtil.couldMerge(is, it)) {
-                    count += it.stackSize;
+                    if (target.canInsert(i, it) || target.canExtract(i, it)) {
+                        count += it.stackSize;
+                    }
                 }
             }
         }
