@@ -1,5 +1,7 @@
 package factorization.servo;
 
+import java.util.Iterator;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -15,7 +17,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
@@ -385,21 +386,27 @@ public class RenderServoMotor extends RenderEntity {
     }
     
     boolean renderStackWithColor(ServoStack stack, int color) {
-        int i = 0;
-        Minecraft mc = Minecraft.getMinecraft();
-        FontRenderer fr = mc.fontRenderer;
-        fr.drawString("_", 0, 0, color, true); // All the cool kids use Yijing.
-        for (Object o : stack) {
-            if (i == 0) {
-                GL11.glPushMatrix();
-            }
+        FontRenderer fr = getFontRendererFromRenderManager();
+        int count = stack.getSize();
+        if (count == 0) {
+            fr.drawString("_", 0, 0, color, true);
+            return false;
+        }
+        GL11.glPushMatrix();
+        float s = 7.0F/count;
+        if (s > 1) {
+            s = 1;
+        }
+        GL11.glScalef(s, s, s);
+        GL11.glTranslatef(0, count*7.5F, 0);
+        fr.drawString("_", 0, 0, color, true);
+        Iterator<Object> it = stack.descendingIterator();
+        while (it.hasNext()) {
+            Object o = it.next();
             GL11.glTranslatef(0, -10, 0);;
             fr.drawString(o != null ? o.toString() : "null", 0, 0, color, true);
-            i++;
         }
-        if (i > 0) {
-            GL11.glPopMatrix();
-        }
-        return i > 0;
+        GL11.glPopMatrix();
+        return true;
     }
 }
