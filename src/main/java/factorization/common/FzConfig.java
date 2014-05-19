@@ -41,6 +41,7 @@ public class FzConfig {
     public static boolean use_tps_reports = true;
     public static float lowest_dilation = 0.6F;
     public static boolean lagssie_watcher = false;
+    public static boolean limit_integrated_server = false;
     public static double lagssie_interval = 0.25;
     public static int max_rocket_base_size = 20*20;
     public static int max_rocket_height = 64;
@@ -125,6 +126,7 @@ public class FzConfig {
             lowest_dilation = Math.max(1, Math.min(0, lowest_dilation));
             lagssie_watcher = getBoolConfig("enableLagWatchDog", "client", lagssie_watcher, "If true, enables a thread that dumps a stack trace of Minecraft if it is paused for longer than lagWatchDogInterval");
             lagssie_interval = getDoubleConfig("lagWatchDogInterval", "client", lagssie_interval, "If the game is stuck for longer than this amount of time (in seconds), dump a stacktrace of what it is doing.");
+            limit_integrated_server = getBoolConfig("limitIntegratedServer", "client", limit_integrated_server, "Prevent the integrated server from ticking faster than the client. Probably won't cause a deadlocks.");
             fix_middle_click = getBoolConfig("fixPickBlock", "client", fix_middle_click, "Make middle clicking more useful");
             large_servo_instructions = getBoolConfig("largeServoInstructions", "client", large_servo_instructions, "Render servo instructions extra-large. This can also be toggled on and off using '/f servoInstructionSize'.");
         }
