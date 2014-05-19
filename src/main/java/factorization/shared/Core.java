@@ -100,7 +100,7 @@ public class Core {
     public static boolean cheat_servo_energy = false;
     public static boolean debug_network = false;
     public static boolean show_fine_logging = false;
-    public static boolean dev_environ = (Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
+    public static boolean dev_environ = Launch.blackboard != null ? (Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment") : false;
     static {
         if (!dev_environ) {
             cheat = false;
