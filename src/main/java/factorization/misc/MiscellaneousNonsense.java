@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -13,15 +14,15 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatisticsFile;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DungeonHooks;
-import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -31,6 +32,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
@@ -46,7 +48,6 @@ public class MiscellaneousNonsense {
     public static MiscProxy proxy;
     public static MiscellaneousNonsense instance;
     public static int newMaxChatLength = 250;
-    public static Embarkener embarkener = null;
     
     public MiscellaneousNonsense() {
         MiscellaneousNonsense.instance = this;
@@ -63,6 +64,7 @@ public class MiscellaneousNonsense {
         DungeonHooks.addDungeonMob("Creeper", 1);
         // Etho, of all people, found one. It'd be nice if they were just a bit rarer.
         // Scaling everything else up seems like a poor solution tho.
+        @SuppressWarnings("unused")
         String THATS_SOME_VERY_NICE_SOURCE_CODE_YOU_HAVE_THERE[] = {
                 "##  ##",
                 "##  ##",
@@ -75,20 +77,82 @@ public class MiscellaneousNonsense {
         proxy.registerLoadAlert();
         Core.loadBus(this);
         if (FzConfig.equal_opportunities_for_mobs) {
-            MinecraftForge.EVENT_BUS.register(new MobEqualizer());
+            Core.loadBus(new MobEqualizer());
         }
         if (FzConfig.embarken_wood) {
-            embarkener = new Embarkener();
+            Core.loadBus(new Embarkener());
         }
         if (FzConfig.proper_projectile_physics) {
-            MinecraftForge.EVENT_BUS.register(new ProperProjectilePhysics());
+            Core.loadBus(new ProperProjectilePhysics());
         }
         if (FzConfig.buffed_nametags) {
-            MinecraftForge.EVENT_BUS.register(new BuffNametags());
+            Core.loadBus(new BuffNametags());
+        }
+        if (FzConfig.limit_integrated_server && FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+            Core.loadBus(new TickSynchronizer());
         }
     }
     
-
+    public static class TickSynchronizer {
+        /*
+         * I'm tired of getting murdered by mobs while my client is frozen.
+         */
+        long pokeValue = 0;
+        long serversLastSeenPoke = 0;
+        Minecraft mc = Minecraft.getMinecraft();
+        static final boolean enabled = true;
+        @SubscribeEvent
+        public void serverTick(TickEvent.ServerTickEvent event) {
+            if (event.phase == Phase.END) return;
+            if (!enabled) return;
+            if (pokeValue % 5 != 0 && !isPlayerInDanger(mc.thePlayer)) return;
+            
+            if (pokeValue != serversLastSeenPoke) {
+                serversLastSeenPoke = pokeValue;
+                return;
+            }
+            
+            synchronized (this) {
+                long originalPoke = pokeValue;
+                long maxWaitTime = 1000*1;
+                do {
+                    try {
+                        this.wait(maxWaitTime);
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                } while (originalPoke == pokeValue);
+            }
+            serversLastSeenPoke = pokeValue;
+        }
+        
+        @SubscribeEvent
+        public void clientTick(TickEvent.ClientTickEvent event) {
+            if (event.phase == Phase.END) return;
+            pokeValue++;
+            synchronized (this) {
+                this.notifyAll();
+            }
+        }
+        
+        static boolean isPlayerInDanger(EntityPlayer player) {
+            if (player == null || !player.isEntityAlive()) return false;
+            if (player.isBurning() && player.getActivePotionEffect(Potion.fireResistance) == null) return false;
+            if (player.hurtTime > 0) return true;
+            if (player.getAir() != 300) return true; // 300 from EntityLivingBase.onEntityUpdate; see usages of player.setAir()
+            if (player.fallDistance > 1) return true;
+            if (player.ticksExisted < 20*10) return true;
+            if (player.getFoodStats().getFoodLevel() <= 2) return true;
+            for (PotionEffect pot : (Iterable<PotionEffect>) player.getActivePotionEffects()) {
+                int id = pot.getPotionID();
+                // Any particularly harmful potions
+                if (id == Potion.wither.id || id == Potion.poison.id || id == Potion.weakness.id || id == Potion.hunger.id) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
     
     
     private final double expected_tick_time_ms = 1000D/20D; //20 ticks/second = 20 ticks/1000 ms
@@ -127,6 +191,7 @@ public class MiscellaneousNonsense {
         if (event.phase != TickEvent.Phase.START) return;
         LagssieWatchDog.ticks++;
     }
+    
     
     @SubscribeEvent
     public void playerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {

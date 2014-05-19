@@ -21,13 +21,6 @@ import factorization.common.FzConfig;
 import factorization.shared.Core;
 
 public class Embarkener {
-    public Embarkener() {
-        if (FzConfig.embarken_wood) {
-            addLogBarkRecipes();
-            Core.loadBus(this);
-        }
-    }
-
     int wood_rendertype = Blocks.log.getRenderType();
     boolean isWoodish(Block block) {
         if (block == null) return false;
