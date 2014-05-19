@@ -1,85 +1,4 @@
-\title{Math}
-
-\seg
-\u{\#{item.factorization:servo/component.fz.instruction.cmp} Compare}
-
-\img{factorization:textures/blocks/servo/cmp_eq.png}
-\img{factorization:textures/blocks/servo/cmp_ge.png}
-\img{factorization:textures/blocks/servo/cmp_gt.png}
-\img{factorization:textures/blocks/servo/cmp_le.png}
-\img{factorization:textures/blocks/servo/cmp_lt.png}
-\img{factorization:textures/blocks/servo/cmp_ne.png}
-
-Pops two values of the same type from the stack, and compares them.
-The first item popped goes on the left side, and the second item on the right side.
-The cyan underline indicates the bottom of the icon.
-\endseg
-
-
-\seg
-\nl\u{\#{item.factorization:servo/component.fz.instruction.integervalue} Push Integer}
-
-Pushes either 1, 0, or -1.
-\endseg
-
-
-\seg
-\nl\u{\#{item.factorization:servo/component.fz.instruction.boolean} Push Boolean}
-
-Pushes either true or false.
-\endseg
-
-
-\seg
-\nl\u{\#{item.factorization:servo/component.fz.instruction.sum} Sum}
-
-Pops two integers and pushes their sum.
-\endseg
-
-
-\seg
-\nl\u{\#{item.factorization:servo/component.fz.instruction.product} Product}
-
-Pops two integers and pushes their product.
-\endseg
-
-\newpage\title{Stack}
-
-\seg
-\nl\u{\#{item.factorization:servo/component.fz.instruction.drop} Drop}
-
-Pops a value from the stack.
-\endseg
-
-
-\seg
-\nl\u{\#{item.factorization:servo/component.fz.instruction.dup} Dup}
-
-Pushes a copy of the top value of the stack.
-\endseg
-
-
-\seg
-\nl\u{\#{item.factorization:servo/component.fz.instruction.valuetransfer} Stack Transfer}
-
-This instruction exchanges one or more values between the IO stack
-and another stack indicated by a color popped from the argument stack.
-
-First a color value
-(which can be read in by the \link{colorscanner}{Color Scanner} decorator)
-is popped from the argument stack.
-Then either the top value of a stack,
-or all the values in a stack,
-are moved.
-
-\- \img{factorization:textures/blocks/servo/move_value.png} Push to IO: 1 value is moved from the indicated stack to the IO stack.
-\- \img{factorization:textures/blocks/servo/take_value.png} Pop from IO: 1 value is moved from the IO stack to the indicated stack.
-\- \img{factorization:textures/blocks/servo/move_stack.png} Move stack to IO: All the values from the indicated stack are moved to the IO stack.
-\- \img{factorization:textures/blocks/servo/take_stack.png} Take IO stack: All the values on the IO stack are moved to the indicated stack.
-\endseg
-
-
-\newpage\title{Computation}
+\title{Computation Instructions}
 
 \seg
 \nl\u{\#{item.factorization:servo/component.fz.instruction.jmp} Jump}
@@ -97,7 +16,6 @@ If the next servo rail is empty, then there will be no effect.
 \nl\u{\#{item.factorization:servo/component.fz.instruction.entryaction} Entry Action}
 
 This controls what the servo does when it runs over instructions.
-
 \- \img{factorization:textures/blocks/servo/entry_execute.png} Execute Immediately: The servo will execute the instructions it runs over. This is the default behavior.
 \- \img{factorization:textures/blocks/servo/entry_load.png} Read to IO Stack: When the servo hits an instruction, it will be copied to the IO stack.
 \- \img{factorization:textures/blocks/servo/entry_write.png} Write from IO Stack: When the servo enters a new tile, a value will be popped from the IO stack and written to that tile. When it runs out of instructions, it will switch its action to Ignore.

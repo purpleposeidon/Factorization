@@ -1,9 +1,9 @@
 \title{Charge Energy}
 
-Charge is used to generate power, and the power is consumed by \link{processing}{processing machines}, some \link{socket}{socket tools}, and \link{servo}{servos}.
+Charge is used to generate power, and the power is consumed by \link{processing}{processing machines}, some \link{socket}{socket parts}, and \link{servo}{servos}.
 
-\index{chargegen}{Generating Charge}
-\index{chargetran}{Transfering Charge}
-\index{chargemeter}{Measuring Charge}
-\index{chargestorage}{Storing Charge}
+\index{chargegen}{Generation}
+\index{chargetran}{Transfer}
+\index{chargemeter}{Measurement}
+\index{chargestorage}{Storage}
 

@@ -55,3 +55,6 @@ Commands swallow following spaces. To actually follow a command with a space, do
 
 
 
+If you are in a dev environment, symlink the resources folder into MC's resource packs folder. This way you can edit the docs, save it, and press 'r' in the doc viewer to refresh.
+(Also, you can press 's' to change color schemes.)
+

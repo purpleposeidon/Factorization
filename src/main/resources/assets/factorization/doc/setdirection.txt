@@ -2,6 +2,7 @@
 
 When a servo hits this instruction,
 it will attempt to go in the direction it is pointing.
+The direction can be changed by right-clicking with an \lmp .
 
 If it can not actually go that way,
 it will at the next opportunity.

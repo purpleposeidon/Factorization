@@ -1,5 +1,6 @@
 item.factorization:mirror	chargegen
 factorization.factoryBlock.CALIOMETRIC_BURNER	chargegen
+tile.factorization:darkIronOre	ores
 item.factorization:diamond_cutting_head	lacerator
 item.factorization:diamond_cutting_head	processing
 factorization.factoryBlock.SERVORAIL	servorail
@@ -14,8 +15,10 @@ factorization.factoryBlock.SLAGFURNACE	slagfurnace
 factorization.factoryBlock.LEADWIRE	chargetran
 factorization.factoryBlock.PACKAGER	packager
 item.factorization:tool/matrix_programmer	lmp
+item.factorization:diamond_shard	ores
 item.factorization:tool/charge_meter	chargemeter
 item.factorization:socket/SOCKET_SHIFTER	itemshifter
+tile.factorization.ResourceBlock.SILVERORE	ores
 factorization.factoryBlock.COMPRESSIONCRAFTER	compact
 factorization.factoryBlock.MIXER	mixer
 item.factorization:fan	pressurizer

@@ -1,7 +1,7 @@
 \title{The Item Shifter}
 
 The item shifter is a \link{socket}{socket tool}
-that moves items to and from its backing inventory
+that moves items to and from a block behind it
 into an inventory in front of it, such as a furnace,
 a minecart with a chest, or a servo.
 

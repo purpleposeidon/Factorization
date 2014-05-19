@@ -1,4 +1,4 @@
-\title{Charge Transfer}
+\title{Transfering Charge}
 
 Charge is transfered using lead wiring.
 Any block that uses charge will conduct it amongst other blocks.

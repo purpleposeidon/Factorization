@@ -4,6 +4,9 @@ The socket is a block that can hold machine parts.
 To equip a socket with a tool, simply right click it with the tool.
 Some tools require that a motor be installed on the socket first.
 
+\nl
+
+\h1{Socket Parts}
 \include{socket_parts}
 
 % This figure is pretty pointless.

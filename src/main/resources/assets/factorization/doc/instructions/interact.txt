@@ -1,0 +1,55 @@
+\title{Interaction Instructions}
+
+\h1{\#{item.factorization:servo/component.fz.instruction.pulse} Redstone Pulse}
+
+This causes a redstone pulse to be emitted from the servo rail.
+Note that this *can* cause nearby instructions to be temporarily disabled.
+
+\seg
+\h1{\#{item.factorization:servo/component.fz.instruction.socketCtrl} Socket Signal}
+
+This sends a redstone signal,
+not to the world,
+but to the socket tool attatched to the servo.
+
+It has three modes:
+
+\img{factorization:textures/blocks/servo/socket_pulse.png}Socket Pulse: the socket will recieve a brief redstone signal.
+
+\img{factorization:textures/blocks/servo/socket_on.png}Socket Powered: the socket will recieve a constant ON signal.
+
+\img{factorization:textures/blocks/servo/socket_off.png}Socket Unpowered: the socket will recieve a constant OFF signal.
+
+If a socket pulse is sent when Socket Powered is active,
+then the signal will flicker off.
+
+\endseg
+
+\newpage
+\h1{\#{item.factorization:servo/component.fz.instruction.shifterctrl} Item Shifter Control}
+
+This instruction modifies \link{itemshifter}{Item Shifter} settings.
+So, it only works if there's an item shifter installed on the servo.
+
+There are several settings; most of them correspond to the \lmp\ configuration on the Item Shifter.
+Of note:
+
+\img{factorization:textures/blocks/servo/ctrl/shift_target_slot.png}
+Set Transfer Limit: reads an integer.
+
+\img{factorization:textures/blocks/servo/ctrl/shift_transfer_limit.png}
+Set Target Slot: reads an integer;
+if it is -1 then the shifter will target any slot.
+
+\img{factorization:textures/blocks/servo/ctrl/shift_probe.png}
+Probe: Counts how many items in the inventory match the target inventory.
+This pushes an integer.
+
+If there was no inventory, then it pushes -1.
+If the item shifter had a target slot set,
+but that target slot was out of range of the inventory,
+then it pushes -1.
+
+If the servo is holding no item, then it will count all items in the inventory.
+
+

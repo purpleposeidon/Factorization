@@ -1,3 +1,5 @@
+\h1{About}
+
 Squeezing an ink sac between a book and your \lmp\ has
 printed its internal encyclopedia to this convenient paper copy.
 
@@ -13,6 +15,6 @@ Go forth and build cool things!
 
 scrollwheel down: next page \nl
 scrollwheel up: previous page \nl
-z: go back \nl
+left click: go back \nl
 escape: close manual \nl
 

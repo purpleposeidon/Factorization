@@ -3,13 +3,13 @@
 When confronted with a rail junction, the servo has a choice of which direction to go. 
 
 If there is an
-\link{entrycontrol}{\#{item.factorization:servo/component.fz.instruction.entryControl}entry control}
+\link{entrycontrol}{\#{item.factorization:servo/component.fz.instruction.entryControl} entry control}
 instruction, it will go that way.
 
 %  ![](screen/move_require.png)
 
 It will try to go in the direction pointed by 
-\link{setdirection}{\#{item.factorization:servo/component.fz.instruction.setdirection}set direction}.
+\link{setdirection}{\#{item.factorization:servo/component.fz.instruction.setdirection} set direction}.
 
 %  ![](screen/move_pacman.png)
 

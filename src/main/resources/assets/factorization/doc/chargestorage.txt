@@ -1,4 +1,4 @@
-\title{Charge Storage}
+\title{Storing Charge}
 
 There are a few ways of storing charge.
 

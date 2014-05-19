@@ -11,17 +11,9 @@
 \index{charge}{Charge Energy}
 % \index{oreprocessing}{Ore Processing}
 \index{misc}{Miscellaneous Nonsense}
-
-% \figure{
-% H4sIAAAAAAAAAO3csQ3CQAwF0H+XCpKCDRiAHZgGCoqIhgKYnJILYoOcRMF7kuVfWW7cepsMKack
-% dZNyzqKF2yeMKXOySwelxxAAAAAAAAAAAAAAAAAAAAD4Z0Pq9Z7UwxKeLbzGlMv3M0BtNa0Yvu+z
-% I/ADU9bdPwAAAAAAAAAAAAAAAAAA0MnyEODR+jFv0UE2kUmAAAA=
-% }
-
 \checkmods{none}{craftguide NotEnoughItems}{
-\link{cgi/recipes}{Recipes}
-
-\link{cgi/items}{Items}
+\index{cgi/recipes}{Recipes}
+\index{cgi/items}{Items}
 
 %
 % Dedicated recipe viewer mods do a much much better job.
@@ -41,4 +33,11 @@
 
 \nl
 }{}
+
+
+% \figure{
+% H4sIAAAAAAAAAO3csQ3CQAwF0H+XCpKCDRiAHZgGCoqIhgKYnJILYoOcRMF7kuVfWW7cepsMKack
+% dZNyzqKF2yeMKXOySwelxxAAAAAAAAAAAAAAAAAAAAD4Z0Pq9Z7UwxKeLbzGlMv3M0BtNa0Yvu+z
+% I/ADU9bdPwAAAAAAAAAAAAAAAAAA0MnyEODR+jFv0UE2kUmAAAA=
+% }
 

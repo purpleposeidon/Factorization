@@ -4,9 +4,12 @@ See \link{servomotion}{here} for a complete list of motion behavior.
 
 \u{\#{item.factorization:servo/component.fz.instruction.setdirection} Set Direction}
 tells the servo to move in a particular direction at the earliest possible opportunity.
+If it can't immediately go in that direction,
+then it will continue moving until it can.
 
 \u{\#{item.factorization:servo/component.fz.instruction.rotatetop} Point Top}
-makes the servo's socket point in that direction
+rotates the servo on the rail so that
+the servo's socket point in that direction
 
 \u{\#{item.factorization:servo/component.fz.instruction.spin} Spin}
 Rotates the servo clockwise or counter-clockwise.
@@ -21,6 +24,14 @@ This stops the servo.
 When the rail recieves a redstone signal,
 the servo will continue moving.
 (Like all instructions,
-clicking on a servo with the instruction will cause it to be executed immediately.)
+clicking on a servo with the instruction will cause it to be executed immediately.
+If the servo is clicked on with the Trap instruction while already stopped,
+it will start moving again.)
 
+
+\topic{item.factorization:servo/component.fz.instruction.setdirection}
+\topic{item.factorization:servo/component.fz.instruction.rotatetop}
+\topic{item.factorization:servo/component.fz.instruction.spin}
+\topic{item.factorization:servo/component.fz.instruction.setspeed}
+\topic{item.factorization:servo/component.fz.instruction.trap}
 

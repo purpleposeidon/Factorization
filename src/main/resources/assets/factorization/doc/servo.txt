@@ -8,7 +8,7 @@ Servos ride on \link{servorail}{servo rail}.
 They move along this rail in a particular direction,
 and its socket can point perpendicular to the direction of motion.
 
-Servos require \link{charge}{charge} to operate.
+Servos need \link{charge}{charge} to run.
 
 They are controlled by \link{servodecor}{instructions}.
 

@@ -2,10 +2,10 @@
 
 The compression crafter is a powerful crafting machine.
 
-It crafts using blocks.
+It crafts using blocks and barrels.
 It is built like a ring,
-with an inner area ranging from 3x3 to 1x1.
-The crafting table faces must point inwards.
+with an inside area ranging from 3x3 to 1x1.
+The individual compression crafters must face inwards.
 It can be built flat, or vertically.
 
 It is activated with a redstone signal.

@@ -1,14 +1,15 @@
-\title{\#{item.factorization:servo/component.fz.instruction.entryControl}Entry Control}
+\title{Entry Control\#{item.factorization:servo/component.fz.instruction.entryControl}}
 
 This instructions prioritizes which direction a servo will move in at an intersection.
-It has two sub-instructions.
+It has two modes.
+
 Unlike the other instructions, it can \b{not} be disabled with a redstone signal.
 
-\#{item.factorization:servo/component.fz.instruction.entryControl}
-When a servo is in an intersection, it will prefer moving through this instruction.
+\img{factorization:textures/blocks/servo/entry_require.png}
+When a servo is in an intersection, it will prefer to move towards this instruction.
 
 \img{factorization:textures/blocks/servo/entry_forbid.png}
 When a servo is in an intersection, it will try to avoid moving through this instruction.
 
 
-Servos will not respond with U-turns.
+This instruction can't force a servo to make a U-turn.

@@ -1,0 +1,59 @@
+\title{Value Instructions}
+
+\seg
+\u{\#{item.factorization:servo/component.fz.instruction.cmp} Compare}
+
+\img{factorization:textures/blocks/servo/cmp_eq.png}
+\img{factorization:textures/blocks/servo/cmp_ge.png}
+\img{factorization:textures/blocks/servo/cmp_gt.png}
+\img{factorization:textures/blocks/servo/cmp_le.png}
+\img{factorization:textures/blocks/servo/cmp_lt.png}
+\img{factorization:textures/blocks/servo/cmp_ne.png}
+
+Pops two values of the same type from the stack, and compares them.
+The first item popped goes on the left side, and the second item on the right side.
+The cyan underline indicates the bottom of the icon.
+\endseg
+
+
+\seg
+\nl\u{\#{item.factorization:servo/component.fz.instruction.integervalue} Push Integer}
+
+Pushes either 1, 0, or -1.
+\endseg
+
+
+\seg
+\nl\u{\#{item.factorization:servo/component.fz.instruction.boolean} Push Boolean}
+
+Pushes either true or false.
+\endseg
+
+
+\seg
+\nl\u{\#{item.factorization:servo/component.fz.instruction.sum} Sum}
+
+Pops two integers and pushes their sum.
+\endseg
+
+
+\seg
+\nl\u{\#{item.factorization:servo/component.fz.instruction.product} Product}
+
+Pops two integers and pushes their product.
+\endseg
+
+
+
+\seg
+\nl\u{\#{item.factorization:servo/component.fz.instruction.drop} Drop}
+
+Pops a value from the stack.
+\endseg
+
+
+\seg
+\nl\u{\#{item.factorization:servo/component.fz.instruction.dup} Dup}
+
+Pushes a copy of the top value of the stack.
+\endseg

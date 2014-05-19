@@ -23,10 +23,12 @@
 \index{servo}{The Servo}
 \index{servorail}{Servo Rail}
 \index{servomotion}{Motion}
-\index{servologic}{Computation}
-\index{servointeract}{Interaction}
 \index{instructions/motion}{Motion Instructions}
+\index{servologic}{Servo Memory}
+\index{instructions/subroutine}{Subroutines}
+\index{instructions/value}{Value Instructions}
 \index{instructions/compute}{Computation Instructions}
+\index{instructions/interact}{Interaction Instructions}
 \endseg
 
 \nl\nl

@@ -14,8 +14,8 @@ followed by a
 Diamond Cutting Head.
 
 It requires \link{charge}{charge} to power its motor,
-and it must have a backing inventory to drop the items
-it collects.
+and it needs an inventory behind itself
+to put its items into.
 
 If a mob or player steps in front of the spinning blades,
 they will get hurt.

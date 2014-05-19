@@ -1,0 +1,75 @@
+\title{Subroutine}
+
+This instruction tells the servo to execute other instructions,
+one after the other.
+
+But first, the instructions must be loaded into the subroutine.
+
+Start by laying out, on powered servo rail,
+the instructions you want for the subroutine.
+
+Place two servo rails on each end of the instruction list.
+
+At the beginning, leave the first extra rail blank,
+and on the second rail put the
+\#{item.factorization:servo/component.fz.instruction.entryaction} Entry Action instruction,
+set to read mode by clicking on it with an \lmp .
+
+At the very end, place the 
+\#{item.factorization:servo/component.fz.instruction.trap} trap instruction,
+and before that,
+use
+\#{item.factorization:servo/component.fz.instruction.entryaction} Entry Action
+again, except this time in "Execute Immediately" mode.
+
+
+Place the servo at the beginning, on the blank rail.
+
+It should read in the instructions between the Entry Actions,
+and then stop.
+
+Shift click the servo with an empty Instruction Group to lead the instructions
+into the Subroutine.
+
+\leftpage
+\h1{Multiply By 2}
+[Servo Start]
+
+\#{item.factorization:servo/component.fz.instruction.entryaction} Entry Action: read to stack
+
+\#{item.factorization:servo/component.fz.instruction.integervalue} Push Integer: 1
+
+\#{item.factorization:servo/component.fz.instruction.integervalue} Push Integer: 1
+
+\#{item.factorization:servo/component.fz.instruction.sum} Sum
+
+\#{item.factorization:servo/component.fz.instruction.product} Product
+
+\#{item.factorization:servo/component.fz.instruction.entryaction} Entry Action: execute immediately
+
+\#{item.factorization:servo/component.fz.instruction.trap} Trap
+
+\leftpage
+\h1{8}
+[Servo Start]
+
+\#{item.factorization:servo/component.fz.instruction.integervalue} Push Integer: 1
+
+\#{item.factorization:servo/component.fz.instruction.integervalue} Push Integer: 1
+
+\#{item.factorization:servo/component.fz.instruction.sum} Sum
+
+\#{item.factorization:servo/component.fz.instruction.dup} Dup
+\#{item.factorization:servo/component.fz.instruction.sum} Sum
+
+\#{item.factorization:servo/component.fz.instruction.dup} Dup
+\#{item.factorization:servo/component.fz.instruction.sum} Sum
+
+\#{item.factorization:servo/component.fz.instruction.trap} Trap
+
+
+
+
+
+\topic{item.factorization:servo/component.fz.instruction.group}
+
