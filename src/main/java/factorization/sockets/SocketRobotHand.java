@@ -9,6 +9,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -83,7 +84,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
     @Override
     public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
         boolean ret = doHandleRay(socket, mop, mopIsThis, powered);
-        if (!ret && !mopIsThis) {
+        if (!ret && !mopIsThis && mop.typeOfHit == MovingObjectType.BLOCK) {
             return !worldObj.isAirBlock(mop.blockX, mop.blockY, mop.blockZ);
         }
         return ret;
@@ -224,14 +225,11 @@ public class SocketRobotHand extends TileEntitySocketBase {
         }
         int origSize = FzUtil.getStackSize(itemstack);
         ItemStack mutatedItem = itemstack.useItemRightClick(world, player);
-        if (mutatedItem != itemstack) {
-            ret = true;
-        } else if (!ret && !FzUtil.identical(mutatedItem, itemstack)) {
-            ret = true;
-        }
-        if (!ret) {
-            ret = origItemHash != FzUtil.getItemHash(mutatedItem);
-        }
+        ret = ret
+                | mutatedItem != itemstack
+                | origSize != FzUtil.getStackSize(mutatedItem)
+                | !FzUtil.identical(mutatedItem, itemstack)
+                | origItemHash != FzUtil.getItemHash(mutatedItem);
         player.inventory.mainInventory[player.inventory.currentItem] = mutatedItem;
         return ret;
     }
