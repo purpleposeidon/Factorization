@@ -1,0 +1,4 @@
+#!/bin/sh
+
+ack-grep --ignore-dir=src/factorization/fzds/ NORELEASE src/
+ack-grep '%i' src/
