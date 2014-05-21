@@ -21,6 +21,10 @@ import factorization.common.FzConfig;
 import factorization.shared.Core;
 
 public class Embarkener {
+    public Embarkener() {
+        addLogBarkRecipes();
+    }
+    
     int wood_rendertype = Blocks.log.getRenderType();
     boolean isWoodish(Block block) {
         if (block == null) return false;
@@ -35,7 +39,7 @@ public class Embarkener {
                     count++;
                     ItemStack log = new ItemStack(block, 1, md);
                     ItemStack barked = new ItemStack(block, 4, md | 0xC);
-                    barked.setStackDisplayName("Bark"); // Localization fail :/
+                    barked.setStackDisplayName("Bark"); // FIXME: Localization fail :/
                     Core.registry.shapelessRecipe(barked, log, log, log, log);
                     ItemStack barked1 = barked.copy();
                     barked1.stackSize = 1;
