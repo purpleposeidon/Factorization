@@ -143,6 +143,7 @@ public class MiscellaneousNonsense {
             if (player.fallDistance > 1) return true;
             if (player.ticksExisted < 20*10) return true;
             if (player.getFoodStats().getFoodLevel() <= 2) return true;
+            if (player.worldObj.getWorldInfo().getVanillaDimension() != 0) return true; // Grrrr....
             for (PotionEffect pot : (Iterable<PotionEffect>) player.getActivePotionEffects()) {
                 int id = pot.getPotionID();
                 // Any particularly harmful potions
