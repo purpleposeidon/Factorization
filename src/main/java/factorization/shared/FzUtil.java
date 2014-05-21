@@ -1141,6 +1141,11 @@ public class FzUtil {
         @Override public void addStat(StatBase par1StatBase, int par2) { }
         @Override public void openGui(Object mod, int modGuiId, World world, int x, int y, int z) { }
         @Override public void addChatMessage(IChatComponent var1) { }
+        
+        @Override
+        public boolean isEntityInvulnerable() {
+            return true;
+        }
     }
     
     private static HashMap<String, WeakHashMap<World, FzFakePlayer>> usedPlayerCache = new HashMap();
