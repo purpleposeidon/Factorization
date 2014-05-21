@@ -17,12 +17,10 @@ regarding actuators:
     Ball Lightning Gun
 
 Lower barriers to entry for servos:
-    (Suuuugar crystalllss.... hard rock candy....)
   Eliminate dependencies on ore processing:
     alternative aqua regia recipe (substitute blaze powder for nether powder? or maybe magma cream?)
       Maybe this shouldn't make aqua regia; but instead an acid that's compatible.
   Maybe we should see about flattening our mod in other areas as well.
-  Make dark iron an ore found at bedrock level
   Have a stack that's a "reaction" stack. So when the 'status' stack gets updated (this would be typical of a socket command), this stack could be triggered.
 
 
@@ -31,16 +29,13 @@ IMMEDIATE (for next public release)
 barrels getting rotated by other players doesn't redraw?
 fzdocs:
     servo instruction documentation
-    Building an index? Hrm. Using \topic.
     ore dictionary needs better handling:
         [DEALT WITH?] arrays of stuff need to be rendered nicely
         [DEALT WITH?] strings need to be converted to OD arrays if possible
-servos draw too much power; a lacerator can run, but a servo can not!?  -- or lacerators draw too little ;)
 servos:
     servo upgrading doesn't get synced to other players! (? how not?) Test it...
     test writing instructions
     colorizing servos
-    Consider adding 'stupid' servos; ignore non-simple instructions; has easy crafting recipe
 
 
 FZDocs! Yes!
@@ -51,14 +46,9 @@ FZDocs! Yes!
 Pressurizer:
     blowentities doesn't sync properly when relogging?
     pressurizer doesn't seem to actually be working properly with flooding/draining? Test like our SSP world.
-    we should split this up into a fan-thing & a corkscrew thing.
-
-Check bark recipe stuff? Does it get the 'Bark' name actually!? The reconversion recipe works?
 
 
-[Tue Apr 01 23:09:44 PDT 2014] oredictionary lists in fzdocs
 [Tue Apr 01 23:09:52 PDT 2014] We really do need to be able to click on the shuffling items...
-[Wed Apr 02 13:31:40 PDT 2014] screwpump should pump into other inventories...
 
 [Tue Apr 01 23:22:21 PDT 2014] port FZDS. :P
 
@@ -66,11 +56,6 @@ Check bark recipe stuff? Does it get the 'Bark' name actually!? The reconversion
 [prooobably fixed. Yep. Definitely.] (It does now?) servos not syncing stacks to players holding LMPs like they should...
 more creative tabs?
 we don't need to reload the keymapping anymore
-
-KILL
-----
-BOH
-WRATH
 
 
 FZDOCS
@@ -97,7 +82,6 @@ servos:
     If you've got like forking and branches or stuff, you'll have to start at the end and work back.
   <digitalseraphim> is there a way to clear out error messages from the black stack yet?
 pocket crafting table, clicking 1-item-at-a-time for the craft output, seems laggy. Are we over-syncing?
-light shining through our blocks; barrels. I don't think we can actually fix this?
 split up FactorizationClientProxy
 Add pressure generator:
     - is an inventoryless mixer. Might also blow around chest contents? :D
@@ -122,7 +106,6 @@ BEFORE 0.9
 ----------
 Complete the in-game documentation:
     - The '?' key should bring up help for an item, if you've got the docbook in your inventory. Hopefully it'd work with the NEI sidebar as well.
-    - Ability to include ItemStacks in the text. They'll need to support hyperlinks.
     - Possibly pictures? I might not need pictures tho.
     - Support for WWW links.
     - Demonstrations, with interactive diagrams; sort of reminiscent of the MC wiki stuff for redstone contraptions. They should render a world, and you can click and drag to rotate the view. If you're in creative mode, you should be able to press a button, labelled "import" possibly, to place it down.
@@ -130,7 +113,6 @@ Complete the in-game documentation:
 
 WITH 0.9.0
 ----------
-Remove junk we don't want. Routers, old barrels, lacerator
 Back to FZDS
 
 
@@ -151,10 +133,8 @@ Thaumcraft Compat:
   thaumcraft wood barrels?
   SoundLogic thaumcraft aspects
   Remember to wrap mod compat module calls in try/catch!
-Do we remove aluminum ore processing? It feels unnecessary to me.
 Exchange Bag of Holding for just... free inventory space.
 make leyden jars narrower. The purpose of this is to improve their proportions.
-forge public/AT bullshit
 
 
 UNTRIAGED
@@ -169,21 +149,23 @@ do maths on energy conversion:
   (And we still need cooking food to be worthwhile!)
 LMP store instructions... Like a bag or a backpack
   - maybe let you merge instructions together? But then middle clicking.
-Test BoH key with NEI installed & with sneak key set to a mouse button.
 Church Organ
 instructions mess up servo rail tessellator shading?
 add an LMP instruction (recipe may be difficult!). Clicks the instruction with an LMP.
-FZ notify item kept? [might be fixed? Weirdness.]
 wires get messed up?
 pressure gen on servo holding bucket pumps out the servo's bucket?
-/f for music?
+Eclipse errors/warnings: enable annotation-based null analysis
+Check for sending packet to players watching a chunk; probably doing it the lame way, use an AT for the non-lame way.
+
+
 
 
 NEVER/POSTPONED
 ---------------
 fix shading of faces of blocks that are in barrels; research if such a fix is possible
 lightning should power our stuff; even if you can't make lightning rods... -- would require watching *every* entity that gets spawned
-biome ID conflict detection
+/f for music?
+light shining through our blocks; barrels. I don't think we can actually fix this?
 
 
 LESS TOP LIST
@@ -410,6 +392,7 @@ So, the things:
     Nebula Balloons
     Propellers. Weeeelllll....
 
+camo/mutation blocks: when it gets drawn, iterates through the tessellator & replaces textures with other textures
 
 Building Tools
     Building tool: The snapshot
@@ -436,4 +419,123 @@ Building Tools
                 - There'll be an "Attack/Sustain/Decay" model
                     - Higher epiclevels give a longer sustain
                     - Trivial & Easy levels have no attack ramp-up
+    
+    You can insta-break the last three blocks you've placed. If a block is broken in this manner, it goes directly into your inventory.
+    Some sort of eyeball/cameray thing. You click it, and it saves your camera orientation. If you press F5, the camera'll render from the saved location. (In addition to the other things you can cycle through, I guess? Or it could overwrite one of them.) Something something super mario 64 camera lakatus.
+    You can swap out stairs/upsidedownstairs/top-slabs/bottom-slabs/full blocks (that have the same texture/material) with some sort of tool.
+    ways to mark/hilight blocks; lines/tape measures (fishing rod tape measure?)...
+    In ender-civilized areas you can find bits of paper. When you click them, it says "you discover that $(whatever)", and it disappears. Doing this is not actually necessary to use the thing, tho.
+
+
+DATA HELPER CHANGES
+-------------------
+abstract DataPutter
+    ⬚ put⬚(⬚ val) throws IOException;
+DataPassthrough extends DataPutter
+    ⬚ put⬚(⬚ val) throws IOException { return val; }
+DataHelper extends DataPutter
+    public DataPutter as(ShareTarget share, String name) {
+        if (!dataPurpose.isCompatible(share)) return DataPassthrough.INSTANCE;
+        this.name = name;
+        return this;
+    }
+    
+DataAbstractIn extends DataHelper
+DataAbstractOut extends DataHelper
+
+DataPurpose {
+    DISK_SERIALIZE() {
+        @Override
+        public boolean isCompatible(ShareTarget share) {
+            return !share.is_transient;
+        }
+    },
+    PUBLIC_PACKETS() { ... },
+    SEND_HIDDEN_INFO() { ... },
+    CLIENT_EDIT() { ... },
+    
+    
+}
+
+
+TWO DECORATIVE ENTITIES
+-----------------------
+Seat
+    C   Carpet, slime ball, pressure plate
+    o
+    -
+    It's an entity. Click on it to sit on it. Snaps to 1/4s block, not whole blocks
+
+    “/I can sit *anywhere*!/”
+
+Item Holder
+    B   Button, Slime
+    S
+    It's pretty much an item frame. Barrel-esque interface. Only holds one item, of course.
+    It might come in small, medium, and large varieties? This would definitely be useful, but I'm not sure...
+    maybe we only have 1 variety, but sculpting tools can adjust it.
+
+
+ABSTRACT FACTORY
+----------------
+You build a large box out of a suitably black material. ("Containment Cubes")
+Inside it, you make a factory.
+There are two other blocks: the Input block, and the Output block.
+The player right clicks a Contaiment Cube to attempt to seal it:
+    Starting at the clicked block, iteratively go Down/West/South. (But no more than, say, 24 times each direction)
+    We'll end up at a corner.
+    Make sure there's nothing to the Down/West/South; otherwise this isn't really a corner and the structure is weird.
+    Extend feelers Up, East, and North, that'll give us the dimensions.
+    Ensure that there's a rectangular prism shell without any holes
+    verifyWhitelist()
+important point: TEs will need to have things like their power level/progress reset. full caliometric burners; almost-complete crystallizers... basically all the whitelisted TEs'll need an interface or something, for resetting this kind of state. Should look at Buildcraft APIs?
+A new TE is created in the Factory Barrier that was clicked on to store various progress info
+The volume is serialized & stored in the master TE, and the contents are deleted.
+    Note: don't copy blocks that have isAir()
+The factory is loaded into an FZDS area, and getMaterialsInVolume is run on it, and those materials are stored in the master TE. The material-counting volume is removed. This happens without any intervening ticks.
+Three copies of the original volume are pasted in FZDS, as FZDS entities in the now-transparent Abstract Factory
+The sealing walls become transparent. (They probably continue to collide tho.)
+A shader is used to make things render desaturated. Each copy renders tinted to an RGB, probably 80% opaque
+The factories are allowed to exist, need a chunkloader in the 3 copies & the master TE while they run.
+When an Output Block gets a redstone signal, getMaterialsinVolume is run on that instance & the result sent to the master TE.
+    The user can cancel the process at this point, eg if the factory gets stuck.
+    If so, then the original factory is deserialized from the master.
+When all three are complete, Abstract Factory becomes opaque.
+The output lists are examined:
+    (Not sure how to merge them. The problem is that there's randomness & stuff, eg from crystallizers or growing trees...)
+    (Let's pretend that we only have 1 list for now; we might be able to merge them somehow by taking averages? But rounding to 0!)
+    We have the 'input materials' and the 'output materials'. These include the machines. The intersection of the two sets are the machines.
+If something has failed somehow, we reload the factory into the volume, and if we were given input materials, those materials are returned.
+    
+
+
+
+
+
+getMaterialsInVolume(FZDS volume):
+    Every block in the volume is deconstructed, and the materials necessary for building it added to a list.
+    (Note: barrels. Prolly gonna need to use jumbo-sized stacks)
+    The volume is cleared, emptied, and ddeallocated
+    This returns a list of the obtained materials.
+evaluateFactory(serialized volume):
+    The input block emits a redstone pulse.
+    The factory must start running.
+    When it is complete, it sends a pulse to the output block.
+
+verifyWhitelist(volume (two Coords)):
+    Need to check:
+        Blocks (Maybe. TE-less blocks miiight be safe. Ish. Erm. And there are a lot of blocks that are merely decorative.)
+        Entity Classes
+        Item Entities contents
+        IInventory contents
+        TileEntity classes
+        TileEntity contents
+
+"Abstract Factory explicitly rejects any component that uses, enables, requires, or resembles: time travel; teleportation; inter-dimensional discontinuities; breaking the fourth wall (or higher); Zoltan shielding; root privileges; practical solipsism; the Logrus; non-conservation of mass and/or energy; breaking out of the Universe; unfettered access to the Internet; the Spice; Ontological loopholes; the narative principle; blatant magic (including the Force); worm holes; anything involving the word 'singularity'; anti-matter; dark matter; white matter; red matter; infinite nesting; cheating; applied improbability; the Principle of Explosion; Māyā; Dust Theory; the Dust; 'special magic dust'; space worm parasitic super-powers; Turing Oracles; the Axiom of Choice; cosmic string weaving; munchkinism; rewriting the structure of reality; or faster-than-light signalling. Nanotech is OK tho."
+
+doing I/O to the factory:
+    There's an Input and an Output port block; these go in the walls.
+    place a chest on the inner & outter sides of each IO port.
+
+
 

@@ -17,17 +17,26 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = (new File('fzversion').getText('UTF-8').replaceAll("\\s",""))
+version = new File('fzversion').getText('UTF-8').replaceAll("\\s","")
 group = "factorization"
 archivesBaseName = "Factorization"
-print "\n\n   build/libs/" + archivesBaseName + "-" + version + ".jar\n\n"
 
 minecraft {
-    version = "1.7.2-10.12.1.1065"
+    version = "1.7.2-10.12.1.1065" // FORGEMARK
     assetDir = "eclipse/assets"
     replace '@FZVERSION@', project.version
 }
 
+task writeFzFile {
+    shouldRunAfter "build"
+    doFirst {
+        def outName = "build/libs/" + archivesBaseName + "-" + version + ".jar"
+        print "\n\n   " + outName + "\n\n"
+        def last_fz = new File("last_fz")
+        last_fz.delete()
+        last_fz << outName
+    }
+}
 
 processResources {
     // this will ensure that this task is redone when the versions change.

@@ -1,22 +1,16 @@
 #!/usr/bin/python
 
 import os, random, time
-import update_info
 
 def getForgeVersion():
-  forge_version_file = "../src/net/minecraftforge/common/ForgeVersion.java"
-  version = []
-  for line in open(forge_version_file):
-    if "=" in line:
-      version.append(line.split("=")[1].strip(";\n").strip())
-  return "Minecraft Forge " + ".".join(version)
+  return "Minecraft Forge " + getMinecraftVersion()
 
 def getMinecraftVersion():
-  property_filename = "../src/fmlversion.properties"
   tofind = "fmlbuild.mcversion="
-  for line in open(property_filename):
-    if line.startswith(tofind):
-      return line[len(tofind):].strip()
+  for line in open("build.gradle"):
+    if "FORGEMARK" in line:
+      ret = line.split('"')[1].strip()
+      return ret
   return "unknown"
 
 def run(cmd):
@@ -29,22 +23,21 @@ def adfly(url):
 
 exp = os.path.expanduser
 
-version = update_info.version
-mcversion = getMinecraftVersion()
-filename = "Factorization-{0}.jar".format(version, random.randrange(0, 1000))
+version = open("fzversion").read().strip()
+mc_forge_version = getMinecraftVersion()
+filename = "Factorization-{0}.jar".format(version)
+
 oldfile = exp("~/Dropbox/Public/old/" + filename)
+run("cp " + open("last_fz").read().strip() + " " +oldfile)
 mfurl = exp("~/tmp/factorization_mediafire_url")
 run("rm " + mfurl)
 changelogFilename = "changelogs/Changelog-" + version + ".txt"
 my_dropbox = "http://dl.dropbox.com/u/76265666/"
 
 #Check for baddies
-run("ack-grep --ignore-dir=src/factorization/fzds/ NORELEASE src/ resources/")
-run("ack-grep '%i' src/")
+run("./check_norelease")
 
 #Factorization
-run("./make")
-run("cp ~/Dropbox/dev/Factorization-dev.jar " + oldfile)
 run("cp CHANGELOG ~/Dropbox/Public/old/")
 run("cp CHANGELOG ~/Dropbox/Public/" + changelogFilename)
 changelog_url = my_dropbox + changelogFilename
@@ -63,7 +56,7 @@ if mediafire_url == "":
 #Don't add non-trivial tasks here unless we can get mediafire behaving properly.
 
 print "\n"*4
-LOG  = "Factorization " + version + " (MC " + mcversion + ")\n"
+LOG  = "Factorization " + version + "\n"
 LOG += '''
 [url="{0}"]adfly + MediaFire[/url], or\n[url="{1}"]adfly + DropBox[/url]
 '''.format(
@@ -73,5 +66,6 @@ LOG += '''
 LOG += "Built on " + time.strftime("%F") + " against " + (getForgeVersion() + "\n")
 LOG += '[url="{0}"]Changelog[/url]'.format(changelog_url)
 print LOG
+
 open("build.log", 'a').write(LOG+ '\n\n')
 

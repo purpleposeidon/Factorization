@@ -1,12 +1,18 @@
-0.8.
+0.8.69
+  Unbroke the Embarkener
+
+0.8.68
   Ported to 1.7
-  Removed a ton of lame things:
+  Servos Logic has been rearchitected. There are now only 2 stacks.
+    So, removed some instructions and added some new ones
+  Removed a ton of lame things, including:
     Router
     Bag of Holding
-    ...
   You'll find an FZ Manual shortly after acquiring iron.
-  Other things...
-    Click/shift-click a painting with an LMP to change it
+  many many other things, such as:
+    new recipe for bonemeal
+    clicking on paintings with an LMP cycles through all the paintings
+    barrels indicate when they'll be placed in a strange direction
 
 0.8.35
   Fix pressurizer draining & flooding
