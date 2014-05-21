@@ -309,6 +309,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         int i = facing.ordinal();
         player.rotationPitch = player.prevRotationPitch = pitch[i];
         player.rotationYaw = player.prevRotationYaw = yaw[i];
+        player.limbSwingAmount = 0;
         
         return player;
     }
