@@ -1,6 +1,8 @@
 item.factorization:mirror	chargegen
 factorization.factoryBlock.CALIOMETRIC_BURNER	chargegen
 tile.factorization:darkIronOre	ores
+item.factorization:servo/component.fz.instruction.spin	instructions/motion
+item.factorization:servo/component.fz.instruction.trap	instructions/motion
 item.factorization:diamond_cutting_head	lacerator
 item.factorization:diamond_cutting_head	processing
 factorization.factoryBlock.SERVORAIL	servorail
@@ -8,9 +10,11 @@ factorization.factoryBlock.LEYDENJAR	chargestorage
 factorization.factoryBlock.STEAMTURBINE	chargegen
 item.diode	repeater
 tile.hopper	hopper
-item.factorization:servo/servo	servo
 factorization.factoryBlock.SOLARBOILER	chargegen
+item.factorization:servo/servo	servo
+item.factorization:servo/component.fz.instruction.rotatetop	instructions/motion
 factorization.factoryBlock.STAMPER	stamper
+item.factorization:servo/component.fz.instruction.setdirection	instructions/motion
 factorization.factoryBlock.SLAGFURNACE	slagfurnace
 factorization.factoryBlock.LEADWIRE	chargetran
 factorization.factoryBlock.PACKAGER	packager
@@ -26,6 +30,7 @@ item.factorization:charge_battery	chargestorage
 tile.pistonBase	piston
 tile.pistonStickyBase	piston
 factorization.factoryBlock.PARASIEVE	parasieve
+item.factorization:servo/component.fz.instruction.setspeed	instructions/motion
 factorization.factoryBlock.SOCKET_EMPTY	socket
 item.factorization:socket/SOCKET_ROBOTHAND	arm
 item.comparator	comparator

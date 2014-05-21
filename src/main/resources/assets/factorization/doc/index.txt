@@ -9,6 +9,7 @@
 \index{building}{Building}
 \index{cookbook}{Designs}
 \index{charge}{Charge Energy}
+\index{projects}{Projects}
 % \index{oreprocessing}{Ore Processing}
 \index{misc}{Miscellaneous Nonsense}
 \checkmods{none}{craftguide NotEnoughItems}{
