@@ -65,7 +65,7 @@ public class ItemGlazeBucket extends ItemFactorization {
         String base = super.getItemStackDisplayName(is);
         if (isMimic(is)) {
             ItemStack hint = getSource(is);
-            if (hint != null) {
+            if (hint != null && hint.getItem() != null) {
                 return Core.translate(getUnlocalizedName() + ".mimicry_prefix") + " " + hint.getDisplayName();
             }
         }
@@ -150,7 +150,6 @@ public class ItemGlazeBucket extends ItemFactorization {
         tag.setBoolean("fake", true);
         setGid(is, unique_id);
         is.setItemDamage(md_for_nei++);
-        //add(is);
         return is;
     }
     
