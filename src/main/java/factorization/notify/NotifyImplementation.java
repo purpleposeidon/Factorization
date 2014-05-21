@@ -92,7 +92,7 @@ public class NotifyImplementation extends Notify {
             
             @Override
             public String getCommandUsage(ICommandSender icommandsender) {
-                return "/mutter [--long] [--show-item] [--refer-item] some text. Clears if empty";
+                return "/mutter [--long] [--show-item] some text. Clears if empty";
             }
             
             @Override
