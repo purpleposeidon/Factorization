@@ -23,9 +23,13 @@ def adfly(url):
 
 exp = os.path.expanduser
 
+run("rm -f last_fz")
+
 version = open("fzversion").read().strip()
 mc_forge_version = getMinecraftVersion()
 filename = "Factorization-{0}.jar".format(version)
+
+run("./rungradle build writeFzFile")
 
 oldfile = exp("~/Dropbox/Public/old/" + filename)
 run("cp " + open("last_fz").read().strip() + " " +oldfile)
