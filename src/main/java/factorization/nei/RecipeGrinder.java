@@ -61,6 +61,10 @@ public class RecipeGrinder extends TemplateRecipeHandler {
                 continue;
             }
             for (ItemStack is : gr.getInput()) {
+                if (is.getItem() == null) {
+                    Core.logSevere("Bad item! Recipe output is " + gr.output);
+                    continue;
+                }
                 if (FzUtil.wildcardSimilar(is, ingredient)) {
                     arecipes.add(new CachedGrinderRecipe(gr));
                     break;
