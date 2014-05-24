@@ -57,6 +57,10 @@ public class TileEntityGrinder {
                 itemstack = new ItemStack((Item) input, 1, FzUtil.WILDCARD_DAMAGE);
             } else if (input instanceof ItemStack) {
                 itemstack = (ItemStack) input;
+                if (itemstack.getItem() == null) {
+                    Core.logSevere("Trying to define a recipe with an itemstack with a null item!?");
+                    Thread.dumpStack();
+                }
             } else {
                 this.oreName = (String) input;
                 return;
