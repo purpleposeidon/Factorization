@@ -27,7 +27,7 @@ public class AirInspector implements IClassTransformer {
                 if (checkInstructions(insn)) {
                     if (!prefix) {
                         prefix = true;
-                        log("Brought to you by Factorization! \"Are you sure you should be using Blocks.air instead of block.isAir()!?\"");
+                        log("Brought to you by Factorization! \"Please use block.isAir() rather than block == Blocks.air\"");
                         log("And by...");
                         log("Powdermilk biscuits! In the big blue box with the picture of the biscuit on the cover in the bag with the brown stains that indicate freshness.");
                         log("Heavens! They're tasty and expeditious!");
