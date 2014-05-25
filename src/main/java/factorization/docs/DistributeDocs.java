@@ -9,10 +9,10 @@ import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatBase;
 import net.minecraft.stats.StatisticsFile;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.world.WorldSettings;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -28,17 +28,27 @@ public class DistributeDocs {
     static HashSet<String> needyPlayers = new HashSet();
     
     static StatisticsFile getFile(EntityPlayer player) {
+        String name = player.getCommandSenderName();
+        if (name == null) return null;
         MinecraftServer server = MinecraftServer.getServer();
-        return server.getConfigurationManager().func_148538_i(player.getCommandSenderName());
+        if (server == null) return null;
+        ServerConfigurationManager cm = server.getConfigurationManager();
+        if (cm == null) return null;
+        // Java! Java? Java!
+        return cm.func_148538_i(name);
     }
     
     static boolean givenBook(EntityPlayer player) {
-        return getFile(player).writeStat(bookGet) > 0 || player.getEntityData().hasKey("fzDocd");
+        StatisticsFile statsFile = getFile(player);
+        return (statsFile != null && statsFile.writeStat(bookGet) > 0) || player.getEntityData().hasKey("fzDocd");
     }
     
     static void setGivenBook(EntityPlayer player) {
         needyPlayers.remove(player.getCommandSenderName());
-        getFile(player).func_150873_a(player, bookGet, 1);
+        StatisticsFile statsFile = getFile(player);
+        if (statsFile != null) {
+            statsFile.func_150873_a(player, bookGet, 1);
+        }
         player.getEntityData().setBoolean("fzDocd", true);
     }
     
