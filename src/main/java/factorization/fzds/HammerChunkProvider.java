@@ -3,12 +3,12 @@ package factorization.fzds;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.ChunkPosition;
 import net.minecraft.entity.EnumCreatureType;
-import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.util.IProgressUpdate;
+import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.IChunkProvider;
 
 public class HammerChunkProvider implements IChunkProvider {
     
@@ -65,7 +65,7 @@ public class HammerChunkProvider implements IChunkProvider {
     }
 
     @Override
-    public ChunkPosition findClosestStructure(World var1, String var2, int var3, int var4, int var5) {
+    public ChunkPosition func_147416_a(World var1, String var2, int var3, int var4, int var5) { //findClosestStructure
         return null;
     }
 

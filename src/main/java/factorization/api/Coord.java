@@ -1,5 +1,7 @@
 package factorization.api;
 
+import io.netty.buffer.ByteBuf;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -641,7 +643,19 @@ public class Coord implements IDataSerializable {
         dos.writeInt(z);
     }
     
+    public void writeToStream(ByteBuf dos) {
+        dos.writeInt(x);
+        dos.writeInt(y);
+        dos.writeInt(z);
+    }
+    
     public void readFromStream(ByteArrayDataInput dis) {
+        x = dis.readInt();
+        y = dis.readInt();
+        z = dis.readInt();
+    }
+    
+    public void readFromStream(ByteBuf dis) {
         x = dis.readInt();
         y = dis.readInt();
         z = dis.readInt();

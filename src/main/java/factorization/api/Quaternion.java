@@ -1,14 +1,16 @@
 package factorization.api;
 
+import io.netty.buffer.ByteBuf;
+
 import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
+
+import org.lwjgl.opengl.GL11;
 
 import com.google.common.io.ByteArrayDataOutput;
 
@@ -86,6 +88,13 @@ public class Quaternion implements IDataSerializable {
         }
     }
     
+    public void write(ByteBuf out) {
+        double[] d = toStaticArray();
+        for (int i = 0; i < d.length; i++) {
+            out.writeDouble(d[i]);
+        }
+    }
+    
     public void write(DataOutputStream out) throws IOException {
         double[] d = toStaticArray();
         for (int i = 0; i < d.length; i++) {
@@ -94,6 +103,14 @@ public class Quaternion implements IDataSerializable {
     }
     
     public static Quaternion read(DataInput in) throws IOException {
+        double[] d = localStaticArray.get();
+        for (int i = 0; i < d.length; i++) {
+            d[i] = in.readDouble();
+        }
+        return new Quaternion(d);
+    }
+    
+    public static Quaternion read(ByteBuf in) throws IOException {
         double[] d = localStaticArray.get();
         for (int i = 0; i < d.length; i++) {
             d[i] = in.readDouble();
@@ -213,7 +230,6 @@ public class Quaternion implements IDataSerializable {
         if (orient == FzOrientation.UNKNOWN) {
             return quat_cache[ord] = new Quaternion();
         }
-        final Vec3 target = orient.getDiagonalVector();
         final Quaternion q1;
         final double quart = Math.toRadians(90);
         int rotation = orient.getRotation();

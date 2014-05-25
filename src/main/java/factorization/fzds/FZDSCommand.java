@@ -7,8 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -16,6 +14,7 @@ import net.minecraft.command.SyntaxErrorException;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.tileentity.TileEntity;
@@ -77,7 +76,7 @@ public class FZDSCommand extends CommandBase {
         
         public SubCommand() { }
         
-        static ServerConfigurationManager manager = MinecraftServer.getServerConfigurationManager(MinecraftServer.getServer());
+        static ServerConfigurationManager manager = MinecraftServer.getServer().getConfigurationManager();
         
         String arg0;
         ICommandSender sender;
@@ -216,7 +215,7 @@ public class FZDSCommand extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) {
         if (sender instanceof EntityPlayerMP) {
             EntityPlayerMP player = (EntityPlayerMP) sender;
-            boolean op = MinecraftServer.getServer().getConfigurationManager().isPlayerOpped(player.username);
+            boolean op = MinecraftServer.getServer().getConfigurationManager().isPlayerOpped(player.getCommandSenderName());
             boolean cr = player.capabilities.isCreativeMode;
             if (!(op || cr)) {
                 Core.sendChatMessage(true, sender, "You must be op or in creative mode to use these commands");

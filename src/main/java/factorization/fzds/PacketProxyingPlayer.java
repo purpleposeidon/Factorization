@@ -6,16 +6,20 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemInWorldManager;
-import net.minecraft.network.NetServerHandler;
+import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.Packet;
-import net.minecraft.network.packet.Packet56MapChunks;
+import net.minecraft.network.play.server.S26PacketMapChunkBulk;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.server.management.PlayerManager;
+import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
+
+import com.mojang.authlib.GameProfile;
+
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import factorization.api.Coord;
@@ -29,22 +33,24 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements IFzdsEnt
     private HashSet<EntityPlayerMP> trackedPlayers = new HashSet();
     
     public PacketProxyingPlayer(DimensionSliceEntity dimensionSlice, World shadowWorld) {
-        super(MinecraftServer.getServer(), shadowWorld, "FzdsPacket", new ItemInWorldManager(shadowWorld));
+        super(MinecraftServer.getServer(), (WorldServer) shadowWorld, new GameProfile(null, "[FzdsPacket]"), new ItemInWorldManager(shadowWorld));
         this.dimensionSlice = dimensionSlice;
         Coord c = dimensionSlice.getCenter();
         c.y = -8; //lurk in the void; we should catch most mod's packets.
         c.setAsEntityLocation(this);
         WorldServer ws = (WorldServer) dimensionSlice.worldObj;
+        ServerConfigurationManager scm = MinecraftServer.getServer().getConfigurationManager();
         if (useShortViewRadius) {
             int orig = savePlayerViewRadius();
             try {
-                MinecraftServer.getServerConfigurationManager(mcServer).func_72375_a(this, null);
+                
+                scm.func_72375_a(this, null);
             } finally {
                 restorePlayerViewRadius(orig);
                 //altho the server might just crash anyways. Then again, there might be a handler higher up.
             }
         } else {
-            MinecraftServer.getServerConfigurationManager(mcServer).func_72375_a(this, null);
+            scm.func_72375_a(this, null);
         }
         ticks_since_last_update = (int) (Math.random()*20);
         //TODO: I think the chunks are unloading despite the PPP's presence.
@@ -116,12 +122,11 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements IFzdsEnt
         //Inspired by EntityPlayerMP.onUpdate. Shame we can't just add chunks... but there'd be no wrapper for the packets.
         ArrayList<Chunk> chunks = new ArrayList();
         ArrayList<TileEntity> tileEntities = new ArrayList();
-        Coord corner = dimensionSlice.getCorner();
         World world = DeltaChunk.getServerShadowWorld();
         
         Coord low = dimensionSlice.getCorner();
         Coord far = dimensionSlice.getFarCorner();
-        int byteCount = 0, chunkCount = 0, teCount = 0; //TODO NORELEASE: Won't need this...
+        int chunkCount = 0, teCount = 0; //TODO NORELEASE: Won't need this...
         for (int x = low.x - 16; x <= far.x + 16; x += 16) {
             for (int z = low.z - 16; z <= far.z + 16; z += 16) {
                 if (!world.blockExists(x+1, 0, z+1)) {
@@ -136,11 +141,10 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements IFzdsEnt
         
         
         //NOTE: This has the potential to go badly if there's a large amount of data in the chunks.
-        NetServerHandler net = target.playerNetServerHandler;
+        NetHandlerPlayServer net = target.playerNetServerHandler;
         if (!chunks.isEmpty()) {
-            Packet toSend = new Packet220FzdsWrap(new Packet56MapChunks(chunks));
-            net.sendPacketToPlayer(toSend);
-            byteCount += toSend.getPacketSize() + 1;
+            Packet toSend = new Packet220FzdsWrap(new S26PacketMapChunkBulk(chunks));
+            net.sendPacket(toSend);
         }
         teCount = tileEntities.size();
         if (!tileEntities.isEmpty()) {
@@ -150,11 +154,10 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements IFzdsEnt
                     continue;
                 }
                 Packet toSend = new Packet220FzdsWrap(description);
-                net.sendPacketToPlayer(toSend);
-                byteCount += toSend.getPacketSize() + 1;
+                net.sendPacket(toSend);
             }
         }
-        System.out.println("Sending data of " + chunkCount + " chunks with " + teCount + " tileEntities, totalling " + byteCount + " (reported) bytes");
+        System.out.println("Sending data of " + chunkCount + " chunks with " + teCount + " tileEntities");
     }
     
     public void endProxy() {
@@ -162,7 +165,7 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements IFzdsEnt
         WorldServer var2 = getServerForPlayer();
         var2.removeEntity(this); //setEntityDead
         var2.getPlayerManager().removePlayer(this); //No comod?
-        var2.getMinecraftServer().getConfigurationManager().playerEntityList.remove(playerNetServerHandler);
+        MinecraftServer.getServer().getConfigurationManager().playerEntityList.remove(playerNetServerHandler);
         //The stuff above might not be necessary.
         setDead();
         dimensionSlice.proxy = null;
@@ -172,7 +175,6 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements IFzdsEnt
         return !trackedPlayers.isEmpty();
     }
     
-    //IFzdsEntryControl implementation
     @Override
     public void addToSendQueue(Packet packet) {
         if (trackedPlayers.isEmpty()) {
@@ -189,11 +191,12 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements IFzdsEnt
             if (player.isDead || player.worldObj != dimensionSlice.worldObj) {
                 it.remove();
             } else {
-                player.playerNetServerHandler.sendPacketToPlayer(wrappedPacket);
+                player.playerNetServerHandler.sendPacket(wrappedPacket);
             }
         }
     }
     
+    //IFzdsEntryControl implementation
     @Override
     public boolean canEnter(IDeltaChunk dse) { return false; } //PPP must stay in the shadow (It stays out of range anyways.)
     

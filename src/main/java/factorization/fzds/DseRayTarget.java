@@ -70,7 +70,7 @@ public class DseRayTarget extends Entity {
             case ENTITY:
                 toSend = HammerNet.makePacket(rightClick ? HammerNetType.rightClickEntity : HammerNetType.leftClickEntity, ray.parent.getEntityId());
                 break;
-            case TILE:
+            case BLOCK:
                 if (rightClick) {
                     if (!parent.can(DeltaCapability.BLOCK_PLACE)) {
                         return;

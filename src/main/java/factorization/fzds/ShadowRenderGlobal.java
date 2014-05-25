@@ -121,5 +121,10 @@ class ShadowRenderGlobal implements IWorldAccess {
         // TODO Auto-generated method stub
         //Prooooobably not.
     }
+
+    @Override
+    public void onStaticEntitiesChanged() {
+        // TODO Auto-generated method stub
+    }
     
 }

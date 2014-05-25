@@ -1,5 +1,7 @@
 package factorization.fzds;
 
+import io.netty.buffer.ByteBuf;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +24,6 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 
 import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteArrayDataOutput;
 
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import factorization.api.Coord;
@@ -685,7 +686,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     public void onExit(IDeltaChunk dse) { }
     
     @Override
-    public void writeSpawnData(ByteArrayDataOutput data) {
+    public void writeSpawnData(ByteBuf data) {
         data.writeLong(capabilities);
         rotation.write(data);
         rotationalVelocity.write(data);
@@ -703,7 +704,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     }
 
     @Override
-    public void readSpawnData(ByteArrayDataInput data) {
+    public void readSpawnData(ByteBuf data) {
         try {
             capabilities = data.readLong();
             rotation = Quaternion.read(data);

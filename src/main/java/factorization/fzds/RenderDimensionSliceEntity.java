@@ -5,7 +5,6 @@ import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -25,13 +24,13 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.chunk.Chunk;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.common.IScheduledTickHandler;
-import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
+import cpw.mods.fml.common.gameevent.TickEvent.RenderTickEvent;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.common.FzConfig;
@@ -40,7 +39,7 @@ import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
 
-public class RenderDimensionSliceEntity extends Render implements IScheduledTickHandler {
+public class RenderDimensionSliceEntity extends Render {
     public static int update_frequency = 16;
     public static RenderDimensionSliceEntity instance;
     
@@ -49,6 +48,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
     
     public RenderDimensionSliceEntity() {
         instance = this;
+        Core.loadBus(this);
     }
     
     @Override
@@ -128,7 +128,7 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
             while (last_update_index < renderers.length) {
                 WorldRenderer wr = renderers[last_update_index++];
                 if (wr.needsUpdate) {
-                    wr.updateRenderer();
+                    wr.updateRenderer(null /* Need an entity located at the players position in shadowspace */);
                     if (++updates == update_limit) {
                         break;
                     }
@@ -399,36 +399,29 @@ public class RenderDimensionSliceEntity extends Render implements IScheduledTick
         megatickCount += 100;
     }
 
-    @Override
-    public void tickStart(EnumSet<TickType> type, Object... tickData) {
+    private int tickDelay = 0;
+    
+    @SubscribeEvent
+    public void tick(RenderTickEvent event) {
+        if (tickDelay++ <= 20) return;
+        // This is FPS-based, not worldtick based. It just needs to happen occasionally
+        tickDelay = 0;
+        if (event.phase == Phase.START) {
+            tickStart();
+        } else if (event.phase == Phase.END) {
+            tickEnd();
+        }
+    }
+    
+    public void tickStart() {
         megatickCount++;
         if (nest != 0) {
             nest = 0;
-            Core.logFine("FZDS render nesting depth was not 0");
+            Core.logSevere("FZDS render nesting depth was not 0");
         }
     }
 
-    @Override
-    public void tickEnd(EnumSet<TickType> type, Object... tickData) {
+    public void tickEnd() {
         discardOldRenderLists();
-    }
-
-    EnumSet<TickType> renderTicks = EnumSet.of(TickType.RENDER);
-    @Override
-    public EnumSet<TickType> ticks() {
-        return renderTicks;
-    }
-
-    @Override
-    public String getLabel() {
-        return "fzdsRenderDealloc";
-    }
-
-    @Override
-    public int nextTickSpacing() {
-        return 20;
-        //return 20*60; //XXX TODO
-        //20*60 would be "every minute". This actually isn't quite correct, since MC doesn't render at 20 FPS.
-        //I mean, other people's MC doesn't render at 20 FPS. So, let's say you're getting 60 FPS.
     }
 }

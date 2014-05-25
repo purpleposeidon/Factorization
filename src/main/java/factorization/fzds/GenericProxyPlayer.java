@@ -1,60 +1,23 @@
 package factorization.fzds;
 
 import java.net.SocketAddress;
+
+import com.mojang.authlib.GameProfile;
+
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemInWorldManager;
-import net.minecraft.network.INetworkManager;
-import net.minecraft.network.NetServerHandler;
-import net.minecraft.network.packet.NetHandler;
+import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 
-public abstract class GenericProxyPlayer extends EntityPlayerMP implements INetworkManager {
-
-    public GenericProxyPlayer(MinecraftServer server, World world, String playername, ItemInWorldManager itemManager) {
-        super(server, world, playername, itemManager);
-        this.playerNetServerHandler = new NetServerHandler(server, this, this);
+public abstract class GenericProxyPlayer extends EntityPlayerMP {
+    NetworkManager networkManager;
+    public GenericProxyPlayer(MinecraftServer server, WorldServer world, GameProfile gameProfile, ItemInWorldManager itemInWorldManager) {
+        super(server, world, gameProfile, itemInWorldManager);
+        this.playerNetServerHandler = new NetHandlerPlayServer(server, networkManager, this);
     }
-
-    //INetworkManager implementation -- or whatever this is.
-    @Override
-    public void setNetHandler(NetHandler netHandler) { }
-
-    @Override
     public abstract void addToSendQueue(Packet packet);
-    
-    @Override
-    public void wakeThreads() { }
-
-    @Override
-    public void processReadPackets() { }
-
-    @Override
-    public SocketAddress getSocketAddress() {
-        return new SocketAddress() {
-            @Override
-            public String toString() {
-                return "<Proxying Player: " + GenericProxyPlayer.this.toString() + ">";
-            }
-        };
-    }
-
-    @Override
-    public void serverShutdown() { }
-
-    @Override
-    public int packetSize() {
-        //usages suggests this is used only to delay sending item map data, and that only happens if this is <= 5. Yeaaah. No.
-        //The real player should be receiving that kind of details anyways. Besides, PPP won't be carrying items.
-        return 10;
-    }
-
-    @Override
-    public void networkShutdown(String str, Object... args) { }
-
-    @Override
-    public void closeConnections() { }
-    
-
 }

@@ -65,4 +65,9 @@ public final class ShadowWorldAccess implements IWorldAccess {
     @Override public void destroyBlockPartially(int var1, int var2, int var3, int var4, int var5) { }
 
     @Override public void broadcastSound(int var1, int var2, int var3, int var4, int var5) { }
+
+    @Override
+    public void onStaticEntitiesChanged() {
+        // TODO: Implement? We may just render them lame-style
+    }
 }
