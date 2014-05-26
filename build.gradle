@@ -16,6 +16,7 @@ buildscript {
 }
 
 apply plugin: 'forge'
+// Try this some time: apply plugin: 'checkstyle'... well that might not work. But see Buildcraft.
 
 version = new File('fzversion').getText('UTF-8').replaceAll("\\s","")
 group = "factorization"
@@ -63,4 +64,10 @@ jar {
                    "FMLCorePluginContainsFMLMod": "true")
     }
     exclude "codechicken/**"
+}
+
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    from sourceSets.api.output
+    classifier = 'dev'
 }
