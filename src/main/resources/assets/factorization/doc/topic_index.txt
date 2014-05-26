@@ -8,6 +8,7 @@ item.factorization:diamond_cutting_head	processing
 factorization.factoryBlock.SERVORAIL	servorail
 factorization.factoryBlock.LEYDENJAR	chargestorage
 factorization.factoryBlock.STEAMTURBINE	chargegen
+item.factorization:servo/component.fz.instruction.group	instructions/subroutine
 item.diode	repeater
 tile.hopper	hopper
 factorization.factoryBlock.SOLARBOILER	chargegen
