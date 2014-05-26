@@ -1,4 +1,12 @@
 #!/bin/sh
 
-ack-grep --ignore-dir=src/factorization/fzds/ NORELEASE src/
+
+if git branch | grep "*" | grep fzds > /dev/zero;
+then
+    EXCLUDE="--ignore-dir=src/factorization/fzds/"
+else
+    EXCLUDE=""
+fi
+
+ack-grep $EXCLUDE NORELEASE src/
 ack-grep '%i' src/
