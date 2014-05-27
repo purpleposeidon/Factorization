@@ -17,6 +17,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatisticsFile;
 import net.minecraft.util.MathHelper;
@@ -105,6 +106,11 @@ public class MiscellaneousNonsense {
         public void serverTick(TickEvent.ServerTickEvent event) {
             if (event.phase == Phase.END) return;
             if (!enabled) return;
+            IntegratedServer is = Minecraft.getMinecraft().getIntegratedServer();
+            if (is != null) {
+                if (is.isServerStopped()) return;
+                if (!is.isServerRunning()) return;
+            }
             if (pokeValue % 5 != 0 && !isPlayerInDanger(mc.thePlayer)) return;
             
             if (pokeValue != serversLastSeenPoke) {
