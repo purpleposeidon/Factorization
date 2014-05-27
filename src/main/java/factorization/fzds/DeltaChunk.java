@@ -25,7 +25,12 @@ public class DeltaChunk {
     }
     
     public static World getClientShadowWorld() {
-        return Hammer.worldClient;
+        World ret = Hammer.worldClient;
+        if (ret == null) {
+            Hammer.proxy.createClientShadowWorld();
+            return Hammer.worldClient;
+        }
+        return ret;
     }
     
     public static World getServerShadowWorld() {

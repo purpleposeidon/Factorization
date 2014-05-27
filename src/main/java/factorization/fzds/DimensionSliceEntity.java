@@ -14,7 +14,6 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.Packet;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.util.AxisAlignedBB;
@@ -22,9 +21,8 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
-
-import com.google.common.io.ByteArrayDataInput;
-
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
@@ -425,7 +423,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     void shareRotationInfo() {
         boolean d0 = !rotation.isEqual(last_shared_rotation), d1 = !rotationalVelocity.isEqual(last_shared_rotational_velocity);
-        Packet toSend = null;
+        FMLProxyPacket toSend = null;
         if (d0 && d1) {
             toSend = HammerNet.makePacket(HammerNet.HammerNetType.rotationBoth, getEntityId(), rotation, rotationalVelocity);
             last_shared_rotation.update(rotation);
@@ -438,7 +436,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             last_shared_rotational_velocity.update(rotationalVelocity);
         }
         if (toSend != null) {
-            PacketDispatcher.sendPacketToAllAround(posX, posY, posZ, 64, this.dimension, toSend);
+            HammerNetEventHandler.INSTANCE.channel.sendToAllAround(toSend, new NetworkRegistry.TargetPoint(dimension, posX, posY, posZ, 64));
         }
     }
     

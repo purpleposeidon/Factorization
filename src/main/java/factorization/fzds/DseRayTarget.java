@@ -1,15 +1,14 @@
 package factorization.fzds;
 
-import cpw.mods.fml.common.network.PacketDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.Packet;
 import net.minecraft.util.MovingObjectPosition;
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import cpw.mods.fml.common.eventhandler.EventPriority;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import factorization.fzds.HammerNet.HammerNetType;
 import factorization.fzds.api.DeltaCapability;
 import factorization.shared.Core;
@@ -65,7 +64,7 @@ public class DseRayTarget extends Entity {
                 return;
             }
             event.setCanceled(true);
-            Packet toSend = null;
+            FMLProxyPacket toSend = null;
             switch (hit.typeOfHit) {
             case ENTITY:
                 toSend = HammerNet.makePacket(rightClick ? HammerNetType.rightClickEntity : HammerNetType.leftClickEntity, ray.parent.getEntityId());
@@ -92,7 +91,7 @@ public class DseRayTarget extends Entity {
                 Core.logWarning("What did you just click? " + hit.typeOfHit + " " + hit);
                 return;
             }
-            PacketDispatcher.sendPacketToServer(toSend);
+            HammerNetEventHandler.INSTANCE.channel.sendToServer(toSend);
             //XXX Mmm, no, not quite. Need to do stuff in shadow on the client-side.
         }
     }

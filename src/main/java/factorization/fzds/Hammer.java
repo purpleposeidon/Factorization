@@ -77,7 +77,7 @@ public class Hammer {
         File base = event.getSuggestedConfigurationFile().getParentFile();
         hammerInfo.setConfigFile(new File(base, "hammerChannels.cfg"));
         fzds_command_channel = hammerInfo.makeChannelFor(this, "cmd", fzds_command_channel, -1, "This channel is used for Slices created using the /fzds command");
-        Packet.addIdClassMapping(220, true /* client side */, true /* server side */, Packet220FzdsWrap.class);
+        S54FzdsWrap.registerPacket();
         
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             //When the client logs in or out, we need to do something to the shadow world
@@ -86,6 +86,7 @@ public class Hammer {
         
         //This sets up saving how many IDs we've used
         Core.loadBus(hammerInfo);
+        Core.loadBus(proxy);
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             MinecraftForge.EVENT_BUS.register(new DseRayTarget.ClickHandler());
         }

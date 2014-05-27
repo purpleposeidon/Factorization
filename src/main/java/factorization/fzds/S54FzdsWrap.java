@@ -11,7 +11,7 @@ import net.minecraft.network.PacketBuffer;
 
 import com.google.common.collect.BiMap;
 
-public class Packet220FzdsWrap extends Packet {
+public class S54FzdsWrap extends Packet {
     /**
      * These fields hold the packet maps.
      * See {@link net.minecraft.util.MessageDeserializer.decode(ChannelHandlerContext, ByteBuf, List)}
@@ -21,12 +21,35 @@ public class Packet220FzdsWrap extends Packet {
     
     Packet wrapped = null;
     
-    public Packet220FzdsWrap() {
+    public S54FzdsWrap() {
         
     }
     
-    public Packet220FzdsWrap(Packet toWrap) {
+    public S54FzdsWrap(Packet toWrap) {
         this.wrapped = toWrap;
+    }
+    
+    public static void registerPacket() {
+        // FIXME: It's probably possible to setup a netty channel that's just as, or possibly even more, efficient than this.
+        final int startPacketId = 0x54;
+        final int naturalMax = 0x80;
+        for (int pid = startPacketId; pid < naturalMax; pid++) {
+            if (tryInjectPacketAt(pid)) return;
+        }
+        for (int pid = 0; pid < startPacketId; pid++) {
+            if (tryInjectPacketAt(pid)) return;
+        }
+        for (int pid = naturalMax; pid < Short.MAX_VALUE; pid++) {
+            if (tryInjectPacketAt(pid)) return;
+        }
+        throw new IllegalArgumentException("Out of packet IDs!?");
+    }
+    
+    private static boolean tryInjectPacketAt(int id) {
+        if (serverPacketMap.containsKey(id)) return false;
+        serverPacketMap.put(id, S54FzdsWrap.class);
+        //NORELEASE...
+        return true;
     }
     
     @Override

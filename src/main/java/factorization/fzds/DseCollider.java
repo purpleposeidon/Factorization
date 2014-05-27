@@ -1,14 +1,15 @@
 package factorization.fzds;
 
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteArrayDataOutput;
-
-import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+
+import com.google.common.io.ByteArrayDataOutput;
+
+import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsEntryControl;
 
@@ -80,7 +81,7 @@ public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdd
     @Override public void onExit(IDeltaChunk dse) { }
 
     @Override
-    public void writeSpawnData(ByteArrayDataOutput data) {
+    public void writeSpawnData(ByteBuf data) {
         if (parent == null) {
             data.writeInt(-1);
             setDead();
@@ -93,7 +94,7 @@ public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdd
     }
 
     @Override
-    public void readSpawnData(ByteArrayDataInput data) {
+    public void readSpawnData(ByteBuf data) {
         parent_id = data.readInt();
         if (parent_id == -1) {
             setDead();

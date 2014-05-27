@@ -25,4 +25,6 @@ public class HammerProxy {
     MovingObjectPosition getShadowHit() { return null; }
     
     void mineBlock(MovingObjectPosition mop) { }
+
+    public void createClientShadowWorld() { }
 }

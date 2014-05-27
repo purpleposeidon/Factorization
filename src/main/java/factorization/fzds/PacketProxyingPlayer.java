@@ -143,7 +143,7 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements IFzdsEnt
         //NOTE: This has the potential to go badly if there's a large amount of data in the chunks.
         NetHandlerPlayServer net = target.playerNetServerHandler;
         if (!chunks.isEmpty()) {
-            Packet toSend = new Packet220FzdsWrap(new S26PacketMapChunkBulk(chunks));
+            Packet toSend = new S54FzdsWrap(new S26PacketMapChunkBulk(chunks));
             net.sendPacket(toSend);
         }
         teCount = tileEntities.size();
@@ -153,7 +153,7 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements IFzdsEnt
                 if (description == null) {
                     continue;
                 }
-                Packet toSend = new Packet220FzdsWrap(description);
+                Packet toSend = new S54FzdsWrap(description);
                 net.sendPacket(toSend);
             }
         }
@@ -184,7 +184,7 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements IFzdsEnt
             setDead();
             return;
         }
-        Packet wrappedPacket = new Packet220FzdsWrap(packet);
+        Packet wrappedPacket = new S54FzdsWrap(packet);
         Iterator<EntityPlayerMP> it = trackedPlayers.iterator();
         while (it.hasNext()) {
             EntityPlayerMP player = it.next();

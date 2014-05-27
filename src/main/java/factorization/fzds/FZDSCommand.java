@@ -403,7 +403,9 @@ public class FZDSCommand extends CommandBase {
                         sc.reset();
                     }
                 }
-                sendChat(join(good));
+                for (String msg : join(good).split("\n")) {
+                    sendChat(msg);
+                }
                 sendChat("To specify a Coord or player: #worldId,x,y,z $PlayerName");
                 sendChat("Best commands: cut d drop");
             }});

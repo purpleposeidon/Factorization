@@ -101,24 +101,20 @@ public class HammerClientProxy extends HammerProxy {
         }
     }
     
-    @SubscribeEvent
-    public void onClientLogin(ClientConnectedToServerEvent event) {
-        if (!FzConfig.enable_dimension_slice || FMLCommonHandler.instance().getEffectiveSide() != Side.CLIENT) return;
-        //event.handler, event.manager
-        
-        INetHandlerPlayClient nch = event.handler;
-        
+    @Override
+    public void createClientShadowWorld() {
+        final Minecraft mc = Minecraft.getMinecraft();
+        send_queue = mc.thePlayer.sendQueue;
         World world = Minecraft.getMinecraft().theWorld;
         WorldInfo wi = world.getWorldInfo();
-        Hammer.worldClient = new HammerWorldClient((NetHandlerPlayClient) nch,
+        Hammer.worldClient = new HammerWorldClient(send_queue,
                 new WorldSettings(wi),
                 Hammer.dimensionID,
                 world.difficultySetting,
                 Core.proxy.getProfiler());
-        final Minecraft mc = Minecraft.getMinecraft();
-        send_queue = mc.thePlayer.sendQueue;
         Hammer.worldClient.addWorldAccess(new ShadowRenderGlobal(mc.theWorld));
     }
+    
     
     @SubscribeEvent
     public void onClientLogout(ClientDisconnectionFromServerEvent event) {
