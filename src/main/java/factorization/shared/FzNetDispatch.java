@@ -41,6 +41,14 @@ public class FzNetDispatch {
     }
     
     public static void addPacketFrom(Packet packet, Chunk chunk) {
+        // Can't actually use this because the AT just won't apply.
+//    	if (chunk.worldObj.isRemote) return;
+//        final WorldServer world = (WorldServer) chunk.worldObj;
+//        final PlayerManager pm = world.getPlayerManager();
+//        PlayerManager.PlayerInstance watcher = pm.getOrCreateChunkWatcher(chunk.xPosition, chunk.zPosition, false);
+//        if (watcher == null) return;
+//        watcher.sendToAllPlayersWatchingChunk(packet);
+        
         if (chunk.worldObj.isRemote) return;
         final WorldServer world = (WorldServer) chunk.worldObj;
         final PlayerManager pm = world.getPlayerManager();
