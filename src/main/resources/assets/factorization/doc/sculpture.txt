@@ -1,0 +1,73 @@
+\title{Sculpting}
+
+A hand-made sculpture could be perfect for your home or dungeon.
+
+Craft a ball of clay onto a wooden slab,
+and then place it on the ground.
+
+This gives you a single lump of clay.
+Clicking on the lump with a clay ball will add another lump to the sculpture.
+
+To remove a clay lump, just break it like a normal block.
+If you sneak and break at the same time,
+you can pick up the entire sculpture.
+
+If you put the sculpture back down,
+you might find that it faces a different direction.
+This is because sculptures are always placed facing towards you.
+
+
+\h1{Sculpting Tools}
+Sticking a ball of clay on the end of a stick will make a sculpting tool.
+You only need one, but you may find it convenient to make multiples.
+
+The first sculpting tool is "Move". 
+Click with the tool on a clay lump to move it towards the side you clicked.
+Sneak-clicking will move it away.
+
+If you sneak-click the ground with "Move",
+the tool will turn into "Stretch".
+Clicking on a clay lump with "Stretch" will stretch it towards that side,
+and sneak-clicking will squish it away.
+
+Crafting "Move" by itself will give you the "Rotate" tool.
+Clicking on a clay lump with the tool to turn it,
+and sneak-clicking will turn it the other way.
+
+Crafting "Rotate" gives the "Reset Rotation" tool, which removes all rotation from the lump.
+
+Crafting "Reset Rotation" gives "Mold Sculpture".
+A sculpture that has been fired can be copied using the "Mold" tool.
+This requires a wooden plank, and an appropriate number of clay balls.
+"Mold Sculpture" crafts back into "Move".
+
+"Move", "Stretch", and "Rotate" can be stacked up to 4 times to multiply their effect.
+
+\topic{item.factorization:sculptTool}
+
+\h1{Drying and Firing}
+If a sculpture is left alone for a while, or patted down with a piece of wool,
+it will dry out.
+It can't be reshaped when dry;
+clicking on it with a bucket of water will make it wet again.
+
+Dry clay is low-fired by placing the sculpture inside several furnace heaters.
+If the heaters has plenty of power, it will soon be fired.
+
+Once fired, the sculpture can be glazed.
+Then it can be high fired.
+This can take an uncomfortably long time if there are not enough furnace heaters.
+
+\h1{Making Glazes}
+Glazes are mixed in glaze buckets,
+and can be used 64 times before they run out.
+Most blocks can be used in mimicing glazes.
+Water and lava glazes can be crafted using its bucket with the base glaze.
+
+\topic{item.factorization:ceramics/glaze_bucket}
+\topic{item.factorization:ceramics/glaze_bucket.base_mimicry}
+
+
+\topic{factorization.factoryBlock.CERAMIC}
+
+
