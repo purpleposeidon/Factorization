@@ -243,7 +243,8 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         info = decoration.getInfo();
         info = info == null ? "" : info;
         final Coord here = getCoord();
-        if (here.isWeaklyPowered()) {
+        boolean powered = here.isWeaklyPowered();
+        if (powered) {
             Notify.withItem(new ItemStack(Blocks.redstone_torch));
             Notify.withStyle(Style.DRAWITEM);
         }
@@ -253,7 +254,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             }
             info += EnumChatFormatting.ITALIC + comment;
         }
-        if (info.length() > 0) {
+        if (info.length() > 0 || powered) {
             Notify.send(player, here, info);
         }
     }
