@@ -133,6 +133,9 @@ public class ItemGlazeBucket extends ItemFactorization {
     }
     
     public void addGlaze(ItemStack is) {
+        if (subItems.isEmpty()) {
+            subItems.add(Core.registry.empty_glaze_bucket.copy());
+        }
         if (!done) {
             subItems.add(is);
         }
@@ -234,15 +237,19 @@ public class ItemGlazeBucket extends ItemFactorization {
         if (part.icon_id == id && part.icon_md == md && part.icon_side == sd) {
             return is;
         }
-        if (player.capabilities.isCreativeMode || useCharge(is)) {
+        if (getCharges(is) > 0) {
             part.icon_id = id;
             part.icon_md = md;
             part.icon_side = sd;
             clay.changeLump(mop.subHit, part);
             clay.glazesApplied = true;
-            return is;
-        } else {
-            return new ItemStack(this);
+            if (!player.capabilities.isCreativeMode) {
+                useCharge(is);
+                if (getCharges(is) <= 0) {
+                    return Core.registry.empty_glaze_bucket.copy();
+                }
+            }
         }
+        return is;
     }
 }

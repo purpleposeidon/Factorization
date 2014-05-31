@@ -128,6 +128,7 @@ public class Registry {
     public ItemCraftingComponent sludge;
     public ItemSculptingTool sculpt_tool;
     public ItemGlazeBucket glaze_bucket;
+    public ItemStack empty_glaze_bucket;
     public ItemStack base_common, glaze_base_mimicry;
     public ItemCraftingComponent logicMatrix, logicMatrixIdentifier, logicMatrixController;
     public ItemMatrixProgrammer logicMatrixProgrammer;
@@ -326,6 +327,7 @@ public class Registry {
         //ceramics
         sculpt_tool = new ItemSculptingTool();
         glaze_bucket = new ItemGlazeBucket();
+        empty_glaze_bucket = new ItemStack(glaze_bucket, 1, 100);
 
         //Misc
         pocket_table = new ItemPocketTable();
@@ -505,7 +507,6 @@ public class Registry {
                 'c', Items.clay_ball,
                 '/', Items.stick);
         ItemSculptingTool.addModeChangeRecipes();
-        ItemStack empty_glaze_bucket = new ItemStack(glaze_bucket, 1, 100);
         oreRecipe(empty_glaze_bucket.copy(),
                 "_ _",
                 "# #",
