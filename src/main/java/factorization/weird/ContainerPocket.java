@@ -1,5 +1,6 @@
 package factorization.weird;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,11 +15,9 @@ import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 import factorization.common.Command;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
-import factorization.shared.FzUtil.FzInv;
 
 public class ContainerPocket extends Container {
     final EntityPlayer player;
@@ -479,5 +478,53 @@ public class ContainerPocket extends Container {
         }
         playerInv.setInventorySlotContents(slot, FzUtil.normalize(toMove));
         updateMatrix();
+    }
+    
+    @Override
+    public ItemStack slotClick(int slotId, int clickedButton, int mode, EntityPlayer player) {
+        // In a pocket crafting table, use 2 stacks of iron & 1 stick to make a sword.
+        // Put an iron sword in your 3rd hotbar slot.
+        // Fill the rest of your inventory up with cobble.
+        // Put your mouse over the crafting result, and press 3 to lose your sword.
+        boolean bad_news = false;
+        if (mode == 2 && clickedButton >= 0 && clickedButton < 9) {
+            Slot slot2 = (Slot)this.inventorySlots.get(slotId);
+            if (slot2.canTakeStack(player)) {
+                bad_news = true;
+            }
+        }
+        if (bad_news) {
+            final InventoryPlayer realInventory = player.inventory;
+            try {
+                player.inventory = new InventoryPlayer(player) {
+                    {
+                        for (Field field : InventoryPlayer.class.getFields()) {
+                            field.set(this, field.get(realInventory));
+                        }
+                    }
+                    
+                    @Override
+                    public int getFirstEmptyStack() {
+                        foundCraftingSlot: for (int i = 0; i < mainInventory.length; ++i) {
+                            if (mainInventory[i] != null) continue;
+                            for (Slot slot : craftingSlots) {
+                                if (i == slot.getSlotIndex()) {
+                                    continue foundCraftingSlot;
+                                }
+                            }
+                            return i;
+                        }
+                        return -1;
+                    }
+                };
+                return super.slotClick(slotId, clickedButton, mode, player);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+                return null;
+            } finally {
+                player.inventory = realInventory;
+            }
+        }
+        return super.slotClick(slotId, clickedButton, mode, player);
     }
 }
