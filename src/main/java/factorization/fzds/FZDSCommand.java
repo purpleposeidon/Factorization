@@ -246,7 +246,7 @@ public class FZDSCommand extends CommandBase {
     
     public static Coord parseCoord(World world, String src) {
         ArrayList<Integer> parts = new ArrayList<Integer>();
-        for (String part : comma.split(src.substring(1))) {
+        for (String part : comma.split(src)) {
             parts.add(Integer.parseInt(part));
         }
         if (parts.size() == 4) {
@@ -487,12 +487,7 @@ public class FZDSCommand extends CommandBase {
             String details() { return "Creates a Slice from the range given"; }
             @Override
             void call(String[] args) {
-                Coord base;
-                if (arg0.startsWith("r")) {
-                    base = user.copy();
-                } else {
-                    base = new Coord(user.w, 0, 0, 0);
-                }
+                Coord base = new Coord(user.w, 0, 0, 0);
                 final boolean copy = arg0.contains("copy");
                 Coord low = base.add(DeltaCoord.parse(args[0]));
                 Coord up = base.add(DeltaCoord.parse(args[1]));
@@ -547,14 +542,19 @@ public class FZDSCommand extends CommandBase {
             void call(String[] args) {
                 DeltaChunk.paste(selected, args.length > 1);
             }}, Requires.SLICE_SELECTED, Requires.CREATIVE);
-        add(new SubCommand("oracle") {
+        add(new SubCommand("oracle", "x,y,z", "x,y,z") {
             @Override
             void call(String[] args) {
+                Coord base = new Coord(user.w, 0, 0, 0);
+                Coord low = base.add(DeltaCoord.parse(args[0]));
+                Coord up = base.add(DeltaCoord.parse(args[1]));
                 AreaMap do_nothing = new AreaMap() {
                     @Override public void fillDse(DseDestination destination) { }
                 };
-                IDeltaChunk dse = DeltaChunk.makeSlice(Hammer.fzds_command_channel, user, user, do_nothing, false);
+                IDeltaChunk dse = DeltaChunk.makeSlice(Hammer.fzds_command_channel, low, up, do_nothing, false);
                 dse.permit(DeltaCapability.ORACLE);
+                dse.forbid(DeltaCapability.COLLIDE);
+                user.setAsEntityLocation(dse);
                 dse.worldObj.spawnEntityInWorld(dse);
             }}, Requires.OP);
         
@@ -783,7 +783,7 @@ public class FZDSCommand extends CommandBase {
             }}, Requires.SLICE_SELECTED);
         add(new SubCommand("caps") {
             @Override
-            String details() { return "Lists the available Caps"; }
+            String details() { return "Lists the available capabilities"; }
             @Override
             void call(String[] args) {
                 String r = "";
@@ -794,7 +794,7 @@ public class FZDSCommand extends CommandBase {
             }});
         add(new SubCommand("cap?") {
             @Override
-            String details() { return "Lists the Caps enabled on the selection"; }
+            String details() { return "Lists the capabilities enabled on the selection"; }
             @Override
             void call(String[] args) {
                 String r = "";
@@ -807,7 +807,7 @@ public class FZDSCommand extends CommandBase {
             }}, Requires.SLICE_SELECTED);
         add(new SubCommand("cap+|cap-", "CAP+") {
             @Override
-            String details() { return "Gives or takes away Caps. May cause client desyncing."; }
+            String details() { return "Gives or takes away capabilities. (May cause client desyncing.)"; }
             @Override
             void call(String[] args) {
                 for (String a : args) {

@@ -2,6 +2,8 @@ package factorization.fzds;
 
 import java.util.List;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -31,8 +33,25 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
         return this;
     }
     
+    static class AabbHolder extends Entity {
+        public AabbHolder() {
+            super(null);
+        }
+        AxisAlignedBB held = null;
+        public AxisAlignedBB getBoundingBox() {
+            return held;
+        }
+        
+        @Override protected void entityInit() { }
+        @Override protected void readEntityFromNBT(NBTTagCompound var1) { }
+        @Override protected void writeEntityToNBT(NBTTagCompound var1) { }
+    }
+    
+    AabbHolder aabbHolder = new AabbHolder();
+    
     List<AxisAlignedBB> getUnderlying(AxisAlignedBB aabb) {
-        return shadowWorld.getCollidingBoundingBoxes(null, aabb);
+        aabbHolder.held = aabb;
+        return shadowWorld.getCollidingBoundingBoxes(aabbHolder, aabb);
     }
     
     private void shadow2rotation(Vec3 v) {

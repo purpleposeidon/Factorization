@@ -104,8 +104,14 @@ public class HammerClientProxy extends HammerProxy {
     @Override
     public void createClientShadowWorld() {
         final Minecraft mc = Minecraft.getMinecraft();
+        World world = mc.theWorld;
+        if (world == null || mc.thePlayer == null) {
+            Hammer.worldClient = null;
+            send_queue = null;
+            fake_player = null;
+            return;
+        }
         send_queue = mc.thePlayer.sendQueue;
-        World world = Minecraft.getMinecraft().theWorld;
         WorldInfo wi = world.getWorldInfo();
         Hammer.worldClient = new HammerWorldClient(send_queue,
                 new WorldSettings(wi),
@@ -213,6 +219,9 @@ public class HammerClientProxy extends HammerProxy {
         if (Minecraft.getMinecraft().isGamePaused()) {
             return;
         }
+        if (!Minecraft.getMinecraft().isIntegratedServerRunning()) {
+            return;
+        }
         WorldClient w = (WorldClient) DeltaChunk.getClientShadowWorld();
         if (w == null) {
             return;
@@ -303,7 +312,7 @@ public class HammerClientProxy extends HammerProxy {
         double origZ = player.posZ;
         Vec3 shadowPos = ray.parent.real2shadow(Vec3.createVectorHelper(origX, origY, origZ));
         MovingObjectPosition origMouseOver = mc.objectMouseOver;
-        Entity origPointed = mc.entityRenderer.pointedEntity;
+        //Entity origPointed = mc.entityRenderer.pointedEntity;
         //It's private! It's used in one function! Why is this even a field?
         
         try {
@@ -350,7 +359,7 @@ public class HammerClientProxy extends HammerProxy {
             rayTarget = ray;
         } finally {
             mc.objectMouseOver = origMouseOver;
-            mc.entityRenderer.pointedEntity = origPointed;
+            //mc.entityRenderer.pointedEntity = origPointed;
         }
     }
     

@@ -128,7 +128,7 @@ public class RenderDimensionSliceEntity extends Render {
             while (last_update_index < renderers.length) {
                 WorldRenderer wr = renderers[last_update_index++];
                 if (wr.needsUpdate) {
-                    wr.updateRenderer(null /* Need an entity located at the players position in shadowspace */);
+                    wr.updateRenderer(Minecraft.getMinecraft().thePlayer /* NORELEASE: Need an entity located at the players position in shadowspace? */);
                     if (++updates == update_limit) {
                         break;
                     }

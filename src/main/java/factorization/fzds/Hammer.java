@@ -23,6 +23,7 @@ import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.common.FzConfig;
 import factorization.fzds.api.IDeltaChunk;
+import factorization.fzds.network.FzdsPacketRegistry;
 import factorization.shared.Core;
 
 @Mod(modid = Hammer.modId, name = Hammer.name, version = Core.version, dependencies = "required-after: " + Core.modId)
@@ -77,7 +78,7 @@ public class Hammer {
         File base = event.getSuggestedConfigurationFile().getParentFile();
         hammerInfo.setConfigFile(new File(base, "hammerChannels.cfg"));
         fzds_command_channel = hammerInfo.makeChannelFor(this, "cmd", fzds_command_channel, -1, "This channel is used for Slices created using the /fzds command");
-        S54FzdsWrap.registerPacket();
+        FzdsPacketRegistry.init();
         
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             //When the client logs in or out, we need to do something to the shadow world

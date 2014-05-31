@@ -14,7 +14,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
 public abstract class GenericProxyPlayer extends EntityPlayerMP {
-    NetworkManager networkManager;
+    NetworkManager networkManager = new NetworkManager(false);
     public GenericProxyPlayer(MinecraftServer server, WorldServer world, GameProfile gameProfile, ItemInWorldManager itemInWorldManager) {
         super(server, world, gameProfile, itemInWorldManager);
         //this.playerNetServerHandler = new NetHandlerPlayServer(server, networkManager, this);
