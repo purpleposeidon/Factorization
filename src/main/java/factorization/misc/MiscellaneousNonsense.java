@@ -6,8 +6,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.item.EntityFireworkRocket;
+import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
@@ -91,6 +93,16 @@ public class MiscellaneousNonsense {
         }
         if (FzConfig.limit_integrated_server && FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
             Core.loadBus(new TickSynchronizer());
+        }
+        if (FzConfig.disable_endermen_griefing) {
+            int i = 0;
+            for (Block block : (Iterable<Block>) Block.blockRegistry) {
+                if (EntityEnderman.getCarriable(block)) {
+                    EntityEnderman.setCarriable(block, false);
+                    i++;
+                }
+            }
+            Core.logInfo("Endermen griefing disabled for " + i + " blocks.");
         }
     }
     
