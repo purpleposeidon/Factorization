@@ -22,9 +22,9 @@ group = "factorization"
 archivesBaseName = "Factorization"
 
 minecraft {
-    version = "1.7.2-10.12.1.1065" // FORGEMARK
+    version = "1.7.2-10.12.1.1098" // FORGEMARK
     assetDir = "eclipse/assets"
-    replace '@FZVERSION@', project.version
+    replace '@FZVERSION@', (project.version.split("-")[1])
 }
 
 task writeFzFile {
@@ -48,7 +48,7 @@ processResources {
         include 'mcmod.info'
                 
         // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        expand 'version':(project.version.split("-")[1]), 'mcversion':project.minecraft.version
     }
         
     // copy everything else, thats not the mcmod.info
