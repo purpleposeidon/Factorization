@@ -15,7 +15,7 @@ import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 public class MobEqualizer {
     @SubscribeEvent(priority = EventPriority.LOW)
     public void upgradeMob(LivingSpawnEvent.SpecialSpawn event) {
-        if (event.world.difficultySetting.getDifficultyId() <= 1) {
+        if (event.world.difficultySetting == null || event.world.difficultySetting.getDifficultyId() <= 1) {
             return;
         }
         if (!(event.entityLiving instanceof EntityMob)) {
