@@ -896,7 +896,7 @@ public class TileEntityGreenware extends TileEntityCommon {
 
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
-        AxisAlignedBB bb = AxisAlignedBB.getAABBPool().getAABB(xCoord - 1, yCoord - 1, zCoord - 1, xCoord + 1, yCoord + 1, zCoord + 1);
+        AxisAlignedBB bb = AxisAlignedBB.getAABBPool().getAABB(xCoord - 2, yCoord - 2, zCoord - 2, xCoord + 2, yCoord + 2, zCoord + 2);
         return bb;
     }
 
