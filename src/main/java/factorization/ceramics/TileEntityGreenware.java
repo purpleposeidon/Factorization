@@ -41,7 +41,7 @@ import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.common.ResourceType;
-import factorization.notify.Notify;
+import factorization.notify.Notice;
 import factorization.shared.BlockClass;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
@@ -479,7 +479,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             return false;
         }
         if (state != ClayState.WET) {
-            Notify.send(player, getCoord(), "Not wet");
+            new Notice(this, "Not wet").send(player);
             return false;
         }
         if (!creative) {
@@ -490,7 +490,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             return true;
         }
         if (parts.size() >= MAX_PARTS) {
-            Notify.send(player, getCoord(), "Too complex");
+            new Notice(this, "Too complex").send(player);
             held.stackSize++;
             return false;
         }
@@ -612,7 +612,7 @@ public class TileEntityGreenware extends TileEntityCommon {
                         // We used to not allow this. We just make a bit of noise instead.
                         // A notification will indicate that things will be a bit messed up here.
                         // FIXME: Let block collision boxes go outside the block (Notch hard-coded for fences)
-                        Notify.send(null, c, "!");
+                        new Notice(c, "!").sendToAll();
                     }
                 }
             }

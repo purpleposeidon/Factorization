@@ -11,7 +11,6 @@ import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
@@ -47,7 +46,7 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
-import factorization.notify.Notify;
+import factorization.notify.Notice;
 import factorization.oreprocessing.TileEntityGrinder;
 import factorization.oreprocessing.TileEntityGrinder.GrinderRecipe;
 import factorization.oreprocessing.TileEntityGrinderRender;
@@ -120,11 +119,11 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
             return false;
         }
         if (!buffer.isEmpty()) {
-            Notify.send(this, "%s items buffered", "" + buffer.size());
+            new Notice(this, "%s items buffered", "" + buffer.size()).send(entityplayer);
             return false;
         }
         if (getBackingInventory(this) == null) {
-            Notify.send(this, "No output inventory");
+            new Notice(this, "No output inventory").send(entityplayer);
             return false;
         }
         return false;

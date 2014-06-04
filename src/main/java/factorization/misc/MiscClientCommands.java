@@ -34,8 +34,8 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
-import factorization.notify.Notify;
-import factorization.notify.Notify.Style;
+import factorization.notify.Notice;
+import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
@@ -482,8 +482,7 @@ public class MiscClientCommands implements ICommand {
                     for (int dx = -d; dx <= d; dx++) {
                         Coord here = at.add(dx, dy, dz);
                         if (here.isAir() && here.getBlock() != Blocks.air) {
-                            Notify.withStyle(Style.FORCE);
-                            Notify.send(here, "X");
+                            new Notice(here, "X").withStyle(Style.FORCE).send(mc.thePlayer);
                         }
                     }
                 }

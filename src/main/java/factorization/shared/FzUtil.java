@@ -23,6 +23,7 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.Container;
@@ -51,6 +52,7 @@ import net.minecraft.util.StringUtils;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
@@ -1707,5 +1709,15 @@ public class FzUtil {
         if (a == b) return true;
         if (a == null || b == null) return false;
         return a.equals(b);
+    }
+    
+    public static EntityPlayer fakeplayerToNull(EntityPlayer player) {
+        if (player instanceof EntityPlayerMP) {
+            if (player instanceof FakePlayer) {
+                return null;
+            }
+            return player;
+        }
+        return null;
     }
 }

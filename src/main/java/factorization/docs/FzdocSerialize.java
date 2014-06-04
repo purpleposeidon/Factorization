@@ -16,7 +16,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
-import factorization.notify.Notify;
+import factorization.notify.Notice;
 import factorization.shared.FzUtil;
 
 final class FzdocSerialize implements ICommand {
@@ -99,8 +99,8 @@ final class FzdocSerialize implements ICommand {
         Coord max = peak.copy();
         Coord min = peak.add(xSize, ySize, zSize);
         Coord.sort(min, max);
-        Notify.send(max, "max");
-        Notify.send(min, "min");
+        new Notice(max, "max").sendToAll();
+        new Notice(min, "min").sendToAll();
         DocWorld dw = copyChunkToWorld(min, max);
         NBTTagCompound worldTag = new NBTTagCompound();
         dw.writeToTag(worldTag);

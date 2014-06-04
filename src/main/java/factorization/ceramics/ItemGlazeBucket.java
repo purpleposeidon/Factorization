@@ -18,7 +18,7 @@ import factorization.api.Coord;
 import factorization.ceramics.TileEntityGreenware.ClayLump;
 import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.common.BlockIcons;
-import factorization.notify.Notify;
+import factorization.notify.Notice;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.shared.FzUtil;
@@ -221,11 +221,10 @@ public class ItemGlazeBucket extends ItemFactorization {
             switch (state) {
             case WET:
             case DRY:
-                Notify.withItem(Core.registry.heater_item);
-                Notify.send(player, clay.getCoord(), "Use a {ITEM_NAME} to bisque");
+                new Notice(clay, "Use a {ITEM_NAME} to bisque").withItem(Core.registry.heater_item).send(player);
                 return is;
             case HIGHFIRED:
-                Notify.send(player, clay.getCoord(), "Already high-fired");
+                new Notice(clay, "Already high-fired").send(player);
                 return is;
             default: break;
             }

@@ -4,9 +4,7 @@ import java.util.List;
 
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IIcon;
@@ -20,7 +18,7 @@ import factorization.ceramics.TileEntityGreenware.ClayLump;
 import factorization.ceramics.TileEntityGreenware.ClayState;
 import factorization.common.FactoryType;
 import factorization.common.ItemIcons;
-import factorization.notify.Notify;
+import factorization.notify.Notice;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
@@ -172,7 +170,7 @@ public class ItemSculptingTool extends ItemFactorization {
         if (mode == ToolMode.MOLD) {
             int is_fired = state.compareTo(ClayState.BISQUED);
             if (is_fired < 0 && !player.capabilities.isCreativeMode) {
-                Notify.send(player, here, "Not fired");
+                new Notice(here, "Not fired").send(player);
                 return true;
             }
             FzInv inv = FzUtil.openInventory(player.inventory, 0);
@@ -193,7 +191,7 @@ public class ItemSculptingTool extends ItemFactorization {
                     }
                 }
                 if (theSlab == null || materialCount < neededClay) {
-                    Notify.send(player, here, "Need wood slab\nAnd %s clay", "" + neededClay); //TODO: Localize properly
+                    new Notice(here, "Need wood slab\nAnd %s clay", "" + neededClay).send(player); //TODO: Localize properly
                     return false;
                 }
                 inv.pull(theSlab, 1, false);
@@ -223,19 +221,20 @@ public class ItemSculptingTool extends ItemFactorization {
             if (w.isRemote) {
                 return false;
             }
+            Notice msg = new Notice(gw.getCoord(), null);
             switch (state) {
             case DRY:
-                Notify.withItem(new ItemStack(Items.water_bucket));
-                Notify.send(player, gw.getCoord(), "The clay is dry\nUse a {ITEM_NAME}");
+                msg.withItem(new ItemStack(Items.water_bucket)).setMessage("The clay is dry\nUse a {ITEM_NAME}");
                 break;
             case BISQUED:
             case HIGHFIRED:
-                Notify.send(player, gw.getCoord(), "This has been fired");
+                msg.setMessage("This has been fired");
                 break;
             default:
-                Notify.send(player, gw.getCoord(), "This clay can not be reshaped.");
+                msg.setMessage("This clay can not be reshaped.");
                 break;
             }
+            msg.send(player);
             return false;
         }
         if (w.isRemote) {
@@ -281,7 +280,7 @@ public class ItemSculptingTool extends ItemFactorization {
             }
             break;
         case MOLD:
-            Notify.send(player, here, "Not fired");
+            new Notice(here, "Not fired").send(player);
             return true;
         }
         if (gw.isValidLump(test)) {

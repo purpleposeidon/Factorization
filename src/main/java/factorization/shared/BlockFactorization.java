@@ -33,8 +33,7 @@ import factorization.api.IFactoryType;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.common.Registry;
-import factorization.notify.Notify;
-import factorization.oreprocessing.TileEntitySlagFurnace;
+import factorization.notify.Notice;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.weird.TileEntityDayBarrel;
 
@@ -227,7 +226,7 @@ public class BlockFactorization extends BlockContainer {
         Coord here = new Coord(world, x, y, z);
         TileEntityCommon tec = here.getTE(TileEntityCommon.class);
         if (tec == null) {
-            Notify.send(player, here, "No TileEntity!");
+            new Notice(here, "No TileEntity!").send(player);
             return super.removedByPlayer(world, player, x, y, z);
         }
         return tec.removedByPlayer(player);

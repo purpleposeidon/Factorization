@@ -31,12 +31,13 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
+import factorization.notify.ISaneCoord;
 import factorization.shared.BlockHelper;
 import factorization.shared.FzUtil;
 
 // Note: The rules for holding on to references to Coord are the same as for holding on to World.
 // Don't keep references to them outside of things that are in worlds to avoid mem-leaks; or be careful about it.
-public class Coord implements IDataSerializable {
+public class Coord implements IDataSerializable, ISaneCoord {
     public World w;
     public int x, y, z;
     static private Random rand = new Random();
@@ -65,6 +66,11 @@ public class Coord implements IDataSerializable {
     public Coord(World w, MovingObjectPosition mop) {
         this(w, mop.blockX, mop.blockY, mop.blockZ);
     }
+    
+    @Override public World w() { return w; }
+    @Override public int x() { return x; }
+    @Override public int y() { return y; }
+    @Override public int z() { return z; }
     
     public static Coord tryLoad(World world, Object o) {
         if (o instanceof Coord) {

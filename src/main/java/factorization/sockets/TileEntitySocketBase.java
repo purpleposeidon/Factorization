@@ -7,14 +7,12 @@ import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.Random;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -39,7 +37,7 @@ import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
-import factorization.notify.Notify;
+import factorization.notify.Notice;
 import factorization.servo.LoggerDataHelper;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
@@ -435,7 +433,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
                         break;
                     }
                     if (rep.getParentFactoryType() != getFactoryType()) {
-                        rep.mentionPrereq(this);
+                        rep.mentionPrereq(this, player);
                         return false;
                     }
                     TileEntityCommon upgrade = ft.makeTileEntity();
@@ -454,20 +452,15 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
         return false;
     }
     
-    public void mentionPrereq(ISocketHolder holder) {
+    public void mentionPrereq(ISocketHolder holder, EntityPlayer player) {
         FactoryType pft = getParentFactoryType();
         if (pft == null) return;
         TileEntityCommon tec = pft.getRepresentative();
         if (!(tec instanceof TileEntitySocketBase)) return;
         ItemStack is = ((TileEntitySocketBase) tec).getCreatingItem();
         if (is == null) return;
-        Notify.withItem(is);
         String msg = "Needs {ITEM_NAME}";
-        if (holder instanceof Entity) {
-            Notify.send((Entity) holder, msg);
-        } else {
-            Notify.send((TileEntity) holder, msg);
-        }
+        new Notice(holder, msg).withItem(is).send(player);
     }
     
     protected void replaceWith(TileEntitySocketBase replacement, ISocketHolder socket) {

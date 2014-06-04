@@ -486,6 +486,9 @@ public class ContainerPocket extends Container {
         // Put an iron sword in your 3rd hotbar slot.
         // Fill the rest of your inventory up with cobble.
         // Put your mouse over the crafting result, and press 3 to lose your sword.
+        // Since it gets put in the crafting area and then gets wiped out.
+        
+        // So this is code to dance around that issue. There may be similar
         boolean bad_news = false;
         if (mode == 2 && clickedButton >= 0 && clickedButton < 9) {
             Slot slot2 = (Slot)this.inventorySlots.get(slotId);
@@ -493,38 +496,39 @@ public class ContainerPocket extends Container {
                 bad_news = true;
             }
         }
-        if (bad_news) {
-            final InventoryPlayer realInventory = player.inventory;
-            try {
-                player.inventory = new InventoryPlayer(player) {
-                    {
-                        for (Field field : InventoryPlayer.class.getFields()) {
-                            field.set(this, field.get(realInventory));
-                        }
+        if (!bad_news) return super.slotClick(slotId, clickedButton, mode, player);
+        final InventoryPlayer realInventory = player.inventory;
+        
+        try {
+            player.inventory = new InventoryPlayer(player) {
+                {
+                    for (Field field : InventoryPlayer.class.getFields()) {
+                        field.set(this, field.get(realInventory));
                     }
-                    
-                    @Override
-                    public int getFirstEmptyStack() {
-                        foundCraftingSlot: for (int i = 0; i < mainInventory.length; ++i) {
-                            if (mainInventory[i] != null) continue;
-                            for (Slot slot : craftingSlots) {
-                                if (i == slot.getSlotIndex()) {
-                                    continue foundCraftingSlot;
-                                }
+                }
+                
+                @Override
+                public int getFirstEmptyStack() {
+                    foundCraftingSlot: for (int i = 0; i < mainInventory.length; ++i) {
+                        if (mainInventory[i] != null) continue;
+                        for (Slot slot : craftingSlots) {
+                            if (i == slot.getSlotIndex()) {
+                                continue foundCraftingSlot;
                             }
-                            return i;
                         }
-                        return -1;
+                        return i;
                     }
-                };
-                return super.slotClick(slotId, clickedButton, mode, player);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-                return null;
-            } finally {
-                player.inventory = realInventory;
-            }
+                    return -1;
+                }
+            };
+            return super.slotClick(slotId, clickedButton, mode, player);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            player.inventory = realInventory;
         }
-        return super.slotClick(slotId, clickedButton, mode, player);
+        // (Could we just verify the crafting recipe instead of this nosense? Might not actually be possible. But if it is, it'd be less terrible.)
+        
     }
 }

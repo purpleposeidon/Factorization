@@ -8,7 +8,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
@@ -44,15 +43,13 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
-import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
-import factorization.notify.MessageUpdater;
-import factorization.notify.Notify;
-import factorization.notify.Notify.Style;
+import factorization.notify.Notice;
+import factorization.notify.NoticeUpdater;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
@@ -700,7 +697,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         }
         
         if (!worldObj.isRemote && isNested(is) && (item == null || itemMatch(is))) {
-            Notify.send(entityplayer, this, "No.");
+            new Notice(this, "No.").send(entityplayer);
             return true;
         }
         
@@ -713,7 +710,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
 
         if (!itemMatch(is)) {
             if (Core.getTranslationKey(is.getItem()).equals(Core.getTranslationKey(item))) {
-                Notify.send(entityplayer, this, "That item is different");
+                new Notice(this, "That item is different").send(entityplayer);
             } else {
                 info(entityplayer);
             }
@@ -743,7 +740,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         }
         if (hand != null && !itemMatch(hand)) {
             if (Core.getTranslationKey(hand).equals(Core.getTranslationKey(item))) {
-                Notify.send(entityplayer, this, "That item is different");
+                new Notice(this, "That item is different").send(entityplayer);
             } else {
                 info(entityplayer);
             }
@@ -950,39 +947,24 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     void info(final EntityPlayer entityplayer) {
-        Notify.recuring(entityplayer, this, new MessageUpdater() {
-            ItemStack origItem = item;
-            int origCount;
-            @Override public boolean update(boolean firstMessage) {
+        new Notice(this, new NoticeUpdater() {
+            @Override
+            public void update(Notice msg) {
                 int itemCount = getItemCount();
-                if (!firstMessage && FzUtil.couldMerge(origItem, TileEntityDayBarrel.this.item) && origCount == itemCount) {
-                    return true;
-                }
-                if (!firstMessage) {
-                    if (FzUtil.couldMerge(origItem, TileEntityDayBarrel.this.item)) {
-                        Notify.withStyle(Style.UPDATE_SAME_ITEM);
-                    } else {
-                        Notify.withStyle(Style.UPDATE);
-                    }
-                }
-                origCount = itemCount;
-                origItem = TileEntityDayBarrel.this.item;
                 
                 if (item == null && getItemCount() == 0) {
-                    Notify.send(entityplayer, TileEntityDayBarrel.this, "Empty");
+                    msg.setMessage("Empty");
                 } else if (getItemCount() >= getMaxSize()) {
-                    Notify.withItem(item);
-                    Notify.send(entityplayer, TileEntityDayBarrel.this, "Full of {ITEM_NAME}{ITEM_INFOS_NEWLINE}");
+                    msg.withItem(item).setMessage("Full of {ITEM_NAME}{ITEM_INFOS_NEWLINE}");
                 } else {
                     String count = "" + getItemCount();
                     if (type == Type.CREATIVE) {
                         count = "Infinite";
                     }
-                    Notify.withItem(item);
-                    Notify.send(entityplayer, TileEntityDayBarrel.this, "%s {ITEM_NAME}{ITEM_INFOS_NEWLINE}", count);
+                    msg.withItem(item).setMessage("%s {ITEM_NAME}{ITEM_INFOS_NEWLINE}", count);
                 }
-                return true;
-            }});
+            }
+        }).send(entityplayer);
     }
 
     private ItemStack makeStack(int count) {

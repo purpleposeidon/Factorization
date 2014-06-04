@@ -429,7 +429,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             ItemStack creator = rep.getCreatingItem();
             if (creator != null && FzUtil.couldMerge(is, creator)) {
                 if (rep.getParentFactoryType() != socket.getFactoryType()) {
-                    rep.mentionPrereq(this);
+                    rep.mentionPrereq(this, player);
                     return false;
                 }
                 TileEntityCommon upgrade = ft.makeTileEntity();

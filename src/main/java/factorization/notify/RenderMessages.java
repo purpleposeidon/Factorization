@@ -3,6 +3,7 @@ package factorization.notify;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
@@ -17,17 +18,13 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.common.MinecraftForge;
 
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import factorization.api.Coord;
-import factorization.notify.Notify.Style;
 
 public class RenderMessages extends RenderMessagesProxy {
-    static ArrayList<Message> messages = new ArrayList();
+    static ArrayList<ClientMessage> messages = new ArrayList();
     
     {
         NotifyImplementation.loadBus(this);
@@ -39,7 +36,7 @@ public class RenderMessages extends RenderMessagesProxy {
         if (player == null || player.worldObj == null) {
             return;
         }
-        Message msg = new Message(player.worldObj, locus, item, format, args);
+        ClientMessage msg = new ClientMessage(player.worldObj, locus, item, format, args);
         if (msg.style.contains(Style.CLEAR)) {
             messages.clear();
             return;
@@ -58,7 +55,7 @@ public class RenderMessages extends RenderMessagesProxy {
         if (testPos == null) {
             return;
         }
-        for (Message m : messages) {
+        for (ClientMessage m : messages) {
             if (m.getPosition(0).distanceTo(testPos) < 1.05 && !force_position) {
                 m.creationTime = 0;
             }
@@ -71,8 +68,8 @@ public class RenderMessages extends RenderMessagesProxy {
         messages.add(msg);
     }
     
-    void updateMessage(Message update) {
-        for (Message msg : messages) {
+    void updateMessage(ClientMessage update) {
+        for (ClientMessage msg : messages) {
             if (!msg.locus.equals(update.locus)) {
                 continue;
             }
@@ -99,7 +96,7 @@ public class RenderMessages extends RenderMessagesProxy {
         if (messages.size() == 0) {
             return;
         }
-        Iterator<Message> it = messages.iterator();
+        Iterator<ClientMessage> it = messages.iterator();
         long approximateNow = System.currentTimeMillis();
         EntityLivingBase camera = Minecraft.getMinecraft().renderViewEntity;
         double cx = camera.lastTickPosX + (camera.posX - camera.lastTickPosX) * (double) event.partialTicks;
@@ -116,13 +113,13 @@ public class RenderMessages extends RenderMessagesProxy {
         GL11.glColor4f(1, 1, 1, 1);
         
         while (it.hasNext()) {
-            Message m = it.next();
+            ClientMessage m = it.next();
             long timeExisted = approximateNow - m.creationTime;
             if (timeExisted > m.lifeTime || m.world != w || !m.stillValid()) {
                 it.remove();
                 continue;
             }
-            if (!m.style.contains(Notify.Style.DRAWFAR)) {
+            if (!m.style.contains(Style.DRAWFAR)) {
                 Vec3 pos = m.getPosition(event.partialTicks);
                 double dist = camera.getDistance(pos.xCoord, pos.yCoord, pos.zCoord);
                 if (dist > 8) {
@@ -149,7 +146,7 @@ public class RenderMessages extends RenderMessagesProxy {
 
     RenderItem renderItem = new RenderItem();
 
-    private void renderMessage(Message m, float partial, float opacity) {
+    private void renderMessage(ClientMessage m, float partial, float opacity) {
         int width = 0;
         String[] lines = m.msg.split("\n");
         FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
@@ -176,9 +173,10 @@ public class RenderMessages extends RenderMessagesProxy {
         float x = (float) vec.xCoord;
         float y = (float) vec.yCoord;
         float z = (float) vec.zCoord;
-        Coord co = m.asCoordMaybe();
+        ISaneCoord co = m.asCoordMaybe();
         if (co != null && !m.position_important) {
-            AxisAlignedBB bb = co.getCollisionBoundingBoxFromPool();
+            Block b = co.w().getBlock(co.x(), co.y(), co.z());
+            AxisAlignedBB bb = b.getCollisionBoundingBoxFromPool(co.w(), co.x(), co.y(), co.z());
             if (bb != null) {
                 y += bb.maxY - bb.minY;
             } else {
