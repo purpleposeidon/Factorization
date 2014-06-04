@@ -42,6 +42,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
             if (is == null) {
                 return false;
             }
+            GL11.glPushMatrix();
             BlockRenderHelper block = BlockRenderHelper.instance;
             boolean stand = true;
             boolean rescale = false;
@@ -64,21 +65,21 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
                     }
                 }
                 if (rescale) {
-                    GL11.glPushMatrix();
                     float scale = 1F/3F;
                     GL11.glScalef(scale, scale, scale);
                 }
+                float d = -0.5F; // Odd.
+                Tessellator.instance.setTranslation(d, d, d);
                 renderDynamic(loader);
+                Tessellator.instance.setTranslation(0, 0, 0);
                 ClayState cs = loader.getState();
                 stand = cs == ClayState.WET;
             } else {
                 setupRenderGenericLump().renderForInventory(rb);
             }
+            GL11.glPopMatrix();
             if (stand) {
                 setupRenderStand().renderForInventory(rb);
-            }
-            if (rescale) {
-                GL11.glPopMatrix();
             }
             return false;
         }
