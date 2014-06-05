@@ -37,6 +37,7 @@ public class MiscClientTickHandler {
     int count = 0;
     boolean hit = false;
     private void emitLoadAlert() {
+        if (hit) return;
         if (count == 40) {
             //playing any earlier doesn't seem to work (sound is probably loaded in a separate thread?)
             if (mc.currentScreen instanceof GuiMainMenu) {
