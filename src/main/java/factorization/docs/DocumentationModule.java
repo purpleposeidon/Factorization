@@ -246,7 +246,7 @@ public class DocumentationModule {
             FzUtil.closeNoisily("closing topic_index", topic_index);
         }
         if (Loader.isModLoaded("NotEnoughItems") || Loader.isModLoaded("craftguide")) return false;
-        mc.displayGuiScreen(new DocViewer("cgi/recipes/for/" + name));
+        mc.displayGuiScreen(new DocViewer("cgi/recipes/" + name));
         return true;
     }
     
