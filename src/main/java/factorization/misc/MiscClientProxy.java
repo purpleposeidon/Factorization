@@ -2,6 +2,7 @@ package factorization.misc;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiOptions;
 import net.minecraft.client.gui.GuiSelectWorld;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.EnumChatFormatting;
@@ -67,5 +68,22 @@ public class MiscClientProxy extends MiscProxy {
     
     EnumDifficulty getDifficulty() {
         return Minecraft.getMinecraft().gameSettings.difficulty;
+    }
+    
+    @SubscribeEvent
+    public void patchupTheStupidSecretButton(InitGuiEvent.Post event) {
+        if (!(event.gui instanceof GuiOptions)) return;
+        
+        for (Object obj : event.buttonList) {
+            if (obj instanceof GuiButton) {
+                GuiButton button = (GuiButton) obj;
+                if (button.id == 8675309) {
+                    button.displayString = "Shaders; press F4 to reset";
+                    button.xPosition = 0;
+                    button.yPosition = 0;
+                    return;
+                }
+            }
+        }
     }
 }

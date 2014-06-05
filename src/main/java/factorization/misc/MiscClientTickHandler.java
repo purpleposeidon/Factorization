@@ -32,7 +32,6 @@ public class MiscClientTickHandler {
         checkPickBlockKey();
         checkSprintKey();
         MiscClientCommands.tick();
-        fuckTheSecretButton();
     }
     
     int count = 0;
@@ -151,22 +150,5 @@ public class MiscClientTickHandler {
             mc.thePlayer.setSprinting(false);
         }
         prevState = state;
-    }
-    
-    private void fuckTheSecretButton() {
-        if (mc.currentScreen == null) return;
-        if (!(mc.currentScreen instanceof GuiOptions)) return;
-        
-        GuiOptions gui = (GuiOptions) mc.currentScreen;
-        for (Object obj : gui.buttonList) {
-            if (obj instanceof GuiButton) {
-                GuiButton button = (GuiButton) obj;
-                if (button.id == 8675309) {
-                    button.displayString = "Shaders; press F4 to reset";
-                    button.xPosition = 0;
-                    button.yPosition = 0;
-                }
-            }
-        }
     }
 }
