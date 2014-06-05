@@ -421,6 +421,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
             return false;
         } else if (held != null) {
             boolean isValidItem = false;
+            if (FzUtil.identical(getCreatingItem(), held)) return false;
             for (FactoryType ft : FactoryType.values()) {
                 TileEntityCommon tec = ft.getRepresentative();
                 if (tec == null) continue;
