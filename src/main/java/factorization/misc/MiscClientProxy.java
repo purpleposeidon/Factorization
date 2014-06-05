@@ -1,28 +1,16 @@
 package factorization.misc;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.stats.AchievementList;
-import net.minecraft.stats.StatFileWriter;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiSelectWorld;
+import net.minecraft.client.settings.GameSettings;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.world.EnumDifficulty;
 import net.minecraftforge.client.ClientCommandHandler;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
+import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import cpw.mods.fml.relauncher.Side;
-import factorization.api.Coord;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
@@ -50,5 +38,34 @@ public class MiscClientProxy extends MiscProxy {
         }
         newTps = Math.min(1.5F, Math.max(FzConfig.lowest_dilation, newTps));
         mc.timer.timerSpeed = newTps;
+    }
+    
+    private GuiButton difficulty_button = null;
+    
+    @SubscribeEvent
+    public void addDifficultyInfo(InitGuiEvent.Post event) {
+        difficulty_button = null;
+        if (!(event.gui instanceof GuiSelectWorld)) return;
+        if (getDifficulty() != EnumDifficulty.PEACEFUL) return;
+        event.buttonList.add(difficulty_button = new GuiButton(-237, 0, 0, ""));
+        updateDifficultyString();
+    }
+    
+    @SubscribeEvent
+    public void changeDifficulty(ActionPerformedEvent.Pre event) {
+        if (event.button != difficulty_button || difficulty_button == null) return;
+        GameSettings gs = Minecraft.getMinecraft().gameSettings;
+        gs.difficulty = FzUtil.shiftEnum(gs.difficulty, EnumDifficulty.values(), 1);
+        updateDifficultyString();
+    }
+    
+    void updateDifficultyString() {
+        EnumDifficulty ed = getDifficulty();
+        String color = (ed == EnumDifficulty.PEACEFUL) ? ("" + EnumChatFormatting.RED) : "";
+        difficulty_button.displayString = color + "Difficulty: " + ed;
+    }
+    
+    EnumDifficulty getDifficulty() {
+        return Minecraft.getMinecraft().gameSettings.difficulty;
     }
 }
