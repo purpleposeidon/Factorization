@@ -26,6 +26,7 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
+import factorization.notify.Notice;
 import factorization.shared.FzUtil;
 import factorization.shared.FzUtil.FzInv;
 import factorization.sockets.ISocketHolder;
@@ -291,5 +292,14 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
         for (ItemStack item : buffer) {
             FzUtil.spawnItemStack(here, item);
         }
+    }
+    
+    @Override
+    public boolean activate(EntityPlayer player, ForgeDirection side) {
+        if (!buffer.isEmpty()) {
+            new Notice(this, "Buffered output").send(player);
+            return false;
+        }
+        return super.activate(player, side);
     }
 }
