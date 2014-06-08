@@ -32,7 +32,7 @@ public class Notice {
      * Creates an in-world notification message, which is sent using
      * {@link sendTo} or {@link sendToEveryone}. Additional options can be
      * provided using {@link withItem}, {@link withStyle}, {@link withWorld},
-     * and {@link withUpdater}. <br>
+     * and {@link withUpdater}. Don't forget to send the Notice!<br>
      * <code><pre>
      * Notice msg = new Notice(oldManEntity, "%s", "It's dangerous to go alone!\nTake this!");
      * msg.withItem(new ItemStack(Items.iron_sword)).sendTo(player); 
