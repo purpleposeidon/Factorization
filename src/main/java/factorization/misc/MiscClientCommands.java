@@ -168,9 +168,16 @@ public class MiscClientCommands implements ICommand {
         @sketchy
         @help("Reveals your coordinates in-chat")
         public static void saycoords() {
+            String append = "";
+            if (args.size() > 1) {
+                append = ": ";
+                for (int i = 1; i < args.size(); i++) {
+                    append += args.get(i) + " ";
+                }
+            }
             player.sendChatMessage("/me is at " + ((int) player.posX) + ", "
                     + ((int) player.posY) + ", " + ((int) player.posZ) + " in dimension "
-                    + player.worldObj.provider.dimensionId);
+                    + player.worldObj.provider.dimensionId + append);
         }
         
         @alias({"ss"})
