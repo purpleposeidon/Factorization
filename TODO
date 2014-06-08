@@ -6,11 +6,7 @@ SERVOS
 ------
 regarding actuators:
   We'll keep a "generic use actuator instruction", but we'll also add instructions for each actuator. Possibly multiple ones per actuator.
-  All the socket-tools we'll have:
-    ✓ Lacerator
-    ✓ Robot Arm
-    ✓ Item Vacuum
-    Chicken Baster
+  some possibl esocket-tools:
     Launcher (dispenser)
     Rotor (fzds)
     Grasper (gravity gun; fzds for just one block? Eh....)
@@ -21,11 +17,11 @@ Lower barriers to entry for servos:
     alternative aqua regia recipe (substitute blaze powder for nether powder? or maybe magma cream?)
       Maybe this shouldn't make aqua regia; but instead an acid that's compatible.
   Maybe we should see about flattening our mod in other areas as well.
-  Have a stack that's a "reaction" stack. So when the 'status' stack gets updated (this would be typical of a socket command), this stack could be triggered.
 
 
 IMMEDIATE (for next public release)
 ---------
+we don't need to reload the keymapping anymore [probably already dealt with]
 barrels getting rotated by other players doesn't redraw?
 fzdocs:
     servo instruction documentation
@@ -36,6 +32,10 @@ servos:
     servo upgrading doesn't get synced to other players! (? how not?) Test it...
     test writing instructions
     colorizing servos
+    2 consecutive turns doesn't show the 2nd turn nicely -- No, that's not the behavior. -- Yes it is?
+        Let's just fix this once and for all. Throw away that code.
+            - Track what the quaternion was in the previous block, rather than the FzOrientation
+
 
 
 FZDocs! Yes!
@@ -45,17 +45,14 @@ FZDocs! Yes!
 
 Pressurizer:
     blowentities doesn't sync properly when relogging?
-    pressurizer doesn't seem to actually be working properly with flooding/draining? Test like our SSP world.
 
 
 [Tue Apr 01 23:09:52 PDT 2014] We really do need to be able to click on the shuffling items...
 
-[Tue Apr 01 23:22:21 PDT 2014] port FZDS. :P
 
 
 [prooobably fixed. Yep. Definitely.] (It does now?) servos not syncing stacks to players holding LMPs like they should...
 more creative tabs?
-we don't need to reload the keymapping anymore
 
 
 FZDOCS
@@ -75,7 +72,6 @@ items getting messed up w/ enchants; item rendering in general:
     servo rail
     (May just be 1.7.2; could be fixed in 1.7.5?)
 servos:
-  2 consecutive turns doesn't show the 2nd turn nicely -- No, that's not the behavior. -- Yes it is?
   refactor tool
     click once, then click a direction to move instructions... or something. Hmm.
     Maybe click to make a path? Too complicated.
