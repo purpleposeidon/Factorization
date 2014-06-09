@@ -23,7 +23,7 @@ group = "factorization"
 archivesBaseName = "Factorization"
 
 minecraft {
-    version = "1.7.2-10.12.1.1065" // FORGEMARK
+    version = "1.7.2-10.12.1.1098" // FORGEMARK
     assetDir = "eclipse/assets"
     replace '@FZVERSION@', project.version
 }
