@@ -37,7 +37,7 @@ import factorization.fzds.DeltaChunk.AreaMap;
 import factorization.fzds.DeltaChunk.DseDestination;
 import factorization.fzds.api.DeltaCapability;
 import factorization.fzds.api.IDeltaChunk;
-import factorization.notify.Notify;
+import factorization.notify.Notice;
 import factorization.shared.Core;
 
 public class FZDSCommand extends CommandBase {
@@ -500,8 +500,10 @@ public class FZDSCommand extends CommandBase {
                 }
                 final Coord lower = low.copy();
                 final Coord upper = up.copy();
-                Notify.send(lower, "Low");
-                Notify.send(null, upper, "High");
+                if (player != null) {
+                    new Notice(lower, "Low").send(player);
+                    new Notice(upper, "High").send(player);
+                }
                 
                 IDeltaChunk dse = DeltaChunk.makeSlice(Hammer.fzds_command_channel, lower, upper, new AreaMap() {
                     @Override
@@ -871,7 +873,9 @@ public class FZDSCommand extends CommandBase {
                 }
                 positionVariables.put(name, val);
                 sendChat("@" + name + " = " + val);
-                Notify.send(null, val, name);
+                if (player != null) {
+                    new Notice(val, name).send(player);
+                }
             }}, Requires.COORD);
         add(new SubCommand("@?|@??", "[search]") {
             @Override
@@ -894,7 +898,9 @@ public class FZDSCommand extends CommandBase {
                     if (!name.contains(search)) {
                         continue;
                     }
-                    Notify.send(player, pos, name);
+                    if (player != null) {
+                        new Notice(pos, name).send(player);
+                    }
                     if (print) {
                         sendChat(name + ": " + pos);
                     }
