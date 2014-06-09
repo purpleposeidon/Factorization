@@ -63,6 +63,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
 
         //render the fluid
         if (crys.solution != null) {
+            glPushAttrib(GL_COLOR_BUFFER_BIT);
             glAlphaFunc(GL_GREATER, 0.1F);
             glEnable(GL_BLEND);
             ItemStack sol = crys.solution;
@@ -78,11 +79,8 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
                 glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
             } else if (sol.getItem() == Items.milk_bucket) {
                 float f = 0.9F;
-                glColor4f(f, f, f, 0.2F);
-                //glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_ALPHA);
-                //glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_ALPHA);
-                glBlendFunc(GL_SRC_COLOR, GL_SRC_ALPHA);
-                //tex = 16 + 9; //Bluh!
+                glColor4f(f, f, f, 0.9F);
+                tex = Blocks.quartz_block.getIcon(0, 0); // Or white stained clay
             } else {
                 glColor4f(1F, 1F, 1F, 1);
                 glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_ALPHA);
@@ -100,7 +98,7 @@ public class TileEntityCrystallizerRender extends TileEntitySpecialRenderer {
             tess.addVertexWithUV(1, 0, 0, u1, v0);
             tess.setTranslation(0, 0, 0);
             tess.draw();
-            glDisable(GL_BLEND);
+            glPopAttrib();
         }
 
         glEnable(GL_LIGHTING);

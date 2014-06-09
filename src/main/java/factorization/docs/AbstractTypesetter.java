@@ -2,12 +2,8 @@ package factorization.docs;
 
 import java.util.ArrayList;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.resources.IResource;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.ResourceLocation;
 
 import com.google.common.base.Strings;
 
@@ -115,7 +111,6 @@ public abstract class AbstractTypesetter {
             page = newPage();
             if (oldSeg != null) {
                 int n = oldPage.text.lastIndexOf(oldSeg);
-                ArrayList<ArrayList<Word>> got = new ArrayList();
                 while (oldPage.text.size() > n) {
                     page.text.add(oldPage.text.remove(n));
                 }

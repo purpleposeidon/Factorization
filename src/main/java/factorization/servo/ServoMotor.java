@@ -421,6 +421,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         }
         if (socket == null) return false;
         if (socket.activateOnServo(player, this)) return false;
+        if (FzUtil.identical(socket.getCreatingItem(), is)) return false;
         for (FactoryType ft : FactoryType.values()) {
             TileEntityCommon tec = ft.getRepresentative();
             if (tec == null) continue;
@@ -429,7 +430,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             ItemStack creator = rep.getCreatingItem();
             if (creator != null && FzUtil.couldMerge(is, creator)) {
                 if (rep.getParentFactoryType() != socket.getFactoryType()) {
-                    rep.mentionPrereq(this);
+                    rep.mentionPrereq(this, player);
                     return false;
                 }
                 TileEntityCommon upgrade = ft.makeTileEntity();

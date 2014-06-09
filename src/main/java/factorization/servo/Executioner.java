@@ -6,7 +6,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
-import factorization.notify.Notify;
+import factorization.notify.Notice;
 import factorization.servo.instructions.IntegerValue;
 
 public class Executioner {
@@ -148,7 +148,7 @@ public class Executioner {
     
     public void putError(Object error) {
         if (!motor.worldObj.isRemote) {
-            Notify.send(motor.getCurrentPos(), "%s", error.toString());
+            new Notice(motor, "%s", error.toString()).sendToAll();
         }
     }
     

@@ -20,7 +20,7 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
-import factorization.notify.Notify;
+import factorization.notify.Notice;
 import factorization.shared.BlockClass;
 import factorization.shared.FzUtil;
 import factorization.shared.Sound;
@@ -220,11 +220,10 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
             append += "\n" + "No adjacent boiler!";
         }
         if (stomache == null || stomache.stackSize == 0) {
-            Notify.send(entityplayer, this, "Empty" + append);
+            new Notice(this, "Empty" + append).send(entityplayer);
             return;
         }
-        Notify.withItem(stomache);
-        Notify.send(entityplayer, this, stomache.stackSize + " {ITEM_NAME}" + append);
+        new Notice(this, stomache.stackSize + " {ITEM_NAME}").withItem(stomache).send(entityplayer);
     }
     
     @Override

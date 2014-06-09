@@ -271,8 +271,8 @@ public class MotionHandler {
             
             if (orientation != prevOrientation) {
                 servo_reorient += move;
-                if (servo_reorient >= 1) {
-                    servo_reorient -= 1;
+                if (servo_reorient >= 0.95 /* Floating point inaccuracy!? */) {
+                    servo_reorient = 0;
                     prev_servo_reorient = servo_reorient;
                     prevOrientation = orientation;
                 }

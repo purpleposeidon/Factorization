@@ -11,8 +11,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
-import factorization.notify.Notify;
-import factorization.notify.Notify.Style;
+import factorization.notify.Notice;
+import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 import factorization.shared.FzUtil.FzInv;
@@ -45,7 +45,7 @@ public class CompressionState {
     
     void error(TileEntityCompressionCrafter at, String msg, String... args) {
         if (errored) return;
-        Notify.send(player, at, msg, args);
+        new Notice(at, msg, args).withStyle(Style.FORCE).send(player);
         errored = true;
     }
     
@@ -201,7 +201,7 @@ public class CompressionState {
     }
     
     private void showExample() {
-        Notify.clear(player);
+        Notice.clear(player);
         int width = pickSize(), height = pickSize();
         ForgeDirection r = ForgeDirection.WEST;
         if (up.offsetX*r.offsetX != 0) {
@@ -229,7 +229,6 @@ public class CompressionState {
             d.adjust(up);
         }
         
-        Notify.withStyle(Style.FORCE);
         errored = false;
         error(root, "Place as marked for %sx%s crafting grid\nThen give a redstone signal", ""+width, ""+height);
     }
@@ -238,9 +237,7 @@ public class CompressionState {
         if (c.getTE(TileEntityCompressionCrafter.class) != null) {
             return;
         }
-        Notify.withItem(Core.registry.compression_crafter_item);
-        Notify.withStyle(Style.FORCE, Style.EXACTPOSITION, Style.DRAWITEM, Style.DRAWFAR);
-        Notify.send(player, c, "");
+        new Notice(c, "").withItem(Core.registry.compression_crafter_item).withStyle(Style.FORCE, Style.EXACTPOSITION, Style.DRAWITEM, Style.DRAWFAR).send(player);
     }
     
     private TileEntityCompressionCrafter getOtherSideRoot() {

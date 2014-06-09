@@ -30,8 +30,8 @@ import factorization.api.Coord;
 import factorization.api.IChargeConductor;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
-import factorization.notify.Notify;
-import factorization.notify.Notify.Style;
+import factorization.notify.Notice;
+import factorization.notify.Style;
 import factorization.shared.BlockClass;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
@@ -243,18 +243,20 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         info = decoration.getInfo();
         info = info == null ? "" : info;
         final Coord here = getCoord();
-        if (here.isWeaklyPowered()) {
-            Notify.withItem(new ItemStack(Blocks.redstone_torch));
-            Notify.withStyle(Style.DRAWITEM);
-        }
+        boolean powered = here.isWeaklyPowered();
         if (comment.length() > 0) {
             if (info.length() > 0) {
                 info += "\n";
             }
             info += EnumChatFormatting.ITALIC + comment;
         }
-        if (info.length() > 0) {
-            Notify.send(player, here, info);
+        if (info.length() > 0 || powered) {
+            Notice notice = new Notice(here, info);
+            if (powered) {
+                notice.withItem(new ItemStack(Blocks.redstone_torch));
+                notice.withStyle(Style.DRAWITEM);
+            }
+            notice.send(player);
         }
     }
     
@@ -325,8 +327,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
                 Core.logWarning("Component packet error at %s %s:", this, getCoord());
                 e.printStackTrace();
                 decoration = null;
-                Notify.withStyle(Style.FORCE, Style.LONG);
-                Notify.send(null, getCoord(), "Component packet error!\nSee console log.");
+                new Notice(this, "Component packet error!\nSee console log.").withStyle(Style.FORCE, Style.LONG).sendToAll();
                 return super.getDescriptionPacket();
             }
             return getDescriptionPacketWith(MessageType.ServoRailDecor, baos.toByteArray());

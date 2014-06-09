@@ -3,19 +3,33 @@
 (Sorted, approximately, from easiest to hardest)
 
 Cobble generator
+
 Sheep shearing facility
+
 Cow feeder (with a limited amount of wheat)
+
 Pumpkin, melon, sugar cane, or cactus farm
+
 Wheat, netherwart, carrot, or potato farm, harvested by a manually activated flood.
+
 Cobblestone, sand, and gravel generator.
+
 Cobblestone, sand, and gravel generator using only 1 lacerator
+
 Servo sorting system: Brute Force. Using barrels and parasieves
+
 Servo sorting system: Automatic. Use a subroutine with probe to insert items into chests that already have that item.
+
 Servo sorting system: Guided. Multiple servo rail lines, with a chest at each junction to help the servo choose.
+
 Flower farm
+
 Potion machine
+
 Wheat farm, using a \link{color scanner}{color scanner} for detecting optimal harvest time.
+
 Tree farm, using sand and a piston
+
 Automated ore processing system
 
 

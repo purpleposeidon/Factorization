@@ -111,6 +111,10 @@ public class PumpLiquids extends BufferedFanturpeller {
         final HashSet<PumpCoord> visited = new HashSet();
         final PriorityQueue<PumpCoord> queue = new PriorityQueue<PumpCoord>(128, getComparator());
         final ArrayDeque<FoundFluidHandler> foundContainers = new ArrayDeque();
+        /*
+         * Eh. Memory inefficient.
+         * Could we switch to packed arrays?
+         */
         
         Comparator<PumpCoord> getComparator() {
             return new Comparator<PumpCoord>() {
@@ -308,7 +312,9 @@ public class PumpLiquids extends BufferedFanturpeller {
                 if (buffer.getFluidAmount() <= 0) {
                     reset();
                 } else {
-                    foundContainers.add(foundIfh);
+                    if (amount > 0) {
+                        foundContainers.add(foundIfh);
+                    }
                     delay = 0;
                 }
                 return;

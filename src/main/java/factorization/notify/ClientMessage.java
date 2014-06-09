@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -12,10 +13,8 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import factorization.api.Coord;
-import factorization.notify.Notify.Style;
 
-class Message {
+class ClientMessage {
     World world;
     Object locus;
     ItemStack item;
@@ -26,8 +25,10 @@ class Message {
     long lifeTime;
     boolean position_important = false;
     boolean show_item = false;
+    
+    static final int SHORT_TIME = 6, LONG_TIME = 11;
 
-    public Message(World world, Object locus, ItemStack item, String format, String... args) {
+    public ClientMessage(World world, Object locus, ItemStack item, String format, String... args) {
         this.world = world;
         this.locus = locus;
         this.item = item;
@@ -38,9 +39,10 @@ class Message {
         msg = parts[1];
         
         creationTime = System.currentTimeMillis();
-        lifeTime = 1000 * 6;
         if (style.contains(Style.LONG)) {
-            lifeTime += 1000 * 5;
+            lifeTime = 1000 * LONG_TIME;
+        } else {
+            lifeTime = 1000 * SHORT_TIME;
         }
         position_important = style.contains(Style.EXACTPOSITION);
         show_item = style.contains(Style.DRAWITEM) && item != null;
@@ -49,10 +51,6 @@ class Message {
     
     void translate(String... args) {
         msg = StatCollector.translateToLocal(msg);
-        for (int i = 0; i < args.length; i++) {
-            String translated = StatCollector.translateToLocal(args[i]);
-            args[i] = translated;
-        }
         
         String item_name = "null", item_info = "", item_info_newline = "";
         if (item != null) {
@@ -87,12 +85,7 @@ class Message {
         msg = msg.replace("{ITEM_INFOS}", "%" + (args.length + 2) + "$s");
         msg = msg.replace("{ITEM_INFOS_NEWLINE}", "%" + (args.length + 3) + "$s");
 
-        try {
-            msg = String.format(msg, (Object[]) cp);
-        } catch (Exception e) {
-            e.printStackTrace();
-            msg = "FORMAT ERROR\n" + msg;
-        }
+        msg = String.format(msg, (Object[]) cp);
     }
     
     static double interp(double old, double new_, float partial) {
@@ -116,8 +109,9 @@ class Message {
             TileEntity te = ((TileEntity) locus);
             return Vec3.createVectorHelper(te.xCoord, te.yCoord, te.zCoord);
         }
-        if (locus instanceof Coord) {
-            return ((Coord) locus).createVector();
+        if (locus instanceof ISaneCoord) {
+            ISaneCoord c = (ISaneCoord) locus;
+            return Vec3.createVectorHelper(c.x(), c.y(), c.z());
         }
         return null;
     }
@@ -134,12 +128,13 @@ class Message {
         return true;
     }
 
-    Coord asCoordMaybe() {
-        if (locus instanceof Coord) {
-            return (Coord) locus;
+    ISaneCoord asCoordMaybe() {
+        if (locus instanceof ISaneCoord) {
+            return (ISaneCoord) locus;
         }
         if (locus instanceof TileEntity) {
-            return new Coord((TileEntity) locus);
+            TileEntity te = (TileEntity) locus;
+            return new SimpleCoord(te.getWorldObj(), te.xCoord, te.yCoord, te.zCoord);
         }
         return null;
     }

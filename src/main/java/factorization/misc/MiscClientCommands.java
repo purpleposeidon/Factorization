@@ -34,8 +34,8 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
-import factorization.notify.Notify;
-import factorization.notify.Notify.Style;
+import factorization.notify.Notice;
+import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
@@ -168,9 +168,16 @@ public class MiscClientCommands implements ICommand {
         @sketchy
         @help("Reveals your coordinates in-chat")
         public static void saycoords() {
+            String append = "";
+            if (args.size() > 1) {
+                append = ": ";
+                for (int i = 1; i < args.size(); i++) {
+                    append += args.get(i) + " ";
+                }
+            }
             player.sendChatMessage("/me is at " + ((int) player.posX) + ", "
                     + ((int) player.posY) + ", " + ((int) player.posZ) + " in dimension "
-                    + player.worldObj.provider.dimensionId);
+                    + player.worldObj.provider.dimensionId + append);
         }
         
         @alias({"ss"})
@@ -482,8 +489,7 @@ public class MiscClientCommands implements ICommand {
                     for (int dx = -d; dx <= d; dx++) {
                         Coord here = at.add(dx, dy, dz);
                         if (here.isAir() && here.getBlock() != Blocks.air) {
-                            Notify.withStyle(Style.FORCE);
-                            Notify.send(here, "X");
+                            new Notice(here, "X").withStyle(Style.FORCE).send(mc.thePlayer);
                         }
                     }
                 }

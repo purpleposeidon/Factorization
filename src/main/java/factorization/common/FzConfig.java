@@ -26,7 +26,6 @@ public class FzConfig {
     public static int dimension_slice_dimid = -7;
     public static int force_max_entity_radius = -1;
     public static boolean pocket_craft_anywhere = true;
-    public static boolean bag_swap_anywhere = true;
     public static String pocketActions = "xcbf";
     public static boolean renderTEs = true;
     public static boolean renderAO = true;
@@ -55,6 +54,7 @@ public class FzConfig {
     public static boolean fanturpeller_works_on_players = true;
     public static boolean large_servo_instructions = false;
     public static boolean players_discover_docbooks = true;
+    public static boolean disable_endermen_griefing = false;
     
     public static boolean enable_retrogen = false;
     public static String retrogen_key = "DEFAULT";
@@ -106,7 +106,6 @@ public class FzConfig {
         {
             debug_light_air = getBoolConfig("debugLightAir", "client", debug_light_air, "Show invisible lamp-air");
             pocket_craft_anywhere = getBoolConfig("anywherePocketCraft", "client", pocket_craft_anywhere, "Lets you open the pocket crafting table from GUIs");
-            bag_swap_anywhere = getBoolConfig("anywhereBagSwap", "client", bag_swap_anywhere, "Lets you use the bag from GUIs");
             render_barrel_item = getBoolConfig("renderBarrelItem", "client", render_barrel_item, null);
             render_barrel_item = getBoolConfig("renderBarrelText", "client", render_barrel_text, null);
             render_barrel_close = getBoolConfig("renderBarrelClose", "client", render_barrel_close, "If true, render barrel info only when nearby");
@@ -126,7 +125,7 @@ public class FzConfig {
             lowest_dilation = Math.max(1, Math.min(0, lowest_dilation));
             lagssie_watcher = getBoolConfig("enableLagWatchDog", "client", lagssie_watcher, "If true, enables a thread that dumps a stack trace of Minecraft if it is paused for longer than lagWatchDogInterval");
             lagssie_interval = getDoubleConfig("lagWatchDogInterval", "client", lagssie_interval, "If the game is stuck for longer than this amount of time (in seconds), dump a stacktrace of what it is doing.");
-            limit_integrated_server = getBoolConfig("limitIntegratedServer", "client", limit_integrated_server, "Prevent the integrated server from ticking faster than the client. Probably won't cause a deadlocks.");
+            limit_integrated_server = getBoolConfig("limitIntegratedServer", "client", limit_integrated_server, /*"Prevent the integrated server from ticking faster than the client. Probably won't cause a deadlocks."*/ "(Broken; don't use this. Attempts to limit integrated server tick speed to match the client's, but can cause deadlocks.)");
             fix_middle_click = getBoolConfig("fixPickBlock", "client", fix_middle_click, "Make middle clicking more useful");
             large_servo_instructions = getBoolConfig("largeServoInstructions", "client", large_servo_instructions, "Render servo instructions extra-large. This can also be toggled on and off using '/f servoInstructionSize'.");
         }
@@ -155,6 +154,7 @@ public class FzConfig {
             prop.set(entity_relight_task_id);
         }
         boilers_suck_water = getBoolConfig("boilersSuckWater", "server", boilers_suck_water, "If false, water must be piped in");
+        disable_endermen_griefing = getBoolConfig("disableEndermenGriefing", "server", disable_endermen_griefing, "If set to true, then endermen will not pick up blocks.");
         steam_output_adjust = getDoubleConfig("steamOutputAdjustment", "server", steam_output_adjust, "Scale how much steam is produced by the solar boiler");
         stretchy_clay = getBoolConfig("stretchyClay", "server", stretchy_clay, "If true, maximum clay lump volume is 1 m³ instead of (1 m³)/4");
         tps_reporting_interval = getIntConfig("tpsReportInterval", "server", tps_reporting_interval, "How many ticks the server will wait before sending out TPS reports. 20 ticks = 1 second, unless it's lagging.");

@@ -9,8 +9,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -24,13 +22,14 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
-import factorization.notify.Notify;
-import factorization.notify.Notify.Style;
+import factorization.notify.Notice;
+import factorization.notify.Style;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
@@ -140,25 +139,23 @@ public class TileEntityRocketEngine extends TileEntityCommon {
         }
         DeltaCoord dc = getCornerDirection(player, side);
         if (dc == null) {
-            Notify.send(player, c, "Place it differently");
+            new Notice(c, "Place it differently").send(player);
             return false;
         }
         boolean fail = false;
         for (Coord spot : getArea(c, dc)) {
             if (!spot.isReplacable()) {
                 if (fail == false) {
-                    Notify.clear(player);
+                    Notice.clear(player);
                     fail = true;
                 }
                 if (!spot.equals(c)) {
-                    Notify.withStyle(Style.FORCE);
-                    Notify.send(player, spot, "X");
+                    new Notice(spot, "X").withStyle(Style.FORCE).send(player);
                 }
             }
         }
         if (fail) {
-            Notify.withStyle(Style.FORCE);
-            Notify.send(player, c, "Obstructed");
+            new Notice(c, "Obstructed").withStyle(Style.FORCE).send(player);
             return false;
         }
         AxisAlignedBB area = AxisAlignedBB.getBoundingBox(c.x, c.y, c.z, c.x, c.y, c.z);
@@ -168,12 +165,11 @@ public class TileEntityRocketEngine extends TileEntityCommon {
         for (Object o : c.w.getEntitiesWithinAABBExcludingEntity(null, area)) {
             Entity e = (Entity) o;
             if (e.canBeCollidedWith() || e instanceof EntityLiving || true) {
-                Notify.withStyle(Style.FORCE);
                 if (e == player) {
-                    Notify.send(player, c, "You are in the way");
+                    new Notice(c, "You are in the way").withStyle(Style.FORCE).send(player);
                     return false;
                 }
-                Notify.send(player, c, "Obstructed by entity");
+                new Notice(c, "Obstructed by entity").send(player);
                 Coord ec = new Coord(e);
                 if (!ec.equals(c)) {
                     String it = "(this guy)";
@@ -183,8 +179,7 @@ public class TileEntityRocketEngine extends TileEntityCommon {
                     if (e instanceof EntityCreeper) {
                         it = "(thissss guy)";
                     }
-                    Notify.withStyle(Style.FORCE);
-                    Notify.send(player, e, it);
+                    new Notice(e, it).withStyle(Style.FORCE).send(player);
                 }
                 return false;
             }
@@ -326,18 +321,18 @@ for x in range(0, len(d[0])):
         double score = fireCount / perfect;
         if (score >= 0.5) {
             if (solver.entireRocket.size() == 0) {
-                Notify.send(getCoord(), "No body?");
+                new Notice(this, "No body?").sendToAll();
             } else {
                 return solver;
             }
         } else {
-            Notify.send(getCoord(), "Nope!");
+            new Notice(this, "Nope!").sendToAll();
         }
         return null;
     }
     
     void ignite(ContiguitySolver solver) {
-        Notify.send(getCoord(), "Ignition");
+        new Notice(this, "Ignition!").sendToAll();
         isLeaderEngine = true;
         availableFuel = solver.fuel;
         for (TileEntityRocketEngine engine : solver.engines) {
@@ -427,8 +422,7 @@ for x in range(0, len(d[0])):
             return true;
         }
         if (isValid(entityplayer)) {
-            Notify.withStyle(Style.EXACTPOSITION);
-            Notify.send(entityplayer, getCoord(), "Rocket is valid!\nSuround the nozzles with fire to launch");
+            new Notice(this, "Rocket is valid!\nSuround the nozzles with fire to launch").withStyle(Style.EXACTPOSITION).send(entityplayer);
         }
         return true;
     }
@@ -485,8 +479,7 @@ for x in range(0, len(d[0])):
     public void notifyArea(EntityPlayer player) {
         ContiguitySolver solver = canIgnite(player);
         for (Coord c : solver.entireRocket) {
-            Notify.withStyle(Style.FORCE);
-            Notify.send(player, c, "" + c.y);
+            new Notice(c, "" + c.y).withStyle(Style.FORCE).send(player);
         }
     }
         
@@ -497,13 +490,13 @@ for x in range(0, len(d[0])):
         String msg;
         Coord mark = null;
         
-        Notify.Style style = null;
+        Style style = null;
         ItemStack item = null;
         
         public RocketValidationException(String msg) { this.msg = msg; }
         public RocketValidationException(String msg, Coord mark) { this.msg = msg; this.mark = mark; }
         
-        public RocketValidationException with(Notify.Style style, ItemStack item) {
+        public RocketValidationException with(Style style, ItemStack item) {
             this.style = style;
             this.item = item;
             return this;
@@ -514,19 +507,19 @@ for x in range(0, len(d[0])):
                 if (mark != null) {
                     Coord xtra = where.getCoord();
                     if (xtra.distance(mark) > 2) {
-                        Notify.withStyle(Style.EXACTPOSITION);
-                        Notify.send(who, where.getCoord(), "Validation failed");
+                        new Notice(where, "Validation failed").withStyle(Style.EXACTPOSITION).send(who);
                     }
                 } else {
                     mark = where.getCoord();
                 }
+                Notice notice = new Notice(mark, msg);
                 if (style != null) {
-                    Notify.withStyle(style);
+                    notice.withStyle(style);
                 }
                 if (item != null) {
-                    Notify.withItem(item);
+                    notice.withItem(item);
                 }
-                Notify.send(who, mark, msg);
+                notice.send(who);
             }
         }
     }

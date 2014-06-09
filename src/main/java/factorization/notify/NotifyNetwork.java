@@ -1,6 +1,5 @@
 package factorization.notify;
 
-import factorization.api.Coord;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.Unpooled;
 
@@ -23,6 +22,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -60,7 +60,7 @@ public class NotifyNetwork {
             x = input.readInt();
             y = input.readInt();
             z = input.readInt();
-            target = new Coord(me.worldObj, x, y, z);
+            target = new SimpleCoord(me.worldObj, x, y, z);
             break;
         case ENTITY:
             int id = input.readInt();
@@ -76,7 +76,7 @@ public class NotifyNetwork {
             z = input.readInt();
             target = me.worldObj.getTileEntity(x, y, z);
             if (target == null) {
-                target = new Coord(me.worldObj, x, y, z);
+                target = new SimpleCoord(me.worldObj, x, y, z);
             }
             break;
         case VEC3:
@@ -105,7 +105,7 @@ public class NotifyNetwork {
     }
     
     
-    static void broadcast(FMLProxyPacket packet, EntityPlayer player) {
+    static void broadcast(FMLProxyPacket packet, EntityPlayer player, TargetPoint area) {
         if (player == null) {
             NotifyNetwork.channel.sendToAll(packet);
         } else if (player instanceof EntityPlayerMP) {
@@ -139,12 +139,12 @@ public class NotifyNetwork {
                 output.writeDouble(v.xCoord);
                 output.writeDouble(v.yCoord);
                 output.writeDouble(v.zCoord);
-            } else if (where instanceof Coord) {
+            } else if (where instanceof ISaneCoord) {
                 output.writeByte(COORD);
-                Coord c = (Coord) where;
-                output.writeInt(c.x);
-                output.writeInt(c.y);
-                output.writeInt(c.z);
+                ISaneCoord c = (ISaneCoord) where;
+                output.writeInt(c.x());
+                output.writeInt(c.y());
+                output.writeInt(c.z());
             } else if (where instanceof Entity) {
                 output.writeByte(ENTITY);
                 Entity ent = (Entity) where;

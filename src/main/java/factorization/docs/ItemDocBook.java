@@ -4,13 +4,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.docs.DocViewer.HistoryPage;
-import factorization.notify.Notify;
+import factorization.notify.Notice;
 import factorization.shared.Core.TabType;
 import factorization.shared.ItemFactorization;
 
@@ -36,7 +35,7 @@ public class ItemDocBook extends ItemFactorization {
         ItemStack hit = at.getPickBlock(mc.objectMouseOver);
         DocumentationModule.tryOpenBookForItem(hit);
         if (hit != null) {
-            Notify.onscreen(player, "%s", hit.getDisplayName());
+            Notice.onscreen(player, "%s", hit.getDisplayName());
         }
         return true;
     }

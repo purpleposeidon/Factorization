@@ -4,19 +4,19 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockClass;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
-import factorization.shared.TileEntityFactorization;
+import factorization.shared.NetworkFactorization;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.TileEntityFactorization;
 
 public class TileEntityCrystallizer extends TileEntityFactorization {
     ItemStack inputs[] = new ItemStack[6];
@@ -160,7 +160,8 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
             return;
         }
         if (growing_crystal == null) {
-            growing_crystal = match.output;
+            growing_crystal = match.output.copy();
+            growing_crystal.stackSize = 1;
             solution = match.solution;
             share_delay = 0;
             current_state = 3;
@@ -307,7 +308,9 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
 
     @Override
     public FMLProxyPacket getDescriptionPacket() {
-        return getDescriptionPacketWith(MessageType.CrystallizerInfo, null2fake(growing_crystal), null2fake(solution), progress);
+        ItemStack crys = NetworkFactorization.nullItem(growing_crystal);
+        ItemStack sol = NetworkFactorization.nullItem(solution);
+        return getDescriptionPacketWith(MessageType.CrystallizerInfo, crys, sol, progress);
     }
 
     @Override
@@ -316,8 +319,8 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
             return true;
         }
         if (messageType == MessageType.CrystallizerInfo) {
-            growing_crystal = FzUtil.readStack(input);
-            solution = FzUtil.readStack(input);
+            growing_crystal = NetworkFactorization.denullItem(FzUtil.readStack(input));
+            solution = NetworkFactorization.denullItem(FzUtil.readStack(input));
             progress = input.readInt();
             return true;
         }

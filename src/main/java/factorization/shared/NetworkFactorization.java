@@ -13,17 +13,13 @@ import java.util.Random;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.IEntityMessage;
@@ -31,7 +27,6 @@ import factorization.api.Quaternion;
 import factorization.api.VectorUV;
 import factorization.common.Command;
 import factorization.common.FactoryType;
-import factorization.notify.NotifyImplementation;
 
 public class NetworkFactorization {
     public static final ItemStack EMPTY_ITEMSTACK = new ItemStack(Blocks.air);
@@ -383,5 +378,11 @@ public class NetworkFactorization {
     
     public static ItemStack nullItem(ItemStack is) {
         return is == null ? EMPTY_ITEMSTACK : is;
+    }
+    
+    public static ItemStack denullItem(ItemStack is) {
+        if (is == null) return null;
+        if (FzUtil.getId(is) == FzUtil.getId(Blocks.air)) return null;
+        return is;
     }
 }
