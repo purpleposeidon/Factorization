@@ -25,10 +25,15 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.world.World;
 import cpw.mods.fml.client.GuiModList;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -445,6 +450,22 @@ public class MiscClientCommands implements ICommand {
             player.sendChatMessage("/gamerule doMobSpawning false");
             player.sendChatMessage("/weather clear 999999");
             player.sendChatMessage("/time set " + 20*60);
+            MinecraftServer ms = MinecraftServer.getServer();
+            if (ms == null) {
+                return;
+            }
+            if (ms.worldServers == null) {
+                return;
+            }
+            for (World w : ms.worldServers) {
+                for (Entity ent : (Iterable<Entity>) w.loadedEntityList) {
+                    if (ent instanceof EntityLiving) {
+                        ent.setDead();
+                    } else if (ent instanceof EntityItem) {
+                        ent.setDead();
+                    }
+                }
+            }
         }
         
         @help("Pass an /f command to the server (for Factions)")
