@@ -4,8 +4,10 @@ import java.util.Arrays;
 
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
+import factorization.api.FzColor;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.shared.BlockRenderHelper;
@@ -39,7 +41,6 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
     @Override
     public boolean render(RenderBlocks rb) {
         TileEntityServoRail rail = null;
-        boolean has_comment = false;
         if (world_mode) {
             if (te instanceof TileEntityServoRail) {
                 rail = (TileEntityServoRail) te;
@@ -56,8 +57,24 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
                 sides[i] = true;
             }
         }
-        IIcon icon = has_comment ? BlockIcons.servo$rail_comment : BlockIcons.servo$rail;
         
+        if (world_mode && rail != null) {
+            boolean has_comment = rail.comment != null && rail.comment.length() > 0;
+            drawWithTexture(rb, has_comment ? BlockIcons.servo$rail_comment : BlockIcons.servo$rail);
+            if (rail.color != FzColor.NO_COLOR) {
+                drawWithTexture(rb, coloredRails[rail.color.toVanillaColorIndex()]);
+            }
+            Decorator dec = rail.decoration;
+            if (dec != null) {
+                dec.renderStatic(rail.getCoord(), rb);
+            }
+        } else {
+            drawWithTexture(rb, BlockIcons.servo$rail);
+        }
+        return true;
+    }
+    
+    void drawWithTexture(RenderBlocks rb, IIcon icon) {
         final float fL = TileEntityServoRail.width;
         final float fH = 1 - fL;
         
@@ -86,7 +103,7 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
 
             //renderBlock(rb, block);
             if (world_mode) {
-                block.beginWithMirroredUVs();
+                block.beginWithHipsterUVs();
                 block.renderRotated(Tessellator.instance, x, y, z);
             } else {
                 block.renderForInventory(rb);
@@ -95,20 +112,18 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
             Arrays.fill(extend, false);
             block.setTexture(i, null);
         }
-        if (world_mode && rail != null) {
-            Decorator dec = rail.decoration;
-            if (dec != null) {
-                dec.renderStatic(rail.getCoord(), rb);
-            }
-            if (rail.comment != null && rail.comment.length() > 0) {
-                has_comment = true;
-            }
-        }
-        return true;
     }
 
     @Override
     public FactoryType getFactoryType() {
         return FactoryType.SERVORAIL;
+    }
+
+    static IIcon[] coloredRails = new IIcon[FzColor.VALID_COLORS.length];
+    public static void registerColoredIcons(IIconRegister reg) {
+        for (int i = 0; i < FzColor.VALID_COLORS.length; i++) {
+            FzColor color = FzColor.VALID_COLORS[i];
+            coloredRails[i] = reg.registerIcon("factorization:servo/colored_rails/" + color.toString().toLowerCase());
+        }
     }
 }

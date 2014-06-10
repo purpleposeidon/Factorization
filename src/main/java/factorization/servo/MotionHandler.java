@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
+import factorization.api.FzColor;
 import factorization.api.FzOrientation;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
@@ -25,6 +26,7 @@ public class MotionHandler {
     static final byte max_speed_b = 127;
     double accumulated_motion;
     boolean stopped = false;
+    FzColor color = FzColor.NO_COLOR;
     
     //For client-side rendering
     double sprocket_rotation = 0, prev_sprocket_rotation = 0;
@@ -56,6 +58,15 @@ public class MotionHandler {
             target_speed_index = 0;
         } else if (target_speed_index >= target_speeds_b.length) {
             target_speed_index = (byte) (target_speeds_b.length - 1);
+        }
+        if (data.isNBT() && data.isReader()) {
+            if (!data.hasLegacy("color")) {
+                color = FzColor.NO_COLOR;
+            }
+        }
+        color = data.as(Share.VISIBLE, "color").putEnum(color);
+        if (color == null) {
+            color = FzColor.NO_COLOR;
         }
     }
     
@@ -117,7 +128,7 @@ public class MotionHandler {
         if (sr == null) {
             return false;
         }
-        return sr.priority >= 0 || desperate;
+        return (sr.priority >= 0 || desperate) && !color.conflictsWith(sr.color);
     }
 
     boolean validDirection(ForgeDirection dir, boolean desperate) {
@@ -188,6 +199,7 @@ public class MotionHandler {
             if (sr == null) {
                 continue;
             }
+            if (color.conflictsWith(sr.color)) continue;
             all_count++;
             if (fd == orientation.facing.getOpposite()) {
                 continue;

@@ -1,12 +1,10 @@
 package factorization.common;
 
-import java.util.Random;
-
-import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.EntityPlayer;
@@ -20,8 +18,6 @@ import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
-import factorization.api.Coord;
-import factorization.api.IFactoryType;
 import factorization.ceramics.BlockRenderGreenware;
 import factorization.ceramics.ItemRenderGlazeBucket;
 import factorization.ceramics.TileEntityGreenware;
@@ -58,7 +54,6 @@ import factorization.oreprocessing.GuiSlag;
 import factorization.oreprocessing.TileEntityCrystallizer;
 import factorization.oreprocessing.TileEntityCrystallizerRender;
 import factorization.oreprocessing.TileEntityGrinderRender;
-import factorization.oreprocessing.TileEntitySlagFurnace;
 import factorization.servo.BlockRenderServoRail;
 import factorization.servo.GuiParasieve;
 import factorization.servo.RenderServoMotor;
@@ -241,8 +236,9 @@ public class FactorizationClientProxy extends FactorizationProxy {
     }
     
     @Override
-    public void texturepackChanged() {
+    public void texturepackChanged(IIconRegister reg) {
         TileEntityGrinderRender.remakeModel();
+        BlockRenderServoRail.registerColoredIcons(reg);
     }
     
     @Override

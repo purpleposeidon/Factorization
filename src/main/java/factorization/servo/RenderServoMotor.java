@@ -20,6 +20,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
@@ -28,9 +29,12 @@ import net.minecraftforge.common.util.ForgeDirection;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import factorization.api.FzColor;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
+import factorization.charge.BlockRenderHeater;
 import factorization.common.BlockIcons;
+import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 import factorization.shared.ObjectModel;
@@ -226,7 +230,7 @@ public class RenderServoMotor extends RenderEntity {
             return;
         }
         dummy_entity.worldObj = motor.worldObj;
-        holder_render.setRenderManager(renderManager);
+        holder_render.setRenderManager(renderManager); // NORELEASE: Pretty sure we can RM this
         motor.socket.renderItemOnServo(this, motor, is, partial);
         dummy_entity.worldObj = null;
     }
@@ -241,6 +245,10 @@ public class RenderServoMotor extends RenderEntity {
         GL11.glPushMatrix();
         bindTexture(Core.blockAtlas);
         chasis.render(BlockIcons.servo$model$chasis);
+        
+        FzColor c = motor.motionHandler.color;
+        renderServoColor(c);
+        GL11.glColor3f(c.getRed(), c.getGreen(), c.getBlue());
 
         // Determine the sprocket location & rotation
         double rail_width = TileEntityServoRail.width;
@@ -255,6 +263,7 @@ public class RenderServoMotor extends RenderEntity {
 
         float rd = (float) (radius + rail_width);
         if (motor.motionHandler.orientation != motor.motionHandler.prevOrientation && motor.motionHandler.prevOrientation != FzOrientation.UNKNOWN) {
+            // This could use some work: only stretch if the new direction is parallel to the old gear direction.
             double stretch_interp = ro * 2;
             if (stretch_interp < 1) {
                 if (stretch_interp > 0.5) {
@@ -281,6 +290,7 @@ public class RenderServoMotor extends RenderEntity {
             GL11.glPopMatrix();
         }
         
+        GL11.glColor3f(1, 1, 1);
         GL11.glPopMatrix();
     }
 
@@ -364,6 +374,18 @@ public class RenderServoMotor extends RenderEntity {
         renderStack(motor.getArgStack(), scale, 0);
         renderStack(motor.getInstructionsStack(), scale, 1);
         
+        FzColor color = motor.motionHandler.color;
+        if (color != FzColor.NO_COLOR) {
+            FontRenderer fr = getFontRendererFromRenderManager();
+            String text = "" + color;
+            int width = fr.getStringWidth(text);
+            GL11.glRotatef(180, 0, 0, 1);
+            GL11.glTranslatef(-width/4F, 10, 0);
+            float s = 0.5F;
+            GL11.glScalef(s, s, s);
+            fr.drawString(text, 0, 0, 0xDAC9D0, true);
+        }
+        
         GL11.glPopMatrix();
         GL11.glEnable(GL11.GL_LIGHTING);
     }
@@ -408,5 +430,33 @@ public class RenderServoMotor extends RenderEntity {
         }
         GL11.glPopMatrix();
         return true;
+    }
+    
+    void renderServoColor(FzColor color) {
+        if (color == FzColor.NO_COLOR) return;
+        IIcon colorIcon = BlockRenderServoRail.coloredRails[color.toVanillaColorIndex()];
+        BlockRenderHelper block = BlockRenderHelper.instance;
+        block.setBlockBoundsOffset(0, 0, 0);
+        block.useTexture(null);
+        block.setTexture(1 /* up */, colorIcon);
+        block.beginWithMirroredUVs();
+        GL11.glPushMatrix();
+        float d = -0.5F;
+        GL11.glTranslatef(d, d - 3F/8F + 0.0001F, d);
+        {
+            // We need to get 14/16ths transformed for 10/16ths.
+            float b = 14F/16F;
+            GL11.glScalef(1/b, 1, 1/b);
+            float s = 10F/16F;
+            GL11.glScalef(s, 1, s);
+            float t = 3.2F/16F;
+            GL11.glTranslatef(t, 0, t);
+        }
+        Tessellator.instance.startDrawingQuads();
+        block.renderForTileEntity();
+        //GL11.glDisable(GL11.GL_LIGHTING);
+        Tessellator.instance.draw();
+        //GL11.glEnable(GL11.GL_LIGHTING);
+        GL11.glPopMatrix();
     }
 }

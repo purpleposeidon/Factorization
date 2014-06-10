@@ -175,6 +175,11 @@ public class NetworkFactorization {
                 }
                 return;
             }
+            
+            if (messageType == MessageType.RedrawOnClient && world.isRemote) {
+                world.markBlockForUpdate(x, y, z);
+                return;
+            }
 
             if ((messageType == MessageType.FactoryType || messageType == MessageType.FactoryTypeWithSecondMessage) && world.isRemote) {
                 //create a Tile Entity of that type there.
@@ -320,7 +325,7 @@ public class NetworkFactorization {
         factorizeCmdChannel,
         PlaySound, EntityParticles(true),
         
-        DrawActive, FactoryType, FactoryTypeWithSecondMessage, DescriptionRequest, DataHelperEdit, DataHelperEditOnEntity(true), OpenDataHelperGui, OpenDataHelperGuiOnEntity(true),
+        DrawActive, FactoryType, FactoryTypeWithSecondMessage, DescriptionRequest, DataHelperEdit, RedrawOnClient, DataHelperEditOnEntity(true), OpenDataHelperGui, OpenDataHelperGuiOnEntity(true),
         TileEntityMessageOnEntity(true),
         BarrelDescription, BarrelItem, BarrelCount,
         BatteryLevel, LeydenjarLevel,

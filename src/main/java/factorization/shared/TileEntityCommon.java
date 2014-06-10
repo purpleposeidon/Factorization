@@ -29,6 +29,7 @@ import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
+import factorization.api.FzColor;
 import factorization.api.IChargeConductor;
 import factorization.api.ICoord;
 import factorization.api.IFactoryType;
@@ -311,4 +312,6 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public void mappingsChanged(FMLModIdMappingEvent event) { }
     
     public void spawnDisplayTickParticles(Random rand) { }
+
+    public boolean recolourBlock(ForgeDirection side, FzColor fzColor) { return false; }
 }
