@@ -77,7 +77,7 @@ public class Notice {
      * <code>
      * new Notice(somewhere, new NoticeUpdater() {
      *     void update(Notice msg) {
-     *         msg.setMessage("%i", System.currentTimeMillis()/1000);
+     *         msg.setMessage("%s", System.currentTimeMillis()/1000);
      *     }
      * }).sendTo(someone);
      * </code>
