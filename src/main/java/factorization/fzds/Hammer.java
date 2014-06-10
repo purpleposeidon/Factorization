@@ -1,16 +1,24 @@
 package factorization.fzds;
 
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.network.Packet;
+import net.minecraft.profiler.Profiler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerManager;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldManager;
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.WorldServerMulti;
+import net.minecraft.world.WorldSettings;
+import net.minecraft.world.storage.ISaveHandler;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.world.WorldEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -99,14 +107,64 @@ public class Hammer {
             return;
         }
         event.registerServerCommand(new FZDSCommand());
-        DimensionManager.initDimension(dimensionID);
-        assert DimensionManager.shouldLoadSpawn(dimensionID);
+        NORELEASE_initDimension(dimensionID);
+        if (!DimensionManager.shouldLoadSpawn(dimensionID)) {
+            throw new RuntimeException("hammerWorld is not loaded");
+        }
         World hammerWorld = DimensionManager.getWorld(dimensionID);
         hammerWorld.addWorldAccess(new ShadowWorldAccess());
         int view_distance = MinecraftServer.getServer().getConfigurationManager().getViewDistance();
         //the undeobfed method comes after "isPlayerWatchingChunk", also in uses of ServerConfigurationManager.getViewDistance()
         //It returns how many blocks are visible.
         DSE_ChunkUpdateRangeSquared = Math.pow(PlayerManager.getFurthestViewableBlock(view_distance) + 16*2, 2);
+    }
+    
+
+    public static void NORELEASE_initDimension(int dim) {
+        WorldServer overworld = DimensionManager.getWorld(0);
+        if (overworld == null)
+        {
+            throw new RuntimeException("Cannot Hotload Dim: Overworld is not Loaded!");
+        }
+        try
+        {
+            DimensionManager.getProviderType(dim);
+        }
+        catch (Exception e)
+        {
+            System.err.println("Cannot Hotload Dim: " + e.getMessage());
+            return; // If a provider hasn't been registered then we can't hotload the dim
+        }
+        MinecraftServer mcServer = overworld.func_73046_m();
+        ISaveHandler savehandler = overworld.getSaveHandler();
+        WorldSettings worldSettings = new WorldSettings(overworld.getWorldInfo());
+
+        WorldServer world = new HammerWorldMulti(mcServer, savehandler, overworld.getWorldInfo().getWorldName(), dim, worldSettings, overworld, mcServer.theProfiler);
+        world.addWorldAccess(new WorldManager(mcServer, world));
+        MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(world));
+        if (!mcServer.isSinglePlayer())
+        {
+            world.getWorldInfo().setGameType(mcServer.getGameType());
+        }
+
+        mcServer.func_147139_a(mcServer.func_147135_j());
+    }
+    
+    static class HammerWorldMulti extends WorldServerMulti {
+        public HammerWorldMulti(MinecraftServer p_i45283_1_, ISaveHandler p_i45283_2_, String p_i45283_3_, int p_i45283_4_, WorldSettings p_i45283_5_, WorldServer p_i45283_6_, Profiler p_i45283_7_) {
+            super(p_i45283_1_, p_i45283_2_, p_i45283_3_, p_i45283_4_, p_i45283_5_, p_i45283_6_, p_i45283_7_);
+        }
+        
+        @Override
+        public void tick() {
+            super.tick();
+        }
+        
+        @Override
+        public void updateEntities() {
+            super.updateEntities();
+        }
+        
     }
     
     @EventHandler

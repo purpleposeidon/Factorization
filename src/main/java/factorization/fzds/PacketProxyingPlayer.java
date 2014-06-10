@@ -28,13 +28,11 @@ import factorization.shared.FzNetDispatch;
 public class PacketProxyingPlayer extends GenericProxyPlayer implements
         IFzdsEntryControl {
     DimensionSliceEntity dimensionSlice;
-    static boolean useShortViewRadius = false; // true doesn't actually change
-                                                // the view radius
+    static boolean useShortViewRadius = false; // true doesn't actually change the view radius
 
     private HashSet<EntityPlayerMP> trackedPlayers = new HashSet();
 
-    public PacketProxyingPlayer(final DimensionSliceEntity dimensionSlice,
-            World shadowWorld) {
+    public PacketProxyingPlayer(final DimensionSliceEntity dimensionSlice, World shadowWorld) {
         super(MinecraftServer.getServer(), (WorldServer) shadowWorld,
                 new GameProfile(null, "[FzdsPacket]"), new ItemInWorldManager(
                         shadowWorld));
@@ -42,18 +40,14 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements
         Coord c = dimensionSlice.getCenter();
         c.y = -8; // lurk in the void; we should catch most mod's packets.
         c.setAsEntityLocation(this);
-        WorldServer ws = (WorldServer) dimensionSlice.worldObj;
-        ServerConfigurationManager scm = MinecraftServer.getServer()
-                .getConfigurationManager();
+        ServerConfigurationManager scm = MinecraftServer.getServer().getConfigurationManager();
         if (useShortViewRadius) {
             int orig = savePlayerViewRadius();
             try {
-
                 scm.func_72375_a(this, null);
             } finally {
                 restorePlayerViewRadius(orig);
-                // altho the server might just crash anyways. Then again, there
-                // might be a handler higher up.
+                // altho the server might just crash anyways. Then again, there might be a handler higher up.
             }
         } else {
             scm.func_72375_a(this, null);
@@ -62,8 +56,7 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements
         // TODO: I think the chunks are unloading despite the PPP's presence.
         // Either figure out how to get this to act like an actual player, or
         // make chunk loaders happen as well
-        playerNetServerHandler = new NetHandlerPlayServer(mcServer,
-                networkManager, this) {
+        playerNetServerHandler = new NetHandlerPlayServer(mcServer, networkManager, this) {
             @Override
             public void sendPacket(Packet packet) {
                 // NORELEASE: Check if we're wrapping an already wrapped packet
@@ -107,9 +100,7 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements
                 if (isPlayerInUpdateRange(player)) {
                     boolean new_player = trackedPlayers.add(player);
                     if (new_player && shouldShareChunks()) {
-                        // welcome to the club. This may net-lag a bit. (Well,
-                        // it depends on the chunk's contents. Air compresses
-                        // well tho.)
+                        // welcome to the club. This may net-lag a bit. (Well, it depends on the chunk's contents. Air compresseswell tho.)
                         sendChunkMapDataToPlayer(player);
                     }
                 } else {
@@ -133,8 +124,7 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements
     }
 
     void sendChunkMapDataToPlayer(EntityPlayerMP target) {
-        // Inspired by EntityPlayerMP.onUpdate. Shame we can't just add
-        // chunks... but there'd be no wrapper for the packets.
+        // Inspired by EntityPlayerMP.onUpdate. Shame we can't just add chunks... but there'd be no wrapper for the packets.
         ArrayList<Chunk> chunks = new ArrayList();
         ArrayList<TileEntity> tileEntities = new ArrayList();
         World world = DeltaChunk.getServerShadowWorld();
@@ -154,8 +144,7 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements
             }
         }
 
-        // NOTE: This has the potential to go badly if there's a large amount of
-        // data in the chunks.
+        // NOTE: This has the potential to go badly if there's a large amount of data in the chunks.
         NetHandlerPlayServer net = target.playerNetServerHandler;
         if (!chunks.isEmpty()) {
             Packet toSend = FzdsPacketRegistry.wrap(new S26PacketMapChunkBulk(chunks));
@@ -176,8 +165,7 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements
     }
 
     public void endProxy() {
-        // From
-        // playerNetServerHandler.mcServer.getConfigurationManager().playerLoggedOut(this);
+        // From playerNetServerHandler.mcServer.getConfigurationManager().playerLoggedOut(this);
         WorldServer var2 = getServerForPlayer();
         var2.removeEntity(this); // setEntityDead
         var2.getPlayerManager().removePlayer(this); // No comod?
@@ -210,6 +198,11 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements
                 player.playerNetServerHandler.sendPacket(wrappedPacket);
             }
         }
+    }
+    
+    @Override
+    public void setDead() {
+        super.setDead();
     }
 
     // IFzdsEntryControl implementation

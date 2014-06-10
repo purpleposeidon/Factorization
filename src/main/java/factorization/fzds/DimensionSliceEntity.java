@@ -451,7 +451,11 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             }
         } else if (proxy == null && !isDead) {
             DeltaChunk.getSlices(worldObj).add(this);
-            proxy = new PacketProxyingPlayer(this, DeltaChunk.getServerShadowWorld());
+            World shadowWorld = DeltaChunk.getServerShadowWorld();
+            proxy = new PacketProxyingPlayer(this, shadowWorld);
+            if (shadowWorld != proxy.worldObj) {
+                throw new IllegalStateException("NORELEASE");
+            }
             proxy.worldObj.spawnEntityInWorld(proxy);
             return;
         }
