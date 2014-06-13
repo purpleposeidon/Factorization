@@ -30,85 +30,65 @@ public class FactorizationOreProcessingHandler {
     public static final float REDUCE = REDUCE_MULTIPLY/GRIND_MULTIPLY;
     public static final float CRYSTALLIZE = CRYSTALLIZE_MULTIPLY/REDUCE_MULTIPLY;
     
-    void addProcessingFront(OreType oreType, ItemStack ore) {
-        ItemStack dirty = Core.registry.ore_dirty_gravel.makeStack(oreType);
-        TileEntityGrinder.addRecipe(ore, dirty, GRIND);
+    void smelt(ItemStack is, ItemStack ore, ItemStack ingot) {
+        float xp = FurnaceRecipes.smelting().func_151398_b(ore);
+        FurnaceRecipes.smelting().func_151394_a(is, ingot, xp);
     }
     
-    void addProcessingEnds(OreType oreType, ItemStack ore, ItemStack ingot) {
-        //Everything can be slagged
+    void addProcessingFront(OreType oreType, ItemStack ore, ItemStack ingot) {
         oreType.enable();
-        if (oreType != OreType.SILVER && oreType != OreType.GALENA) {
-            TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, ingot, 0.4F, oreType.surounding_medium);
-        } else if (oreType == OreType.SILVER) {
-            TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, new ItemStack(Core.registry.lead_ingot), 1F, ingot);
-        }
-        if (oreType.processingResult != null) {
-            return;
-        }
-        oreType.processingResult = ingot;
-        
         ItemStack dirty = Core.registry.ore_dirty_gravel.makeStack(oreType);
         ItemStack clean = Core.registry.ore_clean_gravel.makeStack(oreType);
-        ItemStack reduced = Core.registry.ore_reduced.makeStack(oreType);
-        ItemStack crystal = Core.registry.ore_crystal.makeStack(oreType);
-
-        //All processing steps can be smelted
-        ItemStack smeltable[];
-        if (oreType == OreType.LEAD || oreType == OreType.SILVER) {
-            smeltable = new ItemStack[] { reduced, crystal };
-        } else if (oreType == OreType.GALENA) {
-            smeltable = new ItemStack[] { dirty, clean };
-        } else {
-            smeltable = new ItemStack[] { dirty, clean, reduced, crystal };
-        }
-        for (ItemStack is : smeltable) {
-            float xp = FurnaceRecipes.smelting().func_151398_b(ore);
-            FurnaceRecipes.smelting().func_151394_a(is, ingot, xp);
-        }
-        if (oreType != OreType.SILVER) {
-            TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.1F, ingot, 0.2F, Blocks.dirt);
-            //Or it could output reduced chunks instead.
-        }
-    }
-    
-    ArrayList<OreType> createdBodies = new ArrayList();
-    /** Creates the processing chain from gravel to crystals */
-    void createProccessingBody(OreType oreType) {
-        if (createdBodies.contains(oreType)) {
-            return;
-        }
-        createdBodies.add(oreType);
-        ItemStack dirty = Core.registry.ore_dirty_gravel.makeStack(oreType);
-        ItemStack clean = Core.registry.ore_clean_gravel.makeStack(oreType);
-        ItemStack reduced = Core.registry.ore_reduced.makeStack(oreType);
-        ItemStack crystal = Core.registry.ore_crystal.makeStack(oreType);
+        TileEntityGrinder.addRecipe(ore, dirty, GRIND);
+        TileEntitySlagFurnace.SlagRecipes.register(dirty, 1.1F, ingot, 0.2F, Blocks.dirt); //Or it could output reduced chunks instead.
         ItemStack clean8 = clean.copy();
         clean8.stackSize = 8;
         
         //dirty gravel -> clean gravel
         Core.registry.shapelessOreRecipe(clean, waterBucket, dirty);
         Core.registry.shapelessOreRecipe(clean8, waterBucket, dirty, dirty, dirty, dirty, dirty, dirty, dirty, dirty);
-        if (oreType == OreType.GALENA) {
-            ItemStack reduced_silver = Core.registry.ore_reduced.makeStack(OreType.SILVER);
-            ItemStack reduced_lead = Core.registry.ore_reduced.makeStack(OreType.LEAD);
-            ItemStack crystal_silver = Core.registry.ore_crystal.makeStack(OreType.SILVER);
-            ItemStack crystal_lead = Core.registry.ore_crystal.makeStack(OreType.LEAD);
-            
-            TileEntitySlagFurnace.SlagRecipes.register(clean, REDUCE, reduced_lead, REDUCE, reduced_silver);
-            TileEntityCrystallizer.addRecipe(reduced_silver, crystal_silver, CRYSTALLIZE, Core.registry.aqua_regia);
-            TileEntityCrystallizer.addRecipe(reduced_lead, crystal_lead, CRYSTALLIZE, Core.registry.aqua_regia);
-        } else {
-            //clean gravel -> reduced chunks
-            int r = (int)REDUCE;
-            TileEntitySlagFurnace.SlagRecipes.register(clean, r, reduced, REDUCE - r, reduced);
-            //reduced chunks -> crystals
-            if (oreType != OreType.LEAD) {
-                TileEntityCrystallizer.addRecipe(reduced, crystal, CRYSTALLIZE, Core.registry.aqua_regia);
-            }
-        }
+        
+        smelt(clean, ore, ingot);
+        smelt(dirty, ore, ingot);
     }
     
+    void addProcessingEnd(OreType oreType, ItemStack ore, ItemStack ingot) {
+        //Everything can be slagged
+        oreType.enable();
+        if (oreType.processingResult != null) {
+            return;
+        }
+        oreType.processingResult = ingot;
+        
+        ItemStack reduced = Core.registry.ore_reduced.makeStack(oreType);
+        ItemStack crystal = Core.registry.ore_crystal.makeStack(oreType);
+        
+        TileEntityCrystallizer.addRecipe(reduced, crystal, CRYSTALLIZE, Core.registry.aqua_regia);
+        
+        //All processing steps can be smelted
+        smelt(reduced, ore, ingot);
+        smelt(crystal, ore, ingot);
+    }
+    
+    void addStandardReduction(OreType oreType, ItemStack ore, ItemStack ingot) {
+        oreType.enable();
+        ItemStack clean = Core.registry.ore_clean_gravel.makeStack(oreType);
+        ItemStack reduced = Core.registry.ore_reduced.makeStack(oreType);
+        TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, ingot, 0.4F, oreType.surounding_medium);
+        int r = (int)REDUCE;
+        TileEntitySlagFurnace.SlagRecipes.register(clean, r, reduced, REDUCE - r, reduced);
+    }
+    
+    void addGalenaReduction(OreType oreType, ItemStack ore) {
+        ItemStack clean_galena = Core.registry.ore_clean_gravel.makeStack(oreType);
+        ItemStack reduced_silver = Core.registry.ore_reduced.makeStack(OreType.SILVER);
+        ItemStack reduced_lead = Core.registry.ore_reduced.makeStack(OreType.LEAD);
+        
+        TileEntitySlagFurnace.SlagRecipes.register(clean_galena, REDUCE, reduced_lead, REDUCE, reduced_silver);
+    }
+    
+    //ArrayList<OreType> createdBodies = new ArrayList();
+
     void handleNewOre(String oreClass, ItemStack ore) {
         OreType oreType = OreType.fromOreClass(oreClass);
         if (oreType == null) {
@@ -116,8 +96,6 @@ public class FactorizationOreProcessingHandler {
         }
         if (ItemOreProcessing.OD_ores.contains(oreClass)) {
             oreType.enable();
-            addProcessingFront(oreType, ore);
-            createProccessingBody(oreType);
             ItemStack ingot = bestIngots.get(oreClass);
             if (ingot == null) {
                 ingot = oreType.processingResult;
@@ -125,17 +103,17 @@ public class FactorizationOreProcessingHandler {
             if (ingot == null) {
                 ingot = FurnaceRecipes.smelting().getSmeltingResult(ore);
             }
-            if (ingot != null) {
-                if (oreType == OreType.GALENA) {
-                    //NORELEASE: Test this. Uhm. Bluh?
-                    //addProcessingEnds(OreType.LEAD, ore, new ItemStack(Core.registry.lead_ingot));
-                    addProcessingEnds(OreType.SILVER, ore, new ItemStack(Core.registry.silver_ingot));
-                    addProcessingEnds(OreType.GALENA, ore, new ItemStack(Core.registry.silver_ingot));
-                } else {
-                    addProcessingEnds(oreType, ore, ingot);
-                    oreType.processingResult = ingot;
-                }
+            if (ingot == null) return;
+            addProcessingFront(oreType, ore, ingot);
+            if (oreType == OreType.GALENA) {
+                addGalenaReduction(oreType, ore);
+                addProcessingEnd(OreType.SILVER, ore, new ItemStack(Core.registry.silver_ingot));
+                addProcessingEnd(OreType.LEAD, ore, new ItemStack(Core.registry.lead_ingot));
+            } else {
+                addStandardReduction(oreType, ore, ingot);
+                addProcessingEnd(oreType, ore, ingot);
             }
+            oreType.processingResult = ingot;
         }
     }
 
