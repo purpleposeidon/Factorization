@@ -583,7 +583,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         
         @Override
         public void addEffect(EntityFX particle) {
-            if (particle == null) {
+            if (particle == null || origER == null || me == null) {
                 return;
             }
             ForgeDirection fd = me.facing;
