@@ -3,6 +3,11 @@ package factorization.sockets.fanturpeller;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -27,6 +32,8 @@ import factorization.api.datahelpers.Share;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.notify.Notice;
+import factorization.servo.RenderServoMotor;
+import factorization.servo.ServoMotor;
 import factorization.shared.FzUtil;
 import factorization.shared.FzUtil.FzInv;
 import factorization.sockets.ISocketHolder;
@@ -301,5 +308,47 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
             return false;
         }
         return super.activate(player, side);
+    }
+    
+    @Override
+    public void installedOnServo(ServoMotor servoMotor) {
+        super.installedOnServo(servoMotor);
+        servoMotor.resizeInventory(3);
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void renderItemOnServo(RenderServoMotor render, ServoMotor motor, ItemStack is, float partial) {
+        GL11.glPushMatrix();
+        GL11.glTranslatef(0, 5F/16F, 0);
+        float turn = scaleRotation(FzUtil.interp(prevFanRotation, fanRotation, partial));
+        GL11.glRotatef(-turn, 0, 1, 0);
+        float s = 9F/16F;
+        GL11.glScalef(s, s, s);
+
+        GL11.glPushMatrix();
+        GL11.glRotatef(90, 1, 0, 0);
+        GL11.glRotatef(45/2F, 0, 0, 1);
+        GL11.glTranslatef(0, 0, -2F/16F);
+        render.renderItem(is);
+        GL11.glPopMatrix();
+        
+        for (int i = 1; i < motor.getSizeInventory(); i++) {
+            is = motor.getStackInSlot(i);
+            if (is == null) continue;
+            GL11.glPushMatrix();
+            float r = 360*i/2 + 58;
+            GL11.glRotatef(r, 0, 1, 0);
+            GL11.glTranslatef(0, 0, 9F/16F);
+            GL11.glRotatef(r, 0, 1, 0);
+            /*if (isSucking) {
+                GL11.glRotatef(15, 1, 0, 0);
+            } else {
+                GL11.glRotatef(-15, 1, 0, 0);
+            }*/
+            render.renderItem(is);
+            GL11.glPopMatrix();
+        }
+        GL11.glPopMatrix();
     }
 }

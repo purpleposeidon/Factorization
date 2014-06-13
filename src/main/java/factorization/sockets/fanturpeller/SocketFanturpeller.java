@@ -41,7 +41,7 @@ import factorization.sockets.TileEntitySocketBase;
 
 public abstract class SocketFanturpeller extends TileEntitySocketBase implements IChargeConductor {
     Charge charge = new Charge(this);
-    boolean isSucking = false;
+    boolean isSucking = true;
     byte target_speed = 1;
     float fanω;
     boolean dirty = false;

@@ -1,5 +1,6 @@
 0.8.79
   Servos & servo rails can now be colored; a colored servo will ignore differently colored servo rails.
+  The pressurizer now has 3 slots on servos, and defaults to sucking
   /f saycoords now supports notes; "/f saycoords There's a big cave here!"
   Since I'm tired of discovering I've been playing in peaceful for the past 2 hours, and losing named mobs, I've added a button to the world select screen that warns you if you're in peaceful mode.
   Crystallizer state syncs & renders better
