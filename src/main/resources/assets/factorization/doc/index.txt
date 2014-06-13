@@ -1,5 +1,7 @@
 \title{The Factorization Manual}
-\nl\nl
+\nl
+\i{v. @FZVERSION@}
+\nl
 
 
 \index{about}{About}
