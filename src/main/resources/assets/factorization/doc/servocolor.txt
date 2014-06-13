@@ -1,0 +1,10 @@
+\title{Servo Coloring}
+
+\link{servo}{Servos} and \link{servorail}{servo rail} can be colored by placing some dye on them.
+
+Colored servos can travel on rails that have a matching color,
+and will completely ignore servo rails that do not match.
+% Barring bugs, of course. :P
+
+Uncolored servos can travel on colored rails,
+and colored servos can travel on uncolored rails.
