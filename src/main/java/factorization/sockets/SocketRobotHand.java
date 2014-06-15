@@ -76,6 +76,9 @@ public class SocketRobotHand extends TileEntitySocketBase {
         FzOrientation orientation = FzOrientation.fromDirection(facing).getSwapped();
         fakePlayer = null;
         rayTrace(socket, coord, orientation, powered, true, false);
+        if (fakePlayer != null) {
+            fakePlayer.isDead = true; // Avoid mob retribution
+        }
         fakePlayer = null;
     }
     
