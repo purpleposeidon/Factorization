@@ -1,4 +1,4 @@
 #!/bin/sh
 
-ack-grep --ignore-dir=src/factorization/fzds/ NORELEASE src/
+ack-grep --ignore-dir=src/factorization/fzds/ NORELEASE src/ QUICK_BUGS TODO
 ack-grep '%i' src/
