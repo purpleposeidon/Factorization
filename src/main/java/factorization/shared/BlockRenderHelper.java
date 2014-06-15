@@ -173,7 +173,7 @@ public class BlockRenderHelper extends Block {
         rb.renderStandardBlock(this, c.x, c.y, c.z);
     }
     
-    private static final byte UV_NONE = 0, UV_OLD_STYLE_ROTATED = 1, UV_NEW_STYLE_MIRRORED = 2;
+    private static final byte UV_NONE = 0, UV_OLD_STYLE_ROTATED = 1, UV_NEW_STYLE_MIRRORED = 2, UV_FULLY_ROTATED_STYLE = 3;
     
     private VectorUV center = new VectorUV();
     
@@ -185,6 +185,11 @@ public class BlockRenderHelper extends Block {
     @SideOnly(Side.CLIENT)
     public BlockRenderHelper beginWithMirroredUVs() {
         return begin(UV_NEW_STYLE_MIRRORED);
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public BlockRenderHelper beginWithHipsterUVs() {
+        return begin(UV_FULLY_ROTATED_STYLE);
     }
     
     @SideOnly(Side.CLIENT)
@@ -515,6 +520,55 @@ public class BlockRenderHelper extends Block {
         }
     }
     
+    private void setStyleFullyRotatedUVs(int face) {
+        switch (face) {
+        case 0: //-y
+            for (int i = 0; i < currentFace.length; i++) {
+                VectorUV vert = currentFace[i];
+                vert.u = vert.x;
+                vert.v = 1 - vert.z;
+            }
+            break;
+        case 1: //+y
+            for (int i = 0; i < currentFace.length; i++) {
+                VectorUV vert = currentFace[i];
+                vert.u = 1 - vert.x;
+                vert.v = 1 - vert.z;
+            }
+            break;
+        case 2: //-z
+            for (int i = 0; i < currentFace.length; i++) {
+                VectorUV vert = currentFace[i];
+                vert.u = 1 - vert.x;
+                vert.v = 1 - vert.y;
+            }
+            break;
+        case 3: //+z
+            for (int i = 0; i < currentFace.length; i++) {
+                VectorUV vert = currentFace[i];
+                vert.u = vert.x;
+                vert.v = 1 - vert.y;
+            }
+            break;
+        case 4: //-x
+            for (int i = 0; i < currentFace.length; i++) {
+                VectorUV vert = currentFace[i];
+                vert.u = vert.z;
+                vert.v = 1 - vert.y;
+            }
+            break;
+        case 5: //+x
+            for (int i = 0; i < currentFace.length; i++) {
+                VectorUV vert = currentFace[i];
+                vert.u = 1 - vert.z;
+                vert.v = 1 - vert.y;
+            }
+            break;
+        default:
+            throw new RuntimeException("Invalid face number");
+        }
+    }
+    
     private void convertUVsForIcon(int face) {
         VectorUV[] cache = currentFace;
         int WIDTH = 1;
@@ -562,6 +616,8 @@ public class BlockRenderHelper extends Block {
             setVanillaStyleMirroredUVs(face);
         } else if (uv_mode == UV_OLD_STYLE_ROTATED) {
             setOldStyleRotatedishUVs(face);
+        } else if (uv_mode == UV_FULLY_ROTATED_STYLE) {
+            setStyleFullyRotatedUVs(face);
         }
         convertUVsForIcon(face);
         clipUVs();

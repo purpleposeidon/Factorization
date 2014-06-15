@@ -23,13 +23,15 @@ They will count only items that can pass through the filter.
 Comparators can give more precise counts of items if a range is defined.
 
 For example, suppose a chest has a parasieve with 16 cobble in the 1st top slot, and 32 cobble in the 2nd bottom slot.
-16 and fewer cobble in the chest will cause a signal of strength 1,
+If there is 16 or fewer cobble in the chest, then the comparator will will signal with strength of 1,
 and more than 32 cobble will output the strongest signal.
 
 \newpage
 Parasieves can be chained, up to a point.
 
 Applying a redstone signal will invert the filter.
+
+The parasieve can pass items to minecarts and servos.
 
 
 \topic{factorization.factoryBlock.PARASIEVE}

@@ -12,4 +12,6 @@ Servos need \link{charge}{charge} to run.
 
 They are controlled by \link{servodecor}{instructions}.
 
+They can be \link{servocolor}{colored}.
+
 \topic{item.factorization:servo/servo}

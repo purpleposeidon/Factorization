@@ -36,3 +36,5 @@ this is the second-to-last resort.
 %  ![](screen/move_forbid.png)
 
 It won't go backwards unless it is at a dead-end.
+
+Servos will not enter a rails if they have conflicting \link{servocolor}{colors}.

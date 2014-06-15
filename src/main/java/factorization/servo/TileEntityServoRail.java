@@ -21,12 +21,16 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
+
+import org.apache.commons.lang3.StringUtils;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Charge;
 import factorization.api.Coord;
+import factorization.api.FzColor;
 import factorization.api.IChargeConductor;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
@@ -35,6 +39,7 @@ import factorization.notify.Style;
 import factorization.shared.BlockClass;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
+import factorization.shared.FzUtil;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.shared.TileEntityCommon;
 
@@ -45,6 +50,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     Decorator decoration = null;
     public byte priority = 0;
     String comment = "";
+    FzColor color = FzColor.NO_COLOR;
     
     @Override
     public FactoryType getFactoryType() {
@@ -78,12 +84,13 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         super.writeToNBT(tag);
         charge.writeToNBT(tag);
         tag.setByte("priority", priority);
+        tag.setByte("color", color.toOrdinal());
+        tag.setString("rem", comment);
         if (decoration != null) {
             NBTTagCompound decor = new NBTTagCompound();
             decoration.save(decor);
             tag.setTag(decor_tag_key, decor);
         }
-        tag.setString("rem", comment);
     }
     
     @Override
@@ -91,14 +98,18 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         super.readFromNBT(tag);
         charge.readFromNBT(tag);
         priority = tag.getByte("priority");
-        comment = tag.getString("rem");
-        if (!tag.hasKey(decor_tag_key)) {
-            return;
+        if (tag.hasKey("color")) {
+            color = FzColor.fromOrdinal(tag.getByte("color"));
+        } else {
+            color = FzColor.NO_COLOR;
         }
-        NBTTagCompound dtag = tag.getCompoundTag(decor_tag_key);
-        ServoComponent component = ServoComponent.load(dtag);
-        if (component instanceof Decorator) {
-            decoration = (Decorator) component;
+        comment = tag.getString("rem");
+        if (tag.hasKey(decor_tag_key)) {
+            NBTTagCompound dtag = tag.getCompoundTag(decor_tag_key);
+            ServoComponent component = ServoComponent.load(dtag);
+            if (component instanceof Decorator) {
+                decoration = (Decorator) component;
+            }
         }
     }
     
@@ -236,11 +247,7 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     }
     
     void showDecorNotification(EntityPlayer player) {
-        String info = "";
-        if (decoration == null) {
-            return;
-        }
-        info = decoration.getInfo();
+        String info = decoration == null ? null : decoration.getInfo();
         info = info == null ? "" : info;
         final Coord here = getCoord();
         boolean powered = here.isWeaklyPowered();
@@ -250,8 +257,11 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             }
             info += EnumChatFormatting.ITALIC + comment;
         }
+        if (color != FzColor.NO_COLOR) {
+            info += "\n" + color;
+        }
         if (info.length() > 0 || powered) {
-            Notice notice = new Notice(here, info);
+            Notice notice = new Notice(here, StringUtils.strip(info, "\n"));
             if (powered) {
                 notice.withItem(new ItemStack(Blocks.redstone_torch));
                 notice.withStyle(Style.DRAWITEM);
@@ -270,8 +280,19 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
         if (decoration != null) {
             ret = decoration.onClick(entityplayer, here, side);
         }
+        if (!ret && color == FzColor.NO_COLOR) {
+            FzColor newColor = FzColor.fromItem(entityplayer.getHeldItem());
+            if (newColor != color) {
+                color = newColor;
+                if (!entityplayer.capabilities.isCreativeMode) {
+                    ItemStack held = entityplayer.getHeldItem();
+                    entityplayer.setCurrentItemOrArmor(0 /* held item slot */, FzUtil.normalDecr(held));
+                }
+                ret = true;
+            }
+        }
         if (ret) {
-            here.markBlockForUpdate();
+            here.syncAndRedraw();
         }
         if (entityplayer instanceof EntityPlayerMP) {
             showDecorNotification(entityplayer);
@@ -286,14 +307,18 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             return true;
         }
         if (messageType == MessageType.ServoRailDecor) {
-            getCoord().redraw();
-            ServoComponent sc = ServoComponent.readFromPacket(input);
-            if (!(sc instanceof Decorator)) {
-                return false;
-            }
-            decoration = (Decorator) sc;
+            color = FzColor.fromOrdinal(input.readByte());
             comment = input.readBoolean() ? "x" : null;
-            decoration.afterClientLoad(this);
+            boolean has_decor = input.readBoolean();
+            if (has_decor) {
+                ServoComponent sc = ServoComponent.readFromPacket(input);
+                if (!(sc instanceof Decorator)) {
+                    return false;
+                }
+                decoration = (Decorator) sc;
+                decoration.afterClientLoad(this);
+                getCoord().redraw();
+            }
             return true;
         }
         if (messageType == MessageType.ServoRailEditComment) {
@@ -315,23 +340,24 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
     
     @Override
     public FMLProxyPacket getDescriptionPacket() {
-        if (decoration == null) {
-            return super.getDescriptionPacket();
-        } else {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            DataOutputStream dos = new DataOutputStream(baos);
-            try {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(baos);
+        try {
+            byte c = color.toOrdinal();
+            dos.writeByte(c);
+            dos.writeBoolean(comment != null && comment.length() > 0);
+            dos.writeBoolean(decoration != null);
+            if (decoration != null) {
                 decoration.writeToPacket(dos);
-                dos.writeBoolean(comment != null && comment.length() > 0);
-            } catch (Throwable e) {
-                Core.logWarning("Component packet error at %s %s:", this, getCoord());
-                e.printStackTrace();
-                decoration = null;
-                new Notice(this, "Component packet error!\nSee console log.").withStyle(Style.FORCE, Style.LONG).sendToAll();
-                return super.getDescriptionPacket();
             }
-            return getDescriptionPacketWith(MessageType.ServoRailDecor, baos.toByteArray());
+        } catch (Throwable e) {
+            Core.logWarning("Component packet error at %s %s:", this, getCoord());
+            e.printStackTrace();
+            decoration = null;
+            new Notice(this, "Component packet error!\nSee console log.").withStyle(Style.FORCE, Style.LONG).sendToAll();
+            return super.getDescriptionPacket();
         }
+        return getDescriptionPacketWith(MessageType.ServoRailDecor, baos.toByteArray());
     }
     
     @Override
@@ -357,5 +383,15 @@ public class TileEntityServoRail extends TileEntityCommon implements IChargeCond
             return decoration.toItem();
         }
         return getDroppedBlock();
+    }
+    
+    @Override
+    public boolean recolourBlock(ForgeDirection side, FzColor fzColor) {
+        if (fzColor != color) {
+            color = fzColor;
+            getCoord().markBlockForUpdate();
+            return true;
+        }
+        return false;
     }
 }

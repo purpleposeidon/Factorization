@@ -13,6 +13,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChunkCoordinates;
@@ -29,13 +30,17 @@ import net.minecraftforge.fluids.IFluidBlock;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.notify.ISaneCoord;
 import factorization.shared.BlockHelper;
+import factorization.shared.Core;
 import factorization.shared.FzUtil;
+import factorization.shared.TileEntityCommon;
+import factorization.shared.NetworkFactorization.MessageType;
 
 // Note: The rules for holding on to references to Coord are the same as for holding on to World.
 // Don't keep references to them outside of things that are in worlds to avoid mem-leaks; or be careful about it.
@@ -437,6 +442,7 @@ public class Coord implements IDataSerializable, ISaneCoord {
     
     public void markBlockForUpdate() {
         //this will re-send block values & TE description to the client, which will also do a redraw()
+        //...is what it used to do. Now you have to use syncAndDraw()?
         w.markBlockForUpdate(x, y, z);
     }
 
@@ -444,6 +450,26 @@ public class Coord implements IDataSerializable, ISaneCoord {
         if (w.isRemote) {
             w.markBlockForUpdate(x, y, z);
         }
+    }
+    
+    public void syncTE() {
+        TileEntityCommon tec = getTE(TileEntityCommon.class);
+        if (tec == null) return;
+        FMLProxyPacket description = tec.getDescriptionPacket();
+        Core.network.broadcastPacket(null, this, description);
+    }
+    
+    public void sendRedraw() {
+        if (w.isRemote) {
+            redraw();
+        } else {
+            Core.network.broadcastMessage(null, this, MessageType.RedrawOnClient);
+        }
+    }
+    
+    public void syncAndRedraw() {
+        syncTE();
+        sendRedraw();
     }
     
     public void notifyNeighbors() {

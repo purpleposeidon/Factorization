@@ -1,8 +1,12 @@
-0.8.78
-  Since I'm tired of discovering I've been playing in peaceful for the past 2 hours, and losing named mobs, I've added a button to the world select screen that warns you if you're in peaceful mode.
+0.8.79
+  Servos & servo rails can now be colored; a colored servo will ignore differently colored servo rails.
+  The pressurizer now has 3 slots on servos, and defaults to sucking
+  /f saycoords now supports notes; eg "/f saycoords there's a big cave here!"
+  Since I'm tired of discovering I've been playing in peaceful for the past 2 hours and/or losing named mobs, I've added a button to the world select screen that warns you if you're about to load up a world with peaceful difficulty.
   Crystallizer state syncs & renders better
-  /f saycoords now supports notes; "/f saycoords There's a big cave here!"
   FINALLY FIXED THE SERVO GLITCHY TURNY THING \(╥﹏╥)/
+  Hopefully maybe possibly fixed ore processing recipe problems
+  Switched to Forge's FakePlayer
 
 0.8.77
   Fixed some NPEs.

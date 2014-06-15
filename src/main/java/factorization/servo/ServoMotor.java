@@ -33,6 +33,7 @@ import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
+import factorization.api.FzColor;
 import factorization.api.FzOrientation;
 import factorization.api.IChargeConductor;
 import factorization.api.IEntityMessage;
@@ -441,6 +442,17 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
                     socket.installedOnServo(this);
                     return true;
                 }
+            }
+        }
+        if (motionHandler.color == FzColor.NO_COLOR) {
+            FzColor newColor = FzColor.fromItem(is);
+            if (newColor != FzColor.NO_COLOR) {
+                motionHandler.color = newColor;
+                markDirty();
+                if (!player.capabilities.isCreativeMode) {
+                    player.setCurrentItemOrArmor(0, FzUtil.normalDecr(is));
+                }
+                return true;
             }
         }
         return false;

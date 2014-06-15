@@ -29,6 +29,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
+import factorization.api.FzColor;
 import factorization.api.IFactoryType;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
@@ -157,7 +158,7 @@ public class BlockFactorization extends BlockContainer {
     @Override
     public void registerBlockIcons(IIconRegister reg) {
         FactorizationTextureLoader.register(reg, BlockIcons.class, null, "factorization:");
-        Core.proxy.texturepackChanged();
+        Core.proxy.texturepackChanged(reg);
     }
     
     static public IIcon force_texture = null;
@@ -636,5 +637,14 @@ public class BlockFactorization extends BlockContainer {
         if (te instanceof TileEntityCommon) {
             ((TileEntityCommon) te).onNeighborTileChanged(tilex, tiley, tilez);
         }
+    }
+    
+    @Override
+    public boolean recolourBlock(World world, int x, int y, int z, ForgeDirection side, int colour) {
+        TileEntity te = world.getTileEntity(x, y, z);
+        if (te instanceof TileEntityCommon) {
+            return ((TileEntityCommon) te).recolourBlock(side, FzColor.fromVanillaColorIndex(colour));
+        }
+        return false;
     }
 }

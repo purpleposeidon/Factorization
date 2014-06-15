@@ -1,6 +1,5 @@
 #!/bin/sh
 
-
 if git branch | grep "*" | grep fzds > /dev/zero;
 then
     EXCLUDE="--ignore-dir=src/factorization/fzds/"
@@ -8,5 +7,5 @@ else
     EXCLUDE=""
 fi
 
-ack-grep $EXCLUDE NORELEASE src/
+ack-grep $EXCLUDE NORELEASE src/ QUICK_BUGS TODO
 ack-grep '%i' src/

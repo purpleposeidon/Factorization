@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.tileentity.TileEntity;
 
@@ -26,7 +27,7 @@ public class FigurePage extends AbstractPage {
     
     FigurePage(DocWorld figure) {
         this.figure = figure;
-        eyeball = FzUtil.makePlayer(new Coord(figure, 0, 0, 0), "drawFigurePage");
+        eyeball = new EntityLiving(figure) {};
     }
 
     double origRotationX, origRotationY;

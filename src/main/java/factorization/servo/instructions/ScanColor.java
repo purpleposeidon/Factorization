@@ -39,7 +39,7 @@ public class ScanColor extends Decorator {
         Coord at = motor.getCurrentPos();
         at = at.add(motor.getOrientation().top);
         FzColor col = FzColor.readColor(at);
-        if (col != null) {
+        if (col != FzColor.NO_COLOR) {
             motor.getArgStack().push(col);
             return;
         }

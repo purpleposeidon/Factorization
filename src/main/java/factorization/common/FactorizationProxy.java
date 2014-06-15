@@ -1,7 +1,6 @@
 package factorization.common;
 
-import java.util.Random;
-
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
@@ -86,7 +85,7 @@ public class FactorizationProxy implements IGuiHandler {
         return true;
     }
     
-    public void texturepackChanged() {}
+    public void texturepackChanged(IIconRegister reg) {}
     
     public boolean BlockRenderHelper_has_texture(BlockRenderHelper block, int f) { return true; }
     

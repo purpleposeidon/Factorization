@@ -51,6 +51,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.StringUtils;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -989,10 +990,6 @@ public class FzUtil {
         if (item == null) {
             return null;
         }
-        double dx = rand.nextFloat() * 0.5 - 0.5;
-        double dy = rand.nextFloat() * 0.5 - 0.5;
-        double dz = rand.nextFloat() * 0.5 - 0.5;
-
         EntityItem entityitem = new EntityItem(c.w, c.x + 0.5, c.y + 0.5, c.z + 0.5, item);
         entityitem.motionY = 0.2 + rand.nextGaussian() * 0.02;
         entityitem.motionX = rand.nextGaussian() * 0.02;
@@ -1005,10 +1002,6 @@ public class FzUtil {
         if (item == null) {
             return null;
         }
-        double dx = rand.nextFloat() * 0.5 - 0.5;
-        double dy = rand.nextFloat() * 0.5 - 0.5;
-        double dz = rand.nextFloat() * 0.5 - 0.5;
-
         EntityItem entityitem = new EntityItem(c.worldObj, c.posX + c.width/2, c.posY + c.height/2, c.posZ + c.width/2, item);
         entityitem.motionY = 0.2 + rand.nextGaussian() * 0.02;
         entityitem.motionX = rand.nextGaussian() * 0.02;
@@ -1128,21 +1121,18 @@ public class FzUtil {
         }, 3, 3);
     }
     
-    private static class FzFakePlayer extends EntityPlayer {
+    private static class FzFakePlayer extends FakePlayer {
         Coord where;
 
-        private FzFakePlayer(World par1World, String par2Str, Coord where) {
-            super(par1World, new GameProfile(null, par2Str));
+        private FzFakePlayer(WorldServer world, String name, Coord where) {
+            super(world, new GameProfile(name, name));
             this.where = where;
         }
-
-        //TODO: Forge'll probably have this working properly by the time I catch up to it.
-        public void sendChatToPlayer(String s) {}
-        public boolean canCommandSenderUseCommand(int i, String s) { return false; }
-        @Override public ChunkCoordinates getPlayerCoordinates() { return new ChunkCoordinates(where.x, where.y, where.z); }
-        @Override public void addStat(StatBase par1StatBase, int par2) { }
-        @Override public void openGui(Object mod, int modGuiId, World world, int x, int y, int z) { }
-        @Override public void addChatMessage(IChatComponent var1) { }
+        
+        @Override
+        public ChunkCoordinates getPlayerCoordinates() {
+            return new ChunkCoordinates(where.x, where.y, where.z);
+        }
         
         @Override
         public boolean isEntityInvulnerable() {
@@ -1160,13 +1150,18 @@ public class FzUtil {
         }
         FzFakePlayer found = fakePlayerCache.get(where.w);
         if (found == null) {
-            found = new FzFakePlayer(where.w, "[FZ." + use + "]", where);
+            if (where.w instanceof WorldServer) {
+                found = new FzFakePlayer((WorldServer) where.w, "[FZ." + use + "]", where);
+            } else {
+                throw new IllegalArgumentException("Can't construct fake players on the client");
+            }
             fakePlayerCache.put(where.w, found);
         }
         found.where = where;
         where.setAsEntityLocation(found);
         Arrays.fill(found.inventory.armorInventory, null);
         Arrays.fill(found.inventory.mainInventory, null);
+        found.isDead = false;
         return found;
     }
     
@@ -1320,8 +1315,8 @@ public class FzUtil {
     static ArrayList<IRecipe> recipeCache = new ArrayList();
     private static int cache_fear = 10;
     public static IRecipe findMatchingRecipe(InventoryCrafting inv, World world) {
-        List<IRecipe> craftingManagerRecipes = CraftingManager.getInstance().getRecipeList();
         if (Core.serverStarted) {
+            List<IRecipe> craftingManagerRecipes = CraftingManager.getInstance().getRecipeList();
             cache_fear--;
             if (cache_fear > 0) {
                 return lookupRecipeUncached(inv, world);
@@ -1359,7 +1354,6 @@ public class FzUtil {
         List<IRecipe> craftingManagerRecipes = CraftingManager.getInstance().getRecipeList();
         for (int i = 0; i < craftingManagerRecipes.size(); i++) {
             IRecipe recipe = craftingManagerRecipes.get(i);
-            ItemStack output = recipe.getRecipeOutput();
             if (recipe.matches(inv, world)) {
                 return recipe;
             }
