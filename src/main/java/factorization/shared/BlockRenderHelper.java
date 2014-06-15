@@ -173,7 +173,7 @@ public class BlockRenderHelper extends Block {
         rb.renderStandardBlock(this, c.x, c.y, c.z);
     }
     
-    private static final byte UV_NONE = 0, UV_OLD_STYLE_ROTATED = 1, UV_NEW_STYLE_MIRRORED = 2, UV_HIPSTER_STYLE = 3;
+    private static final byte UV_NONE = 0, UV_OLD_STYLE_ROTATED = 1, UV_NEW_STYLE_MIRRORED = 2, UV_FULLY_ROTATED_STYLE = 3;
     
     private VectorUV center = new VectorUV();
     
@@ -189,7 +189,7 @@ public class BlockRenderHelper extends Block {
     
     @SideOnly(Side.CLIENT)
     public BlockRenderHelper beginWithHipsterUVs() {
-        return begin(UV_HIPSTER_STYLE);
+        return begin(UV_FULLY_ROTATED_STYLE);
     }
     
     @SideOnly(Side.CLIENT)
@@ -520,7 +520,7 @@ public class BlockRenderHelper extends Block {
         }
     }
     
-    private void setHipsterStyleRotatedishUVs(int face) {
+    private void setStyleFullyRotatedUVs(int face) {
         switch (face) {
         case 0: //-y
             for (int i = 0; i < currentFace.length; i++) {
@@ -616,8 +616,8 @@ public class BlockRenderHelper extends Block {
             setVanillaStyleMirroredUVs(face);
         } else if (uv_mode == UV_OLD_STYLE_ROTATED) {
             setOldStyleRotatedishUVs(face);
-        } else if (uv_mode == UV_HIPSTER_STYLE) {
-            setHipsterStyleRotatedishUVs(face); //NORELEASE s/hipster/fully rotated
+        } else if (uv_mode == UV_FULLY_ROTATED_STYLE) {
+            setStyleFullyRotatedUVs(face);
         }
         convertUVsForIcon(face);
         clipUVs();
