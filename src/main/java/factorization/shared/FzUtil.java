@@ -990,10 +990,6 @@ public class FzUtil {
         if (item == null) {
             return null;
         }
-        double dx = rand.nextFloat() * 0.5 - 0.5;
-        double dy = rand.nextFloat() * 0.5 - 0.5;
-        double dz = rand.nextFloat() * 0.5 - 0.5;
-
         EntityItem entityitem = new EntityItem(c.w, c.x + 0.5, c.y + 0.5, c.z + 0.5, item);
         entityitem.motionY = 0.2 + rand.nextGaussian() * 0.02;
         entityitem.motionX = rand.nextGaussian() * 0.02;
@@ -1006,10 +1002,6 @@ public class FzUtil {
         if (item == null) {
             return null;
         }
-        double dx = rand.nextFloat() * 0.5 - 0.5;
-        double dy = rand.nextFloat() * 0.5 - 0.5;
-        double dz = rand.nextFloat() * 0.5 - 0.5;
-
         EntityItem entityitem = new EntityItem(c.worldObj, c.posX + c.width/2, c.posY + c.height/2, c.posZ + c.width/2, item);
         entityitem.motionY = 0.2 + rand.nextGaussian() * 0.02;
         entityitem.motionX = rand.nextGaussian() * 0.02;
@@ -1323,8 +1315,8 @@ public class FzUtil {
     static ArrayList<IRecipe> recipeCache = new ArrayList();
     private static int cache_fear = 10;
     public static IRecipe findMatchingRecipe(InventoryCrafting inv, World world) {
-        List<IRecipe> craftingManagerRecipes = CraftingManager.getInstance().getRecipeList();
         if (Core.serverStarted) {
+            List<IRecipe> craftingManagerRecipes = CraftingManager.getInstance().getRecipeList();
             cache_fear--;
             if (cache_fear > 0) {
                 return lookupRecipeUncached(inv, world);
@@ -1362,7 +1354,6 @@ public class FzUtil {
         List<IRecipe> craftingManagerRecipes = CraftingManager.getInstance().getRecipeList();
         for (int i = 0; i < craftingManagerRecipes.size(); i++) {
             IRecipe recipe = craftingManagerRecipes.get(i);
-            ItemStack output = recipe.getRecipeOutput();
             if (recipe.matches(inv, world)) {
                 return recipe;
             }
