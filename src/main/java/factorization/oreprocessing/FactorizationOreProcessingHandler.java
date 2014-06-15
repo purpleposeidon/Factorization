@@ -125,7 +125,7 @@ public class FactorizationOreProcessingHandler {
     void loadWater() {
         FluidStack h2o = FluidContainerRegistry.getFluidForFilledItem(new ItemStack(Items.water_bucket));
         if (h2o == null) {
-            return; //NORELEASE: Wat
+            return; //???
         }
         for (FluidContainerData container : FluidContainerRegistry.getRegisteredFluidContainerData()) {
             FluidStack liq = container.fluid;
