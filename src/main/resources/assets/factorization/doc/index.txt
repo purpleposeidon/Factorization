@@ -8,11 +8,11 @@
 \index{ores}{Ores and Materials}
 \index{lmp}{Logic Matrix Programmer}
 \index{parts}{Parts and Machines}
+\index{charge}{Charge Energy}
+% \index{oreprocessing}{Ore Processing}
 \index{building}{Building}
 \index{cookbook}{Designs}
-\index{charge}{Charge Energy}
 \index{projects}{Projects}
-% \index{oreprocessing}{Ore Processing}
 \index{misc}{Miscellaneous Nonsense}
 \checkmods{none}{craftguide NotEnoughItems}{
 \index{cgi/recipes}{Recipes}
