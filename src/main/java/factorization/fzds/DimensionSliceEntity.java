@@ -109,7 +109,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     @Override
     public Vec3 shadow2real(final Vec3 shadowVector) {
-        Vec3 buffer = Vec3.createVectorHelper(0, 0, 0);
+        Vec3 buffer = shadowVector.myVec3LocalPool.getVecFromPool(0, 0, 0);
         double diffX = shadowVector.xCoord - hammerCell.x;
         double diffY = shadowVector.yCoord - hammerCell.y;
         double diffZ = shadowVector.zCoord - hammerCell.z;
@@ -144,7 +144,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     @Override
     public Coord getCenter() {
-        return hammerCell.center(farCorner);
+        return hammerCell.center(farCorner); //this.worldObj
         /*return hammerCell.add((int)centerOffset.xCoord,
                 (int)centerOffset.yCoord,
                 (int)centerOffset.zCoord);*/
@@ -170,11 +170,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
 
     @Override
     protected void readEntityFromNBT(NBTTagCompound tag) {
-        hammerCell = new Coord(DeltaChunk.getWorld(worldObj), 0, 0, 0);
-        farCorner = hammerCell.copy();
-        
-        
         capabilities = tag.getLong("cap");
+        hammerCell = new Coord(null, 0, 0, 0);
+        farCorner = hammerCell.copy();
         rotation = Quaternion.loadFromTag(tag, "r");
         rotationalVelocity = Quaternion.loadFromTag(tag, "w");
         centerOffset = Vec3.createVectorHelper(0, 0, 0);
@@ -249,6 +247,16 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                     }
                 }
             }
+        }
+        int r = 16;
+        if (motionX == 0) {
+            odx = Math.round(odx*r)/r;
+        }
+        if (motionY == 0) {
+            ody = Math.round(ody*r)/r;
+        }
+        if (motionZ == 0) {
+            odz = Math.round(odz*r)/r;
         }
         metaAABB = new MetaAxisAlignedBB(hammerCell.w, shadowArea, Vec3.createVectorHelper(odx, ody, odz), rotation, real2shadow(Vec3.createVectorHelper(posX, posY, posZ)));
         metaAABB.setUnderlying(realArea);
@@ -450,12 +458,11 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 DeltaChunk.getSlices(worldObj).add(this);
             }
         } else if (proxy == null && !isDead) {
+            World target_world = can(DeltaCapability.ORACLE) ? worldObj : DeltaChunk.getServerShadowWorld();
+            hammerCell.w = farCorner.w = target_world;
             DeltaChunk.getSlices(worldObj).add(this);
             World shadowWorld = DeltaChunk.getServerShadowWorld();
             proxy = new PacketProxyingPlayer(this, shadowWorld);
-            if (shadowWorld != proxy.worldObj) {
-                throw new IllegalStateException("NORELEASE");
-            }
             proxy.worldObj.spawnEntityInWorld(proxy);
             return;
         }
@@ -671,7 +678,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     @Override
     public boolean isInRangeToRenderDist(double distSquared) {
         //NOTE: This doesn't actually render entities as far as it should
-        int s = 8*16;
+        int s = 10*16;
         return distSquared < s*s;
     }
     
@@ -730,6 +737,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             //Not expected to happen ever
             e.printStackTrace();
         }
+        boolean isNew = DeltaChunk.getSlices(worldObj).add(this);
     }
     
     @Override
