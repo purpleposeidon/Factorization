@@ -1,6 +1,7 @@
 package factorization.fzds.network;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.EnumConnectionState;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
@@ -37,6 +38,9 @@ public class WrappedPacket  implements IMessage, IMessageHandler<WrappedPacket, 
     @Override
     public IMessage onMessage(WrappedPacket message, MessageContext ctx) {
         if (message.wrapped == null) return null;
+        if (Minecraft.getMinecraft().thePlayer == null) {
+            return null; // :/
+        }
         Hammer.proxy.setShadowWorld(); //behold my power of voodoo
         try {
             message.wrapped.processPacket(ctx.netHandler); //who do?
