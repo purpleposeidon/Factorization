@@ -1,12 +1,18 @@
 package factorization.fzds;
 
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.util.concurrent.GenericFutureListener;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.EnumConnectionState;
 import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S26PacketMapChunkBulk;
 import net.minecraft.server.MinecraftServer;
@@ -19,16 +25,18 @@ import net.minecraft.world.chunk.Chunk;
 
 import com.mojang.authlib.GameProfile;
 
+import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
 import factorization.api.Coord;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsEntryControl;
 import factorization.fzds.network.FzdsPacketRegistry;
+import factorization.shared.Core;
 import factorization.shared.FzNetDispatch;
 
 public class PacketProxyingPlayer extends GenericProxyPlayer implements
         IFzdsEntryControl {
     DimensionSliceEntity dimensionSlice;
-    static boolean useShortViewRadius = false; // true doesn't actually change the view radius
+    static boolean useShortViewRadius = true; // true doesn't actually change the view radius
 
     private HashSet<EntityPlayerMP> trackedPlayers = new HashSet();
 
@@ -43,6 +51,7 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements
         ServerConfigurationManager scm = MinecraftServer.getServer().getConfigurationManager();
         if (useShortViewRadius) {
             int orig = savePlayerViewRadius();
+            restorePlayerViewRadius(3);
             try {
                 scm.func_72375_a(this, null);
             } finally {
@@ -65,6 +74,8 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements
                 FzNetDispatch.addPacketFrom(wrapped, chunk);
             }
         };
+        
+        playerNetServerHandler.netManager.channel().attr(NetworkDispatcher.FML_DISPATCHER).set(new NetworkDispatcher(this.networkManager));
     }
 
     int savePlayerViewRadius() {
@@ -161,7 +172,7 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements
                 net.sendPacket(toSend);
             }
         }
-        System.out.println("Sending data of " + chunkCount + " chunks with " + teCount + " tileEntities");
+        Core.logInfo("Sending data of " + chunkCount + " chunks with " + teCount + " tileEntities"); // NORELEASE
     }
 
     public void endProxy() {
@@ -197,6 +208,49 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements
             } else {
                 player.playerNetServerHandler.sendPacket(wrappedPacket);
             }
+        }
+    }
+    
+    @Override
+    public void addNettyMessage(Channel sourceChannel, Object msg) {
+        // Return a future?
+        if (trackedPlayers.isEmpty()) {
+            return;
+        }
+        if (dimensionSlice.isDead) {
+            setDead();
+            return;
+        }
+        Iterator<EntityPlayerMP> it = trackedPlayers.iterator();
+        while (it.hasNext()) {
+            EntityPlayerMP player = it.next();
+            if (player.isDead || player.worldObj != dimensionSlice.worldObj) {
+                it.remove();
+            } else {
+                addNettyMessageForPlayer(sourceChannel, msg, player);
+            }
+        }
+    }
+    
+    void addNettyMessageForPlayer(final Channel sourceChannel, final Object packet, final EntityPlayerMP player, final GenericFutureListener... futureListeners) {
+        // See NetworkManager.dispatchPacket
+        final Channel destinationChannel = player.playerNetServerHandler.netManager.channel();
+        if (destinationChannel == sourceChannel || player instanceof PacketProxyingPlayer) {
+            throw new IllegalStateException("Sending a packet to myself!");
+        }
+        if (destinationChannel.attr(NetworkManager.attrKeyConnectionState).get() != EnumConnectionState.PLAY) {
+            Core.logWarning("Not sending packet to " + player + ", because they are not in EnumConnectionState.PLAY: " + packet);
+            return; // We're not going to attempt to send packets if they're not in the proper state.
+        }
+
+        if (destinationChannel.eventLoop().inEventLoop()) {
+            destinationChannel.writeAndFlush(packet).addListeners(futureListeners).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+        } else {
+            destinationChannel.eventLoop().execute(new Runnable() {
+                public void run() {
+                    destinationChannel.writeAndFlush(packet).addListeners(futureListeners).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+                }
+            });
         }
     }
     

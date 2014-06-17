@@ -139,6 +139,7 @@ public class HammerClientProxy extends HammerProxy {
     private static NetHandlerPlayClient send_queue;
     
     private void setSendQueueWorld(WorldClient wc) {
+        if (send_queue == null) throw new NullPointerException();
         send_queue.clientWorldController = wc;
     }
     
