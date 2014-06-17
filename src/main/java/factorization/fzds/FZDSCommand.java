@@ -28,6 +28,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
@@ -618,16 +619,16 @@ public class FZDSCommand extends CommandBase {
             @Override
             void call(String[] args) {
                 boolean add = arg0.equals("+");
-                Iterator<IDeltaChunk> it = DeltaChunk.getSlices(MinecraftServer.getServer().worldServerForDimension(0)).iterator();
+                ArrayList<List<Entity>> entityLists = new ArrayList();
+                for (World world : MinecraftServer.getServer().worldServers) {
+                    entityLists.add(world.loadedEntityList);
+                }
+                
                 IDeltaChunk first = null, prev = null, next = null, last = null;
                 boolean found_current = false;
-                while (it.hasNext()) {
-                    IDeltaChunk here = it.next();
-                    if (here.isDead) {
-                        Core.logWarning(here + " was not removed");
-                        it.remove();
-                        continue;
-                    }
+                for (Entity ent : Iterables.concat(entityLists)) {
+                    if (!(ent instanceof IDeltaChunk)) continue;
+                    IDeltaChunk here = (IDeltaChunk) ent;
                     last = here;
                     if (first == null) {
                         first = last;

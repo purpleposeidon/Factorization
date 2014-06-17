@@ -19,6 +19,7 @@ import net.minecraft.world.storage.ISaveHandler;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -28,6 +29,8 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppingEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.common.FzConfig;
@@ -59,7 +62,7 @@ public class Hammer {
     public static int fzds_command_channel = 0;
     public static int max_fzds_grab_area = 16*16*80*4;
     
-    static Set<IDeltaChunk> serverSlices = new WeakSet(), clientSlices = new WeakSet();
+    static DeltaChunkMap serverSlices = new DeltaChunkMap(), clientSlices = new DeltaChunkMap();
     
     public Hammer() {
         Hammer.instance = this;
@@ -125,6 +128,11 @@ public class Hammer {
     public void saveInfo(FMLServerStoppingEvent event) {
         hammerInfo.saveCellAllocations();
         serverSlices.clear();
+        clientSlices.clear();
+    }
+    
+    @SubscribeEvent
+    public void clearSlices(ClientDisconnectionFromServerEvent event) {
         clientSlices.clear();
     }
     

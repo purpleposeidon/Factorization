@@ -11,6 +11,7 @@ import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.shared.FzUtil;
+import gnu.trove.set.hash.THashSet;
 
 class ShadowRenderGlobal implements IWorldAccess {
     /***
@@ -39,26 +40,21 @@ class ShadowRenderGlobal implements IWorldAccess {
         markBlocksForUpdate(var1 - 1, var2 - 1, var3 - 1, var4 + 1, var5 + 1, var6 + 1);
     }
     
+    private THashSet<IDeltaChunk> found_deltachunks = new THashSet<IDeltaChunk>(10); //NORELEASE: rm
     void markBlocksForUpdate(int lx, int ly, int lz, int hx, int hy, int hz) {
-        //Could this be more efficient?
         World realClientWorld = DeltaChunk.getClientRealWorld();
-        Iterator<IDeltaChunk> it = DeltaChunk.getSlices(realClientWorld).iterator();
-        while (it.hasNext()) {
-            DimensionSliceEntity dse = (DimensionSliceEntity) it.next();
-            if (dse.isDead) {
-                it.remove(); //shouldn't happen. Keeping it anyways.
-                continue;
-            }
-            
+        for (IDeltaChunk idc : DeltaChunk.getSlicesInRange(realClientWorld, lx, ly, lz, hx, hy, hz)) {
+            DimensionSliceEntity dse = (DimensionSliceEntity) idc;
             Coord near = dse.getCorner(), far = dse.getFarCorner();
             if (FzUtil.intersect(near.x, far.x, lx, hx)
                     && FzUtil.intersect(near.y, far.y, ly, hy)
                     && FzUtil.intersect(near.z, far.z, lz, hz)) {
-                RenderDimensionSliceEntity.markBlocksForUpdate((DimensionSliceEntity) dse, lx, ly, lz, hx, hy, hz);
+                RenderDimensionSliceEntity.markBlocksForUpdate(dse, lx, ly, lz, hx, hy, hz);
                 dse.blocksChanged(lx, ly, lz);
                 dse.blocksChanged(hx, hy, hz);
             }
         }
+        found_deltachunks.clear();
     }
 
     @Override

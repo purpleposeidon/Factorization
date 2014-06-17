@@ -5,15 +5,18 @@ import java.util.Set;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DimensionManager;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.fzds.api.IDeltaChunk;
+import factorization.shared.FzUtil;
+import gnu.trove.set.hash.THashSet;
 
 public class DeltaChunk {
-    static Set<IDeltaChunk> getSlices(World w) {
+    static DeltaChunkMap getSlices(World w) {
         if (w == null) {
             if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
                 return Hammer.clientSlices;
@@ -22,6 +25,33 @@ public class DeltaChunk {
             }
         }
         return w.isRemote ? Hammer.clientSlices : Hammer.serverSlices;
+    }
+    
+    public static IDeltaChunk[] getSlicesContainingPoint(Coord at) {
+        return getSlices(at.w).get(at.getChunk());
+    }
+    
+    static boolean addSlice(IDeltaChunk dse) {
+        return getSlices(dse.worldObj).add(dse);
+    }
+    
+    static Set<IDeltaChunk> getSlicesInRange(World w, int lx, int ly, int lz, int hx, int hy, int hz) {
+        THashSet<IDeltaChunk> found_deltachunks = new THashSet<IDeltaChunk>(10);
+        World sliceWorld = DeltaChunk.getWorld(w);
+        DeltaChunkMap map = DeltaChunk.getSlices(w);
+        IDeltaChunk last_found = null;
+        for (int x = lx; x <= hx; x += 16) {
+            for (int z = lz; z <= hz; z += 16) {
+                Chunk hereChunk = sliceWorld.getChunkFromBlockCoords(x, z);
+                IDeltaChunk new_idcs[] = map.get(hereChunk);
+                for (IDeltaChunk idc : new_idcs) {
+                    if (idc == last_found) continue;
+                    found_deltachunks.add(idc);
+                    last_found = idc;
+                }
+            }
+        }
+        return found_deltachunks;
     }
     
     public static World getClientShadowWorld() {
@@ -58,11 +88,10 @@ public class DeltaChunk {
         if (target == null) {
             return null;
         }
+        World real_world = target.worldObj;
         IDeltaChunk closest = null;
         double dist = Double.POSITIVE_INFINITY;
-        World real_world = DeltaChunk.getClientRealWorld();
-        
-        for (IDeltaChunk here : DeltaChunk.getSlices(target.worldObj)) {
+        for (IDeltaChunk here : DeltaChunk.getSlicesContainingPoint(pos)) {
             if (here.worldObj != real_world && !pos.inside(here.getCorner(), here.getFarCorner())) {
                 continue;
             }

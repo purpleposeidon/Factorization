@@ -41,17 +41,11 @@ public final class ShadowWorldAccess implements IWorldAccess {
     }
 
     void markBlocksForUpdate(int lx, int ly, int lz, int hx, int hy, int hz) {
-        //Sorry, it could probably be a bit more efficient.
+        World realClientWorld = DeltaChunk.getClientRealWorld();
         Coord lower = new Coord(null, lx, ly, lz);
         Coord upper = new Coord(null, hx, hy, hz);
-        World realClientWorld = DeltaChunk.getClientRealWorld();
-        Iterator<IDeltaChunk> it = DeltaChunk.getSlices(realClientWorld).iterator();
-        while (it.hasNext()) {
-            DimensionSliceEntity dse = (DimensionSliceEntity) it.next();
-            if (dse.isDead) {
-                it.remove(); //shouldn't happen. Keeping it anyways.
-                continue;
-            }
+        for (IDeltaChunk idc : DeltaChunk.getSlicesInRange(realClientWorld, lx, ly, lz, hx, hy, hz)) {
+            DimensionSliceEntity dse = (DimensionSliceEntity) idc;
             if (dse.getCorner().inside(lower, upper) || dse.getFarCorner().inside(lower, upper)) {
                 dse.blocksChanged(lx, ly, lz);
                 dse.blocksChanged(hx, hy, hz);
