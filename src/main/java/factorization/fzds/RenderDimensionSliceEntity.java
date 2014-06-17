@@ -19,6 +19,10 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
@@ -54,6 +58,18 @@ public class RenderDimensionSliceEntity extends Render {
     @Override
     protected ResourceLocation getEntityTexture(Entity entity) { return null; }
 
+    Vec3 shadowEyeVec = Vec3.createVectorHelper(0, 0, 0);
+    EntityLivingBase shadowEye = new EntityLivingBase(null) {
+        @Override protected void entityInit() { }
+        @Override public void readEntityFromNBT(NBTTagCompound var1) { }
+        @Override public void writeEntityToNBT(NBTTagCompound var1) { }
+        @Override public ItemStack getHeldItem() { return null; }
+        @Override public ItemStack getEquipmentInSlot(int var1) { return null; }
+        @Override public void setCurrentItemOrArmor(int var1, ItemStack var2) { }
+        @Override public ItemStack[] getLastActiveItems() { return null; }
+        @Override public void setHealth(float par1) { }
+    };
+    
     class DSRenderInfo {
         //final int width = Hammer.cellWidth;
         //final int height = 4;
@@ -103,7 +119,7 @@ public class RenderDimensionSliceEntity extends Render {
                         renderers[i].posXClip = x*16;
                         renderers[i].posYClip = y*16;
                         renderers[i].posZClip = z*16;
-                        //renderers[i].markDirty();
+                        renderers[i].markDirty();
                         FzUtil.checkGLError("FZDS WorldRenderer init");
                         i++;
                     }
@@ -115,7 +131,21 @@ public class RenderDimensionSliceEntity extends Render {
         int last_update_index = 0;
         int render_skips = 0;
         
+        void updateRelativeEyePosition() {
+            final EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+            shadowEyeVec.xCoord = player.posX;
+            shadowEyeVec.yCoord = player.posY;
+            shadowEyeVec.zCoord = player.posZ;
+            Vec3 eyepos = dse.real2shadow(shadowEyeVec);
+            shadowEye.posX = eyepos.xCoord;
+            shadowEye.posY = eyepos.yCoord;
+            shadowEye.posZ = eyepos.zCoord;
+        }
+        
         void update() {
+            if (far.getChunk().isEmpty()) {
+                return;
+            }
             if (!anyRenderersDirty) {
                 last_update_index = 0;
                 return;
@@ -128,7 +158,10 @@ public class RenderDimensionSliceEntity extends Render {
             while (last_update_index < renderers.length) {
                 WorldRenderer wr = renderers[last_update_index++];
                 if (wr.needsUpdate) {
-                    wr.updateRenderer(Minecraft.getMinecraft().thePlayer /* NORELEASE: Need an entity located at the players position in shadowspace? */);
+                    if (updates == 0) {
+                        updateRelativeEyePosition();
+                    }
+                    wr.updateRenderer(shadowEye);
                     if (++updates == update_limit) {
                         break;
                     }
@@ -153,9 +186,10 @@ public class RenderDimensionSliceEntity extends Render {
             for (int pass = 0; pass < 2; pass++) {
                 if (pass == 1) {
                     //setup transparency
+                    //NORELEASE: Oh god, this is going to be a pain to get working properly...
+                    // Can we just cheat? No transparency?
                     GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                     GL11.glEnable(GL11.GL_BLEND);
-                    //GL11.glDisable(GL11.GL_CULL_FACE);
                 }
                 for (int i = 0; i < renderers.length; i++) {
                     WorldRenderer wr = renderers[i];
@@ -252,13 +286,11 @@ public class RenderDimensionSliceEntity extends Render {
         renderInfo.anyRenderersDirty = true;
         for (int i = 0; i < renderInfo.renderers.length; i++) {
             WorldRenderer wr = renderInfo.renderers[i];
-            wr.markDirty();
-            //TODO NORELEASE IMPORTANT GAH
-            /*if (FactorizationUtil.intersect(lx, hx, wr.posX, wr.posX + 16) &&
-                    FactorizationUtil.intersect(ly, hy, wr.posY, wr.posY + 16) && 
-                    FactorizationUtil.intersect(lz, hz, wr.posZ, wr.posZ + 16)) {
+            if (FzUtil.intersect(lx, hx, wr.posX, wr.posX + 16) &&
+                    FzUtil.intersect(ly, hy, wr.posY, wr.posY + 16) && 
+                    FzUtil.intersect(lz, hz, wr.posZ, wr.posZ + 16)) {
                 wr.markDirty();
-            }*/
+            }
         }
     }
     
@@ -315,15 +347,11 @@ public class RenderDimensionSliceEntity extends Render {
             }
             glPushMatrix();
             try {
-                float pdx = (float) ((dse.posX - dse.lastTickPosX)*partialTicks);
-                float pdy = (float) ((dse.posY - dse.lastTickPosY)*partialTicks); //err, not used? XXX
-                float pdz = (float) ((dse.posZ - dse.lastTickPosZ)*partialTicks);
                 glTranslatef((float)(x), (float)(y), (float)(z));
                 Quaternion rotation = dse.getRotation();
                 if (!rotation.isZero()) {
                     Quaternion quat = rotation.add(dse.prevTickRotation);
                     quat.incrScale(0.5);
-                    Vec3 vec = Vec3.createVectorHelper(0, 0, 0);
                     quat.glRotate();
                 }
                 glTranslatef((float)(-dse.centerOffset.xCoord),
