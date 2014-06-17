@@ -25,6 +25,7 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppingEvent;
 import cpw.mods.fml.common.registry.EntityRegistry;
@@ -76,8 +77,9 @@ public class Hammer {
             return;
         }
         
-        EntityRegistry.registerModEntity(DimensionSliceEntity.class, "fzds", 1, this, 64, 1, true);
-        EntityRegistry.registerModEntity(DseCollider.class, "fzdsC", 2, this, 64, 80000, false);
+        int client_despawn_distance = 16*10; //NORELEASE: This wants for a config setting. "How far away the a client must be from a DSE before the server will tell the client to forget about it (eg, client side despawn)."
+        EntityRegistry.registerModEntity(DimensionSliceEntity.class, "fzds", 1, this, client_despawn_distance, 1, true);
+        EntityRegistry.registerModEntity(DseCollider.class, "fzdsC", 2, this, client_despawn_distance, 80000, false);
         
         //Create the hammer dimension
         dimensionID = FzConfig.dimension_slice_dimid;
@@ -102,12 +104,12 @@ public class Hammer {
     }
     
     @EventHandler
-    public void serverStartup(FMLServerStartingEvent event) {
+    public void serverStart(FMLServerStartingEvent event) {
         if (!enabled) {
             return;
         }
         event.registerServerCommand(new FZDSCommand());
-        NORELEASE_initDimension(dimensionID);
+        DimensionManager.initDimension(dimensionID);
         if (!DimensionManager.shouldLoadSpawn(dimensionID)) {
             throw new RuntimeException("hammerWorld is not loaded");
         }
@@ -117,54 +119,6 @@ public class Hammer {
         //the undeobfed method comes after "isPlayerWatchingChunk", also in uses of ServerConfigurationManager.getViewDistance()
         //It returns how many blocks are visible.
         DSE_ChunkUpdateRangeSquared = Math.pow(PlayerManager.getFurthestViewableBlock(view_distance) + 16*2, 2);
-    }
-    
-
-    public static void NORELEASE_initDimension(int dim) {
-        WorldServer overworld = DimensionManager.getWorld(0);
-        if (overworld == null)
-        {
-            throw new RuntimeException("Cannot Hotload Dim: Overworld is not Loaded!");
-        }
-        try
-        {
-            DimensionManager.getProviderType(dim);
-        }
-        catch (Exception e)
-        {
-            System.err.println("Cannot Hotload Dim: " + e.getMessage());
-            return; // If a provider hasn't been registered then we can't hotload the dim
-        }
-        MinecraftServer mcServer = overworld.func_73046_m();
-        ISaveHandler savehandler = overworld.getSaveHandler();
-        WorldSettings worldSettings = new WorldSettings(overworld.getWorldInfo());
-
-        WorldServer world = new HammerWorldMulti(mcServer, savehandler, overworld.getWorldInfo().getWorldName(), dim, worldSettings, overworld, mcServer.theProfiler);
-        world.addWorldAccess(new WorldManager(mcServer, world));
-        MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(world));
-        if (!mcServer.isSinglePlayer())
-        {
-            world.getWorldInfo().setGameType(mcServer.getGameType());
-        }
-
-        mcServer.func_147139_a(mcServer.func_147135_j());
-    }
-    
-    static class HammerWorldMulti extends WorldServerMulti {
-        public HammerWorldMulti(MinecraftServer p_i45283_1_, ISaveHandler p_i45283_2_, String p_i45283_3_, int p_i45283_4_, WorldSettings p_i45283_5_, WorldServer p_i45283_6_, Profiler p_i45283_7_) {
-            super(p_i45283_1_, p_i45283_2_, p_i45283_3_, p_i45283_4_, p_i45283_5_, p_i45283_6_, p_i45283_7_);
-        }
-        
-        @Override
-        public void tick() {
-            super.tick();
-        }
-        
-        @Override
-        public void updateEntities() {
-            super.updateEntities();
-        }
-        
     }
     
     @EventHandler
