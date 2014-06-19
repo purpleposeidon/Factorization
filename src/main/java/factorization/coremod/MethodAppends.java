@@ -1,5 +1,7 @@
 package factorization.coremod;
 
+import factorization.coremodhooks.HookTargetsClient;
+import factorization.coremodhooks.HookTargetsServer;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
