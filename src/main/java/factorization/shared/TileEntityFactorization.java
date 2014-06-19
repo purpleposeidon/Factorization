@@ -209,7 +209,7 @@ public abstract class TileEntityFactorization extends TileEntityCommon
 
     @Override
     public ItemStack decrStackSize(int i, int amount) {
-        ItemStack target = getStackInSlot(i);
+        ItemStack target = FzUtil.normalize(getStackInSlot(i));
         if (target == null) {
             return null;
         }
