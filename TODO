@@ -24,18 +24,12 @@ IMMEDIATE (for next public release)
 we don't need to reload the keymapping anymore [probably already dealt with]
 barrels getting rotated by other players doesn't redraw?
 fzdocs:
-    servo instruction documentation
     ore dictionary needs better handling:
         [DEALT WITH?] arrays of stuff need to be rendered nicely
         [DEALT WITH?] strings need to be converted to OD arrays if possible
 servos:
     servo upgrading doesn't get synced to other players! (? how not?) Test it...
     test writing instructions
-    colorizing servos
-    2 consecutive turns doesn't show the 2nd turn nicely -- No, that's not the behavior. -- Yes it is?
-        Let's just fix this once and for all. Throw away that code.
-            - Track what the quaternion was in the previous block, rather than the FzOrientation
-
 
 
 FZDocs! Yes!
@@ -533,5 +527,31 @@ doing I/O to the factory:
     There's an Input and an Output port block; these go in the walls.
     place a chest on the inner & outter sides of each IO port.
 
+
+
+
+The Stuff Chest from the Year 2329
+==================================
+ECE Ender chest, normal Chest
+CEC Alternatively, solid 3x3 of enderchests.
+ECE
+
+
+Like an ender chest, but way bigger, and searchable.
+
+Each chest is bound to the player who placed it down.
+Does *NOT* do I/O. (Would *definitely* need a config setting tho.)
+Publically accessible. (Also a config setting... Maybe the config setting makes it anonymousish like vanilla's enderchest.)
+
+GUI either says "My Stuff" or "$PLAYERNAME's Stuff"
+
+
+
+Star Kindling
+=============
+ - A barrel of nebula; doesn't have to be full. But the # of stacks is important.
+ - Surounded by some number of layers of nebula. (Apparently it'll kinda layer sorta like snow does? Except in colors or something.)
+ - Surounded by a shell of iron or dark iron blocks.
+ - Make a hole in the iron shell, above the barrel. Light some TNT, repair the hole, and run.
 
 

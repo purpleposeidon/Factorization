@@ -5,6 +5,7 @@ import java.util.List;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import factorization.api.Quaternion;
@@ -85,11 +86,29 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
         rotation2shadow(center);
         Vec3 diff = centerInShadowSpace.subtract(center); // NO LONGER client-side only; praise be to notch
         AxisAlignedBB moved = shadow.getOffsetBoundingBox(diff.xCoord, diff.yCoord, diff.zCoord);
+//		moved.minX = round(moved.minX);
+//		moved.minY = round(moved.minY);
+//		moved.minZ = round(moved.minZ);
+//		moved.maxX = round(moved.maxX);
+//		moved.maxY = round(moved.maxY);
+//		moved.maxZ = round(moved.maxZ);
         return moved;
+    }
+    
+    double round(double val) {
+        double r = 16;
+        val = val * r;
+        val = val - Math.rint(r);
+        val = val / r;
+        return val;
     }
     
     private AxisAlignedBB mutateLocal(AxisAlignedBB bb) {
         return bb;
+    }
+    
+    private AxisAlignedBB mutateForeign(AxisAlignedBB bb) {
+        return AabbReal2Shadow(bb);
     }
     
     
@@ -98,7 +117,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
     //bbs.get(i).calculate_AXIS_Offset
     @Override
     public double calculateXOffset(AxisAlignedBB collider, double currentOffset) {
-        AxisAlignedBB shadow_version = AabbReal2Shadow(collider);
+        AxisAlignedBB shadow_version = mutateForeign(collider);
         List<AxisAlignedBB> bbs = getUnderlying(shadow_version.addCoord(currentOffset, 0, 0));
         for (int i = 0; i < bbs.size(); i++) {
             AxisAlignedBB here = mutateLocal(bbs.get(i));
@@ -109,7 +128,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
     
     @Override
     public double calculateYOffset(AxisAlignedBB collider, double currentOffset) {
-        AxisAlignedBB shadow_version = AabbReal2Shadow(collider);
+        AxisAlignedBB shadow_version = mutateForeign(collider);
         List<AxisAlignedBB> bbs = getUnderlying(shadow_version.addCoord(0, currentOffset, 0));
         for (int i = 0; i < bbs.size(); i++) {
             AxisAlignedBB here = mutateLocal(bbs.get(i));
@@ -120,7 +139,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
     
     @Override
     public double calculateZOffset(AxisAlignedBB collider, double currentOffset) {
-        AxisAlignedBB shadow_version = AabbReal2Shadow(collider);
+        AxisAlignedBB shadow_version = mutateForeign(collider);
         List<AxisAlignedBB> bbs = getUnderlying(shadow_version.addCoord(0, 0, currentOffset));
         for (int i = 0; i < bbs.size(); i++) {
             AxisAlignedBB here = mutateLocal(bbs.get(i));
@@ -131,10 +150,8 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
     
     @Override
     public boolean intersectsWith(AxisAlignedBB collider) {
-        AxisAlignedBB shadow_version = AabbReal2Shadow(collider);
-        Core.profileStart("getUnderlying");
+        AxisAlignedBB shadow_version = mutateForeign(collider);
         List<AxisAlignedBB> bbs = getUnderlying(shadow_version);
-        Core.profileEnd();
         for (int i = 0; i < bbs.size(); i++) {
             AxisAlignedBB here = mutateLocal(bbs.get(i));
             if (here.intersectsWith(shadow_version)) {

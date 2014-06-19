@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
@@ -32,11 +31,10 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import cpw.mods.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
-import factorization.common.FzConfig;
+import factorization.fzds.api.IDeltaChunk;
 import factorization.shared.Core;
 import factorization.shared.EmptyRender;
 import factorization.shared.FzUtil;
@@ -69,6 +67,10 @@ public class HammerClientProxy extends HammerProxy {
         public void clearAccesses() {
             worldAccesses.clear();
         }
+        
+        public void shadowTick() {
+            clientChunkProvider.unloadQueuedChunks();
+        }
     }
     
     @Override
@@ -87,8 +89,10 @@ public class HammerClientProxy extends HammerProxy {
             if (lastWorld == null) {
                 return;
             }
-            ((HammerWorldClient)Hammer.worldClient).clearAccesses();
-            Hammer.worldClient.addWorldAccess(new ShadowRenderGlobal(currentWorld));
+            if (Hammer.worldClient != null) {
+                ((HammerWorldClient)Hammer.worldClient).clearAccesses();
+                Hammer.worldClient.addWorldAccess(new ShadowRenderGlobal(currentWorld));
+            }
         }
     }
     
@@ -96,7 +100,6 @@ public class HammerClientProxy extends HammerProxy {
     public void tick(ClientTickEvent event) {
         if (event.phase == Phase.START) {
             checkForWorldChange(); // Is there an event for this?
-        } else {
             runShadowTick();
         }
     }
@@ -139,14 +142,13 @@ public class HammerClientProxy extends HammerProxy {
     private static NetHandlerPlayClient send_queue;
     
     private void setSendQueueWorld(WorldClient wc) {
-        if (send_queue == null) throw new NullPointerException();
         send_queue.clientWorldController = wc;
     }
     
     private void setWorldAndPlayer(WorldClient wc, EntityClientPlayerMP player) {
         Minecraft mc = Minecraft.getMinecraft();
         if (wc == null) {
-            Core.logSevere("Setting client world to null. Remember: Crashing is fun!");
+            Core.logSevere("Setting client world to null. PREPARE FOR IMPACT.");
         }
         //For logic
         mc.theWorld = wc;
@@ -193,7 +195,6 @@ public class HammerClientProxy extends HammerProxy {
         }
         real_player.worldObj = w;
         if (fake_player == null || w != fake_player.worldObj) {
-            //TODO NORELEASE: Cache
             fake_player = new EntityClientPlayerMP(
                     mc,
                     mc.theWorld /* why is this real world? */,
@@ -217,22 +218,32 @@ public class HammerClientProxy extends HammerProxy {
     }
     
     void runShadowTick() {
-        if (Minecraft.getMinecraft().isGamePaused()) {
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc.isGamePaused()) {
             return;
         }
-        if (!Minecraft.getMinecraft().isIntegratedServerRunning()) {
+        EntityPlayer player = mc.thePlayer;
+        if (player == null) {
             return;
         }
-        WorldClient w = (WorldClient) DeltaChunk.getClientShadowWorld();
+        HammerWorldClient w = (HammerWorldClient) DeltaChunk.getClientShadowWorld();
         if (w == null) {
             return;
         }
+        int range = 10;
+        AxisAlignedBB nearby = player.boundingBox.expand(range, range, range);
+        Iterable<IDeltaChunk> nearbyChunks = mc.theWorld.getEntitiesWithinAABB(IDeltaChunk.class, nearby);
         setShadowWorld();
-        Core.profileStart("FZ.DStick");
+        Core.profileStart("FZDStick");
         try {
             //Inspired by Minecraft.runTick()
             w.updateEntities();
-            w.doVoidFogParticles(32, 7, 32);
+            Vec3 playerPos = w.getWorldVec3Pool().getVecFromPool(player.posX, player.posY, player.posZ);
+            for (IDeltaChunk idc : nearbyChunks) {
+                Vec3 center = idc.real2shadow(playerPos);
+                w.doVoidFogParticles((int) center.xCoord, (int) center.yCoord, (int) center.zCoord);
+            }
+            w.shadowTick();
         } finally {
             Core.profileEnd();
             restoreRealWorld();

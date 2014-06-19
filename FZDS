@@ -1,3 +1,26 @@
+Time for a task list. Again.
+
+would like:
+    proper camera handling, see EntityRenderer.orientCamera; may be able to hack around using FOVUpdateEvent & trickery (well, not super-necessarily that particular event)
+    efficient DSE lookup; use a trove int hashmap on System.hashcode(Chunk) to DSE[]
+
+* <-- FZ is here
+* Abstract Factory
+    Rendering properly
+    No collisions
+    No rotations
+* Chains/Epoxy/Winches
+    Collisions
+    No rotations (?)
+* Rockets
+* Commerce
+* Orbital Support
+* Astrogenisis
+* Clamps, Rotors
+* Dark iron collosus
+
+
+
 ✓ Step 1 is "create a dimension"
 ✓ Step 2 is "give the client an extra world for that dimension"
   Step 3 is "create pseudoplayer, have packets sent to the pseudoplayer be sent to the real players, and render part of the dimension"

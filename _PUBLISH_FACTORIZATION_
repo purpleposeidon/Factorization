@@ -59,7 +59,7 @@ if mediafire_url == "":
 
 #Don't add non-trivial tasks here unless we can get mediafire behaving properly.
 
-print "\n"*4
+print("\n"*4)
 LOG  = "Factorization " + version + "\n"
 LOG += '''
 [url="{0}"]adfly + MediaFire[/url], or\n[url="{1}"]adfly + DropBox[/url]
@@ -69,7 +69,11 @@ LOG += '''
 ).strip() + "\n"
 LOG += "Built on " + time.strftime("%F") + " against " + (getForgeVersion() + "\n")
 LOG += '[url="{0}"]Changelog[/url]'.format(changelog_url)
-print LOG
+print(LOG)
 
 open("build.log", 'a').write(LOG+ '\n\n')
 
+db = os.system("pidof dropbox > /dev/zero")
+if not db:
+    print("Dropbox not running! Starting dropbox")
+    os.system("dropbox &")

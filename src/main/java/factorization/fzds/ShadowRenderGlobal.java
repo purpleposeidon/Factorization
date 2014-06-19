@@ -75,7 +75,14 @@ class ShadowRenderGlobal implements IWorldAccess {
         if (realCoords == null) {
             return;
         }
-        realWorld.spawnParticle(particle, realCoords.xCoord, realCoords.yCoord, realCoords.zCoord, vx, vy, vz);
+        if (!Hammer.proxy.isInShadowWorld()) {
+            // Shouldn't happen
+            realWorld.spawnParticle(particle, realCoords.xCoord, realCoords.yCoord, realCoords.zCoord, vx, vy, vz);
+        } else {
+            Hammer.proxy.restoreRealWorld();
+            realWorld.spawnParticle(particle, realCoords.xCoord, realCoords.yCoord, realCoords.zCoord, vx, vy, vz);
+            Hammer.proxy.setShadowWorld();
+        }
     }
     
     @Override
