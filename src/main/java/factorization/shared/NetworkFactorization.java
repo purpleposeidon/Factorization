@@ -327,7 +327,7 @@ public class NetworkFactorization {
         
         DrawActive, FactoryType, FactoryTypeWithSecondMessage, DescriptionRequest, DataHelperEdit, RedrawOnClient, DataHelperEditOnEntity(true), OpenDataHelperGui, OpenDataHelperGuiOnEntity(true),
         TileEntityMessageOnEntity(true),
-        BarrelDescription, BarrelItem, BarrelCount,
+        BarrelDescription, BarrelItem, BarrelCount, BarrelDoubleClickHack,
         BatteryLevel, LeydenjarLevel,
         MirrorDescription,
         TurbineWater, TurbineSpeed,

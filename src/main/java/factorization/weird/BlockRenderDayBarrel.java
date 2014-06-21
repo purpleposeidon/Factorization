@@ -44,7 +44,6 @@ public class BlockRenderDayBarrel extends FactorizationBlockRender {
     
     void doRender(RenderBlocks rb, int pass) {
         BlockRenderHelper block = Core.registry.blockRender;
-        IIcon plank, log;
         TileEntityDayBarrel barrel;
         if (world_mode) {
             if (te instanceof TileEntityDayBarrel) {
@@ -56,22 +55,26 @@ public class BlockRenderDayBarrel extends FactorizationBlockRender {
             barrel = (TileEntityDayBarrel) FactoryType.DAYBARREL.getRepresentative();
             barrel.loadFromStack(is);
         }
-        if (pass == 0) {
-            for (int i = 0; i < 6; i++) {
-                block.setTexture(i, barrel.getIcon(ForgeDirection.getOrientation(i)));
-            }
+        if (rb.hasOverrideBlockTexture()) {
+            block.useTexture(rb.overrideBlockTexture);
         } else {
-            BlockIcons.BarrelTextureset set;
-            switch (barrel.type) {
-            case HOPPING: set = BlockIcons.hopping; break;
-            case SILKY: set = BlockIcons.silky; break;
-            case STICKY: set = BlockIcons.sticky; break;
-            default: set = BlockIcons.normal; break;
+            if (pass == 0) {
+                for (int i = 0; i < 6; i++) {
+                    block.setTexture(i, barrel.getIcon(ForgeDirection.getOrientation(i)));
+                }
+            } else {
+                BlockIcons.BarrelTextureset set;
+                switch (barrel.type) {
+                case HOPPING: set = BlockIcons.hopping; break;
+                case SILKY: set = BlockIcons.silky; break;
+                case STICKY: set = BlockIcons.sticky; break;
+                default: set = BlockIcons.normal; break;
+                }
+                block.useTexture(set.side);
+                block.setTexture(0, set.top);
+                block.setTexture(1, set.top);
+                block.setTexture(4, set.front);
             }
-            block.useTexture(set.side);
-            block.setTexture(0, set.top);
-            block.setTexture(1, set.top);
-            block.setTexture(4, set.front);
         }
         float blockOffset = pass == 0 ? 0 : -1F/512F;
         block.setBlockBoundsOffset(blockOffset, blockOffset, blockOffset);
