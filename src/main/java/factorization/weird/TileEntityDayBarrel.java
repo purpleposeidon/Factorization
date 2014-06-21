@@ -618,7 +618,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             bottomStack = is;
         } else {
             if (!spammed) {
-                Core.logWarning("Say goodbye, %s !", is);
+                Core.logSevere("Say goodbye, %s !", is);
                 Thread.dumpStack();
                 spammed = true;
             }
