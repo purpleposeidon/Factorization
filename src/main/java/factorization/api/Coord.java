@@ -587,6 +587,10 @@ public class Coord implements IDataSerializable, ISaneCoord {
     public boolean isTop() {
         return w.getHeightValue(x, z) == y;
     }
+    
+    public int getColumnHeight() {
+        return w.getHeightValue(x, z);
+    }
 
     public boolean canBeSeenThrough() {
         return getBlock().getLightOpacity() == 0;

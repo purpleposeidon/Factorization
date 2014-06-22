@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.command.CommandBase;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -19,7 +21,10 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatisticsFile;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DungeonHooks;
@@ -29,6 +34,7 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -331,5 +337,44 @@ public class MiscellaneousNonsense {
             
             w.spawnEntityInWorld(new EntityFireworkRocket(w, x, y, z, red_is));
         }
+    }
+    
+    @EventHandler
+    public void registerLightFixer(FMLServerStartingEvent event) { //NORELEASE: Probably want to remove this guy?
+        event.registerServerCommand(new CommandBase() {
+            @Override
+            public void processCommand(ICommandSender sender, String[] args) {
+                if (args.length == 0) {
+                    sender.addChatMessage(new ChatComponentText("Missing radius"));
+                    return;
+                }
+                int radius = Integer.parseInt(args[0]);
+                ChunkCoordinates pos = sender.getPlayerCoordinates();
+                for (int dx = -radius; dx <= radius; dx++) {
+                    for (int dz = -radius; dz <= radius; dz++) {
+                        int x = pos.posX + dx;
+                        int z = pos.posZ + dz;
+                        Coord at = new Coord(sender.getEntityWorld(), x, 0, z);
+                        if (!at.blockExists()) continue;
+                        Chunk c = at.getChunk();
+                        c.isLightPopulated = false;
+                        at.y = at.getColumnHeight();
+                        at.updateLight();
+                        at.w.setLightValue(EnumSkyBlock.Sky, at.x, at.y, at.z, 0xF);
+                        c.setChunkModified();
+                    }
+                }
+            }
+            
+            @Override
+            public String getCommandUsage(ICommandSender var1) {
+                return "/skylight-surface radius";
+            }
+            
+            @Override
+            public String getCommandName() {
+                return "skylight-surface";
+            }
+        });
     }
 }
