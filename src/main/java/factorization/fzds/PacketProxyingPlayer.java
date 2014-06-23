@@ -1,9 +1,21 @@
 package factorization.fzds;
 
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.ChannelProgressivePromise;
+import io.netty.channel.ChannelPromise;
+import io.netty.channel.embedded.EmbeddedChannel;
+import io.netty.util.DefaultAttributeMap;
+import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.GenericFutureListener;
 
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -31,19 +43,49 @@ import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsEntryControl;
 import factorization.fzds.network.FzdsPacketRegistry;
 import factorization.shared.Core;
-import factorization.shared.FzNetDispatch;
 
-public class PacketProxyingPlayer extends GenericProxyPlayer implements
+public class PacketProxyingPlayer extends EntityPlayerMP implements
         IFzdsEntryControl {
     DimensionSliceEntity dimensionSlice;
     static boolean useShortViewRadius = true; // true doesn't actually change the view radius
 
     private HashSet<EntityPlayerMP> trackedPlayers = new HashSet();
+    NetworkManager networkManager = new NetworkManager(false) {
+        @Override
+        public void channelActive(ChannelHandlerContext ctx) throws Exception {
+            throw new IllegalArgumentException("No, go away");
+        }
+        
+        @Override
+        public void setConnectionState(EnumConnectionState state) {
+            throw new IllegalArgumentException("No solicitors!");
+        }
+        
+        @Override
+        public void channelInactive(ChannelHandlerContext ctx) {
+            throw new IllegalArgumentException("Blllauergh!");
+        }
+        
+        public Channel channel() {
+            return proxiedChannel;
+        }
+        
+        EmbeddedChannel proxiedChannel = new EmbeddedChannel(new WrappedMulticastHandler());
+    };
+    
+    class WrappedMulticastHandler extends ChannelOutboundHandlerAdapter {
+        @Override
+        public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+            super.write(ctx, msg, promise);
+        }
+    }
+    
+    void initWrapping() {
+        
+    }
 
     public PacketProxyingPlayer(final DimensionSliceEntity dimensionSlice, World shadowWorld) {
-        super(MinecraftServer.getServer(), (WorldServer) shadowWorld,
-                new GameProfile(null, "[FzdsPacket]"), new ItemInWorldManager(
-                        shadowWorld));
+        super(MinecraftServer.getServer(), (WorldServer) shadowWorld, new GameProfile(null, "[FzdsPacket]"), new ItemInWorldManager(shadowWorld));
         this.dimensionSlice = dimensionSlice;
         Coord c = dimensionSlice.getCenter();
         c.y = -8; // lurk in the void; we should catch most mod's packets.
@@ -62,22 +104,15 @@ public class PacketProxyingPlayer extends GenericProxyPlayer implements
             scm.func_72375_a(this, null);
         }
         ticks_since_last_update = (int) (Math.random() * 20);
+        
         // TODO: I think the chunks are unloading despite the PPP's presence.
         // Either figure out how to get this to act like an actual player, or
         // make chunk loaders happen as well
-        playerNetServerHandler = new NetHandlerPlayServer(mcServer, networkManager, this) {
-            @Override
-            public void sendPacket(Packet packet) {
-                // NORELEASE: Check if we're wrapping an already wrapped packet
-                Chunk chunk = dimensionSlice.worldObj.getChunkFromBlockCoords((int) dimensionSlice.posX, (int) dimensionSlice.posZ);
-                Packet wrapped = FzdsPacketRegistry.wrap(packet);
-                FzNetDispatch.addPacketFrom(wrapped, chunk);
-            }
-        };
-        
+        playerNetServerHandler = new NetHandlerPlayServer(mcServer, networkManager, this);
+        initWrapping();
         playerNetServerHandler.netManager.channel().attr(NetworkDispatcher.FML_DISPATCHER).set(new NetworkDispatcher(this.networkManager));
     }
-
+    
     int savePlayerViewRadius() {
         return getServerForPlayer().getPlayerManager().playerViewRadius;
     }
