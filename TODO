@@ -468,6 +468,7 @@ Item Holder
 
 ABSTRACT FACTORY
 ----------------
+(Maybe rename it to "Abstract Optimizer")
 You build a large box out of a suitably black material. ("Containment Cubes")
 Inside it, you make a factory.
 There are two other blocks: the Input block, and the Output block.
