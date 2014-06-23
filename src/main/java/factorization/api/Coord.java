@@ -481,6 +481,18 @@ public class Coord implements IDataSerializable, ISaneCoord {
     public void updateBlockLight() {
         w.updateLightByType(EnumSkyBlock.Block, x, y, z);
     }
+    
+    public int getCombinedLight() {
+        return w.getBlockLightValue(x, y, z); 
+    }
+    
+    public int getLightLevelBlock() {
+        return w.getSkyBlockTypeBrightness(EnumSkyBlock.Block, x, y, z);
+    }
+    
+    public int getLightLevelSky() {
+        return w.getSkyBlockTypeBrightness(EnumSkyBlock.Sky, x, y, z);
+    }
 
     public void setTE(TileEntity te) {
         w.setTileEntity(x, y, z, te);
