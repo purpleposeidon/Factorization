@@ -43,6 +43,8 @@ import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
+import factorization.notify.Notice;
+import factorization.notify.Style;
 import factorization.shared.Core;
 
 @Mod(modid = MiscellaneousNonsense.modId, name = MiscellaneousNonsense.name, version = Core.version, dependencies = "required-after: " + Core.modId)
@@ -341,7 +343,17 @@ public class MiscellaneousNonsense {
     
     @EventHandler
     public void registerLightFixer(FMLServerStartingEvent event) { //NORELEASE: Probably want to remove this guy?
-        event.registerServerCommand(new CommandBase() {
+        event.registerServerCommand(new CommandBase() { //NORELEASE remove
+            @Override
+            public String getCommandName() {
+                return "skylight-fix";
+            }
+
+            @Override
+            public String getCommandUsage(ICommandSender var1) {
+                return "/skylight-fix radius";
+            }
+
             @Override
             public void processCommand(ICommandSender sender, String[] args) {
                 if (args.length == 0) {
@@ -350,31 +362,24 @@ public class MiscellaneousNonsense {
                 }
                 int radius = Integer.parseInt(args[0]);
                 ChunkCoordinates pos = sender.getPlayerCoordinates();
+                World w = sender.getEntityWorld();
                 for (int dx = -radius; dx <= radius; dx++) {
                     for (int dz = -radius; dz <= radius; dz++) {
                         int x = pos.posX + dx;
                         int z = pos.posZ + dz;
-                        Coord at = new Coord(sender.getEntityWorld(), x, 0, z);
-                        if (!at.blockExists()) continue;
-                        Chunk c = at.getChunk();
-                        c.isLightPopulated = false;
-                        at.y = at.getColumnHeight();
-                        at.updateLight();
-                        at.w.setLightValue(EnumSkyBlock.Sky, at.x, at.y, at.z, 0xF);
-                        c.setChunkModified();
+                        Coord at = new Coord(w, x, 0, z);
+                        for (int y = 0xFF; y > 50; y--) {
+                            at.y = y;
+                            if (!at.isAir()) break;
+                            if (at.getLightLevelSky() != 0xF) {
+                                new Notice(at, "X").withStyle(Style.DRAWFAR, Style.FORCE).send((EntityPlayer) sender);
+                                at.w.setLightValue(EnumSkyBlock.Sky, at.x, at.y, at.z, 0xF);
+                            }
+                        }
                     }
                 }
             }
             
-            @Override
-            public String getCommandUsage(ICommandSender var1) {
-                return "/skylight-surface radius";
-            }
-            
-            @Override
-            public String getCommandName() {
-                return "skylight-surface";
-            }
         });
     }
 }

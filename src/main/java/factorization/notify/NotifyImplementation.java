@@ -40,6 +40,7 @@ public class NotifyImplementation {
     {
         NotifyImplementation.instance = this;
         loadBus(this);
+        PointNetworkHandler.INSTANCE.initialize();
     }
     
     static void loadBus(Object obj) {

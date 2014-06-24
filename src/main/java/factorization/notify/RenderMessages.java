@@ -17,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 
 import org.lwjgl.opengl.GL11;
@@ -28,6 +29,7 @@ public class RenderMessages extends RenderMessagesProxy {
     
     {
         NotifyImplementation.loadBus(this);
+        ClientCommandHandler.instance.registerCommand(new PointCommand());
     }
     
     @Override
