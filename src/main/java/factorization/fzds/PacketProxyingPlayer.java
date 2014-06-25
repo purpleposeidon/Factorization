@@ -1,21 +1,12 @@
 package factorization.fzds;
 
-import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.ChannelProgressivePromise;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
-import io.netty.util.DefaultAttributeMap;
-import io.netty.util.concurrent.EventExecutor;
-import io.netty.util.concurrent.GenericFutureListener;
 
-import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -34,15 +25,17 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
+import scala.NotImplementedError;
 
 import com.mojang.authlib.GameProfile;
 
+import cpw.mods.fml.common.network.FMLEmbeddedChannel;
 import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
+import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsEntryControl;
-import factorization.fzds.network.FzdsPacketRegistry;
-import factorization.shared.Core;
+import factorization.fzds.network.WrappedPacket;
 
 public class PacketProxyingPlayer extends EntityPlayerMP implements
         IFzdsEntryControl {
@@ -50,7 +43,14 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     static boolean useShortViewRadius = true; // true doesn't actually change the view radius
 
     private HashSet<EntityPlayerMP> trackedPlayers = new HashSet();
+    
+    
+    
+    EmbeddedChannel proxiedChannel = new EmbeddedChannel(new WrappedMulticastHandler());
     NetworkManager networkManager = new NetworkManager(false) {
+        {
+            this.channel = proxiedChannel;
+        }
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
             throw new IllegalArgumentException("No, go away");
@@ -58,30 +58,38 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         
         @Override
         public void setConnectionState(EnumConnectionState state) {
-            throw new IllegalArgumentException("No solicitors!");
+            if (state != EnumConnectionState.PLAY) throw new IllegalArgumentException("No solicitors!");
+            super.setConnectionState(state);
+            return;
         }
         
         @Override
         public void channelInactive(ChannelHandlerContext ctx) {
             throw new IllegalArgumentException("Blllauergh!");
         }
-        
-        public Channel channel() {
-            return proxiedChannel;
-        }
-        
-        EmbeddedChannel proxiedChannel = new EmbeddedChannel(new WrappedMulticastHandler());
     };
+    
+    static final Throwable generic_future_failure = new NotImplementedError("Sorry!");
     
     class WrappedMulticastHandler extends ChannelOutboundHandlerAdapter {
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-            super.write(ctx, msg, promise);
+            PacketProxyingPlayer.this.addNettyMessage(proxiedChannel, msg);
+            //promise.setFailure(generic_future_failure); // Nooooope, causes spam.
         }
     }
     
     void initWrapping() {
-        
+        playerNetServerHandler = new NetHandlerPlayServer(mcServer, networkManager, this);
+        playerNetServerHandler.netManager.channel().attr(NetworkDispatcher.FML_DISPATCHER).set(new NetworkDispatcher(this.networkManager));
+        //Compare cpw.mods.fml.common.network.FMLOutboundHandler.OutboundTarget.PLAYER.{...}.selectNetworks(Object, ChannelHandlerContext, FMLProxyPacket)
+        playerNetServerHandler.netManager.setConnectionState(EnumConnectionState.PLAY);
+        /* (misc notes here)
+         * We don't need to touch NetworkDispatcher; we need a NetworkManager.
+         * 
+         * NetworkManager.scheduleOutboundPacket is too early I think?
+         * What we really want is its channel.
+         */
     }
 
     public PacketProxyingPlayer(final DimensionSliceEntity dimensionSlice, World shadowWorld) {
@@ -104,13 +112,9 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
             scm.func_72375_a(this, null);
         }
         ticks_since_last_update = (int) (Math.random() * 20);
-        
-        // TODO: I think the chunks are unloading despite the PPP's presence.
-        // Either figure out how to get this to act like an actual player, or
-        // make chunk loaders happen as well
-        playerNetServerHandler = new NetHandlerPlayServer(mcServer, networkManager, this);
         initWrapping();
-        playerNetServerHandler.netManager.channel().attr(NetworkDispatcher.FML_DISPATCHER).set(new NetworkDispatcher(this.networkManager));
+        // TODO: I think the chunks are unloading despite the PPP's presence.
+        // Need to make DSEs chunkload
     }
     
     int savePlayerViewRadius() {
@@ -146,7 +150,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
                 if (isPlayerInUpdateRange(player)) {
                     boolean new_player = trackedPlayers.add(player);
                     if (new_player && shouldShareChunks()) {
-                        // welcome to the club. This may net-lag a bit. (Well, it depends on the chunk's contents. Air compresseswell tho.)
+                        // welcome to the club. This may net-lag a bit. (Well, it depends on the chunk's contents. Air compresses well tho.)
                         sendChunkMapDataToPlayer(player);
                     }
                 } else {
@@ -170,14 +174,13 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     }
 
     void sendChunkMapDataToPlayer(EntityPlayerMP target) {
-        // Inspired by EntityPlayerMP.onUpdate. Shame we can't just add chunks... but there'd be no wrapper for the packets.
+        // Inspired by EntityPlayerMP.onUpdate. Shame we can't just add chunks directly to target's chunkwatcher... but there'd be no wrapper for the packets.
         ArrayList<Chunk> chunks = new ArrayList();
         ArrayList<TileEntity> tileEntities = new ArrayList();
         World world = DeltaChunk.getServerShadowWorld();
 
         Coord low = dimensionSlice.getCorner();
         Coord far = dimensionSlice.getFarCorner();
-        int chunkCount = 0, teCount = 0; // TODO NORELEASE: Won't need this...
         for (int x = low.x - 16; x <= far.x + 16; x += 16) {
             for (int z = low.z - 16; z <= far.z + 16; z += 16) {
                 if (!world.blockExists(x + 1, 0, z + 1)) {
@@ -186,28 +189,23 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
                 Chunk chunk = world.getChunkFromBlockCoords(x, z);
                 chunks.add(chunk);
                 tileEntities.addAll(chunk.chunkTileEntityMap.values());
-                chunkCount++;
             }
         }
 
         // NOTE: This has the potential to go badly if there's a large amount of data in the chunks.
-        NetHandlerPlayServer net = target.playerNetServerHandler;
         if (!chunks.isEmpty()) {
-            Packet toSend = FzdsPacketRegistry.wrap(new S26PacketMapChunkBulk(chunks));
-            net.sendPacket(toSend);
+            Packet toSend = new S26PacketMapChunkBulk(chunks);
+            addNettyMessageForPlayer(target, new WrappedPacket(toSend));
         }
-        teCount = tileEntities.size();
         if (!tileEntities.isEmpty()) {
             for (TileEntity te : tileEntities) {
                 Packet description = te.getDescriptionPacket();
                 if (description == null) {
                     continue;
                 }
-                Packet toSend = FzdsPacketRegistry.wrap(description);
-                net.sendPacket(toSend);
+                addNettyMessageForPlayer(target, new WrappedPacket(description));
             }
         }
-        Core.logInfo("Sending data of " + chunkCount + " chunks with " + teCount + " tileEntities"); // NORELEASE
     }
 
     public void endProxy() {
@@ -221,32 +219,24 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
         dimensionSlice.proxy = null;
     }
 
-    boolean shouldForceChunkLoad() {
+    boolean shouldForceChunkLoad() { //TODO: Chunk loading!
         return !trackedPlayers.isEmpty();
     }
-
-    @Override
-    public void addToSendQueue(Packet packet) {
-        if (trackedPlayers.isEmpty()) {
-            return;
+    
+    FMLEmbeddedChannel wrapper_channel = new FMLEmbeddedChannel("?", Side.SERVER, new ChannelHandler() {
+        @Override public void handlerRemoved(ChannelHandlerContext ctx) throws Exception { }
+        @Override public void handlerAdded(ChannelHandlerContext ctx) throws Exception { }
+        @Override @Deprecated public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception { }
+    });
+    
+    public Packet wrapMessage(Object msg) {
+        if (msg instanceof Packet) {
+            return new WrappedPacket((Packet) msg);
         }
-        if (dimensionSlice.isDead) {
-            setDead();
-            return;
-        }
-        Packet wrappedPacket = FzdsPacketRegistry.wrap(packet);
-        Iterator<EntityPlayerMP> it = trackedPlayers.iterator();
-        while (it.hasNext()) {
-            EntityPlayerMP player = it.next();
-            if (player.isDead || player.worldObj != dimensionSlice.worldObj) {
-                it.remove();
-            } else {
-                player.playerNetServerHandler.sendPacket(wrappedPacket);
-            }
-        }
+        Packet pkt = wrapper_channel.generatePacketFrom(msg);
+        return new WrappedPacket(pkt);
     }
     
-    @Override
     public void addNettyMessage(Channel sourceChannel, Object msg) {
         // Return a future?
         if (trackedPlayers.isEmpty()) {
@@ -256,37 +246,24 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
             setDead();
             return;
         }
+        Object wrappedMsg = wrapMessage(msg);
         Iterator<EntityPlayerMP> it = trackedPlayers.iterator();
         while (it.hasNext()) {
             EntityPlayerMP player = it.next();
             if (player.isDead || player.worldObj != dimensionSlice.worldObj) {
                 it.remove();
             } else {
-                addNettyMessageForPlayer(sourceChannel, msg, player);
+                addNettyMessageForPlayer(player, wrappedMsg);
             }
         }
     }
     
-    void addNettyMessageForPlayer(final Channel sourceChannel, final Object packet, final EntityPlayerMP player, final GenericFutureListener... futureListeners) {
+    void addNettyMessageForPlayer(EntityPlayerMP player, Object packet) {
         // See NetworkManager.dispatchPacket
-        final Channel destinationChannel = player.playerNetServerHandler.netManager.channel();
-        if (destinationChannel == sourceChannel || player instanceof PacketProxyingPlayer) {
+        if (player instanceof PacketProxyingPlayer) {
             throw new IllegalStateException("Sending a packet to myself!");
         }
-        if (destinationChannel.attr(NetworkManager.attrKeyConnectionState).get() != EnumConnectionState.PLAY) {
-            Core.logWarning("Not sending packet to " + player + ", because they are not in EnumConnectionState.PLAY: " + packet);
-            return; // We're not going to attempt to send packets if they're not in the proper state.
-        }
-
-        if (destinationChannel.eventLoop().inEventLoop()) {
-            destinationChannel.writeAndFlush(packet).addListeners(futureListeners).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
-        } else {
-            destinationChannel.eventLoop().execute(new Runnable() {
-                public void run() {
-                    destinationChannel.writeAndFlush(packet).addListeners(futureListeners).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
-                }
-            });
-        }
+        player.playerNetServerHandler.sendPacket((Packet) packet);
     }
     
     @Override
@@ -295,10 +272,11 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     }
 
     // IFzdsEntryControl implementation
+    // PPP must stay in the shadow (It stays out of range anyways.)
     @Override
     public boolean canEnter(IDeltaChunk dse) {
         return false;
-    } // PPP must stay in the shadow (It stays out of range anyways.)
+    }
 
     @Override
     public boolean canExit(IDeltaChunk dse) {
