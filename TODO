@@ -49,48 +49,6 @@ Pressurizer:
 
 [Tue Apr 01 23:09:52 PDT 2014] We really do need to be able to click on the shuffling items...
 
-[00:26:58 INFO]: Client> java.lang.NullPointerException
-[00:26:58 INFO]: Client>        at cpw.mods.fml.common.network.FMLOutboundHandler$OutboundTarget$4.selectNetworks(FMLOutboundHandler.java:109) ~[FMLOutboundHandler$OutboundTarget$4.class:?]
-[00:26:58 INFO]: Client>        at cpw.mods.fml.common.network.FMLOutboundHandler.write(FMLOutboundHandler.java:273) ~[FMLOutboundHandler.class:?]
-[00:26:58 INFO]: Client>        at io.netty.channel.DefaultChannelHandlerContext.invokeWrite(DefaultChannelHandlerContext.java:644) ~[DefaultChannelHandlerContext.class:?]
-[00:26:58 INFO]: Client>        at io.netty.channel.DefaultChannelHandlerContext.write(DefaultChannelHandlerContext.java:698) ~[DefaultChannelHandlerContext.class:?]
-[00:26:58 INFO]: Client>        at io.netty.channel.DefaultChannelHandlerContext.writeAndFlush(DefaultChannelHandlerContext.java:688) ~[DefaultChannelHandlerContext.class:?]
-[00:26:58 INFO]: Client>        at io.netty.channel.DefaultChannelHandlerContext.writeAndFlush(DefaultChannelHandlerContext.java:717) ~[DefaultChannelHandlerContext.class:?]
-[00:26:58 INFO]: Client>        at io.netty.channel.DefaultChannelPipeline.writeAndFlush(DefaultChannelPipeline.java:893) ~[DefaultChannelPipeline.class:?]
-[00:26:58 INFO]: Client>        at io.netty.channel.AbstractChannel.writeAndFlush(AbstractChannel.java:239) ~[AbstractChannel.class:?]
-[00:26:58 INFO]: Client>        at cpw.mods.fml.common.network.FMLEventChannel.sendTo(FMLEventChannel.java:139) [FMLEventChannel.class:?]
-[00:26:58 INFO]: Client>        at factorization.notify.NotifyNetwork.broadcast(NotifyNetwork.java:112) [NotifyNetwork.class:?]
-[00:26:58 INFO]: Client>        at factorization.notify.NotifyImplementation.doSend(NotifyImplementation.java:109) [NotifyImplementation.class:?]
-[00:26:58 INFO]: Client>        at factorization.notify.Notice.send(Notice.java:236) [Notice.class:?]
-[00:26:58 INFO]: Client>        at factorization.servo.TileEntityServoRail.showDecorNotification(TileEntityServoRail.java:269) [TileEntityServoRail.class:?]
-[00:26:58 INFO]: Client>        at factorization.servo.TileEntityServoRail.activate(TileEntityServoRail.java:298) [TileEntityServoRail.class:?]
-[00:26:58 INFO]: Client>        at factorization.shared.BlockFactorization.func_149727_a(BlockFactorization.java:126) [BlockFactorization.class:?]
-[00:26:58 INFO]: Client>        at factorization.sockets.SocketRobotHand.mcClick(SocketRobotHand.java:214) [SocketRobotHand.class:?]
-[00:26:58 INFO]: Client>        at factorization.sockets.SocketRobotHand.clickItem(SocketRobotHand.java:168) [SocketRobotHand.class:?]
-[00:26:58 INFO]: Client>        at factorization.sockets.SocketRobotHand.clickWithInventory(SocketRobotHand.java:129) [SocketRobotHand.class:?]
-[00:26:58 INFO]: Client>        at factorization.sockets.SocketRobotHand.doHandleRay(SocketRobotHand.java:113) [SocketRobotHand.class:?]
-[00:26:58 INFO]: Client>        at factorization.sockets.SocketRobotHand.handleRay(SocketRobotHand.java:89) [SocketRobotHand.class:?]
-[00:26:58 INFO]: Client>        at factorization.sockets.TileEntitySocketBase.mopBlock(TileEntitySocketBase.java:182) [TileEntitySocketBase.class:?]
-[00:26:58 INFO]: Client>        at factorization.sockets.TileEntitySocketBase.rayTrace(TileEntitySocketBase.java:167) [TileEntitySocketBase.class:?]
-[00:26:58 INFO]: Client>        at factorization.sockets.SocketRobotHand.genericUpdate(SocketRobotHand.java:78) [SocketRobotHand.class:?]
-[00:26:58 INFO]: Client>        at factorization.servo.ServoMotor.updateSocket(ServoMotor.java:303) [ServoMotor.class:?]
-[00:26:58 INFO]: Client>        at factorization.servo.MotionHandler.doLogic(MotionHandler.java:355) [MotionHandler.class:?]
-[00:26:58 INFO]: Client>        at factorization.servo.MotionHandler.doMotionLogic(MotionHandler.java:318) [MotionHandler.class:?]
-[00:26:58 INFO]: Client>        at factorization.servo.MotionHandler.updateServoMotion(MotionHandler.java:310) [MotionHandler.class:?]
-[00:26:58 INFO]: Client>        at factorization.servo.ServoMotor.func_70030_z(ServoMotor.java:275) [ServoMotor.class:?]
-[00:26:58 INFO]: Client>        at net.minecraft.entity.Entity.func_70071_h_(Entity.java:318) [qn.class:?]
-[00:26:58 INFO]: Client>        at net.minecraft.world.World.func_72866_a(World.java:2019) [afn.class:?]
-[00:26:58 INFO]: Client>        at net.minecraft.world.WorldServer.func_72866_a(WorldServer.java:659) [mj.class:?]
-[00:26:58 INFO]: Client>        at net.minecraft.world.World.func_72870_g(World.java:1983) [afn.class:?]
-[00:26:58 INFO]: Client>        at net.minecraft.world.World.func_72939_s(World.java:1836) [afn.class:?]
-[00:26:58 INFO]: Client>        at net.minecraft.world.WorldServer.func_72939_s(WorldServer.java:500) [mj.class:?]
-[00:26:58 INFO]: Client>        at net.minecraft.server.MinecraftServer.func_71190_q(MinecraftServer.java:620) [MinecraftServer.class:?]
-[00:26:58 INFO]: Client>        at net.minecraft.server.MinecraftServer.func_71217_p(MinecraftServer.java:531) [MinecraftServer.class:?]
-[00:26:58 INFO]: Client>        at net.minecraft.server.integrated.IntegratedServer.func_71217_p(IntegratedServer.java:111) [bsk.class:?]
-[00:26:58 INFO]: Client>        at net.minecraft.server.MinecraftServer.run(MinecraftServer.java:414) [MinecraftServer.class:?]
-[00:26:58 INFO]: Client>        at net.minecraft.server.MinecraftServer$2.run(MinecraftServer.java:669) [?:?]
-
-
 
 [prooobably fixed. Yep. Definitely.] (It does now?) servos not syncing stacks to players holding LMPs like they should...
 more creative tabs?
