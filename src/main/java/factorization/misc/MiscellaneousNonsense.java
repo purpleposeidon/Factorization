@@ -8,6 +8,8 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.command.CommandBase;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
@@ -22,7 +24,10 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatisticsFile;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DungeonHooks;
@@ -32,6 +37,7 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -40,6 +46,8 @@ import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
+import factorization.notify.Notice;
+import factorization.notify.Style;
 import factorization.shared.Core;
 
 @Mod(modid = MiscellaneousNonsense.modId, name = MiscellaneousNonsense.name, version = Core.version, dependencies = "required-after: " + Core.modId)
@@ -349,5 +357,47 @@ public class MiscellaneousNonsense {
             
             w.spawnEntityInWorld(new EntityFireworkRocket(w, x, y, z, red_is));
         }
+    }
+    
+    @EventHandler
+    public void registerLightFixer(FMLServerStartingEvent event) { //NORELEASE: Probably want to remove this guy?
+        event.registerServerCommand(new CommandBase() { //NORELEASE remove
+            @Override
+            public String getCommandName() {
+                return "skylight-fix";
+            }
+
+            @Override
+            public String getCommandUsage(ICommandSender var1) {
+                return "/skylight-fix radius";
+            }
+
+            @Override
+            public void processCommand(ICommandSender sender, String[] args) {
+                if (args.length == 0) {
+                    sender.addChatMessage(new ChatComponentText("Missing radius"));
+                    return;
+                }
+                int radius = Integer.parseInt(args[0]);
+                ChunkCoordinates pos = sender.getPlayerCoordinates();
+                World w = sender.getEntityWorld();
+                for (int dx = -radius; dx <= radius; dx++) {
+                    for (int dz = -radius; dz <= radius; dz++) {
+                        int x = pos.posX + dx;
+                        int z = pos.posZ + dz;
+                        Coord at = new Coord(w, x, 0, z);
+                        for (int y = 0xFF; y > 50; y--) {
+                            at.y = y;
+                            if (!at.isAir()) break;
+                            if (at.getLightLevelSky() != 0xF) {
+                                new Notice(at, "X").withStyle(Style.DRAWFAR, Style.FORCE).send((EntityPlayer) sender);
+                                at.w.setLightValue(EnumSkyBlock.Sky, at.x, at.y, at.z, 0xF);
+                            }
+                        }
+                    }
+                }
+            }
+            
+        });
     }
 }

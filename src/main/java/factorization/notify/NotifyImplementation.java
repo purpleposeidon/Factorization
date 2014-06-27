@@ -11,6 +11,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.FakePlayer;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
@@ -40,6 +41,7 @@ public class NotifyImplementation {
     {
         NotifyImplementation.instance = this;
         loadBus(this);
+        PointNetworkHandler.INSTANCE.initialize();
     }
     
     static void loadBus(Object obj) {
@@ -63,6 +65,9 @@ public class NotifyImplementation {
     
     void doSend(EntityPlayer player, Object where, World world, EnumSet<Style> style, ItemStack item, String format, String[] args) {
         if (where == null) {
+            return;
+        }
+        if (player instanceof FakePlayer) {
             return;
         }
         format = styleMessage(style, format);

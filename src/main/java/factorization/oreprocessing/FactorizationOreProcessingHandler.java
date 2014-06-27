@@ -109,6 +109,7 @@ public class FactorizationOreProcessingHandler {
                 addGalenaReduction(oreType, ore);
                 addProcessingEnd(OreType.SILVER, ore, new ItemStack(Core.registry.silver_ingot));
                 addProcessingEnd(OreType.LEAD, ore, new ItemStack(Core.registry.lead_ingot));
+                TileEntitySlagFurnace.SlagRecipes.register(ore, 1.2F, new ItemStack(Core.registry.lead_ingot), 1F, new ItemStack(Core.registry.silver_ingot));
             } else {
                 addStandardReduction(oreType, ore, ingot);
                 addProcessingEnd(oreType, ore, ingot);

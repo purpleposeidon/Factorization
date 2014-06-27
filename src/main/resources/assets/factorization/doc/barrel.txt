@@ -24,7 +24,9 @@ There are a few important varieties of barrel.
 
 The hopping barrel will pull one item from its above into it,
 and push one item out its bottom, at the same speed as a
-vanilla hopper. It also hops.
+vanilla hopper.
+It also hops.
+A direct redstone signal will disable it.
 
 The silky barrel will hold its contents
 if it is broken with a silk-touch axe.

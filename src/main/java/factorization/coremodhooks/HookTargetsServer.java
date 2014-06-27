@@ -1,4 +1,4 @@
-package factorization.coremod;
+package factorization.coremodhooks;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;

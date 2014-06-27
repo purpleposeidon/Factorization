@@ -7,11 +7,13 @@ import java.util.ArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -488,6 +490,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     }
     
     @Override
+    @SideOnly(Side.CLIENT)
     public boolean handleMessageFromServer(MessageType messageType, DataInput input) throws IOException {
         if (super.handleMessageFromServer(messageType, input)) {
             return true;
@@ -511,6 +514,11 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             item = FzUtil.readStack(input);
             setItemCount(input.readInt());
             display_list = -1;
+            return true;
+        }
+        if (messageType == MessageType.BarrelDoubleClickHack) {
+            Minecraft mc = Minecraft.getMinecraft();
+            mc.playerController.currentItemHittingBlock = mc.thePlayer.getHeldItem();
             return true;
         }
         return false;
@@ -618,7 +626,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             bottomStack = is;
         } else {
             if (!spammed) {
-                Core.logWarning("Say goodbye, %s !", is);
+                Core.logSevere("Say goodbye, %s !", is);
                 Thread.dumpStack();
                 spammed = true;
             }
@@ -685,31 +693,27 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             return true;
         }
         lastClick = worldObj.getTotalWorldTime();
-        int handslot = entityplayer.inventory.currentItem;
-        if (handslot < 0 || handslot > 8) {
-            return true;
-        }
 
-        ItemStack is = entityplayer.inventory.getStackInSlot(handslot);
-        if (is == null) {
+        ItemStack held = entityplayer.getHeldItem();
+        if (held == null) {
             info(entityplayer);
             return true;
         }
         
-        if (!worldObj.isRemote && isNested(is) && (item == null || itemMatch(is))) {
+        if (!worldObj.isRemote && isNested(held) && (item == null || itemMatch(held))) {
             new Notice(this, "No.").send(entityplayer);
             return true;
         }
         
-        NBTTagCompound tag = is.getTagCompound();
+        NBTTagCompound tag = held.getTagCompound();
         if (tag != null && tag.hasKey("noFzBarrel")) {
             return false;
         }
 
-        boolean veryNew = taint(is);
+        boolean veryNew = taint(held);
 
-        if (!itemMatch(is)) {
-            if (Core.getTranslationKey(is.getItem()).equals(Core.getTranslationKey(item))) {
+        if (!itemMatch(held)) {
+            if (Core.getTranslationKey(held.getItem()).equals(Core.getTranslationKey(item))) {
                 new Notice(this, "That item is different").send(entityplayer);
             } else {
                 info(entityplayer);
@@ -721,31 +725,31 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             info(entityplayer);
             return true;
         }
-        int take = Math.min(free, is.stackSize);
-        is.stackSize -= take;
+        int take = Math.min(free, held.stackSize);
+        held.stackSize -= take;
         changeItemCount(take);
         if (veryNew) {
             updateClients(MessageType.BarrelItem);
         }
-        if (is.stackSize == 0) {
-            entityplayer.inventory.setInventorySlotContents(handslot, null);
+        if (held.stackSize == 0) {
+            entityplayer.setCurrentItemOrArmor(0, null);
         }
         return true;
     }
     
     void addAllItems(EntityPlayer entityplayer) {
-        ItemStack hand = entityplayer.inventory.getStackInSlot(entityplayer.inventory.currentItem);
-        if (hand != null) {
-            taint(hand);
+        ItemStack held = entityplayer.getHeldItem();
+        if (held != null) {
+            taint(held);
         }
-        if (hand != null && !itemMatch(hand)) {
-            if (Core.getTranslationKey(hand).equals(Core.getTranslationKey(item))) {
+        /*if (held != null && !itemMatch(held)) {
+            if (Core.getTranslationKey(held).equals(Core.getTranslationKey(item))) {
                 new Notice(this, "That item is different").send(entityplayer);
             } else {
                 info(entityplayer);
             }
             return;
-        }
+        }*/
         InventoryPlayer inv = entityplayer.inventory;
         int total_delta = 0;
         for (int i = 0; i < inv.getSizeInventory(); i++) {
@@ -761,7 +765,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
                 continue;
             }
             int toAdd = Math.min(is.stackSize, free_space);
-            if (is == hand && toAdd > 1) {
+            if (is == held && toAdd > 1) {
                 toAdd -= 1;
             }
             total_delta += toAdd;
@@ -926,7 +930,8 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             info(entityplayer);
             return;
         }
-        if (ForgeHooks.canToolHarvestBlock(Blocks.log, 0, entityplayer.getHeldItem())) {
+        ItemStack origHeldItem = entityplayer.getHeldItem();
+        if (ForgeHooks.canToolHarvestBlock(Blocks.log, 0, origHeldItem)) {
             return;
         }
         
@@ -939,7 +944,15 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         }
         EntityItem ent = ejectItem(makeStack(to_remove), false, entityplayer, last_hit_side);
         if (ent != null && !(entityplayer instanceof FakePlayer)) {
-            ent.onCollideWithPlayer(entityplayer);
+            if (origHeldItem != null) {
+                ent.onCollideWithPlayer(entityplayer);
+            } else {
+                ent.onCollideWithPlayer(entityplayer);
+                ItemStack newHeld = entityplayer.getHeldItem();
+                if (newHeld != origHeldItem) {
+                    broadcastMessage(entityplayer, MessageType.BarrelDoubleClickHack);
+                }
+            }
         }
         changeItemCount(-to_remove);
         cleanBarrel();
