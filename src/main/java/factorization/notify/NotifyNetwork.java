@@ -1,5 +1,6 @@
 package factorization.notify;
 
+import factorization.shared.FzUtil;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.Unpooled;
 
@@ -93,8 +94,7 @@ public class NotifyNetwork {
             return;
         }
         
-        NBTTagCompound tag = CompressedStreamTools.read(input);
-        ItemStack item = ItemStack.loadItemStackFromNBT(tag);
+        ItemStack item = FzUtil.readStack(input);
         if (item != null && EMPTY_ITEMSTACK.isItemEqual(item)) {
             item = null;
         }

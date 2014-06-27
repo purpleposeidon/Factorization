@@ -121,7 +121,7 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
             ent = (Entity) socket;
         }
         int one = 1;
-        AxisAlignedBB ab = AxisAlignedBB.getAABBPool().getAABB(
+        AxisAlignedBB ab = AxisAlignedBB.getBoundingBox(
                 c.x + top.offsetX, c.y + top.offsetY, c.z + top.offsetZ,  
                 c.x + one + top.offsetX, c.y + one + top.offsetY, c.z + one + top.offsetZ);
         if (d != 0) {

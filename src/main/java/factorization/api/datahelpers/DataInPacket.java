@@ -3,9 +3,9 @@ package factorization.api.datahelpers;
 import java.io.DataInput;
 import java.io.IOException;
 
-import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import cpw.mods.fml.relauncher.Side;
+import factorization.shared.FzUtil;
 
 public class DataInPacket extends DataHelper {
     private final DataInput dis;
@@ -45,7 +45,7 @@ public class DataInPacket extends DataHelper {
         } else if (o instanceof String) {
             return dis.readUTF();
         } else if (o instanceof NBTTagCompound) {
-            return CompressedStreamTools.read(dis);
+            return FzUtil.readTag(dis);
         }
         return o;
     }

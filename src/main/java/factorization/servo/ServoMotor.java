@@ -659,7 +659,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         final ForgeDirection face = motionHandler.orientation.facing;
         final ForgeDirection right = face.getRotation(top);
         
-        AxisAlignedBB ab = AxisAlignedBB.getAABBPool().getAABB(
+        AxisAlignedBB ab = AxisAlignedBB.getBoundingBox(
                 c.x + top.offsetX, c.y + top.offsetY, c.z + top.offsetZ,  
                 c.x + 1 + top.offsetX, c.y + 1 + top.offsetY, c.z + 1 + top.offsetZ);
         for (Entity entity : (Iterable<Entity>)worldObj.getEntitiesWithinAABBExcludingEntity(this, ab)) {

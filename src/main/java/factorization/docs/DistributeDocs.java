@@ -8,8 +8,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatBase;
 import net.minecraft.stats.StatisticsFile;
@@ -27,25 +25,14 @@ import factorization.shared.FzUtil.FzInv;
 public class DistributeDocs {
     static HashSet<String> needyPlayers = new HashSet();
     
-    static StatisticsFile getFile(EntityPlayer player) {
-        String name = player.getCommandSenderName();
-        if (name == null) return null;
-        MinecraftServer server = MinecraftServer.getServer();
-        if (server == null) return null;
-        ServerConfigurationManager cm = server.getConfigurationManager();
-        if (cm == null) return null;
-        // Java! Java? Java!
-        return cm.func_148538_i(name);
-    }
-    
     static boolean givenBook(EntityPlayer player) {
-        StatisticsFile statsFile = getFile(player);
+        StatisticsFile statsFile = FzUtil.getStatsFile(player);
         return (statsFile != null && statsFile.writeStat(bookGet) > 0) || player.getEntityData().hasKey("fzDocd");
     }
     
     static void setGivenBook(EntityPlayer player) {
         needyPlayers.remove(player.getCommandSenderName());
-        StatisticsFile statsFile = getFile(player);
+        StatisticsFile statsFile = FzUtil.getStatsFile(player);
         if (statsFile != null) {
             statsFile.func_150873_a(player, bookGet, 1);
         }
@@ -80,7 +67,7 @@ public class DistributeDocs {
         if (!needyPlayers.contains(name)) {
             return;
         }
-        StatisticsFile sfw = getFile(player);
+        StatisticsFile sfw = FzUtil.getStatsFile(player);
         if (!sfw.hasAchievementUnlocked(AchievementList.acquireIron)) {
             return;
         }

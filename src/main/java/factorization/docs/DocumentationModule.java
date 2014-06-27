@@ -6,7 +6,6 @@ import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.base64.Base64;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
