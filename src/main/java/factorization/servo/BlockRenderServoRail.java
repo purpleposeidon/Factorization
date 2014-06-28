@@ -2,6 +2,8 @@ package factorization.servo;
 
 import java.util.Arrays;
 
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -69,7 +71,15 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
                 dec.renderStatic(rail.getCoord(), rb);
             }
         } else {
-            drawWithTexture(rb, BlockIcons.servo$rail);
+            final float fL = TileEntityServoRail.width;
+            final float fH = 1 - fL;
+            block.useTexture(BlockIcons.servo$rail);
+            block.setBlockBounds(0, fL, fL, 1, fH, fH);
+            block.renderForInventory(rb);
+            block.setBlockBounds(fL, 0, fL, fH, 1, fH);
+            block.renderForInventory(rb);
+            block.setBlockBounds(fL, fL, 0, fH, fH, 1);
+            block.renderForInventory(rb);
         }
         return true;
     }
@@ -101,13 +111,8 @@ public class BlockRenderServoRail extends FactorizationBlockRender {
                     extend[1] ? 1 : fH,
                     extend[3] ? 1 : fH);
 
-            //renderBlock(rb, block);
-            if (world_mode) {
-                block.beginWithHipsterUVs();
-                block.renderRotated(Tessellator.instance, x, y, z);
-            } else {
-                block.renderForInventory(rb);
-            }
+            block.beginWithHipsterUVs();
+            block.renderRotated(Tessellator.instance, x, y, z);
             
             Arrays.fill(extend, false);
             block.setTexture(i, null);
