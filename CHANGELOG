@@ -1,4 +1,8 @@
-0.8.82
+0.8.83
+  Ran over a bunch of giant render bugs with a truck.
+
+0.8.81
+  1.7.10 port
   Prevent notices sent to fake players, which was causing networking error spam
   Added the /point command. Point at things!
 
