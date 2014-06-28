@@ -5,13 +5,16 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
@@ -25,6 +28,7 @@ import factorization.common.FzConfig;
 import factorization.common.ItemIcons;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
+import factorization.shared.NetworkFactorization;
 import factorization.weird.TileEntityDayBarrel.Type;
 
 public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
@@ -61,7 +65,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         GL11.glAlphaFunc(GL11.GL_GREATER, 0.0F);
         
         renderItemCount(is, barrel);
-        handleRenderItem(is);
+        handleRenderItem(is, barrel);
         
         GL11.glPopAttrib();
         GL11.glEnable(GL11.GL_LIGHTING);
@@ -240,24 +244,31 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         }
     }
     TextureManager interception = null;
+    EntityItem entityitem;
     
-    public void handleRenderItem(ItemStack is) {
+    public void handleRenderItem(ItemStack is, TileEntityDayBarrel barrel) {
         //Got problems? Consider looking at ForgeHooksClient.renderInventoryItem, that might be better than this here.
         GL11.glPushMatrix();
         GL11.glRotatef(180, 0, 0, 1);
-        GL11.glTranslatef(0, 0, 1F/32F);
-        float scale = 1F/32F;
-        GL11.glScalef(scale, scale, scale);
-        GL11.glScalef(1, 1, -0.02F);
-        {
+        boolean multi = is.getItem().requiresMultipleRenderPasses();
+        if (multi) {
+            GL11.glRotatef(180, 1, 0, 0);
+            GL11.glTranslatef(-12F/16F, -6.75F/16F, 0);
+            if (entityitem == null) {
+                entityitem = new EntityItem(null, 0, 0, 0, NetworkFactorization.EMPTY_ITEMSTACK.copy());
+            }
+            entityitem.setEntityItemStack(is);
+            entityitem.hoverStart = 0.0F;
+            RenderItem.renderInFrame = true;
+            RenderManager.instance.renderEntityWithPosYaw(entityitem, 1.0D, 0.0D, 0.0D, 0.0F, 0.0F);
+            RenderItem.renderInFrame = false;
+        } else {
+            GL11.glTranslatef(0, 0, 1F/32F);
+            float scale = 1F/32F;
+            GL11.glScalef(scale, scale, scale);
+            GL11.glScalef(1, 1, -0.02F);
             TextureManager re = Minecraft.getMinecraft().renderEngine;
             FontRenderer fr = func_147498_b();
-            // Let's wait for 1.7.6, or something, to figure this out. Maybe things'll be fixed by then...
-            boolean multi = is.getItem().requiresMultipleRenderPasses();
-            float d = 0;
-            if (multi) {
-                renderItem.zLevel += d;
-            }
             if (!is.hasEffect(0)) {
                 renderItem.renderItemAndEffectIntoGUI(fr, re, is, 0, 0);
             } else {
@@ -267,9 +278,6 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
                 Tessellator orig = Tessellator.instance;
                 renderItem.renderItemAndEffectIntoGUI(fr, interception, is, 0, 0);
                 Tessellator.instance = orig;
-            }
-            if (multi) {
-                renderItem.zLevel -= d;
             }
         }
         GL11.glPopMatrix();
