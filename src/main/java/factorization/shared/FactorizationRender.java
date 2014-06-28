@@ -4,6 +4,12 @@ import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.client.IItemRenderer.ItemRenderType;
+import net.minecraftforge.client.IItemRenderer.ItemRendererHelper;
+
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import factorization.wrath.BlockLightAir;
@@ -14,13 +20,19 @@ public class FactorizationRender implements ISimpleBlockRenderingHandler {
     }
 
     @Override
-    public void renderInventoryBlock(Block block, int metadata, int modelID,
-            RenderBlocks renderer) {
+    public void renderInventoryBlock(Block block, int metadata, int modelID, RenderBlocks renderer) {
         if (block == Core.registry.factory_block) {
             FactorizationBlockRender FBR = FactorizationBlockRender.getRenderer(metadata);
             FBR.renderInInventory();
             FBR.setMetadata(metadata);
-            FBR.render(renderer);
+            if (FBR.renderType == ItemRenderType.EQUIPPED
+                    || FBR.renderType == ItemRenderType.EQUIPPED_FIRST_PERSON) {
+                GL11.glDepthMask(true);
+                FBR.render(renderer);
+                GL11.glDepthMask(false); //NORELEASE: pushAttrib
+            } else {
+                FBR.render(renderer);
+            }
         }
     }
 
