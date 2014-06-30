@@ -126,7 +126,7 @@ public class Hammer {
     }
     
     public static Vec3 ent2vec(Entity ent) {
-        return ent.worldObj.getWorldVec3Pool().getVecFromPool(ent.posX, ent.posY, ent.posZ);
+        return Vec3.createVectorHelper(ent.posX, ent.posY, ent.posZ);
     }
     
     @EventHandler

@@ -109,7 +109,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     @Override
     public Vec3 shadow2real(final Vec3 shadowVector) {
-        Vec3 buffer = shadowVector.myVec3LocalPool.getVecFromPool(0, 0, 0);
+        Vec3 buffer = Vec3.createVectorHelper(0, 0, 0);
         double diffX = shadowVector.xCoord - hammerCell.x;
         double diffY = shadowVector.yCoord - hammerCell.y;
         double diffZ = shadowVector.zCoord - hammerCell.z;

@@ -3,7 +3,6 @@ package factorization.fzds;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -40,6 +39,7 @@ import factorization.fzds.api.DeltaCapability;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.notify.Notice;
 import factorization.shared.Core;
+import factorization.shared.FzUtil;
 
 public class FZDSCommand extends CommandBase {
     //private static DimensionSliceEntity currentWE = null;
@@ -216,7 +216,7 @@ public class FZDSCommand extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) {
         if (sender instanceof EntityPlayerMP) {
             EntityPlayerMP player = (EntityPlayerMP) sender;
-            boolean op = MinecraftServer.getServer().getConfigurationManager().isPlayerOpped(player.getCommandSenderName());
+            boolean op = FzUtil.isPlayerOpped(player);
             boolean cr = player.capabilities.isCreativeMode;
             if (!(op || cr)) {
                 Core.sendChatMessage(true, sender, "You must be op or in creative mode to use these commands");
@@ -284,7 +284,7 @@ public class FZDSCommand extends CommandBase {
                 if (!cmd.op) {
                     throw new CommandException("You are not allowed to use arbitrary players");
                 }
-                cmd.player = MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(a.substring(1));
+                cmd.player = MinecraftServer.getServer().getConfigurationManager().func_152612_a(a.substring(1));
                 if (cmd.player == null) {
                     throw new CommandException("Player not found");
                 }

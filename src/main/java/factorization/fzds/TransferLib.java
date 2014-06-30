@@ -12,7 +12,6 @@ import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import factorization.api.Coord;
-import factorization.shared.Core;
 
 public class TransferLib {
     public static int default_set_method = 0;

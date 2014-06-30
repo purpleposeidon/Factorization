@@ -238,7 +238,7 @@ public class HammerClientProxy extends HammerProxy {
         try {
             //Inspired by Minecraft.runTick()
             w.updateEntities();
-            Vec3 playerPos = w.getWorldVec3Pool().getVecFromPool(player.posX, player.posY, player.posZ);
+            Vec3 playerPos = Vec3.createVectorHelper(player.posX, player.posY, player.posZ);
             for (IDeltaChunk idc : nearbyChunks) {
                 Vec3 center = idc.real2shadow(playerPos);
                 w.doVoidFogParticles((int) center.xCoord, (int) center.yCoord, (int) center.zCoord);
