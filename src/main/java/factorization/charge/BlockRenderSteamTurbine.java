@@ -2,6 +2,7 @@ package factorization.charge;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
@@ -69,6 +70,7 @@ public class BlockRenderSteamTurbine extends FactorizationBlockRender {
             GL11.glTranslatef(-0.5F, 0.1F, -0.5F);
             GL11.glRotatef(90, 1, 0, 0);
             renderItemIIcon(Core.registry.fan.getIconFromDamage(0));
+            Minecraft.getMinecraft().renderEngine.bindTexture(Core.blockAtlas);
             GL11.glPopMatrix();
         }
         return true;

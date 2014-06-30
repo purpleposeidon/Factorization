@@ -49,6 +49,7 @@ import factorization.common.FzConfig;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
+import factorization.shared.FzUtil;
 
 @Mod(modid = MiscellaneousNonsense.modId, name = MiscellaneousNonsense.name, version = Core.version, dependencies = "required-after: " + Core.modId)
 public class MiscellaneousNonsense {
@@ -226,7 +227,7 @@ public class MiscellaneousNonsense {
         {
             // Give the first achievement, because it is stupid and nobody cares.
             // If you're using this mod, you've probably opened your inventory before anyways.
-            StatisticsFile sfw = ms.getConfigurationManager().func_148538_i(event.player.getCommandSenderName());
+            StatisticsFile sfw = FzUtil.getStatsFile(event.player);
             if (sfw != null && !sfw.hasAchievementUnlocked(AchievementList.openInventory) && FMLCommonHandler.instance().getSide() == Side.CLIENT) {
                 sfw.func_150873_a(event.player, AchievementList.openInventory, -1);
                 sfw.func_150873_a(event.player, AchievementList.openInventory, 300); // Literally, hundreds of times. :D

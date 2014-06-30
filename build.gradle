@@ -15,18 +15,34 @@ buildscript {
     }
 }
 
-apply plugin: 'forge'
-// Try this some time: apply plugin: 'checkstyle'... well that might not work. But see Buildcraft.
+apply plugin: 'forge' // Try this some time: apply plugin: 'checkstyle'... well that might not work. But see Buildcraft.
 
 version = new File('fzversion').getText('UTF-8').replaceAll("\\s","")
 group = "factorization"
 archivesBaseName = "Factorization"
 
 minecraft {
-    version = "1.7.2-10.12.1.1098" // FORGEMARK
+    version = "1.7.10-10.13.0.1152" // FORGEMARK
     assetDir = "eclipse/assets"
     replace '@FZVERSION@', (project.version.split("-")[1])
 }
+
+dependencies {
+    // you may put jars on which you depend on in ./libs
+    // or you may define them like so..
+    //compile "some.group:artifact:version:classifier"
+    //compile "some.group:artifact:version"
+    
+    // real examples
+    //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env 
+    //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env 
+
+    // for more info...
+    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
+    // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
+}
+
 
 task writeFzFile {
     shouldRunAfter "build"
@@ -71,3 +87,13 @@ task deobfJar(type: Jar) {
     from sourceSets.api.output
     classifier = 'dev'
 }
+
+// NORELEASE
+// runClient { args "--username" "username" }
+// task copySrcJar(type: Copy, dependsOn: "remapJar") {
+//     from zipTree("/home/poseidon/.gradle/caches/minecraft/net/minecraftforge/forge/${minecraft.apiVersion}/forgSrc-${minecraft.version}-${minecraft.apiVersion}-sources.jar")
+//     exclude "META-INF/**"
+//     into "mcSrc"
+// }
+// tasks.setupDecompWorkspace.dependsOn "copySrcJar"
+

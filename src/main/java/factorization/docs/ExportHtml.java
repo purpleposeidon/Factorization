@@ -12,7 +12,7 @@ import java.util.List;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
+import factorization.shared.FzUtil;
 
 public class ExportHtml implements ICommand {
     @Override
@@ -39,7 +39,7 @@ public class ExportHtml implements ICommand {
 
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender icommandsender) {
-        return icommandsender instanceof EntityPlayer && MinecraftServer.getServer().getConfigurationManager().isPlayerOpped(icommandsender.getCommandSenderName());
+        return icommandsender instanceof EntityPlayer && FzUtil.isPlayerOpped(icommandsender);
     }
 
     @Override

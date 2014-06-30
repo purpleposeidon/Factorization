@@ -2,7 +2,6 @@ package factorization.shared;
 
 import java.io.DataInput;
 import java.io.IOException;
-import java.util.Random;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
@@ -166,8 +165,8 @@ public abstract class TileEntityFactorization extends TileEntityCommon
         if (violent) {
             mult = 0.2;
         }
-        Vec3 pos = worldObj.getWorldVec3Pool().getVecFromPool(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
-        Vec3 vel = worldObj.getWorldVec3Pool().getVecFromPool(0, 0, 0);
+        Vec3 pos = Vec3.createVectorHelper(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
+        Vec3 vel = Vec3.createVectorHelper(0, 0, 0);
         if (to_side != -1) {
             ForgeDirection dir = ForgeDirection.getOrientation(to_side);
             /*

@@ -9,7 +9,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -44,7 +43,7 @@ final class FzdocSerialize implements ICommand {
 
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender icommandsender) {
-        return icommandsender instanceof EntityPlayer && MinecraftServer.getServer().getConfigurationManager().isPlayerOpped(icommandsender.getCommandSenderName());
+        return icommandsender instanceof EntityPlayer && FzUtil.isPlayerOpped(icommandsender);
     }
 
     @Override

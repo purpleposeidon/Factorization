@@ -21,7 +21,6 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import net.minecraft.util.Vec3Pool;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -795,7 +794,6 @@ public class TileEntityGreenware extends TileEntityCommon {
             ClayLump lump = parts.get(i);
             lump.toRotatedBlockBounds(this, block);
             MovingObjectPosition mop = block.collisionRayTrace(worldObj, xCoord, yCoord, zCoord, startVec, endVec);
-            Vec3Pool vp = worldObj.getWorldVec3Pool();
             if (mop != null) {
                 mop.subHit = i;
                 if (shortest == null) {
@@ -803,8 +801,8 @@ public class TileEntityGreenware extends TileEntityCommon {
                 } else {
                     Vec3 s = shortest.hitVec;
                     Vec3 m = mop.hitVec;
-                    s = vp.getVecFromPool(s.xCoord, s.yCoord, s.zCoord);
-                    m = vp.getVecFromPool(m.xCoord, m.yCoord, m.zCoord);
+                    s = Vec3.createVectorHelper(s.xCoord, s.yCoord, s.zCoord);
+                    m = Vec3.createVectorHelper(m.xCoord, m.yCoord, m.zCoord);
                     offsetVector(startVec, s);
                     offsetVector(startVec, m);
                     if (m.lengthVector() < s.lengthVector()) {
@@ -896,7 +894,7 @@ public class TileEntityGreenware extends TileEntityCommon {
 
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
-        AxisAlignedBB bb = AxisAlignedBB.getAABBPool().getAABB(xCoord - 2, yCoord - 2, zCoord - 2, xCoord + 2, yCoord + 2, zCoord + 2);
+        AxisAlignedBB bb = AxisAlignedBB.getBoundingBox(xCoord - 2, yCoord - 2, zCoord - 2, xCoord + 2, yCoord + 2, zCoord + 2);
         return bb;
     }
 

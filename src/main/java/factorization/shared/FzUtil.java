@@ -15,11 +15,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.WeakHashMap;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -40,13 +42,16 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTSizeTracker;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.stats.StatBase;
+import net.minecraft.network.rcon.RConConsoleSource;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.ServerConfigurationManager;
+import net.minecraft.stats.StatisticsFile;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.StringUtils;
 import net.minecraft.util.Vec3;
@@ -1121,11 +1126,18 @@ public class FzUtil {
         }, 3, 3);
     }
     
+    private static final UUID FZ_UUID = UUID.fromString("f979c78a-f80d-46b1-9c49-0121ea8850e6");
+    
+    private static GameProfile makeProfile(String name) {
+        if (StringUtils.isNullOrEmpty(name)) return new GameProfile(FZ_UUID, "[FZ]");
+        return new GameProfile(FZ_UUID, "[FZ:" + name + "]");
+    }
+    
     private static class FzFakePlayer extends FakePlayer {
         Coord where;
 
         private FzFakePlayer(WorldServer world, String name, Coord where) {
-            super(world, new GameProfile(name, name));
+            super(world, makeProfile(name));
             this.where = where;
         }
         
@@ -1431,12 +1443,26 @@ public class FzUtil {
         
     };
     
-    static public ItemStack readStack(DataInput input) throws IOException {
-        ItemStack is = ItemStack.loadItemStackFromNBT(CompressedStreamTools.read(input));
+    static public NBTTagCompound readTag(DataInput input, NBTSizeTracker tracker) throws IOException {
+        return CompressedStreamTools.func_152456_a(input, tracker);
+    }
+    
+    static public ItemStack readStack(DataInput input, NBTSizeTracker tracker) throws IOException {
+        ItemStack is = ItemStack.loadItemStackFromNBT(readTag(input, tracker));
         if (is == null || is.getItem() == null) {
             return null;
         }
         return is;
+    }
+    
+    @Deprecated // Provide an NBTSizeTracker!
+    static public NBTTagCompound readTag(DataInput input) throws IOException {
+        return readTag(input, NBTSizeTracker.field_152451_a);
+    }
+    
+    @Deprecated // Provide an NBTSizeTracker!
+    static public ItemStack readStack(DataInput input) throws IOException {
+        return readStack(input, NBTSizeTracker.field_152451_a);
     }
 
     @SideOnly(Side.CLIENT)
@@ -1713,5 +1739,23 @@ public class FzUtil {
             return player;
         }
         return null;
+    }
+    
+    public static boolean isPlayerOpped(EntityPlayer player) {
+        player = fakeplayerToNull(player);
+        if (player == null) return false;
+        return MinecraftServer.getServer().getConfigurationManager().func_152596_g(player.getGameProfile());
+    }
+    
+    public static boolean isPlayerOpped(ICommandSender player) {
+        if (player instanceof EntityPlayer) {
+            return isPlayerOpped(player);
+        }
+        return player instanceof MinecraftServer || player instanceof RConConsoleSource;
+    }
+    
+    public static StatisticsFile getStatsFile(EntityPlayer player) {
+        ServerConfigurationManager cm = MinecraftServer.getServer().getConfigurationManager();
+        return cm.func_152602_a(player);
     }
 }
