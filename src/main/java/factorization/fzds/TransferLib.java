@@ -39,6 +39,9 @@ public class TransferLib {
      *  SET_CHUNKY: Set through the chunk
      */
     public static void setRaw(Coord c, Block id, int md, int use_method) {
+        if (c.y < 0) return;
+        if (c.y > 0xFF) return;
+        
         switch (use_method) {
         default:
         case SET_SNEAKY:
