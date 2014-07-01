@@ -136,21 +136,33 @@ public class DeltaChunk {
         dse.posX = (int)vrm.xCoord;
         dse.posY = (int)vrm.yCoord;
         dse.posZ = (int)vrm.zCoord;
-        mapper.fillDse(new DseDestination() {@Override
-        public void include(Coord real) {
-            shadow.set(real);
-            dse.real2shadow(shadow);
-            TransferLib.move(real, shadow, false, true);
-        }});
-        mapper.fillDse(new DseDestination() {@Override
-        public void include(Coord real) {
-            if (wipeSrc) {
-                TransferLib.rawErase(real);
+        mapper.fillDse(new DseDestination() {
+            @Override
+            public void include(Coord real) {
+                shadow.set(real);
+                dse.real2shadow(shadow);
+                TransferLib.move(real, shadow, false, true);
             }
-            shadow.set(real);
-            dse.real2shadow(shadow);
-            shadow.markBlockForUpdate();
-        }});
+        });
+        mapper.fillDse(new DseDestination() {
+            @Override
+            public void include(Coord real) {
+                if (wipeSrc) {
+                    TransferLib.rawErase(real);
+                }
+                shadow.set(real);
+                dse.real2shadow(shadow);
+                shadow.markBlockForUpdate();
+            }
+        });
+        if (wipeSrc) {
+            mapper.fillDse(new DseDestination() {
+                @Override
+                public void include(Coord real) {
+                    real.markBlockForUpdate();
+                }
+            });
+        }
         return dse;
     }
     
@@ -167,7 +179,6 @@ public class DeltaChunk {
         selected.getFarCorner().setAsVector(vShadowMax);
         a.set(vShadowMin);
         b.set(vShadowMax);
-        DeltaCoord dc = b.difference(a);
         Coord dest = new Coord(selected);
         Coord c = new Coord(a.w, 0, 0, 0);
         
