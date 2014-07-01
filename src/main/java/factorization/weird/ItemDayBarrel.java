@@ -53,6 +53,10 @@ public class ItemDayBarrel extends ItemBlockProxy {
             db.loadFromStack(is);
             int count = db.getItemCount();
             if (count > 0 && db.item != null) {
+                if (db.item.getItem() == this) {
+                    list.add("?");
+                    return;
+                }
                 ArrayList sub = new ArrayList();
                 db.item.getItem().addInformation(db.item, player, sub, verbose);
                 if (!sub.isEmpty()) {

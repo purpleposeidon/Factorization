@@ -451,7 +451,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         return null;
     }
     
-    private static boolean isNested(ItemStack is) {
+    public static boolean isNested(ItemStack is) {
         return getSilkedItem(is) != null;
     }
     
