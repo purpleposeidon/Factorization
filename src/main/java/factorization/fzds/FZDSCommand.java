@@ -523,6 +523,40 @@ public class FZDSCommand extends CommandBase {
                 dse.worldObj.spawnEntityInWorld(dse);
                 setSelection(dse);
             }}, Requires.COORD);
+        add(new SubCommand("grabchunk") {
+            @Override
+            String details() {
+                return "Cuts out the chunk you're standing in";
+            }
+            @Override
+            void call(String[] args) {
+                Coord min = user.copy();
+                min.x &= ~0xF;
+                min.z &= ~0xF;
+                min.y = 0;
+                Coord max = min.copy();
+                max.x += 0xF;
+                max.z += 0xF;
+                max.y = 0xFF;
+                final Coord lower = min.copy();
+                final Coord upper = max.copy();
+                IDeltaChunk dse = DeltaChunk.makeSlice(Hammer.fzds_command_channel, lower, upper, new AreaMap() {
+                    @Override
+                    public void fillDse(DseDestination destination) {
+                        Coord here = user.copy();
+                        for (int x = lower.x; x <= upper.x; x++) {
+                            for (int y = lower.y; y <= upper.y; y++) {
+                                for (int z = lower.z; z <= upper.z; z++) {
+                                    here.set(here.w, x, y, z);
+                                    destination.include(here);
+                                }
+                            }
+                        }
+                    }}, true);
+                dse.permit(DeltaCapability.ROTATE).forbid(DeltaCapability.COLLIDE);
+                dse.worldObj.spawnEntityInWorld(dse);
+                setSelection(dse);
+            }}, Requires.COORD);
         add(new SubCommand("include") { //TODO: would pull blocks into the slice
             @Override
             void call(String[] args) {
