@@ -11,6 +11,7 @@ import net.minecraft.network.PacketBuffer;
 import com.google.common.collect.BiMap;
 
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import cpw.mods.fml.relauncher.Side;
 import factorization.fzds.Hammer;
 import factorization.shared.Core;
 
@@ -34,10 +35,6 @@ public class WrappedPacket extends Packet {
     }
     
     public WrappedPacket(Packet wrapped) {
-        if (wrapped instanceof FMLProxyPacket) {
-            FMLProxyPacket pp = (FMLProxyPacket) wrapped;
-            wrapped = pp.toS3FPacket();
-        }
         this.wrapped = wrapped;
     }
 
@@ -62,6 +59,11 @@ public class WrappedPacket extends Packet {
         if (wrapped == null) {
             return;
         }
+        if (wrapped instanceof FMLProxyPacket) {
+            FMLProxyPacket pp = (FMLProxyPacket) wrapped;
+            wrapped = pp.toS3FPacket();
+            // NORELEASE: What about reading?
+        }
         PacketBuffer buff = new PacketBuffer(data);
         Integer packetId = serverPacketMap.inverse().get(wrapped.getClass());
         if (packetId == null) {
@@ -81,6 +83,10 @@ public class WrappedPacket extends Packet {
         if (wrapped == null) return;
         if (Minecraft.getMinecraft().thePlayer == null) {
             return; // :/
+        }
+        if (wrapped instanceof FMLProxyPacket) {
+            FMLProxyPacket fml = (FMLProxyPacket) wrapped;
+            fml.setTarget(Side.CLIENT);
         }
         Hammer.proxy.setShadowWorld(); //behold my power of voodoo
         try {
