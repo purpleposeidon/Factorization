@@ -132,7 +132,7 @@ public class RenderDimensionSliceEntity extends Render {
         int render_skips = 0;
         
         void updateRelativeEyePosition() {
-            final EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+            final Entity player = Minecraft.getMinecraft().renderViewEntity;
             shadowEyeVec.xCoord = player.posX;
             shadowEyeVec.yCoord = player.posY;
             shadowEyeVec.zCoord = player.posZ;
@@ -210,6 +210,15 @@ public class RenderDimensionSliceEntity extends Render {
             double sx = TileEntityRendererDispatcher.staticPlayerX;
             double sy = TileEntityRendererDispatcher.staticPlayerY;
             double sz = TileEntityRendererDispatcher.staticPlayerZ;
+            
+            double px = TileEntityRendererDispatcher.instance.field_147560_j;
+            double py = TileEntityRendererDispatcher.instance.field_147561_k;
+            double pz = TileEntityRendererDispatcher.instance.field_147558_l;
+            // The player's position converted to shadow coordinates; these fields used in renderTileEntity()
+            TileEntityRendererDispatcher.instance.field_147560_j = shadowEye.posX;
+            TileEntityRendererDispatcher.instance.field_147561_k = shadowEye.posY;
+            TileEntityRendererDispatcher.instance.field_147558_l = shadowEye.posZ;
+            
             try {
                 int xwidth = far.x - corner.x;
                 int height = far.y - corner.y;
@@ -243,10 +252,13 @@ public class RenderDimensionSliceEntity extends Render {
                             
                             //Since we don't know the actual distance from the player to the TE, we need to cheat.
                             //(We *could* calculate it, I suppose... Or maybe just not render entities when the player's far away)
-                            TileEntityRendererDispatcher.staticPlayerX = te.xCoord;
+                            /*TileEntityRendererDispatcher.staticPlayerX = te.xCoord;
                             TileEntityRendererDispatcher.staticPlayerY = te.yCoord;
-                            TileEntityRendererDispatcher.staticPlayerZ = te.zCoord;
+                            TileEntityRendererDispatcher.staticPlayerZ = te.zCoord;*/
+                            
                             TileEntityRendererDispatcher.instance.renderTileEntity(te, partialTicks);
+                            // NORELEASE (probably): cull if outside camera!
+                            // NORELEASE: That's the wrong list? It's every TE, not the TESR'd TEs.
                         }
                         Core.profileEnd();
                     }
@@ -255,6 +267,10 @@ public class RenderDimensionSliceEntity extends Render {
                 TileEntityRendererDispatcher.staticPlayerX = sx;
                 TileEntityRendererDispatcher.staticPlayerY = sy;
                 TileEntityRendererDispatcher.staticPlayerZ = sz;
+                
+                TileEntityRendererDispatcher.instance.field_147560_j = px;
+                TileEntityRendererDispatcher.instance.field_147561_k = py;
+                TileEntityRendererDispatcher.instance.field_147558_l = pz;
             }
         }
         
@@ -372,6 +388,7 @@ public class RenderDimensionSliceEntity extends Render {
                 Coord c = dse.getCorner();
                 glTranslatef(-c.x, -c.y, -c.z);
                 if (nest == 1) {
+                    renderInfo.updateRelativeEyePosition();
                     if (oracle) {
                         renderInfo.renderEntities(partialTicks);
                     } else {
