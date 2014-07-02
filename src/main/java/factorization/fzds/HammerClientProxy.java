@@ -317,6 +317,7 @@ public class HammerClientProxy extends HammerProxy {
             return;
         }
         //mc.renderViewEntity.rayTrace(reachDistance, partialTicks) Just this function would work if we didn't care about entities.
+        // But we also need entities. So we'll just invoke MC's ray trace code.
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer player = mc.thePlayer;
         double origX = player.posX;
@@ -324,8 +325,6 @@ public class HammerClientProxy extends HammerProxy {
         double origZ = player.posZ;
         Vec3 shadowPos = ray.parent.real2shadow(Vec3.createVectorHelper(origX, origY, origZ));
         MovingObjectPosition origMouseOver = mc.objectMouseOver;
-        //Entity origPointed = mc.entityRenderer.pointedEntity;
-        //It's private! It's used in one function! Why is this even a field?
         
         try {
             AxisAlignedBB bb;
@@ -362,7 +361,8 @@ public class HammerClientProxy extends HammerProxy {
             }
             //TODO: Rotations!
             if (bb == null) {
-                System.out.println("NORELEASE?");
+                ray.setPosition(0, -1000, 0);
+                return;
             }
             Vec3 min = ray.parent.shadow2real(FzUtil.getMin(bb));
             Vec3 max = ray.parent.shadow2real(FzUtil.getMax(bb));
@@ -371,7 +371,6 @@ public class HammerClientProxy extends HammerProxy {
             rayTarget = ray;
         } finally {
             mc.objectMouseOver = origMouseOver;
-            //mc.entityRenderer.pointedEntity = origPointed;
         }
     }
     
@@ -382,118 +381,13 @@ public class HammerClientProxy extends HammerProxy {
     
     @Override
     void mineBlock(final MovingObjectPosition mop) {
-        final Minecraft mc = Minecraft.getMinecraft();
-        final EntityClientPlayerMP player = mc.thePlayer;
-        final PlayerControllerMP origController = mc.playerController;
-        
-        /*
-        mc.playerController = new PlayerControllerMP(mc, player.sendQueue) {
-            void pushWrapper() {
-                setShadowWorld();
-            }
-            
-            void popWrapper() {
-                restoreRealWorld();
-            }
-            
-            void sendDigPacket(Packet toWrap) {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                DataOutputStream dos = new DataOutputStream(baos);
-                try {
-                    dos.write(toWrap.getPacketId());
-                    toWrap.writePacketData(dos);
-                } catch (IOException e) {
-                    e.printStackTrace(); //Isn't there some guava thing for this?
-                }
-                Packet toSend = PacketDispatcher.getTinyPacket(Hammer.instance, HammerNet.HammerNetType.digPacket, baos.toByteArray());
-                System.out.println("SEND: " + toWrap); //NORELEASE
-                PacketDispatcher.sendPacketToServer(toSend);
-                
-            }
-            
-            void resetController() {
-                mc.playerController = origController;
-                System.out.println("Resetting controller"); //NORELEASE
-            }
-            
-            //NOTE: Incomplete, because java sucks. Are there any other functions we'll need?
-            
-            @Override
-            public void resetBlockRemoving() {
-                System.out.println("HCP.PCMP.resetBlockRemoving"); //NORELEASE
-                sendDigPacket(new Packet14BlockDig(1, mop.blockX, mop.blockY, mop.blockZ, mop.sideHit));
-                resetController();
-            }
-            
-            @Override
-            public void clickBlock(int x, int y, int z, int side) {
-                System.out.println("HCP.PCMP.clickBlock"); //NORELEASE
-                //Unlike vanilla's, this should only be called during the mining. Not at the start. Not at the cancellation. Not when we switch to a different one. (HOPEFULLY)
-                pushWrapper();
-                try {
-                    clickBlock_implementation(x, y, z, side);
-                } finally {
-                    popWrapper();
-                }
-            }
-            
-            public void clickBlock_implementation(int x, int y, int z, int side) {
-                //Very terribly copied from clickBlock with this change: sendDigPacket instead of using addToSendQueue
-                //And also adding resetController call after the block gets broken
-                if (!this.currentGameType.isAdventure() || mc.thePlayer.isCurrentToolAdventureModeExempt(x, y, z))
-                {
-                    if (this.currentGameType.isCreative())
-                    {
-                        sendDigPacket(new Packet14BlockDig(0, x, y, z, side));
-                        clickBlockCreative(this.mc, this, x, y, z, side);
-                        this.blockHitDelay = 5;
-                    }
-                    else if (!this.isHittingBlock || !this.sameToolAndBlock(x, y, z)) // sameToolAndBlock sameToolAndBlock
-                    {
-                        if (this.isHittingBlock)
-                        {
-                            sendDigPacket(new Packet14BlockDig(1, this.currentBlockX, this.currentBlockY, this.currentblockZ, side));
-                        }
-
-                        sendDigPacket(new Packet14BlockDig(0, x, y, z, side));
-                        Block i1 = this.mc.theWorld.getBlock(x, y, z);
-
-                        if (this.curBlockDamageMP == 0.0F)
-                        {
-                            i1.onBlockClicked(this.mc.theWorld, x, y, z, this.mc.thePlayer);
-                        }
-
-                        if (i1.getPlayerRelativeBlockHardness(this.mc.thePlayer, this.mc.thePlayer.worldObj, x, y, z) >= 1.0F)
-                        {
-                            this.onPlayerDestroyBlock(x, y, z, side);
-                            resetController();
-                        }
-                        else
-                        {
-                            this.isHittingBlock = true;
-                            this.currentBlockX = x;
-                            this.currentBlockY = y;
-                            this.currentblockZ = z;
-                            this.currentItemHittingBlock = this.mc.thePlayer.getHeldItem();
-                            this.curBlockDamageMP = 0.0F;
-                            this.stepSoundTickCounter = 0.0F;
-                            this.mc.theWorld.destroyBlockInWorldPartially(this.mc.thePlayer.getEntityId(), this.currentBlockX, this.currentBlockY, this.currentblockZ, (int)(this.curBlockDamageMP * 10.0F) - 1);
-                        }
-                    }
-                }
-            }
-            
-            
-            
-            @Override
-            public void attackEntity(EntityPlayer par1EntityPlayer, Entity par2Entity) {
-                //likely will need stuff in here
-                // TODO Auto-generated method stub
-                System.out.println("HCP.PCMP.attackEntity"); //NORELEASE
-                super.attackEntity(par1EntityPlayer, par2Entity);
-            }
-        };
-        mc.playerController.clickBlock(mop.blockX, mop.blockY, mop.blockZ, mop.sideHit);
-        */
+        // Step one: Make the arm swing animation happen
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityPlayer player = mc.thePlayer;
+        if (player == null) return;
+        if (mc.currentScreen == null && mc.gameSettings.keyBindAttack.getIsKeyPressed() && mc.inGameHasFocus) {
+            player.swingItem();
+        }
+        // Step two: Make the block breaking render
     }
 }

@@ -519,7 +519,7 @@ public class FZDSCommand extends CommandBase {
                             }
                         }
                     }}, !copy);
-                dse.permit(DeltaCapability.ROTATE).forbid(DeltaCapability.COLLIDE);
+                dse.permit(DeltaCapability.ROTATE).permit(DeltaCapability.INTERACT).permit(DeltaCapability.BLOCK_MINE).permit(DeltaCapability.BLOCK_PLACE).forbid(DeltaCapability.COLLIDE);
                 dse.worldObj.spawnEntityInWorld(dse);
                 setSelection(dse);
             }}, Requires.COORD);

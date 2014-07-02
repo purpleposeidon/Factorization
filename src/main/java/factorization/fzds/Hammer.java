@@ -90,7 +90,7 @@ public class Hammer {
         Core.loadBus(hammerInfo);
         Core.loadBus(proxy);
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            MinecraftForge.EVENT_BUS.register(new DseRayTarget.ClickHandler());
+            Core.loadBus(new ClickHandler());
         }
         WrappedPacket.registerPacket();
     }
