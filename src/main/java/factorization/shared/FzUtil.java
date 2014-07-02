@@ -1575,6 +1575,10 @@ public class FzUtil {
         return oldValue*(1 - partial) + newValue*partial;
     }
     
+    public static double interp(double oldValue, double newValue, double partial) {
+        return oldValue*(1 - partial) + newValue*partial;
+    }
+    
     public static int getAxis(ForgeDirection fd) {
         if (fd.offsetX != 0) {
             return 1;

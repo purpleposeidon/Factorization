@@ -1,17 +1,20 @@
 package factorization.fzds;
 
+import factorization.api.Coord;
+import factorization.fzds.api.IDeltaChunk;
+import factorization.shared.FzUtil;
+import gnu.trove.set.hash.THashSet;
+
+import java.util.HashMap;
 import java.util.Iterator;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.DestroyBlockProgress;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
-import factorization.api.Coord;
-import factorization.fzds.api.IDeltaChunk;
-import factorization.shared.FzUtil;
-import gnu.trove.set.hash.THashSet;
 
 class ShadowRenderGlobal implements IWorldAccess {
     /***
@@ -118,11 +121,41 @@ class ShadowRenderGlobal implements IWorldAccess {
         
     }
 
+    HashMap<Integer, DestroyBlockProgress> damagedBlocks = new HashMap();
+    
     @Override
-    public void destroyBlockPartially(int var1, int var2, int var3,
-            int var4, int var5) {
-        // TODO Auto-generated method stub
-        //Prooooobably not.
+    public void destroyBlockPartially(int breakerId, int blockX, int blockY, int blockZ, int damageProgress) {
+        if (!(damageProgress >= 0 && damageProgress < 10)) {
+            damagedBlocks.remove(Integer.valueOf(breakerId));
+            return;
+        }
+        DestroyBlockProgress destroyblockprogress = (DestroyBlockProgress) damagedBlocks.get(Integer.valueOf(breakerId));
+
+        if (destroyblockprogress == null
+                || destroyblockprogress.getPartialBlockX() != blockX
+                || destroyblockprogress.getPartialBlockY() != blockY
+                || destroyblockprogress.getPartialBlockZ() != blockZ) {
+            destroyblockprogress = new DestroyBlockProgress(breakerId, blockX, blockY, blockZ);
+            damagedBlocks.put(Integer.valueOf(breakerId), destroyblockprogress);
+        }
+
+        destroyblockprogress.setPartialBlockDamage(damageProgress);
+        destroyblockprogress.setCloudUpdateTick(tickTime);
+    }
+    
+    int tickTime = 0;
+    public void removeStaleDamage() {
+        if (tickTime++ % 20 != 0) return;
+        
+        Iterator<DestroyBlockProgress> iterator = damagedBlocks.values().iterator();
+        while (iterator.hasNext()) {
+            DestroyBlockProgress destroyblockprogress = iterator.next();
+            int createTime = destroyblockprogress.getCreationCloudUpdateTick();
+
+            if (tickTime - createTime > 400) {
+                iterator.remove();
+            }
+        }
     }
 
     @Override

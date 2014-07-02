@@ -4,7 +4,6 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
-import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -82,6 +81,7 @@ public class HammerClientProxy extends HammerProxy {
     }
     
     private static World lastWorld = null;
+    static ShadowRenderGlobal shadowRenderGlobal = null;
     void checkForWorldChange() {
         WorldClient currentWorld = Minecraft.getMinecraft().theWorld;
         if (currentWorld != lastWorld) {
@@ -91,16 +91,18 @@ public class HammerClientProxy extends HammerProxy {
             }
             if (Hammer.worldClient != null) {
                 ((HammerWorldClient)Hammer.worldClient).clearAccesses();
-                Hammer.worldClient.addWorldAccess(new ShadowRenderGlobal(currentWorld));
+                Hammer.worldClient.addWorldAccess(shadowRenderGlobal = new ShadowRenderGlobal(currentWorld));
             }
         }
     }
     
     @SubscribeEvent
     public void tick(ClientTickEvent event) {
-        if (event.phase == Phase.START) {
-            checkForWorldChange(); // Is there an event for this?
-            runShadowTick();
+        if (event.phase != Phase.START) return;
+        checkForWorldChange(); // Is there an event for this?
+        runShadowTick();
+        if (shadowRenderGlobal != null) {
+            shadowRenderGlobal.removeStaleDamage();
         }
     }
     
@@ -121,7 +123,7 @@ public class HammerClientProxy extends HammerProxy {
                 Hammer.dimensionID,
                 world.difficultySetting,
                 Core.proxy.getProfiler());
-        Hammer.worldClient.addWorldAccess(new ShadowRenderGlobal(mc.theWorld));
+        Hammer.worldClient.addWorldAccess(shadowRenderGlobal = new ShadowRenderGlobal(mc.theWorld));
     }
     
     
@@ -381,6 +383,7 @@ public class HammerClientProxy extends HammerProxy {
     
     @Override
     void mineBlock(final MovingObjectPosition mop) {
+        if (mop == null) return;
         // Step one: Make the arm swing animation happen
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer player = mc.thePlayer;
@@ -389,5 +392,7 @@ public class HammerClientProxy extends HammerProxy {
             player.swingItem();
         }
         // Step two: Make the block breaking render
+        shadowRenderGlobal.destroyBlockPartially(0, mop.blockX, mop.blockY, mop.blockZ, 2);
+        // Step three: Send a (custom) dig packet once the block has broken
     }
 }

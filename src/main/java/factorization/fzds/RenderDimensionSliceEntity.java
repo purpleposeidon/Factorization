@@ -5,18 +5,26 @@ import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.DestroyBlockProgress;
 import net.minecraft.client.renderer.GLAllocation;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -24,9 +32,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.ChunkPosition;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.event.world.WorldEvent;
 
@@ -88,6 +98,8 @@ public class RenderDimensionSliceEntity extends Render {
         int xSize, ySize, zSize;
         int xSizeChunk, ySizeChunk, zSizeChunk;
         int cubicChunkCount;
+        
+        RenderBlocks rb = new RenderBlocks(DeltaChunk.getClientShadowWorld());
         
         public DSRenderInfo(DimensionSliceEntity dse) {
             this.dse = dse;
@@ -274,6 +286,64 @@ public class RenderDimensionSliceEntity extends Render {
             }
         }
         
+        void renderBreakingBlocks(EntityPlayer player, float partial) {
+            HashMap<Integer, DestroyBlockProgress> damagedBlocks = HammerClientProxy.shadowRenderGlobal.damagedBlocks;
+            if (damagedBlocks.isEmpty()) return;
+            Coord a = dse.getCorner();
+            Coord b = dse.getFarCorner();
+            
+            Tessellator tess = Tessellator.instance;
+            startDamageDrawing(tess, player, partial);
+            Minecraft mc = Minecraft.getMinecraft();
+            
+            for (Iterator<DestroyBlockProgress> iterator = damagedBlocks.values().iterator(); iterator.hasNext();) {
+                DestroyBlockProgress damage = iterator.next();
+                if (a.x <= damage.getPartialBlockX() && damage.getPartialBlockX() <= b.x
+                        && a.y <= damage.getPartialBlockY() && damage.getPartialBlockY() <= b.y
+                        && a.z <= damage.getPartialBlockZ() && damage.getPartialBlockZ() <= b.z) {
+                    renderDamage(a.w, damage, mc.renderGlobal.destroyBlockIcons);
+                }
+            }
+            
+            endDamageDrawing(tess);
+        }
+        
+        void renderDamage(World world, DestroyBlockProgress damage, IIcon destructionIcons[]) {
+            Block block = world.getBlock(damage.getPartialBlockX(), damage.getPartialBlockY(), damage.getPartialBlockZ());
+
+            if (block.getMaterial() != Material.air) {
+                rb.renderBlockUsingTexture(block, damage.getPartialBlockX(), damage.getPartialBlockY(), damage.getPartialBlockZ(), destructionIcons[damage.getPartialBlockDamage()]);
+            }
+        }
+        
+        void startDamageDrawing(Tessellator tess, EntityPlayer player, float partial) {
+            OpenGlHelper.glBlendFunc(774, 768, 1, 0);
+            bindTexture(TextureMap.locationBlocksTexture);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.5F);
+            GL11.glPushMatrix();
+            GL11.glPolygonOffset(-3.0F, -3.0F);
+            GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);
+            GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F);
+            GL11.glEnable(GL11.GL_ALPHA_TEST);
+            tess.startDrawingQuads();
+            double dx = FzUtil.interp(player.prevPosX, player.posX, partial);
+            double dy = FzUtil.interp(player.prevPosY, player.posY, partial);
+            double dz = FzUtil.interp(player.prevPosZ, player.posZ, partial);
+            tess.setTranslation(-dx, -dy, -dz);
+            tess.disableColor();
+        }
+        
+        void endDamageDrawing(Tessellator tess) {
+            tess.draw();
+            tess.setTranslation(0.0D, 0.0D, 0.0D);
+            GL11.glDisable(GL11.GL_ALPHA_TEST);
+            GL11.glPolygonOffset(0.0F, 0.0F);
+            GL11.glDisable(GL11.GL_POLYGON_OFFSET_FILL);
+            GL11.glEnable(GL11.GL_ALPHA_TEST);
+            GL11.glDepthMask(true);
+            GL11.glPopMatrix();
+        }
+        
         int getRenderList() {
             if (renderList == -1) {
                 renderList = GLAllocation.generateDisplayLists(wr_display_list_size*cubicChunkCount);
@@ -340,6 +410,7 @@ public class RenderDimensionSliceEntity extends Render {
         } else if (nest == 1) {
             Core.profileStart("recursion");
         }
+        EntityPlayer real_player = Minecraft.getMinecraft().thePlayer;
         
         nest++;
         try {
@@ -391,10 +462,12 @@ public class RenderDimensionSliceEntity extends Render {
                     renderInfo.updateRelativeEyePosition();
                     if (oracle) {
                         renderInfo.renderEntities(partialTicks);
+                        renderInfo.renderBreakingBlocks(real_player, partialTicks);
                     } else {
                         Hammer.proxy.setShadowWorld();
                         try {
                             renderInfo.renderEntities(partialTicks);
+                            renderInfo.renderBreakingBlocks(real_player, partialTicks);
                         } finally {
                             Hammer.proxy.restoreRealWorld();
                         }

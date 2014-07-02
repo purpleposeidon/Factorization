@@ -82,17 +82,27 @@ public class ClickHandler {
     @SubscribeEvent
     public void tick(ClientTickEvent event) {
         if (event.phase != Phase.START) return;
-        if (current_attacking_target == null) return;
+        if (current_attacking_target == null) {
+            resetProgress();
+            return;
+        }
         MovingObjectPosition hit = Hammer.proxy.getShadowHit();
         if (current_attacking_target.blockX != hit.blockX
                 || current_attacking_target.blockY != hit.blockY
                 || current_attacking_target.blockZ != hit.blockZ
                 || current_attacking_target.subHit != hit.subHit) {
-            current_attacking_target = null;
+            resetProgress();
             return;
         }
         Hammer.proxy.mineBlock(hit);
-        //NORELEASE: Proxify?
-        
     }
+    
+    void resetProgress() {
+        progress = 0;
+        is_mining = false;
+        current_attacking_target = null;
+    }
+    
+    static float progress = 0;
+    static boolean is_mining = false;
 }
