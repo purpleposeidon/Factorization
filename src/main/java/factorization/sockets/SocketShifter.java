@@ -333,13 +333,14 @@ public class SocketShifter extends TileEntitySocketBase {
         int targetStart, targetEnd;
         if (foreignSlot == -1) {
             targetStart = 0;
-            targetEnd = target.size() - 1;
+            targetEnd = target.size();
         } else {
             if (foreignSlot >= target.size()) {
                 motor.getArgStack().push(-1); // Sure?
                 return;
             }
-            targetStart = targetEnd = foreignSlot;
+            targetStart = foreignSlot;
+            targetEnd = foreignSlot + 1;
         }
         
         int count = 0;
