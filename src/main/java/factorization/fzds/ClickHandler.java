@@ -1,7 +1,12 @@
 package factorization.fzds;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -12,7 +17,6 @@ import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import factorization.fzds.HammerNet.HammerNetType;
 import factorization.fzds.api.DeltaCapability;
-import factorization.shared.Core;
 
 public class ClickHandler {
     //Note that these events will be triggered client-side only, as this entity is only used client-side.
@@ -30,6 +34,7 @@ public class ClickHandler {
     MovingObjectPosition current_attacking_target = null;
     
     void handle(PlayerEvent event, Entity target, boolean rightClick) {
+        if (!target.worldObj.isRemote) return;
         current_attacking_target = null;
         if (target.getClass() != DseRayTarget.class) {
             return;
@@ -69,20 +74,25 @@ public class ClickHandler {
                         (float) (hit.hitVec.xCoord - hit.blockX),
                         (float) (hit.hitVec.yCoord - hit.blockY),
                         (float) (hit.hitVec.zCoord - hit.blockZ));
-                Hammer.proxy.mineBlock(hit);
                 current_attacking_target = hit;
             }
             break;
         default: return;
         }
-        HammerNetEventHandler.INSTANCE.channel.sendToServer(toSend);
+        if (toSend == null) return;
+        HammerNet.channel.sendToServer(toSend);
         //XXX Mmm, no, not quite. Need to do stuff in shadow on the client-side.
     }
     
     @SubscribeEvent
     public void tick(ClientTickEvent event) {
+        // NORELEASE: Just move everything to the proxy?
         if (event.phase != Phase.START) return;
         if (current_attacking_target == null) {
+            resetProgress();
+            return;
+        }
+        if (current_attacking_target.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
             resetProgress();
             return;
         }
@@ -91,18 +101,61 @@ public class ClickHandler {
                 || current_attacking_target.blockY != hit.blockY
                 || current_attacking_target.blockZ != hit.blockZ
                 || current_attacking_target.subHit != hit.subHit) {
+            // NORELEASE: Cursor moved off the block. Make it so that the click can re-fire
             resetProgress();
             return;
         }
-        Hammer.proxy.mineBlock(hit);
+        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+        World shadowWorld = DeltaChunk.getClientShadowWorld();
+        Minecraft mc = Minecraft.getMinecraft();
+        if (player == null) return;
+        
+        Block hitBlock = shadowWorld.getBlock(hit.blockX, hit.blockY, hit.blockZ);
+        if (hitBlock == null || hitBlock.getMaterial() == Material.air) {
+            resetProgress();
+            return;
+        }
+        if (progress == 0) {
+            hitBlock.onBlockClicked(shadowWorld, hit.blockX, hit.blockY, hit.blockZ, player);
+        }
+        //float relativeHardness = hitBlock.getPlayerRelativeBlockHardness(player, shadowWorld, hit.blockX, hit.blockY, hit.blockZ);
+        if (!(mc.currentScreen == null && mc.gameSettings.keyBindAttack.getIsKeyPressed() && mc.inGameHasFocus)) {
+            resetProgress();
+            return;
+        }
+        player.swingItem();
+        int int_progress = (int) (progress/10F);
+        byte packetType = progress == 0 ? HammerNetType.digStart : HammerNetType.digProgress;
+        progress++;
+        if (int_progress >= 10) {
+            packetType = HammerNetType.digFinish;
+        }
+        FMLProxyPacket toSend = HammerNet.makePacket(packetType, hit.blockX, hit.blockY, hit.blockZ, (byte) hit.sideHit);
+        HammerNet.channel.sendToServer(toSend);
+        if (int_progress >= 10) {
+            resetProgress();
+            System.out.println("NORELEASE: Pop!");
+            // NORELEASE: Refire the click here as well!
+            Hammer.proxy.setShadowWorld();
+            try {
+                Minecraft.getMinecraft().playerController.onPlayerDestroyBlock(hit.blockX, hit.blockY, hit.blockZ, hit.sideHit);
+            } finally {
+                Hammer.proxy.restoreRealWorld();
+            }
+        } else {
+            HammerClientProxy.shadowRenderGlobal.destroyBlockPartially(player.getEntityId(), hit.blockX, hit.blockY, hit.blockZ, int_progress);
+        }
     }
     
     void resetProgress() {
+        if (current_attacking_target != null) {
+            EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+            MovingObjectPosition hit = current_attacking_target;
+            HammerClientProxy.shadowRenderGlobal.destroyBlockPartially(player.getEntityId(), hit.blockX, hit.blockY, hit.blockZ, -1);
+        }
         progress = 0;
-        is_mining = false;
         current_attacking_target = null;
     }
     
     static float progress = 0;
-    static boolean is_mining = false;
 }

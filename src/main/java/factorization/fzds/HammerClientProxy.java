@@ -380,19 +380,4 @@ public class HammerClientProxy extends HammerProxy {
     MovingObjectPosition getShadowHit() {
         return shadowSelected;
     }
-    
-    @Override
-    void mineBlock(final MovingObjectPosition mop) {
-        if (mop == null) return;
-        // Step one: Make the arm swing animation happen
-        Minecraft mc = Minecraft.getMinecraft();
-        EntityPlayer player = mc.thePlayer;
-        if (player == null) return;
-        if (mc.currentScreen == null && mc.gameSettings.keyBindAttack.getIsKeyPressed() && mc.inGameHasFocus) {
-            player.swingItem();
-        }
-        // Step two: Make the block breaking render
-        shadowRenderGlobal.destroyBlockPartially(0, mop.blockX, mop.blockY, mop.blockZ, 2);
-        // Step three: Send a (custom) dig packet once the block has broken
-    }
 }

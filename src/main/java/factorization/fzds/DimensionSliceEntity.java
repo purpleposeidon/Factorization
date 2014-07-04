@@ -444,7 +444,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             last_shared_rotational_velocity.update(rotationalVelocity);
         }
         if (toSend != null) {
-            HammerNetEventHandler.INSTANCE.channel.sendToAllAround(toSend, new NetworkRegistry.TargetPoint(dimension, posX, posY, posZ, 64));
+            HammerNet.channel.sendToAllAround(toSend, new NetworkRegistry.TargetPoint(dimension, posX, posY, posZ, 64));
         }
     }
     
@@ -560,17 +560,18 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     private void removeItemEntities() {
         //Move entities outside the bounds in the shadow world into the real world
+        World w = hammerCell.w;
         for (int x = hammerCell.x; x <= farCorner.x; x += 16) {
             for (int z = hammerCell.z; z <= farCorner.z; z += 16) {
-                if (!worldObj.blockExists(x, 64, z)) {
+                if (!w.blockExists(x, 64, z)) {
                     continue;
                 }
-                Chunk chunk = worldObj.getChunkFromBlockCoords(x, z);
+                Chunk chunk = w.getChunkFromBlockCoords(x, z);
                 for (int j = 0; j < chunk.entityLists.length; j++) {
                     List<Entity> l = chunk.entityLists[j];
                     for (int k = 0; k < l.size(); k++) {
                         Entity ent = l.get(k); //This is probably an ArrayList.
-                        if (ent.posY < 0 || ent.posY > worldObj.getActualHeight() || ent == this /* oh god what */) {
+                        if (ent.posY < 0 || ent.posY > w.getActualHeight() || ent == this /* oh god what */) {
                             continue;
                         }
                         if (ent instanceof EntityItem) {

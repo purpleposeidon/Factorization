@@ -8,7 +8,6 @@ import net.minecraft.server.management.PlayerManager;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -41,6 +40,7 @@ public class Hammer {
     public static final String modId = Core.modId + ".dimensionalSlice";
     public static final String name = "Factorization Dimensional Slices";
     public static Hammer instance; //@Instance seems to give the parent?
+    public static HammerNet net;
     @SidedProxy(clientSide = "factorization.fzds.HammerClientProxy", serverSide = "factorization.fzds.HammerProxy")
     public static HammerProxy proxy;
     public static boolean enabled;
@@ -54,6 +54,7 @@ public class Hammer {
     
     public Hammer() {
         Hammer.instance = this;
+        Hammer.net = new HammerNet();
         Core.loadBus(this);
     }
     

@@ -23,8 +23,6 @@ public class HammerProxy {
     void updateRayPosition(DseRayTarget ray) { }
     
     MovingObjectPosition getShadowHit() { return null; }
-    
-    void mineBlock(MovingObjectPosition mop) { }
 
     public void createClientShadowWorld() { }
 }

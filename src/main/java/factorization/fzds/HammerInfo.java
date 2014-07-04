@@ -27,7 +27,7 @@ public class HammerInfo {
     boolean world_loaded = false;
     HashMap<Integer, ConfigCategory> channel2category = new HashMap<Integer, ConfigCategory>();
     
-    private static final int defaultPadding = 16*8;
+    private static final int defaultPadding = 16*4;
     
     void setConfigFile(File f) {
         channelConfig = new Configuration(f);
