@@ -28,7 +28,7 @@ Place the servo at the beginning, on the blank rail.
 It should read in the instructions between the Entry Actions,
 and then stop.
 
-Shift click the servo with an empty Instruction Group to lead the instructions
+Shift click the servo with an empty Instruction Group to load the instructions
 into the Subroutine.
 
 \leftpage
