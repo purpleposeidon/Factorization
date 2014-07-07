@@ -9,7 +9,7 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
 
 @SortingIndex(1)
-@MCVersion("1.7.2")
+@MCVersion("1.7.10") // NORELEASE: Check that this matches our MC version! (Or just automate it...)
 @TransformerExclusions("factorization.coremod.")
 @DependsOn("cpw.mods.fml.common.asm.transformers.DeobfuscationTransformer")
 public class LoadingPlugin implements IFMLLoadingPlugin {
