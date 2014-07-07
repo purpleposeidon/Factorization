@@ -1747,9 +1747,9 @@ public class FzUtil {
         return MinecraftServer.getServer().getConfigurationManager().func_152596_g(player.getGameProfile());
     }
     
-    public static boolean isPlayerOpped(ICommandSender player) {
+    public static boolean isCommandSenderOpped(ICommandSender player) {
         if (player instanceof EntityPlayer) {
-            return isPlayerOpped(player);
+            return isCommandSenderOpped(player);
         }
         return player instanceof MinecraftServer || player instanceof RConConsoleSource;
     }

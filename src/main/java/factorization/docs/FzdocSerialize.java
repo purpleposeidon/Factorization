@@ -43,7 +43,7 @@ final class FzdocSerialize implements ICommand {
 
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender icommandsender) {
-        return icommandsender instanceof EntityPlayer && FzUtil.isPlayerOpped(icommandsender);
+        return icommandsender instanceof EntityPlayer && FzUtil.isCommandSenderOpped(icommandsender);
     }
 
     @Override
