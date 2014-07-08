@@ -41,7 +41,7 @@ public class AirInspector implements IClassTransformer {
         return basicClass;
     }
     
-    static final String dev_block = "Lnet/minecraft/block/Block;", obf_block = "Lahu;";
+    static final String dev_block = "Lnet/minecraft/block/Block;";
     
     boolean checkInstructions(AbstractInsnNode the_instruction) {
         if (the_instruction.getOpcode() != Opcodes.GETSTATIC) return false;

@@ -1,5 +1,6 @@
 package factorization.coremod;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
@@ -14,6 +15,7 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
 @DependsOn("cpw.mods.fml.common.asm.transformers.DeobfuscationTransformer")
 public class LoadingPlugin implements IFMLLoadingPlugin {
     public static boolean deobfuscatedEnvironment = true;
+    private boolean inspect_air = false;
     @Override public String getSetupClass() { return null; }
     @Override public String getModContainerClass() { return null; } // We use the FMLCorePluginContainsFMLMod manifest attribute
     
@@ -24,13 +26,19 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public String[] getASMTransformerClass() {
-        return new String[] {
-                "factorization.coremod.ASMTransformer",
-                "factorization.coremod.AirInspector"};
+        ArrayList<String> plugins = new ArrayList();
+        plugins.add("factorization.coremod.ASMTransformer");
+        if (inspect_air) {
+            plugins.add("factorization.coremod.AirInspector");
+        }
+        String[] ret = new String[plugins.size()];
+        plugins.toArray(ret);
+        return ret;
     }
     
     @Override
     public void injectData(Map<String, Object> data) {
         deobfuscatedEnvironment = !(Boolean) data.get("runtimeDeobfuscationEnabled");
+        inspect_air = "true".equalsIgnoreCase(System.getProperty("factorization.inspectAir"));
     }
 }
