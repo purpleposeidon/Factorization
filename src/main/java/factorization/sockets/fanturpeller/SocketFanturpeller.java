@@ -169,7 +169,7 @@ public abstract class SocketFanturpeller extends TileEntitySocketBase implements
         if (!worldObj.isRemote) {
             final int need = getRequiredCharge();
             float orig_speed = fanω;
-            if (powered) {
+            if (powered || !shouldFeedJuice()) {
                 fanω *= 0.95;
             } else if (need > 0) {
                 final float ts = getTargetSpeed() * (isSucking ? -1 : 1);
