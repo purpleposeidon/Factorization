@@ -896,7 +896,7 @@ public class Registry {
         TileEntityGrinder.addRecipe(Blocks.furnace, new ItemStack(Blocks.cobblestone), 7F);
         TileEntityGrinder.addRecipe(Blocks.lit_furnace, new ItemStack(Blocks.stone), 7F);
         TileEntityGrinder.addRecipe(Blocks.ladder, new ItemStack(Items.stick), 1.5F);
-        TileEntityGrinder.addRecipe(Blocks.snow, new ItemStack(Items.snowball), 0.25F);
+        TileEntityGrinder.addRecipe(Blocks.snow_layer, new ItemStack(Items.snowball), 0.5F);
         TileEntityGrinder.addRecipe(Blocks.snow, new ItemStack(Items.snowball), 4F);
         TileEntityGrinder.addRecipe(Blocks.clay, new ItemStack(Items.clay_ball), 4F);
         TileEntityGrinder.addRecipe(Blocks.fence, new ItemStack(Items.stick), 2.5F);
@@ -913,7 +913,6 @@ public class Registry {
         TileEntityGrinder.addRecipe(Blocks.redstone_lamp, new ItemStack(Items.glowstone_dust), 4F);
         //Don't want to be responsible for some netherstar exploit involving a beacon, so no beacon.
         //Walls have weird geometry
-        TileEntityGrinder.addRecipe(Blocks.quartz_ore, new ItemStack(Items.quartz), 3.5F);
         TileEntityGrinder.addRecipe(Blocks.hay_block, new ItemStack(Items.wheat), 8.25F);
         
         //So, that's blocks. How about items?
