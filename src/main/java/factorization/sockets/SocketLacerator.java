@@ -492,6 +492,11 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         }
     }
     
+    @Override
+    public void click(EntityPlayer entityplayer) {
+        FzUtil.emptyBuffer(entityplayer, buffer, this);
+    }
+    
     
     //Render code
     @Override

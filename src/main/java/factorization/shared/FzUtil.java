@@ -1758,4 +1758,12 @@ public class FzUtil {
         ServerConfigurationManager cm = MinecraftServer.getServer().getConfigurationManager();
         return cm.func_152602_a(player);
     }
+    
+    public static boolean emptyBuffer(EntityPlayer entityplayer, List<ItemStack> buffer, TileEntityCommon te) {
+        if (buffer.isEmpty()) return false;
+        ItemStack is = buffer.remove(0);
+        new Coord((TileEntity) te).spawnItem(is).onCollideWithPlayer(entityplayer);
+        te.markDirty();
+        return true;
+    }
 }

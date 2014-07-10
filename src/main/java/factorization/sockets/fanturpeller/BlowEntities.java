@@ -3,11 +3,6 @@ package factorization.sockets.fanturpeller;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -25,6 +20,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.common.util.ForgeDirection;
+
+import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
@@ -308,6 +308,11 @@ public class BlowEntities extends SocketFanturpeller implements IEntitySelector 
             return false;
         }
         return super.activate(player, side);
+    }
+    
+    @Override
+    public void click(EntityPlayer entityplayer) {
+        FzUtil.emptyBuffer(entityplayer, buffer, this);
     }
     
     @Override

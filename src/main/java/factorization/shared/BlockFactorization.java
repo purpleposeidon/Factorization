@@ -150,8 +150,8 @@ public class BlockFactorization extends BlockContainer {
         }
 
         TileEntity t = world.getTileEntity(x, y, z);
-        if (t instanceof TileEntityFactorization) {
-            ((TileEntityFactorization) t).click(entityplayer);
+        if (t instanceof TileEntityCommon) {
+            ((TileEntityCommon) t).click(entityplayer);
         }
     }
     
