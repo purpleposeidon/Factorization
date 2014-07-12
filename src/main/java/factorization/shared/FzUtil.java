@@ -1,6 +1,11 @@
 package factorization.shared;
 
 import static org.lwjgl.opengl.GL11.glGetError;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
+import io.netty.channel.embedded.EmbeddedChannel;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.ClipboardOwner;
@@ -44,6 +49,9 @@ import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTSizeTracker;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
 import net.minecraft.network.rcon.RConConsoleSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
@@ -1133,12 +1141,36 @@ public class FzUtil {
         return new GameProfile(FZ_UUID, "[FZ:" + name + "]");
     }
     
+    private static class FakeNetManager extends NetworkManager {
+        public FakeNetManager() {
+            super(false);
+            this.channel = new EmbeddedChannel(new ChannelHandler() {
+                @Override public void handlerAdded(ChannelHandlerContext ctx) throws Exception { }
+                @Override public void handlerRemoved(ChannelHandlerContext ctx) throws Exception { }
+                @Override @Deprecated public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception { }
+            });
+            this.channel.pipeline().addFirst("fz:null", new ChannelOutboundHandlerAdapter() {
+                @Override public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception { }
+            });
+        }
+        
+    }
+    
+    private static class FakeNetHandler extends NetHandlerPlayServer {
+        public FakeNetHandler(EntityPlayerMP player) {
+            super(MinecraftServer.getServer(), new FakeNetManager(), player);
+        }
+        
+        @Override public void sendPacket(Packet ignored) { }
+    }
+    
     private static class FzFakePlayer extends FakePlayer {
         Coord where;
 
         private FzFakePlayer(WorldServer world, String name, Coord where) {
             super(world, makeProfile(name));
             this.where = where;
+            playerNetServerHandler = new FakeNetHandler(this);
         }
         
         @Override
