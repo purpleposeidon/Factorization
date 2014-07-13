@@ -1,0 +1,9 @@
+\title{Grates}
+
+Servo grates simply \link{servodecor}{decorators} that make servo rails solid.
+There are three varieties.
+
+\topic{item.factorization:servo/decorator.fz.decorator.servoGrateGlass}
+\topic{item.factorization:servo/decorator.fz.decorator.servoGrateIron}
+\topic{item.factorization:servo/decorator.fz.decorator.servoGrateWood}
+
