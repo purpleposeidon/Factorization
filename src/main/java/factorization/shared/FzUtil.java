@@ -1787,7 +1787,7 @@ public class FzUtil {
     
     public static boolean isCommandSenderOpped(ICommandSender player) {
         if (player instanceof EntityPlayer) {
-            return isCommandSenderOpped(player);
+            return isPlayerOpped((EntityPlayer) player);
         }
         return player instanceof MinecraftServer || player instanceof RConConsoleSource;
     }
