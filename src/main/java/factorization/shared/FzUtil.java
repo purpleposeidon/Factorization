@@ -1607,6 +1607,12 @@ public class FzUtil {
         return oldValue*(1 - partial) + newValue*partial;
     }
     
+    public static float uninterp(float lowValue, float highValue, float currentValue) {
+        if (currentValue < lowValue) return 0F;
+        if (currentValue > highValue) return 1F;
+        return (currentValue - lowValue)/(highValue - lowValue);
+    }
+    
     public static int getAxis(ForgeDirection fd) {
         if (fd.offsetX != 0) {
             return 1;
