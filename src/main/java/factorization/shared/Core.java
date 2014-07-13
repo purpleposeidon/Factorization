@@ -66,7 +66,7 @@ import factorization.oreprocessing.FactorizationOreProcessingHandler;
 import factorization.servo.ServoMotor;
 import factorization.wrath.TileEntityWrathLamp;
 
-@Mod(modid = Core.modId, name = Core.name, version = Core.version)
+@Mod(modid = Core.modId, name = Core.name, version = Core.version, acceptedMinecraftVersions = "1.7.10")
 public class Core {
     //We should repackage stuff. And rename the API package possibly.
     public static final String modId = "factorization";
