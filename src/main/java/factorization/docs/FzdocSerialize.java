@@ -90,13 +90,9 @@ final class FzdocSerialize implements ICommand {
             return;
         }
         
-        xSize -= 2*Math.signum(xSize);
-        zSize -= 2*Math.signum(zSize);
-        ySize += 1;
-        peak.x += Math.signum(xSize);
-        peak.z += Math.signum(zSize);
-        Coord max = peak.copy();
-        Coord min = peak.add(xSize, ySize, zSize);
+        Coord far = bottom.add(xSize, 0, zSize);
+        Coord max = peak.add((int) Math.signum(xSize), 0, (int) Math.signum(zSize));
+        Coord min = far.add((int) -Math.signum(xSize), 0, (int) -Math.signum(zSize));
         Coord.sort(min, max);
         new Notice(max, "max").sendToAll();
         new Notice(min, "min").sendToAll();
