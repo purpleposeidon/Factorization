@@ -1,5 +1,9 @@
 0.8.86
   Better coremod
+  Remove conflicting lacerator recipes
+  Blocks with buffered output can be punched to unclog. This can be helpful for recovering your items if you've fallen into your industrial sugar cane farm.
+  Jammed some netspam
+  Unplugged a render bug
 
 0.8.85
   Coremods are even better than localizations.
