@@ -17,7 +17,8 @@ public class TileEntityGreenwareRender extends TileEntitySpecialRenderer {
             return;
         }
         Core.profileStartRender("ceramics");
-        
+        GL11.glPushAttrib(GL11.GL_LIGHTING_BIT);
+        GL11.glDisable(GL11.GL_LIGHTING);
         //prevents AO flickering on & off
         int lt = gw.lastTouched;
         gw.lastTouched = 0;
@@ -30,6 +31,7 @@ public class TileEntityGreenwareRender extends TileEntitySpecialRenderer {
         BlockRenderGreenware.instance.clearWorldReferences();
         GL11.glPopMatrix();
         gw.lastTouched = lt;
+        GL11.glPopAttrib();
         Core.profileEndRender();
     }
 
