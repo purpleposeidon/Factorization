@@ -96,6 +96,9 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     protected boolean removedByPlayer(EntityPlayer player) {
         return Core.registry.resource_block.removedByPlayer(worldObj, player, xCoord, yCoord, zCoord);
     }
+    
+    public void click(EntityPlayer entityplayer) {
+    }
 
     /** Called when there's a block update. */
     public void neighborChanged() {

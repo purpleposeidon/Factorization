@@ -11,6 +11,7 @@ import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
@@ -425,7 +426,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                     
                     EntityPlayer player = getFakePlayer();
                     ItemStack pick = new ItemStack(Items.diamond_pickaxe);
-                    //pick.addEnchantment(Enchantment.silkTouch, 1);
+                    pick.addEnchantment(Enchantment.silkTouch, 1);
                     player.inventory.mainInventory[0] = pick;
                     {
                         boolean canHarvest = false;
@@ -489,6 +490,11 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         for (ItemStack is : buffer) {
             FzUtil.spawnItemStack(here, is);
         }
+    }
+    
+    @Override
+    public void click(EntityPlayer entityplayer) {
+        FzUtil.emptyBuffer(entityplayer, buffer, this);
     }
     
     

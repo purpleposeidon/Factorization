@@ -1,6 +1,11 @@
 package factorization.shared;
 
 import static org.lwjgl.opengl.GL11.glGetError;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
+import io.netty.channel.embedded.EmbeddedChannel;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.ClipboardOwner;
@@ -44,6 +49,9 @@ import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTSizeTracker;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
 import net.minecraft.network.rcon.RConConsoleSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
@@ -1133,12 +1141,36 @@ public class FzUtil {
         return new GameProfile(FZ_UUID, "[FZ:" + name + "]");
     }
     
+    private static class FakeNetManager extends NetworkManager {
+        public FakeNetManager() {
+            super(false);
+            this.channel = new EmbeddedChannel(new ChannelHandler() {
+                @Override public void handlerAdded(ChannelHandlerContext ctx) throws Exception { }
+                @Override public void handlerRemoved(ChannelHandlerContext ctx) throws Exception { }
+                @Override @Deprecated public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception { }
+            });
+            this.channel.pipeline().addFirst("fz:null", new ChannelOutboundHandlerAdapter() {
+                @Override public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception { }
+            });
+        }
+        
+    }
+    
+    private static class FakeNetHandler extends NetHandlerPlayServer {
+        public FakeNetHandler(EntityPlayerMP player) {
+            super(MinecraftServer.getServer(), new FakeNetManager(), player);
+        }
+        
+        @Override public void sendPacket(Packet ignored) { }
+    }
+    
     private static class FzFakePlayer extends FakePlayer {
         Coord where;
 
         private FzFakePlayer(WorldServer world, String name, Coord where) {
             super(world, makeProfile(name));
             this.where = where;
+            playerNetServerHandler = new FakeNetHandler(this);
         }
         
         @Override
@@ -1552,7 +1584,7 @@ public class FzUtil {
         }
     }
     
-    public static boolean significantChange(float a, float b) {
+    public static boolean significantChange(float a, float b, float threshold) {
         if (a == b) {
             return false;
         }
@@ -1561,7 +1593,11 @@ public class FzUtil {
             b = Math.abs(b);
         }
         float thresh = Math.abs(a - b)/Math.max(a, b);
-        return thresh > 0.05;
+        return thresh > threshold;
+    }
+    
+    public static boolean significantChange(float a, float b) {
+        return significantChange(a, b, 0.05F);
     }
     
     /**
@@ -1577,6 +1613,12 @@ public class FzUtil {
     
     public static double interp(double oldValue, double newValue, double partial) {
         return oldValue*(1 - partial) + newValue*partial;
+    }
+    
+    public static float uninterp(float lowValue, float highValue, float currentValue) {
+        if (currentValue < lowValue) return 0F;
+        if (currentValue > highValue) return 1F;
+        return (currentValue - lowValue)/(highValue - lowValue);
     }
     
     public static int getAxis(ForgeDirection fd) {
@@ -1751,9 +1793,9 @@ public class FzUtil {
         return MinecraftServer.getServer().getConfigurationManager().func_152596_g(player.getGameProfile());
     }
     
-    public static boolean isPlayerOpped(ICommandSender player) {
+    public static boolean isCommandSenderOpped(ICommandSender player) {
         if (player instanceof EntityPlayer) {
-            return isPlayerOpped(player);
+            return isPlayerOpped((EntityPlayer) player);
         }
         return player instanceof MinecraftServer || player instanceof RConConsoleSource;
     }
@@ -1761,5 +1803,13 @@ public class FzUtil {
     public static StatisticsFile getStatsFile(EntityPlayer player) {
         ServerConfigurationManager cm = MinecraftServer.getServer().getConfigurationManager();
         return cm.func_152602_a(player);
+    }
+    
+    public static boolean emptyBuffer(EntityPlayer entityplayer, List<ItemStack> buffer, TileEntityCommon te) {
+        if (buffer.isEmpty()) return false;
+        ItemStack is = buffer.remove(0);
+        new Coord((TileEntity) te).spawnItem(is).onCollideWithPlayer(entityplayer);
+        te.markDirty();
+        return true;
     }
 }

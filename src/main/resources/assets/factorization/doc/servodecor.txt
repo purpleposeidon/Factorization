@@ -1,4 +1,4 @@
-\newpage\title{Instructions and Decorations}
+\newpage\title{Instructions and Decorators}
 
 A length of \link{servorail}{servo rail} can hold either an instruction or a decoration.
 These things are placed on the rail by right-clicking,
@@ -8,6 +8,9 @@ then the instruction will be disabled.
 
 An instruction is simply data, so it can be placed infinitely.
 Servos are able to copy them off the rail.
-Decorations, on the other hand, are physical objects.
+Decorators, on the other hand, are physical objects.
+There are two decorators: \link{servograte}{the servo rail grates}, and
+\link{colorscanner}{the color scanner}.
+
 
 % This would be a good place for a list of instructions...

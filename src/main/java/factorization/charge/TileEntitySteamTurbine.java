@@ -109,6 +109,7 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
     
     int last_speed = -9999;
     public void shareFanSpeed() {
+        if (last_speed == fan_speed) return;
         boolean share = false;
         if (last_speed + fan_speed < 2) {
             share = true;

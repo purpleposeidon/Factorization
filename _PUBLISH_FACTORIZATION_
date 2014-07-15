@@ -21,6 +21,8 @@ def run(cmd):
 def adfly(url):
   return "http://adf.ly/2137658/" + url
 
+open("src/main/resources/assets/factorization/lang/en_US.lang").close()
+
 exp = os.path.expanduser
 
 run("rm -f last_fz")

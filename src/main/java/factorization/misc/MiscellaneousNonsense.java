@@ -360,45 +360,4 @@ public class MiscellaneousNonsense {
         }
     }
     
-    @EventHandler
-    public void registerLightFixer(FMLServerStartingEvent event) { //NORELEASE: Probably want to remove this guy?
-        event.registerServerCommand(new CommandBase() { //NORELEASE remove
-            @Override
-            public String getCommandName() {
-                return "skylight-fix";
-            }
-
-            @Override
-            public String getCommandUsage(ICommandSender var1) {
-                return "/skylight-fix radius";
-            }
-
-            @Override
-            public void processCommand(ICommandSender sender, String[] args) {
-                if (args.length == 0) {
-                    sender.addChatMessage(new ChatComponentText("Missing radius"));
-                    return;
-                }
-                int radius = Integer.parseInt(args[0]);
-                ChunkCoordinates pos = sender.getPlayerCoordinates();
-                World w = sender.getEntityWorld();
-                for (int dx = -radius; dx <= radius; dx++) {
-                    for (int dz = -radius; dz <= radius; dz++) {
-                        int x = pos.posX + dx;
-                        int z = pos.posZ + dz;
-                        Coord at = new Coord(w, x, 0, z);
-                        for (int y = 0xFF; y > 50; y--) {
-                            at.y = y;
-                            if (!at.isAir()) break;
-                            if (at.getLightLevelSky() != 0xF) {
-                                new Notice(at, "X").withStyle(Style.DRAWFAR, Style.FORCE).send((EntityPlayer) sender);
-                                at.w.setLightValue(EnumSkyBlock.Sky, at.x, at.y, at.z, 0xF);
-                            }
-                        }
-                    }
-                }
-            }
-            
-        });
-    }
 }

@@ -16,26 +16,27 @@ import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import cpw.mods.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 import cpw.mods.fml.relauncher.FMLRelaunchLog;
 
 public class ASMTransformer implements IClassTransformer {
-    
     static class Append {
-        String srgName, mcpName, obfDescr;
+        private final String obfClassName;
+        private final String srgName, mcpName;
         boolean satisfied = false;
-        Append(String className, String obfDescr, String srgName, String mcpName) {
-            //<Player> you'll want to check the srg name against mapper.mapMethodName(className.replace('.', '/'), methodName, methodDesc)
-            //and the deobf name against the raw methodName
-            //FMLDeobfuscatingRemapper.INSTANCE.unmap(typeName)
-            this.obfDescr = obfDescr;
+        Append(String obfClassName, String srgClassName, String srgName, String mcpName) {
+            this.obfClassName = obfClassName;
             this.srgName = srgName;
             this.mcpName = mcpName;
         }
         
         boolean applies(MethodNode method) {
-            String mDescr = method.name + method.desc;
-            String name = method.name;
-            return mDescr.equals(obfDescr) || name.equals(srgName) || name.equals(mcpName);
+            if (LoadingPlugin.deobfuscatedEnvironment) {
+                return method.name.equals(mcpName);
+            } else {
+                String method_as_srg = FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(obfClassName, method.name, method.desc);
+                return srgName.equals(method_as_srg);
+            }
         }
     }
     
@@ -43,15 +44,13 @@ public class ASMTransformer implements IClassTransformer {
     public byte[] transform(String name, String transformedName, byte[] basicClass) {
         if (transformedName.equals("net.minecraft.block.Block")) {
             return applyTransform(basicClass,
-                    //NORELEASE TODO: We either need to convert srg names into the descripter form below,
-                    //or we need to convert notch names to srg names.
-                    new Append(transformedName, "a(Lafn;IIILafi;)V", "func_149723_a", "onBlockDestroyedByExplosion"),
-                    new Append(transformedName, "a(Lafi;)Z", "func_149659_a", "canDropFromExplosion")
+                    new Append(name, transformedName, "func_149723_a", "onBlockDestroyedByExplosion"),
+                    new Append(name, transformedName, "func_149659_a", "canDropFromExplosion")
             );
         }
         if (transformedName.equals("net.minecraft.client.gui.inventory.GuiContainer")) {
             return applyTransform(basicClass,
-                    new Append(transformedName, "a(CI)V", "func_73869_a", "keyTyped")
+                    new Append(name, transformedName, "func_73869_a", "keyTyped")
             );
         }
         return basicClass;

@@ -5,6 +5,7 @@ import org.lwjgl.opengl.GL11;
 import factorization.common.ContainerFactorization;
 import factorization.shared.Core;
 import factorization.shared.FactorizationGui;
+import factorization.shared.FzUtil;
 
 public class GuiCrystallizer extends FactorizationGui {
     TileEntityCrystallizer crys;
@@ -30,10 +31,16 @@ public class GuiCrystallizer extends FactorizationGui {
         int var6 = (this.height - this.ySize) / 2;
         this.drawTexturedModalRect(var5, var6, 0, 0, this.xSize, this.ySize);
 
-        int progress = (int) (crys.getProgress() * 90);
+        float prog = crys.getProgress();
+        int progress = (int) (prog * 90);
         this.drawTexturedModalRect(var5 + 43, var6 + 89, 0, 192, progress, 16);
 
         float h = crys.heat / (float) TileEntityCrystallizer.topHeat;
+        float cool_start = 1F/20F;
+        float cool_end = 2F/20F;
+        if (prog > cool_start) {
+            h *= (1 - FzUtil.uninterp(cool_start, cool_end, prog));
+        }
         int heat = (int) ((1 - h) * 13);
         for (int dx : new int[] { 54, 109 }) {
             this.drawTexturedModalRect(var5 + dx, var6 + 75 + heat, 176, 0 + heat, 14, 13 - heat);

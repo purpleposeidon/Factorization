@@ -33,9 +33,6 @@ public abstract class TileEntityFactorization extends TileEntityCommon
     @Override
     public abstract FactoryType getFactoryType();
 
-    public void click(EntityPlayer entityplayer) {
-    }
-
     protected void makeNoise() {
     }
 

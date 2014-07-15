@@ -230,7 +230,6 @@ public class RenderServoMotor extends RenderEntity {
             return;
         }
         dummy_entity.worldObj = motor.worldObj;
-        holder_render.setRenderManager(renderManager); // NORELEASE: Pretty sure we can RM this
         motor.socket.renderItemOnServo(this, motor, is, partial);
         dummy_entity.worldObj = null;
     }
@@ -302,19 +301,7 @@ public class RenderServoMotor extends RenderEntity {
             return equiped_item;
         }
     };
-
-    private static class HolderRenderer extends RenderBiped {
-
-        public HolderRenderer(ModelBiped model, float someFloat) {
-            super(model, someFloat);
-        }
-
-        public void renderItem(float partial) {
-            renderEquippedItems(item_holder, partial);
-        }
-    }
-
-    static HolderRenderer holder_render = new HolderRenderer(new ModelZombie(), 1);
+    
     static EntityLiving dummy_entity = new EntityEnderman(null);
 
     public void renderItem(ItemStack is) {

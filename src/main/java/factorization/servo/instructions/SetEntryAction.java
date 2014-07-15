@@ -80,8 +80,8 @@ public class SetEntryAction extends Instruction {
         switch (mode) {
         default:
         case ENTRY_EXECUTE: return "Execute Immediately";
-        case ENTRY_LOAD: return "Read to IO Stack";
-        case ENTRY_WRITE: return "Write from IO Stack";
+        case ENTRY_LOAD: return "Read to Stack";
+        case ENTRY_WRITE: return "Write from Stack";
         case ENTRY_IGNORE: return "Ignore Instructions"; //excepting this one
         }
     }

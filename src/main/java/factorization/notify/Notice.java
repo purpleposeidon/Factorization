@@ -119,7 +119,7 @@ public class Notice {
      */
     public Notice withItem(ItemStack item) {
         if (isUpdating && !changed) {
-            cmp(this.item, item);
+            cmpIs(this.item, item);
             changedItem |= changed;
         }
         this.item = item == null ? null : item.copy();
@@ -181,8 +181,18 @@ public class Notice {
     }
     
     private void cmp(Object a, Object b) {
+        if (a == b) return;
         if (a != null && b != null) {
-            changed |= a.equals(b);
+            changed |= !a.equals(b);
+        } else {
+            changed |= a == b;
+        }
+    }
+    
+    private void cmpIs(ItemStack a, ItemStack b) {
+        if (a == b) return;
+        if (a != null && b != null) {
+            changed |= !a.isItemEqual(b);
         } else {
             changed |= a == b;
         }
@@ -190,7 +200,7 @@ public class Notice {
     
     boolean isInvalid() {
         int maxAge = 20 * (style.contains(Style.LONG) ? ClientMessage.LONG_TIME : ClientMessage.SHORT_TIME);
-        if (age++ > 20 * maxAge) {
+        if (age++ > maxAge) {
             return true;
         }
         if (where instanceof Entity) {

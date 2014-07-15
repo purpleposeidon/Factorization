@@ -26,7 +26,7 @@ Flower farm
 
 Potion machine
 
-Wheat farm, using a \link{color scanner}{color scanner} for detecting optimal harvest time.
+Wheat farm, using a \link{colorscanner}{color scanner} for detecting optimal harvest time.
 
 Tree farm, using sand and a piston
 

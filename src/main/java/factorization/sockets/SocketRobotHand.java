@@ -185,7 +185,7 @@ public class SocketRobotHand extends TileEntitySocketBase {
         final int x = mop.blockX;
         final int y = mop.blockY;
         final int z = mop.blockZ;
-        final int side = mop.sideHit;
+        int side = mop.sideHit;
         final Vec3 hitVec = mop.hitVec;
         final float dx = (float)hitVec.xCoord - (float)x;
         final float dy = (float)hitVec.yCoord - (float)y;
@@ -219,6 +219,9 @@ public class SocketRobotHand extends TileEntitySocketBase {
             if (itemstack == null) {
                 ret = false;
                 break;
+            }
+            if (!world.isBlockNormalCubeDefault(x, y, z, true)) {
+                side = side ^ 1;
             }
             ret = itemstack.tryPlaceItemIntoWorld(player, world, x, y, z, side, dx, dy, dz);
             break;

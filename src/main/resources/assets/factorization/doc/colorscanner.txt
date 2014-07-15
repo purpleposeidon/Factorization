@@ -1,0 +1,10 @@
+\title{Color Scanner}
+
+When a servo runs over this \link{servodecor}{decorator},
+it will scan the color of whatever's in front of it.
+
+Colored blocks will have their color scanner.
+
+Scanning farmable crops will give a color corresponding to their growth stage.
+
+\topic{item.factorization:servo/decorator.fz.decorator.scancolor}

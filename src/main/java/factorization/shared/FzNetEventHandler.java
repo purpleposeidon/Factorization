@@ -35,7 +35,7 @@ public class FzNetEventHandler {
     }
     
     private void handlePacket(CustomPacketEvent event, boolean isServer, EntityPlayer player) {
-        ByteBufInputStream input = new ByteBufInputStream(event.packet.payload());
+        ByteBufInputStream input = new ByteBufInputStream(event.packet.payload()); //TODO: Actually, can't we just switch to using the ByteBuf directly?
         try {
             MessageType mt = MessageType.read(input);
             if (mt.isEntityMessage) {

@@ -1,12 +1,12 @@
 package factorization.api;
 
-import java.util.EnumSet;
-
-import factorization.shared.FzUtil;
-
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockCarpet;
 import net.minecraft.block.BlockColored;
+import net.minecraft.block.BlockStainedGlass;
+import net.minecraft.block.BlockStainedGlassPane;
 import net.minecraft.item.ItemStack;
+import factorization.shared.FzUtil;
 
 public enum FzColor {
     NO_COLOR(null, 0xFFFFFF),
@@ -59,12 +59,12 @@ public enum FzColor {
         if (b == null) {
             return NO_COLOR;
         }
-        if (b instanceof BlockColored) {
+        if (b instanceof BlockColored || b instanceof BlockStainedGlassPane || b instanceof BlockStainedGlass || b instanceof BlockCarpet) {
             int md = c.getMd();
             if (md < 0 || md >= 16) {
-                return null;
+                return NO_COLOR;
             }
-            return cache[md];
+            return cache[md + 1];
         }
         return NO_COLOR;
     }

@@ -318,4 +318,9 @@ public class TileEntityCompressionCrafter extends TileEntityCommon implements IM
         if (!buffer.isEmpty()) return "Buffered output";
         return null;
     }
+    
+    @Override
+    public void click(EntityPlayer entityplayer) {
+        FzUtil.emptyBuffer(entityplayer, buffer, this);
+    }
 }
