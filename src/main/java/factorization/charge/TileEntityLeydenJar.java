@@ -164,8 +164,10 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     
     void updateClients() {
         if (storage != last_storage) {
-            broadcastMessage(null, MessageType.LeydenjarLevel, storage);
-            last_storage = storage;
+            if (FzUtil.significantChange(storage, last_storage, 0.005F)) {
+                broadcastMessage(null, MessageType.LeydenjarLevel, storage);
+                last_storage = storage;
+            }
         }
     }
     

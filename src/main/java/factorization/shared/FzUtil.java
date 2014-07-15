@@ -1584,7 +1584,7 @@ public class FzUtil {
         }
     }
     
-    public static boolean significantChange(float a, float b) {
+    public static boolean significantChange(float a, float b, float threshold) {
         if (a == b) {
             return false;
         }
@@ -1593,7 +1593,11 @@ public class FzUtil {
             b = Math.abs(b);
         }
         float thresh = Math.abs(a - b)/Math.max(a, b);
-        return thresh > 0.05;
+        return thresh > threshold;
+    }
+    
+    public static boolean significantChange(float a, float b) {
+        return significantChange(a, b, 0.05F);
     }
     
     /**
