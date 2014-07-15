@@ -5,10 +5,8 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.IItemRenderer.ItemRenderType;
-import net.minecraftforge.client.IItemRenderer.ItemRendererHelper;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
@@ -27,9 +25,10 @@ public class FactorizationRender implements ISimpleBlockRenderingHandler {
             FBR.setMetadata(metadata);
             if (FBR.renderType == ItemRenderType.EQUIPPED
                     || FBR.renderType == ItemRenderType.EQUIPPED_FIRST_PERSON) {
+                GL11.glPushAttrib(GL11.GL_DEPTH_BUFFER_BIT);
                 GL11.glDepthMask(true);
                 FBR.render(renderer);
-                GL11.glDepthMask(false); //NORELEASE: pushAttrib
+                GL11.glPopAttrib();
             } else {
                 FBR.render(renderer);
             }
