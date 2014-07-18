@@ -13,9 +13,10 @@ import com.google.common.collect.BiMap;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import factorization.fzds.Hammer;
+import factorization.fzds.api.IFzdsShenanigans;
 import factorization.shared.Core;
 
-public class WrappedPacket extends Packet {
+public class WrappedPacket extends Packet implements IFzdsShenanigans {
     /**
      * These fields hold the packet maps.
      * See {@link net.minecraft.util.MessageDeserializer.decode(ChannelHandlerContext, ByteBuf, List)}
@@ -39,11 +40,11 @@ public class WrappedPacket extends Packet {
     }
 
     @Override
-    public void readPacketData(PacketBuffer data) throws IOException {
+    public void readPacketData(PacketBuffer data) {
         wrapped = unwrapPacket(data);
     }
     
-    private static Packet unwrapPacket(PacketBuffer buf) throws IOException {
+    private static Packet unwrapPacket(PacketBuffer buf) {
         int packetId = buf.readVarIntFromBuffer();
         Packet recieved_packet = Packet.generatePacket(serverPacketMap, packetId);
         if (recieved_packet == null) {
@@ -55,7 +56,7 @@ public class WrappedPacket extends Packet {
     }
 
     @Override
-    public void writePacketData(PacketBuffer data) throws IOException {
+    public void writePacketData(PacketBuffer data) {
         if (wrapped == null) {
             return;
         }
