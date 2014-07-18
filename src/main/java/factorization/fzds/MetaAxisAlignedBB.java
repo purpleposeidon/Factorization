@@ -2,6 +2,9 @@ package factorization.fzds;
 
 import java.util.List;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
@@ -9,10 +12,11 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import factorization.api.Quaternion;
+import factorization.fzds.api.IFzdsShenanigans;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
-public class MetaAxisAlignedBB extends AxisAlignedBB {
+public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans {
     //NORELEASE, Optimization: If not rotated, check more vanilla-like, and mutate the parameter to test instead of shadowaabbs.
     World shadowWorld;
     AxisAlignedBB shadowAABB;
@@ -51,7 +55,8 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
     AabbHolder aabbHolder = new AabbHolder();
     
     List<AxisAlignedBB> getUnderlying(AxisAlignedBB aabb) {
-        aabbHolder.held = aabb;
+        double padding = 0;
+        aabbHolder.held = aabb.expand(padding, padding, padding);
         return shadowWorld.getCollidingBoundingBoxes(aabbHolder, aabb);
     }
     
@@ -82,7 +87,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
         Vec3 centerInShadowSpace = FzUtil.averageVec(shadowMax, shadowMin);
         Vec3 center = centerInShadowSpace.addVector(0, 0, 0);
         shadow2rotation(center);
-        rotation.applyRotation(center);
+        rotation.conjugate().applyRotation(center); //rotation.applyRotation(center);
         rotation2shadow(center);
         Vec3 diff = centerInShadowSpace.subtract(center); // NO LONGER client-side only; praise be to notch
         AxisAlignedBB moved = shadow.getOffsetBoundingBox(diff.xCoord, diff.yCoord, diff.zCoord);
@@ -112,13 +117,19 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
     }
     
     
-    //The three functions below differ in these ways:
-    //shadow_version.addCoord(XcurrentOffset, YcurrentOffset, ZcurrentOffset)
-    //bbs.get(i).calculate_AXIS_Offset
+    /*
+     * The three functions are decomposed here:
+     *  - Vec3 offset = rotateOffset(XcurrentOffset, YcurrentOffset, ZcurrentOffset)
+     *  - bbs.get(i).calculate_AXIS_Offset
+     * 
+     * *NOTE* currentOffset is the length of a vector aligned to the relevant axis in **real world space**.
+     * So, we just need to rotate the vector and use that to adjust the peek-area.
+     */
     @Override
     public double calculateXOffset(AxisAlignedBB collider, double currentOffset) {
         AxisAlignedBB shadow_version = mutateForeign(collider);
-        List<AxisAlignedBB> bbs = getUnderlying(shadow_version.addCoord(currentOffset, 0, 0));
+        Vec3 offset = rotateOffset(currentOffset, 0, 0);
+        List<AxisAlignedBB> bbs = getUnderlying(shadow_version.addCoord(offset.xCoord, offset.yCoord, offset.zCoord));
         for (int i = 0; i < bbs.size(); i++) {
             AxisAlignedBB here = mutateLocal(bbs.get(i));
             currentOffset = here.calculateXOffset(shadow_version, currentOffset);
@@ -129,7 +140,8 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
     @Override
     public double calculateYOffset(AxisAlignedBB collider, double currentOffset) {
         AxisAlignedBB shadow_version = mutateForeign(collider);
-        List<AxisAlignedBB> bbs = getUnderlying(shadow_version.addCoord(0, currentOffset, 0));
+        Vec3 offset = rotateOffset(0, currentOffset, 0);
+        List<AxisAlignedBB> bbs = getUnderlying(shadow_version.addCoord(offset.xCoord, offset.yCoord, offset.zCoord));
         for (int i = 0; i < bbs.size(); i++) {
             AxisAlignedBB here = mutateLocal(bbs.get(i));
             currentOffset = here.calculateYOffset(shadow_version, currentOffset);
@@ -140,7 +152,8 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
     @Override
     public double calculateZOffset(AxisAlignedBB collider, double currentOffset) {
         AxisAlignedBB shadow_version = mutateForeign(collider);
-        List<AxisAlignedBB> bbs = getUnderlying(shadow_version.addCoord(0, 0, currentOffset));
+        Vec3 offset = rotateOffset(0, 0, currentOffset);
+        List<AxisAlignedBB> bbs = getUnderlying(shadow_version.addCoord(offset.xCoord, offset.yCoord, offset.zCoord));
         for (int i = 0; i < bbs.size(); i++) {
             AxisAlignedBB here = mutateLocal(bbs.get(i));
             currentOffset = here.calculateZOffset(shadow_version, currentOffset);
@@ -148,9 +161,23 @@ public class MetaAxisAlignedBB extends AxisAlignedBB {
         return currentOffset;
     }
     
+    private Vec3 _currentOffset_vector = Vec3.createVectorHelper(0, 0, 0);
+    Vec3 rotateOffset(double x, double y, double z) {
+        _currentOffset_vector.xCoord = x;
+        _currentOffset_vector.yCoord = y;
+        _currentOffset_vector.zCoord = z;
+        rotation.applyRotation(_currentOffset_vector);
+        return _currentOffset_vector;
+    }
+    
     @Override
     public boolean intersectsWith(AxisAlignedBB collider) {
-        AxisAlignedBB shadow_version = mutateForeign(collider);
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+            //System.out.println("NORELEASE");
+            return false; //NORELEASE
+        }
+        double d = 2;
+        AxisAlignedBB shadow_version = mutateForeign(collider.expand(d, d, d));
         List<AxisAlignedBB> bbs = getUnderlying(shadow_version);
         for (int i = 0; i < bbs.size(); i++) {
             AxisAlignedBB here = mutateLocal(bbs.get(i));
