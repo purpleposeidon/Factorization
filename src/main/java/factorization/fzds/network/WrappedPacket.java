@@ -51,7 +51,11 @@ public class WrappedPacket extends Packet implements IFzdsShenanigans {
             Core.logWarning("Bad packet ID " + packetId);
             return null;
         }
-        recieved_packet.readPacketData(buf);
+        try {
+            recieved_packet.readPacketData(buf);
+        } catch (IOException e) {
+            // TODO: This can go away.
+        }
         return recieved_packet;
     }
 
