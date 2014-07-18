@@ -29,6 +29,9 @@ public abstract class IDeltaChunk extends Entity {
      */
     public abstract void setRotationalVelocity(Quaternion w);
     
+    public abstract Vec3 getRotationalCenterOffset();
+    
+    public abstract void setRotationalCenterOffset(Vec3 newOffset);
     
     
     /***
@@ -79,10 +82,14 @@ public abstract class IDeltaChunk extends Entity {
     public abstract Coord getCorner();
     /***
      * @return the center, in shadow coordinates
+     * This method shouldn't be here. Just average getCorner() and getFarCorner().
      */
+    @Deprecated
     public abstract Coord getCenter();
     /***
      * @return the upper corner, in shadow coordinates
      */
     public abstract Coord getFarCorner();
+    
+    
 }

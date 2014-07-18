@@ -49,11 +49,12 @@ import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.common.FzConfig;
 import factorization.fzds.api.DeltaCapability;
+import factorization.fzds.api.IFzdsShenanigans;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
 
-public class RenderDimensionSliceEntity extends Render {
+public class RenderDimensionSliceEntity extends Render implements IFzdsShenanigans {
     public static int update_frequency = 16;
     public static RenderDimensionSliceEntity instance;
     

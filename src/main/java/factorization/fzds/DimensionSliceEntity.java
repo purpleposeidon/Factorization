@@ -808,6 +808,19 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     }
     
     @Override
+    public Vec3 getRotationalCenterOffset() {
+        return centerOffset;
+    }
+    
+    @Override
+    public void setRotationalCenterOffset(Vec3 newOffset) {
+        centerOffset = newOffset;
+        if (worldObj.isRemote) return;
+        FMLProxyPacket toSend = HammerNet.makePacket(HammerNet.HammerNetType.rotationCenterOffset, getEntityId(), centerOffset);
+        HammerNet.channel.sendToAllAround(toSend, new NetworkRegistry.TargetPoint(dimension, posX, posY, posZ, 64));
+    }
+    
+    @Override
     public float getCollisionBorderSize() {
         return 0;
     }

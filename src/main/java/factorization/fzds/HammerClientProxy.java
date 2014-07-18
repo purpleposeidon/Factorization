@@ -261,6 +261,7 @@ public class HammerClientProxy extends HammerProxy {
     MovingObjectPosition shadowSelected = null;
     DseRayTarget rayTarget = null;
     AxisAlignedBB selectionBlockBounds = null;
+    IDeltaChunk hitSlice = null;
     
     @SubscribeEvent
     public void renderSelection(DrawBlockHighlightEvent event) {
@@ -315,9 +316,11 @@ public class HammerClientProxy extends HammerProxy {
     
     @Override
     void updateRayPosition(DseRayTarget ray) {
+        hitSlice = null;
         if (ray.parent.centerOffset == null) {
             return;
         }
+        hitSlice = ray.parent;
         //mc.renderViewEntity.rayTrace(reachDistance, partialTicks) Just this function would work if we didn't care about entities.
         // But we also need entities. So we'll just invoke MC's ray trace code.
         Minecraft mc = Minecraft.getMinecraft();
@@ -379,5 +382,10 @@ public class HammerClientProxy extends HammerProxy {
     @Override
     MovingObjectPosition getShadowHit() {
         return shadowSelected;
+    }
+    
+    @Override
+    IDeltaChunk getHitIDC() {
+        return hitSlice;
     }
 }

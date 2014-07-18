@@ -12,8 +12,9 @@ import com.google.common.io.ByteArrayDataOutput;
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsEntryControl;
+import factorization.fzds.api.IFzdsShenanigans;
 
-public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdditionalSpawnData {
+public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdditionalSpawnData, IFzdsShenanigans {
     DimensionSliceEntity parent;
     Vec3 offset;
     

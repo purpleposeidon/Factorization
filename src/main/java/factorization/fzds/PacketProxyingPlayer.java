@@ -35,10 +35,11 @@ import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsEntryControl;
+import factorization.fzds.api.IFzdsShenanigans;
 import factorization.fzds.network.WrappedPacket;
 
 public class PacketProxyingPlayer extends EntityPlayerMP implements
-        IFzdsEntryControl {
+        IFzdsEntryControl, IFzdsShenanigans {
     DimensionSliceEntity dimensionSlice;
     static boolean useShortViewRadius = true; // true doesn't actually change the view radius
 
@@ -47,10 +48,14 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     
     
     EmbeddedChannel proxiedChannel = new EmbeddedChannel(new WrappedMulticastHandler());
-    NetworkManager networkManager = new NetworkManager(false) {
-        {
+    NetworkManager networkManager = new ProxyingNetworkManager();
+    
+    class ProxyingNetworkManager extends NetworkManager implements IFzdsShenanigans {
+        public ProxyingNetworkManager() {
+            super(false);
             this.channel = proxiedChannel;
         }
+        
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
             throw new IllegalArgumentException("No, go away");
@@ -71,7 +76,7 @@ public class PacketProxyingPlayer extends EntityPlayerMP implements
     
     static final Throwable generic_future_failure = new NotImplementedError("Sorry!");
     
-    class WrappedMulticastHandler extends ChannelOutboundHandlerAdapter {
+    class WrappedMulticastHandler extends ChannelOutboundHandlerAdapter implements IFzdsShenanigans {
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
             PacketProxyingPlayer.this.addNettyMessage(proxiedChannel, msg);

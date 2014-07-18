@@ -20,6 +20,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityCommandBlock;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
@@ -527,6 +528,26 @@ public class FZDSCommand extends CommandBase {
                 dse.worldObj.spawnEntityInWorld(dse);
                 setSelection(dse);
             }}, Requires.COORD);
+        add(new SubCommand("movecenter", "x,y,z") {
+            @Override
+            void call(String[] args) {
+                Vec3 newOffset = null;
+                try {
+                    String[] vecArg = args[0].split(",");
+                    Coord base = selected.getCorner();
+                    newOffset = Vec3.createVectorHelper(
+                            Double.parseDouble(vecArg[0]),
+                            Double.parseDouble(vecArg[1]),
+                            Double.parseDouble(vecArg[2]));
+                } catch (Throwable e) {
+                    Vec3 v = selected.getRotationalCenterOffset();
+                    sendChat("Current rotational center: " + v.xCoord + "," + v.yCoord + "," + v.zCoord);
+                }
+                if (newOffset != null) {
+                    selected.setRotationalCenterOffset(newOffset);
+                }
+            }
+        }, Requires.SLICE_SELECTED);
         add(new SubCommand("grabchunk") {
             @Override
             String details() {

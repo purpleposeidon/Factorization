@@ -1,5 +1,6 @@
 package factorization.fzds;
 
+import factorization.fzds.api.IDeltaChunk;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
@@ -23,6 +24,8 @@ public class HammerProxy {
     void updateRayPosition(DseRayTarget ray) { }
     
     MovingObjectPosition getShadowHit() { return null; }
+    
+    IDeltaChunk getHitIDC() { return null; }
 
     public void createClientShadowWorld() { }
 }

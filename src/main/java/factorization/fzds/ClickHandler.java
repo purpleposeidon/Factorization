@@ -15,6 +15,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import factorization.api.Coord;
 import factorization.fzds.HammerNet.HammerNetType;
 import factorization.fzds.api.DeltaCapability;
 
@@ -61,7 +62,7 @@ public class ClickHandler {
                 if (!parent.can(DeltaCapability.BLOCK_PLACE)) {
                     return;
                 }
-                toSend = HammerNet.makePacket(HammerNetType.rightClickBlock, hit.blockX, hit.blockY, hit.blockZ, hit.sideHit,
+                toSend = HammerNet.makePacket(HammerNetType.rightClickBlock, parent.getEntityId(), hit,
                         (float) (hit.hitVec.xCoord - hit.blockX),
                         (float) (hit.hitVec.yCoord - hit.blockY),
                         (float) (hit.hitVec.zCoord - hit.blockZ));
@@ -70,7 +71,7 @@ public class ClickHandler {
                     return;
                 }
                 //TODO XXX FIXME: Implement proper digging
-                toSend = HammerNet.makePacket(HammerNetType.leftClickBlock, hit.blockX, hit.blockY, hit.blockZ, hit.sideHit,
+                toSend = HammerNet.makePacket(HammerNetType.leftClickBlock, parent.getEntityId(), hit,
                         (float) (hit.hitVec.xCoord - hit.blockX),
                         (float) (hit.hitVec.yCoord - hit.blockY),
                         (float) (hit.hitVec.zCoord - hit.blockZ));
@@ -110,7 +111,8 @@ public class ClickHandler {
         Minecraft mc = Minecraft.getMinecraft();
         if (player == null) return;
         
-        Block hitBlock = shadowWorld.getBlock(hit.blockX, hit.blockY, hit.blockZ);
+        Coord at = new Coord(shadowWorld, hit);
+        Block hitBlock = at.getBlock();
         if (hitBlock == null || hitBlock.getMaterial() == Material.air) {
             resetProgress();
             return;
@@ -130,7 +132,7 @@ public class ClickHandler {
         if (int_progress >= 10) {
             packetType = HammerNetType.digFinish;
         }
-        FMLProxyPacket toSend = HammerNet.makePacket(packetType, hit.blockX, hit.blockY, hit.blockZ, (byte) hit.sideHit);
+        FMLProxyPacket toSend = HammerNet.makePacket(packetType, Hammer.proxy.getHitIDC().getEntityId(), hit);
         HammerNet.channel.sendToServer(toSend);
         if (int_progress >= 10) {
             resetProgress();
