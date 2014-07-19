@@ -208,6 +208,13 @@ public class DeltaChunk {
                 }
             }
         }
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    dest.w.markBlockForUpdate(x, y, z);
+                }
+            }
+        }
         dest.w.markBlockRangeForRenderUpdate(minX, minY, minZ, maxX, maxY, maxZ);
     }
     

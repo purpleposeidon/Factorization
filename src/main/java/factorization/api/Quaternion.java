@@ -432,6 +432,12 @@ public class Quaternion implements IDataSerializable {
         p.zCoord = trans.z;
     }
     
+    public void applyReverseRotation(Vec3 p) {
+        incrConjugate();
+        applyRotation(p);
+        incrConjugate();
+    }
+    
     private static Vec3 uvCache = Vec3.createVectorHelper(0, 0, 0);
     public void applyRotation(VectorUV vec) {
         uvCache.xCoord = vec.x;

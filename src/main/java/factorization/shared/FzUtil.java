@@ -1104,14 +1104,74 @@ public class FzUtil {
         return Vec3.createVectorHelper(aabb.maxX, aabb.maxY, aabb.maxZ);
     }
     
+    public static void getMin(AxisAlignedBB box, Vec3 target) {
+        target.xCoord = box.minX;
+        target.yCoord = box.minY;
+        target.zCoord = box.minZ;
+    }
+    
+    public static void getMax(AxisAlignedBB box, Vec3 target) {
+        target.xCoord = box.maxX;
+        target.yCoord = box.maxY;
+        target.zCoord = box.maxZ;
+    }
+    
     public static void setMax(AxisAlignedBB aabb, Vec3 v) {
         aabb.maxX = v.xCoord;
         aabb.maxY = v.yCoord;
         aabb.maxZ = v.zCoord;
     }
     
+    public static void setMiddle(AxisAlignedBB ab, Vec3 v) {
+        v.xCoord = (ab.minX + ab.maxX)/2;
+        v.yCoord = (ab.minY + ab.maxY)/2;
+        v.zCoord = (ab.minZ + ab.maxZ)/2;
+    }
+    
+    public static double getDiagonalLength(AxisAlignedBB ab) {
+        double x = ab.maxX - ab.minX;
+        double y = ab.maxY - ab.minY;
+        double z = ab.maxZ - ab.minZ;
+        return Math.sqrt(x*x + y*y + z*z);
+    }
+    
     public static Vec3 averageVec(Vec3 a, Vec3 b) {
         return Vec3.createVectorHelper((a.xCoord + b.xCoord)/2, (a.yCoord + b.yCoord)/2, (a.zCoord + b.zCoord)/2);
+    }
+    
+    public static void assignVecFrom(Vec3 dest, Vec3 orig) {
+        dest.xCoord = orig.xCoord;
+        dest.yCoord = orig.yCoord;
+        dest.zCoord = orig.zCoord;
+    }
+    
+    public static void incrAdd(Vec3 base, Vec3 add) {
+        base.xCoord += add.xCoord;
+        base.yCoord += add.yCoord;
+        base.zCoord += add.zCoord;
+    }
+    
+    public static void incrSubtract(Vec3 base, Vec3 sub) {
+        base.xCoord -= sub.xCoord;
+        base.yCoord -= sub.yCoord;
+        base.zCoord -= sub.zCoord;
+    }
+    
+    public static void setAABB(AxisAlignedBB target, Vec3 min, Vec3 max) {
+        target.minX = min.xCoord;
+        target.minY = min.yCoord;
+        target.minZ = min.zCoord;
+        target.maxX = max.xCoord;
+        target.maxY = max.yCoord;
+        target.maxZ = max.zCoord;
+    }
+    
+    public static AxisAlignedBB createAABB(Vec3 min, Vec3 max) {
+        return AxisAlignedBB.getBoundingBox(min.xCoord, min.yCoord, min.zCoord, max.xCoord, max.yCoord, max.zCoord);
+    }
+    
+    public static void assignBoxFrom(AxisAlignedBB dest, AxisAlignedBB orig) {
+        dest.setBB(orig);
     }
     
     public static boolean intersect(double la, double ha, double lb, double hb) {

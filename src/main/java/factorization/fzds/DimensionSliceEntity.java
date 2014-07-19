@@ -95,12 +95,14 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     @Override
     public Vec3 real2shadow(final Vec3 realVector) {
-        //TODO: Apply transformations!
+        //TODO: Scale?
         Vec3 buffer = Vec3.createVectorHelper(0, 0, 0);
         double diffX = realVector.xCoord + centerOffset.xCoord - posX;
         double diffY = realVector.yCoord + centerOffset.yCoord - posY;
         double diffZ = realVector.zCoord + centerOffset.zCoord - posZ;
-
+        
+        rotation.applyReverseRotation(buffer);
+        
         buffer.xCoord = hammerCell.x + diffX;
         buffer.yCoord = hammerCell.y + diffY;
         buffer.zCoord = hammerCell.z + diffZ;
@@ -110,12 +112,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     @Override
     public Vec3 shadow2real(final Vec3 shadowVector) {
         Vec3 buffer = Vec3.createVectorHelper(0, 0, 0);
-        double diffX = shadowVector.xCoord - hammerCell.x;
-        double diffY = shadowVector.yCoord - hammerCell.y;
-        double diffZ = shadowVector.zCoord - hammerCell.z;
-        buffer.xCoord = diffX - centerOffset.xCoord;
-        buffer.yCoord = diffY - centerOffset.yCoord;
-        buffer.zCoord = diffZ - centerOffset.zCoord;
+        buffer.xCoord = shadowVector.xCoord - hammerCell.x - centerOffset.xCoord;
+        buffer.yCoord = shadowVector.yCoord - hammerCell.y - centerOffset.yCoord;
+        buffer.zCoord = shadowVector.zCoord - hammerCell.z - centerOffset.zCoord;
         
         rotation.applyRotation(buffer);
         
@@ -258,7 +257,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         if (motionZ == 0) {
             odz = Math.round(odz*r)/r;
         }
-        metaAABB = new MetaAxisAlignedBB(hammerCell.w, shadowArea, Vec3.createVectorHelper(odx, ody, odz), rotation, real2shadow(Vec3.createVectorHelper(posX, posY, posZ)));
+        metaAABB = new MetaAxisAlignedBB(this, hammerCell.w);
         metaAABB.setUnderlying(realArea);
     }
     
