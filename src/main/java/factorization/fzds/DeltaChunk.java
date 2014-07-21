@@ -192,6 +192,7 @@ public class DeltaChunk {
                     dest.set(c);
                     selected.shadow2real(dest);
                     TransferLib.move(c, dest, false, overwriteDestination);
+                    dest.w.markBlockForUpdate(dest.x, dest.y, dest.z);
                     if (first) {
                         minX = maxX = x;
                         minY = maxY = y;
@@ -208,14 +209,6 @@ public class DeltaChunk {
                 }
             }
         }
-        for (int x = minX; x <= maxX; x++) {
-            for (int y = minY; y <= maxY; y++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    dest.w.markBlockForUpdate(x, y, z);
-                }
-            }
-        }
-        dest.w.markBlockRangeForRenderUpdate(minX, minY, minZ, maxX, maxY, maxZ);
     }
     
     public static void clear(IDeltaChunk selected) {
