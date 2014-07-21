@@ -183,19 +183,19 @@ public class TransferLib {
             rawRemoveTE(dest);
         }
         setRaw(dest, id, md);
+        TileEntity ret = null;
         if (teData != null) {
             teData.setInteger("x", dest.x);
             teData.setInteger("y", dest.y);
             teData.setInteger("z", dest.z);
-            TileEntity ret = TileEntity.createAndLoadEntity(teData);
+            ret = TileEntity.createAndLoadEntity(teData);
             ret.validate();
             dest.setTE(ret);
-            return ret;
         }
         if (block_tick_time > -1) {
             dest.w.scheduleBlockUpdateWithPriority(dest.x, dest.y, dest.z, id, (int) block_tick_time, block_tick_priority);
         }
-        return null;
+        return ret;
     }
     
     public static void rawErase(Coord c) {
