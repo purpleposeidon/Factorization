@@ -122,22 +122,25 @@ public class Coord implements IDataSerializable, ISaneCoord {
         String ret = "(" + x + ", " + y + ", " + z + ")";
         if (w == null) {
             ret += " null world";
-        } else if (!blockExists()) {
-            ret += " not loaded";
-        } else if (w != null) {
-            Block b = getBlock();
-            if (b != null) {
-                ret += " " + getBlock().getClass().getSimpleName();
-                ret += " " + b.getUnlocalizedName();
+        } else {
+            ret += " (Dimension " + FzUtil.getWorldDimension(w) + ")";
+            if (!blockExists()) {
+                ret += " not loaded";
             } else {
-                ret += " null";
+                Block b = getBlock();
+                if (b != null) {
+                    ret += " " + getBlock().getClass().getSimpleName();
+                    ret += " " + b.getUnlocalizedName();
+                } else {
+                    ret += " null";
+                }
+                TileEntity te = getTE();
+                if (te != null) {
+                    ret += " " + te.getClass().getSimpleName();
+                }
+                //Chunk chunk = getChunk();
+                //ret += " " + chunk;
             }
-            TileEntity te = getTE();
-            if (te != null) {
-                ret += " " + te.getClass().getSimpleName();
-            }
-            //Chunk chunk = getChunk();
-            //ret += " " + chunk;
         }
         return ret;
     }
