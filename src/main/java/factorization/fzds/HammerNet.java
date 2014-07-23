@@ -52,7 +52,7 @@ public class HammerNet {
     
     public static class HammerNetType {
         // Next time, make it an enum.
-        public static final byte rotation = 0, rotationVelocity = 1, rotationBoth = 2, rotationCenterOffset = 10,
+        public static final byte rotation = 0, rotationVelocity = 1, rotationBoth = 2, rotationCenterOffset = 10, exactPositionAndMotion = 11,
                 rightClickEntity = 3, leftClickEntity = 4, rightClickBlock = 5, leftClickBlock = 6, digStart = 7, digProgress = 8, digFinish = 9;
     }
     
@@ -93,6 +93,12 @@ public class HammerNet {
             break;
         case HammerNetType.rotationCenterOffset:
             setCenterOffset(dis, dse);
+            break;
+        case HammerNetType.exactPositionAndMotion:
+            dse.setPosition(dis.readDouble(), dis.readDouble(), dis.readDouble());
+            dse.motionX = dis.readDouble();
+            dse.motionY = dis.readDouble();
+            dse.motionZ = dis.readDouble();
             break;
         }
         
@@ -296,6 +302,8 @@ public class HammerNet {
                 dos.writeByte((Byte) obj);
             } else if (obj instanceof Float) {
                 dos.writeFloat((Float) obj);
+            } else if (obj instanceof Double) {
+                dos.writeDouble((Double) obj);
             } else if (obj instanceof MovingObjectPosition) { 
                 MovingObjectPosition mop = (MovingObjectPosition) obj;
                 dos.writeInt(mop.blockX);
@@ -308,7 +316,7 @@ public class HammerNet {
                 dos.writeDouble(vec.yCoord);
                 dos.writeDouble(vec.zCoord);
             } else {
-                throw new IllegalArgumentException("Can only do Quaternions/Integers/Bytes/Floats/MovingObjectPosition/Vec3!");
+                throw new IllegalArgumentException("Can only do Quaternions/Integers/Bytes/Floats/Doubles/MovingObjectPosition/Vec3!");
             }
         }
         return new FMLProxyPacket(Unpooled.wrappedBuffer(dos.toByteArray()), channelName);

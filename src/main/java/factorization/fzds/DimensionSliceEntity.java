@@ -52,6 +52,8 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     private Quaternion rotation = new Quaternion(), rotationalVelocity = new Quaternion();
     private Quaternion last_shared_rotation = new Quaternion(), last_shared_rotational_velocity = new Quaternion(); //used on the server
     Quaternion prevTickRotation = new Quaternion(); //Client-side
+    private double last_shared_posX = -99, last_shared_posY = -99, last_shared_posZ = -99;
+    private double last_shared_motionX = 0, last_shared_motionY = 0, last_shared_motionZ = 0;
     
     float scale = 1;
     float opacity = 1;
@@ -447,6 +449,26 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         }
     }
     
+    void shareDisplacementInfo() {
+        last_shared_posX += last_shared_motionX;
+        last_shared_posY += last_shared_motionY;
+        last_shared_posZ += last_shared_motionZ;
+        boolean share_displacement = (last_shared_posX != posX) || (last_shared_posY != posY) || (last_shared_posZ != posZ);
+        boolean share_velocity = (last_shared_motionX != motionX) || (last_shared_motionY != motionY) || (last_shared_motionZ != motionZ);
+        if (!share_displacement && !share_velocity) {
+            return;
+        }
+        // Vanilla's packets don't give enough precision. We need ALL of the precision.
+        FMLProxyPacket toSend = HammerNet.makePacket(HammerNet.HammerNetType.exactPositionAndMotion, posX, posY, posZ, motionX, motionY, motionZ);
+        HammerNet.channel.sendToAllAround(toSend, new NetworkRegistry.TargetPoint(dimension, posX, posY, posZ, 64));
+        
+        last_shared_posX = posX;
+        last_shared_posY = posY;
+        last_shared_posZ = posZ;
+        last_shared_motionX = motionX;
+        last_shared_motionY = motionY;
+        last_shared_motionZ = motionZ;
+    }
     
     void doUpdate() {
         Core.profileStart("init");
@@ -469,6 +491,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         Core.profileStart("updateMotion");
         updateMotion();
         Core.profileEnd();
+        if (worldObj.isRemote) {
+            shareDisplacementInfo();
+        }
         if (!worldObj.isRemote && can(DeltaCapability.ROTATE)) {
             shareRotationInfo();
         }
