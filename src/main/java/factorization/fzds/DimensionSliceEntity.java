@@ -742,10 +742,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     @Override
     public void setPositionAndRotation2(double x, double y, double z, float yaw, float pitch, int the_number_three) {
-        //TODO NORELEASE: Investigate this function; it might cause that collisions jitter we get occasionally
-        // This is required because we have some self-interference
-        this.setPosition(x, y, z);
-        this.setRotation(yaw, pitch);
+        // This function is disabled because entity position packets call it with insufficiently precise variables.
+//		this.setPosition(x, y, z);
+//		this.setRotation(yaw, pitch);
     }
     
     @Override
