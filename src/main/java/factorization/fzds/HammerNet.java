@@ -197,6 +197,8 @@ public class HammerNet {
     InteractionLiason getLiason(WorldServer shadowWorld, EntityPlayer real_player) {
         InteractionLiason liason = new InteractionLiason(shadowWorld, new ItemInWorldManager(shadowWorld));
         liason.inventory = real_player.inventory;
+        liason.setSprinting(real_player.isSprinting());
+        liason.setSneaking(real_player.isSneaking());
         return liason;
     }
     
