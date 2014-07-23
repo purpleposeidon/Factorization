@@ -12,6 +12,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsShenanigans;
+import factorization.notify.RenderMessages;
 import factorization.shared.FzUtil;
 
 public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans {
@@ -78,6 +79,9 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
         Vec3 realMiddle = Vec3.createVectorHelper(0, 0, 0);
         FzUtil.setMiddle(realBox, realMiddle);
         double d = FzUtil.getDiagonalLength(realBox)/2;
+        if (!idc.worldObj.isRemote) { // NORELEASE
+            //d *= 0.5;
+        }
         Vec3 shadowMiddle = convertRealVecToShadowVec(realMiddle);
         return AxisAlignedBB.getBoundingBox(
                 shadowMiddle.xCoord - d,
@@ -126,8 +130,8 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
      */
     @Override
     public double calculateXOffset(AxisAlignedBB collider, double currentOffset) {
-        List<AxisAlignedBB> shadowBoxes = getShadowBoxesInRealBox(collider.offset(currentOffset, 0, 0));
-        collider.offset(-currentOffset, 0, 0);
+        collider = collider.copy();
+        List<AxisAlignedBB> shadowBoxes = getShadowBoxesInRealBox(collider.expand(1, 0, 0));
         for (AxisAlignedBB shadowBox : shadowBoxes) {
             AxisAlignedBB realShadow = convertShadowBoxToRealBox(shadowBox);
             currentOffset = realShadow.calculateXOffset(collider, currentOffset);
@@ -137,8 +141,8 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
     
     @Override
     public double calculateYOffset(AxisAlignedBB collider, double currentOffset) {
-        List<AxisAlignedBB> shadowBoxes = getShadowBoxesInRealBox(collider.offset(0, currentOffset, 0));
-        collider.offset(0, -currentOffset, 0);
+        collider = collider.copy();
+        List<AxisAlignedBB> shadowBoxes = getShadowBoxesInRealBox(collider.expand(0, 1, 0));
         for (AxisAlignedBB shadowBox : shadowBoxes) {
             AxisAlignedBB realShadow = convertShadowBoxToRealBox(shadowBox);
             currentOffset = realShadow.calculateYOffset(collider, currentOffset);
@@ -148,14 +152,15 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
     
     @Override
     public double calculateZOffset(AxisAlignedBB collider, double currentOffset) {
-        List<AxisAlignedBB> shadowBoxes = getShadowBoxesInRealBox(collider.offset(0, 0, currentOffset));
-        collider.offset(0, 0, -currentOffset);
+        collider = collider.copy();
+        List<AxisAlignedBB> shadowBoxes = getShadowBoxesInRealBox(collider.expand(0, 0, 1));
         for (AxisAlignedBB shadowBox : shadowBoxes) {
             AxisAlignedBB realShadow = convertShadowBoxToRealBox(shadowBox);
             currentOffset = realShadow.calculateZOffset(collider, currentOffset);
         }
         return currentOffset;
     }
+    
     
     
     
