@@ -142,8 +142,15 @@ public class HammerClientProxy extends HammerProxy {
     }
     
     private static NetHandlerPlayClient send_queue;
-    
+    private boolean send_queue_spam = false;
     private void setSendQueueWorld(WorldClient wc) {
+        if (send_queue == null) {
+            if (!send_queue_spam) {
+                Core.logSevere("send_queue is null!?");
+                send_queue_spam = true;
+            }
+            return;
+        }
         send_queue.clientWorldController = wc;
     }
     
