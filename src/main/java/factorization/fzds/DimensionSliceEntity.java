@@ -455,11 +455,11 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         last_shared_posZ += last_shared_motionZ;
         boolean share_displacement = (last_shared_posX != posX) || (last_shared_posY != posY) || (last_shared_posZ != posZ);
         boolean share_velocity = (last_shared_motionX != motionX) || (last_shared_motionY != motionY) || (last_shared_motionZ != motionZ);
-        if (!share_displacement && !share_velocity) {
+        if (!(share_displacement || share_velocity)) {
             return;
         }
         // Vanilla's packets don't give enough precision. We need ALL of the precision.
-        FMLProxyPacket toSend = HammerNet.makePacket(HammerNet.HammerNetType.exactPositionAndMotion, posX, posY, posZ, motionX, motionY, motionZ);
+        FMLProxyPacket toSend = HammerNet.makePacket(HammerNet.HammerNetType.exactPositionAndMotion, getEntityId(), posX, posY, posZ, motionX, motionY, motionZ);
         HammerNet.channel.sendToAllAround(toSend, new NetworkRegistry.TargetPoint(dimension, posX, posY, posZ, 64));
         
         last_shared_posX = posX;
@@ -491,7 +491,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         Core.profileStart("updateMotion");
         updateMotion();
         Core.profileEnd();
-        if (worldObj.isRemote) {
+        if (!worldObj.isRemote) {
             shareDisplacementInfo();
         }
         if (!worldObj.isRemote && can(DeltaCapability.ROTATE)) {
