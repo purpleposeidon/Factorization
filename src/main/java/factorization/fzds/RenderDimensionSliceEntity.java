@@ -437,7 +437,7 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
             try {
                 glTranslatef((float)(x), (float)(y), (float)(z));
                 Quaternion rotation = dse.getRotation();
-                if (!rotation.isZero()) {
+                if (!rotation.isZero() || !dse.prevTickRotation.isZero()) {
                     Quaternion quat = rotation.add(dse.prevTickRotation);
                     quat.incrScale(0.5);
                     quat.glRotate();
