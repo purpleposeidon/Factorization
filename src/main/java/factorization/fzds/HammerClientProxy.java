@@ -291,6 +291,7 @@ public class HammerClientProxy extends HammerProxy {
         ItemStack is = event.currentItem;
         float partial = event.partialTicks;
         DimensionSliceEntity dse = rayTarget.parent;
+        Coord corner = dse.getCorner();
         Coord here = null;
         if (selectionBlockBounds != null && shadowSelected.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
             here = new Coord(DeltaChunk.getClientShadowWorld(), shadowSelected.blockX, shadowSelected.blockY, shadowSelected.blockZ);
@@ -316,34 +317,56 @@ public class HammerClientProxy extends HammerProxy {
                 rotation = quat;
                 rotation.glRotate();
             }
-            glTranslatef(
-                    (float)(-dse.centerOffset.xCoord),
-                    (float)(-dse.centerOffset.yCoord),
-                    (float)(-dse.centerOffset.zCoord));
-            GL11.glTranslated(
-                    FzUtil.interp(dse.lastTickPosX, dse.posX, partial),
-                    FzUtil.interp(dse.lastTickPosY, dse.posY, partial),
-                    FzUtil.interp(dse.lastTickPosZ, dse.posZ, partial));
-            Coord c = dse.getCorner(); glTranslatef(-c.x, -c.y, -c.z);
-            rotation.conjugate().glRotate();
+            
             GL11.glTranslated(
                     -FzUtil.interp(player.lastTickPosX, player.posX, partial),
                     -FzUtil.interp(player.lastTickPosY, player.posY, partial),
                     -FzUtil.interp(player.lastTickPosZ, player.posZ, partial));
+
+
+            
+            // Mother of god, this is the worst thing ever.
+            // Anyways.
+            // in hammer space:
+            // 		origin: 0,0
+            // 		corner: the corner!
+            // 		selection: the selection, that we got from ray tracing, that's near the corner.
+            /* nothing hapens */
+            
+            // Subtract the corner.
+            //      origin: -corner
+            // 		corner: 0
+            //		selection: selection - corner
+            GL11.glTranslated(-corner.x, -corner.y, -corner.z);
+            Vec3 origin = Vec3.createVectorHelper(-corner.x, -corner.y, -corner.z);
+            
+            // Cast our hammer coordinates to real world space.
+            //  	origin: -corner
+            //		corner: 0
+            //		selection: selection - corner
+            /* nothing happens */
+            
+            // Apply the DSE's rotation quaternion
+            //		origin: rotation.applyTo(-corner)
+            //		corner: 0
+            //		selection: rotation.applyTo(selection - corner)
             rotation.glRotate();
+            rotation.applyRotation(origin);
             
+            // Translate to the DSE
+            //		origin: rotation.applyTo(-corner) + DSE.position
+            //		corner: DSE.position
+            //		selection: rotation.applyTo(selection - corner) + DSE.position
+            GL11.glTranslated(dse.posX, dse.posY, dse.posZ);
+            origin.xCoord += dse.posX;
+            origin.yCoord += dse.posY;
+            origin.zCoord += dse.posZ;
+             
+            //GL11.glTranslated(origin.xCoord, origin.yCoord, origin.zCoord);
             
-            double savePlayerX = player.posX;
-            double savePlayerY = player.posY;
-            double savePlayerZ = player.posZ;
-            partial = 1;
-            player.posX = player.posY = player.posZ = 0;
             if (!ForgeHooksClient.onDrawBlockHighlight(rg, player, shadowSelected, shadowSelected.subHit, is, partial)) {
                 event.context.drawSelectionBox(player, shadowSelected, 0, partial);
             }
-            player.posX = savePlayerX;
-            player.posY = savePlayerY;
-            player.posZ = savePlayerZ;
         } finally {
             //GL11.glColorMask(true, true, true, true);
             GL11.glEnable(GL11.GL_DEPTH_TEST);
