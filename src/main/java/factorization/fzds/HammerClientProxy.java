@@ -1,5 +1,6 @@
 package factorization.fzds;
 
+import static org.lwjgl.opengl.GL11.glTranslatef;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -33,6 +34,7 @@ import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
+import factorization.api.Quaternion;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.shared.Core;
 import factorization.shared.EmptyRender;
@@ -272,7 +274,6 @@ public class HammerClientProxy extends HammerProxy {
     
     @SubscribeEvent
     public void renderSelection(DrawBlockHighlightEvent event) {
-        //System.out.println(event.target.hitVec);
         if (!(event.target.entityHit instanceof DseRayTarget)) {
             return;
         }
@@ -298,25 +299,55 @@ public class HammerClientProxy extends HammerProxy {
                     (float)(selectionBlockBounds.maxX - here.x), (float)(selectionBlockBounds.maxY - here.y), (float)(selectionBlockBounds.maxZ - here.z)
                 );
         }
-        //GL11.glDisable(GL11.GL_ALPHA_TEST);
-        GL11.glPushMatrix();
-        setShadowWorld();
+        if (here == null) {
+            return;
+        }
         try {
-            //TODO: Rotation transform
-            Coord corner = dse.getCenter();
-            GL11.glTranslatef(-corner.x, -corner.y, -corner.z);
-            GL11.glTranslatef((float)(+dse.posX), (float)(+dse.posY), (float)(+dse.posZ));
+            GL11.glPushMatrix();
+            setShadowWorld();
+            GL11.glDisable(GL11.GL_ALPHA_TEST);
+            GL11.glDisable(GL11.GL_DEPTH_TEST);
+            //GL11.glColorMask(false, true, true, true); //Could glPushAttr for the mask. Nah.
             
-            //Could glPushAttr for the mask. Nah.
-            GL11.glColorMask(true, true, false, true);
+            Quaternion rotation = dse.getRotation();
+            if (!rotation.isZero() || !dse.prevTickRotation.isZero()) {
+                Quaternion quat = rotation.add(dse.prevTickRotation);
+                quat.incrScale(0.5);
+                rotation = quat;
+                rotation.glRotate();
+            }
+            glTranslatef((float)(-dse.centerOffset.xCoord),
+                    (float)(-dse.centerOffset.yCoord),
+                    (float)(-dse.centerOffset.zCoord)
+                    );
+            glTranslatef((float)(dse.posX), (float)(dse.posY), (float)(dse.posZ));
+            Coord c = dse.getCorner();
+            glTranslatef(-c.x, -c.y, -c.z);
+            
+            rotation.conjugate().glRotate();
+            double playerPartialX = player.lastTickPosX + (player.posX - player.lastTickPosX) * (double)partialTicks;
+            double playerPartialY = player.lastTickPosY + (player.posY - player.lastTickPosY) * (double)partialTicks;
+            double playerPartialZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * (double)partialTicks;
+            GL11.glTranslated(-playerPartialX, -playerPartialY, -playerPartialZ);
+            rotation.glRotate();
+            
+            double savePlayerX = player.posX;
+            double savePlayerY = player.posY;
+            double savePlayerZ = player.posZ;
+            partialTicks = 1;
+            player.posX = player.posY = player.posZ = 0;
             if (!ForgeHooksClient.onDrawBlockHighlight(rg, player, shadowSelected, shadowSelected.subHit, is, partialTicks)) {
                 event.context.drawSelectionBox(player, shadowSelected, 0, partialTicks);
             }
+            player.posX = savePlayerX;
+            player.posY = savePlayerY;
+            player.posZ = savePlayerZ;
         } finally {
-            GL11.glColorMask(true, true, true, true);
+            //GL11.glColorMask(true, true, true, true);
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
+            GL11.glEnable(GL11.GL_ALPHA_TEST);
             restoreRealWorld();
             GL11.glPopMatrix();
-            //GL11.glEnable(GL11.GL_ALPHA_TEST);
         }
         //shadowSelected = null;
     }
