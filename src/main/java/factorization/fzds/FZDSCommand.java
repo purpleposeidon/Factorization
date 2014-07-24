@@ -680,6 +680,7 @@ public class FZDSCommand extends CommandBase {
                 boolean add = arg0.equals("+");
                 ArrayList<List<Entity>> entityLists = new ArrayList();
                 for (World world : MinecraftServer.getServer().worldServers) {
+                    if (world.isRemote) continue;
                     entityLists.add(world.loadedEntityList);
                 }
                 
@@ -978,7 +979,11 @@ public class FZDSCommand extends CommandBase {
                 Coord low = origin.add(DeltaCoord.parse(args[0]));
                 Coord upr = origin.add(DeltaCoord.parse(args[1]));
                 Coord.sort(low, upr);
-                IDeltaChunk ent = DeltaChunk.construct(low, upr);
+                IDeltaChunk ent = DeltaChunk.construct(user.w, low, upr);
+                ent.permit(DeltaCapability.INTERACT);
+                ent.permit(DeltaCapability.BLOCK_MINE);
+                ent.permit(DeltaCapability.BLOCK_PLACE);
+                ent.permit(DeltaCapability.ROTATE);
                 user.setAsEntityLocation(ent);
                 user.w.spawnEntityInWorld(ent);
             }

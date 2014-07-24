@@ -166,8 +166,8 @@ public class DeltaChunk {
         return dse;
     }
     
-    public static IDeltaChunk construct(final Coord min, final Coord max) {
-        return new DimensionSliceEntity(getServerShadowWorld(), min, max);
+    public static IDeltaChunk construct(World inWorld, final Coord min, final Coord max) {
+        return new DimensionSliceEntity(inWorld, min, max);
     }
     
     public static void paste(IDeltaChunk selected, boolean overwriteDestination) {
