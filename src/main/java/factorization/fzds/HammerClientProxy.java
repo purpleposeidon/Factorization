@@ -289,7 +289,7 @@ public class HammerClientProxy extends HammerProxy {
         EntityPlayer player = event.player;
         RenderGlobal rg = event.context;
         ItemStack is = event.currentItem;
-        float partialTicks = event.partialTicks;
+        float partial = event.partialTicks;
         DimensionSliceEntity dse = rayTarget.parent;
         Coord here = null;
         if (selectionBlockBounds != null && shadowSelected.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
@@ -316,28 +316,30 @@ public class HammerClientProxy extends HammerProxy {
                 rotation = quat;
                 rotation.glRotate();
             }
-            glTranslatef((float)(-dse.centerOffset.xCoord),
+            glTranslatef(
+                    (float)(-dse.centerOffset.xCoord),
                     (float)(-dse.centerOffset.yCoord),
-                    (float)(-dse.centerOffset.zCoord)
-                    );
-            glTranslatef((float)(dse.posX), (float)(dse.posY), (float)(dse.posZ));
-            Coord c = dse.getCorner();
-            glTranslatef(-c.x, -c.y, -c.z);
-            
+                    (float)(-dse.centerOffset.zCoord));
+            GL11.glTranslated(
+                    FzUtil.interp(dse.lastTickPosX, dse.posX, partial),
+                    FzUtil.interp(dse.lastTickPosY, dse.posY, partial),
+                    FzUtil.interp(dse.lastTickPosZ, dse.posZ, partial));
+            Coord c = dse.getCorner(); glTranslatef(-c.x, -c.y, -c.z);
             rotation.conjugate().glRotate();
-            double playerPartialX = player.lastTickPosX + (player.posX - player.lastTickPosX) * (double)partialTicks;
-            double playerPartialY = player.lastTickPosY + (player.posY - player.lastTickPosY) * (double)partialTicks;
-            double playerPartialZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * (double)partialTicks;
-            GL11.glTranslated(-playerPartialX, -playerPartialY, -playerPartialZ);
+            GL11.glTranslated(
+                    -FzUtil.interp(player.lastTickPosX, player.posX, partial),
+                    -FzUtil.interp(player.lastTickPosY, player.posY, partial),
+                    -FzUtil.interp(player.lastTickPosZ, player.posZ, partial));
             rotation.glRotate();
+            
             
             double savePlayerX = player.posX;
             double savePlayerY = player.posY;
             double savePlayerZ = player.posZ;
-            partialTicks = 1;
+            partial = 1;
             player.posX = player.posY = player.posZ = 0;
-            if (!ForgeHooksClient.onDrawBlockHighlight(rg, player, shadowSelected, shadowSelected.subHit, is, partialTicks)) {
-                event.context.drawSelectionBox(player, shadowSelected, 0, partialTicks);
+            if (!ForgeHooksClient.onDrawBlockHighlight(rg, player, shadowSelected, shadowSelected.subHit, is, partial)) {
+                event.context.drawSelectionBox(player, shadowSelected, 0, partial);
             }
             player.posX = savePlayerX;
             player.posY = savePlayerY;
@@ -359,8 +361,8 @@ public class HammerClientProxy extends HammerProxy {
             return;
         }
         hitSlice = ray.parent;
-        //mc.renderViewEntity.rayTrace(reachDistance, partialTicks) Just this function would work if we didn't care about entities.
-        // But we also need entities. So we'll just invoke MC's ray trace code.
+        // mc.renderViewEntity.rayTrace(reachDistance, partialTicks) would work if we didn't care about entities.
+        // But we do need entities, so we'll just invoke MC's ray trace code.
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer player = mc.thePlayer;
         double origX = player.posX;
