@@ -1151,6 +1151,12 @@ public class FzUtil {
         base.zCoord += add.zCoord;
     }
     
+    public static Vec3 add(Vec3 a, Vec3 b) {
+        Vec3 ret = Vec3.createVectorHelper(a.xCoord, a.yCoord, a.zCoord);
+        incrAdd(ret, b);
+        return ret;
+    }
+    
     public static void incrSubtract(Vec3 base, Vec3 sub) {
         base.xCoord -= sub.xCoord;
         base.yCoord -= sub.yCoord;
