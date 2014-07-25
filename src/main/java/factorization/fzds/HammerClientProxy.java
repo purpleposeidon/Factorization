@@ -286,12 +286,6 @@ public class HammerClientProxy extends HammerProxy {
         if (event.isCanceled()) {
             return;
         }
-        EntityPlayer player = event.player;
-        RenderGlobal rg = event.context;
-        ItemStack is = event.currentItem;
-        float partial = event.partialTicks;
-        DimensionSliceEntity dse = rayTarget.parent;
-        Coord corner = dse.getCorner();
         Coord here = null;
         if (selectionBlockBounds != null && shadowSelected.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
             here = new Coord(DeltaChunk.getClientShadowWorld(), shadowSelected.blockX, shadowSelected.blockY, shadowSelected.blockZ);
@@ -300,6 +294,16 @@ public class HammerClientProxy extends HammerProxy {
                     (float)(selectionBlockBounds.maxX - here.x), (float)(selectionBlockBounds.maxY - here.y), (float)(selectionBlockBounds.maxZ - here.z)
                 );
         }
+        EntityPlayer player = event.player;
+        RenderGlobal rg = event.context;
+        ItemStack is = event.currentItem;
+        float partialTicks = event.partialTicks;
+        DimensionSliceEntity dse = rayTarget.parent;
+        Coord corner = dse.getCorner();
+        Quaternion rotation = dse.getRotation();
+        if (!rotation.isZero() || !dse.prevTickRotation.isZero()) {
+            rotation = rotation.slerp(dse.prevTickRotation, partialTicks);
+        }
         if (here == null) {
             return;
         }
@@ -307,69 +311,31 @@ public class HammerClientProxy extends HammerProxy {
             GL11.glPushMatrix();
             setShadowWorld();
             GL11.glDisable(GL11.GL_ALPHA_TEST);
-            GL11.glDisable(GL11.GL_DEPTH_TEST);
             //GL11.glColorMask(false, true, true, true); //Could glPushAttr for the mask. Nah.
-            
-            Quaternion rotation = dse.getRotation();
-            if (!rotation.isZero() || !dse.prevTickRotation.isZero()) {
-                Quaternion quat = rotation.add(dse.prevTickRotation);
-                quat.incrScale(0.5);
-                rotation = quat;
-                rotation.glRotate();
-            }
-            
+            // ##### selection = rotation.applyTo(selection - corner) + DSE.position #####
             GL11.glTranslated(
-                    -FzUtil.interp(player.lastTickPosX, player.posX, partial),
-                    -FzUtil.interp(player.lastTickPosY, player.posY, partial),
-                    -FzUtil.interp(player.lastTickPosZ, player.posZ, partial));
-
-
-            
-            // Mother of god, this is the worst thing ever.
-            // Anyways.
-            // in hammer space:
-            // 		origin: 0,0
-            // 		corner: the corner!
-            // 		selection: the selection, that we got from ray tracing, that's near the corner.
-            /* nothing hapens */
-            
-            // Subtract the corner.
-            //      origin: -corner
-            // 		corner: 0
-            //		selection: selection - corner
-            GL11.glTranslated(-corner.x, -corner.y, -corner.z);
-            Vec3 origin = Vec3.createVectorHelper(-corner.x, -corner.y, -corner.z);
-            
-            // Cast our hammer coordinates to real world space.
-            //  	origin: -corner
-            //		corner: 0
-            //		selection: selection - corner
-            /* nothing happens */
-            
-            // Apply the DSE's rotation quaternion
-            //		origin: rotation.applyTo(-corner)
-            //		corner: 0
-            //		selection: rotation.applyTo(selection - corner)
+                    FzUtil.interp(dse.lastTickPosX - player.lastTickPosX, dse.posX - player.posX, partialTicks),
+                    FzUtil.interp(dse.lastTickPosY - player.lastTickPosY, dse.posY - player.posY, partialTicks),
+                    FzUtil.interp(dse.lastTickPosZ - player.lastTickPosZ, dse.posZ - player.posZ, partialTicks));
             rotation.glRotate();
-            rotation.applyRotation(origin);
+            GL11.glTranslated(
+                    -dse.centerOffset. xCoord - corner.x,
+                    -dse.centerOffset.yCoord - corner.y,
+                    -dse.centerOffset.zCoord - corner.z);
             
-            // Translate to the DSE
-            //		origin: rotation.applyTo(-corner) + DSE.position
-            //		corner: DSE.position
-            //		selection: rotation.applyTo(selection - corner) + DSE.position
-            GL11.glTranslated(dse.posX, dse.posY, dse.posZ);
-            origin.xCoord += dse.posX;
-            origin.yCoord += dse.posY;
-            origin.zCoord += dse.posZ;
-             
-            //GL11.glTranslated(origin.xCoord, origin.yCoord, origin.zCoord);
-            
-            if (!ForgeHooksClient.onDrawBlockHighlight(rg, player, shadowSelected, shadowSelected.subHit, is, partial)) {
-                event.context.drawSelectionBox(player, shadowSelected, 0, partial);
+            double savePlayerX = player.posX;
+            double savePlayerY = player.posY;
+            double savePlayerZ = player.posZ;
+            partialTicks = 1;
+            player.posX = player.posY = player.posZ = 0;
+            if (!ForgeHooksClient.onDrawBlockHighlight(rg, player, shadowSelected, shadowSelected.subHit, is, partialTicks)) {
+                event.context.drawSelectionBox(player, shadowSelected, 0, partialTicks);
             }
+            player.posX = savePlayerX;
+            player.posY = savePlayerY;
+            player.posZ = savePlayerZ;
         } finally {
             //GL11.glColorMask(true, true, true, true);
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
             GL11.glEnable(GL11.GL_ALPHA_TEST);
             restoreRealWorld();
             GL11.glPopMatrix();
@@ -384,8 +350,8 @@ public class HammerClientProxy extends HammerProxy {
             return;
         }
         hitSlice = ray.parent;
-        // mc.renderViewEntity.rayTrace(reachDistance, partialTicks) would work if we didn't care about entities.
-        // But we do need entities, so we'll just invoke MC's ray trace code.
+        //mc.renderViewEntity.rayTrace(reachDistance, partialTicks) Just this function would work if we didn't care about entities.
+        // But we also need entities. So we'll just invoke MC's ray trace code.
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer player = mc.thePlayer;
         double origX = player.posX;
