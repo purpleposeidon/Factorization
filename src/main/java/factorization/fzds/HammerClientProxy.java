@@ -294,6 +294,9 @@ public class HammerClientProxy extends HammerProxy {
                     (float)(selectionBlockBounds.maxX - here.x), (float)(selectionBlockBounds.maxY - here.y), (float)(selectionBlockBounds.maxZ - here.z)
                 );
         }
+        if (here == null) {
+            return;
+        }
         EntityPlayer player = event.player;
         RenderGlobal rg = event.context;
         ItemStack is = event.currentItem;
@@ -302,10 +305,7 @@ public class HammerClientProxy extends HammerProxy {
         Coord corner = dse.getCorner();
         Quaternion rotation = dse.getRotation();
         if (!rotation.isZero() || !dse.prevTickRotation.isZero()) {
-            rotation = rotation.slerp(dse.prevTickRotation, partialTicks);
-        }
-        if (here == null) {
-            return;
+            rotation = dse.prevTickRotation.slerp(rotation, partialTicks);
         }
         try {
             GL11.glPushMatrix();
