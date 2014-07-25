@@ -3,7 +3,6 @@ package factorization.fzds;
 import static org.lwjgl.opengl.GL11.glCallList;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glTranslatef;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -435,17 +434,15 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
             }
             glPushMatrix();
             try {
-                glTranslatef((float)(x), (float)(y), (float)(z));
+                GL11.glTranslated(x, y, z);
                 Quaternion rotation = dse.getRotation();
                 if (!rotation.isZero() || !dse.prevTickRotation.isZero()) {
-                    Quaternion quat = rotation.add(dse.prevTickRotation);
-                    quat.incrScale(0.5);
-                    quat.glRotate();
+                    dse.prevTickRotation.slerp(rotation, partialTicks).glRotate();
                 }
-                glTranslatef((float)(-dse.centerOffset.xCoord),
-                        (float)(-dse.centerOffset.yCoord),
-                        (float)(-dse.centerOffset.zCoord)
-                        );
+                GL11.glTranslated(
+                        -dse.centerOffset.xCoord,
+                        -dse.centerOffset.yCoord,
+                        -dse.centerOffset.zCoord);
                 if (dse.scale != 1) {
                     GL11.glScalef(dse.scale, dse.scale, dse.scale);
                 }
@@ -456,9 +453,9 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
                 renderInfo.renderTerrain();
                 Core.profileEnd();
                 FzUtil.checkGLError("FZDS terrain display list render");
-                glTranslatef((float)(dse.posX - x), (float)(dse.posY - y), (float)(dse.posZ - z));
+                GL11.glTranslated(dse.posX - x, dse.posY - y, dse.posZ - z);
                 Coord c = dse.getCorner();
-                glTranslatef(-c.x, -c.y, -c.z);
+                GL11.glTranslated(-c.x, -c.y, -c.z);
                 if (nest == 1) {
                     renderInfo.updateRelativeEyePosition();
                     if (oracle) {
