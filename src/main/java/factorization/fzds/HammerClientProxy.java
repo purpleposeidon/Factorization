@@ -1,12 +1,12 @@
 package factorization.fzds;
 
-import static org.lwjgl.opengl.GL11.glTranslatef;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
@@ -33,6 +33,7 @@ import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import cpw.mods.fml.relauncher.Side;
+import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.fzds.api.IDeltaChunk;
@@ -168,7 +169,7 @@ public class HammerClientProxy extends HammerProxy {
         setSendQueueWorld(wc);
         
         //For rendering
-        mc.renderViewEntity = player; //TODO NOTE: This make mess up in third person!
+        mc.renderViewEntity = player; //TODO NOTE: This may mess up in third person!
         if (TileEntityRendererDispatcher.instance.field_147550_f != null) {
             TileEntityRendererDispatcher.instance.field_147550_f = wc;
         }
@@ -259,7 +260,6 @@ public class HammerClientProxy extends HammerProxy {
             Core.profileEnd();
             restoreRealWorld();
         }
-        
     }
     
     @Override
@@ -270,7 +270,7 @@ public class HammerClientProxy extends HammerProxy {
     MovingObjectPosition shadowSelected = null;
     DseRayTarget rayTarget = null;
     AxisAlignedBB selectionBlockBounds = null;
-    IDeltaChunk hitSlice = null;
+    DimensionSliceEntity hitSlice = null;
     
     @SubscribeEvent
     public void renderSelection(DrawBlockHighlightEvent event) {
@@ -319,7 +319,7 @@ public class HammerClientProxy extends HammerProxy {
                     FzUtil.interp(dse.lastTickPosZ - player.lastTickPosZ, dse.posZ - player.posZ, partialTicks));
             rotation.glRotate();
             GL11.glTranslated(
-                    -dse.centerOffset. xCoord - corner.x,
+                    -dse.centerOffset.xCoord - corner.x,
                     -dse.centerOffset.yCoord - corner.y,
                     -dse.centerOffset.zCoord - corner.z);
             
@@ -350,28 +350,53 @@ public class HammerClientProxy extends HammerProxy {
             return;
         }
         hitSlice = ray.parent;
+        if (hitSlice.metaAABB == null) return;
         //mc.renderViewEntity.rayTrace(reachDistance, partialTicks) Just this function would work if we didn't care about entities.
         // But we also need entities. So we'll just invoke MC's ray trace code.
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer player = mc.thePlayer;
-        double origX = player.posX;
-        double origY = player.posY;
-        double origZ = player.posZ;
-        Vec3 shadowPos = ray.parent.real2shadow(Vec3.createVectorHelper(origX, origY, origZ));
+        Vec3 realPos = player.getPosition(1);
+        Vec3 tmp = player.getLookVec();
+        FzUtil.incrAdd(tmp, realPos);
+        Vec3 realLookEnd = tmp;
+        Vec3 shadowPos = ray.parent.real2shadow(realPos); // This used to be the raw ent pos, which isn't the same.
+        /*{
+            double d = 0.04;
+            Vec3 thing = shadowPos.addVector(0, 0, 0);
+            AxisAlignedBB box = AxisAlignedBB.getBoundingBox(thing.xCoord + d, thing.yCoord + d, thing.zCoord + d, thing.xCoord - d, thing.yCoord - d, thing.zCoord - d);
+            box = hitSlice.metaAABB.convertShadowBoxToRealBox(box);
+            AabbDebugger.addBox(box);
+        }*/
+        Vec3 tmp_shadowLookEnd = ray.parent.real2shadow(realLookEnd);
+        /*{
+            double d = 0.04;
+            Vec3 thing = tmp_shadowLookEnd;
+            AxisAlignedBB box = AxisAlignedBB.getBoundingBox(thing.xCoord + d, thing.yCoord + d, thing.zCoord + d, thing.xCoord - d, thing.yCoord - d, thing.zCoord - d);
+            box = hitSlice.metaAABB.convertShadowBoxToRealBox(box);
+            AabbDebugger.addBox(box);
+        }*/
+        FzUtil.incrSubtract(tmp_shadowLookEnd, shadowPos);
+        Vec3 shadowLook = tmp_shadowLookEnd;
+        double xz_len = Math.hypot(shadowLook.xCoord, shadowLook.zCoord);
+        double shadow_pitch = -Math.toDegrees(Math.atan2(shadowLook.yCoord, xz_len)); // erm, negative? Dunno.
+        double shadow_yaw = Math.toDegrees(Math.atan2(-shadowLook.xCoord, shadowLook.zCoord)); // Another weird negative!
         MovingObjectPosition origMouseOver = mc.objectMouseOver;
         
         try {
             AxisAlignedBB bb;
-            Hammer.proxy.setShadowWorld();
+            setShadowWorld();
             try {
                 mc.thePlayer.posX = shadowPos.xCoord;
                 mc.thePlayer.posY = shadowPos.yCoord;
                 mc.thePlayer.posZ = shadowPos.zCoord;
-                //TODO: Need to rotate the player if the DSE has rotated
-                mc.thePlayer.rotationPitch = player.rotationPitch;
-                mc.thePlayer.rotationYaw = player.rotationYaw;
+                mc.thePlayer.rotationPitch = (float) shadow_pitch;
+                mc.thePlayer.rotationYaw = (float) shadow_yaw;
                 
                 mc.entityRenderer.getMouseOver(1F);
+                /*AxisAlignedBB working_box = EntityRenderer.working_box;
+                if (working_box != null) {
+                    AabbDebugger.addBox(hitSlice.metaAABB.convertShadowBoxToRealBox(working_box));
+                }*/
                 shadowSelected = mc.objectMouseOver;
                 if (shadowSelected == null) {
                     rayTarget = null;
@@ -383,15 +408,15 @@ public class HammerClientProxy extends HammerProxy {
                     selectionBlockBounds = null;
                     break;
                 case BLOCK:
-                    Coord hit = new Coord(DeltaChunk.getClientShadowWorld(), shadowSelected.blockX, shadowSelected.blockY, shadowSelected.blockZ);
-                    Block block = hit.getBlock();
-                    bb = block.getSelectedBoundingBoxFromPool(hit.w, hit.x, hit.y, hit.z);
+                    World w = DeltaChunk.getClientShadowWorld();
+                    Block block = w.getBlock(shadowSelected.blockX, shadowSelected.blockY, shadowSelected.blockZ);
+                    bb = block.getSelectedBoundingBoxFromPool(w, shadowSelected.blockX, shadowSelected.blockY, shadowSelected.blockZ);
                     selectionBlockBounds = bb;
                     break;
                 default: return;
                 }
             } finally {
-                Hammer.proxy.restoreRealWorld();
+                restoreRealWorld();
             }
             //TODO: Rotations!
             if (bb == null) {
