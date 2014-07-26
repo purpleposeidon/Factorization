@@ -69,7 +69,21 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
     }
     
     List<AxisAlignedBB> getShadowBoxesInRealBox(AxisAlignedBB realBox) {
-        AxisAlignedBB shadowBox = convertRealBoxToShadowBox(realBox);
+        double expansion = 2.45;
+        // The worst case would be a 1x2x1 collision box rotated 45+90°,45°,0° at the top.
+        // (MC hard-codes the max BB size to 1x2x1, instead of 1x1x1, for fences.)
+        // So if the expansion is too small, then the player might not collide with blocks
+        // that 'e should collide -- and does, in fact, collide at 0° rotation -- 
+        // because this expanded area does not contain the block that would need checking.
+        
+        // Optimization: make the expansion depend on the rotation; so the expansion would
+        // range from 0, at no rotation, to <whatever the maximum should be> at the most extreme angles.
+        // Could even enlarge the realBox differently on only certain sides maybe?
+        AxisAlignedBB useBox = realBox;
+        if (!idc.getRotation().isZero()) {
+            useBox = realBox.expand(expansion, expansion, expansion);
+        }
+        AxisAlignedBB shadowBox = convertRealBoxToShadowBox(useBox);
         return getShadowBoxesWithinShadowBox(shadowBox);
     }
     
@@ -78,10 +92,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
         // A more accurate algo would be to translate each corner and make a box that contains them.
         Vec3 realMiddle = Vec3.createVectorHelper(0, 0, 0);
         FzUtil.setMiddle(realBox, realMiddle);
-        double d = FzUtil.getDiagonalLength(realBox)/2;
-        if (!idc.worldObj.isRemote) { // NORELEASE
-            //d *= 0.5;
-        }
+        double d = FzUtil.getDiagonalLength(realBox);
         Vec3 shadowMiddle = convertRealVecToShadowVec(realMiddle);
         return AxisAlignedBB.getBoundingBox(
                 shadowMiddle.xCoord - d,
