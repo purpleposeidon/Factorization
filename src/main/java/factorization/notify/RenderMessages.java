@@ -89,15 +89,15 @@ public class RenderMessages extends RenderMessagesProxy {
     public void renderMessages(RenderWorldLastEvent event) {
         doRenderMessages(event); // Forge events are too hard for eclipse to hot-swap?
     }
-
+    
     void doRenderMessages(RenderWorldLastEvent event) {
         World w = Minecraft.getMinecraft().theWorld;
         if (w == null) {
             return;
         }
-        if (messages.size() == 0) {
+        /*if (messages.size() == 0) {
             return;
-        }
+        }*/ // NORELEASE
         Iterator<ClientMessage> it = messages.iterator();
         long approximateNow = System.currentTimeMillis();
         EntityLivingBase camera = Minecraft.getMinecraft().renderViewEntity;
