@@ -24,9 +24,11 @@ import net.minecraft.world.chunk.Chunk;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
+import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.Quaternion;
+import factorization.common.FzConfig;
 import factorization.fzds.api.DeltaCapability;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsCustomTeleport;
@@ -97,22 +99,23 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     @Override
     public Vec3 real2shadow(final Vec3 realVector) {
-        //TODO: Scale?
+        // rotate⁻¹(real - DSE) + centerOffset + corner = shadow
         Vec3 buffer = Vec3.createVectorHelper(0, 0, 0);
-        double diffX = realVector.xCoord + centerOffset.xCoord - posX;
-        double diffY = realVector.yCoord + centerOffset.yCoord - posY;
-        double diffZ = realVector.zCoord + centerOffset.zCoord - posZ;
+        buffer.xCoord = realVector.xCoord - posX;
+        buffer.yCoord = realVector.yCoord - posY;
+        buffer.zCoord = realVector.zCoord - posZ;
         
         rotation.applyReverseRotation(buffer);
         
-        buffer.xCoord = hammerCell.x + diffX;
-        buffer.yCoord = hammerCell.y + diffY;
-        buffer.zCoord = hammerCell.z + diffZ;
+        buffer.xCoord += hammerCell.x + centerOffset.xCoord;
+        buffer.yCoord += hammerCell.y + centerOffset.yCoord;
+        buffer.zCoord += hammerCell.z + centerOffset.zCoord;
         return buffer;
     }
     
     @Override
     public Vec3 shadow2real(final Vec3 shadowVector) {
+        // rotate(shadow - corner - centerOffset) + DSE = real
         Vec3 buffer = Vec3.createVectorHelper(0, 0, 0);
         buffer.xCoord = shadowVector.xCoord - hammerCell.x - centerOffset.xCoord;
         buffer.yCoord = shadowVector.yCoord - hammerCell.y - centerOffset.yCoord;
@@ -470,6 +473,28 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         last_shared_motionZ = motionZ;
     }
     
+    void debugCollisions() {
+        if (!FzConfig.debug_fzds_collisions) return;
+        if (this.metaAABB == null) return;
+        Coord low = getCorner();
+        Coord hig = getFarCorner();
+        Coord at = low.copy();
+        
+        for (int x = low.x; x <= hig.x; x++) {
+            for (int y = low.y; y <= hig.y; y++) {
+                for (int z = low.z; z <= hig.z; z++) {
+                    at.x = x;
+                    at.y = y;
+                    at.z = z; // NORELEASE NORELEAS
+                    if (at.isAir()) continue;
+                    AxisAlignedBB box = at.getCollisionBoundingBoxFromPool();
+                    if (box == null) continue;
+                    AabbDebugger.addBox(this.metaAABB.convertShadowBoxToRealBox(box));
+                }
+            }
+        }
+    }
+    
     void doUpdate() {
         Core.profileStart("init");
         if (worldObj.isRemote) {
@@ -478,6 +503,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             if (ticksExisted == 1) {
                 DeltaChunk.getSlices(worldObj).add(this);
             }
+            debugCollisions();
         } else if (proxy == null && !isDead) {
             World target_world = can(DeltaCapability.ORACLE) ? worldObj : DeltaChunk.getServerShadowWorld();
             hammerCell.w = farCorner.w = target_world;
