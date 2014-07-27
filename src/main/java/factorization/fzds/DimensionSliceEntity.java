@@ -34,6 +34,7 @@ import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsCustomTeleport;
 import factorization.fzds.api.IFzdsEntryControl;
 import factorization.shared.Core;
+import factorization.shared.FzUtil;
 
 public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryControl, IEntityAdditionalSpawnData {
     //Dang, this is a lot of fields
@@ -148,10 +149,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     @Override
     public Coord getCenter() {
-        return hammerCell.center(farCorner); //this.worldObj
-        /*return hammerCell.add((int)centerOffset.xCoord,
-                (int)centerOffset.yCoord,
-                (int)centerOffset.zCoord);*/
+        return hammerCell.center(farCorner);
     }
     
     @Override
@@ -413,23 +411,63 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                     continue;
                 }
                 
-                double d = 1.01;
                 //e.moveEntity(motionX*d, motionY*d, motionZ*d);
                 e.onGround = true;
-                //e.motionY = (e.motionY + motionY)/2;
-                e.setPosition(e.posX + motionX, e.posY + motionY, e.posZ + motionZ);
-                e.prevPosX += motionX;
-                e.prevPosY += motionY;
-                e.prevPosZ += motionZ;
-                
-                
-                if (motionY > 0 && e.motionY < motionY) {
-                    e.motionY = motionY;
-                    e.fallDistance += (float) Math.abs(motionY - e.motionY);
+                if (can(DeltaCapability.ENTITY_PHYSICS)) {
+                    double instant_scale = 1;
+                    double motion_scale = 1.25;
+                    Vec3 entityAt = Vec3.createVectorHelper(e.posX, e.posY, e.posZ);
+                    Vec3 velocity = getInstantVelocityAtPoint(entityAt);
+                    velocity.xCoord *= instant_scale;
+                    velocity.yCoord *= instant_scale;
+                    velocity.zCoord *= instant_scale;
+                    velocity.xCoord = clipVelocity(velocity.xCoord*motion_scale, e.motionX);
+                    velocity.yCoord = clipVelocity(velocity.yCoord*motion_scale, e.motionY);
+                    velocity.zCoord = clipVelocity(velocity.zCoord*motion_scale, e.motionZ);
+                    //e.motionY = (e.motionY + motionY)/2;
+                    e.setPosition(e.posX + velocity.xCoord, e.posY + velocity.yCoord, e.posZ + velocity.zCoord);
+                    e.prevPosX += velocity.xCoord;
+                    e.prevPosY += velocity.yCoord;
+                    e.prevPosZ += velocity.zCoord;
+                    e.onGround = false;
+                    e.motionX = velocity.xCoord;
+                    e.motionY = velocity.yCoord;
+                    e.motionZ = velocity.zCoord;
+                    /*
+                    if (motionY > 0 && e.motionY < motionY) {
+                        e.motionY = motionY;
+                        e.fallDistance += (float) Math.abs(motionY - e.motionY);
+                    }
+                    e.onGround = true;*/
+                } else {
+                    double d = 1.01;
+                    //e.moveEntity(motionX*d, motionY*d, motionZ*d);
+                    e.onGround = true;
+                    //e.motionY = (e.motionY + motionY)/2;
+                    e.setPosition(e.posX + motionX, e.posY + motionY, e.posZ + motionZ);
+                    e.prevPosX += motionX;
+                    e.prevPosY += motionY;
+                    e.prevPosZ += motionZ;
+                    
+                    
+                    if (motionY > 0 && e.motionY < motionY) {
+                        e.motionY = motionY;
+                        e.fallDistance += (float) Math.abs(motionY - e.motionY);
+                    }
+                    e.onGround = true;
                 }
-                e.onGround = true;
             }
             updateRealArea();
+        }
+    }
+    
+    double clipVelocity(double impulse_velocity, double current_velocity) {
+        if (impulse_velocity < 0) {
+            return Math.min(impulse_velocity, current_velocity);
+        } else if (impulse_velocity > 0) {
+            return Math.max(impulse_velocity, current_velocity);
+        } else {
+            return current_velocity;
         }
     }
     
@@ -895,5 +933,15 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             Hammer.proxy.updateRayPosition(rayTarget);
         }
         return raypart;
+    }
+    
+    public Vec3 getInstantVelocityAtPoint(Vec3 real) {
+        Vec3 linear = Vec3.createVectorHelper(motionX, motionY, motionZ);
+        Vec3 dse_space = real.addVector( -posX - centerOffset.xCoord, -posY - centerOffset.yCoord, -posZ - centerOffset.zCoord);
+        Vec3 point_a = dse_space;
+        Vec3 point_b = dse_space.addVector(0, 0, 0);
+        rotationalVelocity.applyRotation(point_b);
+        Vec3 rotational = point_a.subtract(point_b);
+        return FzUtil.add(rotational, linear);
     }
 }

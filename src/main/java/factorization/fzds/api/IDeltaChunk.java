@@ -5,6 +5,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
+import static factorization.fzds.api.DeltaCapability.*;
 
 public abstract class IDeltaChunk extends Entity {
     //This would be an actual interface, but it needs to extend Entity.
@@ -52,6 +53,29 @@ public abstract class IDeltaChunk extends Entity {
      * @return this
      */
     public abstract IDeltaChunk forbid(DeltaCapability cap);
+    
+    public void loadUsualCapabilities() {
+        for (DeltaCapability cap : new DeltaCapability[] {
+                COLLIDE,
+                MOVE,
+                ROTATE,
+                DRAG,
+                REMOVE_EXTERIOR_ENTITIES,
+                TRANSPARENT,
+                INTERACT,
+                BLOCK_PLACE,
+                BLOCK_MINE,
+                REMOVE_ITEM_ENTITIES,
+                ENTITY_PHYSICS,
+        }) {
+            permit(cap);
+        }
+        for (DeltaCapability cap : new DeltaCapability[] {
+                
+        }) {
+            forbid(cap);
+        }
+    }
     
     
     

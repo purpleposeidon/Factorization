@@ -520,11 +520,7 @@ public class FZDSCommand extends CommandBase {
                             }
                         }
                     }}, !copy);
-                dse.permit(DeltaCapability.ROTATE);
-                dse.permit(DeltaCapability.INTERACT).permit(DeltaCapability.BLOCK_MINE).permit(DeltaCapability.BLOCK_PLACE);
-                dse.permit(DeltaCapability.REMOVE_ALL_ENTITIES);
-                dse.permit(DeltaCapability.REMOVE_ITEM_ENTITIES);
-                dse.forbid(DeltaCapability.COLLIDE);
+                dse.loadUsualCapabilities();
                 dse.worldObj.spawnEntityInWorld(dse);
                 setSelection(dse);
             }}, Requires.COORD);
@@ -578,7 +574,7 @@ public class FZDSCommand extends CommandBase {
                             }
                         }
                     }}, true);
-                dse.permit(DeltaCapability.ROTATE).permit(DeltaCapability.INTERACT).permit(DeltaCapability.BLOCK_MINE).permit(DeltaCapability.BLOCK_PLACE).forbid(DeltaCapability.COLLIDE);
+                dse.loadUsualCapabilities();
                 dse.worldObj.spawnEntityInWorld(dse);
                 setSelection(dse);
             }}, Requires.COORD);
@@ -979,13 +975,10 @@ public class FZDSCommand extends CommandBase {
                 Coord low = origin.add(DeltaCoord.parse(args[0]));
                 Coord upr = origin.add(DeltaCoord.parse(args[1]));
                 Coord.sort(low, upr);
-                IDeltaChunk ent = DeltaChunk.construct(user.w, low, upr);
-                ent.permit(DeltaCapability.INTERACT);
-                ent.permit(DeltaCapability.BLOCK_MINE);
-                ent.permit(DeltaCapability.BLOCK_PLACE);
-                ent.permit(DeltaCapability.ROTATE);
-                user.setAsEntityLocation(ent);
-                user.w.spawnEntityInWorld(ent);
+                IDeltaChunk dse = DeltaChunk.construct(user.w, low, upr);
+                dse.loadUsualCapabilities();
+                user.setAsEntityLocation(dse);
+                user.w.spawnEntityInWorld(dse);
             }
         }, Requires.COORD);
     }
