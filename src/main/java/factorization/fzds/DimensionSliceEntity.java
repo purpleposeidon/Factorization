@@ -223,32 +223,32 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 orig.maxX + dx, orig.maxY + dy, orig.maxZ + dz);
     }
     
-    AxisAlignedBB enlargeBoxToIncludeRotation(AxisAlignedBB box) {
-        if (rotation.isZero()) return box;
-        Vec3 work = Vec3.createVectorHelper(0, 0, 0);
-        AxisAlignedBB ret = null;
-        for (byte flag = FzUtil.GET_POINT_MIN; flag <= FzUtil.GET_POINT_MAX; flag++) {
-            FzUtil.getPoint(box, flag, work);
-            rotation.applyRotation(work);
-            if (ret == null) {
-                ret = AxisAlignedBB.getBoundingBox(work.xCoord, work.yCoord, work.zCoord, work.xCoord, work.yCoord, work.zCoord);
-            } else {
-                FzUtil.incrAddCoord(ret, work);
-            }
-        }
-        return ret;
-    }
-    
     private void updateRealArea() {
         Coord c = hammerCell;
         double odx = posX - c.x - centerOffset.xCoord;
         double ody = posY - c.y - centerOffset.yCoord;
         double odz = posZ - c.z - centerOffset.zCoord;
-        realArea = enlargeBoxToIncludeRotation(offsetAABB(shadowArea, odx, ody, odz)); //NOTE: Will need to update realArea when we move
+        realArea = offsetAABB(shadowArea, odx, ody, odz); //NOTE: Will need to update realArea when we move
         realCollisionArea = offsetAABB(shadowCollisionArea, odx, ody, odz);
         needAreaUpdate = false;
-        if (children == null && !worldObj.isRemote && can(DeltaCapability.COLLIDE)) {
-            initializeColliders();
+        //this.boundingBox.setBB(realArea);
+        if (children == null && worldObj.isRemote) {
+            children = new ArrayList();
+            //The array will be filled as the server sends us children
+        } else if (children == null && !worldObj.isRemote) {
+            children = new ArrayList();
+            DeltaCoord size = getFarCorner().difference(getCorner());
+            DeltaCoord half = size.scale(0.5);
+            for (int dx = 0; dx <= size.x; dx += 16) {
+                for (int dy = 0; dy <= size.y; dy += 16) {
+                    for (int dz = 0; dz <= size.z; dz += 16) {
+                        //could theoretically re-use a single DseCollider for all chunks. Theoretically.
+                        DseCollider e = new DseCollider(this, Vec3.createVectorHelper(dx - half.x, dy - half.y, dz - half.z));
+                        e.onEntityUpdate();
+                        worldObj.spawnEntityInWorld(e);
+                    }
+                }
+            }
         }
         int r = 16;
         if (motionX == 0) {
@@ -262,42 +262,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         }
         metaAABB = new MetaAxisAlignedBB(this, hammerCell.w);
         metaAABB.setUnderlying(realArea);
-    }
-    
-    private void initializeColliders() {
-        children = new ArrayList();
-        DeltaCoord size = getFarCorner().difference(getCorner());
-        DeltaCoord half = size.scale(0.5);
-        for (int dx = 0; dx <= size.x; dx += 16) {
-            for (int dy = 0; dy <= size.y; dy += 16) {
-                for (int dz = 0; dz <= size.z; dz += 16) {
-                    DseCollider e = new DseCollider(this, Vec3.createVectorHelper(dx - half.x, dy - half.y, dz - half.z));
-                    e.onEntityUpdate();
-                    worldObj.spawnEntityInWorld(e);
-                }
-            }
-        }
-
-    }
-    
-    private ArrayList<Vec3> getRotationRange() {
-        ArrayList<Vec3> ret = new ArrayList();
-        Vec3 shadow_min = getCorner().createVector();
-        Vec3 shadow_max = getFarCorner().createVector();
-        shadow_max.xCoord++;
-        shadow_max.yCoord++;
-        shadow_max.zCoord++;
-        
-        ret.add(shadow2real(shadow_min));
-        ret.add(shadow2real(shadow_max));
-        
-        Quaternion no_rotation = new Quaternion();
-        Quaternion real_rotation = rotation;
-        rotation = no_rotation;
-        ret.add(shadow2real(shadow_min));
-        ret.add(shadow2real(shadow_max));
-        rotation = real_rotation;
-        return ret;
     }
     
     private void updateShadowArea() {
@@ -923,9 +887,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     @Override
     public void setRotation(Quaternion r) {
         rotation = r;
-        if (realArea != null) {
-            updateRealArea();
-        }
     }
 
     @Override
