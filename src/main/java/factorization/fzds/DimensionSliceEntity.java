@@ -415,7 +415,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 e.onGround = true;
                 if (can(DeltaCapability.ENTITY_PHYSICS)) {
                     double instant_scale = 1;
-                    double motion_scale = 1.25;
+                    double motion_scale = 2; // 2 is kind of fun.
                     Vec3 entityAt = Vec3.createVectorHelper(e.posX, e.posY, e.posZ);
                     Vec3 velocity = getInstantVelocityAtPoint(entityAt);
                     velocity.xCoord *= instant_scale;
@@ -425,7 +425,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                     velocity.yCoord = clipVelocity(velocity.yCoord*motion_scale, e.motionY);
                     velocity.zCoord = clipVelocity(velocity.zCoord*motion_scale, e.motionZ);
                     //e.motionY = (e.motionY + motionY)/2;
-                    e.setPosition(e.posX + velocity.xCoord, e.posY + velocity.yCoord, e.posZ + velocity.zCoord);
+                    e.moveEntity(velocity.xCoord, velocity.yCoord, velocity.zCoord);
                     e.prevPosX += velocity.xCoord;
                     e.prevPosY += velocity.yCoord;
                     e.prevPosZ += velocity.zCoord;
