@@ -223,32 +223,32 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 orig.maxX + dx, orig.maxY + dy, orig.maxZ + dz);
     }
     
+    AxisAlignedBB enlargeBoxToIncludeRotation(AxisAlignedBB box) {
+        if (rotation.isZero()) return box;
+        Vec3 work = Vec3.createVectorHelper(0, 0, 0);
+        AxisAlignedBB ret = null;
+        for (byte flag = FzUtil.GET_POINT_MIN; flag <= FzUtil.GET_POINT_MAX; flag++) {
+            FzUtil.getPoint(box, flag, work);
+            rotation.applyRotation(work);
+            if (ret == null) {
+                ret = AxisAlignedBB.getBoundingBox(work.xCoord, work.yCoord, work.zCoord, work.xCoord, work.yCoord, work.zCoord);
+            } else {
+                FzUtil.incrAddCoord(ret, work);
+            }
+        }
+        return ret;
+    }
+    
     private void updateRealArea() {
         Coord c = hammerCell;
         double odx = posX - c.x - centerOffset.xCoord;
         double ody = posY - c.y - centerOffset.yCoord;
         double odz = posZ - c.z - centerOffset.zCoord;
-        realArea = offsetAABB(shadowArea, odx, ody, odz); //NOTE: Will need to update realArea when we move
+        realArea = enlargeBoxToIncludeRotation(offsetAABB(shadowArea, odx, ody, odz)); //NOTE: Will need to update realArea when we move
         realCollisionArea = offsetAABB(shadowCollisionArea, odx, ody, odz);
         needAreaUpdate = false;
-        //this.boundingBox.setBB(realArea);
-        if (children == null && worldObj.isRemote) {
-            children = new ArrayList();
-            //The array will be filled as the server sends us children
-        } else if (children == null && !worldObj.isRemote) {
-            children = new ArrayList();
-            DeltaCoord size = getFarCorner().difference(getCorner());
-            DeltaCoord half = size.scale(0.5);
-            for (int dx = 0; dx <= size.x; dx += 16) {
-                for (int dy = 0; dy <= size.y; dy += 16) {
-                    for (int dz = 0; dz <= size.z; dz += 16) {
-                        //could theoretically re-use a single DseCollider for all chunks. Theoretically.
-                        DseCollider e = new DseCollider(this, Vec3.createVectorHelper(dx - half.x, dy - half.y, dz - half.z));
-                        e.onEntityUpdate();
-                        worldObj.spawnEntityInWorld(e);
-                    }
-                }
-            }
+        if (children == null && !worldObj.isRemote && can(DeltaCapability.COLLIDE)) {
+            initializeColliders();
         }
         int r = 16;
         if (motionX == 0) {
@@ -262,6 +262,105 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         }
         metaAABB = new MetaAxisAlignedBB(this, hammerCell.w);
         metaAABB.setUnderlying(realArea);
+    }
+    
+    private void initializeColliders() {
+        children = new ArrayList();
+        AxisAlignedBB fullRange;
+        if (can(DeltaCapability.ROTATE)) {
+            List<Vec3> range = getRotationRange();
+            fullRange = null;
+            for (Vec3 vec : range) {
+                AxisAlignedBB point = FzUtil.createAABB(vec, vec);
+                if (fullRange == null) {
+                    fullRange = point;
+                } else {
+                    fullRange = fullRange.func_111270_a(point);
+                }
+            }
+            if (fullRange == null) {
+                throw new NullPointerException();
+            }
+        } else {
+            fullRange = realCollisionArea.copy();
+        }
+        final double chunk = 16;
+        final double halfChunk = chunk/2;
+        final double added = chunk;
+        fullRange.minX = FzUtil.roundDown(fullRange.minX, chunk);
+        fullRange.minY = FzUtil.roundDown(fullRange.minY, chunk);
+        fullRange.minZ = FzUtil.roundDown(fullRange.minZ, chunk);
+        fullRange.maxX = FzUtil.roundDown(fullRange.maxX, chunk) + added;
+        fullRange.maxY = FzUtil.roundDown(fullRange.maxY, chunk) + added;
+        fullRange.maxZ = FzUtil.roundDown(fullRange.maxZ, chunk) + added;
+        
+        int count = 0;
+        for (double dx = fullRange.minX; dx <= fullRange.maxX; dx += chunk) {
+            for (double dy = fullRange.minY; dy <= fullRange.maxY; dy += chunk) {
+                for (double dz = fullRange.minZ; dz <= fullRange.maxZ; dz += chunk) {
+                    count++;
+                }
+            }
+        }
+        if (count > Hammer.max_dse_collidable_chunk_area) {
+            forbid(DeltaCapability.COLLIDE);
+            Core.logSevere("====================================");
+            Core.logSevere("Severe problem with %s", this);
+            Core.logSevere("====================================");
+            Core.logSevere("The area is too large! The area is %s 16³-chunks; the maximum permitted by configuration is %s", count, Hammer.max_dse_collidable_chunk_area);
+            Core.logSevere("Collision has been disabled.");
+            if (can(DeltaCapability.ROTATE) && rotation.isZero() && rotationalVelocity.isZero()) {
+                Core.logSevere("This DSE has the ROTATE capability, but isn't using it right now.");
+                Core.logSevere("Disabling it could potentially reduce the number of required 16³-chunks.");
+            }
+            Core.logSevere("");
+            children = null;
+            return;
+        }
+        
+        /*for (double dx = fullRange.minX; dx <= fullRange.maxX; dx += chunk) {
+            for (double dy = fullRange.minY; dy <= fullRange.maxY; dy += chunk) {
+                for (double dz = fullRange.minZ; dz <= fullRange.maxZ; dz += chunk) {
+                    Vec3 at = Vec3.createVectorHelper(dx + halfChunk - posX, dy + halfChunk - posY, dz + halfChunk - posZ);
+                    DseCollider e = new DseCollider(this, at);
+                    e.onEntityUpdate();
+                    worldObj.spawnEntityInWorld(e);
+                }
+            }
+        }*/
+        children = new ArrayList();
+        DeltaCoord size = getFarCorner().difference(getCorner());
+        DeltaCoord half = size.scale(0.5);
+        for (int dx = 0; dx <= size.x; dx += 16) {
+            for (int dy = 0; dy <= size.y; dy += 16) {
+                for (int dz = 0; dz <= size.z; dz += 16) {
+                    DseCollider e = new DseCollider(this, Vec3.createVectorHelper(dx - half.x, dy - half.y, dz - half.z));
+                    e.onEntityUpdate();
+                    worldObj.spawnEntityInWorld(e);
+                }
+            }
+        }
+
+    }
+    
+    private ArrayList<Vec3> getRotationRange() {
+        ArrayList<Vec3> ret = new ArrayList();
+        Vec3 shadow_min = getCorner().createVector();
+        Vec3 shadow_max = getFarCorner().createVector();
+        shadow_max.xCoord++;
+        shadow_max.yCoord++;
+        shadow_max.zCoord++;
+        
+        ret.add(shadow2real(shadow_min));
+        ret.add(shadow2real(shadow_max));
+        
+        Quaternion no_rotation = new Quaternion();
+        Quaternion real_rotation = rotation;
+        rotation = no_rotation;
+        ret.add(shadow2real(shadow_min));
+        ret.add(shadow2real(shadow_max));
+        rotation = real_rotation;
+        return ret;
     }
     
     private void updateShadowArea() {
@@ -887,6 +986,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     @Override
     public void setRotation(Quaternion r) {
         rotation = r;
+        if (realArea != null) {
+            updateRealArea();
+        }
     }
 
     @Override

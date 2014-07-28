@@ -49,6 +49,7 @@ public class Hammer {
     public static double DSE_ChunkUpdateRangeSquared = Math.pow(16*8, 2); //This is actually set when the server starts
     public static int fzds_command_channel = 0;
     public static int max_fzds_grab_area = 16*16*80*4;
+    public static int max_dse_collidable_chunk_area = 9*9*9;
     
     static DeltaChunkMap serverSlices = new DeltaChunkMap(), clientSlices = new DeltaChunkMap();
     

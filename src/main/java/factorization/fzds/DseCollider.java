@@ -57,6 +57,13 @@ public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdd
         posZ = parent.posZ + offset.zCoord;
         AxisAlignedBB toSet = parent.realArea;
         boundingBox.setBB(toSet);
+        double d = 8;
+        boundingBox.minX -= d;
+        boundingBox.minY -= d;
+        boundingBox.minZ -= d;
+        boundingBox.maxX += d;
+        boundingBox.maxY += d;
+        boundingBox.maxZ += d;
     }
     
     @Override
@@ -65,7 +72,6 @@ public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdd
             return null;
         }
         return parent.metaAABB;
-        //return boundingBox;
     }
     
     @Override
