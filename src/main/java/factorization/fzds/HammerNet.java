@@ -205,6 +205,7 @@ public class HammerNet {
         liason.inventory = real_player.inventory;
         liason.setSprinting(real_player.isSprinting());
         liason.setSneaking(real_player.isSneaking());
+        liason.capabilities = real_player.capabilities;
         return liason;
     }
     
