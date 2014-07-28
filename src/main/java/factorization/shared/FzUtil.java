@@ -1145,6 +1145,11 @@ public class FzUtil {
     public static final byte GET_POINT_MIN = 0x0;
     public static final byte GET_POINT_MAX = 0x7;
     
+    public static double roundDown(double value, double units) {
+        double scaled = value / units;
+        return Math.floor(scaled) * units;
+    }
+    
     public static double getDiagonalLength(AxisAlignedBB ab) {
         double x = ab.maxX - ab.minX;
         double y = ab.maxY - ab.minY;
