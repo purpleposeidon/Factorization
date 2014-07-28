@@ -6,6 +6,8 @@ import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import javax.vecmath.Quat4d;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -169,7 +171,11 @@ public class Quaternion implements IDataSerializable {
         update(w, dir.offsetX, dir.offsetY, dir.offsetZ);
     }
     
-    public void updateVector(Vec3 v) {
+    public void update(Vec3 v) {
+        update(0, v.xCoord, v.yCoord, v.zCoord);
+    }
+    
+    public void copyToVector(Vec3 v) {
         v.xCoord = x;
         v.yCoord = y;
         v.zCoord = z;
@@ -359,9 +365,9 @@ public class Quaternion implements IDataSerializable {
     }
     
     public void incrConjugate() {
-        x *= -1;
-        y *= -1;
-        z *= -1;
+        x = -x;
+        y = -y;
+        z = -z;
     }
     
     public void incrAdd(Quaternion other) {
@@ -385,6 +391,18 @@ public class Quaternion implements IDataSerializable {
         ny = w*other.y - x*other.z + y*other.w + z*other.x;
         nz = w*other.z + x*other.y - y*other.x + z*other.w;
         update(nw, nx, ny, nz);
+    }
+    
+    /** 
+     * Acts like {@link incrMultiply}, but the argument gets incremented instead of this.
+     */
+    public void incrToOtherMultiply(Quaternion other) {
+        double nw, nx, ny, nz;
+        nw = w*other.w - x*other.x - y*other.y - z*other.z;
+        nx = w*other.x + x*other.w + y*other.z - z*other.y;
+        ny = w*other.y - x*other.z + y*other.w + z*other.x;
+        nz = w*other.z + x*other.y - y*other.x + z*other.w;
+        other.update(nw, nx, ny, nz);
     }
     
     public void incrScale(double scaler) {
@@ -418,19 +436,23 @@ public class Quaternion implements IDataSerializable {
      * @param p
      */
     public void applyRotation(Vec3 p) {
-        //TODO: Optimize!
-        //also, rather inefficient
         //return this * p * this^-1
-        Quaternion point = new Quaternion(0, p);
-        Quaternion trans = this.multiply(point).multiply(this.conjugate());
-//		Quaternion trans = this.multiply(point);
-//		incrConjugate();
-//		trans.multiply(this);
-//		incrConjugate();
-        p.xCoord = trans.x;
-        p.yCoord = trans.y;
-        p.zCoord = trans.z;
+        if (this.isZero()) {
+            return;
+        }
+        if (_vector_conversion_cache == null) {
+            _vector_conversion_cache = new Quaternion();
+        }
+        Quaternion point = _vector_conversion_cache;
+        point.update(p);
+        this.incrToOtherMultiply(point);
+        this.incrConjugate();
+        point.incrMultiply(this);
+        this.incrConjugate();
+        point.copyToVector(p);
     }
+    
+    private Quaternion _vector_conversion_cache = null;
     
     public void applyReverseRotation(Vec3 p) {
         incrConjugate();
