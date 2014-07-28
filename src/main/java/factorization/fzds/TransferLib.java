@@ -69,6 +69,7 @@ public class TransferLib {
             if (origBlock == id && origMd == md) {
                 return;
             }
+            chunk.setChunkModified();
             ExtendedBlockStorage[] storageArrays = chunk.getBlockStorageArray();
             ExtendedBlockStorage extendedblockstorage = storageArrays[c.y >> 4];
             boolean extendsHeight = false;
