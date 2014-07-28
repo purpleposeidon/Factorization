@@ -329,7 +329,7 @@ public class HammerClientProxy extends HammerProxy {
             partialTicks = 1;
             player.posX = player.posY = player.posZ = 0;
             if (!ForgeHooksClient.onDrawBlockHighlight(rg, player, shadowSelected, shadowSelected.subHit, is, partialTicks)) {
-                event.context.drawSelectionBox(player, shadowSelected, 0, partialTicks);
+                rg.drawSelectionBox(player, shadowSelected, 0, partialTicks);
             }
             player.posX = savePlayerX;
             player.posY = savePlayerY;
