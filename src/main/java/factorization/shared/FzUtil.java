@@ -1128,6 +1128,23 @@ public class FzUtil {
         v.zCoord = (ab.minZ + ab.maxZ)/2;
     }
     
+    /**
+     * Copies a point on box into target.
+     * pointFlags is a bit-flag, like <Z, Y, X>.
+     * So if the value is 0b000, then target is the minimum point,
+     * and 0b111 the target is the maximum.
+     */
+    public static void getPoint(AxisAlignedBB box, byte pointFlags, Vec3 target) {
+        boolean xSide = (pointFlags & 1) == 1;
+        boolean ySide = (pointFlags & 2) == 2;
+        boolean zSide = (pointFlags & 4) == 4;
+        target.xCoord = xSide ? box.minX : box.maxX;
+        target.yCoord = ySide ? box.minY : box.maxY;
+        target.zCoord = zSide ? box.minZ : box.maxZ;
+    }
+    public static final byte GET_POINT_MIN = 0x0;
+    public static final byte GET_POINT_MAX = 0x7;
+    
     public static double getDiagonalLength(AxisAlignedBB ab) {
         double x = ab.maxX - ab.minX;
         double y = ab.maxY - ab.minY;
@@ -1178,6 +1195,15 @@ public class FzUtil {
     
     public static void assignBoxFrom(AxisAlignedBB dest, AxisAlignedBB orig) {
         dest.setBB(orig);
+    }
+    
+    public static void incrAddCoord(AxisAlignedBB box, Vec3 vec) {
+        if (vec.xCoord < box.minX) box.minX = vec.xCoord;
+        if (box.maxX < vec.xCoord) box.maxX = vec.xCoord;
+        if (vec.yCoord < box.minY) box.minY = vec.yCoord;
+        if (box.maxY < vec.yCoord) box.maxY = vec.yCoord;
+        if (vec.zCoord < box.minZ) box.minZ = vec.zCoord;
+        if (box.maxZ < vec.zCoord) box.maxZ = vec.zCoord;
     }
     
     public static boolean intersect(double la, double ha, double lb, double hb) {
