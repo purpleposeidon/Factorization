@@ -33,10 +33,10 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
      * 2. We now have a list of AABBs in shadow space, and the passed in AABB in real world space.
      * 3. Iterate over the AABBs, converting each one to real space & applying the operation
      */
-    private IDeltaChunk idc;
+    private DimensionSliceEntity idc;
     private World shadowWorld;
     
-    public MetaAxisAlignedBB(IDeltaChunk idc, World shadowWorld) {
+    public MetaAxisAlignedBB(DimensionSliceEntity idc, World shadowWorld) {
         super(0, 0, 0, 0, 0, 0);
         this.idc = idc;
         this.shadowWorld = shadowWorld;
@@ -79,11 +79,24 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
         // Optimization: make the expansion depend on the rotation; so the expansion would
         // range from 0, at no rotation, to <whatever the maximum should be> at the most extreme angles.
         // Could even enlarge the realBox differently on only certain sides maybe?
+        double cx = realBox.maxX - realBox.minX;
+        double cy = realBox.maxY - realBox.minY;
+        double cz = realBox.maxZ - realBox.minZ;
+        System.out.println("RealBox: " + (cx*cy*cz) + " = " + cx + ", " + cy + ", " + cz);
         AxisAlignedBB useBox = realBox;
         if (!idc.getRotation().isZero()) {
             useBox = realBox.expand(expansion, expansion, expansion);
         }
+        double bx = useBox.maxX - useBox.minX;
+        double by = useBox.maxY - useBox.minY;
+        double bz = useBox.maxZ - useBox.minZ;
+        System.out.println("useBox: " + (bx * by * bz) + " = " + bx + ", " + by + ", " + bz);
+        
         AxisAlignedBB shadowBox = convertRealBoxToShadowBox(useBox);
+        double dx = shadowBox.maxX - shadowBox.minX;
+        double dy = shadowBox.maxY - shadowBox.minY;
+        double dz = shadowBox.maxZ - shadowBox.minZ;
+        System.out.println("ShadowBoxArea: " + (dx*dy*dz) + " = " + dx + ", " + dy + ", " + dz);
         return getShadowBoxesWithinShadowBox(shadowBox);
     }
     
@@ -178,6 +191,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
     
     @Override
     public boolean intersectsWith(AxisAlignedBB collider) {
+        if (!idc.realArea.intersectsWith(collider)) return false;
         List<AxisAlignedBB> shadowBoxes = getShadowBoxesInRealBox(collider);
         for (AxisAlignedBB shadowBox : shadowBoxes) {
             AxisAlignedBB realShadow = convertShadowBoxToRealBox(shadowBox);
@@ -186,6 +200,11 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
             }
         }
         return false;
+    }
+    
+    @Override
+    public String toString() {
+        return "META" + super.toString();
     }
 
 }

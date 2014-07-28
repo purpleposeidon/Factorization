@@ -65,7 +65,6 @@ public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdd
             return null;
         }
         return parent.metaAABB;
-        //return boundingBox;
     }
     
     @Override

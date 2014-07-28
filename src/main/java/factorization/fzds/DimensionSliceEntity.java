@@ -231,24 +231,8 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         realArea = offsetAABB(shadowArea, odx, ody, odz); //NOTE: Will need to update realArea when we move
         realCollisionArea = offsetAABB(shadowCollisionArea, odx, ody, odz);
         needAreaUpdate = false;
-        //this.boundingBox.setBB(realArea);
-        if (children == null && worldObj.isRemote) {
-            children = new ArrayList();
-            //The array will be filled as the server sends us children
-        } else if (children == null && !worldObj.isRemote) {
-            children = new ArrayList();
-            DeltaCoord size = getFarCorner().difference(getCorner());
-            DeltaCoord half = size.scale(0.5);
-            for (int dx = 0; dx <= size.x; dx += 16) {
-                for (int dy = 0; dy <= size.y; dy += 16) {
-                    for (int dz = 0; dz <= size.z; dz += 16) {
-                        //could theoretically re-use a single DseCollider for all chunks. Theoretically.
-                        DseCollider e = new DseCollider(this, Vec3.createVectorHelper(dx - half.x, dy - half.y, dz - half.z));
-                        e.onEntityUpdate();
-                        worldObj.spawnEntityInWorld(e);
-                    }
-                }
-            }
+        if (children == null && !worldObj.isRemote) {
+            initializeColliders();
         }
         int r = 16;
         if (motionX == 0) {
@@ -262,6 +246,22 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         }
         metaAABB = new MetaAxisAlignedBB(this, hammerCell.w);
         metaAABB.setUnderlying(realArea);
+    }
+    
+    private void initializeColliders() {
+        children = new ArrayList();
+        DeltaCoord size = getFarCorner().difference(getCorner());
+        DeltaCoord half = size.scale(0.5);
+        for (int dx = 0; dx <= size.x; dx += 16) {
+            for (int dy = 0; dy <= size.y; dy += 16) {
+                for (int dz = 0; dz <= size.z; dz += 16) {
+                    //could theoretically re-use a single DseCollider for all chunks. Theoretically.
+                    DseCollider e = new DseCollider(this, Vec3.createVectorHelper(dx - half.x, dy - half.y, dz - half.z));
+                    e.onEntityUpdate();
+                    worldObj.spawnEntityInWorld(e);
+                }
+            }
+        }
     }
     
     private void updateShadowArea() {
