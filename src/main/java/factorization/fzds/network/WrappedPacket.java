@@ -53,8 +53,8 @@ public class WrappedPacket extends Packet implements IFzdsShenanigans {
         }
         try {
             recieved_packet.readPacketData(buf);
-        } catch (IOException e) {
-            // TODO: This can go away.
+        } catch (Throwable e) {
+            // TODO: This can go away; just to make the compiler happy...
         }
         return recieved_packet;
     }
