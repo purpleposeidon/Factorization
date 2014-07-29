@@ -1,6 +1,5 @@
 package factorization.fzds;
 
-import java.util.Arrays;
 import java.util.List;
 
 import net.minecraft.entity.Entity;
@@ -8,11 +7,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
-import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsShenanigans;
-import factorization.notify.RenderMessages;
 import factorization.shared.FzUtil;
 
 public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans {
@@ -68,35 +63,37 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
         return shadowWorld.getCollidingBoundingBoxes(aabbHolder, aabb);
     }
     
+    static void debugBox(String name, AxisAlignedBB box) {
+        double bx = box.maxX - box.minX;
+        double by = box.maxY - box.minY;
+        double bz = box.maxZ - box.minZ;
+        System.out.println(name + ": " + (bx * by * bz) + " = " + bx + ", " + by + ", " + bz);
+    }
+    
     List<AxisAlignedBB> getShadowBoxesInRealBox(AxisAlignedBB realBox) {
-        double expansion = 2.45;
-        // The worst case would be a 1x2x1 collision box rotated 45+90°,45°,0° at the top.
-        // (MC hard-codes the max BB size to 1x2x1, instead of 1x1x1, for fences.)
-        // So if the expansion is too small, then the player might not collide with blocks
-        // that 'e should collide -- and does, in fact, collide at 0° rotation -- 
-        // because this expanded area does not contain the block that would need checking.
+        double expansion = 0.3660254037844387;
+        // It is important that expansion be the right value.
+        // If it is too small, then collisions will be incorrect when rotated.
+        // If it is too big, then there will be significant lag with e.g. splash potions.
+        // Currently using width = 1.
+        // (Which is cheating. It should be 2 due to fences, but I think this is a good tradeoff)
+        
+        // Here's how this number is derived 
+        // Take our max-sized cube.
+        // Calculate the distance between the center of the cube and a corner.
+        // If we move that cube to the origin and rotate it so that the corner pokes out as far as it can,
+        // this is equivalent to laying the corner_radius down flat, and the amount that it pokes over the cube's
+        // area is what our expansion should be.
+        // corner_radius = sqrt(3 * (width/2)**2)
+        // expansion = corner_radius + 1 - 0.5
         
         // Optimization: make the expansion depend on the rotation; so the expansion would
         // range from 0, at no rotation, to <whatever the maximum should be> at the most extreme angles.
-        // Could even enlarge the realBox differently on only certain sides maybe?
-        double cx = realBox.maxX - realBox.minX;
-        double cy = realBox.maxY - realBox.minY;
-        double cz = realBox.maxZ - realBox.minZ;
-        System.out.println("RealBox: " + (cx*cy*cz) + " = " + cx + ", " + cy + ", " + cz);
-        AxisAlignedBB useBox = realBox;
+        // Could probably be done as a simpleish function depending on rotationQuaternion.w
+        AxisAlignedBB shadowBox = convertRealBoxToShadowBox(realBox);
         if (!idc.getRotation().isZero()) {
-            useBox = realBox.expand(expansion, expansion, expansion);
+            shadowBox = shadowBox.expand(expansion, expansion, expansion);
         }
-        double bx = useBox.maxX - useBox.minX;
-        double by = useBox.maxY - useBox.minY;
-        double bz = useBox.maxZ - useBox.minZ;
-        System.out.println("useBox: " + (bx * by * bz) + " = " + bx + ", " + by + ", " + bz);
-        
-        AxisAlignedBB shadowBox = convertRealBoxToShadowBox(useBox);
-        double dx = shadowBox.maxX - shadowBox.minX;
-        double dy = shadowBox.maxY - shadowBox.minY;
-        double dz = shadowBox.maxZ - shadowBox.minZ;
-        System.out.println("ShadowBoxArea: " + (dx*dy*dz) + " = " + dx + ", " + dy + ", " + dz);
         return getShadowBoxesWithinShadowBox(shadowBox);
     }
     
