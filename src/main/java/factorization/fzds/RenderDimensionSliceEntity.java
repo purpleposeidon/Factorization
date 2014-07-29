@@ -317,10 +317,20 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
         }
         
         void startDamageDrawing(Tessellator tess, EntityPlayer player, float partial) {
+            GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+            /*
+             * Push all the things!
+             * There's a bunch of crazy state stuff here; who knows if the commented stuff below that came with it actually restores the state?
+             * In any case, it could still mess up the state in other places.
+             */
+            
+            GL11.glShadeModel(GL11.GL_FLAT);
+            GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F);
+            GL11.glEnable(GL11.GL_BLEND);
+            OpenGlHelper.glBlendFunc(770, 1, 1, 0);
             OpenGlHelper.glBlendFunc(774, 768, 1, 0);
             bindTexture(TextureMap.locationBlocksTexture);
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.5F);
-            GL11.glPushMatrix();
             GL11.glPolygonOffset(-3.0F, -3.0F);
             GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);
             GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F);
@@ -336,12 +346,13 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
         void endDamageDrawing(Tessellator tess) {
             tess.draw();
             tess.setTranslation(0.0D, 0.0D, 0.0D);
-            GL11.glDisable(GL11.GL_ALPHA_TEST);
+            /*GL11.glDisable(GL11.GL_ALPHA_TEST);
             GL11.glPolygonOffset(0.0F, 0.0F);
             GL11.glDisable(GL11.GL_POLYGON_OFFSET_FILL);
             GL11.glEnable(GL11.GL_ALPHA_TEST);
             GL11.glDepthMask(true);
-            GL11.glPopMatrix();
+            GL11.glDisable(GL11.GL_BLEND);*/ // See comment above re. these attributes
+            GL11.glPopAttrib();
         }
         
         int getRenderList() {
@@ -458,14 +469,15 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
                 GL11.glTranslated(-c.x, -c.y, -c.z);
                 if (nest == 1) {
                     renderInfo.updateRelativeEyePosition();
+                    // renderBreakingBlocks needs to happen before renderEntities due to gl state nonsense.
                     if (oracle) {
-                        renderInfo.renderEntities(partialTicks);
                         renderInfo.renderBreakingBlocks(real_player, partialTicks);
+                        renderInfo.renderEntities(partialTicks);
                     } else {
                         Hammer.proxy.setShadowWorld();
                         try {
-                            renderInfo.renderEntities(partialTicks);
                             renderInfo.renderBreakingBlocks(real_player, partialTicks);
+                            renderInfo.renderEntities(partialTicks);
                         } finally {
                             Hammer.proxy.restoreRealWorld();
                         }
