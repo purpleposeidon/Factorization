@@ -649,8 +649,8 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     private void removeItemEntities() {
         //Move entities outside the bounds in the shadow world into the real world
         World w = hammerCell.w;
-        for (int x = hammerCell.x; x <= farCorner.x; x += 16) {
-            for (int z = hammerCell.z; z <= farCorner.z; z += 16) {
+        for (int x = hammerCell.x - 16; x <= farCorner.x + 16; x += 16) {
+            for (int z = hammerCell.z - 16; z <= farCorner.z + 16; z += 16) {
                 if (!w.blockExists(x, 64, z)) {
                     continue;
                 }
