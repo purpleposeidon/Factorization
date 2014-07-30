@@ -58,6 +58,8 @@ import factorization.charge.ItemAcidBottle;
 import factorization.charge.ItemBattery;
 import factorization.charge.ItemChargeMeter;
 import factorization.charge.TileEntityLeydenJar;
+import factorization.colossi.ColossalBlock;
+import factorization.colossi.ColossalBlockItem;
 import factorization.darkiron.BlockDarkIronOre;
 import factorization.docs.ItemDocBook;
 import factorization.oreprocessing.ItemOreProcessing;
@@ -95,6 +97,7 @@ public class Registry {
     public BlockResource resource_block;
     public Block dark_iron_ore;
     public Block fractured_bedrock_block;
+    public Block colossal_block;
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
@@ -173,12 +176,14 @@ public class Registry {
         dark_iron_ore = new BlockDarkIronOre().setBlockName("factorization:darkIronOre").setBlockTextureName("stone").setCreativeTab(Core.tabFactorization).setHardness(3.0F).setResistance(5.0F);
         class NotchBlock extends Block { public NotchBlock(Material honestly) { super(honestly); } }
         fractured_bedrock_block = new NotchBlock(Material.rock).setBlockUnbreakable().setResistance(6000000).setBlockName("bedrock").setBlockTextureName("bedrock").setCreativeTab(Core.tabFactorization);
+        colossal_block = new ColossalBlock();
         
         GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FzBlock");
         GameRegistry.registerBlock(lightair_block, "Lightair");
         GameRegistry.registerBlock(resource_block, ItemBlockResource.class, "ResourceBlock");
         GameRegistry.registerBlock(dark_iron_ore, "DarkIronOre");
         GameRegistry.registerBlock(fractured_bedrock_block, "FracturedBedrock");
+        GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
         
         
         is_factory = new ItemStack(factory_block);

@@ -106,6 +106,10 @@ public class BlockIcons {
     public static IIcon servo$scan_color;
     public static IIcon servo$group_empty, servo$group_something;
     
+    
+    
+    public static IIcon colossi$body, colossi$body_cracked, colossi$arm;
+    
     public static class ActivatingMachineIIcon extends IIconGroup {
         public IIcon top, bottom, side, side_on;
         public IIcon get(TileEntityFactorization tef, ForgeDirection dir) {
