@@ -16,6 +16,7 @@ import factorization.shared.Core;
 
 public class BlockResource extends Block {
     public IIcon[] icons = new IIcon[ResourceType.values().length];
+    
     protected BlockResource() {
         super(Material.rock);
         setHardness(2.0F);
@@ -33,8 +34,6 @@ public class BlockResource extends Block {
         Core.registry.steamFluid.setIcons(BlockIcons.steam);
     }
 
-    
-    boolean done_spam = false;
     @Override
     public IIcon getIcon(int side, int md) {
         if (md < icons.length && md >= 0) {
@@ -49,19 +48,10 @@ public class BlockResource extends Block {
         itemList.add(Core.registry.lead_block_item);
         itemList.add(Core.registry.dark_iron_block_item);
     }
+    
     @Override
     public void getSubBlocks(Item par1, CreativeTabs par2CreativeTabs, List itemList) {
         addCreativeItems((List) itemList);
-    }
-
-    @Override
-    public boolean onBlockActivated(World w, int x, int y, int z, EntityPlayer player, int md,
-            float vx, float vy, float vz) {
-        if (player.isSneaking()) {
-            return false;
-        }
-        Coord here = new Coord(w, x, y, z);
-        return false;
     }
 
     @Override
