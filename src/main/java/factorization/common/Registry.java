@@ -23,6 +23,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.village.MerchantRecipeList;
@@ -353,6 +354,7 @@ public class Registry {
         socket_part = new ItemSocketPart("socket/", TabType.SERVOS);
         instruction_plate = new ItemCraftingComponent("servo/instruction_plate", TabType.SERVOS);
         instruction_plate.setSpriteNumber(0);
+        instruction_plate.setMaxStackSize(16);
         servo_rail_comment_editor = new ItemCommenter("servo/commenter");
         
         socket_lacerator = FactoryType.SOCKET_LACERATOR.asSocketItem();
@@ -455,11 +457,13 @@ public class Registry {
                 'M', logicMatrix,
                 'i', Items.quartz,
                 'X', logicMatrixProgrammer);
+        GameRegistry.addSmelting(logicMatrixIdentifier, new ItemStack(logicMatrix), 0);
         oreRecipe(new ItemStack(logicMatrixController),
                 "MiX",
                 'M', logicMatrix,
                 'i', "ingotSilver",
                 'X', logicMatrixProgrammer);
+        GameRegistry.addSmelting(logicMatrixController, new ItemStack(logicMatrix), 0);
         recipe(new ItemStack(logicMatrixProgrammer),
                 "MiX",
                 'M', logicMatrix,
@@ -489,6 +493,7 @@ public class Registry {
                 EntityVillager.func_146089_b(recipeList, item, random, chance);
             }
         });
+        TileEntitySlagFurnace.SlagRecipes.register(new ItemStack(logicMatrixProgrammer), 2F/3F, new ItemStack(dark_iron), 0.85F, new ItemStack(logicMatrix));
         
         TileEntityCrystallizer.addRecipe(new ItemStack(Blocks.redstone_block), new ItemStack(logicMatrix), 1, Core.registry.aqua_regia);
 
@@ -996,6 +1001,7 @@ public class Registry {
                 "T",
                 '#', instruction_plate,
                 'T', Items.sign);
+        GameRegistry.addSmelting(servo_widget_instruction, new ItemStack(instruction_plate), 0);
         recipe(new ItemStack(docbook),
                 "B~>",
                 'B', Items.book,
