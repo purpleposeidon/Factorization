@@ -266,6 +266,7 @@ public class TileEntityCrystallizer extends TileEntityFactorization {
                 crys.output.stackSize = 0;
             }
             crys.output.stackSize += delta;
+            crys.output = FzUtil.normalize(crys.output);
         }
 
         void apply(TileEntityCrystallizer crys) {

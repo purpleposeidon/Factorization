@@ -1,3 +1,14 @@
+0.8.87
+  Czech localizations by golyalpha!
+  Work around for another change that made mirrors stackable
+  Added recycling recipes:
+    LMPs can be slag-furnaced'd
+    Instructions can be smelted into blank instruction plates
+    Logic Matrix <Whatevers> can be smelted into blank logic matrices
+  Lacerators speed up much quicker
+  The LMP clicking/shift-clicking a note block with an LMP will adjust the note up/down, and show its name
+    
+
 0.8.86
   Better coremod
   Remove conflicting lacerator recipes

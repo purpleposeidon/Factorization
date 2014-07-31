@@ -61,7 +61,9 @@ import factorization.weird.TileEntityDayBarrel;
 
 public class SocketLacerator extends TileEntitySocketBase implements IChargeConductor {
     Charge charge = new Charge(this);
-    @Override public String getInfo() {
+    
+    @Override
+    public String getInfo() {
         int s = speed*100/max_speed;
         String msg = s + "% speed";
         if (!buffer.isEmpty()) {
@@ -69,7 +71,11 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         }
         return msg;
     }
-    @Override public Charge getCharge() { return charge; }
+    
+    @Override
+    public Charge getCharge() {
+        return charge;
+    }
     
     short speed = 0;
     short progress;
@@ -80,7 +86,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     boolean isPowered = false;
     
     final static byte grind_time = 25;
-    final static short max_speed = 400;
+    final static short max_speed = 200;
     final static short min_speed = max_speed/10;
     ArrayList<ItemStack> buffer = new ArrayList();
     
@@ -264,8 +270,8 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     
     boolean cantDoWork(ISocketHolder socket) {
         //Calls this in two places in handleRay because we may have unlacerable mops
-        if (!isPowered && socket.extractCharge(4)) {
-            speed = (short) Math.min(max_speed, speed + 4);
+        if (!isPowered && socket.extractCharge(8)) {
+            speed = (short) Math.min(max_speed, speed + 32);
             if (speed == max_speed) {
                 return false;
             }
