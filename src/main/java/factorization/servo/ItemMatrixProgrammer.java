@@ -37,6 +37,7 @@ public class ItemMatrixProgrammer extends ItemFactorization {
         Coord c = new Coord(world, x, y, z);
         TileEntityNote noteBlock = c.getTE(TileEntityNote.class);
         if (noteBlock != null) {
+            if (world.isRemote) return true;
             byte orig_note = noteBlock.note;
             int delta = player.isSneaking() ? -1 : 1;
             byte new_note = (byte) (orig_note + delta);
