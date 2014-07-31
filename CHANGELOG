@@ -1,5 +1,11 @@
 0.8.87
   Czech localizations by golyalpha!
+  Work around for another change that made mirrors stackable
+  Added recycling recipes:
+    LMPs can be slag-furnaced'd
+    Instructions can be smelted into blank instruction plates
+    Logic Matrix <Whatevers> can be smelted into blank logic matrices
+    
 
 0.8.86
   Better coremod
