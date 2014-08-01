@@ -314,8 +314,6 @@ public class Core {
     public static void logFine(String format, Object... formatParameters) {
         if (dev_environ) {
             FZLogger.info(String.format(format, formatParameters));
-        } else {
-            FZLogger.debug(String.format(format, formatParameters));
         }
     }
     
