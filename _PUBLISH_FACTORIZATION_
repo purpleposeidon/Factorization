@@ -21,6 +21,8 @@ def run(cmd):
 def adfly(url):
   return "http://adf.ly/2137658/" + url
 
+def devify(name): return name.replace(".jar", "-dev.jar")
+
 open("src/main/resources/assets/factorization/lang/en_US.lang").close()
 
 exp = os.path.expanduser
@@ -31,10 +33,12 @@ version = open("fzversion").read().strip()
 mc_forge_version = getMinecraftVersion()
 filename = "Factorization-{0}.jar".format(version)
 
-run("./rungradle build writeFzFile")
+run("./rungradle build deobfJar writeFzFile")
 
 oldfile = exp("~/Dropbox/Public/old/" + filename)
-run("cp " + open("last_fz").read().strip() + " " +oldfile)
+last_fz = open("last_fz").read().strip()
+run("cp " + last_fz + " " + oldfile)
+run("cp " + devify(last_fz) + " " + devify(oldfile))
 mfurl = exp("~/tmp/factorization_mediafire_url")
 run("rm " + mfurl)
 changelogFilename = "changelogs/Changelog-" + version + ".txt"
@@ -51,6 +55,7 @@ changelog_url = my_dropbox + changelogFilename
 #Dropbox
 dropbox_url = my_dropbox + "old/" + filename
 run("dropbox_uploader.sh upload " + oldfile + " Public/old/" + filename)
+run("dropbox_uploader.sh upload " + devify(oldfile) + " Public/old/" + devify(filename))
 
 #Mediafire
 run("mediafire upload --quiet " + oldfile + " > " + mfurl)
@@ -70,7 +75,8 @@ LOG += '''
   adfly(dropbox_url)
 ).strip() + "\n"
 LOG += "Built on " + time.strftime("%F") + " against " + (getForgeVersion() + "\n")
-LOG += '[url="{0}"]Changelog[/url]'.format(changelog_url)
+LOG += '[url="{0}"]Changelog[/url]\n'.format(changelog_url)
+LOG += '[url="{0}"]Deobf for Mod Authors[/url]'.format(devify(dropbox_url))
 print LOG
 
 open("build.log", 'a').write(LOG+ '\n\n')
