@@ -7,13 +7,18 @@ import java.util.HashSet;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.EntityLeashKnot;
 import net.minecraft.entity.item.EntityFireworkRocket;
+import net.minecraft.entity.passive.EntityHorse;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemAxe;
+import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemSword;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.Potion;
@@ -21,20 +26,17 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatisticsFile;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
-import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DungeonHooks;
+import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -43,8 +45,6 @@ import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
-import factorization.notify.Notice;
-import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
@@ -237,6 +237,34 @@ public class MiscellaneousNonsense {
         // Place a slab on the ground below it. Look up, try to place a block against the top one.
         double new_rd = old_rd + 1;
         player.theItemInWorldManager.setBlockReachDistance(new_rd);
+    }
+    
+    @SubscribeEvent
+    public void doTheZorroThing(EntityInteractEvent event) {
+        EntityPlayer player = event.entityPlayer;
+        if (player.worldObj.isRemote) return;
+        if (player.isRiding()) return;
+        if (!(event.target instanceof EntityHorse)) return;
+        EntityHorse horse = (EntityHorse) event.target;
+        if (player.fallDistance <= 2) return;
+        if (!horse.isHorseSaddled()) return;
+        if (horse.getLeashed()) {
+            if (!(horse.getLeashedToEntity() instanceof EntityLeashKnot)) return;
+            horse.getLeashedToEntity().interactFirst(player);
+        }
+        boolean awesome = false;
+        if (player.fallDistance > 5 && player.getHeldItem() != null) {
+            Item held = player.getHeldItem().getItem();
+            awesome &= held instanceof ItemSword || held instanceof ItemAxe || held instanceof ItemBow || player.riddenByEntity instanceof EntityPlayer || player.riddenByEntity instanceof EntityVillager;
+        }
+        if (awesome) {
+            horse.addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 20*15, 2, false));
+            horse.addPotionEffect(new PotionEffect(Potion.resistance.id, 20*15, 1, true));
+            horse.addPotionEffect(new PotionEffect(Potion.jump.id, 20*15, 1, true));
+        } else {
+            horse.addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 20, 1, false));
+        }
+        horse.playLivingSound();
     }
     
     
