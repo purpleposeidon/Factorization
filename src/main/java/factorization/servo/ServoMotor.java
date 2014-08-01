@@ -78,6 +78,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     public void spawnServoMotor() {
         motionHandler.beforeSpawn();
         worldObj.spawnEntityInWorld(this);
+        cloningDebug(this, "User created a new servo");
     }
 
     public void syncWithSpawnPacket() {
@@ -97,6 +98,15 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Entity ent = worldObj.getEntityByID(getEntityId());
+        if (ent == null) {
+            cloningDebug(this, "Loading from NBT. There is no other entity with my ID.");
+        } else if (ent == this) {
+            cloningDebug(this, "Loading from NBT. I am already loaded????");
+        } else if (ent != this) {
+            cloningDebug(this, "Loading from NBT. *** ENTITY ID CONFLICT ***! Beep beep beep!");
+            cloningDebug(ent, "THE CONFLICTING ENTITY");
+        }
     }
     
     @Override
@@ -106,6 +116,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         } catch (IOException e) {
             e.printStackTrace();
         }
+        cloningDebug(this, "Writing to NBT");
     }
 
     @Override
@@ -270,6 +281,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             motionHandler.updateServoMotion();
             executioner.tick();
         } else {
+            if (!getNextPos().blockExists()) return;
             byte orig_speed = motionHandler.speed_b;
             FzOrientation orig_or = motionHandler.orientation;
             motionHandler.updateServoMotion();
@@ -520,7 +532,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
 
     @Override
     public void setPosition(double x, double y, double z) {
-        // super.setPosition(x, y, z); //Super does some stupid shit to the bounding box.
+        // super.setPosition(x, y, z); //Super does some stupid shit to the bounding box. Does not mess with the chunk location or anything like that.
         this.posX = x;
         this.posY = y;
         this.posZ = z;
@@ -731,4 +743,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         Core.network.broadcastPacket(null, getCurrentPos(), toSend); 
     }
     
+    static void cloningDebug(Entity me, String action) {
+        Core.logSevere("[SPAWNLOG] %s   servo #%s %s in chunk (%s,%s) y=%s ", action, me.getEntityId(), me.getUniqueID(), (int) (me.posX % 16), (int) (me.posZ % 16), (int) me.posY);
+    }
 }
