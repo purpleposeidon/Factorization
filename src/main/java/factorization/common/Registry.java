@@ -115,8 +115,6 @@ public class Registry {
     public ItemStack is_factory, is_lamp, is_lightair;
     public ItemPocketTable pocket_table;
     public ItemCraftingComponent diamond_shard;
-    public ItemStack diamond_shard_packet;
-    public IRecipe boh_upgrade_recipe;
     public ItemCraftingComponent silver_ingot, lead_ingot;
     public ItemCraftingComponent dark_iron;
     public ItemAcidBottle acid;
@@ -736,14 +734,14 @@ public class Registry {
                 'P', Blocks.piston);
 
         // Wrath lamp
-//		oreRecipe(lamp_item,
-//				"ISI",
-//				"GWG",
-//				"ISI",
-//				'I', dark_iron,
-//				'S', "ingotSilver",
-//				'G', Blocks.glass_pane,
-//				'W', new ItemStack(wrath_igniter, 1, FzUtil.WILDCARD_DAMAGE));
+        oreRecipe(lamp_item,
+                "ISI",
+                "GWG",
+                "ISI",
+                'I', dark_iron,
+                'S', "ingotSilver",
+                'G', Blocks.glass_pane,
+                'W', diamond_shard);
 
         //Slag furnace
         recipe(slagfurnace_item,
