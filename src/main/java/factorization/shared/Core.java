@@ -54,6 +54,7 @@ import cpw.mods.fml.common.registry.GameRegistry.Type;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.charge.TileEntitySolarBoiler;
+import factorization.colossi.BuildColossusCommand;
 import factorization.common.FactorizationProxy;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
@@ -185,6 +186,7 @@ public class Core {
         isMainServerThread.set(true);
         serverStarted = true;
         DocumentationModule.instance.serverStarts(event);
+        event.registerServerCommand(new BuildColossusCommand());
     }
     
     @EventHandler
