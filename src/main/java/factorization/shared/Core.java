@@ -55,6 +55,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.charge.TileEntitySolarBoiler;
 import factorization.colossi.BuildColossusCommand;
+import factorization.colossi.MaskLoader;
 import factorization.common.FactorizationProxy;
 import factorization.common.FactoryType;
 import factorization.common.FzConfig;
@@ -142,6 +143,7 @@ public class Core {
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Lacerator|factorization.oreprocessing.TileEntityGrinder|recipes");
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Crystallizer|factorization.oreprocessing.TileEntityCrystallizer|recipes");
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Slag Furnace|factorization.oreprocessing.TileEntitySlagFurnace$SlagRecipes|smeltingResults");
+        MaskLoader.loadMasks();
     }
     
     void registerSimpleTileEntities() {

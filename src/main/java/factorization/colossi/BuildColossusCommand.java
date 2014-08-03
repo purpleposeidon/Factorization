@@ -11,7 +11,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 
 public class BuildColossusCommand extends CommandBase {
-
     @Override
     public String getCommandName() {
         return "build-colossus";
@@ -29,6 +28,10 @@ public class BuildColossusCommand extends CommandBase {
 
     @Override
     public void processCommand(ICommandSender player, String[] args) {
+        if (args[0].equalsIgnoreCase("reload")) {
+            MaskLoader.reloadMasks();
+            return;
+        }
         ChunkCoordinates cc = player.getPlayerCoordinates();
         Coord at = new Coord(player.getEntityWorld(), cc.posX, cc.posY, cc.posZ);
         if (args[0].equalsIgnoreCase("spam")) {
