@@ -1,19 +1,12 @@
 package factorization.colossi;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Random;
 
-import net.minecraft.init.Blocks;
 import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.colossi.Brush.BrushMask;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
 
 public class ColossalBuilder {
     final Random rand;
@@ -157,6 +150,9 @@ public class ColossalBuilder {
         
         paintMask(ForgeDirection.UP);
         paintMask(ForgeDirection.DOWN);
+        
+        Coord standard_eyeball = start.add(face_depth + body_front_padding, leg_height + 1 + body_height + (face_height / 2), 1 + leg_size + leg_spread / 2);
+        fill(standard_eyeball, standard_eyeball, EYE);
     }
     
     void fill(Coord min, Coord max, BlockState state) {
