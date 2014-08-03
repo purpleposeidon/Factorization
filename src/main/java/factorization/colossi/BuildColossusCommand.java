@@ -19,7 +19,7 @@ public class BuildColossusCommand extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender player) {
-        return "/build-colossus [seed]";
+        return "/build-colossus [spam] seed";
     }
     
     @Override
@@ -29,11 +29,26 @@ public class BuildColossusCommand extends CommandBase {
 
     @Override
     public void processCommand(ICommandSender player, String[] args) {
-        Random rand = new Random(Integer.parseInt(args[0]));
         ChunkCoordinates cc = player.getPlayerCoordinates();
         Coord at = new Coord(player.getEntityWorld(), cc.posX, cc.posY, cc.posZ);
+        if (args[0].equalsIgnoreCase("spam")) {
+            int randSeed = Integer.parseInt(args[1]);
+            for (int i = 0; i < 10; i++) {
+                ColossalBuilder cb = doGen(at, randSeed + i);
+                at = at.add(0, 0, cb.get_width() + 4);
+                if (i == 0) {
+                    at = at.add(0, 0, 6); // Some help for the first guy?
+                }
+            }
+        } else {
+            int randSeed = Integer.parseInt(args[0]);
+            doGen(at, randSeed);
+        }
+    }
+    
+    ColossalBuilder doGen(Coord at, int randSeed) {
+        Random rand = new Random(randSeed);
         Coord signAt = at.copy();
-        
         ColossalBuilder builder = new ColossalBuilder(rand, at);
         builder.construct();
         
@@ -41,9 +56,10 @@ public class BuildColossusCommand extends CommandBase {
         TileEntitySign sign = signAt.getTE(TileEntitySign.class);
         if (sign != null) {
             sign.signText[0] = "Colossus Seed";
-            sign.signText[1] = args[0];
+            sign.signText[1] = "" + randSeed;
             signAt.markBlockForUpdate();
         }
+        return builder;
     }
 
 }
