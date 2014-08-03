@@ -134,6 +134,8 @@ public class Coord implements IDataSerializable, ISaneCoord {
                 } else {
                     ret += " null";
                 }
+                int md = getMd();
+                ret += "#" + md;
                 TileEntity te = getTE();
                 if (te != null) {
                     ret += " " + te.getClass().getSimpleName();
