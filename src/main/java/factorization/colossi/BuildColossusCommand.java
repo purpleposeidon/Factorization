@@ -5,6 +5,7 @@ import java.util.Random;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.TileEntityCommandBlock;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -22,6 +23,11 @@ public class BuildColossusCommand extends CommandBase {
     }
     
     @Override
+    public int getRequiredPermissionLevel() {
+        return 2;
+    }
+    
+    @Override
     public boolean canCommandSenderUseCommand(ICommandSender player) {
         return super.canCommandSenderUseCommand(player);
     }
@@ -34,6 +40,9 @@ public class BuildColossusCommand extends CommandBase {
         }
         ChunkCoordinates cc = player.getPlayerCoordinates();
         Coord at = new Coord(player.getEntityWorld(), cc.posX, cc.posY, cc.posZ);
+        if (player.getCommandSenderName().startsWith("@")) {
+            at = at.add(0, 6, 0);		    
+        }
         if (args[0].equalsIgnoreCase("spam")) {
             int randSeed = Integer.parseInt(args[1]);
             for (int i = 0; i < 10; i++) {
@@ -55,12 +64,14 @@ public class BuildColossusCommand extends CommandBase {
         ColossalBuilder builder = new ColossalBuilder(rand, at);
         builder.construct();
         
-        signAt.setIdMd(Blocks.standing_sign, 12, true);
-        TileEntitySign sign = signAt.getTE(TileEntitySign.class);
-        if (sign != null) {
-            sign.signText[0] = "Colossus Seed";
-            sign.signText[1] = "" + randSeed;
-            signAt.markBlockForUpdate();
+        if (signAt.getTE(TileEntityCommandBlock.class) != null) {
+            signAt.setIdMd(Blocks.standing_sign, 12, true);
+            TileEntitySign sign = signAt.getTE(TileEntitySign.class);
+            if (sign != null) {
+                sign.signText[0] = "Colossus Seed";
+                sign.signText[1] = "" + randSeed;
+                signAt.markBlockForUpdate();
+            }
         }
         return builder;
     }

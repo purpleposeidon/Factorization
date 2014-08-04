@@ -1,9 +1,9 @@
 package factorization.colossi;
 
-import java.awt.HeadlessException;
 import java.util.Random;
 
 import net.minecraft.init.Blocks;
+import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
@@ -183,6 +183,14 @@ public class ColossalBuilder {
         return (leg_size + 1) * 2 + leg_spread + body_arm_padding * 2 + (arm_size + 1) * 2 + 1;
     }
     
+    int get_depth() {
+        return leg_size + body_front_padding + body_back_padding;
+    }
+    
+    int get_height() {
+        return leg_height + 1 + body_height + face_height + 4;
+    }
+    
     void paintMask(ForgeDirection dir) {
         MaskTemplate mask = MaskLoader.pickMask(rand, dir, face_width + 1, face_width + 1);
         if (mask == null) return;
@@ -198,33 +206,79 @@ public class ColossalBuilder {
     
     void growTerrainBlob() {
         int BORDER = 6 + (leg_size * 7 / 3);
-        Coord blobStart = start.add(-body_back_padding - BORDER, 0, -body_arm_padding - arm_size - BORDER);
-        Coord blobEnd = start.add(body_front_padding + leg_size + 1 + (BORDER/2), leg_height + 1 + body_height + face_height + BORDER, leg_size * 2 + leg_spread + body_arm_padding + arm_size + 1 + BORDER);
+        Coord blobStart = start.add(-body_back_padding - BORDER - leg_size, 0, -body_arm_padding - arm_size - BORDER);
+        Coord blobEnd = start.add(body_front_padding + leg_size + 1 + clipMin(leg_size - 1, 2), leg_height + 1 + body_height + face_height + BORDER, leg_size * 2 + leg_spread + body_arm_padding + arm_size + 1 + BORDER);
         blobEnd = blobEnd.add(0, face_height*5/2, 0);
-        BlobBuilder life = new BlobBuilder(blobStart, blobEnd);
+        BlobBuilder life = new BlobBuilder(rand, blobStart, blobEnd);
         life.populateCellsFromWorld();
         
-        /*
-        life.sprinkleSeeds(rand, 0.30F);
-        double reinforce = 0.1;
-        for (int j = 0; j < 10; j++) {
-            for (int i = 0; i < 5; i++) {
-                life.simulateTick(rand);
-            }
-            life.reinforce(rand, reinforce);
-            reinforce *= 0.3;
-            life.sprinkleSeeds(rand, 0.2);
-            //life.wall_healing -= 1;
+        life.sprinkleSeeds(0.05);
+        life.bubble();
+        life.pruneTick();
+        for (int i = 0; i < 3; i++) {
+            life.life(1, 1);
         }
-        life.birth_threshold = 1000;
-        //life.death_threshold = 30;
-        for (int i = 0; i < 4; i++) {
-            life.simulateTick(rand);
-        }
+        life.reinforce(1);
+        life.rainSeeds(0.3, 0.1);
+        life.bubble();
+        //life.smooth(4);
+        life.reinforce(0.8);
+        life.pruneTick();
+        
+        life.sprinkleSeeds(0.025);
+        life.pruneTick();
+        life.reinforce(0.5);
+        life.rainSeeds(0.05, 0.75);
+        
+        
+        
+        
+        life.removeReinforcements();
+        //life.growthTick();
+        life.upset(2, 1, 4);
+        //
+        
+        /*life.sprinkleSeeds(0.25);
+        life.life(3, 5);
+        life.life(3, 5);
+        life.life(3, 5);
+        life.life(3, 5);
+        life.life(3, 5);
+        life.pruneTick();*/
+        
+        /*life.sprinkleSeeds(0.025);
+        life.bubble();
+        life.removeReinforcements();
+        life.pruneTick();*/
+        //life.rainSeeds(0.05, 0.75);
+        
+        /*life.sprinkleSeeds(0.025);
+        life.bubble();
+        life.life(2, 10);*/
+        
+        /*{
+            // This is quite good.
+            life.sprinkleSeeds(0.025);
+            life.pruneTick();
+            life.rainSeeds(0.05, 0.75);
+        }*/
+        
+        //life.life(0, 3);
+        //life.rainSeeds(0.05, 0.75);
+        //life.life(0, 0);
+        //life.sprinkleSeeds(0.025);
+        //life.growthTick();
+        
+        //life.reinforce(1);
+        
+        //life.sprinkleSeeds(0.025);
+        //life.pruneTick();
+        //life.rainSeeds(0.05, 0.75);
+        
+        //life.bubble();
+        //life.smooth(2);
+        
         life.saveCellsToWorld(Blocks.stone);
-        //life.sprinkleSeeds(rand, 0.10F);
-        //life.saveCellsToWorld(Blocks.wool);
-         */
     }
     
 }
