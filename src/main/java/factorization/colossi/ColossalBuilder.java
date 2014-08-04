@@ -197,16 +197,34 @@ public class ColossalBuilder {
     }
     
     void growTerrainBlob() {
-        int BORDER = leg_size * 7 / 3;
+        int BORDER = 6 + (leg_size * 7 / 3);
         Coord blobStart = start.add(-body_back_padding - BORDER, 0, -body_arm_padding - arm_size - BORDER);
-        Coord blobEnd = start.add(body_front_padding + leg_size + 1 + (BORDER/2), leg_height + 1 + body_height + face_height + BORDER, leg_size * 2 + leg_spread + body_arm_padding + arm_size + BORDER);
+        Coord blobEnd = start.add(body_front_padding + leg_size + 1 + (BORDER/2), leg_height + 1 + body_height + face_height + BORDER, leg_size * 2 + leg_spread + body_arm_padding + arm_size + 1 + BORDER);
+        blobEnd = blobEnd.add(0, face_height*5/2, 0);
         BlobBuilder life = new BlobBuilder(blobStart, blobEnd);
         life.populateCellsFromWorld();
-        life.sprinkleSeeds(rand, 0.15F);
-        for (int i = 0; i < 50; i++) {
+        
+        /*
+        life.sprinkleSeeds(rand, 0.30F);
+        double reinforce = 0.1;
+        for (int j = 0; j < 10; j++) {
+            for (int i = 0; i < 5; i++) {
+                life.simulateTick(rand);
+            }
+            life.reinforce(rand, reinforce);
+            reinforce *= 0.3;
+            life.sprinkleSeeds(rand, 0.2);
+            //life.wall_healing -= 1;
+        }
+        life.birth_threshold = 1000;
+        //life.death_threshold = 30;
+        for (int i = 0; i < 4; i++) {
             life.simulateTick(rand);
         }
         life.saveCellsToWorld(Blocks.stone);
+        //life.sprinkleSeeds(rand, 0.10F);
+        //life.saveCellsToWorld(Blocks.wool);
+         */
     }
     
 }
