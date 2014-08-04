@@ -158,6 +158,8 @@ public class ColossalBuilder {
         
         Coord heart = start.add(leg_size + body_front_padding, leg_height + 1 + ((body_height + 1) / 2), leg_size + ((1 + leg_spread) / 2));
         fill(heart, heart, HEART);
+        
+        growTerrainBlob();
     }
     
     void fill(Coord min, Coord max, BlockState state) {
@@ -192,6 +194,19 @@ public class ColossalBuilder {
         Brush maskBrush = new Brush(MASK, BrushMask.ALL, rand);
         Brush eyeBrush = new Brush(EYE, BrushMask.ALL, rand);
         mask.paint(mask_anchor, maskBrush, eyeBrush);
+    }
+    
+    void growTerrainBlob() {
+        int BORDER = leg_size * 7 / 3;
+        Coord blobStart = start.add(-body_back_padding - BORDER, 0, -body_arm_padding - arm_size - BORDER);
+        Coord blobEnd = start.add(body_front_padding + leg_size + 1 + (BORDER/2), leg_height + 1 + body_height + face_height + BORDER, leg_size * 2 + leg_spread + body_arm_padding + arm_size + BORDER);
+        BlobBuilder life = new BlobBuilder(blobStart, blobEnd);
+        life.populateCellsFromWorld();
+        life.sprinkleSeeds(rand, 0.15F);
+        for (int i = 0; i < 50; i++) {
+            life.simulateTick(rand);
+        }
+        life.saveCellsToWorld(Blocks.stone);
     }
     
 }
