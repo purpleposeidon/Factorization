@@ -1718,6 +1718,12 @@ public class FzUtil {
         return (currentValue - lowValue)/(highValue - lowValue);
     }
     
+    public static double uninterp(double lowValue, double highValue, double currentValue) {
+        if (currentValue < lowValue) return 0F;
+        if (currentValue > highValue) return 1F;
+        return (currentValue - lowValue)/(highValue - lowValue);
+    }
+    
     public static int getAxis(ForgeDirection fd) {
         if (fd.offsetX != 0) {
             return 1;

@@ -22,6 +22,7 @@ public class FzConfig {
     public static boolean gen_dark_iron_ore = true;
     public static boolean gen_broken_bedrock = true;
     public static int silver_ore_node_new_size = 18;
+    public static boolean gen_colossi = true;
     public static boolean enable_dimension_slice = Core.dev_environ;
     public static int dimension_slice_dimid = -7;
     public static int force_max_entity_radius = -1;
@@ -139,6 +140,7 @@ public class FzConfig {
         silver_ore_node_new_size = Math.max(5, Math.min(config_silver_size, 35));
         gen_dark_iron_ore = getBoolConfig("generateDarkIronOre", "general", gen_dark_iron_ore, "Set to false to disable dark iron ore generation");
         gen_broken_bedrock = getBoolConfig("generateBrokenBedrock", "general", gen_broken_bedrock, "Set to false to disable broken bedrock spawning around dark iron ore");
+        gen_colossi = getBoolConfig("generateColossi", "general", gen_colossi, "If true, Colossi will generate in the world.");
         
         {
             enable_retrogen = getBoolConfig("enableRetrogen", "retrogen", enable_retrogen, null);

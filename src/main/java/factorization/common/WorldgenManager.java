@@ -15,6 +15,7 @@ import net.minecraftforge.event.world.ChunkDataEvent;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
+import factorization.colossi.WorldGenColossus;
 import factorization.shared.Core;
 
 public class WorldgenManager {
@@ -196,6 +197,9 @@ public class WorldgenManager {
                 }
             };
             GameRegistry.registerWorldGenerator(darkIronGen, 0);
+        }
+        if (FzConfig.gen_colossi) {
+            GameRegistry.registerWorldGenerator(new WorldGenColossus(), -50);
         }
     }
     
