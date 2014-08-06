@@ -66,6 +66,18 @@ public class Awakener {
         }
     }
     
+    void mark(Set<Coord> set, String msg) {
+        for (Coord c : set) {
+            new Notice(c, msg).withStyle(Style.FORCE, Style.EXACTPOSITION).sendToAll();
+        }
+    }
+    
+    void markSets(ArrayList<Set<Coord>> sets, String msg) {
+        for (Set<Coord> set : sets) {
+            mark(set, msg);
+        }
+    }
+    
     int ground_level = -1;
     BlockState valid_natural_blocks = new BlockState(null, 0) {
         @Override
@@ -109,7 +121,8 @@ public class Awakener {
         heart = mask = eyes = null;
         details("mainBody", body);
         
-        if (!verifyLimbDimensions(legs, arms)) return;
+        if (!verifyArmDimensions(arms)) return;
+        if (!verifyLegDimensions(legs)) return;
         
         
         ArrayList<Set<Coord>> all_members = new ArrayList();
@@ -140,60 +153,48 @@ public class Awakener {
         // mark(body, "+");
     }
     
-    void mark(Set<Coord> set, String msg) {
-        for (Coord c : set) {
-            new Notice(c, msg).withStyle(Style.FORCE, Style.EXACTPOSITION).sendToAll();
-        }
-    }
-    
-    void markSets(ArrayList<Set<Coord>> sets, String msg) {
-        for (Set<Coord> set : sets) {
-            mark(set, msg);
-        }
-    }
-    
-    boolean verifyLimbDimensions(ArrayList<Set<Coord>> legs, ArrayList<Set<Coord>> arms) {
-        {
-            boolean first = true;
-            for (Set<Coord> leg : legs) {
-                if (first) {
-                    leg_length = measure_dim(leg, 1);
-                    leg_size = measure_size(leg);
-                    first = false;
-                } else {
-                    int new_leg_length = measure_dim(leg, 1);
-                    int new_leg_size = measure_size(leg);
-                    if (leg_length != new_leg_length || leg_size != new_leg_size) {
-                        Core.logInfo("Mismatched legs!");
-                        return false;
-                    }
+    boolean verifyLegDimensions(ArrayList<Set<Coord>> legs) {
+        boolean first = true;
+        for (Set<Coord> leg : legs) {
+            if (first) {
+                leg_length = measure_dim(leg, 1);
+                leg_size = measure_size(leg);
+                first = false;
+            } else {
+                int new_leg_length = measure_dim(leg, 1);
+                int new_leg_size = measure_size(leg);
+                if (leg_length != new_leg_length || leg_size != new_leg_size) {
+                    Core.logInfo("Mismatched legs!");
+                    return false;
                 }
             }
-            if (leg_length == -1 || leg_size == -1) {
-                Core.logInfo("Invalid legs!");
-                return false;
-            }
         }
-        {
-            boolean first = true;
-            for (Set<Coord> arm : arms) {
-                if (first) {
-                    arm_length = measure_dim(arm, 1);
-                    arm_size = measure_size(arm);
-                    first = false;
-                } else {
-                    int new_arm_length = measure_dim(arm, 1);
-                    int new_arm_size = measure_size(arm);
-                    if (arm_length != new_arm_length || arm_size != new_arm_size) {
-                        Core.logInfo("Mismatched arms!");
-                        return false;
-                    }
+        if (leg_length == -1 || leg_size == -1) {
+            Core.logInfo("Invalid legs!");
+            return false;
+        }
+        return true;
+    }
+    
+    boolean verifyArmDimensions(ArrayList<Set<Coord>> arms) {
+        boolean first = true;
+        for (Set<Coord> arm : arms) {
+            if (first) {
+                arm_length = measure_dim(arm, 1);
+                arm_size = measure_size(arm);
+                first = false;
+            } else {
+                int new_arm_length = measure_dim(arm, 1);
+                int new_arm_size = measure_size(arm);
+                if (arm_length != new_arm_length || arm_size != new_arm_size) {
+                    Core.logInfo("Mismatched arms!");
+                    return false;
                 }
             }
-            if (arm_length == -1 || arm_size == -1) {
-                Core.logInfo("Invalid arms!");
-                return false;
-            }
+        }
+        if (arm_length == -1 || arm_size == -1) {
+            Core.logInfo("Invalid arms!");
+            return false;
         }
         return true;
     }
@@ -268,13 +269,6 @@ public class Awakener {
     boolean inClasses(ArrayList<Set<Coord>> lists, Coord at) {
         for (Set<Coord> sc : lists) {
             if (sc.contains(at)) return true;
-        }
-        return false;
-    }
-    
-    boolean adjacentToSet(Set<Coord> bulk, Coord at) {
-        for (Coord member : bulk) {
-            if (at.distanceSq(member) <= 1) return true;
         }
         return false;
     }
