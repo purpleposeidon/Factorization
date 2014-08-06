@@ -100,8 +100,13 @@ public class ColossalBlock extends Block {
         // No LMP, only the core drops the LMP.
         coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.logicMatrixIdentifier), 1, 1, 5));
         coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.logicMatrixController), 1, 1, 5));
-        coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.diamond_shard), 1, 2, 3));
+        coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.diamond_shard), 2, 4, 1));
         coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.ore_reduced, 1, ItemOreProcessing.OreType.DARKIRON.ID), 1, 7, 10));
+        coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.motor), 1, 1, 8));
+        coreChest.addItem(new WeightedRandomChestContent(Core.registry.servo_motor, 1, 1, 3));
+        coreChest.addItem(new WeightedRandomChestContent(Core.registry.dark_iron_sprocket, 2, 4, 2));
+        coreChest.addItem(new WeightedRandomChestContent(Core.registry.servorail_item, 4, 10, 1));
+        // TODO NORELEASE: It'd be better to drop a srapbox item instead!
         return coreChest;
     }
     
