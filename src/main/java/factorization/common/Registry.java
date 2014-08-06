@@ -60,6 +60,7 @@ import factorization.charge.ItemChargeMeter;
 import factorization.charge.TileEntityLeydenJar;
 import factorization.colossi.ColossalBlock;
 import factorization.colossi.ColossalBlockItem;
+import factorization.colossi.TileEntityColossalHeart;
 import factorization.darkiron.BlockDarkIronOre;
 import factorization.docs.ItemDocBook;
 import factorization.oreprocessing.ItemOreProcessing;
@@ -184,6 +185,7 @@ public class Registry {
         GameRegistry.registerBlock(dark_iron_ore, "DarkIronOre");
         GameRegistry.registerBlock(fractured_bedrock_block, "FracturedBedrock");
         GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
+        GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
         
         
         is_factory = new ItemStack(factory_block);

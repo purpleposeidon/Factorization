@@ -221,7 +221,6 @@ public class BlobBuilder {
     
     public void life(int dieBelow, int birthAbove) {
         tickStart();
-        int changed = 0;
         for (int x = 0; x <= size.x; x++) {
             for (int y = 0; y <= size.y; y++) {
                 for (int z = 0; z <= size.z; z++) {
@@ -242,10 +241,8 @@ public class BlobBuilder {
                         }
                         if (base > 0 && near < dieBelow) {
                             set(x, y, z, AIR);
-                            changed++;
                         } else if (base == AIR && near > birthAbove) {
                             set(x, y, z, (byte) 1);
-                            changed++;
                         }
                     }
                 }

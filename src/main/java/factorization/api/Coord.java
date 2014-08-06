@@ -443,6 +443,12 @@ public class Coord implements IDataSerializable, ISaneCoord {
         z += dc.offsetZ;
     }
     
+    public void adjust(int dx, int dy, int dz) {
+        x += dx;
+        y += dy;
+        z += dz;
+    }
+    
     //Methods on the world
     
     public void markBlockForUpdate() {

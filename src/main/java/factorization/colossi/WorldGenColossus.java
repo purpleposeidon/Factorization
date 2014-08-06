@@ -150,7 +150,7 @@ public class WorldGenColossus implements IWorldGenerator {
     }
 
     @Override
-    public void generate(Random rand, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
+    public void generate(Random worldRandom, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
         if (!genOnWorld(world)) return;
         if (!isGenChunk(chunkX, chunkZ)) return;
         int blockX = 8 + (chunkX * 16);
@@ -173,7 +173,7 @@ public class WorldGenColossus implements IWorldGenerator {
         Block dirt = start.getBlock();
         int dirt_md = start.getMd();
         
-        ColossalBuilder builder = new ColossalBuilder(rand, start);
+        ColossalBuilder builder = new ColossalBuilder(worldRandom.nextInt(), start);
         int width = builder.get_width();
         int depth = builder.get_depth();
         int height = builder.get_height();

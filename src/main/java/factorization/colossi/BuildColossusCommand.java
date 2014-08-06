@@ -59,9 +59,8 @@ public class BuildColossusCommand extends CommandBase {
     }
     
     ColossalBuilder doGen(Coord at, int randSeed) {
-        Random rand = new Random(randSeed);
         Coord signAt = at.copy();
-        ColossalBuilder builder = new ColossalBuilder(rand, at);
+        ColossalBuilder builder = new ColossalBuilder(randSeed, at);
         builder.construct();
         
         if (signAt.getTE(TileEntityCommandBlock.class) != null) {

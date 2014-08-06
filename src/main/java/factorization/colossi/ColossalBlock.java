@@ -9,14 +9,20 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.WeightedRandomChestContent;
+import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.ForgeDirection;
+import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.oreprocessing.ItemOreProcessing;
 import factorization.shared.Core;
@@ -92,7 +98,6 @@ public class ColossalBlock extends Block {
         if (setup) return coreChest;
         setup = true;
         // No LMP, only the core drops the LMP.
-        //coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.logicMatrix), 1, 1, 10));
         coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.logicMatrixIdentifier), 1, 1, 5));
         coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.logicMatrixController), 1, 1, 5));
         coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.diamond_shard), 1, 2, 3));
@@ -153,4 +158,110 @@ public class ColossalBlock extends Block {
         return new ItemStack(this, 1, world.getBlockMetadata(x, y, z));
     }
     
+    double getSensitivity(int md) {
+        switch (md) {
+        case MD_BODY:
+        case MD_BODY_CRACKED:
+            return 0.2;
+        case MD_EYE:
+        case MD_CORE:
+            return 1;
+        case MD_ARM:
+        case MD_LEG:
+            return 0.01;
+        default: return 0;
+        }
+    }
+    
+    boolean maybeAwaken(Coord at, double boldNess) {
+        if (getSensitivity(at.getMd()) * boldNess < at.w.rand.nextDouble()) {
+            return false;
+        }
+        Awakener.awaken(at);
+        return true;
+    }
+    
+    boolean playerImmune(Entity ent) {
+        if (ent instanceof EntityPlayer) {
+            if (ent instanceof FakePlayer) {
+                return false;
+            }
+            return ((EntityPlayer) ent).capabilities.isCreativeMode;
+        }
+        return false;
+    }
+    
+    boolean nearbyNoisyPlayer(World world, int x, int y, int z) {
+        double distSquared = 8*8;
+        for (Entity player : (Iterable<Entity>) world.playerEntities) {
+            if (player.getDistanceSq(x, y, z) < distSquared && !playerImmune(player)) return true;
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float vecX, float vecY, float vecZ) {
+        Coord at = new Coord(world, x, y, z);
+        if (playerImmune(player)) {
+            TileEntityColossalHeart heart = at.getTE(TileEntityColossalHeart.class);
+            if (!world.isRemote && heart != null) {
+                heart.showInfo(player);
+            }
+            return true;
+        }
+        
+        if (world.isRemote) return false;
+        maybeAwaken(at, 10);
+        return false;
+    }
+    
+    @Override
+    public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
+        if (!nearbyNoisyPlayer(world, x, y, z)) return;
+        maybeAwaken(new Coord(world, x, y, z), 1);
+    }
+    
+    @Override
+    public void onEntityCollidedWithBlock(World world, int x, int y, int z, Entity ent) {
+        if (!playerImmune(ent)) {
+            maybeAwaken(new Coord(world, x, y, z), sneakiness(ent));
+        }
+    }
+    
+    @Override
+    public void onBlockDestroyedByExplosion(World world, int x, int y, int z, Explosion boomBoom) {
+        if (nearbyNoisyPlayer(world, x, y, z)) {
+            maybeAwaken(new Coord(world, x, y, z), 10);
+        }
+    }
+    
+    @Override
+    public void onBlockClicked(World world, int x, int y, int z, EntityPlayer player) {
+        if (!playerImmune(player)) {
+            maybeAwaken(new Coord(world, x, y, z), 2);
+        }
+    }
+    
+    @Override
+    public void onEntityWalking(World world, int x, int y, int z, Entity ent) {
+        if (!playerImmune(ent)) {
+            maybeAwaken(new Coord(world, x, y, z), sneakiness(ent));
+        }
+    }
+    
+    double sneakiness(Entity ent) {
+        if (ent.isSprinting()) return 7;
+        if (ent.isSneaking()) return 0.05;
+        return 1;
+    }
+    
+    @Override
+    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack is) {
+        super.onBlockPlacedBy(world, x, y, z, player, is);
+        if (is.getItemDamage() != MD_CORE) {
+            return;
+        }
+        Coord at = new Coord(world, x, y, z);
+        at.setTE(new TileEntityColossalHeart());
+    }
 }

@@ -11,6 +11,7 @@ import factorization.colossi.Brush.BrushMask;
 import factorization.shared.Core;
 
 public class ColossalBuilder {
+    final int seed;
     final Random rand;
     final Coord start;
     int leg_size, leg_height, leg_spread, body_height, arm_size, arm_height;
@@ -25,8 +26,9 @@ public class ColossalBuilder {
     static final BlockState EYE = new BlockState(Core.registry.colossal_block, ColossalBlock.MD_EYE);
     static final BlockState HEART = new BlockState(Core.registry.colossal_block, ColossalBlock.MD_CORE);
     
-    public ColossalBuilder(Random rand, Coord start) {
-        this.rand = rand;
+    public ColossalBuilder(int seed, Coord start) {
+        this.seed = seed;
+        this.rand = new Random(seed);
         for (int x = 0; x < 100; x++) rand.nextInt();
         //leg_size = random_choice(1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3); //, 4 , 4, 4, 4, 5, 5, 5, 6, 7
         leg_size = random_choice(1, 1, 1, 1, 2);
@@ -158,6 +160,9 @@ public class ColossalBuilder {
         
         Coord heart = start.add(leg_size + body_front_padding, leg_height + 1 + ((body_height + 1) / 2), leg_size + ((1 + leg_spread) / 2));
         fill(heart, heart, HEART);
+        TileEntityColossalHeart heartTe = new TileEntityColossalHeart();
+        heart.setTE(heartTe);
+        heartTe.loadInfoFromBuilder(this);
         
         growTerrainBlob();
     }
