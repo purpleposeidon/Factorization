@@ -14,6 +14,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.WeightedRandomChestContent;
@@ -103,10 +104,11 @@ public class ColossalBlock extends Block {
         coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.diamond_shard), 2, 4, 1));
         coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.ore_reduced, 1, ItemOreProcessing.OreType.DARKIRON.ID), 1, 7, 10));
         coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.motor), 1, 1, 8));
-        coreChest.addItem(new WeightedRandomChestContent(Core.registry.servo_motor, 1, 1, 3));
-        coreChest.addItem(new WeightedRandomChestContent(Core.registry.dark_iron_sprocket, 2, 4, 2));
-        coreChest.addItem(new WeightedRandomChestContent(Core.registry.servorail_item, 4, 10, 1));
+        coreChest.addItem(new WeightedRandomChestContent(Core.registry.servo_motor.copy(), 1, 1, 3));
+        coreChest.addItem(new WeightedRandomChestContent(Core.registry.dark_iron_sprocket.copy(), 2, 4, 2));
+        coreChest.addItem(new WeightedRandomChestContent(Core.registry.servorail_item.copy(), 4, 10, 1));
         // TODO NORELEASE: It'd be better to drop a srapbox item instead!
+        // What about lead & silver?
         return coreChest;
     }
     
@@ -207,13 +209,26 @@ public class ColossalBlock extends Block {
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float vecX, float vecY, float vecZ) {
         if (world.isRemote) return true;
+        if (player == null) return false;
         Coord at = new Coord(world, x, y, z);
+        ItemStack held = player.getHeldItem();
+        if (held != null && held.getItem() == Core.registry.logicMatrixProgrammer) {
+            int md = at.getMd();
+            if (held.getItemDamage() == 0) {
+                if (md == ColossalBlock.MD_CORE) {
+                    held.setItemDamage(1);
+                }
+                return true;
+            }
+            player.addChatComponentMessage(new ChatComponentTranslation("tile.factorization:colossalBlock." + md + ".click"));
+            return true;
+        }
         if (playerImmune(player)) {
             TileEntityColossalHeart heart = at.getTE(TileEntityColossalHeart.class);
             if (heart != null) {
                 heart.showInfo(player);
             }
-            return true;
+            return false;
         }
         
         if (world.isRemote) return false;
