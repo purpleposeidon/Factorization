@@ -55,6 +55,8 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.charge.TileEntitySolarBoiler;
 import factorization.colossi.BuildColossusCommand;
+import factorization.colossi.ColossusController;
+import factorization.colossi.ColossusFeature;
 import factorization.colossi.MaskLoader;
 import factorization.common.FactorizationProxy;
 import factorization.common.FactoryType;
@@ -143,7 +145,7 @@ public class Core {
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Lacerator|factorization.oreprocessing.TileEntityGrinder|recipes");
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Crystallizer|factorization.oreprocessing.TileEntityCrystallizer|recipes");
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Slag Furnace|factorization.oreprocessing.TileEntitySlagFurnace$SlagRecipes|smeltingResults");
-        MaskLoader.loadMasks();
+        ColossusFeature.init();
     }
     
     void registerSimpleTileEntities() {
@@ -153,6 +155,7 @@ public class Core {
         
         EntityRegistry.registerModEntity(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", 0, Core.instance, 1, 10, false);
         EntityRegistry.registerModEntity(ServoMotor.class, "factory_servo", 1, Core.instance, 100, 1, true);
+        EntityRegistry.registerModEntity(ColossusController.class, "fz_colossal_controller", 2, Core.instance, 0, 0, false);
     }
     
     @EventHandler

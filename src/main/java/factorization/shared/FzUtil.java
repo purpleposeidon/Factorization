@@ -1194,6 +1194,12 @@ public class FzUtil {
         target.maxZ = max.zCoord;
     }
     
+    public static void scale(Vec3 base, double s) {
+        base.xCoord *= s;
+        base.yCoord *= s;
+        base.zCoord *= s;
+    }
+    
     public static AxisAlignedBB createAABB(Vec3 min, Vec3 max) {
         return AxisAlignedBB.getBoundingBox(min.xCoord, min.yCoord, min.zCoord, max.xCoord, max.yCoord, max.zCoord);
     }

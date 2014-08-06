@@ -2,6 +2,7 @@ package factorization.api.datahelpers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -79,6 +80,23 @@ public abstract class DataHelper {
                 return o;
             }
         }
+        if (o instanceof UUID) {
+            UUID uuid = (UUID) o;
+            String base_name = name;
+            if (isReader()) {
+                long msb = asSameShare(base_name + "MSB").putLong(0);
+                long lsb = asSameShare(base_name + "LSB").putLong(0);
+                if (msb == 0 && lsb == 0) {
+                    return o;
+                }
+                return (E) new UUID(msb, lsb);
+            } else {
+                asSameShare(base_name + "MSB").putLong(uuid.getMostSignificantBits());
+                asSameShare(base_name + "LSB").putLong(uuid.getLeastSignificantBits());
+                return (E) uuid;
+            }
+            
+        }
         return (E) putImplementation(o);
     }
     
@@ -113,6 +131,7 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
     public final long putLong(long value) throws IOException { return (long)put(value); }
     public final float putFloat(float value) throws IOException { return (float)put(value); }
     public final double putDouble(double value) throws IOException { return (double)put(value); }
+    public UUID putUUID(UUID value) throws IOException { return (UUID)put(value); }
     
     public final String putString(String value) throws IOException { return (String)put(value); }
     public final FzOrientation putFzOrientation(FzOrientation value) throws IOException { return (FzOrientation)put(value); }

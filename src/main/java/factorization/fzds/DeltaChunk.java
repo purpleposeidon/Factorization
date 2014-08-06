@@ -233,4 +233,7 @@ public class DeltaChunk {
         }
     }
     
+    public static HammerInfo getHammerRegistry() {
+        return Hammer.instance.hammerInfo;
+    }
 }

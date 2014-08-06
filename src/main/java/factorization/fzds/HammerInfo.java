@@ -46,27 +46,18 @@ public class HammerInfo {
         saveChannelConfig();
     }
     
-    private static final String channelsCategory = "channels";
-    
-    public int makeChannelFor(Object modInstance, String channelId, int default_channel, int padding, String comment) {
+    public int makeChannelFor(String modName, String channelName, int default_channel_id, int padding, String comment) {
         if (padding < 0) {
             padding = defaultPadding;
         }
         if (channelConfig == null) {
             throw new IllegalArgumentException("Tried to register channel too early");
         }
-        Core.logFine("Allocating Hammer channel for %s: %s", modInstance, comment);
+        Core.logFine("Allocating Hammer channel for %s: %s", modName, comment);
         
+        String modCategory = (modName + "." + channelName).toLowerCase();
         
-        Class<? extends Object> c = modInstance.getClass();
-        Annotation a = c.getAnnotation(Mod.class);
-        if (a == null) {
-            throw new IllegalArgumentException("modInstance is not a mod");
-        }
-        Mod info = (Mod) c.getAnnotation(Mod.class);
-        String modCategory = (info.modid() + "." + channelId).toLowerCase();
-        
-        int max = default_channel;
+        int max = default_channel_id;
         boolean collision = false;
         
         for (String categoryName : channelConfig.getCategoryNames()) {
@@ -79,18 +70,18 @@ public class HammerInfo {
             }
             int here_chan = channelConfig.get(categoryName, "channel", -1).getInt();
             max = Math.max(max, here_chan);
-            if (here_chan == default_channel) {
+            if (here_chan == default_channel_id) {
                 collision = true;
             }
         }
         if (collision) {
             int newDefault = max + 1;
-            Core.logFine("Default channel ID for %s (%s) was already taken, using %s", modCategory, default_channel, newDefault);
-            default_channel = newDefault;
+            Core.logFine("Default channel ID for %s (%s) was already taken, using %s", modCategory, default_channel_id, newDefault);
+            default_channel_id = newDefault;
         }
         
         channelConfig.addCustomCategoryComment(modCategory, comment);
-        int channelRet = channelConfig.get(modCategory, "channel", default_channel).getInt();
+        int channelRet = channelConfig.get(modCategory, "channel", default_channel_id).getInt();
         padding = channelConfig.get(modCategory, "padding", padding).getInt();
         
         if (world_loaded) {

@@ -5,11 +5,22 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Vec3;
 import factorization.api.Coord;
+import factorization.colossi.ColossusController.BodySide;
+import factorization.colossi.ColossusController.LimbInfo;
+import factorization.colossi.ColossusController.LimbType;
+import factorization.fzds.DeltaChunk;
+import factorization.fzds.DeltaChunk.AreaMap;
+import factorization.fzds.DeltaChunk.DseDestination;
+import factorization.fzds.api.DeltaCapability;
+import factorization.fzds.api.IDeltaChunk;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
+import factorization.shared.FzUtil;
 
 public class Awakener {
     int arm_size = 0, arm_length = 0;
@@ -18,8 +29,20 @@ public class Awakener {
     public static void awaken(Coord src) {
         TileEntityColossalHeart heart = findNearestHeart(src);
         if (heart == null) return;
+        Core.logInfo("XR10-class entity detected. Neutralization protocol selected."); 
         Awakener awakener = new Awakener(heart);
-        awakener.run();
+        boolean success = awakener.abandonedLongAgo_thisAncientGuardianBurnsItsRemainingPower();
+        if (!success) {
+            Core.logInfo("Body is deformed. Beginning self-destruct sequence.");
+            Coord core = new Coord(heart);
+            Core.logInfo("Heart located. Disconnecting LMP.");
+            ItemStack lmp = new ItemStack(Core.registry.logicMatrixProgrammer);
+            core.setAir();
+            Core.logInfo("Good-bye, world!");
+            core.w.newExplosion(null, core.x + 0.5, core.y + 0.5, core.z + 0.5, 0.25F, false, true);
+            core.spawnItem(lmp);
+            return;
+        }
     }
     
     final TileEntityColossalHeart heartTE;
@@ -99,7 +122,7 @@ public class Awakener {
         }
     };
     
-    public void run() {
+    public final boolean abandonedLongAgo_thisAncientGuardianBurnsItsRemainingPower() {
         Core.logInfo("Awakening Collossus at %s...", new Coord(heartTE));
         Set<Coord> heart = new HashSet<Coord>();
         heart.add(new Coord(heartTE));
@@ -115,15 +138,33 @@ public class Awakener {
         ArrayList<Set<Coord>> legs = getConnectedLimbs(body, ColossalBuilder.LEG);
         limbDetails("legs", legs);
         
+        if (arms.isEmpty() || legs.isEmpty()) return false;
+        
         body.addAll(heart);
         body.addAll(mask);
         body.addAll(eyes);
         heart = mask = eyes = null;
         details("mainBody", body);
         
-        if (!verifyArmDimensions(arms)) return;
-        if (!verifyLegDimensions(legs)) return;
+        if (!verifyArmDimensions(arms)) return false;
+        if (!verifyLegDimensions(legs)) return false;
+        int body_length = measure_dim(body, 1);
         
+        Core.logInfo("Limb sizes match");
+        
+        HashMap<Set, Vec3> limbCenters = new HashMap();
+        for (Set<Coord> arm : arms) {
+            limbCenters.put(arm, calculateJointPosition(arm, arm_size, arm_length));
+        }
+        Vec3 leg_sum = Vec3.createVectorHelper(0, 0, 0);
+        for (Set<Coord> leg: legs) {
+            Vec3 joint = calculateJointPosition(leg, leg_size, leg_length);
+            limbCenters.put(leg, joint);
+            FzUtil.incrAdd(leg_sum, joint);
+        }
+        Vec3 body_center_of_mass = leg_sum;
+        FzUtil.scale(body_center_of_mass, legs.size());
+        limbCenters.put(body, body_center_of_mass);
         
         ArrayList<Set<Coord>> all_members = new ArrayList();
         all_members.add(body);
@@ -144,15 +185,61 @@ public class Awakener {
         double max_iter = Math.pow(body.size(), 1.0/3.0) * 2;
         includeShell(all_members, new HashSet(), (int) max_iter + 3);
         Core.logInfo("Attatched blocks included. New stats:");
-        details("mainBody", body);
         limbDetails("arms", arms);
         limbDetails("legs", legs);
+        details("mainBody", body);
         
         // markSets(legs, "|");
         // markSets(arms, "-");
         // mark(body, "+");
+        
+        ArrayList<LimbInfo> parts = new ArrayList();
+        LimbInfo li = new LimbInfo(LimbType.BODY, BodySide.RIGHT, body_length, createIDC(body, limbCenters.get(body)));
+        parts.add(li);
+        for (Set<Coord> arm : arms) {
+            li = new LimbInfo(LimbType.ARM, getSide(arm), arm_length, createIDC(arm, limbCenters.get(arm)));
+            parts.add(li);
+        }
+        for (Set<Coord> leg : legs) {
+            li = new LimbInfo(LimbType.LEG, getSide(leg), leg_length, createIDC(leg, limbCenters.get(leg)));
+            parts.add(li);
+        }
+        
+        
+        int part_size = parts.size();
+        Core.logInfo("Activated %s parts", part_size);
+        LimbInfo[] info = parts.toArray(new LimbInfo[part_size]);
+        ColossusController controller = new ColossusController(heartTE.getWorldObj(), info);
+        new Coord(heartTE).setAsEntityLocation(controller);
+        controller.worldObj.spawnEntityInWorld(controller);
+        return true;
     }
     
+    BodySide getSide(Set<Coord> set) {
+        return one(set).x < heartTE.xCoord ? BodySide.LEFT : BodySide.RIGHT;
+    }
+    
+    Vec3 calculateJointPosition(Set<Coord> limb, int size, int length) {
+        Coord corner = null;
+        for (Coord c : limb) {
+            if (corner == null) {
+                corner = c;
+                continue;
+            }
+            if (c.y > corner.y) {
+                c = corner;
+            } else if (c.x < corner.x || c.z < corner.z) {
+                c = corner;
+            }
+        }
+        if (corner == null) return Vec3.createVectorHelper(0, 0, 0);
+        Vec3 ret = corner.createVector();
+        ret.xCoord += size/2;
+        ret.yCoord -= size/2;
+        ret.zCoord += size/2;
+        return ret;
+    }
+
     boolean verifyLegDimensions(ArrayList<Set<Coord>> legs) {
         boolean first = true;
         for (Set<Coord> leg : legs) {
@@ -302,5 +389,52 @@ public class Awakener {
     Set<Coord> one(HashMap<Set<Coord>, Set<Coord>> map) {
         for (Set<Coord> ret : map.keySet()) return ret;
         return null;
+    }
+    
+    Coord one(Set<Coord> set) {
+        for (Coord ret : set) return ret;
+        return null;
+    }
+    
+    IDeltaChunk createIDC(final Set<Coord> parts, Vec3 rotationCenter) {
+        Coord min = null, max = null;
+        for (Coord c : parts) {
+            if (min == null || max == null) {
+                min = c;
+                max = c;
+            } else {
+                if (max.isCompletelySubmissiveTo(c)) {
+                    max = c;
+                } else if (c.isCompletelySubmissiveTo(min)) {
+                    min = c;
+                }
+            }
+        }
+        Coord.sort(min, max);
+        IDeltaChunk ret = DeltaChunk.makeSlice(ColossusFeature.deltachunk_channel, min, max, new AreaMap() {
+            @Override
+            public void fillDse(DseDestination destination) {
+                for (Coord c : parts) {
+                    destination.include(c);
+                }
+            }
+        }, true);
+        for (DeltaCapability permit : new DeltaCapability[] {
+                DeltaCapability.INTERACT,
+                DeltaCapability.BLOCK_MINE,
+                DeltaCapability.ROTATE,
+                DeltaCapability.COLLIDE,
+                DeltaCapability.DRAG,
+                DeltaCapability.ENTITY_PHYSICS,
+                DeltaCapability.MOVE,
+                DeltaCapability.PHYSICS_DAMAGE,
+                DeltaCapability.REMOVE_ITEM_ENTITIES,
+                DeltaCapability.REMOVE_ALL_ENTITIES
+        }) {
+            ret.permit(permit);
+        }
+        ret.forbid(DeltaCapability.EMPTY);
+        ret.setRotationalCenterOffset(rotationCenter);
+        return ret;
     }
 }
