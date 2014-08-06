@@ -168,7 +168,7 @@ public class ColossalBlock extends Block {
             return 1;
         case MD_ARM:
         case MD_LEG:
-            return 0.01;
+            return 0.1;
         default: return 0;
         }
     }
@@ -188,7 +188,7 @@ public class ColossalBlock extends Block {
             }
             return ((EntityPlayer) ent).capabilities.isCreativeMode;
         }
-        return false;
+        return true;
     }
     
     boolean nearbyNoisyPlayer(World world, int x, int y, int z) {
@@ -201,10 +201,11 @@ public class ColossalBlock extends Block {
     
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float vecX, float vecY, float vecZ) {
+        if (world.isRemote) return true;
         Coord at = new Coord(world, x, y, z);
         if (playerImmune(player)) {
             TileEntityColossalHeart heart = at.getTE(TileEntityColossalHeart.class);
-            if (!world.isRemote && heart != null) {
+            if (heart != null) {
                 heart.showInfo(player);
             }
             return true;
@@ -263,5 +264,10 @@ public class ColossalBlock extends Block {
         }
         Coord at = new Coord(world, x, y, z);
         at.setTE(new TileEntityColossalHeart());
+    }
+    
+    @Override
+    public boolean hasTileEntity(int metadata) {
+        return metadata == MD_CORE;
     }
 }

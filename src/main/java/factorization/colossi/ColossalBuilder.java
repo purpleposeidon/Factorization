@@ -161,8 +161,8 @@ public class ColossalBuilder {
         Coord heart = start.add(leg_size + body_front_padding, leg_height + 1 + ((body_height + 1) / 2), leg_size + ((1 + leg_spread) / 2));
         fill(heart, heart, HEART);
         TileEntityColossalHeart heartTe = new TileEntityColossalHeart();
-        heart.setTE(heartTe);
         heartTe.loadInfoFromBuilder(this);
+        heart.setTE(heartTe);
         
         growTerrainBlob();
     }
