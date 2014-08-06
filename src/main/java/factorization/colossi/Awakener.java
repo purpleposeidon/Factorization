@@ -6,8 +6,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
+import factorization.notify.Notice;
+import factorization.notify.Style;
 import factorization.shared.Core;
 
 public class Awakener {
@@ -133,6 +134,22 @@ public class Awakener {
         details("mainBody", body);
         limbDetails("arms", arms);
         limbDetails("legs", legs);
+        
+        // markSets(legs, "|");
+        // markSets(arms, "-");
+        // mark(body, "+");
+    }
+    
+    void mark(Set<Coord> set, String msg) {
+        for (Coord c : set) {
+            new Notice(c, msg).withStyle(Style.FORCE, Style.EXACTPOSITION).sendToAll();
+        }
+    }
+    
+    void markSets(ArrayList<Set<Coord>> sets, String msg) {
+        for (Set<Coord> set : sets) {
+            mark(set, msg);
+        }
     }
     
     boolean verifyLimbDimensions(ArrayList<Set<Coord>> legs, ArrayList<Set<Coord>> arms) {
@@ -264,8 +281,10 @@ public class Awakener {
     
     void includeShell(ArrayList<Set<Coord>> sets, Set<Coord> exclude, int maxIter) {
         HashMap<Set<Coord>, Set<Coord>> pending2origs = new HashMap();
+        Set<Coord> allFound = new HashSet();
         for (Set<Coord> f : sets) {
             pending2origs.put(f, f);
+            allFound.addAll(f);
         }
         while (!pending2origs.isEmpty() && maxIter-- > 0) {
             Set<Coord> set = one(pending2origs);
@@ -273,9 +292,10 @@ public class Awakener {
             
             Set<Coord> newBlocks = new HashSet();
             for (Coord at : set) {
-                for (Coord neighbor : at.getNeighborsDiagonal()) {
-                    if (set.contains(neighbor) || newBlocks.contains(neighbor) || exclude.contains(neighbor) || !valid_natural_blocks.matches(neighbor)) continue;
+                for (Coord neighbor : at.getNeighborsAdjacent()) {
+                    if (allFound.contains(neighbor) || set.contains(neighbor) || exclude.contains(neighbor) || !valid_natural_blocks.matches(neighbor)) continue;
                     newBlocks.add(neighbor);
+                    allFound.add(neighbor);
                 }
             }
             if (!newBlocks.isEmpty()) {
