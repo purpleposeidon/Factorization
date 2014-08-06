@@ -1,16 +1,19 @@
 package factorization.colossi;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.shared.Core;
-import factorization.shared.FzUtil;
 
 public class Awakener {
+    int arm_size = 0, arm_length = 0;
+    int leg_size = 0, leg_length = 0;
+    
     public static void awaken(Coord src) {
         TileEntityColossalHeart heart = findNearestHeart(src);
         if (heart == null) return;
@@ -62,21 +65,156 @@ public class Awakener {
         }
     }
     
+    int ground_level = -1;
+    BlockState valid_natural_blocks = new BlockState(null, 0) {
+        @Override
+        public boolean matches(Coord at) {
+            if (at.y <= ground_level) return false;
+            if (at.getBlock() == Core.registry.colossal_block) return false;
+            return !at.isAir() && at.getHardness() >= 0;
+        }
+    };
+    
+    BlockState BODY_ANY = new BlockState(null, 0) {
+        @Override
+        public boolean matches(Coord at) {
+            if (at.getBlock() == Core.registry.colossal_block) {
+                int md = at.getMd();
+                return md == ColossalBlock.MD_BODY || md == ColossalBlock.MD_BODY_CRACKED;
+            }
+            return false;
+        }
+    };
+    
     public void run() {
         Core.logInfo("Awakening Collossus at %s...", new Coord(heartTE));
         Set<Coord> heart = new HashSet<Coord>();
         heart.add(new Coord(heartTE));
         details("heart", heart);
-        Set<Coord> body = iterateFrom(heart, ColossalBuilder.BODY, false);
+        Set<Coord> body = iterateFrom(heart, BODY_ANY, false);
         details("body", body);
         Set<Coord> mask = iterateFrom(body, ColossalBuilder.MASK, true);
         details("mask", mask);
         Set<Coord> eyes = iterateFrom(mask, ColossalBuilder.EYE, true);
         details("eyes", eyes);
-        ArrayList<Set<Coord>> legs = getConnectedLimbs(body, ColossalBuilder.LEG);
-        limbDetails("legs", legs);
         ArrayList<Set<Coord>> arms = getConnectedLimbs(body, ColossalBuilder.ARM);
         limbDetails("arms", arms);
+        ArrayList<Set<Coord>> legs = getConnectedLimbs(body, ColossalBuilder.LEG);
+        limbDetails("legs", legs);
+        
+        body.addAll(heart);
+        body.addAll(mask);
+        body.addAll(eyes);
+        heart = mask = eyes = null;
+        details("mainBody", body);
+        
+        if (!verifyLimbDimensions(legs, arms)) return;
+        
+        
+        ArrayList<Set<Coord>> all_members = new ArrayList();
+        all_members.add(body);
+        all_members.addAll(arms);
+        all_members.addAll(legs);
+        
+        boolean first = true;
+        for (Set<Coord> set : all_members) {
+            int l = lowest(set);
+            if (first) {
+                first = false;
+                ground_level = l;
+            } else if (l < ground_level) {
+                ground_level = l;
+            }
+        }
+        
+        double max_iter = Math.pow(body.size(), 1.0/3.0) * 2;
+        includeShell(all_members, new HashSet(), (int) max_iter + 3);
+        Core.logInfo("Attatched blocks included. New stats:");
+        details("mainBody", body);
+        limbDetails("arms", arms);
+        limbDetails("legs", legs);
+    }
+    
+    boolean verifyLimbDimensions(ArrayList<Set<Coord>> legs, ArrayList<Set<Coord>> arms) {
+        {
+            boolean first = true;
+            for (Set<Coord> leg : legs) {
+                if (first) {
+                    leg_length = measure_dim(leg, 1);
+                    leg_size = measure_size(leg);
+                    first = false;
+                } else {
+                    int new_leg_length = measure_dim(leg, 1);
+                    int new_leg_size = measure_size(leg);
+                    if (leg_length != new_leg_length || leg_size != new_leg_size) {
+                        Core.logInfo("Mismatched legs!");
+                        return false;
+                    }
+                }
+            }
+            if (leg_length == -1 || leg_size == -1) {
+                Core.logInfo("Invalid legs!");
+                return false;
+            }
+        }
+        {
+            boolean first = true;
+            for (Set<Coord> arm : arms) {
+                if (first) {
+                    arm_length = measure_dim(arm, 1);
+                    arm_size = measure_size(arm);
+                    first = false;
+                } else {
+                    int new_arm_length = measure_dim(arm, 1);
+                    int new_arm_size = measure_size(arm);
+                    if (arm_length != new_arm_length || arm_size != new_arm_size) {
+                        Core.logInfo("Mismatched arms!");
+                        return false;
+                    }
+                }
+            }
+            if (arm_length == -1 || arm_size == -1) {
+                Core.logInfo("Invalid arms!");
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    int measure_dim(Set<Coord> set, int axis) {
+        Coord min = null, max = null;
+        for (Coord c : set) {
+            if (min == null || max == null) {
+                min = c;
+                max = c;
+            } else if (c.get(axis) < min.get(axis)){
+                min = c;
+            } else if (c.get(axis) > max.get(axis)){
+                max = c;
+            }
+        }
+        if (min == null || max == null) return 0;
+        return max.get(axis) - min.get(axis);
+    }
+    
+    int measure_size(Set<Coord> set) {
+        int w = measure_dim(set, 0);
+        int d = measure_dim(set, 2);
+        if (w != d) return 0;
+        return w;
+    }
+    
+    int lowest(Set<Coord> set) {
+        Coord min = null;
+        for (Coord c : set) {
+            if (min == null) {
+                min = c;
+            } else if (c.y < min.y){
+                min = c;
+            }
+        }
+        if (min == null) return -1;
+        return min.y;
     }
     
     Set<Coord> iterateFrom(Set<Coord> start, BlockState block, boolean diag) {
@@ -117,19 +255,38 @@ public class Awakener {
         return false;
     }
     
-    Coord excersizeAxiomOfChoice(Set<Coord> bulk) {
-        for (Iterator<Coord> iterator = bulk.iterator(); iterator.hasNext();) {
-            Coord ret = iterator.next();
-            iterator.remove();
-            return ret;
-        }
-        return null;
-    }
-    
     boolean adjacentToSet(Set<Coord> bulk, Coord at) {
         for (Coord member : bulk) {
             if (at.distanceSq(member) <= 1) return true;
         }
         return false;
+    }
+    
+    void includeShell(ArrayList<Set<Coord>> sets, Set<Coord> exclude, int maxIter) {
+        HashMap<Set<Coord>, Set<Coord>> pending2origs = new HashMap();
+        for (Set<Coord> f : sets) {
+            pending2origs.put(f, f);
+        }
+        while (!pending2origs.isEmpty() && maxIter-- > 0) {
+            Set<Coord> set = one(pending2origs);
+            Set<Coord> orig = pending2origs.remove(set);
+            
+            Set<Coord> newBlocks = new HashSet();
+            for (Coord at : set) {
+                for (Coord neighbor : at.getNeighborsDiagonal()) {
+                    if (set.contains(neighbor) || newBlocks.contains(neighbor) || exclude.contains(neighbor) || !valid_natural_blocks.matches(neighbor)) continue;
+                    newBlocks.add(neighbor);
+                }
+            }
+            if (!newBlocks.isEmpty()) {
+                orig.addAll(newBlocks);
+                pending2origs.put(newBlocks, orig);
+            }
+        }
+    }
+    
+    Set<Coord> one(HashMap<Set<Coord>, Set<Coord>> map) {
+        for (Set<Coord> ret : map.keySet()) return ret;
+        return null;
     }
 }
