@@ -5,6 +5,7 @@ import java.io.IOException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChatComponentText;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutNBT;
@@ -19,7 +20,7 @@ public class TileEntityColossalHeart extends TileEntity {
     }
     
     void showInfo(EntityPlayer player) {
-        new Notice(this, "Seed: " + seed).send(player);
+        player.addChatMessage(new ChatComponentText("Seed: " + seed));
     }
     
     void putData(DataHelper data) throws IOException {

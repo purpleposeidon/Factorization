@@ -317,7 +317,7 @@ public class HammerNet {
                 dos.writeDouble(vec.yCoord);
                 dos.writeDouble(vec.zCoord);
             } else {
-                throw new IllegalArgumentException("Can only do Quaternions/Integers/Bytes/Floats/Doubles/MovingObjectPosition/Vec3!");
+                throw new IllegalArgumentException("Can only do Quaternions/Integers/Bytes/Floats/Doubles/MovingObjectPosition/Vec3! Not " + obj);
             }
         }
         return new FMLProxyPacket(Unpooled.wrappedBuffer(dos.toByteArray()), channelName);

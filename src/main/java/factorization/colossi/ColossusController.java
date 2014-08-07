@@ -62,6 +62,7 @@ public class ColossusController extends Entity {
     @Override
     public void onEntityUpdate() {
         if (!setup) {
+            if (worldObj.isRemote) return;
             setup = true;
             loadLimbs();
         }
@@ -73,13 +74,16 @@ public class ColossusController extends Entity {
             if (li.ent == null) {
                 needed = true;
                 break;
+            } else if (li.entityId == null) {
+                li.entityId = li.ent.getUniqueID();
             }
         }
         if (!needed) return;
         for (Entity ent : (Iterable<Entity>) worldObj.loadedEntityList) {
             UUID test = ent.getUniqueID();
             for (LimbInfo li : limbs) {
-                if (li.entityId.equals(test) && li.ent instanceof IDeltaChunk) {
+                if (li.entityId == null || li.ent != null) continue;
+                if (li.entityId.equals(test) && ent instanceof IDeltaChunk) {
                     li.ent = (IDeltaChunk) ent;
                     break;
                 }
@@ -96,6 +100,9 @@ public class ColossusController extends Entity {
             limbs = new LimbInfo[limb_count];
         }
         for (int i = 0; i < limbs.length; i++) {
+            if (data.isReader()) {
+                limbs[i] = new LimbInfo();
+            }
             limbs[i].putData(data, i);
         }
     }

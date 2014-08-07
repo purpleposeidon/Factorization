@@ -6,9 +6,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-
-import com.google.common.io.ByteArrayDataOutput;
-
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsEntryControl;
@@ -28,7 +25,6 @@ public class DseCollider extends Entity implements IFzdsEntryControl, IEntityAdd
         super(parent.worldObj);
         this.parent = parent;
         this.offset = offsets;
-        this.parent.children.add(this);
     }
 
     @Override

@@ -49,7 +49,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     private AxisAlignedBB shadowArea = null, shadowCollisionArea = null, realCollisionArea = null, realDragArea = null;
     private boolean needAreaUpdate = true;
-    ArrayList<DseCollider> children = null; //null so that we can check if we need to init them easily
+    boolean spawned_children = false;
     private double last_motion_hash = Double.NaN;
     
     private Quaternion rotation = new Quaternion(), rotationalVelocity = new Quaternion();
@@ -232,16 +232,14 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         realCollisionArea = offsetAABB(shadowCollisionArea, odx, ody, odz);
         needAreaUpdate = false;
         //this.boundingBox.setBB(realArea);
-        if (children == null && worldObj.isRemote) {
-            children = new ArrayList();
-            //The array will be filled as the server sends us children
-        } else if (children == null && !worldObj.isRemote) {
-            children = new ArrayList();
+        if (!spawned_children && !worldObj.isRemote) {
+            spawned_children = true;
             DeltaCoord size = getFarCorner().difference(getCorner());
             DeltaCoord half = size.scale(0.5);
-            for (int dx = 0; dx <= size.x; dx += 16) {
-                for (int dy = 0; dy <= size.y; dy += 16) {
-                    for (int dz = 0; dz <= size.z; dz += 16) {
+            int pad = 16;
+            for (int dx = -pad; dx <= size.x + pad; dx += 16) {
+                for (int dy = -pad; dy <= size.y + pad; dy += 16) {
+                    for (int dz = -pad; dz <= size.z + pad; dz += 16) {
                         //could theoretically re-use a single DseCollider for all chunks. Theoretically.
                         DseCollider e = new DseCollider(this, Vec3.createVectorHelper(dx - half.x, dy - half.y, dz - half.z));
                         e.onEntityUpdate();
@@ -903,6 +901,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     public void setRotationalCenterOffset(Vec3 newOffset) {
         centerOffset = newOffset;
         if (worldObj.isRemote) return;
+        if (newOffset == null) throw new NullPointerException();
         FMLProxyPacket toSend = HammerNet.makePacket(HammerNet.HammerNetType.rotationCenterOffset, getEntityId(), centerOffset);
         HammerNet.channel.sendToAllAround(toSend, new NetworkRegistry.TargetPoint(dimension, posX, posY, posZ, 64));
     }

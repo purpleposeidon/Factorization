@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Vec3;
 import factorization.api.Coord;
+import factorization.api.DeltaCoord;
 import factorization.colossi.ColossusController.BodySide;
 import factorization.colossi.ColossusController.LimbInfo;
 import factorization.colossi.ColossusController.LimbType;
@@ -122,6 +123,23 @@ public class Awakener {
         }
     };
     
+    static class SetAndInfo {
+        Set<Coord> set;
+        int length;
+        int size;
+        Vec3 rotation;
+        LimbType limbType;
+        BodySide limbSide;
+        public SetAndInfo(Set<Coord> set, int length, int size, Vec3 rotation, LimbType limbType, BodySide limbSide) {
+            this.set = set;
+            this.length = length;
+            this.size = size;
+            this.rotation = rotation;
+            this.limbType = limbType;
+            this.limbSide = limbSide;
+        }
+    }
+    
     public final boolean abandonedLongAgo_thisAncientGuardianBurnsItsRemainingPower() {
         Core.logInfo("Awakening Collossus at %s...", new Coord(heartTE));
         Set<Coord> heart = new HashSet<Coord>();
@@ -148,23 +166,27 @@ public class Awakener {
         
         if (!verifyArmDimensions(arms)) return false;
         if (!verifyLegDimensions(legs)) return false;
-        int body_length = measure_dim(body, 1);
         
         Core.logInfo("Limb sizes match");
         
-        HashMap<Set, Vec3> limbCenters = new HashMap();
+        ArrayList<SetAndInfo> limbInfo = new ArrayList();
         for (Set<Coord> arm : arms) {
-            limbCenters.put(arm, calculateJointPosition(arm, arm_size, arm_length));
+            Vec3 joint = calculateJointPosition(arm, arm_size, arm_length);
+            SetAndInfo sai = new SetAndInfo(arm, arm_length, arm_size, joint, LimbType.ARM, getSide(arm));
+            limbInfo.add(sai);
         }
         Vec3 leg_sum = Vec3.createVectorHelper(0, 0, 0);
         for (Set<Coord> leg: legs) {
             Vec3 joint = calculateJointPosition(leg, leg_size, leg_length);
-            limbCenters.put(leg, joint);
+            SetAndInfo sai = new SetAndInfo(leg, leg_length, leg_size, joint, LimbType.LEG, getSide(leg));
+            limbInfo.add(sai);
             FzUtil.incrAdd(leg_sum, joint);
         }
         Vec3 body_center_of_mass = leg_sum;
-        FzUtil.scale(body_center_of_mass, legs.size());
-        limbCenters.put(body, body_center_of_mass);
+        FzUtil.scale(body_center_of_mass, 1.0/legs.size());
+        body_center_of_mass.yCoord += 1;
+        SetAndInfo sai = new SetAndInfo(body, measure_dim(body, 1), leg_size, body_center_of_mass, LimbType.BODY, BodySide.RIGHT);
+        limbInfo.add(sai);
         
         ArrayList<Set<Coord>> all_members = new ArrayList();
         all_members.add(body);
@@ -194,17 +216,14 @@ public class Awakener {
         // mark(body, "+");
         
         ArrayList<LimbInfo> parts = new ArrayList();
-        LimbInfo li = new LimbInfo(LimbType.BODY, BodySide.RIGHT, body_length, createIDC(body, limbCenters.get(body)));
-        parts.add(li);
-        for (Set<Coord> arm : arms) {
-            li = new LimbInfo(LimbType.ARM, getSide(arm), arm_length, createIDC(arm, limbCenters.get(arm)));
+        int i = 0;
+        for (SetAndInfo partInfo : limbInfo) {
+            //if (i != 0) continue;
+            IDeltaChunk idc = createIDC(partInfo.set, partInfo.rotation);
+            LimbInfo li = new LimbInfo(partInfo.limbType, partInfo.limbSide, partInfo.length, idc);
             parts.add(li);
+            i++;
         }
-        for (Set<Coord> leg : legs) {
-            li = new LimbInfo(LimbType.LEG, getSide(leg), leg_length, createIDC(leg, limbCenters.get(leg)));
-            parts.add(li);
-        }
-        
         
         int part_size = parts.size();
         Core.logInfo("Activated %s parts", part_size);
@@ -410,7 +429,11 @@ public class Awakener {
                 }
             }
         }
+        if (min == null || max == null) return null;
         Coord.sort(min, max);
+        int r = 5;
+        min.adjust(new DeltaCoord(-r, -r, -r));
+        max.adjust(new DeltaCoord(r, r, r));
         IDeltaChunk ret = DeltaChunk.makeSlice(ColossusFeature.deltachunk_channel, min, max, new AreaMap() {
             @Override
             public void fillDse(DseDestination destination) {
@@ -434,7 +457,8 @@ public class Awakener {
             ret.permit(permit);
         }
         ret.forbid(DeltaCapability.EMPTY);
-        ret.setRotationalCenterOffset(rotationCenter);
+        ret.worldObj.spawnEntityInWorld(ret);
+        //ret.setRotationalCenterOffset(rotationCenter);
         return ret;
     }
 }

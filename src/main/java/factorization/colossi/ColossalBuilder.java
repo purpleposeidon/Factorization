@@ -158,13 +158,13 @@ public class ColossalBuilder {
         Coord standard_eyeball = start.add(leg_size + body_front_padding + 1, leg_height + 1 + body_height + (face_height / 2), 1 + leg_size + leg_spread / 2);
         fill(standard_eyeball, standard_eyeball, EYE);
         
+        growTerrainBlob();
+        
         Coord heart = start.add(leg_size + body_front_padding, leg_height + 1 + ((body_height + 1) / 2), leg_size + ((1 + leg_spread) / 2));
         fill(heart, heart, HEART);
         TileEntityColossalHeart heartTe = new TileEntityColossalHeart();
         heartTe.loadInfoFromBuilder(this);
         heart.setTE(heartTe);
-        
-        growTerrainBlob();
     }
     
     void fill(Coord min, Coord max, BlockState state) {

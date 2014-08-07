@@ -226,6 +226,10 @@ public class ColossalBlock extends Block {
         if (playerImmune(player)) {
             TileEntityColossalHeart heart = at.getTE(TileEntityColossalHeart.class);
             if (heart != null) {
+                if (player.isSneaking()) {
+                    Awakener.awaken(at);
+                    return true;
+                }
                 heart.showInfo(player);
             }
             return false;
