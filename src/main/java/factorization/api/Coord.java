@@ -367,13 +367,9 @@ public class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
         return y < o.y || x < o.x || z < o.z;
     }
     
-    public boolean isCompletelySubmissiveTo(Coord o) {
-        return x < o.x && y < o.y && z < o.z;
-    }
-    
     @Override
     public int compareTo(Coord o) {
-        if (isCompletelySubmissiveTo(o)) {
+        if (isSubmissiveTo(o)) {
             return -1;
         }
         if (this.equals(o)) {
@@ -928,5 +924,9 @@ public class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
             return FluidRegistry.LAVA;
         }
         return null;
+    }
+
+    public int getDimensionID() {
+        return w.provider.dimensionId;
     }
 }

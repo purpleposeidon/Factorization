@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Vec3;
@@ -16,6 +17,7 @@ import factorization.colossi.ColossusController.LimbType;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.DeltaChunk.AreaMap;
 import factorization.fzds.DeltaChunk.DseDestination;
+import factorization.fzds.Hammer;
 import factorization.fzds.api.DeltaCapability;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.notify.Notice;
@@ -28,15 +30,16 @@ public class Awakener {
     int leg_size = 0, leg_length = 0;
     
     public static void awaken(Coord src) {
+        if (src.getDimensionID() == Hammer.dimensionID) return;
         TileEntityColossalHeart heart = findNearestHeart(src);
         if (heart == null) return;
-        Core.logInfo("XR10-class entity detected. Neutralization protocol selected."); 
+        Core.logInfo("XR10-class entity detected."); 
         Awakener awakener = new Awakener(heart);
         boolean success = awakener.abandonedLongAgo_thisAncientGuardianBurnsItsRemainingPower();
         if (!success) {
-            Core.logInfo("Body is deformed. Beginning self-destruct sequence.");
+            Core.logInfo("Body is deformed. Self-destructing.");
             Coord core = new Coord(heart);
-            Core.logInfo("Heart located. Disconnecting LMP.");
+            Core.logInfo("Disconnecting LMP.");
             ItemStack lmp = new ItemStack(Core.registry.logicMatrixProgrammer);
             core.setAir();
             Core.logInfo("Good-bye, world!");
@@ -44,6 +47,7 @@ public class Awakener {
             core.spawnItem(lmp);
             return;
         }
+        Core.logInfo("Engaging entity.");
     }
     
     final TileEntityColossalHeart heartTE;
@@ -204,7 +208,7 @@ public class Awakener {
             }
         }
         
-        double max_iter = Math.pow(body.size(), 1.0/3.0) * 2;
+        double max_iter = Math.pow(body.size(), 1.0/3.0) * 4;
         includeShell(all_members, new HashSet(), (int) max_iter + 3);
         Core.logInfo("Attatched blocks included. New stats:");
         limbDetails("arms", arms);
@@ -216,13 +220,10 @@ public class Awakener {
         // mark(body, "+");
         
         ArrayList<LimbInfo> parts = new ArrayList();
-        int i = 0;
         for (SetAndInfo partInfo : limbInfo) {
-            //if (i != 0) continue;
             IDeltaChunk idc = createIDC(partInfo.set, partInfo.rotation);
             LimbInfo li = new LimbInfo(partInfo.limbType, partInfo.limbSide, partInfo.length, idc);
             parts.add(li);
-            i++;
         }
         
         int part_size = parts.size();
@@ -231,6 +232,7 @@ public class Awakener {
         ColossusController controller = new ColossusController(heartTE.getWorldObj(), info);
         new Coord(heartTE).setAsEntityLocation(controller);
         controller.worldObj.spawnEntityInWorld(controller);
+        
         return true;
     }
     
@@ -333,7 +335,7 @@ public class Awakener {
         for (Coord c : set) {
             if (min == null) {
                 min = c;
-            } else if (c.y < min.y){
+            } else if (c.y < min.y) {
                 min = c;
             }
         }
@@ -343,8 +345,13 @@ public class Awakener {
     
     Set<Coord> iterateFrom(Set<Coord> start, BlockState block, boolean diag) {
         ArrayList<Coord> frontier = new ArrayList(start.size());
+        Set<Coord> ret = new HashSet();
         frontier.addAll(start);
-        Set<Coord> ret = new HashSet(frontier.size());
+        for (Coord s : start) {
+            if (block.matches(s)) {
+                ret.add(s);
+            }
+        }
         while (!frontier.isEmpty()) {
             Coord at = frontier.remove(0);
             Iterable<Coord> neighbors = diag ? at.getNeighborsDiagonal() : at.getNeighborsAdjacent();
@@ -422,16 +429,18 @@ public class Awakener {
                 min = c;
                 max = c;
             } else {
-                if (max.isCompletelySubmissiveTo(c)) {
+                if (!c.isSubmissiveTo(max)) {
                     max = c;
-                } else if (c.isCompletelySubmissiveTo(min)) {
+                } else if (c.isSubmissiveTo(min)) {
                     min = c;
                 }
             }
         }
         if (min == null || max == null) return null;
+        min = min.copy();
+        max = max.copy();
         Coord.sort(min, max);
-        int r = 5;
+        int r = 1;
         min.adjust(new DeltaCoord(-r, -r, -r));
         max.adjust(new DeltaCoord(r, r, r));
         IDeltaChunk ret = DeltaChunk.makeSlice(ColossusFeature.deltachunk_channel, min, max, new AreaMap() {
@@ -458,7 +467,7 @@ public class Awakener {
         }
         ret.forbid(DeltaCapability.EMPTY);
         ret.worldObj.spawnEntityInWorld(ret);
-        //ret.setRotationalCenterOffset(rotationCenter);
+        ret.setRotationalCenterOffset(rotationCenter);
         return ret;
     }
 }

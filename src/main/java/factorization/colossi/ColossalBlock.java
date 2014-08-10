@@ -25,6 +25,7 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
+import factorization.fzds.Hammer;
 import factorization.oreprocessing.ItemOreProcessing;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
@@ -133,10 +134,12 @@ public class ColossalBlock extends Block {
     
     @Override
     public void randomDisplayTick(World world, int x, int y, int z, Random rand) {
+        if (world.provider.dimensionId != Hammer.dimensionID) return;
         int md = world.getBlockMetadata(x, y, z);
-        float px = x - 0.5F + rand.nextFloat()*2;
-        float py = y - 0.5F + rand.nextFloat()*2;
-        float pz = z - 0.5F + rand.nextFloat()*2;
+        int r = md == MD_BODY_CRACKED ? 4 : 2;
+        float px = x - 0.5F + rand.nextFloat()*r;
+        float py = y - 0.5F + rand.nextFloat()*r;
+        float pz = z - 0.5F + rand.nextFloat()*r;
         switch (md) {
         case MD_BODY_CRACKED:
             world.spawnParticle("flame", px, py, pz, 0, 0, 0);
@@ -181,6 +184,8 @@ public class ColossalBlock extends Block {
     }
     
     boolean maybeAwaken(Coord at, double boldNess) {
+        if (at.w.isRemote) return false;
+        if (at.getDimensionID() == Hammer.dimensionID) return false;
         if (getSensitivity(at.getMd()) * boldNess < at.w.rand.nextDouble()) {
             return false;
         }

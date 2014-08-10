@@ -287,8 +287,8 @@ public class BlobBuilder {
                     if (index == -1) continue;
                     byte cell = cells[index];
                     if (at.isAir()) {
-                        if (cell > 0) at.setIdMd(stone, 0, false);
-                        if (cell == REINFORCE) at.setIdMd(Blocks.stonebrick, 0, false);
+                        if (cell > 0) at.setIdMd(stone, 0, true);
+                        if (cell == REINFORCE) at.setIdMd(Blocks.stonebrick, 0, true);
                     }
                 }
             }

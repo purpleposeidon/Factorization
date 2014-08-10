@@ -716,6 +716,9 @@ public class FZDSCommand extends CommandBase {
                 }
                 sendChat("> " + selected);
                 setSelection(selected);
+                if (selected != null && player != null) {
+                    new Notice(selected, "Selection").send(player);
+                }
             }} /* needs nothing */);
         add(new SubCommand("remove") {
             @Override
@@ -981,5 +984,12 @@ public class FZDSCommand extends CommandBase {
                 user.w.spawnEntityInWorld(dse);
             }
         }, Requires.COORD);
+        add(new SubCommand("orbitme") {
+            @Override
+            void call(String[] args) {
+                Vec3 p = Vec3.createVectorHelper(player.posX, player.posY, player.posZ);
+                selected.changeRotationCenter(p);
+            }
+        }, Requires.SLICE_SELECTED, Requires.PLAYER);
     }
 }

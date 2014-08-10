@@ -5,6 +5,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
+import factorization.shared.FzUtil;
 import static factorization.fzds.api.DeltaCapability.*;
 
 public abstract class IDeltaChunk extends Entity {
@@ -30,9 +31,38 @@ public abstract class IDeltaChunk extends Entity {
      */
     public abstract void setRotationalVelocity(Quaternion w);
     
+    /***
+     * @return the rotational offset. This is relative to getCorner().
+     */
     public abstract Vec3 getRotationalCenterOffset();
     
+    
+    /***
+     * @param newOffset The new rotational offset. This is relative to getCorner().
+     */
     public abstract void setRotationalCenterOffset(Vec3 newOffset);
+    
+    /***
+     * Helper function.
+     * @param newCenter takes a real-world vector, and makes it the center of rotation, preserving the apparent position of the slice. (The IDC's actual position will change, however.)
+     * 
+     * TODO: If the rotation is not zero, things won't be preserved?
+     * TODO: Flashy glitchiness.
+     */
+    public void changeRotationCenter(Vec3 newCenter) {
+        Vec3 origCenter = getRotationalCenterOffset();
+        Vec3 shadowCenter = real2shadow(newCenter);
+        Coord min = getCorner();
+        shadowCenter.xCoord -= min.x;
+        shadowCenter.yCoord -= min.y;
+        shadowCenter.zCoord -= min.z;
+        setRotationalCenterOffset(shadowCenter);
+        Vec3 ds = origCenter.subtract(shadowCenter);
+        ds.xCoord += posX;
+        ds.yCoord += posY;
+        ds.zCoord += posZ;
+        setPosition(ds.xCoord, ds.yCoord, ds.zCoord);
+    }
     
     
     /***
