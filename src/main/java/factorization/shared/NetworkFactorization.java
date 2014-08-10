@@ -241,7 +241,7 @@ public class NetworkFactorization {
                 break;
             default:
                 if (here.blockExists()) {
-                    Core.logFine("Got unhandled message: " + messageType + " for " + here);
+                    //Core.logFine("Got unhandled message: " + messageType + " for " + here);
                 } else {
                     //XXX: Need to figure out how to keep the server from sending these things!
                     Core.logFine("Got message to unloaded chunk: " + messageType + " for " + here);
