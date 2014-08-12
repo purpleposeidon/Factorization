@@ -1,14 +1,6 @@
 package factorization.colossi;
 
-import static net.minecraftforge.common.BiomeDictionary.Type.BEACH;
-import static net.minecraftforge.common.BiomeDictionary.Type.DENSE;
-import static net.minecraftforge.common.BiomeDictionary.Type.END;
-import static net.minecraftforge.common.BiomeDictionary.Type.MAGICAL;
-import static net.minecraftforge.common.BiomeDictionary.Type.NETHER;
-import static net.minecraftforge.common.BiomeDictionary.Type.OCEAN;
-import static net.minecraftforge.common.BiomeDictionary.Type.RIVER;
-import static net.minecraftforge.common.BiomeDictionary.Type.SPOOKY;
-import static net.minecraftforge.common.BiomeDictionary.Type.WATER;
+import static net.minecraftforge.common.BiomeDictionary.Type.*;
 
 import java.util.Random;
 
@@ -173,7 +165,7 @@ public class WorldGenColossus implements IWorldGenerator {
         Block dirt = start.getBlock();
         int dirt_md = start.getMd();
         
-        ColossalBuilder builder = new ColossalBuilder(worldRandom.nextInt(), start);
+        ColossalBuilder builder = new ColossalBuilder(Math.abs(worldRandom.nextInt()), start);
         int width = builder.get_width();
         int depth = builder.get_depth();
         int height = builder.get_height();
