@@ -5,8 +5,8 @@ import java.util.UUID;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutNBT;
@@ -14,26 +14,38 @@ import factorization.api.datahelpers.Share;
 import factorization.fzds.api.IDeltaChunk;
 
 public class ColossusController extends Entity {
-    static enum BodySide { LEFT, RIGHT };
-    static enum LimbType { BODY, ARM, LEG };
+    static enum BodySide { LEFT, RIGHT, UNKNOWN_BODY_SIDE };
+    static enum LimbType { BODY, ARM, LEG, UNKNOWN_LIMB_TYPE };
     LimbInfo[] limbs;
     boolean setup = false;
     
+    static enum States {
+        WALK_EAST_SAFELY {},
+        RUN_BACK,
+        WAIT,
+        FLAIL_ARMS,
+        SHAKE_BODY,
+        CHASE_PLAYER_ON_GROUND;
+    };
+
+    
     static class LimbInfo {
-        LimbType type;
-        BodySide side;
+        static UUID fake_uuid = UUID.randomUUID();
+        LimbType type = LimbType.UNKNOWN_LIMB_TYPE;
+        BodySide side = BodySide.UNKNOWN_BODY_SIDE;
         int length;
-        UUID entityId;
+        UUID entityId = fake_uuid;
         IDeltaChunk ent = null;
+        Vec3 originalBodyOffset;
         
         public LimbInfo() { }
-        
         
         public LimbInfo(LimbType type, BodySide side, int length, IDeltaChunk ent) {
             this.type = type;
             this.side = side;
             this.length = length;
             this.ent = ent;
+            this.entityId = ent.getUniqueID();
         }
 
 
@@ -42,6 +54,16 @@ public class ColossusController extends Entity {
             side = data.as(Share.PRIVATE, "limbSide" + index).putEnum(side);
             length = data.as(Share.PRIVATE, "limbLength" + index).putInt(length);
             entityId = data.as(Share.PRIVATE, "entityId" + index).putUUID(entityId);
+            if (data.isReader()) {
+                originalBodyOffset = Vec3.createVectorHelper(0, 0, 0);
+            }
+            originalBodyOffset.xCoord = data.as(Share.PRIVATE, "bodyX" + index).putDouble(originalBodyOffset.xCoord);
+            originalBodyOffset.yCoord = data.as(Share.PRIVATE, "bodyY" + index).putDouble(originalBodyOffset.yCoord);
+            originalBodyOffset.zCoord = data.as(Share.PRIVATE, "bodyZ" + index).putDouble(originalBodyOffset.zCoord);
+        }
+        
+        void setOffsetFromBody(IDeltaChunk body) {
+            originalBodyOffset = Vec3.createVectorHelper(ent.posX - body.posX, ent.posY - body.posY, ent.posZ - body.posZ);
         }
     }
     
@@ -53,11 +75,20 @@ public class ColossusController extends Entity {
     public ColossusController(World world, LimbInfo[] limbInfo) {
         super(world);
         this.limbs = limbInfo;
+        IDeltaChunk body = null;
         for (LimbInfo li : limbs) {
             li.entityId = li.ent.getUniqueID();
+            if (li.type == LimbType.BODY) {
+                body = li.ent;
+            }
+        }
+        for (LimbInfo li : limbs) {
+            li.setOffsetFromBody(body);
         }
         setup = true;
     }
+    
+    AnimationExecutor ae = new AnimationExecutor("legWalk");
     
     @Override
     public void onEntityUpdate() {
@@ -65,6 +96,20 @@ public class ColossusController extends Entity {
             if (worldObj.isRemote) return;
             setup = true;
             loadLimbs();
+            if (!setup) return;
+        }
+        LimbInfo body = null;
+        for (LimbInfo li : limbs) {
+            if (li.type == LimbType.BODY) {
+                body = li;
+            }
+        }
+        for (LimbInfo limb : limbs) {
+            if (limb == body) continue;
+            if (ae.tick(body, limb)) {
+                ae = new AnimationExecutor("legWalk");
+            }
+            break;
         }
     }
     
@@ -87,6 +132,12 @@ public class ColossusController extends Entity {
                     li.ent = (IDeltaChunk) ent;
                     break;
                 }
+            }
+        }
+        for (LimbInfo li : limbs) {
+            if (li.ent == null) {
+                setup = false;
+                break;
             }
         }
     }
