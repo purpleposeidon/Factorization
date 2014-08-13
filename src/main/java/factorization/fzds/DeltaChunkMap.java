@@ -1,16 +1,19 @@
 package factorization.fzds;
 
-import factorization.api.Coord;
-import factorization.fzds.api.IDeltaChunk;
-import gnu.trove.map.hash.TLongObjectHashMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
+
+import factorization.api.Coord;
+import factorization.fzds.api.IDeltaChunk;
 
 /**
  * Map<Chunk, IDeltaChunk[]>
  */
 public class DeltaChunkMap {
-    private TLongObjectHashMap<IDeltaChunk[]> values = new TLongObjectHashMap<IDeltaChunk[]>(32);
+    //private TLongObjectHashMap<IDeltaChunk[]> values = new TLongObjectHashMap<IDeltaChunk[]>(32);
+    private Map<Long, IDeltaChunk[]> values = new HashMap();
     
     private long hash(int chunkX, int chunkZ) {
         long ret = chunkX | (((long) chunkZ) << 32);
