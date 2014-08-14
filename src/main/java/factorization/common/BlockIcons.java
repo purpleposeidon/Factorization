@@ -59,7 +59,7 @@ public class BlockIcons {
     @Directory("machine")
     public static SimpleMachine slag_furnace;
     public static IIcon machine$slag_furnace_face_on;
-    
+        
     @Directory("rocket")
     public static IIcon
         rocket_engine_top, rocket_engine_bottom_hole, rocket_engine_nozzle, rocket_engine_valid, rocket_engine_invalid;
@@ -73,6 +73,7 @@ public class BlockIcons {
     public static IIcon socket$hand, socket$arm0, socket$arm1, socket$arm2, socket$arm3;
     public static IIcon socket$shifter_front, socket$shifter_side;
     public static IIcon socket$corkscrew;
+
     
     public static class RouterFace extends IIconGroup {
         public IIcon on, off;

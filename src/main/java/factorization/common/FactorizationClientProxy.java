@@ -69,6 +69,7 @@ import factorization.shared.ItemRenderCapture;
 import factorization.shared.TileEntityFactorization;
 import factorization.sockets.BlockRenderSocketBase;
 import factorization.sockets.SocketLacerator;
+import factorization.sockets.SocketScissors;
 import factorization.sockets.TileEntitySocketRenderer;
 import factorization.sockets.fanturpeller.SocketFanturpeller;
 import factorization.weird.BlockRenderDayBarrel;
@@ -180,6 +181,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             setTileEntityRendererDispatcher(TileEntitySteamTurbine.class, new TileEntitySteamTurbineRender());
             setTileEntityRendererDispatcher(TileEntityLeydenJar.class, new TileEntityLeydenJarRender());
             setTileEntityRendererDispatcher(TileEntityCompressionCrafter.class, new TileEntityCompressionCrafterRenderer());
+            setTileEntityRendererDispatcher(SocketScissors.class, new TileEntitySocketRenderer());
             setTileEntityRendererDispatcher(SocketLacerator.class, new TileEntitySocketRenderer());
             setTileEntityRendererDispatcher(SocketFanturpeller.class, new TileEntitySocketRenderer());
             // End section that is azanor's fault
@@ -211,7 +213,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 FactoryType.SOCKET_SHIFTER,
                 FactoryType.SOCKET_BLOWER,
                 FactoryType.SOCKET_PUMP,
-                FactoryType.SOCKET_BARE_MOTOR
+                FactoryType.SOCKET_BARE_MOTOR,
+                FactoryType.SOCKET_SCISSORS
         }) {
             new BlockRenderSocketBase(ft);
         }

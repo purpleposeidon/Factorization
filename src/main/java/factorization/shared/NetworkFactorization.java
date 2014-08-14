@@ -339,7 +339,7 @@ public class NetworkFactorization {
         SculptDescription, SculptNew, SculptMove, SculptRemove, SculptState,
         ExtensionInfo, RocketState,
         ServoRailDecor, ServoRailEditComment,
-        CompressionCrafter, CompressionCrafterBeginCrafting, CompressionCrafterBounds,
+        CompressionCrafter, CompressionCrafterBeginCrafting, CompressionCrafterBounds, ScissorState, 
         
         servo_brief(true), servo_item(true), servo_complete(true), servo_stopped(true);
         

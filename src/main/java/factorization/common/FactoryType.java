@@ -28,6 +28,7 @@ import factorization.sockets.SocketBareMotor;
 import factorization.sockets.SocketEmpty;
 import factorization.sockets.SocketLacerator;
 import factorization.sockets.SocketRobotHand;
+import factorization.sockets.SocketScissors;
 import factorization.sockets.SocketShifter;
 import factorization.sockets.fanturpeller.BlowEntities;
 import factorization.sockets.fanturpeller.PumpLiquids;
@@ -79,6 +80,7 @@ public enum FactoryType {
     SOCKET_BLOWER(39, true, BlowEntities.class, "fzsock_blow"),
     //40 -- Was the short-lived SOCKET_MIXER
     SOCKET_BARE_MOTOR(41, false, SocketBareMotor.class, "fzsock_motor"),
+    SOCKET_SCISSORS(42, false, SocketScissors.class, "fzsock_scissors"),
     
 
     POCKETCRAFTGUI(101, true)

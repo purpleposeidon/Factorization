@@ -137,6 +137,7 @@ public class Registry {
     public ItemServoMotor servo_placer;
     public ItemServoRailWidget servo_widget_instruction, servo_widget_decor;
     public ItemStack dark_iron_sprocket, servo_motor;
+    public ItemCraftingComponent giant_scissors;
     public ItemDayBarrel daybarrel;
     @Deprecated
     public ItemSocketPart socket_part;
@@ -312,6 +313,7 @@ public class Registry {
         OreDictionary.registerOre("aquaRegia", aqua_regia);
         insulated_coil = new ItemCraftingComponent("insulated_coil");
         motor = new ItemCraftingComponent("motor");
+        giant_scissors = new ItemCraftingComponent("socket/scissors");
         fan = new ItemCraftingComponent("fan");
         corkscrew = new ItemCraftingComponent("corkscrew");
         diamond_cutting_head = new ItemCraftingComponent("diamond_cutting_head");
@@ -781,6 +783,12 @@ public class Registry {
                 " |-",
                 '|', Items.iron_ingot,
                 '-', Blocks.heavy_weighted_pressure_plate);
+        recipe(new ItemStack(giant_scissors),
+                " SI",
+                "S  ",
+                " SI",
+                'I', Items.iron_ingot,
+                'S', Items.shears);
         if (FzConfig.enable_solar_steam) {
             recipe(solarboiler_item,
                     "I#I",
