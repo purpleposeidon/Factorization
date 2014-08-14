@@ -23,7 +23,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.village.MerchantRecipeList;
@@ -81,6 +80,7 @@ import factorization.shared.ItemBlockProxy;
 import factorization.shared.ItemCraftingComponent;
 import factorization.shared.ItemFactorizationBlock;
 import factorization.sockets.ItemSocketPart;
+import factorization.utiligoo.ItemGoo;
 import factorization.weird.ItemDayBarrel;
 import factorization.weird.ItemPocketTable;
 import factorization.weird.TileEntityDayBarrel;
@@ -143,6 +143,7 @@ public class Registry {
     public ItemCraftingComponent instruction_plate;
     public ItemCommenter servo_rail_comment_editor;
     public ItemDocBook docbook;
+    public ItemGoo utiligoo;
 
     public Material materialMachine = new Material(MapColor.ironColor);
     
@@ -362,6 +363,7 @@ public class Registry {
         //Barrels
         daybarrel = new ItemDayBarrel("daybarrel");
         docbook = new ItemDocBook("docbook", TabType.TOOLS);
+        utiligoo = new ItemGoo("utiligoo", TabType.TOOLS);
         postMakeItems();
     }
 

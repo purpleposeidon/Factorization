@@ -6,6 +6,7 @@ import io.netty.buffer.Unpooled;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -27,6 +28,7 @@ import factorization.api.Quaternion;
 import factorization.api.VectorUV;
 import factorization.common.Command;
 import factorization.common.FactoryType;
+import factorization.utiligoo.ItemGoo;
 
 public class NetworkFactorization {
     public static final ItemStack EMPTY_ITEMSTACK = new ItemStack(Blocks.air);
@@ -70,6 +72,9 @@ public class NetworkFactorization {
             } else if (item instanceof MessageType) {
                 MessageType mt = (MessageType) item;
                 mt.write(output);
+            } else if (item instanceof NBTTagCompound) {
+                NBTTagCompound tag = (NBTTagCompound) item;
+                CompressedStreamTools.write(tag, output);
             } else {
                 throw new RuntimeException("Don't know how to serialize " + item.getClass() + " (" + item + ")");
             }
@@ -269,6 +274,9 @@ public class NetworkFactorization {
                         px, py, pz);
             }
             return true;
+        } else if (messageType == MessageType.UtilityGooState) {
+            ItemGoo.handlePacket(input);
+            return true;
         }
         return false;
     }
@@ -292,6 +300,10 @@ public class NetworkFactorization {
             }
             
             if (!(to instanceof IEntityMessage)) {
+                if (!player.worldObj.isRemote) {
+                    Core.logSevere("Sending the server messages to non-IEntityMessages is not allowed, %s!", player);
+                    return;
+                }
                 if (!handleForeignEntityMessage(to, messageType, input)) {
                     Core.logFine("Packet to inappropriate entity #%s: %s", entityId, messageType);
                 }
@@ -341,7 +353,9 @@ public class NetworkFactorization {
         ServoRailDecor, ServoRailEditComment,
         CompressionCrafter, CompressionCrafterBeginCrafting, CompressionCrafterBounds,
         
-        servo_brief(true), servo_item(true), servo_complete(true), servo_stopped(true);
+        // Messages to entities; (true) marks that they are entity messages.
+        servo_brief(true), servo_item(true), servo_complete(true), servo_stopped(true),
+        UtilityGooState(true);
         
         public boolean isEntityMessage;
         private static final MessageType[] valuesCache = values();

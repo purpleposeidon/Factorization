@@ -15,4 +15,6 @@ public class ItemIcons {
     public static IIcon move, reset, rotate_local, rotate_global, stretch, mold;
     
     public static IIcon barrel_font;
+    
+    public static IIcon utiligoo$empty, utiligoo$low, utiligoo$medium, utiligoo$high;
 }
