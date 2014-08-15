@@ -71,6 +71,7 @@ import factorization.sockets.BlockRenderSocketBase;
 import factorization.sockets.SocketLacerator;
 import factorization.sockets.TileEntitySocketRenderer;
 import factorization.sockets.fanturpeller.SocketFanturpeller;
+import factorization.utiligoo.ItemGoo;
 import factorization.weird.BlockRenderDayBarrel;
 import factorization.weird.ContainerPocket;
 import factorization.weird.DayBarrelItemRenderer;
@@ -187,6 +188,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
         RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
         RenderingRegistry.registerEntityRenderingHandler(ServoMotor.class, new RenderServoMotor());
+        RenderingRegistry.registerEntityRenderingHandler(ItemGoo.ClickInterceptor.class, new EmptyRender());
 
         RenderingRegistry.registerBlockHandler(new FactorizationRender());
         BlockRenderBattery renderBattery = new BlockRenderBattery();
