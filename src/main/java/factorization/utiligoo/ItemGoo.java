@@ -320,7 +320,7 @@ public class ItemGoo extends ItemFactorization {
     }
     
     private void misplaceSomeGoo(ItemStack is, Random rand, int removed) {
-        if (rand.nextInt(100) < 80) {
+        if (rand.nextInt(100) < 20) {
             removed--;
         }
         is.stackSize += removed;
