@@ -13,7 +13,8 @@ import factorization.shared.FactorizationTextureLoader.Ignore;
 public class BlockIcons {
     public static IIcon uv_test,
         default_icon,
-        error;
+        error,
+        white;
     
     @Directory("material")
     public static IIcon
@@ -73,6 +74,7 @@ public class BlockIcons {
     public static IIcon socket$hand, socket$arm0, socket$arm1, socket$arm2, socket$arm3;
     public static IIcon socket$shifter_front, socket$shifter_side;
     public static IIcon socket$corkscrew;
+    public static IIcon socket$mini_piston;
 
     
     public static class RouterFace extends IIconGroup {

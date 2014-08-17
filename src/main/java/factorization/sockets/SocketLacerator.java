@@ -55,11 +55,13 @@ import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
+import factorization.shared.DropCaptureHandler;
 import factorization.shared.FzUtil;
+import factorization.shared.ICaptureDrops;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.weird.TileEntityDayBarrel;
 
-public class SocketLacerator extends TileEntitySocketBase implements IChargeConductor {
+public class SocketLacerator extends TileEntitySocketBase implements IChargeConductor, ICaptureDrops {
     Charge charge = new Charge(this);
     
     @Override
@@ -306,38 +308,27 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         }
     };
     
-    static SocketLacerator dropGrabber = null;
-    
     @Override
     public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
-        dropGrabber = this;
+        DropCaptureHandler.catcher = this;
         try {
             return _handleRay(socket, mop, mopIsThis, powered);
         } finally {
-            dropGrabber = null;
+            DropCaptureHandler.catcher = null;
         }
     }
     
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void captureDrops(BlockEvent.HarvestDropsEvent event) {
-        if (dropGrabber == null) {
-            return;
-        }
-        if (dropGrabber != this) {
-            dropGrabber.captureDrops(event);
-            return;
-        }
+    public boolean captureDrops(int x,int y, int z, ArrayList<ItemStack> stacks) {
         final int maxDist = 2*2;
-        int dist = (xCoord - event.x)*(xCoord - event.x) + (yCoord - event.y)*(yCoord - event.y) + (zCoord - event.z)*(zCoord - event.z);
+        int dist = (xCoord - x)*(xCoord - x) + (yCoord - y)*(yCoord - y) + (zCoord - z)*(zCoord - z);
         if (dist > maxDist) {
-            return;
+            return false;
         }
-        ArrayList<ItemStack> drops = event.drops;
-        for (int i = 0; i < drops.size(); i++) {
-            ItemStack is = drops.get(i);
+        for (int i = 0; i < stacks.size(); i++) {
+            ItemStack is = stacks.get(i);
             processCollectedItem(is);
         }
-        drops.clear();
+        return true;
     }
     
     private boolean _handleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {

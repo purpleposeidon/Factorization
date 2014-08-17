@@ -80,6 +80,8 @@ public class Core {
         foph = new FactorizationOreProcessingHandler();
         network = new NetworkFactorization();
         netevent = new FzNetEventHandler();
+        captureHandler = new DropCaptureHandler();
+
     }
     
     // runtime storage
@@ -93,6 +95,7 @@ public class Core {
     public static FactorizationProxy proxy;
     public static NetworkFactorization network;
     public static FzNetEventHandler netevent;
+    public static DropCaptureHandler captureHandler;
     public static int factory_rendertype = -1;
     public static boolean finished_loading = false;
 
@@ -138,6 +141,9 @@ public class Core {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             isMainClientThread.set(true);
         }
+
+        MinecraftForge.EVENT_BUS.register(captureHandler);
+        
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Lacerator|factorization.oreprocessing.TileEntityGrinder|recipes");
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Crystallizer|factorization.oreprocessing.TileEntityCrystallizer|recipes");
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Slag Furnace|factorization.oreprocessing.TileEntitySlagFurnace$SlagRecipes|smeltingResults");

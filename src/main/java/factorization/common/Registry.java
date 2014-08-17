@@ -784,11 +784,12 @@ public class Registry {
                 '|', Items.iron_ingot,
                 '-', Blocks.heavy_weighted_pressure_plate);
         recipe(new ItemStack(giant_scissors),
-                " SI",
-                "S  ",
-                " SI",
-                'I', Items.iron_ingot,
-                'S', Items.shears);
+                "I I",
+                " S ",
+                "P P",
+                'P', Blocks.sticky_piston,
+                'S', Items.shears,
+                'I', Items.iron_sword);
         if (FzConfig.enable_solar_steam) {
             recipe(solarboiler_item,
                     "I#I",
