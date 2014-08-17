@@ -1,8 +1,6 @@
 package factorization.sockets;
 
-import static org.lwjgl.opengl.GL11.GL_LIGHTING;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.*;
 
 import java.io.DataInput;
 import java.io.IOException;
@@ -10,44 +8,32 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.IChatComponent;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IShearable;
 import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.event.world.BlockEvent;
+
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
@@ -58,18 +44,14 @@ import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.common.ItemIcons;
 import factorization.notify.Notice;
-import factorization.oreprocessing.TileEntityGrinder;
-import factorization.oreprocessing.TileEntityGrinderRender;
-import factorization.oreprocessing.TileEntityGrinder.GrinderRecipe;
 import factorization.servo.ServoMotor;
-import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 import factorization.shared.DropCaptureHandler;
 import factorization.shared.FactorizationBlockRender;
 import factorization.shared.FzUtil;
 import factorization.shared.ICaptureDrops;
-import factorization.shared.ObjectModel;
 import factorization.shared.NetworkFactorization.MessageType;
+import factorization.shared.ObjectModel;
 
 public class SocketScissors extends TileEntitySocketBase implements ICaptureDrops{
     boolean wasPowered = false;
@@ -187,7 +169,6 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
             if (victim.worldObj != null) {
                 long now = victim.worldObj.getTotalWorldTime();
                 ret += (now % 3) + 1;
-                System.out.println(now);
             } else {
                 ret += "1";
             }
