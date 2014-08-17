@@ -318,6 +318,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         }
     }
     
+    @Override
     public boolean captureDrops(int x,int y, int z, ArrayList<ItemStack> stacks) {
         final int maxDist = 2*2;
         int dist = (xCoord - x)*(xCoord - x) + (yCoord - y)*(yCoord - y) + (zCoord - z)*(zCoord - z);
