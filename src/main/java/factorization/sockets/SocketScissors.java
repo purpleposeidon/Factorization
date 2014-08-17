@@ -193,13 +193,15 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
             sword.addEnchantment(Enchantment.looting, 1);
         }
         if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
-            Entity entity=mop.entityHit;
+            Entity entity = mop.entityHit;
             if (entity instanceof EntityLivingBase) {
                 EntityLivingBase living = (EntityLivingBase)entity;
                 EntityPlayer player = getFakePlayer();
                 player.inventory.mainInventory[0] = sword;
                 SocketScissors.lootingPlayer = player;
+                int prevRecentlyHit = living.recentlyHit;
                 living.attackEntityFrom(ScissorsDamge, 2);
+                living.recentlyHit = prevRecentlyHit;
                 SocketScissors.lootingPlayer.isDead=true;
                 return true;
             }
@@ -210,20 +212,20 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
             if (block.isAir(worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
                 return false;
             }
-            if (canCutBlock(worldObj,block,mop.blockX,mop.blockY,mop.blockZ)) {
+            if (canCutBlock(worldObj, block, mop.blockX, mop.blockY, mop.blockZ)) {
                 EntityPlayer player = getFakePlayer();
                 player.inventory.mainInventory[0] = shears;
                 if (block instanceof IShearable) {
                      IShearable target = (IShearable)block;
                      if (target.isShearable(shears, worldObj, mop.blockX,mop.blockY,mop.blockZ)) {
                             List<ItemStack> stacks = target.onSheared(shears, worldObj, mop.blockX,mop.blockY,mop.blockZ, 0);
-                            for(ItemStack stack : stacks)
+                            for(ItemStack stack : stacks) {
                                 processCollectedItem(stack);
-                            removeBlock(player,block,metadata,mop.blockX,mop.blockY,mop.blockZ);
+                            }
+                            removeBlock(player,block,metadata, mop.blockX, mop.blockY, mop.blockZ);
                             return true;
                      }
-                }
-                else {
+                } else {
                     boolean didRemove = removeBlock(player,block,metadata,mop.blockX,mop.blockY,mop.blockZ);
                     if (didRemove) {
                         block.harvestBlock(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, metadata);
