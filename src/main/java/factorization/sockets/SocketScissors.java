@@ -246,11 +246,18 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         }
         return false;
     }
+    
     public static boolean canCutBlock(World world, Block block, int x, int y, int z) {
-        if (block.getMaterial() == Material.leaves || block.getMaterial() == Material.cactus || block.getMaterial()==Material.plants || block == Blocks.web || block == Blocks.tallgrass || block == Blocks.vine || block == Blocks.tripwire || block instanceof IShearable)
+        Material mat = block.getMaterial();
+        if (mat == Material.leaves || mat == Material.cactus || mat == Material.plants) {
             return true;
-        if (block.getBlockHardness(world, x, y, z)==0 && block.getMaterial() != Material.circuits && block.getMaterial() != Material.fire && block.getMaterial() != Material.air)
+        }
+        if (block == Blocks.web || block == Blocks.tallgrass || block == Blocks.vine || block == Blocks.tripwire || block instanceof IShearable) {
             return true;
+        }
+        if (block.getBlockHardness(world, x, y, z) == 0 && mat != Material.circuits && mat != Material.fire && mat != Material.air) {
+            return true;
+        }
         return false;
     }
 
@@ -287,9 +294,9 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         float d = 0.5F;
         GL11.glTranslatef(d, d, d);
         Quaternion.fromOrientation(FzOrientation.fromDirection(facing.getOpposite())).glRotate();
-        float turn=28*((float)openCount/(float)openTime);
-        GL11.glTranslatef(0f, 0.25F-7f/16f, 0);
-        float n=-2F/16F;
+        float turn = 28*((float)openCount / (float)openTime);
+        GL11.glTranslatef(0f, 0.25F - 7f/16f, 0);
+        float n= -2F/16F;
         GL11.glTranslatef(0, n, 0);
         GL11.glRotatef(turn, 1, 0, 0);
         GL11.glTranslatef(-0, -n, -0);
@@ -304,7 +311,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         GL11.glRotatef(90, 1, 0, 0);
         GL11.glTranslatef(-0.5F, -0.5F, 0);
         GL11.glRotatef(90, 0, 1, 0);
-        GL11.glTranslatef(-1F+8/16f, 0F, 0.5f);
+        GL11.glTranslatef(-1F + 8/16f, 0F, 0.5f);
         FactorizationBlockRender.renderItemIIcon(ItemIcons.socket$half_scissors);
         GL11.glPopMatrix();
         GL11.glRotatef(-turn*2, 1, 0, 0);
@@ -313,13 +320,13 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         GL11.glTranslatef(0.5F, 0.5F, 0);
         GL11.glRotatef(90, 0, 1, 0);
         GL11.glRotatef(180, 1, 0, 0);
-        GL11.glTranslatef(-1F+8/16f, 0F, 0.5f);
+        GL11.glTranslatef(-1F + 8/16f, 0F, 0.5f);
         FactorizationBlockRender.renderItemIIcon(ItemIcons.socket$half_scissors);
         GL11.glPopMatrix();
         GL11.glPushMatrix();
 
-        GL11.glRotatef(turn+180, 1, 0, 0);
-        GL11.glTranslatef(0, -.5F-1F/16F, .25F-1F/16F);
+        GL11.glRotatef(turn + 180, 1, 0, 0);
+        GL11.glTranslatef(0, -.5F - 1F/16F, .25F - 1F/16F);
 
         TextureManager tex = Minecraft.getMinecraft().renderEngine;
         tex.bindTexture(Core.blockAtlas);
@@ -330,7 +337,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         piston_base.render(BlockIcons.socket$mini_piston);
         GL11.glTranslatef(0, 0, -6f/16f);
         piston_base.render(BlockIcons.socket$mini_piston);
-        float offset=-1F/16F*((float)openCount/(float)openTime)-1F/16F;
+        float offset = -1F/16F * ((float)openCount/(float)openTime) - 1F/16F;
         GL11.glTranslatef(0, offset, 0f);
         piston_head.render(BlockIcons.socket$mini_piston);
         GL11.glTranslatef(0, 0, 6f/16f);
@@ -339,7 +346,6 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         glEnable(GL11.GL_CULL_FACE);
         glEnable(GL_LIGHTING);
         GL11.glPopMatrix();
-//		renderTinyPistons(motor, Tessellator.instance);
     }
 
     @SideOnly(Side.CLIENT)
@@ -353,8 +359,6 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
         super.representYoSelf();
         piston_base = new ObjectModel(Core.getResource("models/mini_piston/mini_piston_base.obj"));
         piston_head = new ObjectModel(Core.getResource("models/mini_piston/mini_piston_head.obj"));
-//		piston_base = new ObjectModel(Core.getResource("models/corkscrew.obj"));
-//		piston_head = new ObjectModel(Core.getResource("models/corkscrew.obj"));
     }
     
     
