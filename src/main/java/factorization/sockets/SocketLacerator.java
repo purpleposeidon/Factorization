@@ -310,11 +310,11 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     
     @Override
     public boolean handleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
-        DropCaptureHandler.catcher = this;
+        DropCaptureHandler.startCapture(this);
         try {
             return _handleRay(socket, mop, mopIsThis, powered);
         } finally {
-            DropCaptureHandler.catcher = null;
+            DropCaptureHandler.endCapture();
         }
     }
     
