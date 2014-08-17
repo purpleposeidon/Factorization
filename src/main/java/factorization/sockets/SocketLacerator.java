@@ -535,8 +535,6 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     }
     
     
-    private static MovingObjectPosition particleMop = new MovingObjectPosition(0, 0, 0, 0, Vec3.createVectorHelper(0, 0, 0));
-    
     @SideOnly(Side.CLIENT)
     static EffectRenderer particleTweaker, origER;
     @SideOnly(Side.CLIENT)
