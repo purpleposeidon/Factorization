@@ -53,15 +53,15 @@ import factorization.shared.ICaptureDrops;
 import factorization.shared.NetworkFactorization.MessageType;
 import factorization.shared.ObjectModel;
 
-public class SocketScissors extends TileEntitySocketBase implements ICaptureDrops{
+public class SocketScissors extends TileEntitySocketBase implements ICaptureDrops {
     boolean wasPowered = false;
     boolean sound = false;
     byte openCount = 0;
     static byte openTime = 6;
 
-    boolean blocked=false;
+    boolean blocked = false;
     
-    boolean dirty=false;
+    boolean dirty = false;
     
     public static Entity lootingPlayer;
     
@@ -112,29 +112,27 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
 
     @Override
     public void genericUpdate(ISocketHolder socket, Coord coord, boolean powered) {
-        if (sound)
-            worldObj.playSound(xCoord,yCoord,zCoord,"mob.sheep.shear",1,1,false);
-        sound=false;
-        if (worldObj.isRemote) {
-            return;
+        if (sound) {
+            worldObj.playSound(xCoord, yCoord, zCoord, "mob.sheep.shear", 1, 1, false);
         }
-        if (openCount>0 && ( !powered || openCount < openTime )) {
+        sound = false;
+        if (worldObj.isRemote) return;
+        if (openCount > 0 && (!powered || openCount < openTime)) {
             openCount--;
-            dirty=true;
+            dirty = true;
         }
         if (wasPowered || !powered) {
             wasPowered = powered;
-        }
-        else {
+        } else {
             wasPowered = true;
             FzOrientation orientation = FzOrientation.fromDirection(facing).getSwapped();
-            if (openCount==0 && getBackingInventory(socket) != null) {
-                blocked=false;
+            if (openCount == 0 && getBackingInventory(socket) != null) {
+                blocked = false;
                 rayTrace(socket, coord, orientation, powered, false, true);
                 if (!blocked) {
-                    sound=true;
-                    openCount=openTime;
-                    dirty=true;
+                    sound = true;
+                    openCount = openTime;
+                    dirty = true;
                 }
             }
         }
@@ -181,33 +179,34 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
                 return new ChatComponentTranslation(ret, victim.func_145748_c_());
             }
         }
-        public Entity getEntity()
-        {
+        
+        public Entity getEntity() {
             return SocketScissors.lootingPlayer;
         }
     };
 
     public boolean _handleRay(ISocketHolder socket, MovingObjectPosition mop, boolean mopIsThis, boolean powered) {
-        ItemStack shears=new ItemStack(Items.shears);
+        ItemStack shears = new ItemStack(Items.shears);
         shears.addEnchantment(Enchantment.silkTouch, 1);
         ItemStack sword = new ItemStack(Items.diamond_sword);
-        if(worldObj.rand.nextInt(10) > 3)
+        if (worldObj.rand.nextInt(10) > 3) {
             sword.addEnchantment(Enchantment.looting, 1);
-        if (mop.typeOfHit==MovingObjectPosition.MovingObjectType.ENTITY) {
+        }
+        if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
             Entity entity=mop.entityHit;
             if (entity instanceof EntityLivingBase) {
-                EntityLivingBase living=(EntityLivingBase)entity;
+                EntityLivingBase living = (EntityLivingBase)entity;
                 EntityPlayer player = getFakePlayer();
                 player.inventory.mainInventory[0] = sword;
-                SocketScissors.lootingPlayer=player;
+                SocketScissors.lootingPlayer = player;
                 living.attackEntityFrom(ScissorsDamge, 2);
                 SocketScissors.lootingPlayer.isDead=true;
                 return true;
             }
         }
-        if (mop.typeOfHit==MovingObjectPosition.MovingObjectType.BLOCK) {
-            Block block=worldObj.getBlock(mop.blockX, mop.blockY, mop.blockZ);
-            int metadata=worldObj.getBlockMetadata(mop.blockX, mop.blockY, mop.blockZ);
+        if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+            Block block = worldObj.getBlock(mop.blockX, mop.blockY, mop.blockZ);
+            int metadata = worldObj.getBlockMetadata(mop.blockX, mop.blockY, mop.blockZ);
             if (block.isAir(worldObj, mop.blockX, mop.blockY, mop.blockZ)) {
                 return false;
             }
@@ -232,7 +231,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
                 }
             }
             else{
-                blocked=true;
+                blocked = true;
             }
         }
         return false;
@@ -241,7 +240,7 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
     private boolean removeBlock(EntityPlayer thisPlayerMP, Block block, int md, int x, int y, int z) {
         if (block == null) return false;
         block.onBlockHarvested(worldObj, x, y, z, md, thisPlayerMP);
-        if (block.removedByPlayer(worldObj, thisPlayerMP, x, y, z)) {
+        if (block.removedByPlayer(worldObj, thisPlayerMP, x, y, z, false)) {
             block.onBlockDestroyedByPlayer(worldObj, x, y, z, md);
             return true;
         }

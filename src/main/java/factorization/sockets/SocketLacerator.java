@@ -439,7 +439,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                         }
                     }
                     block.onBlockHarvested(worldObj, mop.blockX, mop.blockY, mop.blockZ, md, player);
-                    if (block.removedByPlayer(worldObj, player, mop.blockX, mop.blockY, mop.blockZ)) {
+                    if (block.removedByPlayer(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, true)) {
                         block.onBlockDestroyedByPlayer(worldObj, mop.blockX, mop.blockY, mop.blockZ, md);
                         block.harvestBlock(worldObj, player, mop.blockX, mop.blockY, mop.blockZ, 0);
                     }
@@ -462,7 +462,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     private boolean removeBlock(EntityPlayer thisPlayerMP, Block block, int md, int x, int y, int z) {
         if (block == null) return false;
         block.onBlockHarvested(worldObj, x, y, z, md, thisPlayerMP);
-        if (block.removedByPlayer(worldObj, thisPlayerMP, x, y, z)) {
+        if (block.removedByPlayer(worldObj, thisPlayerMP, x, y, z, false)) {
             block.onBlockDestroyedByPlayer(worldObj, x, y, z, md);
             return true;
         }
