@@ -13,8 +13,7 @@ import factorization.shared.FactorizationTextureLoader.Ignore;
 public class BlockIcons {
     public static IIcon uv_test,
         default_icon,
-        error,
-        white;
+        error;
     
     @Directory("material")
     public static IIcon
