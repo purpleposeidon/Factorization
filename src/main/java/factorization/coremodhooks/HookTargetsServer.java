@@ -29,7 +29,7 @@ public class HookTargetsServer {
         }
     }
     
-    static double randShardVelocity(World world) {
+    private static double randShardVelocity(World world) {
         double r = world.rand.nextGaussian()/4;
         double max = 0.3;
         if (r > max) {
@@ -39,4 +39,6 @@ public class HookTargetsServer {
         }
         return r;
     }
+    
+    public static void DUMMY() {}
 }
