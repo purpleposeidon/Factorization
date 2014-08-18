@@ -32,8 +32,6 @@ public class MethodSplices {
         if (HookTargetsClient.attackButtonPressed()) {
             return;
         }
-        HookTargetsServer.DUMMY(); // This is probably necessary to force the two returns to not be optimized into one or something.
-        // NORELEASE: Test once we have something using it
         return;
     }
     
@@ -42,7 +40,6 @@ public class MethodSplices {
         if (HookTargetsClient.useButtonPressed()) {
             return;
         }
-        HookTargetsServer.DUMMY();
         return;
     }
 }

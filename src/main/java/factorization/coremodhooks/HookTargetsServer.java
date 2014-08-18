@@ -39,6 +39,4 @@ public class HookTargetsServer {
         }
         return r;
     }
-    
-    public static void DUMMY() {}
 }
