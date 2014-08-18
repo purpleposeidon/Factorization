@@ -188,7 +188,6 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
         RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
         RenderingRegistry.registerEntityRenderingHandler(ServoMotor.class, new RenderServoMotor());
-        RenderingRegistry.registerEntityRenderingHandler(ItemGoo.ClickInterceptor.class, new EmptyRender());
 
         RenderingRegistry.registerBlockHandler(new FactorizationRender());
         BlockRenderBattery renderBattery = new BlockRenderBattery();

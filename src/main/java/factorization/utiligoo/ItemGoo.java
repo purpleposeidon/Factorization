@@ -29,14 +29,11 @@ import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.event.world.WorldEvent;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -44,6 +41,8 @@ import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.common.Command;
 import factorization.common.ItemIcons;
+import factorization.coremodhooks.HandleAttackKeyEvent;
+import factorization.coremodhooks.HandleUseKeyEvent;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
@@ -331,8 +330,8 @@ public class ItemGoo extends ItemFactorization {
         if (world.isRemote) return;
         GooData data = GooData.getNullGooData(is, world);
         if (data == null) return;
-        if (!data.isPlayerOutOfDate(player)) return;
         if (!(player instanceof EntityPlayer)) return;
+        if (!data.isPlayerOutOfDate(player)) return;
         NBTTagCompound dataTag = new NBTTagCompound();
         data.writeToNBT(dataTag);
         FMLProxyPacket toSend = Core.network.entityPacket(player, MessageType.UtilityGooState, dataTag);
@@ -372,8 +371,8 @@ public class ItemGoo extends ItemFactorization {
         EntityPlayer player = mc.thePlayer;
         if (player == null) return;
         boolean rendered_something = false;
-        for (int i = 0; i < 9; i++) {
-            ItemStack is = player.inventory.getStackInSlot(i);
+        for (int slot = 0; slot < 9; slot++) {
+            ItemStack is = player.inventory.getStackInSlot(slot);
             if (is == null || is.getItem() != this) continue;
             GooData data = GooData.getNullGooData(is, mc.theWorld);
             if (data == null) continue; 
@@ -460,138 +459,49 @@ public class ItemGoo extends ItemFactorization {
         }
     }
     
-    public static class ClickInterceptor extends Entity {
-        
-        public ClickInterceptor(World world) {
-            super(world);
-        }
-        @Override protected void entityInit() { }
-        @Override protected void readEntityFromNBT(NBTTagCompound p_70037_1_) { }
-        @Override protected void writeEntityToNBT(NBTTagCompound p_70014_1_) { }
-        
-        @Override
-        public boolean canBeCollidedWith() {
-            return true;
-        }
-        
-        @Override
-        public boolean interactFirst(EntityPlayer player) {
-            ItemStack held = player.getHeldItem();
-            if (held == null) return false;
-            if (!(held.getItem() instanceof ItemBlock) && held.getItem() != Core.registry.utiligoo) return false;
-            Command.gooRightClick.call(player);
-            hideInterceptor();
-            return true;
-        }
-        
-        @Override
-        public boolean hitByEntity(Entity ent) {
-            if (!(ent instanceof EntityPlayer)) return false;
-            Command.gooLeftClick.call((EntityPlayer) ent);
-            hideInterceptor();
-            return true;
-        }
-    }
-    
-    static ClickInterceptor interceptor = null;
-    
-    @SideOnly(Side.CLIENT)
-    @SubscribeEvent
-    public void discardWorldReference(WorldEvent.Unload event) {
-        if (event.world.isRemote) {
-            interceptor = null;
-        }
-    }
-    
-    @SideOnly(Side.CLIENT)
-    @SubscribeEvent
-    public void positionInterceptionEntity(ClientTickEvent event) {
-        if (event.phase == Phase.END) return;
-        Minecraft mc = Minecraft.getMinecraft();
-        if (mc.objectMouseOver == null) {
-            hideInterceptor();
-            return;
-        }
-        if (mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
-            if (mc.objectMouseOver.entityHit != interceptor) {
-                hideInterceptor();
-            }
-            return;
-        }
-        if (mc.thePlayer == null) return; // world unloading
-        if (!position(mc)) {
-            hideInterceptor();
-        }
-        
-    }
-    
-    private boolean position(Minecraft mc) {
-        for (int i = 0; i < 9; i++) {
-            ItemStack is = mc.thePlayer.inventory.getStackInSlot(i);
+    boolean gooHilighted(EntityPlayer player, MovingObjectPosition mop) {
+        if (mop == null || mop.typeOfHit != MovingObjectType.BLOCK) return false;
+        for (int slot = 0; slot < 9; slot++) {
+            ItemStack is = player.inventory.getStackInSlot(slot);
             if (is == null || is.getItem() != this) continue;
-            GooData data = GooData.getNullGooData(is, mc.theWorld);
+            GooData data = GooData.getNullGooData(is, player.worldObj);
             if (data == null) continue;
-            if (positionInterceptorFor(data, mc.theWorld, mc.objectMouseOver)) return true;
-        }
-        return false;
-    }
-    
-    static void hideInterceptor() {
-        if (interceptor != null) {
-            interceptor.setPosition(interceptor.posX, -60, interceptor.posZ);
-        }
-    }
-    
-    private boolean positionInterceptorFor(GooData data, World world, MovingObjectPosition mop) {
-        if (data.last_traced_index >= 0 && data.last_traced_index <= data.coords.length - 3) {
-            int i = data.last_traced_index;
-            int x = data.coords[i + 0];
-            int y = data.coords[i + 1];
-            int z = data.coords[i + 2];
-            if (check(x, y, z, world, mop)) {
-                return true;
-            }
-        }
-        // O(n) slow!  >__>
-        // At least n is always less than 32.
-        // And the array'll fit perfectly in the CPU cache.
-        for (int i = 0; i < data.coords.length; i += 3) {
-            int x = data.coords[i + 0];
-            int y = data.coords[i + 1];
-            int z = data.coords[i + 2];
-            if (check(x, y, z, world, mop)) {
-                data.last_traced_index = i;
-                return true;
+            for (int i = 0; i < data.coords.length; i += 3) {
+                int x = data.coords[i + 0];
+                int y = data.coords[i + 1];
+                int z = data.coords[i + 2];
+                if (x == mop.blockX && y == mop.blockY && z == mop.blockZ) {
+                    return true;
+                }
             }
         }
         return false;
     }
     
-    boolean check(int x, int y, int z, World world, MovingObjectPosition mop) {
-        if (!(mop.blockX == x && mop.blockY == y && mop.blockZ == z)) return false;
-        boolean spawn = false;
-        if (interceptor == null || interceptor.worldObj != world) {
-            interceptor = new ClickInterceptor(world);
-            spawn = true;
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void interceptGooClick(HandleUseKeyEvent event) {
+        // Only used for replacing blocks.
+        Minecraft mc = Minecraft.getMinecraft();
+        MovingObjectPosition mop = mc.objectMouseOver;
+        EntityPlayer player = mc.thePlayer;
+        if (gooHilighted(player, mop)) {
+            Command.gooRightClick.call(player);
+            event.setCanceled(true);
+            mc.rightClickDelayTimer = 4;
         }
-        interceptor.posX = x;
-        interceptor.posY = y;
-        interceptor.posZ = z;
-        double d = 0F/16F;
-        double e = 1 + d;
-        interceptor.boundingBox.minX = x - d;
-        interceptor.boundingBox.minY = y - d;
-        interceptor.boundingBox.minZ = z - d;
-        interceptor.boundingBox.maxX = x + e;
-        interceptor.boundingBox.maxY = y + e;
-        interceptor.boundingBox.maxZ = z + e;
-        if (spawn) {
-            interceptor.isDead = false;
-            world.spawnEntityInWorld(interceptor);
-            interceptor.isDead = false;
-        }
-        mop.typeOfHit = MovingObjectType.ENTITY;
-        mop.entityHit = interceptor;
-        return true;
     }
+    
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void interceptGooBreak(HandleAttackKeyEvent event) {
+        Minecraft mc = Minecraft.getMinecraft();
+        MovingObjectPosition mop = mc.objectMouseOver;
+        EntityPlayer player = mc.thePlayer;
+        if (gooHilighted(player, mop)) {
+            Command.gooLeftClick.call(player);
+            event.setCanceled(true);
+        }
+    }
+    
 }
