@@ -72,6 +72,7 @@ import factorization.sockets.SocketLacerator;
 import factorization.sockets.SocketScissors;
 import factorization.sockets.TileEntitySocketRenderer;
 import factorization.sockets.fanturpeller.SocketFanturpeller;
+import factorization.utiligoo.ItemGoo;
 import factorization.weird.BlockRenderDayBarrel;
 import factorization.weird.ContainerPocket;
 import factorization.weird.DayBarrelItemRenderer;

@@ -1247,11 +1247,8 @@ public class FzUtil {
     
     @SideOnly(Side.CLIENT)
     private static RenderBlocks rb;
-    /**
-     * This isn't very good. It's better to have a RB that points at the current world.
-     */
+    
     @SideOnly(Side.CLIENT)
-    @Deprecated
     public static RenderBlocks getRB() {
         if (rb == null) {
             rb = new RenderBlocks();

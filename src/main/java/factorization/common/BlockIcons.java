@@ -76,17 +76,7 @@ public class BlockIcons {
     public static IIcon socket$mini_piston;
 
     
-    public static class RouterFace extends IIconGroup {
-        public IIcon on, off;
-        
-        public IIcon get(TileEntityFactorization tef) {
-            return tef.draw_active > 0 ? on : off;
-        }
-    }
-    
-    public static RouterFace router$north, router$south, router$east, router$west;
-    
-    public static IIcon router$top, router$bottom;
+    public static IIcon utiligoo$invasion;
     
     @Directory("storage")
     public static BarrelTextureset normal, silky, hopping, sticky;
