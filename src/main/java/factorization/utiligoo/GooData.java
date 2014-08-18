@@ -62,8 +62,12 @@ public class GooData extends WorldSavedData {
     void wipe(ItemStack is, World world) {
         coords = new int[0];
         dimensionId = 0;
-        is.setItemDamage(0);
-        deleteDataFile(world);
+        if (!is.hasDisplayName()) {
+            is.setItemDamage(0);
+            deleteDataFile(world);
+        } else {
+            markDirty();
+        }
     }
     
     static final String fz_goo = "fz_goo";
