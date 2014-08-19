@@ -46,7 +46,10 @@ import factorization.coremodhooks.HandleUseKeyEvent;
 import factorization.shared.BlockRenderHelper;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
+import factorization.shared.DropCaptureHandler;
 import factorization.shared.FzUtil;
+import factorization.shared.FzUtil.FzInv;
+import factorization.shared.ICaptureDrops;
 import factorization.shared.ItemFactorization;
 import factorization.shared.NetworkFactorization.MessageType;
 
@@ -109,10 +112,27 @@ public class ItemGoo extends ItemFactorization {
                 int iy = data.coords[i + 1];
                 int iz = data.coords[i + 2];
                 if (ix == mop.blockX && iy == mop.blockY && iz == mop.blockZ) {
-                    if (command == Command.gooLeftClick) {
-                        leftClick(player, data, is, held, mop);
-                    } else if (command == Command.gooRightClick) {
-                        rightClick(player, data, is, held, mop);
+                    final FzInv playerInv = FzUtil.openInventory(player, true);
+                    DropCaptureHandler.startCapture(new ICaptureDrops() {
+                        @Override
+                        public boolean captureDrops(int x, int y, int z, ArrayList<ItemStack> stacks) {
+                            boolean any = false;
+                            for (ItemStack is : stacks) {
+                                if (FzUtil.normalize(is) == null) continue;
+                                is.stackSize = FzUtil.getStackSize(playerInv.push(is.copy()));
+                                any = true;
+                            }
+                            return any;
+                        }
+                    });
+                    try {
+                        if (command == Command.gooLeftClick) {
+                            leftClick(player, data, is, held, mop);
+                        } else if (command == Command.gooRightClick) {
+                            rightClick(player, data, is, held, mop);
+                        }
+                    } finally {
+                        DropCaptureHandler.endCapture();
                     }
                     return;
                 }
