@@ -273,12 +273,13 @@ public class ItemGoo extends ItemFactorization {
             } else {
                 Block block = at.getBlock();
                 int md = at.getMd();
-                // NORELEASE: This doesn't work right with eg. spruce wood logs
-                block.onBlockHarvested(world, at.x, at.y, at.z, mop.sideHit, player);
-                if (block.removedByPlayer(world, player, at.x, at.y, at.z, true)) {
+                EntityPlayerMP emp = (EntityPlayerMP) player;
+                block.onBlockHarvested(world, at.x, at.y, at.z, md, emp);
+                boolean destroyed = block.removedByPlayer(world, emp, at.x, at.y, at.z, true);
+                if (destroyed) {
                     block.onBlockDestroyedByPlayer(world, at.x, at.y, at.z, md);
-                    block.harvestBlock(world, player, at.x, at.y, at.z, 0);
                 }
+                block.harvestBlock(world, emp, at.x, at.y, at.z, md);
             }
             to_remove.add(i + 0);
             to_remove.add(i + 1);
