@@ -333,6 +333,7 @@ public class ItemGoo extends ItemFactorization {
                     toRemove.add(i + 2);
                 }
             }
+            if (FzUtil.normalize(tool) == null) break;
         }
         if (removed == 0) return;
         data.removeIndices(toRemove, is, world);
