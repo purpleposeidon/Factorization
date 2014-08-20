@@ -268,7 +268,9 @@ public class Registry {
         mixer_item = FactoryType.MIXER.itemStack();
         crystallizer_item = FactoryType.CRYSTALLIZER.itemStack();
         greenware_item = FactoryType.CERAMIC.itemStack();
-        rocket_engine_item_hidden = FactoryType.ROCKETENGINE.itemStack();
+        if (FzConfig.enable_rocketry) {
+            rocket_engine_item_hidden = FactoryType.ROCKETENGINE.itemStack();
+        }
 
         //BlockResource stuff
         silver_ore_item = ResourceType.SILVERORE.itemStack("Silver Ore");
@@ -338,7 +340,7 @@ public class Registry {
         
         //Rocketry
         nether_powder = new ItemCraftingComponent("nether_powder");
-        if (FzConfig.enable_dimension_slice) {
+        if (FzConfig.enable_rocketry) {
             rocket_fuel = new ItemCraftingComponent("rocket/rocket_fuel");
             rocket_engine = new ItemBlockProxy(rocket_engine_item_hidden, "rocket/rocket_engine", TabType.ROCKETRY);
             rocket_engine.setMaxStackSize(1);
@@ -962,7 +964,7 @@ public class Registry {
         
         //Rocketry
         TileEntityGrinder.addRecipe(new ItemStack(Blocks.netherrack), new ItemStack(nether_powder, 1), 1);
-        if (FzConfig.enable_dimension_slice) {
+        if (FzConfig.enable_rocketry) {
             shapelessRecipe(new ItemStack(rocket_fuel, 9),
                     nether_powder, nether_powder, nether_powder,
                     nether_powder, Items.fire_charge, nether_powder,

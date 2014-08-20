@@ -55,6 +55,7 @@ public class FzConfig {
     public static boolean large_servo_instructions = false;
     public static boolean players_discover_docbooks = true;
     public static boolean disable_endermen_griefing = false;
+    public static boolean enable_rocketry = enable_dimension_slice && Core.dev_environ;
     
     public static boolean enable_retrogen = false;
     public static String retrogen_key = "DEFAULT";

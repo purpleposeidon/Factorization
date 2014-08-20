@@ -91,6 +91,9 @@ public enum FactoryType {
         for (FactoryType ft : values()) {
             MAX_ID = Math.max(MAX_ID, ft.md);
         }
+        if (!FzConfig.enable_rocketry) {
+            ROCKETENGINE.disable();
+        }
     }
     
     final public int md;
