@@ -1,8 +1,6 @@
 package factorization.sockets.fanturpeller;
 
-import static org.lwjgl.opengl.GL11.GL_LIGHTING;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.*;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -21,7 +19,9 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.BlockFluidFinite;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
@@ -35,6 +35,7 @@ import factorization.api.FzOrientation;
 import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
+import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
 import factorization.servo.ServoMotor;
@@ -43,7 +44,51 @@ import factorization.shared.FzUtil;
 import factorization.shared.ObjectModel;
 import factorization.sockets.ISocketHolder;
 
-public class PumpLiquids extends BufferedFanturpeller {
+public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
+    protected static final int BUCKET = FluidContainerRegistry.BUCKET_VOLUME;
+    protected FluidTank buffer = new FluidTank(BUCKET);
+    protected boolean isDrainingTank = false;
+    protected boolean isFloodingTank = false;
+    private static FluidTankInfo[] no_info = new FluidTankInfo[0];
+    
+
+    @Override
+    public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+        if (from != facing.getOpposite()) return 0;
+        return buffer.fill(resource, doFill);
+    }
+
+    @Override
+    public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+        return null;
+    }
+
+    @Override
+    public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+        return null;
+    }
+
+    @Override
+    public boolean canFill(ForgeDirection from, Fluid fluid) {
+        return from == facing.getOpposite();
+    }
+
+    @Override
+    public boolean canDrain(ForgeDirection from, Fluid fluid) {
+        return false;
+    }
+
+    private FluidTankInfo[] tank_info = new FluidTankInfo[] { new FluidTankInfo(buffer) };
+    
+    @Override
+    public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+        if (from == facing.getOpposite()) return tank_info;
+        return no_info;
+    }
+    
+    
+    
+    
     private interface PumpAction {
         void suckIn();
         FluidStack drainBlock(PumpCoord probe, boolean doDrain);
@@ -208,7 +253,7 @@ public class PumpLiquids extends BufferedFanturpeller {
         @Override
         public void suckIn() {
             if (isSucking) return; //don't run backwards
-            if (buffer.getFluidAmount() > 0) return;
+            if (buffer.getFluidAmount() > 0 && !isDrainingTank) return;
             if (updateFrontier()) return;
             if (delay > 0) {
                 delay--;
@@ -225,6 +270,7 @@ public class PumpLiquids extends BufferedFanturpeller {
                 FluidStack resource = new FluidStack(targetFluid, buffer.getCapacity() - buffer.getFluidAmount());
                 FluidStack gotten = foundIfh.te.drain(foundIfh.dir, resource, true);
                 buffer.fill(gotten, true);
+                isDrainingTank = (buffer.getFluidAmount() % 1000) != 0;
                 return;
             }
             if (!pc.verifyConnection(this, worldObj)) {
@@ -317,9 +363,13 @@ public class PumpLiquids extends BufferedFanturpeller {
                     }
                     delay = 0;
                 }
+                isFloodingTank = (buffer.getFluidAmount() % 1000) != 0;
                 return;
             }
-            if (buffer.getFluidAmount() < BUCKET) return;
+            if (buffer.getFluidAmount() < BUCKET) {
+                if (isFloodingTank) updateFrontier();
+                return;
+            }
             FluidStack fs = buffer.getFluid();
             if (fs == null) return;
             Fluid fluid = fs.getFluid();
@@ -601,11 +651,19 @@ public class PumpLiquids extends BufferedFanturpeller {
     
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        IDataSerializable ret = super.serialize(prefix, data);
-        // Ugly. But I'm lazy.
-        // TODO: Pull the base class & this class back together
+        super.serialize(prefix, data);
+        if (data.isNBT()) { // Lame, but only just this once.
+            if (data.isReader()) {
+                buffer.readFromNBT(data.getTag());
+            } else {
+                buffer.writeToNBT(data.getTag());
+            }
+        }
+        isDrainingTank = data.as(Share.PRIVATE, "drainTank").putBoolean(isDrainingTank);
+        isFloodingTank = data.as(Share.PRIVATE, "floodTank").putBoolean(isFloodingTank);
+        
         target_speed = 2;
         isSucking = false;
-        return ret;
+        return this;
     }
 }
