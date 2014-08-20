@@ -328,6 +328,7 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
         for (int i = 0; i < stacks.size(); i++) {
             ItemStack is = stacks.get(i);
             processCollectedItem(is);
+            stacks.set(i, null);
         }
         return true;
     }
@@ -419,7 +420,6 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
                 grab_items = true;
                 grind_items = true;
                 if (barrel == null) {
-                    int i1 = md;
                     worldObj.playAuxSFX(2001, mop.blockX, mop.blockY, mop.blockZ, Block.getIdFromBlock(block) + md << 12);
                     
                     EntityPlayer player = getFakePlayer();
