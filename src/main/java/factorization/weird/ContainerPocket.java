@@ -27,7 +27,7 @@ public class ContainerPocket extends Container {
     IInventory craftResult = new InventoryCraftResult();
     final World world;
 
-    ArrayList<Slot> inventorySlots = new ArrayList();
+    ArrayList<Slot> nonCraftingInventorySlots = new ArrayList();
     ArrayList<Slot> craftingSlots = new ArrayList();
     ArrayList<Slot> mainInvThenHotbarSlots = new ArrayList();
     Slot craftResultSlot;
@@ -70,8 +70,8 @@ public class ContainerPocket extends Container {
                 }
             }
         }
-        inventorySlots.addAll(hotbarSlots);
-        inventorySlots.addAll(mainInvSlots);
+        nonCraftingInventorySlots.addAll(hotbarSlots);
+        nonCraftingInventorySlots.addAll(mainInvSlots);
         mainInvThenHotbarSlots.addAll(mainInvSlots);
         mainInvThenHotbarSlots.addAll(hotbarSlots);
     }
@@ -245,14 +245,14 @@ public class ContainerPocket extends Container {
     
     @Override
     public ItemStack transferStackInSlot(EntityPlayer player, int slotId) {
-        for (Slot slot : inventorySlots) {
+        for (Slot slot : nonCraftingInventorySlots) {
             if (slot.slotNumber == slotId) {
                 return FzUtil.transferSlotToSlots(player, slot, craftingSlots);
             }
         }
         for (Slot slot : craftingSlots) {
             if (slot.slotNumber == slotId) {
-                return FzUtil.transferSlotToSlots(player, slot, inventorySlots);
+                return FzUtil.transferSlotToSlots(player, slot, nonCraftingInventorySlots);
             }
         }
         if (craftResultSlot.slotNumber == slotId) {
@@ -263,7 +263,7 @@ public class ContainerPocket extends Container {
             }
             ItemStack held = null;
             for (int count = getCraftCount(res); count > 0; count--) {
-                held = FzUtil.tryTransferSlotToSlots(player, craftResultSlot, inventorySlots);
+                held = FzUtil.tryTransferSlotToSlots(player, craftResultSlot, nonCraftingInventorySlots);
                 if (held != null) {
                     break;
                 }
@@ -313,7 +313,7 @@ public class ContainerPocket extends Container {
     int getCraftCount(ItemStack res) {
         boolean hasEmpty = false;
         int space_to_fill = 0;
-        for (Slot slot : inventorySlots) {
+        for (Slot slot : nonCraftingInventorySlots) {
             ItemStack is = slot.getStack();
             if (is == null) {
                 hasEmpty = true;
