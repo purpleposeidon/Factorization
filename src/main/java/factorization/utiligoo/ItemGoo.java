@@ -29,6 +29,7 @@ import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.opengl.GL11;
@@ -145,7 +146,7 @@ public class ItemGoo extends ItemFactorization {
         // Normal punch: degoo 3x3x3 goo area
         // shift-punch: degoo punched block
         if (held != null && (held.getItem() instanceof ItemTool || !held.getItem().getToolClasses(held).isEmpty())) {
-            mineSelection(gooItem, data, player.worldObj, mop, player, held);
+            // mineSelection(gooItem, data, player.worldObj, mop, player, held);
         } else {
             int radius = player.isSneaking() ? 0 : 1;
             degooArea(player, data, gooItem, mop, radius);
@@ -286,12 +287,16 @@ public class ItemGoo extends ItemFactorization {
             to_remove.add(i + 2);
             
             ItemBlock ib = (ItemBlock) source.getItem();
+            int origSize = source.stackSize;
             ib.onItemUse(source, player, player.worldObj, at.x, at.y, at.z, mop.sideHit, (float) mop.hitVec.xCoord, (float) mop.hitVec.yCoord, (float) mop.hitVec.zCoord);
+            if (player.capabilities.isCreativeMode) {
+                source.stackSize = origSize; // Great work, guys.
+            }
             removed++;
         }
         if (removed <= 0) return;
         data.removeIndices(to_remove, is, world);
-        misplaceSomeGoo(is, world.rand, removed);
+        if (!player.capabilities.isCreativeMode) misplaceSomeGoo(is, world.rand, removed);
     }
     
     private boolean deselectCoord(ItemStack is, GooData data, World world, int x, int y, int z, boolean bulkAction) {
@@ -337,7 +342,7 @@ public class ItemGoo extends ItemFactorization {
         }
         if (removed == 0) return;
         data.removeIndices(toRemove, is, world);
-        misplaceSomeGoo(is, world.rand, removed);
+        if (!player.capabilities.isCreativeMode) misplaceSomeGoo(is, world.rand, removed);
     }
     
     private void misplaceSomeGoo(ItemStack is, Random rand, int removed) {
@@ -523,6 +528,33 @@ public class ItemGoo extends ItemFactorization {
         if (gooHilighted(player, mop)) {
             Command.gooLeftClick.call(player);
             event.setCanceled(true);
+        }
+    }
+    
+    
+    ThreadLocal<Boolean> processing = new ThreadLocal<Boolean>();
+    
+    @SubscribeEvent
+    public void mineGooeyBlocks(BreakEvent event) {
+        if (processing.get() != null) return;
+        EntityPlayer p = event.getPlayer();
+        if (!(p instanceof EntityPlayerMP)) return;
+        EntityPlayerMP player = (EntityPlayerMP) p;
+        ItemStack held = player.getHeldItem();
+        if (held == null) return;
+        for (int i = 0; i < 9; i++) {
+            ItemStack is = FzUtil.normalize(player.inventory.getStackInSlot(i));
+            if (is == null || is.getItem() != this) continue;
+            GooData data = GooData.getNullGooData(is, player.worldObj);
+            if (data == null) continue;
+            MovingObjectPosition mop = getMovingObjectPositionFromPlayer(player.worldObj, player, false);
+            processing.set(true);
+            try {
+                mineSelection(is, data, player.worldObj, mop, player, held);
+            } finally {
+                processing.remove();
+            }
+            break;
         }
     }
     
