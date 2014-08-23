@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -123,6 +124,31 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
             broadcastMessage(null, MessageType.TurbineSpeed, fan_speed);
         }
     }
+    
+    private static final double kp = 0.01;
+    private static final double ki = 2;
+    private static final double MAX_FAN_DSPEED = 6;
+    private static final double MAX_FAN_SPEED = 120;
+    private double error_sum = 0;
+    
+    double getFanDeltaSpeed() {
+        double error = getTargetFanSpeed() - fan_speed;
+        error_sum = clip(error_sum + error, -MAX_FAN_DSPEED, +MAX_FAN_DSPEED);
+        return clip(fan_speed + error * kp + error_sum * ki, 0, MAX_FAN_SPEED*1000) - fan_speed;
+    }
+    
+    double getTargetFanSpeed() {
+        FluidStack steam = steamTank.getFluid();
+        if (steam == null) return 0;
+        return steam.amount;
+        //return Math.min(MAX_FAN_SPEED*10, steam.amount);
+    }
+    
+    static double clip(double val, double min, double max) {
+        if (val < min) return min;
+        if (val > max) return max;
+        return val;
+    }
 
     @Override
     public void updateEntity() {
@@ -142,19 +168,14 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
         }
         long seed = getCoord().seed() + worldObj.getTotalWorldTime();
         if (seed % 5 == 0) {
-            if (fan_speed > steam.amount) {
-                fan_speed -= 10;
+            double dfan = getFanDeltaSpeed();
+            fan_speed += dfan;
+            steam.amount -= fan_speed;
+            if (steam.amount < 0) {
                 steam.amount = 0;
-            } else {
-                if (steam.amount == fan_speed) {
-                    steam.amount = 0;
-                } else if (steam.amount > fan_speed) {
-                    steam.amount -= fan_speed + 1;
-                    fan_speed++;
-                }
             }
         }
-        if (fan_speed < 0) {
+        if (fan_speed <= 0) {
             fan_speed = 0;
             return;
         }
