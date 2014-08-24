@@ -219,8 +219,11 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
     
     protected boolean isBlockPowered() {
-        return worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord);
-        //return worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0;
+        for (ForgeDirection fd : ForgeDirection.VALID_DIRECTIONS) {
+            if (fd == facing) continue;
+            if (worldObj.getIndirectPowerLevelTo(xCoord + fd.offsetX, yCoord + fd.offsetY, zCoord + fd.offsetZ, fd.ordinal()) > 0) return true;
+        }
+        return false;
     }
     
     @Override
