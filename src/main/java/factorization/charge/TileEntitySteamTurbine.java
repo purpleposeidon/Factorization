@@ -143,25 +143,21 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
         long seed = getCoord().seed() + worldObj.getTotalWorldTime();
         if (seed % 5 == 0) {
             if (fan_speed > steam.amount) {
-                fan_speed -= 10;
+                fan_speed = (int) Math.max(fan_speed * 0.8 - 1, 0);
                 steam.amount = 0;
             } else {
-                if (steam.amount == fan_speed) {
-                    steam.amount = 0;
-                } else if (steam.amount > fan_speed) {
-                    steam.amount -= fan_speed + 1;
-                    fan_speed++;
-                }
+                fan_speed += Math.log(steam.amount);
+                steam.amount -= fan_speed;
             }
         }
-        if (fan_speed < 0) {
+        if (fan_speed <= 0) {
             fan_speed = 0;
             return;
         }
         if (3*charge.getValue() > fan_speed) {
             return;
         }
-        charge.addValue(fan_speed);
+        charge.setValue(fan_speed);
     }
     
     @Override
