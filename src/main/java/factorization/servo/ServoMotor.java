@@ -78,7 +78,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
     public void spawnServoMotor() {
         motionHandler.beforeSpawn();
         worldObj.spawnEntityInWorld(this);
-        cloningDebug(this, "User created a new servo");
     }
 
     public void syncWithSpawnPacket() {
@@ -98,15 +97,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Entity ent = worldObj.getEntityByID(getEntityId());
-        if (ent == null) {
-            cloningDebug(this, "Loading from NBT. There is no other entity with my ID.");
-        } else if (ent == this) {
-            cloningDebug(this, "Loading from NBT. I am already loaded????");
-        } else if (ent != this) {
-            cloningDebug(this, "Loading from NBT. *** ENTITY ID CONFLICT ***! Beep beep beep!");
-            cloningDebug(ent, "THE CONFLICTING ENTITY");
-        }
     }
     
     @Override
@@ -116,7 +106,6 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         } catch (IOException e) {
             e.printStackTrace();
         }
-        cloningDebug(this, "Writing to NBT");
     }
 
     @Override
@@ -741,9 +730,5 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         buff[0] = msgType;
         FMLProxyPacket toSend = Core.network.entityPacket(this, MessageType.TileEntityMessageOnEntity, buff);
         Core.network.broadcastPacket(null, getCurrentPos(), toSend); 
-    }
-    
-    static void cloningDebug(Entity me, String action) {
-        Core.logSevere("[SPAWNLOG] %s   servo #%s %s in chunk (%s,%s) y=%s ", action, me.getEntityId(), me.getUniqueID(), (int) (me.posX % 16), (int) (me.posZ % 16), (int) me.posY);
     }
 }
