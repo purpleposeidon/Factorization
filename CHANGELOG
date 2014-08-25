@@ -1,5 +1,32 @@
-0.8.88
+0.8.87.3
+  Enormous Scissors, by SoundLogic!
+  ... with help from neptune
+    A socket part!
+    Cut things!
+    Leaves and grass and stuff get sheared!
+    Mobs get cut! And the scissors occasionally give you an extra cut of loot!
+    Any and all bugs are SoundLogic's fault!
+  Construction Goo
+    Oh man! It's totally awesome!
+    No method of obtaining yet!
+    Goo can be applied to a block.
+    Gooing up a gooy block will spread the gooey goodness.
+    Punch a gooey block to remove the goo and the adjacent goo
+    Shift-punch a gooey block to remove a one goo
+    Right-click gooey block with a block to replace the gooey blocks.
+    Mine the gooey block with an appropriate tool to break the gooey blocks.
+    Shift-right-click with some goo to adjust the gooey selection
+    Mining & replacing goo will occasionally cause goo loss.
+  Socket parts ignore redstone signal from the facing direction
+  Sculpting tool is now with 50% less NPE.
+  The time will be printed every 30 minutes if you're in full screen.
+  /f rng will spit out a random collection of random things
+  Improved the placement of giant mushroom blocks.
+    
+
+0.8.87.2
   Temporary wrath^wMagical lamp recipe
+  
 
 0.8.87
   Czech localizations by golyalpha!

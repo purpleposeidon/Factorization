@@ -91,6 +91,9 @@ public class MiscellaneousNonsense {
         if (FzConfig.embarken_wood) {
             Core.loadBus(new Embarkener());
         }
+        if (FzConfig.mushroomalize) {
+            Core.loadBus(new Mushroomalizer());
+        }
         if (FzConfig.proper_projectile_physics) {
             Core.loadBus(new ProperProjectilePhysics());
         }
