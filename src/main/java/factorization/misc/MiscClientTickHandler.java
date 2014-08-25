@@ -1,6 +1,9 @@
 package factorization.misc;
 
+import java.text.DateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
@@ -11,8 +14,10 @@ import net.minecraft.client.gui.GuiOptions;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -32,6 +37,7 @@ public class MiscClientTickHandler {
         checkPickBlockKey();
         checkSprintKey();
         MiscClientCommands.tick();
+        notifyTimeOnFullScreen();
     }
     
     int count = 0;
@@ -151,5 +157,29 @@ public class MiscClientTickHandler {
             mc.thePlayer.setSprinting(false);
         }
         prevState = state;
+    }
+    
+    long old_now = -1;
+    long interval = 30;
+    long getNow() {
+        World world = Minecraft.getMinecraft().theWorld;
+        if (world == null) return -1;
+        Calendar cal = world.getCurrentDate();
+        return cal.get(Calendar.MINUTE) / interval;
+    }
+    
+    String last_msg = null;
+    
+    public void notifyTimeOnFullScreen() {
+        if (interval <= 0) return;
+        long now = getNow();
+        if (now == old_now || now == -1) return;
+        old_now = now;
+        Minecraft mc = Minecraft.getMinecraft();
+        if (!mc.isFullScreen()) return;
+        DateFormat df = DateFormat.getDateTimeInstance();
+        String msg = df.format(new Date());
+        mc.ingameGUI.getChatGUI().printChatMessageWithOptionalDeletion(new ChatComponentText(msg), 20392);
+        last_msg = msg;
     }
 }
