@@ -295,6 +295,11 @@ public class BlockFactorization extends BlockContainer {
             //These checks are for buildcraft, which is hatin'.
             itemList.add(new ItemStack(reg.battery, 1, 2));
         }
+        itemList.add(reg.leydenjar_item);
+        if (reg.leydenjar_item_full != null) {
+            itemList.add(reg.leydenjar_item_full);
+        }
+        itemList.add(FactoryType.CREATIVE_CHARGE.itemStack());
         itemList.add(reg.caliometric_burner_item);
         itemList.add(reg.solarboiler_item);
         itemList.add(reg.steamturbine_item);
@@ -306,10 +311,6 @@ public class BlockFactorization extends BlockContainer {
         itemList.add(reg.leadwire_item);
         itemList.add(reg.mixer_item);
         itemList.add(reg.crystallizer_item);
-        itemList.add(reg.leydenjar_item);
-        if (reg.leydenjar_item_full != null) {
-            itemList.add(reg.leydenjar_item_full);
-        }
 
         itemList.add(reg.greenware_item);
         

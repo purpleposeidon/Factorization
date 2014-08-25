@@ -4,6 +4,7 @@ import net.minecraft.item.ItemStack;
 import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.astro.TileEntityRocketEngine;
 import factorization.ceramics.TileEntityGreenware;
+import factorization.charge.InfiniteChargeBlock;
 import factorization.charge.TileEntityBattery;
 import factorization.charge.TileEntityCaliometricBurner;
 import factorization.charge.TileEntityHeater;
@@ -81,6 +82,7 @@ public enum FactoryType {
     //40 -- Was the short-lived SOCKET_MIXER
     SOCKET_BARE_MOTOR(41, false, SocketBareMotor.class, "fzsock_motor"),
     SOCKET_SCISSORS(42, false, SocketScissors.class, "fzsock_scissors"),
+    CREATIVE_CHARGE(43, false, InfiniteChargeBlock.class, "factory_creative_charge"),
     
 
     POCKETCRAFTGUI(101, true)

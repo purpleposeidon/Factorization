@@ -225,7 +225,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 FactoryType.SLAGFURNACE,
                 FactoryType.SOLARBOILER,
                 FactoryType.PARASIEVE,
-                FactoryType.CALIOMETRIC_BURNER
+                FactoryType.CALIOMETRIC_BURNER,
+                FactoryType.CREATIVE_CHARGE
                 }) {
             FactorizationBlockRender.setDefaultRender(ft);
         }
