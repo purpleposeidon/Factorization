@@ -221,7 +221,7 @@ public class ItemSculptingTool extends ItemFactorization {
             if (w.isRemote) {
                 return false;
             }
-            Notice msg = new Notice(gw.getCoord(), null);
+            Notice msg = new Notice(gw.getCoord(), "");
             switch (state) {
             case DRY:
                 msg.withItem(new ItemStack(Items.water_bucket)).setMessage("The clay is dry\nUse a {ITEM_NAME}");
@@ -240,7 +240,6 @@ public class ItemSculptingTool extends ItemFactorization {
         if (w.isRemote) {
             return true;
         }
-        BlockRenderHelper hit = Core.registry.serverTraceHelper;
         
         //See EntityLiving.rayTrace
         MovingObjectPosition hitPart = getMovingObjectPositionFromPlayer(w, player, true);
