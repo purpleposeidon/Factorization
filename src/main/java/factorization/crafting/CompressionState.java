@@ -290,7 +290,7 @@ public class CompressionState {
                     return;
                 }
                 ItemStack b = barrel.item.copy();
-                b.stackSize = Math.min(MAX_CRAFT, barrel.getItemCount());
+                b.stackSize = Math.min(MAX_CRAFT, barrel.getItemCountSticky());
                 b.stackSize = Math.min(b.stackSize, b.getMaxStackSize());
                 items[BARREL] = b;
                 airBlock = false;

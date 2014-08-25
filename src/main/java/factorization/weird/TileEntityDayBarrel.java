@@ -263,6 +263,15 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         return ret;
     }
     
+    public int getItemCountSticky() {
+        int count = getItemCount();
+        if (type == Type.STICKY) {
+            count--;
+            return Math.max(0, count);
+        }
+        return count;
+    }
+    
     public int getMaxSize() {
         int size = 64*64;
         if (item != null) {
