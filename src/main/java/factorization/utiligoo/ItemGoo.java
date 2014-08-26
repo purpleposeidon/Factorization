@@ -58,6 +58,7 @@ public class ItemGoo extends ItemFactorization {
     public ItemGoo(String name, TabType tabType) {
         super(name, tabType);
         setMaxStackSize(32);
+        setHasSubtypes(true);
         Core.loadBus(this);
     }
     
