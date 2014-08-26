@@ -19,5 +19,5 @@ public class ItemIcons {
     
     public static IIcon barrel_font;
     
-    public static IIcon utiligoo$empty, utiligoo$low, utiligoo$medium, utiligoo$high;
+    public static IIcon utiligoo$low, utiligoo$medium, utiligoo$high;
 }

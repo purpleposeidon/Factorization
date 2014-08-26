@@ -13,6 +13,9 @@ import net.minecraft.world.WorldSavedData;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import factorization.api.Coord;
+import factorization.notify.Notice;
+
 public class GooData extends WorldSavedData {
     public GooData(String dataName) {
         super(dataName);
@@ -113,5 +116,14 @@ public class GooData extends WorldSavedData {
         } else {
             markDirty();
         }
+    }
+    
+    boolean checkWorld(EntityPlayer player, Coord complainAt) {
+        if (coords.length == 0) return false;
+        if (dimensionId == player.worldObj.provider.dimensionId) return false;
+        if (complainAt != null) {
+            new Notice(complainAt, "item.factorization:utiligoo.wrongDimension").send(player);
+        }
+        return true;
     }
 }

@@ -11,9 +11,11 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSound;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,6 +30,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.event.sound.SoundEvent;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 
@@ -67,9 +70,10 @@ public class ItemGoo extends ItemFactorization {
         if (world.isRemote) {
             return false;
         }
+        GooData data = GooData.getGooData(is, world);
+        if (data.checkWorld(player, new Coord(world, x, y, z))) return false;
         if (player.isSneaking()) {
             ForgeDirection fd = ForgeDirection.getOrientation(side);
-            GooData data = GooData.getGooData(is, world);
             for (int i = 0; i < data.coords.length; i += 3) {
                 data.coords[i + 0] = data.coords[i + 0] + fd.offsetX;
                 data.coords[i + 1] = data.coords[i + 1] + fd.offsetY;
@@ -79,7 +83,6 @@ public class ItemGoo extends ItemFactorization {
             return false;
         }
         if (is.stackSize <= 1) return false;
-        GooData data = GooData.getGooData(is, world);
         for (int i = 0; i < data.coords.length; i += 3) {
             int ix = data.coords[i + 0];
             int iy = data.coords[i + 1];
@@ -109,6 +112,7 @@ public class ItemGoo extends ItemFactorization {
             ItemStack is = player.inventory.getStackInSlot(slot);
             if (is == null || is.getItem() != this) continue;
             GooData data = GooData.getGooData(is, player.worldObj);
+            if (data.checkWorld(player, null)) continue;
             for (int i = 0; i < data.coords.length; i += 3) {
                 int ix = data.coords[i + 0];
                 int iy = data.coords[i + 1];
@@ -379,7 +383,6 @@ public class ItemGoo extends ItemFactorization {
     @Override
     public IIcon getIconIndex(ItemStack is) {
         int size = is.stackSize;
-        if (size <= 1) return ItemIcons.utiligoo$empty;
         int third = is.getMaxStackSize() / 3;
         int fullness = size / third;
         if (fullness <= 1) return ItemIcons.utiligoo$low;
@@ -476,13 +479,16 @@ public class ItemGoo extends ItemFactorization {
     @Override
     protected void addExtraInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
         super.addExtraInformation(is, player, list, verbose);
-        if (verbose) {
-            list.add("Goo Index: " + is.getItemDamage());
-            GooData data = GooData.getNullGooData(is, player.worldObj);
-            if (data == null) {
-                list.add("Not loaded...");
-            } else {
-                list.add((data.coords.length / 3) + " points");
+        GooData data = GooData.getNullGooData(is, player.worldObj);
+        if (data != null) {
+            list.add(I18n.format("item.factorization:utiligoo.placed", data.coords.length / 3));
+            if (player != null && player.worldObj != null) {
+                if (data.dimensionId != player.worldObj.provider.dimensionId) {
+                    list.add(I18n.format("item.factorization:utiligoo.wrongDimension"));
+                }
+            }
+            if (Core.dev_environ) {
+                list.add("#" + is.getItemDamage());
             }
         }
     }
@@ -558,5 +564,4 @@ public class ItemGoo extends ItemFactorization {
             break;
         }
     }
-    
 }
