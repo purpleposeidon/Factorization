@@ -223,14 +223,14 @@ public class BlockFactorization extends BlockContainer {
     }
     
     @Override
-    public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest) {
+    public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z) {
         Coord here = new Coord(world, x, y, z);
         TileEntityCommon tec = here.getTE(TileEntityCommon.class);
         if (tec == null) {
             if (!world.isRemote) {
                 new Notice(here, "No TileEntity!").send(player);
             }
-            return super.removedByPlayer(world, player, x, y, z, willHarvest);
+            return super.removedByPlayer(world, player, x, y, z); // That is a *LIE*, this function is *NOT* deprecated as of Aug 26 2014.
         }
         return tec.removedByPlayer(player);
     }
