@@ -14,10 +14,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -553,6 +555,28 @@ public class MiscClientCommands implements ICommand {
                 chunk.addEntity(ent);
             }
             return "Fixed " + failed + " entities";
+        }
+        
+        public static void showEntityUUIDs() {
+            World world = mc.theWorld;
+            for (Entity ent : (Iterable<Entity>) world.loadedEntityList) {
+                new Notice(ent, ent.getUniqueID().toString()).send(mc.thePlayer);
+            }
+        }
+        
+        @help("Show how many entities have the same UUID")
+        public static String countDupeEntities() {
+            int n = 0;
+            int total = 0;
+            HashSet<UUID> found = new HashSet();
+            World world = mc.theWorld;
+            for (Entity ent : (Iterable<Entity>) world.loadedEntityList) {
+                if (!found.add(ent.getUniqueID())) {
+                    n++;
+                }
+                total++;
+            }
+            return "" + n + " dupes out of " + total;
         }
         
         /*
