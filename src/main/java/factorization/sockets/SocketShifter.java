@@ -360,6 +360,11 @@ public class SocketShifter extends TileEntitySocketBase {
     }
     
     @Override
+    protected boolean isBlockPowered() {
+        return worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0;
+    }
+    
+    @Override
     @SideOnly(Side.CLIENT)
     public void renderStatic(ServoMotor motor, Tessellator tess) {
         BlockRenderHelper block = BlockRenderHelper.instance;

@@ -57,6 +57,7 @@ public class FzConfig {
     public static boolean players_discover_docbooks = true;
     public static boolean disable_endermen_griefing = false;
     public static boolean enable_rocketry = /* Hey! If you're turning this on, remove stuff from factorization_dead_items */ enable_dimension_slice && Core.dev_environ;
+    public static boolean sockets_ignore_front_redstone = true;
     
     public static boolean enable_retrogen = false;
     public static String retrogen_key = "DEFAULT";
@@ -170,6 +171,7 @@ public class FzConfig {
         //Broken. Doesn't work.
         enable_solar_steam = getBoolConfig("enableSolarSteam", "server", enable_solar_steam, "Set to false to disable the crafting recipe for solar2steam machines");
         fanturpeller_works_on_players = getBoolConfig("fanturpellerWorksOnPlayers", "server", fanturpeller_works_on_players, "If set to false, fanturpellers will not move players.");
+        sockets_ignore_front_redstone = getBoolConfig("socketsIgnoreFacePower", "server", sockets_ignore_front_redstone, "Set to false to let socket blocks detect redstone from their front; provided for legacy worlds.");
         config.save();
     }
 }

@@ -1,4 +1,8 @@
 0.8.87.3
+  Important note:
+    Socket blocks ignore redstone signal from the facing direction
+    This breaks some builds; there's a config option for it
+    ...except for the item shifter. It still takes redstone signals from the front.
   Enormous Scissors, by SoundLogic!
   ... with help from neptune
     A socket part!
@@ -6,7 +10,7 @@
     Leaves and grass and stuff get sheared!
     Mobs get cut! And the scissors occasionally give you an extra cut of loot!
     Any and all bugs are SoundLogic's fault!
-  Construction Goo
+  Goo
     Oh man! It's totally awesome!
     No method of obtaining yet!
     Goo can be applied to a block.
@@ -17,11 +21,11 @@
     Mine the gooey block with an appropriate tool to break the gooey blocks.
     Shift-right-click with some goo to adjust the gooey selection
     Mining & replacing goo will occasionally cause goo loss.
-  Socket parts ignore redstone signal from the facing direction
   Sculpting tool is now with 50% less NPE.
   The time will be printed every 30 minutes if you're in full screen.
   /f rng will spit out a random collection of random things
   Improved the placement of giant mushroom blocks.
+  Added creative charge battery
     
 
 0.8.87.2

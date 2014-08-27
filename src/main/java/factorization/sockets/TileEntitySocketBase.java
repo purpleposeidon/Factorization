@@ -1,6 +1,6 @@
 package factorization.sockets;
 
-import static org.lwjgl.opengl.GL11.GL_LIGHTING;
+import static org.lwjgl.opengl.GL11.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
@@ -37,6 +37,7 @@ import factorization.api.datahelpers.DataOutPacket;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
+import factorization.common.FzConfig;
 import factorization.notify.Notice;
 import factorization.servo.LoggerDataHelper;
 import factorization.servo.RenderServoMotor;
@@ -219,11 +220,15 @@ public abstract class TileEntitySocketBase extends TileEntityCommon implements I
     }
     
     protected boolean isBlockPowered() {
-        for (ForgeDirection fd : ForgeDirection.VALID_DIRECTIONS) {
-            if (fd == facing) continue;
-            if (worldObj.getIndirectPowerLevelTo(xCoord + fd.offsetX, yCoord + fd.offsetY, zCoord + fd.offsetZ, fd.ordinal()) > 0) return true;
+        if (FzConfig.sockets_ignore_front_redstone) {
+            for (ForgeDirection fd : ForgeDirection.VALID_DIRECTIONS) {
+                if (fd == facing) continue;
+                if (worldObj.getIndirectPowerLevelTo(xCoord + fd.offsetX, yCoord + fd.offsetY, zCoord + fd.offsetZ, fd.ordinal()) > 0) return true;
+            }
+            return false;
+        } else {
+            return worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0;
         }
-        return false;
     }
     
     @Override
