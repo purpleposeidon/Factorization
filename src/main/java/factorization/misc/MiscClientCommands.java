@@ -26,10 +26,13 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import cpw.mods.fml.client.GuiModList;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -535,6 +538,21 @@ public class MiscClientCommands implements ICommand {
 
         private static String pick(Random rng, String... args) {
             return args[rng.nextInt(args.length)];
+        }
+        
+        @help("Temp-fix for the entity interaction bug")
+        public static String mc2713() {
+            int failed = 0;
+            World world = mc.theWorld;
+            nextEntity: for (Entity ent : (Iterable<Entity>) world.loadedEntityList) {
+                Chunk chunk = world.getChunkFromChunkCoords(ent.chunkCoordX, ent.chunkCoordZ);
+                for (Entity e : (Iterable<Entity>) chunk.entityLists[ent.chunkCoordY]) {
+                    if (e == ent) continue nextEntity;
+                }
+                failed++;
+                chunk.addEntity(ent);
+            }
+            return "Fixed " + failed + " entities";
         }
         
         /*
