@@ -236,7 +236,9 @@ public class RenderMessages extends RenderMessagesProxy {
                 
                 GL11.glTranslatef((float) (halfWidth + 4), -lineCount/2, 0);
                 renderItem.zLevel -= 50;
+                GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
                 renderItem.renderItemAndEffectIntoGUI(fr, re, m.item, 0, 0);
+                GL11.glPopAttrib();
                 renderItem.zLevel += 50;
             }
         }
