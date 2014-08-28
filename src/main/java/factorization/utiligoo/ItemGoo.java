@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockSlab;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.PositionedSound;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
@@ -30,7 +30,6 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.client.event.sound.SoundEvent;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 
@@ -188,7 +187,8 @@ public class ItemGoo extends ItemFactorization {
             int iz = data.coords[i + 2];
             if (check(dir.offsetX, ix, x) && check(dir.offsetY, iy, y) && check(dir.offsetZ, iz, z)) {
                 Coord at = new Coord(world, ix, iy, iz);
-                if (at.add(dir).isSolid()) continue;
+                Coord adj = at.add(dir);
+                if (adj.isSolid() || adj.isSolidOnSide(dir.getOpposite())) continue;
                 Block atBlock = at.getBlock();
                 ItemStack atDrop = at.getBrokenBlock();
                 for (ForgeDirection fd : ForgeDirection.VALID_DIRECTIONS) {
@@ -196,6 +196,11 @@ public class ItemGoo extends ItemFactorization {
                     Coord n = at.add(fd);
                     Block nBlock = n.getBlock();
                     if (atBlock == nBlock && (atDrop == null || FzUtil.couldMerge(atDrop, n.getBrokenBlock())) && !n.add(dir).isSolid()) {
+                        Coord nadj = n.add(dir);
+                        if (nadj.isSolidOnSide(dir.getOpposite())) continue;
+                        if (nadj.getBlock() instanceof BlockSlab && (nadj.getMd() & 8) == 0) {
+                            continue;
+                        }
                         found.add(n);
                     }
                 }
@@ -550,19 +555,26 @@ public class ItemGoo extends ItemFactorization {
         EntityPlayerMP player = (EntityPlayerMP) p;
         ItemStack held = player.getHeldItem();
         if (held == null) return;
-        for (int i = 0; i < 9; i++) {
-            ItemStack is = FzUtil.normalize(player.inventory.getStackInSlot(i));
+        for (int slot = 0; slot < 9; slot++) {
+            ItemStack is = FzUtil.normalize(player.inventory.getStackInSlot(slot));
             if (is == null || is.getItem() != this) continue;
             GooData data = GooData.getNullGooData(is, player.worldObj);
             if (data == null) continue;
             MovingObjectPosition mop = getMovingObjectPositionFromPlayer(player.worldObj, player, false);
-            processing.set(true);
-            try {
-                mineSelection(is, data, player.worldObj, mop, player, held);
-            } finally {
-                processing.remove();
+            for (int i = 0; i < data.coords.length; i += 3) {
+                int ix = data.coords[i + 0];
+                int iy = data.coords[i + 1];
+                int iz = data.coords[i + 2];
+                if (ix == mop.blockX && iy == mop.blockY && iz == mop.blockZ) {
+                    processing.set(true);
+                    try {
+                        mineSelection(is, data, player.worldObj, mop, player, held);
+                    } finally {
+                        processing.remove();
+                    }
+                    return;
+                }
             }
-            break;
         }
     }
 }
