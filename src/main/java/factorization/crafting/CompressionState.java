@@ -114,7 +114,6 @@ public class CompressionState {
         
         FzInv[] inv = cc.getAdjacentInventories();
         if (inv[0] == null) {
-            error(cc, "Need output inventory\n(Like a chest)");
             return false;
         }
         
