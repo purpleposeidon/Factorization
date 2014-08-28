@@ -579,6 +579,12 @@ public class MiscClientCommands implements ICommand {
             return "" + n + " dupes out of " + total;
         }
         
+        @help("Turns your cape on or off")
+        public static void cape() {
+            mc.gameSettings.showCape ^= true;
+            mc.gameSettings.sendSettingsToServer();
+        }
+        
         /*
         @help("Change the FOV")
         public static String fov() {
