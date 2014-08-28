@@ -1027,6 +1027,11 @@ public class Registry {
                 'H', Blocks.hay_block,
                 'n', Items.nether_wart,
                 'X', Items.bone);
+        recipe(new ItemStack(utiligoo, 32), // NORELEASE: Temporary recipe!
+                "RD>",
+                'R', Blocks.red_mushroom,
+                'D', Items.diamond,
+                '>', logicMatrixProgrammer);
     }
     
     private void makeServoRecipes() {
