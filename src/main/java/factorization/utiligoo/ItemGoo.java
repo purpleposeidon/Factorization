@@ -93,6 +93,7 @@ public class ItemGoo extends ItemFactorization {
             }
         }
         data.coords = ArrayUtils.addAll(data.coords, x, y, z);
+        data.dimensionId = world.provider.dimensionId;
         data.markDirty();
         is.stackSize--;
         return true;
