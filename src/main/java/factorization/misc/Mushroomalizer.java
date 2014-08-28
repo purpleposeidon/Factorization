@@ -17,7 +17,7 @@ import factorization.shared.FzUtil;
 
 public class Mushroomalizer {
     Item red_mushroom = new ItemStack(Blocks.red_mushroom_block).getItem();
-    Item brown_mushroom = new ItemStack(Blocks.red_mushroom_block).getItem();
+    Item brown_mushroom = new ItemStack(Blocks.brown_mushroom_block).getItem();
     
     ArrayList<PlayerInteractEvent> shroomQueue = new ArrayList();
     
@@ -60,7 +60,12 @@ public class Mushroomalizer {
             int md = 14;
             // Alone & Surounded
             if (flag == 0) md = 14;
-            if (flag == 15) md = 0;
+            if (flag == 15) {
+                md = 0;
+                if (at.add(ForgeDirection.UP).getBlock() != shroom) {
+                    md = 9;
+                }
+            }
             
             // Edges
             if (flag == 13) md = 8;
