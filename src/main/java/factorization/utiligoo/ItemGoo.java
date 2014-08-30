@@ -68,6 +68,7 @@ public class ItemGoo extends ItemFactorization {
     }
     
     @Override
+    @SideOnly(Side.CLIENT)
     public void registerIcons(IIconRegister reg) { }
     
     @Override
