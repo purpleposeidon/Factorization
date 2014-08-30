@@ -18,6 +18,10 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.shader.ShaderLinkHelper;
+import net.minecraft.client.shader.ShaderLoader;
+import net.minecraft.client.shader.ShaderManager;
+import net.minecraft.client.util.JsonException;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -416,20 +420,56 @@ public class ItemGoo extends ItemFactorization {
         return getIconIndex(is);
     }
     
+    Minecraft mc = Minecraft.getMinecraft();
+    ShaderManager sobel = null;
+    boolean loaded = false;
     
+    javax.vecmath.Matrix4f projectionMatrix;
     
-    private static boolean useShaders() {
-        return false;
+    void resetProjectionMatrix() {
+        projectionMatrix = new javax.vecmath.Matrix4f();
+        projectionMatrix.setIdentity();
+        projectionMatrix.m00 = 2.0F / (float)mc.displayWidth;
+        projectionMatrix.m11 = 2.0F / (float)(-mc.displayHeight);
+        projectionMatrix.m22 = -0.0020001999F;
+        projectionMatrix.m33 = 1.0F;
+        projectionMatrix.m03 = -1.0F;
+        projectionMatrix.m13 = 1.0F;
+        projectionMatrix.m23 = -1.0001999F;
+    }
+
+    
+    private boolean useShaders() {
+        if (loaded) return sobel != null;
+        loaded = true;
+        try {
+            sobel = new ShaderManager(mc.getResourceManager(), "invert");
+            sobel.func_147992_a("DiffuseSampler", mc.getFramebuffer());
+        } catch (IOException e) {
+            e.printStackTrace();
+            sobel = null;
+            return false;
+        }
+        return true;
     }
     
     
-    private static void beginGlWithShaders() {
+    private void beginGlWithShaders() {
+        resetProjectionMatrix();
+        int width = mc.getFramebuffer().framebufferWidth;
+        int height = mc.getFramebuffer().framebufferHeight;
+        sobel.func_147984_b("ProjMat").setProjectionMatrix(projectionMatrix);
+        //sobel.func_147984_b("InSize").func_148087_a((float)width, (float)height);
+        sobel.func_147984_b("OutSize").func_148087_a(width, height);
+        sobel.func_147984_b("Time").func_148090_a(0);
+        sobel.func_147995_c();
     }
     
-    private static void endGlWithShaders() {
+    private void endGlWithShaders() {
+        sobel.func_147993_b();
     }
     
-    private static void beginGlNoShaders() {
+    private void beginGlNoShaders() {
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
         
         GL11.glEnable(GL11.GL_BLEND);
@@ -441,7 +481,7 @@ public class ItemGoo extends ItemFactorization {
         GL11.glPolygonOffset(-3.0F, -3F);
     }
     
-    private static void endGlNoShaders() {
+    private void endGlNoShaders() {
         GL11.glPolygonOffset(0.0F, 0.0F);
         GL11.glPopAttrib();
     }
