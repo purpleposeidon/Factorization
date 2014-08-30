@@ -2,7 +2,6 @@ package factorization.utiligoo;
 
 import java.io.DataInput;
 import java.io.IOException;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -19,10 +18,6 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.shader.Framebuffer;
-import net.minecraft.client.shader.Shader;
-import net.minecraft.client.shader.ShaderLinkHelper;
-import net.minecraft.client.util.JsonException;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -35,15 +30,12 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -424,128 +416,17 @@ public class ItemGoo extends ItemFactorization {
         return getIconIndex(is);
     }
     
-    //private static boolean use_sobel_shader = false;
-    private static boolean tried_to_load = false;
     
-    
-    @SubscribeEvent
-    public void resourcepackChanged(TextureStitchEvent.Post event) {
-        tried_to_load = false;
-        if (sobel != null) {
-            mc.checkGLError("before resource pack change");
-            sobel.deleteShader();
-            mc.checkGLError("delete sobel");
-            sobel = null;
-        }
-    }
-    
-    private static Framebuffer infection_render_buffer = null;
     
     private static boolean useShaders() {
-        if (tried_to_load) {
-            return sobel != null;
-        }
-        sobel = null;
-        tried_to_load = true;
-        if (!OpenGlHelper.shadersSupported) {
-            return false;
-        }
-        if (ShaderLinkHelper.getStaticShaderLinkHelper() == null) {
-            ShaderLinkHelper.setNewStaticShaderLinkHelper();
-        }
-        ResourceLocation sobel_location = new ResourceLocation("minecraft:shaders/post/notch.json");
-        infection_render_buffer = new Framebuffer(mc.displayWidth, mc.displayHeight, true);
-        try {
-            mc.checkGLError("useShaders1");
-            Framebuffer mcBuff = mc.getFramebuffer();
-            sobel = new Shader(mc.getResourceManager(), "sobel", infection_render_buffer, infection_render_buffer);
-            resetProjectionMatrix();
-            sobel.setProjectionMatrix(projectionMatrix);
-            mc.checkGLError("useShaders2");
-        } catch (JsonException e) {
-            e.printStackTrace();
-        }
-        return sobel != null;
+        return false;
     }
     
-    
-    private static Minecraft mc = Minecraft.getMinecraft();
-    private static Shader sobel = null;
-    private static int old_width = -1;
-    private static int old_height = -1;
-    private static IntBuffer previous_shader = BufferUtils.createIntBuffer(16);
-    
-    private static javax.vecmath.Matrix4f projectionMatrix;
-    
-    private static void resetProjectionMatrix() {
-        projectionMatrix = new javax.vecmath.Matrix4f();
-        projectionMatrix.setIdentity();
-        projectionMatrix.m00 = 2.0F / (float)mc.displayWidth;
-        projectionMatrix.m11 = 2.0F / (float)(-mc.displayHeight);
-        projectionMatrix.m22 = -0.0020001999F;
-        projectionMatrix.m33 = 1.0F;
-        projectionMatrix.m03 = -1.0F;
-        projectionMatrix.m13 = 1.0F;
-        projectionMatrix.m23 = -1.0001999F;
-    }
-
     
     private static void beginGlWithShaders() {
-        //GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
-        Minecraft mc = Minecraft.getMinecraft();
-        if (old_width != mc.displayWidth || old_height != mc.displayHeight) {
-            old_width = mc.displayWidth;
-            old_height = mc.displayHeight;
-            infection_render_buffer.createBindFramebuffer(old_width, old_height);
-            resetProjectionMatrix();
-            sobel.setProjectionMatrix(projectionMatrix);
-        }
-        infection_render_buffer.framebufferClear();
-        infection_render_buffer.bindFramebuffer(false);
-        //sobel.loadShader(0);
     }
     
     private static void endGlWithShaders() {
-        infection_render_buffer.unbindFramebuffer();
-        mc.getFramebuffer().bindFramebuffer(true);
-        GL11.glPushMatrix();
-        if (OpenGlHelper.isFramebufferEnabled()) {
-            // It was originally the following, but this has disabled depth & alpha tests
-            //infection_render_buffer.framebufferRender(old_width, old_height);
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
-            GL11.glDepthMask(false);
-            GL11.glMatrixMode(GL11.GL_PROJECTION);
-            GL11.glLoadIdentity();
-            GL11.glOrtho(0.0D, (double)old_width, (double)old_height, 0.0D, 1000.0D, 3000.0D);
-            GL11.glMatrixMode(GL11.GL_MODELVIEW);
-            GL11.glLoadIdentity();
-            GL11.glTranslatef(0.0F, 0.0F, -2000.0F);
-            GL11.glViewport(0, 0, old_width, old_height);
-            GL11.glEnable(GL11.GL_TEXTURE_2D);
-            GL11.glDisable(GL11.GL_LIGHTING);
-            //GL11.glDisable(GL11.GL_ALPHA_TEST);
-            GL11.glDisable(GL11.GL_BLEND);
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-            GL11.glEnable(GL11.GL_COLOR_MATERIAL);
-            infection_render_buffer.bindFramebufferTexture();
-            float f = (float)old_width;
-            float f1 = (float)old_height;
-            float f2 = (float)infection_render_buffer.framebufferWidth / (float)infection_render_buffer.framebufferTextureWidth;
-            float f3 = (float)infection_render_buffer.framebufferHeight / (float)infection_render_buffer.framebufferTextureHeight;
-            Tessellator tessellator = Tessellator.instance;
-            tessellator.startDrawingQuads();
-            tessellator.setColorOpaque_I(-1);
-            tessellator.addVertexWithUV(0.0D, (double)f1, 0.0D, 0.0D, 0.0D);
-            tessellator.addVertexWithUV((double)f, (double)f1, 0.0D, (double)f2, 0.0D);
-            tessellator.addVertexWithUV((double)f, 0.0D, 0.0D, (double)f2, (double)f3);
-            tessellator.addVertexWithUV(0.0D, 0.0D, 0.0D, 0.0D, (double)f3);
-            tessellator.draw();
-            infection_render_buffer.unbindFramebufferTexture();
-            GL11.glDepthMask(true);
-            GL11.glColorMask(true, true, true, true);
-        }
-        GL11.glPopMatrix();
-        //GL11.glPopAttrib();
     }
     
     private static void beginGlNoShaders() {
@@ -625,8 +506,9 @@ public class ItemGoo extends ItemFactorization {
             }
             Block b = player.worldObj.getBlock(x, y, z);
             Material mat = b.getMaterial();
+            int md = player.worldObj.getBlockMetadata(x, y, z);
             if (useShaders()) {
-                if (mat.blocksMovement() && !b.hasTileEntity() /* Seems unnecessary to query MD */) {
+                if (mat.blocksMovement() && !b.hasTileEntity(md)) {
                     rb.renderBlockByRenderType(b, x, y, z);
                 } else {
                     b.setBlockBoundsBasedOnState(player.worldObj, x, y, z);
@@ -635,7 +517,7 @@ public class ItemGoo extends ItemFactorization {
                     block.render(rb, x, y, z);
                 }
             } else {
-                if (mat.blocksMovement() && !b.hasTileEntity() /* Seems unnecessary to query MD */) {
+                if (mat.blocksMovement() && !b.hasTileEntity(md)) {
                     rb.renderBlockUsingTexture(b, x, y, z, BlockIcons.utiligoo$invasion);
                 } else if (b.getRenderType() == 2 /* torches */) {
                     // Torches stupidly don't support setBlockBoundsBasedOnState. #blamenotch
