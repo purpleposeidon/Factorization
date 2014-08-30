@@ -72,6 +72,7 @@ import factorization.sockets.SocketLacerator;
 import factorization.sockets.SocketScissors;
 import factorization.sockets.TileEntitySocketRenderer;
 import factorization.sockets.fanturpeller.SocketFanturpeller;
+import factorization.utiligoo.GooRenderer;
 import factorization.utiligoo.ItemGoo;
 import factorization.weird.BlockRenderDayBarrel;
 import factorization.weird.ContainerPocket;
@@ -238,6 +239,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket, new ItemRenderGlazeBucket());
         MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel, new DayBarrelItemRenderer(renderBarrel));
         setTileEntityRendererDispatcher(BlockDarkIronOre.Glint.class, new GlintRenderer());
+        Core.loadBus(GooRenderer.INSTANCE);
     }
     
     @Override
