@@ -456,10 +456,10 @@ public class ItemGoo extends ItemFactorization {
         resetProjectionMatrix();
         int width = mc.getFramebuffer().framebufferWidth;
         int height = mc.getFramebuffer().framebufferHeight;
-        sobel.func_147984_b("ProjMat").setProjectionMatrix(projectionMatrix);
+        //sobel.func_147984_b("ProjMat").setProjectionMatrix(projectionMatrix);
         //sobel.func_147984_b("InSize").func_148087_a((float)width, (float)height);
-        sobel.func_147984_b("OutSize").func_148087_a(width, height);
-        sobel.func_147984_b("Time").func_148090_a(0);
+        //sobel.func_147984_b("OutSize").func_148087_a(width, height);
+        //sobel.func_147984_b("Time").func_148090_a(0);
         sobel.func_147995_c();
     }
     
