@@ -18,10 +18,7 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.shader.ShaderLinkHelper;
-import net.minecraft.client.shader.ShaderLoader;
 import net.minecraft.client.shader.ShaderManager;
-import net.minecraft.client.util.JsonException;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -440,7 +437,8 @@ public class ItemGoo extends ItemFactorization {
 
     
     private boolean useShaders() {
-        if (loaded) return sobel != null;
+        return false;
+/*        if (loaded) return sobel != null;
         loaded = true;
         try {
             sobel = new ShaderManager(mc.getResourceManager(), "invert");
@@ -450,7 +448,7 @@ public class ItemGoo extends ItemFactorization {
             sobel = null;
             return false;
         }
-        return true;
+        return true;*/
     }
     
     
