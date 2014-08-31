@@ -557,28 +557,6 @@ public class MiscClientCommands implements ICommand {
             return "Fixed " + failed + " entities";
         }
         
-        public static void showEntityUUIDs() {
-            World world = mc.theWorld;
-            for (Entity ent : (Iterable<Entity>) world.loadedEntityList) {
-                new Notice(ent, ent.getUniqueID().toString()).send(mc.thePlayer);
-            }
-        }
-        
-        @help("Show how many entities have the same UUID")
-        public static String countDupeEntities() {
-            int n = 0;
-            int total = 0;
-            HashSet<UUID> found = new HashSet();
-            World world = mc.theWorld;
-            for (Entity ent : (Iterable<Entity>) world.loadedEntityList) {
-                if (!found.add(ent.getUniqueID())) {
-                    n++;
-                }
-                total++;
-            }
-            return "" + n + " dupes out of " + total;
-        }
-        
         @help("Turns your cape on or off")
         public static void cape() {
             mc.gameSettings.showCape ^= true;

@@ -37,6 +37,7 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -275,6 +276,11 @@ public class MiscellaneousNonsense {
         try {
             Thread.sleep(1000 / 10);
         } catch (InterruptedException e) { }
+    }
+    
+    @EventHandler
+    public void registerCommands(FMLServerStartingEvent event) {
+        event.registerServerCommand(new MC16009());
     }
     
 
