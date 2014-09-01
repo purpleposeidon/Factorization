@@ -1588,6 +1588,7 @@ public class FzUtil {
         if (a == 0 || b == 0) {
             a = Math.abs(a);
             b = Math.abs(b);
+            if (a + b < 2) return true;
         }
         float thresh = Math.abs(a - b)/Math.max(a, b);
         return thresh > threshold;
