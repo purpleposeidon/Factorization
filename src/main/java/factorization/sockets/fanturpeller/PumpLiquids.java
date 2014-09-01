@@ -51,6 +51,10 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
     protected boolean isFloodingTank = false;
     private static FluidTankInfo[] no_info = new FluidTankInfo[0];
     
+    {
+        isSucking = false;
+    }
+    
 
     @Override
     public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
@@ -496,13 +500,8 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
             return;
         }
         boolean onServo = socket != this;
-        if (isSucking) {
-            sourceDirection = facing;
-            destinationDirection = facing.getOpposite();
-        } else {
-            sourceDirection = facing.getOpposite();
-            destinationDirection = facing;
-        }
+        sourceDirection = facing.getOpposite();
+        destinationDirection = facing;
         if (dirty) {
             dirty = false;
             coord.adjust(facing.getOpposite());
