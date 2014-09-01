@@ -289,4 +289,6 @@ public abstract class ServoComponent implements IDataSerializable {
     }
     
     protected void addRecipes() {}
+
+    public void onItemUse(Coord here, EntityPlayer player) { }
 }

@@ -64,10 +64,12 @@ public class ItemServoRailWidget extends ItemFactorization {
         if (sc == null) {
             return false;
         }
-        if (sc instanceof Decorator) {
+        Coord here = new Coord(world, x, y, z);
+        TileEntityServoRail rail = here.getTE(TileEntityServoRail.class);
+        if (rail == null) {
+            sc.onItemUse(here, player);
+        } else if (sc instanceof Decorator) {
             Decorator dec = (Decorator) sc;
-            Coord here = new Coord(world, x, y, z);
-            TileEntityServoRail rail = here.getTE(TileEntityServoRail.class);
             if (rail != null && rail.decoration == null) {
                 rail.setDecoration(dec);
                 if (world.isRemote){

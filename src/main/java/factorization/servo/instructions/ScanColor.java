@@ -16,6 +16,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
+import factorization.notify.Notice;
 import factorization.servo.Decorator;
 import factorization.servo.ServoMotor;
 import factorization.shared.Core;
@@ -91,5 +92,12 @@ public class ScanColor extends Decorator {
     @Override
     public boolean collides() {
         return false;
+    }
+    
+    @Override
+    public void onItemUse(Coord here, EntityPlayer player) {
+        FzColor color = FzColor.readColor(here);
+        if (color == FzColor.NO_COLOR) return;
+        new Notice(here, "color." + color).sendTo(player);
     }
 }
