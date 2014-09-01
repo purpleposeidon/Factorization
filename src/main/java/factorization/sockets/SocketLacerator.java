@@ -123,17 +123,16 @@ public class SocketLacerator extends TileEntitySocketBase implements IChargeCond
     }
     
     @Override
-    public boolean activate(EntityPlayer entityplayer, ForgeDirection side) {
+    public boolean activate(EntityPlayer player, ForgeDirection side) {
         if (worldObj.isRemote) {
             return false;
         }
         if (!buffer.isEmpty()) {
-            new Notice(this, "%s items buffered", "" + buffer.size()).send(entityplayer);
+            new Notice(this, "%s items buffered", "" + buffer.size()).send(player);
             return false;
         }
         if (getBackingInventory(this) == null) {
-            new Notice(this, "No output inventory").send(entityplayer);
-            return false;
+            new Notice(getCoord(), "factorization.socket.noOutputInventory").sendTo(player);
         }
         return false;
     }
