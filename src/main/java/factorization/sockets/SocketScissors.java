@@ -264,9 +264,12 @@ public class SocketScissors extends TileEntitySocketBase implements ICaptureDrop
     }
 
     @Override
-    public boolean captureDrops(int x,int y, int z, ArrayList<ItemStack> stacks) {
-        final int maxDist = 2*2;
-        int dist = (xCoord - x)*(xCoord - x) + (yCoord - y)*(yCoord - y) + (zCoord - z)*(zCoord - z);
+    public boolean captureDrops(int x, int y, int z, ArrayList<ItemStack> stacks) {
+        final int maxDist = 3*3;
+        double dx = xCoord + 0.5 - x;
+        double dy = yCoord + 0.5 - y;
+        double dz = zCoord + 0.5 - z;
+        double dist = dx * dx + dy * dy + dz * dz;
         if (dist > maxDist) {
             return false;
         }
