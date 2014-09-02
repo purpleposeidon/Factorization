@@ -176,9 +176,9 @@ public class ItemGoo extends ItemFactorization {
             if (b.hasTileEntity(md)) return;
             if (b instanceof BlockStairs) {
                 if (player.isSneaking()) {
-                    md ^= 0x8;
+                    md ^= 0x4;
                 } else {
-                    md = (md + 1) % 0xF;
+                    md = ((md + 1) % 0x3) | (md & 0x4);
                 }
                 at.setMd(md);
             } else if (b instanceof BlockSlab) {
