@@ -170,7 +170,6 @@ public class ItemGoo extends ItemFactorization {
         // goo click: expand the selection.
         // ItemBlock click: replace everything with held item
         if (held == null) {
-            // NORELEASE: Map to everything!
             Coord at = new Coord(player.worldObj, mop);
             Block bat = at.getBlock();
             if (!(bat instanceof BlockStairs || bat instanceof BlockSlab)) return;
