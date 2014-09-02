@@ -170,19 +170,29 @@ public class ItemGoo extends ItemFactorization {
         // goo click: expand the selection.
         // ItemBlock click: replace everything with held item
         if (held == null) {
+            // NORELEASE: Map to everything!
             Coord at = new Coord(player.worldObj, mop);
-            Block b = at.getBlock();
-            int md = at.getMd();
-            if (b.hasTileEntity(md)) return;
-            if (b instanceof BlockStairs) {
-                if (player.isSneaking()) {
-                    md ^= 0x4;
-                } else {
-                    md = ((md + 1) % 0x3) | (md & 0x4);
+            Block bat = at.getBlock();
+            if (!(bat instanceof BlockStairs || bat instanceof BlockSlab)) return;
+            for (int i = 0; i < data.coords.length; i += 3) {
+                at.x = data.coords[i + 0];
+                at.y = data.coords[i + 1];
+                at.z = data.coords[i + 2];
+                Block b = at.getBlock();
+                int md = at.getMd();
+                if (b.hasTileEntity(md)) return;
+                if (b instanceof BlockStairs) {
+                    if (!player.isSneaking()) {
+                        md ^= 0x4;
+                    } else {
+                        md = ((md + 1) % 0x4) | (md & 0x4);
+                    }
+                    at.setMd(md);
+                } else if (b instanceof BlockSlab) {
+                    if (!player.isSneaking()) {
+                        at.setMd(md ^ 0x8);
+                    }
                 }
-                at.setMd(md);
-            } else if (b instanceof BlockSlab) {
-                at.setMd(md ^ 0x8);
             }
         } else if (held.getItem() == this) {
             expandSelection(gooItem, data, player.worldObj, mop.blockX, mop.blockY, mop.blockZ, ForgeDirection.getOrientation(mop.sideHit));
