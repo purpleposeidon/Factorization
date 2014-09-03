@@ -22,7 +22,7 @@ group = "factorization"
 archivesBaseName = "Factorization"
 
 minecraft {
-    version = "1.7.10-10.13.0.1170" // FORGEMARK
+    version = "1.7.10-10.13.0.1207" // FORGEMARK
     assetDir = "eclipse/assets"
     replace '@FZVERSION@', project.version
 }
@@ -96,3 +96,8 @@ task deobfJar(type: Jar) {
 // }
 // tasks.setupDecompWorkspace.dependsOn "copySrcJar"
 
+// task apiJar(type: Jar, dependsOn: 'classes') {
+//     from sourceSets.main.allSource, sourceSets.main.output
+//     include 'factorization/api/**'
+//     classifier = 'api'
+// }

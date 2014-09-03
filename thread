@@ -261,7 +261,6 @@ Each Servo has 16 stacks, which can each hold 16 integers, booleans, strings, or
 
 [u]Other Stuff/Future Plans[/u]
 [spoiler]
-Finish Docs
 ?
 ?
 ?
@@ -280,6 +279,15 @@ This is a [url="http://files.minecraftforge.net/"]Minecraft Forge[/url] mod.
 
 
 [u][b][size=6][anchor=DOWNLOAD]Download[/anchor][/size][/b][/u]
+Factorization 1.7.10-0.8.88
+[url="http://adf.ly/2137658/https://www.mediafire.com/?a645g4hgh85lh2o"]adfly + MediaFire[/url], or
+[url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88.jar"]adfly + DropBox[/url]
+Built on 2014-09-02 against Minecraft Forge 1.7.10-10.13.0.1207
+[url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.88.txt"]Changelog[/url]
+[url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.88-dev.jar"]Deobf for Mod Authors[/url]
+
+
+Old versions [spoiler]
 Factorization 1.7.10-0.8.87.1
 [url="http://adf.ly/2137658/https://www.mediafire.com/?a7maiy1povo16ar"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.87.1.jar"]adfly + DropBox[/url]
@@ -287,8 +295,6 @@ Built on 2014-07-31 against Minecraft Forge 1.7.10-10.13.0.1170
 [url="http://dl.dropbox.com/u/76265666/changelogs/Changelog-1.7.10-0.8.87.1.txt"]Changelog[/url]
 [url="http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.87.1-dev.jar"]Deobf for Mod Authors[/url]
 
-
-Old versions [spoiler]
 Factorization 1.7.10-0.8.86
 [url="http://adf.ly/2137658/https://www.mediafire.com/?yasnx1eebzgbj3j"]adfly + MediaFire[/url], or
 [url="http://adf.ly/2137658/http://dl.dropbox.com/u/76265666/old/Factorization-1.7.10-0.8.86.jar"]adfly + DropBox[/url]

@@ -1,5 +1,5 @@
 http://www.minecraftforum.net/topic/1351802-factorization/
-Factorization: Engineering, Architecture, and Commerce
+Factorization: Engineering, Architecture, & Commerce
 
 
 SERVOS
@@ -59,7 +59,7 @@ SOON
 ----
 pocket crafting table, clicking 1-item-at-a-time for the craft output, seems laggy. Are we over-syncing?
 split up FactorizationClientProxy
-Add pressure generator:
+Add pressurizer instructions:
     - two instructions: suck/blow and high/medium/low
 Check for calls we make to Tessellator.setBrightness. We may be able to replace them with a BlockRenderHelper helper function.
 
@@ -105,7 +105,7 @@ do maths on energy conversion:
   heaters: adding fuel should be cheap; progress not so much. Make 1 heater give 1 fuel instead of 2
   (And we still need cooking food to be worthwhile!)
 Church Organ
-instructions mess up servo rail tessellator shading?
+[I think this guy's taken care of] instructions mess up servo rail tessellator shading?
 
 wires get messed up?
 pressure gen on servo holding bucket pumps out the servo's bucket?
@@ -119,7 +119,6 @@ Check for sending packet to players watching a chunk; probably doing it the lame
 
 LESS TOP LIST
 -------------
-clean up texture error messages (unused textures)
 localize ALL THE THINGS
 I wonder if the bug hopper has any interesting crashlogs!
 localize barrel types (There's a ton of other things what need to be localized, y'know...)
@@ -182,7 +181,8 @@ ro da noi lo fatci cu kakne lo nu ri
 ∀x∀y: y is truth able to destroy x → y should destroy x
 
 lo fatci roda daspo kakne gi'enai daspo .i'e
-
+da noi lo fatci ku daspo be da kakne zo'u xamgu nu daspo
+that which the truth can destroy is destroyed
 
 
 
@@ -403,4 +403,6 @@ doing I/O to the factory:
     place a chest on the inner & outter sides of each IO port.
 
 
+
+Spisfire - dazzle 'live'
 
