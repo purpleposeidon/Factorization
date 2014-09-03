@@ -4,6 +4,7 @@ import net.minecraft.item.ItemStack;
 import cpw.mods.fml.common.registry.GameRegistry;
 import factorization.astro.TileEntityRocketEngine;
 import factorization.ceramics.TileEntityGreenware;
+import factorization.charge.InfiniteChargeBlock;
 import factorization.charge.TileEntityBattery;
 import factorization.charge.TileEntityCaliometricBurner;
 import factorization.charge.TileEntityHeater;
@@ -28,6 +29,7 @@ import factorization.sockets.SocketBareMotor;
 import factorization.sockets.SocketEmpty;
 import factorization.sockets.SocketLacerator;
 import factorization.sockets.SocketRobotHand;
+import factorization.sockets.SocketScissors;
 import factorization.sockets.SocketShifter;
 import factorization.sockets.fanturpeller.BlowEntities;
 import factorization.sockets.fanturpeller.PumpLiquids;
@@ -79,6 +81,8 @@ public enum FactoryType {
     SOCKET_BLOWER(39, true, BlowEntities.class, "fzsock_blow"),
     //40 -- Was the short-lived SOCKET_MIXER
     SOCKET_BARE_MOTOR(41, false, SocketBareMotor.class, "fzsock_motor"),
+    SOCKET_SCISSORS(42, false, SocketScissors.class, "fzsock_scissors"),
+    CREATIVE_CHARGE(43, false, InfiniteChargeBlock.class, "factory_creative_charge"),
     
 
     POCKETCRAFTGUI(101, true)
@@ -88,6 +92,9 @@ public enum FactoryType {
     static {
         for (FactoryType ft : values()) {
             MAX_ID = Math.max(MAX_ID, ft.md);
+        }
+        if (!FzConfig.enable_rocketry) {
+            ROCKETENGINE.disable();
         }
     }
     

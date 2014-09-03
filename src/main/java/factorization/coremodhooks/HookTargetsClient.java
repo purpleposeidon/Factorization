@@ -2,6 +2,7 @@ package factorization.coremodhooks;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.common.MinecraftForge;
 import factorization.common.Command;
 import factorization.common.FactorizationKeyHandler;
 import factorization.common.FzConfig;
@@ -20,5 +21,13 @@ public class HookTargetsClient {
         if (chr == '?') {
             DocumentationModule.openPageForHilightedItem();
         }
+    }
+    
+    public static boolean attackButtonPressed() {
+        return MinecraftForge.EVENT_BUS.post(new HandleAttackKeyEvent());
+    }
+    
+    public static boolean useButtonPressed() {
+        return MinecraftForge.EVENT_BUS.post(new HandleUseKeyEvent());
     }
 }

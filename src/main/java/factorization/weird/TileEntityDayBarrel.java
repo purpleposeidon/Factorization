@@ -263,6 +263,15 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
         return ret;
     }
     
+    public int getItemCountSticky() {
+        int count = getItemCount();
+        if (type == Type.STICKY) {
+            count--;
+            return Math.max(0, count);
+        }
+        return count;
+    }
+    
     public int getMaxSize() {
         int size = 64*64;
         if (item != null) {
@@ -502,18 +511,18 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
             woodSlab = FzUtil.readStack(input);
             orientation = FzOrientation.getOrientation(input.readByte());
             type = Type.valueOf(input.readByte());
-            display_list = -1;
+            freeDisplayList();
             return true;
         }
         if (messageType == MessageType.BarrelCount) {
             setItemCount(input.readInt());
-            display_list = -1;
+            freeDisplayList();
             return true;
         }
         if (messageType == MessageType.BarrelItem) {
             item = FzUtil.readStack(input);
             setItemCount(input.readInt());
-            display_list = -1;
+            freeDisplayList();
             return true;
         }
         if (messageType == MessageType.BarrelDoubleClickHack) {

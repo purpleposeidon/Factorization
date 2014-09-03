@@ -270,6 +270,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
             motionHandler.updateServoMotion();
             executioner.tick();
         } else {
+            if (!getNextPos().blockExists()) return;
             byte orig_speed = motionHandler.speed_b;
             FzOrientation orig_or = motionHandler.orientation;
             motionHandler.updateServoMotion();
@@ -520,7 +521,7 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
 
     @Override
     public void setPosition(double x, double y, double z) {
-        // super.setPosition(x, y, z); //Super does some stupid shit to the bounding box.
+        // super.setPosition(x, y, z); //Super does some stupid shit to the bounding box. Does not mess with the chunk location or anything like that.
         this.posX = x;
         this.posY = y;
         this.posZ = z;
@@ -730,5 +731,4 @@ public class ServoMotor extends Entity implements IEntityAdditionalSpawnData, IE
         FMLProxyPacket toSend = Core.network.entityPacket(this, MessageType.TileEntityMessageOnEntity, buff);
         Core.network.broadcastPacket(null, getCurrentPos(), toSend); 
     }
-    
 }

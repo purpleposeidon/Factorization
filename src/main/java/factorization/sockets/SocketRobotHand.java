@@ -215,9 +215,6 @@ public class SocketRobotHand extends TileEntitySocketBase {
                 ret = false;
                 break;
             }
-            if (!world.isBlockNormalCubeDefault(x, y, z, true)) {
-                side = side ^ 1;
-            }
             ret = itemstack.tryPlaceItemIntoWorld(player, world, x, y, z, side, dx, dy, dz);
             break;
         } while (false);

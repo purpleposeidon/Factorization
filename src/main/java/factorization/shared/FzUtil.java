@@ -1344,11 +1344,8 @@ public class FzUtil {
     
     @SideOnly(Side.CLIENT)
     private static RenderBlocks rb;
-    /**
-     * This isn't very good. It's better to have a RB that points at the current world.
-     */
+    
     @SideOnly(Side.CLIENT)
-    @Deprecated
     public static RenderBlocks getRB() {
         if (rb == null) {
             rb = new RenderBlocks();
@@ -1688,6 +1685,7 @@ public class FzUtil {
         if (a == 0 || b == 0) {
             a = Math.abs(a);
             b = Math.abs(b);
+            if (a + b < 2) return true;
         }
         float thresh = Math.abs(a - b)/Math.max(a, b);
         return thresh > threshold;

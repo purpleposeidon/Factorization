@@ -15,6 +15,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
+import factorization.weird.NeptuneCape;
 
 public class MiscClientProxy extends MiscProxy {
     static final Minecraft mc = Minecraft.getMinecraft();
@@ -26,6 +27,7 @@ public class MiscClientProxy extends MiscProxy {
         Core.loadBus(this);
         ClientCommandHandler.instance.registerCommand(new MiscClientCommands());
         FMLCommonHandler.instance().bus().register(cth);
+        new NeptuneCape();
     }
     
     

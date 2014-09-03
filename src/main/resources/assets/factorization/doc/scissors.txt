@@ -1,0 +1,15 @@
+\title{Enormous Scissors}
+
+The scissors are a socket part for cutting blocks and mobs.
+
+A redstone signal will close the scissors.
+
+These scissors can deftly cut blocks like grass and leaves.
+
+They're not the sharpest,
+so they do minimal damage to mobs and players.
+However, they occasionally snip an extra cut of mob loot.
+
+\topic{item.factorization:socket/scissors}
+
+

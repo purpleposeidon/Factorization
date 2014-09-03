@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -20,6 +21,7 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.common.BlockIcons;
 import factorization.common.FactoryType;
+import factorization.notify.Notice;
 import factorization.servo.RenderServoMotor;
 import factorization.servo.ServoMotor;
 import factorization.shared.BlockRenderHelper;
@@ -360,6 +362,11 @@ public class SocketShifter extends TileEntitySocketBase {
     }
     
     @Override
+    protected boolean isBlockPowered() {
+        return worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0;
+    }
+    
+    @Override
     @SideOnly(Side.CLIENT)
     public void renderStatic(ServoMotor motor, Tessellator tess) {
         BlockRenderHelper block = BlockRenderHelper.instance;
@@ -394,5 +401,15 @@ public class SocketShifter extends TileEntitySocketBase {
         GL11.glScalef(s, s, s);
         render.renderItem(is);
         GL11.glPopMatrix();
+    }
+    
+    @Override
+    public boolean activate(EntityPlayer player, ForgeDirection side) {
+        if (super.activate(player, side)) return true;
+        if (worldObj.isRemote) return true;
+        if (getCoord().add(facing.getOpposite()).getTE(IInventory.class) == null) {
+            new Notice(getCoord(), "factorization.socket.noBackingInventory").sendTo(player);
+        }
+        return false;
     }
 }

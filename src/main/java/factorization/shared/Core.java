@@ -138,6 +138,7 @@ public class Core {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             isMainClientThread.set(true);
         }
+        
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Lacerator|factorization.oreprocessing.TileEntityGrinder|recipes");
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Crystallizer|factorization.oreprocessing.TileEntityCrystallizer|recipes");
         FMLInterModComms.sendMessage(Core.modId, "AddRecipeCategory", "Slag Furnace|factorization.oreprocessing.TileEntitySlagFurnace$SlagRecipes|smeltingResults");
@@ -314,8 +315,6 @@ public class Core {
     public static void logFine(String format, Object... formatParameters) {
         if (dev_environ) {
             FZLogger.info(String.format(format, formatParameters));
-        } else {
-            FZLogger.debug(String.format(format, formatParameters));
         }
     }
     

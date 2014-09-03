@@ -31,7 +31,7 @@ public class BuffNametags {
                 if (buffApplied) return false;
                 buffApplied = true;
                 if (ent.getCustomNameTag().equals(origName)) return false;
-                float delta = 2*5;
+                float delta = 2*3;
                 float origHealth = ent.getMaxHealth();
                 float newMaxHealth = origHealth + delta;
                 ent.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(newMaxHealth);

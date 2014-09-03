@@ -1,7 +1,7 @@
 package factorization.misc;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.RetentionPolicy.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -34,6 +35,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import cpw.mods.fml.client.GuiModList;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -515,6 +517,67 @@ public class MiscClientCommands implements ICommand {
                     }
                 }
             }
+        }
+
+        @help("Generate random values")
+        public static String rng() {
+            String coin = "TF";
+            String dirs = "⬅⬆⬇➡";
+            String blocks = "░▀▄█";
+            String[] woods = new String[] { "Oak", "Spruce", "Birch", "Jungle", "Dark Oak", "Acacia" };
+            String[] tc4 = new String[] { "Earth", "Air", "Fire", "Water", "Order", "Chaos" };
+            String iching = "䷀䷁䷂䷃䷄䷅䷆䷇䷈䷉䷊䷋䷌䷍䷎䷏䷐䷑䷒䷓䷔䷕䷖䷗䷘䷙䷚䷛䷜䷝䷞䷟䷠䷡䷢䷣䷤䷥䷦䷧䷨䷩䷪䷫䷬䷭䷮䷯䷰䷱䷲䷳䷴䷵䷶䷷䷸䷹䷺䷻䷼䷽䷾䷿";
+            Random rng;
+            if (arg1 == null) {
+                rng = new Random();
+            } else {
+                long seed;
+                try {
+                    seed = Long.parseLong(arg1);
+                } catch (NumberFormatException e) {
+                    seed = arg1.hashCode();
+                }
+                rng = new Random(seed);
+            }
+            return pick(coin, rng) + " " + pick(dirs, rng) + " " + pick(blocks, rng, 8) + " " + pick(rng, woods) + " " + rng.nextFloat() + " " + pick(iching, rng) + " " + pick(rng, tc4);
+        }
+
+        private static String pick(String s, Random rng) {
+            int i = rng.nextInt(s.length());
+            return s.substring(i, i + 1);
+        }
+
+        private static String pick(String s, Random rng, int n) {
+            String bs = "";
+            for (int i = 0; i < n; i++) {
+                bs += pick(s, rng);
+            }
+            return bs;
+        }
+
+        private static String pick(Random rng, String... args) {
+            return args[rng.nextInt(args.length)];
+        }
+        
+        @help("Temp-fix for the entity interaction bug")
+        public static String mc2713() {
+            int failed = 0;
+            World world = mc.theWorld;
+            nextEntity: for (Entity ent : (Iterable<Entity>) world.loadedEntityList) {
+                Chunk chunk = world.getChunkFromChunkCoords(ent.chunkCoordX, ent.chunkCoordZ);
+                for (Entity e : (Iterable<Entity>) chunk.entityLists[ent.chunkCoordY]) {
+                    if (e == ent) continue nextEntity;
+                }
+                failed++;
+                chunk.addEntity(ent);
+            }
+            return "Fixed " + failed + " entities";
+        }
+        
+        @help("Turns your cape on or off")
+        public static void cape() {
+            mc.gameSettings.showCape ^= true;
+            mc.gameSettings.sendSettingsToServer();
         }
         
         /*

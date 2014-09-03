@@ -38,5 +38,10 @@ public enum Style {
      * The original item will not be changed.
      * {@link Notice.withUpdater} is preferable to using this manually.
      */
-    UPDATE_SAME_ITEM
+    UPDATE_SAME_ITEM,
+    /**
+     * This will enlarge messages far away from the camera so that they occupy about the same area on the screen as nearby messages.
+     * You will likely want to pass in DRAWFAR with this one.
+     */
+    SCALE_SIZE
 }

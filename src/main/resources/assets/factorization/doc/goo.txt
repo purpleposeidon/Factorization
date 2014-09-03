@@ -1,0 +1,27 @@
+\title{Goo}
+
+Goo is a builder's swiss army knife!
+
+Right clicking a block with goo will put some goo on that block.
+Click on a block with goo on it to spread more goo around.
+Punch a gooey block to remove the goo from it,
+and the goo around it.
+Shift-punch a gooey block to remove just one goo.
+
+Mining a gooey block with the appropriate tool will
+mine out all of the other gooey blocks with it.
+
+The gooey blocks can be replaced by clicking on them with a different block.
+
+These two operations have a small chance of causing goo loss.
+
+\newpage
+Shift-clicking a goo-freey block with goo will move the other
+gooey blocks in that direction.
+
+Clicking & shift-clicking slabs and stairs with an empty hand
+will rotate them.
+
+
+
+\topic{item.factorization:utiligoo}

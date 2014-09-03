@@ -48,6 +48,7 @@ public class FzConfig {
     public static boolean equal_opportunities_for_mobs = true;
     public static boolean fix_middle_click = true;
     public static boolean embarken_wood = true;
+    public static boolean mushroomalize = true;
     public static boolean proper_projectile_physics = true;
     public static boolean buffed_nametags = true;
     public static boolean enable_solar_steam = true;
@@ -56,6 +57,8 @@ public class FzConfig {
     public static boolean players_discover_docbooks = true;
     public static boolean disable_endermen_griefing = false;
     public static boolean debug_fzds_collisions = false;
+    public static boolean enable_rocketry = /* Hey! If you're turning this on, remove stuff from factorization_dead_items */ enable_dimension_slice && Core.dev_environ;
+    public static boolean sockets_ignore_front_redstone = true;
     
     public static boolean enable_retrogen = false;
     public static String retrogen_key = "DEFAULT";
@@ -161,6 +164,7 @@ public class FzConfig {
         tps_reporting_interval = getIntConfig("tpsReportInterval", "server", tps_reporting_interval, "How many ticks the server will wait before sending out TPS reports. 20 ticks = 1 second, unless it's lagging.");
         equal_opportunities_for_mobs = getBoolConfig("equalOpportunitiesForMobs", "server", equal_opportunities_for_mobs, "Causes some mobs to rarely spawn wearing your armor");
         embarken_wood = getBoolConfig("barkRecipes", "server", embarken_wood, "Adds recipes for bark variants of logs");
+        mushroomalize = getBoolConfig("mushroomNormalize", "server", mushroomalize, "Textures giant mushroom blocks when placed");
         proper_projectile_physics = getBoolConfig("properProjectilePhysics", "server", proper_projectile_physics, "Makes projectiles start with the velocity of the thrower");
         buffed_nametags = getBoolConfig("buffedNametags", "server", buffed_nametags, "Naming entities gives them +5 hearts");
         players_discover_docbooks = getBoolConfig("playersDiscoverDocBooks", "server", players_discover_docbooks, "If set to true, players will find a docbook after getting iron");
@@ -168,6 +172,7 @@ public class FzConfig {
         //Broken. Doesn't work.
         enable_solar_steam = getBoolConfig("enableSolarSteam", "server", enable_solar_steam, "Set to false to disable the crafting recipe for solar2steam machines");
         fanturpeller_works_on_players = getBoolConfig("fanturpellerWorksOnPlayers", "server", fanturpeller_works_on_players, "If set to false, fanturpellers will not move players.");
+        sockets_ignore_front_redstone = getBoolConfig("socketsIgnoreFacePower", "server", sockets_ignore_front_redstone, "Set to false to let socket blocks detect redstone from their front; provided for legacy worlds.");
         if (config.hasChanged()) {
             config.save();
         }
