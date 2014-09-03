@@ -4,6 +4,8 @@ Several secret \link{vanillablocks}{vanilla blocks} now have crafting recipes.
 
 Arbitrary shapes and statues can be built using \link{sculpture}{Ceramic Sculpture}.
 
+\link{goo}{Goo} is very helpful for construction and excavation.
+
 \newpage
 Middle clicking has been made more useful.
 If you middle click on a block that is not on your hotbar,

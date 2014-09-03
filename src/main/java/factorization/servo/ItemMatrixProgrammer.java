@@ -6,10 +6,14 @@ import net.minecraft.entity.item.EntityPainting;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntityNote;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import factorization.api.Coord;
+import factorization.notify.Notice;
+import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
 import factorization.shared.FzUtil;
@@ -30,12 +34,33 @@ public class ItemMatrixProgrammer extends ItemFactorization {
     
     @Override
     public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
+        Coord c = new Coord(world, x, y, z);
+        TileEntityNote noteBlock = c.getTE(TileEntityNote.class);
+        if (noteBlock != null) {
+            if (world.isRemote) return false;
+            byte orig_note = noteBlock.note;
+            int delta = player.isSneaking() ? -1 : 1;
+            byte new_note = (byte) (orig_note + delta);
+            if (new_note < 0) {
+                new_note = 24;
+            } else if (new_note > 24) {
+                new_note = 0;
+            }
+            noteBlock.note = new_note;
+            if (ForgeHooks.onNoteChange(noteBlock, orig_note)) {
+                noteBlock.markDirty();
+            }
+            if (noteBlock.note != orig_note) {
+                noteBlock.triggerNote(world, x, y, z);
+            }
+            new Notice(noteBlock, "noteblock.pitch." + noteBlock.note).withStyle(Style.EXACTPOSITION).send(player);
+            return true;
+        }
         if (!player.isSneaking()) {
             if (Core.dev_environ && !world.isRemote) {
             }
             return false;
         }
-        Coord c = new Coord(world, x, y, z);
         TileEntityServoRail rail = c.getTE(TileEntityServoRail.class);
         if (rail == null) {
             return false;

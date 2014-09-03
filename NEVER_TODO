@@ -1,0 +1,96 @@
+NEVER/POSTPONED
+---------------
+
+[Wed Jun 11 01:00:26 PDT 2014] Power gen on the nether roof?
+[Tue Jul 01 01:30:52 PDT 2014] mere idea: portal proxy. Fires an entity through a portal. If it lands on an inv, connect
+[Fri Jul 04 17:54:18 PDT 2014] socket blocks don't render so well on servo-item shifter
+servo instruction refactor tool
+    click once, then click a direction to move instructions... or something. Hmm.
+    Maybe click to make a path? Too complicated.
+    If you've got like forking and branches or stuff, you'll have to start at the end and work back.
+compression crafter; items that don't get used up (liiike LMP's) stay in the world?
+    and also put in a temp recipe that uses wires; test that the CompACT doesn't destroy them
+    crafting recipes that use the battery block?
+can we move the position the servo renders at back? So that it can look like it's turning at a better place...
+LMP store instructions... Like a bag or a backpack
+  - maybe let you merge instructions together? But then middle clicking.
+add an LMP instruction (recipe may be difficult!). Clicks the instruction with an LMP.
+fix shading of faces of blocks that are in barrels; research if such a fix is possible
+lightning should power our stuff; even if you can't make lightning rods... -- would require watching *every* entity that gets spawned
+/f for music?
+light shining through our blocks; barrels. I don't think we can actually fix this?
+FML has code to disable mods now; can use it for FZDS...
+"Puff Blocks": 9 feathers; it's the building block helper thingie
+Notify is using FZ net code
+config files for disabling barrel types
+notification system upgrade:
+  extra controls for clearing up other notifications: get rid of nearby messages (barrels), start fading the message away as soon as it shows up (energy measurements), remove any messages that have the same typename as this one, leave the message up for # seconds
+  being able to group messages together might be nice; so you could do "clear tutorialMessages".
+Config option for ore processing output
+IMC for adding new Ores to the Ore Processing chain?
+To kill NEI's shift-? cheat: clear out RecipeInfo.overlayMap... or something.  Hmm....
+  Might want to just remove instances whose class = DefaultOverlayHandler or BrewingOverlayHandler.
+Redstone signal on furnace heaters -- No. Just don't give it something to heat.
+make a caving-friendly dark iron ore gen? -- Colossi
+
+rainbow chest
+  ROY
+  CWC
+  GBP
+  only allows in items with color/dye names. Sorts them automagically by color.
+  proooobably won't be able to implement ISidedInventory decently. :(
+  How will the server know what's colored?
+    1. Create a list of all the colored dyes. Be sure to check the OreDictionary for dyes..
+    2. Iterate over all the crafting recipes:
+      If the recipe contains a single item from the list (and any additional items not on the list), add it to the list.
+    3. Repeat step 2 until nothing else is added.
+  each color gets 3 slots
+  clicking on a slot will put it in the regular inventory.
+  And... stuff added to the regular inventory'll try to be moved to their color slots.
+    WWWOOOMMM
+    bbbYYYLLL
+    PPPGGGggg
+    CCCPPPBBB
+    rrrgggRRR
+    KKK------
+
+  WWW OOO MMM bbb
+  YYY LLL PPP GGG
+  ggg CCC PPP BBB
+  rrr ggg RRR KKK
+  --- --- --- ---
+
+  Okay. So items can be taken from the slots, but they can't be put in. They have to be inserted indirectly via the extra
+  slots on the bottom.
+Invasive charge'd be nice (lets you transmit charge through metal blocks)
+
+
+
+When we get to doing sound:
+  Overwrite TileEntityNoteBlock (& NoteBlock may be necessary as well)
+  Shift-clicking tunes down
+  Putting a white/gray/light gray/black wool block over the note dampens the sound (and continues searching upward for...)
+  Blocks of metal.
+  silver, stakced up:
+    1 block gives a bell
+    2 gives a weaker organ (or maybe a flute noise?)
+    3 gives a stronger organ
+    4 gives an awesome organ
+    5 gives an epic organ
+  gold: a cymbal; would make sense for wider platforms of gold to make different pitches or something?
+  dark iron: a cool mournful saw noise
+  water: sine wave
+  lava: square wave
+  iron: saw wave (cactus'd make sense, but isn't actually possible :p)
+  lapis block: ocarina
+  another note block (maybe? the actual noteblock might interfere): something synthesizy
+  obsidian: something brittle?
+
+
+Chaos orbs:
+  toss one. They cause some sort of crazy semi-scripted event. The endermen sell them. "1 cup of Chaos, scooped from beyond the edge of all Shadow"
+    array of Object[], +Integer = noteblock, -Integer = timed delay; spawn vexian mob stacks
+
+
+camo/mutation blocks: when it gets drawn, iterates through the tessellator & replaces textures with other textures
+

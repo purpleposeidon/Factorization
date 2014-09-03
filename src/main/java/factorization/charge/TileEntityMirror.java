@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
@@ -87,7 +88,22 @@ public class TileEntityMirror extends TileEntityCommon {
 
     boolean hasSun() {
         boolean raining = getWorldObj().isRaining() && getWorldObj().getBiomeGenForCoords(xCoord, yCoord).rainfall > 0;
-        return getCoord().canSeeSky() && worldObj.isDaytime() && !raining;
+        if (raining) return false;
+        if (!worldObj.isDaytime()) return false;
+        // Used to be able to use Coord.canSeeSky(), but I made my blocks transparent. >_>
+        Coord skyLook = new Coord(this);
+        int y = yCoord;
+        World w = getWorldObj();
+        for (int i = y + 1; i < w.getHeight(); i++) {
+            skyLook.y = i;
+            if (!skyLook.canBeSeenThrough()) {
+                return false;
+            }
+            if (skyLook.getTE(TileEntityMirror.class) != null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     int last_shared = -1;

@@ -1,13 +1,12 @@
 http://www.minecraftforum.net/topic/1351802-factorization/
-Factorization: Engineering, Architecture, and Commerce
+Factorization: Engineering, Architecture, & Commerce
 
 
 SERVOS
 ------
 regarding actuators:
-  We'll keep a "generic use actuator instruction", but we'll also add instructions for each actuator. Possibly multiple ones per actuator.
-  some possibl esocket-tools:
-    Launcher (dispenser)
+  Some socket parts may have part-specific instructions, like the shifter does
+  some possible socket-tools:
     Rotor (fzds)
     Grasper (gravity gun; fzds for just one block? Eh....)
     Ball Lightning Gun
@@ -21,8 +20,6 @@ Lower barriers to entry for servos:
 
 IMMEDIATE (for next public release)
 ---------
-we don't need to reload the keymapping anymore [probably already dealt with]
-barrels getting rotated by other players doesn't redraw?
 fzdocs:
     ore dictionary needs better handling:
         [DEALT WITH?] arrays of stuff need to be rendered nicely
@@ -59,42 +56,15 @@ well, what are the new instructions?
 
 SOON
 ----
-[Tue Apr 01 23:19:40 PDT 2014] colorizing servos
-items getting messed up w/ enchants; item rendering in general:
-    battery renders wonky w/ enchants in front
-    servo rail
-    (May just be 1.7.2; could be fixed in 1.7.5?)
-servos:
-  refactor tool
-    click once, then click a direction to move instructions... or something. Hmm.
-    Maybe click to make a path? Too complicated.
-    If you've got like forking and branches or stuff, you'll have to start at the end and work back.
-  <digitalseraphim> is there a way to clear out error messages from the black stack yet?
 pocket crafting table, clicking 1-item-at-a-time for the craft output, seems laggy. Are we over-syncing?
 split up FactorizationClientProxy
-Add pressure generator:
-    - is an inventoryless mixer. Might also blow around chest contents? :D
-    - It doesn't need an inventory behind it. But if there *is* an inventory behind it, it will move items into/outof that inventory.
+Add pressurizer instructions:
     - two instructions: suck/blow and high/medium/low
-    - change socket tool placement. First click w/ a motor; then click w/ the original socket thingie.
-    Tell me more about using the fan as a mixer.
-        Uses the inventory in front of it as the base inventory for the mixer; then it spits mixed stuff out the back.
-        How does it deal with its configuration options?
-            Suck/blow changes nothing, it will still output to the back. OR it only works in suck mode. (Incidentally, suck mode will probably be the default mode?)
-            The speed setting will make it work faster.
-    - It also works on fluids.
-        If there is a liquid 'source' (either a TE providing a liquid, or a source block that we can handle) avail, then we push it in the appropriate direction. 
-        pushes about 7*speed blocks away, and 3*speed blocks up.
-        What about the filling algorithm? A pain, eh? Just something kinda randomish maybe?
-    - Oh, also, it can get power from steam. (Well, any hot gas.)
-An upgraded bonemeal. Acts as bonemeal, & schedules a block tick even if the bonemeal'd thing isn't bonemealable. 2 bonemeal + 4 nether wart -> 2 Nether Bone Meal. "It's Super-Effective!"
 Check for calls we make to Tessellator.setBrightness. We may be able to replace them with a BlockRenderHelper helper function.
-barrels need to redraw when the resource pack changes
 
 BEFORE 0.9
 ----------
 Complete the in-game documentation:
-    - The '?' key should bring up help for an item, if you've got the docbook in your inventory. Hopefully it'd work with the NEI sidebar as well.
     - Possibly pictures? I might not need pictures tho.
     - Support for WWW links.
     - Demonstrations, with interactive diagrams; sort of reminiscent of the MC wiki stuff for redstone contraptions. They should render a world, and you can click and drag to rotate the view. If you're in creative mode, you should be able to press a button, labelled "import" possibly, to place it down.
@@ -108,11 +78,9 @@ Back to FZDS
 LESS SOON
 ---------
 Check if dark iron retrogen works?
-compression crafter; items that don't get used up (liiike LMP's) stay in the world?
-    and also put in a temp recipe that uses wires; test that the CompACT doesn't destroy them
-    crafting recipes that use the battery block?
 
-AFTER 1.7 PORT
+
+AFTER 1.? PORT
 --------------
 open sourcing the mod; get stuff ready for that. What needs to happen? Probably after porting to 1.7
   FZ has been packagized; now turn the packages into sub-modules.
@@ -128,7 +96,6 @@ make leyden jars narrower. The purpose of this is to improve their proportions.
 
 UNTRIAGED
 ---------
-can we move the position the servo renders at back? So that it can look like it's turning at a better place...
 show what instruction is being hilighted in big?
 /f entityrendertoggle; forgetTEs; forgetEnts
 do maths on energy conversion:
@@ -136,11 +103,9 @@ do maths on energy conversion:
   steam to charge to furnace-ing
   heaters: adding fuel should be cheap; progress not so much. Make 1 heater give 1 fuel instead of 2
   (And we still need cooking food to be worthwhile!)
-LMP store instructions... Like a bag or a backpack
-  - maybe let you merge instructions together? But then middle clicking.
 Church Organ
-instructions mess up servo rail tessellator shading?
-add an LMP instruction (recipe may be difficult!). Clicks the instruction with an LMP.
+[I think this guy's taken care of] instructions mess up servo rail tessellator shading?
+
 wires get messed up?
 pressure gen on servo holding bucket pumps out the servo's bucket?
 Eclipse errors/warnings: enable annotation-based null analysis
@@ -149,77 +114,46 @@ Check for sending packet to players watching a chunk; probably doing it the lame
 
 
 
-NEVER/POSTPONED
----------------
-fix shading of faces of blocks that are in barrels; research if such a fix is possible
-lightning should power our stuff; even if you can't make lightning rods... -- would require watching *every* entity that gets spawned
-/f for music?
-light shining through our blocks; barrels. I don't think we can actually fix this?
 
 
 LESS TOP LIST
 -------------
-FML has code to disable mods now; can use it for FZDS...
-"Puff Blocks": 9 feathers; it's the building block helper thingie
-Notify is using FZ net code
-clean up texture error messages (unused textures)
-config files for disabling barrel types
-test parasieves + comparators + recursion depth. Somehow.
 localize ALL THE THINGS
 I wonder if the bug hopper has any interesting crashlogs!
-  - Oh yay the bug hopper is no longer running!
 localize barrel types (There's a ton of other things what need to be localized, y'know...)
 leyden jars & batteries should overcharge slightly so that they can drop exactly 100%-charged stuff
 hopping barrels could be optimized if they're moving something above them to below them!
-★★★Talk to RLP about monetization plan★★★
 underground silver temples/vaults. With moon lamps? :D
 onInventoryUpdate all the TEs
-can't glaze a sculpture cloned from an already glazed sculpture
-change raw glaze colors to their real colors
 either bats are spawning in the hammer dimension, or we're getting entity updates that we shouldn't be
 having more boilers/mirrors seems to give you more steam somehow
-notification system upgrade:
-  extra controls for clearing up other notifications: get rid of nearby messages (barrels), start fading the message away as soon as it shows up (energy measurements), remove any messages that have the same typename as this one, leave the message up for # seconds
-  being able to group messages together might be nice; so you could do "clear tutorialMessages".
-Modularize FZ/astro so that astro has no deps & can be removed for public release
-Config option for ore processing output
-IMC for adding new Ores to the Ore Processing chain?
 configuration method for adding ores?
 Placing/breaking wrath lamp in hammerspace seems to cause the client to crap its pants
 Don't keep non-weak references to worlds ("MapMaker.weakKeys().buildMap()") except in Entity/TileEntity
 register ore blocks
 compression crafter notification showing a bunch of ==='s? o_O
-To kill NEI's shift-? cheat: clear out RecipeInfo.overlayMap... or something.  Hmm....
-  Might want to just remove instances whose class = DefaultOverlayHandler or BrewingOverlayHandler.
 http://jezek2.advel.cz/tmp/jstackalloc/javadoc/
-richardG suggests doing world.blockExists to prevent orphaning chunks:
-  new socket stufff....
-  hopping barrels that are sideways
 glowing glazes
 compression crafter; items that don't get used up (liiike LMP's) stay in the world?
     and also put in a temp recipe that uses wires; test that the CompACT doesn't destroy them
-Maybe lacerator recipes in the macerator?
-Coocoo clock? :D
 axle thing on the motor when it's by itself in a socket
+Occasionally enable all warnings & clean things up
 
 
 
 [Low-Priority Bugs]
 our TEs could do that crazy thermex optimization thing; some function that gets called before onUpdate. But we have to make sure that we aren't cheating anywhere. It's TileEntity.hasWorldObj(); no inherent issues with overriding, except what we make. So check them.
 do block breaking animations properly (after 1.3). Look at src/minecraft/net/minecraft/src/RenderGlobal.java +1569 renderWorld()
+barrels need to redraw when the resource pack changes
+
 
 [Features]
-Redstone signal on furnace heaters
-right-clicking a barrel with a tool could put stuff in as if you had right-clicked with an empty hand
 Go over our API stuff. Clean up. Make sure other people can actually use stuff. (Maybe test this?)
-Occasionally enable all warnings & clean things up
 
 Need more uses for diamond shards!
   Shard spear? :o  Something about dark crystals. 
 
 backup occasionally, eh?
-
-make a caving-friendly dark iron ore gen?
 
 
 SPACE
@@ -246,55 +180,19 @@ ro da noi lo fatci cu kakne lo nu ri
 ∀x∀y: y is truth able to destroy x → y should destroy x
 
 lo fatci roda daspo kakne gi'enai daspo .i'e
-
-
-
-rainbow chest
-  ROY
-  CWC
-  GBP
-  only allows in items with color/dye names. Sorts them automagically by color.
-  proooobably won't be able to implement ISidedInventory decently. :(
-  How will the server know what's colored?
-    1. Create a list of all the colored dyes. Be sure to check the OreDictionary for dyes..
-    2. Iterate over all the crafting recipes:
-      If the recipe contains a single item from the list (and any additional items not on the list), add it to the list.
-    3. Repeat step 2 until nothing else is added.
-  each color gets 3 slots
-  clicking on a slot will put it in the regular inventory.
-  And... stuff added to the regular inventory'll try to be moved to their color slots.
-    WWWOOOMMM
-    bbbYYYLLL
-    PPPGGGggg
-    CCCPPPBBB
-    rrrgggRRR
-    KKK------
-
-  WWW OOO MMM bbb
-  YYY LLL PPP GGG
-  ggg CCC PPP BBB
-  rrr ggg RRR KKK
-  --- --- --- ---
-
-  Okay. So items can be taken from the slots, but they can't be put in. They have to be inserted indirectly via the extra
-  slots on the bottom.
+da noi lo fatci ku daspo be da kakne zo'u xamgu nu daspo
+that which the truth can destroy is destroyed
 
 
 
 
 
-Whatchya gonna do, oh, whatchya gonna do
-When Elo's nanobots get a hold of you?
-Nothin' you can do, 'cause you'll be dead.
-(And then they'll eat your brains!)
-(And then they'll eat your brains!)
-Then some douchebag what thinks he's you
-Will wake up with a computanium head.
-That computanium head, it sure is fine
-Oh, computanium head, some day you'll be mine!
 
 
-Boats. Of course, you'll need a splash potion-like to set them afloat. This will, obviously, require the most annoying ingredients available:
+
+
+
+FZDS Ships. Of course, you'll need a splash potion-like to set them afloat. This will, obviously, require the most annoying ingredients available:
     Ghast tear, ink sack, cyan dye, leather, feather...
 
  Ceremonial Bottle:
@@ -319,32 +217,10 @@ More storage:
 Moderator:
   prevents you from using items based on their package? Probably voids them from your inventory as well.
 
-Invasive charge'd be nice (lets you transmit charge through metal blocks)
-
-When we get to doing sound:
-  Overwrite TileEntityNoteBlock (& NoteBlock may be necessary as well)
-  Shift-clicking tunes down
-  Putting a white/gray/light gray/black wool block over the note dampens the sound (and continues searching upward for...)
-  Blocks of metal.
-  silver, stakced up:
-    1 block gives a bell
-    2 gives a weaker organ (or maybe a flute noise?)
-    3 gives a stronger organ
-    4 gives an awesome organ
-    5 gives an epic organ
-  gold: a cymbal; would make sense for wider platforms of gold to make different pitches or something?
-  dark iron: a cool mournful saw noise
-  water: sine wave
-  lava: square wave
-  iron: saw wave (cactus'd make sense, but isn't actually possible :p)
-  lapis block: ocarina
-  another note block (maybe? the actual noteblock might interfere): something synthesizy
-  obsidian: something brittle?
 
 
-Chaos orbs:
-  toss one. They cause some sort of crazy semi-scripted event. The endermen sell them. "1 cup of Chaos, scooped from beyond the edge of all Shadow"
-    array of Object[], +Integer = noteblock, -Integer = timed delay; spawn vexian mob stacks
+
+
 
 https://en.wikipedia.org/wiki/Astra_(weapon)
 
@@ -381,7 +257,6 @@ So, the things:
     Nebula Balloons
     Propellers. Weeeelllll....
 
-camo/mutation blocks: when it gets drawn, iterates through the tessellator & replaces textures with other textures
 
 Building Tools
     Building tool: The snapshot
@@ -562,4 +437,5 @@ Only THEIR litter remains on Earth;
 THEY made THEIR home a vast network spanning the voids between the ever-burning stars.
 And THEY are eager to begin mutually beneficial economic transactions.
 
+Spisfire - dazzle 'live'
 

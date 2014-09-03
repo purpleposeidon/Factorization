@@ -362,20 +362,21 @@ public class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
         }
         return null;
     }
-
-    public boolean isSubmissiveTo(Coord o) {
-        return y < o.y || x < o.x || z < o.z;
-    }
     
     @Override
     public int compareTo(Coord o) {
-        if (isSubmissiveTo(o)) {
-            return -1;
+        int d = y - o.y;
+        if (d == 0) {
+            d = x - o.x;
+            if (d == 0) {
+                d = z - o.z;
+            }
         }
-        if (this.equals(o)) {
-            return 0;
-        }
-        return 1;
+        return d;
+    }
+
+    public boolean isSubmissiveTo(Coord o) {
+        return y < o.y || x < o.x || z < o.z;
     }
     
     public boolean inside(Coord lower, Coord upper) {

@@ -85,6 +85,7 @@ import factorization.shared.ItemBlockProxy;
 import factorization.shared.ItemCraftingComponent;
 import factorization.shared.ItemFactorizationBlock;
 import factorization.sockets.ItemSocketPart;
+import factorization.utiligoo.ItemGoo;
 import factorization.weird.ItemDayBarrel;
 import factorization.weird.ItemPocketTable;
 import factorization.weird.TileEntityDayBarrel;
@@ -120,8 +121,6 @@ public class Registry {
     public ItemStack is_factory, is_lamp, is_lightair;
     public ItemPocketTable pocket_table;
     public ItemCraftingComponent diamond_shard;
-    public ItemStack diamond_shard_packet;
-    public IRecipe boh_upgrade_recipe;
     public ItemCraftingComponent silver_ingot, lead_ingot;
     public ItemCraftingComponent dark_iron;
     public ItemAcidBottle acid;
@@ -144,12 +143,14 @@ public class Registry {
     public ItemServoMotor servo_placer;
     public ItemServoRailWidget servo_widget_instruction, servo_widget_decor;
     public ItemStack dark_iron_sprocket, servo_motor;
+    public ItemCraftingComponent giant_scissors;
     public ItemDayBarrel daybarrel;
     @Deprecated
     public ItemSocketPart socket_part;
     public ItemCraftingComponent instruction_plate;
     public ItemCommenter servo_rail_comment_editor;
     public ItemDocBook docbook;
+    public ItemGoo utiligoo;
 
     public Material materialMachine = new Material(MapColor.ironColor);
     
@@ -276,7 +277,9 @@ public class Registry {
         mixer_item = FactoryType.MIXER.itemStack();
         crystallizer_item = FactoryType.CRYSTALLIZER.itemStack();
         greenware_item = FactoryType.CERAMIC.itemStack();
-        rocket_engine_item_hidden = FactoryType.ROCKETENGINE.itemStack();
+        if (FzConfig.enable_rocketry) {
+            rocket_engine_item_hidden = FactoryType.ROCKETENGINE.itemStack();
+        }
 
         //BlockResource stuff
         silver_ore_item = ResourceType.SILVERORE.itemStack("Silver Ore");
@@ -322,6 +325,7 @@ public class Registry {
         OreDictionary.registerOre("aquaRegia", aqua_regia);
         insulated_coil = new ItemCraftingComponent("insulated_coil");
         motor = new ItemCraftingComponent("motor");
+        giant_scissors = new ItemCraftingComponent("socket/scissors");
         fan = new ItemCraftingComponent("fan");
         corkscrew = new ItemCraftingComponent("corkscrew");
         diamond_cutting_head = new ItemCraftingComponent("diamond_cutting_head");
@@ -345,7 +349,7 @@ public class Registry {
         
         //Rocketry
         nether_powder = new ItemCraftingComponent("nether_powder");
-        if (FzConfig.enable_dimension_slice) {
+        if (FzConfig.enable_rocketry) {
             rocket_fuel = new ItemCraftingComponent("rocket/rocket_fuel");
             rocket_engine = new ItemBlockProxy(rocket_engine_item_hidden, "rocket/rocket_engine", TabType.ROCKETRY);
             rocket_engine.setMaxStackSize(1);
@@ -362,6 +366,7 @@ public class Registry {
         socket_part = new ItemSocketPart("socket/", TabType.SERVOS);
         instruction_plate = new ItemCraftingComponent("servo/instruction_plate", TabType.SERVOS);
         instruction_plate.setSpriteNumber(0);
+        instruction_plate.setMaxStackSize(16);
         servo_rail_comment_editor = new ItemCommenter("servo/commenter");
         
         socket_lacerator = FactoryType.SOCKET_LACERATOR.asSocketItem();
@@ -371,6 +376,7 @@ public class Registry {
         //Barrels
         daybarrel = new ItemDayBarrel("daybarrel");
         docbook = new ItemDocBook("docbook", TabType.TOOLS);
+        utiligoo = new ItemGoo("utiligoo", TabType.TOOLS);
         postMakeItems();
     }
 
@@ -464,11 +470,13 @@ public class Registry {
                 'M', logicMatrix,
                 'i', Items.quartz,
                 'X', logicMatrixProgrammer);
+        GameRegistry.addSmelting(logicMatrixIdentifier, new ItemStack(logicMatrix), 0);
         oreRecipe(new ItemStack(logicMatrixController),
                 "MiX",
                 'M', logicMatrix,
                 'i', "ingotSilver",
                 'X', logicMatrixProgrammer);
+        GameRegistry.addSmelting(logicMatrixController, new ItemStack(logicMatrix), 0);
         recipe(new ItemStack(logicMatrixProgrammer),
                 "MiX",
                 'M', logicMatrix,
@@ -498,6 +506,7 @@ public class Registry {
                 EntityVillager.func_146089_b(recipeList, item, random, chance);
             }
         });
+        TileEntitySlagFurnace.SlagRecipes.register(new ItemStack(logicMatrixProgrammer), 2F/3F, new ItemStack(dark_iron), 0.85F, new ItemStack(logicMatrix));
         
         TileEntityCrystallizer.addRecipe(new ItemStack(Blocks.redstone_block), new ItemStack(logicMatrix), 1, Core.registry.aqua_regia);
 
@@ -740,14 +749,14 @@ public class Registry {
                 'P', Blocks.piston);
 
         // Wrath lamp
-//		oreRecipe(lamp_item,
-//				"ISI",
-//				"GWG",
-//				"ISI",
-//				'I', dark_iron,
-//				'S', "ingotSilver",
-//				'G', Blocks.glass_pane,
-//				'W', new ItemStack(wrath_igniter, 1, FzUtil.WILDCARD_DAMAGE));
+        oreRecipe(lamp_item,
+                "ISI",
+                "GWG",
+                "ISI",
+                'I', dark_iron,
+                'S', "ingotSilver",
+                'G', Blocks.glass_pane,
+                'W', diamond_shard);
 
         //Slag furnace
         recipe(slagfurnace_item,
@@ -787,6 +796,13 @@ public class Registry {
                 " |-",
                 '|', Items.iron_ingot,
                 '-', Blocks.heavy_weighted_pressure_plate);
+        recipe(new ItemStack(giant_scissors),
+                "I I",
+                " S ",
+                "P P",
+                'P', Blocks.sticky_piston,
+                'S', Items.shears,
+                'I', Items.iron_sword);
         if (FzConfig.enable_solar_steam) {
             recipe(solarboiler_item,
                     "I#I",
@@ -957,7 +973,7 @@ public class Registry {
         
         //Rocketry
         TileEntityGrinder.addRecipe(new ItemStack(Blocks.netherrack), new ItemStack(nether_powder, 1), 1);
-        if (FzConfig.enable_dimension_slice) {
+        if (FzConfig.enable_rocketry) {
             shapelessRecipe(new ItemStack(rocket_fuel, 9),
                     nether_powder, nether_powder, nether_powder,
                     nether_powder, Items.fire_charge, nether_powder,
@@ -1005,6 +1021,7 @@ public class Registry {
                 "T",
                 '#', instruction_plate,
                 'T', Items.sign);
+        GameRegistry.addSmelting(servo_widget_instruction, new ItemStack(instruction_plate), 0);
         recipe(new ItemStack(docbook),
                 "B~>",
                 'B', Items.book,
@@ -1019,6 +1036,11 @@ public class Registry {
                 'H', Blocks.hay_block,
                 'n', Items.nether_wart,
                 'X', Items.bone);
+        shapelessRecipe(new ItemStack(utiligoo, 32), // NORELEASE: Temporary recipe!
+                Blocks.red_mushroom,
+                Items.diamond,
+                Items.diamond,
+                logicMatrixProgrammer);
     }
     
     private void makeServoRecipes() {

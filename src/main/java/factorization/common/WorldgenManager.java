@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ReportedException;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.feature.WorldGenMinable;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.ChunkDataEvent;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -26,6 +28,20 @@ public class WorldgenManager {
     
     IWorldGenerator silverGen, darkIronGen; 
     
+    static void disclaimErrors(ReportedException e) {
+        CrashReport crash = e.getCrashReport();
+        CrashReportCategory disclaimer = crash.makeCategory("disclaimer");
+        disclaimer.addCrashSection("HEY",
+                "It's probably not Factorization's fault! Okay? Okay.\n"
+                + "Just because I show up here doesn't mean I'm the cause. In any case there's not a thing I could possibly do differently.\n"
+                + "Maybe you've got corrupted worldgen structures;\n"
+                + "If this is the case, removing files like 'Mineshaft.dat', 'Village.dat', (but NOT things like 'map_0.dat')\n"
+                + "from the data/ folder in the save may help.\n"
+                + "Be sure to make a backup first tho."
+                );
+        throw e;
+    }
+    
     void setupWorldGenerators() {
         if (FzConfig.gen_silver_ore) {
             silverGen = new IWorldGenerator() {
@@ -39,11 +55,15 @@ public class WorldgenManager {
                         return;
                     }
                     int count = 1; // + (rand.nextBoolean() && rand.nextBoolean() && rand.nextBoolean() ? 1 : 0);
-                    for (int i = 0; i < count; i++) {
-                        int x = chunkX*16 + rand.nextInt(16);
-                        int z = chunkZ*16 + rand.nextInt(16);
-                        int y = 4 + rand.nextInt(42);
-                        gen.generate(world, rand, x, y, z);
+                    try {
+                        for (int i = 0; i < count; i++) {
+                            int x = chunkX*16 + rand.nextInt(16);
+                            int z = chunkZ*16 + rand.nextInt(16);
+                            int y = 4 + rand.nextInt(42);
+                            gen.generate(world, rand, x, y, z);
+                        }
+                    } catch (ReportedException e) {
+                        disclaimErrors(e);
                     }
                 }
             };
@@ -110,6 +130,14 @@ public class WorldgenManager {
                     if (!world.provider.isSurfaceWorld()) {
                         return;
                     }
+                    try {
+                        generation_implementation(random, chunkX, chunkZ, world, chunkGenerator, chunkProvider);
+                    } catch (ReportedException e) {
+                        disclaimErrors(e);
+                    }
+                }
+                
+                private void generation_implementation(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
                     if (chunkX == 0 && chunkZ == 0) {
                         x = z = 0;
                     } else {

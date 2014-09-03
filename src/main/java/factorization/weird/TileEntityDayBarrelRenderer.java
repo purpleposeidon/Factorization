@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -259,9 +260,13 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
             }
             entityitem.setEntityItemStack(is);
             entityitem.hoverStart = 0.0F;
+            GameSettings gs = Minecraft.getMinecraft().gameSettings;
+            boolean fancy = gs.fancyGraphics;
+            gs.fancyGraphics = false;
             RenderItem.renderInFrame = true;
             RenderManager.instance.renderEntityWithPosYaw(entityitem, 1.0D, 0.0D, 0.0D, 0.0F, 0.0F);
             RenderItem.renderInFrame = false;
+            gs.fancyGraphics = fancy;
         } else {
             GL11.glTranslatef(0, 0, 1F/32F);
             float scale = 1F/32F;

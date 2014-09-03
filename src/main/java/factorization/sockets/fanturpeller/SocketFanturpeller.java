@@ -123,9 +123,10 @@ public abstract class SocketFanturpeller extends TileEntitySocketBase implements
         if (baseReplacement instanceof SocketFanturpeller) {
             SocketFanturpeller replacement = (SocketFanturpeller) baseReplacement;
             if (!isSafeToDiscard()) {
-                if (replacement instanceof BufferedFanturpeller && this instanceof BufferedFanturpeller) {
-                    BufferedFanturpeller old = (BufferedFanturpeller) this;
-                    BufferedFanturpeller rep = (BufferedFanturpeller) replacement;
+                if (replacement instanceof PumpLiquids && this instanceof PumpLiquids) {
+                    // Ugly! :|
+                    PumpLiquids old = (PumpLiquids) this;
+                    PumpLiquids rep = (PumpLiquids) replacement;
                     rep.buffer = old.buffer;
                 } else {
                     return;

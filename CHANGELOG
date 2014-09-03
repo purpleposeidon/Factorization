@@ -1,3 +1,52 @@
+0.8.88
+  Important note:
+    Socket blocks ignore redstone signal from the facing direction
+    This breaks some builds; there's a config option for it
+    ...except for the item shifter. It still takes redstone signals from the front.
+  Enormous Scissors, by SoundLogic!
+  ... with help from neptune
+    A socket part!
+    Cut things!
+    Leaves and grass and stuff get sheared!
+    Mobs get cut! And the scissors occasionally give you an extra cut of loot!
+    Any and all bugs are SoundLogic's fault!
+  Goo
+    Oh man! It's totally awesome!
+    Goo can be applied to a block.
+    Gooing up a gooy block will spread the gooey goodness.
+    Punch a gooey block to remove the goo and the adjacent goo
+    Shift-punch a gooey block to remove a one goo
+    Right-click gooey block with a block to replace the gooey blocks.
+    Mine the gooey block with an appropriate tool to break the gooey blocks.
+    Shift-right-click with some goo to adjust the gooey selection
+    Mining & replacing goo will occasionally cause goo loss.
+    The recipe is temporary -- get it while it's cheap!
+  Sculpting tool is now with 50% less NPE.
+  The time will be printed every 30 minutes if you're in full screen.
+  /f rng will spit out a random collection of random things
+  Improved the placement of giant mushroom blocks.
+  Added creative charge battery
+  Inoculated the screw pump against derp; hopefully it will work consistantly now
+  Fixed some barrel rendering bugs
+  Fix steam turbine speed syncing
+    
+
+0.8.87.2
+  Temporary wrath^wMagical lamp recipe
+  
+
+0.8.87
+  Czech localizations by golyalpha!
+  Work around for another change that made mirrors stackable
+  Added recycling recipes:
+    LMPs can be slag-furnaced'd
+    Instructions can be smelted into blank instruction plates
+    Logic Matrix <Whatevers> can be smelted into blank logic matrices
+  Lacerators speed up much quicker
+  The LMP clicking/shift-clicking a note block with an LMP will adjust the note up/down, and show its name
+  Jumping off a building and onto a horse will break the lead, if necessary, and give the horse a small speed buff. The buffs will be much more significant if you are jumping off a tall building while holding a weapon or carrying a damsel.
+    
+
 0.8.86
   Better coremod
   Remove conflicting lacerator recipes

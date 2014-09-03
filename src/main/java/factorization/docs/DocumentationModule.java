@@ -89,7 +89,9 @@ public class DocumentationModule {
     public void serverStarts(FMLServerStartingEvent event) {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
             event.registerServerCommand(new FzdocSerialize());
-            event.registerServerCommand(new ExportHtml());
+            if (Core.dev_environ) {
+                event.registerServerCommand(new ExportHtml());
+            }
         }
     }
     

@@ -327,8 +327,8 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
             GL11.glShadeModel(GL11.GL_FLAT);
             GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F);
             GL11.glEnable(GL11.GL_BLEND);
-            OpenGlHelper.glBlendFunc(770, 1, 1, 0);
-            OpenGlHelper.glBlendFunc(774, 768, 1, 0);
+            OpenGlHelper.glBlendFunc(770 /* GL_SRC_ALPHA */, 1 /* GL_ONE */, 1 /* GL_ONE */, 0 /* GL_ZERO */);
+            OpenGlHelper.glBlendFunc(774 /* GL_DST_COLOR */, 768 /* GL_SRC_COLOR */, 1 /* GL_ONE */, 0 /* GL_ZERO */);
             bindTexture(TextureMap.locationBlocksTexture);
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.5F);
             GL11.glPolygonOffset(-3.0F, -3.0F);

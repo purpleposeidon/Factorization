@@ -70,8 +70,11 @@ import factorization.shared.ItemRenderCapture;
 import factorization.shared.TileEntityFactorization;
 import factorization.sockets.BlockRenderSocketBase;
 import factorization.sockets.SocketLacerator;
+import factorization.sockets.SocketScissors;
 import factorization.sockets.TileEntitySocketRenderer;
 import factorization.sockets.fanturpeller.SocketFanturpeller;
+import factorization.utiligoo.GooRenderer;
+import factorization.utiligoo.ItemGoo;
 import factorization.weird.BlockRenderDayBarrel;
 import factorization.weird.ContainerPocket;
 import factorization.weird.DayBarrelItemRenderer;
@@ -181,6 +184,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
             setTileEntityRendererDispatcher(TileEntitySteamTurbine.class, new TileEntitySteamTurbineRender());
             setTileEntityRendererDispatcher(TileEntityLeydenJar.class, new TileEntityLeydenJarRender());
             setTileEntityRendererDispatcher(TileEntityCompressionCrafter.class, new TileEntityCompressionCrafterRenderer());
+            setTileEntityRendererDispatcher(SocketScissors.class, new TileEntitySocketRenderer());
             setTileEntityRendererDispatcher(SocketLacerator.class, new TileEntitySocketRenderer());
             setTileEntityRendererDispatcher(SocketFanturpeller.class, new TileEntitySocketRenderer());
             // End section that is azanor's fault
@@ -213,7 +217,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 FactoryType.SOCKET_SHIFTER,
                 FactoryType.SOCKET_BLOWER,
                 FactoryType.SOCKET_PUMP,
-                FactoryType.SOCKET_BARE_MOTOR
+                FactoryType.SOCKET_BARE_MOTOR,
+                FactoryType.SOCKET_SCISSORS
         }) {
             new BlockRenderSocketBase(ft);
         }
@@ -223,7 +228,8 @@ public class FactorizationClientProxy extends FactorizationProxy {
                 FactoryType.SLAGFURNACE,
                 FactoryType.SOLARBOILER,
                 FactoryType.PARASIEVE,
-                FactoryType.CALIOMETRIC_BURNER
+                FactoryType.CALIOMETRIC_BURNER,
+                FactoryType.CREATIVE_CHARGE
                 }) {
             FactorizationBlockRender.setDefaultRender(ft);
         }
@@ -235,6 +241,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
         MinecraftForgeClient.registerItemRenderer(Core.registry.glaze_bucket, new ItemRenderGlazeBucket());
         MinecraftForgeClient.registerItemRenderer(Core.registry.daybarrel, new DayBarrelItemRenderer(renderBarrel));
         setTileEntityRendererDispatcher(BlockDarkIronOre.Glint.class, new GlintRenderer());
+        Core.loadBus(GooRenderer.INSTANCE);
     }
     
     @Override

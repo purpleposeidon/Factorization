@@ -3,3 +3,4 @@
 \index{corkscrew}{Screw Pump}
 \index{lacerator}{Lacerator}
 \index{pressurizer}{Pressurizer}
+\index{scissors}{Enormous Scissors}

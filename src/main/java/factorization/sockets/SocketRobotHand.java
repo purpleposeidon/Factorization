@@ -167,13 +167,8 @@ public class SocketRobotHand extends TileEntitySocketBase {
         if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
             return mcClick(player, mop, is);
         } else if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
-            if (mop.entityHit.interactFirst(player)) {
+            if (player.interactWith(mop.entityHit)) {
                 return true;
-            }
-            if (is != null && mop.entityHit instanceof EntityLiving) {
-                if (is.interactWithEntity(player, (EntityLiving)mop.entityHit)) {
-                    return true;
-                }
             }
         }
         return false;
@@ -219,9 +214,6 @@ public class SocketRobotHand extends TileEntitySocketBase {
             if (itemstack == null) {
                 ret = false;
                 break;
-            }
-            if (!world.isBlockNormalCubeDefault(x, y, z, true)) {
-                side = side ^ 1;
             }
             ret = itemstack.tryPlaceItemIntoWorld(player, world, x, y, z, side, dx, dy, dz);
             break;

@@ -3,12 +3,13 @@ package factorization.common;
 import java.util.HashMap;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import factorization.shared.Core;
 import factorization.weird.ContainerPocket;
 
 public enum Command {
-    craftClear(2, true), craftSwirl(3, true), craftBalance(4, true), craftOpen(5, true),
-    craftFill(11, true);
+    craftClear(2, true), craftSwirl(3, true), craftBalance(4, true), craftOpen(5, true), craftFill(11, true),
+    gooRightClick(12, false), gooLeftClick(13, false);
 
     static class name {
         static HashMap<Byte, Command> map = new HashMap<Byte, Command>();
@@ -67,6 +68,12 @@ public enum Command {
             break;
         case craftOpen:
             Core.registry.pocket_table.tryOpen(player);
+            break;
+        case gooLeftClick:
+        case gooRightClick:
+            if (player instanceof EntityPlayerMP) {
+                Core.registry.utiligoo.executeCommand(this, (EntityPlayerMP) player);
+            }
             break;
         default:
             Core.logWarning("Command " + this + " is missing handler");

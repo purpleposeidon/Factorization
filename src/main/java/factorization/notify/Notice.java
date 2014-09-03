@@ -232,8 +232,7 @@ public class Notice {
     }
 
     /**
-     * Dispatches the Notice to the player. If the player is null, then all
-     * players in the world will see it.
+     * @see sendTo
      */
     public void send(EntityPlayer player) {
         if (isUpdating) {
@@ -251,6 +250,14 @@ public class Notice {
             targetPlayer = player;
             addedToRecurList = true;
         }
+    }
+    
+    /**
+     * Dispatches the Notice to the player. If the player is null, then all
+     * players in the world will see it.
+     */
+    public void sendTo(EntityPlayer player) {
+        send(player);
     }
 
     /**

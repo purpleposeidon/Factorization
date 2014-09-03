@@ -36,7 +36,6 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     static final int max_charge_threshold = 70, min_charge_threshold = 20;
     static final int max_discharge_threshold = 40, min_discharge_threshold = 10;
     public static final int max_storage = 6400*200;
-    static final int max_charge_per_tick = 200;
     static final int max_discharge_per_tick = 50;
 
     public ChargeSparks sparks = null;
@@ -136,11 +135,11 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
         int charge_threshold = getChargeThreshold();
         int discharge_threshold = getDischargeThreshold();
         if (charge_value > charge_threshold) {
+            int max_charge_per_tick = Math.max(20, charge_value / 5);
             double efficiency = getEfficiency();
             int free = max_storage - storage;
             int to_take = Math.min(charge_value - charge_threshold, max_charge_per_tick);
             to_take = Math.min(free, to_take);
-            to_take = Math.min(charge_threshold - discharge_threshold - 1, to_take);
             int gain = (int) (to_take*efficiency);
             if (gain > 0) {
                 storage += charge.deplete(to_take)*efficiency;
@@ -164,7 +163,7 @@ public class TileEntityLeydenJar extends TileEntityCommon implements IChargeCond
     
     void updateClients() {
         if (storage != last_storage) {
-            if (FzUtil.significantChange(storage, last_storage, 0.005F)) {
+            if (FzUtil.significantChange(storage, last_storage, 0.05F)) {
                 broadcastMessage(null, MessageType.LeydenjarLevel, storage);
                 last_storage = storage;
             }

@@ -227,8 +227,10 @@ public class BlockFactorization extends BlockContainer {
         Coord here = new Coord(world, x, y, z);
         TileEntityCommon tec = here.getTE(TileEntityCommon.class);
         if (tec == null) {
-            new Notice(here, "No TileEntity!").send(player);
-            return super.removedByPlayer(world, player, x, y, z);
+            if (!world.isRemote) {
+                new Notice(here, "No TileEntity!").send(player);
+            }
+            return super.removedByPlayer(world, player, x, y, z); // That is a *LIE*, this function is *NOT* deprecated as of Aug 26 2014.
         }
         return tec.removedByPlayer(player);
     }
@@ -293,6 +295,11 @@ public class BlockFactorization extends BlockContainer {
             //These checks are for buildcraft, which is hatin'.
             itemList.add(new ItemStack(reg.battery, 1, 2));
         }
+        itemList.add(reg.leydenjar_item);
+        if (reg.leydenjar_item_full != null) {
+            itemList.add(reg.leydenjar_item_full);
+        }
+        itemList.add(FactoryType.CREATIVE_CHARGE.itemStack());
         itemList.add(reg.caliometric_burner_item);
         itemList.add(reg.solarboiler_item);
         itemList.add(reg.steamturbine_item);
@@ -304,10 +311,6 @@ public class BlockFactorization extends BlockContainer {
         itemList.add(reg.leadwire_item);
         itemList.add(reg.mixer_item);
         itemList.add(reg.crystallizer_item);
-        itemList.add(reg.leydenjar_item);
-        if (reg.leydenjar_item_full != null) {
-            itemList.add(reg.leydenjar_item_full);
-        }
 
         itemList.add(reg.greenware_item);
         

@@ -136,7 +136,7 @@ public class RenderMessages extends RenderMessagesProxy {
             }
             opacity = (float) Math.sin(opacity);
             if (opacity > 0.12) {
-                renderMessage(m, event.partialTicks, opacity);
+                renderMessage(m, event.partialTicks, opacity, cx, cy, cz);
             }
         }
         GL11.glEnable(GL11.GL_LIGHTING);
@@ -148,7 +148,7 @@ public class RenderMessages extends RenderMessagesProxy {
 
     RenderItem renderItem = new RenderItem();
 
-    private void renderMessage(ClientMessage m, float partial, float opacity) {
+    private void renderMessage(ClientMessage m, float partial, float opacity, double cx, double cy, double cz) {
         int width = 0;
         String[] lines = m.msg.split("\n");
         FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
@@ -172,9 +172,18 @@ public class RenderMessages extends RenderMessagesProxy {
         }
 
         Vec3 vec = m.getPosition(partial);
+        
         float x = (float) vec.xCoord;
         float y = (float) vec.yCoord;
         float z = (float) vec.zCoord;
+        if (m.style.contains(Style.SCALE_SIZE)) {
+            double dx = x - cx;
+            double dy = y - cy;
+            double dz = z - cz;
+            double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            scaling *= Math.sqrt(dist);
+        }
+        
         ISaneCoord co = m.asCoordMaybe();
         if (co != null && !m.position_important) {
             Block b = co.w().getBlock(co.x(), co.y(), co.z());
@@ -236,7 +245,9 @@ public class RenderMessages extends RenderMessagesProxy {
                 
                 GL11.glTranslatef((float) (halfWidth + 4), -lineCount/2, 0);
                 renderItem.zLevel -= 50;
+                GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
                 renderItem.renderItemAndEffectIntoGUI(fr, re, m.item, 0, 0);
+                GL11.glPopAttrib();
                 renderItem.zLevel += 50;
             }
         }
