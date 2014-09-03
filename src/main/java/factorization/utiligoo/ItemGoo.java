@@ -324,14 +324,18 @@ public class ItemGoo extends ItemFactorization {
             ItemBlock ib = (ItemBlock) source.getItem();
             int origSize = source.stackSize;
             ib.onItemUse(source, player, player.worldObj, at.x, at.y, at.z, mop.sideHit, (float) mop.hitVec.xCoord, (float) mop.hitVec.yCoord, (float) mop.hitVec.zCoord);
-            if (player.capabilities.isCreativeMode) {
+            if (creative) {
                 source.stackSize = origSize; // Great work, guys.
             }
             removed++;
         }
         if (removed <= 0) return;
         data.removeIndices(to_remove, is, world);
-        if (!player.capabilities.isCreativeMode) misplaceSomeGoo(is, world.rand, removed);
+        if (!creative) {
+            misplaceSomeGoo(is, world.rand, removed);
+        } else {
+            is.stackSize += removed;
+        }
     }
     
     private boolean deselectCoord(ItemStack is, GooData data, World world, int x, int y, int z, boolean bulkAction) {
@@ -354,7 +358,8 @@ public class ItemGoo extends ItemFactorization {
     }
     
     private void mineSelection(ItemStack is, GooData data, World world, MovingObjectPosition mop, EntityPlayerMP player, ItemStack tool) {
-        Item toolItem = tool.getItem();
+        boolean creative = player.capabilities.isCreativeMode;
+        Item toolItem = creative ? null : tool.getItem();
         ArrayList<Integer> toRemove = new ArrayList();
         int removed = 0;
         for (int i = 0; i < data.coords.length; i += 3) {
@@ -364,8 +369,12 @@ public class ItemGoo extends ItemFactorization {
             Block b = world.getBlock(ix, iy, iz);
             if (b.isAir(world, ix, iy, iz)) continue;
             float hardness = b.getBlockHardness(world, ix, iy, iz);
-            if (hardness < 0) continue;
-            if (hardness == 0 || toolItem.canHarvestBlock(b, tool) || toolItem.func_150893_a(tool, b) > 1)  {
+            if (hardness < 0 && !creative) continue;
+            boolean canBreak = creative || hardness == 0;
+            if (toolItem != null) {
+                canBreak |= toolItem.canHarvestBlock(b, tool) || toolItem.func_150893_a(tool, b) > 1;
+            }
+            if (canBreak)  {
                 if (player.theItemInWorldManager.tryHarvestBlock(ix, iy, iz)) {
                     removed++;
                     toRemove.add(i);
@@ -377,7 +386,11 @@ public class ItemGoo extends ItemFactorization {
         }
         if (removed == 0) return;
         data.removeIndices(toRemove, is, world);
-        if (!player.capabilities.isCreativeMode) misplaceSomeGoo(is, world.rand, removed);
+        if (!creative) {
+            misplaceSomeGoo(is, world.rand, removed);
+        } else {
+            is.stackSize += removed;
+        }
     }
     
     private void misplaceSomeGoo(ItemStack is, Random rand, int removed) {
@@ -496,8 +509,9 @@ public class ItemGoo extends ItemFactorization {
         EntityPlayer p = event.getPlayer();
         if (!(p instanceof EntityPlayerMP)) return;
         EntityPlayerMP player = (EntityPlayerMP) p;
+        boolean creative = player.capabilities.isCreativeMode;
         ItemStack held = player.getHeldItem();
-        if (held == null) return;
+        if (held == null && !creative) return;
         for (int slot = 0; slot < 9; slot++) {
             ItemStack is = FzUtil.normalize(player.inventory.getStackInSlot(slot));
             if (is == null || is.getItem() != this) continue;
