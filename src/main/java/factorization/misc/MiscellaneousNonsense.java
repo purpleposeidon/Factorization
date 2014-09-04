@@ -48,6 +48,8 @@ import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
+import factorization.colossi.CommandScanForColossus;
+import factorization.colossi.WorldGenColossus;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
@@ -299,6 +301,9 @@ public class MiscellaneousNonsense {
     @EventHandler
     public void registerCommands(FMLServerStartingEvent event) {
         event.registerServerCommand(new MC16009());
+        if (FzConfig.gen_colossi) { // NORELEASE... right place for this? Not really.
+            event.registerServerCommand(new CommandScanForColossus());
+        }
     }
     
 

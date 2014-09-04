@@ -5,6 +5,8 @@ import static net.minecraftforge.common.BiomeDictionary.Type.*;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.IChunkProvider;
@@ -37,14 +39,29 @@ public class WorldGenColossus implements IWorldGenerator {
     
     {
         if (FzConfig.gen_colossi) {
-            Core.loadBus(this);;
+            Core.loadBus(this);
             MinecraftForge.TERRAIN_GEN_BUS.register(this);
         }
     }
     
-    static int GENERATION_SPACING = 80;
+    static int GENERATION_SPACING = 64; // TODO NORELEASE: Config option
     static int GENERATION_START_X = 40, GENERATION_START_Z = 40;
     static final double SMOOTH_END = 8*3, SMOOTH_START = 8*5;
+    
+    static double position(int generation_spacing, int pos_start, double pos) {
+     // chunkX % dist = x_start
+        // target_x = ((dist * n) + x_start)*16 + 8
+        int radius = GENERATION_SPACING / 2;
+        int mul = (int) (((pos + 8)/16 - pos_start + radius)/generation_spacing); // the 'n' of the nearest location
+        double target_pos1 = ((generation_spacing * mul) + pos_start) * 16 + 8;
+        double target_pos2 = ((generation_spacing * (mul + 1)) + pos_start) * 16 + 8;
+        double dp1 = target_pos1 - pos;
+        double dp2 = target_pos2 - pos;
+        if (Math.abs(dp1) < Math.abs(dp2)) {
+            return target_pos1;
+        }
+        return target_pos2;
+    }
     
     static double dist(int generation_spacing, int pos_start, double pos) {
         // chunkX % dist = x_start
@@ -56,7 +73,6 @@ public class WorldGenColossus implements IWorldGenerator {
         double dist1 = Math.abs(pos - target_pos1);
         double dist2 = Math.abs(pos - target_pos2);
         return Math.min(dist1, dist2);
-        //return 4487 - pos;
     }
     
     static double distance(double blockX, double blockZ) {
@@ -68,8 +84,17 @@ public class WorldGenColossus implements IWorldGenerator {
         return Math.abs(distX + distZ)/2;
     }
     
-    boolean isGenChunk(int chunkX, int chunkZ) {
+    static boolean isGenChunk(int chunkX, int chunkZ) {
         return (chunkX % GENERATION_SPACING) == GENERATION_START_X && (chunkZ % GENERATION_SPACING) == GENERATION_START_Z;
+    }
+    
+    static Coord getNearest(Coord player) {
+        double cx = position(GENERATION_SPACING, GENERATION_START_X, player.x);
+        double cz = position(GENERATION_SPACING, GENERATION_START_Z, player.z);
+        Coord ret = player.copy();
+        ret.x = (int) cx;
+        ret.z = (int) cz;
+        return ret;
     }
     
     static class SmoothNoiseNearColossi extends NoiseGeneratorOctaves {
@@ -148,10 +173,13 @@ public class WorldGenColossus implements IWorldGenerator {
         int blockX = 8 + (chunkX * 16);
         int blockZ = 8 + (chunkZ * 16);
         
+        boolean bad_biome = false;
+        
         BiomeGenBase biome = world.getBiomeGenForCoords(blockX, blockZ);
         for (Type bad : forbiddenBiomeTypes) {
             if (BiomeDictionary.isBiomeOfType(biome, bad)) {
-                return;
+                bad_biome = true;
+                break;
             }
         }
         
@@ -162,6 +190,13 @@ public class WorldGenColossus implements IWorldGenerator {
             start.y--;
         }
         start.y++;
+        if (bad_biome) {
+            start.setId(Blocks.standing_sign);
+            TileEntitySign sign = start.getTE(TileEntitySign.class);
+            sign.signText[0] = "Bad biome!";
+            sign.signText[1] = biome.biomeName; // NORELEASE
+            return;
+        }
         Block dirt = start.getBlock();
         int dirt_md = start.getMd();
         
@@ -188,6 +223,4 @@ public class WorldGenColossus implements IWorldGenerator {
         
         builder.construct();
     }
-    
-    
 }
