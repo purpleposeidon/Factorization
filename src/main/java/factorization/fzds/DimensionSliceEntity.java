@@ -337,9 +337,11 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         @Override
         public boolean isEntityApplicable(Entity entity) {
             if (entity instanceof EntityPlayer) {
-                return entity.worldObj.isRemote;
+                return entity.worldObj.isRemote; // erm, wait, what?
             }
-            return !(entity.getClass() == DseCollider.class || entity.boundingBox == null);
+            Class entClass = entity.getClass();
+            if (entClass == DseCollider.class || entClass == DimensionSliceEntity.class) return false;
+            return entity.boundingBox != null;
         }
     };
     
