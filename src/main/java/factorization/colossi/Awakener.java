@@ -237,7 +237,7 @@ public class Awakener {
     }
     
     BodySide getSide(Set<Coord> set) {
-        return one(set).x < heartTE.xCoord ? BodySide.LEFT : BodySide.RIGHT;
+        return one(set).z > heartTE.zCoord ? BodySide.LEFT : BodySide.RIGHT;
     }
     
     Vec3 calculateJointPosition(Set<Coord> limb, int size, int length) {
