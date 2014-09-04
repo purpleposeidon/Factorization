@@ -3,7 +3,7 @@
   "authorList": [
    "neptunepink"
   ], 
-  "credits": "OvermindDL1", 
+  "credits": "", 
   "dependencies": [], 
   "description": "Auto-crafting, ore processing, barrels, and other tools", 
   "mcversion": "${mcversion}", 
