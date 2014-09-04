@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Vec3;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.colossi.ColossusController.BodySide;
@@ -241,23 +241,29 @@ public class Awakener {
     }
     
     Vec3 calculateJointPosition(Set<Coord> limb, int size, int length) {
+        size++;
         Coord corner = null;
         for (Coord c : limb) {
             if (corner == null) {
-                corner = c;
+                corner = c.copy();
                 continue;
             }
             if (c.y > corner.y) {
-                c = corner;
-            } else if (c.x < corner.x || c.z < corner.z) {
-                c = corner;
+                corner.y = c.y;
+            }
+            if (c.x < corner.x) {
+                corner.x = c.x;
+            }
+            if (c.z < corner.z) {
+                corner.z = c.z;
             }
         }
         if (corner == null) return Vec3.createVectorHelper(0, 0, 0);
+        corner = corner.add(ForgeDirection.UP); // Make the Y axis start at the top
         Vec3 ret = corner.createVector();
-        ret.xCoord += size/2;
-        ret.yCoord -= size/2;
-        ret.zCoord += size/2;
+        ret.xCoord += size/2.0;
+        ret.yCoord -= size/2.0;
+        ret.zCoord += size/2.0;
         return ret;
     }
 
