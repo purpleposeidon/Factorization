@@ -120,7 +120,7 @@ public class ColossusController extends Entity {
             if (li.type == LimbType.BODY) {
                 body = li;
             }
-            if (li.type == LimbType.ARM) { // NORELEASE LimbSide isn't being calculated right
+            if (li.type == LimbType.ARM) {
                 li.extension = -0.0;
                 li.twist += (TAU * 1.0/8.0) / 20;
                 li.twist = 0;
