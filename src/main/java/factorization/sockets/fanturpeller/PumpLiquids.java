@@ -351,9 +351,9 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         @Override
         public void pumpOut() {
             if (isSucking) return; //don't run backwards
-            if (!foundContainers.isEmpty()) {
+            if (!foundContainers.isEmpty() && buffer.getFluidAmount() > 0) {
                 FoundFluidHandler foundIfh = foundContainers.poll();
-                FluidStack work = buffer.getFluid().copy(); //TODO NORELEASE: Bugs. Bugs! Thing doesn't work...
+                FluidStack work = buffer.getFluid().copy();
                 if (work.amount > 10) {
                     work.amount = 10;
                 }
