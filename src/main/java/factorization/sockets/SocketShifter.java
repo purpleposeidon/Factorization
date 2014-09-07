@@ -363,7 +363,8 @@ public class SocketShifter extends TileEntitySocketBase {
     
     @Override
     protected boolean isBlockPowered() {
-        return worldObj.getBlockPowerInput(xCoord, yCoord, zCoord) > 0;
+        if (worldObj.isRemote) return false;
+        return worldObj.getStrongestIndirectPower(xCoord, yCoord, zCoord) > 0;
     }
     
     @Override
