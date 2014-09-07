@@ -66,9 +66,14 @@ public class GlintRenderer extends TileEntitySpecialRenderer {
             float opacity = (float) (theta/(2*Math.PI));
             opacity *= Math.min(te.age, 10)/10F;
             opacity *= distPacity;
+            double maxTheta = 3;
+            double minTheta = 2.8;
+            float r = FzUtil.uninterp((float) minTheta, (float) maxTheta, (float) theta);
+            opacity *= r;
             
             int light = w.getBlockLightValue(te.xCoord + dir.offsetX, te.yCoord + dir.offsetY, te.zCoord + dir.offsetZ);
             opacity += (light/16F)*0.2F;
+            opacity = Math.min(opacity, 0.35F);
             
             block.alpha = opacity;
             block.useTexture(null);
@@ -76,7 +81,7 @@ public class GlintRenderer extends TileEntitySpecialRenderer {
             float d = 1F/512F;
             float a = -d, b = 1 + d;
             block.setBlockBounds(a, a, a, b, b, b);
-            block.beginWithMirroredUVs();
+            block.beginWithRotatedUVs();
             block.renderForTileEntity();
         }
         tess.draw();
