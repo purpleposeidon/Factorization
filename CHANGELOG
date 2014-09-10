@@ -1,3 +1,9 @@
+0.8.88.1
+  Bunch of bug fixes & polishes:
+    socket shifter checks redstone properly
+    Fix dark iron ore's glint
+    Made /f now use localy formated time; notes can be added with the command as well
+
 0.8.88
   Important note:
     Socket blocks ignore redstone signal from the facing direction
