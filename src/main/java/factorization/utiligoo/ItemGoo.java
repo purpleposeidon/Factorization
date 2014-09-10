@@ -362,6 +362,7 @@ public class ItemGoo extends ItemFactorization {
         Item toolItem = creative ? null : tool.getItem();
         ArrayList<Integer> toRemove = new ArrayList();
         int removed = 0;
+        float origHardness = Float.POSITIVE_INFINITY; // creative ? Float.POSITIVE_INFINITY : new Coord(world, mop).getHardness();
         for (int i = 0; i < data.coords.length; i += 3) {
             int ix = data.coords[i + 0];
             int iy = data.coords[i + 1];
@@ -370,6 +371,7 @@ public class ItemGoo extends ItemFactorization {
             if (b.isAir(world, ix, iy, iz)) continue;
             float hardness = b.getBlockHardness(world, ix, iy, iz);
             if (hardness < 0 && !creative) continue;
+            if (hardness > origHardness) continue;
             boolean canBreak = creative || hardness == 0;
             if (toolItem != null) {
                 canBreak |= toolItem.canHarvestBlock(b, tool) || toolItem.func_150893_a(tool, b) > 1;
