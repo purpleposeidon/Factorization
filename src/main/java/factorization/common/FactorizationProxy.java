@@ -96,4 +96,6 @@ public class FactorizationProxy implements IGuiHandler {
     public boolean isClientHoldingShift() { return false; }
     
     public void afterLoad() { }
+    
+    public void sendBlockClickPacket() { }
 }

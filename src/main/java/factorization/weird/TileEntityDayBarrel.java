@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
@@ -21,6 +20,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
@@ -37,6 +37,7 @@ import net.minecraftforge.event.world.ChunkEvent;
 
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
@@ -1201,8 +1202,28 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     @Override
     protected boolean removedByPlayer(EntityPlayer player) {
+        if (cancelRemovedByPlayer(player)) {
+            if (player.worldObj.isRemote) {
+                Core.proxy.sendBlockClickPacket();
+            }
+            return false;
+        }
         broken_with_silk_touch = EnchantmentHelper.getSilkTouchModifier(player);
         return super.removedByPlayer(player);
+    }
+    
+    @Override
+    public boolean cancelRemovedByPlayer(EntityPlayer player) {
+        if (item == null) {
+            return false;
+        }
+        if (player == null) return false;
+        if (!player.capabilities.isCreativeMode) return false;
+        if (player.isSneaking()) return false;
+        if (!player.worldObj.isRemote) {
+            click(player);
+        }
+        return true;
     }
     
     static ArrayList<Integer> finalizedDisplayLists = new ArrayList();
