@@ -3,6 +3,7 @@ package factorization.colossi;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 import net.minecraft.item.ItemStack;
@@ -197,6 +198,8 @@ public class Awakener {
         all_members.addAll(arms);
         all_members.addAll(legs);
         
+        damageBody(body);
+        
         boolean first = true;
         for (Set<Coord> set : all_members) {
             int l = lowest(set);
@@ -236,6 +239,37 @@ public class Awakener {
         return true;
     }
     
+    private void damageBody(Set<Coord> body) {
+        int ls = leg_size + 1;
+        int count = ls * ls;
+        Random rand = new Random(new Coord(heartTE).seed());
+        ArrayList<Coord> samples = new ArrayList(count);
+        int i = 0;
+        for (Coord cell : body) {
+            if (!isExposedSkin(cell)) continue;
+            if (i++ < count) {
+                samples.add(cell);
+            } else {
+                int j = rand.nextInt(i);
+                if (j < count) {
+                    samples.set(j, cell);
+                }
+            }
+        }
+        for (Coord cell : samples) {
+            cell.setIdMd(Core.registry.colossal_block, ColossalBlock.MD_BODY_CRACKED, true);
+        }
+    }
+    
+    boolean isExposedSkin(Coord cell) {
+        if (cell.getBlock() != Core.registry.colossal_block) return false;
+        if (cell.getMd() != ColossalBlock.MD_BODY) return false;
+        for (Coord n : cell.getNeighborsAdjacent()) {
+            if (n.isAir()) return true;
+        }
+        return false;
+    }
+
     BodySide getSide(Set<Coord> set) {
         return one(set).z > heartTE.zCoord ? BodySide.LEFT : BodySide.RIGHT;
     }
@@ -394,13 +428,15 @@ public class Awakener {
     
     void includeShell(ArrayList<Set<Coord>> sets, Set<Coord> exclude, int maxIter) {
         HashMap<Set<Coord>, Set<Coord>> pending2origs = new HashMap();
+        ArrayList<Set<Coord>> sortedPendings = new ArrayList();
         Set<Coord> allFound = new HashSet();
         for (Set<Coord> f : sets) {
+            sortedPendings.add(f);
             pending2origs.put(f, f);
             allFound.addAll(f);
         }
         while (!pending2origs.isEmpty() && maxIter-- > 0) {
-            Set<Coord> set = one(pending2origs);
+            Set<Coord> set = sortedPendings.remove(0);
             Set<Coord> orig = pending2origs.remove(set);
             
             Set<Coord> newBlocks = new HashSet();
@@ -413,6 +449,7 @@ public class Awakener {
             }
             if (!newBlocks.isEmpty()) {
                 orig.addAll(newBlocks);
+                sortedPendings.add(newBlocks);
                 pending2origs.put(newBlocks, orig);
             }
         }
