@@ -29,26 +29,34 @@ import factorization.shared.FzUtil;
 public class Awakener {
     int arm_size = 0, arm_length = 0;
     int leg_size = 0, leg_length = 0;
+    static boolean is_working = false;
     
     public static void awaken(Coord src) {
-        if (src.getDimensionID() == Hammer.dimensionID) return;
-        TileEntityColossalHeart heart = findNearestHeart(src);
-        if (heart == null) return;
-        Core.logInfo("XR10-class entity detected."); 
-        Awakener awakener = new Awakener(heart);
-        boolean success = awakener.abandonedLongAgo_thisAncientGuardianBurnsItsRemainingPower();
-        if (!success) {
-            Core.logInfo("Body is deformed. Self-destructing.");
+        if (is_working) return;
+        try {
+            is_working = true;
+            if (src.getDimensionID() == Hammer.dimensionID) return;
+            TileEntityColossalHeart heart = findNearestHeart(src);
+            if (heart == null) return;
+            Core.logInfo("XR10-class entity detected.");
             Coord core = new Coord(heart);
-            Core.logInfo("Disconnecting LMP.");
-            ItemStack lmp = new ItemStack(Core.registry.logicMatrixProgrammer);
+            Awakener awakener = new Awakener(heart);
+            boolean success = awakener.abandonedLongAgo_thisAncientGuardianBurnsItsRemainingPower();
+            if (!success) {
+                Core.logInfo("Body is deformed. Self-destructing.");
+                Core.logInfo("Disconnecting LMP.");
+                ItemStack lmp = new ItemStack(Core.registry.logicMatrixProgrammer);
+                core.setAir();
+                Core.logInfo("Good-bye, world!");
+                core.w.newExplosion(null, core.x + 0.5, core.y + 0.5, core.z + 0.5, 0.25F, false, true);
+                core.spawnItem(lmp);
+                return;
+            }
             core.setAir();
-            Core.logInfo("Good-bye, world!");
-            core.w.newExplosion(null, core.x + 0.5, core.y + 0.5, core.z + 0.5, 0.25F, false, true);
-            core.spawnItem(lmp);
-            return;
+            Core.logInfo("Engaging entity.");
+        } finally {
+            is_working = false;
         }
-        Core.logInfo("Engaging entity.");
     }
     
     final TileEntityColossalHeart heartTE;
@@ -183,6 +191,7 @@ public class Awakener {
         Vec3 leg_sum = Vec3.createVectorHelper(0, 0, 0);
         for (Set<Coord> leg: legs) {
             Vec3 joint = calculateJointPosition(leg, leg_size, leg_length);
+            joint.yCoord += leg_size / 2;
             SetAndInfo sai = new SetAndInfo(leg, leg_length, leg_size, joint, LimbType.LEG, getSide(leg));
             limbInfo.add(sai);
             FzUtil.incrAdd(leg_sum, joint);
@@ -232,10 +241,11 @@ public class Awakener {
         int part_size = parts.size();
         Core.logInfo("Activated %s parts", part_size);
         LimbInfo[] info = parts.toArray(new LimbInfo[part_size]);
-        ColossusController controller = new ColossusController(heartTE.getWorldObj(), info);
+        ColossusController controller = new ColossusController(heartTE.getWorldObj(), info, arm_size, arm_length, leg_size, leg_length);
         new Coord(heartTE).setAsEntityLocation(controller);
         controller.worldObj.spawnEntityInWorld(controller);
         
+        Core.logInfo("*** WARNING: Energy reserves < 0.1%% ***");
         return true;
     }
     

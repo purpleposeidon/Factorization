@@ -77,7 +77,9 @@ public class DeltaChunk {
     
     public static IDeltaChunk allocateSlice(World spawnWorld, int channel, DeltaCoord size) {
         Coord base = Hammer.hammerInfo.takeCell(channel, size);
-        return new DimensionSliceEntity(spawnWorld, base, base.add(size));
+        Coord end = base.add(size);
+        wipeRegion(base, end);
+        return new DimensionSliceEntity(spawnWorld, base, end);
     }
     
     public static IDeltaChunk findClosest(Entity target, Coord pos) {
@@ -128,6 +130,21 @@ public class DeltaChunk {
     }
     
     private static Coord shadow = new Coord(null, 0, 0, 0);
+    
+    public static void wipeRegion(final Coord min, final Coord max) {
+        Coord.sort(min, max);
+        Coord at = min.copy();
+        for (int x = min.x; x <= max.x; x++) {
+            at.x = x;
+            for (int y = min.y; y <= max.y; y++) {
+                at.y = y;
+                for (int z = min.z; z <= max.z; z++) {
+                    at.z = z;
+                    at.setAir();
+                }
+            }
+        }
+    }
     
     public static IDeltaChunk makeSlice(int channel, final Coord min, final Coord max, AreaMap mapper, final boolean wipeSrc) {
         DeltaCoord size = max.difference(min);

@@ -344,7 +344,7 @@ public class Quaternion implements IDataSerializable {
     
     public double getAngleBetween(Quaternion other) {
         double dot = dotProduct(other);
-        dot = Math.min(-1, Math.max(1, dot));
+        dot = Math.max(-1, Math.min(1, dot));
         return Math.acos(dot);
     }
     
