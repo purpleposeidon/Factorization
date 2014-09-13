@@ -18,13 +18,7 @@ public class ColossusAI implements IDataSerializable {
     
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
-        if (state == null) {
-            System.out.println("NORELEASE");
-        }
         state = data.as(Share.PRIVATE, prefix + "_state").putEnum(state);
-        if (state == null) {
-            System.out.println("NORELEASE");
-        }
         return this;
     }
     

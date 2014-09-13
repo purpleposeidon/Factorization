@@ -13,7 +13,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.colossi.ColossusController.BodySide;
-import factorization.colossi.ColossusController.LimbInfo;
 import factorization.colossi.ColossusController.LimbType;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.DeltaChunk.AreaMap;

@@ -8,7 +8,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
-import factorization.colossi.ColossusController.LimbInfo;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.shared.FzUtil;
 import static factorization.shared.FzUtil.interp;
