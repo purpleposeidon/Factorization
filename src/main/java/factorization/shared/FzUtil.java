@@ -1201,7 +1201,13 @@ public class FzUtil {
     }
     
     public static AxisAlignedBB createAABB(Vec3 min, Vec3 max) {
-        return AxisAlignedBB.getBoundingBox(min.xCoord, min.yCoord, min.zCoord, max.xCoord, max.yCoord, max.zCoord);
+        double minX = Math.min(min.xCoord, max.xCoord);
+        double minY = Math.min(min.yCoord, max.yCoord);
+        double minZ = Math.min(min.zCoord, max.zCoord);
+        double maxX = Math.max(min.xCoord, max.xCoord);
+        double maxY = Math.max(min.yCoord, max.yCoord);
+        double maxZ = Math.max(min.zCoord, max.zCoord);
+        return AxisAlignedBB.getBoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
     }
     
     public static void assignBoxFrom(AxisAlignedBB dest, AxisAlignedBB orig) {
@@ -1215,6 +1221,20 @@ public class FzUtil {
         if (box.maxY < vec.yCoord) box.maxY = vec.yCoord;
         if (vec.zCoord < box.minZ) box.minZ = vec.zCoord;
         if (box.maxZ < vec.zCoord) box.maxZ = vec.zCoord;
+    }
+    
+    public static Vec3[] getCorners(AxisAlignedBB box) {
+        return new Vec3[] {
+                Vec3.createVectorHelper(box.minX, box.minY, box.minZ),
+                Vec3.createVectorHelper(box.minX, box.maxY, box.minZ),
+                Vec3.createVectorHelper(box.maxX, box.maxY, box.minZ),
+                Vec3.createVectorHelper(box.maxX, box.minY, box.minZ),
+                
+                Vec3.createVectorHelper(box.minX, box.minY, box.maxZ),
+                Vec3.createVectorHelper(box.minX, box.maxY, box.maxZ),
+                Vec3.createVectorHelper(box.maxX, box.maxY, box.maxZ),
+                Vec3.createVectorHelper(box.maxX, box.minY, box.maxZ)
+        };
     }
     
     public static boolean intersect(double la, double ha, double lb, double hb) {

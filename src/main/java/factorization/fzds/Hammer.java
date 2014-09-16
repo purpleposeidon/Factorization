@@ -72,7 +72,6 @@ public class Hammer {
         
         int client_despawn_distance = 16*10; //NORELEASE: This wants for a config setting. "How far away the a client must be from a DSE before the server will tell the client to forget about it (eg, client side despawn)."
         EntityRegistry.registerModEntity(DimensionSliceEntity.class, "fzds", 1, this, client_despawn_distance, 1, true);
-        EntityRegistry.registerModEntity(DseCollider.class, "fzdsC", 2, this, client_despawn_distance, 80000, false);
         
         //Create the hammer dimension
         dimensionID = FzConfig.dimension_slice_dimid;

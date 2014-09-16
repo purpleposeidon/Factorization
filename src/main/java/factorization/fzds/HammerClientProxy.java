@@ -6,7 +6,6 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
@@ -33,17 +32,14 @@ import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import cpw.mods.fml.relauncher.Side;
-import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.shared.Core;
-import factorization.shared.EmptyRender;
 import factorization.shared.FzUtil;
 
 public class HammerClientProxy extends HammerProxy {
     public HammerClientProxy() {
-        RenderingRegistry.registerEntityRenderingHandler(DseCollider.class, new EmptyRender());
         RenderDimensionSliceEntity rwe = new RenderDimensionSliceEntity();
         RenderingRegistry.registerEntityRenderingHandler(DimensionSliceEntity.class, rwe);
         Core.loadBus(rwe);
