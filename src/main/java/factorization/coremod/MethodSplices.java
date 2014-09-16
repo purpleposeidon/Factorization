@@ -1,8 +1,13 @@
 package factorization.coremod;
 
+import java.util.List;
+
 import factorization.coremodhooks.HookTargetsClient;
 import factorization.coremodhooks.HookTargetsServer;
+import net.minecraft.command.IEntitySelector;
+import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 
@@ -41,5 +46,10 @@ public class MethodSplices {
             return;
         }
         return;
+    }
+    
+    // Chunk.getEntitiesWithinAABBForEntity
+    public void func_76588_a(Entity p_76588_1_, AxisAlignedBB p_76588_2_, List p_76588_3_, IEntitySelector p_76588_4_) {
+        HookTargetsServer.addConstantColliders(this, p_76588_1_, p_76588_2_, p_76588_3_, p_76588_4_);
     }
 }

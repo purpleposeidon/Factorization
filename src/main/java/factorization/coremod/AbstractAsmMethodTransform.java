@@ -7,12 +7,12 @@ import org.objectweb.asm.tree.MethodNode;
 
 import cpw.mods.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 
-abstract class AbstractAsmTransform {
+abstract class AbstractAsmMethodTransform {
     protected final String obfClassName;
     final String srgName;
     final String mcpName;
     boolean satisfied = false;
-    AbstractAsmTransform(String obfClassName, String srgClassName, String srgName, String mcpName) {
+    AbstractAsmMethodTransform(String obfClassName, String srgClassName, String srgName, String mcpName) {
         this.obfClassName = obfClassName;
         this.srgName = srgName;
         this.mcpName = mcpName;
@@ -38,7 +38,7 @@ abstract class AbstractAsmTransform {
                 || op == Opcodes.RETURN;
     }
     
-    static class Append extends AbstractAsmTransform {
+    static class Append extends AbstractAsmMethodTransform {
         Append(String obfClassName, String srgClassName, String srgName, String mcpName) {
             super(obfClassName, srgClassName, srgName, mcpName);
         }
@@ -61,7 +61,7 @@ abstract class AbstractAsmTransform {
         }
     }
     
-    static class Prepend extends AbstractAsmTransform {
+    static class Prepend extends AbstractAsmMethodTransform {
         Prepend(String obfClassName, String srgClassName, String srgName, String mcpName) {
             super(obfClassName, srgClassName, srgName, mcpName);
         }
@@ -87,6 +87,4 @@ abstract class AbstractAsmTransform {
         }
         
     }
-    
-    
 }

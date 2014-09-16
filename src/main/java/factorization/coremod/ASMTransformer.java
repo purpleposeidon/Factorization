@@ -22,37 +22,58 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 import cpw.mods.fml.relauncher.FMLRelaunchLog;
+import factorization.coremodhooks.MixinExtraChunkData;
 
 public class ASMTransformer implements IClassTransformer {
     @Override
     public byte[] transform(String name, String transformedName, byte[] basicClass) {
         if (transformedName.equals("net.minecraft.block.Block")) {
             return applyTransform(basicClass,
-                    new AbstractAsmTransform.Append(name, transformedName, "func_149723_a", "onBlockDestroyedByExplosion"),
-                    new AbstractAsmTransform.Append(name, transformedName, "func_149659_a", "canDropFromExplosion")
+                    new AbstractAsmMethodTransform.Append(name, transformedName, "func_149723_a", "onBlockDestroyedByExplosion"),
+                    new AbstractAsmMethodTransform.Append(name, transformedName, "func_149659_a", "canDropFromExplosion")
             );
         }
         if (transformedName.equals("net.minecraft.client.gui.inventory.GuiContainer")) {
             return applyTransform(basicClass,
-                    new AbstractAsmTransform.Append(name, transformedName, "func_73869_a", "keyTyped")
+                    new AbstractAsmMethodTransform.Append(name, transformedName, "func_73869_a", "keyTyped")
             );
         }
         if (transformedName.equals("net.minecraft.client.Minecraft")) {
             return applyTransform(basicClass,
-                    new AbstractAsmTransform.Prepend(name, transformedName, "func_147116_af", "func_147116_af"), // "attack key pressed" function (first handler), MCPBot name clickMouse
-                    new AbstractAsmTransform.Prepend(name, transformedName, "func_147121_ag", "func_147121_ag") // "use key pressed" function, MCPBot name rightClickMouse
+                    new AbstractAsmMethodTransform.Prepend(name, transformedName, "func_147116_af", "func_147116_af"), // "attack key pressed" function (first handler), MCPBot name clickMouse
+                    new AbstractAsmMethodTransform.Prepend(name, transformedName, "func_147121_ag", "func_147121_ag") // "use key pressed" function, MCPBot name rightClickMouse
+            );
+        }
+        if (transformedName.equals("net.minecraft.world.chunk.Chunk")) {
+            return applyTransform(basicClass,
+                    new AbstractAsmClassTransform.Mixin("factorization.coremodhooks.MixinExtraChunkData", "Lfactorization/coremodhooks/MixinExtraChunkData;"),
+                    new AbstractAsmMethodTransform.Append(name, transformedName, "func_76588_a", "getEntitiesWithinAABBForEntity")
             );
         }
         return basicClass;
     }
     
-    byte[] applyTransform(byte[] basicClass, AbstractAsmTransform... changes) {
+    static AbstractAsmClassTransform[] EMPTY = new AbstractAsmClassTransform[0];
+    
+    byte[] applyTransform(byte[] basicClass, AbstractAsmMethodTransform... changes) {
+        return applyTransform(basicClass, EMPTY, changes);
+    }
+    
+    byte[] applyTransform(byte[] basicClass, AbstractAsmClassTransform ct, AbstractAsmMethodTransform... changes) {
+        return applyTransform(basicClass, new AbstractAsmClassTransform[] { ct }, changes);
+    }
+    
+    byte[] applyTransform(byte[] basicClass, AbstractAsmClassTransform[] classChanges, AbstractAsmMethodTransform... changes) {
         ClassReader cr = new ClassReader(basicClass);
         ClassNode cn = new ClassNode();
         cr.accept(cn, 0);
+        
+        for (AbstractAsmClassTransform classTransformer : classChanges) {
+            classTransformer.apply(cn);
+        }
 
         for (MethodNode m : cn.methods) {
-            for (AbstractAsmTransform change : changes) {
+            for (AbstractAsmMethodTransform change : changes) {
                 if (change.applies(m)) {
                     MethodNode method = getMethod(change.srgName);
                     change.apply(m, method);
@@ -61,7 +82,7 @@ public class ASMTransformer implements IClassTransformer {
             }
         }
         
-        for (AbstractAsmTransform change : changes) {
+        for (AbstractAsmMethodTransform change : changes) {
             if (!change.satisfied) {
                 throw new RuntimeException("Unable to find method " + cn.name + "." + change.srgName + " (" + change.mcpName + ")");
             }
@@ -74,11 +95,23 @@ public class ASMTransformer implements IClassTransformer {
     
     List<MethodNode> apendeeMethods = null;
     
-    MethodNode getMethod(String methodName) {
-        if (apendeeMethods == null) {
-            ClassReader cr = new ClassReader(getAppendeeBytecodeBytecode());
+    public static ClassNode readClass(String classname) {
+        LaunchClassLoader rcl = (LaunchClassLoader) ASMTransformer.class.getClassLoader();
+        try {
+            byte[] classBytes = rcl.getClassBytes(classname);
+            ClassReader cr = new ClassReader(classBytes);
             ClassNode cn = new ClassNode();
             cr.accept(cn, 0);
+            return cn;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }   
+        return null;
+    }
+    
+    MethodNode getMethod(String methodName) {
+        if (apendeeMethods == null) {
+            ClassNode cn = readClass(MethodSplices.class.getCanonicalName());
             apendeeMethods = cn.methods;
         }
         for (MethodNode m : apendeeMethods) {
@@ -87,17 +120,6 @@ public class ASMTransformer implements IClassTransformer {
             }
         }
         throw new RuntimeException("Couldn't find method " + methodName);
-    }
-
-    
-    byte[] getAppendeeBytecodeBytecode() {
-        LaunchClassLoader rcl = (LaunchClassLoader) getClass().getClassLoader();
-        try {
-            return rcl.getClassBytes(MethodSplices.class.getCanonicalName());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }   
-        return null;
     }
     
     static HashMap<Integer, String> opcodeNameMap = new HashMap();

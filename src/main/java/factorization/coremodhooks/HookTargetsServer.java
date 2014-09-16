@@ -1,9 +1,15 @@
 package factorization.coremodhooks;
 
+import java.util.List;
+
+import net.minecraft.command.IEntitySelector;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import factorization.api.Coord;
 import factorization.shared.Core;
 
@@ -38,5 +44,16 @@ public class HookTargetsServer {
             r = -max;
         }
         return r;
+    }
+    
+    public static void addConstantColliders(Object me, Entity collider, AxisAlignedBB box, List found, IEntitySelector filter) {
+        Entity[] constant_colliders = ((IExtraChunkData) me).getConstantColliders();
+        if (constant_colliders == null) return;
+        for (Entity ent : constant_colliders) {
+            if (ent == collider) continue;
+            if (filter == null || filter.isEntityApplicable(ent)) {
+                found.add(ent);
+            }
+        }
     }
 }
