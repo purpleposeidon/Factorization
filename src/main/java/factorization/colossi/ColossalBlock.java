@@ -7,6 +7,7 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
@@ -19,10 +20,13 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.Explosion;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.ForgeDirection;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.fzds.Hammer;
@@ -298,5 +302,15 @@ public class ColossalBlock extends Block {
     @Override
     public boolean hasTileEntity(int metadata) {
         return metadata == MD_CORE;
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public int colorMultiplier(IBlockAccess w, int x, int y, int z) {
+        int ret = 16777215;
+        World mcw = Minecraft.getMinecraft().theWorld;
+        if (mcw == null) return ret;
+        if (mcw.provider.dimensionId == Hammer.dimensionID) return ret;
+        return 0x524474;
     }
 }
