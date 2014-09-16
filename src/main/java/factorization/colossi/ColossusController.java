@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -16,7 +17,7 @@ import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.Share;
 import factorization.fzds.api.IDeltaChunk;
 
-public class ColossusController extends Entity {
+public class ColossusController extends Entity implements IBossDisplayData {
     static enum BodySide { LEFT, RIGHT, UNKNOWN_BODY_SIDE };
     static enum LimbType { BODY, ARM, LEG, UNKNOWN_LIMB_TYPE };
     LimbInfo[] limbs;
@@ -25,6 +26,9 @@ public class ColossusController extends Entity {
     boolean setup = false;
     int arm_size = 0, arm_length = 0;
     int leg_size = 0, leg_length = 0;
+    
+    int cracked_body_blocks = 0;
+    int broken_body_blocks = 0;
     
     Coord home = null;
     Coord path_target = null;
@@ -39,7 +43,7 @@ public class ColossusController extends Entity {
         path_target = new Coord(this);
     }
     
-    public ColossusController(World world, LimbInfo[] limbInfo, int arm_size, int arm_length, int leg_size, int leg_length) {
+    public ColossusController(World world, LimbInfo[] limbInfo, int arm_size, int arm_length, int leg_size, int leg_length, int damage) {
         super(world);
         this.limbs = limbInfo;
         for (LimbInfo li : limbs) {
@@ -81,6 +85,7 @@ public class ColossusController extends Entity {
         this.arm_length = arm_length;
         this.leg_size = leg_size;
         this.leg_length = leg_length;
+        this.cracked_body_blocks = damage;
     }
     
     AnimationExecutor ae = new AnimationExecutor("legWalk");
@@ -198,6 +203,8 @@ public class ColossusController extends Entity {
         leg_size = data.as(Share.PRIVATE, "legSize").putInt(leg_size);
         home = data.as(Share.PRIVATE, "home").put(home);
         path_target = data.as(Share.PRIVATE, "path_target").put(path_target);
+        cracked_body_blocks = data.as(Share.VISIBLE, "cracks").putInt(cracked_body_blocks);
+        broken_body_blocks = data.as(Share.VISIBLE, "broken").putInt(broken_body_blocks);
     }
 
     @Override
@@ -360,5 +367,15 @@ public class ColossusController extends Entity {
         
         
         turnTicks++;
+    }
+
+    @Override
+    public float getMaxHealth() {
+        return cracked_body_blocks + leg_size * leg_size;
+    }
+
+    @Override
+    public float getHealth() {
+        return cracked_body_blocks - broken_body_blocks;
     }
 }

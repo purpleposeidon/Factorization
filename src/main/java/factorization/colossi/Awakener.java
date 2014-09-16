@@ -206,7 +206,7 @@ public class Awakener {
         all_members.addAll(arms);
         all_members.addAll(legs);
         
-        damageBody(body);
+        int cracked_body_blocks = damageBody(body);
         
         boolean first = true;
         for (Set<Coord> set : all_members) {
@@ -240,7 +240,7 @@ public class Awakener {
         int part_size = parts.size();
         Core.logInfo("Activated %s parts", part_size);
         LimbInfo[] info = parts.toArray(new LimbInfo[part_size]);
-        ColossusController controller = new ColossusController(heartTE.getWorldObj(), info, arm_size, arm_length, leg_size, leg_length);
+        ColossusController controller = new ColossusController(heartTE.getWorldObj(), info, arm_size, arm_length, leg_size, leg_length, cracked_body_blocks);
         new Coord(heartTE).setAsEntityLocation(controller);
         controller.worldObj.spawnEntityInWorld(controller);
         
@@ -248,7 +248,7 @@ public class Awakener {
         return true;
     }
     
-    private void damageBody(Set<Coord> body) {
+    private int damageBody(Set<Coord> body) {
         int ls = leg_size + 1;
         int count = ls * ls;
         Random rand = new Random(new Coord(heartTE).seed());
@@ -265,9 +265,12 @@ public class Awakener {
                 }
             }
         }
+        int damaged = 0;
         for (Coord cell : samples) {
             cell.setIdMd(Core.registry.colossal_block, ColossalBlock.MD_BODY_CRACKED, true);
+            damaged++;
         }
+        return damaged;
     }
     
     boolean isExposedSkin(Coord cell) {
@@ -492,7 +495,7 @@ public class Awakener {
         min = min.copy();
         max = max.copy();
         Coord.sort(min, max);
-        int r = 16; // NORELEASE: Lazy! Laggy!
+        int r = 1;
         min.adjust(new DeltaCoord(-r, -r, -r));
         max.adjust(new DeltaCoord(r, r, r));
         IDeltaChunk ret = DeltaChunk.makeSlice(ColossusFeature.deltachunk_channel, min, max, new AreaMap() {
