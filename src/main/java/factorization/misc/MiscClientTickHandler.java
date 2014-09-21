@@ -24,6 +24,7 @@ import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import factorization.api.Coord;
+import factorization.common.FzConfig;
 import factorization.shared.FzUtil;
 
 public class MiscClientTickHandler {
@@ -171,6 +172,7 @@ public class MiscClientTickHandler {
     String last_msg = null;
     
     public void notifyTimeOnFullScreen() {
+        if (!FzConfig.show_time_on_fullscreen) return;
         if (interval <= 0) return;
         long now = getNow();
         if (now == old_now || now == -1) return;
