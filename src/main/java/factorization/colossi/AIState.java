@@ -4,7 +4,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import factorization.api.Coord;
 
-enum AIState {
+public enum AIState {
     IDLE {
         @Override
         AIState tick(ColossusController controller, int age) {

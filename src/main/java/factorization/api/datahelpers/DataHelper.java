@@ -68,7 +68,7 @@ public abstract class DataHelper {
             if (isWriter()) {
                 return (E) value;
             }
-            return (E) value.getClass().getEnumConstants()[i];
+            return (E) value.getDeclaringClass().getEnumConstants()[i];
         }
         if (o instanceof ItemStack) {
             ItemStack value = (ItemStack) o;

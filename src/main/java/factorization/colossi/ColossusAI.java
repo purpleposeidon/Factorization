@@ -18,6 +18,7 @@ public class ColossusAI implements IDataSerializable {
     
     @Override
     public IDataSerializable serialize(String prefix, DataHelper data) throws IOException {
+        age = data.as(Share.PRIVATE, prefix + "_age").putInt(age);
         state = data.as(Share.PRIVATE, prefix + "_state").putEnum(state);
         return this;
     }
