@@ -43,7 +43,6 @@ class ShadowRenderGlobal implements IWorldAccess {
         markBlocksForUpdate(var1 - 1, var2 - 1, var3 - 1, var4 + 1, var5 + 1, var6 + 1);
     }
     
-    private THashSet<IDeltaChunk> found_deltachunks = new THashSet<IDeltaChunk>(10); //NORELEASE: rm
     void markBlocksForUpdate(int lx, int ly, int lz, int hx, int hy, int hz) {
         World realClientWorld = DeltaChunk.getClientRealWorld();
         for (IDeltaChunk idc : DeltaChunk.getSlicesInRange(realClientWorld, lx, ly, lz, hx, hy, hz)) {
@@ -57,7 +56,6 @@ class ShadowRenderGlobal implements IWorldAccess {
                 dse.blocksChanged(hx, hy, hz);
             }
         }
-        found_deltachunks.clear();
     }
 
     @Override
