@@ -38,7 +38,6 @@ public abstract class AbstractAsmClassTransform {
                 for (MethodNode method : mixin.methods) {
                     if (method.name.equals("<init>")) continue;
                     parent.methods.add(method);
-                    ASMTransformer.printInstructions(method.instructions.getFirst()); // NORELEASE
                     for (LocalVariableNode var : method.localVariables) {
                         if (var.desc.equals(mangledMixinName)) {
                             var.desc = "L" + parent.name + ";";
