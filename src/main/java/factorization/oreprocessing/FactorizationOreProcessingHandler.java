@@ -31,8 +31,14 @@ public class FactorizationOreProcessingHandler {
     public static final float CRYSTALLIZE = CRYSTALLIZE_MULTIPLY/REDUCE_MULTIPLY;
     
     void smelt(ItemStack is, ItemStack ore, ItemStack ingot) {
-        float xp = FurnaceRecipes.smelting().func_151398_b(ore);
-        FurnaceRecipes.smelting().func_151394_a(is, ingot, xp);
+        float xp = 0;
+        FurnaceRecipes smeltingRegistry = FurnaceRecipes.smelting();
+        try {
+            xp = smeltingRegistry.func_151398_b(ore);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+        smeltingRegistry.func_151394_a(is, ingot, xp);
     }
     
     void addProcessingFront(OreType oreType, ItemStack ore, ItemStack ingot) {
