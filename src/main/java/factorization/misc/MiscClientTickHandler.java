@@ -170,6 +170,7 @@ public class MiscClientTickHandler {
     }
     
     String last_msg = null;
+    boolean mentioned_disabling = false;
     
     public void notifyTimeOnFullScreen() {
         if (!FzConfig.show_time_on_fullscreen) return;
@@ -181,6 +182,10 @@ public class MiscClientTickHandler {
         if (!mc.isFullScreen()) return;
         DateFormat df = DateFormat.getDateTimeInstance();
         String msg = df.format(new Date());
+        if (!mentioned_disabling) {
+            msg += " (via FZ)";
+            mentioned_disabling = true;
+        }
         mc.ingameGUI.getChatGUI().printChatMessageWithOptionalDeletion(new ChatComponentText(msg), 20392);
         last_msg = msg;
     }
