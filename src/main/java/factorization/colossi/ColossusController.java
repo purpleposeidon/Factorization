@@ -266,6 +266,12 @@ public class ColossusController extends Entity implements IBossDisplayData {
             double t = rotation_speed / rotation_distance;
             t = Math.min(0.5, t);
             target_rotation.incrLerp(current_rotation, 1 - t);
+            /*current_rotation.incrConjugate();
+            current_rotation.incrToOtherMultiply(target_rotation);
+            current_rotation.incrConjugate();
+            target_rotation.incrMultiply(current_rotation);
+            target_rotation.incrNormalize();
+            body.setRotationalVelocity(target_rotation);*/
             body.setRotation(target_rotation);
             turning = angle > 0 ? 1 : -1;
         } else if (rotation_distance > Math.PI * 0.0001) {
