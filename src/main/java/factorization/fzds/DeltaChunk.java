@@ -1,10 +1,12 @@
 package factorization.fzds;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DimensionManager;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
@@ -161,6 +163,7 @@ public class DeltaChunk {
                 TransferLib.move(real, shadow, false, true);
             }
         });
+        final HashSet<Chunk> chunks = new HashSet();
         mapper.fillDse(new DseDestination() {
             @Override
             public void include(Coord real) {
@@ -170,6 +173,7 @@ public class DeltaChunk {
                 shadow.set(real);
                 dse.real2shadow(shadow);
                 shadow.markBlockForUpdate();
+                chunks.add(real.getChunk());
             }
         });
         if (wipeSrc) {
@@ -179,6 +183,9 @@ public class DeltaChunk {
                     real.markBlockForUpdate();
                 }
             });
+        }
+        for (Chunk chunk : chunks) {
+            chunk.func_150809_p();
         }
         return dse;
     }
