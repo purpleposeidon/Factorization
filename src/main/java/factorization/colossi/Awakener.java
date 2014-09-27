@@ -495,7 +495,7 @@ public class Awakener {
         min = min.copy();
         max = max.copy();
         Coord.sort(min, max);
-        int r = 1;
+        int r = 2;
         min.adjust(new DeltaCoord(-r, -r, -r));
         max.adjust(new DeltaCoord(r, r, r));
         IDeltaChunk ret = DeltaChunk.makeSlice(ColossusFeature.deltachunk_channel, min, max, new AreaMap() {
