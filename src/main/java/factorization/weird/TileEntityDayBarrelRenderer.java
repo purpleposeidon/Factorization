@@ -65,8 +65,8 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT);
         GL11.glAlphaFunc(GL11.GL_GREATER, 0.0F);
         
-        renderItemCount(is, barrel);
-        handleRenderItem(is, barrel);
+        boolean hasLabel = renderItemCount(is, barrel);
+        handleRenderItem(is, barrel, hasLabel);
         
         GL11.glPopAttrib();
         GL11.glEnable(GL11.GL_LIGHTING);
@@ -124,9 +124,10 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
     }
     
     String getCountLabel(ItemStack item, TileEntityDayBarrel barrel) {
-        String t = "";
         int ms = item.getMaxStackSize();
         int count = barrel.getItemCount();
+        if (count == 1) return "";
+        String t = "";
         if (ms == 1 || count == ms) {
             t += count;
         } else {
@@ -158,10 +159,10 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         "i!  " // 'i' stands in for ∞, '!' stands in for '!!'
     };
     
-    void renderItemCount(ItemStack item, TileEntityDayBarrel barrel) {
+    boolean renderItemCount(ItemStack item, TileEntityDayBarrel barrel) {
         final String t = getCountLabel(item, barrel);
         if (t.isEmpty()) {
-            return;
+            return false;
         }
         GL11.glRotatef(180, 0, 0, 1);
         final IIcon font;
@@ -212,6 +213,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         tess.draw();
         tess.setTranslation(0, 0, 0);
         GL11.glRotatef(180, 0, 0, 1);
+        return true;
     }
 
     Tessellator voidTessellator = new Tessellator() {
@@ -247,14 +249,15 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
     TextureManager interception = null;
     EntityItem entityitem;
     
-    public void handleRenderItem(ItemStack is, TileEntityDayBarrel barrel) {
+    public void handleRenderItem(ItemStack is, TileEntityDayBarrel barrel, boolean hasLabel) {
         //Got problems? Consider looking at ForgeHooksClient.renderInventoryItem, that might be better than this here.
         GL11.glPushMatrix();
         GL11.glRotatef(180, 0, 0, 1);
+        float labelD = hasLabel ? 0F : -1F/16F;
         boolean multi = is.getItem().requiresMultipleRenderPasses();
         if (multi) {
             GL11.glRotatef(180, 1, 0, 0);
-            GL11.glTranslatef(-12F/16F, -6.75F/16F, 0);
+            GL11.glTranslatef(-12F/16F, -6.75F/16F - labelD, 0);
             if (entityitem == null) {
                 entityitem = new EntityItem(null, 0, 0, 0, NetworkFactorization.EMPTY_ITEMSTACK.copy());
             }
@@ -268,7 +271,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
             RenderItem.renderInFrame = false;
             gs.fancyGraphics = fancy;
         } else {
-            GL11.glTranslatef(0, 0, 1F/32F);
+            GL11.glTranslatef(0, labelD, 1F/32F);
             float scale = 1F/32F;
             GL11.glScalef(scale, scale, scale);
             GL11.glScalef(1, 1, -0.02F);
