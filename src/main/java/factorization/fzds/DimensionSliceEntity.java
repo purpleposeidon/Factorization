@@ -69,6 +69,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     PacketProxyingPlayer proxy = null;
     HashSet<IExtraChunkData> registered_chunks = new HashSet();
+    Entity universalCollider;
     
     public DimensionSliceEntity(World world) {
         super(world);
@@ -77,6 +78,22 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         }
         ignoreFrustumCheck = true; //kinda lame; we should give ourselves a proper bounding box?
         boundingBox.setBounds(0, 0, 0, 0, 0, 0);
+        universalCollider = new Entity(world) {
+            @Override
+            protected void entityInit() { }
+
+            @Override
+            protected void readEntityFromNBT(NBTTagCompound tag) { }
+
+            @Override
+            protected void writeEntityToNBT(NBTTagCompound tag) { }
+            
+            @Override
+            public AxisAlignedBB getBoundingBox() {
+                return metaAABB;
+            }
+                
+        };
     }
     
     public DimensionSliceEntity(World world, Coord lowerCorner, Coord upperCorner) {
@@ -164,7 +181,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     @Override
     public AxisAlignedBB getBoundingBox() {
-        return metaAABB;
+        return null; // universalCollider handles collisions.
     }
     
     @Override
@@ -348,7 +365,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             if (colliders == null || colliders.length == 1) {
                 colliders = null;
             } else {
-                colliders = ArrayUtils.removeElement(colliders, this);
+                colliders = ArrayUtils.removeElement(colliders, universalCollider);
             }
             chunk.setConstantColliders(colliders);
         }
@@ -363,19 +380,19 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         IExtraChunkData chunk = (IExtraChunkData) mc_chunk;
         Entity[] colliders = chunk.getConstantColliders();
         boolean require_collision = (minX <= x && x <= maxX + 16) && (minZ <= z && z <= maxZ + 16) && !isDead;
-        boolean is_registered = ArrayUtils.contains(colliders, this);
-        if (require_collision) {
-            if (!is_registered) {
-                colliders = ArrayUtils.add(colliders, this);
-                registered_chunks.add(chunk);
-            }
-        } else if (is_registered) {
+        boolean is_registered = ArrayUtils.contains(colliders, universalCollider);
+        if (!require_collision && is_registered) {
             if (colliders == null || colliders.length == 1) {
                 colliders = null;
             } else {
-                colliders = ArrayUtils.removeElement(colliders, this);
+                colliders = ArrayUtils.removeElement(colliders, universalCollider);
             }
+            chunk.setConstantColliders(colliders);
             registered_chunks.remove(chunk);
+        } else if (require_collision && !is_registered) {
+            colliders = ArrayUtils.add(colliders, universalCollider);
+            registered_chunks.add(chunk);
+            chunk.setConstantColliders(colliders);
         }
     }
     
@@ -533,7 +550,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 e.onGround = true;
                 if (can(DeltaCapability.ENTITY_PHYSICS)) {
                     double instant_scale = 1;
-                    double motion_scale = 2; // 2 is kind of fun.
+                    double motion_scale = 1; // 2 is kind of fun.
                     Vec3 entityAt = Vec3.createVectorHelper(e.posX, e.posY, e.posZ);
                     Vec3 velocity = getInstantVelocityAtPoint(entityAt);
                     velocity.xCoord *= instant_scale;
@@ -558,14 +575,13 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                     }
                     e.onGround = true;*/
                 } else {
-                    double d = 1.01;
-                    //e.moveEntity(motionX*d, motionY*d, motionZ*d);
+                    e.moveEntity(motionX, motionY, motionZ);
                     e.onGround = true;
                     //e.motionY = (e.motionY + motionY)/2;
-                    e.setPosition(e.posX + motionX, e.posY + motionY, e.posZ + motionZ);
+                    /*e.setPosition(e.posX + motionX, e.posY + motionY, e.posZ + motionZ);
                     e.prevPosX += motionX;
                     e.prevPosY += motionY;
-                    e.prevPosZ += motionZ;
+                    e.prevPosZ += motionZ;*/
                     
                     
                     if (motionY > 0 && e.motionY < motionY) {
