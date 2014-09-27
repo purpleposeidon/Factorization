@@ -59,6 +59,7 @@ import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.common.Registry;
 import factorization.compat.CompatManager;
+import factorization.darkiron.BlockDarkIronOre;
 import factorization.docs.DistributeDocs;
 import factorization.docs.DocumentationModule;
 import factorization.docs.RecipeViewer;
@@ -147,6 +148,7 @@ public class Core {
     void registerSimpleTileEntities() {
         FactoryType.registerTileEntities();
         GameRegistry.registerTileEntity(TileEntityFzNull.class, "fz.null");
+        GameRegistry.registerTileEntity(BlockDarkIronOre.Glint.class, "fz.glint");
         //TileEntity renderers are registered in the client proxy
         
         EntityRegistry.registerModEntity(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", 0, Core.instance, 1, 10, false);
