@@ -601,7 +601,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
 
     @Override
     int getRequiredCharge() {
-        return (int)getTargetSpeed();
+        return (int)getTargetSpeed() / 2;
     }
     
     @SideOnly(Side.CLIENT)
