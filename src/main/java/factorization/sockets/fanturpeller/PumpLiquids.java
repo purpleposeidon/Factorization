@@ -377,6 +377,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
             FluidStack fs = buffer.getFluid();
             if (fs == null) return;
             Fluid fluid = fs.getFluid();
+            if (fluid == null) return; // Uhm, what?
             if (!fluid.canBePlacedInWorld()) {
                 destinationAction = new TankPumper(); // This is okay?
                 return;
