@@ -58,7 +58,7 @@ public class FzConfig {
     public static boolean disable_endermen_griefing = false;
     public static boolean enable_rocketry = /* Hey! If you're turning this on, remove stuff from factorization_dead_items */ enable_dimension_slice && Core.dev_environ;
     public static boolean sockets_ignore_front_redstone = true;
-    public static boolean show_time_on_fullscreen = false;
+    public static boolean show_time_on_fullscreen = true;
     
     public static boolean enable_retrogen = false;
     public static String retrogen_key = "DEFAULT";
