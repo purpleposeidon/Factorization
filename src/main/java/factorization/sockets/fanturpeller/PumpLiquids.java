@@ -427,7 +427,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         
         @Override
         int getMaxHeight() {
-            return yCoord + 1 + 3*target_speed;
+            return yCoord + 12;
         }
     }
     
