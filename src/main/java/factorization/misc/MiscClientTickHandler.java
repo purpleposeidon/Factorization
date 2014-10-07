@@ -8,13 +8,13 @@ import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.client.gui.GuiOptions;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatStyle;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -180,13 +180,14 @@ public class MiscClientTickHandler {
         old_now = now;
         Minecraft mc = Minecraft.getMinecraft();
         if (!mc.isFullScreen()) return;
-        DateFormat df = DateFormat.getDateTimeInstance();
+        DateFormat df = DateFormat.getTimeInstance(DateFormat.SHORT);
         String msg = df.format(new Date());
         if (!mentioned_disabling) {
             msg += " (via FZ)";
             mentioned_disabling = true;
         }
-        mc.ingameGUI.getChatGUI().printChatMessageWithOptionalDeletion(new ChatComponentText(msg), 20392);
+        ChatStyle style = new ChatStyle().setItalic(true).setColor(EnumChatFormatting.GRAY);
+        mc.ingameGUI.getChatGUI().printChatMessageWithOptionalDeletion(new ChatComponentText(msg).setChatStyle(style), 20392);
         last_msg = msg;
     }
 }
