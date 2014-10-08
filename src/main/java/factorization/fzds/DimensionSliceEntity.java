@@ -546,8 +546,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                     continue;
                 }
                 
-                //e.moveEntity(motionX*d, motionY*d, motionZ*d);
-                e.onGround = true;
                 if (can(DeltaCapability.ENTITY_PHYSICS)) {
                     double instant_scale = 1;
                     double motion_scale = 1; // 2 is kind of fun.
@@ -559,37 +557,19 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                     velocity.xCoord = clipVelocity(velocity.xCoord*motion_scale, e.motionX);
                     velocity.yCoord = clipVelocity(velocity.yCoord*motion_scale, e.motionY);
                     velocity.zCoord = clipVelocity(velocity.zCoord*motion_scale, e.motionZ);
-                    //e.motionY = (e.motionY + motionY)/2;
                     e.moveEntity(velocity.xCoord, velocity.yCoord, velocity.zCoord);
                     e.prevPosX += velocity.xCoord;
                     e.prevPosY += velocity.yCoord;
                     e.prevPosZ += velocity.zCoord;
-                    e.onGround = false;
-                    e.motionX = velocity.xCoord;
-                    e.motionY = velocity.yCoord;
-                    e.motionZ = velocity.zCoord;
-                    /*
-                    if (motionY > 0 && e.motionY < motionY) {
-                        e.motionY = motionY;
-                        e.fallDistance += (float) Math.abs(motionY - e.motionY);
-                    }
-                    e.onGround = true;*/
                 } else {
                     e.moveEntity(motionX, motionY, motionZ);
-                    e.onGround = true;
-                    //e.motionY = (e.motionY + motionY)/2;
-                    /*e.setPosition(e.posX + motionX, e.posY + motionY, e.posZ + motionZ);
-                    e.prevPosX += motionX;
-                    e.prevPosY += motionY;
-                    e.prevPosZ += motionZ;*/
-                    
                     
                     if (motionY > 0 && e.motionY < motionY) {
                         e.motionY = motionY;
                         e.fallDistance += (float) Math.abs(motionY - e.motionY);
                     }
-                    e.onGround = true;
                 }
+                e.onGround = true;
             }
             updateRealArea();
         }
