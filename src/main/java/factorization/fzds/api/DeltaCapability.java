@@ -39,7 +39,9 @@ public enum DeltaCapability {
     /** Living entities can be hurt by physics (TODO) */
     PHYSICS_DAMAGE,
     /** When a DSE hits an entity, an opposing force will be applied to the DSE. (TODO) */
-    CONSERVE_MOMENTUM
+    CONSERVE_MOMENTUM,
+    /** When a DSE hits an entity, hurt it & apply knockback */
+    VIOLENT_COLLISIONS
     ;
     //Do not re-order this list, only append.
     public final long bit;

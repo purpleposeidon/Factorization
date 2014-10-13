@@ -10,6 +10,8 @@ import net.minecraft.block.Block;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -17,6 +19,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -69,7 +72,43 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     PacketProxyingPlayer proxy = null;
     HashSet<IExtraChunkData> registered_chunks = new HashSet();
-    Entity universalCollider;
+    UniversalCollider universalCollider;
+    
+    class UniversalCollider extends Entity implements IFzdsEntryControl {
+        public UniversalCollider(World world) {
+            super(world);
+        }
+
+        @Override
+        protected void entityInit() { }
+
+        @Override
+        protected void readEntityFromNBT(NBTTagCompound tag) { }
+
+        @Override
+        protected void writeEntityToNBT(NBTTagCompound tag) { }
+        
+        @Override
+        public AxisAlignedBB getBoundingBox() {
+            return metaAABB;
+        }
+
+        @Override
+        public boolean canEnter(IDeltaChunk dse) {
+            return false;
+        }
+
+        @Override
+        public boolean canExit(IDeltaChunk dse) {
+            return false;
+        }
+
+        @Override
+        public void onEnter(IDeltaChunk dse) { }
+
+        @Override
+        public void onExit(IDeltaChunk dse) { }
+    }
     
     public DimensionSliceEntity(World world) {
         super(world);
@@ -78,22 +117,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         }
         ignoreFrustumCheck = true; //kinda lame; we should give ourselves a proper bounding box?
         boundingBox.setBounds(0, 0, 0, 0, 0, 0);
-        universalCollider = new Entity(world) {
-            @Override
-            protected void entityInit() { }
-
-            @Override
-            protected void readEntityFromNBT(NBTTagCompound tag) { }
-
-            @Override
-            protected void writeEntityToNBT(NBTTagCompound tag) { }
-            
-            @Override
-            public AxisAlignedBB getBoundingBox() {
-                return metaAABB;
-            }
-                
-        };
+        universalCollider = new UniversalCollider(world);
     }
     
     public DimensionSliceEntity(World world, Coord lowerCorner, Coord upperCorner) {
@@ -471,14 +495,17 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     private static final IEntitySelector excludeDseRelatedEntities = new IEntitySelector() {
         @Override
         public boolean isEntityApplicable(Entity entity) {
-            if (entity instanceof EntityPlayer) {
-                return entity.worldObj.isRemote; // erm, wait, what?
-            }
+            /*if (entity instanceof EntityPlayer) {
+                return entity.worldObj.isRemote; // erm, wait, what? NORELEASE ?
+            }*/
             Class entClass = entity.getClass();
             if (entClass == DimensionSliceEntity.class) return false;
+            if (entClass == UniversalCollider.class) return false;
             return entity.boundingBox != null;
         }
     };
+    
+    private static DamageSource violenceDamage = new DamageSource("dseHit");
     
     void updateMotion() {
         if (motionX == 0 && motionY == 0 && motionZ == 0 && rotationalVelocity.isZero()) {
@@ -502,7 +529,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         rotation.incrMultiply(rotationalVelocity);
         last_shared_rotation.incrMultiply(last_shared_rotational_velocity);
 
-        boolean moved = true;
+        boolean moved = motionX != 0 || motionY != 0 || motionZ != 0;
 
         if (!noClip && can(DeltaCapability.COLLIDE)) {
             List<AxisAlignedBB> collisions = worldObj.getCollidingBoundingBoxes(this, realArea);
@@ -531,9 +558,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 Entity e = (Entity) ents.get(i);
                 double friction_expansion = -0.05*Math.sqrt(motionX*motionX + motionY*motionY + motionZ*motionZ);
                 AxisAlignedBB ebb = e.boundingBox;
-                if (ebb == null) {
-                    continue;
-                }
                 if (motionY > 0) {
                     ebb = ebb.expand(-motionX, -motionY, -motionZ);
                 }
@@ -548,9 +572,19 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 
                 if (can(DeltaCapability.ENTITY_PHYSICS)) {
                     double instant_scale = 1;
-                    double motion_scale = 1; // 2 is kind of fun.
+                    double motion_scale = 1;
                     Vec3 entityAt = Vec3.createVectorHelper(e.posX, e.posY, e.posZ);
                     Vec3 velocity = getInstantVelocityAtPoint(entityAt);
+                    if (can(DeltaCapability.VIOLENT_COLLISIONS) && !worldObj.isRemote) {
+                        double smackSpeed = velocity.lengthVector();
+                        motion_scale = 2;
+                        if (e instanceof EntityLivingBase) {
+                            if (smackSpeed > 0.05) {
+                                EntityLivingBase el = (EntityLivingBase) e;
+                                el.attackEntityFrom(violenceDamage, 4 );
+                            }
+                        }
+                    }
                     velocity.xCoord *= instant_scale;
                     velocity.yCoord *= instant_scale;
                     velocity.zCoord *= instant_scale;

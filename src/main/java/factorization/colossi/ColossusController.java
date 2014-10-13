@@ -15,6 +15,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.Share;
+import factorization.fzds.api.DeltaCapability;
 import factorization.fzds.api.IDeltaChunk;
 
 public class ColossusController extends Entity implements IBossDisplayData {
@@ -50,6 +51,8 @@ public class ColossusController extends Entity implements IBossDisplayData {
             li.entityId = li.ent.getUniqueID();
             if (li.type == LimbType.BODY) {
                 body = li.ent;
+            } else if (li.type == LimbType.LEG) {
+                li.ent.permit(DeltaCapability.VIOLENT_COLLISIONS);
             }
         }
         for (LimbInfo li : limbs) {
@@ -135,8 +138,6 @@ public class ColossusController extends Entity implements IBossDisplayData {
                 Quaternion flap = Quaternion.getRotationQuaternionRadians(limb.flap, ForgeDirection.EAST);
                 rot.incrMultiply(flap);
             }
-            
-            
             
             
             rot.incrNormalize();
