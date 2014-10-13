@@ -307,13 +307,18 @@ public class HammerClientProxy extends HammerProxy {
             GL11.glPushMatrix();
             setShadowWorld();
             GL11.glDisable(GL11.GL_ALPHA_TEST);
+            if (Core.dev_environ) {
+                GL11.glColorMask(false, true, true, true);
+            }
             //GL11.glColorMask(false, true, true, true); //Could glPushAttr for the mask. Nah.
             // ##### selection = rotation.applyTo(selection - corner) + DSE.position #####
             GL11.glTranslated(
                     FzUtil.interp(dse.lastTickPosX - player.lastTickPosX, dse.posX - player.posX, partialTicks),
                     FzUtil.interp(dse.lastTickPosY - player.lastTickPosY, dse.posY - player.posY, partialTicks),
                     FzUtil.interp(dse.lastTickPosZ - player.lastTickPosZ, dse.posZ - player.posZ, partialTicks));
-            rotation.glRotate();
+            Quaternion rot = new Quaternion(rotation);
+            rot.incrNormalize();
+            rot.glRotate();
             GL11.glTranslated(
                     -dse.centerOffset.xCoord - corner.x,
                     -dse.centerOffset.yCoord - corner.y,
@@ -335,6 +340,9 @@ public class HammerClientProxy extends HammerProxy {
             GL11.glEnable(GL11.GL_ALPHA_TEST);
             restoreRealWorld();
             GL11.glPopMatrix();
+            if (Core.dev_environ) {
+                GL11.glColorMask(true, true, true, true);
+            }
         }
         //shadowSelected = null;
     }
@@ -377,23 +385,33 @@ public class HammerClientProxy extends HammerProxy {
         double shadow_pitch = -Math.toDegrees(Math.atan2(shadowLook.yCoord, xz_len)); // erm, negative? Dunno.
         double shadow_yaw = Math.toDegrees(Math.atan2(-shadowLook.xCoord, shadowLook.zCoord)); // Another weird negative!
         MovingObjectPosition origMouseOver = mc.objectMouseOver;
+        mc.objectMouseOver = null;
         
         try {
             AxisAlignedBB bb;
             setShadowWorld();
             try {
+                // mc.theWorld.spawnParticle("smoke", shadowPos.xCoord, shadowPos.yCoord, shadowPos.zCoord, 0, 0, 0);
+                // mc.theWorld.spawnParticle("reddust", shadowPos.xCoord + shadowLook.xCoord, shadowPos.yCoord + shadowLook.yCoord, shadowPos.zCoord + shadowLook.zCoord, 0, 0, 0);
                 mc.thePlayer.posX = shadowPos.xCoord;
                 mc.thePlayer.posY = shadowPos.yCoord;
                 mc.thePlayer.posZ = shadowPos.zCoord;
                 mc.thePlayer.rotationPitch = (float) shadow_pitch;
                 mc.thePlayer.rotationYaw = (float) shadow_yaw;
                 
-                mc.entityRenderer.getMouseOver(1F);
+                WorldSettings.GameType origType = mc.playerController.currentGameType;
+                mc.playerController.currentGameType = WorldSettings.GameType.CREATIVE;
+                try {
+                    mc.entityRenderer.getMouseOver(1F);
+                } finally {
+                    mc.playerController.currentGameType = origType;
+                }
                 /*AxisAlignedBB working_box = EntityRenderer.working_box;
                 if (working_box != null) {
                     AabbDebugger.addBox(hitSlice.metaAABB.convertShadowBoxToRealBox(working_box));
                 }*/
                 shadowSelected = mc.objectMouseOver;
+                //System.out.println(shadowSelected);
                 if (shadowSelected == null) {
                     rayTarget = null;
                     return;
