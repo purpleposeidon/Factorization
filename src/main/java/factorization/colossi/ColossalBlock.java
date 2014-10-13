@@ -307,10 +307,10 @@ public class ColossalBlock extends Block {
     @Override
     @SideOnly(Side.CLIENT)
     public int colorMultiplier(IBlockAccess w, int x, int y, int z) {
-        int ret = 16777215;
+        int ret = 0xFFFFFF;
         World mcw = Minecraft.getMinecraft().theWorld;
         if (mcw == null) return ret;
         if (mcw.provider.dimensionId == Hammer.dimensionID) return ret;
-        return 0x524474;
+        return 0x9284B4;
     }
 }
