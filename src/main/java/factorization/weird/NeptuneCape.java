@@ -82,6 +82,7 @@ public class NeptuneCape {
         @Override
         public void render(float partial) {
             if (!should_render_mask) return;
+            if (rendering_player == null) return;
             GL11.glPushMatrix();
             
             float s = 12F/16F; GL11.glScalef(s, s, s);
