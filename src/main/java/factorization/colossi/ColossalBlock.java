@@ -68,7 +68,7 @@ public class ColossalBlock extends Block {
     @Override
     public float getBlockHardness(World world, int x, int y, int z) {
         if (world.getBlockMetadata(x, y, z) == MD_BODY_CRACKED) {
-            return 10;
+            return 6; // 10
         }
         if (world.getBlockMetadata(x, y, z) == MD_MASK) {
             for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
@@ -76,7 +76,7 @@ public class ColossalBlock extends Block {
                     return super.getBlockHardness(world, x, y, z);
                 }
             }
-            return 100;
+            return 50; // 100
         }
         return super.getBlockHardness(world, x, y, z);
     }
@@ -84,7 +84,7 @@ public class ColossalBlock extends Block {
     boolean isSupportive(World world, int x, int y, int z) {
         if (world.getBlock(x, y, z) != this) return false;
         int md = world.getBlockMetadata(x, y, z);
-        return md == MD_BODY || md == MD_BODY_CRACKED || md == MD_EYE || md == MD_CORE;
+        return md == MD_BODY || md == MD_EYE || md == MD_CORE;
         
     }
     
@@ -229,7 +229,7 @@ public class ColossalBlock extends Block {
                 }
                 return true;
             }
-            player.addChatComponentMessage(new ChatComponentTranslation("tile.factorization:colossalBlock." + md + ".click"));
+            // player.addChatComponentMessage(new ChatComponentTranslation("tile.factorization:colossalBlock." + md + ".click"));
             return true;
         }
         if (playerImmune(player)) {

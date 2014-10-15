@@ -19,6 +19,7 @@ class LimbInfo {
     UUID entityId = fake_uuid;
     IDeltaChunk ent = null;
     Vec3 originalBodyOffset; // Joint position, relative to the body's DSE.
+    boolean controlled = true;
     
     // The following transformations are applied in the order given here.
     // They aren't relevant to LimbType.BODY.
@@ -48,6 +49,7 @@ class LimbInfo {
         parity = data.as(Share.PRIVATE, "limbParity" + index).putByte(parity);
         length = data.as(Share.PRIVATE, "limbLength" + index).putInt(length);
         entityId = data.as(Share.PRIVATE, "entityId" + index).putUUID(entityId);
+        controlled = data.as(Share.PRIVATE, "controlled" + index).putBoolean(controlled);
         if (data.isReader()) {
             originalBodyOffset = Vec3.createVectorHelper(0, 0, 0);
         }
@@ -67,5 +69,9 @@ class LimbInfo {
     
     boolean limbSwingParity() {
         return side == BodySide.RIGHT ^ (parity % 1 == 0) ^ type == LimbType.ARM;
+    }
+    
+    void setControlled(boolean controlled) {
+        this.controlled = controlled;
     }
 }

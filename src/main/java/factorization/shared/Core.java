@@ -155,7 +155,7 @@ public class Core {
         
         EntityRegistry.registerModEntity(TileEntityWrathLamp.RelightTask.class, "factory_relight_task", 0, Core.instance, 1, 10, false);
         EntityRegistry.registerModEntity(ServoMotor.class, "factory_servo", 1, Core.instance, 100, 1, true);
-        EntityRegistry.registerModEntity(ColossusController.class, "fz_colossal_controller", 2, Core.instance, 1, 1, false);
+        EntityRegistry.registerModEntity(ColossusController.class, "fz_colossal_controller", 2, Core.instance, 256, 20, false);
     }
     
     @EventHandler

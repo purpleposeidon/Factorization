@@ -32,6 +32,7 @@ import com.google.common.collect.Iterables;
 
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
+import factorization.api.ICoordFunction;
 import factorization.api.Quaternion;
 import factorization.common.FzConfig;
 import factorization.fzds.DeltaChunk.AreaMap;
@@ -643,6 +644,7 @@ public class FZDSCommand extends CommandBase {
                         if (ent instanceof DimensionSliceEntity) {
                             ent.setDead();
                             i++;
+                            clearDseArea((DimensionSliceEntity) ent);
                         }
                     }
                 }
@@ -726,6 +728,7 @@ public class FZDSCommand extends CommandBase {
             @Override
             void call(String[] args) {
                 selected.setDead();
+                clearDseArea(selected);
                 setSelection(null);
                 sendChat("Made dead");
             }}, Requires.SLICE_SELECTED);
@@ -991,5 +994,16 @@ public class FZDSCommand extends CommandBase {
                 selected.changeRotationCenter(p);
             }
         }, Requires.SLICE_SELECTED, Requires.PLAYER);
+    }
+    
+    private static void clearDseArea(IDeltaChunk idc) {
+        Coord a = idc.getCorner();
+        Coord b = idc.getFarCorner();
+        Coord.iterateCube(a, b, new ICoordFunction() {
+            @Override
+            public void handle(Coord here) {
+                here.setAir();
+            }
+        });
     }
 }

@@ -2,7 +2,13 @@ package factorization.colossi;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.Vec3;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
+import factorization.api.Quaternion;
+import factorization.colossi.ColossusController.BodySide;
+import factorization.colossi.ColossusController.LimbType;
+import factorization.fzds.api.DeltaCapability;
 
 public enum AIState {
     IDLE {
@@ -56,13 +62,65 @@ public enum AIState {
     FLAIL_ARMS {
         @Override
         AIState tick(ColossusController controller, int age) {
-            return IDLE;
+            int cycle_length = controller.arm_length * 40;
+            // TODO: There's many wrong usages of arm_length; it needs some kind of radial conversion.
+            // We the instantaneous linear velocity of something rotating radially with a radius of arm_length to have some specific target velocity for all arm_lengths.
+            if (cycle_length == 0) return IDLE;
+            double maxVelocity = Math.PI / cycle_length;
+            double d = -maxVelocity * Math.sin(Math.PI * 2 * age / cycle_length);
+            Quaternion flapxis = Quaternion.getRotationQuaternionRadians(d, ForgeDirection.EAST);
+            Quaternion bod = controller.body.getRotation();
+            bod.toVector().normalize() Grrr...
+            bod.incrToOtherMultiply(flapxis);
+            bod.incrConjugate();
+            flapxis.incrMultiply(bod);
+            bod.incrConjugate();
+            
+            Quaternion leftRotation = flapxis;
+            Quaternion rightRotation = new Quaternion(leftRotation);
+            rightRotation.incrConjugate();
+            
+            for (LimbInfo li : controller.limbs) {
+                if (li.type != LimbType.ARM) continue;
+                int parity = li.side == BodySide.LEFT ? -1 : 1;
+                li.ent.setRotationalVelocity(parity < 0 ? leftRotation : rightRotation);
+            }
+            if (age >= cycle_length * 3) {
+                for (LimbInfo li : controller.limbs) {
+                    if (li.type != LimbType.ARM) continue;
+                    li.ent.setRotationalVelocity(new Quaternion());
+                }
+                return IDLE;
+            }
+            return FLAIL_ARMS;
+        }
+        
+        @Override
+        public void onEnterState(ColossusController controller, AIState state) {
+            for (LimbInfo li : controller.limbs){
+                if (li.type == LimbType.ARM){
+                    li.ent.permit(DeltaCapability.VIOLENT_COLLISIONS);
+                    li.setControlled(false);
+                }
+            }
+            controller.path_target = null;
+            controller.turning = 0;
+        }
+        
+        @Override
+        public void onExitState(ColossusController controller, AIState nextState) {
+            for (LimbInfo li : controller.limbs){
+                if (li.type == LimbType.ARM){
+                    li.ent.forbid(DeltaCapability.VIOLENT_COLLISIONS);
+                    li.setControlled(true);
+                }
+            }
         }
     },
     SHAKE_BODY {
         @Override
         AIState tick(ColossusController controller, int age) {
-            return IDLE;
+            return FLAIL_ARMS;
         }
     },
     CHASE_PLAYER_ON_GROUND {

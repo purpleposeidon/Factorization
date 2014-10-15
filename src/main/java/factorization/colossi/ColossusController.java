@@ -3,9 +3,12 @@ package factorization.colossi;
 import java.io.IOException;
 import java.util.UUID;
 
+import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -37,15 +40,18 @@ public class ColossusController extends Entity implements IBossDisplayData {
     transient Entity target_entity;
     transient int target_count = 0;
     transient long shake_seed = 0;
+    
+    transient int client_ticks = 0;
 
     
     public ColossusController(World world) {
         super(world);
         path_target = new Coord(this);
+        ignoreFrustumCheck = true;
     }
     
     public ColossusController(World world, LimbInfo[] limbInfo, int arm_size, int arm_length, int leg_size, int leg_length, int damage) {
-        super(world);
+        this(world);
         this.limbs = limbInfo;
         for (LimbInfo li : limbs) {
             li.entityId = li.ent.getUniqueID();
@@ -91,11 +97,12 @@ public class ColossusController extends Entity implements IBossDisplayData {
         this.cracked_body_blocks = damage;
     }
     
-    AnimationExecutor ae = new AnimationExecutor("legWalk");
-    
     @Override
     public void onEntityUpdate() {
-        if (worldObj.isRemote) return;
+        if (worldObj.isRemote) {
+            client_ticks++;
+            return;
+        }
         if (!setup) {
             setup = true;
             loadLimbs();
@@ -115,6 +122,7 @@ public class ColossusController extends Entity implements IBossDisplayData {
         Quaternion bodyRotation = body.getRotation();
         for (LimbInfo limb : limbs) {
             if (limb.type == LimbType.BODY) continue;
+            if (!limb.controlled) continue;
             Vec3 joint = limb.originalBodyOffset.addVector(0, limb.extension, 0);
             bodyRotation.applyRotation(joint);
             Quaternion rot = new Quaternion(bodyRotation);
@@ -145,11 +153,6 @@ public class ColossusController extends Entity implements IBossDisplayData {
             limb.ent.posX = body.posX + joint.xCoord;
             limb.ent.posY = body.posY + joint.yCoord;
             limb.ent.posZ = body.posZ + joint.zCoord;
-            
-            
-            /*if (ae.tick(body, limb)) {
-                ae = new AnimationExecutor("legWalk");
-            }*/
         }
         setPosition(body.posX, body.posY, body.posZ);
     }
@@ -201,7 +204,9 @@ public class ColossusController extends Entity implements IBossDisplayData {
             limbs[i].putData(data, i);
         }
         controller.serialize("controller", data);
-        leg_size = data.as(Share.PRIVATE, "legSize").putInt(leg_size);
+        leg_size = data.as(Share.VISIBLE, "legSize").putInt(leg_size);
+        arm_size = data.as(Share.VISIBLE, "armSize").putInt(arm_size);
+        arm_length = data.as(Share.VISIBLE, "armLength").putInt(arm_length);
         home = data.as(Share.PRIVATE, "home").put(home);
         path_target = data.as(Share.PRIVATE, "path_target").put(path_target);
         cracked_body_blocks = data.as(Share.VISIBLE, "cracks").putInt(cracked_body_blocks);
@@ -384,5 +389,19 @@ public class ColossusController extends Entity implements IBossDisplayData {
     @Override
     public float getHealth() {
         return cracked_body_blocks - broken_body_blocks;
+    }
+    
+    int current_name = 0;
+    static final int max_names = 20;
+    
+    @Override
+    public IChatComponent func_145748_c_() {
+        if (broken_body_blocks % 3 == 0 && broken_body_blocks > 0) {
+            return new ChatComponentTranslation("colossus.name.true");
+        }
+        if ((client_ticks % 300 < 60 && client_ticks % 4 == 0) || client_ticks % 50 == 0) {
+            current_name = worldObj.rand.nextInt(max_names);
+        }
+        return new ChatComponentTranslation("colossus.name." + current_name);
     }
 }

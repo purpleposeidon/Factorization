@@ -36,6 +36,7 @@ import factorization.charge.TileEntityLeydenJarRender;
 import factorization.charge.TileEntitySteamTurbine;
 import factorization.charge.TileEntitySteamTurbineRender;
 import factorization.colossi.ColossusController;
+import factorization.colossi.ColossusControllerRenderer;
 import factorization.crafting.BlockRenderCompressionCrafter;
 import factorization.crafting.BlockRenderMixer;
 import factorization.crafting.ContainerMixer;
@@ -192,7 +193,7 @@ public class FactorizationClientProxy extends FactorizationProxy {
 
         RenderingRegistry.registerEntityRenderingHandler(TileEntityWrathLamp.RelightTask.class, new EmptyRender());
         RenderingRegistry.registerEntityRenderingHandler(ServoMotor.class, new RenderServoMotor());
-        RenderingRegistry.registerEntityRenderingHandler(ColossusController.class, new EmptyRender());
+        RenderingRegistry.registerEntityRenderingHandler(ColossusController.class, new ColossusControllerRenderer());
 
         RenderingRegistry.registerBlockHandler(new FactorizationRender());
         BlockRenderBattery renderBattery = new BlockRenderBattery();
