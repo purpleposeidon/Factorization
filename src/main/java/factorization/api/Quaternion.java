@@ -69,7 +69,7 @@ public class Quaternion implements IDataSerializable {
     
     @Override
     public String toString() {
-        return "Quaternion(" + w + ", " + x + ", " + y + ", " + z + ")";
+        return "Quaternion(w=" + w + ", " + x + ", " + y + ", " + z + ")";
     }
     
     public void writeToTag(NBTTagCompound tag, String prefix) {
