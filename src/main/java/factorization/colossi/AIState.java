@@ -33,7 +33,7 @@ public enum AIState {
                 }
             }
             controller.path_target = controller.home.copy();
-            return RUN_BACK;
+            return RUN_BACK; 
         }
     },
     WALK_EAST_SAFELY {
@@ -68,15 +68,7 @@ public enum AIState {
             if (cycle_length == 0) return IDLE;
             double maxVelocity = Math.PI / cycle_length;
             double d = -maxVelocity * Math.sin(Math.PI * 2 * age / cycle_length);
-            Quaternion flapxis = Quaternion.getRotationQuaternionRadians(d, ForgeDirection.EAST);
-            Quaternion bod = controller.body.getRotation();
-            bod.toVector().normalize() Grrr...
-            bod.incrToOtherMultiply(flapxis);
-            bod.incrConjugate();
-            flapxis.incrMultiply(bod);
-            bod.incrConjugate();
-            
-            Quaternion leftRotation = flapxis;
+            Quaternion leftRotation = Quaternion.getRotationQuaternionRadians(d, ForgeDirection.EAST);
             Quaternion rightRotation = new Quaternion(leftRotation);
             rightRotation.incrConjugate();
             
