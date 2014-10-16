@@ -263,7 +263,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
                 delay--;
                 return;
             }
-            delay = 20;
+            delay = 10;
             PumpCoord pc = queue.poll();
             if (pc == null) {
                 FoundFluidHandler foundIfh = foundContainers.poll();
@@ -354,8 +354,8 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
             if (!foundContainers.isEmpty() && buffer.getFluidAmount() > 0) {
                 FoundFluidHandler foundIfh = foundContainers.poll();
                 FluidStack work = buffer.getFluid().copy();
-                if (work.amount > 10) {
-                    work.amount = 10;
+                if (work.amount > 25) {
+                    work.amount = 25;
                 }
                 int amount = foundIfh.te.fill(foundIfh.dir, work, true);
                 buffer.drain(amount, true);
@@ -386,7 +386,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
                 delay--;
                 return;
             }
-            delay = 20;
+            delay = 10;
             if (updateFrontier()) return;
             for (int i = 0; i < 16; i++) {
                 PumpCoord pc = queue.poll();
