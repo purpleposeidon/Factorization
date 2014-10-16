@@ -526,10 +526,12 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         posX += motionX;
         posY += motionY;
         posZ += motionZ;
-        rotation.incrMultiply(rotationalVelocity);
-        last_shared_rotation.incrMultiply(last_shared_rotational_velocity);
-
         boolean moved = motionX != 0 || motionY != 0 || motionZ != 0;
+        if (!rotationalVelocity.isZero()) {
+            rotation.incrMultiply(rotationalVelocity);
+            moved = true;
+        }
+        last_shared_rotation.incrMultiply(last_shared_rotational_velocity);
 
         if (!noClip && can(DeltaCapability.COLLIDE)) {
             List<AxisAlignedBB> collisions = worldObj.getCollidingBoundingBoxes(this, realArea);
@@ -573,15 +575,20 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 if (can(DeltaCapability.ENTITY_PHYSICS)) {
                     double instant_scale = 1;
                     double motion_scale = 1;
+                    double vel_scale = 2;
                     Vec3 entityAt = Vec3.createVectorHelper(e.posX, e.posY, e.posZ);
                     Vec3 velocity = getInstantVelocityAtPoint(entityAt);
                     if (can(DeltaCapability.VIOLENT_COLLISIONS) && !worldObj.isRemote) {
                         double smackSpeed = velocity.lengthVector();
-                        motion_scale = 2;
+                        vel_scale = 1;
                         if (e instanceof EntityLivingBase) {
                             if (smackSpeed > 0.05) {
                                 EntityLivingBase el = (EntityLivingBase) e;
-                                el.attackEntityFrom(violenceDamage, 4 );
+                                el.attackEntityFrom(violenceDamage, 4);
+                                Vec3 emo = velocity.normalize();
+                                e.motionX += emo.xCoord * vel_scale;
+                                e.motionY += emo.yCoord * vel_scale;
+                                e.motionZ += emo.zCoord * vel_scale;
                             }
                         }
                     }
