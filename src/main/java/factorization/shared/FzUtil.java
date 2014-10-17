@@ -1128,6 +1128,24 @@ public class FzUtil {
         v.zCoord = (ab.minZ + ab.maxZ)/2;
     }
     
+    public static void sort(Vec3 min, Vec3 max) {
+        if (min.xCoord > max.xCoord) {
+            double big = min.xCoord;
+            min.xCoord = max.xCoord;
+            max.xCoord = big;
+        }
+        if (min.yCoord > max.yCoord) {
+            double big = min.yCoord;
+            min.yCoord = max.yCoord;
+            max.yCoord = big;
+        }
+        if (min.zCoord > max.zCoord) {
+            double big = min.zCoord;
+            min.zCoord = max.zCoord;
+            max.zCoord = big;
+        }
+    }
+    
     /**
      * Copies a point on box into target.
      * pointFlags is a bit-flag, like <Z, Y, X>.

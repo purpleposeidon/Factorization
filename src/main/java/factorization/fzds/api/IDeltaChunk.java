@@ -145,5 +145,9 @@ public abstract class IDeltaChunk extends Entity {
      */
     public abstract Coord getFarCorner();
     
+    public void setPartName(String name) {
+        this.partName = name;
+    }
     
+    protected String partName;
 }

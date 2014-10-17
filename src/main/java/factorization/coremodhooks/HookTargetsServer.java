@@ -53,6 +53,11 @@ public class HookTargetsServer {
             if (ent == collider) continue;
             if (filter == null || filter.isEntityApplicable(ent)) {
                 found.add(ent);
+                Entity[] parts = ent.getParts();
+                if (parts == null) continue;
+                for (Entity part : parts) {
+                    found.add(part);
+                }
             }
         }
     }

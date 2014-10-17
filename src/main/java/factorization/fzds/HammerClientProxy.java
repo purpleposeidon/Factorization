@@ -32,6 +32,7 @@ import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import cpw.mods.fml.relauncher.Side;
+import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.fzds.api.IDeltaChunk;
@@ -308,6 +309,7 @@ public class HammerClientProxy extends HammerProxy {
             setShadowWorld();
             GL11.glDisable(GL11.GL_ALPHA_TEST);
             if (Core.dev_environ) {
+                GL11.glDisable(GL11.GL_DEPTH_TEST);
                 GL11.glColorMask(false, true, true, true);
             }
             //GL11.glColorMask(false, true, true, true); //Could glPushAttr for the mask. Nah.
@@ -342,6 +344,7 @@ public class HammerClientProxy extends HammerProxy {
             GL11.glPopMatrix();
             if (Core.dev_environ) {
                 GL11.glColorMask(true, true, true, true);
+                GL11.glEnable(GL11.GL_DEPTH_TEST);
             }
         }
         //shadowSelected = null;
@@ -353,6 +356,7 @@ public class HammerClientProxy extends HammerProxy {
         if (ray.parent.centerOffset == null) {
             return;
         }
+        //System.out.println(ray.parent);
         hitSlice = ray.parent;
         if (hitSlice.metaAABB == null) return;
         //mc.renderViewEntity.rayTrace(reachDistance, partialTicks) Just this function would work if we didn't care about entities.
@@ -437,10 +441,31 @@ public class HammerClientProxy extends HammerProxy {
                 ray.setPosition(0, -1000, 0);
                 return;
             }
-            Vec3 min = ray.parent.shadow2real(FzUtil.getMin(bb));
-            Vec3 max = ray.parent.shadow2real(FzUtil.getMax(bb));
+            Vec3 min, max;
+            {
+                Vec3 corners[] = FzUtil.getCorners(bb);
+                min = ray.parent.shadow2real(corners[0]);
+                max = min.addVector(0, 0, 0);
+                for (int i = 1; i < corners.length; i++) {
+                    Vec3 c = ray.parent.shadow2real(corners[i]);
+                    min.xCoord = Math.min(c.xCoord, min.xCoord);
+                    min.yCoord = Math.min(c.yCoord, min.yCoord);
+                    min.zCoord = Math.min(c.zCoord, min.zCoord);
+                    max.xCoord = Math.max(c.xCoord, max.xCoord);
+                    max.yCoord = Math.max(c.yCoord, max.yCoord);
+                    max.zCoord = Math.max(c.zCoord, max.zCoord);
+                }
+                //FzUtil.setMin(ray.boundingBox, min);
+                //FzUtil.setMax(ray.boundingBox, max);
+                //System.out.println(ray.boundingBox);
+            }
+            //Vec3 min = ray.parent.shadow2real(FzUtil.getMin(bb));
+            //Vec3 max = ray.parent.shadow2real(FzUtil.getMax(bb));
+            //FzUtil.sort(min, max);
             FzUtil.setMin(ray.boundingBox, min);
             FzUtil.setMax(ray.boundingBox, max);
+            AabbDebugger.addBox(ray.boundingBox);
+            //System.out.println(ray.boundingBox);
             rayTarget = ray;
         } finally {
             mc.objectMouseOver = origMouseOver;

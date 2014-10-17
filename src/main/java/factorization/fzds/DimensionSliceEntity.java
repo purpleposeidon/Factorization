@@ -27,6 +27,7 @@ import net.minecraft.world.chunk.Chunk;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
@@ -92,6 +93,11 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         public AxisAlignedBB getBoundingBox() {
             return metaAABB;
         }
+        
+        @Override
+        public Entity[] getParts() {
+            return DimensionSliceEntity.this.getParts();
+        }
 
         @Override
         public boolean canEnter(IDeltaChunk dse) {
@@ -141,6 +147,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     @Override
     public String toString() {
+        if (partName != null) {
+            return "[DSE " + partName + " " + getEntityId() +  "]";
+        }
         return super.toString() + " - from " + hammerCell + "  to  " + farCorner + "   center at " + centerOffset;
     }
     
@@ -229,6 +238,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         centerOffset.zCoord = tag.getFloat("coz");
         hammerCell.readFromNBT("min", tag);
         farCorner.readFromNBT("max", tag);
+        partName = tag.getString("partName");
     }
 
     @Override
@@ -241,6 +251,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         tag.setFloat("coz", (float) centerOffset.zCoord);
         hammerCell.writeToNBT("min", tag);
         farCorner.writeToNBT("max", tag);
+        if (partName != null) {
+            tag.setString("partname", partName);
+        }
     }
     
     @Override
@@ -955,6 +968,9 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         if (can(DeltaCapability.TRANSPARENT)) {
             data.writeFloat(opacity);
         }
+        String name = partName == null ? "" : partName;
+        ByteBufUtils.writeUTF8String(data, name);
+        data.writeBytes(partName.getBytes());
     }
 
     @Override
@@ -978,6 +994,8 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             if (can(DeltaCapability.TRANSPARENT)) {
                 opacity = data.readFloat();
             }
+            String name = ByteBufUtils.readUTF8String(data);
+            partName = name == "" ? null : name;
         } catch (IOException e) {
             //Not expected to happen ever
             e.printStackTrace();

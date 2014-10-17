@@ -178,6 +178,7 @@ public class ColossusController extends Entity implements IBossDisplayData {
                 }
             }
         }
+        int i = 0;
         for (LimbInfo li : limbs) {
             if (li.ent == null) {
                 setup = false;
@@ -186,6 +187,7 @@ public class ColossusController extends Entity implements IBossDisplayData {
             if (li.type == LimbType.BODY) {
                 body = li.ent;
             }
+            li.ent.setPartName(li.side + " " + li.type + "#" + (i++));
         }
     }
 
