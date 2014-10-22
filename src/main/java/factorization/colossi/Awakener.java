@@ -1,3 +1,4 @@
+
 package factorization.colossi;
 
 import java.util.ArrayList;
@@ -10,6 +11,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.colossi.ColossusController.BodySide;
@@ -37,22 +42,22 @@ public class Awakener {
             if (src.getDimensionID() == Hammer.dimensionID) return;
             TileEntityColossalHeart heart = findNearestHeart(src);
             if (heart == null) return;
-            Core.logInfo("XR10-class entity detected.");
+            msg("Unknown XR10-class entity detected.");
             Coord core = new Coord(heart);
             Awakener awakener = new Awakener(heart);
             boolean success = awakener.abandonedLongAgo_thisAncientGuardianBurnsItsRemainingPower();
             if (!success) {
-                Core.logInfo("Body is deformed. Self-destructing.");
-                Core.logInfo("Disconnecting LMP.");
+                msg("Body is deformed. Self-destructing.");
+                msg("Disconnecting LMP.");
                 ItemStack lmp = new ItemStack(Core.registry.logicMatrixProgrammer);
                 core.setAir();
-                Core.logInfo("Good-bye, world!");
+                msg("Good-bye, world!");
                 core.w.newExplosion(null, core.x + 0.5, core.y + 0.5, core.z + 0.5, 0.25F, false, true);
                 core.spawnItem(lmp);
                 return;
             }
             core.setAir();
-            Core.logInfo("Engaging entity.");
+            msg("Engaging entity.");
         } finally {
             is_working = false;
         }
@@ -61,6 +66,12 @@ public class Awakener {
     final TileEntityColossalHeart heartTE;
     Awakener(TileEntityColossalHeart heart) {
         this.heartTE = heart;
+    }
+    
+    static Logger log = LogManager.getLogger("Colossus");
+    
+    static void msg(String msg, Object... params) {
+        log.info(String.format(msg, params));
     }
     
     static TileEntityColossalHeart findNearestHeart(Coord src) {
@@ -91,7 +102,7 @@ public class Awakener {
     }
     
     void details(String name, Set<Coord> set) {
-        Core.logInfo("Body part " + name + " made of " + set.size() + " blocks");
+        msg("    " + name + " made of " + set.size() + " blocks"); // NORELEASE: Custom logger
     }
     
     void limbDetails(String name, ArrayList<Set<Coord>> limbs) {
@@ -153,7 +164,7 @@ public class Awakener {
     }
     
     public final boolean abandonedLongAgo_thisAncientGuardianBurnsItsRemainingPower() {
-        Core.logInfo("Awakening Collossus at %s...", new Coord(heartTE));
+        msg("Awakening Collossus at %s...", new Coord(heartTE));
         Set<Coord> heart = new HashSet<Coord>();
         heart.add(new Coord(heartTE));
         details("heart", heart);
@@ -174,12 +185,12 @@ public class Awakener {
         body.addAll(mask);
         body.addAll(eyes);
         heart = mask = eyes = null;
-        details("mainBody", body);
+        details("torso", body);
         
         if (!verifyArmDimensions(arms)) return false;
         if (!verifyLegDimensions(legs)) return false;
         
-        Core.logInfo("Limb sizes match");
+        msg("Limb sizes match");
         
         ArrayList<SetAndInfo> limbInfo = new ArrayList();
         for (Set<Coord> arm : arms) {
@@ -221,10 +232,10 @@ public class Awakener {
         
         double max_iter = Math.pow(body.size(), 1.0/3.0) * 4;
         includeShell(all_members, new HashSet(), (int) max_iter + 3);
-        Core.logInfo("Attatched blocks included. New stats:");
-        limbDetails("arms", arms);
-        limbDetails("legs", legs);
-        details("mainBody", body);
+        msg("Attatched adjacent blocks. New body:");
+        limbDetails("arm", arms);
+        limbDetails("leg", legs);
+        details("torso", body);
         
         // markSets(legs, "|");
         // markSets(arms, "-");
@@ -238,13 +249,13 @@ public class Awakener {
         }
         
         int part_size = parts.size();
-        Core.logInfo("Activated %s parts", part_size);
+        msg("Activated with %s parts", part_size);
         LimbInfo[] info = parts.toArray(new LimbInfo[part_size]);
         ColossusController controller = new ColossusController(heartTE.getWorldObj(), info, arm_size, arm_length, leg_size, leg_length, cracked_body_blocks);
         new Coord(heartTE).setAsEntityLocation(controller);
         controller.worldObj.spawnEntityInWorld(controller);
         
-        Core.logInfo("*** WARNING: Energy reserves < 0.1%% ***");
+        msg("*** WARNING: Energy reserves < 0.1%% ***");
         return true;
     }
     
@@ -324,13 +335,13 @@ public class Awakener {
                 int new_leg_length = measure_dim(leg, 1);
                 int new_leg_size = measure_size(leg);
                 if (leg_length != new_leg_length || leg_size != new_leg_size) {
-                    Core.logInfo("Mismatched legs!");
+                    msg("Mismatched legs!");
                     return false;
                 }
             }
         }
         if (leg_length == -1 || leg_size == -1) {
-            Core.logInfo("Invalid legs!");
+            msg("Invalid legs!");
             return false;
         }
         return true;
@@ -347,13 +358,13 @@ public class Awakener {
                 int new_arm_length = measure_dim(arm, 1);
                 int new_arm_size = measure_size(arm);
                 if (arm_length != new_arm_length || arm_size != new_arm_size) {
-                    Core.logInfo("Mismatched arms!");
+                    msg("Mismatched arms!");
                     return false;
                 }
             }
         }
         if (arm_length == -1 || arm_size == -1) {
-            Core.logInfo("Invalid arms!");
+            msg("Invalid arms!");
             return false;
         }
         return true;
