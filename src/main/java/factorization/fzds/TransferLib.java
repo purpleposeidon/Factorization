@@ -146,6 +146,8 @@ public class TransferLib {
     public static TileEntity move(Coord src, Coord dest, boolean wipeSrc, boolean overwriteDestination, int setMethod) {
         Block id = src.getId();
         int md = src.getMd();
+        int blockLight = src.getLightLevelBlock();
+        int skyLight = src.getLightLevelSky();
         if (id == null && !overwriteDestination) {
             return null;
         }
@@ -184,6 +186,8 @@ public class TransferLib {
             rawRemoveTE(dest);
         }
         setRaw(dest, id, md);
+        dest.setLightLevelBlock(blockLight);
+        dest.setLightLevelSky(skyLight);
         TileEntity ret = null;
         if (teData != null) {
             teData.setInteger("x", dest.x);

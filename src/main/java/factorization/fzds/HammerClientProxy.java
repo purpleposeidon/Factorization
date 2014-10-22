@@ -389,7 +389,7 @@ public class HammerClientProxy extends HammerProxy {
         double shadow_pitch = -Math.toDegrees(Math.atan2(shadowLook.yCoord, xz_len)); // erm, negative? Dunno.
         double shadow_yaw = Math.toDegrees(Math.atan2(-shadowLook.xCoord, shadowLook.zCoord)); // Another weird negative!
         MovingObjectPosition origMouseOver = mc.objectMouseOver;
-        mc.objectMouseOver = null;
+        mc.objectMouseOver = null; // The ray trace function will do the wrong thing if this isn't nulled.
         
         try {
             AxisAlignedBB bb;
@@ -464,8 +464,7 @@ public class HammerClientProxy extends HammerProxy {
             //FzUtil.sort(min, max);
             FzUtil.setMin(ray.boundingBox, min);
             FzUtil.setMax(ray.boundingBox, max);
-            AabbDebugger.addBox(ray.boundingBox);
-            //System.out.println(ray.boundingBox);
+            AabbDebugger.addBox(ray.boundingBox); // NORELEASE
             rayTarget = ray;
         } finally {
             mc.objectMouseOver = origMouseOver;

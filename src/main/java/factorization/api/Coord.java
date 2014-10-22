@@ -514,6 +514,14 @@ public class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
     public int getLightLevelSky() {
         return w.getSkyBlockTypeBrightness(EnumSkyBlock.Sky, x, y, z);
     }
+    
+    public void setLightLevelBlock(int light) {
+        getChunk().setLightValue(EnumSkyBlock.Block, x & 0xF, y & 0xF, z & 0xF, light);
+    }
+    
+    public void setLightLevelSky(int light) {
+        getChunk().setLightValue(EnumSkyBlock.Sky, x & 0xF, y & 0xF, z & 0xF, light);
+    }
 
     public void setTE(TileEntity te) {
         w.setTileEntity(x, y, z, te);

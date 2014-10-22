@@ -970,7 +970,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         }
         String name = partName == null ? "" : partName;
         ByteBufUtils.writeUTF8String(data, name);
-        data.writeBytes(partName.getBytes());
     }
 
     @Override

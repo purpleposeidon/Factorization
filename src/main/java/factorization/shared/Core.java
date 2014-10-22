@@ -301,7 +301,7 @@ public class Core {
 
     }
     
-    private static Logger FZLogger = LogManager.getLogger("FZ-init");;
+    private static Logger FZLogger = LogManager.getLogger("FZ-init");
     private void initializeLogging(Logger logger) {
         Core.FZLogger = logger;
         logInfo("This is Factorization %s", version);

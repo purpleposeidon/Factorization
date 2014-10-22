@@ -103,13 +103,19 @@ public class HammerInfo {
         return ret;
     }
     
+    int roundToChunk(int n) {
+        n++;
+        if (n % 16 == 0) return n;
+        return ((n/16) + 1) * 16;
+    }
+    
     Coord takeCell(int channel, DeltaCoord size) {
         loadGlobalConfig();
         Property chanAllocs = worldState.get("allocations", "channel" + channel, 0);
-        int start = chanAllocs.getInt(0);
+        int start = roundToChunk(chanAllocs.getInt(0));
         int add = size.x + getPaddingForChannel(channel);
         chanAllocs.set(Integer.toString(start + add));
-        Coord ret = new Coord(DeltaChunk.getServerShadowWorld(), start, 16, channel*Hammer.channelWidth);
+        Coord ret = new Coord(DeltaChunk.getServerShadowWorld(), start, 16, roundToChunk(channel*Hammer.channelWidth));
         dirtyCellAllocations();
         return ret;
     }

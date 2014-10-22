@@ -589,7 +589,7 @@ public class FZDSCommand extends CommandBase {
             String details() { return "Returns a Slice's blocks to the world, destroying the Slice"; }
             @Override
             void call(String[] args) {
-                DeltaChunk.paste(selected, args.length > 1);
+                DeltaChunk.paste(selected, args.length >= 1);
                 DeltaChunk.clear(selected);
                 selected.setDead();
                 setSelection(null);

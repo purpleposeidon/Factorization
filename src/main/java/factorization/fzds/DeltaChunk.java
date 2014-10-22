@@ -1,5 +1,7 @@
 package factorization.fzds;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -8,6 +10,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
@@ -155,15 +158,20 @@ public class DeltaChunk {
         dse.posX = (int)vrm.xCoord;
         dse.posY = (int)vrm.yCoord;
         dse.posZ = (int)vrm.zCoord;
+        final HashSet<Chunk> chunks = new HashSet();
         mapper.fillDse(new DseDestination() {
             @Override
             public void include(Coord real) {
                 shadow.set(real);
                 dse.real2shadow(shadow);
                 TransferLib.move(real, shadow, false, true);
+                chunks.add(real.getChunk());
             }
         });
-        final HashSet<Chunk> chunks = new HashSet();
+        // Force-load chunks to ensure that lighting updates happen
+        // shadow.updateLight requires that chunks 17 blocks away be loaded...
+        outsetChunks(chunks);
+        outsetChunks(chunks);
         mapper.fillDse(new DseDestination() {
             @Override
             public void include(Coord real) {
@@ -173,7 +181,7 @@ public class DeltaChunk {
                 shadow.set(real);
                 dse.real2shadow(shadow);
                 shadow.markBlockForUpdate();
-                chunks.add(real.getChunk());
+                shadow.updateLight();
             }
         });
         if (wipeSrc) {
@@ -184,10 +192,18 @@ public class DeltaChunk {
                 }
             });
         }
-        for (Chunk chunk : chunks) {
-            chunk.func_150809_p();
-        }
         return dse;
+    }
+    
+    static void outsetChunks(Collection<Chunk> chunks) {
+        ArrayList<Chunk> edges = new ArrayList();
+        for (Chunk chunk : chunks) {
+            for (ForgeDirection fd : ForgeDirection.VALID_DIRECTIONS) {
+                if (fd.offsetY != 0) continue;
+                edges.add(chunk.worldObj.getChunkFromChunkCoords(chunk.xPosition + fd.offsetX, chunk.zPosition + fd.offsetZ));
+            }
+        }
+        chunks.addAll(edges);
     }
     
     public static IDeltaChunk construct(World inWorld, final Coord min, final Coord max) {
@@ -213,6 +229,7 @@ public class DeltaChunk {
             for (int y = a.y; y <= b.y; y++) {
                 for (int z = a.z; z <= b.z; z++) {
                     c.set(a.w, x, y, z);
+                    if (c.isAir()) continue;
                     dest.set(c);
                     selected.shadow2real(dest);
                     TransferLib.move(c, dest, false, overwriteDestination);

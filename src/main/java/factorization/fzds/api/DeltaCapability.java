@@ -18,7 +18,7 @@ public enum DeltaCapability {
     TRANSFER_PLAYERS,
     /** The DSE reflects the real world instead of hammerspace. */
     ORACLE,
-    /** The DSE will self-destruct if it is empty. (TODO: Is this implemented?) */
+    /** The DSE will self-destruct if it is empty. (TODO: Is this implemented?) (TODO: This is a bad/confusing name.) */
     EMPTY,
     /** The DSE can be rescaled. (Not implemented.) */
     SCALE,
