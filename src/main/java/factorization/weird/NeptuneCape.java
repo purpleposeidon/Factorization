@@ -77,12 +77,13 @@ public class NeptuneCape {
         
         public LmpMaskRenderer(ModelBase base) {
             super(base);
+            base.boxList.remove(this); // Prevents arrows from rendering inside us; else rendering will crash
         }
         
         @Override
         public void render(float partial) {
             if (!should_render_mask) return;
-            if (rendering_player == null) return;
+            if (rendering_player == null) return; // Model may be rendered twice for the hurt animation
             GL11.glPushMatrix();
             
             float s = 12F/16F; GL11.glScalef(s, s, s);
@@ -95,10 +96,10 @@ public class NeptuneCape {
             GL11.glRotatef(-335.0F, 0.0F, 0.0F, 1.0F);
             GL11.glRotatef(-50.0F, 0.0F, 1.0F, 0.0F);
             
-            GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
-            GL11.glEnable(GL11.GL_CULL_FACE);
+            
+            GL11.glEnable(GL11.GL_CULL_FACE); // Pretty necessary for 3D-item rendering.
             RenderManager.instance.itemRenderer.renderItem(dummy_entity, LMP, 0);
-            GL11.glPopAttrib();
+            GL11.glDisable(GL11.GL_CULL_FACE); // It's the default for entity rendering.
             GL11.glPopMatrix();
             Minecraft.getMinecraft().renderEngine.bindTexture(rendering_player.getLocationSkin());
             rendering_player = null;

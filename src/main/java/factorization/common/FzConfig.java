@@ -60,6 +60,7 @@ public class FzConfig {
     public static boolean debug_fzds_collisions = false;
     public static boolean enable_rocketry = /* Hey! If you're turning this on, remove stuff from factorization_dead_items */ enable_dimension_slice && Core.dev_environ;
     public static boolean sockets_ignore_front_redstone = true;
+    public static boolean show_time_on_fullscreen = true;
     
     public static boolean enable_retrogen = false;
     public static String retrogen_key = "DEFAULT";
@@ -133,6 +134,7 @@ public class FzConfig {
             limit_integrated_server = getBoolConfig("limitIntegratedServer", "client", limit_integrated_server, /*"Prevent the integrated server from ticking faster than the client. Probably won't cause a deadlocks."*/ "(Broken; don't use this. Attempts to limit integrated server tick speed to match the client's, but can cause deadlocks.)");
             fix_middle_click = getBoolConfig("fixPickBlock", "client", fix_middle_click, "Make middle clicking more useful");
             large_servo_instructions = getBoolConfig("largeServoInstructions", "client", large_servo_instructions, "Render servo instructions extra-large. This can also be toggled on and off using '/f servoInstructionSize'.");
+            show_time_on_fullscreen = getBoolConfig("showTimeOnFullscreen", "client", show_time_on_fullscreen, "If true, show the time every half hour");
         }
 
         

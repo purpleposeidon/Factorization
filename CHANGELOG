@@ -1,3 +1,19 @@
+0.8.88.3
+  Screw pump's max pump height is now 12 instead of 7
+  Better format for the half-hour time reminders
+
+0.8.88.2
+  Barrels don't break in creative mode, unless you shift-punch.
+  Barrels don't render the item count if the item count is 1.
+  Fix horrific infinite steam bug
+  It is I who did the half-hour time reminders! They can be turned off now!
+
+0.8.88.1
+  Bunch of bug fixes & polishes:
+    socket shifter checks redstone properly
+    Fix dark iron ore's glint
+    Made /f now use localy formated time; notes can be added with the command as well
+
 0.8.88
   Important note:
     Socket blocks ignore redstone signal from the facing direction

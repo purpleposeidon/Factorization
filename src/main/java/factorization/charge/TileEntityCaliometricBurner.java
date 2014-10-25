@@ -223,7 +223,7 @@ public class TileEntityCaliometricBurner extends TileEntityFactorization impleme
             new Notice(this, "Empty" + append).send(entityplayer);
             return;
         }
-        new Notice(this, stomache.stackSize + " {ITEM_NAME}").withItem(stomache).send(entityplayer);
+        new Notice(this, stomache.stackSize + " {ITEM_NAME}" + append).withItem(stomache).send(entityplayer);
     }
     
     @Override

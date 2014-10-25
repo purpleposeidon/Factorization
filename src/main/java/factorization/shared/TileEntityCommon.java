@@ -317,4 +317,6 @@ public abstract class TileEntityCommon extends TileEntity implements ICoord, IFa
     public void spawnDisplayTickParticles(Random rand) { }
 
     public boolean recolourBlock(ForgeDirection side, FzColor fzColor) { return false; }
+    
+    public boolean cancelRemovedByPlayer(EntityPlayer player) { return false; }
 }

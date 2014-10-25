@@ -10,14 +10,18 @@ import java.io.Writer;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import com.google.common.base.Joiner;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -111,9 +115,15 @@ public class MiscClientCommands implements ICommand {
         static List<String> args;
         
         @alias({"date", "time"})
-        @help("Show the real-world time")
+        @help("Show the real-world time. Notes can be added.")
         public static String now() {
-            return Calendar.getInstance().getTime().toString();
+            DateFormat df = DateFormat.getDateTimeInstance();
+            String ret = "[" + df.format(new Date()) + "]";
+            args.remove(0);
+            if (!args.isEmpty()) {
+                ret += " " + Joiner.on(" ").join(args);
+            }
+            return ret;
         }
         
         @alias({"help", "?"})

@@ -5,12 +5,15 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiOptions;
 import net.minecraft.client.gui.GuiSelectWorld;
 import net.minecraft.client.settings.GameSettings;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
@@ -87,5 +90,39 @@ public class MiscClientProxy extends MiscProxy {
                 }
             }
         }
+    }
+    
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public void addDirectionInfoToDebugScreen(RenderGameOverlayEvent.Text event) {
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityPlayer player = mc.thePlayer;
+        float t = 360;
+        double yaw = ((player.rotationYaw % t) + t) % t;
+        yaw = Math.toRadians(yaw);
+        double x = -Math.sin(yaw);
+        double z = Math.cos(yaw);
+        
+        for (int i = 0; i < event.left.size(); i++) {
+            String line = event.left.get(i);
+            if (line == null) continue;
+            if (line.startsWith("f:")) {
+                line += " (" + displ(x) + ", " + displ(z) + ")";
+                event.left.set(i, line);
+                break;
+            }
+        }
+    }
+    
+    private String displ(double r) {
+        int n = (int) Math.abs(r * 3);
+        if (n == 0) {
+            return "=";
+        }
+        String s = r > 0 ? "+" : "-";
+        String ret = "";
+        for (int i = 0; i < n; i++) {
+            ret += s;
+        }
+        return ret;
     }
 }

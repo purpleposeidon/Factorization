@@ -43,6 +43,7 @@ import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
 import cpw.mods.fml.common.registry.EntityRegistry;
+import cpw.mods.fml.common.registry.ExistingSubstitutionException;
 import cpw.mods.fml.common.registry.FMLControlledNamespacedRegistry;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -209,12 +210,20 @@ public class Registry {
                 {"factorization:tile.factorization:darkIronOre", "factorization:FZ dark iron ore"},
                 {"factorization:tile.bedrock", "factorization:FZ fractured bedrock"}
         };
-        FMLControlledNamespacedRegistry<Block> blockRegistry = GameData.getBlockRegistry();
         for (String[] pair : aliases) {
             String proper = pair[0];
             String derpy = pair[1];
-            GameRegistry.addAlias(derpy, proper, Type.BLOCK);
-            GameRegistry.addAlias(derpy, proper, Type.ITEM);
+            try {
+                GameRegistry.addSubstitutionAlias(derpy, Type.BLOCK, proper);
+            } catch (ExistingSubstitutionException e) {
+                e.printStackTrace();
+            }
+            try {
+                GameRegistry.addSubstitutionAlias(derpy, Type.ITEM, proper);
+            } catch (ExistingSubstitutionException e) {
+                e.printStackTrace();
+            }
+            // Not totally awesome to ignore them. If someone else is replacing our own old names, then they ought to know what they're doing tho...
         }
     }
 

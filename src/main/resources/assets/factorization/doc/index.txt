@@ -14,7 +14,7 @@
 \index{cookbook}{Designs}
 \index{projects}{Projects}
 \index{misc}{Miscellaneous Nonsense}
-\checkmods{none}{craftguide NotEnoughItems}{
+\checkmods{none}{NotEnoughItems}{
 \index{cgi/recipes}{Recipes}
 \index{cgi/items}{Items}
 

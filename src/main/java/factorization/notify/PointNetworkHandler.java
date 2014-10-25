@@ -65,7 +65,7 @@ public enum PointNetworkHandler {
                 break;
             }
         }
-        notice.withStyle(Style.DRAWFAR, Style.LONG, Style.SCALE_SIZE);
+        notice.withStyle(Style.DRAWFAR, Style.LONG, Style.SCALE_SIZE, Style.EXACTPOSITION);
         double maxDist = 0xFF * 0xFF;
         for (EntityPlayer viewer : (Iterable<EntityPlayer>) player.worldObj.playerEntities) {
             if (player.getDistanceSqToEntity(viewer) > maxDist) continue;

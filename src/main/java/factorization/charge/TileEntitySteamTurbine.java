@@ -138,7 +138,8 @@ public class TileEntitySteamTurbine extends TileEntityCommon implements IFluidHa
                 fan_speed = (int) Math.max(fan_speed * 0.8 - 1, 0);
                 steam.amount = 0;
             } else {
-                fan_speed += Math.log(steam.amount);
+                int delta = (int) Math.max(0, Math.log(steam.amount));
+                fan_speed += delta;
                 steam.amount -= fan_speed;
             }
         }

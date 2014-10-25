@@ -1663,7 +1663,10 @@ public class FzUtil {
         NBTTagCompound tag = new NBTTagCompound();
         is.writeToNBT(tag);
         tag.removeTag("id");
-        tag.setString("name", FzUtil.getName(is));
+        String name = FzUtil.getName(is);
+        if (name != null) {
+            tag.setString("name", name);
+        }
         return tag;
     }
     

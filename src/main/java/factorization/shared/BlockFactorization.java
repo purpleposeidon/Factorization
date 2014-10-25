@@ -650,4 +650,16 @@ public class BlockFactorization extends BlockContainer {
         }
         return false;
     }
+    
+    @Override
+    public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest) {
+        TileEntity te = world.getTileEntity(x, y, z);
+        if (te instanceof TileEntityCommon) {
+            TileEntityCommon tec = (TileEntityCommon) te;
+            if (tec.cancelRemovedByPlayer(player)) {
+                return false;
+            }
+        }
+        return super.removedByPlayer(world, player, x, y, z, willHarvest);
+    }
 }

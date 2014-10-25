@@ -9,8 +9,10 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
@@ -75,7 +77,6 @@ import factorization.sockets.SocketScissors;
 import factorization.sockets.TileEntitySocketRenderer;
 import factorization.sockets.fanturpeller.SocketFanturpeller;
 import factorization.utiligoo.GooRenderer;
-import factorization.utiligoo.ItemGoo;
 import factorization.weird.BlockRenderDayBarrel;
 import factorization.weird.ContainerPocket;
 import factorization.weird.DayBarrelItemRenderer;
@@ -283,5 +284,12 @@ public class FactorizationClientProxy extends FactorizationProxy {
     public void afterLoad() {
         Core.logInfo("Reloading game settings");
         Minecraft.getMinecraft().gameSettings.loadOptions();
+    }
+    
+    @Override
+    public void sendBlockClickPacket() {
+        Minecraft mc = Minecraft.getMinecraft();
+        MovingObjectPosition mop = mc.objectMouseOver;
+        new C07PacketPlayerDigging(0, mop.blockX, mop.blockY, mop.blockZ, mop.sideHit);
     }
 }
