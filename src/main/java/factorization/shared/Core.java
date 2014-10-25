@@ -59,6 +59,7 @@ import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.common.Registry;
 import factorization.compat.CompatManager;
+import factorization.coremod.LoadingPlugin;
 import factorization.darkiron.BlockDarkIronOre;
 import factorization.docs.DistributeDocs;
 import factorization.docs.DocumentationModule;
@@ -547,5 +548,24 @@ public class Core {
         //@SubscribeEvent is the annotation the eventbus, *NOT* @EventHandler; that one is for mod containers.
         FMLCommonHandler.instance().bus().register(obj);
         MinecraftForge.EVENT_BUS.register(obj);
+    }
+    
+    static {
+        if (!LoadingPlugin.pluginInvoked) {
+            String fml = "-Dfml.coreMods.load=factorization.coremod.LoadingPlugin";
+            String ignore = "-Dfz.ignoreMissingCoremod=true";
+            if (System.getProperty("fz.ignoreMissingCoremod", "") == "") {
+                String dev = dev_environ ? "You're in a dev environ, so this is to be expected.\n" : "";
+                throw new IllegalStateException("Coremod didn't load! Is your installation broken?\n" +
+                        "Weird. It really is supposed to load, y'know...\n" +
+                        "Anyways, try adding this flag to the JVM command line: " + fml + "\n" +
+                        dev +
+                        "(If the '-Dfml.coreMods.load' property is already being passed with another coremod, instead add the FZ coremod class with a comma.)\n" +
+                        "If you want to force loading to continue anyways, without the coremod, " +
+                        "pass the following flag, but many things (including blowing up diamond blocks) will be broken: " + ignore);
+            } else {
+                System.err.println("Coremod did not load! But continuing anyways; as per VM flag " + ignore);
+            }
+        }
     }
 }
