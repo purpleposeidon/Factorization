@@ -241,48 +241,6 @@ public class ColossalBuilder {
         life.removeReinforcements();
         //life.growthTick();
         life.upset(2, 1, 4);
-        //
-        
-        /*life.sprinkleSeeds(0.25);
-        life.life(3, 5);
-        life.life(3, 5);
-        life.life(3, 5);
-        life.life(3, 5);
-        life.life(3, 5);
-        life.pruneTick();*/
-        
-        /*life.sprinkleSeeds(0.025);
-        life.bubble();
-        life.removeReinforcements();
-        life.pruneTick();*/
-        //life.rainSeeds(0.05, 0.75);
-        
-        /*life.sprinkleSeeds(0.025);
-        life.bubble();
-        life.life(2, 10);*/
-        
-        /*{
-            // This is quite good.
-            life.sprinkleSeeds(0.025);
-            life.pruneTick();
-            life.rainSeeds(0.05, 0.75);
-        }*/
-        
-        //life.life(0, 3);
-        //life.rainSeeds(0.05, 0.75);
-        //life.life(0, 0);
-        //life.sprinkleSeeds(0.025);
-        //life.growthTick();
-        
-        //life.reinforce(1);
-        
-        //life.sprinkleSeeds(0.025);
-        //life.pruneTick();
-        //life.rainSeeds(0.05, 0.75);
-        
-        //life.bubble();
-        //life.smooth(2);
-        
         life.saveCellsToWorld(Blocks.stone);
     }
     
