@@ -59,7 +59,6 @@ public class BlobBuilder {
                 return POISON;
             }
         } else {
-            at.setAir(); // NORELEASE;
             return AIR;
         }
         return WALL;
@@ -288,7 +287,6 @@ public class BlobBuilder {
                     byte cell = cells[index];
                     if (at.isAir()) {
                         if (cell > 0) at.setIdMd(stone, 0, true);
-                        if (cell == REINFORCE) at.setIdMd(Blocks.stonebrick, 0, true);
                     }
                 }
             }
