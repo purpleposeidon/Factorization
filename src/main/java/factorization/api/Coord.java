@@ -74,6 +74,10 @@ public class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
         this(w, mop.blockX, mop.blockY, mop.blockZ);
     }
     
+    public Coord(Chunk chunk) {
+        this(chunk.worldObj, chunk.xPosition * 16, 0, chunk.zPosition * 16);
+    }
+    
     @Override public World w() { return w; }
     @Override public int x() { return x; }
     @Override public int y() { return y; }

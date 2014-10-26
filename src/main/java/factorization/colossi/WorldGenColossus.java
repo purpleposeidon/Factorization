@@ -2,21 +2,30 @@ package factorization.colossi;
 
 import static net.minecraftforge.common.BiomeDictionary.Type.*;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraft.world.gen.NoiseGenerator;
 import net.minecraft.world.gen.NoiseGeneratorOctaves;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.terraingen.InitNoiseGensEvent;
+import net.minecraftforge.event.terraingen.SaplingGrowTreeEvent;
+import net.minecraftforge.event.terraingen.DecorateBiomeEvent.Decorate;
 import cpw.mods.fml.common.IWorldGenerator;
+import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import factorization.api.Coord;
 import factorization.common.FzConfig;
@@ -34,7 +43,8 @@ public class WorldGenColossus implements IWorldGenerator {
             RIVER,
             OCEAN,
             BEACH,
-            DENSE
+            DENSE,
+            FOREST
     };
     
     {
@@ -44,9 +54,14 @@ public class WorldGenColossus implements IWorldGenerator {
         }
     }
     
-    static int GENERATION_SPACING = 64; // TODO NORELEASE: Config option
-    static int GENERATION_START_X = 40, GENERATION_START_Z = 40;
+    static int GENERATION_SPACING = 32; // TODO NORELEASE: Config option. Defaultt o 50?
+    static int GENERATION_START_X = 9, GENERATION_START_Z = 9;
     static final double SMOOTH_END = 8*3, SMOOTH_START = 8*5;
+    static {
+        if (GENERATION_START_X > GENERATION_SPACING || GENERATION_START_Z > GENERATION_SPACING) {
+            throw new IllegalArgumentException();
+        }
+    }
     
     static double position(int generation_spacing, int pos_start, double pos) {
      // chunkX % dist = x_start
@@ -85,7 +100,9 @@ public class WorldGenColossus implements IWorldGenerator {
     }
     
     static boolean isGenChunk(int chunkX, int chunkZ) {
-        return (chunkX % GENERATION_SPACING) == GENERATION_START_X && (chunkZ % GENERATION_SPACING) == GENERATION_START_Z;
+        boolean x = (((chunkX % GENERATION_SPACING) + GENERATION_SPACING) % GENERATION_SPACING) == GENERATION_START_X;
+        boolean z = (((chunkZ % GENERATION_SPACING) + GENERATION_SPACING) % GENERATION_SPACING) == GENERATION_START_Z;
+        return x && z;
     }
     
     static Coord getNearest(Coord player) {
@@ -95,6 +112,53 @@ public class WorldGenColossus implements IWorldGenerator {
         ret.x = (int) cx;
         ret.z = (int) cz;
         return ret;
+    }
+    
+    public static ArrayList<Coord> getCandidatesNear(final Coord player, int chunkSearchDistance, boolean forceLoad) {
+        ArrayList<Coord> ret = new ArrayList<Coord>();
+        ChunkCoordIntPair chunkAt = player.getChunk().getChunkCoordIntPair();
+        for (int dx = -chunkSearchDistance; dx <= chunkSearchDistance; dx++) {
+            for (int dz = -chunkSearchDistance; dz <= chunkSearchDistance; dz++) {
+                int cx = chunkAt.chunkXPos + dx;
+                int cz = chunkAt.chunkZPos + dz;
+                if (isGenChunk(cx, cz)) {
+                    Chunk chunk = player.w.getChunkFromChunkCoords(cx, cz);
+                    boolean unload = false;
+                    if (forceLoad && !chunk.isTerrainPopulated) {
+                        forceLoadChunk(player.w, cx, cz);
+                        chunk = player.w.getChunkFromChunkCoords(cx, cz);
+                        unload = true;
+                    }
+                    Coord at = new Coord(chunk);
+                    at.getBlock();
+                    for (TileEntity te : (Iterable<TileEntity>)chunk.chunkTileEntityMap.values()) {
+                        if (te instanceof TileEntityColossalHeart) {
+                            ret.add(new Coord(te));
+                            break;
+                        }
+                    }
+                    if (unload) {
+                        releaseChunk(chunk);
+                    }
+                }
+            }
+        }
+        ret.sort(new Comparator<Coord>() {
+            @Override
+            public int compare(Coord a, Coord b) {
+                return player.distanceSq(a) - player.distanceSq(b);
+            }
+        });
+        return ret;
+    }
+    
+    private static void forceLoadChunk(World world, int cx, int cz) {
+        ChunkProviderServer cps = (ChunkProviderServer) world.getChunkProvider();
+        cps.populate(cps, cx, cz);
+    }
+    
+    private static void releaseChunk(Chunk chunk) {
+        // Not necessary I hope?
     }
     
     static class SmoothNoiseNearColossi extends NoiseGeneratorOctaves {
@@ -165,6 +229,16 @@ public class WorldGenColossus implements IWorldGenerator {
     boolean genOnWorld(World world) {
         return world.getWorldInfo().isMapFeaturesEnabled() && world.provider.isSurfaceWorld() && FzConfig.gen_colossi;
     }
+    
+    boolean isBadBiome(World w, int chunkX, int chunkZ) {
+        BiomeGenBase biome = w.getBiomeGenForCoords(8 + chunkX * 16, 8 + chunkZ * 16);
+        for (Type bad : forbiddenBiomeTypes) {
+            if (BiomeDictionary.isBiomeOfType(biome, bad)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     @Override
     public void generate(Random worldRandom, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
@@ -173,32 +247,23 @@ public class WorldGenColossus implements IWorldGenerator {
         int blockX = 8 + (chunkX * 16);
         int blockZ = 8 + (chunkZ * 16);
         
-        boolean bad_biome = false;
-        
-        BiomeGenBase biome = world.getBiomeGenForCoords(blockX, blockZ);
-        for (Type bad : forbiddenBiomeTypes) {
-            if (BiomeDictionary.isBiomeOfType(biome, bad)) {
-                bad_biome = true;
-                break;
-            }
-        }
-        
-        Coord start = new Coord(world, blockX, 0xFF, blockZ);
+        Coord start = new Coord(world, blockX, 0xFF /* NORELEASE */, blockZ);
+        boolean bad_biome = isBadBiome(world, chunkX, chunkZ);
+        System.out.println("Colossus position candidate at " + blockX + ", " + blockZ + ":  " + bad_biome);
         start.moveToTopBlock();
         while (!start.isSolid()) {
             if (start.y <= 0) return;
             start.y--;
         }
-        start.y++;
-        if (bad_biome) {
-            start.setId(Blocks.standing_sign);
-            TileEntitySign sign = start.getTE(TileEntitySign.class);
-            sign.signText[0] = "Bad biome!";
-            sign.signText[1] = biome.biomeName; // NORELEASE
-            return;
-        }
         Block dirt = start.getBlock();
         int dirt_md = start.getMd();
+        start.y++;
+        if (bad_biome) {
+            start.setId(Blocks.standing_sign); // NORELEASE
+            TileEntitySign sign = start.getTE(TileEntitySign.class);
+            sign.signText[0] = "Bad biome!"; 
+            return;
+        }
         
         ColossalBuilder builder = new ColossalBuilder(Math.abs(worldRandom.nextInt()), start);
         int width = builder.get_width();
@@ -214,13 +279,46 @@ public class WorldGenColossus implements IWorldGenerator {
                     at.setIdMd(dirt, dirt_md, false);
                     at.y++;
                 }
-                while (at.y < start.y + height) {
+                int end = at.y;
+                at.y = start.y + height;
+                while (at.y >= end) {
                     at.setAir();
-                    at.y++;
+                    at.y--;
                 }
             }
         }
         
         builder.construct();
+    }
+    
+    private boolean cancel(World w, int cx, int cz) {
+        int d = 1;
+        for (int dx = -d; dx <= d; dx++) {
+            for (int dz = -d; dz <= d; dz++) {
+                if (isGenChunk(cx + dx, cz + dz) && !isBadBiome(w, cx + dx, cz + dz)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // There's a GrowTreeEvent, but I think it's actually for normal in-game sapling growth?
+    
+    @SubscribeEvent
+    public void cancelDecorations(Decorate event) {
+        if (!genOnWorld(event.world)) return;
+        switch (event.type) {
+        case BIG_SHROOM:
+        case LAKE:
+        case LILYPAD:
+        case PUMPKIN:
+        case TREE:
+            if (cancel(event.world, event.chunkX / 16, event.chunkZ / 16)) {
+                event.setResult(Result.DENY);
+            }
+            return;
+        default: break;
+        }
     }
 }

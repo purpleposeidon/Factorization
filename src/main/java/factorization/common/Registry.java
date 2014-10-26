@@ -63,6 +63,7 @@ import factorization.charge.TileEntityLeydenJar;
 import factorization.colossi.ColossalBlock;
 import factorization.colossi.ColossalBlockItem;
 import factorization.colossi.ColossusController;
+import factorization.colossi.ItemColossusGuide;
 import factorization.colossi.TileEntityColossalHeart;
 import factorization.darkiron.BlockDarkIronOre;
 import factorization.docs.ItemDocBook;
@@ -152,6 +153,7 @@ public class Registry {
     public ItemCommenter servo_rail_comment_editor;
     public ItemDocBook docbook;
     public ItemGoo utiligoo;
+    public ItemColossusGuide colossusGuide;
 
     public Material materialMachine = new Material(MapColor.ironColor);
     
@@ -386,6 +388,7 @@ public class Registry {
         daybarrel = new ItemDayBarrel("daybarrel");
         docbook = new ItemDocBook("docbook", TabType.TOOLS);
         utiligoo = new ItemGoo("utiligoo", TabType.TOOLS);
+        colossusGuide = new ItemColossusGuide("colossusGuide", TabType.TOOLS);
         postMakeItems();
     }
 
