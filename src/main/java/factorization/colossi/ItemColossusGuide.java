@@ -28,7 +28,7 @@ public class ItemColossusGuide extends ItemFactorization {
         
         int range = WorldGenColossus.GENERATION_SPACING * 3 / 2;
         if (MinecraftServer.getServer().getCurrentPlayerCount() == 1) {
-            range = WorldGenColossus.GENERATION_SPACING * 3;
+            range = WorldGenColossus.GENERATION_SPACING * 5 / 2;
         }
         ArrayList<Coord> nearby = WorldGenColossus.getCandidatesNear(new Coord(player), range, true);
         if (nearby.isEmpty()) {
