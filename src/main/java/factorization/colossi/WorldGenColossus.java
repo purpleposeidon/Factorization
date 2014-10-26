@@ -22,6 +22,7 @@ import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.terraingen.InitNoiseGensEvent;
+import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.SaplingGrowTreeEvent;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent.Decorate;
 import cpw.mods.fml.common.IWorldGenerator;
@@ -33,20 +34,6 @@ import factorization.shared.Core;
 import factorization.shared.FzUtil;
 
 public class WorldGenColossus implements IWorldGenerator {
-    
-    Type[] forbiddenBiomeTypes = new Type[] {
-            SPOOKY,
-            NETHER,
-            END,
-            MAGICAL,
-            WATER,
-            RIVER,
-            OCEAN,
-            BEACH,
-            DENSE,
-            FOREST
-    };
-    
     {
         if (FzConfig.gen_colossi) {
             Core.loadBus(this);
@@ -54,64 +41,40 @@ public class WorldGenColossus implements IWorldGenerator {
         }
     }
     
-    static int GENERATION_SPACING = 32; // TODO NORELEASE: Config option. Defaultt o 50?
+    static int GENERATION_SPACING = 32; // TODO NORELEASE: Config option. Default to 50?
     static int GENERATION_START_X = 9, GENERATION_START_Z = 9;
-    static final double SMOOTH_END = 8*3, SMOOTH_START = 8*5;
+    static final double SMOOTH_START = 16 * 5 / 2;
+    static final double SMOOTH_END = 16 * 3 / 2;
+    static final double SMOOTH_GEN_BORDER = SMOOTH_END + 24;
+    static final double SMOOTH_END_FUZZ = SMOOTH_END + 32;
     static {
         if (GENERATION_START_X > GENERATION_SPACING || GENERATION_START_Z > GENERATION_SPACING) {
             throw new IllegalArgumentException();
         }
     }
     
-    static double position(int generation_spacing, int pos_start, double pos) {
-     // chunkX % dist = x_start
-        // target_x = ((dist * n) + x_start)*16 + 8
-        int radius = GENERATION_SPACING / 2;
-        int mul = (int) (((pos + 8)/16 - pos_start + radius)/generation_spacing); // the 'n' of the nearest location
-        double target_pos1 = ((generation_spacing * mul) + pos_start) * 16 + 8;
-        double target_pos2 = ((generation_spacing * (mul + 1)) + pos_start) * 16 + 8;
-        double dp1 = target_pos1 - pos;
-        double dp2 = target_pos2 - pos;
-        if (Math.abs(dp1) < Math.abs(dp2)) {
-            return target_pos1;
+    private static double dist(int generation_spacing, int pos) {
+        pos = Math.abs(pos);
+        int n = pos / generation_spacing;
+        int dist = pos - n * generation_spacing;
+        if (dist > generation_spacing / 2) {
+            dist = generation_spacing - dist;
         }
-        return target_pos2;
+        return dist;
     }
     
-    static double dist(int generation_spacing, int pos_start, double pos) {
-        // chunkX % dist = x_start
-        // target_x = ((dist * n) + x_start)*16 + 8
-        int radius = GENERATION_SPACING / 2;
-        int mul = (int) (((pos + 8)/16 - pos_start + radius)/generation_spacing); // the 'n' of the nearest location
-        double target_pos1 = ((generation_spacing * mul) + pos_start) * 16 + 8;
-        double target_pos2 = ((generation_spacing * (mul + 1)) + pos_start) * 16 + 8;
-        double dist1 = Math.abs(pos - target_pos1);
-        double dist2 = Math.abs(pos - target_pos2);
-        return Math.min(dist1, dist2);
-    }
-    
-    static double distance(double blockX, double blockZ) {
-        double distX = dist(GENERATION_SPACING, GENERATION_START_X, blockX);
-        double distZ = dist(GENERATION_SPACING, GENERATION_START_Z, blockZ);
+    public static double distance(int blockX, int blockZ) {
+        double distX = dist(GENERATION_SPACING * 16, blockX - GENERATION_START_X * 16);
+        double distZ = dist(GENERATION_SPACING * 16, blockZ - GENERATION_START_Z * 16);
         
-        //double distSq = distX * distX + distZ * distZ;
-        //return Math.sqrt(distSq);
-        return Math.abs(distX + distZ)/2;
+        double distSq = distX * distX + distZ * distZ;
+        return Math.sqrt(distSq);
     }
     
-    static boolean isGenChunk(int chunkX, int chunkZ) {
+    public static boolean isGenChunk(int chunkX, int chunkZ) {
         boolean x = (((chunkX % GENERATION_SPACING) + GENERATION_SPACING) % GENERATION_SPACING) == GENERATION_START_X;
         boolean z = (((chunkZ % GENERATION_SPACING) + GENERATION_SPACING) % GENERATION_SPACING) == GENERATION_START_Z;
         return x && z;
-    }
-    
-    static Coord getNearest(Coord player) {
-        double cx = position(GENERATION_SPACING, GENERATION_START_X, player.x);
-        double cz = position(GENERATION_SPACING, GENERATION_START_Z, player.z);
-        Coord ret = player.copy();
-        ret.x = (int) cx;
-        ret.z = (int) cz;
-        return ret;
     }
     
     public static ArrayList<Coord> getCandidatesNear(final Coord player, int chunkSearchDistance, boolean forceLoad) {
@@ -161,6 +124,17 @@ public class WorldGenColossus implements IWorldGenerator {
         // Not necessary I hope?
     }
     
+    @SubscribeEvent
+    public void injectNoiseSmoothers(InitNoiseGensEvent event) {
+        // Create a flat arena around colossi.
+        if (!genOnWorld(event.world)) return;
+        int[] target_noises = new int[] { 0, 1, 2, 5 };
+        for (int noise_index : target_noises) {
+            NoiseGenerator parentGenerator = event.newNoiseGens[noise_index];
+            event.newNoiseGens[noise_index] = new SmoothNoiseNearColossi(noise_index, (NoiseGeneratorOctaves) parentGenerator);
+        }
+    }
+    
     static class SmoothNoiseNearColossi extends NoiseGeneratorOctaves {
         final NoiseGeneratorOctaves parent;
         final int parentIndex;
@@ -174,61 +148,70 @@ public class WorldGenColossus implements IWorldGenerator {
         @Override
         public double[] generateNoiseOctaves(double[] noiseOut, int chunkXTimes4, int noiseStartY, int chunkZTimes4, int noiseSizeX, int noiseSizeY, int noiseSizeZ,
                 double scaleX, double scaleY, double scaleZ) {
+            // The terrain generator uses 4 noise sources, and does a bunch of crazy math on them to do world gen.
+            // The noise arrays are *not* the same size as a chunk, and one of the noises is only 1 high.
             double[] ret = parent.generateNoiseOctaves(noiseOut, chunkXTimes4, noiseStartY, chunkZTimes4, noiseSizeX, noiseSizeY, noiseSizeZ,
                     scaleX, scaleY, scaleZ);
             // int blockIndex = x * blockDataHeight * 16 | z * blockDataHeight | y;
             // The noise is 5x33x5
-            int noiseSrcX = chunkXTimes4*16/4; // chunkXTimes4 is actually 'noiseStartX'
-            int noiseSrcZ = chunkZTimes4*16/4; // chunkZTimes4 is actually 'noiseStartZ'
+            int noiseSrcX = chunkXTimes4 * 16 / 4; // chunkXTimes4 is actually 'noiseStartX'
+            int noiseSrcZ = chunkZTimes4 * 16 / 4; // chunkZTimes4 is actually 'noiseStartZ'
             
-            double noise_src_dist = distance(noiseSrcX + 2 * 4, noiseSrcZ + 2 * 4);
-            if (noise_src_dist > SMOOTH_START * 2) return ret;
+            double noise_src_dist = distance(noiseSrcX + 8, noiseSrcZ + 8);
+            if (noise_src_dist > SMOOTH_END_FUZZ) return ret;
             
-            int y_count = parentIndex == 5 ? 1 : 33;
+            final int y_count = parentIndex == 5 ? 1 : 33;
+            int distance_fuzz = 500; // Used to be 1k. Messes with the distance to make the border look natural.
             
+            // Ia! Ia! Cachuchu flaht'n!
             for (int noiseX = 0; noiseX < 5; noiseX++) {
                 for (int noiseZ = 0; noiseZ < 5; noiseZ++) {
                     int world_x = noiseSrcX + noiseX * 4;
                     int world_z = noiseSrcZ + noiseZ * 4;
                     int column = ((noiseX * 5) + noiseZ) * y_count;
                     double d = distance(world_x, world_z);
+                    double dFuzz = 0;
                     if (y_count > 1) {
-                        d -= Math.abs(ret[column] - ret[column + 1]) / 1000;
+                        dFuzz = (ret[column] - ret[column + 1]) / distance_fuzz;
                     } else {
-                        d -= Math.abs(ret[column] / 1000);
+                        dFuzz = ret[column] / distance_fuzz;
                     }
+                    d -= Math.cos(dFuzz) * 3;
                     for (int noiseY = 0; noiseY < y_count; noiseY++) {
                         ret[column + noiseY] = smooth(d, ret[column + noiseY], 500);
                     }
                 }
             }
-            
             return ret;
         }
         
         double smooth(double dist, double max, double min) {
+            // "They're smooth posers" -- LSP
             if (dist > SMOOTH_START) return max;
             if (dist < SMOOTH_END) return min;
-            double val = FzUtil.uninterp(SMOOTH_END, SMOOTH_START, dist);
-            val = Math.pow(2, val * val * val) - 1;
+            double val = FzUtil.uninterp(SMOOTH_END, SMOOTH_START, dist); // val between 0, 1
+            //val += 0.1;
+            //val = Math.pow(2, val * val * val) - 1; // Gives a smooth _|-shaped curve.
             return FzUtil.interp(min, max, val);
         }
         
     }
     
-    @SubscribeEvent
-    public void injectNoiseSmoothers(InitNoiseGensEvent event) {
-        if (!genOnWorld(event.world)) return;
-        int[] target_noises = new int[] { 0, 1, 2, 5 };
-        for (int noise_index : target_noises) {
-            NoiseGenerator previousGenerator = event.newNoiseGens[noise_index];
-            event.newNoiseGens[noise_index] = new SmoothNoiseNearColossi(noise_index, (NoiseGeneratorOctaves) previousGenerator);
-        }
-    }
-    
     boolean genOnWorld(World world) {
         return world.getWorldInfo().isMapFeaturesEnabled() && world.provider.isSurfaceWorld() && FzConfig.gen_colossi;
     }
+    
+    static Type[] forbiddenBiomeTypes = new Type[] {
+        SPOOKY,
+        NETHER,
+        END,
+        MAGICAL,
+        WATER,
+        RIVER,
+        OCEAN,
+        BEACH,
+        DENSE
+    };
     
     boolean isBadBiome(World w, int chunkX, int chunkZ) {
         BiomeGenBase biome = w.getBiomeGenForCoords(8 + chunkX * 16, 8 + chunkZ * 16);
@@ -249,61 +232,28 @@ public class WorldGenColossus implements IWorldGenerator {
         
         Coord start = new Coord(world, blockX, 0xFF /* NORELEASE */, blockZ);
         boolean bad_biome = isBadBiome(world, chunkX, chunkZ);
-        System.out.println("Colossus position candidate at " + blockX + ", " + blockZ + ":  " + bad_biome);
+        if (bad_biome) {
+            return;
+        }
         start.moveToTopBlock();
         while (!start.isSolid()) {
             if (start.y <= 0) return;
             start.y--;
         }
-        Block dirt = start.getBlock();
-        int dirt_md = start.getMd();
         start.y++;
-        if (bad_biome) {
-            start.setId(Blocks.standing_sign); // NORELEASE
-            TileEntitySign sign = start.getTE(TileEntitySign.class);
-            sign.signText[0] = "Bad biome!"; 
-            return;
-        }
-        
         ColossalBuilder builder = new ColossalBuilder(Math.abs(worldRandom.nextInt()), start);
-        int width = builder.get_width();
-        int depth = builder.get_depth();
-        int height = builder.get_height();
-        Coord at = start.copy();
-        for (int dw = -width; dw <= width; dw++) {
-            for (int dd = -depth; dd <= depth; dd++) {
-                at.x = start.x + dw;
-                at.z = start.z + dd;
-                at.moveToTopBlock();
-                while (at.y < start.y) {
-                    at.setIdMd(dirt, dirt_md, false);
-                    at.y++;
-                }
-                int end = at.y;
-                at.y = start.y + height;
-                while (at.y >= end) {
-                    at.setAir();
-                    at.y--;
-                }
-            }
-        }
-        
         builder.construct();
     }
     
+    // Forbid decoration/population to make life easy for the colossi
+    
     private boolean cancel(World w, int cx, int cz) {
-        int d = 1;
-        for (int dx = -d; dx <= d; dx++) {
-            for (int dz = -d; dz <= d; dz++) {
-                if (isGenChunk(cx + dx, cz + dz) && !isBadBiome(w, cx + dx, cz + dz)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        int blockX = cx * 16 + 8;
+        int blockZ = cz * 16 + 8;
+        return distance(blockX, blockZ) < SMOOTH_GEN_BORDER;
     }
 
-    // There's a GrowTreeEvent, but I think it's actually for normal in-game sapling growth?
+    // GrowTreeEvent is for normal in-game sapling growth, so it's not included here.
     
     @SubscribeEvent
     public void cancelDecorations(Decorate event) {
@@ -311,10 +261,25 @@ public class WorldGenColossus implements IWorldGenerator {
         switch (event.type) {
         case BIG_SHROOM:
         case LAKE:
-        case LILYPAD:
         case PUMPKIN:
         case TREE:
             if (cancel(event.world, event.chunkX / 16, event.chunkZ / 16)) {
+                event.setResult(Result.DENY);
+            }
+            return;
+        default: break;
+        }
+    }
+    
+    @SubscribeEvent
+    public void cancelPopulations(PopulateChunkEvent.Populate event) {
+        if (!genOnWorld(event.world)) return;
+        switch (event.type) {
+        case LAKE:
+        case LAVA:
+        case ANIMALS:
+        case CUSTOM:
+            if (cancel(event.world, event.chunkX, event.chunkZ)) {
                 event.setResult(Result.DENY);
             }
             return;
