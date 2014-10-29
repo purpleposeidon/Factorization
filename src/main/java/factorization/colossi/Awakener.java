@@ -43,6 +43,7 @@ public class Awakener {
             TileEntityColossalHeart heart = findNearestHeart(src);
             if (heart == null) return;
             msg("Unknown XR10-class entity detected.");
+            msg("Attempting to awaken Colossal Guardian " + heart.seed);
             Coord core = new Coord(heart);
             Awakener awakener = new Awakener(heart);
             boolean success = awakener.abandonedLongAgo_thisAncientGuardianBurnsItsRemainingPower();
@@ -242,8 +243,10 @@ public class Awakener {
         // mark(body, "+");
         
         ArrayList<LimbInfo> parts = new ArrayList();
+        int i = 0;
         for (SetAndInfo partInfo : limbInfo) {
-            IDeltaChunk idc = createIDC(partInfo.set, partInfo.rotation);
+            String name = partInfo.limbType + " " + partInfo.limbSide + (i++);
+            IDeltaChunk idc = createIDC(partInfo.set, partInfo.rotation, name);
             LimbInfo li = new LimbInfo(partInfo.limbType, partInfo.limbSide, partInfo.length, idc);
             parts.add(li);
         }
@@ -488,16 +491,16 @@ public class Awakener {
         return null;
     }
     
-    IDeltaChunk createIDC(final Set<Coord> parts, Vec3 rotationCenter) {
+    IDeltaChunk createIDC(final Set<Coord> parts, Vec3 rotationCenter, String partName) {
         Coord min = null, max = null;
         for (Coord c : parts) {
             if (min == null || max == null) {
                 min = c;
                 max = c;
             } else {
-                if (!c.isSubmissiveTo(max)) {
+                if (c.x > max.x || c.y > max.y || c.z > max.z) {
                     max = c;
-                } else if (c.isSubmissiveTo(min)) {
+                } else if (c.x < min.x || c.y < min.y || c.z < min.z) {
                     min = c;
                 }
             }
@@ -532,8 +535,9 @@ public class Awakener {
         }
         ret.forbid(DeltaCapability.EMPTY);
         ret.forbid(DeltaCapability.COLLIDE);
+        ret.setPartName(partName);
+        ret.changeRotationCenter(rotationCenter); // Was down below. NORELEASE: Don't need this comment? :D
         ret.worldObj.spawnEntityInWorld(ret);
-        ret.changeRotationCenter(rotationCenter);
         return ret;
     }
 }

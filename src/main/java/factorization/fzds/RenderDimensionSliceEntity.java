@@ -1,8 +1,6 @@
 package factorization.fzds;
 
-import static org.lwjgl.opengl.GL11.glCallList;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,9 +13,11 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.DestroyBlockProgress;
+import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -110,34 +110,36 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
             ySize = (far.y - corner.y);
             zSize = (far.z - corner.z);
             
-            xSizeChunk = xSize/16;
-            ySizeChunk = ySize/16;
-            zSizeChunk = zSize/16;
+            int DSC = 16;
+            xSizeChunk = (xSize + DSC)/16;
+            ySizeChunk = (ySize + DSC)/16;
+            zSizeChunk = (zSize + DSC)/16;
             
+            if (xSizeChunk <= 0 || ySizeChunk <= 0 || zSizeChunk <= 0) throw new AssertionError();
             
-            int xzSizeChunk = xSizeChunk*zSizeChunk;
-            cubicChunkCount = (1 + xSizeChunk)*(1 + ySizeChunk)*(1 + zSizeChunk);
+            cubicChunkCount = xSizeChunk * ySizeChunk * zSizeChunk;
             
             renderers = new WorldRenderer[cubicChunkCount];
             int i = 0;
             FzUtil.checkGLError("FZDS before render");
-            for (int y = 0; y <= ySizeChunk; y++) {
-                for (int x = 0; x <= xSizeChunk; x++) {
-                    for (int z = 0; z <= zSizeChunk; z++) {
+            int DC = 16;
+            for (int y = corner.y; y <= far.y; y += DC) {
+                for (int x = corner.x; x <= far.x; x += DC) {
+                    for (int z = corner.z; z <= far.z; z += DC) {
                         //We could allocate lists per WR instead?
                         //NORELEASE: w.loadedTileEntityList might be wrong? Might be inefficient?
                         //It creates a list... maybe we should use that instead?
-                        renderers[i] = new WorldRenderer(corner.w, corner.w.loadedTileEntityList, corner.x + x*16, corner.y + y*16, corner.z + z*16, getRenderList() + i*wr_display_list_size);
-                        renderers[i].posXClip = x*16;
-                        renderers[i].posYClip = y*16;
-                        renderers[i].posZClip = z*16;
+                        renderers[i] = new WorldRenderer(corner.w, corner.w.loadedTileEntityList, x, y, z, getRenderList() + i*wr_display_list_size);
+                        renderers[i].posXClip = x - corner.x;
+                        renderers[i].posYClip = y - corner.y;
+                        renderers[i].posZClip = z - corner.z;
                         renderers[i].markDirty();
                         FzUtil.checkGLError("FZDS WorldRenderer init");
                         i++;
                     }
                 }
             }
-            assert i == cubicChunkCount;
+            if (i != cubicChunkCount) throw new AssertionError();
         }
         
         int last_update_index = 0;
@@ -161,7 +163,7 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
             if (!anyRenderersDirty) {
                 last_update_index = 0;
                 return;
-            }
+            } // NORELEASE: Can we queue the renderchunks up to something in 1.8?
             boolean start_from_begining = last_update_index == 0;
             Core.profileStart("updateFzdsTerrain");
             FzUtil.checkGLError("FZDS before WorldRender update");
