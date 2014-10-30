@@ -81,10 +81,28 @@ public class ItemGoo extends ItemFactorization {
         if (player.isSneaking()) {
             if (data == null) return false;
             ForgeDirection fd = ForgeDirection.getOrientation(side);
+            ArrayList<Integer> toRemove = new ArrayList();
             for (int i = 0; i < data.coords.length; i += 3) {
                 data.coords[i + 0] = data.coords[i + 0] + fd.offsetX;
-                data.coords[i + 1] = data.coords[i + 1] + fd.offsetY;
+                int goo_y = data.coords[i + 1] = data.coords[i + 1] + fd.offsetY;
                 data.coords[i + 2] = data.coords[i + 2] + fd.offsetZ;
+                if (goo_y < 0 || goo_y > 0xFF) {
+                    toRemove.add(i + 0);
+                    toRemove.add(i + 1);
+                    toRemove.add(i + 2);
+                }
+            }
+            if (!toRemove.isEmpty()) {
+                int[] removed = new int[toRemove.size()];
+                int i = 0;
+                for (Integer val : toRemove) {
+                    removed[i++] = val;
+                }
+                data.coords = ArrayUtils.removeAll(data.coords, removed);
+                if (data.coords.length == 0) {
+                    data.wipe(is, world);
+                }
+                is.stackSize += removed.length / 3;
             }
             data.markDirty();
             return true;
@@ -463,6 +481,27 @@ public class ItemGoo extends ItemFactorization {
                     list.add(I18n.format("item.factorization:utiligoo.wrongDimension"));
                 }
             }
+            int minX = 0, minY = 0, minZ = 0;
+            int maxX = 0, maxY = 0, maxZ = 0;
+            for (int i = 0; i < data.coords.length; i += 3) {
+                int x = data.coords[i + 0];
+                int y = data.coords[i + 1];
+                int z = data.coords[i + 2];
+                if (i == 0) {
+                    minX = maxX = x;
+                    minY = maxY = y;
+                    minZ = maxZ = z;
+                } else {
+                    minX = Math.min(x, minX);
+                    minY = Math.min(y, minY);
+                    minZ = Math.min(z, minZ);
+                    maxX = Math.max(x, maxX);
+                    maxY = Math.max(y, maxY);
+                    maxZ = Math.max(z, maxZ);
+                }
+            }
+            list.add(I18n.format("item.factorization:utiligoo.min", minX, minY, minZ));
+            list.add(I18n.format("item.factorization:utiligoo.max", maxX, maxY, maxZ));
             if (Core.dev_environ) {
                 list.add("#" + is.getItemDamage());
             }
