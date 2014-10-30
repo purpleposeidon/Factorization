@@ -526,7 +526,12 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
             }
             coord.adjust(facing.getOpposite());
         }
-        if (shouldDoWork()) {
+        if (!shouldDoWork()) {
+            updateDestination(coord, onServo);
+            if (sourceAction == null) {
+                updateSource(coord, onServo);
+            }
+        } else {
             updateSource(coord, onServo);
             updateDestination(coord, onServo);
         }
@@ -542,7 +547,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
                 sourceAction = new Drainer(c, c.getFluid());
             }
             coord.adjust(facing);
-        } else {
+        } else if (shouldDoWork()) {
             sourceAction.suckIn();
         }
     }
@@ -559,7 +564,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
                 destinationAction = new Flooder(c, buffer.getFluid().getFluid());
             }
             coord.adjust(facing.getOpposite());
-        } else {
+        } else if (shouldDoWork()) {
             destinationAction.pumpOut();
         }
     }
