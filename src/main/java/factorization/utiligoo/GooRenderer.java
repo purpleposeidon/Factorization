@@ -83,7 +83,7 @@ public enum GooRenderer {
         GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F);
         GL11.glEnable(GL11.GL_ALPHA_TEST);
         GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);
-        GL11.glPolygonOffset(-3.0F, -3F);
+        GL11.glPolygonOffset(0F, -100F);
     }
     
     private void endGlNoShaders() {
