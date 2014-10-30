@@ -300,6 +300,15 @@ public class FzUtil {
         return is;
     }
     
+    public static void givePlayerItem(EntityPlayer player, ItemStack is) {
+        FzInv inv = FzUtil.openInventory(player.inventory, ForgeDirection.UP);
+        ItemStack drop = inv.push(is);
+        if (drop != null) {
+            player.dropPlayerItemWithRandomChoice(drop, false);
+        }
+        player.openContainer.detectAndSendChanges();
+    }
+    
     public static ItemStack transferSlotToSlots(EntityPlayer player, Slot clickSlot, Iterable<Slot> destinations) {
         ItemStack got = tryTransferSlotToSlots(player, clickSlot, destinations);
         if (got != null) {
