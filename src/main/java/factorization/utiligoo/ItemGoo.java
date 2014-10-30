@@ -98,7 +98,7 @@ public class ItemGoo extends ItemFactorization {
             int iy = data.coords[i + 1];
             int iz = data.coords[i + 2];
             if (x == ix && y == iy && z == iz) {
-                expandSelection(is, data, world, x, y, z, ForgeDirection.getOrientation(side));
+                expandSelection(is, data, player, world, x, y, z, ForgeDirection.getOrientation(side));
                 return true;
             }
         }
@@ -161,7 +161,7 @@ public class ItemGoo extends ItemFactorization {
         if (held != null && (held.getItem() instanceof ItemTool || !held.getItem().getToolClasses(held).isEmpty())) {
             // mineSelection(gooItem, data, player.worldObj, mop, player, held);
         } else {
-            int radius = player.isSneaking() ? 0 : 1;
+            int radius = player.isSneaking() ? 0 : 2;
             degooArea(player, data, gooItem, mop, radius);
         }
     }
@@ -194,7 +194,10 @@ public class ItemGoo extends ItemFactorization {
                 }
             }
         } else if (held.getItem() == this) {
-            expandSelection(gooItem, data, player.worldObj, mop.blockX, mop.blockY, mop.blockZ, ForgeDirection.getOrientation(mop.sideHit));
+            int n = player.isSneaking() ? 1 : 2;
+            for (int i = 0; i < n; i++) {
+                expandSelection(gooItem, data, player, player.worldObj, mop.blockX, mop.blockY, mop.blockZ, ForgeDirection.getOrientation(mop.sideHit));
+            }
         } else if (held.getItem() instanceof ItemBlock) {
             replaceBlocks(gooItem, data, player.worldObj, player, mop, held);
             for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
@@ -210,7 +213,7 @@ public class ItemGoo extends ItemFactorization {
         return offset == 0 || i == x;
     }
     
-    private void expandSelection(ItemStack is, GooData data, World world, int x, int y, int z, ForgeDirection dir) {
+    private void expandSelection(ItemStack is, GooData data, EntityPlayer player, World world, int x, int y, int z, ForgeDirection dir) {
         HashSet<Coord> found = new HashSet();
         for (int i = 0; i < data.coords.length; i += 3) {
             int ix = data.coords[i + 0];
@@ -248,8 +251,15 @@ public class ItemGoo extends ItemFactorization {
             addable.add(c);
         }
         Collections.sort(addable);
-        int count = Math.min(addable.size(), is.stackSize - 1);
-        count = Math.min(maxStackSize - 1 - data.coords.length / 3, count);
+        int count = addable.size();
+        if (!player.capabilities.isCreativeMode) {
+            count = Math.min(count, is.stackSize - 1);
+            count = Math.min(maxStackSize - 1 - data.coords.length / 3, count);
+        } else {
+            int creativeMax = 1024;
+            creativeMax -= data.coords.length / 3;
+            count = Math.min(count, creativeMax);
+        }
         if (count <= 0) return;
         int[] use = new int[count * 3];
         for (int i = 0; i < count; i++) {
@@ -335,6 +345,7 @@ public class ItemGoo extends ItemFactorization {
             misplaceSomeGoo(is, world.rand, removed);
         } else {
             is.stackSize += removed;
+            is.stackSize = Math.min(is.stackSize, maxStackSize);
         }
     }
     
@@ -392,6 +403,7 @@ public class ItemGoo extends ItemFactorization {
             misplaceSomeGoo(is, world.rand, removed);
         } else {
             is.stackSize += removed;
+            is.stackSize = Math.min(is.stackSize, maxStackSize);
         }
     }
     
