@@ -133,6 +133,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
 
     @Override
     public void setInventorySlotContents(int slot, ItemStack is) {
+        markDirty();
         if (slot >= 0 && slot < input.length) {
             input[slot] = is;
             return;
@@ -146,6 +147,7 @@ public class TileEntityMixer extends TileEntityFactorization implements
     
     @Override
     public ItemStack decrStackSize(int i, int amount) {
+        markDirty();
         return super.decrStackSize(i, amount);
     }
 
