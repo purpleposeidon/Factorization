@@ -522,12 +522,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
             }
             coord.adjust(facing.getOpposite());
         }
-        if (!shouldDoWork()) {
-            updateDestination(coord, onServo);
-            if (sourceAction == null) {
-                updateSource(coord, onServo);
-            }
-        } else {
+        if (shouldDoWork()) {
             updateSource(coord, onServo);
             updateDestination(coord, onServo);
         }
