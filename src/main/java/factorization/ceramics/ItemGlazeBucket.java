@@ -6,6 +6,7 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -46,8 +47,20 @@ public class ItemGlazeBucket extends ItemFactorization {
             //Or could return the error icon.
             //But I think this'll look less terribly awful if a block goes away.
         }
-        return block.getIcon(getBlockSide(is), getBlockMd(is));
+        try {
+            int side = getBlockSide(is);
+            if (side == -1) side = 1;
+            return block.getIcon(side, getBlockMd(is));
+        } catch (Throwable t) {
+            if (!spammed) {
+                t.printStackTrace();
+                spammed = true;
+            }
+            return BlockIcons.error;
+        }
     }
+    
+    private boolean spammed = false;
     
     @Override
     public String getUnlocalizedName(ItemStack is) {
@@ -213,6 +226,8 @@ public class ItemGlazeBucket extends ItemFactorization {
             return is;
         }
         ClayState state = clay.getState();
+        ClayLump part = clay.parts.get(mop.subHit);
+        boolean repairMissingBlock = part.icon_id == null || part.icon_id == Blocks.air;
         if (player.capabilities.isCreativeMode) {
             if (state != ClayState.HIGHFIRED) {
                 clay.totalHeat = TileEntityGreenware.highfireHeat + 1;
@@ -224,12 +239,13 @@ public class ItemGlazeBucket extends ItemFactorization {
                 new Notice(clay, "Use a {ITEM_NAME} to bisque").withItem(Core.registry.heater_item).send(player);
                 return is;
             case HIGHFIRED:
-                new Notice(clay, "Already high-fired").send(player);
-                return is;
+                if (!repairMissingBlock) {
+                    new Notice(clay, "Already high-fired").send(player);
+                    return is;
+                }
             default: break;
             }
         }
-        ClayLump part = clay.parts.get(mop.subHit);
         Block id = getBlockId(is);
         byte md = getBlockMd(is);
         byte sd = getBlockSide(is);
@@ -242,7 +258,7 @@ public class ItemGlazeBucket extends ItemFactorization {
             part.icon_side = sd;
             clay.changeLump(mop.subHit, part);
             clay.glazesApplied = true;
-            if (!player.capabilities.isCreativeMode) {
+            if (!player.capabilities.isCreativeMode && !repairMissingBlock) {
                 useCharge(is);
                 if (getCharges(is) <= 0) {
                     return Core.registry.empty_glaze_bucket.copy();
