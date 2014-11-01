@@ -299,9 +299,6 @@ public class MiscellaneousNonsense {
     @EventHandler
     public void registerCommands(FMLServerStartingEvent event) {
         event.registerServerCommand(new MC16009());
-        if (FzConfig.gen_colossi) { // NORELEASE... right place for this? Not really.
-            event.registerServerCommand(new CommandScanForColossus());
-        }
     }
     
 
