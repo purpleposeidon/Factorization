@@ -48,8 +48,6 @@ import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
-import factorization.colossi.CommandScanForColossus;
-import factorization.colossi.WorldGenColossus;
 import factorization.common.FzConfig;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
