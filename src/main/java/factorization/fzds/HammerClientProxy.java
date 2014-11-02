@@ -28,6 +28,7 @@ import org.lwjgl.opengl.GL11;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
@@ -38,6 +39,7 @@ import factorization.api.Quaternion;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
+import factorization.shared.NORELEASE;
 
 public class HammerClientProxy extends HammerProxy {
     public HammerClientProxy() {
@@ -264,47 +266,63 @@ public class HammerClientProxy extends HammerProxy {
         
     }
     
-    MovingObjectPosition shadowSelected = null;
-    DseRayTarget rayTarget = null;
-    AxisAlignedBB selectionBlockBounds = null;
-    DimensionSliceEntity hitSlice = null;
+    final Minecraft mc = Minecraft.getMinecraft();
+    
+    @SubscribeEvent
+    public void resetTracing(ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.START) return;
+        distance = Double.POSITIVE_INFINITY;
+        // _shadowSelected = null;
+        //_rayTarget = null;
+        //_selectionBlockBounds = null;
+        //_hitSlice = null;
+    }
+    
+    public void offerHit(MovingObjectPosition mop, DseRayTarget rayTarget, AxisAlignedBB moppedBounds) {
+        double d = rayTarget.getDistanceSqToEntity(mc.thePlayer);
+        if (d > distance) return;
+        _shadowSelected = mop;
+        _rayTarget = rayTarget;
+        _selectionBlockBounds = moppedBounds;
+        _hitSlice = rayTarget.parent;
+    }
+    
+    double distance;
+    MovingObjectPosition _shadowSelected;
+    DseRayTarget _rayTarget;
+    AxisAlignedBB _selectionBlockBounds;
+    DimensionSliceEntity _hitSlice;
     
     @SubscribeEvent
     public void renderSelection(DrawBlockHighlightEvent event) {
         if (!(event.target.entityHit instanceof DseRayTarget)) {
             return;
         }
-        if (shadowSelected == null) {
-            return;
-        }
-        if (shadowSelected.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
+        AxisAlignedBB box = _selectionBlockBounds;
+        MovingObjectPosition shadowSelected = _shadowSelected;
+        if (box == null || shadowSelected.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
             return;
         }
         if (event.isCanceled()) {
             return;
         }
-        Coord here = null;
-        if (selectionBlockBounds != null && shadowSelected.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-            here = new Coord(DeltaChunk.getClientShadowWorld(), shadowSelected.blockX, shadowSelected.blockY, shadowSelected.blockZ);
-            here.getBlock().setBlockBounds(
-                    (float)(selectionBlockBounds.minX - here.x), (float)(selectionBlockBounds.minY - here.y), (float)(selectionBlockBounds.minZ - here.z),
-                    (float)(selectionBlockBounds.maxX - here.x), (float)(selectionBlockBounds.maxY - here.y), (float)(selectionBlockBounds.maxZ - here.z)
-                );
-        }
-        if (here == null) {
-            return;
-        }
+        Coord here = new Coord(DeltaChunk.getClientShadowWorld(), shadowSelected.blockX, shadowSelected.blockY, shadowSelected.blockZ);
+        here.getBlock().setBlockBounds(
+                (float)(box.minX - here.x), (float)(box.minY - here.y), (float)(box.minZ - here.z),
+                (float)(box.maxX - here.x), (float)(box.maxY - here.y), (float)(box.maxZ - here.z)
+            );
         EntityPlayer player = event.player;
         RenderGlobal rg = event.context;
         ItemStack is = event.currentItem;
         float partialTicks = event.partialTicks;
-        DimensionSliceEntity dse = rayTarget.parent;
+        DimensionSliceEntity dse = _hitSlice;
         Coord corner = dse.getCorner();
         Quaternion rotation = dse.getRotation();
         if (!rotation.isZero() || !dse.prevTickRotation.isZero()) {
             rotation = dse.prevTickRotation.slerp(rotation, partialTicks);
         }
         try {
+            // NORELEASE: Has partial tick/lag problems
             GL11.glPushMatrix();
             setShadowWorld();
             GL11.glDisable(GL11.GL_ALPHA_TEST);
@@ -312,8 +330,6 @@ public class HammerClientProxy extends HammerProxy {
                 GL11.glDisable(GL11.GL_DEPTH_TEST);
                 GL11.glColorMask(false, true, true, true);
             }
-            //GL11.glColorMask(false, true, true, true); //Could glPushAttr for the mask. Nah.
-            // ##### selection = rotation.applyTo(selection - corner) + DSE.position #####
             GL11.glTranslated(
                     FzUtil.interp(dse.lastTickPosX - player.lastTickPosX, dse.posX - player.posX, partialTicks),
                     FzUtil.interp(dse.lastTickPosY - player.lastTickPosY, dse.posY - player.posY, partialTicks),
@@ -338,7 +354,6 @@ public class HammerClientProxy extends HammerProxy {
             player.posY = savePlayerY;
             player.posZ = savePlayerZ;
         } finally {
-            //GL11.glColorMask(true, true, true, true);
             GL11.glEnable(GL11.GL_ALPHA_TEST);
             restoreRealWorld();
             GL11.glPopMatrix();
@@ -347,56 +362,42 @@ public class HammerClientProxy extends HammerProxy {
                 GL11.glEnable(GL11.GL_DEPTH_TEST);
             }
         }
-        //shadowSelected = null;
     }
     
     @Override
     void updateRayPosition(DseRayTarget ray) {
-        hitSlice = null;
         if (ray.parent.centerOffset == null) {
             return;
         }
-        //System.out.println(ray.parent);
-        hitSlice = ray.parent;
-        if (hitSlice.metaAABB == null) return;
-        //mc.renderViewEntity.rayTrace(reachDistance, partialTicks) Just this function would work if we didn't care about entities.
-        // But we also need entities. So we'll just invoke MC's ray trace code.
-        Minecraft mc = Minecraft.getMinecraft();
+        if (ray.parent.metaAABB == null) return;
+        // If we didn't care about entities, we could call:
+        //    mc.renderViewEntity.rayTrace(reachDistance, partialTicks)
+        // But we need entities, so we'll just invoke MC's ray trace code.
+        
+        // Save values
+        MovingObjectPosition origMouseOver = mc.objectMouseOver;
+        mc.objectMouseOver = null; // The ray trace function will do the wrong thing if this isn't nulled.
+        
+        // Change the player's look to shadow rotation
+        // (Hmm, this could probably be done better)
         EntityPlayer player = mc.thePlayer;
         Vec3 realPos = player.getPosition(1);
         Vec3 tmp = player.getLookVec();
         FzUtil.incrAdd(tmp, realPos);
         Vec3 realLookEnd = tmp;
         Vec3 shadowPos = ray.parent.real2shadow(realPos); // This used to be the raw ent pos, which isn't the same.
-        /*{
-            double d = 0.04;
-            Vec3 thing = shadowPos.addVector(0, 0, 0);
-            AxisAlignedBB box = AxisAlignedBB.getBoundingBox(thing.xCoord + d, thing.yCoord + d, thing.zCoord + d, thing.xCoord - d, thing.yCoord - d, thing.zCoord - d);
-            box = hitSlice.metaAABB.convertShadowBoxToRealBox(box);
-            AabbDebugger.addBox(box);
-        }*/
         Vec3 tmp_shadowLookEnd = ray.parent.real2shadow(realLookEnd);
-        /*{
-            double d = 0.04;
-            Vec3 thing = tmp_shadowLookEnd;
-            AxisAlignedBB box = AxisAlignedBB.getBoundingBox(thing.xCoord + d, thing.yCoord + d, thing.zCoord + d, thing.xCoord - d, thing.yCoord - d, thing.zCoord - d);
-            box = hitSlice.metaAABB.convertShadowBoxToRealBox(box);
-            AabbDebugger.addBox(box);
-        }*/
         FzUtil.incrSubtract(tmp_shadowLookEnd, shadowPos);
         Vec3 shadowLook = tmp_shadowLookEnd;
         double xz_len = Math.hypot(shadowLook.xCoord, shadowLook.zCoord);
         double shadow_pitch = -Math.toDegrees(Math.atan2(shadowLook.yCoord, xz_len)); // erm, negative? Dunno.
         double shadow_yaw = Math.toDegrees(Math.atan2(-shadowLook.xCoord, shadowLook.zCoord)); // Another weird negative!
-        MovingObjectPosition origMouseOver = mc.objectMouseOver;
-        mc.objectMouseOver = null; // The ray trace function will do the wrong thing if this isn't nulled.
         
         try {
-            AxisAlignedBB bb;
+            MovingObjectPosition mop = null;
+            AxisAlignedBB mopBox = null;
             setShadowWorld();
             try {
-                // mc.theWorld.spawnParticle("smoke", shadowPos.xCoord, shadowPos.yCoord, shadowPos.zCoord, 0, 0, 0);
-                // mc.theWorld.spawnParticle("reddust", shadowPos.xCoord + shadowLook.xCoord, shadowPos.yCoord + shadowLook.yCoord, shadowPos.zCoord + shadowLook.zCoord, 0, 0, 0);
                 mc.thePlayer.posX = shadowPos.xCoord;
                 mc.thePlayer.posY = shadowPos.yCoord;
                 mc.thePlayer.posZ = shadowPos.zCoord;
@@ -410,40 +411,32 @@ public class HammerClientProxy extends HammerProxy {
                 } finally {
                     mc.playerController.currentGameType = origType;
                 }
-                /*AxisAlignedBB working_box = EntityRenderer.working_box;
-                if (working_box != null) {
-                    AabbDebugger.addBox(hitSlice.metaAABB.convertShadowBoxToRealBox(working_box));
-                }*/
-                shadowSelected = mc.objectMouseOver;
-                //System.out.println(shadowSelected);
-                if (shadowSelected == null) {
-                    rayTarget = null;
+                mop = mc.objectMouseOver;
+                if (mop == null) {
                     return;
                 }
-                switch (shadowSelected.typeOfHit) {
+                switch (mop.typeOfHit) {
                 case ENTITY:
-                    bb = shadowSelected.entityHit.boundingBox;
-                    selectionBlockBounds = null;
+                    mopBox = mop.entityHit.boundingBox;
                     break;
                 case BLOCK:
                     World w = DeltaChunk.getClientShadowWorld();
-                    Block block = w.getBlock(shadowSelected.blockX, shadowSelected.blockY, shadowSelected.blockZ);
-                    bb = block.getSelectedBoundingBoxFromPool(w, shadowSelected.blockX, shadowSelected.blockY, shadowSelected.blockZ);
-                    selectionBlockBounds = bb;
+                    Block block = w.getBlock(mop.blockX, mop.blockY, mop.blockZ);
+                    mopBox = block.getSelectedBoundingBoxFromPool(w, mop.blockX, mop.blockY, mop.blockZ);
                     break;
                 default: return;
                 }
             } finally {
                 restoreRealWorld();
             }
-            //TODO: Rotations!
-            if (bb == null) {
+            if (mopBox == null) {
                 ray.setPosition(0, -1000, 0);
                 return;
             }
+            // Create a realbox that contains the entirety of the shadowbox
             Vec3 min, max;
             {
-                Vec3 corners[] = FzUtil.getCorners(bb);
+                Vec3 corners[] = FzUtil.getCorners(mopBox);
                 min = ray.parent.shadow2real(corners[0]);
                 max = min.addVector(0, 0, 0);
                 for (int i = 1; i < corners.length; i++) {
@@ -455,17 +448,11 @@ public class HammerClientProxy extends HammerProxy {
                     max.yCoord = Math.max(c.yCoord, max.yCoord);
                     max.zCoord = Math.max(c.zCoord, max.zCoord);
                 }
-                //FzUtil.setMin(ray.boundingBox, min);
-                //FzUtil.setMax(ray.boundingBox, max);
-                //System.out.println(ray.boundingBox);
             }
-            //Vec3 min = ray.parent.shadow2real(FzUtil.getMin(bb));
-            //Vec3 max = ray.parent.shadow2real(FzUtil.getMax(bb));
-            //FzUtil.sort(min, max);
+            ray.setPosition((min.xCoord + max.xCoord) / 2, (min.yCoord + max.yCoord) / 2, (min.zCoord + max.zCoord) / 2);
             FzUtil.setMin(ray.boundingBox, min);
             FzUtil.setMax(ray.boundingBox, max);
-            AabbDebugger.addBox(ray.boundingBox); // NORELEASE
-            rayTarget = ray;
+            offerHit(mop, ray, mopBox);
         } finally {
             mc.objectMouseOver = origMouseOver;
         }
@@ -473,11 +460,11 @@ public class HammerClientProxy extends HammerProxy {
     
     @Override
     MovingObjectPosition getShadowHit() {
-        return shadowSelected;
+        return _shadowSelected;
     }
     
     @Override
     IDeltaChunk getHitIDC() {
-        return hitSlice;
+        return _hitSlice;
     }
 }

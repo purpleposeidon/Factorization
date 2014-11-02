@@ -10,7 +10,6 @@ import net.minecraft.block.Block;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -44,6 +43,7 @@ import factorization.fzds.api.IFzdsEntryControl;
 import factorization.notify.Notice;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
+import factorization.shared.NORELEASE;
 
 public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryControl, IEntityAdditionalSpawnData {
     //Dang, this is a lot of fields
@@ -96,7 +96,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         
         @Override
         public Entity[] getParts() {
-            return DimensionSliceEntity.this.getParts();
+            return DimensionSliceEntity.this.getRayParts();
         }
 
         @Override
@@ -1090,15 +1090,14 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     private Entity[] raypart = null;
     private boolean rayOutOfDate = true;
     
-    @Override
-    public Entity[] getParts() {
+    private Entity[] getRayParts() {
         if (!worldObj.isRemote) {
             return null;
         }
         if (!can(DeltaCapability.INTERACT)) {
             return null;
         }
-        if (rayOutOfDate) {
+        if (rayOutOfDate || NORELEASE.on) {
             if (raypart == null) {
                 raypart = new Entity[1];
                 raypart[0] = rayTarget = new DseRayTarget(this);
