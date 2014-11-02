@@ -3,13 +3,11 @@ package factorization.colossi;
 import static net.minecraftforge.common.BiomeDictionary.Type.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
 
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -21,10 +19,9 @@ import net.minecraft.world.gen.NoiseGeneratorOctaves;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.terraingen.DecorateBiomeEvent.Decorate;
 import net.minecraftforge.event.terraingen.InitNoiseGensEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
-import net.minecraftforge.event.terraingen.SaplingGrowTreeEvent;
-import net.minecraftforge.event.terraingen.DecorateBiomeEvent.Decorate;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -106,7 +103,7 @@ public class WorldGenColossus implements IWorldGenerator {
                 }
             }
         }
-        ret.sort(new Comparator<Coord>() {
+        Collections.sort(ret, new Comparator<Coord>() {
             @Override
             public int compare(Coord a, Coord b) {
                 return player.distanceSq(a) - player.distanceSq(b);
