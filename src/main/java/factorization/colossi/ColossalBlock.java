@@ -49,6 +49,8 @@ public class ColossalBlock extends Block {
     
     static final byte MD_BODY = 0, MD_BODY_CRACKED = 1, MD_ARM = 2, MD_LEG = 3, MD_MASK = 4, MD_EYE = 5, MD_CORE = 6;
     
+    static final int EAST_SIDE = 5;
+    
     @Override
     public IIcon getIcon(int side, int md) {
         switch (md) {
@@ -58,11 +60,21 @@ public class ColossalBlock extends Block {
         case MD_LEG: return BlockIcons.colossi$leg;
         case MD_MASK: return BlockIcons.colossi$mask;
         case MD_EYE: return BlockIcons.colossi$eye;
-            // if (side == 5 /* EAST*/) 
-            // return BlockIcons.colossi$mask;
         case MD_CORE: return BlockIcons.colossi$core;
         default: return super.getIcon(side, md);
-        } 
+        }
+    }
+    
+    @Override
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(IBlockAccess w, int x, int y, int z, int side) {
+        int md = w.getBlockMetadata(x, y, z);
+        if (md == MD_EYE) {
+            // This is here rather than up there so that the item form doesn't look lame
+            if (side != EAST_SIDE) return BlockIcons.colossi$mask;
+            return BlockIcons.colossi$eye;
+        }
+        return getIcon(side, md);
     }
     
     @Override
