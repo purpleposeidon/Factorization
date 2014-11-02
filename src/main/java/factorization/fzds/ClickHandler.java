@@ -44,8 +44,7 @@ public class ClickHandler {
         if (target.getClass() != DseRayTarget.class) {
             return;
         }
-        HammerClientProxy hcp = (HammerClientProxy) Hammer.proxy;
-        MovingObjectPosition hit = hcp.shadowSelected;
+        MovingObjectPosition hit = Hammer.proxy.getShadowHit();
         if (hit == null) {
             return; //huh.
         }
