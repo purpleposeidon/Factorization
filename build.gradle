@@ -43,6 +43,10 @@ dependencies {
 
 }
 
+compileJava {
+    // Prevents NORELEASE from being compiled
+    exclude "factorization/shared/NORELEASE.java"
+}
 
 task writeFzFile {
     shouldRunAfter "build"
@@ -63,7 +67,7 @@ processResources {
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-                
+        
         // replace version and mcversion
         expand 'version':(project.version.split("-")[1]), 'mcversion':project.minecraft.version
     }
@@ -101,3 +105,14 @@ task deobfJar(type: Jar) {
 //     include 'factorization/api/**'
 //     classifier = 'api'
 // }
+
+
+// The following two things cause the output of "Factorization-latest.jar"
+task latestJar(type: Jar, dependsOn: 'classes') {
+    from sourceSets.main.output
+    version = "latest"
+}
+ 
+reobf {
+    reobf latestJar
+}
