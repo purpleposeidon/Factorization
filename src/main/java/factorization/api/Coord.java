@@ -49,6 +49,8 @@ public class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
     public int x, y, z;
     static private Random rand = new Random();
     static private ThreadLocal<Coord> staticCoord = new ThreadLocal<Coord>();
+    
+    public static final Coord ZERO = new Coord(null, 0, 0, 0);
 
     public Coord(World w, int x, int y, int z) {
         this.w = w;
@@ -857,6 +859,57 @@ public class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
                     func.handle(here);
                 }
             }
+        }
+    }
+    
+    public static void iterateEmptyBox(Coord min, Coord max, ICoordFunction func) {
+        min = min.copy();
+        max = max.copy();
+        sort(min, max);
+        Coord here = min.copy();
+        for (here.y = min.y; here.y <= max.y; here.y++) {
+            if (here.y == min.y || here.y == max.y) {
+                // Do the top / bottom
+                for (here.x = min.x; here.x <= max.x; here.x++) {
+                    for (here.z = min.z; here.z <= max.z; here.z++) {
+                        func.handle(here);
+                    }
+                }
+                continue;
+            }
+            for (here.x = min.x; here.x <= max.x; here.x++) {
+                if (here.x == min.x || here.x == max.x) {
+                    // Fill a line between them
+                    for (here.z = min.z; here.z <= max.z; here.z++) {
+                        func.handle(here);
+                    }
+                    continue;
+                }
+                here.z = min.z;
+                func.handle(here);
+                here.z = max.z;
+                func.handle(here);
+            }
+        }
+    }
+    
+    public static void drawLine(Coord start, Coord end, ICoordFunction func) {
+        Coord at = start.copy();
+        double len = start.distance(end);
+        double t = 0;
+        double dt = 1.0 / len;
+        int elsewhere = (int) (len * 3);
+        Coord last = end.add(elsewhere, elsewhere, elsewhere);
+        DeltaCoord d = end.difference(start);
+        while (t <= 1) {
+            at.x = (int) (d.x * t) + start.x;
+            at.y = (int) (d.y * t) + start.y;
+            at.z = (int) (d.z * t) + start.z;
+            if (!at.equals(last)) {
+                func.handle(at);;
+                last.set(at);
+            }
+            t += dt;
         }
     }
     
