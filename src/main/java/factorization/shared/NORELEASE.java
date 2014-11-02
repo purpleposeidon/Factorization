@@ -10,6 +10,8 @@ import com.google.common.base.Joiner;
 public class NORELEASE {
     public static boolean on = true;
     public static boolean off = false;
+    public static int one = 1;
+    public static int zero = 0;
     
     public static void println(Object... msg) {
         String line = Joiner.on(" ").join(msg);
