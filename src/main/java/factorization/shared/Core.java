@@ -183,6 +183,7 @@ public class Core {
         for (FactoryType ft : FactoryType.values()) ft.getRepresentative(); // Make sure everyone's registered to the EVENT_BUS
         proxy.afterLoad();
         finished_loading = true;
+        validateEnvironment();
     }
     
     @EventHandler
@@ -551,7 +552,7 @@ public class Core {
         MinecraftForge.EVENT_BUS.register(obj);
     }
     
-    {
+    private static void validateEnvironment() {
         if (!LoadingPlugin.pluginInvoked) {
             String fml = "-Dfml.coreMods.load=factorization.coremod.LoadingPlugin";
             String ignore = "-Dfz.ignoreMissingCoremod=true";
