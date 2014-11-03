@@ -14,13 +14,14 @@ import com.google.common.base.Splitter;
 import com.google.common.io.CharSource;
 import com.google.common.io.Resources;
 
-import cpw.mods.fml.relauncher.ReflectionHelper;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
+import factorization.shared.Core;
 
 public class AtVerifier {
     private static String currentLine;
     
     public static void verify() {
-        //InputStream at = AtVerifier.class.getResourceAsStream("factorization_at.cfg");
         CharSource at = Resources.asCharSource(Resources.getResource("factorization_at.cfg"), Charsets.UTF_8);
         if (at == null) {
             throw new IllegalArgumentException("AT is missing!");
@@ -55,12 +56,23 @@ public class AtVerifier {
                 }
             }
         } catch (IOException e) {
-            throw new IllegalArgumentException(e);
+            throw new IllegalArgumentException("Handling: " + currentLine, e);
         }
     }
     
     protected static void validate(String access, String className, String member) throws Throwable {
-        Class<?> theClass = AtVerifier.class.forName(className);
+        Class<?> theClass;
+        try {
+            theClass = AtVerifier.class.forName(className);
+        } catch (ClassNotFoundException e) {
+            if (FMLCommonHandler.instance().getSide() != Side.CLIENT) {
+                // Client-only classes are in the AT.
+                // I don't feel like adding metadata storing this.
+                // So if the class isn't found, don't bother.
+                return;
+            }
+            throw e;
+        }
         if (member == null) {
             validateClass(access, theClass);
             return;
