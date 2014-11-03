@@ -4,7 +4,7 @@ Factorization: Engineering, Architecture, & Commerce
 
 SERVOS
 ------
-regarding actuators:
+regarding socket tools:
   Some socket parts may have part-specific instructions, like the shifter does
   some possible socket-tools:
     Rotor (fzds)
@@ -12,10 +12,7 @@ regarding actuators:
     Ball Lightning Gun
 
 Lower barriers to entry for servos:
-  Eliminate dependencies on ore processing:
-    alternative aqua regia recipe (substitute blaze powder for nether powder? or maybe magma cream?)
-      Maybe this shouldn't make aqua regia; but instead an acid that's compatible.
-  Maybe we should see about flattening our mod in other areas as well.
+  Colossi drop dark iron, logic matrices, coils, and LMPs
 
 
 IMMEDIATE (for next public release)

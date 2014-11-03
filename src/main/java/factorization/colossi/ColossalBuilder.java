@@ -2,13 +2,17 @@ package factorization.colossi;
 
 import java.util.Random;
 
+import net.minecraft.block.BlockStairs;
 import net.minecraft.init.Blocks;
+import net.minecraft.world.gen.NoiseGeneratorOctaves;
 import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
+import factorization.api.ICoordFunction;
 import factorization.colossi.Brush.BrushMask;
 import factorization.shared.Core;
+import factorization.shared.NORELEASE;
 
 public class ColossalBuilder {
     final int seed;
@@ -31,7 +35,7 @@ public class ColossalBuilder {
         this.rand = new Random(seed);
         for (int x = 0; x < 100; x++) rand.nextInt();
         //leg_size = random_choice(1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3); //, 4 , 4, 4, 4, 5, 5, 5, 6, 7
-        leg_size = random_choice(1, 1, 1, 1, 2);
+        leg_size = random_choice(1, 1, 1, 1, 2) + NORELEASE.one;
         leg_height = random_linear(leg_size*3/2, leg_size*5/2);
         leg_height = clipMax(2, leg_height);
         leg_spread = random_choice(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 5);
@@ -158,7 +162,7 @@ public class ColossalBuilder {
         Coord standard_eyeball = start.add(leg_size + body_front_padding + 1, leg_height + 1 + body_height + (face_height / 2), 1 + leg_size + leg_spread / 2);
         fill(standard_eyeball, standard_eyeball, EYE);
         
-        growTerrainBlob();
+        new Drawer().visitFaces();
         
         Coord heart = start.add(leg_size + body_front_padding, leg_height + 1 + ((body_height + 1) / 2), leg_size + ((1 + leg_spread) / 2));
         fill(heart, heart, HEART);
@@ -209,39 +213,102 @@ public class ColossalBuilder {
         mask.paint(mask_anchor, maskBrush, eyeBrush);
     }
     
-    void growTerrainBlob() {
-        int BORDER = 6 + (leg_size * 7 / 3);
-        Coord blobStart = start.add(-body_back_padding - BORDER - leg_size, 0, -body_arm_padding - arm_size - BORDER);
-        Coord blobEnd = start.add(body_front_padding + leg_size + 1 + clipMin(leg_size - 1, 2), leg_height + 1 + body_height + face_height + BORDER, leg_size * 2 + leg_spread + body_arm_padding + arm_size + 1 + BORDER);
-        blobEnd = blobEnd.add(0, face_height*5/2, 0);
-        BlobBuilder life = new BlobBuilder(rand, blobStart, blobEnd);
-        life.populateCellsFromWorld();
-        
-        life.sprinkleSeeds(0.05);
-        life.bubble();
-        life.pruneTick();
-        for (int i = 0; i < 3; i++) {
-            life.life(1, 1);
+    class Drawer implements ICoordFunction {
+        final int BORDER = 2 + (leg_size * 7 / 3);
+        final Coord body_inner_start = start.add(0, leg_height + 1, 0);
+        final Coord body_start = body_inner_start.add(-body_back_padding, 0, -body_arm_padding);
+        final Coord body_end = body_inner_start.add(leg_size + body_front_padding, body_height, leg_size * 2 + leg_spread + body_arm_padding + 1);
+        {
+            Coord.sort(body_start, body_end);
         }
-        life.reinforce(1);
-        life.rainSeeds(0.3, 0.1);
-        life.bubble();
-        //life.smooth(4);
-        life.reinforce(0.8);
-        life.pruneTick();
+        int arm_ext = 1 + arm_size / 2;
+        final Coord blobStart = body_start.add(-leg_size * leg_size, leg_size / 2, -arm_ext);
+        final Coord blobEnd = body_end.add(1, face_height * 4 + leg_size, arm_ext);
         
-        life.sprinkleSeeds(0.025);
-        life.pruneTick();
-        life.reinforce(0.5);
-        life.rainSeeds(0.05, 0.75);
+        final double[] noise;
+        final DeltaCoord size;
+        final double len;
+        Drawer() {
+            Coord.sort(blobStart, blobEnd);
+            size = blobEnd.difference(blobStart);
+            size.x++;
+            size.y++;
+            size.z++;
+            NoiseGeneratorOctaves noiseGen = new NoiseGeneratorOctaves(rand, 4);
+            noise = new double[size.x * size.y * size.z];
+            double s = 1.0 / 256; // 1.0/512.0;
+            noiseGen.generateNoiseOctaves(noise,
+                    blobStart.x, blobStart.y, blobStart.z,
+                    size.x, size.y, size.z,
+                    blobEnd.x * s, blobEnd.y * s, blobEnd.z * s);
+            for (int i = 0; i < noise.length; i++) {
+                noise[i] = (noise[i] + 1) / 2;
+            }
+            this.len = size.magnitude();
+        }
         
+        double sum;
+        int n;
         
+        public void reset() {
+            sum = 1;
+            n = -1;
+        }
         
+        double sample(Coord here) {
+            int x = here.x - blobStart.x;
+            int y = here.y - blobStart.y;
+            int z = here.z - blobStart.z;
+            int idx = y + (z * size.y) + (x * size.y * size.z);
+            return noise[idx];
+        }
         
-        life.removeReinforcements();
-        //life.growthTick();
-        life.upset(2, 1, 4);
-        life.saveCellsToWorld(Blocks.stone);
+        @Override
+        public void handle(Coord here) {
+            n++;
+            sum += sample(here);
+            int m = n;
+            if (here.y > body_end.y) {
+                int d = blobEnd.y - body_end.y;
+                m -= d * 0.7;
+            } // NORELEASE: CONTINUE: with testing colossus #8
+            // Also try starting sum at 5 or leg_size*3 or something
+            double threshold = m * m * 0.5;
+            if (sum > threshold && here.isReplacable()) {
+                here.setId(Blocks.stone);
+            }
+        }
+        
+        Coord work = start.copy();
+        
+        Coord clipToBody(Coord at) {
+            work.set(at);
+            at = work;
+            
+            if (at.x < body_start.x) at.x = body_start.x;
+            if (at.y < body_start.y) at.y = body_start.y;
+            if (at.z < body_start.z) at.z = body_start.z;
+            if (at.x > body_end.x) at.x = body_end.x;
+            if (at.y > body_end.y) at.y = body_end.y;
+            if (at.z > body_end.z) at.z = body_end.z;
+            
+            return at;
+        }
+        
+        void visitFaces() {
+            Coord.iterateEmptyBox(blobStart, blobEnd, new ICoordFunction() {
+                @Override
+                public void handle(Coord here) {
+                    reset();
+                    Coord start = clipToBody(here);
+                    Coord.drawLine(start, here, Drawer.this);
+                    if (here.isReplacable()) {
+                        here.setId(Blocks.glass);
+                    }
+                }
+            });
+        }
     }
+    
     
 }
