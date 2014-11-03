@@ -216,14 +216,16 @@ public class ColossalBuilder {
     class Drawer implements ICoordFunction {
         final int BORDER = 2 + (leg_size * 7 / 3);
         final Coord body_inner_start = start.add(0, leg_height + 1, 0);
-        final Coord body_start = body_inner_start.add(-body_back_padding, 0, -body_arm_padding);
-        final Coord body_end = body_inner_start.add(leg_size + body_front_padding, body_height, leg_size * 2 + leg_spread + body_arm_padding + 1);
+        final Coord bodyStart = body_inner_start.add(-body_back_padding, 0, -body_arm_padding);
+        final Coord bodyEnd = body_inner_start.add(leg_size + body_front_padding, body_height, leg_size * 2 + leg_spread + body_arm_padding + 1);
         {
-            Coord.sort(body_start, body_end);
+            bodyEnd.add(0, (int)(-leg_size * 0.5), 0);
+            Coord.sort(bodyStart, bodyEnd);
         }
         int arm_ext = 1 + arm_size / 2;
-        final Coord blobStart = body_start.add(-leg_size * leg_size, leg_size / 2, -arm_ext);
-        final Coord blobEnd = body_end.add(1, face_height * 4 + leg_size, arm_ext);
+        int max_radius = leg_size * 4;
+        final Coord blobStart = bodyStart.add(-max_radius, -max_radius, -max_radius);
+        final Coord blobEnd = bodyEnd.add(max_radius, max_radius, max_radius);
         
         final double[] noise;
         final DeltaCoord size;
@@ -265,17 +267,10 @@ public class ColossalBuilder {
         
         @Override
         public void handle(Coord here) {
-            n++;
-            sum += sample(here);
-            int m = n;
-            if (here.y > body_end.y) {
-                int d = blobEnd.y - body_end.y;
-                m -= d * 0.7;
-            } // NORELEASE: CONTINUE: with testing colossus #8
-            // Also try starting sum at 5 or leg_size*3 or something
-            double threshold = m * m * 0.5;
-            if (sum > threshold && here.isReplacable()) {
+            double s = sample(here);
+            if (s > sum && here.isReplacable()) {
                 here.setId(Blocks.stone);
+                sum += (sum + s) / len;
             }
         }
         
@@ -285,29 +280,59 @@ public class ColossalBuilder {
             work.set(at);
             at = work;
             
-            if (at.x < body_start.x) at.x = body_start.x;
-            if (at.y < body_start.y) at.y = body_start.y;
-            if (at.z < body_start.z) at.z = body_start.z;
-            if (at.x > body_end.x) at.x = body_end.x;
-            if (at.y > body_end.y) at.y = body_end.y;
-            if (at.z > body_end.z) at.z = body_end.z;
+            if (at.x < bodyStart.x) at.x = bodyStart.x;
+            if (at.y < bodyStart.y) at.y = bodyStart.y;
+            if (at.z < bodyStart.z) at.z = bodyStart.z;
+            if (at.x > bodyEnd.x) at.x = bodyEnd.x;
+            if (at.y > bodyEnd.y) at.y = bodyEnd.y;
+            if (at.z > bodyEnd.z) at.z = bodyEnd.z;
             
             return at;
         }
         
         void visitFaces() {
-            Coord.iterateEmptyBox(blobStart, blobEnd, new ICoordFunction() {
+            Coord.iterateEmptyBox(bodyStart, bodyEnd, new ICoordFunction() {
                 @Override
                 public void handle(Coord here) {
+                    if (here.x >= bodyEnd.x - leg_size/2 || here.z == bodyStart.z || here.z == bodyEnd.z) return;
                     reset();
-                    Coord start = clipToBody(here);
-                    Coord.drawLine(start, here, Drawer.this);
-                    if (here.isReplacable()) {
-                        here.setId(Blocks.glass);
-                    }
+                    double val = sample(here);
+                    paint(here, (int) (val + 0.2));
                 }
             });
         }
+        
+        void paint(Coord center, int r) {
+            if (r <= 0) return;
+            Coord at = center.copy();
+            if (r > max_radius) r = max_radius;
+            for (int dx = -r; dx <= r; dx++) {
+                at.x = center.x + dx;
+                int hypotX = dx * dx;
+                for (int dy = -r; dy <= r; dy++) {
+                    at.y = center.y + dy;
+                    int hypotY = hypotX + dy * dy;
+                    for (int dz = -r; dz <= r; dz++) {
+                        at.z = center.z + dz;
+                        int hypotSq = hypotY + dz * dz;
+                        double R = r + sample(at) * 0.5;
+                        R *= R;
+                        if (hypotSq <= R) {
+                            draw(at);
+                        }
+                    }
+                }
+            }
+        }
+        
+        void draw(Coord at) {
+            if (at.x > bodyEnd.x) return;
+            if (at.isReplacable()) {
+                at.setId(Blocks.stone);
+            }
+        }
+        
+        
     }
     
     

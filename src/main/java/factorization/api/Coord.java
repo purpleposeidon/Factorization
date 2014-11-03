@@ -867,12 +867,14 @@ public class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
         max = max.copy();
         sort(min, max);
         Coord here = min.copy();
+        Coord food = here.copy();
         for (here.y = min.y; here.y <= max.y; here.y++) {
             if (here.y == min.y || here.y == max.y) {
                 // Do the top / bottom
                 for (here.x = min.x; here.x <= max.x; here.x++) {
                     for (here.z = min.z; here.z <= max.z; here.z++) {
-                        func.handle(here);
+                        food.set(here);
+                        func.handle(food);
                     }
                 }
                 continue;
@@ -881,14 +883,16 @@ public class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
                 if (here.x == min.x || here.x == max.x) {
                     // Fill a line between them
                     for (here.z = min.z; here.z <= max.z; here.z++) {
-                        func.handle(here);
+                        func.handle(food);
                     }
                     continue;
                 }
                 here.z = min.z;
-                func.handle(here);
+                food.set(here);
+                func.handle(food);
                 here.z = max.z;
-                func.handle(here);
+                food.set(here);
+                func.handle(food);
             }
         }
     }
