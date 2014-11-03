@@ -1,3 +1,29 @@
+0.8.88.5
+  Hopefully fixed AT verifier issues
+
+0.8.88.4
+  Just polishing & bugfixing.
+  Goo:
+    Shifting goo into the void will return it to you; use this to recover goo that is inconvenient to break
+    Goo now expands twice as quickly, and punching it removes a larger area
+    Using goo in creative mode should behave better
+    Creative-mode players can spread goo up to 1024 blocks
+    Fixed z-fighting at certain camera angles
+    Shows a bounding box in the tool tip
+
+  Screwpump:
+    Clicking on a screwpump with a fluid container will drain its buffer into the container
+    Pumps faster
+    Uses a bit less power
+    No longer floods for free
+    
+  Sculptures:
+    High-fired sculptures that were glazed with a block that was since removed (or with those old glaze textures) can have a new glaze applied for free
+    Raw glazes have colors that are actually random rather than just varying shades of red.
+
+  The nametag buff can no longer be applied infinitely
+  Shift-clicking an otherwise blank servo rail with an LMP will remove the color
+  
 0.8.88.3
   Screw pump's max pump height is now 12 instead of 7
   Better format for the half-hour time reminders
@@ -34,7 +60,7 @@
     Shift-punch a gooey block to remove a one goo
     Right-click gooey block with a block to replace the gooey blocks.
     Mine the gooey block with an appropriate tool to break the gooey blocks.
-    Shift-right-click with some goo to adjust the gooey selection
+    Shift-right-click an ungooed block with some goo to move the gooey selection
     Mining & replacing goo will occasionally cause goo loss.
     The recipe is temporary -- get it while it's cheap!
   Sculpting tool is now with 50% less NPE.

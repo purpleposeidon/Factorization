@@ -109,11 +109,11 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
     int getColor(ClayLump rc) {
         if (rc.raw_color == -1) {
             //Get the raw color, possibly making something up
-            rawMimicRandom.setSeed((rc.icon_id.getUnlocalizedName().hashCode() << 16) + rc.icon_md);
+            rawMimicRandom.setSeed(rc.icon_id.getUnlocalizedName().hashCode() << 4 + rc.icon_md);
             int c = 0;
             for (int i = 0; i < 3; i++) {
-                c += (rawMimicRandom.nextInt(0xE0) + 10);
-                c <<= 16;
+                c <<= 8;
+                c += (rawMimicRandom.nextInt(0x80) + 40);
             }
             rc.raw_color = c;
         }
@@ -143,7 +143,7 @@ public class BlockRenderGreenware extends FactorizationBlockRender {
             rci++;
             if (state == ClayState.HIGHFIRED) {
                 Block it = rc.icon_id;
-                if (it == null) {
+                if (it == null || it == Blocks.air) {
                     block.useTexture(BlockIcons.error);
                 } else {
                     for (int i = 0; i < 6; i++) {

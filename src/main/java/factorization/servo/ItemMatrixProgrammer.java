@@ -12,6 +12,7 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import factorization.api.Coord;
+import factorization.api.FzColor;
 import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
@@ -68,6 +69,11 @@ public class ItemMatrixProgrammer extends ItemFactorization {
         rail.priority = 0;
         Decorator decor = rail.getDecoration();
         if (decor == null) {
+            if (rail.color != FzColor.NO_COLOR) {
+                rail.color = FzColor.NO_COLOR;
+                c.redraw();
+                c.syncTE();
+            }
             return false;
         }
         if (!decor.isFreeToPlace() && !player.capabilities.isCreativeMode && !world.isRemote) {

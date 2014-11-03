@@ -63,6 +63,7 @@ import factorization.common.FactoryType;
 import factorization.common.FzConfig;
 import factorization.common.Registry;
 import factorization.compat.CompatManager;
+import factorization.coremod.AtVerifier;
 import factorization.coremod.LoadingPlugin;
 import factorization.darkiron.BlockDarkIronOre;
 import factorization.docs.DistributeDocs;
@@ -188,6 +189,7 @@ public class Core {
         for (FactoryType ft : FactoryType.values()) ft.getRepresentative(); // Make sure everyone's registered to the EVENT_BUS
         proxy.afterLoad();
         finished_loading = true;
+        validateEnvironment();
     }
     
     @EventHandler
@@ -557,11 +559,11 @@ public class Core {
         MinecraftForge.EVENT_BUS.register(obj);
     }
     
-    static {
+    private static void validateEnvironment() {
         if (!LoadingPlugin.pluginInvoked) {
             String fml = "-Dfml.coreMods.load=factorization.coremod.LoadingPlugin";
             String ignore = "-Dfz.ignoreMissingCoremod=true";
-            if (System.getProperty("fz.ignoreMissingCoremod", "") == "") {
+            if ("".equals(System.getProperty("fz.ignoreMissingCoremod", ""))) {
                 String dev = dev_environ ? "You're in a dev environ, so this is to be expected.\n" : "";
                 throw new IllegalStateException("Coremod didn't load! Is your installation broken?\n" +
                         "Weird. It really is supposed to load, y'know...\n" +
@@ -572,6 +574,11 @@ public class Core {
                         "pass the following flag, but many things (including blowing up diamond blocks) will be broken: " + ignore);
             } else {
                 System.err.println("Coremod did not load! But continuing anyways; as per VM flag " + ignore);
+            }
+        }
+        if (!dev_environ) {
+            if ("".equals(System.getProperty("fz.dontVerifyAt", ""))) {
+                AtVerifier.verify();
             }
         }
     }

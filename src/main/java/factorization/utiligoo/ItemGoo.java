@@ -81,10 +81,28 @@ public class ItemGoo extends ItemFactorization {
         if (player.isSneaking()) {
             if (data == null) return false;
             ForgeDirection fd = ForgeDirection.getOrientation(side);
+            ArrayList<Integer> toRemove = new ArrayList();
             for (int i = 0; i < data.coords.length; i += 3) {
                 data.coords[i + 0] = data.coords[i + 0] + fd.offsetX;
-                data.coords[i + 1] = data.coords[i + 1] + fd.offsetY;
+                int goo_y = data.coords[i + 1] = data.coords[i + 1] + fd.offsetY;
                 data.coords[i + 2] = data.coords[i + 2] + fd.offsetZ;
+                if (goo_y < 0 || goo_y > 0xFF) {
+                    toRemove.add(i + 0);
+                    toRemove.add(i + 1);
+                    toRemove.add(i + 2);
+                }
+            }
+            if (!toRemove.isEmpty()) {
+                int[] removed = new int[toRemove.size()];
+                int i = 0;
+                for (Integer val : toRemove) {
+                    removed[i++] = val;
+                }
+                data.coords = ArrayUtils.removeAll(data.coords, removed);
+                if (data.coords.length == 0) {
+                    data.wipe(is, world);
+                }
+                is.stackSize += removed.length / 3;
             }
             data.markDirty();
             return true;
@@ -98,7 +116,7 @@ public class ItemGoo extends ItemFactorization {
             int iy = data.coords[i + 1];
             int iz = data.coords[i + 2];
             if (x == ix && y == iy && z == iz) {
-                expandSelection(is, data, world, x, y, z, ForgeDirection.getOrientation(side));
+                expandSelection(is, data, player, world, x, y, z, ForgeDirection.getOrientation(side));
                 return true;
             }
         }
@@ -161,7 +179,7 @@ public class ItemGoo extends ItemFactorization {
         if (held != null && (held.getItem() instanceof ItemTool || !held.getItem().getToolClasses(held).isEmpty())) {
             // mineSelection(gooItem, data, player.worldObj, mop, player, held);
         } else {
-            int radius = player.isSneaking() ? 0 : 1;
+            int radius = player.isSneaking() ? 0 : 2;
             degooArea(player, data, gooItem, mop, radius);
         }
     }
@@ -194,7 +212,10 @@ public class ItemGoo extends ItemFactorization {
                 }
             }
         } else if (held.getItem() == this) {
-            expandSelection(gooItem, data, player.worldObj, mop.blockX, mop.blockY, mop.blockZ, ForgeDirection.getOrientation(mop.sideHit));
+            int n = player.isSneaking() ? 1 : 2;
+            for (int i = 0; i < n; i++) {
+                expandSelection(gooItem, data, player, player.worldObj, mop.blockX, mop.blockY, mop.blockZ, ForgeDirection.getOrientation(mop.sideHit));
+            }
         } else if (held.getItem() instanceof ItemBlock) {
             replaceBlocks(gooItem, data, player.worldObj, player, mop, held);
             for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
@@ -210,7 +231,7 @@ public class ItemGoo extends ItemFactorization {
         return offset == 0 || i == x;
     }
     
-    private void expandSelection(ItemStack is, GooData data, World world, int x, int y, int z, ForgeDirection dir) {
+    private void expandSelection(ItemStack is, GooData data, EntityPlayer player, World world, int x, int y, int z, ForgeDirection dir) {
         HashSet<Coord> found = new HashSet();
         for (int i = 0; i < data.coords.length; i += 3) {
             int ix = data.coords[i + 0];
@@ -248,8 +269,15 @@ public class ItemGoo extends ItemFactorization {
             addable.add(c);
         }
         Collections.sort(addable);
-        int count = Math.min(addable.size(), is.stackSize - 1);
-        count = Math.min(maxStackSize - 1 - data.coords.length / 3, count);
+        int count = addable.size();
+        if (!player.capabilities.isCreativeMode) {
+            count = Math.min(count, is.stackSize - 1);
+            count = Math.min(maxStackSize - 1 - data.coords.length / 3, count);
+        } else {
+            int creativeMax = 1024;
+            creativeMax -= data.coords.length / 3;
+            count = Math.min(count, creativeMax);
+        }
         if (count <= 0) return;
         int[] use = new int[count * 3];
         for (int i = 0; i < count; i++) {
@@ -335,6 +363,7 @@ public class ItemGoo extends ItemFactorization {
             misplaceSomeGoo(is, world.rand, removed);
         } else {
             is.stackSize += removed;
+            is.stackSize = Math.min(is.stackSize, maxStackSize);
         }
     }
     
@@ -392,6 +421,7 @@ public class ItemGoo extends ItemFactorization {
             misplaceSomeGoo(is, world.rand, removed);
         } else {
             is.stackSize += removed;
+            is.stackSize = Math.min(is.stackSize, maxStackSize);
         }
     }
     
@@ -451,6 +481,27 @@ public class ItemGoo extends ItemFactorization {
                     list.add(I18n.format("item.factorization:utiligoo.wrongDimension"));
                 }
             }
+            int minX = 0, minY = 0, minZ = 0;
+            int maxX = 0, maxY = 0, maxZ = 0;
+            for (int i = 0; i < data.coords.length; i += 3) {
+                int x = data.coords[i + 0];
+                int y = data.coords[i + 1];
+                int z = data.coords[i + 2];
+                if (i == 0) {
+                    minX = maxX = x;
+                    minY = maxY = y;
+                    minZ = maxZ = z;
+                } else {
+                    minX = Math.min(x, minX);
+                    minY = Math.min(y, minY);
+                    minZ = Math.min(z, minZ);
+                    maxX = Math.max(x, maxX);
+                    maxY = Math.max(y, maxY);
+                    maxZ = Math.max(z, maxZ);
+                }
+            }
+            list.add(I18n.format("item.factorization:utiligoo.min", minX, minY, minZ));
+            list.add(I18n.format("item.factorization:utiligoo.max", maxX, maxY, maxZ));
             if (Core.dev_environ) {
                 list.add("#" + is.getItemDamage());
             }

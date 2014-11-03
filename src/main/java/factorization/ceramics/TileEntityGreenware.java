@@ -266,7 +266,7 @@ public class TileEntityGreenware extends TileEntityCommon {
             return BlockIcons.error;
         case HIGHFIRED:
             Item it = FzUtil.getItem(lump.icon_id);
-            if (it == null) {
+            if (it == null || lump.icon_id == Blocks.air) {
                 return BlockIcons.error;
             }
             return it.getIconFromDamage(lump.icon_md);

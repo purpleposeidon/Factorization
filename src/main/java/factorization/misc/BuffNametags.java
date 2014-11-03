@@ -1,11 +1,14 @@
 package factorization.misc;
 
+import com.google.common.base.Strings;
+
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -23,6 +26,11 @@ public class BuffNametags {
         if (!(event.target instanceof EntityLiving)) return;
         final EntityLiving ent = (EntityLiving) event.target;
         final String origName = ent.getCustomNameTag();
+        if (!Strings.isNullOrEmpty(origName)) return;
+        NBTTagCompound tag = ent.getEntityData();
+        final String name = "FZMiscBuffNametags";
+        if (tag.hasKey(name)) return;
+        tag.setBoolean(name, true);
         ent.tasks.addTask(0, new EntityAIBase() {
             boolean buffApplied = false; // Might not be necessary.
             

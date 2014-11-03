@@ -11,8 +11,10 @@ import java.util.PriorityQueue;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemBucket;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -23,6 +25,7 @@ import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 
 import org.lwjgl.opengl.GL11;
@@ -41,6 +44,7 @@ import factorization.common.FactoryType;
 import factorization.servo.ServoMotor;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
+import factorization.shared.FzUtil.FzInv;
 import factorization.shared.ObjectModel;
 import factorization.sockets.ISocketHolder;
 
@@ -543,7 +547,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
                 sourceAction = new Drainer(c, c.getFluid());
             }
             coord.adjust(facing);
-        } else {
+        } else if (shouldDoWork()) {
             sourceAction.suckIn();
         }
     }
@@ -560,7 +564,7 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
                 destinationAction = new Flooder(c, buffer.getFluid().getFluid());
             }
             coord.adjust(facing.getOpposite());
-        } else {
+        } else if (shouldDoWork()) {
             destinationAction.pumpOut();
         }
     }
@@ -665,5 +669,26 @@ public class PumpLiquids extends SocketFanturpeller implements IFluidHandler {
         target_speed = 2;
         isSucking = false;
         return this;
+    }
+    
+    @Override
+    public boolean activate(EntityPlayer player, ForgeDirection side) {
+        ItemStack is = FzUtil.normalize(player.getHeldItem());
+        if (is != null && is.getItem() instanceof IFluidContainerItem && buffer.getFluidAmount() > 0) {
+            ItemStack use = is;
+            boolean pushBack = false;
+            if (use.stackSize > 1) {
+                use = use.splitStack(1);
+                pushBack = true;
+            }
+            IFluidContainerItem it = (IFluidContainerItem) use.getItem();
+            int taken = it.fill(use, buffer.getFluid(), true);
+            buffer.drain(taken, true);
+            if (pushBack) {
+                FzUtil.givePlayerItem(player, use);
+            }
+            return true;
+        }
+        return super.activate(player, side);
     }
 }
