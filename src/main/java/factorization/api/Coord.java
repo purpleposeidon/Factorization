@@ -21,6 +21,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
@@ -558,6 +559,10 @@ public class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
     
     public Chunk getChunk() {
         return w.getChunkFromBlockCoords(x, z);
+    }
+    
+    public BiomeGenBase getBiome() {
+        return w.getBiomeGenForCoords(x, z);
     }
 
     public Block getBlock() {
