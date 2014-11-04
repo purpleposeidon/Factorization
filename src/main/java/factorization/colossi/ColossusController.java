@@ -3,7 +3,6 @@ package factorization.colossi;
 import java.io.IOException;
 import java.util.UUID;
 
-import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.nbt.NBTTagCompound;
@@ -32,7 +31,6 @@ public class ColossusController extends Entity implements IBossDisplayData {
     int leg_size = 0, leg_length = 0;
     
     int cracked_body_blocks = 0;
-    int broken_body_blocks = 0;
     
     Coord home = null;
     Coord path_target = null;
@@ -43,14 +41,16 @@ public class ColossusController extends Entity implements IBossDisplayData {
     
     transient int client_ticks = 0;
 
+    private static final int destroyed_cracked_block_id = 2;
     
     public ColossusController(World world) {
         super(world);
         path_target = new Coord(this);
         ignoreFrustumCheck = true;
+        dataWatcher.addObject(destroyed_cracked_block_id, (Integer) 0);
     }
     
-    public ColossusController(World world, LimbInfo[] limbInfo, int arm_size, int arm_length, int leg_size, int leg_length, int damage) {
+    public ColossusController(World world, LimbInfo[] limbInfo, int arm_size, int arm_length, int leg_size, int leg_length, int crackedBlocks) {
         this(world);
         this.limbs = limbInfo;
         for (LimbInfo li : limbs) {
@@ -94,7 +94,7 @@ public class ColossusController extends Entity implements IBossDisplayData {
         this.arm_length = arm_length;
         this.leg_size = leg_size;
         this.leg_length = leg_length;
-        this.cracked_body_blocks = damage;
+        this.cracked_body_blocks = crackedBlocks;
     }
     
     @Override
@@ -212,7 +212,9 @@ public class ColossusController extends Entity implements IBossDisplayData {
         home = data.as(Share.PRIVATE, "home").put(home);
         path_target = data.as(Share.PRIVATE, "path_target").put(path_target);
         cracked_body_blocks = data.as(Share.VISIBLE, "cracks").putInt(cracked_body_blocks);
+        int broken_body_blocks = dataWatcher.getWatchableObjectInt(destroyed_cracked_block_id);
         broken_body_blocks = data.as(Share.VISIBLE, "broken").putInt(broken_body_blocks);
+        dataWatcher.updateObject(destroyed_cracked_block_id, broken_body_blocks);
     }
 
     @Override
@@ -274,12 +276,6 @@ public class ColossusController extends Entity implements IBossDisplayData {
             double t = rotation_speed / rotation_distance;
             t = Math.min(0.5, t);
             target_rotation.incrLerp(current_rotation, 1 - t);
-            /*current_rotation.incrConjugate();
-            current_rotation.incrToOtherMultiply(target_rotation);
-            current_rotation.incrConjugate();
-            target_rotation.incrMultiply(current_rotation);
-            target_rotation.incrNormalize();
-            body.setRotationalVelocity(target_rotation);*/
             body.setRotation(target_rotation);
             turning = angle > 0 ? 1 : -1;
         } else if (rotation_distance > Math.PI * 0.0001) {
@@ -385,12 +381,22 @@ public class ColossusController extends Entity implements IBossDisplayData {
 
     @Override
     public float getMaxHealth() {
-        return cracked_body_blocks + leg_size * leg_size;
+        return cracked_body_blocks; // + leg_size * leg_size;
+    }
+    
+    public int getCracks() {
+        return dataWatcher.getWatchableObjectInt(destroyed_cracked_block_id);
     }
 
     @Override
     public float getHealth() {
-        return cracked_body_blocks - broken_body_blocks;
+        return cracked_body_blocks - getCracks();
+    }
+    
+    public void crackBroken() {
+        int cracks = getCracks();
+        cracks++;
+        dataWatcher.updateObject(destroyed_cracked_block_id, cracks);
     }
     
     int current_name = 0;
@@ -398,7 +404,7 @@ public class ColossusController extends Entity implements IBossDisplayData {
     
     @Override
     public IChatComponent func_145748_c_() {
-        if (broken_body_blocks % 3 == 0 && broken_body_blocks > 0) {
+        if (getCracks() % 3 == 0 && getCracks() > 0) {
             return new ChatComponentTranslation("colossus.name.true");
         }
         if ((client_ticks % 300 < 60 && client_ticks % 4 == 0) || client_ticks % 50 == 0) {
