@@ -13,11 +13,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.DestroyBlockProgress;
-import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -452,10 +450,11 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
                 if (!rotation.isZero() || !dse.prevTickRotation.isZero()) {
                     dse.prevTickRotation.slerp(rotation, partialTicks).glRotate();
                 }
+                Vec3 centerOffset = dse.getRotationalCenterOffset();
                 GL11.glTranslated(
-                        -dse.centerOffset.xCoord,
-                        -dse.centerOffset.yCoord,
-                        -dse.centerOffset.zCoord);
+                        -centerOffset.xCoord,
+                        -centerOffset.yCoord,
+                        -centerOffset.zCoord);
                 if (dse.scale != 1) {
                     GL11.glScalef(dse.scale, dse.scale, dse.scale);
                 }

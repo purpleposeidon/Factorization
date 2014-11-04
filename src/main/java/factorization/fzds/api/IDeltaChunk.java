@@ -1,14 +1,13 @@
 package factorization.fzds.api;
 
-import net.minecraft.entity.Entity;
+import static factorization.fzds.api.DeltaCapability.*;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
-import factorization.shared.FzUtil;
-import static factorization.fzds.api.DeltaCapability.*;
+import factorization.shared.EntityFz;
 
-public abstract class IDeltaChunk extends Entity {
+public abstract class IDeltaChunk extends EntityFz {
     //This would be an actual interface, but it needs to extend Entity.
     public IDeltaChunk(World w) { super(w); } //For java
     
@@ -135,19 +134,29 @@ public abstract class IDeltaChunk extends Entity {
      */
     public abstract Coord getCorner();
     /***
-     * @return the center, in shadow coordinates
-     * This method shouldn't be here. Just average getCorner() and getFarCorner().
+     * @return the center, in shadow coordinates. (Justs averages getCorner() and getFarCorner())
      */
-    @Deprecated
-    public abstract Coord getCenter();
+    public Coord getCenter() {
+        return getCorner().center(getFarCorner());
+    }
     /***
      * @return the upper corner, in shadow coordinates
      */
     public abstract Coord getFarCorner();
     
     public void setPartName(String name) {
+        if (name == null) throw new NullPointerException();
         this.partName = name;
     }
     
-    protected String partName;
+    protected String partName = "";
+    
+    @Override
+    public String toString() {
+        if (partName != "") {
+            return "[DSE " + partName + " " + getEntityId() + "]";
+        }
+        return super.toString() + " - from " + getCorner() + "  to  " + getFarCorner() +
+                "   center at " + getRotationalCenterOffset();
+    }
 }

@@ -33,13 +33,11 @@ import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import cpw.mods.fml.relauncher.Side;
-import factorization.aabbdebug.AabbDebugger;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
-import factorization.shared.NORELEASE;
 
 public class HammerClientProxy extends HammerProxy {
     public HammerClientProxy() {
@@ -337,10 +335,11 @@ public class HammerClientProxy extends HammerProxy {
             Quaternion rot = new Quaternion(rotation);
             rot.incrNormalize();
             rot.glRotate();
+            Vec3 centerOffset = dse.getRotationalCenterOffset();
             GL11.glTranslated(
-                    -dse.centerOffset.xCoord - corner.x,
-                    -dse.centerOffset.yCoord - corner.y,
-                    -dse.centerOffset.zCoord - corner.z);
+                    -centerOffset.xCoord - corner.x,
+                    -centerOffset.yCoord - corner.y,
+                    -centerOffset.zCoord - corner.z);
             
             double savePlayerX = player.posX;
             double savePlayerY = player.posY;
@@ -366,9 +365,6 @@ public class HammerClientProxy extends HammerProxy {
     
     @Override
     void updateRayPosition(DseRayTarget ray) {
-        if (ray.parent.centerOffset == null) {
-            return;
-        }
         if (ray.parent.metaAABB == null) return;
         // If we didn't care about entities, we could call:
         //    mc.renderViewEntity.rayTrace(reachDistance, partialTicks)

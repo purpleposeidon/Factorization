@@ -7,6 +7,7 @@ import java.util.UUID;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.Vec3;
 import factorization.api.FzOrientation;
 
 public abstract class DataHelper {
@@ -159,6 +160,15 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
     }
     public final NBTTagCompound putTag(NBTTagCompound value) throws IOException {
         return (NBTTagCompound)put(value);
+    }
+    
+    public Vec3 putVec3(Vec3 val) throws IOException {
+        String prefix = name;
+        val.xCoord = asSameShare(prefix + ".x").putDouble(val.xCoord);
+        val.yCoord = asSameShare(prefix + ".y").putDouble(val.yCoord);
+        val.zCoord = asSameShare(prefix + ".z").putDouble(val.zCoord);
+        name = prefix;
+        return val;
     }
 
     public final <E extends Enum> E putEnum(E value) throws IOException { return (E)put(value); }
