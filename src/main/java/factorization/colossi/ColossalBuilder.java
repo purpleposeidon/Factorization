@@ -1,18 +1,23 @@
 package factorization.colossi;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Random;
 
-import net.minecraft.block.BlockStairs;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockFalling;
 import net.minecraft.init.Blocks;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.NoiseGeneratorOctaves;
-import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
 import factorization.api.ICoordFunction;
 import factorization.colossi.Brush.BrushMask;
 import factorization.shared.Core;
-import factorization.shared.NORELEASE;
 
 public class ColossalBuilder {
     final int seed;
@@ -33,9 +38,7 @@ public class ColossalBuilder {
     public ColossalBuilder(int seed, Coord start) {
         this.seed = seed;
         this.rand = new Random(seed);
-        for (int x = 0; x < 100; x++) rand.nextInt();
-        //leg_size = random_choice(1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3); //, 4 , 4, 4, 4, 5, 5, 5, 6, 7
-        leg_size = random_choice(1, 1, 1, 1, 2) + NORELEASE.one;
+        leg_size = random_choice(1, 1, 1, 1, 2);
         leg_height = random_linear(leg_size*3/2, leg_size*5/2);
         leg_height = clipMax(2, leg_height);
         leg_spread = random_choice(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 5);
@@ -50,7 +53,7 @@ public class ColossalBuilder {
         arm_size = clipMin(leg_size, random_linear(2, leg_size));
         arm_height = clipMin(body_leg_height - shoulder_start - 1, random_linear(body_height + 1 + leg_height/2, (body_height + leg_height)*3/4));
         body_arm_padding = random_exponential(0, 2);
-        body_back_padding = random_linear(0, 1) + random_exponential(0, 4);
+        body_back_padding = random_linear(1, 2) + random_exponential(0, 3);
         body_front_padding = clipMax(0, random_linear(-4, 2));
         face_width = clipMax(3, leg_spread + random_linear(leg_size - 1, leg_size * 2));
         face_width = face_width + (face_width % 2);
@@ -162,7 +165,9 @@ public class ColossalBuilder {
         Coord standard_eyeball = start.add(leg_size + body_front_padding + 1, leg_height + 1 + body_height + (face_height / 2), 1 + leg_size + leg_spread / 2);
         fill(standard_eyeball, standard_eyeball, EYE);
         
-        new Drawer().visitFaces();
+        Drawer drawer = new Drawer();
+        drawer.generateBlob();
+        drawer.applyBiomeDecorations();
         
         Coord heart = start.add(leg_size + body_front_padding, leg_height + 1 + ((body_height + 1) / 2), leg_size + ((1 + leg_spread) / 2));
         fill(heart, heart, HEART);
@@ -220,7 +225,9 @@ public class ColossalBuilder {
         final Coord bodyEnd = body_inner_start.add(leg_size + body_front_padding, body_height, leg_size * 2 + leg_spread + body_arm_padding + 1);
         {
             bodyEnd.add(0, (int)(-leg_size * 0.5), 0);
+            bodyStart.add(-leg_size, 0, 0);
             Coord.sort(bodyStart, bodyEnd);
+            bodyStart.y++; // Don't scrape the ground
         }
         int arm_ext = 1 + arm_size / 2;
         int max_radius = leg_size * 4;
@@ -230,13 +237,16 @@ public class ColossalBuilder {
         final double[] noise;
         final DeltaCoord size;
         final double len;
+        
+        final HashSet<Coord> painted = new HashSet();
+        
         Drawer() {
             Coord.sort(blobStart, blobEnd);
             size = blobEnd.difference(blobStart);
             size.x++;
             size.y++;
             size.z++;
-            NoiseGeneratorOctaves noiseGen = new NoiseGeneratorOctaves(rand, 4);
+            NoiseGeneratorOctaves noiseGen = new NoiseGeneratorOctaves(rand, 2);
             noise = new double[size.x * size.y * size.z];
             double s = 1.0 / 256; // 1.0/512.0;
             noiseGen.generateNoiseOctaves(noise,
@@ -290,14 +300,14 @@ public class ColossalBuilder {
             return at;
         }
         
-        void visitFaces() {
+        void generateBlob() {
             Coord.iterateEmptyBox(bodyStart, bodyEnd, new ICoordFunction() {
                 @Override
                 public void handle(Coord here) {
                     if (here.x >= bodyEnd.x - leg_size/2 || here.z == bodyStart.z || here.z == bodyEnd.z) return;
                     reset();
                     double val = sample(here);
-                    paint(here, (int) (val + 0.2));
+                    paint(here, (int) (val + 1.9));
                 }
             });
         }
@@ -305,7 +315,8 @@ public class ColossalBuilder {
         void paint(Coord center, int r) {
             if (r <= 0) return;
             Coord at = center.copy();
-            if (r > max_radius) r = max_radius;
+            double rShrink = 0.99;
+            if (r > max_radius * rShrink) r *= rShrink;
             for (int dx = -r; dx <= r; dx++) {
                 at.x = center.x + dx;
                 int hypotX = dx * dx;
@@ -329,9 +340,77 @@ public class ColossalBuilder {
             if (at.x > bodyEnd.x) return;
             if (at.isReplacable()) {
                 at.setId(Blocks.stone);
+                painted.add(at.copy());
             }
         }
         
+        void applyBiomeDecorations() {
+            BiomeGenBase biome = null; // 1 biome per colossus.
+            for (Coord at : painted) {
+                biome = at.getBiome();
+                break;
+            }
+            if (biome == null) return;
+            ArrayList<Coord> sorted = new ArrayList();
+            sorted.addAll(painted);
+            Collections.sort(sorted, new Comparator<Coord>() {
+                @Override
+                public int compare(Coord a, Coord b) {
+                    if (a.x == b.x) {
+                        return a.z - b.z;
+                    }
+                    return a.x - b.x;
+                }
+            });
+            Block[] blocks = new Block[0x100];
+            byte[] mds = new byte[0x100];
+            
+            double stoneNoise = rand.nextDouble();
+            Coord lastCol = null;
+            for (Coord at : sorted) {
+                if (lastCol == null || (lastCol.x != at.x || lastCol.z != at.z)) {
+                    biomeifyBlocks(lastCol, blocks, mds, biome, stoneNoise);
+                    lastCol = at;
+                    Arrays.fill(blocks, Blocks.air);
+                    Arrays.fill(mds, (byte) 0);
+                }
+                blocks[at.y] = at.getBlock();
+                mds[at.y]= (byte) at.getMd(); 
+            }
+            biomeifyBlocks(lastCol, blocks, mds, biome, stoneNoise);
+            
+            
+            
+        }
+        
+        void biomeifyBlocks(Coord col, Block[] blocks, byte[] mds, BiomeGenBase biome, double stoneNoise) {
+            if (col == null) return;
+            biome.genTerrainBlocks(col.w, rand, blocks, mds, 0, 0, stoneNoise);
+            Coord at = col.copy();
+            boolean onSolid = false;
+            for (int y = 0; y < blocks.length; y++) {
+                Block id = blocks[y];
+                byte md = mds[y];
+                if (id == Blocks.bedrock) continue;
+                if (id == Blocks.air) {
+                    onSolid = false;
+                    continue;
+                }
+                if (!onSolid && id instanceof BlockFalling) {
+                    if (id == Blocks.sand) {
+                        id = Blocks.sandstone;
+                        md = 0;
+                        // NORELEASE: 1.8 red sandstone
+                    } else {
+                        id = Blocks.stone;
+                        md = 0;
+                    }
+                }
+                at.y = y;
+                at.setIdMd(id, md, false);
+                onSolid = true;
+            }
+        }
         
     }
     
