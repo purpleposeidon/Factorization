@@ -19,6 +19,7 @@ public class ItemColossusGuide extends ItemFactorization {
     public ItemColossusGuide(String name, TabType tabType) {
         super(name, tabType);
         Core.loadBus(this);
+        setMaxStackSize(1);
     }
     
     @Override
