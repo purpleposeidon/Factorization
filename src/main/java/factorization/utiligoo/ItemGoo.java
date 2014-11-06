@@ -503,7 +503,7 @@ public class ItemGoo extends ItemFactorization {
             list.add(I18n.format("item.factorization:utiligoo.min", minX, minY, minZ));
             list.add(I18n.format("item.factorization:utiligoo.max", maxX, maxY, maxZ));
             if (Core.dev_environ) {
-                list.add("#" + is.getItemDamage());
+                list.add("#" + data.mapName);
             }
         }
     }
@@ -565,12 +565,13 @@ public class ItemGoo extends ItemFactorization {
         boolean creative = player.capabilities.isCreativeMode;
         ItemStack held = player.getHeldItem();
         if (held == null && !creative) return;
+        MovingObjectPosition mop = getMovingObjectPositionFromPlayer(player.worldObj, player, false);
+        if (mop == null) return;
         for (int slot = 0; slot < 9; slot++) {
             ItemStack is = FzUtil.normalize(player.inventory.getStackInSlot(slot));
             if (is == null || is.getItem() != this) continue;
             GooData data = GooData.getNullGooData(is, player.worldObj);
             if (data == null) continue;
-            MovingObjectPosition mop = getMovingObjectPositionFromPlayer(player.worldObj, player, false);
             for (int i = 0; i < data.coords.length; i += 3) {
                 int ix = data.coords[i + 0];
                 int iy = data.coords[i + 1];
