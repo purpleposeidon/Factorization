@@ -159,4 +159,20 @@ public abstract class IDeltaChunk extends EntityFz {
         return super.toString() + " - from " + getCorner() + "  to  " + getFarCorner() +
                 "   center at " + getRotationalCenterOffset();
     }
+    
+    private Object controller;
+    
+    /**
+     * @return the object set by setController. May be null.
+     */
+    public Object getController() {
+        return controller;
+    }
+    
+    /**
+     * @param controller The controller responsible for this IDC. It is the responsibility of the controller to set this value when deserialized.
+     */
+    public void setController(Object controller) {
+        this.controller = controller;
+    }
 }
