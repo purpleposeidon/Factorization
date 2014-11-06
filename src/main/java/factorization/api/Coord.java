@@ -1004,4 +1004,10 @@ public class Coord implements IDataSerializable, ISaneCoord, Comparable<Coord> {
     public int getDimensionID() {
         return w.provider.dimensionId;
     }
+
+    public void breakBlock() {
+        Block b = getBlock();
+        int md = getMd();
+        b.dropBlockAsItem(w, x, y, z, md, 0 /* fortune */);
+    }
 }

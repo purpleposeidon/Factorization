@@ -431,6 +431,13 @@ public class Quaternion implements IDataSerializable {
         this.z = Z;
     }
     
+    public void incrRotateBy(Quaternion rotation) {
+        rotation.incrToOtherMultiply(this);
+        rotation.incrConjugate();
+        this.incrMultiply(rotation);
+        rotation.incrConjugate();
+    }
+    
     /**
      * Note: This assumes that this quaternion is normal (magnitude = 1).
      * @param p
