@@ -495,19 +495,18 @@ public class Awakener {
         Coord min = null, max = null;
         for (Coord c : parts) {
             if (min == null || max == null) {
-                min = c;
-                max = c;
+                min = c.copy();
+                max = c.copy();
             } else {
-                if (c.x > max.x || c.y > max.y || c.z > max.z) {
-                    max = c;
-                } else if (c.x < min.x || c.y < min.y || c.z < min.z) {
-                    min = c;
-                }
+                min.x = Math.min(min.x, c.x);
+                min.y = Math.min(min.y, c.y);
+                min.z = Math.min(min.z, c.z);
+                max.x = Math.max(max.x, c.x);
+                max.y = Math.max(max.y, c.y);
+                max.z = Math.max(max.z, c.z);
             }
         }
         if (min == null || max == null) return null;
-        min = min.copy();
-        max = max.copy();
         Coord.sort(min, max);
         int r = 2;
         min.adjust(new DeltaCoord(-r, -r, -r));

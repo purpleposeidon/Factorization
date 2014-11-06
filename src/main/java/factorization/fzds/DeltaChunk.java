@@ -151,7 +151,9 @@ public class DeltaChunk {
         }
     }
     
-    public static IDeltaChunk makeSlice(int channel, final Coord min, final Coord max, AreaMap mapper, final boolean wipeSrc) {
+    public static IDeltaChunk makeSlice(int channel, Coord min, Coord max, AreaMap mapper, final boolean wipeSrc) {
+        min = min.copy();
+        max = max.copy();
         DeltaCoord size = max.difference(min);
         final IDeltaChunk dse = allocateSlice(min.w, channel, size);
         Vec3 vrm = min.centerVec(max);
