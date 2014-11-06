@@ -1,8 +1,10 @@
 package factorization.colossi;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
@@ -15,7 +17,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.WeightedRandomChestContent;
@@ -29,7 +30,9 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.Coord;
 import factorization.common.BlockIcons;
+import factorization.fzds.DeltaChunk;
 import factorization.fzds.Hammer;
+import factorization.fzds.api.IDeltaChunk;
 import factorization.oreprocessing.ItemOreProcessing;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
@@ -47,7 +50,7 @@ public class ColossalBlock extends Block {
         Core.tab(this, TabType.BLOCKS);
     }
     
-    static final byte MD_BODY = 0, MD_BODY_CRACKED = 1, MD_ARM = 2, MD_LEG = 3, MD_MASK = 4, MD_EYE = 5, MD_CORE = 6;
+    static final byte MD_MASK = 0, MD_BODY = 4, MD_BODY_CRACKED = 1, MD_ARM = 2, MD_LEG = 3, MD_EYE = 5, MD_CORE = 6;
     
     static final int EAST_SIDE = 5;
     
@@ -118,12 +121,12 @@ public class ColossalBlock extends Block {
         // No LMP, only the core drops the LMP.
         coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.logicMatrixIdentifier), 1, 1, 5));
         coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.logicMatrixController), 1, 1, 5));
-        coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.diamond_shard), 2, 4, 1));
-        coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.ore_reduced, 1, ItemOreProcessing.OreType.DARKIRON.ID), 1, 7, 10));
+        coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.diamond_shard), 2, 4, 1)); // Hrm. Not sure about this one.
+        coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.ore_crystal, 1, ItemOreProcessing.OreType.DARKIRON.ID), 1, 7, 10));
         coreChest.addItem(new WeightedRandomChestContent(new ItemStack(Core.registry.insulated_coil), 4, 6, 8));
         coreChest.addItem(new WeightedRandomChestContent(Core.registry.dark_iron_sprocket.copy(), 2, 4, 2));
         coreChest.addItem(new WeightedRandomChestContent(Core.registry.servorail_item.copy(), 4, 10, 1));
-        // TODO NORELEASE: It'd be better to drop a srapbox item instead!
+        // TODO NORELEASE: Would it be better to drop a srapbox item instead!
         // What about lead & silver?
         return coreChest;
     }
@@ -323,5 +326,34 @@ public class ColossalBlock extends Block {
         if (mcw == null) return ret;
         if (mcw.provider.dimensionId == Hammer.dimensionID) return ret;
         return 0x9284B4;
+    }
+    
+    @Override
+    public void onBlockHarvested(World world, int x, int y, int z, int md, EntityPlayer player) {
+        if (md != MD_BODY_CRACKED || world.isRemote || world != DeltaChunk.getServerShadowWorld()) {
+            return;
+        }
+        Coord at = new Coord(world, x, y, z);
+        ColossusController controller = findController(at);
+        if (controller != null) {
+            controller.crackBroken();
+        }
+    }
+    
+    public ColossusController findController(Coord at) {
+        TileEntityColossalHeart heart = Awakener.findNearestHeart(at);
+        if (heart == null) return null;
+        UUID controllerId = heart.controllerUuid;
+        if (controllerId.equals(TileEntityColossalHeart.noController)) return null;
+        for (IDeltaChunk idc : DeltaChunk.getSlicesContainingPoint(at)) {
+            Object c = idc.getController();
+            if (c instanceof ColossusController) {
+                ColossusController controller = (ColossusController) c;
+                if (controller.getPersistentID().equals(controllerId)) {
+                    return controller;
+                }
+            }
+        }
+        return null;
     }
 }

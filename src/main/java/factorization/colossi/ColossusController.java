@@ -19,8 +19,9 @@ import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.Share;
 import factorization.fzds.api.DeltaCapability;
 import factorization.fzds.api.IDeltaChunk;
+import factorization.shared.EntityFz;
 
-public class ColossusController extends Entity implements IBossDisplayData {
+public class ColossusController extends EntityFz implements IBossDisplayData {
     static enum BodySide { LEFT, RIGHT, UNKNOWN_BODY_SIDE };
     static enum LimbType { BODY, ARM, LEG, UNKNOWN_LIMB_TYPE };
     LimbInfo[] limbs;
@@ -55,6 +56,7 @@ public class ColossusController extends Entity implements IBossDisplayData {
         this.limbs = limbInfo;
         for (LimbInfo li : limbs) {
             li.entityId = li.ent.getUniqueID();
+            li.ent.setController(this);
             if (li.type == LimbType.BODY) {
                 body = li.ent;
             } else if (li.type == LimbType.LEG) {
@@ -184,6 +186,7 @@ public class ColossusController extends Entity implements IBossDisplayData {
                 setup = false;
                 break;
             }
+            li.ent.setController(this);
             if (li.type == LimbType.BODY) {
                 body = li.ent;
             }
@@ -194,7 +197,7 @@ public class ColossusController extends Entity implements IBossDisplayData {
     @Override
     protected void entityInit() { }
     
-    void putData(DataHelper data) throws IOException {
+    public void putData(DataHelper data) throws IOException {
         int limb_count = data.as(Share.PRIVATE, "limbCount").putInt(limbs == null ? 0 : limbs.length);
         if (data.isReader()) {
             limbs = new LimbInfo[limb_count];
@@ -215,24 +218,6 @@ public class ColossusController extends Entity implements IBossDisplayData {
         int broken_body_blocks = dataWatcher.getWatchableObjectInt(destroyed_cracked_block_id);
         broken_body_blocks = data.as(Share.VISIBLE, "broken").putInt(broken_body_blocks);
         dataWatcher.updateObject(destroyed_cracked_block_id, broken_body_blocks);
-    }
-
-    @Override
-    protected void readEntityFromNBT(NBTTagCompound tag) {
-        try {
-            putData(new DataInNBT(tag));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    protected void writeEntityToNBT(NBTTagCompound tag) {
-        try {
-            putData(new DataOutNBT(tag));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     boolean atTarget() {
@@ -345,6 +330,10 @@ public class ColossusController extends Entity implements IBossDisplayData {
     
     int turnTicks = 0;
     void tickLimbTurn() {
+        if (path_target == null) {
+            turning = 0;
+            return;
+        }
         // lift right leg while twisting left leg
         // set right leg down
         // lift left leg while twiting right leg
@@ -404,7 +393,7 @@ public class ColossusController extends Entity implements IBossDisplayData {
     
     @Override
     public IChatComponent func_145748_c_() {
-        if (getCracks() % 3 == 0 && getCracks() > 0) {
+        if (getHealth() <= 0) {
             return new ChatComponentTranslation("colossus.name.true");
         }
         if ((client_ticks % 300 < 60 && client_ticks % 4 == 0) || client_ticks % 50 == 0) {

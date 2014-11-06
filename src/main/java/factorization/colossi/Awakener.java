@@ -29,6 +29,7 @@ import factorization.notify.Notice;
 import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
+import factorization.shared.ReservoirSampler;
 
 public class Awakener {
     int arm_size = 0, arm_length = 0;
@@ -258,6 +259,18 @@ public class Awakener {
         new Coord(heartTE).setAsEntityLocation(controller);
         controller.worldObj.spawnEntityInWorld(controller);
         
+        for (LimbInfo limb : info) {
+            if (limb.type == LimbType.BODY) {
+                Coord at = limb.ent.getCenter();
+                TileEntityColossalHeart beatingHeart = findNearestHeart(at);
+                if (beatingHeart != null) {
+                    beatingHeart.controllerUuid = controller.getUniqueID();
+                }
+            }
+        }
+        
+        heartTE.controllerUuid = controller.getUniqueID();
+        
         msg("*** WARNING: Energy reserves < 0.1%% ***");
         return true;
     }
@@ -266,21 +279,14 @@ public class Awakener {
         int ls = leg_size + 1;
         int count = ls * ls;
         Random rand = new Random(new Coord(heartTE).seed());
-        ArrayList<Coord> samples = new ArrayList(count);
-        int i = 0;
+        ReservoirSampler<Coord> sampler = new ReservoirSampler<Coord>(count, rand);
         for (Coord cell : body) {
-            if (!isExposedSkin(cell)) continue;
-            if (i++ < count) {
-                samples.add(cell);
-            } else {
-                int j = rand.nextInt(i);
-                if (j < count) {
-                    samples.set(j, cell);
-                }
+            if (isExposedSkin(cell)) {
+                sampler.give(cell);
             }
         }
         int damaged = 0;
-        for (Coord cell : samples) {
+        for (Coord cell : sampler) {
             cell.setIdMd(Core.registry.colossal_block, ColossalBlock.MD_BODY_CRACKED, true);
             damaged++;
         }

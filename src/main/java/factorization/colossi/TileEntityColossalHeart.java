@@ -1,6 +1,7 @@
 package factorization.colossi;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -10,10 +11,11 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.DataInNBT;
 import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.Share;
-import factorization.notify.Notice;
 
 public class TileEntityColossalHeart extends TileEntity {
+    public static final UUID noController = UUID.fromString("00000000-0000-0000-0000-000000000000");
     int seed = -1;
+    UUID controllerUuid = noController;
     
     void loadInfoFromBuilder(ColossalBuilder builder) {
         seed = builder.seed;
@@ -25,6 +27,7 @@ public class TileEntityColossalHeart extends TileEntity {
     
     void putData(DataHelper data) throws IOException {
         seed = data.as(Share.PRIVATE, "gen_seed").putInt(seed);
+        controllerUuid = data.as(Share.PRIVATE, "controller").putUUID(controllerUuid);
     }
     
     @Override

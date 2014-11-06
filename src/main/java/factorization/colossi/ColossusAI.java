@@ -5,6 +5,7 @@ import java.io.IOException;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
+import factorization.shared.NORELEASE;
 
 public class ColossusAI implements IDataSerializable {
     final ColossusController controller;
@@ -30,7 +31,7 @@ public class ColossusAI implements IDataSerializable {
             nextState.onEnterState(controller, state);
             age = 0;
             state = nextState;
-            System.out.println("Current state: " + nextState);
+            NORELEASE.println("Current state: " + nextState);
         }
     }
 }
