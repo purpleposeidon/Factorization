@@ -79,7 +79,7 @@ public class Awakener {
     static TileEntityColossalHeart findNearestHeart(Coord src) {
         TileEntityColossalHeart ret = null;
         double ret_dist = 0;
-        int r = 2;
+        int r = 0;
         Coord at = src.copy();
         for (int dxChunk = -r; dxChunk <= r; dxChunk++) {
             for (int dzChunk = -r; dzChunk <= r; dzChunk++) {
