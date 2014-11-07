@@ -33,8 +33,8 @@ public class AtVerifier {
                 if (rem != -1) {
                     line = line.substring(0,  rem);
                 }
+                currentLine = line = line.trim();
                 if (line.equals("")) continue;
-                currentLine = line;
                 List<String> parts = bannana.splitToList(line);
                 if (parts == null || parts.size() == 0) continue;
                 String access, className, member;
@@ -47,7 +47,7 @@ public class AtVerifier {
                     className = parts.get(1);
                     member = null;
                 } else {
-                    throw new IllegalArgumentException("Malformed AT?");
+                    throw new IllegalArgumentException("Malformed AT? " + line);
                 }
                 try {
                     validate(access, className, member);
