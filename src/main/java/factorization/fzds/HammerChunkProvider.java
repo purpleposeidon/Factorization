@@ -3,10 +3,12 @@ package factorization.fzds;
 import java.util.ArrayList;
 import java.util.List;
 
+import scala.actors.threadpool.Arrays;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.IProgressUpdate;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 
@@ -27,6 +29,8 @@ public class HammerChunkProvider implements IChunkProvider {
     public Chunk provideChunk(int chunkX, int chunkZ) {
         Chunk chunk = new Chunk(world, chunkX, chunkZ);
         chunk.generateSkylightMap();
+        byte[] biomes = chunk.getBiomeArray();
+        Arrays.fill(biomes, (byte) BiomeGenBase.plains.biomeID);
         return chunk;
     }
 
