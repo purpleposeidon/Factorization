@@ -176,9 +176,16 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         return buffer;
     }
     
+    private Vec3 workVec = Vec3.createVectorHelper(0, 0, 0);
+    
     @Override
     public void shadow2real(Coord c) {
-        c.set(shadow2real(c.createVector()));
+        double d = 0.5;
+        workVec.xCoord = c.x + d;
+        workVec.yCoord = c.y + d;
+        workVec.zCoord = c.z + d;
+        workVec = shadow2real(workVec);
+        c.set(workVec);
         c.w = worldObj;
     }
     

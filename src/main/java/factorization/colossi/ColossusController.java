@@ -1,25 +1,26 @@
 package factorization.colossi;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.IBossDisplayData;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
+import factorization.api.ICoordFunction;
 import factorization.api.Quaternion;
 import factorization.api.datahelpers.DataHelper;
-import factorization.api.datahelpers.DataInNBT;
-import factorization.api.datahelpers.DataOutNBT;
 import factorization.api.datahelpers.Share;
 import factorization.fzds.api.DeltaCapability;
 import factorization.fzds.api.IDeltaChunk;
+import factorization.shared.Core;
 import factorization.shared.EntityFz;
+import factorization.shared.NORELEASE;
 
 public class ColossusController extends EntityFz implements IBossDisplayData {
     static enum BodySide { LEFT, RIGHT, UNKNOWN_BODY_SIDE };
@@ -32,6 +33,9 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
     int leg_size = 0, leg_length = 0;
     
     int cracked_body_blocks = 0;
+    
+    int last_pos_hash = -1;
+    double target_y = Double.NaN;
     
     Coord home = null;
     Coord path_target = null;
@@ -119,6 +123,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             return;
         }
         moveToTarget(body);
+        updateBlockClimb();
         tickLimbSwing();
         controller.tick();
         Quaternion bodyRotation = body.getRotation();
@@ -401,4 +406,112 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         }
         return new ChatComponentTranslation("colossus.name." + current_name);
     }
+    
+    void updateBlockClimb() {
+        if (ticksExisted <= 5) return; // Make sure limbs are in position
+        if (getHealth() <= 0) {
+            return;
+        }
+        int currentPosHash = new Coord(this).hashCode();
+        if (currentPosHash != last_pos_hash) {
+            last_pos_hash = currentPosHash;
+            int dy = new HeightCalculator().calc();
+            target_y = posY + dy;
+        }
+        if (target_y == posY) return;
+        double close_enough = 1.0 / 64.0;
+        if (Math.abs(posY - target_y) <= close_enough) {
+            target_y = posY;
+            for (LimbInfo limb : limbs) {
+                if (limb.type != LimbType.BODY) continue;
+                limb.ent.motionY = 0;
+            }
+            return;
+        }
+        double maxV = 1.0/5.0;
+        int sign = posY > target_y ? -1 : +1;
+        double delta = Math.abs(posY - target_y);
+        double motion = sign * Math.min(maxV, delta);
+        for (LimbInfo limb : limbs) {
+            if (limb.type != LimbType.BODY) continue;
+            limb.ent.motionY = motion;
+        }
+    }
+    
+    class HeightCalculator implements ICoordFunction {
+        int lowest = Integer.MAX_VALUE;
+        ArrayList<Coord> found = new ArrayList();
+        IDeltaChunk idc;
+        boolean any;
+        int calc() {
+            found.clear();
+            for (LimbInfo li : limbs) { // NORELEASE: only if the angle isn't super-steap
+                if (li.type != LimbType.LEG) continue;
+                idc = li.ent;
+                if (Math.abs(li.swing) > Math.toRadians(25)) continue;
+                Coord min = idc.getCorner().copy();
+                Coord max = idc.getFarCorner().copy();
+                Coord.sort(min, max);
+                final int maxY = max.y;
+                any = false;
+                for (int y = min.y; y < maxY; y++) {
+                    max.y = min.y = y;
+                    Coord.iterateCube(min, max, this);
+                    if (any) break;
+                }
+            }
+            int total = found.size();
+            if (total == 0) return 0;
+            double solid_at = 0;
+            double solid_below = 0;
+            NORELEASE.println();
+            for (Coord at : found) {
+                if (at.isSolid()) {
+                    solid_at++;
+                    NORELEASE.println("solid_at: " + at.getBlock());
+                } else {
+                    at.y--;
+                    if (at.isSolid()) {
+                        NORELEASE.println("solid_below: " + at.getBlock());
+                        solid_below++;
+                    } else {
+                        NORELEASE.println("no support: " + at.getBlock());
+                    }
+                    at.y++;
+                }
+            }
+            double at = solid_at / total;
+            double below = solid_below / total;
+            NORELEASE.println("total: " + total);
+            NORELEASE.println("at: " + at);
+            NORELEASE.println("below: " + below);
+            NORELEASE.println("lowest: " + lowest);
+            if (at >= 0.5) {
+                return +1;
+            }
+            if (below <= 0.4 && at <= 0.15) {
+                return -1;
+            }
+            return 0;
+        }
+        
+        @Override
+        public void handle(Coord here) {
+            if (here.getBlock() != Core.registry.colossal_block) return;
+            Coord real = here.copy();
+            idc.shadow2real(real);
+            if (real.y > lowest) return;
+            if (real.y < lowest) {
+                lowest = real.y;
+                found.clear();
+            }
+            found.add(real);
+            any = true;
+        }
+    }
+    
+    
+    
+    
+    
 }
