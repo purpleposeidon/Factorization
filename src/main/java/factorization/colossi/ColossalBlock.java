@@ -108,7 +108,7 @@ public class ColossalBlock extends Block {
     
     @Override
     public void getSubBlocks(Item item, CreativeTabs tab, List list) {
-        for (byte md = MD_BODY; md <= MD_CORE; md++) {
+        for (byte md = MD_MASK; md <= MD_CORE; md++) {
             list.add(new ItemStack(this, 1, md));
         }
     }
@@ -299,6 +299,7 @@ public class ColossalBlock extends Block {
     
     double sneakiness(Entity ent) {
         if (ent.isSprinting()) return 7;
+        if (ent.isEating()) return 0.5;
         if (ent.isSneaking()) return 0.05;
         return 1;
     }
@@ -330,14 +331,21 @@ public class ColossalBlock extends Block {
     
     @Override
     public void onBlockHarvested(World world, int x, int y, int z, int md, EntityPlayer player) {
-        if (md != MD_BODY_CRACKED || world.isRemote || world != DeltaChunk.getServerShadowWorld()) {
-            return;
+        if (world.isRemote) return;
+        if (world == DeltaChunk.getServerShadowWorld()) {
+            if (md == MD_BODY_CRACKED) {
+                Coord at = new Coord(world, x, y, z);
+                ColossusController controller = findController(at);
+                if (controller != null) {
+                    controller.crackBroken();
+                }
+            }
+        } else if (md == MD_MASK) {
+            if (!playerImmune(player)) {
+                maybeAwaken(new Coord(world, x, y, z), 2 * sneakiness(player));
+            }
         }
-        Coord at = new Coord(world, x, y, z);
-        ColossusController controller = findController(at);
-        if (controller != null) {
-            controller.crackBroken();
-        }
+        
     }
     
     public ColossusController findController(Coord at) {
