@@ -7,8 +7,12 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
+import factorization.aabbdebug.AabbDebugger;
 import factorization.fzds.api.IFzdsShenanigans;
 import factorization.shared.FzUtil;
+import factorization.shared.NORELEASE;
 
 public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans {
     // NORELEASE: Optimize & cache
@@ -92,7 +96,10 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
         // Could probably be done as a simpleish function depending on rotationQuaternion.w
         AxisAlignedBB shadowBox = convertRealBoxToShadowBox(realBox);
         if (!idc.getRotation().isZero()) {
-            shadowBox = shadowBox.expand(expansion, expansion, expansion);
+            shadowBox = shadowBox.expand(expansion, expansion, expansion); NORELEASE.fixme(/* cache */);
+        }
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+            AabbDebugger.addBox(realBox);
         }
         return getShadowBoxesWithinShadowBox(shadowBox);
     }
@@ -100,7 +107,7 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
     AxisAlignedBB convertRealBoxToShadowBox(AxisAlignedBB realBox) {
         // This function returns a box is likely larger than what it should really be.
         // A more accurate algo would be to translate each corner and make a box that contains them.
-        Vec3 realMiddle = Vec3.createVectorHelper(0, 0, 0);
+        Vec3 realMiddle = Vec3.createVectorHelper(0, 0, 0); NORELEASE.fixme(/* Can be cached */);
         FzUtil.setMiddle(realBox, realMiddle);
         double d = FzUtil.getDiagonalLength(realBox);
         Vec3 shadowMiddle = convertRealVecToShadowVec(realMiddle);
