@@ -342,8 +342,7 @@ public enum AIState {
     public void onExitState(ColossusController controller, AIState nextState) { }
     
     protected AIState preempt(ColossusController controller, int age) {
-        return FALL;
-        //if (controller.getHealth() <= 0) return FALL;
-        //return this;
+        if (controller.getHealth() <= 0) return FALL;
+        return this;
     }
 }
