@@ -10,7 +10,7 @@ import factorization.shared.NORELEASE;
 public class ColossusAI implements IDataSerializable {
     final ColossusController controller;
 
-    AIState state = AIState.IDLE;
+    AIState state = AIState.INITIAL_STATE;
     int age = 0;
     
     public ColossusAI(ColossusController controller) {

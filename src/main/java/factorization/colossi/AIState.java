@@ -23,9 +23,17 @@ import factorization.shared.Core;
 import factorization.shared.ReservoirSampler;
 
 public enum AIState {
+    INITIAL_STATE {
+        @Override
+        AIState tick(ColossusController controller, int age) {
+            return IDLE;
+        }
+    },
+    
     IDLE {
         @Override
         AIState tick(ColossusController controller, int age) {
+            // Picks a state
             AIState pre = this.preempt(controller, age);
             if (pre != this) return pre;
             Coord at = new Coord(controller);
@@ -50,6 +58,7 @@ public enum AIState {
             return RUN_BACK;
         }
     },
+    
     WALK_EAST_SAFELY {
         @Override
         AIState tick(ColossusController controller, int age) {
@@ -61,6 +70,7 @@ public enum AIState {
             return preempt(controller, age);
         }
     },
+    
     RUN_BACK {
         @Override
         AIState tick(ColossusController controller, int age) {
@@ -73,6 +83,76 @@ public enum AIState {
             controller.path_target = controller.home.copy();
         }
     },
+    
+    WANDER {
+        @Override
+        AIState tick(ColossusController controller, int age) {
+            if (controller.atTarget()) return IDLE;
+            return this;
+        }
+        
+        @Override
+        public void onEnterState(ColossusController controller, AIState state) {
+            int d = (int) (WorldGenColossus.SMOOTH_END * 0.85);
+            Coord target = controller.home.copy();
+            target.x += target.w.rand.nextInt(d) - d / 2;
+            target.z += target.w.rand.nextInt(d) - d / 2;
+            controller.path_target = target;
+        }
+        
+    },
+    
+    WAIT {
+        @Override
+        AIState tick(ColossusController controller, int age) {
+            if (age > 20*3) return IDLE;
+            return IDLE;
+        }
+    },
+    
+    ATTACK {
+        @Override
+        AIState tick(ColossusController controller, int age) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+    },
+    
+    SELECT_NEW_TARGET {
+        @Override
+        AIState tick(ColossusController controller, int age) {
+            return this;
+        }
+        
+    },
+    
+    IGNORE {
+        @Override
+        AIState tick(ColossusController controller, int age) {
+            // Give the player some time to attack the colossus unmolested
+            if (age < 20 * 8) return IGNORE;
+            if (age % 20 != 0) return IGNORE;
+            if (controller.worldObj.rand.nextBoolean()) return ATTACK;
+            return IGNORE;
+        }
+    },
+    
+    DISLODGE_RIDING_PLAYER {
+        @Override
+        AIState tick(ColossusController controller, int age) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+    },
+    
+    BOW {
+        @Override
+        AIState tick(ColossusController controller, int age) {
+            return BOW;
+        } 
+        
+    },
+    
     FLAIL_ARMS {
         @Override
         AIState tick(ColossusController controller, int age) {
@@ -127,12 +207,30 @@ public enum AIState {
             }
         }
     },
-    SHAKE_BODY {
+    
+    SHAKE {
         @Override
         AIState tick(ColossusController controller, int age) {
             return FLAIL_ARMS;
         }
     },
+    
+    SPIN {
+        @Override
+        AIState tick(ColossusController controller, int age) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+    },
+    
+    HURT_GROUNDED_PLAYER {
+        @Override
+        AIState tick(ColossusController controller, int age) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+    },
+    
     CHASE_PLAYER_ON_GROUND {
         @Override
         AIState tick(ColossusController controller, int age) {
@@ -146,7 +244,7 @@ public enum AIState {
             }
             controller.path_target = new Coord(controller.target_entity);
             if (controller.atTarget()) {
-                return SHAKE_BODY;
+                return SHAKE;
             }
             return this;
         }
@@ -156,13 +254,9 @@ public enum AIState {
             controller.target_count = 0;
         }
     },
-    SELECT_NEW_TARGET {
-        @Override
-        AIState tick(ColossusController controller, int age) {
-            return this;
-        }
-        
-    },
+    
+    
+    
     FALL {
         @Override
         public void onEnterState(ColossusController controller, AIState state) {
