@@ -26,7 +26,7 @@ public enum AabbDebugger {
     static ArrayList<AxisAlignedBB> boxes = new ArrayList();
     
     public static void addBox(AxisAlignedBB box) {
-        boxes.add(box);
+        boxes.add(box.copy());
     }
     
     @SubscribeEvent
