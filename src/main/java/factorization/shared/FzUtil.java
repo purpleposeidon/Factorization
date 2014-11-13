@@ -1206,6 +1206,10 @@ public class FzUtil {
         return ret;
     }
     
+    public static Vec3 copy(Vec3 a) {
+        return Vec3.createVectorHelper(a.xCoord, a.yCoord, a.zCoord);
+    }
+    
     public static void incrSubtract(Vec3 base, Vec3 sub) {
         base.xCoord -= sub.xCoord;
         base.yCoord -= sub.yCoord;
