@@ -1,6 +1,9 @@
 package factorization.fzds.api;
 
 import static factorization.fzds.api.DeltaCapability.*;
+
+import java.util.ArrayList;
+
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import factorization.api.Coord;
@@ -9,7 +12,32 @@ import factorization.shared.EntityFz;
 
 public abstract class IDeltaChunk extends EntityFz {
     //This would be an actual interface, but it needs to extend Entity.
-    public IDeltaChunk(World w) { super(w); } //For java
+    public IDeltaChunk(World w) { super(w); }
+    
+    /***
+     * Sets the parent. The parent can be null. Reparenting probably isn't synchronized, so set it before spawning in the IDC.
+     * Attatches the slice to its parent. When the parent translates & rotates, the child follows, *and* the does the same physics calculations as if it had native motion.
+     * The child can rotate independently of the parent.
+     * 
+     * @param parent
+     * @param jointPositionAtParent Specifies a location to attatch to in the parent's local entity space, relative to parent.getCorner()
+     * 
+     * 
+     * Suppose you have an IDC for a large door. The rotational center is located at (0, 0, 0) to allow it to be opened on a hinge, and also kicked down.
+     * setParent can be used to add a doorknob that will stay connected as appropriate, but still be able to be spun independently.
+     * 
+     * The knob will have its rotation point be the center of its area so that it can turn appropriately on its axis. If the knob is just a 3-block long stick passing through the door,
+     * then the center would well be (0.5, 0.5, 1).
+     * If the door has height = H and width = W, then jointPositionAtParent would be (W - 1, H / 2.0, 0)
+     * 
+     */
+    public abstract void setParent(IDeltaChunk parent, Vec3 jointPositionAtParent);
+    
+    public abstract IDeltaChunk getParent();
+    
+    public abstract Vec3 getParentJoint();
+    
+    public abstract ArrayList<IDeltaChunk> getChildren();
     
     /***
      * @return the {@link Quaternion} representing the rotation (theta).
@@ -153,11 +181,17 @@ public abstract class IDeltaChunk extends EntityFz {
     
     @Override
     public String toString() {
+        String ret;
         if (partName != "") {
-            return "[DSE " + partName + " " + getEntityId() + "]";
+            ret = "[DSE " + partName + " " + getEntityId() + "]";
+        } else {
+            ret = super.toString() + " - from " + getCorner() + "  to  " + getFarCorner() +
+            "   center at " + getRotationalCenterOffset();
         }
-        return super.toString() + " - from " + getCorner() + "  to  " + getFarCorner() +
-                "   center at " + getRotationalCenterOffset();
+        if (getParent() != null) {
+            ret += ":PARENT=" + getParent().getEntityId();
+        }
+        return ret;
     }
     
     private Object controller;

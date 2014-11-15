@@ -1,8 +1,13 @@
 package factorization.fzds;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
+import net.minecraft.command.ICommand;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerManager;
 import net.minecraft.util.Vec3;
@@ -21,9 +26,11 @@ import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServer
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.common.FzConfig;
+import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.network.FzdsPacketRegistry;
 import factorization.fzds.network.WrappedPacket;
 import factorization.shared.Core;
+import factorization.shared.NORELEASE;
 
 @Mod(modid = Hammer.modId, name = Hammer.name, version = Core.version, dependencies = "required-after: " + Core.modId)
 public class Hammer {
@@ -112,6 +119,59 @@ public class Hammer {
         //the undeobfed method comes after "isPlayerWatchingChunk", also in uses of ServerConfigurationManager.getViewDistance()
         //It returns how many blocks are visible.
         DSE_ChunkUpdateRangeSquared = Math.pow(PlayerManager.getFurthestViewableBlock(view_distance) + 16*2, 2);
+        NORELEASE.fixme("");
+        event.registerServerCommand(new ICommand() {
+            @Override
+            public int compareTo(Object o) {
+                return 0;
+            }
+
+            @Override
+            public String getCommandName() {
+                return "test";
+            }
+
+            @Override
+            public String getCommandUsage(ICommandSender p_71518_1_) {
+                return "test";
+            }
+
+            @Override
+            public List getCommandAliases() {
+                return null;
+            }
+
+            @Override
+            public void processCommand(ICommandSender sender, String[] args) {
+                EntityPlayer player = (EntityPlayer) sender;
+                ArrayList<IDeltaChunk> found = new ArrayList();
+                for (Object ent : player.worldObj.loadedEntityList) {
+                    if (ent instanceof IDeltaChunk) {
+                        found.add((IDeltaChunk) ent);
+                    }
+                }
+                
+                IDeltaChunk parent = found.get(0);
+                IDeltaChunk child = found.get(1);
+                child.setParent(parent, Vec3.createVectorHelper(3, 3, 3));
+            }
+
+            @Override
+            public boolean canCommandSenderUseCommand(ICommandSender p_71519_1_) {
+                return true;
+            }
+
+            @Override
+            public List addTabCompletionOptions(ICommandSender p_71516_1_, String[] p_71516_2_) {
+                return null;
+            }
+
+            @Override
+            public boolean isUsernameIndex(String[] p_82358_1_, int p_82358_2_) {
+                return false;
+            }
+            
+        });
     }
     
     @EventHandler

@@ -41,7 +41,9 @@ public enum DeltaCapability {
     /** When a DSE hits an entity, an opposing force will be applied to the DSE. (TODO) */
     CONSERVE_MOMENTUM,
     /** When a DSE hits an entity, hurt it & apply knockback */
-    VIOLENT_COLLISIONS
+    VIOLENT_COLLISIONS,
+    /** The DSE stops moving if it hits a block */
+    COLLIDE_WITH_WORLD
     ;
     //Do not re-order this list, only append.
     public final long bit;

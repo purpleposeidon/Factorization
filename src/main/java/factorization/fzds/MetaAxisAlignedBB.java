@@ -98,9 +98,9 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
         if (!idc.getRotation().isZero()) {
             shadowBox = shadowBox.expand(expansion, expansion, expansion); NORELEASE.fixme(/* cache */);
         }
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+        /*if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
             AabbDebugger.addBox(realBox);
-        }
+        }*/
         return getShadowBoxesWithinShadowBox(shadowBox);
     }
     

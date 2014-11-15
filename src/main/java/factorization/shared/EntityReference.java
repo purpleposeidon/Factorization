@@ -56,17 +56,20 @@ public class EntityReference<E extends Entity> implements IDataSerializable {
     
     protected transient int fails = 0;
     protected void fetchEntity() {
-        if (fails > 4) {
+        if (fails++ > 4) {
             if (fails % 40 != 0) return;
         }
         for (Entity ent : (Iterable<Entity>)world.loadedEntityList) {
-            if (entity_uuid == ent.getUniqueID()) {
+            if (entity_uuid.equals(ent.getUniqueID())) {
                 tracked_entity = (E) ent;
                 fails = 0;
                 break;
             }
         }
-        fails++;
+    }
+
+    public boolean entityFound() {
+        return tracked_entity != null;
     }
     
     
