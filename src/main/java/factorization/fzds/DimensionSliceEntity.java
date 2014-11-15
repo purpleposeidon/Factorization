@@ -512,10 +512,8 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         }
         boolean need_to_move = motionX != 0 || motionY != 0 || motionZ != 0 || parent.trackingEntity();
         Vec3 mot = null;
+        boolean mot_is_zero = true;
         if (need_to_move) {
-            if (realDragArea == null || updateHashMotion() || !rotationalVelocity.isZero()) {
-                realDragArea = realArea.addCoord(motionX, motionY, motionZ);
-            }
             prevPosX = posX;
             prevPosY = posY;
             prevPosZ = posZ;
@@ -525,16 +523,19 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 // The parent chain isn't loaded
                 return;
             }
-        }
-        
-        for (IDeltaChunk child : children) {
-            // Force the children to be located at the right place.
-            // They should already be in position (unless they've just joined us)?
-            // They'll go through their actual motions after their parent does.
-            Vec3 joint = child.getParentJoint();
-            joint = joint.addVector(cornerMin.x, cornerMin.y, cornerMin.z);
-            joint = shadow2real(joint);
-            child.setPosition(joint.xCoord, joint.yCoord, joint.zCoord);
+            if (parent.trackingEntity()) {
+                IDeltaChunk par = parent.getEntity();
+                Vec3 parentCorner = par.getCorner().createVector();
+                FzUtil.incrAdd(parentCorner, getParentJoint());
+                Vec3 correctPosition = par.shadow2real(parentCorner);
+                mot.xCoord += correctPosition.xCoord - posX;
+                mot.yCoord += correctPosition.yCoord - posY;
+                mot.zCoord += correctPosition.zCoord - posZ;
+            }
+            mot_is_zero = mot.xCoord != 0 || mot.yCoord != 0 || mot.zCoord != 0;
+            if (realDragArea == null || updateHashMotion() || !rotationalVelocity.isZero() || !mot_is_zero) {
+                realDragArea = realArea.addCoord(mot.xCoord, mot.yCoord, mot.zCoord);
+            }
         }
 
         boolean moved = false;
@@ -542,7 +543,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             posX += mot.xCoord;
             posY += mot.yCoord;
             posZ += mot.zCoord;
-            moved = true;
+            moved |= mot_is_zero;
         }
         
         boolean rotational_motion = !rotationalVelocity.isZero() || parent.trackingEntity();
@@ -590,12 +591,12 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 Entity e = (Entity) ents.get(i);
                 AxisAlignedBB ebb = e.boundingBox;
                 if (mot != null) {
-                    double friction_expansion = -0.05 * mot.lengthVector();
+                    double friction_expansion = 0.05 * mot.lengthVector();
                     if (mot.yCoord > 0) {
                         ebb = ebb.expand(-mot.xCoord, -mot.yCoord, -mot.zCoord); NORELEASE.fixme("eh?");
                     }
                     if (mot.xCoord != 0 || mot.zCoord != 0) {
-                        ebb = ebb.contract(friction_expansion, friction_expansion, friction_expansion);
+                        ebb = ebb.expand(friction_expansion, friction_expansion, friction_expansion);
                     }
                 }
                 // could multiply stuff by velocity
@@ -1086,12 +1087,19 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     }
     
     public Vec3 getInstantVelocityAtRealPoint(Vec3 real) {
+        NORELEASE.fixme("Lots of garbage?");
         Vec3 linear = Vec3.createVectorHelper(motionX, motionY, motionZ);
         Vec3 dse_space = real.addVector(-posX - centerOffset.xCoord, -posY - centerOffset.yCoord, -posZ - centerOffset.zCoord);
         Vec3 point_a = dse_space;
         Vec3 point_b = dse_space.addVector(0, 0, 0);
         rotationalVelocity.applyRotation(point_b);
         Vec3 rotational = point_a.subtract(point_b);
-        return FzUtil.add(rotational, linear);
+        Vec3 ret = FzUtil.add(rotational, linear);
+        if (parent.trackingEntity()) {
+            DimensionSliceEntity parentDse = parent.getEntity();
+            if (parentDse == null) return Vec3.createVectorHelper(0, 0, 0);
+            FzUtil.incrAdd(ret, parentDse.getInstantVelocityAtRealPoint(real));
+        }
+        return ret;
     }
 }

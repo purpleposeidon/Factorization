@@ -1109,6 +1109,10 @@ public class FzUtil {
         aabb.minZ = v.zCoord;
     }
     
+    public static Vec3 fromEntPos(Entity ent) {
+        return Vec3.createVectorHelper(ent.posX, ent.posY, ent.posZ);
+    }
+    
     public static Vec3 getMax(AxisAlignedBB aabb) {
         return Vec3.createVectorHelper(aabb.maxX, aabb.maxY, aabb.maxZ);
     }

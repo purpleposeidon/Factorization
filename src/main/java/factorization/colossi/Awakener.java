@@ -1,4 +1,3 @@
-
 package factorization.colossi;
 
 import java.util.ArrayList;
@@ -44,7 +43,7 @@ public class Awakener {
             TileEntityColossalHeart heart = findNearestHeart(src);
             if (heart == null) return;
             msg("Unknown XR10-class entity detected.");
-            msg("Attempting to awaken Colossal Guardian " + heart.seed);
+            msg("Attempting to awaken Colossal Sentinel " + heart.seed);
             Coord core = new Coord(heart);
             Awakener awakener = new Awakener(heart);
             boolean success = awakener.abandonedLongAgo_thisAncientGuardianBurnsItsRemainingPower();
@@ -104,7 +103,7 @@ public class Awakener {
     }
     
     void details(String name, Set<Coord> set) {
-        msg("    " + name + " made of " + set.size() + " blocks"); // NORELEASE: Custom logger
+        msg("    " + name + " made of " + set.size() + " blocks");
     }
     
     void limbDetails(String name, ArrayList<Set<Coord>> limbs) {
@@ -245,11 +244,30 @@ public class Awakener {
         
         ArrayList<LimbInfo> parts = new ArrayList();
         int i = 0;
+        IDeltaChunk bodyIdc = null;
         for (SetAndInfo partInfo : limbInfo) {
             String name = partInfo.limbType + " " + partInfo.limbSide + (i++);
             IDeltaChunk idc = createIDC(partInfo.set, partInfo.rotation, name);
             LimbInfo li = new LimbInfo(partInfo.limbType, partInfo.limbSide, partInfo.length, idc);
             parts.add(li);
+            if (li.type == LimbType.BODY) {
+                bodyIdc = idc;
+            }
+        }
+        
+        if (bodyIdc == null) throw new NullPointerException();
+        
+        for (LimbInfo li : parts) {
+            if (li.ent != bodyIdc) {
+                Vec3 at = FzUtil.fromEntPos(li.ent);
+                at = bodyIdc.real2shadow(at);
+                Coord corner = bodyIdc.getCorner();
+                at.xCoord -= corner.x;
+                at.yCoord -= corner.y;
+                at.zCoord -= corner.z;
+                li.ent.setParent(bodyIdc, at);
+            }
+            li.ent.worldObj.spawnEntityInWorld(li.ent);
         }
         
         int part_size = parts.size();
@@ -257,7 +275,7 @@ public class Awakener {
         LimbInfo[] info = parts.toArray(new LimbInfo[part_size]);
         ColossusController controller = new ColossusController(heartTE.getWorldObj(), info, arm_size, arm_length, leg_size, leg_length, cracked_body_blocks);
         new Coord(heartTE).setAsEntityLocation(controller);
-        controller.worldObj.spawnEntityInWorld(controller);
+        // NORELEASE controller.worldObj.spawnEntityInWorld(controller);
         
         for (LimbInfo limb : info) {
             if (limb.type == LimbType.BODY) {
@@ -541,8 +559,7 @@ public class Awakener {
         ret.forbid(DeltaCapability.EMPTY);
         ret.forbid(DeltaCapability.COLLIDE);
         ret.setPartName(partName);
-        ret.changeRotationCenter(rotationCenter); // Was down below. NORELEASE: Don't need this comment? :D
-        ret.worldObj.spawnEntityInWorld(ret);
+        ret.changeRotationCenter(rotationCenter);
         return ret;
     }
 }
