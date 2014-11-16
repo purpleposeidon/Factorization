@@ -258,16 +258,17 @@ public class Awakener {
         if (bodyIdc == null) throw new NullPointerException();
         
         for (LimbInfo li : parts) {
-            if (li.ent != bodyIdc) {
-                Vec3 at = FzUtil.fromEntPos(li.ent);
+            IDeltaChunk idc = li.idc.getEntity();
+            if (idc != bodyIdc) {
+                Vec3 at = FzUtil.fromEntPos(idc);
                 at = bodyIdc.real2shadow(at);
                 Coord corner = bodyIdc.getCorner();
                 at.xCoord -= corner.x;
                 at.yCoord -= corner.y;
                 at.zCoord -= corner.z;
-                li.ent.setParent(bodyIdc, at);
+                idc.setParent(bodyIdc, at);
             }
-            li.ent.worldObj.spawnEntityInWorld(li.ent);
+            FzUtil.spawn(idc);
         }
         
         int part_size = parts.size();
@@ -275,11 +276,11 @@ public class Awakener {
         LimbInfo[] info = parts.toArray(new LimbInfo[part_size]);
         ColossusController controller = new ColossusController(heartTE.getWorldObj(), info, arm_size, arm_length, leg_size, leg_length, cracked_body_blocks);
         new Coord(heartTE).setAsEntityLocation(controller);
-        // NORELEASE controller.worldObj.spawnEntityInWorld(controller);
+        FzUtil.spawn(controller);
         
         for (LimbInfo limb : info) {
             if (limb.type == LimbType.BODY) {
-                Coord at = limb.ent.getCenter();
+                Coord at = limb.idc.getEntity().getCenter();
                 TileEntityColossalHeart beatingHeart = findNearestHeart(at);
                 if (beatingHeart != null) {
                     beatingHeart.controllerUuid = controller.getUniqueID();
