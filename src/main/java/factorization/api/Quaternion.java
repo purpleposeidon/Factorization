@@ -63,8 +63,13 @@ public class Quaternion implements IDataSerializable {
         this.z = v.z;
     }
     
-    public boolean isEqual(Quaternion other) {
-        return w == other.w && x == other.x && y == other.y && z == other.z; 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Quaternion) {
+            Quaternion other = (Quaternion) obj;
+            return w == other.w && x == other.x && y == other.y && z == other.z;
+        }
+        return false;
     }
     
     @Override
@@ -311,7 +316,8 @@ public class Quaternion implements IDataSerializable {
     
     private static final double DOT_THRESHOLD = 0.9995;
     public Quaternion slerp(Quaternion other, double t) {
-        //From http://number-none.com/product/Understanding%20Slerp,%20Then%20Not%20Using%20It/index.html (encoding = Western; ISO-8859-1)
+        // From http://number-none.com/product/Understanding%20Slerp,%20Then%20Not%20Using%20It/index.html (encoding = Western; ISO-8859-1)
+        // But see also: http://physicsforgames.blogspot.com/2010/02/quaternions.html
 
         // v0 and v1 should be unit length or else
         // something broken will happen.

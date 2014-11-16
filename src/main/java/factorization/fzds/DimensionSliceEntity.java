@@ -663,7 +663,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     }
     
     void shareRotationInfo() {
-        boolean d0 = !rotation.isEqual(last_shared_rotation), d1 = !rotationalVelocity.isEqual(last_shared_rotational_velocity);
+        boolean d0 = !rotation.equals(last_shared_rotation), d1 = !rotationalVelocity.equals(last_shared_rotational_velocity);
         FMLProxyPacket toSend = null;
         if ((d0 && d1) || (ticksExisted % 60 == 0)) {
             toSend = HammerNet.makePacket(HammerNet.HammerNetType.rotationBoth, getEntityId(), rotation, rotationalVelocity);
