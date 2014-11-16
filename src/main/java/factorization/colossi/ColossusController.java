@@ -2,7 +2,6 @@ package factorization.colossi;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.UUID;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.IBossDisplayData;
@@ -20,6 +19,7 @@ import factorization.fzds.api.DeltaCapability;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.shared.Core;
 import factorization.shared.EntityFz;
+import factorization.shared.FzUtil;
 import factorization.shared.NORELEASE;
 
 public class ColossusController extends EntityFz implements IBossDisplayData {
@@ -27,6 +27,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
     static enum LimbType { BODY, ARM, LEG, UNKNOWN_LIMB_TYPE };
     LimbInfo[] limbs;
     IDeltaChunk body;
+    LimbInfo bodyLimbInfo;
     final ColossusAI controller = new ColossusAI(this);
     boolean setup = false;
     int arm_size = 0, arm_length = 0;
@@ -59,17 +60,24 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         this(world);
         this.limbs = limbInfo;
         for (LimbInfo li : limbs) {
-            li.entityId = li.ent.getUniqueID();
-            li.ent.setController(this);
+            IDeltaChunk idc = li.idc.getEntity();
+            idc.setController(this);
             if (li.type == LimbType.BODY) {
-                body = li.ent;
+                body = idc;
+                bodyLimbInfo = li;
             } else if (li.type == LimbType.LEG) {
-                li.ent.permit(DeltaCapability.VIOLENT_COLLISIONS);
+                idc.permit(DeltaCapability.VIOLENT_COLLISIONS);
             }
         }
-        for (LimbInfo li : limbs) {
-            li.setOffsetFromBody(body);
-        }
+        this.arm_size = arm_size;
+        this.arm_length = arm_length;
+        this.leg_size = leg_size;
+        this.leg_length = leg_length;
+        this.cracked_body_blocks = crackedBlocks;
+        calcLimbParity();
+    }
+    
+    protected void calcLimbParity() {
         byte left_leg_parity = 0, left_arm_parity = 0, right_leg_parity = 0, right_arm_parity = 0;
         discover_limb_parities: for (LimbInfo li : limbs) {
             byte use_parity = 0;
@@ -96,11 +104,6 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             }
             li.parity = use_parity;
         }
-        this.arm_size = arm_size;
-        this.arm_length = arm_length;
-        this.leg_size = leg_size;
-        this.leg_length = leg_length;
-        this.cracked_body_blocks = crackedBlocks;
     }
     
     @Override
@@ -110,7 +113,6 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             return;
         }
         if (!setup) {
-            setup = true;
             loadLimbs();
             if (home == null) {
                 home = new Coord(this);
@@ -122,81 +124,29 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             setDead();
             return;
         }
-        moveToTarget(body);
+        moveToTarget();
         updateBlockClimb();
         tickLimbSwing();
         controller.tick();
-        Quaternion bodyRotation = body.getRotation();
         for (LimbInfo limb : limbs) {
-            if (limb.type == LimbType.BODY) continue;
-            if (!limb.controlled) continue;
-            Vec3 joint = limb.originalBodyOffset.addVector(0, limb.extension, 0);
-            bodyRotation.applyRotation(joint);
-            Quaternion rot = new Quaternion(bodyRotation);
-            
-            if (limb.sweep != 0) {
-                Quaternion sweep = Quaternion.getRotationQuaternionRadians(limb.sweep, ForgeDirection.UP);
-                rot.incrMultiply(sweep);
-            }
-            
-            if (limb.swing != 0) {
-                Quaternion swing = Quaternion.getRotationQuaternionRadians(limb.swing, ForgeDirection.SOUTH);
-                rot.incrMultiply(swing);
-            }
-            
-            if (limb.twist != 0) {
-                Quaternion twist = Quaternion.getRotationQuaternionRadians(limb.twist, ForgeDirection.UP);
-                rot.incrMultiply(twist);
-            }
-            
-            if (limb.flap != 0) {
-                Quaternion flap = Quaternion.getRotationQuaternionRadians(limb.flap, ForgeDirection.EAST);
-                rot.incrMultiply(flap);
-            }
-            
-            
-            rot.incrNormalize();
-            limb.ent.setRotation(rot);
-            limb.ent.posX = body.posX + joint.xCoord;
-            limb.ent.posY = body.posY + joint.yCoord;
-            limb.ent.posZ = body.posZ + joint.zCoord;
+            limb.tick();
         }
         setPosition(body.posX, body.posY, body.posZ);
     }
     
     void loadLimbs() {
-        boolean needed = false;
-        for (LimbInfo li : limbs) {
-            if (li.ent == null) {
-                needed = true;
-                break;
-            } else if (li.entityId == null) {
-                li.entityId = li.ent.getUniqueID();
-            }
-        }
-        if (!needed) return;
-        for (Entity ent : (Iterable<Entity>) worldObj.loadedEntityList) {
-            UUID test = ent.getUniqueID();
-            for (LimbInfo li : limbs) {
-                if (li.entityId == null || li.ent != null) continue;
-                if (li.entityId.equals(test) && ent instanceof IDeltaChunk) {
-                    li.ent = (IDeltaChunk) ent;
-                    break;
-                }
-            }
-        }
         int i = 0;
         for (LimbInfo li : limbs) {
-            if (li.ent == null) {
-                setup = false;
-                break;
-            }
-            li.ent.setController(this);
+            IDeltaChunk idc = li.idc.getEntity();
+            if (idc == null) return;
+            idc.setController(this);
             if (li.type == LimbType.BODY) {
-                body = li.ent;
+                body = idc;
+                bodyLimbInfo = li;
             }
-            li.ent.setPartName(li.side + " " + li.type + "#" + (i++));
+            idc.setPartName(li.side + " " + li.type + "#" + (i++));
         }
+        setup = true;
     }
 
     @Override
@@ -209,7 +159,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         }
         for (int i = 0; i < limbs.length; i++) {
             if (data.isReader()) {
-                limbs[i] = new LimbInfo();
+                limbs[i] = new LimbInfo(worldObj);
             }
             limbs[i].putData(data, i);
         }
@@ -237,37 +187,30 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         return false;
     }
     
-    int turning = 0;
+    int turningDirection = 0;
     
-    void moveToTarget(IDeltaChunk body) {
+    void moveToTarget() {
         if (atTarget()) {
-            for (LimbInfo limb : limbs) {
-                limb.ent.motionX = 0;
-                limb.ent.motionY = 0;
-                limb.ent.motionZ = 0;
-            }
+            body.motionX = body.motionZ = 0; // Not setting motionY so that I can easily implement jumping
             return;
         }
+        if (bodyLimbInfo.isTurning()) return;
         Vec3 target = path_target.createVector();
         target.yCoord = posY;
-        Vec3 me = Vec3.createVectorHelper(body.posX, body.posY, body.posZ);
+        Vec3 me = FzUtil.fromEntPos(body);
         Vec3 delta = me.subtract(target);
-        double speed = Math.min(1.0/20.0, delta.lengthVector());
-        delta = delta.normalize();
         double angle = Math.atan2(delta.xCoord, delta.zCoord) - Math.PI / 2;
-        //System.out.println(Math.toDegrees(angle));
         Quaternion target_rotation = Quaternion.getRotationQuaternionRadians(angle, ForgeDirection.UP);
         Quaternion current_rotation = body.getRotation();
         double rotation_distance = target_rotation.getAngleBetween(current_rotation);
-        turning = 0;
+        turningDirection = 0;
         if (rotation_distance > Math.PI / 1800) {
             int size = leg_size + 1;
             double rotation_speed = (Math.PI * 2) / (360 * size * size * 2);
-            double t = rotation_speed / rotation_distance;
-            t = Math.min(0.5, t);
-            target_rotation.incrLerp(current_rotation, 1 - t);
-            body.setRotation(target_rotation);
-            turning = angle > 0 ? 1 : -1;
+            double rotation_time = rotation_distance / rotation_speed;
+            bodyLimbInfo.setTargetRotation(target_rotation, (int) rotation_time);
+            // Now bodyLimbInfo.isTurning() is set.
+            turningDirection = angle > 0 ? 1 : -1;
         } else if (rotation_distance > Math.PI * 0.0001) {
             body.setRotation(target_rotation);
             body.setRotationalVelocity(new Quaternion());
@@ -275,107 +218,100 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             if (!body.getRotationalVelocity().isZero()) {
                 body.setRotationalVelocity(new Quaternion());
             }
-            for (LimbInfo limb : limbs) {
-                limb.ent.motionX = delta.xCoord * speed;
-                limb.ent.motionY = delta.yCoord * speed;
-                limb.ent.motionZ = delta.zCoord * speed;
-            }
-            walked += speed;
+            double walk_speed = Math.min(1.0/20.0 /* TODO: Inversly proportional to size? */, delta.lengthVector());
+            delta = delta.normalize();
+            body.motionX = delta.xCoord * walk_speed;
+            body.motionZ = delta.zCoord * walk_speed;
+            walked += walk_speed;
         }
     }
     
     
+    double max_leg_swing_degrees = 22.5;
+    double max_leg_swing_radians = Math.toRadians(max_leg_swing_degrees);
     double swingTicks = 0;
     double walked = 0;
+    private static final Quaternion arm_hang = new Quaternion(Math.toRadians(5), ForgeDirection.EAST);
     void tickLimbSwing() {
-        if (turning != 0) {
-            tickLimbTurn();
+        if (turningDirection != 0) {
+            tickLegTurn();
             return;
-        } else {
-            turnTicks = 0;
         }
-        double slow = 1;
-        double offsetTick = swingTicks * slow + Math.PI / 2;
-        double loop = offsetTick % (2 * Math.PI);
-        loop = Math.abs(loop - Math.PI) - Math.PI / 2;
-        double swing = loop * 3.0 / 16.0;
+        
+        final double legCircumference = 2 * Math.PI * leg_size;
+        final double swingTime = legCircumference * 360 / (2 * max_leg_swing_degrees * swingTicks);
+        
+        
         for (LimbInfo limb : limbs) {
-            if (limb.type == LimbType.LEG || limb.type == LimbType.ARM) {
-                limb.swing = swing;
+            if (limb.type != LimbType.LEG && limb.type != LimbType.ARM) continue;
+            if (limb.isTurning()) continue;
+            Quaternion currentRotation = limb.idc.getEntity().getRotation();
+            Quaternion nextRotation;
+            double nextRotationTime = swingTime;
+            int p = limb.limbSwingParity() ? 1 : -1;
+            if (currentRotation.isZero()) {
+                // We were standing straight; begin with half a swing
+                nextRotationTime /= 2;
+                p /= 2;
+            } else {
+                // Swing the other direction
+                if (currentRotation.dotProduct(down) > 0) {
+                    p *= -1;
+                }
+            }
+            if (walked == 0) {
+                p = 0;
+            }
+            nextRotation = new Quaternion(max_leg_swing_radians * p, ForgeDirection.NORTH);
+            if (limb.type == LimbType.ARM) {
                 if (limb.limbSwingParity()) {
-                    limb.swing *= -1;
-                }
-                if (limb.type == LimbType.ARM) {
-                    boolean should_swing_arms = true;
-                    if (should_swing_arms) {
-                        limb.swing *= 0.025;
-                        limb.extension = swing * 0.01;
-                        limb.flap = Math.abs(swing) / arm_length * (limb.limbSwingParity() ? 1 : -1);
-                    } else {
-                        limb.swing = 0;
-                        limb.extension = 0;
-                        limb.flap = 0;
-                    }
+                    nextRotation.incrMultiply(arm_hang);
+                } else {
+                    arm_hang.incrToOtherMultiply(nextRotation);
                 }
             }
+            limb.setTargetRotation(nextRotation, (int) nextRotationTime);
         }
-        if (walked == 0) {
-            double clip = 0.01;
-            double stop_moving_delta = (Math.abs(swing) - clip) * 0.25;
-            if (swing > clip) {
-                swingTicks += stop_moving_delta;
-            } else if (swing < -clip) {
-                swingTicks -= stop_moving_delta;
-            }
-        } else {
-            swingTicks += walked;
-            walked = 0;
-        }
+        swingTicks += walked;
     }
     
-    int turnTicks = 0;
-    void tickLimbTurn() {
+    void tickLegTurn() {
         if (path_target == null) {
-            turning = 0;
+            turningDirection = 0;
             return;
         }
-        // lift right leg while twisting left leg
-        // set right leg down
-        // lift left leg while twiting right leg
-        // set left leg down
-        
-        double lift_height = 1.5F/16F;
-        double base_twist = Math.PI * 2 * 0.005;
-        double phase_length = 18;
-        double freq = Math.sin(turnTicks * phase_length / Math.PI);
-        double deriv = Math.cos(turnTicks * phase_length / Math.PI);
-        for (LimbInfo limb : limbs) {
-            if (limb.type != LimbType.LEG) continue;
-            if (limb.limbSwingParity() ^ freq > 0) {
-                limb.extension = Math.abs(freq * lift_height);
-                limb.swing = freq * 0.01;
-                if (deriv < 0) {
-                    limb.twist = freq * base_twist;
-                }
-            } else {
-                limb.extension *= 0.90;
-                if (limb.extension < 0.01) {
-                    limb.extension = 0;
-                }
-                if (deriv > 0) {
-                    limb.twist = freq * base_twist;
-                }
-            }
-            limb.act_violently = true;
+        if (turningDirection == 0) {
+            // There's a path_target, but we aren't turning. So we must be moving forward.
+            return;
         }
         
-        
-        turnTicks++;
+        // TODO: Leg lifting.
+        // double lift_height = 1.5F/16F;
+        double base_twist = Math.PI * 2 * 0.005;
+        double phase_length = 18;
+        for (LimbInfo limb : limbs) {
+            if (limb.type != LimbType.LEG) continue;
+            if (limb.isTurning()) continue;
+            IDeltaChunk idc = limb.idc.getEntity();
+            Quaternion currentRotation = limb.idc.getEntity().getRotation();
+            double nextRotation = base_twist;
+            double nextRotationTime = phase_length;
+            if (idc.getRotation().isZero()) {
+                nextRotation /= 2;
+                nextRotationTime /= 2;
+            } else {
+                if (currentRotation.dotProduct(down) > 0) {
+                    nextRotation *= -1;
+                }
+            }
+            Quaternion nr = new Quaternion(nextRotation, ForgeDirection.DOWN);
+            limb.setTargetRotation(nr, (int) nextRotationTime);
+        }
     }
 
     @Override
     public float getMaxHealth() {
-        return cracked_body_blocks; // + leg_size * leg_size;
+        return cracked_body_blocks * (8 + leg_size);
     }
     
     public int getCracks() {
@@ -422,23 +358,19 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         double close_enough = 1.0 / 64.0;
         if (Math.abs(posY - target_y) <= close_enough) {
             target_y = posY;
-            for (LimbInfo limb : limbs) {
-                if (limb.type != LimbType.BODY) continue;
-                limb.ent.motionY = 0;
-            }
+            body.motionY = 0;
             return;
         }
         double maxV = 1.0/5.0;
         int sign = posY > target_y ? -1 : +1;
         double delta = Math.abs(posY - target_y);
-        double motion = sign * Math.min(maxV, delta);
-        for (LimbInfo limb : limbs) {
-            if (limb.type != LimbType.BODY) continue;
-            limb.ent.motionY = motion;
-        }
+        body.motionY = sign * Math.min(maxV, delta);
     }
     
+    private static final Quaternion down = new Quaternion(0, ForgeDirection.DOWN);
+    private static final double max_leg_angle = Math.toRadians(25);
     class HeightCalculator implements ICoordFunction {
+        
         int lowest = Integer.MAX_VALUE;
         ArrayList<Coord> found = new ArrayList();
         IDeltaChunk idc;
@@ -447,8 +379,8 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             found.clear();
             for (LimbInfo li : limbs) { // NORELEASE: only if the angle isn't super-steap
                 if (li.type != LimbType.LEG) continue;
-                idc = li.ent;
-                if (Math.abs(li.swing) > Math.toRadians(25)) continue;
+                idc = li.idc.getEntity();
+                if (down.getAngleBetween(idc.getRotation()) > max_leg_angle) continue;
                 Coord min = idc.getCorner().copy();
                 Coord max = idc.getFarCorner().copy();
                 Coord.sort(min, max);
