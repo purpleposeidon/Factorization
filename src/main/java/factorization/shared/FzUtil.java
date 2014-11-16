@@ -1981,4 +1981,9 @@ public class FzUtil {
         te.markDirty();
         return true;
     }
+    
+    public static void spawn(Entity ent) {
+        if (ent == null) return;
+        ent.worldObj.spawnEntityInWorld(ent);
+    }
 }
