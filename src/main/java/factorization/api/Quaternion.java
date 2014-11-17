@@ -48,14 +48,6 @@ public class Quaternion implements IDataSerializable {
         assert init.length == 4;
     }
     
-    public Quaternion(double w, Vec3 v) {
-        this(w, v.xCoord, v.yCoord, v.zCoord);
-    }
-    
-    public Quaternion(double w, ForgeDirection dir) {
-        this(w, dir.offsetX, dir.offsetY, dir.offsetZ);
-    }
-    
     public void loadFrom(VectorUV v) {
         this.w = 1;
         this.x = v.x;
@@ -74,7 +66,7 @@ public class Quaternion implements IDataSerializable {
     
     @Override
     public String toString() {
-        return "Quaternion(w=" + w + ", " + x + ", " + y + ", " + z + ")";
+        return "Quaternion(w=" + w + ", " + x + ", " + y + ", " + z + ")" + " MAG=" + this.magnitude();
     }
     
     public void writeToTag(NBTTagCompound tag, String prefix) {
@@ -188,6 +180,10 @@ public class Quaternion implements IDataSerializable {
     
     public Vec3 toVector() {
         return Vec3.createVectorHelper(x, y, z);
+    }
+    
+    public double getAngleRadians() {
+        return 2 * Math.acos(w);
     }
     
     //Math functions
