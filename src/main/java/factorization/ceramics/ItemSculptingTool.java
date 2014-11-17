@@ -50,7 +50,7 @@ public class ItemSculptingTool extends ItemFactorization {
             if (j == length) {
                 j = 0;
             }
-            Core.registry.shapelessRecipe(fromMode(mode[j]), fromMode(mode[i]));
+            Core.registry.shapelessOreRecipe(fromMode(mode[j]), fromMode(mode[i]));
         }
     }
     

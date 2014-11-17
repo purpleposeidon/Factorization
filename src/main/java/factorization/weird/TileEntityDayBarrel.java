@@ -1088,7 +1088,7 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
     
     public static void makeRecipe(ItemStack log, ItemStack slab) {
         ItemStack normal = make(Type.NORMAL, log, slab);
-        Core.registry.recipe(normal,
+        Core.registry.vanillaRecipe(normal,
                 "W-W",
                 "W W",
                 "WWW",
@@ -1096,19 +1096,19 @@ public class TileEntityDayBarrel extends TileEntityFactorization {
                 '-', slab);
         
         //Note: Don't add creative. That'd be bad.
-        Core.registry.recipe(make(Type.SILKY, log, slab),
+        Core.registry.oreRecipe(make(Type.SILKY, log, slab),
                 "XXX",
                 "XOX",
                 "XXX",
                 'X', Blocks.web,
                 'O', normal);
-        Core.registry.recipe(make(Type.HOPPING, log, slab),
+        Core.registry.oreRecipe(make(Type.HOPPING, log, slab),
                 "Y",
                 "0",
                 "Y",
                 'Y', Blocks.hopper,
                 '0', normal);
-        Core.registry.recipe(make(Type.STICKY, log, slab),
+        Core.registry.oreRecipe(make(Type.STICKY, log, slab),
                 "*",
                 "0",
                 '*', Items.slime_ball,

@@ -41,7 +41,7 @@ public class InstructionGroup extends Instruction {
     @Override
     protected void addRecipes() {
         super.addRecipes();
-        Core.registry.shapelessRecipe(toItem(), toItem()); 
+        Core.registry.vanillaShapelessRecipe(toItem(), toItem()); 
     }
 
     @Override

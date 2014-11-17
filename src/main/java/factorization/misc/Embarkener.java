@@ -40,10 +40,10 @@ public class Embarkener {
                     ItemStack log = new ItemStack(block, 1, md);
                     ItemStack barked = new ItemStack(block, 4, md | 0xC);
                     barked.setStackDisplayName("Bark"); // FIXME: Localization fail :/
-                    Core.registry.shapelessRecipe(barked, log, log, log, log);
+                    Core.registry.vanillaShapelessRecipe(barked, log, log, log, log);
                     ItemStack barked1 = barked.copy();
                     barked1.stackSize = 1;
-                    Core.registry.shapelessRecipe(log, barked1);
+                    Core.registry.vanillaShapelessRecipe(log, barked1);
                 }
             }
         }
