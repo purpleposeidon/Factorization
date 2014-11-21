@@ -406,3 +406,17 @@ doing I/O to the factory:
 
 Spisfire - dazzle 'live'
 
+NEW ORE PROCESSING
+==================
+
+Each ore should have a custom processing method!
+We return to the ore-doubling.
+    gold ore: pan for gold by running it over sand. Has a chance to turn the sand into nuggety sand, and the gold turns into <some other gold-ore-ish block>. (Invisible field of lines pass in the direction opposite of the moving block's motion, ensuring that a line of moving gold ore will likely be processed.)
+    lapis lazuli ore: buff it with white or light blue wool using a piston. The wools will become blueer (10% chance, say). Converts into a lapis block?
+    Diamond ore: Blow up with TNT! Drops diamond shards. 3x3 of diamond shards becomes a shardy block, 3 (or something) diamond shards become a diamond
+    Redstone ore: Place between water & lava. Cracks into a 1-3 blocks. Redstone slabs? :D Gives better loot if it's ice & lava, since presumably the ice is going to be melting constantly.
+    Iron ore: Lacerate, the wash with water!
+    Dark Iron ore: Crystallize!
+    Nether quartz: Lacerate. Gives ridiculous amounts of quartz.
+All the processes should give a unique decorative block.
+    Emerald ore: Hrrm. Attack with enormous scissors to chip pieces of emerald out? Recieve chipped emerald ore?
