@@ -191,6 +191,7 @@ public abstract class IDeltaChunk extends EntityFz {
         if (getParent() != null) {
             ret += ":PARENT=" + getParent().getEntityId();
         }
+        ret += " " + ((int) posX) + " " + ((int) posY) + " " + ((int) posZ);
         return ret;
     }
     
