@@ -1,15 +1,13 @@
 package factorization.colossi;
 
-import java.util.Random;
-
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntityCommandBlock;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.ChunkCoordinates;
-import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
+import factorization.shared.Core;
 
 public class BuildColossusCommand extends CommandBase {
     @Override
@@ -19,7 +17,7 @@ public class BuildColossusCommand extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender player) {
-        return "/build-colossus [spam] seed";
+        return "/build-colossus ([spam] seed)|reload-masks";
     }
     
     @Override
@@ -34,7 +32,7 @@ public class BuildColossusCommand extends CommandBase {
 
     @Override
     public void processCommand(ICommandSender player, String[] args) {
-        if (args[0].equalsIgnoreCase("reload")) {
+        if (args[0].equalsIgnoreCase("reload-masks")) {
             MaskLoader.reloadMasks();
             return;
         }
@@ -43,8 +41,15 @@ public class BuildColossusCommand extends CommandBase {
         if (player.getCommandSenderName().startsWith("@")) {
             at = at.add(0, 6, 0);		    
         }
-        if (args[0].equalsIgnoreCase("spam")) {
-            int randSeed = Integer.parseInt(args[1]);
+        if (args[0].equalsIgnoreCase("spam") || args[0].equals("$")) {
+            int randSeed;
+            if (args[0].equals("$")) {
+                MaskLoader.reloadMasks();
+                randSeed = player.getEntityWorld().rand.nextInt();
+                Core.logInfo("seed: " + randSeed);
+            } else {
+                randSeed = Integer.parseInt(args[1]);
+            }
             for (int i = 0; i < 10; i++) {
                 ColossalBuilder cb = doGen(at, randSeed + i);
                 at = at.add(0, 0, cb.get_width() + 4);
