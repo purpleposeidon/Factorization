@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.UUID;
 
 import net.minecraft.block.Block;
 import net.minecraft.command.IEntitySelector;
@@ -557,6 +556,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 rotation.incrMultiply(dse.rotationalVelocity);
                 dse = dse.parent.getEntity();
             }
+            rotation.incrNormalize(); // Rounding errors will denormalize the quaternion
         }
         last_shared_rotation.incrMultiply(last_shared_rotational_velocity);
 
@@ -662,10 +662,15 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         }
     }
     
+    static final int force_sync_time = 20 * 4;
+    
     void shareRotationInfo() {
         boolean d0 = !rotation.equals(last_shared_rotation), d1 = !rotationalVelocity.equals(last_shared_rotational_velocity);
+        if (parent.trackingEntity()) {
+            d0 = false;
+        }
         FMLProxyPacket toSend = null;
-        if ((d0 && d1) || (ticksExisted % 60 == 0)) {
+        if ((d0 && d1) || (ticksExisted % force_sync_time == 0)) {
             toSend = HammerNet.makePacket(HammerNet.HammerNetType.rotationBoth, getEntityId(), rotation, rotationalVelocity);
             last_shared_rotation.update(rotation);
             last_shared_rotational_velocity.update(rotationalVelocity);
@@ -687,6 +692,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         last_shared_posZ += last_shared_motionZ;
         boolean share_displacement = (last_shared_posX != posX) || (last_shared_posY != posY) || (last_shared_posZ != posZ);
         boolean share_velocity = (last_shared_motionX != motionX) || (last_shared_motionY != motionY) || (last_shared_motionZ != motionZ);
+        share_displacement |= ticksExisted % force_sync_time == 0;
         if (!(share_displacement || share_velocity)) {
             return;
         }
