@@ -11,6 +11,7 @@ import factorization.colossi.ColossusController.BodySide;
 import factorization.colossi.ColossusController.LimbType;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.shared.EntityReference;
+import factorization.shared.NORELEASE;
 
 class LimbInfo {
     static UUID fake_uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
@@ -55,16 +56,32 @@ class LimbInfo {
     }
     
     public void setTargetRotation(Quaternion rot, int time) {
+        // NORELEASE: Seems to flip the fuck out if moving faster than something around 180°/46 ticks, 90°/26 ticks ? wtf?
+        NORELEASE.fixme("Cleanup? De-garbage?");
         IDeltaChunk dse = idc.getEntity();
         if (dse == null) return;
         startRotation = new Quaternion(dse.getRotation());
         endRotation = new Quaternion(rot);
+        startRotation.incrNormalize();
+        endRotation.incrNormalize();
         startTime = dse.worldObj.getTotalWorldTime();
         endTime = startTime + time;
         
         // TODO: smooth acceleration
-        double t = 1.0 / time;
-        Quaternion velocity = startRotation.slerp(endRotation, t);
+        double t = 2.0 / (3 * time); // 1.0 / time * 2/3
+        // Something involving quaternion calculus, I think?
+        // There's a factor of 2 in the displacement's derivative,
+        // so it travels half again as far as it ought to in the alloted time.
+        // So it needs to go 2/3rds as fast.
+        Quaternion deltaRotation = startRotation.slerp(endRotation, t);
+        deltaRotation.incrNormalize();
+        
+        
+        Quaternion startConj = new Quaternion(startRotation);
+        startConj.incrConjugate();
+        startConj.incrToOtherMultiply(deltaRotation);
+        Quaternion velocity = new Quaternion(deltaRotation);
+        velocity.incrNormalize();
         dse.setRotationalVelocity(velocity);
     }
     
@@ -72,13 +89,14 @@ class LimbInfo {
         IDeltaChunk dse = idc.getEntity();
         if (dse == null) return;
         if (startRotation.equals(endRotation)) {
+            endTime = NO_TIME;
             return;
         }
         long now = dse.worldObj.getTotalWorldTime();
-        if (now >= endTime) {
+        if (now > endTime) {
             // FIXME: We could be off by a tick, depending on when setTargetRotation gets called?
             dse.setRotationalVelocity(new Quaternion());
-            dse.setRotation(endRotation);
+            //dse.setRotation(endRotation);
             startRotation = endRotation;
             startTime = endTime = NO_TIME;
         }

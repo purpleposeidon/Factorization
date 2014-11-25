@@ -188,8 +188,7 @@ public enum AIState {
         public void onEnterState(ColossusController controller, AIState state) {
             for (LimbInfo li : controller.limbs){
                 if (li.type == LimbType.ARM){
-                    li.ent.permit(DeltaCapability.VIOLENT_COLLISIONS);
-                    li.setControlled(false);
+                    li.idc.getEntity().permit(DeltaCapability.VIOLENT_COLLISIONS);
                 }
             }
             controller.path_target = null;
@@ -200,9 +199,8 @@ public enum AIState {
         public void onExitState(ColossusController controller, AIState nextState) {
             for (LimbInfo li : controller.limbs){
                 if (li.type == LimbType.ARM){
-                    li.ent.forbid(DeltaCapability.VIOLENT_COLLISIONS);
-                    li.ent.setRotationalVelocity(new Quaternion());
-                    li.setControlled(true);
+                    li.idc.getEntity().forbid(DeltaCapability.VIOLENT_COLLISIONS);
+                    li.idc.getEntity().setRotation(new Quaternion());
                 }
             }
         }

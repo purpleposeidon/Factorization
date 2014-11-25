@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.IBossDisplayData;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.Vec3;
@@ -17,6 +18,8 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.fzds.api.DeltaCapability;
 import factorization.fzds.api.IDeltaChunk;
+import factorization.notify.Notice;
+import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.shared.EntityFz;
 import factorization.shared.FzUtil;
@@ -124,10 +127,18 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             setDead();
             return;
         }
-        moveToTarget();
-        updateBlockClimb();
-        tickLimbSwing();
-        controller.tick();
+        if (NORELEASE.on) {
+            if (!bodyLimbInfo.isTurning()) {
+                //double r = worldObj.getTotalWorldTime() % 2 == 0 ? -Math.PI/2 : +Math.PI/2;
+                double r = 2 * Math.PI * Math.random();
+                Quaternion q = Quaternion.getRotationQuaternionRadians(r, ForgeDirection.UP);
+                bodyLimbInfo.setTargetRotation(q, 200);
+            }
+        }
+        //moveToTarget();
+        //updateBlockClimb();
+        //tickLimbSwing();
+        //controller.tick();
         for (LimbInfo limb : limbs) {
             limb.tick();
         }
@@ -218,7 +229,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             if (!body.getRotationalVelocity().isZero()) {
                 body.setRotationalVelocity(new Quaternion());
             }
-            double walk_speed = Math.min(1.0/20.0 /* TODO: Inversly proportional to size? */, delta.lengthVector());
+            double walk_speed = Math.min(1.0/20.0 /* TODO: Inversely proportional to size? */, delta.lengthVector());
             delta = delta.normalize();
             body.motionX = delta.xCoord * walk_speed;
             body.motionZ = delta.zCoord * walk_speed;
@@ -231,7 +242,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
     double max_leg_swing_radians = Math.toRadians(max_leg_swing_degrees);
     double swingTicks = 0;
     double walked = 0;
-    private static final Quaternion arm_hang = new Quaternion(Math.toRadians(5), ForgeDirection.EAST);
+    private static final Quaternion arm_hang = Quaternion.getRotationQuaternionRadians(Math.toRadians(5), ForgeDirection.EAST);
     void tickLimbSwing() {
         if (turningDirection != 0) {
             tickLegTurn();
@@ -262,7 +273,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             if (walked == 0) {
                 p = 0;
             }
-            nextRotation = new Quaternion(max_leg_swing_radians * p, ForgeDirection.NORTH);
+            nextRotation  = Quaternion.getRotationQuaternionRadians(max_leg_swing_radians * p, ForgeDirection.NORTH);
             if (limb.type == LimbType.ARM) {
                 if (limb.limbSwingParity()) {
                     nextRotation.incrMultiply(arm_hang);
@@ -304,7 +315,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
                     nextRotation *= -1;
                 }
             }
-            Quaternion nr = new Quaternion(nextRotation, ForgeDirection.DOWN);
+            Quaternion nr = Quaternion.getRotationQuaternionRadians(nextRotation, ForgeDirection.DOWN);
             limb.setTargetRotation(nr, (int) nextRotationTime);
         }
     }
@@ -367,7 +378,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         body.motionY = sign * Math.min(maxV, delta);
     }
     
-    private static final Quaternion down = new Quaternion(0, ForgeDirection.DOWN);
+    private static final Quaternion down = Quaternion.getRotationQuaternionRadians(0, ForgeDirection.DOWN);
     private static final double max_leg_angle = Math.toRadians(25);
     class HeightCalculator implements ICoordFunction {
         
@@ -377,7 +388,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         boolean any;
         int calc() {
             found.clear();
-            for (LimbInfo li : limbs) { // NORELEASE: only if the angle isn't super-steap
+            for (LimbInfo li : limbs) {
                 if (li.type != LimbType.LEG) continue;
                 idc = li.idc.getEntity();
                 if (down.getAngleBetween(idc.getRotation()) > max_leg_angle) continue;
