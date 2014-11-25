@@ -526,4 +526,15 @@ public class Quaternion implements IDataSerializable {
         r.incrReciprocal();
         return r;
     }
+    
+    public Quaternion power(double alpha) {
+        // http://en.wikipedia.org/wiki/Quaternion#Exponential.2C_logarithm.2C_and_power
+        double norm = this.magnitude();
+        double theta = Math.acos(w / norm);
+        double qa = Math.pow(norm, alpha);
+        double alphaTheta = alpha * theta;
+        double W = qa * Math.cos(alpha * theta);
+        double sat = Math.sin(alphaTheta);
+        return new Quaternion(W, x * sat, y * sat, z * sat);
+    }
 }
