@@ -15,3 +15,17 @@ last_fz
 src/main/java/codechicken/
 build.log
 bin/
+factorization.iml
+factorization.ipr
+factorization.irs
+factorization.iws
+out/
+protips/
+other/
+DeSrg/
+at.cfg
+
+#Symlinked directories
+lang
+fzsrc
+textures
