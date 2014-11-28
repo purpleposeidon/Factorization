@@ -1230,6 +1230,8 @@ public class FzUtil {
     }
     
     public static void scale(Vec3 base, double s) {
+        NORELEASE.fixme("refactor to incrScale");
+        NORELEASE.fixme("(and making a separate Vec/Box util would be nice also...)");
         base.xCoord *= s;
         base.yCoord *= s;
         base.zCoord *= s;

@@ -38,6 +38,7 @@ import factorization.api.Quaternion;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
+import factorization.shared.NORELEASE;
 
 public class HammerClientProxy extends HammerProxy {
     public HammerClientProxy() {
@@ -209,6 +210,7 @@ public class HammerClientProxy extends HammerProxy {
                     mc.theWorld /* why is this real world? */,
                     mc.getSession(), real_player.sendQueue /* not sure about this one. */,
                     real_player.getStatFileWriter());
+            fake_player.movementInput = real_player.movementInput;
         }
         setWorldAndPlayer((WorldClient) w, fake_player);
     }
@@ -274,6 +276,7 @@ public class HammerClientProxy extends HammerProxy {
         //_rayTarget = null;
         //_selectionBlockBounds = null;
         //_hitSlice = null;
+        NORELEASE.fixme("Can do the wrong thing when there's overlapping DSEs");
     }
     
     public void offerHit(MovingObjectPosition mop, DseRayTarget rayTarget, AxisAlignedBB moppedBounds) {
@@ -315,12 +318,9 @@ public class HammerClientProxy extends HammerProxy {
         float partialTicks = event.partialTicks;
         DimensionSliceEntity dse = _hitSlice;
         Coord corner = dse.getCorner();
-        Quaternion rotation = dse.getRotation();
-        if (!rotation.isZero() || !dse.prevTickRotation.isZero()) {
-            rotation = dse.prevTickRotation.slerp(rotation, partialTicks);
-        }
+        Quaternion rotation = dse.prevTickRotation;
+        // I tried it with interpolation between the current rotation, but it works fine this way. Very strange.
         try {
-            // NORELEASE: Has partial tick/lag problems
             GL11.glPushMatrix();
             setShadowWorld();
             GL11.glDisable(GL11.GL_ALPHA_TEST);

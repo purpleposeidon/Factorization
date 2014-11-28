@@ -44,7 +44,13 @@ public abstract class IDeltaChunk extends EntityFz {
      */
     public abstract Quaternion getRotation();
     /***
+     * @return the rotational offset. This is relative to getCorner().
+     */
+    public abstract Vec3 getRotationalCenterOffset();
+    /***
      * @return the {@link Quaternion} representing the rotational velocity (omega).
+     * 
+     * This does not take into account setTargetRotation
      */
     public abstract Quaternion getRotationalVelocity();
     /***
@@ -58,10 +64,20 @@ public abstract class IDeltaChunk extends EntityFz {
      */
     public abstract void setRotationalVelocity(Quaternion w);
     
-    /***
-     * @return the rotational offset. This is relative to getCorner().
+    /**
+     * Orders the IDC to move to a target rotation. This will set the rotational velocity to 0.
+     * If setTargetRotation is called before a previous order has completed, the old order will be interrupted.
+     * 
+     * @param target The target rotation
+     * @param tickTime How many ticks to reach that rotation
+     * @param interp How to interpolate between them.
      */
-    public abstract Vec3 getRotationalCenterOffset();
+    public abstract void orderTargetRotation(Quaternion target, int tickTime, Interpolation interp);
+    
+    public abstract boolean hasOrderedRotation();
+    
+    public abstract void cancelOrderedRotation();
+    
     
     
     /***

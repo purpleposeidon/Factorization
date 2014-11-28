@@ -763,16 +763,14 @@ public class FZDSCommand extends CommandBase {
                     sendChat(msg);
                     return;
                 }
-                int derivative = -1;
+                Quaternion newVal = Quaternion.getRotationQuaternionRadians(theta, dir);
                 if (arg0.equalsIgnoreCase("sr")) {
-                    derivative = 0;
+                    selected.setRotation(newVal);
                 } else if (arg0.equalsIgnoreCase("sw")) {
-                    derivative = 1;
+                    selected.setRotationalVelocity(newVal);
                 } else {
                     throw new SyntaxErrorException();
                 }
-                Quaternion toMod = derivative == 0 ? selected.getRotation() : selected.getRotationalVelocity();
-                toMod.update(Quaternion.getRotationQuaternionRadians(theta, dir));
             }}, Requires.SLICE_SELECTED);
         add(new SubCommand("d|s|v|r|w", "+|=", "[W=1]", "X", "Y", "Z") {
             @Override

@@ -254,11 +254,12 @@ public class ColossalBlock extends Block {
                     return true;
                 }
                 heart.showInfo(player);
+            } else if (at.getMd() == MD_EYE && player.isSneaking()) {
+                Awakener.awaken(at);
+                return true;
             }
             return false;
         }
-        
-        if (world.isRemote) return false;
         maybeAwaken(at, 10);
         return false;
     }

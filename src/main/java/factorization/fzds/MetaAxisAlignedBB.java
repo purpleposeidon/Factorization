@@ -1,5 +1,6 @@
 package factorization.fzds;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.entity.Entity;
@@ -7,10 +8,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
-import factorization.aabbdebug.AabbDebugger;
 import factorization.fzds.api.IFzdsShenanigans;
+import factorization.shared.Core;
 import factorization.shared.FzUtil;
 import factorization.shared.NORELEASE;
 
@@ -61,9 +60,14 @@ public class MetaAxisAlignedBB extends AxisAlignedBB implements IFzdsShenanigans
     }
     
     AabbHolder aabbHolder = new AabbHolder();
+    private static final List<AxisAlignedBB> EMPTY = new ArrayList();
     
     List<AxisAlignedBB> getShadowBoxesWithinShadowBox(AxisAlignedBB aabb) {
         aabbHolder.held = aabb; //.expand(padding, padding, padding);
+        if (aabb.getAverageEdgeLength() > 1024) {
+            Core.logSevere("Giant MetaAABB!? {}", this);
+            return EMPTY;
+        }
         return shadowWorld.getCollidingBoundingBoxes(aabbHolder, aabb);
     }
     

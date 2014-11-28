@@ -310,6 +310,35 @@ public class Quaternion implements IDataSerializable {
         this.incrNormalize();
     }
     
+    public Quaternion lerp(Quaternion other, double t) {
+        Quaternion ret = new Quaternion(this);
+        ret.incrLerp(other, t);
+        return ret;
+    }
+    
+    public Quaternion slerpBlender(Quaternion other, double t) {
+        // from blender/blenlib/intern/math_rotation.c interp_qt_qtqt
+        double cosom = this.dotProduct(other);
+        // We don't do the dot product thing, because maybe we'd like long-ways rotation some times
+        double omega, sinom, sc1, sc2;
+
+        if ((1.0f - cosom) > 0.0001f) {
+            omega = Math.acos(cosom);
+            sinom = Math.sin(omega);
+            sc1 = Math.sin((1 - t) * omega) / sinom;
+            sc2 = Math.sin(t * omega) / sinom;
+        } else {
+            sc1 = 1.0f - t;
+            sc2 = t;
+        }
+        
+        return new Quaternion(
+                sc1 * this.w + sc2 * other.w,
+                sc1 * this.x + sc2 * other.x,
+                sc1 * this.y + sc2 * other.y,
+                sc1 * this.z + sc2 * other.z);
+        }
+    
     private static final double DOT_THRESHOLD = 0.9995;
     public Quaternion slerp(Quaternion other, double t) {
         // From http://number-none.com/product/Understanding%20Slerp,%20Then%20Not%20Using%20It/index.html (encoding = Western; ISO-8859-1)

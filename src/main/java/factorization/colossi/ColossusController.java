@@ -129,19 +129,19 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         }
         if (NORELEASE.on) {
             if (!bodyLimbInfo.isTurning()) {
-                //double r = worldObj.getTotalWorldTime() % 2 == 0 ? -Math.PI/2 : +Math.PI/2;
-                double r = 2 * Math.PI * Math.random();
-                Quaternion q = Quaternion.getRotationQuaternionRadians(r, ForgeDirection.UP);
-                bodyLimbInfo.setTargetRotation(q, 200);
+                body.setRotationalVelocity(new Quaternion());
+                double r = worldObj.getTotalWorldTime() % 2 == 0 ? 0 : +Math.PI/2;
+                Quaternion q = Quaternion.getRotationQuaternionRadians(r, ForgeDirection.EAST);
+                double dist = q.getAngleBetween(body.getRotation());
+                if (dist > 0.01) { // next tick will be farther
+                    bodyLimbInfo.setTargetRotation(q, 20 * 10);
+                }
             }
         }
         //moveToTarget();
         //updateBlockClimb();
         //tickLimbSwing();
         //controller.tick();
-        for (LimbInfo limb : limbs) {
-            limb.tick();
-        }
         setPosition(body.posX, body.posY, body.posZ);
     }
     

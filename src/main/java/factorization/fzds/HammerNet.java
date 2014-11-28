@@ -6,6 +6,7 @@ import io.netty.buffer.Unpooled;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -15,6 +16,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ItemInWorldManager;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -36,8 +39,10 @@ import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsShenanigans;
+import factorization.fzds.api.Interpolation;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
+import factorization.shared.NORELEASE;
 
 
 public class HammerNet {
@@ -52,7 +57,7 @@ public class HammerNet {
     
     public static class HammerNetType {
         // Next time, make it an enum.
-        public static final byte rotation = 0, rotationVelocity = 1, rotationBoth = 2, rotationCenterOffset = 10, exactPositionAndMotion = 11,
+        public static final byte rotation = 0, rotationVelocity = 1, rotationBoth = 2, rotationCenterOffset = 10, exactPositionAndMotion = 11, orderedRotation = 12,
                 rightClickEntity = 3, leftClickEntity = 4, rightClickBlock = 5, leftClickBlock = 6, digStart = 7, digProgress = 8, digFinish = 9;
     }
     
@@ -78,8 +83,13 @@ public class HammerNet {
         if (ent instanceof DimensionSliceEntity) {
             dse = (DimensionSliceEntity) ent;
         } else {
+            Core.logWarning("Packet %s to non-DSE (ID=%s) %s", type, dse_id, ent);
             return;
         }
+        /*if (NORELEASE.on) {
+            Minecraft mc = Minecraft.getMinecraft();
+            NORELEASE.println("packet " + type + " @ " + mc.theWorld.getTotalWorldTime());
+        }*/
         switch (type) {
         case HammerNetType.rotation:
             setRotation(dis, dse);
@@ -99,6 +109,15 @@ public class HammerNet {
             dse.motionX = dis.readDouble();
             dse.motionY = dis.readDouble();
             dse.motionZ = dis.readDouble();
+            break;
+        case HammerNetType.orderedRotation:
+            Quaternion rotationStart = Quaternion.read(dis);
+            Quaternion rotationEnd = Quaternion.read(dis);
+            int orderTime = dis.readInt();
+            byte interpIndex = dis.readByte();
+            Interpolation interp = Interpolation.values()[interpIndex];
+            dse.setRotation(rotationStart);
+            dse.orderTargetRotation(rotationEnd, orderTime, interp);
             break;
         }
         

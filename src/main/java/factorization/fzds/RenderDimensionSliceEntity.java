@@ -49,6 +49,7 @@ import factorization.fzds.api.DeltaCapability;
 import factorization.fzds.api.IFzdsShenanigans;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
+import factorization.shared.NORELEASE;
 
 
 public class RenderDimensionSliceEntity extends Render implements IFzdsShenanigans {
@@ -402,11 +403,13 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
     @Override
     public void doRender(Entity ent, double x, double y, double z, float yaw, float partialTicks) {
         //need to do: Don't render if we're far away! (This should maybe be done in some other function?)
+        partialTicks = NORELEASE.zero;
         if (ent.isDead) {
             return;
         }
         if (ent.ticksExisted < 5) {
-            //TODO: Sometimes it fails to draw (Probably because the chunk data isn't loaded as it draws, it draws, does not dirty properly)
+            // TODO: Sometimes it fails to draw (Probably because the chunk data isn't loaded as it draws, it draws, does not dirty properly)
+            NORELEASE.fixme("Can we reduce/remove this?");
             return;
         }
         if (nest > 3) {
@@ -448,7 +451,7 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
                 GL11.glTranslated(x, y, z);
                 Quaternion rotation = dse.getRotation();
                 if (!rotation.isZero() || !dse.prevTickRotation.isZero()) {
-                    dse.prevTickRotation.slerp(rotation, partialTicks).glRotate();
+                    dse.prevTickRotation.slerpBlender(rotation, partialTicks).glRotate();
                 }
                 Vec3 centerOffset = dse.getRotationalCenterOffset();
                 GL11.glTranslated(
