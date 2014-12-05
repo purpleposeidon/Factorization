@@ -50,6 +50,10 @@ public class ASMTransformer implements IClassTransformer {
                     new AbstractAsmMethodTransform.Append(name, transformedName, "func_76588_a", "getEntitiesWithinAABBForEntity")
             );
         }
+        if (transformedName.equals("net.minecraft.entity.Entity")) {
+            return applyTransform(basicClass,
+                    new AbstractAsmClassTransform.Mixin("factorization.coremodhooks.MixinEntityKinematicsTracker", "Lfactorization/coremodhooks/MixinEntityKinematicsTracker;"));
+        }
         return basicClass;
     }
     

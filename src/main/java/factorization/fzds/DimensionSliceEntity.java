@@ -35,6 +35,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.common.FzConfig;
 import factorization.coremodhooks.IExtraChunkData;
+import factorization.coremodhooks.IKinematicTracker;
 import factorization.fzds.api.DeltaCapability;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.fzds.api.IFzdsCustomTeleport;
@@ -524,80 +525,61 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         return !rotationalVelocity.isZero() || hasOrderedRotation();
     }
     
-    void updateMotion(boolean parentLinearMotion, boolean parentRotationalMotion) {
+    void updateMotion(Vec3 parentTickDisp, Quaternion parentTickRotation) {
         NORELEASE.fixme("refactor any fzds.api packages into fzds.interfaces");
         if (realArea == null || metaAABB == null) {
             return;
         }
-        final boolean linearMotion = parentLinearMotion || hasLinearMotion() /* || parentRotationalMotion */;
-        Vec3 mot = null;
-        
-        boolean mot_is_zero = true;
-        if (linearMotion) {
-            prevPosX = posX;
-            prevPosY = posY;
-            prevPosZ = posZ;
-            
-            mot = accumulateMotions(this, Vec3.createVectorHelper(0, 0, 0));
-            if (mot == null) {
-                // The parent chain isn't loaded
-                return;
-            }
-            if (parent.trackingEntity()) {
-                IDeltaChunk par = parent.getEntity();
-                Vec3 parentCorner = par.getCorner().createVector();
-                FzUtil.incrAdd(parentCorner, getParentJoint());
-                Vec3 correctPosition = par.shadow2real(parentCorner);
-                mot.xCoord += correctPosition.xCoord - posX;
-                mot.yCoord += correctPosition.yCoord - posY;
-                mot.zCoord += correctPosition.zCoord - posZ;
-            }
-            mot_is_zero = mot.xCoord != 0 || mot.yCoord != 0 || mot.zCoord != 0;
-            if (realDragArea == null || updateHashMotion() || !rotationalVelocity.isZero() || !mot_is_zero) {
-                realDragArea = realArea.addCoord(mot.xCoord, mot.yCoord, mot.zCoord);
-            }
-        }
-
-        boolean moved = false;
-        if (linearMotion && mot != null) {
-            posX += mot.xCoord;
-            posY += mot.yCoord;
-            posZ += mot.zCoord;
-            moved |= mot_is_zero;
-        }
-        
         if (hasOrderedRotation() && orderTimeEnd <= worldObj.getTotalWorldTime()) {
             setRotation(new Quaternion(rotationEnd));
             cancelOrderedRotation();
         }
+        boolean parentRotation = !parentTickRotation.isZero();
+        final boolean linearMotion = !FzUtil.isZero(parentTickDisp) || hasLinearMotion() || parentRotation;
+        final boolean rotationalMotion = parentRotation || hasRotationalMotion();
         
-        final boolean rotationalMotion = parentRotationalMotion || hasRotationalMotion();
+        Vec3 mot = null;
         Quaternion rot = null;
+        boolean moved = false;
         
-        if (rotationalMotion) {
-            DimensionSliceEntity dse = this;
-            rot = new Quaternion();
-            long now = worldObj.getTotalWorldTime();
-            while (dse != null) {
-                Quaternion dseW;
-                if (dse.hasOrderedRotation()) {
-                    Quaternion w0 = getOrderedRotation(now);
-                    Quaternion w1 = getOrderedRotation(now + 1);
-                    dseW = w1.multiply(w0);
-                } else {
-                    dseW = dse.rotationalVelocity;
-                }
-                rot.incrMultiply(dseW);
-                dse = dse.parent.getEntity();
+        if (linearMotion) {
+            mot = parentTickDisp.addVector(motionX, motionY, motionZ);
+            if (realDragArea == null || updateHashMotion() || rotationalMotion) {
+                realDragArea = realArea.addCoord(mot.xCoord, mot.yCoord, mot.zCoord);
             }
-            if (!rot.isZero()) {
-                rotation.incrMultiply(rot);
-                rotation.incrNormalize(); // Rounding errors will denormalize the quaternion
+            if (mot.xCoord != 0 || mot.yCoord != 0 || mot.zCoord != 0) {
+                posX += mot.xCoord;
+                posY += mot.yCoord;
+                posZ += mot.zCoord;
                 moved = true;
             }
+        } else {
+            mot = parentTickDisp;
+        }
+        
+        if (rotationalMotion) {
             if (hasOrderedRotation()) {
-                rotation = getOrderedRotation(now);
+                long now = worldObj.getTotalWorldTime();
+                Quaternion w0 = getOrderedRotation(now);
+                Quaternion w1 = getOrderedRotation(now + 1 /* or -1 on the other? */);
+                w1.incrMultiply(w0);
+                rot = w1;
+            } else {
+                rot = new Quaternion(rotationalVelocity);
             }
+            if (parentRotation) {
+                parentTickRotation.incrToOtherMultiply(rot);
+                //rot.incrMultiply(parentTickRotation);
+            }
+            
+            if (!rot.isZero()) {
+                rot.incrToOtherMultiply(rotation);
+                //rotation.incrMultiply(rot);
+                rotation.incrNormalize(); // Prevent the accumulation of error
+                moved = true;
+            }
+        } else {
+            rot = parentTickRotation;
         }
         last_shared_rotation.incrMultiply(last_shared_rotational_velocity);
 
@@ -636,7 +618,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 dyaw = (float) Math.toDegrees(-rotVec.yCoord);
                 //NORELEASE.println(dyaw);
             }
-            
+            long now = worldObj.getTotalWorldTime() + 100 /* Hack around MixinEntityKinematicsTracker.kinematics_last_change not being initialized */;
             
             for (int i = 0; i < ents.size(); i++) {
                 Entity e = (Entity) ents.get(i);
@@ -665,6 +647,8 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 }
                 
                 if (can(DeltaCapability.ENTITY_PHYSICS)) {
+                    IKinematicTracker kine = (IKinematicTracker) e;
+                    kine.reset(now);
                     double instant_scale = 1;
                     double motion_scale = 1;
                     double vel_scale = 1;
@@ -697,8 +681,11 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                     //e.prevPosX += velocity.xCoord;
                     //e.prevPosY += velocity.yCoord;
                     //e.prevPosZ += velocity.zCoord;
-                    e.rotationYaw += dyaw;
-                    e.prevRotationYaw += dyaw;
+                    // TODO FIXME: Jittering rotation when the player is standing on top! Argh! PLEASE FIX!
+                    double origYaw = e.rotationYaw;
+                    e.rotationYaw = (float) addLimitedDelta(kine.getKinematics_yaw(), e.rotationYaw, dyaw);
+                    double yd = e.rotationYaw - origYaw;
+                    e.prevRotationYaw += yd;
                 } else if (mot != null) {
                     e.moveEntity(mot.xCoord, mot.yCoord, mot.zCoord);
                     
@@ -714,13 +701,37 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         if (linearMotion || rotationalMotion) {
             updateUniversalCollisions();
         }
+        Vec3 childAt = Vec3.createVectorHelper(0, 0, 0);
         for (Iterator<IDeltaChunk> iterator = children.iterator(); iterator.hasNext();) {
-            IDeltaChunk child = iterator.next();
+            DimensionSliceEntity child = (DimensionSliceEntity) iterator.next();
             if (child.isDead) {
                 iterator.remove();
                 continue;
             }
-            ((DimensionSliceEntity)child).updateMotion(linearMotion, rotationalMotion);
+            childAt.xCoord = child.posX;
+            childAt.yCoord = child.posY;
+            childAt.zCoord = child.posZ;
+            Vec3 inst = getInstRotVel(childAt);
+            FzUtil.incrAdd(inst, mot);
+            child.updateMotion(inst, rot);
+        }
+    }
+    
+    /**
+     * If the player is standing on two platforms moving in the same direction, then the natural behavior is for the player to move twice as fast. 
+     * @param prevVal
+     * @param currentVal
+     * @param delta
+     * @return
+     */
+    double addLimitedDelta(double prevVal, double currentVal, double delta) {
+        if (delta == 0) return currentVal;
+        double oldDelta = currentVal - prevVal;
+        if (oldDelta != 0 && Math.signum(oldDelta) != Math.signum(delta)) return currentVal; // First DSE wins
+        if (delta > 0) {
+            return prevVal + Math.max(delta, oldDelta);
+        } else {
+            return prevVal + Math.min(delta, oldDelta);
         }
     }
     
@@ -807,10 +818,13 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     public void onEntityUpdate() {
         if (isDead) return;
         //We don't want to call super, because it does a bunch of stuff that makes no sense for us.
-        Core.profileStart("FZDSEntityTick");
+        Core.profileStart("FzdsDseTick");
         Core.profileStart("init");
+        prevTickRotation.update(rotation);
+        prevPosX = posX;
+        prevPosY = posY;
+        prevPosZ = posZ;
         if (worldObj.isRemote) {
-            prevTickRotation.update(rotation);
             rayOutOfDate = true;
             if (ticksExisted == 1) {
                 DeltaChunk.getSlices(worldObj).add(this);
@@ -827,19 +841,21 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 proxy = new PacketProxyingPlayer(this, shadowWorld);
                 proxy.worldObj.spawnEntityInWorld(proxy);
             }
+            Core.profileEnd();
+            Core.profileEnd(); // Really should be try/finally or nested in another method...
             return;
         }
         Core.profileEnd();
-        Core.profileStart("updateMotion");
         if (!parent.trackingEntity()) {
-            updateMotion(false, false);
+            Core.profileStart("updateMotion");
+            updateMotion(Vec3.createVectorHelper(0, 0, 0), new Quaternion());
+            Core.profileEnd();
         } else if (!parent.entityFound()) {
             IDeltaChunk p = parent.getEntity();
             if (p != null) {
                 setParent(p, getParentJoint());
             }
         }
-        Core.profileEnd();
         if (!worldObj.isRemote) {
             shareDisplacementInfo();
             if (can(DeltaCapability.ROTATE)) {
@@ -1202,6 +1218,14 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             Hammer.proxy.updateRayPosition(rayTarget);
         }
         return raypart;
+    }
+    
+    public Vec3 getInstRotVel(Vec3 real) {
+        Vec3 dse_space = real.addVector(-posX, -posY, -posZ); // Errm, center offset?
+        Vec3 point_a = dse_space;
+        Vec3 point_b = dse_space.addVector(0, 0, 0);
+        rotationalVelocity.applyRotation(point_b);
+        return point_a.subtract(point_b); // How is that not backwards? o_O
     }
     
     public Vec3 getInstantVelocityAtRealPoint(Vec3 real) {

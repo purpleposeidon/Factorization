@@ -66,7 +66,12 @@ public class Quaternion implements IDataSerializable {
     
     @Override
     public String toString() {
-        return "Quaternion(w=" + w + ", " + x + ", " + y + ", " + z + ")" + " MAG=" + this.magnitude();
+        String m = "";
+        double mag = this.magnitude();
+        if (mag != 1.0) {
+            m = " MAG=" + mag;
+        }
+        return "Q<w=" + w + ", " + x + ", " + y + ", " + z + ">" + m;
     }
     
     public void writeToTag(NBTTagCompound tag, String prefix) {

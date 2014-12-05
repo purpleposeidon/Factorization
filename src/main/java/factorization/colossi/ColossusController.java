@@ -63,6 +63,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         this(world);
         this.limbs = limbInfo;
         for (LimbInfo li : limbs) {
+            NORELEASE.fixme("mixed up left&right");
             IDeltaChunk idc = li.idc.getEntity();
             idc.setController(this);
             if (li.type == LimbType.BODY) {
@@ -126,17 +127,6 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         if (body == null || body.isDead) {
             setDead();
             return;
-        }
-        if (NORELEASE.on) {
-            if (!bodyLimbInfo.isTurning()) {
-                body.setRotationalVelocity(new Quaternion());
-                double r = worldObj.getTotalWorldTime() % 2 == 0 ? 0 : +Math.PI/2;
-                Quaternion q = Quaternion.getRotationQuaternionRadians(r, ForgeDirection.EAST);
-                double dist = q.getAngleBetween(body.getRotation());
-                if (dist > 0.01) { // next tick will be farther
-                    bodyLimbInfo.setTargetRotation(q, 20 * 10);
-                }
-            }
         }
         //moveToTarget();
         //updateBlockClimb();

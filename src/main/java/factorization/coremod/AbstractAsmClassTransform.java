@@ -29,6 +29,7 @@ public abstract class AbstractAsmClassTransform {
 
         @Override
         public void apply(ClassNode parent) {
+            // TODO: Doesn't copy field initializers
             if (mixin.fields != null) {
                 for (FieldNode field : mixin.fields) {
                     parent.fields.add(field);

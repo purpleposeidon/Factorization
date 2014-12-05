@@ -1988,4 +1988,12 @@ public class FzUtil {
         if (ent == null) return;
         ent.worldObj.spawnEntityInWorld(ent);
     }
+    
+    {
+        NORELEASE.fixme("refactor into separate classes");
+    }
+    
+    public static boolean isZero(Vec3 vec) {
+        return vec.xCoord == 0 && vec.yCoord == 0 && vec.zCoord == 0;
+    }
 }
