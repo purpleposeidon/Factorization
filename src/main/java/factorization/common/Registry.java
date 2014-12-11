@@ -42,10 +42,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
-import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.ExistingSubstitutionException;
-import cpw.mods.fml.common.registry.FMLControlledNamespacedRegistry;
-import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.Type;
 import cpw.mods.fml.common.registry.VillagerRegistry;
@@ -62,8 +59,9 @@ import factorization.charge.ItemChargeMeter;
 import factorization.charge.TileEntityLeydenJar;
 import factorization.colossi.ColossalBlock;
 import factorization.colossi.ColossalBlockItem;
-import factorization.colossi.ColossusController;
+import factorization.colossi.GargantuanBlock;
 import factorization.colossi.ItemColossusGuide;
+import factorization.colossi.ItemGargantuanBlock;
 import factorization.colossi.TileEntityColossalHeart;
 import factorization.darkiron.BlockDarkIronOre;
 import factorization.docs.ItemDocBook;
@@ -104,6 +102,7 @@ public class Registry {
     public Block dark_iron_ore;
     public Block fractured_bedrock_block;
     public Block colossal_block;
+    public Block gargantuan_block;
 
     public ItemStack servorail_item;
     public ItemStack empty_socket_item, socket_lacerator, socket_robot_hand, socket_shifter;
@@ -184,6 +183,7 @@ public class Registry {
         class NotchBlock extends Block { public NotchBlock(Material honestly) { super(honestly); } }
         fractured_bedrock_block = new NotchBlock(Material.rock).setBlockUnbreakable().setResistance(6000000).setBlockName("bedrock").setBlockTextureName("bedrock").setCreativeTab(Core.tabFactorization);
         colossal_block = new ColossalBlock();
+        gargantuan_block = new GargantuanBlock();
         
         GameRegistry.registerBlock(factory_block, ItemFactorizationBlock.class, "FzBlock");
         GameRegistry.registerBlock(lightair_block, "Lightair");
@@ -191,6 +191,7 @@ public class Registry {
         GameRegistry.registerBlock(dark_iron_ore, "DarkIronOre");
         GameRegistry.registerBlock(fractured_bedrock_block, "FracturedBedrock");
         GameRegistry.registerBlock(colossal_block, ColossalBlockItem.class, "ColossalBlock");
+        GameRegistry.registerBlock(gargantuan_block, ItemGargantuanBlock.class, "GargantuanBlock");
         GameRegistry.registerTileEntity(TileEntityColossalHeart.class, "fz_colossal_heart");
         
         
