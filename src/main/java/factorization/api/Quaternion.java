@@ -6,8 +6,6 @@ import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import javax.vecmath.Quat4d;
-
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
