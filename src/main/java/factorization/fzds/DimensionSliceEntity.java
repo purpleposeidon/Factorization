@@ -560,10 +560,11 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         if (rotationalMotion) {
             if (hasOrderedRotation()) {
                 long now = worldObj.getTotalWorldTime();
-                Quaternion w0 = getOrderedRotation(now);
-                Quaternion w1 = getOrderedRotation(now + 1 /* or -1 on the other? */);
-                w1.incrMultiply(w0);
-                rot = w1;
+                Quaternion r0 = getOrderedRotation(now);
+                Quaternion r1 = getOrderedRotation(now + 1 /* or -1 on the other? I think this is the right way tho. */);
+                r0.incrConjugate();
+                r1.incrMultiply(r0);
+                rot = r1;
             } else {
                 rot = new Quaternion(rotationalVelocity);
             }
@@ -574,6 +575,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             
             if (!rot.isZero()) {
                 rot.incrToOtherMultiply(rotation);
+                //Or....?
                 //rotation.incrMultiply(rot);
                 rotation.incrNormalize(); // Prevent the accumulation of error
                 moved = true;
@@ -609,7 +611,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             }
         }
         if (moved && can(DeltaCapability.DRAG)) {
-            NORELEASE.fixme("Rotational dragging");
             List ents = worldObj.getEntitiesWithinAABBExcludingEntity(this, metaAABB, excludeDseRelatedEntities);
             float dyaw = 0;
             if (rot != null) {
@@ -655,7 +656,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                     if (entityAt == null) {
                         entityAt = FzUtil.fromEntPos(e);
                     }
-                    Vec3 velocity = getInstantVelocityAtRealPoint(entityAt);
+                    Vec3 velocity = calcInstantVelocityAtRealPoint(entityAt, mot, rot);
                     if (can(DeltaCapability.VIOLENT_COLLISIONS) && !worldObj.isRemote) {
                         double smackSpeed = velocity.lengthVector();
                         vel_scale = 1;
@@ -715,6 +716,24 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             FzUtil.incrAdd(inst, mot);
             child.updateMotion(inst, rot);
         }
+    }
+    
+    public Vec3 getInstRotVel(Vec3 real) {
+        Vec3 dse_space = real.addVector(-posX, -posY, -posZ); // Errm, center offset?
+        Vec3 point_a = dse_space;
+        Vec3 point_b = dse_space.addVector(0, 0, 0);
+        rotationalVelocity.applyRotation(point_b);
+        return point_a.subtract(point_b); // How is that not backwards? o_O
+    }
+    
+    Vec3 calcInstantVelocityAtRealPoint(Vec3 realPos, Vec3 linear, Quaternion rot) {
+        NORELEASE.fixme("Lots of garbage?");
+        Vec3 dse_space = realPos.addVector(-posX, -posY, -posZ); // Errm, center offset?
+        Vec3 point_a = dse_space;
+        Vec3 point_b = dse_space.addVector(0, 0, 0);
+        rot.applyRotation(point_b);
+        Vec3 rotational = point_a.subtract(point_b); // How is that not backwards? o_O
+        return FzUtil.add(rotational, linear);
     }
     
     /**
@@ -1137,7 +1156,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     @Override
     public void setRotationalVelocity(Quaternion w) {
         if (!worldObj.isRemote) {
-            NORELEASE.println();
+            NORELEASE.println("Set rotational velocity: " + w);
         }
         if (hasOrderedRotation()) return; // Could throw an error?
         rotationalVelocity = w;
@@ -1164,6 +1183,11 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         if (!worldObj.isRemote) {
             FMLProxyPacket toSend = HammerNet.makePacket(HammerNet.HammerNetType.orderedRotation, this.getEntityId(), rotationStart, rotationEnd, tickTime, (byte) interp.ordinal());
             broadcastPacket(toSend);
+            
+            NORELEASE.println();
+            NORELEASE.println("order rotation: " + target + "  " + tickTime + " " + interp);
+            NORELEASE.println("angle: " + Math.toDegrees(rotationStart.getAngleBetween(rotationEnd)));
+            NORELEASE.println("dot: " + rotationStart.dotProduct(rotationEnd));
         }
     }
     
@@ -1218,31 +1242,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             Hammer.proxy.updateRayPosition(rayTarget);
         }
         return raypart;
-    }
-    
-    public Vec3 getInstRotVel(Vec3 real) {
-        Vec3 dse_space = real.addVector(-posX, -posY, -posZ); // Errm, center offset?
-        Vec3 point_a = dse_space;
-        Vec3 point_b = dse_space.addVector(0, 0, 0);
-        rotationalVelocity.applyRotation(point_b);
-        return point_a.subtract(point_b); // How is that not backwards? o_O
-    }
-    
-    public Vec3 getInstantVelocityAtRealPoint(Vec3 real) {
-        NORELEASE.fixme("Lots of garbage?");
-        Vec3 linear = Vec3.createVectorHelper(motionX, motionY, motionZ);
-        Vec3 dse_space = real.addVector(-posX, -posY, -posZ); // Errm, center offset?
-        Vec3 point_a = dse_space;
-        Vec3 point_b = dse_space.addVector(0, 0, 0);
-        rotationalVelocity.applyRotation(point_b);
-        Vec3 rotational = point_a.subtract(point_b); // How is that not backwards? o_O
-        Vec3 ret = FzUtil.add(rotational, linear);
-        if (parent.trackingEntity()) {
-            DimensionSliceEntity parentDse = parent.getEntity();
-            if (parentDse == null) return Vec3.createVectorHelper(0, 0, 0);
-            FzUtil.incrAdd(ret, parentDse.getInstantVelocityAtRealPoint(real));
-        }
-        return ret;
     }
     
     private void broadcastPacket(FMLProxyPacket toSend) {
