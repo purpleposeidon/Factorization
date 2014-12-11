@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
 
+import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
@@ -235,6 +236,8 @@ public class WorldGenColossus implements IWorldGenerator {
         start.moveToTopBlock();
         while (!start.isSolid()) {
             if (start.y <= 0) return;
+            Material mat = start.getBlock().getMaterial();
+            if (mat == Material.water || mat == Material.lava) return;
             start.y--;
         }
         start.y++;
