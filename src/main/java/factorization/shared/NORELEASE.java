@@ -58,4 +58,9 @@ public class NORELEASE {
             trace = System.err;
         }
     }
+    
+    // Free variables for use when hotswapping code
+    public static int i1 = 0, i2 = 0, i3 = 0, i4 = 0;
+    public static boolean b1 = false, b2 = false, b3 = false, b4 = false;
+    public static Object obj1 = null, obj2 = null, obj3 = null, obj4 = null;
 }
