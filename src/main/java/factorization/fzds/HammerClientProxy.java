@@ -22,6 +22,8 @@ import net.minecraft.world.WorldSettings;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 
 import org.lwjgl.opengl.GL11;
 
@@ -35,6 +37,7 @@ import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServer
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
+import factorization.coremodhooks.IExtraChunkData;
 import factorization.fzds.api.IDeltaChunk;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
@@ -462,5 +465,16 @@ public class HammerClientProxy extends HammerProxy {
     @Override
     IDeltaChunk getHitIDC() {
         return _hitSlice;
+    }
+    
+    @SubscribeEvent
+    public void showUniversalCollidersInfo(RenderGameOverlayEvent.Text event) {
+        if (mc.thePlayer == null) return;
+        if (!mc.gameSettings.showDebugInfo) return;
+        Coord at = new Coord(mc.thePlayer);
+        IExtraChunkData ed = (IExtraChunkData) at.getChunk();
+        Entity[] objs = ed.getConstantColliders();
+        if (objs == null) return;
+        event.left.add("uc: " + objs.length);
     }
 }
