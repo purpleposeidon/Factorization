@@ -128,11 +128,19 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             setDead();
             return;
         }
-        //moveToTarget();
+        moveToTarget();
         //updateBlockClimb();
-        //tickLimbSwing();
+        tickLimbSwing();
         //controller.tick();
         setPosition(body.posX, body.posY, body.posZ);
+        if (atTarget()) {
+            int d = 15;
+            if (posX < 0) {
+                path_target = home.copy().add(d, 0, 0);
+            } else {
+                path_target = home.copy().add(-d, 0, 0);
+            }
+        }
     }
     
     void loadLimbs() {
@@ -196,6 +204,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             return;
         }
         if (bodyLimbInfo.isTurning()) return;
+        NORELEASE.println("moveToTarget");
         Vec3 target = path_target.createVector();
         target.yCoord = posY;
         Vec3 me = FzUtil.fromEntPos(body);
@@ -235,7 +244,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
     private static final Quaternion arm_hang = Quaternion.getRotationQuaternionRadians(Math.toRadians(5), ForgeDirection.EAST);
     void tickLimbSwing() {
         if (turningDirection != 0) {
-            tickLegTurn();
+            //tickLegTurn();
             return;
         }
         
@@ -312,7 +321,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
 
     @Override
     public float getMaxHealth() {
-        return cracked_body_blocks * (8 + leg_size);
+        return cracked_body_blocks * 3;
     }
     
     public int getCracks() {
