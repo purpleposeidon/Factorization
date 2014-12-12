@@ -26,7 +26,7 @@ import factorization.shared.FzUtil;
 import factorization.shared.NORELEASE;
 
 public class ColossusController extends EntityFz implements IBossDisplayData {
-    static enum BodySide { LEFT, RIGHT, UNKNOWN_BODY_SIDE };
+    static enum BodySide { LEFT, RIGHT, CENTER, UNKNOWN_BODY_SIDE };
     static enum LimbType { BODY, ARM, LEG, UNKNOWN_LIMB_TYPE };
     LimbInfo[] limbs;
     IDeltaChunk body;
@@ -63,7 +63,6 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         this(world);
         this.limbs = limbInfo;
         for (LimbInfo li : limbs) {
-            NORELEASE.fixme("mixed up left&right");
             IDeltaChunk idc = li.idc.getEntity();
             idc.setController(this);
             if (li.type == LimbType.BODY) {
@@ -130,17 +129,15 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         }
         moveToTarget();
         //updateBlockClimb();
-        tickLimbSwing();
+        //tickLimbSwing();
         //controller.tick();
-        setPosition(body.posX, body.posY, body.posZ);
         if (atTarget()) {
-            int d = 15;
-            if (posX < 0) {
-                path_target = home.copy().add(d, 0, 0);
-            } else {
-                path_target = home.copy().add(-d, 0, 0);
-            }
+            int d = 16;
+            int dx = worldObj.rand.nextInt(d) - d/2;
+            int dz = worldObj.rand.nextInt(d) - d/2;
+            path_target = home.copy().add(dx, 0, dz);
         }
+        setPosition(body.posX, body.posY, body.posZ);
     }
     
     void loadLimbs() {

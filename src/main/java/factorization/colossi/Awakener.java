@@ -251,6 +251,7 @@ public class Awakener {
             LimbInfo li = new LimbInfo(partInfo.limbType, partInfo.limbSide, partInfo.length, idc);
             parts.add(li);
             if (li.type == LimbType.BODY) {
+                li.side = BodySide.CENTER;
                 bodyIdc = idc;
             }
         }
@@ -322,7 +323,7 @@ public class Awakener {
     }
 
     BodySide getSide(Set<Coord> set) {
-        return one(set).z > heartTE.zCoord ? BodySide.LEFT : BodySide.RIGHT;
+        return one(set).z > heartTE.zCoord ? BodySide.RIGHT : BodySide.LEFT;
     }
     
     Vec3 calculateJointPosition(Set<Coord> limb, int size, int length) {
