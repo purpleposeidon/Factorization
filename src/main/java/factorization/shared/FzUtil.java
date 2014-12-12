@@ -1103,6 +1103,13 @@ public class FzUtil {
         return Vec3.createVectorHelper(aabb.minX, aabb.minY, aabb.minZ);
     }
     
+    public static Vec3 set(Vec3 dest, Vec3 orig) {
+        dest.xCoord = orig.xCoord;
+        dest.yCoord = orig.yCoord;
+        dest.zCoord = orig.zCoord;
+        return dest;
+    }
+    
     public static void setMin(AxisAlignedBB aabb, Vec3 v) {
         aabb.minX = v.xCoord;
         aabb.minY = v.yCoord;
@@ -1198,10 +1205,11 @@ public class FzUtil {
         dest.zCoord = orig.zCoord;
     }
     
-    public static void incrAdd(Vec3 base, Vec3 add) {
+    public static Vec3 incrAdd(Vec3 base, Vec3 add) {
         base.xCoord += add.xCoord;
         base.yCoord += add.yCoord;
         base.zCoord += add.zCoord;
+        return base;
     }
     
     public static Vec3 add(Vec3 a, Vec3 b) {
@@ -1214,10 +1222,15 @@ public class FzUtil {
         return Vec3.createVectorHelper(a.xCoord, a.yCoord, a.zCoord);
     }
     
-    public static void incrSubtract(Vec3 base, Vec3 sub) {
+    public static Vec3 newVec() {
+        return Vec3.createVectorHelper(0, 0, 0);
+    }
+    
+    public static Vec3 incrSubtract(Vec3 base, Vec3 sub) {
         base.xCoord -= sub.xCoord;
         base.yCoord -= sub.yCoord;
         base.zCoord -= sub.zCoord;
+        return base;
     }
     
     public static void setAABB(AxisAlignedBB target, Vec3 min, Vec3 max) {
