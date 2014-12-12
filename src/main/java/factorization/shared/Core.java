@@ -536,9 +536,6 @@ public class Core {
     public final static String real_texture_dir = "/mods/factorization/textures/";
     public final static String gui_dir = "/mods/factorization/textures/gui/";
     public final static String gui_nei = "factorization:textures/gui/";
-//	public final static String texture_file_block = "/terrain.png";
-//	public final static String texture_file_item = "/gui/items.png";
-    
     public static final ResourceLocation blockAtlas = new ResourceLocation("textures/atlas/blocks.png");
     public static final ResourceLocation itemAtlas = new ResourceLocation("textures/atlas/items.png");
     

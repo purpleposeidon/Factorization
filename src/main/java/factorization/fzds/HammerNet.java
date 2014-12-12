@@ -6,7 +6,6 @@ import io.netty.buffer.Unpooled;
 import java.io.IOException;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -16,8 +15,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ItemInWorldManager;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -42,7 +39,6 @@ import factorization.fzds.api.IFzdsShenanigans;
 import factorization.fzds.api.Interpolation;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
-import factorization.shared.NORELEASE;
 
 
 public class HammerNet {
@@ -86,10 +82,6 @@ public class HammerNet {
             Core.logWarning("Packet %s to non-DSE (ID=%s) %s", type, dse_id, ent);
             return;
         }
-        /*if (NORELEASE.on) {
-            Minecraft mc = Minecraft.getMinecraft();
-            NORELEASE.println("packet " + type + " @ " + mc.theWorld.getTotalWorldTime());
-        }*/
         switch (type) {
         case HammerNetType.rotation:
             setRotation(dis, dse);

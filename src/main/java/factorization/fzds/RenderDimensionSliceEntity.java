@@ -403,7 +403,6 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
     @Override
     public void doRender(Entity ent, double x, double y, double z, float yaw, float partialTicks) {
         //need to do: Don't render if we're far away! (This should maybe be done in some other function?)
-        partialTicks = NORELEASE.zero;
         if (ent.isDead) {
             return;
         }

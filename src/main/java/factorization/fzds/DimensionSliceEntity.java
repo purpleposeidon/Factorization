@@ -481,9 +481,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     private static final IEntitySelector excludeDseRelatedEntities = new IEntitySelector() {
         @Override
         public boolean isEntityApplicable(Entity entity) {
-            /*if (entity instanceof EntityPlayer) {
-                return entity.worldObj.isRemote; // erm, wait, what? NORELEASE ?
-            }*/
             Class entClass = entity.getClass();
             if (entClass == DimensionSliceEntity.class) return false;
             if (entClass == UniversalCollider.class) return false;
@@ -617,7 +614,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 Vec3 rotVec = rot.toVector().normalize();
                 FzUtil.scale(rotVec, rot.getAngleRadians());
                 dyaw = (float) Math.toDegrees(-rotVec.yCoord);
-                //NORELEASE.println(dyaw);
             }
             long now = worldObj.getTotalWorldTime() + 100 /* Hack around MixinEntityKinematicsTracker.kinematics_last_change not being initialized */;
             
@@ -628,7 +624,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 if (mot != null) {
                     double friction_expansion = 0.05 * mot.lengthVector();
                     if (mot.yCoord > 0) {
-                        ebb = ebb.expand(-mot.xCoord, -mot.yCoord, -mot.zCoord); NORELEASE.fixme("eh?");
+                        ebb = ebb.expand(-mot.xCoord, -mot.yCoord, -mot.zCoord);
                     }
                     if (mot.xCoord != 0 || mot.zCoord != 0) {
                         expansion = friction_expansion;
@@ -643,7 +639,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
                 Vec3 entityAt = null;
                 // could multiply stuff by velocity
                 if (!metaAABB.intersectsWith(ebb)) {
-                    //NORELEASE: metaAABB.intersectsWith is very slow, especially with lots of entities
+                    NORELEASE.fixme("metaAABB.intersectsWith is very slow, especially with lots of entities");
                     continue;
                 }
                 
@@ -726,14 +722,16 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         return point_a.subtract(point_b); // How is that not backwards? o_O
     }
     
+    Vec3 point_a = FzUtil.newVec(), point_b = FzUtil.newVec();
     Vec3 calcInstantVelocityAtRealPoint(Vec3 realPos, Vec3 linear, Quaternion rot) {
-        NORELEASE.fixme("Lots of garbage?");
-        Vec3 dse_space = realPos.addVector(-posX, -posY, -posZ); // Errm, center offset?
-        Vec3 point_a = dse_space;
-        Vec3 point_b = dse_space.addVector(0, 0, 0);
+        NORELEASE.fixme("center offset? See real2shadow probably");
+        point_a.xCoord = realPos.xCoord - posX;
+        point_a.yCoord = realPos.yCoord - posY;
+        point_a.zCoord = realPos.zCoord - posZ;
+        point_b = FzUtil.set(point_b, point_a);
         rot.applyRotation(point_b);
-        Vec3 rotational = point_a.subtract(point_b); // How is that not backwards? o_O
-        return FzUtil.add(rotational, linear);
+        Vec3 rotational = FzUtil.incrSubtract(point_b, point_a);
+        return FzUtil.incrAdd(rotational, linear);
     }
     
     /**
@@ -1155,9 +1153,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
 
     @Override
     public void setRotationalVelocity(Quaternion w) {
-        if (!worldObj.isRemote) {
-            NORELEASE.println("Set rotational velocity: " + w);
-        }
         if (hasOrderedRotation()) return; // Could throw an error?
         rotationalVelocity = w;
     }
@@ -1183,11 +1178,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         if (!worldObj.isRemote) {
             FMLProxyPacket toSend = HammerNet.makePacket(HammerNet.HammerNetType.orderedRotation, this.getEntityId(), rotationStart, rotationEnd, tickTime, (byte) interp.ordinal());
             broadcastPacket(toSend);
-            
-            NORELEASE.println();
-            NORELEASE.println("order rotation: " + target + "  " + tickTime + " " + interp);
-            NORELEASE.println("angle: " + Math.toDegrees(rotationStart.getAngleBetween(rotationEnd)));
-            NORELEASE.println("dot: " + rotationStart.dotProduct(rotationEnd));
         }
     }
     
@@ -1233,7 +1223,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         if (!can(DeltaCapability.INTERACT)) {
             return null;
         }
-        if (rayOutOfDate || NORELEASE.on) {
+        if (rayOutOfDate) {
             if (raypart == null) {
                 raypart = new Entity[1];
                 raypart[0] = rayTarget = new DseRayTarget(this);

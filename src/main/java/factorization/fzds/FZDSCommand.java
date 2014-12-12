@@ -32,7 +32,6 @@ import com.google.common.collect.Iterables;
 
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
-import factorization.api.FzOrientation;
 import factorization.api.ICoordFunction;
 import factorization.api.Quaternion;
 import factorization.common.FzConfig;
@@ -40,11 +39,9 @@ import factorization.fzds.DeltaChunk.AreaMap;
 import factorization.fzds.DeltaChunk.DseDestination;
 import factorization.fzds.api.DeltaCapability;
 import factorization.fzds.api.IDeltaChunk;
-import factorization.fzds.api.Interpolation;
 import factorization.notify.Notice;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
-import factorization.shared.NORELEASE;
 
 public class FZDSCommand extends CommandBase {
     //private static DimensionSliceEntity currentWE = null;
@@ -995,20 +992,6 @@ public class FZDSCommand extends CommandBase {
                 selected.changeRotationCenter(p);
             }
         }, Requires.SLICE_SELECTED, Requires.PLAYER);
-        add(new SubCommand("test") {
-            int n = 0;
-            @Override
-            void call(String[] args) {
-                NORELEASE.fixme();
-                n++;
-                if (n == FzOrientation.values().length - 1) n = 0;
-                FzOrientation orient = FzOrientation.values()[n];
-                //orient = n % 2 == 0 ? FzOrientation.FACE_DOWN_POINT_SOUTH : FzOrientation.FACE_DOWN_POINT_NORTH;
-                Quaternion q = new Quaternion(Quaternion.fromOrientation(orient));
-                selected.orderTargetRotation(q, 40, Interpolation.LINEAR);
-                NORELEASE.println(orient);;
-            }
-        }, Requires.SLICE_SELECTED);
     }
     
     private static void clearDseArea(IDeltaChunk idc) {
