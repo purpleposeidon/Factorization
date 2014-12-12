@@ -393,11 +393,16 @@ verifyWhitelist(volume (two Coords)):
         TileEntity classes
         TileEntity contents
 
-"Abstract Factory explicitly rejects any component that uses, enables, requires, or resembles: time travel; teleportation; inter-dimensional discontinuities; breaking the fourth wall (or higher); Zoltan shielding; root privileges; practical solipsism; the Logrus; non-conservation of mass and/or energy; breaking out of the Universe; unfettered access to the Internet; the Spice; Ontological loopholes; the narative principle; blatant magic (including the Force); worm holes; anything involving the word 'singularity'; anti-matter; dark matter; white matter; red matter; infinite nesting; cheating; applied improbability; the Principle of Explosion; Māyā; Dust Theory; the Dust; 'special magic dust'; space worm parasitic super-powers; gauge asymmetry; Turing Oracles; the Axiom of Choice; cosmic string weaving; munchkinism; rewriting the structure of reality; or faster-than-light signalling. Nanotech is OK tho."
+"Abstract Factory explicitly rejects any component that uses, enables, requires, or resembles: time travel; teleportation; inter-dimensional discontinuities; breaking the fourth wall; Zoltan shielding; root privileges; applied solipsism; the Logrus; mass/energy conservation violations; escaping the Universe; unfettered access to the Internet; the Spice; Ontological loopholes; the narative principle; blatant magic (including the Force); worm holes; any kind of singularity; anti-matter; dark matter; white matter; red matter; infinite nesting; cheating; dupe bugs; improbability or serendipity; spheres and circles; the Principle of Explosion; Māyā; Dust Theory; the Dust; 'special magic dust'; space worm parasitic super-powers; gauge asymmetry; Turing Oracles; the Axiom of Choice; cosmic string weaving; munchkinism; hax; rewriting the structure of reality; or faster-than-light signaling. But nanotech is OK."
 
 doing I/O to the factory:
     There's an Input and an Output port block; these go in the walls.
     place a chest on the inner & outter sides of each IO port.
+    IO is done through parasieves
+
+    OR:
+        Setup your factory so that it's ready to run, with the imputs already in place.
+        Any item that is missing after the run is considered an 'input'; pipe that stuff into the factory...
 
 
 
@@ -422,7 +427,7 @@ GUI either says "My Stuff" or "$PLAYERNAME's Stuff"
 Star Kindling
 =============
  - A barrel of nebula; doesn't have to be full. But the # of stacks is important.
- - Surounded by some number of layers of nebula. (Apparently it'll kinda layer sorta like snow does? Except in colors or something.)
+ - Surounded by some number of layers of nebula. (Apparently it'll kinda layer sorta like snow does? Except in colors or something, and it won't just be flat...)
  - Surounded by a shell of iron or dark iron blocks.
  - Make a hole in the iron shell, above the barrel. Light some TNT, repair the hole, and run.
 
@@ -435,4 +440,11 @@ THEY made THEIR home a vast network spanning the voids between the ever-burning 
 And THEY are eager to begin mutually beneficial economic transactions.
 
 Spisfire - dazzle 'live'
+
+
+Recipe for the Ocarina of Wind:
+
+B``
+BB`
+BB 
 
