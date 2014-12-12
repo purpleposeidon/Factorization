@@ -15,7 +15,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.DeltaCoord;
-import factorization.fzds.api.IDeltaChunk;
+import factorization.fzds.interfaces.IDeltaChunk;
 import gnu.trove.set.hash.THashSet;
 
 public class DeltaChunk {

@@ -4,7 +4,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Quaternion;
-import factorization.fzds.api.IFzdsShenanigans;
+import factorization.fzds.interfaces.IFzdsShenanigans;
 
 public class RotatedBB extends AxisAlignedBB implements IFzdsShenanigans {
     protected RotatedBB() {

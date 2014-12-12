@@ -38,7 +38,7 @@ import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
 import factorization.coremodhooks.IExtraChunkData;
-import factorization.fzds.api.IDeltaChunk;
+import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 import factorization.shared.NORELEASE;

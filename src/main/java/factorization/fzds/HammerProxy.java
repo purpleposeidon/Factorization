@@ -1,6 +1,6 @@
 package factorization.fzds;
 
-import factorization.fzds.api.IDeltaChunk;
+import factorization.fzds.interfaces.IDeltaChunk;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 

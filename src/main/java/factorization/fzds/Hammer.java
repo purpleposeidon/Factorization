@@ -26,7 +26,7 @@ import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServer
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.relauncher.Side;
 import factorization.common.FzConfig;
-import factorization.fzds.api.IDeltaChunk;
+import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.network.FzdsPacketRegistry;
 import factorization.fzds.network.WrappedPacket;
 import factorization.shared.Core;

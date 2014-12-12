@@ -1,7 +1,7 @@
 package factorization.fzds;
 
 import factorization.api.Coord;
-import factorization.fzds.api.IDeltaChunk;
+import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.shared.FzUtil;
 import gnu.trove.set.hash.THashSet;
 

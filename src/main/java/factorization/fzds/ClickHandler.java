@@ -20,7 +20,7 @@ import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import factorization.api.Coord;
 import factorization.fzds.HammerNet.HammerNetType;
-import factorization.fzds.api.DeltaCapability;
+import factorization.fzds.interfaces.DeltaCapability;
 import factorization.shared.FzUtil;
 
 public class ClickHandler {

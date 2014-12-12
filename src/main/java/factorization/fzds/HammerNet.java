@@ -34,9 +34,9 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import factorization.api.Coord;
 import factorization.api.Quaternion;
-import factorization.fzds.api.IDeltaChunk;
-import factorization.fzds.api.IFzdsShenanigans;
-import factorization.fzds.api.Interpolation;
+import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IFzdsShenanigans;
+import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 

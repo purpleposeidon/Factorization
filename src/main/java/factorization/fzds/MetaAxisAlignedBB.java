@@ -8,7 +8,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import factorization.fzds.api.IFzdsShenanigans;
+import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 import factorization.shared.NORELEASE;

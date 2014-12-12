@@ -33,9 +33,9 @@ import cpw.mods.fml.common.network.FMLEmbeddedChannel;
 import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import factorization.api.Coord;
-import factorization.fzds.api.IDeltaChunk;
-import factorization.fzds.api.IFzdsEntryControl;
-import factorization.fzds.api.IFzdsShenanigans;
+import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IFzdsEntryControl;
+import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.fzds.network.WrappedPacket;
 
 public class PacketProxyingPlayer extends EntityPlayerMP implements

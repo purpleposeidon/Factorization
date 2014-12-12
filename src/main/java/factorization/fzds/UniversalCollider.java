@@ -4,8 +4,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
-import factorization.fzds.api.IDeltaChunk;
-import factorization.fzds.api.IFzdsEntryControl;
+import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.IFzdsEntryControl;
 
 class UniversalCollider extends Entity implements IFzdsEntryControl {
     private final DimensionSliceEntity dimensionSliceEntity;

@@ -17,8 +17,8 @@ import factorization.api.Quaternion;
 import factorization.colossi.ColossusController.BodySide;
 import factorization.colossi.ColossusController.LimbType;
 import factorization.fzds.TransferLib;
-import factorization.fzds.api.DeltaCapability;
-import factorization.fzds.api.IDeltaChunk;
+import factorization.fzds.interfaces.DeltaCapability;
+import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.shared.Core;
 import factorization.shared.ReservoirSampler;
 

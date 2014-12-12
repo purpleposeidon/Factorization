@@ -32,7 +32,7 @@ import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.Hammer;
-import factorization.fzds.api.IDeltaChunk;
+import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.oreprocessing.ItemOreProcessing;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;

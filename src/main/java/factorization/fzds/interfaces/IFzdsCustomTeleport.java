@@ -1,4 +1,4 @@
-package factorization.fzds.api;
+package factorization.fzds.interfaces;
 
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;

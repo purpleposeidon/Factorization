@@ -6,7 +6,7 @@ import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 
 import factorization.api.Coord;
-import factorization.fzds.api.IDeltaChunk;
+import factorization.fzds.interfaces.IDeltaChunk;
 
 /**
  * Map<Chunk, IDeltaChunk[]>

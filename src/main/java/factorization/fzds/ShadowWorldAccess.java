@@ -7,7 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
 import factorization.api.Coord;
-import factorization.fzds.api.IDeltaChunk;
+import factorization.fzds.interfaces.IDeltaChunk;
 
 public final class ShadowWorldAccess implements IWorldAccess {
     // "IWorldAccess" is poorly named; "IWorldWatcher" would be better.

@@ -13,7 +13,7 @@ import com.google.common.collect.BiMap;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import factorization.fzds.Hammer;
-import factorization.fzds.api.IFzdsShenanigans;
+import factorization.fzds.interfaces.IFzdsShenanigans;
 import factorization.shared.Core;
 
 public class WrappedPacket extends Packet implements IFzdsShenanigans {

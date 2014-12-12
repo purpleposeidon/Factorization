@@ -1,6 +1,6 @@
-package factorization.fzds.api;
+package factorization.fzds.interfaces;
 
-import static factorization.fzds.api.DeltaCapability.*;
+import static factorization.fzds.interfaces.DeltaCapability.*;
 
 import java.util.ArrayList;
 

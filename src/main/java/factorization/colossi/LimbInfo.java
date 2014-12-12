@@ -8,8 +8,8 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.colossi.ColossusController.BodySide;
 import factorization.colossi.ColossusController.LimbType;
-import factorization.fzds.api.IDeltaChunk;
-import factorization.fzds.api.Interpolation;
+import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.EntityReference;
 
 class LimbInfo {

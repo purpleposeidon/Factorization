@@ -1,4 +1,4 @@
-package factorization.fzds.api;
+package factorization.fzds.interfaces;
 
 
 public interface IFzdsEntryControl {

@@ -1,4 +1,4 @@
-package factorization.fzds.api;
+package factorization.fzds.interfaces;
 
 public enum DeltaCapability {
     //TODO: Implement SCALE, TRANSPARENT, REMOVE_ALL_ENTITIES
