@@ -107,6 +107,17 @@ public abstract class IDeltaChunk extends EntityFz {
         setPosition(ds.xCoord, ds.yCoord, ds.zCoord);
     }
     
+    /**
+     * Helper function. Applies all parent rotations to rot.
+     */
+    public void multiplyParentRotations(Quaternion rot) {
+        IDeltaChunk parent = getParent();
+        while (parent != null) {
+            parent.getRotation().incrToOtherMultiply(rot);
+            parent = parent.getParent();
+        }
+    }
+    
     
     /***
      * Checks if the {@link DeltaCapability} is enabled.
@@ -128,6 +139,9 @@ public abstract class IDeltaChunk extends EntityFz {
     public abstract IDeltaChunk forbid(DeltaCapability cap);
     
     public void loadUsualCapabilities() {
+        for (DeltaCapability cap : DeltaCapability.values()) {
+            forbid(cap);
+        }
         for (DeltaCapability cap : new DeltaCapability[] {
                 COLLIDE,
                 MOVE,
@@ -142,11 +156,6 @@ public abstract class IDeltaChunk extends EntityFz {
                 ENTITY_PHYSICS,
         }) {
             permit(cap);
-        }
-        for (DeltaCapability cap : new DeltaCapability[] {
-                
-        }) {
-            forbid(cap);
         }
     }
     
