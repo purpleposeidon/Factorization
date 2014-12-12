@@ -358,7 +358,7 @@ public class ColossalBlock extends Block {
             Object c = idc.getController();
             if (c instanceof ColossusController) {
                 ColossusController controller = (ColossusController) c;
-                if (controller.getPersistentID().equals(controllerId)) {
+                if (controller.getUniqueID().equals(controllerId)) {
                     return controller;
                 }
             }
