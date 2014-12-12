@@ -452,6 +452,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
         
         shadowArea = cloneAABB(start);
         updateRealArea();
+        updateUniversalCollisions();
     }
     
     public void blocksChanged(int x, int y, int z) {
@@ -490,22 +491,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     private static DamageSource violenceDamage = new DamageSource("dseHit");
     
-    private static Vec3 accumulateMotions(DimensionSliceEntity self, Vec3 accum) {
-        if (self.parent.trackingEntity()) {
-            DimensionSliceEntity parent = self.parent.getEntity();
-            if (parent == null) return null;
-            accum = accumulateMotions(parent, accum);
-            if (accum == null) return null;
-            Vec3 parentRotation = parent.getInstantaneousRotationalVelocityAtPointInCornerSpace(self.offsetFromParent);
-            FzUtil.incrAdd(accum, parentRotation);
-        } else {
-            accum.xCoord = self.motionX;
-            accum.yCoord = self.motionY;
-            accum.zCoord = self.motionZ;
-        }
-        return accum;
-    }
-    
     public Vec3 getInstantaneousRotationalVelocityAtPointInCornerSpace(Vec3 corner) {
         Vec3 origPoint = corner.subtract(centerOffset);
         rotation.applyRotation(origPoint);
@@ -523,7 +508,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     }
     
     void updateMotion(Vec3 parentTickDisp, Quaternion parentTickRotation) {
-        NORELEASE.fixme("refactor any fzds.api packages into fzds.interfaces");
         if (realArea == null || metaAABB == null) {
             return;
         }
@@ -708,17 +692,17 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             childAt.xCoord = child.posX;
             childAt.yCoord = child.posY;
             childAt.zCoord = child.posZ;
-            Vec3 inst = getInstRotVel(childAt);
+            Vec3 inst = getInstRotVel(childAt, rot);
             FzUtil.incrAdd(inst, mot);
             child.updateMotion(inst, rot);
         }
     }
     
-    public Vec3 getInstRotVel(Vec3 real) {
+    public Vec3 getInstRotVel(Vec3 real, Quaternion rot) {
         Vec3 dse_space = real.addVector(-posX, -posY, -posZ); // Errm, center offset?
         Vec3 point_a = dse_space;
         Vec3 point_b = dse_space.addVector(0, 0, 0);
-        rotationalVelocity.applyRotation(point_b);
+        rot.applyRotation(point_b);
         return point_a.subtract(point_b); // How is that not backwards? o_O
     }
     
