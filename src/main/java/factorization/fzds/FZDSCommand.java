@@ -357,15 +357,6 @@ public class FZDSCommand extends CommandBase {
         return ret;
     }
     
-    private static String pick(String ...bits) {
-        for (int i = 0; i < bits.length - 1; i += 2) {
-            if (bits[i].equalsIgnoreCase(bits[i + 1])) {
-                return bits[i + 1];
-            }
-        }
-        return bits[bits.length - 1];
-    }
-    
     static HashMap<String, Coord> positionVariables = new HashMap<String, Coord>(); //NOTE: This keeps references to worlds. Oh well.
     
     static {
@@ -531,7 +522,6 @@ public class FZDSCommand extends CommandBase {
                 Vec3 newOffset = null;
                 try {
                     String[] vecArg = args[0].split(",");
-                    Coord base = selected.getCorner();
                     newOffset = Vec3.createVectorHelper(
                             Double.parseDouble(vecArg[0]),
                             Double.parseDouble(vecArg[1]),
