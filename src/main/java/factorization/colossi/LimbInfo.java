@@ -17,7 +17,7 @@ class LimbInfo {
     BodySide side = BodySide.UNKNOWN_BODY_SIDE;
     byte parity = 0; // If you have a centipede, you kind of need to swap left & right every other foot
     int length; // How long the limb is
-    final EntityReference<IDeltaChunk> idc;
+    EntityReference<IDeltaChunk> idc;
     
     public LimbInfo(LimbType type, BodySide side, int length, IDeltaChunk ent) {
         this(ent.worldObj);
@@ -37,7 +37,7 @@ class LimbInfo {
         side = data.as(Share.VISIBLE, "limbSide" + index).putEnum(side);
         parity = data.as(Share.VISIBLE, "limbParity" + index).putByte(parity);
         length = data.as(Share.VISIBLE, "limbLength" + index).putInt(length);
-        data.as(Share.VISIBLE, "entUuid" + index).put(idc);
+        idc = data.as(Share.VISIBLE, "entUuid" + index).put(idc);
     }
     
     boolean limbSwingParity() {
@@ -52,7 +52,7 @@ class LimbInfo {
     
     public boolean isTurning() {
         IDeltaChunk dse = idc.getEntity();
-        if (dse == null) return false;
+        if (dse == null) return true; // isTurning() is used to block action, so we'll return true here
         return dse.hasOrderedRotation();
     }
 }
