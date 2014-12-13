@@ -1,32 +1,41 @@
-'This is the list of colossi masks.
-'The # gets replaced with a mask block,
-'The @ gets replaced with the eye block,
-'The . replaces nothing.
-'Each entry is separated by a blank line.
-'A line starting with a ' is a comment.
-'"weight <number>" can preceed a mask to adjust its rarity.
-'The default weight is 100; lower numbers are rarer.
-'Each mask has a line of ^^^'s or vvv's, which are the "anchors".
-'^ indicates that the mask attatches to the bottom,
-'and v indicates that it attatches to the top.
-'The number of the anchors indicates what the size of the mask must be.
-'Masks always have odd parity.
-'They are at least 3 wide, and at most... well, there probably will never be one bigger than 25.
-'It may or may not be possible that a smaller mask is worn by a larger colossi.
-'The system will generate reflected variants for you.
-'There may also potentially be <<< anchors.
-'Masks can extend past anchors both horizontally & vertically
+' This is the list of colossi masks.
+' The # gets replaced with a mask block,
+' The @ gets replaced with the eye block,
+' The . replaces nothing.
+' Each entry is separated by a blank line.
+' A line starting with a ' is a comment.
+' "weight <number>" can preceed a mask to adjust its rarity.
+' The default weight is 100; lower numbers are rarer.
+' Each mask has a line of ^^^'s or vvv's, which are the "anchors".
+' ^ indicates that the mask attatches to the bottom,
+' and v indicates that it attatches to the top.
+' The number of the anchors indicates what the size of the mask must be.
+' Masks always have odd parity.
+' They are at least 3 wide, and at most... well, there probably will never be one bigger than 15.
+' It may or may not be possible that a smaller mask is worn by a larger colossi.
+' The system will generate reflected variants for you.
+' (There may also potentially be <<< anchors in the future?)
+' Masks can extend past anchors both horizontally & vertically,
+' which may fool you in to thinking they attatch to the other side.
+' 
+' I bet giant antlers would be totally kick-ass
+' I tried an arc, and it was super-lame
+' I don't want hair or wavey tentacles
 '
-'Style tips:
-'I bet giant antlers would be totally kick-ass
-'I tried an arc, and it was super-lame
-'I don't want hair or tentacles
-'Quantity is pretty important, but similar variants should have their weight reduced.
-'No friendly masks. They can be weird, mysterious, angry, terrifying, or boring.
-'The colossi are guards.
-'No familiar masks, either! Avoid the mickey mouse & teletubbies look
 '
-'Also: Remember that this font probably isn't square...
+' Quantity is pretty important, but similar variants should have their weight reduced.
+' No friendly masks. They can be weird, mysterious, angry, terrifying, or boring.
+' No familiar masks, either! Avoid the mickey mouse & teletubbies look
+' Animal/plant designs are quite fine.
+' The colossi are guards.
+' Don't be a stranger to the eyeball.
+'
+' *** IMPORTANT *** The font isn't square. So these images aren't going to look square,
+' and the proportions will be bad if you edit them here.
+' Design them in minecraft, and copy them in.
+
+
+
 
 'Upper-mask that droops down
 ##...##
@@ -686,4 +695,98 @@ VVVVVVVVV
 .@.#.#.#.
 ...#.@...
 ...#.....
+
+..@.@..
+..#.#..
+@.###.@
+#.#@#.#
+#######
+VVVVVVV
+
+..#.#..
+..###..
+..#@#..
+#.###.#
+###@###
+VVVVVVV
+
+...@...
+..###..
+.#####.
+#######
+VVVVVVV
+
+.#####.
+##@#@##
+#######
+VVVVVVV
+
+.#####.
+##.#.##
+#######
+VVVVVVV
+
+weight 20
+###.###
+#.#.#.#
+..###..
+..#@#..
+.#####.
+###.###
+##...##
+##...##
+VVVVVVV
+
+..#.#..
+..#.#..
+..#.#..
+.##.##.
+###.###
+#VVVVV#
+#.....#
+#.....#
+
+##......##
+#.^^^^^^.#
+
+.#...#.
+#.....#
+#.....#
+#.....#
+#VVVVV#
+#.....#
+
+.#.......#.
+#.^^^^^^^.#
+#.........#
+.#.......#.
+
+weight 70
+..#######..
+.##@@@@@##.
+.#@@@@@@@#.
+##@@@@@@@##
+#@@@@@@@@@#
+#@@@@@@@@@#
+#@@@@@@@@@#
+##@@@@@@@##
+.#@@@@@@@#.
+.##@@@@@##.
+..#######..
+VVVVVVVVVVV
+
+weight 20
+..#######..
+.##@@@@@##.
+.#@@@@@@@#.
+##@@@#@@@##
+#@@@###@@@#
+#@@#####@@#
+#@@@###@@@#
+##@@@#@@@##
+.#@@@@@@@#.
+.##@@@@@##.
+..#######..
+VVVVVVVVVVV
+
 
