@@ -327,10 +327,10 @@ public class HammerClientProxy extends HammerProxy {
             GL11.glPushMatrix();
             setShadowWorld();
             GL11.glDisable(GL11.GL_ALPHA_TEST);
-            if (Core.dev_environ) {
+            /*if (Core.dev_environ) {
                 GL11.glDisable(GL11.GL_DEPTH_TEST);
                 GL11.glColorMask(false, true, true, true);
-            }
+            }*/
             GL11.glTranslated(
                     FzUtil.interp(dse.lastTickPosX - player.lastTickPosX, dse.posX - player.posX, partialTicks),
                     FzUtil.interp(dse.lastTickPosY - player.lastTickPosY, dse.posY - player.posY, partialTicks),
@@ -359,10 +359,10 @@ public class HammerClientProxy extends HammerProxy {
             GL11.glEnable(GL11.GL_ALPHA_TEST);
             restoreRealWorld();
             GL11.glPopMatrix();
-            if (Core.dev_environ) {
+            /*if (Core.dev_environ) {
                 GL11.glColorMask(true, true, true, true);
                 GL11.glEnable(GL11.GL_DEPTH_TEST);
-            }
+            }*/
         }
     }
     
