@@ -19,6 +19,8 @@ class LimbInfo {
     int length; // How long the limb is
     EntityReference<IDeltaChunk> idc;
     
+    byte lastTurnDirection = 0;
+    
     public LimbInfo(LimbType type, BodySide side, int length, IDeltaChunk ent) {
         this(ent.worldObj);
         this.type = type;
@@ -38,6 +40,7 @@ class LimbInfo {
         parity = data.as(Share.VISIBLE, "limbParity" + index).putByte(parity);
         length = data.as(Share.VISIBLE, "limbLength" + index).putInt(length);
         idc = data.as(Share.VISIBLE, "entUuid" + index).put(idc);
+        lastTurnDirection = data.as(Share.VISIBLE, "lastTurnDir" + index).put(lastTurnDirection);
     }
     
     boolean limbSwingParity() {
