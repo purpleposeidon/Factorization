@@ -47,10 +47,10 @@ class LimbInfo {
         return side == BodySide.RIGHT ^ (parity % 1 == 0) ^ type == LimbType.ARM;
     }
     
-    public void setTargetRotation(Quaternion rot, int time) {
+    public void setTargetRotation(Quaternion rot, int time, Interpolation interp) {
         IDeltaChunk dse = idc.getEntity();
         if (dse == null) return;
-        dse.orderTargetRotation(rot, time, Interpolation.SMOOTH);
+        dse.orderTargetRotation(rot, time, interp);
     }
     
     public boolean isTurning() {

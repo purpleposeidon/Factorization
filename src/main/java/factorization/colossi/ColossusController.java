@@ -17,6 +17,7 @@ import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
+import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.Core;
 import factorization.shared.EntityFz;
 import factorization.shared.FzUtil;
@@ -213,7 +214,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             int size = leg_size + 1;
             double rotation_speed = (Math.PI * 2) / (360 * size * size * 2);
             double rotation_time = rotation_distance / rotation_speed;
-            bodyLimbInfo.setTargetRotation(target_rotation, (int) rotation_time);
+            bodyLimbInfo.setTargetRotation(target_rotation, (int) rotation_time, Interpolation.SMOOTH);
             // Now bodyLimbInfo.isTurning() is set.
             turningDirection = angle > 0 ? 1 : -1;
             for (LimbInfo li : limbs) {
@@ -283,7 +284,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
                     arm_hang.incrToOtherMultiply(nextRotation);
                 }
             }
-            limb.setTargetRotation(nextRotation, (int) nextRotationTime);
+            limb.setTargetRotation(nextRotation, (int) nextRotationTime, Interpolation.SMOOTH);
         }
     }
     
@@ -309,7 +310,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
                 double arm_angle = arms_angle * (limb.side == BodySide.LEFT ? +1 : -1);
                 Quaternion ar = Quaternion.getRotationQuaternionRadians(arm_angle, ForgeDirection.EAST);
                 idc.multiplyParentRotations(ar);
-                limb.setTargetRotation(ar, 20);
+                limb.setTargetRotation(ar, 20, Interpolation.SMOOTH);
                 continue;
             }
             if (limb.type != LimbType.LEG) continue;
@@ -318,8 +319,12 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             double nextRotationTime = phase_length;
             
             limb.lastTurnDirection *= -1;
+            Interpolation interp = Interpolation.SMOOTH;
             if (limb.lastTurnDirection == 0) {
                 limb.lastTurnDirection = (byte) (turningDirection * (limb.limbSwingParity() ? 1 : -1));
+            }
+            if (limb.lastTurnDirection == 1 ^ limb.limbSwingParity()) {
+                interp = Interpolation.CUBIC;
             }
             nextRotation *= limb.lastTurnDirection;
             
@@ -330,7 +335,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             
             Quaternion nr = Quaternion.getRotationQuaternionRadians(nextRotation, ForgeDirection.DOWN);
             idc.multiplyParentRotations(nr);
-            limb.setTargetRotation(nr, (int) nextRotationTime);
+            limb.setTargetRotation(nr, (int) nextRotationTime, interp);
         }
     }
 
