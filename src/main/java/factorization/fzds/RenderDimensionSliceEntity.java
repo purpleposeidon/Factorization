@@ -406,11 +406,6 @@ public class RenderDimensionSliceEntity extends Render implements IFzdsShenaniga
         if (ent.isDead) {
             return;
         }
-        if (ent.ticksExisted < 5) {
-            // TODO: Sometimes it fails to draw (Probably because the chunk data isn't loaded as it draws, it draws, does not dirty properly)
-            NORELEASE.fixme("Can we reduce/remove this?");
-            return;
-        }
         if (nest > 3) {
             return; //This will never happen, except with outside help.
         }
