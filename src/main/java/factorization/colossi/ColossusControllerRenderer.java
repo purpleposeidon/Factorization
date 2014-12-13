@@ -7,8 +7,8 @@ import factorization.shared.EmptyRender;
 
 public class ColossusControllerRenderer extends EmptyRender {
     @Override
-    public void doRender(Entity ent, double var2, double var4, double var6, float var8, float var9) {
+    public void doRender(Entity ent, double cameraX, double cameraY, double cameraZ, float yaw, float partial) {
         ColossusController controller = (ColossusController) ent;
-        BossStatus.setBossStatus(controller, true);
+        BossStatus.setBossStatus(controller, false);
     }
 }
