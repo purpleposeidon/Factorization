@@ -512,7 +512,7 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             return;
         }
         if (hasOrderedRotation() && orderTimeEnd <= worldObj.getTotalWorldTime()) {
-            setRotation(new Quaternion(rotationEnd));
+            //setRotation(new Quaternion(rotationEnd));
             cancelOrderedRotation();
         }
         boolean parentRotation = !parentTickRotation.isZero();
@@ -595,9 +595,8 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
             List ents = worldObj.getEntitiesWithinAABBExcludingEntity(this, metaAABB, excludeDseRelatedEntities);
             float dyaw = 0;
             if (rot != null) {
-                Vec3 rotVec = rot.toVector().normalize();
-                FzUtil.scale(rotVec, rot.getAngleRadians());
-                dyaw = (float) Math.toDegrees(-rotVec.yCoord);
+                dyaw = (float) Math.toDegrees(-rot.toRotationVector().yCoord);
+                if (Float.isNaN(dyaw)) dyaw = 0;
             }
             long now = worldObj.getTotalWorldTime() + 100 /* Hack around MixinEntityKinematicsTracker.kinematics_last_change not being initialized */;
             

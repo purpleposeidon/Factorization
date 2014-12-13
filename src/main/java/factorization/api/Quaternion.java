@@ -18,6 +18,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.IDataSerializable;
+import factorization.shared.FzUtil;
 
 public class Quaternion implements IDataSerializable {
     public double w, x, y, z;
@@ -183,6 +184,15 @@ public class Quaternion implements IDataSerializable {
     
     public Vec3 toVector() {
         return Vec3.createVectorHelper(x, y, z);
+    }
+    
+    /**
+     * @return a vector parallel with the imaginary components with length equal to the rotation
+     */
+    public Vec3 toRotationVector() {
+        Vec3 rotVec = toVector().normalize();
+        FzUtil.scale(rotVec, getAngleRadians());
+        return rotVec;
     }
     
     public double getAngleRadians() {
