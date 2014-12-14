@@ -14,6 +14,8 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import com.google.common.base.Joiner;
 
+import factorization.shared.Core;
+
 public class MaskLoader {
     public static ArrayList<MaskTemplate> mask_templates = new ArrayList();
     
@@ -121,6 +123,10 @@ public class MaskLoader {
             try {
                 mask(weight, mask);
             } catch (Throwable t) {
+                if (Core.dev_environ) {
+                    Core.logSevere("Near line " + lineNumber);
+                    Core.logSevere("Parsing template: " + "\n" + Joiner.on("\n").join(template));
+                }
                 CrashReport crashreport = CrashReport.makeCrashReport(t, "Loading mask data");
                 CrashReportCategory maskInfo = crashreport.makeCategory("Mask Info");
                 maskInfo.addCrashSection("Near line", lineNumber);
