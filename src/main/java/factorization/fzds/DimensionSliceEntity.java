@@ -748,7 +748,6 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     static final int force_sync_time = 20 * 4;
     
     void shareRotationInfo() {
-        if (hasOrderedRotation()) return;
         boolean d0 = !rotation.equals(last_shared_rotation), d1 = !rotationalVelocity.equals(last_shared_rotational_velocity);
         if (parent.trackingEntity()) {
             d0 = false;
