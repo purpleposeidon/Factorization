@@ -210,17 +210,17 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         Quaternion target_rotation = Quaternion.getRotationQuaternionRadians(angle, ForgeDirection.UP);
         Quaternion current_rotation = body.getRotation();
         double rotation_distance = target_rotation.getAngleBetween(current_rotation);
-        if (rotation_distance > Math.PI / 1800) {
-            int size = leg_size + 1;
-            double rotation_speed = (Math.PI * 2) / (360 * size * size * 2);
-            double rotation_time = rotation_distance / rotation_speed;
+        int size = leg_size + 1;
+        double rotation_speed = (Math.PI * 2) / (360 * size * size * 2);
+        double rotation_time = rotation_distance / rotation_speed;
+        if (rotation_time >= 1) {
             bodyLimbInfo.setTargetRotation(target_rotation, (int) rotation_time, Interpolation.SMOOTH);
             // Now bodyLimbInfo.isTurning() is set.
             turningDirection = angle > 0 ? 1 : -1;
             for (LimbInfo li : limbs) {
                 li.lastTurnDirection = 0;
             }
-        } else if (rotation_distance > Math.PI * 0.0001) {
+        } else if (rotation_time > 0.001) {
             body.setRotation(target_rotation);
             body.setRotationalVelocity(new Quaternion());
         } else {
