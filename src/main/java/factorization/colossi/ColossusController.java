@@ -306,7 +306,11 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         for (LimbInfo limb : limbs) {
             IDeltaChunk idc = limb.idc.getEntity();
             if (idc == null) continue;
+            if (limb.isTurning()) continue;
             if (limb.type == LimbType.ARM) {
+                if ((limb.side == BodySide.LEFT) ^ turningDirection == 1) {
+                    continue;
+                }
                 double arm_angle = arms_angle * (limb.side == BodySide.LEFT ? +1 : -1);
                 Quaternion ar = Quaternion.getRotationQuaternionRadians(arm_angle, ForgeDirection.EAST);
                 idc.multiplyParentRotations(ar);
@@ -314,7 +318,6 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
                 continue;
             }
             if (limb.type != LimbType.LEG) continue;
-            if (limb.isTurning()) continue;
             double nextRotation = base_twist;
             double nextRotationTime = phase_length;
             
@@ -334,6 +337,10 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             */
             
             Quaternion nr = Quaternion.getRotationQuaternionRadians(nextRotation, ForgeDirection.DOWN);
+            if (limb.lastTurnDirection == turningDirection) {
+                // Lift a leg up a tiny bit
+                nr.incrMultiply(Quaternion.getRotationQuaternionRadians(Math.toRadians(2), ForgeDirection.SOUTH));
+            }
             idc.multiplyParentRotations(nr);
             limb.setTargetRotation(nr, (int) nextRotationTime, interp);
         }
