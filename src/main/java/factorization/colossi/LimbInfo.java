@@ -11,6 +11,7 @@ import factorization.colossi.ColossusController.LimbType;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
 import factorization.shared.EntityReference;
+import factorization.shared.NORELEASE;
 
 class LimbInfo {
     LimbType type = LimbType.UNKNOWN_LIMB_TYPE;
@@ -44,10 +45,11 @@ class LimbInfo {
     }
     
     boolean limbSwingParity() {
-        return side == BodySide.RIGHT ^ (parity % 1 == 0) ^ type == LimbType.ARM;
+        return side == BodySide.RIGHT ^ (parity % 2 == 0) ^ type == LimbType.ARM;
     }
     
     public void setTargetRotation(Quaternion rot, int time, Interpolation interp) {
+        NORELEASE.fixme("add one for size-dependent rotations?");
         IDeltaChunk dse = idc.getEntity();
         if (dse == null) return;
         dse.orderTargetRotation(rot, time, interp);
