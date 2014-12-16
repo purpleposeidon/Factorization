@@ -60,4 +60,12 @@ class LimbInfo {
         if (dse == null) return true; // isTurning() is used to block action, so we'll return true here
         return dse.hasOrderedRotation();
     }
+    
+    public void reset(int time, Interpolation interp) {
+        IDeltaChunk dse = idc.getEntity();
+        if (dse == null) return;
+        Quaternion zero = new Quaternion();
+        dse.multiplyParentRotations(zero);
+        setTargetRotation(zero, time, interp);
+    }
 }
