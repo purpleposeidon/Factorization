@@ -1,3 +1,7 @@
+0.8.88.8
+  Add "Count Items" servo instruction. Counts the number of items the servo's holding.
+  Add "Read Redstone" servo instruction. Gets the redstone signal on the block the servo is pointing at.
+
 0.8.88.7
   A copy of this changelog is now located INSIDE the mod itself! Whoah! It's like a whole new mod!
   They told me not to feed the Greg. I fed the Greg. Hopefully there won't be any strange consequences?

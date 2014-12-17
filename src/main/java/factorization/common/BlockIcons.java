@@ -109,6 +109,7 @@ public class BlockIcons {
     public static IIcon servo$entry_execute, servo$entry_load, servo$entry_write, servo$entry_ignore;
     public static IIcon servo$scan_color;
     public static IIcon servo$group_empty, servo$group_something;
+    public static IIcon servo$count_items, servo$read_redstone;
     
     public static class ActivatingMachineIIcon extends IIconGroup {
         public IIcon top, bottom, side, side_on;

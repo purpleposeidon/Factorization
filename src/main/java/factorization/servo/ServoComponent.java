@@ -29,6 +29,7 @@ import factorization.api.datahelpers.IDataSerializable;
 import factorization.api.datahelpers.Share;
 import factorization.servo.instructions.BooleanValue;
 import factorization.servo.instructions.Compare;
+import factorization.servo.instructions.CountItems;
 import factorization.servo.instructions.Drop;
 import factorization.servo.instructions.Dup;
 import factorization.servo.instructions.EntryControl;
@@ -41,6 +42,7 @@ import factorization.servo.instructions.Product;
 import factorization.servo.instructions.RedstonePulse;
 import factorization.servo.instructions.RotateTop;
 import factorization.servo.instructions.ScanColor;
+import factorization.servo.instructions.ReadRedstone;
 import factorization.servo.instructions.SetDirection;
 import factorization.servo.instructions.SetEntryAction;
 import factorization.servo.instructions.SetSpeed;
@@ -273,6 +275,9 @@ public abstract class ServoComponent implements IDataSerializable {
                 ScanColor.class,
                 SetEntryAction.class,
                 InstructionGroup.class,
+                
+                ReadRedstone.class,
+                CountItems.class
         }) {
             register(cl);
         }
