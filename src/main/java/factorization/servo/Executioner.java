@@ -2,7 +2,6 @@ package factorization.servo;
 
 import java.io.IOException;
 
-import net.minecraft.nbt.NBTTagCompound;
 import factorization.api.Coord;
 import factorization.api.datahelpers.DataHelper;
 import factorization.api.datahelpers.Share;
@@ -16,7 +15,7 @@ public class Executioner {
     
     protected ServoStack argumentStack = new ServoStack(this);
     protected ServoStack pendingInstructions = new ServoStack(this);
-    protected Instruction enterBlockInstruction = null;
+    protected ServoStack enterBlockInstructions = new ServoStack(this);
     
     public byte jmp = JMP_NONE;
     public boolean cpu_blocked = false;
@@ -66,17 +65,17 @@ public class Executioner {
                 if (jmp == JMP_NEXT_TILE) {
                     jmp = JMP_NONE;
                 }
-                return;
+                break;
             }
             if (motor.getCurrentPos().isWeaklyPowered()) {
                 if (jmp == JMP_NEXT_TILE) {
                     jmp = JMP_NONE;
                 }
-                return;
+                break;
             }
             if (jmp != JMP_NONE) {
                 jmp = JMP_NONE;
-                return;
+                break;
             }
             rail.decoration.motorHit(motor);
             break;
@@ -111,28 +110,17 @@ public class Executioner {
         case ENTRY_IGNORE:
             break;
         }
-        if (enterBlockInstruction != null) {
-            enterBlockInstruction.motorHit(motor);
+        if (enterBlockInstructions.getSize() > 0) {
+            for (Object obj : enterBlockInstructions) {
+                pendingInstructions.push(obj);
+            }
         }
     }
     
     void putData(DataHelper data) throws IOException {
         argumentStack = data.as(Share.VISIBLE, "stack4" /* 4 is for compatibility */).put(argumentStack);
         pendingInstructions = data.as(Share.VISIBLE, "pendingInstructions").put(pendingInstructions);
-        if (data.isReader()) {
-            NBTTagCompound tag = data.as(Share.VISIBLE, "onEntry").put(new NBTTagCompound());
-            ServoComponent sc = ServoComponent.load(tag);
-            if (sc instanceof Instruction) {
-                enterBlockInstruction = (Instruction) sc;
-            }
-        } else {
-            NBTTagCompound tag = new NBTTagCompound();
-            if (enterBlockInstruction != null) {
-                enterBlockInstruction.save(tag);
-            }
-            data.as(Share.VISIBLE, "onEntry").put(tag);
-        }
-        
+        enterBlockInstructions = data.as(Share.VISIBLE, "enterBlockInstructions").put(enterBlockInstructions);
         jmp = data.as(Share.VISIBLE, "jmp").putByte(jmp);
         cpu_blocked = data.as(Share.VISIBLE, "cpuBlock").putBoolean(cpu_blocked);
         entry_action = data.as(Share.VISIBLE, "entryAction").putEnum(entry_action);
@@ -146,6 +134,10 @@ public class Executioner {
         return pendingInstructions;
     }
     
+    public ServoStack getEntryInstructionStack() {
+        return enterBlockInstructions;
+    }
+    
     public void putError(Object error) {
         if (!motor.worldObj.isRemote) {
             new Notice(motor, "%s", error.toString()).sendToAll();
@@ -154,5 +146,10 @@ public class Executioner {
     
     public void markDirty() {
         stacks_changed = true;
+    }
+    
+    public void setEntryInstruction(Object insn) {
+        enterBlockInstructions.clear();
+        enterBlockInstructions.push(insn);
     }
 }

@@ -45,6 +45,7 @@ import factorization.servo.instructions.ScanColor;
 import factorization.servo.instructions.ReadRedstone;
 import factorization.servo.instructions.SetDirection;
 import factorization.servo.instructions.SetEntryAction;
+import factorization.servo.instructions.SetRepeatedInstruction;
 import factorization.servo.instructions.SetSpeed;
 import factorization.servo.instructions.ShifterControl;
 import factorization.servo.instructions.SocketCtrl;
@@ -277,7 +278,8 @@ public abstract class ServoComponent implements IDataSerializable {
                 InstructionGroup.class,
                 
                 ReadRedstone.class,
-                CountItems.class
+                CountItems.class,
+                SetRepeatedInstruction.class
         }) {
             register(cl);
         }
