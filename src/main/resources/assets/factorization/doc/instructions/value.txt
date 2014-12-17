@@ -57,3 +57,12 @@ Pops a value from the stack.
 
 Pushes a copy of the top value of the stack.
 \endseg
+
+\topic{item.factorization:servo/component.fz.instruction.cmp}
+\topic{item.factorization:servo/component.fz.instruction.integervalue}
+\topic{item.factorization:servo/component.fz.instruction.boolean}
+\topic{item.factorization:servo/component.fz.instruction.sum}
+\topic{item.factorization:servo/component.fz.instruction.product}
+\topic{item.factorization:servo/component.fz.instruction.drop}
+\topic{item.factorization:servo/component.fz.instruction.dup}
+
