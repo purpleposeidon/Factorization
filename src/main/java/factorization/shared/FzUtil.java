@@ -1383,6 +1383,7 @@ public class FzUtil {
             }
             for (int i = 0; i < recipeCache.size(); i++) {
                 IRecipe recipe = recipeCache.get(i);
+                if (recipe == null) continue;
                 if (recipe.matches(inv, world)) {
                     if (i > 50) {
                         int j = i/3;
@@ -1796,7 +1797,9 @@ public class FzUtil {
     public static boolean isPlayerOpped(EntityPlayer player) {
         player = fakeplayerToNull(player);
         if (player == null) return false;
-        return MinecraftServer.getServer().getConfigurationManager().func_152596_g(player.getGameProfile());
+        MinecraftServer server = MinecraftServer.getServer();
+        if (server == null) return false;
+        return server.getConfigurationManager().func_152596_g(player.getGameProfile());
     }
     
     public static boolean isCommandSenderOpped(ICommandSender player) {
@@ -1807,7 +1810,9 @@ public class FzUtil {
     }
     
     public static StatisticsFile getStatsFile(EntityPlayer player) {
-        ServerConfigurationManager cm = MinecraftServer.getServer().getConfigurationManager();
+        MinecraftServer server = MinecraftServer.getServer();
+        if (server == null) return null;
+        ServerConfigurationManager cm = server.getConfigurationManager();
         return cm.func_152602_a(player);
     }
     
