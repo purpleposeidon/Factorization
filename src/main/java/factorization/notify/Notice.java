@@ -71,7 +71,9 @@ public class Notice {
     }
     
     /**
-     * Creates a new Notice.
+     * Creates a new Notice. The {@link NoticeUpdater} will be used to populate the initial message,
+     * and will be called repeatedly until some amount of time passes. If the message changes,
+     * then the clients will be updated.
      * 
      * <pre>
      * <code>
@@ -86,6 +88,8 @@ public class Notice {
      * @param where
      *            An {@link Entity}, {@link TileEntity}, {@link Vec3}, or
      *            {@link ISaneCoord} (eg {@link SimpleCoord}, or FZ's Coord)
+     * @param updater
+     *             The {@link NoticeUpdater} object.
      * 
      */
     public Notice(Object where, NoticeUpdater updater) {
@@ -160,7 +164,7 @@ public class Notice {
     }
     
     /**
-     * Changes the message. This goes with the {@link NOticeUpdater} constructor.
+     * Changes the message. This goes with the {@link NoticeUpdater} constructor.
      */
     public void setMessage(String newMessage, String... newMessageParameters) {
         cmp(this.message, newMessage);
