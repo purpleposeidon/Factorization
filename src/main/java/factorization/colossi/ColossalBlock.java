@@ -127,7 +127,6 @@ public class ColossalBlock extends Block {
         coreChest.addItem(new WeightedRandomChestContent(Core.registry.dark_iron_sprocket.copy(), 2, 4, 2));
         coreChest.addItem(new WeightedRandomChestContent(Core.registry.servorail_item.copy(), 4, 10, 1));
         // TODO NORELEASE: Would it be better to drop a srapbox item instead!
-        // What about lead & silver?
         return coreChest;
     }
     

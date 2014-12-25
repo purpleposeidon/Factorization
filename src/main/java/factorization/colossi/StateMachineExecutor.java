@@ -29,6 +29,7 @@ public class StateMachineExecutor<E extends Enum<E> & IStateMachine<E> > impleme
     void tick() {
         E nextState = state.tick(controller, age++);
         if (nextState != state) {
+            NORELEASE.println(machineName + nextState);
             state.onExitState(controller, nextState);
             nextState.onEnterState(controller, state);
             age = 0;

@@ -22,23 +22,24 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.shared.Core;
 import factorization.shared.ReservoirSampler;
 
-public enum AIState {
+public enum AIState implements IStateMachine<AIState> {
     INITIAL_STATE {
         @Override
-        AIState tick(ColossusController controller, int age) {
+        public AIState tick(ColossusController controller, int age) {
             return IDLE;
         }
     },
     
     IDLE {
         @Override
-        AIState tick(ColossusController controller, int age) {
+        public AIState tick(ColossusController controller, int age) {
             // Picks a state
             AIState pre = this.preempt(controller, age);
             if (pre != this) return pre;
             Coord at = new Coord(controller);
-            if (at.x == controller.home.x && at.z == controller.home.z) {
-                controller.path_target = controller.home.add(24, 0, 0);
+            Coord home = controller.getHome();
+            if (at.x == home.x && at.z == home.z) {
+                controller.setTarget(home.add(24, 0, 0));
                 return WALK_EAST_SAFELY;
             }
             for (EntityPlayer player : (Iterable<EntityPlayer>) controller.worldObj.playerEntities) {
@@ -54,14 +55,13 @@ public enum AIState {
                     }
                 }
             }
-            controller.path_target = controller.home.copy();
             return RUN_BACK;
         }
     },
     
     WALK_EAST_SAFELY {
         @Override
-        AIState tick(ColossusController controller, int age) {
+        public AIState tick(ColossusController controller, int age) {
             if (age % 40 == 0) {
                 if (controller.atTarget() && controller.worldObj.rand.nextBoolean()) {
                     return IDLE;
@@ -73,20 +73,20 @@ public enum AIState {
     
     RUN_BACK {
         @Override
-        AIState tick(ColossusController controller, int age) {
+        public AIState tick(ColossusController controller, int age) {
             if (controller.atTarget()) return IDLE;
             return this;
         }
         
         @Override
         public void onEnterState(ColossusController controller, AIState state) {
-            controller.path_target = controller.home.copy();
+            controller.goHome();
         }
     },
     
     WANDER {
         @Override
-        AIState tick(ColossusController controller, int age) {
+        public AIState tick(ColossusController controller, int age) {
             if (controller.atTarget()) return IDLE;
             return this;
         }
@@ -94,17 +94,17 @@ public enum AIState {
         @Override
         public void onEnterState(ColossusController controller, AIState state) {
             int d = (int) (WorldGenColossus.SMOOTH_END * 0.85);
-            Coord target = controller.home.copy();
+            Coord target = controller.getHome().copy();
             target.x += target.w.rand.nextInt(d) - d / 2;
             target.z += target.w.rand.nextInt(d) - d / 2;
-            controller.path_target = target;
+            controller.setTarget(target);
         }
         
     },
     
     WAIT {
         @Override
-        AIState tick(ColossusController controller, int age) {
+        public AIState tick(ColossusController controller, int age) {
             if (age > 20*3) return IDLE;
             return IDLE;
         }
@@ -112,7 +112,7 @@ public enum AIState {
     
     ATTACK {
         @Override
-        AIState tick(ColossusController controller, int age) {
+        public AIState tick(ColossusController controller, int age) {
             // TODO Auto-generated method stub
             return null;
         }
@@ -120,7 +120,7 @@ public enum AIState {
     
     SELECT_NEW_TARGET {
         @Override
-        AIState tick(ColossusController controller, int age) {
+        public AIState tick(ColossusController controller, int age) {
             return this;
         }
         
@@ -128,7 +128,7 @@ public enum AIState {
     
     IGNORE {
         @Override
-        AIState tick(ColossusController controller, int age) {
+        public AIState tick(ColossusController controller, int age) {
             // Give the player some time to attack the colossus unmolested
             if (age < 20 * 8) return IGNORE;
             if (age % 20 != 0) return IGNORE;
@@ -139,7 +139,7 @@ public enum AIState {
     
     DISLODGE_RIDING_PLAYER {
         @Override
-        AIState tick(ColossusController controller, int age) {
+        public AIState tick(ColossusController controller, int age) {
             // TODO Auto-generated method stub
             return null;
         }
@@ -147,7 +147,7 @@ public enum AIState {
     
     BOW {
         @Override
-        AIState tick(ColossusController controller, int age) {
+        public AIState tick(ColossusController controller, int age) {
             return BOW;
         } 
         
@@ -155,7 +155,7 @@ public enum AIState {
     
     FLAIL_ARMS {
         @Override
-        AIState tick(ColossusController controller, int age) {
+        public AIState tick(ColossusController controller, int age) {
             int cycle_length = controller.arm_length * 40;
             // TODO: There's many wrong usages of arm_length; it needs some kind of radial conversion.
             // We the instantaneous linear velocity of something rotating radially with a radius of arm_length to have some specific target velocity for all arm_lengths.
@@ -176,7 +176,7 @@ public enum AIState {
             for (LimbInfo li : controller.limbs) {
                 if (li.type != LimbType.ARM) continue;
                 int parity = li.side == BodySide.LEFT ? -1 : 1;
-                li.ent.setRotationalVelocity(parity < 0 ? leftRotation : rightRotation);
+                li.idc.getEntity().setRotationalVelocity(parity < 0 ? leftRotation : rightRotation);
             }
             if (age >= cycle_length * 3) {
                 return IDLE;
@@ -191,8 +191,8 @@ public enum AIState {
                     li.idc.getEntity().permit(DeltaCapability.VIOLENT_COLLISIONS);
                 }
             }
-            controller.path_target = null;
-            controller.turning = 0;
+            controller.setTarget(null);
+            // Do we need this? controller.turning = 0;
         }
         
         @Override
@@ -208,14 +208,14 @@ public enum AIState {
     
     SHAKE {
         @Override
-        AIState tick(ColossusController controller, int age) {
+        public AIState tick(ColossusController controller, int age) {
             return FLAIL_ARMS;
         }
     },
     
     SPIN {
         @Override
-        AIState tick(ColossusController controller, int age) {
+        public AIState tick(ColossusController controller, int age) {
             // TODO Auto-generated method stub
             return null;
         }
@@ -223,7 +223,7 @@ public enum AIState {
     
     HURT_GROUNDED_PLAYER {
         @Override
-        AIState tick(ColossusController controller, int age) {
+        public AIState tick(ColossusController controller, int age) {
             // TODO Auto-generated method stub
             return null;
         }
@@ -231,7 +231,7 @@ public enum AIState {
     
     CHASE_PLAYER_ON_GROUND {
         @Override
-        AIState tick(ColossusController controller, int age) {
+        public AIState tick(ColossusController controller, int age) {
             if (!controller.atTarget()) return this;
             if (controller.target_count > 8) return IDLE;
             if (controller.target_entity == null || controller.target_entity.isDead) return IDLE;
@@ -240,7 +240,7 @@ public enum AIState {
             if (!canTargetPlayer(controller, controller.target_entity)) {
                 return IDLE;
             }
-            controller.path_target = new Coord(controller.target_entity);
+            controller.setTarget(new Coord(controller.target_entity));
             if (controller.atTarget()) {
                 return SHAKE;
             }
@@ -260,22 +260,22 @@ public enum AIState {
         public void onEnterState(ColossusController controller, AIState state) {
             int death_ticks = 20 * 6 * controller.leg_size;
             for (LimbInfo li : controller.limbs) {
-                li.ent.setVelocity(0, 0, 0);
-                li.ent.setRotationalVelocity(new Quaternion());
-                li.act_violently = true;
+                IDeltaChunk idc = li.idc.getEntity();
+                idc.setVelocity(0, 0, 0);
+                idc.setRotationalVelocity(new Quaternion());
+                idc.permit(DeltaCapability.VIOLENT_COLLISIONS);
                 if (li.type == LimbType.BODY) {
-                    IDeltaChunk idc = li.ent;
                     Quaternion fallAxis = Quaternion.getRotationQuaternionRadians(Math.PI / 2 / death_ticks, ForgeDirection.SOUTH);
                     Quaternion rotation = idc.getRotation();
                     fallAxis.incrRotateBy(rotation);
                     idc.setRotationalVelocity(fallAxis);
                 }
             }
-            controller.path_target = null;
+            controller.setTarget(null);
         }
         
         @Override
-        AIState tick(ColossusController controller, int age) {
+        public AIState tick(ColossusController controller, int age) {
             int death_ticks = 20 * 6 * controller.leg_size;
             if (age < death_ticks) return this;
             return EXPLODE;
@@ -284,20 +284,23 @@ public enum AIState {
         @Override
         public void onExitState(ColossusController controller, AIState nextState) {
             for (LimbInfo li : controller.limbs) {
-                li.ent.setVelocity(0, 0, 0);
-                li.ent.setRotationalVelocity(new Quaternion());
+                IDeltaChunk idc = li.idc.getEntity();
+                idc.setVelocity(0, 0, 0);
+                idc.setRotationalVelocity(new Quaternion());
+                idc.setVelocity(0, 0, 0);
+                idc.setRotationalVelocity(new Quaternion());
             }
         }
     },
     EXPLODE {
         @Override
-        AIState tick(ColossusController controller, int age) {
+        public AIState tick(ColossusController controller, int age) {
             if (age % 15 != 0) return this;
             boolean any = false;
             double n = 1 + (controller.leg_size / 2.0) * (age / 45);
             for (LimbInfo li : controller.limbs) {
                 final ReservoirSampler<Coord> sampler = new ReservoirSampler<Coord>((int)n, null);
-                IDeltaChunk idc = li.ent;
+                IDeltaChunk idc = li.idc.getEntity();
                 Coord.iterateCube(idc.getCorner(), idc.getFarCorner(), new ICoordFunction() {
                     @Override
                     public void handle(Coord here) {
@@ -318,7 +321,8 @@ public enum AIState {
             if (any) {
                 // Explosions can mess with our IDCs. :|
                 for (LimbInfo li : controller.limbs) {
-                    li.ent.motionX = li.ent.motionY = li.ent.motionZ = 0;
+                    IDeltaChunk idc = li.idc.getEntity();
+                    idc.motionX = idc.motionY = idc.motionZ = 0;
                 }
             }
             return any ? this : EXPIRE;
@@ -361,14 +365,15 @@ public enum AIState {
     },
     EXPIRE {
         @Override
-        AIState tick(ColossusController controller, int age) { return this; }
+        public AIState tick(ColossusController controller, int age) { return this; }
         
         @Override
         public void onEnterState(final ColossusController controller, AIState state) {
             final ArrayList<Entity> lmps = new ArrayList();
             for (final LimbInfo li : controller.limbs) {
-                Coord min = li.ent.getCorner();
-                Coord max = li.ent.getFarCorner();
+                final IDeltaChunk idc = li.idc.getEntity();
+                Coord min = idc.getCorner();
+                Coord max = idc.getFarCorner();
                 Coord.iterateCube(min, max, new ICoordFunction() {
                     @Override
                     public void handle(Coord here) {
@@ -380,7 +385,7 @@ public enum AIState {
                         case ColossalBlock.MD_BODY_CRACKED:
                         case ColossalBlock.MD_CORE:
                             here.setAir();
-                            Vec3 core = li.ent.shadow2real(here.createVector().addVector(0.5, 0.5, 0.5));
+                            Vec3 core = idc.shadow2real(here.createVector().addVector(0.5, 0.5, 0.5));
                             controller.worldObj.newExplosion(null, core.xCoord, core.yCoord, core.zCoord, 0.25F, false, true);
                             if (md == ColossalBlock.MD_CORE) {
                                 ItemStack lmp = new ItemStack(Core.registry.logicMatrixProgrammer);
@@ -395,7 +400,7 @@ public enum AIState {
                         case ColossalBlock.MD_MASK:
                             here.setAir();
                             Coord real = here.copy();
-                            li.ent.shadow2real(real);
+                            idc.shadow2real(real);
                             if (real.isReplacable()) {
                                 EntityFallingBlock mask = new EntityFallingBlock(real.w, real.x, real.y, real.z, Core.registry.colossal_block, ColossalBlock.MD_MASK);
                                 mask.field_145812_b = 1; // "Time" field. This is set to make it not suicide immediately.
@@ -413,7 +418,7 @@ public enum AIState {
             }
             
             for (LimbInfo li : controller.limbs) {
-                li.ent.setDead();
+                li.idc.getEntity().setDead();
             }
             controller.setDead();
         }
@@ -424,12 +429,12 @@ public enum AIState {
         double max_dist = 24 * 24 * controller.leg_size;
         double max_home_dist = 32 * 32;
         if (controller.getDistanceSqToEntity(player) > max_dist) return false;
-        if (controller.home.distanceSq(new Coord(player)) > max_home_dist) return false;
+        if (controller.getHome().distanceSq(new Coord(player)) > max_home_dist) return false;
         return true;
     }
 
     
-    abstract AIState tick(ColossusController controller, int age);
+    public abstract AIState tick(ColossusController controller, int age);
     public void onEnterState(ColossusController controller, AIState state) { }
     public void onExitState(ColossusController controller, AIState nextState) { }
     

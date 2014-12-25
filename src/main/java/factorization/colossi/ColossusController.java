@@ -17,6 +17,8 @@ import factorization.api.datahelpers.Share;
 import factorization.fzds.interfaces.DeltaCapability;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.fzds.interfaces.Interpolation;
+import factorization.notify.Notice;
+import factorization.notify.Style;
 import factorization.shared.Core;
 import factorization.shared.EntityFz;
 import factorization.shared.NORELEASE;
@@ -28,7 +30,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
     IDeltaChunk body;
     LimbInfo bodyLimbInfo;
     final StateMachineExecutor walk_controller = new StateMachineExecutor(this, "walk", WalkState.IDLE);
-    //final StateMachineExecutor ai_controller = new StateMachineExecutor(this, "ai", AIState.IDLE);
+    final StateMachineExecutor ai_controller = new StateMachineExecutor(this, "ai", AIState.IDLE);
     boolean setup = false;
     int arm_size = 0, arm_length = 0;
     int leg_size = 0, leg_length = 0;
@@ -39,10 +41,10 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
     int turningDirection = 0;
     boolean target_changed = false;
     double walked = 0;
+    int last_step_direction = -100;
     
     transient int last_pos_hash = -1;
     double target_y = Double.NaN;
-    
     
     int target_count = 0;
     transient Entity target_entity;
@@ -156,6 +158,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         walked = data.as(Share.PRIVATE, "walked").putDouble(walked);
         target_count = data.as(Share.PRIVATE, "target_count").putInt(target_count);
         target_y = data.as(Share.PRIVATE, "target_y").putDouble(target_y);
+        last_step_direction = data.as(Share.PRIVATE, "last_step_direction").putInt(last_step_direction);
     }
     
     @Override
@@ -177,13 +180,13 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             return;
         }
         walk_controller.tick();
-        //updateBlockClimb();
+        updateBlockClimb();
         //ai_controller.tick();
         if (atTarget()) {
             int d = 16;
             int dx = worldObj.rand.nextInt(d) - d/2;
             int dz = worldObj.rand.nextInt(d) - d/2;
-            path_target = home.copy().add(dx, 0, dz);
+            path_target = home.copy().add(dx * 2, 0, dz * 2);
         }
         setPosition(body.posX, body.posY, body.posZ);
     }
@@ -278,22 +281,35 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         if (getHealth() <= 0) {
             return;
         }
-        int currentPosHash = new Coord(this).hashCode();
+        int currentPosHash = new Coord(this).hashCode() + 100 * (int) posY;
         if (currentPosHash != last_pos_hash) {
             last_pos_hash = currentPosHash;
             int dy = new HeightCalculator().calc();
-            target_y = posY + dy;
+            double new_target = (int) (posY + dy);
+            if (new_target != (int) target_y) {
+                NORELEASE.println("target_y: " + new_target);
+                target_y = new_target;
+            }
+            if (last_step_direction != dy) {
+                last_step_direction = dy;
+                if (dy == 0 && target_y == posY) {
+                    body.motionY = 0;
+                    return;
+                }
+            }
         }
-        if (target_y == posY) return;
+        //if (target_y == posY) return;
         double close_enough = 1.0 / 64.0;
         if (Math.abs(posY - target_y) <= close_enough) {
             target_y = posY;
             body.motionY = 0;
             return;
         }
-        double maxV = 1.0/5.0;
+        double maxV = 1.0/16.0;
         int sign = posY > target_y ? -1 : +1;
+        if (posY == target_y) sign = 0;
         double delta = Math.abs(posY - target_y);
+        if (delta < 1.0/16.0) sign = 0;
         body.motionY = sign * Math.min(maxV, delta);
     }
     
@@ -310,7 +326,7 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
             for (LimbInfo li : limbs) {
                 if (li.type != LimbType.LEG) continue;
                 idc = li.idc.getEntity();
-                if (down.getAngleBetween(idc.getRotation()) > max_leg_angle) continue;
+                //if (down.getAngleBetween(idc.getRotation()) > max_leg_angle) continue;
                 Coord min = idc.getCorner().copy();
                 Coord max = idc.getFarCorner().copy();
                 Coord.sort(min, max);
@@ -323,38 +339,40 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
                 }
             }
             int total = found.size();
-            if (total == 0) return 0;
+            if (total == 0) {
+                return 0; // Or return -1?
+            }
             double solid_at = 0;
             double solid_below = 0;
             NORELEASE.println();
             for (Coord at : found) {
                 if (at.isSolid()) {
+                    new Notice(at, "#").withStyle(Style.FORCE, Style.DRAWFAR, Style.LONG).sendToAll();
                     solid_at++;
-                    NORELEASE.println("solid_at: " + at.getBlock());
-                } else {
-                    at.y--;
-                    if (at.isSolid()) {
-                        NORELEASE.println("solid_below: " + at.getBlock());
-                        solid_below++;
-                    } else {
-                        NORELEASE.println("no support: " + at.getBlock());
-                    }
-                    at.y++;
                 }
+                at.y--;
+                if (at.isSolid()) {
+                    new Notice(at, ".").withStyle(Style.FORCE, Style.DRAWFAR, Style.LONG).sendToAll();
+                    solid_below++;
+                }
+                at.y++;
             }
             double at = solid_at / total;
             double below = solid_below / total;
             NORELEASE.println("total: " + total);
             NORELEASE.println("at: " + at);
             NORELEASE.println("below: " + below);
-            NORELEASE.println("lowest: " + lowest);
-            if (at >= 0.5) {
-                return +1;
+            if (at > 0.4) {
+                // We're standing in something pretty fat; we *must* move up!
+                return 1;
             }
-            if (below <= 0.4 && at <= 0.15) {
+            if (below < 0.2) {
+                // We're unsupported, so we *must* move down!
+                NORELEASE.println("*** GET DOWN ***");
                 return -1;
+            } else {
+                return 0;
             }
-            return 0;
         }
         
         @Override
@@ -367,6 +385,8 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
                 lowest = real.y;
                 found.clear();
             }
+            NORELEASE.fixme("hashset");
+            if (found.contains(real)) return;
             found.add(real);
             any = true;
         }
