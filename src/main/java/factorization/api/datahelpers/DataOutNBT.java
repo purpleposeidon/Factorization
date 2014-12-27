@@ -29,7 +29,7 @@ public class DataOutNBT extends DataHelperNBT {
     }
     
     @Override
-    protected <E> Object putImplementation(E value) throws IOException {
+    protected <E> E putImplementation(E value) throws IOException {
         if (value instanceof Boolean) {
             tag.setBoolean(name, (Boolean) value);
         } else if (value instanceof Byte) {

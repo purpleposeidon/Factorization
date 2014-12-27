@@ -263,7 +263,7 @@ public class ServoStack implements IDataSerializable, Iterable {
         }
 
         @Override
-        protected <E> Object putImplementation(E value) throws IOException {
+        protected <E> E putImplementation(E value) throws IOException {
             if (reader) {
                 E ret = (E) popType(value.getClass());
                 if (ret == null) {

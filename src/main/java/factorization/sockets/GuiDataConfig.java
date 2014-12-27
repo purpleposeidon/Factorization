@@ -316,9 +316,9 @@ public class GuiDataConfig extends GuiScreen {
             }
             
             @Override
-            protected <E> Object putImplementation(E o) throws IOException {
+            protected <E> E putImplementation(E o) throws IOException {
                 if (!valid) {
-                    return 0;
+                    return o;
                 }
                 int fieldStart = 100;
                 int fieldHeight = 24;

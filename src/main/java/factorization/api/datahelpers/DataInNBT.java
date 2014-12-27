@@ -22,29 +22,29 @@ public class DataInNBT extends DataHelperNBT {
     }
     
     @Override
-    protected <E> Object putImplementation(E o) throws IOException {
+    protected <E> E putImplementation(E o) throws IOException {
         if (!tag.hasKey(name)) {
             return o;
         }
         try {
             if (o instanceof Boolean) {
-                return tag.getBoolean(name);
+                return (E) (Boolean) tag.getBoolean(name);
             } else if (o instanceof Byte) {
-                return tag.getByte(name);
+                return (E) (Byte) tag.getByte(name);
             } else if (o instanceof Short) {
-                return tag.getShort(name);
+                return (E) (Short) tag.getShort(name);
             } else if (o instanceof Integer) {
-                return tag.getInteger(name);
+                return (E) (Integer) tag.getInteger(name);
             } else if (o instanceof Long) {
-                return tag.getLong(name);
+                return (E) (Long) tag.getLong(name);
             } else if (o instanceof Float) {
-                return tag.getFloat(name);
+                return (E) (Float) tag.getFloat(name);
             } else if (o instanceof Double) {
-                return tag.getDouble(name);			
+                return (E) (Double) tag.getDouble(name);			
             } else if (o instanceof String) {
-                return tag.getString(name);
+                return (E) (String) tag.getString(name);
             } else if (o instanceof NBTTagCompound) {
-                return tag.getCompoundTag(name);
+                return (E) (NBTTagCompound) tag.getCompoundTag(name);
             }
         } catch (Throwable t) {
             Core.logWarning("Failed to load " + name + "; will use default value " + o);

@@ -17,12 +17,12 @@ public class DataValidator extends DataHelper {
     }
     
     @Override
-    protected <E> Object putImplementation(E o) throws IOException {
+    protected <E> E putImplementation(E o) throws IOException {
         if (!fields.containsKey(name)) {
             log("Missing data");
             return o;
         }
-        return fields.get(name);
+        return (E) fields.get(name);
     }
     
     @Override

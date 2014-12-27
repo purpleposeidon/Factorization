@@ -29,7 +29,7 @@ public class DataOutByteBuf extends DataHelper {
     }
     
     @Override
-    protected <E> Object putImplementation(E value) throws IOException {
+    protected <E> E putImplementation(E value) throws IOException {
         if (value instanceof Boolean) {
             dos.writeBoolean((Boolean)value);
         } else if (value instanceof Byte) {
@@ -49,6 +49,6 @@ public class DataOutByteBuf extends DataHelper {
         } else if (value instanceof NBTTagCompound) {
             ByteBufUtils.writeTag(dos, (NBTTagCompound) value);
         }
-        return value;
+        return (E) value;
     }
 }

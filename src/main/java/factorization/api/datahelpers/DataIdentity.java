@@ -19,7 +19,7 @@ public class DataIdentity extends DataHelper {
     }
     
     @Override
-    protected <E> Object putImplementation(E o) throws IOException {
+    protected <E> E putImplementation(E o) throws IOException {
         return o;
     }
 

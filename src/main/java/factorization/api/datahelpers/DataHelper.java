@@ -98,7 +98,7 @@ public abstract class DataHelper {
             }
             
         }
-        return (E) putImplementation(o);
+        return putImplementation(o);
     }
     
     /** Reads or writes a value, and returns what was read or written.
@@ -117,7 +117,7 @@ public abstract class DataHelper {
         The actual list is: Boolean Byte Short Integer Long Float Double String
      * @throws IOException
      */
-    protected abstract <E> Object putImplementation(E o) throws IOException;
+    protected abstract <E> E putImplementation(E o) throws IOException;
     
     /*
      * For compatability with old code:
@@ -132,7 +132,7 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
     public final long putLong(long value) throws IOException { return (long)put(value); }
     public final float putFloat(float value) throws IOException { return (float)put(value); }
     public final double putDouble(double value) throws IOException { return (double)put(value); }
-    public UUID putUUID(UUID value) throws IOException { return (UUID)put(value); }
+    public final UUID putUUID(UUID value) throws IOException { return (UUID)put(value); }
     
     public final String putString(String value) throws IOException { return (String)put(value); }
     public final FzOrientation putFzOrientation(FzOrientation value) throws IOException { return (FzOrientation)put(value); }
@@ -170,6 +170,7 @@ for t in "Boolean Byte Short Int Long Float Double String FzOrientation ItemStac
         name = prefix;
         return val;
     }
+                                    
 
     public final <E extends Enum> E putEnum(E value) throws IOException { return (E)put(value); }
     

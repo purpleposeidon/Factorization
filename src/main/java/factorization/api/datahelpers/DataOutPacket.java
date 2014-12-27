@@ -27,7 +27,7 @@ public class DataOutPacket extends DataHelper {
     }
     
     @Override
-    protected <E> Object putImplementation(E value) throws IOException {
+    protected <E> E putImplementation(E value) throws IOException {
         if (value instanceof Boolean) {
             dos.writeBoolean((Boolean)value);
         } else if (value instanceof Byte) {

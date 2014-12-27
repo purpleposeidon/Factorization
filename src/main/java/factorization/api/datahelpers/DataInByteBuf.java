@@ -28,25 +28,25 @@ public class DataInByteBuf extends DataHelper {
     }
     
     @Override
-    protected <E> Object putImplementation(E o) throws IOException {
+    protected <E> E putImplementation(E o) throws IOException {
         if (o instanceof Boolean) {
-            return dis.readBoolean();
+            return (E) (Boolean) dis.readBoolean();
         } else if (o instanceof Byte) {
-            return dis.readByte();
+            return (E) (Byte) dis.readByte();
         } else if (o instanceof Short) {
-            return dis.readShort();
+            return (E) (Short) dis.readShort();
         } else if (o instanceof Integer) {
-            return dis.readInt();
+            return (E) (Integer) dis.readInt();
         } else if (o instanceof Long) {
-            return dis.readLong();
+            return (E) (Long) dis.readLong();
         } else if (o instanceof Float) {
-            return dis.readFloat();
+            return (E) (Float) dis.readFloat();
         } else if (o instanceof Double) {
-            return dis.readDouble();
+            return (E) (Double) dis.readDouble();
         } else if (o instanceof String) {
-            return ByteBufUtils.readUTF8String(dis);
+            return (E) (String) ByteBufUtils.readUTF8String(dis);
         } else if (o instanceof NBTTagCompound) {
-            return ByteBufUtils.readTag(dis);
+            return (E) (NBTTagCompound) ByteBufUtils.readTag(dis);
         }
         return o;
     }

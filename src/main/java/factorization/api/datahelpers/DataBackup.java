@@ -14,13 +14,13 @@ public class DataBackup extends DataHelper {
     }
     
     @Override
-    protected <E> Object putImplementation(E o) throws IOException {
+    protected <E> E putImplementation(E o) throws IOException {
         if (isReading) {
             fields.put(name, o);
             return o;
         } else {
             if (fields.containsKey(name)) {
-                return fields.get(name);
+                return (E) fields.get(name);
             }
             return o;
         }
