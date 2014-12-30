@@ -86,7 +86,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer {
         }
         TileEntityDayBarrel barrel = (TileEntityDayBarrel) tileentity;
         ItemStack is = barrel.item;
-        if (is == null || barrel.getItemCount() == 0) {
+        if (is == null || barrel.getItemCount() <= 0) {
             return;
         }
         Core.profileStart("barrel");
