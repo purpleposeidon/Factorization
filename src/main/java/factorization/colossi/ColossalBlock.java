@@ -200,8 +200,8 @@ public class ColossalBlock extends Block {
         if (player == null) return false;
         Coord at = new Coord(world, x, y, z);
         ItemStack held = player.getHeldItem();
+        int md = at.getMd();
         if (held != null && held.getItem() == Core.registry.logicMatrixProgrammer) {
-            int md = at.getMd();
             if (held.getItemDamage() == 0) {
                 if (md == ColossalBlock.MD_CORE) {
                     held.setItemDamage(1);
@@ -224,6 +224,11 @@ public class ColossalBlock extends Block {
                 return true;
             }
             return false;
+        } else {
+            if (md == MD_CORE || md == MD_EYE || md == MD_EYE_OPEN) {
+                Awakener.awaken(at);
+                return true;
+            }
         }
         return false;
     }

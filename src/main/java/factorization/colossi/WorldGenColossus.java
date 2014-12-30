@@ -195,7 +195,7 @@ public class WorldGenColossus implements IWorldGenerator {
         
     }
     
-    boolean genOnWorld(World world) {
+    public static boolean genOnWorld(World world) {
         return world.getWorldInfo().isMapFeaturesEnabled() && world.provider.isSurfaceWorld() && FzConfig.gen_colossi;
     }
     

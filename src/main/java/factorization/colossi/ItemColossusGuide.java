@@ -7,11 +7,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.common.util.ForgeDirection;
 import factorization.api.Coord;
+import factorization.api.DeltaCoord;
+import factorization.notify.Notice;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
+import factorization.shared.FzUtil;
 import factorization.shared.ItemFactorization;
 
 public class ItemColossusGuide extends ItemFactorization {
@@ -27,25 +32,77 @@ public class ItemColossusGuide extends ItemFactorization {
         if (world.isRemote) return is;
         if (player instanceof FakePlayer) return is;
         
+        int msgKey = 888888888;
+        if (!WorldGenColossus.genOnWorld(world)) {
+            Notice.chat(player, msgKey, new ChatComponentTranslation("colossus.is.impossible"));
+            return is;
+        }
+        
         int range = WorldGenColossus.GENERATION_SPACING * 3 / 2;
         if (MinecraftServer.getServer().getCurrentPlayerCount() == 1) {
             range = WorldGenColossus.GENERATION_SPACING * 5 / 2;
         }
-        ArrayList<Coord> nearby = WorldGenColossus.getCandidatesNear(new Coord(player), range, true);
+        Coord playerPos = new Coord(player);
+        ArrayList<Coord> nearby = WorldGenColossus.getCandidatesNear(playerPos, range, true);
         if (nearby.isEmpty()) {
-            player.addChatComponentMessage(new ChatComponentTranslation("colossus.no_nearby"));
+            Notice.chat(player, msgKey, new ChatComponentTranslation("colossus.is.no_nearby"));
             return is;
         }
-        int limit = 4;
-        for (Coord at : nearby) {
-            String t = at.toString();
-            t = at.getChunk().isTerrainPopulated + " " + t;
-            player.addChatComponentMessage(new ChatComponentText(t));
-            if (limit-- <= 0) break;
+        if (FzUtil.isPlayerCreative(player)) {
+            int limit = 4;
+            for (Coord at : nearby) {
+                String t = at.toString();
+                t = at.getChunk().isTerrainPopulated + " " + t;
+                player.addChatComponentMessage(new ChatComponentText(t));
+                if (limit-- <= 0) break;
+            }
+            player.addChatComponentMessage(new ChatComponentTranslation("colossus.is.creativeFound", nearby.size()));
+        } else {
+            Coord at = nearby.get(0);
+            at.adjust(ForgeDirection.EAST); // The heart is positioned behind a cracked block
+            DeltaCoord dc = at.difference(playerPos);
+            IChatComponent msg;
+            if (dc.x == 0 && dc.z == 0) {
+                String m;
+                if (!(at.getBlock() == Core.registry.colossal_block && at.getMd() == ColossalBlock.MD_BODY_CRACKED)) {
+                    m = "colossus.is.hereish";
+                } else if (dc.y > 0) {
+                    m = "colossus.is.above";
+                } else if (dc.y < 0) {
+                    m = "colossus.is.below";
+                } else {
+                    m = "colossus.is.mineit";
+                }
+                msg = new ChatComponentTranslation(m);
+            } else {
+                dc.y = 0;
+                msg = new ChatComponentTranslation(getDirection(dc), getDistance(dc));
+            }
+            Notice.chat(player, msgKey, msg);
         }
-        player.addChatComponentMessage(new ChatComponentText("Found: " + nearby.size()));
         
         return is;
+    }
+    
+    String getDistance(DeltaCoord dc) {
+        int d = (int) dc.magnitude();
+        String pretty = "" + d;
+        String unit = "m";
+        if (d > 1000) {
+            pretty = String.format("%.1f", d / 1000F);
+            unit = "km";
+        }
+        return pretty + unit;
+    }
+    
+    String getDirection(DeltaCoord dc) {
+        double angle = Math.toDegrees(dc.getAngleHorizontal());
+        angle = (angle + 360) % 360;
+        // The circle is divided into 8 parts.
+        angle += 360. / 8. / 2.; // Add half a piece to turn
+        angle %= 360; // and then wrap
+        int a = (int) (angle * 8. / 360.);
+        return "colossus.compass." + a;
     }
 
 }
