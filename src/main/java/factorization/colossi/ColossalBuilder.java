@@ -34,6 +34,8 @@ public class ColossalBuilder {
     static final BlockState MASK = new BlockState(Core.registry.colossal_block, ColossalBlock.MD_MASK);
     static final BlockState EYE = new BlockState(Core.registry.colossal_block, ColossalBlock.MD_EYE);
     static final BlockState HEART = new BlockState(Core.registry.colossal_block, ColossalBlock.MD_CORE);
+    static final BlockState CRACK = new BlockState(Core.registry.colossal_block, ColossalBlock.MD_BODY_CRACKED);
+    static final BlockState AIR = new BlockState(Blocks.air, 0);
     
     public ColossalBuilder(int seed, Coord start) {
         this.seed = seed;
@@ -169,8 +171,12 @@ public class ColossalBuilder {
         drawer.generateBlob();
         drawer.applyBiomeDecorations();
         
-        Coord heart = start.add(leg_size + body_front_padding, leg_height + 1 + ((body_height + 1) / 2), leg_size + ((1 + leg_spread) / 2));
+        Coord heart_crack = start.add(leg_size + body_front_padding, leg_height + 1 + ((body_height + 1) / 2), leg_size + ((1 + leg_spread) / 2));
+        Coord heart = heart_crack.add(ForgeDirection.WEST);
+        Coord air_front = heart_crack.add(ForgeDirection.EAST);
         fill(heart, heart, HEART);
+        fill(heart_crack, heart_crack, CRACK);
+        fill(air_front, air_front, AIR);
         TileEntityColossalHeart heartTe = new TileEntityColossalHeart();
         heartTe.loadInfoFromBuilder(this);
         heart.setTE(heartTe);

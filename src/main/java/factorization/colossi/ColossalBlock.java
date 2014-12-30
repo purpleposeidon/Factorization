@@ -1,7 +1,6 @@
 package factorization.colossi;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -12,7 +11,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -20,11 +18,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.WeightedRandomChestContent;
-import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
-import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -36,6 +32,7 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.oreprocessing.ItemOreProcessing;
 import factorization.shared.Core;
 import factorization.shared.Core.TabType;
+import factorization.shared.FzUtil;
 
 public class ColossalBlock extends Block {
     static Material collosal_material = new Material(MapColor.purpleColor);
@@ -50,7 +47,7 @@ public class ColossalBlock extends Block {
         Core.tab(this, TabType.BLOCKS);
     }
     
-    static final byte MD_MASK = 0, MD_BODY = 4, MD_BODY_CRACKED = 1, MD_ARM = 2, MD_LEG = 3, MD_EYE = 5, MD_CORE = 6;
+    static final byte MD_MASK = 0, MD_BODY = 4, MD_BODY_CRACKED = 1, MD_ARM = 2, MD_LEG = 3, MD_EYE = 5, MD_CORE = 6, MD_EYE_OPEN = 7;
     
     static final int EAST_SIDE = 5;
     
@@ -64,6 +61,7 @@ public class ColossalBlock extends Block {
         case MD_MASK: return BlockIcons.colossi$mask;
         case MD_EYE: return BlockIcons.colossi$eye;
         case MD_CORE: return BlockIcons.colossi$core;
+        case MD_EYE_OPEN: return BlockIcons.colossi$eye_open;
         default: return super.getIcon(side, md);
         }
     }
@@ -72,10 +70,10 @@ public class ColossalBlock extends Block {
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(IBlockAccess w, int x, int y, int z, int side) {
         int md = w.getBlockMetadata(x, y, z);
-        if (md == MD_EYE) {
+        if (md == MD_EYE || md == MD_EYE_OPEN) {
             // This is here rather than up there so that the item form doesn't look lame
             if (side != EAST_SIDE) return BlockIcons.colossi$mask;
-            return BlockIcons.colossi$eye;
+            return md == MD_EYE_OPEN ? BlockIcons.colossi$eye_open : BlockIcons.colossi$eye;
         }
         return getIcon(side, md);
     }
@@ -99,7 +97,7 @@ public class ColossalBlock extends Block {
     boolean isSupportive(World world, int x, int y, int z) {
         if (world.getBlock(x, y, z) != this) return false;
         int md = world.getBlockMetadata(x, y, z);
-        return md == MD_BODY || md == MD_EYE || md == MD_CORE;
+        return md == MD_BODY || md == MD_EYE || md == MD_EYE_OPEN || md == MD_CORE;
         
     }
     
@@ -171,6 +169,7 @@ public class ColossalBlock extends Block {
             break;
         case MD_MASK:
         case MD_EYE:
+        case MD_EYE_OPEN:
             world.spawnParticle("depthsuspend", px, py, pz, 0, 0, 0);
             break;
         default:
@@ -183,49 +182,6 @@ public class ColossalBlock extends Block {
     @Override
     public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
         return new ItemStack(this, 1, world.getBlockMetadata(x, y, z));
-    }
-    
-    double getSensitivity(int md) {
-        switch (md) {
-        case MD_BODY:
-        case MD_BODY_CRACKED:
-            return 0.2;
-        case MD_EYE:
-        case MD_CORE:
-            return 1;
-        case MD_ARM:
-        case MD_LEG:
-            return 0.1;
-        default: return 0;
-        }
-    }
-    
-    boolean maybeAwaken(Coord at, double boldNess) {
-        if (at.w.isRemote) return false;
-        if (at.getDimensionID() == Hammer.dimensionID) return false;
-        if (getSensitivity(at.getMd()) * boldNess < at.w.rand.nextDouble()) {
-            return false;
-        }
-        Awakener.awaken(at);
-        return true;
-    }
-    
-    boolean playerImmune(Entity ent) {
-        if (ent instanceof EntityPlayer) {
-            if (ent instanceof FakePlayer) {
-                return false;
-            }
-            return ((EntityPlayer) ent).capabilities.isCreativeMode;
-        }
-        return true;
-    }
-    
-    boolean nearbyNoisyPlayer(World world, int x, int y, int z) {
-        double distSquared = 8*8;
-        for (Entity player : (Iterable<Entity>) world.playerEntities) {
-            if (player.getDistanceSq(x, y, z) < distSquared && !playerImmune(player)) return true;
-        }
-        return false;
     }
     
     @Override
@@ -245,7 +201,7 @@ public class ColossalBlock extends Block {
             // player.addChatComponentMessage(new ChatComponentTranslation("tile.factorization:colossalBlock." + md + ".click"));
             return true;
         }
-        if (playerImmune(player)) {
+        if (FzUtil.isPlayerCreative(player)) {
             TileEntityColossalHeart heart = at.getTE(TileEntityColossalHeart.class);
             if (heart != null) {
                 if (player.isSneaking()) {
@@ -253,55 +209,13 @@ public class ColossalBlock extends Block {
                     return true;
                 }
                 heart.showInfo(player);
-            } else if (at.getMd() == MD_EYE && player.isSneaking()) {
+            } else if ((at.getMd() == MD_EYE || at.getMd() == MD_EYE_OPEN) && player.isSneaking()) {
                 Awakener.awaken(at);
                 return true;
             }
             return false;
         }
-        maybeAwaken(at, 10);
         return false;
-    }
-    
-    @Override
-    public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
-        if (!nearbyNoisyPlayer(world, x, y, z)) return;
-        maybeAwaken(new Coord(world, x, y, z), 1);
-    }
-    
-    @Override
-    public void onEntityCollidedWithBlock(World world, int x, int y, int z, Entity ent) {
-        if (!playerImmune(ent)) {
-            maybeAwaken(new Coord(world, x, y, z), sneakiness(ent));
-        }
-    }
-    
-    @Override
-    public void onBlockDestroyedByExplosion(World world, int x, int y, int z, Explosion boomBoom) {
-        if (nearbyNoisyPlayer(world, x, y, z)) {
-            maybeAwaken(new Coord(world, x, y, z), 10);
-        }
-    }
-    
-    @Override
-    public void onBlockClicked(World world, int x, int y, int z, EntityPlayer player) {
-        if (!playerImmune(player)) {
-            maybeAwaken(new Coord(world, x, y, z), 2);
-        }
-    }
-    
-    @Override
-    public void onEntityWalking(World world, int x, int y, int z, Entity ent) {
-        if (!playerImmune(ent)) {
-            maybeAwaken(new Coord(world, x, y, z), sneakiness(ent));
-        }
-    }
-    
-    double sneakiness(Entity ent) {
-        if (ent.isSprinting()) return 7;
-        if (ent.isEating()) return 0.5;
-        if (ent.isSneaking()) return 0.05;
-        return 1;
     }
     
     @Override
@@ -340,10 +254,8 @@ public class ColossalBlock extends Block {
                     controller.crackBroken();
                 }
             }
-        } else if (md == MD_MASK) {
-            if (!playerImmune(player)) {
-                maybeAwaken(new Coord(world, x, y, z), 2 * sneakiness(player));
-            }
+        } else if (md == MD_EYE || md == MD_EYE_OPEN) {
+            Awakener.awaken(new Coord(world, x, y, z));
         }
         
     }
