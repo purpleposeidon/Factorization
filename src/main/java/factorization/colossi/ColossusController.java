@@ -2,7 +2,10 @@ package factorization.colossi;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
 
+import sun.util.locale.provider.AvailableLanguageTags;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.util.ChatComponentTranslation;
@@ -30,12 +33,16 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
     IDeltaChunk body;
     LimbInfo bodyLimbInfo;
     final StateMachineExecutor walk_controller = new StateMachineExecutor(this, "walk", WalkState.IDLE);
-    final StateMachineExecutor ai_controller = new StateMachineExecutor(this, "ai", AIState.IDLE);
+    final StateMachineExecutor ai_controller = new StateMachineExecutor(this, "tech", Technique.INITIAL_BOW);
     boolean setup = false;
     int arm_size = 0, arm_length = 0;
     int leg_size = 0, leg_length = 0;
     int cracked_body_blocks = 0;
     private Coord home = null;
+    private boolean been_hurt = false;
+    
+    EnumSet<Technique> known = EnumSet.<Technique>of(Technique.INITIAL_BOW);
+    EnumSet<Technique> locked = EnumSet.<Technique>complementOf(known);
     
     private Coord path_target = null;
     int turningDirection = 0;
@@ -159,6 +166,28 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         target_count = data.as(Share.PRIVATE, "target_count").putInt(target_count);
         target_y = data.as(Share.PRIVATE, "target_y").putDouble(target_y);
         last_step_direction = data.as(Share.PRIVATE, "last_step_direction").putInt(last_step_direction);
+        been_hurt = data.as(Share.PRIVATE, "been_hurt").putBoolean(been_hurt);
+        
+        known = putEnumSet(data, "known", known, Technique.class);
+        locked = putEnumSet(data, "locked", locked, Technique.class);
+    }
+    
+    <E extends Enum<E>> EnumSet<E> putEnumSet(DataHelper data, String prefix, EnumSet<E> set, Class<E> elementType) throws IOException {
+        if (!data.isNBT()) return set;
+        if (data.isWriter()) {
+            for (E e : set) {
+                data.asSameShare(prefix + e.name()).putBoolean(true);
+            }
+            return set;
+        } else {
+            EnumSet<E> ret = EnumSet.noneOf(elementType);
+            for (E e : elementType.getEnumConstants()) {
+                if (data.asSameShare(prefix + e.name()).putBoolean(false)) {
+                    ret.add(e);
+                }
+            }
+            return ret;
+        }
     }
     
     @Override
@@ -244,29 +273,38 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         return cracked_body_blocks * 3;
     }
     
-    public int getCracks() {
+    public int getDestroyedCracks() {
         return dataWatcher.getWatchableObjectInt(destroyed_cracked_block_id);
     }
 
     @Override
     public float getHealth() {
         float wiggle = 1 - 0.1F * (current_name / (float) max_names);
-        return (cracked_body_blocks - getCracks()) * wiggle;
+        return (cracked_body_blocks - getDestroyedCracks()) * wiggle;
     }
     
     public void crackBroken() {
-        int cracks = getCracks();
+        int cracks = getDestroyedCracks();
         cracks++;
         dataWatcher.updateObject(destroyed_cracked_block_id, cracks);
     }
     
-    static int max_names = 20;
+    static int max_names = -1;
     transient int current_name = 0;
     transient int client_ticks = 0;
     
     @Override
     public IChatComponent func_145748_c_() {
-        NORELEASE.fixme("have max_names be defined in the localizations file");
+        if (getDestroyedCracks() == 0) {
+            return new ChatComponentTranslation("colossus.name.null");
+        }
+        if (max_names == -1) {
+            try {
+                max_names = Integer.parseInt(Core.translate("colossus.name.count"));
+            } catch (NumberFormatException e) {
+                max_names = 1;
+            } 
+        }
         if (getHealth() <= 0) {
             return new ChatComponentTranslation("colossus.name.true");
         }
@@ -392,8 +430,47 @@ public class ColossusController extends EntityFz implements IBossDisplayData {
         }
     }
     
+    boolean checkHurt(boolean reset) {
+        if (been_hurt && reset) {
+            been_hurt = false;
+            wakeUpMore();
+            return true;
+        }
+        return been_hurt;
+    }
     
+    void wakeUpMore() {
+        openEyes();
+        if (!locked.isEmpty()) {
+            ArrayList<Technique> avail = new ArrayList(locked);
+            ArrayList<Technique> toRemove = new ArrayList();
+            Collections.shuffle(avail);
+            Technique learned = avail.remove(0);
+            {
+                toRemove.add(Technique.INITIAL_BOW);
+                // Merely hard-wire the forgetting
+                switch (learned) {
+                default: break;
+                case HAMMAR: toRemove.add(Technique.BOW); break;
+                }
+            }
+            locked.remove(learned);
+            known.add(learned);
+            known.removeAll(toRemove);
+        }
+    }
     
+    void openEyes() {
+        NORELEASE.fixme("Eyelids.");
+    }
+    
+    boolean canTargetPlayer(Entity player) {
+        double max_dist = 24 * 24 * leg_size;
+        double max_home_dist = 32 * 32;
+        if (getDistanceSqToEntity(player) > max_dist) return false;
+        if (getHome().distanceSq(new Coord(player)) > max_home_dist) return false;
+        return true;
+    }
     
     
 }

@@ -68,7 +68,7 @@ public abstract class IDeltaChunk extends EntityFz {
      * Orders the IDC to move to a target rotation. This will set the rotational velocity to 0.
      * If setTargetRotation is called before a previous order has completed, the old order will be interrupted.
      * 
-     * @param target The target rotation
+     * @param target The target rotation. The method will make a copy of that parameter.
      * @param tickTime How many ticks to reach that rotation
      * @param interp How to interpolate between them.
      */

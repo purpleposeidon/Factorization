@@ -49,10 +49,23 @@ class LimbInfo {
     }
     
     public void setTargetRotation(Quaternion rot, int time, Interpolation interp) {
-        NORELEASE.fixme("add one for size-dependent rotations?");
         IDeltaChunk dse = idc.getEntity();
         if (dse == null) return;
         dse.orderTargetRotation(rot, time, interp);
+    }
+    
+    /**
+     * Orders this limb to move to a target rotation. The rotation time is dependent on the rotational distance, the limb size, and power.
+     * @param rot target rotation
+     * @param power How much (completely fake) power to use. Higher amounts of power make the limb move faster. 1 is the default value.
+     */
+    public void target(Quaternion rot, double power) {
+        target(rot, power, Interpolation.SMOOTH);
+    }
+    
+    public void target(Quaternion rot, double power, Interpolation interp) {
+        NORELEASE.fixme("implement!");
+        setTargetRotation(rot, 20, interp);
     }
     
     public boolean isTurning() {
