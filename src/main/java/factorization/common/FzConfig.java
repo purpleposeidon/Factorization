@@ -55,7 +55,7 @@ public class FzConfig {
     public static boolean enable_solar_steam = true;
     public static boolean fanturpeller_works_on_players = true;
     public static boolean large_servo_instructions = false;
-    public static boolean players_discover_docbooks = true;
+    public static boolean players_discover_colossus_guides = true;
     public static boolean disable_endermen_griefing = false;
     public static boolean debug_fzds_collisions = false;
     public static boolean enable_rocketry = /* Hey! If you're turning this on, remove stuff from factorization_dead_items */ enable_dimension_slice && Core.dev_environ;
@@ -171,7 +171,7 @@ public class FzConfig {
         mushroomalize = getBoolConfig("mushroomNormalize", "server", mushroomalize, "Textures giant mushroom blocks when placed");
         proper_projectile_physics = getBoolConfig("properProjectilePhysics", "server", proper_projectile_physics, "Makes projectiles start with the velocity of the thrower");
         buffed_nametags = getBoolConfig("buffedNametags", "server", buffed_nametags, "Naming entities gives them +5 hearts");
-        players_discover_docbooks = getBoolConfig("playersDiscoverDocBooks", "server", players_discover_docbooks, "If set to true, players will find a docbook after getting iron");
+        players_discover_colossus_guides = getBoolConfig("playersDiscoverColossusGuides", "server", players_discover_colossus_guides, "If set to true, players will find a weird tablet after getting the diamonds achievement");
         //invasiveCharge = getBoolConfig("invasiveCharge", "server", invasiveCharge, "Set to true to prevent charge from connecting over metal blocks.");
         //Broken. Doesn't work.
         enable_solar_steam = getBoolConfig("enableSolarSteam", "server", enable_solar_steam, "Set to false to disable the crafting recipe for solar2steam machines");

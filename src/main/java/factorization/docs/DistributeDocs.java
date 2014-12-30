@@ -18,6 +18,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import factorization.api.Coord;
+import factorization.common.FzConfig;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
 import factorization.shared.FzUtil.FzInv;
@@ -28,11 +29,13 @@ public class DistributeDocs {
     static StatBase guideGet = new StatBase("factorization.dropcolossusguide", new ChatComponentTranslation("factorization.dropcolossusguide")).registerStat();
     
     static boolean givenBook(EntityPlayer player) {
+        if (!FzConfig.players_discover_colossus_guides) return true;
         StatisticsFile statsFile = FzUtil.getStatsFile(player);
         return (statsFile != null && statsFile.writeStat(guideGet) > 0) || player.getEntityData().hasKey(guideKey);
     }
     
     static void setGivenBook(EntityPlayer player) {
+        if (!FzConfig.players_discover_colossus_guides) return;
         needyPlayers.remove(player.getCommandSenderName());
         StatisticsFile statsFile = FzUtil.getStatsFile(player);
         if (statsFile != null) {
