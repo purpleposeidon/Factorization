@@ -8,6 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -179,6 +180,15 @@ public class NotifyImplementation {
             proxy.onscreen(message, formatArgs);
         } else {
             FMLProxyPacket packet = NotifyNetwork.onscreenPacket(message, formatArgs);
+            NotifyNetwork.broadcast(packet, player, null);
+        }
+    }
+    
+    void sendReplacableChatMessage(EntityPlayer player, IChatComponent msg, int msgKey) {
+        if (player.worldObj.isRemote) {
+            proxy.replaceable(msg, msgKey);
+        } else {
+            FMLProxyPacket packet = NotifyNetwork.replaceableChatPacket(msg, msgKey);
             NotifyNetwork.broadcast(packet, player, null);
         }
     }

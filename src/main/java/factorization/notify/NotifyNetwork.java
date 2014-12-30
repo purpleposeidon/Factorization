@@ -18,6 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.Vec3;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
@@ -32,7 +33,7 @@ public class NotifyNetwork {
     static final String channelName = "fzNotify";
     static FMLEventChannel channel;
     
-    static final byte COORD = 0, VEC3 = 1, ENTITY = 2, TILEENTITY = 3, ONSCREEN = 4;
+    static final byte COORD = 0, VEC3 = 1, ENTITY = 2, TILEENTITY = 3, ONSCREEN = 4, REPLACEABLE = 5;
     
     public NotifyNetwork() {
         channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(channelName);
@@ -87,6 +88,12 @@ public class NotifyNetwork {
             String message = input.readUTF();
             String[] formatArgs = readStrings(input);
             NotifyImplementation.proxy.onscreen(message, formatArgs);
+            return;
+        case REPLACEABLE:
+            String str = input.readUTF();
+            int msgKey = input.readInt();
+            IChatComponent msg = IChatComponent.Serializer.func_150699_a(str);
+            NotifyImplementation.proxy.replaceable(msg, msgKey);
             return;
         default: return;
         }
@@ -190,6 +197,24 @@ public class NotifyNetwork {
             return null;
         }
     }
+    
+    static FMLProxyPacket replaceableChatPacket(IChatComponent msg, int msgKey) {
+        String str = IChatComponent.Serializer.func_150696_a(msg);
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            DataOutputStream output = new DataOutputStream(outputStream);
+            output.writeByte(REPLACEABLE);
+            output.writeUTF(str);
+            output.writeInt(msgKey);
+            output.flush();
+            return generate(outputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    
     
     public static FMLProxyPacket generate(ByteArrayOutputStream baos) {
         return new FMLProxyPacket(Unpooled.wrappedBuffer(baos.toByteArray()), channelName);

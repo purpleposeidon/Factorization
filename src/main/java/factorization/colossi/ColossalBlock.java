@@ -28,6 +28,7 @@ import factorization.api.Coord;
 import factorization.common.BlockIcons;
 import factorization.fzds.DeltaChunk;
 import factorization.fzds.Hammer;
+import factorization.fzds.TransferLib;
 import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.oreprocessing.ItemOreProcessing;
 import factorization.shared.Core;
@@ -106,7 +107,7 @@ public class ColossalBlock extends Block {
     
     @Override
     public void getSubBlocks(Item item, CreativeTabs tab, List list) {
-        for (byte md = MD_MASK; md <= MD_CORE; md++) {
+        for (byte md = MD_MASK; md <= MD_EYE_OPEN; md++) {
             list.add(new ItemStack(this, 1, md));
         }
     }
@@ -143,6 +144,15 @@ public class ColossalBlock extends Block {
         int count = 2 + world.rand.nextInt(3 + fortune);
         for (int i = 0; i < count; i++) {
             ret.add(getChest().getOneItem(world.rand));
+        }
+        if (metadata == MD_BODY_CRACKED) {
+            Coord me = new Coord(world, x, y, z);
+            Coord back = me.add(ForgeDirection.WEST);
+            if (back.getBlock() == this && back.getMd() == MD_CORE) {
+                TransferLib.move(back, me, true, true);
+                back.setIdMd(this, MD_BODY, true);
+            }
+            Awakener.awaken(me);
         }
         return ret;
     }

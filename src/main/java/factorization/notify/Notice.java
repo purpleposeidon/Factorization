@@ -7,6 +7,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
@@ -32,7 +34,8 @@ public class Notice {
      * Creates an in-world notification message, which is sent using
      * {@link sendTo} or {@link sendToEveryone}. Additional options can be
      * provided using {@link withItem}, {@link withStyle}, {@link withWorld},
-     * and {@link withUpdater}. Don't forget to send the Notice!<br>
+     * and {@link withUpdater}. <br>
+     * <b>Remember to send the Notice!</b><br>
      * <code><pre>
      * Notice msg = new Notice(oldManEntity, "%s", "It's dangerous to go alone!\nTake this!");
      * msg.withItem(new ItemStack(Items.iron_sword)).sendTo(player); 
@@ -295,6 +298,25 @@ public class Notice {
      */
     public static void onscreen(EntityPlayer player, String message, String... formatArguments) {
         NotifyImplementation.instance.doSendOnscreenMessage(player, message, formatArguments);
+    }
+    
+    /**
+     * Sends an updatable chat message to the player. If a message with the same msgKey is sent,
+     * then all other messages with the same key will be removed.
+     * (But it might have a problem with word-wrapping if the message is too long. By the grace of notch.) 
+     * 
+     * <code><pre>
+     * {@link ChatComponentTranslation} msg = new {@link ChatComponentTranslation}("mymod.currentTime", System.currentTimeMillis());
+     * Notice.chat(thePlayer, 914357, msg);
+     * </pre></code>
+     * 
+     * 
+     * @param player Who to send the message to.
+     * @param msgKey A non-zero, arbitrary, and consistent integer.
+     * @param msg The chat message to send, preferably a {@link ChatComponentTranslation}
+     */
+    public static void chat(EntityPlayer player, int msgKey, IChatComponent msg) {
+        NotifyImplementation.instance.sendReplacableChatMessage(player, msg, msgKey);
     }
 
     boolean updateNotice() {

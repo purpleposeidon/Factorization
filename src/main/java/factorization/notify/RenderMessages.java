@@ -15,6 +15,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ClientCommandHandler;
@@ -260,5 +261,11 @@ public class RenderMessages extends RenderMessagesProxy {
         Minecraft mc = Minecraft.getMinecraft();
         String msg = I18n.format(message, (Object[]) formatArgs);
         mc.ingameGUI.func_110326_a(msg, false);
+    }
+    
+    @Override
+    public void replaceable(IChatComponent msg, int msgKey) {
+        Minecraft mc = Minecraft.getMinecraft();
+        mc.ingameGUI.getChatGUI().printChatMessageWithOptionalDeletion(msg, msgKey);
     }
 }
