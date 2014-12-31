@@ -64,9 +64,7 @@ public class ItemColossusGuide extends ItemFactorization {
             IChatComponent msg;
             if (dc.x == 0 && dc.z == 0) {
                 String m;
-                if (!(at.getBlock() == Core.registry.colossal_block && at.getMd() == ColossalBlock.MD_BODY_CRACKED)) {
-                    m = "colossus.is.hereish";
-                } else if (dc.y > 0) {
+                if (dc.y > 0) {
                     m = "colossus.is.above";
                 } else if (dc.y < 0) {
                     m = "colossus.is.below";
