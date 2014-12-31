@@ -1146,6 +1146,10 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     
     @Override
     public void cancelOrderedRotation() {
+        if (!worldObj.isRemote && orderTimeEnd > worldObj.getTotalWorldTime() /* Didn't end naturally */) {
+            FMLProxyPacket toSend = HammerNet.makePacket(HammerNet.HammerNetType.orderedRotation, this.getEntityId(), getRotation(), getRotation(), 0, Interpolation.CONSTANT.ordinal());
+            broadcastPacket(toSend);
+        }
         orderTimeStart = orderTimeEnd = -1;
     }
     
