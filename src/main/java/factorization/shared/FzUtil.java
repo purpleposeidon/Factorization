@@ -1120,6 +1120,12 @@ public class FzUtil {
         return Vec3.createVectorHelper(ent.posX, ent.posY, ent.posZ);
     }
     
+    public static void toEntPos(Entity ent, Vec3 pos) {
+        ent.posX = pos.xCoord;
+        ent.posY = pos.yCoord;
+        ent.posZ = pos.zCoord;
+    }
+    
     public static Vec3 getMax(AxisAlignedBB aabb) {
         return Vec3.createVectorHelper(aabb.maxX, aabb.maxY, aabb.maxZ);
     }

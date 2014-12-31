@@ -42,6 +42,7 @@ import factorization.fzds.interfaces.IDeltaChunk;
 import factorization.notify.Notice;
 import factorization.shared.Core;
 import factorization.shared.FzUtil;
+import factorization.shared.NORELEASE;
 
 public class FZDSCommand extends CommandBase {
     //private static DimensionSliceEntity currentWE = null;
@@ -982,6 +983,30 @@ public class FZDSCommand extends CommandBase {
                 selected.changeRotationCenter(p);
             }
         }, Requires.SLICE_SELECTED, Requires.PLAYER);
+        add(new SubCommand("resetbody") {
+            @Override
+            String details() {
+                return "Resets the rotation of a DSE & its children";
+            }
+            
+            @Override
+            void call(String[] args) {
+                selected.cancelOrderedRotation();
+                selected.setRotation(new Quaternion());
+                selected.setRotationalVelocity(new Quaternion());
+                Coord pc = selected.getCorner();
+                for (IDeltaChunk idc : selected.getChildren()) {
+                    Vec3 base = idc.getParentJoint().addVector(pc.x, pc.y, pc.z);
+                    Vec3 snapTo = idc.shadow2real(base);
+                    FzUtil.toEntPos(idc, snapTo);
+                    selected = idc;
+                    this.call(args);
+                    // If there was a loop, we'd already be doomed I guess maybe?
+                    NORELEASE.fixme("Loop-checking in DSE de-serialization");
+                }
+            }
+            
+        }, Requires.SLICE_SELECTED);
     }
     
     private static void clearDseArea(IDeltaChunk idc) {
