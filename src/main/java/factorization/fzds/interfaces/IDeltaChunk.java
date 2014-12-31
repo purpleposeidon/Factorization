@@ -76,6 +76,11 @@ public abstract class IDeltaChunk extends EntityFz {
     
     public abstract boolean hasOrderedRotation();
     
+    /**
+     * @return how much time remains on the rotation. The return value is undefined if !hasOrderedRotation(), so be sure to check that first.
+     */
+    public abstract int getRemainingRotationTime();
+    
     public abstract void cancelOrderedRotation();
     
     

@@ -1164,6 +1164,13 @@ public class DimensionSliceEntity extends IDeltaChunk implements IFzdsEntryContr
     }
     
     @Override
+    public int getRemainingRotationTime() {
+        long now = worldObj.getTotalWorldTime();
+        if (now > orderTimeEnd) return 0;
+        return (int) (orderTimeEnd - now);
+    }
+    
+    @Override
     public Vec3 getRotationalCenterOffset() {
         return centerOffset;
     }
